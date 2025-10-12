@@ -2132,7 +2132,7 @@
         "dependencies": [
           "39"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -2140,10 +2140,10 @@
             "description": "Develop the essential export functionality for the three primary formats: Mermaid Markdown, OPML, and JSON (native format).",
             "dependencies": [],
             "details": "Create a unified export service that handles the conversion of mind map data structures to Mermaid Markdown, OPML, and JSON formats. Implement proper formatting for each export type, ensuring hierarchical relationships are preserved. Add file naming conventions and appropriate file extensions. Test each format with various mind map complexities to ensure accuracy and completeness of exported data.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Create unit tests for each export format. Verify exported files match expected structure. Test with simple and complex mind maps. Validate exported files can be imported by relevant third-party applications.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:50:06.449Z"
+            "updatedAt": "2025-10-12T18:52:49.034Z"
           },
           {
             "id": 2,
@@ -2153,10 +2153,10 @@
               1
             ],
             "details": "Design and implement an export settings UI that allows users to select format, customize export options, and initiate the export process. Add a preview capability when possible. Integrate with the iOS Files app for saving exports to user-selected locations. Implement share sheet functionality to allow direct sharing to other apps. Include appropriate icons and visual feedback during the export process.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Conduct UI tests to verify all export options are functional. Test sharing to various destinations. Verify user preferences are saved correctly. Test on different device sizes to ensure responsive design.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:50:06.462Z"
+            "updatedAt": "2025-10-12T18:52:49.043Z"
           },
           {
             "id": 3,
@@ -2167,16 +2167,16 @@
               2
             ],
             "details": "Research and implement the XMind file format specification. Create a converter from the app's native mind map structure to XMind format. Develop background processing capability using iOS background tasks for handling large mind maps without blocking the UI. Implement a notification system to inform users of export completion or failures. Add progress indicators for lengthy exports. Optimize export algorithms for performance with large data sets.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test XMind export compatibility with XMind applications. Measure performance with progressively larger mind maps. Test background export with app in different states (foreground, background, suspended). Verify notifications appear correctly in all scenarios.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:50:06.467Z"
+            "updatedAt": "2025-10-12T18:52:49.046Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement mind map export functionality.",
-        "updatedAt": "2025-10-12T18:50:06.467Z"
+        "updatedAt": "2025-10-12T18:52:49.046Z"
       },
       {
         "id": "42",
@@ -2458,11 +2458,50 @@
         "dependencies": [
           "8"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement XP Accumulation and Reward System",
+            "description": "Develop the core logic for XP accumulation and define rewards for various user activities within the app.",
+            "dependencies": [],
+            "details": "Create a centralized XP service that tracks and awards points for different user actions. Implement the base XP accumulation logic with appropriate data models. Define specific XP rewards for various activities including task completion, study time tracking, flashcard reviews, and daily streaks. Ensure the system is extensible for future gamification features.",
+            "status": "in-progress",
+            "testStrategy": "Unit test XP calculation for different activities. Verify XP accumulation works correctly across multiple user sessions. Test edge cases like maximum daily XP limits.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:53:29.992Z"
+          },
+          {
+            "id": 2,
+            "title": "Create Level Progression System",
+            "description": "Implement the level progression system with a scale from 1-100 and the required XP thresholds for each level.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design and implement the level progression algorithm with increasing XP requirements for higher levels. Create a mathematical formula for XP thresholds that provides a satisfying progression curve. Implement level-up detection logic that triggers when a user accumulates enough XP to advance. Store current level and progress data in the user profile. Ensure the system handles edge cases like maximum level cap.",
+            "status": "in-progress",
+            "testStrategy": "Test level calculations at various XP thresholds. Verify level-up triggers work correctly. Test progression through multiple levels in sequence.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:53:30.001Z"
+          },
+          {
+            "id": 3,
+            "title": "Develop XP Visualization and Celebrations",
+            "description": "Create the visual elements for displaying XP progress and implement level-up animations and celebrations.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design and implement a visual progress bar showing current XP and progress toward the next level. Create engaging level-up animations and celebration sequences that trigger when a user advances to a new level. Implement subtle visual feedback for small XP gains during normal app usage. Ensure all animations are performant and can be disabled in accessibility settings. Add sound effects for level-up events with appropriate volume controls.",
+            "status": "in-progress",
+            "testStrategy": "Test visual elements across different device sizes. Measure performance impact of animations. Verify accessibility compliance for all visual elements.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:53:30.004Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement xp and leveling system."
+        "expansionPrompt": "Break down this task with a focus on implement xp and leveling system.",
+        "updatedAt": "2025-10-12T18:53:30.004Z"
       },
       {
         "id": "47",
@@ -3158,9 +3197,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T18:50:06.467Z",
+      "lastModified": "2025-10-12T18:53:30.005Z",
       "taskCount": 83,
-      "completedCount": 39,
+      "completedCount": 40,
       "tags": [
         "master"
       ]
