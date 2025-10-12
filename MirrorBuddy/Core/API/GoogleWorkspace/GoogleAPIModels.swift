@@ -11,7 +11,7 @@ struct DriveFilesListResponse: Codable {
     let incompleteSearch: Bool?
 }
 
-struct DriveFile: Codable {
+struct DriveFile: Codable, Identifiable, Sendable {
     let id: String
     let name: String
     let mimeType: String
@@ -22,6 +22,20 @@ struct DriveFile: Codable {
     let size: String?
     let parents: [String]?
     let description: String?
+    let md5Checksum: String?
+    let trashed: Bool?
+
+    /// Get created date as Date object
+    var createdDate: Date? {
+        guard let createdTime = createdTime else { return nil }
+        return ISO8601DateFormatter().date(from: createdTime)
+    }
+
+    /// Get modified date as Date object
+    var modifiedDate: Date? {
+        guard let modifiedTime = modifiedTime else { return nil }
+        return ISO8601DateFormatter().date(from: modifiedTime)
+    }
 }
 
 // MARK: - Google Calendar Models

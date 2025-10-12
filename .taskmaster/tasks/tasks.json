@@ -644,11 +644,84 @@
           "13",
           "16"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Google Drive API Authentication",
+            "description": "Implement authentication with Google Drive API using OAuth 2.0 to access the 'Mario - Scuola' folder.",
+            "dependencies": [],
+            "details": "Create service account or OAuth 2.0 credentials in Google Cloud Console. Implement token management including refresh tokens. Store credentials securely using keychain or encrypted storage. Handle authentication errors and token expiration gracefully.",
+            "status": "done",
+            "testStrategy": "Test authentication flow with valid and invalid credentials. Verify token refresh works correctly. Test error handling for authentication failures.",
+            "updatedAt": "2025-10-12T15:55:01.034Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement File Listing and Filtering",
+            "description": "Create functionality to list all files in the specified Google Drive folder with filtering capabilities by file type.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use Google Drive API to query files in 'Mario - Scuola' folder. Implement pagination for large folders. Add filtering by MIME type for PDFs, DOCXs, etc. Create data models to store file metadata. Implement sorting options by name, date, and size. Add caching layer to improve performance.",
+            "status": "pending",
+            "testStrategy": "Test with folders containing various file types. Verify filters work correctly. Test pagination with large folders. Verify sorting functions correctly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create Database for File Tracking",
+            "description": "Implement a local database to store file metadata and track changes over time.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design database schema to store file IDs, names, modification dates, and checksums. Implement SwiftData models for file metadata. Create functions to compare local database with Drive API results. Add methods to detect new, modified, and deleted files. Implement database migration strategy for future schema changes.",
+            "status": "pending",
+            "testStrategy": "Test database operations with mock file data. Verify change detection works correctly. Test database migrations. Verify performance with large datasets.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Change Tracking and Incremental Sync",
+            "description": "Create functionality to efficiently track file changes using Google Drive API's change tracking features.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement Google Drive API's changes.list endpoint with pageToken for efficient change tracking. Store and update startPageToken for incremental sync. Create logic to process change events (created, modified, deleted). Implement bandwidth-efficient sync by only downloading changed files. Add conflict resolution for simultaneous changes.",
+            "status": "pending",
+            "testStrategy": "Test change detection with various file operations. Verify incremental sync works correctly. Test with simulated network limitations. Measure API usage efficiency.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create Scheduled Background Tasks",
+            "description": "Implement background tasks to check for file changes at scheduled times (13:00 and 18:00 CET).",
+            "dependencies": [
+              4
+            ],
+            "details": "Use BackgroundTasks framework to register background processing tasks. Implement scheduling logic for 13:00 and 18:00 CET checks. Add time zone handling for correct execution regardless of device location. Implement retry mechanism for failed background tasks. Add power and network efficiency considerations. Create logging for background task execution.",
+            "status": "pending",
+            "testStrategy": "Test scheduled execution at specified times. Verify tasks run correctly in background. Test behavior when device is in low power mode. Verify retry mechanism works correctly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Implement Push Notifications for File Changes",
+            "description": "Create a notification system to alert users when new files are added or existing files are modified.",
+            "dependencies": [
+              5
+            ],
+            "details": "Implement local notifications using UNUserNotificationCenter. Create notification categories for different file types and change types. Add deep linking from notifications to the relevant files. Implement notification grouping for multiple changes. Add user preferences for notification types. Create rich notifications with file previews when available.",
+            "status": "pending",
+            "testStrategy": "Test notifications for various file changes. Verify deep links work correctly. Test notification grouping with multiple changes. Verify user preferences are respected.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement google drive file listing and monitoring."
+        "expansionPrompt": "Break down this task with a focus on implement google drive file listing and monitoring.",
+        "updatedAt": "2025-10-12T15:55:01.034Z"
       },
       {
         "id": "18",
@@ -1850,7 +1923,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T15:50:23.808Z",
+      "lastModified": "2025-10-12T15:55:01.036Z",
       "taskCount": 83,
       "completedCount": 17,
       "tags": [
