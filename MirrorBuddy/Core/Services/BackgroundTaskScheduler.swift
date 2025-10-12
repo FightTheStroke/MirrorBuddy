@@ -19,6 +19,7 @@ final class BackgroundTaskScheduler {
     // MARK: - Properties
 
     private let syncService = DriveSyncService.shared
+    private let notificationManager = NotificationManager.shared
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "BackgroundTasks")
 
     /// Last scheduled task date
@@ -151,6 +152,11 @@ final class BackgroundTaskScheduler {
                     - Modified: \(stats.modified)
                     - Deleted: \(stats.deleted)
                     """)
+
+                // Send push notification if changes detected
+                if stats.hasChanges {
+                    try? await notificationManager.notifySyncCompleted(stats: stats)
+                }
 
                 // Mark task as complete
                 task.setTaskCompleted(success: true)

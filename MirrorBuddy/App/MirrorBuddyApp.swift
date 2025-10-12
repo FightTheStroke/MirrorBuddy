@@ -61,6 +61,14 @@ struct MirrorBuddyApp: App {
                     // Configure Google Drive sync service with model context
                     DriveSyncService.shared.configure(modelContext: sharedModelContainer.mainContext)
                     BackgroundTaskScheduler.shared.scheduleNextSync()
+
+                    // Request notification authorization
+                    _Concurrency.Task {
+                        await NotificationManager.shared.checkAuthorization()
+                        if !NotificationManager.shared.isAuthorized {
+                            _ = try? await NotificationManager.shared.requestAuthorization()
+                        }
+                    }
                 }
         }
         .modelContainer(sharedModelContainer)

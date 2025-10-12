@@ -704,10 +704,10 @@
               4
             ],
             "details": "Use BackgroundTasks framework to register background processing tasks. Implement scheduling logic for 13:00 and 18:00 CET checks. Add time zone handling for correct execution regardless of device location. Implement retry mechanism for failed background tasks. Add power and network efficiency considerations. Create logging for background task execution.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test scheduled execution at specified times. Verify tasks run correctly in background. Test behavior when device is in low power mode. Verify retry mechanism works correctly.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T16:03:38.558Z"
+            "updatedAt": "2025-10-12T16:06:47.284Z"
           },
           {
             "id": 6,
@@ -717,15 +717,16 @@
               5
             ],
             "details": "Implement local notifications using UNUserNotificationCenter. Create notification categories for different file types and change types. Add deep linking from notifications to the relevant files. Implement notification grouping for multiple changes. Add user preferences for notification types. Create rich notifications with file previews when available.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": "Test notifications for various file changes. Verify deep links work correctly. Test notification grouping with multiple changes. Verify user preferences are respected.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:07:04.201Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement google drive file listing and monitoring.",
-        "updatedAt": "2025-10-12T16:03:38.558Z"
+        "updatedAt": "2025-10-12T16:07:04.201Z"
       },
       {
         "id": "18",
@@ -1927,7 +1928,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T16:03:38.560Z",
+      "lastModified": "2025-10-12T16:07:04.203Z",
       "taskCount": 83,
       "completedCount": 17,
       "tags": [
