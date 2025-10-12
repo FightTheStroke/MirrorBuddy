@@ -50,27 +50,20 @@ enum Subject: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    /// English translation for localization
-    var englishName: String {
-        switch self {
-        case .educazioneCivica: return "Civic Education"
-        case .fisica: return "Physics"
-        case .inglese: return "English"
-        case .italiano: return "Italian"
-        case .matematica: return "Mathematics"
-        case .religione: return "Religion"
-        case .scienzeMotorie: return "Physical Education"
-        case .scienzeNaturali: return "Natural Sciences"
-        case .sostegno: return "Support"
-        case .storiaGeografia: return "History and Geography"
-        case .other: return "Other"
-        }
-    }
-
-    /// Localized name based on current locale
+    /// Localized name using String Catalog
     var localizedName: String {
-        // TODO: Implement proper localization with String catalogs
-        // For now, return Italian by default
-        rawValue
+        switch self {
+        case .educazioneCivica: return String(localized: "subject.educazioneCivica")
+        case .fisica: return String(localized: "subject.fisica")
+        case .inglese: return String(localized: "subject.inglese")
+        case .italiano: return String(localized: "subject.italiano")
+        case .matematica: return String(localized: "subject.matematica")
+        case .religione: return String(localized: "subject.religione")
+        case .scienzeMotorie: return String(localized: "subject.scienzeMotorie")
+        case .scienzeNaturali: return String(localized: "subject.scienzeNaturali")
+        case .sostegno: return String(localized: "subject.sostegno")
+        case .storiaGeografia: return String(localized: "subject.storiaGeografia")
+        case .other: return String(localized: "subject.other")
+        }
     }
 }

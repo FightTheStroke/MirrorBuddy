@@ -3,13 +3,13 @@ import SwiftData
 
 /// Achievement types for gamification
 enum Achievement: String, Codable, CaseIterable {
-    case firstMaterial = "First Material"
-    case firstFlashcard = "First Flashcard"
-    case firstMindMap = "First Mind Map"
-    case streak7Days = "7 Day Streak"
-    case streak30Days = "30 Day Streak"
-    case complete100Flashcards = "Complete 100 Flashcards"
-    case completeAllSubjects = "Complete All Subjects"
+    case firstMaterial
+    case firstFlashcard
+    case firstMindMap
+    case streak7Days
+    case streak30Days
+    case complete100Flashcards
+    case completeAllSubjects
 
     var iconName: String {
         switch self {
@@ -23,23 +23,14 @@ enum Achievement: String, Codable, CaseIterable {
         }
     }
 
-    var description: String {
-        switch self {
-        case .firstMaterial:
-            return "Added your first material"
-        case .firstFlashcard:
-            return "Created your first flashcard"
-        case .firstMindMap:
-            return "Generated your first mind map"
-        case .streak7Days:
-            return "Studied for 7 consecutive days"
-        case .streak30Days:
-            return "Studied for 30 consecutive days"
-        case .complete100Flashcards:
-            return "Completed 100 flashcards"
-        case .completeAllSubjects:
-            return "Created materials in all subjects"
-        }
+    /// Localized achievement title
+    var localizedTitle: String {
+        String(localized: "achievement.\(rawValue)")
+    }
+
+    /// Localized achievement description
+    var localizedDescription: String {
+        String(localized: "achievement.\(rawValue).desc")
     }
 }
 

@@ -17,19 +17,22 @@ struct ContentView: View {
             List {
                 if materials.isEmpty {
                     ContentUnavailableView {
-                        Label("No Materials Yet", systemImage: "book.closed")
+                        Label(
+                            String(localized: "materials.empty.title"),
+                            systemImage: "book.closed"
+                        )
                     } description: {
-                        Text("Materials from Google Drive will appear here")
+                        Text("materials.empty.description")
                     }
                 } else {
                     ForEach(materials) { material in
                         NavigationLink {
-                            Text("Material: \(material.title)")
+                            Text("\(String(localized: "materials.detail.prefix")) \(material.title)")
                         } label: {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(material.title)
                                     .font(.headline)
-                                Text(material.subject.rawValue)
+                                Text(material.subject.localizedName)
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -40,21 +43,24 @@ struct ContentView: View {
 #if os(macOS)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif
-            .navigationTitle("MirrorBuddy")
+            .navigationTitle("dashboard.title")
             .toolbar {
                 ToolbarItem {
                     Button(action: addSampleMaterial) {
-                        Label("Add Sample", systemImage: "plus")
+                        Label("materials.add.sample", systemImage: "plus")
                     }
-                    .accessibilityLabel("Add sample material")
-                    .accessibilityHint("Double tap to create a sample material")
+                    .accessibilityLabel("materials.add.accessibility")
+                    .accessibilityHint("materials.add.hint")
                 }
             }
         } detail: {
             ContentUnavailableView {
-                Label("Select a Material", systemImage: "book")
+                Label(
+                    String(localized: "materials.select.title"),
+                    systemImage: "book"
+                )
             } description: {
-                Text("Choose a material to view details, mind maps, and flashcards")
+                Text("materials.select.description")
             }
         }
     }
@@ -62,7 +68,7 @@ struct ContentView: View {
     private func addSampleMaterial() {
         withAnimation {
             let sample = Material(
-                title: "Materiale di esempio",
+                title: String(localized: "materials.sample.title"),
                 subject: .matematica
             )
             modelContext.insert(sample)
