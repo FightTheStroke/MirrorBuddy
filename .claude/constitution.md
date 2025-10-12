@@ -387,6 +387,58 @@ Text(material.content)
 
 ---
 
+## 🏗️ Build & Test Requirements
+
+### Simulator Usage
+**ALWAYS use the iPad simulator "IpadDiMario" for building and testing.**
+
+```bash
+# ✅ Good: Correct simulator
+xcodebuild -scheme MirrorBuddy \
+  -destination 'platform=iOS Simulator,name=IpadDiMario' \
+  test
+
+# ❌ Bad: Wrong platform
+xcodebuild -scheme MirrorBuddy \
+  -destination 'platform=macOS' \
+  build  # NEVER use macOS
+
+# ❌ Bad: Wrong simulator
+xcodebuild -scheme MirrorBuddy \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  test  # NEVER use iPhone simulators
+```
+
+**Why IpadDiMario?**
+- Mario's primary device is an iPad Pro 11"
+- UI layouts are optimized for iPad
+- Testing on iPhone gives false results
+- macOS has different APIs (BGProcessingTask unavailable)
+
+### Git Commit Requirements
+**ALWAYS commit after completing each task.**
+
+```bash
+# ✅ Good: Descriptive commit with task reference
+git add .
+git commit -m "Task 11: Implement OpenAI API Client Infrastructure
+
+- Created OpenAIClient with async/await support
+- Implemented GPT-5 chat completion, vision, and DALL-E 3
+- Added WebSocket support for Realtime API
+- Implemented comprehensive error handling and retry logic
+- Added rate limiting with actor-based limiter
+- Created 40+ unit tests with >90% coverage
+
+🤖 Generated with Claude Code
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# ❌ Bad: Vague commit message
+git commit -m "updated files"
+```
+
+---
+
 ## 🔄 Agent Workflow Requirements
 
 ### Before Starting Work
@@ -397,16 +449,18 @@ Text(material.content)
 
 ### During Work
 1. Follow TDD: Write tests before implementation
-2. Commit frequently with descriptive messages
-3. Update task status in Task Master
-4. Document complex decisions inline
+2. **Build and test ONLY using the iPad simulator "IpadDiMario"** (never macOS or iPhone)
+3. Commit frequently with descriptive messages
+4. Update task status in Task Master
+5. Document complex decisions inline
 
 ### Before Completing Task
-1. All tests pass (unit + integration)
+1. All tests pass (unit + integration) on **IpadDiMario simulator**
 2. SwiftLint: 0 warnings
 3. Accessibility: VoiceOver works
 4. Documentation updated
 5. Task marked complete in Task Master
+6. **Git commit created with task number reference** (e.g., "Task 11: OpenAI API Client Infrastructure")
 
 ### When Blocked
 1. Document blocker clearly
@@ -469,9 +523,11 @@ A task is DONE only when:
 - [ ] VoiceOver works correctly
 - [ ] SwiftLint: 0 warnings
 - [ ] Performance acceptable (no lag, no memory leaks)
+- [ ] **Build and tests verified on IpadDiMario simulator**
 - [ ] QA agent approved
 - [ ] Documentation updated
 - [ ] Task marked complete in Task Master
+- [ ] **Git commit created with descriptive message referencing task number**
 
 ---
 
