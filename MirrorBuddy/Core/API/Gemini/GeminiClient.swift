@@ -284,10 +284,10 @@ final class GeminiClient {
                 switch error {
                 case .rateLimitExceeded(let retryAfter):
                     let delay = retryAfter ?? Double(attempt * 2)
-                    try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    try await _Concurrency.Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                 case .networkError, .invalidResponse:
                     let delay = Double(attempt + 1)
-                    try await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                    try await _Concurrency.Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
                 default:
                     throw error // Don't retry on other errors
                 }
@@ -324,7 +324,7 @@ private actor RateLimiter {
             if let oldestRequest = requestTimestamps.first {
                 let waitTime = 60 - now.timeIntervalSince(oldestRequest)
                 if waitTime > 0 {
-                    try await Task.sleep(nanoseconds: UInt64(waitTime * 1_000_000_000))
+                    try await _Concurrency.Task.sleep(nanoseconds: UInt64(waitTime * 1_000_000_000))
                 }
                 // Remove the oldest timestamp
                 requestTimestamps.removeFirst()

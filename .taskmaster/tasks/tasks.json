@@ -420,11 +420,50 @@
         "dependencies": [
           "1"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement OAuth 2.0 Authentication Flow for Google Workspace APIs",
+            "description": "Develop the authentication layer using OAuth 2.0 to securely access Google Drive, Calendar, and Gmail APIs in Swift.",
+            "dependencies": [],
+            "details": "Set up OAuth 2.0 using Google Sign-In for iOS. Ensure the app requests and manages the correct scopes for Drive, Calendar, and Gmail. Implement token refresh logic and error handling for authentication failures. Integrate with Swift concurrency (async/await) for all authentication-related operations.",
+            "status": "done",
+            "testStrategy": "Test with multiple Google accounts. Verify correct scope consent, token acquisition, and refresh. Simulate expired tokens and denied permissions to ensure robust error handling.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T15:06:27.909Z"
+          },
+          {
+            "id": 2,
+            "title": "Develop GoogleAPIClient Methods for Drive, Calendar, and Gmail Operations",
+            "description": "Create async methods in GoogleAPIClient for Drive file listing/download, Calendar event retrieval, and Gmail message retrieval/parsing.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement Swift async/await methods for: listing and downloading files from Drive, retrieving events from Calendar, and fetching/parsing messages from Gmail. Ensure all requests use valid OAuth tokens. Parse API responses into Swift models. Add error handling, retry logic, and rate limiting for each method.",
+            "status": "done",
+            "testStrategy": "Write unit tests with mocked API responses for each method. Test error and retry logic by simulating network/API failures. Validate correct model mapping for various response payloads.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T15:06:27.913Z"
+          },
+          {
+            "id": 3,
+            "title": "Integrate Webhook Setup and Advanced Error Handling in GoogleAPIClient",
+            "description": "Add webhook registration for Drive file changes and implement comprehensive error handling and rate limiting across all API interactions.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement webhook setup for Google Drive file change notifications. Ensure webhook endpoints are registered and verified. Extend error handling to cover all API methods, including exponential backoff for retries and global rate limiting. Document all error and retry scenarios.",
+            "status": "done",
+            "testStrategy": "Test webhook registration and notification delivery using test Google accounts. Simulate API rate limits and network errors to verify retry and backoff logic. Ensure all error cases are logged and handled gracefully.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T15:06:27.921Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on create google apis client for workspace integration."
+        "expansionPrompt": "Break down this task with a focus on create google apis client for workspace integration.",
+        "updatedAt": "2025-10-12T15:06:27.921Z"
       },
       {
         "id": "14",
@@ -1694,9 +1733,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T14:54:59.020Z",
+      "lastModified": "2025-10-12T15:06:27.922Z",
       "taskCount": 83,
-      "completedCount": 14,
+      "completedCount": 15,
       "tags": [
         "master"
       ]
