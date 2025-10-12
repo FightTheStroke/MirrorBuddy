@@ -17,22 +17,7 @@ final class SubjectService {
         // Only seed if no subjects exist
         guard existingSubjects.isEmpty else { return }
 
-        // Mario's 10 subjects + Other
-        let defaultSubjects = [
-            DefaultSubjectData(localizationKey: "subject.educazioneCivica", iconName: "building.columns", colorName: "purple", sortOrder: 0),
-            DefaultSubjectData(localizationKey: "subject.fisica", iconName: "atom", colorName: "blue", sortOrder: 1),
-            DefaultSubjectData(localizationKey: "subject.inglese", iconName: "book.closed", colorName: "red", sortOrder: 2),
-            DefaultSubjectData(localizationKey: "subject.italiano", iconName: "text.book.closed", colorName: "green", sortOrder: 3),
-            DefaultSubjectData(localizationKey: "subject.matematica", iconName: "function", colorName: "orange", sortOrder: 4),
-            DefaultSubjectData(localizationKey: "subject.religione", iconName: "star.circle", colorName: "yellow", sortOrder: 5),
-            DefaultSubjectData(localizationKey: "subject.scienzeMotorie", iconName: "figure.run", colorName: "cyan", sortOrder: 6),
-            DefaultSubjectData(localizationKey: "subject.scienzeNaturali", iconName: "leaf", colorName: "mint", sortOrder: 7),
-            DefaultSubjectData(localizationKey: "subject.sostegno", iconName: "heart.circle.fill", colorName: "pink", sortOrder: 8),
-            DefaultSubjectData(localizationKey: "subject.storiaGeografia", iconName: "globe.europe.africa", colorName: "brown", sortOrder: 9),
-            DefaultSubjectData(localizationKey: "subject.other", iconName: "folder", colorName: "gray", sortOrder: 10)
-        ]
-
-        for item in defaultSubjects {
+        for item in Self.marioDefaultSubjects {
             let subject = SubjectEntity(
                 localizationKey: item.localizationKey,
                 iconName: item.iconName,
@@ -46,6 +31,76 @@ final class SubjectService {
 
         try modelContext.save()
     }
+
+    /// Mario's 10 subjects + Other
+    private static let marioDefaultSubjects = [
+        DefaultSubjectData(
+            localizationKey: "subject.educazioneCivica",
+            iconName: "building.columns",
+            colorName: "purple",
+            sortOrder: 0
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.fisica",
+            iconName: "atom",
+            colorName: "blue",
+            sortOrder: 1
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.inglese",
+            iconName: "book.closed",
+            colorName: "red",
+            sortOrder: 2
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.italiano",
+            iconName: "text.book.closed",
+            colorName: "green",
+            sortOrder: 3
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.matematica",
+            iconName: "function",
+            colorName: "orange",
+            sortOrder: 4
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.religione",
+            iconName: "star.circle",
+            colorName: "yellow",
+            sortOrder: 5
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.scienzeMotorie",
+            iconName: "figure.run",
+            colorName: "cyan",
+            sortOrder: 6
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.scienzeNaturali",
+            iconName: "leaf",
+            colorName: "mint",
+            sortOrder: 7
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.sostegno",
+            iconName: "heart.circle.fill",
+            colorName: "pink",
+            sortOrder: 8
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.storiaGeografia",
+            iconName: "globe.europe.africa",
+            colorName: "brown",
+            sortOrder: 9
+        ),
+        DefaultSubjectData(
+            localizationKey: "subject.other",
+            iconName: "folder",
+            colorName: "gray",
+            sortOrder: 10
+        )
+    ]
 
     /// Get all subjects ordered by sortOrder
     func getAllSubjects() throws -> [SubjectEntity] {
