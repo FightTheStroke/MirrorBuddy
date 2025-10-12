@@ -1,5 +1,5 @@
 import Foundation
-import AVFoundation
+@preconcurrency import AVFoundation
 import os.log
 
 /// Manager for audio pipeline operations for voice conversations
@@ -117,7 +117,7 @@ final class AudioPipelineManager: NSObject {
             self.updateInputAudioLevel(from: buffer)
 
             // Send audio data
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self.onAudioData?(convertedData)
             }
         }
@@ -289,10 +289,10 @@ final class AudioPipelineManager: NSObject {
             guard let self else { return }
 
             // Enable metering
-            self.audioSession.setActive(true, options: [])
+            try? self.audioSession.setActive(true, options: [])
 
             // Update levels
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self.onAudioLevelChanged?(self.currentInputLevel)
             }
         }
@@ -321,7 +321,7 @@ final class AudioPipelineManager: NSObject {
         // Normalize to 0-1 range
         let normalizedLevel = max(0, min(1, (avgPower + 60) / 60))
 
-        Task { @MainActor in
+        _Concurrency.Task { @MainActor in
             self.currentInputLevel = normalizedLevel
         }
     }
