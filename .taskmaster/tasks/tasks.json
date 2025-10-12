@@ -665,9 +665,10 @@
               1
             ],
             "details": "Use Google Drive API to query files in 'Mario - Scuola' folder. Implement pagination for large folders. Add filtering by MIME type for PDFs, DOCXs, etc. Create data models to store file metadata. Implement sorting options by name, date, and size. Add caching layer to improve performance.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with folders containing various file types. Verify filters work correctly. Test pagination with large folders. Verify sorting functions correctly.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T15:56:31.899Z"
           },
           {
             "id": 3,
@@ -677,9 +678,10 @@
               2
             ],
             "details": "Design database schema to store file IDs, names, modification dates, and checksums. Implement SwiftData models for file metadata. Create functions to compare local database with Drive API results. Add methods to detect new, modified, and deleted files. Implement database migration strategy for future schema changes.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test database operations with mock file data. Verify change detection works correctly. Test database migrations. Verify performance with large datasets.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T15:57:24.614Z"
           },
           {
             "id": 4,
@@ -721,7 +723,7 @@
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement google drive file listing and monitoring.",
-        "updatedAt": "2025-10-12T15:55:01.034Z"
+        "updatedAt": "2025-10-12T15:57:24.614Z"
       },
       {
         "id": "18",
@@ -1923,7 +1925,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T15:55:01.036Z",
+      "lastModified": "2025-10-12T15:57:24.615Z",
       "taskCount": 83,
       "completedCount": 17,
       "tags": [

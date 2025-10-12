@@ -26,13 +26,13 @@ struct DriveFile: Codable, Identifiable, Sendable {
     let trashed: Bool?
 
     /// Get created date as Date object
-    var createdDate: Date? {
+    nonisolated var createdDate: Date? {
         guard let createdTime = createdTime else { return nil }
         return ISO8601DateFormatter().date(from: createdTime)
     }
 
     /// Get modified date as Date object
-    var modifiedDate: Date? {
+    nonisolated var modifiedDate: Date? {
         guard let modifiedTime = modifiedTime else { return nil }
         return ISO8601DateFormatter().date(from: modifiedTime)
     }
@@ -181,7 +181,7 @@ extension DriveFile {
     }
 
     /// Get file size in bytes
-    var sizeInBytes: Int? {
+    nonisolated var sizeInBytes: Int? {
         guard let size else { return nil }
         return Int(size)
     }
