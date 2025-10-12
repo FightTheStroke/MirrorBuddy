@@ -355,12 +355,14 @@
         "id": 26,
         "title": "Create Subject-Organized Dashboard UI",
         "description": "Design and implement the main dashboard UI organized by subject.",
-        "details": "1. Create a SwiftUI view for the main dashboard\n2. Implement subject-based organization\n3. Design material cards with thumbnails\n4. Add search and filter functionality\n5. Implement sorting options (date, name, subject)\n6. Create animations for smooth transitions\n7. Optimize for one-handed operation\n8. Implement VoiceOver support\n9. Add large touch targets (min 44×44pt)",
+        "details": "1. Create a SwiftUI view for the main dashboard\n2. Implement subject-based organization\n3. Design material cards with thumbnails\n4. Add search and filter functionality\n5. Implement sorting options (date, name, subject)\n6. Create animations for smooth transitions\n7. Optimize for one-handed operation\n8. Implement VoiceOver support\n9. Add large touch targets (min 44\u00d744pt)",
         "testStrategy": "Test UI on various device sizes. Verify VoiceOver functionality. Test one-handed operation. Measure performance with large number of materials.",
         "priority": "high",
         "dependencies": [
           3,
-          4
+          4,
+          82,
+          83
         ],
         "status": "pending",
         "subtasks": []
@@ -369,7 +371,7 @@
         "id": 27,
         "title": "Implement Material Cards UI Component",
         "description": "Design and implement reusable material card components for the dashboard.",
-        "details": "1. Create a SwiftUI component for material cards\n2. Design visual appearance with thumbnails\n3. Show subject, title, and date information\n4. Add progress indicators for processing status\n5. Implement tap gestures for navigation\n6. Create animations for interactions\n7. Optimize for VoiceOver\n8. Ensure minimum touch target size (44×44pt)",
+        "details": "1. Create a SwiftUI component for material cards\n2. Design visual appearance with thumbnails\n3. Show subject, title, and date information\n4. Add progress indicators for processing status\n5. Implement tap gestures for navigation\n6. Create animations for interactions\n7. Optimize for VoiceOver\n8. Ensure minimum touch target size (44\u00d744pt)",
         "testStrategy": "Test component with various material types. Verify VoiceOver functionality. Test touch target size compliance. Measure rendering performance.",
         "priority": "medium",
         "dependencies": [
@@ -389,7 +391,9 @@
           3,
           5,
           6,
-          26
+          26,
+          82,
+          83
         ],
         "status": "pending",
         "subtasks": []
@@ -444,7 +448,8 @@
         "testStrategy": "Test UI on various device sizes. Verify visual feedback during conversation. Test one-handed operation. Measure performance during active conversations.",
         "priority": "high",
         "dependencies": [
-          31
+          31,
+          82
         ],
         "status": "pending",
         "subtasks": []
@@ -608,13 +613,14 @@
         "id": 44,
         "title": "Create Task List View",
         "description": "Design and implement the task list view for assignments and due dates.",
-        "details": "1. Create a SwiftUI view for task lists\n2. Implement today's tasks section\n3. Add upcoming week view\n4. Create overdue tasks section with encouraging messaging\n5. Implement subject color-coding\n6. Add voice command support\n7. Create large checkboxes (44×44pt)\n8. Implement sorting and filtering options\n9. Add search functionality",
+        "details": "1. Create a SwiftUI view for task lists\n2. Implement today's tasks section\n3. Add upcoming week view\n4. Create overdue tasks section with encouraging messaging\n5. Implement subject color-coding\n6. Add voice command support\n7. Create large checkboxes (44\u00d744pt)\n8. Implement sorting and filtering options\n9. Add search functionality",
         "testStrategy": "Test view with various task combinations. Verify voice commands work correctly. Test sorting and filtering. Measure performance with large number of tasks.",
         "priority": "high",
         "dependencies": [
           7,
           42,
-          43
+          43,
+          82
         ],
         "status": "pending",
         "subtasks": []
@@ -783,14 +789,16 @@
       {
         "id": 56,
         "title": "Implement Settings and Preferences UI",
-        "description": "Create the settings and preferences interface for app customization.",
+        "description": "Settings UI including language selector and subject management (task 83). High priority as it contains essential configuration.",
         "details": "1. Implement text size adjustment\n2. Add font selection (including OpenDyslexic)\n3. Create voice coach language settings\n4. Implement notification preferences\n5. Add sync schedule configuration\n6. Create data export/import functionality\n7. Implement account management\n8. Add about section and help resources",
         "testStrategy": "Test all settings options. Verify text size and font changes apply correctly. Test language switching. Evaluate settings organization and accessibility.",
-        "priority": "medium",
+        "priority": "high",
         "dependencies": [
           10,
           30,
-          33
+          33,
+          82,
+          83
         ],
         "status": "pending",
         "subtasks": []
@@ -1125,8 +1133,8 @@
       {
         "id": 77,
         "title": "Implement Large Touch Targets",
-        "description": "Ensure all interactive elements have minimum 44×44pt touch targets.",
-        "details": "1. Audit all buttons and controls\n2. Resize elements to minimum 44×44pt\n3. Add padding to small elements\n4. Implement touch target expansion\n5. Create spacing between adjacent targets\n6. Add visual feedback for touch\n7. Implement haptic feedback\n8. Create touch target visualization tool (development only)",
+        "description": "Ensure all interactive elements have minimum 44\u00d744pt touch targets.",
+        "details": "1. Audit all buttons and controls\n2. Resize elements to minimum 44\u00d744pt\n3. Add padding to small elements\n4. Implement touch target expansion\n5. Create spacing between adjacent targets\n6. Add visual feedback for touch\n7. Implement haptic feedback\n8. Create touch target visualization tool (development only)",
         "testStrategy": "Measure touch target sizes throughout app. Test touch accuracy with various finger sizes. Verify spacing between adjacent targets. Evaluate touch feedback clarity.",
         "priority": "high",
         "dependencies": [
@@ -1202,39 +1210,39 @@
       {
         "id": 82,
         "title": "Implement Localization Infrastructure",
-        "description": "Set up complete localization infrastructure for Italian (default) and English, with support for additional languages in the future.",
+        "description": "Set up complete localization infrastructure for Italian (PRIMARY/DEFAULT) and English, with support for additional languages. MUST be done before UI implementation.",
         "details": "1. Create Localizable.xcstrings catalog:\n   - Add Italian (it) as base language\n   - Add English (en) as secondary language\n   - Configure for future language additions\n\n2. Extract all hardcoded UI strings:\n   - ContentView and all views\n   - Model descriptions (Subject names, Achievement descriptions, etc.)\n   - Button labels, navigation titles, accessibility labels\n   - Error messages and alerts\n\n3. Convert to localized strings:\n   - Use String catalogs (Xcode 15+) or .strings files\n   - Group by feature/screen for organization\n   - Include context comments for translators\n\n4. Update all SwiftUI views:\n   - Replace hardcoded Text(\"...\") with Text(verbatim:) or Text(LocalizedStringKey(...))\n   - Use .accessibilityLabel with localized strings\n   - Test language switching\n\n5. Add language selector in Settings:\n   - Show current language\n   - Allow switching between Italian and English\n   - Persist preference in UserDefaults\n\n6. Document localization workflow:\n   - How to add new languages\n   - How to add new strings\n   - Translation guidelines",
         "testStrategy": "Switch between Italian and English in Settings and verify all UI text changes correctly. Use Xcode scheme language options to test different languages. Verify accessibility labels are localized. Check that no hardcoded strings remain in the UI.",
         "status": "pending",
         "dependencies": [
-          26,
-          28,
-          32,
-          44,
-          56
+          3,
+          4,
+          5,
+          6,
+          7,
+          8
         ],
-        "priority": "high",
+        "priority": "critical",
         "subtasks": []
       },
       {
         "id": 83,
         "title": "Refactor Subject to Database-Backed System",
-        "description": "Convert hardcoded Subject enum to a database-backed system with SwiftData, allowing users to customize their subject list.",
+        "description": "Convert Mario's 10 subjects from enum to SwiftData entity, allowing customization via Settings. Depends on localization infrastructure.",
         "details": "1. Create new SubjectEntity SwiftData model:\n   - id: UUID\n   - name: String (localized)\n   - iconName: String (SF Symbol name)\n   - colorName: String (color identifier)\n   - sortOrder: Int\n   - isActive: Bool\n   - isCustom: Bool (user-created vs. default)\n\n2. Update Material model:\n   - Change subject: Subject enum to subject: SubjectEntity relationship\n   - Add migration logic for existing data\n\n3. Create SubjectService:\n   - CRUD operations for subjects\n   - Default subjects initialization (Mario's specific subjects)\n   - Import/export functionality\n\n4. Seed default subjects for Mario:\n   - Based on Mario's schedule/needs\n   - Mark as non-custom (cannot be deleted, only deactivated)\n\n5. Update all UI code:\n   - Replace Subject enum references with SubjectEntity\n   - Update queries and filters\n   - Handle subject selection in forms\n\n6. Add Subject management in Settings:\n   - List all subjects with active/inactive toggle\n   - Reorder subjects (drag & drop)\n   - Add custom subjects\n   - Edit subject properties (name, icon, color)\n   - Cannot delete default subjects (only deactivate)",
         "testStrategy": "Create, edit, and delete custom subjects. Verify default subjects cannot be deleted. Test subject filtering and sorting. Verify existing materials maintain subject relationships after migration. Test subject localization.",
         "status": "pending",
         "dependencies": [
           3,
-          26,
-          56
+          82
         ],
-        "priority": "high",
+        "priority": "critical",
         "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-10-12T10:57:05.714Z",
-      "updated": "2025-10-12T12:05:52.356Z",
+      "updated": "2025-10-12T12:13:57.734Z",
       "description": "Tasks for master context"
     }
   }
