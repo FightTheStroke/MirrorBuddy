@@ -10,6 +10,13 @@ import SwiftUI
 
 @main
 struct MirrorBuddyApp: App {
+    @State private var syncMonitor = CloudKitSyncMonitor.shared
+
+    init() {
+        // Register background tasks
+        BackgroundSyncManager.shared.registerBackgroundTasks()
+    }
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             SubjectEntity.self,
@@ -44,6 +51,11 @@ struct MirrorBuddyApp: App {
         WindowGroup {
             ContentView()
                 .environment(LocalizationManager.shared)
+                .environment(syncMonitor)
+                .onAppear {
+                    // Schedule background sync on app launch
+                    BackgroundSyncManager.shared.scheduleBackgroundSync()
+                }
         }
         .modelContainer(sharedModelContainer)
     }

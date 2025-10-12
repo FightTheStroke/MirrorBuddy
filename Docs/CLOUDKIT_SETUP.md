@@ -187,7 +187,7 @@ The app uses SwiftData with CloudKit sync configured in `MirrorBuddyApp.swift`:
 let modelConfiguration = ModelConfiguration(
     schema: schema,
     isStoredInMemoryOnly: false,
-    cloudKitDatabase: .automatic
+    cloudKitDatabase: .private("iCloud.com.mirrorbuddy.MirrorBuddy")
 )
 ```
 
@@ -197,12 +197,76 @@ let modelConfiguration = ModelConfiguration(
 - Changes propagate to all signed-in devices
 - Conflict resolution: last-write-wins (suitable for single user)
 
+### Sync Monitoring
+
+The app includes a `CloudKitSyncMonitor` service that tracks sync status:
+
+```swift
+@Observable
+final class CloudKitSyncMonitor {
+    var syncStatus: SyncStatus = .idle
+    var lastSyncDate: Date?
+    var lastError: Error?
+}
+```
+
+**Sync Status Values:**
+- `idle`: No active sync operation
+- `syncing`: Sync in progress
+- `synced`: Successfully synced
+- `failed`: Sync failed with error
+
+**UI Integration:**
+
+The app displays sync status in the toolbar:
+- `SyncStatusView`: Full status with text and icon
+- `CompactSyncStatusView`: Icon-only compact indicator
+
+Users can tap the sync icon to manually trigger a sync.
+
+### Background Sync
+
+The app implements background sync using `BGProcessingTask`:
+
+**Configuration:**
+- Task identifier: `com.mirrorbuddy.MirrorBuddy.backgroundSync`
+- Frequency: Every 15 minutes (minimum)
+- Requires: Network connectivity
+- External power: Not required
+
+**Info.plist Configuration:**
+
+```xml
+<key>BGTaskSchedulerPermittedIdentifiers</key>
+<array>
+    <string>com.mirrorbuddy.MirrorBuddy.backgroundSync</string>
+</array>
+<key>UIBackgroundModes</key>
+<array>
+    <string>processing</string>
+    <string>remote-notification</string>
+</array>
+```
+
+**Testing Background Sync:**
+
+To test background tasks in the simulator:
+
+1. Run the app from Xcode
+2. Background the app (Cmd+Shift+H)
+3. In Xcode console, run:
+   ```
+   e -l objc -- (void)[[BGTaskScheduler sharedScheduler] _simulateLaunchForTaskWithIdentifier:@"com.mirrorbuddy.MirrorBuddy.backgroundSync"]
+   ```
+4. Check console for sync logs
+
 ### Testing Sync
 
 1. Run app on two devices with same iCloud account
 2. Make changes on device A
-3. Wait 5-10 seconds
+3. Wait 5-10 seconds (or tap sync icon)
 4. Verify changes appear on device B
+5. Check sync status in toolbar
 
 ## Troubleshooting
 
@@ -250,12 +314,18 @@ Enable CloudKit logging in Xcode:
 - [ ] App launches successfully
 - [ ] iCloud account detected
 - [ ] Default subjects created
+- [ ] Sync status indicator appears in toolbar
 - [ ] Create material syncs to CloudKit
 - [ ] Create flashcard syncs to CloudKit
 - [ ] Create task syncs to CloudKit
 - [ ] Changes sync between devices
 - [ ] Offline changes sync when online
 - [ ] User progress saves correctly
+- [ ] Manual sync trigger works (tap sync icon)
+- [ ] Sync status updates correctly (idle → syncing → synced)
+- [ ] Background sync schedules correctly
+- [ ] Background sync executes when app is backgrounded
+- [ ] Sync error handling displays failures
 
 ## Production Deployment
 

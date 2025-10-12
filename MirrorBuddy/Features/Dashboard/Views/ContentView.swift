@@ -48,6 +48,10 @@ struct ContentView: View {
 #endif
             .navigationTitle("dashboard.title")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    CompactSyncStatusView()
+                }
+
                 ToolbarItem {
                     Button(action: addSampleMaterial) {
                         Label("materials.add.sample", systemImage: "plus")
