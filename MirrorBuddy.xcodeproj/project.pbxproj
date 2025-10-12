@@ -6,6 +6,9 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		C2DDF29D2E9BA66A00E76D0A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -85,17 +88,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		A97E07AC2E9BCE0B008D919C /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "New Group";
-			sourceTree = "<group>";
-		};
 		C2DDF2822E9BA66800E76D0A = {
 			isa = PBXGroup;
 			children = (
-				A97E07AC2E9BCE0B008D919C /* New Group */,
 				C2DDF28D2E9BA66800E76D0A /* MirrorBuddy */,
 				C2DDF29F2E9BA66A00E76D0A /* MirrorBuddyTests */,
 				C2DDF2A92E9BA66A00E76D0A /* MirrorBuddyUITests */,
