@@ -271,7 +271,7 @@ This is a personal project for Mario's educational needs. If you're building som
 
 ## 📝 License
 
-TBD - Personal/Educational project
+[LICENSE](https://github.com/FightTheStroke/MirrorBuddy/blob/main/LICENSE)
 
 ---
 
