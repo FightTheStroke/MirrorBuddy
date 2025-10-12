@@ -5,6 +5,7 @@
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>com.mirrorbuddy.sync</string>
+		<string>com.mirrorbuddy.material-sync</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

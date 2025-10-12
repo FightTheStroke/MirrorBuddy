@@ -1191,7 +1191,7 @@
           "23",
           "24"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -1247,7 +1247,7 @@
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement parallel material processing pipeline.",
-        "updatedAt": "2025-10-12T18:45:23.427Z"
+        "updatedAt": "2025-10-12T21:00:26.368Z"
       },
       {
         "id": "26",
@@ -2992,11 +2992,48 @@
           "18",
           "25"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Register and Configure Background Processing Task",
+            "description": "Set up the BGProcessingTask for scheduled material syncs with proper registration and configuration.",
+            "dependencies": [],
+            "details": "Implement BGProcessingTask registration in the app delegate or scene delegate. Configure the task identifier in Info.plist with proper background modes. Set up the task request with appropriate resource requirements (network, processing time). Implement the handler for task execution that will contain the sync logic. Add proper task expiration handling.",
+            "status": "pending",
+            "testStrategy": "Test task registration at app launch. Verify background execution permission is properly requested. Test task scheduling with simulated system calls.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Scheduling Logic for Fixed Times",
+            "description": "Create scheduling mechanism to trigger syncs at 13:00 and 18:00 CET regardless of user's timezone.",
+            "dependencies": [
+              1
+            ],
+            "details": "Calculate next execution times based on current time and target times (13:00 and 18:00 CET). Convert CET times to user's local timezone for proper scheduling. Implement persistent scheduling that survives app restarts. Add logic to reschedule tasks after completion. Create a mechanism to avoid duplicate task scheduling. Implement date handling that accounts for daylight saving time changes.",
+            "status": "pending",
+            "testStrategy": "Test scheduling across timezone boundaries. Verify correct execution at 13:00 and 18:00 CET regardless of device timezone. Test scheduling persistence across app restarts.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Sync Task with Error Handling",
+            "description": "Create the core sync implementation with proper error handling, completion notification, and power efficiency.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement the actual sync logic that will run in the background. Add comprehensive error handling with appropriate recovery strategies. Implement network efficiency by checking connection quality before sync. Add power efficiency by monitoring battery levels and adjusting sync behavior. Create user notifications for sync completion and errors. Implement detailed logging for background execution. Add manual trigger option in the app's settings. Create a retry mechanism for failed syncs with exponential backoff.",
+            "status": "pending",
+            "testStrategy": "Test sync completion in various network conditions. Verify error recovery works properly in background mode. Test power efficiency by monitoring battery impact during sync. Verify notifications are properly delivered after sync completion.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement background tasks for scheduled syncs."
+        "expansionPrompt": "Break down this task with a focus on implement background tasks for scheduled syncs.",
+        "updatedAt": "2025-10-12T21:01:13.625Z"
       },
       {
         "id": "73",
@@ -3197,9 +3234,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T20:51:17.533Z",
+      "lastModified": "2025-10-12T21:01:13.626Z",
       "taskCount": 83,
-      "completedCount": 41,
+      "completedCount": 42,
       "tags": [
         "master"
       ]

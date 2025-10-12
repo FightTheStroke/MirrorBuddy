@@ -16,6 +16,12 @@ struct MirrorBuddyApp: App {
         // Register background tasks
         BackgroundSyncManager.shared.registerBackgroundTasks()
         BackgroundTaskScheduler.shared.registerBackgroundTasks()
+
+        // Register scheduled material sync (Task 72)
+        // Note: register() is sync and can be called from init
+        _Concurrency.Task { @MainActor in
+            BackgroundSyncService.shared.register()
+        }
     }
 
     var sharedModelContainer: ModelContainer = {
@@ -61,6 +67,12 @@ struct MirrorBuddyApp: App {
                     // Configure Google Drive sync service with model context
                     DriveSyncService.shared.configure(modelContext: sharedModelContainer.mainContext)
                     BackgroundTaskScheduler.shared.scheduleNextSync()
+
+                    // Configure and schedule material sync (Task 72)
+                    _Concurrency.Task { @MainActor in
+                        BackgroundSyncService.shared.configure(modelContext: sharedModelContainer.mainContext)
+                        BackgroundSyncService.shared.scheduleNextSync()
+                    }
 
                     // Request notification authorization
                     _Concurrency.Task {
