@@ -220,9 +220,9 @@ struct RetryExecutor {
     }
 
     /// Execute a simple async operation with retry logic
-    func execute<Result>(
+    func execute<Result: Sendable>(
         maxRetries: Int? = nil,
-        operation: @escaping () async throws -> Result
+        operation: @escaping @Sendable () async throws -> Result
     ) async throws -> Result {
         let effectivePolicy = maxRetries.map {
             RetryPolicy(
@@ -271,8 +271,8 @@ enum RetryError: LocalizedError {
 // MARK: - Simple Retryable Task
 
 /// A simple implementation of RetryableTask for closures
-private struct SimpleRetryableTask<Result>: RetryableTask {
-    let operation: () async throws -> Result
+private struct SimpleRetryableTask<Result: Sendable>: RetryableTask {
+    let operation: @Sendable () async throws -> Result
 
     func execute() async throws -> Result {
         try await operation()
@@ -298,17 +298,17 @@ private struct SimpleRetryableTask<Result>: RetryableTask {
 
 extension RetryExecutor {
     /// Convenience method for executing with default policy
-    static func executeWithRetry<Result>(
-        _ operation: @escaping () async throws -> Result
+    static func executeWithRetry<Result: Sendable>(
+        _ operation: @escaping @Sendable () async throws -> Result
     ) async throws -> Result {
         let executor = RetryExecutor()
         return try await executor.execute(operation: operation)
     }
 
     /// Convenience method for executing with custom policy
-    static func executeWithRetry<Result>(
+    static func executeWithRetry<Result: Sendable>(
         policy: RetryPolicy,
-        _ operation: @escaping () async throws -> Result
+        _ operation: @escaping @Sendable () async throws -> Result
     ) async throws -> Result {
         let executor = RetryExecutor(policy: policy)
         return try await executor.execute(operation: operation)
