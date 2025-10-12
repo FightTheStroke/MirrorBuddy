@@ -188,7 +188,7 @@ enum ImageSize: String, Codable {
 
 enum ImageQuality: String, Codable {
     case standard
-    case hd
+    case highDefinition = "hd"
 }
 
 enum ImageStyle: String, Codable {
