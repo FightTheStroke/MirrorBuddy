@@ -1,0 +1,375 @@
+# MirrorBuddy - AI Agent Profiles
+# Date: 2025-10-12
+# Purpose: Define specialized agents for parallel agent-driven development
+
+agents:
+  foundation-agent:
+    id: "foundation-agent"
+    role: "Project Foundation & Infrastructure"
+    model: "claude-sonnet-4.5"
+    priority: "critical"
+    capabilities:
+      - "Xcode project setup and configuration"
+      - "SwiftData schema design and implementation"
+      - "CloudKit container setup and sync configuration"
+      - "Build system configuration (schemes, targets)"
+      - "Dependency management (if needed)"
+      - "Project structure organization"
+    technologies:
+      - "Xcode 16+"
+      - "Swift 6"
+      - "SwiftUI"
+      - "SwiftData"
+      - "CloudKit"
+    parallel: false
+    max_concurrent: 1
+    blocks: ["all"]
+    blocked_by: []
+    max_runtime_hours: 4
+    output_artifacts:
+      - ".xcodeproj configured"
+      - "SwiftData models base"
+      - "CloudKit container ready"
+      - "Build succeeds"
+
+  swiftui-expert-agent:
+    id: "swiftui-expert-agent"
+    role: "UI/UX Design & Implementation"
+    model: "claude-sonnet-4.5"
+    priority: "high"
+    capabilities:
+      - "SwiftUI view design and implementation"
+      - "Apple Human Interface Guidelines (HIG) compliance"
+      - "VoiceOver and accessibility support"
+      - "Dynamic Type implementation"
+      - "Animations and transitions"
+      - "Custom components and reusable views"
+      - "Adaptive layouts (iPad/iPhone/Mac)"
+      - "One-handed optimization (right-thumb)"
+    technologies:
+      - "SwiftUI"
+      - "UIKit (when necessary)"
+      - "Accessibility APIs"
+      - "SF Symbols"
+    parallel: true
+    max_concurrent: 3
+    blocks: []
+    blocked_by: ["foundation-agent"]
+    max_runtime_hours: 8
+    output_artifacts:
+      - "Design system components"
+      - "Feature views"
+      - "Accessible UI (VoiceOver)"
+      - "Responsive layouts"
+
+  swiftdata-agent:
+    id: "swiftdata-agent"
+    role: "Data Layer & Persistence"
+    model: "claude-sonnet-4.5"
+    priority: "high"
+    capabilities:
+      - "SwiftData @Model design"
+      - "Relationships and cascading"
+      - "Queries and predicates"
+      - "Migrations (schema changes)"
+      - "CloudKit sync configuration"
+      - "Data integrity and validation"
+      - "Indexing for performance"
+    technologies:
+      - "SwiftData"
+      - "CloudKit"
+      - "Core Data (legacy knowledge)"
+    parallel: true
+    max_concurrent: 2
+    blocks: []
+    blocked_by: ["foundation-agent"]
+    max_runtime_hours: 6
+    output_artifacts:
+      - "Complete data models"
+      - "Query utilities"
+      - "Migration scripts"
+      - "CloudKit sync working"
+
+  api-integration-agent:
+    id: "api-integration-agent"
+    role: "External API Integration"
+    model: "claude-sonnet-4.5"
+    priority: "high"
+    capabilities:
+      - "HTTP client implementation (URLSession)"
+      - "OAuth 2.0 flows (Google)"
+      - "API error handling and retry logic"
+      - "Request/Response models (Codable)"
+      - "Keychain secure storage"
+      - "Rate limiting and throttling"
+      - "API mocking for tests"
+    technologies:
+      - "URLSession"
+      - "Combine (or async/await)"
+      - "GoogleSignIn-iOS"
+      - "Keychain Services"
+    apis:
+      - "OpenAI GPT-5 (Realtime, Chat, DALL-E)"
+      - "Google Gemini 2.5 Pro"
+      - "Google Drive API"
+      - "Google Calendar API"
+      - "Gmail API"
+    parallel: true
+    max_concurrent: 3
+    blocks: []
+    blocked_by: ["foundation-agent"]
+    max_runtime_hours: 10
+    output_artifacts:
+      - "API client classes"
+      - "OAuth flow working"
+      - "Error handling"
+      - "Unit tests with mocks"
+
+  voice-agent:
+    id: "voice-agent"
+    role: "Voice Features & Audio"
+    model: "claude-sonnet-4.5"
+    priority: "high"
+    capabilities:
+      - "OpenAI Realtime API integration (WebSocket)"
+      - "Apple Speech framework (STT)"
+      - "Apple Speech synthesis (TTS)"
+      - "AVFoundation audio pipeline"
+      - "Audio recording and playback"
+      - "Voice activity detection"
+      - "Audio format conversion"
+      - "Interruption handling"
+    technologies:
+      - "OpenAI Realtime API"
+      - "Speech framework"
+      - "AVFoundation"
+      - "WebSocket (Starscream or native)"
+    parallel: true
+    max_concurrent: 1
+    blocks: []
+    blocked_by: ["api-integration-agent"]
+    max_runtime_hours: 12
+    output_artifacts:
+      - "Realtime voice conversation"
+      - "TTS/STT working"
+      - "Audio pipeline"
+      - "Voice UI components"
+
+  vision-agent:
+    id: "vision-agent"
+    role: "Camera & Vision Features"
+    model: "claude-sonnet-4.5"
+    priority: "medium"
+    capabilities:
+      - "Camera integration (AVFoundation)"
+      - "GPT-5 mini vision API integration"
+      - "VisionKit text detection (OCR)"
+      - "Apple Pencil handwriting recognition"
+      - "Image processing and optimization"
+      - "Photo annotation tools"
+      - "Document scanning"
+    technologies:
+      - "AVFoundation (Camera)"
+      - "VisionKit"
+      - "PencilKit"
+      - "Vision framework"
+      - "GPT-5 mini vision API"
+    parallel: true
+    max_concurrent: 1
+    blocks: []
+    blocked_by: ["api-integration-agent"]
+    max_runtime_hours: 10
+    output_artifacts:
+      - "Camera capture working"
+      - "Vision API integration"
+      - "OCR functional"
+      - "Handwriting recognition"
+
+  mindmap-agent:
+    id: "mindmap-agent"
+    role: "Mind Map Generation & Rendering"
+    model: "claude-sonnet-4.5"
+    priority: "high"
+    capabilities:
+      - "Mind map generation with GPT-5"
+      - "DALL-E 3 image generation for nodes"
+      - "Graph layout algorithms (force-directed)"
+      - "SwiftUI interactive rendering"
+      - "Zoom, pan, tap interactions"
+      - "Export formats (Mermaid, OPML, JSON)"
+      - "Dyslexia-friendly design"
+      - "Voice-driven navigation"
+    technologies:
+      - "SwiftUI (Canvas, custom shapes)"
+      - "GPT-5 API"
+      - "DALL-E 3 API"
+      - "Graph algorithms"
+    parallel: true
+    max_concurrent: 1
+    blocks: []
+    blocked_by: ["api-integration-agent", "swiftui-expert-agent"]
+    max_runtime_hours: 14
+    output_artifacts:
+      - "Mind map generator"
+      - "Interactive renderer"
+      - "Export functionality"
+      - "Voice navigation"
+
+  automation-agent:
+    id: "automation-agent"
+    role: "Background Tasks & Automation"
+    model: "claude-sonnet-4.5"
+    priority: "medium"
+    capabilities:
+      - "BGTaskScheduler implementation"
+      - "Background sync workflows"
+      - "Push notifications (UNNotifications)"
+      - "Scheduling logic (13:00 CET, 18:00 CET)"
+      - "Webhook handling (if available)"
+      - "Material processing pipeline"
+      - "Error recovery and retry"
+    technologies:
+      - "BackgroundTasks framework"
+      - "UserNotifications"
+      - "Combine (for pipeline)"
+    parallel: true
+    max_concurrent: 1
+    blocks: []
+    blocked_by: ["api-integration-agent", "swiftdata-agent"]
+    max_runtime_hours: 8
+    output_artifacts:
+      - "Background sync working"
+      - "Notifications system"
+      - "Scheduled tasks"
+      - "Material pipeline"
+
+  test-agent:
+    id: "test-agent"
+    role: "Testing & Quality Assurance"
+    model: "claude-sonnet-4.5"
+    priority: "high"
+    capabilities:
+      - "Unit test writing (XCTest)"
+      - "Integration test design"
+      - "UI test automation (XCUITest)"
+      - "Performance testing"
+      - "Mock creation for APIs"
+      - "Test coverage analysis"
+      - "Accessibility testing (VoiceOver)"
+      - "Memory leak detection"
+    technologies:
+      - "XCTest"
+      - "XCUITest"
+      - "Instruments"
+      - "SwiftLint"
+    parallel: true
+    max_concurrent: 5
+    blocks: []
+    blocked_by: ["any feature implementation"]
+    max_runtime_hours: 12
+    output_artifacts:
+      - "Test suites (>80% coverage)"
+      - "CI/CD integration"
+      - "Performance benchmarks"
+      - "Accessibility audit"
+
+  accessibility-agent:
+    id: "accessibility-agent"
+    role: "Accessibility & Mario-Specific Optimizations"
+    model: "claude-sonnet-4.5"
+    priority: "high"
+    capabilities:
+      - "VoiceOver labels and hints"
+      - "Dynamic Type support"
+      - "High contrast mode support"
+      - "One-handed layout optimization"
+      - "Dyslexia-friendly fonts (OpenDyslexic)"
+      - "Large touch targets (min 44×44pt)"
+      - "Voice-first interface design"
+      - "Limited working memory considerations"
+    technologies:
+      - "UIAccessibility"
+      - "Dynamic Type"
+      - "Custom fonts"
+    parallel: true
+    max_concurrent: 2
+    blocks: []
+    blocked_by: ["swiftui-expert-agent"]
+    max_runtime_hours: 8
+    output_artifacts:
+      - "Full VoiceOver support"
+      - "Accessibility audit passed"
+      - "Mario-specific optimizations"
+      - "A11y test suite"
+
+  qa-agent:
+    id: "qa-agent"
+    role: "Code Review & Architecture Validation"
+    model: "claude-sonnet-4.5"
+    priority: "critical"
+    capabilities:
+      - "Code review (Swift best practices)"
+      - "Architecture validation"
+      - "Security audit (API keys, data handling)"
+      - "Performance profiling"
+      - "SwiftLint rule compliance"
+      - "Memory management review"
+      - "API usage optimization"
+      - "Pre-PR validation"
+    technologies:
+      - "SwiftLint"
+      - "Instruments"
+      - "Xcode static analyzer"
+    parallel: false
+    max_concurrent: 1
+    blocks: []
+    blocked_by: ["any agent completing work"]
+    max_runtime_hours: 6
+    output_artifacts:
+      - "Code review reports"
+      - "Security audit results"
+      - "Performance recommendations"
+      - "Approved PRs"
+
+# Agent Orchestration Rules
+orchestration:
+  max_parallel_agents: 5
+  human_escalation_triggers:
+    - "Architectural decision required"
+    - "Blocked for >2 hours"
+    - "API rate limit exceeded"
+    - "Critical bug found"
+    - "Security vulnerability detected"
+
+  daily_standup:
+    enabled: true
+    time: "09:00 CET"
+    format: "markdown report"
+    includes:
+      - "Yesterday's progress"
+      - "Today's plan"
+      - "Blockers"
+      - "Questions for human"
+
+  handoff_protocol:
+    - "Update task status in Task Master"
+    - "Document completion notes"
+    - "Notify dependent agents"
+    - "Run validation tests"
+    - "Create PR (if applicable)"
+
+quality_gates:
+  before_merge:
+    - "All tests pass"
+    - "SwiftLint: 0 warnings"
+    - "Coverage: >80%"
+    - "Build succeeds"
+    - "Accessibility: VoiceOver functional"
+    - "QA agent approval"
+
+  before_phase_completion:
+    - "All phase tasks done"
+    - "Integration tests pass"
+    - "Demo to human successful"
+    - "Mario feedback collected (if applicable)"
+    - "Documentation updated"

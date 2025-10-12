@@ -1,0 +1,1196 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Setup Xcode Project with Required Configurations",
+        "description": "Create a new Xcode project for MirrorBuddy with iOS 26+, macOS 26+ targets, Swift 6 strict concurrency, and proper build schemes.",
+        "details": "Create a new Xcode project with the following specifications:\n- Project name: MirrorBuddy\n- Organization identifier: com.mirrorbuddy\n- Deployment targets: iOS 26+, iPadOS 26+, macOS 26+\n- Enable Swift 6 strict concurrency\n- Configure build schemes for development, testing, and release\n- Setup project structure with MVVM architecture\n- Create separate targets for iOS, iPadOS, and macOS\n- Configure shared code between platforms\n- Setup development team and signing certificates",
+        "testStrategy": "Verify project builds successfully on all target platforms. Ensure Swift 6 strict concurrency is enabled. Validate all build schemes work correctly.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 2,
+        "title": "Integrate SwiftLint for Code Quality",
+        "description": "Integrate SwiftLint into the project to enforce code quality standards with zero warnings requirement.",
+        "details": "1. Add SwiftLint to the project using Swift Package Manager\n2. Create a .swiftlint.yml configuration file in the project root\n3. Configure rules to enforce strict code quality standards\n4. Add a build phase script to run SwiftLint during compilation\n5. Configure CI to fail if any SwiftLint warnings are detected\n6. Document SwiftLint setup in README.md\n7. Create a pre-commit hook to run SwiftLint before commits",
+        "testStrategy": "Verify SwiftLint runs during build process. Introduce a test violation and confirm build fails. Ensure all current code passes with zero warnings.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 3,
+        "title": "Define SwiftData Models for Materials",
+        "description": "Create SwiftData models for Material entity with relationships to other entities.",
+        "details": "Create a Material model with the following properties:\n- id: UUID (primary key)\n- title: String\n- subject: Relationship to Subject entity\n- pdfUrl: URL (optional)\n- mindMapId: Relationship to MindMap entity (optional)\n- flashcards: Relationship to Flashcard entities (to-many)\n- summary: String (optional)\n- createdAt: Date\n- updatedAt: Date\n- processed: Bool\n\nImplement proper relationships with cascade delete rules. Add necessary methods for CRUD operations. Implement Codable conformance for data export/import.",
+        "testStrategy": "Create unit tests for Material model CRUD operations. Test relationships with cascade delete. Verify data persistence and retrieval works correctly.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 4,
+        "title": "Define SwiftData Models for Subjects",
+        "description": "Create SwiftData models for Subject entity with relationships to other entities.",
+        "details": "Create a Subject model with the following properties:\n- id: UUID (primary key)\n- name: String (e.g., Math, Italian, Physics, History, English, Science)\n- color: Color (stored as hex string)\n- icon: String (SF Symbol name)\n- materials: Relationship to Material entities (to-many)\n- tasks: Relationship to Task entities (to-many)\n\nImplement proper relationships with cascade delete rules. Add necessary methods for CRUD operations. Create predefined subjects for the initial app launch.",
+        "testStrategy": "Create unit tests for Subject model CRUD operations. Test relationships with cascade delete. Verify predefined subjects are created correctly.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 5,
+        "title": "Define SwiftData Models for MindMaps",
+        "description": "Create SwiftData models for MindMap entity with nodes and relationships.",
+        "details": "Create a MindMap model with the following properties:\n- id: UUID (primary key)\n- title: String\n- material: Relationship to Material entity\n- nodes: Relationship to MindMapNode entities (to-many)\n- createdAt: Date\n- updatedAt: Date\n\nCreate a MindMapNode model with:\n- id: UUID (primary key)\n- text: String\n- imageUrl: URL (optional)\n- x: Double (position)\n- y: Double (position)\n- mindMap: Relationship to MindMap entity\n- parentNode: Relationship to MindMapNode entity (optional)\n- childNodes: Relationship to MindMapNode entities (to-many)\n\nImplement proper relationships with cascade delete rules.",
+        "testStrategy": "Create unit tests for MindMap and MindMapNode models. Test node creation, relationship establishment, and cascade delete functionality.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 6,
+        "title": "Define SwiftData Models for Flashcards",
+        "description": "Create SwiftData models for Flashcard entity with SRS data.",
+        "details": "Create a Flashcard model with the following properties:\n- id: UUID (primary key)\n- front: String\n- back: String\n- material: Relationship to Material entity\n- lastReviewed: Date (optional)\n- nextReviewDate: Date (optional)\n- easeFactor: Double (default: 2.5)\n- interval: Int (days, default: 1)\n- repetitions: Int (default: 0)\n\nImplement SRS (Spaced Repetition System) algorithm methods:\n- calculateNextReview(quality: Int) -> Date\n- updateSRSData(quality: Int)\n\nImplement proper relationships with cascade delete rules.",
+        "testStrategy": "Create unit tests for Flashcard model. Test SRS algorithm functionality with different quality inputs. Verify next review dates are calculated correctly.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 7,
+        "title": "Define SwiftData Models for Tasks",
+        "description": "Create SwiftData models for Task entity with relationships to other entities.",
+        "details": "Create a Task model with the following properties:\n- id: UUID (primary key)\n- title: String\n- description: String (optional)\n- dueDate: Date (optional)\n- subject: Relationship to Subject entity\n- material: Relationship to Material entity (optional)\n- completed: Bool (default: false)\n- completedDate: Date (optional)\n- source: String (e.g., 'calendar', 'email', 'manual')\n- sourceId: String (optional, for tracking external IDs)\n- createdAt: Date\n- updatedAt: Date\n\nImplement proper relationships with cascade delete rules. Add methods for completion tracking and due date calculations.",
+        "testStrategy": "Create unit tests for Task model CRUD operations. Test task completion logic and due date calculations. Verify relationships with Subject and Material entities.",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 8,
+        "title": "Define SwiftData Models for UserProgress",
+        "description": "Create SwiftData models for UserProgress entity to track XP, levels, and achievements.",
+        "details": "Create a UserProgress model with the following properties:\n- id: UUID (primary key, singleton)\n- xp: Int (default: 0)\n- level: Int (default: 1)\n- achievements: Relationship to Achievement entities (to-many)\n- dailyStreak: Int (default: 0)\n- lastActiveDate: Date\n\nCreate an Achievement model with:\n- id: UUID (primary key)\n- title: String\n- description: String\n- iconName: String (SF Symbol name)\n- unlockedAt: Date (optional)\n- unlocked: Bool (default: false)\n- xpReward: Int\n\nImplement methods for XP calculation, level progression, and achievement unlocking.",
+        "testStrategy": "Create unit tests for UserProgress and Achievement models. Test XP accumulation, level progression logic, and achievement unlocking functionality.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 9,
+        "title": "Setup CloudKit Container and Configuration",
+        "description": "Configure CloudKit container for the app and set up necessary entitlements and capabilities.",
+        "details": "1. Create a CloudKit container in Apple Developer Portal\n2. Configure app entitlements for CloudKit\n3. Add CloudKit capability to the app targets\n4. Set up iCloud container identifier in project settings\n5. Configure CloudKit Dashboard with necessary record types\n6. Set up development, staging, and production environments\n7. Document CloudKit setup process for the team",
+        "testStrategy": "Verify CloudKit container is accessible. Test basic record creation and retrieval. Ensure proper environment configuration for development and production.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 10,
+        "title": "Implement CloudKit Sync for SwiftData Models",
+        "description": "Implement automatic CloudKit synchronization for SwiftData models across user devices.",
+        "details": "1. Configure SwiftData with CloudKit sync using the `.cloudKit()` modifier\n2. Set up proper CloudKit container identifiers\n3. Implement conflict resolution strategy (last-write-wins for single user)\n4. Add sync status indicators in the UI\n5. Implement error handling for sync failures\n6. Add retry mechanism for failed syncs\n7. Create a manual sync trigger for user-initiated syncs\n8. Implement background sync using BGProcessingTask",
+        "testStrategy": "Test sync between multiple devices. Verify data changes propagate correctly. Test conflict resolution with simultaneous edits. Verify offline changes sync when coming back online.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 11,
+        "title": "Create OpenAI API Client Infrastructure",
+        "description": "Develop a client for OpenAI APIs including Realtime, Chat, and DALL-E endpoints.",
+        "details": "Create an OpenAIClient class with:\n1. Configuration for API keys and endpoints\n2. Methods for GPT-5 chat completion\n3. Methods for GPT-5 mini vision analysis\n4. Methods for GPT-5 nano simple Q&A\n5. Methods for DALL-E 3 image generation\n6. WebSocket handling for Realtime API\n7. Error handling and retry logic\n8. Rate limiting implementation\n9. Response parsing and model mapping\n\nImplement using Swift concurrency (async/await) and proper error handling.",
+        "testStrategy": "Create unit tests with mock responses for each API endpoint. Test error handling, retry logic, and rate limiting. Create integration tests with actual API calls using test credentials.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 12,
+        "title": "Create Google Gemini API Client",
+        "description": "Develop a client for Google Gemini 2.5 Pro API for Google Workspace integration.",
+        "details": "Create a GeminiClient class with:\n1. Configuration for API keys and endpoints\n2. Methods for text generation and analysis\n3. Methods for Drive folder research\n4. Methods for Calendar event parsing\n5. Methods for Gmail assignment extraction\n6. Error handling and retry logic\n7. Rate limiting implementation\n8. Response parsing and model mapping\n\nImplement using Swift concurrency (async/await) and proper error handling.",
+        "testStrategy": "Create unit tests with mock responses for each API endpoint. Test error handling, retry logic, and rate limiting. Create integration tests with actual API calls using test credentials.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 13,
+        "title": "Create Google APIs Client for Workspace Integration",
+        "description": "Develop a client for Google Drive, Calendar, and Gmail APIs for material and task management.",
+        "details": "Create a GoogleAPIClient class with:\n1. OAuth 2.0 authentication flow\n2. Methods for Google Drive file listing and download\n3. Methods for Google Calendar event retrieval\n4. Methods for Gmail message retrieval and parsing\n5. Webhook setup for Drive file changes\n6. Error handling and retry logic\n7. Rate limiting implementation\n8. Response parsing and model mapping\n\nImplement using Swift concurrency (async/await) and proper error handling.",
+        "testStrategy": "Create unit tests with mock responses for each API endpoint. Test OAuth flow, error handling, retry logic, and rate limiting. Create integration tests with actual API calls using test credentials.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 14,
+        "title": "Implement API Error Handling and Retry Logic",
+        "description": "Develop a robust error handling and retry mechanism for all API clients.",
+        "details": "1. Create a unified APIError enum for all possible error types\n2. Implement exponential backoff retry logic\n3. Create a RetryableTask protocol for retryable operations\n4. Implement circuit breaker pattern for failing endpoints\n5. Add logging for all API errors\n6. Create user-friendly error messages\n7. Implement fallback strategies for critical operations\n8. Add analytics for error tracking",
+        "testStrategy": "Test retry logic with simulated failures. Verify exponential backoff works correctly. Test circuit breaker functionality. Verify fallback strategies execute properly.",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          12,
+          13
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 15,
+        "title": "Implement Secure Keychain Storage for API Keys",
+        "description": "Create a secure storage mechanism for API keys and OAuth tokens using Keychain.",
+        "details": "1. Create a KeychainManager class for secure storage\n2. Implement methods for storing API keys\n3. Implement methods for storing OAuth tokens\n4. Add encryption for sensitive data\n5. Implement secure retrieval methods\n6. Add error handling for Keychain operations\n7. Create a credential rotation mechanism\n8. Implement biometric authentication for sensitive operations",
+        "testStrategy": "Test storing and retrieving API keys. Verify encryption works correctly. Test error handling for Keychain operations. Verify biometric authentication works as expected.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 16,
+        "title": "Implement Google Drive OAuth 2.0 Login Flow",
+        "description": "Create the OAuth 2.0 authentication flow for Google Drive access.",
+        "details": "1. Register app in Google Cloud Console\n2. Configure OAuth consent screen\n3. Generate client ID and secret\n4. Implement ASWebAuthenticationSession for OAuth flow\n5. Store refresh tokens securely in Keychain\n6. Implement token refresh logic\n7. Add sign-out functionality\n8. Handle authentication errors\n9. Create a user-friendly authentication UI",
+        "testStrategy": "Test complete OAuth flow from login to token storage. Verify token refresh works correctly. Test error handling during authentication. Verify sign-out functionality works properly.",
+        "priority": "high",
+        "dependencies": [
+          13,
+          15
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 17,
+        "title": "Implement Google Drive File Listing and Monitoring",
+        "description": "Create functionality to list and monitor files in the 'Mario - Scuola' Google Drive folder.",
+        "details": "1. Implement file listing from specific folder\n2. Add filtering by file type (PDF, DOCX, etc.)\n3. Implement change tracking using Google Drive API\n4. Create a background task for scheduled checks at 13:00 and 18:00 CET\n5. Implement push notifications for new files\n6. Add file metadata extraction\n7. Create a database of known files to detect changes\n8. Implement incremental sync to minimize API usage",
+        "testStrategy": "Test file listing with mock and real Drive folders. Verify scheduled checks run at correct times. Test change detection with modified files. Verify push notifications work correctly.",
+        "priority": "high",
+        "dependencies": [
+          13,
+          16
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 18,
+        "title": "Implement Google Drive File Download",
+        "description": "Create functionality to download files from Google Drive to local storage.",
+        "details": "1. Implement file download using Google Drive API\n2. Add progress tracking for downloads\n3. Implement background downloads using BGTransferTask\n4. Create a download queue for multiple files\n5. Add retry logic for failed downloads\n6. Implement file integrity verification\n7. Store downloaded files in app container\n8. Create a cleanup mechanism for old files",
+        "testStrategy": "Test file download with various file sizes. Verify background downloads work correctly. Test retry logic with simulated failures. Verify file integrity checks work properly.",
+        "priority": "high",
+        "dependencies": [
+          13,
+          16,
+          17
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 19,
+        "title": "Implement PDF Text Extraction with VisionKit",
+        "description": "Create functionality to extract text from PDF files using VisionKit OCR.",
+        "details": "1. Implement PDF loading and rendering\n2. Use VisionKit for OCR text extraction\n3. Process PDF pages in parallel for speed\n4. Extract text structure (headings, paragraphs, lists)\n5. Preserve text formatting information\n6. Handle multi-column layouts\n7. Extract images from PDFs\n8. Create a structured document model from extracted content",
+        "testStrategy": "Test text extraction with various PDF types. Verify structure extraction works correctly. Test performance with large PDFs. Verify multi-column handling works properly.",
+        "priority": "high",
+        "dependencies": [
+          18
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 20,
+        "title": "Implement Summary Generation with Apple Intelligence",
+        "description": "Create functionality to generate summaries of study materials using Apple Intelligence.",
+        "details": "1. Integrate with Apple Intelligence Foundation Models\n2. Implement text summarization functionality\n3. Create prompts for effective summarization\n4. Process extracted PDF text in chunks if needed\n5. Generate summaries at different detail levels\n6. Preserve key concepts and terminology\n7. Add fallback to OpenAI if Apple Intelligence fails\n8. Store generated summaries in SwiftData",
+        "testStrategy": "Test summary generation with various text types. Verify key concepts are preserved. Test fallback mechanism with simulated failures. Measure performance and quality of summaries.",
+        "priority": "high",
+        "dependencies": [
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 21,
+        "title": "Implement Mind Map Generation with GPT-5",
+        "description": "Create functionality to generate mind map structures from study materials using GPT-5.",
+        "details": "1. Create prompts for mind map generation\n2. Implement GPT-5 API calls for structure generation\n3. Parse API responses into MindMap and MindMapNode models\n4. Limit mind maps to 3 levels deep\n5. Keep node text short (5-7 words)\n6. Generate concrete examples for concepts\n7. Create subject-specific templates\n8. Store generated mind maps in SwiftData",
+        "testStrategy": "Test mind map generation with various subjects. Verify structure adheres to 3-level limit. Test node text brevity. Verify subject-specific templates work correctly.",
+        "priority": "high",
+        "dependencies": [
+          5,
+          11,
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 22,
+        "title": "Implement DALL-E 3 Image Generation for Mind Map Nodes",
+        "description": "Create functionality to generate simplified images for mind map nodes using DALL-E 3.",
+        "details": "1. Create prompts for simplified educational images\n2. Implement DALL-E 3 API calls for image generation\n3. Process and optimize generated images\n4. Store images in app container\n5. Associate images with mind map nodes\n6. Implement image caching for performance\n7. Add fallback to generic icons if image generation fails\n8. Implement batch processing for multiple nodes",
+        "testStrategy": "Test image generation for various concepts. Verify image quality and relevance. Test fallback mechanism with simulated failures. Measure performance with batch processing.",
+        "priority": "high",
+        "dependencies": [
+          11,
+          21
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 23,
+        "title": "Implement Flashcard Generation with GPT-5 Nano",
+        "description": "Create functionality to generate flashcards from study materials using GPT-5 nano.",
+        "details": "1. Create prompts for flashcard generation\n2. Implement GPT-5 nano API calls\n3. Parse API responses into Flashcard models\n4. Generate appropriate number of cards based on content\n5. Balance question difficulty\n6. Create subject-specific flashcard templates\n7. Store generated flashcards in SwiftData\n8. Implement batch processing for efficiency",
+        "testStrategy": "Test flashcard generation with various subjects. Verify question quality and relevance. Test subject-specific templates. Measure performance with batch processing.",
+        "priority": "medium",
+        "dependencies": [
+          6,
+          11,
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 24,
+        "title": "Implement Simplified Explanations Generation with GPT-5 Mini",
+        "description": "Create functionality to generate simplified explanations of complex concepts using GPT-5 mini.",
+        "details": "1. Create prompts for simplified explanations\n2. Implement GPT-5 mini API calls\n3. Generate explanations for difficult concepts\n4. Use concrete examples and analogies\n5. Adapt explanation complexity to subject\n6. Store explanations with associated materials\n7. Implement batch processing for efficiency\n8. Add fallback to Apple Intelligence if needed",
+        "testStrategy": "Test explanation generation for various concepts. Verify simplification quality. Test with complex scientific and mathematical concepts. Measure performance with batch processing.",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          19
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 25,
+        "title": "Implement Parallel Material Processing Pipeline",
+        "description": "Create a pipeline to process study materials in parallel for maximum efficiency.",
+        "details": "1. Design a processing pipeline architecture\n2. Implement parallel processing using Swift concurrency\n3. Create a task coordinator for managing subtasks\n4. Implement progress tracking and reporting\n5. Add error handling and recovery\n6. Optimize for performance and battery usage\n7. Implement processing queue for multiple materials\n8. Add background processing using BGProcessingTask",
+        "testStrategy": "Test pipeline with various material types. Measure processing time improvements. Test error recovery with simulated failures. Verify background processing works correctly.",
+        "priority": "high",
+        "dependencies": [
+          19,
+          20,
+          21,
+          22,
+          23,
+          24
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "Create Subject-Organized Dashboard UI",
+        "description": "Design and implement the main dashboard UI organized by subject.",
+        "details": "1. Create a SwiftUI view for the main dashboard\n2. Implement subject-based organization\n3. Design material cards with thumbnails\n4. Add search and filter functionality\n5. Implement sorting options (date, name, subject)\n6. Create animations for smooth transitions\n7. Optimize for one-handed operation\n8. Implement VoiceOver support\n9. Add large touch targets (min 44×44pt)",
+        "testStrategy": "Test UI on various device sizes. Verify VoiceOver functionality. Test one-handed operation. Measure performance with large number of materials.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 27,
+        "title": "Implement Material Cards UI Component",
+        "description": "Design and implement reusable material card components for the dashboard.",
+        "details": "1. Create a SwiftUI component for material cards\n2. Design visual appearance with thumbnails\n3. Show subject, title, and date information\n4. Add progress indicators for processing status\n5. Implement tap gestures for navigation\n6. Create animations for interactions\n7. Optimize for VoiceOver\n8. Ensure minimum touch target size (44×44pt)",
+        "testStrategy": "Test component with various material types. Verify VoiceOver functionality. Test touch target size compliance. Measure rendering performance.",
+        "priority": "medium",
+        "dependencies": [
+          26
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 28,
+        "title": "Implement Material Detail View",
+        "description": "Design and implement the detailed view for study materials.",
+        "details": "1. Create a SwiftUI view for material details\n2. Implement PDF viewer with text-to-speech\n3. Add mind map preview\n4. Add flashcard preview\n5. Create quick action buttons (study, review, share)\n6. Implement navigation between sections\n7. Add large touch targets\n8. Optimize for VoiceOver\n9. Implement sharing functionality",
+        "testStrategy": "Test view with various material types. Verify PDF viewer functionality. Test text-to-speech features. Verify VoiceOver support works correctly.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          5,
+          6,
+          26
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 29,
+        "title": "Implement Voice Command System for Navigation",
+        "description": "Create a voice command system for navigating the app without touch.",
+        "details": "1. Implement voice command recognition using Apple Speech\n2. Create a command registry for available commands\n3. Implement command handlers for navigation\n4. Add support for Italian and English commands\n5. Create visual feedback for recognized commands\n6. Implement error handling for misunderstood commands\n7. Add contextual commands based on current view\n8. Create a help system for available commands",
+        "testStrategy": "Test voice commands in various environments. Verify Italian and English command recognition. Test error handling with incorrect commands. Measure recognition accuracy.",
+        "priority": "high",
+        "dependencies": [
+          26,
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 30,
+        "title": "Implement Push Notification System",
+        "description": "Create a push notification system for material updates and reminders.",
+        "details": "1. Configure push notification capabilities\n2. Implement local notification scheduling\n3. Create notification categories and actions\n4. Add notification for new materials\n5. Add notification for processing completion\n6. Implement badge count for unread materials\n7. Create notification settings UI\n8. Add deep linking from notifications",
+        "testStrategy": "Test notification delivery in various scenarios. Verify badge count updates correctly. Test deep linking from notifications. Verify notification settings work properly.",
+        "priority": "medium",
+        "dependencies": [
+          17,
+          18,
+          25
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 31,
+        "title": "Implement OpenAI Realtime API Integration",
+        "description": "Integrate with OpenAI Realtime API for voice conversations.",
+        "details": "1. Implement WebSocket connection management\n2. Create bidirectional audio streaming\n3. Implement session management\n4. Add interruption handling\n5. Implement voice activity detection\n6. Create audio format conversion (PCM16 24kHz)\n7. Add error handling and reconnection logic\n8. Implement conversation context management",
+        "testStrategy": "Test WebSocket connection stability. Verify audio streaming quality. Test interruption handling. Measure latency and response time.",
+        "priority": "high",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 32,
+        "title": "Create Voice Conversation UI",
+        "description": "Design and implement the UI for voice conversations with the AI coach.",
+        "details": "1. Create a SwiftUI view for voice conversations\n2. Implement large \"Start Talking\" button (bottom-right)\n3. Add visual feedback with waveform animation\n4. Display conversation history\n5. Add \"Stop\" button\n6. Implement context banner for current material/subject\n7. Create animations for state transitions\n8. Optimize for one-handed operation",
+        "testStrategy": "Test UI on various device sizes. Verify visual feedback during conversation. Test one-handed operation. Measure performance during active conversations.",
+        "priority": "high",
+        "dependencies": [
+          31
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 33,
+        "title": "Implement Study Coach Personality and Prompting",
+        "description": "Create the personality and prompting system for the AI study coach.",
+        "details": "1. Design coach personality traits (patient, encouraging, never judgmental)\n2. Implement system prompts for OpenAI\n3. Add Italian and English language support\n4. Create adaptive pacing based on user responses\n5. Implement concept simplification logic\n6. Add concrete examples generation\n7. Create positive reinforcement patterns\n8. Implement conversation memory and context",
+        "testStrategy": "Test coach responses in various scenarios. Verify language support for Italian and English. Test concept simplification with complex topics. Evaluate personality consistency.",
+        "priority": "high",
+        "dependencies": [
+          31,
+          32
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 34,
+        "title": "Implement Audio Pipeline for Voice Conversations",
+        "description": "Create the audio processing pipeline for voice conversations.",
+        "details": "1. Configure AVFoundation audio session\n2. Implement audio format conversion (PCM16 24kHz)\n3. Add background audio support\n4. Implement interruption handling (phone calls)\n5. Add AirPods support and optimization\n6. Create audio level monitoring\n7. Implement noise reduction\n8. Optimize for battery efficiency",
+        "testStrategy": "Test audio quality in various environments. Verify interruption handling works correctly. Test with AirPods and device speaker. Measure battery impact during extended use.",
+        "priority": "high",
+        "dependencies": [
+          31
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 35,
+        "title": "Implement Camera Integration for Homework Help",
+        "description": "Integrate camera functionality for capturing homework problems.",
+        "details": "1. Implement AVFoundation camera capture\n2. Create photo and video modes\n3. Add focus and exposure controls\n4. Implement gallery access for existing photos\n5. Create Apple Pencil photo markup functionality\n6. Add image optimization for AI processing\n7. Implement camera permission handling\n8. Create a camera UI optimized for one-handed use",
+        "testStrategy": "Test camera functionality on various devices. Verify focus and exposure controls work correctly. Test Apple Pencil markup. Measure image quality and optimization.",
+        "priority": "high",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 36,
+        "title": "Implement GPT-5 Vision API Integration",
+        "description": "Integrate with GPT-5 Vision API for analyzing homework problems.",
+        "details": "1. Implement image upload to GPT-5 Vision API\n2. Create prompts for textbook page analysis\n3. Add math problem recognition\n4. Implement diagram understanding\n5. Add handwriting recognition integration\n6. Create step-by-step problem solving logic\n7. Implement response parsing and formatting\n8. Add error handling and retry logic",
+        "testStrategy": "Test vision analysis with various problem types. Verify math notation recognition. Test handwriting recognition accuracy. Measure response time and quality.",
+        "priority": "high",
+        "dependencies": [
+          11,
+          35
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 37,
+        "title": "Create Combined Vision and Voice Interaction",
+        "description": "Implement the combined vision and voice interaction for homework help.",
+        "details": "1. Create a workflow for taking photos and discussing with AI\n2. Implement \"What's this?\" voice command\n3. Add continuous conversation about captured images\n4. Create functionality to save analyzed problems\n5. Implement context switching between images\n6. Add history of analyzed problems\n7. Create UI for reviewing past analyses\n8. Implement sharing of solutions",
+        "testStrategy": "Test complete workflow from photo capture to AI discussion. Verify voice commands work correctly. Test context switching between images. Evaluate solution quality for various problems.",
+        "priority": "high",
+        "dependencies": [
+          32,
+          33,
+          35,
+          36
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 38,
+        "title": "Implement Handwriting Recognition with Apple Pencil",
+        "description": "Create handwriting recognition functionality using Apple Pencil and VisionKit.",
+        "details": "1. Implement PencilKit canvas for input\n2. Integrate VisionKit for handwriting recognition\n3. Add GPT-5 vision for math notation\n4. Create correction and feedback mechanisms\n5. Implement real-time recognition\n6. Add support for mathematical symbols\n7. Create UI for editing recognized text\n8. Implement sharing of recognized content",
+        "testStrategy": "Test handwriting recognition with various writing styles. Verify math notation recognition. Test correction mechanisms. Measure recognition accuracy and speed.",
+        "priority": "medium",
+        "dependencies": [
+          35,
+          36
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 39,
+        "title": "Create Interactive Mind Map Renderer",
+        "description": "Implement an interactive mind map visualization using SwiftUI Canvas.",
+        "details": "1. Create a SwiftUI Canvas-based renderer\n2. Implement force-directed graph layout\n3. Add zoom, pan, and pinch gestures\n4. Create node expansion/collapse functionality\n5. Implement TTS for node explanations\n6. Add visual connections with arrows and colors\n7. Create animations for interactions\n8. Optimize for performance (60 FPS target)",
+        "testStrategy": "Test renderer with various mind map sizes. Verify gesture handling works correctly. Test node expansion/collapse. Measure rendering performance and frame rate.",
+        "priority": "high",
+        "dependencies": [
+          5,
+          22
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 40,
+        "title": "Implement Mind Map Voice Navigation",
+        "description": "Create voice commands for navigating mind maps without touch.",
+        "details": "1. Implement voice commands for mind map navigation\n2. Add \"Explain this node\" functionality\n3. Create \"What's connected to this?\" command\n4. Implement \"Next topic\" navigation\n5. Add \"Zoom in on [subject]\" functionality\n6. Create visual indicators for voice focus\n7. Implement error handling for ambiguous commands\n8. Add help system for available commands",
+        "testStrategy": "Test voice navigation with various mind maps. Verify command recognition accuracy. Test navigation between nodes. Evaluate user experience with voice-only navigation.",
+        "priority": "medium",
+        "dependencies": [
+          29,
+          39
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 41,
+        "title": "Implement Mind Map Export Functionality",
+        "description": "Create functionality to export mind maps in various formats.",
+        "details": "1. Implement Mermaid Markdown export\n2. Add OPML export functionality\n3. Create JSON export (native format)\n4. Implement optional XMind format export\n5. Add sharing via Files app\n6. Create export settings UI\n7. Implement background export for large mind maps\n8. Add success/failure notifications",
+        "testStrategy": "Test export in all supported formats. Verify exported files can be opened in appropriate applications. Test sharing functionality. Measure export performance with large mind maps.",
+        "priority": "low",
+        "dependencies": [
+          39
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 42,
+        "title": "Implement Google Calendar Integration",
+        "description": "Integrate with Google Calendar to extract assignment due dates.",
+        "details": "1. Implement Google Calendar API integration\n2. Create functionality to sync calendar events\n3. Add assignment due date extraction\n4. Create Task objects from calendar events\n5. Implement update logic when calendar changes\n6. Add notification scheduling before due dates\n7. Create background sync using BGAppRefreshTask\n8. Implement error handling and retry logic",
+        "testStrategy": "Test calendar sync with various event types. Verify due date extraction accuracy. Test update handling when calendar changes. Measure sync performance and reliability.",
+        "priority": "high",
+        "dependencies": [
+          7,
+          13,
+          16
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 43,
+        "title": "Implement Gmail Integration for Assignment Extraction",
+        "description": "Integrate with Gmail to extract assignments from teacher emails.",
+        "details": "1. Implement Gmail API integration\n2. Create email filtering by sender\n3. Add parsing for assignment keywords (\"Compito:\", \"Consegna:\")\n4. Implement due date extraction from emails\n5. Create Task objects from parsed emails\n6. Add marking emails as read when processed\n7. Implement background sync using BGAppRefreshTask\n8. Create error handling and retry logic",
+        "testStrategy": "Test email parsing with various formats. Verify assignment and due date extraction accuracy. Test with real teacher emails. Measure parsing accuracy and performance.",
+        "priority": "high",
+        "dependencies": [
+          7,
+          13,
+          16
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 44,
+        "title": "Create Task List View",
+        "description": "Design and implement the task list view for assignments and due dates.",
+        "details": "1. Create a SwiftUI view for task lists\n2. Implement today's tasks section\n3. Add upcoming week view\n4. Create overdue tasks section with encouraging messaging\n5. Implement subject color-coding\n6. Add voice command support\n7. Create large checkboxes (44×44pt)\n8. Implement sorting and filtering options\n9. Add search functionality",
+        "testStrategy": "Test view with various task combinations. Verify voice commands work correctly. Test sorting and filtering. Measure performance with large number of tasks.",
+        "priority": "high",
+        "dependencies": [
+          7,
+          42,
+          43
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 45,
+        "title": "Implement Task Detail and Completion UI",
+        "description": "Create the detailed view and completion functionality for tasks.",
+        "details": "1. Create a SwiftUI view for task details\n2. Implement task description display\n3. Add linked material navigation\n4. Create due date countdown\n5. Implement \"Start studying\" button\n6. Add completion functionality with haptic feedback\n7. Create XP reward animation\n8. Implement sharing functionality\n9. Add edit and delete options",
+        "testStrategy": "Test task completion workflow. Verify haptic feedback works correctly. Test XP reward system. Measure performance and animation smoothness.",
+        "priority": "high",
+        "dependencies": [
+          7,
+          8,
+          44
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 46,
+        "title": "Implement XP and Leveling System",
+        "description": "Create the experience points and leveling system for gamification.",
+        "details": "1. Implement XP accumulation logic\n2. Create level progression system (1-100)\n3. Define XP rewards for various activities\n4. Implement XP for completed tasks\n5. Add XP for study time tracking\n6. Create XP for flashcard reviews\n7. Implement daily streak bonuses\n8. Create visual progress bar\n9. Add level-up animations and celebrations",
+        "testStrategy": "Test XP accumulation from various sources. Verify level progression works correctly. Test daily streak calculation. Measure performance of animations and celebrations.",
+        "priority": "medium",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 47,
+        "title": "Implement Achievements and Badges System",
+        "description": "Create the achievements and badges system for gamification.",
+        "details": "1. Define achievement types and criteria\n2. Implement achievement tracking logic\n3. Create badge unlocking system\n4. Add notifications for unlocked achievements\n5. Implement achievement display UI\n6. Create badge collection view\n7. Add progress tracking for in-progress achievements\n8. Implement sharing of achievements",
+        "testStrategy": "Test achievement unlocking with various criteria. Verify notifications work correctly. Test progress tracking for in-progress achievements. Evaluate badge design and visibility.",
+        "priority": "medium",
+        "dependencies": [
+          8,
+          46
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 48,
+        "title": "Implement Daily Challenges System",
+        "description": "Create the daily challenges system for engagement and motivation.",
+        "details": "1. Define challenge types and difficulty levels\n2. Implement daily challenge generation\n3. Create XP reward calculation\n4. Add challenge tracking and completion logic\n5. Implement challenge UI\n6. Create visual progress trackers\n7. Add notifications for new challenges\n8. Implement streak bonuses for consecutive completions",
+        "testStrategy": "Test challenge generation and variety. Verify completion tracking works correctly. Test XP rewards. Evaluate challenge difficulty and achievability.",
+        "priority": "medium",
+        "dependencies": [
+          8,
+          46
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 49,
+        "title": "Implement Rewards and Customization System",
+        "description": "Create the rewards and customization system for app personalization.",
+        "details": "1. Design app themes (Fortnite-style skins)\n2. Implement theme switching functionality\n3. Create voice coach personality options\n4. Add study music/ambience features\n5. Implement profile customization (avatar, colors)\n6. Create unlock criteria based on levels\n7. Add preview functionality for locked items\n8. Implement settings for customization options",
+        "testStrategy": "Test theme switching functionality. Verify unlock criteria work correctly. Test voice coach personality changes. Evaluate user experience with customization options.",
+        "priority": "low",
+        "dependencies": [
+          46,
+          47
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 50,
+        "title": "Implement Math Mode Specialized Features",
+        "description": "Create specialized features for mathematics study assistance.",
+        "details": "1. Implement step-by-step problem solving\n2. Create visual equation explanations\n3. Add graph rendering functionality\n4. Implement formula reference library\n5. Create practice problem generator\n6. Add calculator integration\n7. Implement math-specific prompts for AI\n8. Create specialized mind map templates for math",
+        "testStrategy": "Test problem solving with various math problems. Verify equation explanations are clear. Test graph rendering accuracy. Evaluate practice problem quality and difficulty.",
+        "priority": "medium",
+        "dependencies": [
+          33,
+          36,
+          37
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 51,
+        "title": "Implement Italian Mode Specialized Features",
+        "description": "Create specialized features for Italian language and literature study.",
+        "details": "1. Implement grammar explanations\n2. Create conjugation tables\n3. Add literature summaries functionality\n4. Implement vocabulary flashcards\n5. Create reading comprehension assistance\n6. Add audio readings feature\n7. Implement Italian-specific prompts for AI\n8. Create specialized mind map templates for Italian",
+        "testStrategy": "Test grammar explanations for clarity. Verify conjugation tables accuracy. Test literature summaries quality. Evaluate vocabulary flashcard effectiveness.",
+        "priority": "medium",
+        "dependencies": [
+          33,
+          36,
+          37
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 52,
+        "title": "Implement History Mode Specialized Features",
+        "description": "Create specialized features for history study assistance.",
+        "details": "1. Implement timeline visualizations\n2. Create event connection mind maps\n3. Add character profiles functionality\n4. Implement interactive maps\n5. Create era summaries\n6. Add date memorization tools\n7. Implement history-specific prompts for AI\n8. Create specialized mind map templates for history",
+        "testStrategy": "Test timeline visualization accuracy. Verify character profiles completeness. Test interactive maps functionality. Evaluate date memorization tool effectiveness.",
+        "priority": "medium",
+        "dependencies": [
+          33,
+          36,
+          37
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 53,
+        "title": "Implement Physics/Science Mode Specialized Features",
+        "description": "Create specialized features for physics and science study assistance.",
+        "details": "1. Implement experiment simulations\n2. Create diagram annotation tools\n3. Add formula explanations\n4. Implement unit conversion functionality\n5. Create lab report templates\n6. Add interactive physics demonstrations\n7. Implement science-specific prompts for AI\n8. Create specialized mind map templates for science",
+        "testStrategy": "Test experiment simulations accuracy. Verify formula explanations clarity. Test unit conversion accuracy. Evaluate lab report template usability.",
+        "priority": "medium",
+        "dependencies": [
+          33,
+          36,
+          37
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 54,
+        "title": "Implement Language Mode Specialized Features",
+        "description": "Create specialized features for English language study assistance.",
+        "details": "1. Implement translation assistance\n2. Create pronunciation help using TTS\n3. Add grammar checker functionality\n4. Implement vocabulary builder\n5. Create conversation practice features\n6. Add listening comprehension exercises\n7. Implement language-specific prompts for AI\n8. Create specialized mind map templates for language learning",
+        "testStrategy": "Test translation accuracy. Verify pronunciation quality. Test grammar checker effectiveness. Evaluate conversation practice functionality.",
+        "priority": "medium",
+        "dependencies": [
+          33,
+          36,
+          37
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 55,
+        "title": "Create Onboarding Flow",
+        "description": "Design and implement the onboarding experience for new users.",
+        "details": "1. Create welcome video (Mario-friendly)\n2. Implement permission requests (camera, mic, notifications)\n3. Add Google account connection flow\n4. Create API key setup for development\n5. Implement voice tutorial\n6. Add sample material demonstration\n7. Create skip options for experienced users\n8. Implement progress tracking through onboarding",
+        "testStrategy": "Test complete onboarding flow. Verify permission requests work correctly. Test Google account connection. Evaluate user experience and clarity of instructions.",
+        "priority": "high",
+        "dependencies": [
+          16,
+          29,
+          32,
+          35
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 56,
+        "title": "Implement Settings and Preferences UI",
+        "description": "Create the settings and preferences interface for app customization.",
+        "details": "1. Implement text size adjustment\n2. Add font selection (including OpenDyslexic)\n3. Create voice coach language settings\n4. Implement notification preferences\n5. Add sync schedule configuration\n6. Create data export/import functionality\n7. Implement account management\n8. Add about section and help resources",
+        "testStrategy": "Test all settings options. Verify text size and font changes apply correctly. Test language switching. Evaluate settings organization and accessibility.",
+        "priority": "medium",
+        "dependencies": [
+          10,
+          30,
+          33
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 57,
+        "title": "Implement Offline Mode Functionality",
+        "description": "Create offline mode with cached materials and limited functionality.",
+        "details": "1. Implement material caching for offline access\n2. Create offline indicator UI\n3. Add Apple Intelligence offline functionality\n4. Implement Apple Speech TTS/STT for offline use\n5. Create saved mind maps offline viewing\n6. Add action queueing for when online\n7. Implement sync status tracking\n8. Create offline help resources",
+        "testStrategy": "Test offline functionality by disabling network. Verify cached materials are accessible. Test Apple Intelligence offline capabilities. Evaluate user experience in offline mode.",
+        "priority": "medium",
+        "dependencies": [
+          10,
+          20,
+          39
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 58,
+        "title": "Implement Error Handling and Recovery UI",
+        "description": "Create user-friendly error handling and recovery mechanisms.",
+        "details": "1. Design friendly error messages (non-technical)\n2. Implement retry buttons for failed operations\n3. Create fallback strategy indicators\n4. Add help/support section\n5. Implement debug logging (developer only)\n6. Create error reporting mechanism\n7. Add automatic recovery for common errors\n8. Implement user feedback collection for errors",
+        "testStrategy": "Test error handling with various error scenarios. Verify retry functionality works correctly. Test fallback strategies. Evaluate error message clarity and helpfulness.",
+        "priority": "medium",
+        "dependencies": [
+          14
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 59,
+        "title": "Implement Performance Optimization",
+        "description": "Optimize app performance for speed, memory usage, and battery life.",
+        "details": "1. Optimize app launch time (target < 2 seconds)\n2. Reduce voice latency (target < 1 second)\n3. Optimize mind map rendering (target < 5 seconds)\n4. Ensure smooth 60 FPS animations\n5. Implement memory usage optimization\n6. Add battery impact reduction techniques\n7. Create performance monitoring tools\n8. Implement caching strategies for frequent operations",
+        "testStrategy": "Measure app launch time on various devices. Test voice latency in different network conditions. Measure mind map rendering performance. Monitor memory usage and battery impact during extended use.",
+        "priority": "high",
+        "dependencies": [
+          25,
+          31,
+          34,
+          39
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 60,
+        "title": "Conduct Accessibility Audit",
+        "description": "Perform a comprehensive accessibility audit and implement improvements.",
+        "details": "1. Test VoiceOver functionality throughout app\n2. Verify Dynamic Type support at all sizes\n3. Test high contrast mode compatibility\n4. Verify voice commands accessibility\n5. Test one-handed operation\n6. Verify Apple Pencil functionality\n7. Implement accessibility improvements\n8. Create accessibility documentation",
+        "testStrategy": "Test with VoiceOver enabled throughout the app. Verify all UI elements are properly labeled. Test with various Dynamic Type sizes. Evaluate one-handed usability with right hand only.",
+        "priority": "high",
+        "dependencies": [
+          26,
+          28,
+          29,
+          32,
+          35,
+          39,
+          44
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 61,
+        "title": "Implement Unit Tests for Core Functionality",
+        "description": "Create comprehensive unit tests for core app functionality.",
+        "details": "1. Implement tests for SwiftData models\n2. Create tests for API clients\n3. Add tests for processing pipeline\n4. Implement tests for voice and vision features\n5. Create tests for mind map generation\n6. Add tests for task management\n7. Implement tests for gamification system\n8. Create tests for offline functionality\n9. Aim for >80% code coverage",
+        "testStrategy": "Use XCTest framework for unit testing. Create mock objects for dependencies. Test edge cases and error conditions. Measure code coverage with XcodeCov.",
+        "priority": "high",
+        "dependencies": [
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          11,
+          12,
+          13,
+          25,
+          31,
+          36
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 62,
+        "title": "Implement Integration Tests",
+        "description": "Create integration tests for end-to-end functionality verification.",
+        "details": "1. Implement tests for Google API integration\n2. Create tests for OpenAI API integration\n3. Add tests for material processing workflow\n4. Implement tests for voice conversation flow\n5. Create tests for vision analysis workflow\n6. Add tests for task creation from external sources\n7. Implement tests for data synchronization\n8. Create tests for offline to online transitions",
+        "testStrategy": "Create test environments with mock servers. Test complete workflows from start to finish. Verify data consistency across integration points. Test error recovery across system boundaries.",
+        "priority": "medium",
+        "dependencies": [
+          17,
+          18,
+          25,
+          31,
+          36,
+          42,
+          43
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 63,
+        "title": "Implement UI Tests",
+        "description": "Create UI tests for main user flows and interactions.",
+        "details": "1. Implement tests for onboarding flow\n2. Create tests for material browsing\n3. Add tests for voice interaction\n4. Implement tests for vision analysis\n5. Create tests for mind map navigation\n6. Add tests for task management\n7. Implement tests for settings configuration\n8. Create tests for accessibility features",
+        "testStrategy": "Use XCUITest for UI testing. Record test sequences for main flows. Add verification points for UI elements and state. Test on multiple device sizes.",
+        "priority": "medium",
+        "dependencies": [
+          26,
+          28,
+          32,
+          35,
+          39,
+          44,
+          55,
+          56
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 64,
+        "title": "Implement Accessibility Tests",
+        "description": "Create specialized tests for accessibility compliance.",
+        "details": "1. Implement VoiceOver navigation tests\n2. Create Dynamic Type tests at various sizes\n3. Add color contrast tests\n4. Implement voice command accessibility tests\n5. Create one-handed operation tests\n6. Add Apple Pencil accessibility tests\n7. Implement tests for minimum touch target sizes\n8. Create documentation for accessibility test results",
+        "testStrategy": "Use XCUITest with accessibility features enabled. Verify all UI elements are accessible with VoiceOver. Test navigation with voice commands only. Verify touch targets meet minimum size requirements.",
+        "priority": "high",
+        "dependencies": [
+          60
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 65,
+        "title": "Implement Performance Tests",
+        "description": "Create performance tests to verify app meets performance targets.",
+        "details": "1. Implement app launch time tests\n2. Create voice latency tests\n3. Add mind map rendering performance tests\n4. Implement animation smoothness tests\n5. Create memory usage tests\n6. Add battery impact tests\n7. Implement network efficiency tests\n8. Create documentation for performance test results",
+        "testStrategy": "Use XCTest with performance metrics. Measure time intervals for key operations. Monitor memory usage during tests. Compare results against performance targets.",
+        "priority": "medium",
+        "dependencies": [
+          59
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 66,
+        "title": "Conduct Real Device Testing",
+        "description": "Test the app on real iPad and iPhone devices with various configurations.",
+        "details": "1. Test on iPad Pro, iPad Air, and iPad mini\n2. Test on iPhone Pro, iPhone, and iPhone SE\n3. Test with various iOS/iPadOS versions (26+)\n4. Test with different accessibility settings\n5. Test with various network conditions\n6. Test with Apple Pencil (1st and 2nd generation)\n7. Test with external keyboards\n8. Create device-specific issue reports",
+        "testStrategy": "Create a test matrix for device/OS combinations. Execute test plan on each configuration. Document device-specific issues and variations. Verify critical functionality works on all devices.",
+        "priority": "high",
+        "dependencies": [
+          61,
+          62,
+          63,
+          64,
+          65
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 67,
+        "title": "Update Project README",
+        "description": "Create comprehensive README documentation for the project.",
+        "details": "1. Update project overview and description\n2. Add installation instructions\n3. Document configuration requirements\n4. Add usage instructions\n5. Create troubleshooting section\n6. Document API integrations\n7. Add contribution guidelines\n8. Include license information\n9. Add screenshots and demo videos",
+        "testStrategy": "Verify README renders correctly on GitHub. Test installation instructions on a clean system. Verify all links work correctly. Have team members review for clarity and completeness.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 68,
+        "title": "Create API Documentation",
+        "description": "Document all internal APIs and external API integrations.",
+        "details": "1. Document SwiftData model APIs\n2. Create documentation for API client interfaces\n3. Document voice and vision integration APIs\n4. Add mind map generation API documentation\n5. Create task management API documentation\n6. Document gamification system APIs\n7. Add external API integration details\n8. Create API usage examples",
+        "testStrategy": "Verify documentation accuracy against implementation. Test code examples for correctness. Review documentation for clarity and completeness. Ensure sensitive information is not exposed.",
+        "priority": "medium",
+        "dependencies": [
+          11,
+          12,
+          13,
+          25,
+          31,
+          36
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 69,
+        "title": "Create User Guide",
+        "description": "Create a user-friendly guide for using the app.",
+        "details": "1. Create getting started section\n2. Document material management features\n3. Add voice coach usage instructions\n4. Document vision capabilities\n5. Create mind map usage guide\n6. Add task management instructions\n7. Document gamification features\n8. Create troubleshooting section\n9. Add FAQ section",
+        "testStrategy": "Review guide with potential users for clarity. Verify instructions match actual app behavior. Test guide with users unfamiliar with the app. Ensure accessibility of the guide itself.",
+        "priority": "medium",
+        "dependencies": [
+          26,
+          28,
+          32,
+          35,
+          39,
+          44,
+          46,
+          47,
+          48
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 70,
+        "title": "Create Developer Notes",
+        "description": "Document technical details and implementation notes for developers.",
+        "details": "1. Document architecture decisions\n2. Create code organization overview\n3. Add performance optimization notes\n4. Document known limitations\n5. Create future improvement suggestions\n6. Add technical debt tracking\n7. Document third-party dependencies\n8. Create development environment setup guide",
+        "testStrategy": "Review notes with development team for accuracy. Verify all major implementation decisions are documented. Ensure notes are useful for onboarding new developers. Keep sensitive information secure.",
+        "priority": "low",
+        "dependencies": [
+          1,
+          61,
+          62,
+          63,
+          64,
+          65
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 71,
+        "title": "Create Deployment Guide",
+        "description": "Document the process for deploying the app to TestFlight and App Store.",
+        "details": "1. Document code signing requirements\n2. Create App Store Connect setup instructions\n3. Add TestFlight distribution process\n4. Document App Store submission process\n5. Create release checklist\n6. Add App Store screenshots preparation guide\n7. Document privacy policy requirements\n8. Create marketing materials guidelines",
+        "testStrategy": "Verify guide by following it for a test deployment. Test TestFlight distribution process. Review App Store submission requirements for accuracy. Ensure all required assets are documented.",
+        "priority": "medium",
+        "dependencies": [
+          1
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 72,
+        "title": "Implement Background Tasks for Scheduled Syncs",
+        "description": "Create background tasks for scheduled material syncs at 13:00 and 18:00 CET.",
+        "details": "1. Register BGProcessingTask for background execution\n2. Implement scheduling logic for 13:00 and 18:00 CET\n3. Create sync task implementation\n4. Add completion handling and error recovery\n5. Implement power and network efficiency\n6. Create notification for sync completion\n7. Add manual trigger option\n8. Implement logging for background execution",
+        "testStrategy": "Test scheduled execution at specified times. Verify sync completes successfully in background. Test error recovery in background mode. Measure power and network usage during background sync.",
+        "priority": "high",
+        "dependencies": [
+          17,
+          18,
+          25
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 73,
+        "title": "Implement Text-to-Speech for All Content",
+        "description": "Create text-to-speech functionality for all textual content using Apple Speech.",
+        "details": "1. Implement Apple Speech integration\n2. Create TTS controls (play, pause, stop)\n3. Add voice selection options\n4. Implement reading speed adjustment\n5. Create text highlighting during reading\n6. Add automatic language detection\n7. Implement continuous reading across pages\n8. Create TTS for mind map nodes",
+        "testStrategy": "Test TTS with various content types. Verify pronunciation quality for technical terms. Test language detection accuracy. Measure performance and resource usage during extended reading.",
+        "priority": "high",
+        "dependencies": [
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 74,
+        "title": "Implement Dyslexia-Friendly Text Rendering",
+        "description": "Create dyslexia-friendly text rendering with customizable fonts and spacing.",
+        "details": "1. Integrate OpenDyslexic font\n2. Implement customizable letter spacing\n3. Add line spacing adjustment\n4. Create paragraph spacing options\n5. Implement color contrast settings\n6. Add reading ruler feature\n7. Create focus mode for reading\n8. Implement text simplification option",
+        "testStrategy": "Test text rendering with various settings. Verify OpenDyslexic font renders correctly. Test with users with dyslexia if possible. Measure reading speed and comprehension improvements.",
+        "priority": "high",
+        "dependencies": [
+          28
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 75,
+        "title": "Implement Context Banner for Working Memory Support",
+        "description": "Create a persistent context banner showing current subject, task, and progress.",
+        "details": "1. Design context banner UI component\n2. Implement current subject display\n3. Add current task information\n4. Create progress indicators\n5. Implement context switching animation\n6. Add voice command for context information\n7. Create expanded context view\n8. Implement context history",
+        "testStrategy": "Test context banner visibility across app. Verify context updates correctly when switching tasks. Test voice command for context information. Evaluate usefulness for working memory support.",
+        "priority": "high",
+        "dependencies": [
+          26,
+          28,
+          32,
+          44
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 76,
+        "title": "Optimize UI for One-Handed Operation",
+        "description": "Optimize the entire UI for one-handed operation with right thumb.",
+        "details": "1. Analyze all UI elements for reach\n2. Move critical controls to bottom-right\n3. Implement reachability features\n4. Create swipe gestures for common actions\n5. Add floating action buttons where needed\n6. Implement thumb-friendly navigation\n7. Create one-handed keyboard options\n8. Add accessibility settings for hand preference",
+        "testStrategy": "Test one-handed operation with right thumb only. Verify all critical functions are accessible. Test with users with limited left-hand mobility if possible. Evaluate comfort during extended use.",
+        "priority": "high",
+        "dependencies": [
+          26,
+          28,
+          32,
+          35,
+          39,
+          44
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 77,
+        "title": "Implement Large Touch Targets",
+        "description": "Ensure all interactive elements have minimum 44×44pt touch targets.",
+        "details": "1. Audit all buttons and controls\n2. Resize elements to minimum 44×44pt\n3. Add padding to small elements\n4. Implement touch target expansion\n5. Create spacing between adjacent targets\n6. Add visual feedback for touch\n7. Implement haptic feedback\n8. Create touch target visualization tool (development only)",
+        "testStrategy": "Measure touch target sizes throughout app. Test touch accuracy with various finger sizes. Verify spacing between adjacent targets. Evaluate touch feedback clarity.",
+        "priority": "high",
+        "dependencies": [
+          26,
+          28,
+          32,
+          35,
+          39,
+          44
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 78,
+        "title": "Implement Study Time Tracking",
+        "description": "Create functionality to track study time for XP rewards and analytics.",
+        "details": "1. Implement study session tracking\n2. Create automatic pause detection\n3. Add manual session control\n4. Implement XP calculation based on time\n5. Create daily and weekly summaries\n6. Add study streak tracking\n7. Implement subject-specific time tracking\n8. Create visualization of study patterns",
+        "testStrategy": "Test study time tracking accuracy. Verify pause detection works correctly. Test XP calculation based on time. Evaluate usefulness of study pattern visualization.",
+        "priority": "medium",
+        "dependencies": [
+          46
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 79,
+        "title": "Implement Spaced Repetition System for Flashcards",
+        "description": "Create a spaced repetition system for effective flashcard review.",
+        "details": "1. Implement SM-2 algorithm for spacing\n2. Create review queue management\n3. Add quality rating input (1-5)\n4. Implement next review date calculation\n5. Create daily review suggestions\n6. Add streak and consistency tracking\n7. Implement analytics for retention\n8. Create visualization of learning progress",
+        "testStrategy": "Test spacing algorithm with various quality inputs. Verify next review dates are calculated correctly. Test review queue management. Evaluate effectiveness of learning progress visualization.",
+        "priority": "medium",
+        "dependencies": [
+          6,
+          23
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 80,
+        "title": "Prepare for TestFlight Distribution",
+        "description": "Prepare the app for TestFlight distribution and testing.",
+        "details": "1. Configure App Store Connect\n2. Create app record and metadata\n3. Configure build settings for distribution\n4. Add app icons and launch screens\n5. Create TestFlight beta information\n6. Set up test groups and invitations\n7. Prepare release notes\n8. Configure crash reporting and analytics\n9. Create feedback collection mechanism",
+        "testStrategy": "Verify app builds and uploads successfully. Test TestFlight installation on various devices. Verify crash reporting works correctly. Test feedback collection mechanism.",
+        "priority": "high",
+        "dependencies": [
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "status": "pending",
+        "subtasks": []
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-12T10:57:05.714Z",
+      "updated": "2025-10-12T10:57:05.714Z",
+      "description": "Tasks for master context"
+    }
+  }
+}

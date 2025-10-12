@@ -1,0 +1,889 @@
+# MirrorBuddy - Product Requirements Document
+**Date**: 2025-10-12
+**Version**: 1.0
+**Status**: Approved - Ready for Development
+
+---
+
+## 1. Executive Summary
+
+### Product Vision
+MirrorBuddy is a multimodal AI learning companion designed specifically for students with learning differences and physical disabilities. The app helps Mario (and students like him) succeed in their studies through voice-first interaction, visual learning, and fully automated material management.
+
+### Target User: Mario
+- **Age**: Student (secondary school)
+- **Challenges**:
+  - Dyslexia (reading difficulties)
+  - Dyscalculia (math difficulties)
+  - Dysgraphia (writing difficulties)
+  - Left hemiplegia (limited left hand mobility from birth stroke)
+  - Very limited working memory
+- **Strengths**:
+  - Works well with ChatGPT voice mode
+  - Visual learner
+  - Loves gaming (Fortnite)
+  - Always studies with internet connection
+  - Uses iPad at study desk with Apple Pencil
+
+### Success Criteria
+- Mario uses app 30-60 minutes daily
+- 90%+ homework completion rate
+- Voice commands 95%+ understood first time
+- Reduced stress during study (qualitative)
+- Improved grades (quantitative)
+- Zero accessibility barriers
+
+---
+
+## 2. Core Problems to Solve
+
+### Problem 1: Material Access Friction
+Teachers upload study materials to Google Drive ("Mario - Scuola" folder), but accessing and organizing them is difficult.
+
+**Solution**: Fully automatic sync at 13:00 CET and 18:00 CET (when teachers typically upload). Material is automatically downloaded, processed, and ready with mind maps, summaries, and flashcards.
+
+### Problem 2: Traditional Text Too Difficult
+PDFs and documents with dense text are nearly impossible to read due to dyslexia.
+
+**Solution**:
+- Auto-generate visual mind maps with simplified images (DALL-E 3)
+- Text-to-speech for all content (Apple Speech)
+- Simplified summaries (Apple Intelligence + GPT-5)
+- Dyslexia-friendly fonts and spacing
+
+### Problem 3: Need for Multimodal Help
+Mario works best when he can show problems via camera and talk them through.
+
+**Solution**:
+- Real-time voice conversation (OpenAI Realtime API)
+- Camera integration for homework help (GPT-5 mini vision)
+- Handwriting recognition (Apple Pencil + VisionKit)
+- Step-by-step explanations
+
+### Problem 4: Working Memory Limitations
+Cannot remember multi-step instructions or where he was in a task.
+
+**Solution**:
+- Context always visible (current subject, current task, progress)
+- No multi-step workflows
+- Voice-driven navigation (no need to remember menu structure)
+- Progress indicators everywhere
+
+### Problem 5: Motivation and Engagement
+Traditional studying is frustrating and demotivating.
+
+**Solution**:
+- Fortnite-inspired gamification (XP, levels, skins)
+- Daily challenges and achievements
+- Positive reinforcement (never judgmental)
+- Visual progress tracking
+
+### Problem 6: One-Handed Operation Required
+Left hand has limited mobility, all interactions must work right-handed.
+
+**Solution**:
+- Voice-first (no hands needed for most features)
+- Right-thumb optimized layouts
+- Large touch targets (min 44×44pt)
+- Apple Pencil support (right hand)
+
+---
+
+## 3. Technical Stack (Approved Final)
+
+### Platform
+- iOS 26+, iPadOS 26+, macOS 26+
+- Swift 6 with strict concurrency
+- SwiftUI for UI
+- SwiftData + CloudKit for storage/sync
+- No backend server (iOS native only)
+
+### AI Services (3-Tier Strategy)
+
+**Tier 1: Apple Intelligence (70% usage, FREE)**
+- Foundation Models (3B parameters, on-device)
+- Text summarization, simplification, Q&A
+- Speech framework (TTS/STT, offline)
+- VisionKit (OCR, document scanning)
+- Privacy-first, instant, free
+
+**Tier 2: OpenAI GPT-5 Family (25% usage, $80-140/month)**
+- GPT-5 Realtime API: Voice conversation ($40-70/month)
+- GPT-5 mini: Vision, general tasks ($20-30/month)
+- GPT-5 nano: Simple Q&A ($5-10/month)
+- GPT-5 full: Complex reasoning, sparingly ($10-20/month)
+- DALL-E 3: Mind map images ($5-10/month)
+
+**Tier 3: Google Gemini 2.5 Pro (5% usage, $10-20/month)**
+- ONLY for Google Workspace integration
+- Deep Research on Drive folders
+- Calendar event parsing
+- Gmail assignment extraction
+
+**Bonus: NotebookLM (FREE)**
+- Audio/Video overviews of materials
+- Study guides generation
+- Manual workflow for MVP
+
+### Google Integrations
+- Google Drive API (OAuth 2.0)
+- Google Calendar API
+- Gmail API
+- Native iOS SDKs (no MCP, no backend)
+
+### Architecture Principles
+- Offline-first with cloud enhancement
+- Direct API calls (no orchestration layers)
+- Background Tasks for automation
+- Smart fallback (local → cloud)
+- Voice-first interface
+- One-handed optimized
+
+---
+
+## 4. Features & Requirements
+
+### PHASE 0: Foundation & Setup (Week 1-2, 2 weeks)
+**Goal**: Working Xcode project with data layer ready
+
+**Features**:
+1. **F0.1: Xcode Project Setup**
+   - iOS 26+, macOS 26+ targets
+   - Swift 6 strict concurrency
+   - Build schemes configured
+   - SwiftLint integrated (zero warnings required)
+
+2. **F0.2: SwiftData Models**
+   - Material (title, subject, PDF, mindMap, flashcards, summary)
+   - Subject (Math, Italian, Physics, History, English, Science)
+   - MindMap (nodes with text + images, relationships)
+   - Flashcard (front, back, SRS data)
+   - Task (title, due date, subject, completion status)
+   - UserProgress (XP, level, achievements)
+   - Relationships with cascade delete rules
+
+3. **F0.3: CloudKit Sync**
+   - iCloud container setup
+   - Automatic sync across devices
+   - Conflict resolution strategy
+
+4. **F0.4: API Client Infrastructure**
+   - OpenAI client (Realtime, Chat, DALL-E)
+   - Gemini client
+   - Google APIs client (Drive, Calendar, Gmail)
+   - Error handling and retry logic
+   - Rate limiting
+
+5. **F0.5: Keychain Storage**
+   - Secure API key storage
+   - OAuth token management
+   - Encryption at rest
+
+**Success Criteria**:
+- Project builds successfully
+- All tests pass (>80% coverage)
+- SwiftData models working
+- CloudKit sync functional
+- API clients ready (with mocks for testing)
+
+---
+
+### PHASE 1: Material Management (Week 3-4, 2 weeks)
+**Goal**: Mario can see and access all his study materials automatically
+
+**Features**:
+6. **F1.1: Google Drive Integration**
+   - OAuth 2.0 login flow
+   - List files from "Mario - Scuola" folder
+   - Download PDFs automatically
+   - Monitor for new uploads (webhook or scheduled)
+   - Background sync at 13:00 CET and 18:00 CET
+
+7. **F1.2: Material Processing Pipeline**
+   - Extract text from PDF (VisionKit OCR)
+   - Generate summary (Apple Intelligence)
+   - Generate mind map (GPT-5 + DALL-E 3 images)
+   - Generate flashcards (GPT-5 nano)
+   - Generate simplified explanations (GPT-5 mini)
+   - All processing in parallel for speed
+
+8. **F1.3: Material List View**
+   - Subject-organized dashboard
+   - Material cards with thumbnails
+   - Search and filter by subject
+   - Sort by date, name, subject
+   - Voice command: "Open Math" / "Apri matematica"
+   - One-handed scrolling
+   - VoiceOver support
+
+9. **F1.4: Material Detail View**
+   - PDF viewer with text-to-speech
+   - Mind map preview
+   - Flashcard preview
+   - Quick actions (study, review, share)
+   - Large touch targets
+
+10. **F1.5: Push Notifications**
+    - "New materials ready!" when sync completes
+    - Badge count for unread materials
+    - Notification settings
+
+**Success Criteria**:
+- Materials auto-sync twice daily
+- PDFs processed within 2 minutes
+- Mind maps have visual images
+- TTS reads all content correctly
+- VoiceOver navigation works
+- Zero sync failures
+
+---
+
+### PHASE 2: Voice Coach (Week 5-6, 2 weeks)
+**Goal**: Mario can talk with AI coach about any material
+
+**Features**:
+11. **F2.1: OpenAI Realtime API Integration**
+    - WebSocket connection management
+    - Bidirectional audio streaming
+    - Session management
+    - Interruption handling
+    - Voice activity detection
+
+12. **F2.2: Voice Conversation UI**
+    - Large "Start Talking" button (bottom-right)
+    - Visual feedback (waveform animation)
+    - Conversation history display
+    - "Stop" button
+    - Voice commands: "Start studying" / "Inizia a studiare"
+    - Context banner (current material/subject)
+
+13. **F2.3: Study Coach Personality**
+    - Patient and encouraging (never judgmental)
+    - Italian + English support
+    - Adapts to Mario's pace
+    - Simplifies complex concepts automatically
+    - Uses concrete examples from daily life
+    - Positive reinforcement
+
+14. **F2.4: Audio Pipeline**
+    - AVFoundation audio session
+    - Audio format conversion (PCM16 24kHz)
+    - Background audio support
+    - Interruption handling (phone calls)
+    - AirPods support
+
+**Success Criteria**:
+- Voice latency < 1 second
+- 95%+ speech recognition accuracy
+- Natural conversation flow
+- Handles interruptions gracefully
+- Works with AirPods/speaker
+- Battery impact minimal
+
+---
+
+### PHASE 3: Vision Capabilities (Week 7-8, 2 weeks)
+**Goal**: Mario can show homework problems via camera for help
+
+**Features**:
+15. **F3.1: Camera Integration**
+    - AVFoundation camera capture
+    - Photo/video modes
+    - Focus and exposure controls
+    - Gallery access
+    - Apple Pencil photo markup
+
+16. **F3.2: GPT-5 Vision API**
+    - Analyze textbook pages
+    - Recognize math problems
+    - Understand diagrams
+    - Read handwriting (via Apple Pencil)
+    - Step-by-step problem solving
+
+17. **F3.3: Vision + Voice Combined**
+    - Take photo, then discuss with AI
+    - "What's this?" voice command
+    - Continuous conversation about image
+    - Save analyzed problems
+
+18. **F3.4: Handwriting Recognition**
+    - Apple Pencil input on iPad
+    - PencilKit canvas
+    - Handwriting to text (VisionKit)
+    - GPT-5 vision for math notation
+    - Corrections and feedback
+
+**Success Criteria**:
+- Camera captures clear images
+- 90%+ text recognition accuracy
+- Math notation recognized
+- Vision + voice seamlessly integrated
+- Apple Pencil handwriting works
+- Analysis complete within 5 seconds
+
+---
+
+### PHASE 4: Mind Maps (Week 9-10, 2 weeks)
+**Goal**: Visual mind maps that help Mario understand complex topics
+
+**Features**:
+19. **F4.1: Mind Map Generation**
+    - GPT-5 generates structure from PDF
+    - DALL-E 3 creates simplified images for nodes
+    - Max 3 levels deep (working memory)
+    - Short phrases (5-7 words per node)
+    - Concrete examples
+    - Subject-specific templates
+
+20. **F4.2: Interactive Mind Map Renderer**
+    - SwiftUI Canvas rendering
+    - Force-directed graph layout
+    - Zoom, pan, pinch gestures (one-handed)
+    - Tap node to expand/collapse
+    - Tap node to hear TTS explanation
+    - Visual connections (arrows, colors)
+
+21. **F4.3: Mind Map Voice Navigation**
+    - "Explain this node"
+    - "What's connected to this?"
+    - "Next topic"
+    - "Zoom in on Math"
+    - Navigate without touching screen
+
+22. **F4.4: Mind Map Export**
+    - Export to Mermaid Markdown (GitHub/Obsidian)
+    - Export to OPML (universal format)
+    - Export to JSON (native format)
+    - Optional: XMind format
+    - Share via Files app
+
+**Success Criteria**:
+- Mind maps generated in < 5 seconds
+- All nodes have visual images
+- Smooth 60 FPS rendering
+- Voice navigation works
+- Export to Mermaid functional
+- Accessible with VoiceOver
+
+---
+
+### PHASE 5: Task Management (Week 11-12, 2 weeks)
+**Goal**: Mario sees upcoming assignments and due dates automatically
+
+**Features**:
+23. **F5.1: Google Calendar Integration**
+    - Sync calendar events
+    - Extract assignment due dates
+    - Create local Task objects
+    - Update when calendar changes
+    - Notification before due date
+
+24. **F5.2: Gmail Integration**
+    - Read teacher emails (filtered by sender)
+    - Parse for assignments ("Compito:", "Consegna:")
+    - Extract due dates from email
+    - Auto-create tasks from emails
+    - Mark as read when processed
+
+25. **F5.3: Task List View**
+    - Today's tasks prominent
+    - Upcoming week view
+    - Overdue tasks highlighted (encouraging, not stressful)
+    - Subject color-coding
+    - Voice: "What's due today?" / "Cosa devo fare oggi?"
+    - Large checkboxes (44×44pt)
+
+26. **F5.4: Task Detail & Completion**
+    - Task description
+    - Linked material (if any)
+    - Due date countdown
+    - "Start studying" button → voice coach
+    - Mark complete (haptic feedback)
+    - XP reward on completion
+
+**Success Criteria**:
+- Calendar syncs automatically
+- Emails parsed correctly (90%+)
+- Tasks created without manual input
+- Due dates accurate
+- Notifications timely
+- Completion gives instant XP
+
+---
+
+### PHASE 6: Gamification (Week 13-14, 2 weeks)
+**Goal**: Fortnite-inspired system that motivates Mario
+
+**Features**:
+27. **F6.1: XP & Leveling System**
+    - XP for completed tasks
+    - XP for study time (voice sessions)
+    - XP for flashcard reviews
+    - XP for daily streaks
+    - Level progression (1-100)
+    - Visual progress bar
+
+28. **F6.2: Achievements & Badges**
+    - "First Mind Map Mastered"
+    - "Week Warrior" (7-day streak)
+    - "Math Hero" (10 math tasks done)
+    - "Flashcard Champion" (100 cards reviewed)
+    - Badges displayed on profile
+    - Notifications when unlocked
+
+29. **F6.3: Daily Challenges**
+    - "Review 10 flashcards" (+50 XP)
+    - "Study for 20 minutes" (+75 XP)
+    - "Complete 3 tasks" (+100 XP)
+    - Randomized, achievable
+    - Visual progress tracker
+
+30. **F6.4: Rewards & Customization**
+    - Unlock app themes (Fortnite-style skins)
+    - Unlock voice coach personalities
+    - Unlock study music/ambience
+    - Profile customization (avatar, colors)
+
+**Success Criteria**:
+- XP system engaging (qualitative feedback)
+- Achievements motivating
+- Daily challenges completed regularly
+- Mario excited to unlock rewards
+- No stress from competition (solo focus)
+
+---
+
+### PHASE 7: Subject-Specific Modes (Week 15-16, 2 weeks)
+**Goal**: Specialized features for each subject
+
+**Features**:
+31. **F7.1: Math Mode**
+    - Step-by-step problem solving
+    - Visual equation explanations
+    - Graph rendering
+    - Formula reference library
+    - Practice problem generator
+    - Calculator integration
+
+32. **F7.2: Italian Mode**
+    - Grammar explanations
+    - Conjugation tables
+    - Literature summaries
+    - Vocabulary flashcards
+    - Reading comprehension help
+    - Audio readings
+
+33. **F7.3: History Mode**
+    - Timeline visualizations
+    - Event connections (mind maps)
+    - Character profiles
+    - Interactive maps
+    - Era summaries
+    - Date memorization tools
+
+34. **F7.4: Physics/Science Mode**
+    - Experiment simulations
+    - Diagram annotations
+    - Formula explanations
+    - Unit conversions
+    - Lab report templates
+
+35. **F7.5: Language Mode (English)**
+    - Translation assistance
+    - Pronunciation help (TTS)
+    - Grammar checker
+    - Vocabulary builder
+    - Conversation practice
+
+**Success Criteria**:
+- Each mode has specialized tools
+- Subject detection automatic
+- Mode switching seamless
+- Tools actually helpful (qualitative)
+- No mode feels incomplete
+
+---
+
+### PHASE 8: Polish & Launch (Week 17-18, 2 weeks)
+**Goal**: Production-ready, polished, bug-free app
+
+**Features**:
+36. **F8.1: Onboarding Flow**
+    - Welcome video (Mario-friendly)
+    - Permission requests (camera, mic, notifications)
+    - Google account connection
+    - API key setup (for solo development)
+    - Voice tutorial
+    - Sample material demo
+
+37. **F8.2: Settings & Preferences**
+    - Text size adjustment
+    - Font selection (OpenDyslexic option)
+    - Voice coach language (Italian/English)
+    - Notification settings
+    - Sync schedule
+    - Data export/import
+
+38. **F8.3: Offline Mode**
+    - Cached materials available
+    - Apple Intelligence works
+    - Apple Speech TTS/STT
+    - Saved mind maps viewable
+    - "Offline" banner with context
+    - Queue actions for when online
+
+39. **F8.4: Error Handling & Recovery**
+    - Friendly error messages (never technical)
+    - Retry buttons
+    - Fallback strategies visible
+    - Help/support section
+    - Debug logs (for developer)
+
+40. **F8.5: Performance Optimization**
+    - App launch < 2 seconds
+    - Voice latency < 1 second
+    - Mind map render < 5 seconds
+    - Smooth 60 FPS animations
+    - Memory usage optimized
+    - Battery impact minimal
+
+41. **F8.6: Accessibility Audit**
+    - VoiceOver 100% functional
+    - Dynamic Type support verified
+    - High contrast mode tested
+    - Voice commands tested
+    - One-handed operation verified
+    - Apple Pencil tested
+
+42. **F8.7: Testing & QA**
+    - Unit tests >80% coverage
+    - Integration tests pass
+    - UI tests for main flows
+    - Accessibility tests
+    - Performance tests
+    - Real device testing (iPad, iPhone)
+
+43. **F8.8: Documentation**
+    - README updated
+    - API documentation
+    - User guide (Mario-friendly)
+    - Developer notes
+    - Deployment guide
+
+**Success Criteria**:
+- Zero critical bugs
+- All tests passing
+- VoiceOver perfect
+- Performance targets met
+- Mario can use independently
+- Ready for TestFlight
+
+---
+
+## 5. Non-Functional Requirements
+
+### Performance
+- App launch: < 2 seconds
+- Voice latency: < 1 second
+- Mind map rendering: < 5 seconds
+- API success rate: > 95%
+- Sync reliability: > 99%
+- Battery impact: < 5% per hour of use
+
+### Accessibility
+- VoiceOver: 100% coverage, all UI navigable
+- Dynamic Type: Support up to .xxxLarge
+- Touch targets: Minimum 44×44pt
+- Voice commands: 95%+ recognition accuracy
+- One-handed: All core features right-thumb accessible
+- Contrast: WCAG AAA compliance
+
+### Security & Privacy
+- API keys: Keychain storage only
+- OAuth tokens: Encrypted in Keychain
+- User data: Encrypted at rest (SwiftData default)
+- No telemetry: Without explicit consent
+- GDPR compliant: Data export/deletion
+- Transparent: User knows what data goes where
+
+### Quality
+- Test coverage: > 80% for new code
+- SwiftLint: Zero warnings (enforced)
+- Code review: Required for all changes
+- QA agent: Approval before merge
+- Documentation: All public APIs documented
+- Versioning: Semantic versioning
+
+### Reliability
+- Graceful degradation: Features work offline when possible
+- Error recovery: Automatic retry with exponential backoff
+- Fallback strategies: Local → Cloud tiering
+- Data sync: Automatic conflict resolution
+- Crash rate: < 0.1% sessions
+
+### Scalability
+- CloudKit: Handles unlimited materials
+- API costs: Scale with usage
+- Local storage: Efficient caching (< 500MB typical)
+- Background Tasks: iOS optimized
+
+---
+
+## 6. User Stories (Priority Order)
+
+### Critical (Must Have)
+1. As Mario, I want materials auto-synced from Google Drive so I don't have to manually download them
+2. As Mario, I want visual mind maps with images so I can understand complex topics easily
+3. As Mario, I want to talk with AI coach so I can get help without typing
+4. As Mario, I want everything to work with one hand so my left hand limitation doesn't matter
+5. As Mario, I want text read aloud so dyslexia doesn't block my learning
+
+### High Priority (Should Have)
+6. As Mario, I want to show homework via camera so AI can help me solve problems
+7. As Mario, I want to see upcoming assignments so I don't forget important dates
+8. As Mario, I want XP and rewards so studying feels like gaming
+9. As Mario, I want context always visible so my working memory limitations don't matter
+10. As Mario, I want everything accessible by voice so I never need menus
+
+### Medium Priority (Nice to Have)
+11. As Mario, I want subject-specific tools so each class has specialized help
+12. As Mario, I want daily challenges so I stay motivated
+13. As Mario, I want to customize the app theme so it feels personal
+14. As Mario, I want handwriting recognition so I can write with Apple Pencil
+15. As Mario, I want offline access so I can study anywhere
+
+### Low Priority (Future)
+16. As Mario, I want to share progress with parents so they can celebrate with me
+17. As Mario, I want study statistics so I can see my improvement
+18. As Mario, I want audio overviews from NotebookLM so I can listen while commuting
+19. As Mario, I want to export mind maps so I can use them in other apps
+20. As Mario, I want multiple languages so I can practice English
+
+---
+
+## 7. Technical Constraints
+
+### Hard Constraints (CANNOT violate)
+- iOS 26+ minimum (for Apple Intelligence)
+- iPad first priority (Mario's primary device)
+- Voice-first interface (all features accessible via voice)
+- One-handed operation (right-thumb optimized)
+- VoiceOver support (100% of UI)
+- No API keys in code (Keychain only)
+- No backend server (iOS native only)
+- SwiftLint zero warnings (enforced)
+- Test coverage >80% (enforced)
+
+### Soft Constraints (SHOULD follow)
+- Prefer Apple Intelligence over cloud (cost + privacy)
+- Prefer OpenAI over other cloud AI (simplicity)
+- Direct API calls over orchestration (simplicity)
+- Native iOS over cross-platform (performance)
+- Simple architecture over complex (maintainability)
+
+### Technology Decisions (LOCKED)
+- ✅ Platform: iOS native, no backend
+- ✅ AI: Apple Intelligence + OpenAI + Gemini (Google only)
+- ✅ Storage: SwiftData + CloudKit
+- ✅ Voice: OpenAI Realtime API
+- ✅ Google: Direct API integration, no MCP
+- ✅ Automation: iOS Background Tasks
+- ✅ Offline: Always online assumption (can fallback)
+
+---
+
+## 8. Success Metrics
+
+### Phase 0-1 Success (Foundation + Materials)
+- [ ] Project builds successfully
+- [ ] Materials sync automatically
+- [ ] Mind maps have visual images
+- [ ] VoiceOver works for material list
+
+### Phase 2-3 Success (Voice + Vision)
+- [ ] Voice conversation works naturally
+- [ ] Latency < 1 second
+- [ ] Camera homework help functional
+- [ ] Mario prefers this over ChatGPT app
+
+### Phase 4-5 Success (Mind Maps + Tasks)
+- [ ] Mind maps render smoothly
+- [ ] Tasks auto-created from calendar/email
+- [ ] Mario uses mind maps regularly
+- [ ] Zero missed assignments
+
+### Phase 6-7 Success (Gamification + Subjects)
+- [ ] XP system motivating (qualitative)
+- [ ] Daily challenges completed
+- [ ] Subject modes useful (qualitative)
+- [ ] Mario studies more consistently
+
+### Phase 8 Success (Polish + Launch)
+- [ ] Zero critical bugs
+- [ ] All tests passing
+- [ ] Performance targets met
+- [ ] Mario can use independently
+- [ ] Ready for TestFlight
+
+### 6-Month Success (Post-Launch)
+- [ ] Mario uses 30-60 min/day
+- [ ] 90%+ homework completion
+- [ ] Improved grades (quantitative)
+- [ ] Reduced study stress (qualitative)
+- [ ] App not abandoned (still using regularly)
+
+---
+
+## 9. Risks & Mitigation
+
+### Technical Risks
+
+**Risk**: API costs exceed budget
+- **Likelihood**: Medium
+- **Impact**: High
+- **Mitigation**: Use Apple Intelligence for 70% of work, GPT-5 nano for simple tasks, monitor costs weekly
+
+**Risk**: Voice latency too high
+- **Likelihood**: Low
+- **Impact**: High
+- **Mitigation**: OpenAI Realtime API designed for <1s latency, use WiFi/good cellular, fallback to text
+
+**Risk**: Mind map generation too slow
+- **Likelihood**: Medium
+- **Impact**: Medium
+- **Mitigation**: Parallel processing (GPT-5 + DALL-E), cache results, show progress indicator
+
+**Risk**: Background Tasks not reliable
+- **Likelihood**: Medium
+- **Impact**: Medium
+- **Mitigation**: Add manual "Sync Now" button always available, user can trigger anytime
+
+**Risk**: CloudKit sync conflicts
+- **Likelihood**: Low
+- **Impact**: Low
+- **Mitigation**: SwiftData handles conflicts, last-write-wins acceptable for solo user
+
+### User Experience Risks
+
+**Risk**: Voice commands not recognized (Italian)
+- **Likelihood**: Medium
+- **Impact**: High
+- **Mitigation**: OpenAI Realtime supports Italian well, test extensively, provide visual alternatives
+
+**Risk**: Too complex for Mario
+- **Likelihood**: Low
+- **Impact**: High
+- **Mitigation**: Voice-first removes complexity, context always visible, onboarding tutorial
+
+**Risk**: Not motivating enough
+- **Likelihood**: Medium
+- **Impact**: High
+- **Mitigation**: Fortnite-style gamification proven with Mario, collect feedback early, iterate
+
+**Risk**: Accessibility issues
+- **Likelihood**: Low
+- **Impact**: Critical
+- **Mitigation**: VoiceOver from day 1, test with real VoiceOver, follow HIG strictly
+
+### Business Risks
+
+**Risk**: Development takes longer than 18 weeks
+- **Likelihood**: Medium
+- **Impact**: Medium
+- **Mitigation**: Agent-driven development, parallel agents, MVP features first, skip nice-to-haves
+
+**Risk**: API providers change pricing
+- **Likelihood**: Low
+- **Impact**: Medium
+- **Mitigation**: Multi-tier strategy, can shift to Apple Intelligence more if needed
+
+**Risk**: Mario doesn't use the app
+- **Likelihood**: Low
+- **Impact**: Critical
+- **Mitigation**: Design WITH Mario in mind from day 1, test early and often, iterate based on feedback
+
+---
+
+## 10. Timeline & Phases
+
+### Development Timeline (18 weeks total)
+
+**Phase 0**: Foundation (Weeks 1-2)
+- Agent: foundation-agent
+- Deliverable: Working project with data models
+
+**Phase 1**: Material Management (Weeks 3-4)
+- Agents: swiftui-expert-agent, swiftdata-agent, api-integration-agent
+- Deliverable: Auto-sync materials with mind maps
+
+**Phase 2**: Voice Coach (Weeks 5-6)
+- Agents: voice-agent, api-integration-agent
+- Deliverable: Real-time voice conversation
+
+**Phase 3**: Vision Capabilities (Weeks 7-8)
+- Agents: vision-agent, voice-agent
+- Deliverable: Camera homework help
+
+**Phase 4**: Mind Maps (Weeks 9-10)
+- Agents: mindmap-agent, swiftui-expert-agent
+- Deliverable: Interactive visual mind maps
+
+**Phase 5**: Task Management (Weeks 11-12)
+- Agents: api-integration-agent, swiftui-expert-agent
+- Deliverable: Auto-created tasks from calendar/email
+
+**Phase 6**: Gamification (Weeks 13-14)
+- Agents: swiftui-expert-agent, swiftdata-agent
+- Deliverable: XP, achievements, daily challenges
+
+**Phase 7**: Subject-Specific Modes (Weeks 15-16)
+- Agents: all agents
+- Deliverable: Math, Italian, History, Physics modes
+
+**Phase 8**: Polish & Launch (Weeks 17-18)
+- Agent: qa-agent, test-agent, accessibility-agent
+- Deliverable: Production-ready app
+
+### Agent-Driven Development (6-8 weeks with parallel agents)
+With 3-5 agents working in parallel, timeline could compress to 6-8 weeks:
+- Weeks 1-2: Foundation + Materials (parallel)
+- Weeks 3-4: Voice + Vision (parallel)
+- Weeks 5-6: Mind Maps + Tasks (parallel)
+- Weeks 7-8: Gamification + Polish (parallel)
+
+---
+
+## 11. Appendix
+
+### Glossary
+- **TTS**: Text-to-Speech
+- **STT**: Speech-to-Text
+- **OCR**: Optical Character Recognition
+- **XP**: Experience Points
+- **SRS**: Spaced Repetition System
+- **HIG**: Human Interface Guidelines
+- **WCAG**: Web Content Accessibility Guidelines
+- **MVP**: Minimum Viable Product
+
+### References
+- [STACK_FINAL.md](Docs/STACK_FINAL.md) - Technology stack details
+- [CRITICAL_DECISIONS.md](Docs/CRITICAL_DECISIONS.md) - Decision rationale
+- [AI_STRATEGY_UPDATED.md](Docs/AI_STRATEGY_UPDATED.md) - AI model analysis
+- [AGENT_DRIVEN_DEVELOPMENT.md](Docs/AGENT_DRIVEN_DEVELOPMENT.md) - Agent workflow
+- [constitution.md](.claude/constitution.md) - Development principles
+
+### Related Documents
+- PLANNING.md: Detailed feature breakdown
+- EXECUTIVE_SUMMARY.md: Quick overview
+- FINAL_BRIEFING.md: Complete summary
+- README.md: Project overview
+- ADR/: Architecture decisions
+
+---
+
+**END OF PRD**
+
+**Last Updated**: 2025-10-12
+**Version**: 1.0
+**Approved By**: Human + AI Planning Team
+**Ready for**: Task Master AI parsing and agent-driven development

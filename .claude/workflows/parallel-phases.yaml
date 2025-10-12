@@ -1,0 +1,415 @@
+# MirrorBuddy - Agent-Driven Development Workflow
+# Parallel Phase Execution Configuration
+# Date: 2025-10-12
+
+---
+
+workflow:
+  name: "MirrorBuddy Agent-Driven Development"
+  version: "1.0"
+  target_timeline: "6-8 weeks"
+  max_parallel_agents: 5
+
+phases:
+  # ============================================
+  # PHASE 0: Foundation (Weeks 1-2, 2 weeks)
+  # ============================================
+  phase_0:
+    name: "Foundation & Setup"
+    duration_weeks: 2
+    priority: critical
+    blocking: true  # All other phases depend on this
+
+    agents:
+      - id: foundation-agent
+        parallel: false
+        max_concurrent: 1
+        tasks:
+          - 1   # Setup Xcode Project
+          - 2   # Integrate SwiftLint
+          - 3   # SwiftData Models: Material
+          - 4   # SwiftData Models: Subject
+          - 5   # SwiftData Models: MindMap
+          - 6   # SwiftData Models: Flashcard
+          - 7   # SwiftData Models: Task
+          - 8   # SwiftData Models: UserProgress
+          - 9   # Setup CloudKit
+          - 10  # CloudKit Sync
+          - 11  # OpenAI Client
+          - 12  # Gemini Client
+          - 13  # Google APIs Client
+          - 14  # Error Handling
+          - 15  # Keychain Storage
+
+    success_criteria:
+      - "Project builds successfully"
+      - "SwiftLint: 0 warnings"
+      - "All SwiftData models working"
+      - "CloudKit sync configured"
+      - "API clients ready"
+      - "Tests passing (>80% coverage)"
+
+    handoff:
+      unblocks:
+        - swiftui-expert-agent
+        - swiftdata-agent
+        - api-integration-agent
+        - voice-agent
+        - vision-agent
+        - mindmap-agent
+        - automation-agent
+        - test-agent
+        - accessibility-agent
+
+  # ============================================
+  # PHASE 1-2: Materials & Voice (Weeks 3-4, 2 weeks)
+  # ============================================
+  phase_1_2:
+    name: "Material Management + Voice Coach"
+    duration_weeks: 2
+    priority: high
+    parallel: true
+    depends_on: [phase_0]
+
+    agent_groups:
+      # Group A: Material Management
+      materials_group:
+        parallel: true
+        agents:
+          - id: api-integration-agent
+            tasks:
+              - 16  # Google Drive OAuth
+              - 17  # Drive File Listing
+              - 18  # Drive File Download
+              - 19  # PDF Text Extraction
+              - 20  # Summary Generation (Apple Intelligence)
+              - 21  # Mind Map Generation (GPT-5)
+              - 22  # DALL-E Images for Mind Maps
+              - 23  # Flashcard Generation
+              - 24  # Simplified Explanations
+              - 25  # Parallel Processing Pipeline
+
+          - id: swiftui-expert-agent
+            tasks:
+              - 26  # Dashboard UI
+              - 27  # Material Cards
+              - 28  # Material Detail View
+              - 29  # Voice Command System
+
+          - id: automation-agent
+            tasks:
+              - 30  # Push Notifications
+              - 72  # Background Tasks for Sync
+
+      # Group B: Voice Coach
+      voice_group:
+        parallel: true
+        agents:
+          - id: voice-agent
+            tasks:
+              - 31  # OpenAI Realtime API
+              - 32  # Voice Conversation UI (with swiftui-expert-agent)
+              - 33  # Study Coach Personality
+              - 34  # Audio Pipeline
+
+    success_criteria:
+      - "Materials sync automatically"
+      - "PDFs processed within 2 minutes"
+      - "Mind maps have visual images"
+      - "Voice conversation works"
+      - "Latency < 1 second"
+      - "VoiceOver navigation works"
+
+  # ============================================
+  # PHASE 3-4: Vision & Mind Maps (Weeks 5-6, 2 weeks)
+  # ============================================
+  phase_3_4:
+    name: "Vision Capabilities + Interactive Mind Maps"
+    duration_weeks: 2
+    priority: high
+    parallel: true
+    depends_on: [phase_1_2]
+
+    agent_groups:
+      # Group A: Vision
+      vision_group:
+        parallel: true
+        agents:
+          - id: vision-agent
+            tasks:
+              - 35  # Camera Integration
+              - 36  # GPT-5 Vision API
+              - 37  # Vision + Voice Combined (with voice-agent)
+              - 38  # Handwriting Recognition
+
+      # Group B: Mind Maps
+      mindmap_group:
+        parallel: true
+        agents:
+          - id: mindmap-agent
+            tasks:
+              - 39  # Interactive Mind Map Renderer
+              - 40  # Mind Map Voice Navigation
+              - 41  # Mind Map Export
+
+    success_criteria:
+      - "Camera captures clear images"
+      - "90%+ text recognition accuracy"
+      - "Vision + voice integrated"
+      - "Mind maps render smoothly (60 FPS)"
+      - "Voice navigation works"
+      - "Export to Mermaid functional"
+
+  # ============================================
+  # PHASE 5-6: Tasks & Gamification (Weeks 7-8, 2 weeks)
+  # ============================================
+  phase_5_6:
+    name: "Task Management + Gamification"
+    duration_weeks: 2
+    priority: medium
+    parallel: true
+    depends_on: [phase_3_4]
+
+    agent_groups:
+      # Group A: Tasks
+      tasks_group:
+        parallel: true
+        agents:
+          - id: api-integration-agent
+            tasks:
+              - 42  # Google Calendar Integration
+              - 43  # Gmail Integration
+
+          - id: swiftui-expert-agent
+            tasks:
+              - 44  # Task List View
+              - 45  # Task Detail & Completion
+
+      # Group B: Gamification
+      gamification_group:
+        parallel: true
+        agents:
+          - id: swiftdata-agent
+            tasks:
+              - 46  # XP & Leveling System
+              - 47  # Achievements & Badges
+              - 48  # Daily Challenges
+              - 49  # Rewards & Customization
+
+    success_criteria:
+      - "Calendar syncs automatically"
+      - "Emails parsed correctly (90%+)"
+      - "Tasks created without manual input"
+      - "XP system engaging"
+      - "Achievements motivating"
+
+  # ============================================
+  # PHASE 7-8: Subjects & Polish (Weeks 9-10, 2 weeks)
+  # ============================================
+  phase_7_8:
+    name: "Subject-Specific Modes + Polish & Launch"
+    duration_weeks: 2
+    priority: medium
+    parallel: true
+    depends_on: [phase_5_6]
+
+    agent_groups:
+      # Group A: Subject Modes
+      subjects_group:
+        parallel: true
+        agents:
+          - id: api-integration-agent
+            tasks:
+              - 50  # Math Mode
+              - 51  # Italian Mode
+              - 52  # History Mode
+              - 53  # Physics/Science Mode
+              - 54  # Language Mode
+
+      # Group B: Polish
+      polish_group:
+        parallel: true
+        agents:
+          - id: swiftui-expert-agent
+            tasks:
+              - 55  # Onboarding Flow
+              - 56  # Settings & Preferences
+
+          - id: accessibility-agent
+            tasks:
+              - 60  # Accessibility Audit
+              - 73  # Text-to-Speech
+              - 74  # Dyslexia-Friendly Rendering
+              - 75  # Context Banners
+              - 76  # One-Handed Optimization
+              - 77  # Large Touch Targets
+
+          - id: test-agent
+            tasks:
+              - 61  # Unit Tests
+              - 62  # Integration Tests
+              - 63  # UI Tests
+              - 64  # Accessibility Tests
+              - 65  # Performance Tests
+              - 66  # Real Device Testing
+
+      # Group C: Performance & Documentation
+      finalization_group:
+        parallel: true
+        agents:
+          - id: api-integration-agent
+            tasks:
+              - 57  # Offline Mode
+              - 58  # Error Handling UI
+              - 59  # Performance Optimization
+
+          - id: swiftdata-agent
+            tasks:
+              - 78  # Study Time Tracking
+              - 79  # Spaced Repetition System
+
+          - id: qa-agent
+            tasks:
+              - 67  # Update README
+              - 68  # API Documentation
+              - 69  # User Guide
+              - 70  # Developer Notes
+              - 71  # Deployment Guide
+              - 80  # Prepare TestFlight
+
+    success_criteria:
+      - "All subject modes functional"
+      - "Zero critical bugs"
+      - "VoiceOver perfect"
+      - "Performance targets met"
+      - "Ready for TestFlight"
+
+---
+
+# Agent Orchestration Rules
+
+orchestration:
+  human_oversight:
+    required_for:
+      - "Architectural decisions"
+      - "Dependency additions"
+      - "Security concerns"
+      - "Cost overruns (>20%)"
+      - "Timeline risks"
+      - "Phase completion approval"
+
+  agent_autonomy:
+    allowed:
+      - "Implementation within spec"
+      - "Code refactoring"
+      - "Test writing"
+      - "Bug fixes"
+      - "Documentation updates"
+      - "Minor UI adjustments"
+
+  conflict_resolution:
+    - "QA agent has final say on code quality"
+    - "Accessibility agent has final say on a11y"
+    - "Foundation agent has final say on architecture"
+    - "Human resolves agent disagreements"
+
+  communication:
+    - "Agents use Task Master for task updates"
+    - "Agents tag dependent agents when unblocking"
+    - "Agents escalate via constitution escalation format"
+    - "Daily status updates in Task Master"
+
+  quality_gates:
+    before_merge:
+      - "All tests pass"
+      - "SwiftLint: 0 warnings"
+      - "Coverage: >80%"
+      - "Build succeeds"
+      - "VoiceOver functional"
+      - "QA agent approval"
+
+    before_phase_completion:
+      - "All phase tasks done"
+      - "Integration tests pass"
+      - "Success criteria met"
+      - "Handoff documentation complete"
+      - "Human approval"
+
+---
+
+# Parallel Execution Strategy
+
+parallel_strategy:
+  week_1_2:
+    active_agents: [foundation-agent]
+    max_parallel: 1
+    focus: "Build solid foundation"
+
+  week_3_4:
+    active_agents:
+      - api-integration-agent
+      - swiftui-expert-agent
+      - automation-agent
+      - voice-agent
+    max_parallel: 4
+    focus: "Materials + Voice in parallel"
+
+  week_5_6:
+    active_agents:
+      - vision-agent
+      - mindmap-agent
+      - voice-agent  # for integration
+    max_parallel: 3
+    focus: "Vision + Mind Maps in parallel"
+
+  week_7_8:
+    active_agents:
+      - api-integration-agent
+      - swiftui-expert-agent
+      - swiftdata-agent
+    max_parallel: 3
+    focus: "Tasks + Gamification in parallel"
+
+  week_9_10:
+    active_agents:
+      - api-integration-agent
+      - swiftui-expert-agent
+      - accessibility-agent
+      - test-agent
+      - swiftdata-agent
+      - qa-agent
+    max_parallel: 5
+    focus: "All hands on deck for polish"
+
+---
+
+# Cost & Timeline Management
+
+cost_management:
+  api_budget:
+    development: "$270-450 (18 weeks)"
+    steady_state: "$90-160/month"
+
+  monitoring:
+    - "Track API costs weekly"
+    - "Alert if >20% over budget"
+    - "Optimize expensive operations"
+    - "Use Apple Intelligence when possible"
+
+timeline_management:
+  milestones:
+    week_2: "Foundation complete, agents unblocked"
+    week_4: "Materials + Voice working"
+    week_6: "Vision + Mind Maps working"
+    week_8: "Tasks + Gamification working"
+    week_10: "TestFlight ready"
+
+  risk_mitigation:
+    - "If phase delayed >3 days, escalate"
+    - "If API costs spike, optimize"
+    - "If tests fail, pause new features"
+    - "If accessibility issues, fix immediately"
+
+---
+
+**This workflow enables 6-8 week development with parallel agents! 🚀**
