@@ -62,8 +62,8 @@ struct ContentView: View {
     private func addSampleMaterial() {
         withAnimation {
             let sample = Material(
-                title: "Sample Material",
-                subject: .mathematics
+                title: "Materiale di esempio",
+                subject: .matematica
             )
             modelContext.insert(sample)
         }

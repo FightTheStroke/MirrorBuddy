@@ -18,7 +18,7 @@ enum Achievement: String, Codable, CaseIterable {
         case .firstMindMap: return "brain.head.profile"
         case .streak7Days: return "flame.fill"
         case .streak30Days: return "flame.circle.fill"
-        case .master100Flashcards: return "star.fill"
+        case .complete100Flashcards: return "star.fill"
         case .completeAllSubjects: return "rosette"
         }
     }
