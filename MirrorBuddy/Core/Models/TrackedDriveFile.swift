@@ -156,7 +156,7 @@ final class DriveFileTracker {
     /// Shared singleton instance
     static let shared = DriveFileTracker()
 
-    private let modelContext: ModelContext
+    let modelContext: ModelContext
 
     private init() {
         // Note: In production, modelContext should be injected
