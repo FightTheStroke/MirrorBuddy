@@ -15,6 +15,7 @@ struct MirrorBuddyApp: App {
     init() {
         // Register background tasks
         BackgroundSyncManager.shared.registerBackgroundTasks()
+        BackgroundTaskScheduler.shared.registerBackgroundTasks()
     }
 
     var sharedModelContainer: ModelContainer = {
@@ -25,7 +26,8 @@ struct MirrorBuddyApp: App {
             MindMapNode.self,
             Flashcard.self,
             Task.self,
-            UserProgress.self
+            UserProgress.self,
+            TrackedDriveFile.self
         ])
         let modelConfiguration = ModelConfiguration(
             schema: schema,
@@ -55,6 +57,10 @@ struct MirrorBuddyApp: App {
                 .onAppear {
                     // Schedule background sync on app launch
                     BackgroundSyncManager.shared.scheduleBackgroundSync()
+
+                    // Configure Google Drive sync service with model context
+                    DriveSyncService.shared.configure(modelContext: sharedModelContainer.mainContext)
+                    BackgroundTaskScheduler.shared.scheduleNextSync()
                 }
         }
         .modelContainer(sharedModelContainer)
