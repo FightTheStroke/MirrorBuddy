@@ -1,0 +1,19 @@
+{
+	"mcpServers": {
+		"task-master-ai": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"-y",
+				"--package=task-master-ai",
+				"task-master-ai"
+			],
+			"env": {
+				"OPENAI_API_KEY": "sk-proj-your-openai-key-here",
+				"ANTHROPIC_API_KEY": "sk-ant-your-anthropic-key-here",
+				"GOOGLE_API_KEY": "your-google-key-here",
+				"PERPLEXITY_API_KEY": "your-perplexity-key-here"
+			}
+		}
+	}
+}

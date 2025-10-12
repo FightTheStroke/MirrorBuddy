@@ -9,9 +9,19 @@ dev-debug.log
 # Dependency directories
 node_modules/
 
-# Environment variables
+# Environment variables and API Keys
 .env
+.env.local
+.env.*.local
 .mcp.json
+.mcp.json.backup
+**/*.backup
+**/APIKeys.swift
+**/Config/APIKeys.swift
+**/*APIKeys*.swift
+**/*Secrets*.swift
+**/*credentials*.json
+**/*keys*.json
 
 # Editor directories and files
 .idea
