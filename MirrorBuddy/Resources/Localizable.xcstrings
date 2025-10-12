@@ -646,6 +646,42 @@
           }
         }
       }
+    },
+    "error.subject.cannotDeleteDefault": {
+      "comment": "Error message: Cannot delete default subjects. You can deactivate them instead.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot delete default subjects. You can deactivate them instead."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile eliminare le materie predefinite. Puoi disattivarle."
+          }
+        }
+      }
+    },
+    "error.subject.hasAssociatedContent": {
+      "comment": "Error message: This subject has associated materials or tasks and cannot be deleted.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This subject has associated materials or tasks and cannot be deleted."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa materia ha materiali o compiti associati e non può essere eliminata."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

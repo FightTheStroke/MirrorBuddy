@@ -11,6 +11,7 @@ import SwiftUI
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var materials: [Material]
+    @Query private var subjects: [SubjectEntity]
 
     var body: some View {
         NavigationSplitView {
@@ -32,9 +33,11 @@ struct ContentView: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 Text(material.title)
                                     .font(.headline)
-                                Text(material.subject.localizedName)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                if let subject = material.subject {
+                                    Label(subject.displayName, systemImage: subject.iconName)
+                                        .font(.caption)
+                                        .foregroundStyle(subject.color)
+                                }
                             }
                         }
                     }
@@ -67,9 +70,12 @@ struct ContentView: View {
 
     private func addSampleMaterial() {
         withAnimation {
+            // Find matematica subject
+            let matematica = subjects.first { $0.localizationKey == "subject.matematica" }
+
             let sample = Material(
                 title: String(localized: "materials.sample.title"),
-                subject: .matematica
+                subject: matematica
             )
             modelContext.insert(sample)
         }

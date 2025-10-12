@@ -14,7 +14,6 @@ enum ProcessingStatus: String, Codable {
 final class Material {
     var id: UUID
     var title: String
-    var subject: Subject
     var createdAt: Date
     var lastAccessedAt: Date?
 
@@ -30,18 +29,21 @@ final class Material {
     var processingStatus: ProcessingStatus
 
     // Relationships
+    @Relationship(deleteRule: .nullify)
+    var subject: SubjectEntity?
+
     @Relationship(deleteRule: .cascade)
     var mindMap: MindMap?
 
     @Relationship(deleteRule: .cascade)
     var flashcards: [Flashcard] = []
 
-    @Relationship(deleteRule: .nullify)
+    @Relationship(deleteRule: .nullify, inverse: \Task.material)
     var tasks: [Task] = []
 
     init(
         title: String,
-        subject: Subject,
+        subject: SubjectEntity? = nil,
         googleDriveFileID: String? = nil
     ) {
         self.id = UUID()

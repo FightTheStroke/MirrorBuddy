@@ -14,7 +14,6 @@ final class Task {
     var id: UUID
     var title: String
     var taskDescription: String?
-    var materialID: UUID?
 
     var dueDate: Date?
     var completedAt: Date?
@@ -27,10 +26,18 @@ final class Task {
     var createdAt: Date
     var priority: Int // 1 (low) to 5 (high)
 
+    // Relationships
+    @Relationship(deleteRule: .nullify)
+    var subject: SubjectEntity?
+
+    @Relationship(deleteRule: .nullify)
+    var material: Material?
+
     init(
         title: String,
         description: String? = nil,
-        materialID: UUID? = nil,
+        subject: SubjectEntity? = nil,
+        material: Material? = nil,
         dueDate: Date? = nil,
         source: TaskSource = .manual,
         priority: Int = 3
@@ -38,7 +45,8 @@ final class Task {
         self.id = UUID()
         self.title = title
         self.taskDescription = description
-        self.materialID = materialID
+        self.subject = subject
+        self.material = material
         self.dueDate = dueDate
         self.isCompleted = false
         self.source = source
