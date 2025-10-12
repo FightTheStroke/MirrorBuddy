@@ -1,0 +1,62 @@
+import Foundation
+
+/// API Keys Configuration
+///
+/// IMPORTANT: This is an example file. To use:
+/// 1. Copy this file to `APIKeys.swift` (same directory)
+/// 2. Replace placeholder values with your actual API keys
+/// 3. NEVER commit APIKeys.swift to git (it's in .gitignore)
+///
+/// Get API keys from:
+/// - OpenAI: https://platform.openai.com/api-keys
+/// - Anthropic: https://console.anthropic.com/
+/// - Google Cloud: https://console.cloud.google.com/apis/credentials
+
+enum APIKeys {
+    /// OpenAI API Key (required for GPT models and DALL-E)
+    /// Format: sk-...
+    static let openAI = "YOUR_OPENAI_KEY_HERE"
+
+    /// Anthropic API Key (required for Claude models)
+    /// Format: sk-ant-...
+    static let anthropic = "YOUR_ANTHROPIC_KEY_HERE"
+
+    /// Google Cloud Client ID (required for Drive, Calendar, Gmail)
+    /// Format: xxxxxxxx.apps.googleusercontent.com
+    static let googleClientID = "YOUR_GOOGLE_CLIENT_ID_HERE"
+
+    /// Google Cloud Client Secret
+    static let googleClientSecret = "YOUR_GOOGLE_CLIENT_SECRET_HERE"
+
+    /// Google API Key (for server-side API calls)
+    /// Format: AIza...
+    static let googleAPIKey = "YOUR_GOOGLE_API_KEY_HERE"
+}
+
+// MARK: - Validation
+
+extension APIKeys {
+    /// Check if all required API keys are configured
+    static var isConfigured: Bool {
+        return !openAI.contains("YOUR_") &&
+               !anthropic.contains("YOUR_") &&
+               !googleClientID.contains("YOUR_")
+    }
+
+    /// Get missing API keys for better error messages
+    static var missingKeys: [String] {
+        var missing: [String] = []
+
+        if openAI.contains("YOUR_") {
+            missing.append("OpenAI")
+        }
+        if anthropic.contains("YOUR_") {
+            missing.append("Anthropic")
+        }
+        if googleClientID.contains("YOUR_") {
+            missing.append("Google")
+        }
+
+        return missing
+    }
+}
