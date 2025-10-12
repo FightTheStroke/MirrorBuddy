@@ -1191,11 +1191,63 @@
           "23",
           "24"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Processing Pipeline Architecture",
+            "description": "Create a comprehensive architecture for the parallel material processing pipeline that defines components, data flow, and concurrency model.",
+            "dependencies": [],
+            "details": "Design a modular pipeline architecture with clear input/output interfaces. Define processing stages including material parsing, content extraction, metadata generation, and storage. Create diagrams showing data flow and concurrency patterns. Document the architecture with performance considerations and scalability options.",
+            "status": "in-progress",
+            "testStrategy": "Review architecture with team. Create proof-of-concept prototype to validate key concepts. Test with sample materials to verify pipeline stages work as expected.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:40:55.012Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Swift Concurrency for Parallel Processing",
+            "description": "Develop the core parallel processing functionality using Swift's modern concurrency features like async/await and task groups.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement async processing functions for each pipeline stage. Create task groups to process multiple materials concurrently. Use actors to manage shared state safely. Implement proper cancellation handling. Create throttling mechanisms to prevent system overload. Use structured concurrency patterns to maintain clean task hierarchies.",
+            "status": "in-progress",
+            "testStrategy": "Unit test each processing function. Measure performance with varying concurrency levels. Test cancellation scenarios. Verify memory usage remains stable during extended processing.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:40:55.015Z"
+          },
+          {
+            "id": 3,
+            "title": "Create Task Coordinator and Progress Tracking",
+            "description": "Develop a coordinator component that manages processing tasks and provides detailed progress reporting.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement a TaskCoordinator class that manages the lifecycle of processing tasks. Create a progress tracking system with support for overall and per-task progress. Implement a notification system for progress updates. Add support for pausing and resuming tasks. Create a dashboard UI for monitoring active processing tasks with detailed statistics.",
+            "status": "in-progress",
+            "testStrategy": "Test coordinator with multiple simultaneous materials. Verify progress reporting accuracy. Test pause/resume functionality. Ensure UI updates correctly reflect processing state.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:40:55.023Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Error Handling and Background Processing",
+            "description": "Add robust error handling, recovery mechanisms, and support for background processing using BGProcessingTask.",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement comprehensive error handling for all pipeline stages. Create recovery strategies for common failure scenarios. Develop a retry mechanism with exponential backoff. Implement BGProcessingTask integration for background execution. Add persistence for task state to survive app termination. Create a processing queue that prioritizes tasks appropriately. Optimize for battery efficiency during background processing.",
+            "status": "in-progress",
+            "testStrategy": "Test error recovery with simulated failures at each stage. Verify background processing continues after app is backgrounded. Test app restoration after termination during processing. Measure battery impact during extended processing sessions.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:40:55.026Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement parallel material processing pipeline."
+        "expansionPrompt": "Break down this task with a focus on implement parallel material processing pipeline.",
+        "updatedAt": "2025-10-12T18:40:55.026Z"
       },
       {
         "id": "26",
@@ -2311,7 +2363,7 @@
           "8",
           "44"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -2319,10 +2371,10 @@
             "description": "Create a SwiftUI view that displays all relevant task details, including description, due date countdown, linked material navigation, and action buttons.",
             "dependencies": [],
             "details": "Develop a SwiftUI view that shows the task's title, description, due date countdown, and provides navigation to linked materials. Add 'Start studying', 'Edit', and 'Delete' buttons. Ensure the view is modular and supports navigation from a task list. Use best practices for data binding and view updates.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Verify that all task details are displayed correctly for various task data. Test navigation to linked materials and ensure all buttons are visible and functional.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:37:45.395Z"
+            "updatedAt": "2025-10-12T18:40:11.814Z"
           },
           {
             "id": 2,
@@ -2332,10 +2384,10 @@
               1
             ],
             "details": "Integrate a 'Complete Task' action that updates the task's status, triggers haptic feedback, and displays an XP reward animation. Ensure the animation is smooth and the feedback is triggered only upon successful completion. Use SwiftUI animation APIs and Core Haptics as needed.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test the completion workflow: mark a task as complete, verify haptic feedback, and observe the XP animation. Confirm state updates and animation performance.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:37:45.405Z"
+            "updatedAt": "2025-10-12T18:40:11.817Z"
           },
           {
             "id": 3,
@@ -2345,16 +2397,16 @@
               1
             ],
             "details": "Add a share button to allow users to share task details using the system share sheet. Implement edit and delete options, ensuring proper confirmation dialogs and state updates. Integrate these actions into the UI with clear affordances.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test sharing on multiple devices and platforms. Verify edit and delete actions update the UI and data model correctly, including confirmation dialogs and error handling.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:37:45.408Z"
+            "updatedAt": "2025-10-12T18:40:11.820Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement task detail and completion ui.",
-        "updatedAt": "2025-10-12T18:37:45.408Z"
+        "updatedAt": "2025-10-12T18:40:11.820Z"
       },
       {
         "id": "46",
@@ -3066,9 +3118,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T18:37:45.409Z",
+      "lastModified": "2025-10-12T18:40:55.026Z",
       "taskCount": 83,
-      "completedCount": 38,
+      "completedCount": 39,
       "tags": [
         "master"
       ]
