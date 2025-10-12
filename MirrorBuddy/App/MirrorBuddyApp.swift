@@ -13,6 +13,11 @@ struct MirrorBuddyApp: App {
     @State private var syncMonitor = CloudKitSyncMonitor.shared
 
     init() {
+        // Start performance monitoring (Task 59)
+        _Concurrency.Task { @MainActor in
+            PerformanceMonitor.shared.startAppLaunch()
+        }
+
         // Register background tasks
         BackgroundSyncManager.shared.registerBackgroundTasks()
         BackgroundTaskScheduler.shared.registerBackgroundTasks()
@@ -61,6 +66,14 @@ struct MirrorBuddyApp: App {
                 .environment(LocalizationManager.shared)
                 .environment(syncMonitor)
                 .onAppear {
+                    // Complete performance monitoring setup (Task 59)
+                    _Concurrency.Task { @MainActor in
+                        PerformanceMonitor.shared.completeAppLaunch()
+                        PerformanceMonitor.shared.setMemoryBaseline()
+                        PerformanceMonitor.shared.startFPSMonitoring()
+                        PerformanceMonitor.shared.logBatteryStatus()
+                    }
+
                     // Schedule background sync on app launch
                     BackgroundSyncManager.shared.scheduleBackgroundSync()
 
