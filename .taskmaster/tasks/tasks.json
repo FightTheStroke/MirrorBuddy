@@ -2239,7 +2239,7 @@
           "43",
           "82"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -2247,10 +2247,10 @@
             "description": "Create a SwiftUI view for displaying task lists, including basic UI elements such as task items and checkboxes.",
             "dependencies": [],
             "details": "Use SwiftUI's List structure to create a scrollable list of tasks. Implement large checkboxes (44×44pt) for marking tasks as done. Ensure the view is responsive and adaptable to different screen sizes.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Verify the view displays tasks correctly and checkboxes are interactive.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:34:47.256Z"
+            "updatedAt": "2025-10-12T18:37:16.309Z"
           },
           {
             "id": 2,
@@ -2260,10 +2260,10 @@
               1
             ],
             "details": "Use SwiftUI's Section structure to organize tasks into different sections. Implement color-coding by using different colors for each subject, ensuring accessibility and visual clarity.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test that tasks are correctly grouped by section and color-coded by subject.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:34:47.260Z"
+            "updatedAt": "2025-10-12T18:37:16.321Z"
           },
           {
             "id": 3,
@@ -2274,10 +2274,10 @@
               2
             ],
             "details": "Use SwiftUI's ForEach structure with conditional statements to filter tasks. Implement sorting using array sorting methods. Add a search bar that filters tasks based on user input.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Verify that filtering, sorting, and search functions work as expected with various task combinations.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:34:47.263Z"
+            "updatedAt": "2025-10-12T18:37:16.324Z"
           },
           {
             "id": 4,
@@ -2288,16 +2288,16 @@
               3
             ],
             "details": "Use speech recognition APIs to enable voice commands for adding, marking, or deleting tasks. Ensure all UI elements have sufficient size and spacing for accessibility.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test voice commands with various tasks and verify accessibility features meet guidelines.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:34:47.265Z"
+            "updatedAt": "2025-10-12T18:37:16.327Z"
           }
         ],
         "complexity": 7,
         "recommendedSubtasks": 9,
         "expansionPrompt": "Break down the task list view implementation into subtasks covering the main view, different task sections, filtering/sorting, voice commands, and accessibility features. Consider how to make the interface efficient for managing multiple tasks.",
-        "updatedAt": "2025-10-12T18:34:47.265Z"
+        "updatedAt": "2025-10-12T18:37:16.327Z"
       },
       {
         "id": "45",
@@ -2311,11 +2311,50 @@
           "8",
           "44"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and Implement Task Detail SwiftUI View",
+            "description": "Create a SwiftUI view that displays all relevant task details, including description, due date countdown, linked material navigation, and action buttons.",
+            "dependencies": [],
+            "details": "Develop a SwiftUI view that shows the task's title, description, due date countdown, and provides navigation to linked materials. Add 'Start studying', 'Edit', and 'Delete' buttons. Ensure the view is modular and supports navigation from a task list. Use best practices for data binding and view updates.",
+            "status": "in-progress",
+            "testStrategy": "Verify that all task details are displayed correctly for various task data. Test navigation to linked materials and ensure all buttons are visible and functional.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:37:45.395Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Task Completion and Feedback Functionality",
+            "description": "Add completion logic, haptic feedback, and XP reward animation to the task detail view.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate a 'Complete Task' action that updates the task's status, triggers haptic feedback, and displays an XP reward animation. Ensure the animation is smooth and the feedback is triggered only upon successful completion. Use SwiftUI animation APIs and Core Haptics as needed.",
+            "status": "in-progress",
+            "testStrategy": "Test the completion workflow: mark a task as complete, verify haptic feedback, and observe the XP animation. Confirm state updates and animation performance.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:37:45.405Z"
+          },
+          {
+            "id": 3,
+            "title": "Add Sharing, Edit, and Delete Options to Task Detail UI",
+            "description": "Implement sharing functionality and provide edit/delete options within the task detail view.",
+            "dependencies": [
+              1
+            ],
+            "details": "Add a share button to allow users to share task details using the system share sheet. Implement edit and delete options, ensuring proper confirmation dialogs and state updates. Integrate these actions into the UI with clear affordances.",
+            "status": "in-progress",
+            "testStrategy": "Test sharing on multiple devices and platforms. Verify edit and delete actions update the UI and data model correctly, including confirmation dialogs and error handling.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:37:45.408Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement task detail and completion ui."
+        "expansionPrompt": "Break down this task with a focus on implement task detail and completion ui.",
+        "updatedAt": "2025-10-12T18:37:45.408Z"
       },
       {
         "id": "46",
@@ -3027,9 +3066,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T18:34:47.266Z",
+      "lastModified": "2025-10-12T18:37:45.409Z",
       "taskCount": 83,
-      "completedCount": 37,
+      "completedCount": 38,
       "tags": [
         "master"
       ]

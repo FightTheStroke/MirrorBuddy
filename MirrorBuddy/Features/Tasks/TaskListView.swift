@@ -51,7 +51,12 @@ struct TaskListView: View {
                 if !overdueTasks.isEmpty {
                     Section {
                         ForEach(overdueTasks) { task in
-                            TaskRow(task: task, onToggle: { toggleTask(task) })
+                            NavigationLink {
+                                TaskDetailView(task: task)
+                            } label: {
+                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                            }
+                            .buttonStyle(.plain)
                         }
                     } header: {
                         SectionHeader(
@@ -67,7 +72,12 @@ struct TaskListView: View {
                 if !todayTasks.isEmpty {
                     Section {
                         ForEach(todayTasks) { task in
-                            TaskRow(task: task, onToggle: { toggleTask(task) })
+                            NavigationLink {
+                                TaskDetailView(task: task)
+                            } label: {
+                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                            }
+                            .buttonStyle(.plain)
                         }
                     } header: {
                         SectionHeader(
@@ -83,7 +93,12 @@ struct TaskListView: View {
                 if !upcomingTasks.isEmpty {
                     Section {
                         ForEach(upcomingTasks) { task in
-                            TaskRow(task: task, onToggle: { toggleTask(task) })
+                            NavigationLink {
+                                TaskDetailView(task: task)
+                            } label: {
+                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                            }
+                            .buttonStyle(.plain)
                         }
                     } header: {
                         SectionHeader(
@@ -99,7 +114,12 @@ struct TaskListView: View {
                 if !laterTasks.isEmpty {
                     Section {
                         ForEach(laterTasks) { task in
-                            TaskRow(task: task, onToggle: { toggleTask(task) })
+                            NavigationLink {
+                                TaskDetailView(task: task)
+                            } label: {
+                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                            }
+                            .buttonStyle(.plain)
                         }
                     } header: {
                         SectionHeader(
@@ -115,7 +135,12 @@ struct TaskListView: View {
                 if viewModel.showCompletedTasks && !completedTasks.isEmpty {
                     Section {
                         ForEach(completedTasks) { task in
-                            TaskRow(task: task, onToggle: { toggleTask(task) })
+                            NavigationLink {
+                                TaskDetailView(task: task)
+                            } label: {
+                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                            }
+                            .buttonStyle(.plain)
                         }
                     } header: {
                         SectionHeader(
