@@ -1199,10 +1199,10 @@
             "description": "Create a comprehensive architecture for the parallel material processing pipeline that defines components, data flow, and concurrency model.",
             "dependencies": [],
             "details": "Design a modular pipeline architecture with clear input/output interfaces. Define processing stages including material parsing, content extraction, metadata generation, and storage. Create diagrams showing data flow and concurrency patterns. Document the architecture with performance considerations and scalability options.",
-            "status": "in-progress",
+            "status": "blocked",
             "testStrategy": "Review architecture with team. Create proof-of-concept prototype to validate key concepts. Test with sample materials to verify pipeline stages work as expected.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:40:55.012Z"
+            "updatedAt": "2025-10-12T18:45:23.419Z"
           },
           {
             "id": 2,
@@ -1212,10 +1212,10 @@
               1
             ],
             "details": "Implement async processing functions for each pipeline stage. Create task groups to process multiple materials concurrently. Use actors to manage shared state safely. Implement proper cancellation handling. Create throttling mechanisms to prevent system overload. Use structured concurrency patterns to maintain clean task hierarchies.",
-            "status": "in-progress",
+            "status": "blocked",
             "testStrategy": "Unit test each processing function. Measure performance with varying concurrency levels. Test cancellation scenarios. Verify memory usage remains stable during extended processing.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:40:55.015Z"
+            "updatedAt": "2025-10-12T18:45:23.422Z"
           },
           {
             "id": 3,
@@ -1225,10 +1225,10 @@
               2
             ],
             "details": "Implement a TaskCoordinator class that manages the lifecycle of processing tasks. Create a progress tracking system with support for overall and per-task progress. Implement a notification system for progress updates. Add support for pausing and resuming tasks. Create a dashboard UI for monitoring active processing tasks with detailed statistics.",
-            "status": "in-progress",
+            "status": "blocked",
             "testStrategy": "Test coordinator with multiple simultaneous materials. Verify progress reporting accuracy. Test pause/resume functionality. Ensure UI updates correctly reflect processing state.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:40:55.023Z"
+            "updatedAt": "2025-10-12T18:45:23.424Z"
           },
           {
             "id": 4,
@@ -1238,16 +1238,16 @@
               3
             ],
             "details": "Implement comprehensive error handling for all pipeline stages. Create recovery strategies for common failure scenarios. Develop a retry mechanism with exponential backoff. Implement BGProcessingTask integration for background execution. Add persistence for task state to survive app termination. Create a processing queue that prioritizes tasks appropriately. Optimize for battery efficiency during background processing.",
-            "status": "in-progress",
+            "status": "blocked",
             "testStrategy": "Test error recovery with simulated failures at each stage. Verify background processing continues after app is backgrounded. Test app restoration after termination during processing. Measure battery impact during extended processing sessions.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:40:55.026Z"
+            "updatedAt": "2025-10-12T18:45:23.427Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement parallel material processing pipeline.",
-        "updatedAt": "2025-10-12T18:40:55.026Z"
+        "updatedAt": "2025-10-12T18:45:23.427Z"
       },
       {
         "id": "26",
@@ -2132,11 +2132,51 @@
         "dependencies": [
           "39"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Core Export Formats (Markdown, OPML, JSON)",
+            "description": "Develop the essential export functionality for the three primary formats: Mermaid Markdown, OPML, and JSON (native format).",
+            "dependencies": [],
+            "details": "Create a unified export service that handles the conversion of mind map data structures to Mermaid Markdown, OPML, and JSON formats. Implement proper formatting for each export type, ensuring hierarchical relationships are preserved. Add file naming conventions and appropriate file extensions. Test each format with various mind map complexities to ensure accuracy and completeness of exported data.",
+            "status": "in-progress",
+            "testStrategy": "Create unit tests for each export format. Verify exported files match expected structure. Test with simple and complex mind maps. Validate exported files can be imported by relevant third-party applications.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:50:06.449Z"
+          },
+          {
+            "id": 2,
+            "title": "Develop Export UI and Sharing Integration",
+            "description": "Create a user interface for export settings and implement sharing functionality via the Files app.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design and implement an export settings UI that allows users to select format, customize export options, and initiate the export process. Add a preview capability when possible. Integrate with the iOS Files app for saving exports to user-selected locations. Implement share sheet functionality to allow direct sharing to other apps. Include appropriate icons and visual feedback during the export process.",
+            "status": "in-progress",
+            "testStrategy": "Conduct UI tests to verify all export options are functional. Test sharing to various destinations. Verify user preferences are saved correctly. Test on different device sizes to ensure responsive design.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:50:06.462Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement Advanced Export Features (XMind, Background Processing)",
+            "description": "Add support for XMind format export and implement background processing for large mind maps with appropriate notifications.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Research and implement the XMind file format specification. Create a converter from the app's native mind map structure to XMind format. Develop background processing capability using iOS background tasks for handling large mind maps without blocking the UI. Implement a notification system to inform users of export completion or failures. Add progress indicators for lengthy exports. Optimize export algorithms for performance with large data sets.",
+            "status": "in-progress",
+            "testStrategy": "Test XMind export compatibility with XMind applications. Measure performance with progressively larger mind maps. Test background export with app in different states (foreground, background, suspended). Verify notifications appear correctly in all scenarios.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:50:06.467Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement mind map export functionality."
+        "expansionPrompt": "Break down this task with a focus on implement mind map export functionality.",
+        "updatedAt": "2025-10-12T18:50:06.467Z"
       },
       {
         "id": "42",
@@ -3118,7 +3158,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T18:40:55.026Z",
+      "lastModified": "2025-10-12T18:50:06.467Z",
       "taskCount": 83,
       "completedCount": 39,
       "tags": [
