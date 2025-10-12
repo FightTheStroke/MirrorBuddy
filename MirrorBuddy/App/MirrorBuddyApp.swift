@@ -5,14 +5,14 @@
 //  Created by Mario D'Angelo on 12/10/25.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 @main
 struct MirrorBuddyApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Item.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

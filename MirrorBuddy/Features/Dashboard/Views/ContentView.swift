@@ -5,8 +5,8 @@
 //  Created by Mario D'Angelo on 12/10/25.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
@@ -31,12 +31,16 @@ struct ContentView: View {
 #if os(iOS)
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
+                        .accessibilityLabel("Edit list")
+                        .accessibilityHint("Double tap to edit or delete items")
                 }
 #endif
                 ToolbarItem {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
                     }
+                    .accessibilityLabel("Add new item")
+                    .accessibilityHint("Double tap to create a new item")
                 }
             }
         } detail: {
