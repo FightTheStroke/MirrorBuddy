@@ -1,0 +1,581 @@
+{
+	"meta": {
+		"generatedAt": "2025-10-12T13:03:15.089Z",
+		"tasksAnalyzed": 71,
+		"totalTasks": 83,
+		"analysisCount": 71,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 69,
+			"taskTitle": "Create User Guide",
+			"complexityScore": 6,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down the user guide creation into subtasks covering each major feature area. Include tasks for content planning, writing, reviewing, and formatting. Consider how to make the guide accessible and user-friendly for different user types.",
+			"reasoning": "Creating a comprehensive user guide requires understanding of all app features and the ability to explain them clearly. The task involves documenting 8 different feature areas plus an FAQ section. While not technically complex, it requires significant content creation, organization, and user testing. The guide must be accessible and match the actual app behavior, requiring coordination with the development team. The medium complexity score reflects the substantial content creation effort balanced by the non-technical nature of the task."
+		},
+		{
+			"taskId": 68,
+			"taskTitle": "Create API Documentation",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the API documentation task into subtasks for each API category. Include tasks for documenting interfaces, creating examples, reviewing for accuracy, and ensuring security. Consider how to structure the documentation for both internal and external developers.",
+			"reasoning": "API documentation requires deep technical understanding of multiple complex systems. The developer must document 7 different API categories including SwiftData models, API clients, voice/vision integrations, and external APIs. This requires precise technical writing and code examples that must be tested for correctness. The documentation must be comprehensive enough for other developers while ensuring no sensitive information is exposed. The complexity is increased by the need to coordinate with multiple development teams responsible for different APIs."
+		},
+		{
+			"taskId": 55,
+			"taskTitle": "Create Onboarding Flow",
+			"complexityScore": 8,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the onboarding flow implementation into subtasks covering UI design, permission handling, account connection, tutorials, and testing. Consider how to make the onboarding experience engaging while collecting necessary permissions and information.",
+			"reasoning": "Creating an effective onboarding flow is highly complex as it's the user's first experience with the app and requires integration with multiple systems. The task involves creating welcome content, implementing permission requests for camera/microphone/notifications, connecting to Google accounts, setting up API keys, creating interactive tutorials, and implementing progress tracking. The flow must be both informative and engaging while handling critical setup tasks. The high priority indicates its importance to the project. Technical complexity comes from integrating with multiple permission systems and external authentication."
+		},
+		{
+			"taskId": 70,
+			"taskTitle": "Create Developer Notes",
+			"complexityScore": 5,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the developer notes creation into subtasks for documenting architecture, code organization, performance considerations, limitations, and setup instructions. Consider how to make the documentation useful for current and future developers.",
+			"reasoning": "Creating developer notes requires comprehensive understanding of the system architecture and implementation details. The task involves documenting architectural decisions, code organization, performance optimizations, limitations, and future improvements. While technically detailed, it's primarily a documentation task rather than implementation. The low priority reflects that it's not critical for initial app functionality. The complexity comes from needing to understand and document the entire system architecture and technical decisions."
+		},
+		{
+			"taskId": 71,
+			"taskTitle": "Create Deployment Guide",
+			"complexityScore": 5,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the deployment guide creation into subtasks covering code signing, App Store setup, TestFlight distribution, submission process, and required assets. Consider how to make the guide useful for both initial and ongoing deployments.",
+			"reasoning": "Creating a deployment guide requires detailed knowledge of Apple's deployment processes. The task involves documenting code signing, App Store Connect setup, TestFlight distribution, App Store submission, and required assets. While technically detailed, it's primarily a documentation task rather than implementation. The medium priority reflects its importance for eventual app distribution. The complexity comes from needing to understand and document Apple's complex deployment processes and requirements."
+		},
+		{
+			"taskId": 32,
+			"taskTitle": "Create Voice Conversation UI",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the voice conversation UI implementation into subtasks covering the main view, conversation display, audio feedback, animations, and accessibility features. Consider how to make the interface intuitive and responsive during voice interactions.",
+			"reasoning": "Creating a voice conversation UI involves complex UI design and real-time feedback systems. The task requires implementing a SwiftUI view with waveform animations, conversation history display, context awareness, and one-handed optimization. The high priority indicates its importance to the core app experience. Technical complexity comes from creating responsive animations that provide feedback during voice conversations, implementing a context banner, and ensuring the UI works well with one-handed operation. Performance optimization for active conversations adds additional complexity."
+		},
+		{
+			"taskId": 44,
+			"taskTitle": "Create Task List View",
+			"complexityScore": 7,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down the task list view implementation into subtasks covering the main view, different task sections, filtering/sorting, voice commands, and accessibility features. Consider how to make the interface efficient for managing multiple tasks.",
+			"reasoning": "Creating a task list view involves complex UI design with multiple sections and interaction methods. The task requires implementing a SwiftUI view with today's tasks, upcoming tasks, overdue tasks, subject color-coding, voice commands, and search functionality. The high priority indicates its importance to the core app experience. Technical complexity comes from implementing efficient filtering and sorting for potentially large task lists, integrating voice commands, and ensuring accessibility with large touch targets. Performance optimization for large datasets adds additional complexity."
+		},
+		{
+			"taskId": 26,
+			"taskTitle": "Create Subject-Organized Dashboard UI",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down the dashboard UI implementation into subtasks covering the main view, subject organization, material cards, search/filtering, animations, and accessibility features. Consider how to make the interface efficient for navigating a large collection of materials.",
+			"reasoning": "Creating a subject-organized dashboard UI is highly complex as it's the main navigation hub for the app. The task involves implementing a SwiftUI view with subject-based organization, material cards, search/filtering, sorting options, smooth animations, one-handed optimization, and VoiceOver support. The high priority indicates its critical importance to the app experience. Technical complexity comes from creating an efficient organization system for potentially large numbers of materials, implementing smooth animations, and ensuring accessibility with VoiceOver and large touch targets. Performance optimization for large datasets adds significant complexity."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Create Google Gemini API Client",
+			"complexityScore": 7,
+			"recommendedSubtasks": 8,
+			"expansionPrompt": "Break down the Google Gemini API client implementation into subtasks covering configuration, different API methods, error handling, rate limiting, and response parsing. Consider how to make the client robust and efficient for various Workspace integrations.",
+			"reasoning": "Creating a Google Gemini API client involves complex networking and integration with Google's AI services. The task requires implementing configuration, methods for text generation, Drive research, Calendar parsing, Gmail extraction, error handling, rate limiting, and response parsing. The high priority indicates its importance to core app functionality. Technical complexity comes from working with multiple Google API endpoints, implementing proper error handling and retry logic, managing rate limits, and parsing complex response structures. Swift concurrency implementation adds additional complexity."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Create OpenAI API Client Infrastructure",
+			"complexityScore": 8,
+			"recommendedSubtasks": 9,
+			"expansionPrompt": "Break down the OpenAI API client implementation into subtasks covering configuration, different API endpoints (Chat, Vision, DALL-E, Realtime), WebSocket handling, error management, rate limiting, and response parsing. Consider how to make the client robust and efficient for various AI interactions.",
+			"reasoning": "Creating an OpenAI API client infrastructure is highly complex as it involves multiple API endpoints and real-time communication. The task requires implementing configuration, methods for GPT-5 chat, vision analysis, Q&A, DALL-E image generation, WebSocket handling for Realtime API, error handling, rate limiting, and response parsing. The high priority and in-progress status indicate its critical importance to the project. Technical complexity comes from implementing WebSocket connections for real-time audio, managing multiple API endpoints with different requirements, implementing proper error handling and retry logic, and parsing complex response structures. Swift concurrency implementation adds additional complexity."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Create Google APIs Client for Workspace Integration",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on create google apis client for workspace integration.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Implement API Error Handling and Retry Logic",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement api error handling and retry logic.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Implement Secure Keychain Storage for API Keys",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement secure keychain storage for api keys.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Implement Google Drive OAuth 2.0 Login Flow",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement google drive oauth 2.0 login flow.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Implement Google Drive File Listing and Monitoring",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement google drive file listing and monitoring.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Implement Google Drive File Download",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement google drive file download.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "Implement PDF Text Extraction with VisionKit",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement pdf text extraction with visionkit.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 20,
+			"taskTitle": "Implement Summary Generation with Apple Intelligence",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement summary generation with apple intelligence.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 21,
+			"taskTitle": "Implement Mind Map Generation with GPT-5",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement mind map generation with gpt-5.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 22,
+			"taskTitle": "Implement DALL-E 3 Image Generation for Mind Map Nodes",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement dall-e 3 image generation for mind map nodes.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 23,
+			"taskTitle": "Implement Flashcard Generation with GPT-5 Nano",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement flashcard generation with gpt-5 nano.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 24,
+			"taskTitle": "Implement Simplified Explanations Generation with GPT-5 Mini",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement simplified explanations generation with gpt-5 mini.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 25,
+			"taskTitle": "Implement Parallel Material Processing Pipeline",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement parallel material processing pipeline.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 27,
+			"taskTitle": "Implement Material Cards UI Component",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement material cards ui component.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 28,
+			"taskTitle": "Implement Material Detail View",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement material detail view.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 29,
+			"taskTitle": "Implement Voice Command System for Navigation",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement voice command system for navigation.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 30,
+			"taskTitle": "Implement Push Notification System",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement push notification system.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 31,
+			"taskTitle": "Implement OpenAI Realtime API Integration",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement openai realtime api integration.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 33,
+			"taskTitle": "Implement Study Coach Personality and Prompting",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement study coach personality and prompting.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 34,
+			"taskTitle": "Implement Audio Pipeline for Voice Conversations",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement audio pipeline for voice conversations.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 35,
+			"taskTitle": "Implement Camera Integration for Homework Help",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement camera integration for homework help.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 36,
+			"taskTitle": "Implement GPT-5 Vision API Integration",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement gpt-5 vision api integration.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 37,
+			"taskTitle": "Create Combined Vision and Voice Interaction",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on create combined vision and voice interaction.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 38,
+			"taskTitle": "Implement Handwriting Recognition with Apple Pencil",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement handwriting recognition with apple pencil.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 39,
+			"taskTitle": "Create Interactive Mind Map Renderer",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on create interactive mind map renderer.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 40,
+			"taskTitle": "Implement Mind Map Voice Navigation",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement mind map voice navigation.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 41,
+			"taskTitle": "Implement Mind Map Export Functionality",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement mind map export functionality.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 42,
+			"taskTitle": "Implement Google Calendar Integration",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement google calendar integration.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 43,
+			"taskTitle": "Implement Gmail Integration for Assignment Extraction",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement gmail integration for assignment extraction.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 45,
+			"taskTitle": "Implement Task Detail and Completion UI",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement task detail and completion ui.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 46,
+			"taskTitle": "Implement XP and Leveling System",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement xp and leveling system.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 47,
+			"taskTitle": "Implement Achievements and Badges System",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement achievements and badges system.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 48,
+			"taskTitle": "Implement Daily Challenges System",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement daily challenges system.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 49,
+			"taskTitle": "Implement Rewards and Customization System",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement rewards and customization system.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 50,
+			"taskTitle": "Implement Math Mode Specialized Features",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement math mode specialized features.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 51,
+			"taskTitle": "Implement Italian Mode Specialized Features",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement italian mode specialized features.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 52,
+			"taskTitle": "Implement History Mode Specialized Features",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement history mode specialized features.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 53,
+			"taskTitle": "Implement Physics/Science Mode Specialized Features",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement physics/science mode specialized features.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 54,
+			"taskTitle": "Implement Language Mode Specialized Features",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement language mode specialized features.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 56,
+			"taskTitle": "Implement Settings and Preferences UI",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement settings and preferences ui.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 57,
+			"taskTitle": "Implement Offline Mode Functionality",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement offline mode functionality.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 58,
+			"taskTitle": "Implement Error Handling and Recovery UI",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement error handling and recovery ui.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 59,
+			"taskTitle": "Implement Performance Optimization",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement performance optimization.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 60,
+			"taskTitle": "Conduct Accessibility Audit",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on conduct accessibility audit.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 61,
+			"taskTitle": "Implement Unit Tests for Core Functionality",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement unit tests for core functionality.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 62,
+			"taskTitle": "Implement Integration Tests",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement integration tests.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 63,
+			"taskTitle": "Implement UI Tests",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement ui tests.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 64,
+			"taskTitle": "Implement Accessibility Tests",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement accessibility tests.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 65,
+			"taskTitle": "Implement Performance Tests",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement performance tests.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 66,
+			"taskTitle": "Conduct Real Device Testing",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on conduct real device testing.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 67,
+			"taskTitle": "Update Project README",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on update project readme.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 72,
+			"taskTitle": "Implement Background Tasks for Scheduled Syncs",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement background tasks for scheduled syncs.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 73,
+			"taskTitle": "Implement Text-to-Speech for All Content",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement text-to-speech for all content.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 74,
+			"taskTitle": "Implement Dyslexia-Friendly Text Rendering",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement dyslexia-friendly text rendering.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 75,
+			"taskTitle": "Implement Context Banner for Working Memory Support",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement context banner for working memory support.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 76,
+			"taskTitle": "Optimize UI for One-Handed Operation",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on optimize ui for one-handed operation.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 77,
+			"taskTitle": "Implement Large Touch Targets",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement large touch targets.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 78,
+			"taskTitle": "Implement Study Time Tracking",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement study time tracking.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 79,
+			"taskTitle": "Implement Spaced Repetition System for Flashcards",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implement spaced repetition system for flashcards.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 80,
+			"taskTitle": "Prepare for TestFlight Distribution",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on prepare for testflight distribution.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 81,
+			"taskTitle": "Design and Implement App Icon",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on design and implement app icon.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		}
+	]
+}

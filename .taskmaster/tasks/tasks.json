@@ -149,52 +149,52 @@
         "dependencies": [
           "1"
         ],
-        "status": "done",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
-            "title": "Design OpenAIClient Class Structure and Configuration",
-            "description": "Define the OpenAIClient class, including configuration for API keys, endpoints, and initialization logic.",
+            "title": "Implement API Key and Endpoint Configuration",
+            "description": "Set up configuration management for API keys and endpoint URLs in the OpenAIClient class.",
             "dependencies": [],
-            "details": "Create a Swift class named OpenAIClient. Add properties for API key, base URLs for each endpoint (Chat, Vision, DALL-E, Realtime). Implement an initializer that accepts configuration parameters and securely stores the API key. Ensure the class is public and can be imported into other modules.",
+            "details": "Create properties for storing API keys and endpoint URLs. Ensure secure storage and retrieval, and allow for easy configuration changes. Use Swift's property wrappers or configuration files as needed.",
             "status": "pending",
-            "testStrategy": "Unit test initialization with valid and invalid configurations. Verify API key is stored securely and endpoints are set correctly.",
+            "testStrategy": "Unit test configuration loading and validation. Test with valid and invalid keys and endpoints.",
             "parentId": "undefined"
           },
           {
             "id": 2,
-            "title": "Implement GPT-5 Chat Completion Method",
-            "description": "Add a method to OpenAIClient for sending chat completion requests to the GPT-5 endpoint using async/await.",
+            "title": "Develop GPT-5 Chat Completion Method",
+            "description": "Implement a method for sending chat completion requests to the GPT-5 endpoint.",
             "dependencies": [
               1
             ],
-            "details": "Implement a Swift async method that constructs and sends a POST request to the /v1/chat/completions endpoint. Accepts user/system messages and model parameters. Handles authentication headers and parses the response into a Swift model.",
+            "details": "Create an async method that constructs and sends a POST request to the chat completion endpoint. Handle request body formatting, authentication headers, and response parsing using Swift concurrency.",
             "status": "pending",
-            "testStrategy": "Unit test with mock responses for various chat scenarios. Integration test with real API using test credentials.",
+            "testStrategy": "Unit test with mock chat requests and responses. Validate correct request formatting and response parsing.",
             "parentId": "undefined"
           },
           {
             "id": 3,
-            "title": "Implement GPT-5 Mini Vision Analysis Method",
-            "description": "Add a method for vision analysis using GPT-5 mini, supporting image input and response parsing.",
+            "title": "Develop GPT-5 Mini Vision Analysis Method",
+            "description": "Implement a method for sending vision analysis requests to the GPT-5 mini endpoint.",
             "dependencies": [
               1
             ],
-            "details": "Create an async method that sends image data and parameters to the vision endpoint. Handle multipart/form-data if required. Parse the vision analysis response into a Swift model.",
+            "details": "Create an async method for vision analysis, handling image data encoding, request construction, and response parsing. Ensure compatibility with the endpoint's requirements.",
             "status": "pending",
-            "testStrategy": "Unit test with mock image data and responses. Integration test with actual vision API endpoint.",
+            "testStrategy": "Unit test with sample image inputs and mock responses. Validate image encoding and result parsing.",
             "parentId": "undefined"
           },
           {
             "id": 4,
-            "title": "Implement GPT-5 Nano Simple Q&A Method",
-            "description": "Add a method for simple Q&A using GPT-5 nano, optimized for lightweight queries.",
+            "title": "Develop GPT-5 Nano Simple Q&A Method",
+            "description": "Implement a method for simple Q&A interactions using the GPT-5 nano endpoint.",
             "dependencies": [
               1
             ],
-            "details": "Implement an async method for sending simple Q&A requests to the appropriate endpoint. Accepts a question string and returns the answer parsed from the response.",
+            "details": "Create an async method for sending Q&A requests, formatting the input, and parsing the output. Ensure lightweight and efficient handling for simple queries.",
             "status": "pending",
-            "testStrategy": "Unit test with various Q&A prompts and mock responses. Integration test with real API.",
+            "testStrategy": "Unit test with various Q&A prompts and mock responses. Check for correct output mapping.",
             "parentId": "undefined"
           },
           {
@@ -204,27 +204,27 @@
             "dependencies": [
               1
             ],
-            "details": "Create an async method that sends a prompt to the DALL-E 3 endpoint and retrieves the generated image URL or data. Handle authentication and response parsing.",
+            "details": "Create an async method that sends text prompts to the DALL-E 3 endpoint, handles authentication, and parses image URLs or binary data from the response.",
             "status": "pending",
-            "testStrategy": "Unit test with mock image generation responses. Integration test with DALL-E 3 API.",
+            "testStrategy": "Unit test with sample prompts and mock image responses. Validate image URL extraction and error handling.",
             "parentId": "undefined"
           },
           {
             "id": 6,
             "title": "Implement WebSocket Handling for Realtime API",
-            "description": "Add WebSocket support to OpenAIClient for real-time audio or chat streaming.",
+            "description": "Add support for WebSocket connections to handle real-time API interactions.",
             "dependencies": [
               1
             ],
-            "details": "Use Swift concurrency to manage WebSocket connections. Implement connect, send, receive, and disconnect logic. Handle incoming real-time data and errors robustly.",
+            "details": "Use Swift concurrency to manage WebSocket connections, message sending, and receiving. Implement connection lifecycle management and reconnection logic.",
             "status": "pending",
-            "testStrategy": "Unit test WebSocket connection lifecycle with mocks. Integration test with real Realtime API endpoint.",
+            "testStrategy": "Integration test with mock WebSocket server. Validate message exchange, reconnection, and error scenarios.",
             "parentId": "undefined"
           },
           {
             "id": 7,
             "title": "Implement Error Handling and Retry Logic",
-            "description": "Add comprehensive error handling and retry logic for all API methods.",
+            "description": "Add robust error handling and retry mechanisms for all API interactions.",
             "dependencies": [
               2,
               3,
@@ -232,14 +232,14 @@
               5,
               6
             ],
-            "details": "Define custom error types for network, API, and parsing errors. Implement retry logic with exponential backoff for transient failures. Ensure all async methods propagate errors appropriately.",
+            "details": "Define custom error types, handle HTTP and network errors, and implement exponential backoff for retries. Ensure errors are surfaced to the caller appropriately.",
             "status": "pending",
-            "testStrategy": "Unit test error scenarios and retry logic using mocks. Simulate network failures and verify retries.",
+            "testStrategy": "Unit test with simulated error conditions. Validate retry logic and error propagation.",
             "parentId": "undefined"
           },
           {
             "id": 8,
-            "title": "Implement Rate Limiting Mechanism",
+            "title": "Implement Rate Limiting",
             "description": "Add rate limiting to prevent exceeding OpenAI API quotas.",
             "dependencies": [
               2,
@@ -248,9 +248,9 @@
               5,
               6
             ],
-            "details": "Implement a rate limiter using Swift concurrency primitives. Track request counts and enforce limits per endpoint. Queue or reject requests when limits are reached.",
+            "details": "Track request counts and timing, and throttle requests as needed. Use Swift concurrency primitives to manage rate limits across async calls.",
             "status": "pending",
-            "testStrategy": "Unit test rate limiting under high load. Verify requests are throttled or queued as expected.",
+            "testStrategy": "Unit test with burst requests. Validate throttling and correct handling of rate limit errors.",
             "parentId": "undefined"
           },
           {
@@ -264,16 +264,16 @@
               5,
               6
             ],
-            "details": "Define Codable Swift structs for each API response type. Implement parsing logic in each method to convert JSON responses into these models. Handle edge cases and malformed responses.",
+            "details": "Define Codable models for each endpoint's response. Implement parsing logic and ensure type safety. Handle edge cases and unexpected response formats.",
             "status": "pending",
-            "testStrategy": "Unit test parsing with valid and invalid JSON. Verify all fields are mapped correctly and errors are handled gracefully.",
+            "testStrategy": "Unit test with diverse mock responses. Validate correct model mapping and error handling for malformed data.",
             "parentId": "undefined"
           }
         ],
         "complexity": 8,
         "recommendedSubtasks": 9,
         "expansionPrompt": "Break down the OpenAI API client implementation into subtasks covering configuration, different API endpoints (Chat, Vision, DALL-E, Realtime), WebSocket handling, error management, rate limiting, and response parsing. Consider how to make the client robust and efficient for various AI interactions.",
-        "updatedAt": "2025-10-12T13:56:51.660Z"
+        "updatedAt": "2025-10-12T14:28:19.352Z"
       },
       {
         "id": "12",
@@ -1575,9 +1575,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T13:56:51.662Z",
+      "lastModified": "2025-10-12T14:28:19.354Z",
       "taskCount": 83,
-      "completedCount": 13,
+      "completedCount": 12,
       "tags": [
         "master"
       ]
