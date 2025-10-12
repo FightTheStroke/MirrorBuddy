@@ -11,6 +11,9 @@
         }
       }
     },
+    "• %@" : {
+
+    },
     "achievement.%@" : {
 
     },
@@ -299,6 +302,186 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "MirrorBuddy"
+          }
+        }
+      }
+    },
+    "error.openai.authenticationFailed" : {
+      "comment" : "Error: OpenAI authentication failed",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Authentication failed. Check your API key."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autenticazione fallita. Verifica la chiave API."
+          }
+        }
+      }
+    },
+    "error.openai.cancelled" : {
+      "comment" : "Error: OpenAI request cancelled",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request cancelled"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta annullata"
+          }
+        }
+      }
+    },
+    "error.openai.decodingError" : {
+      "comment" : "Error: OpenAI decoding error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Failed to parse response"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore parsing risposta"
+          }
+        }
+      }
+    },
+    "error.openai.invalidConfiguration" : {
+      "comment" : "Error: Invalid OpenAI configuration",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid OpenAI configuration"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurazione OpenAI non valida"
+          }
+        }
+      }
+    },
+    "error.openai.invalidRequest" : {
+      "comment" : "Error: Invalid OpenAI request",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid request"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta non valida"
+          }
+        }
+      }
+    },
+    "error.openai.missingAPIKey" : {
+      "comment" : "Error: Missing OpenAI API key",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OpenAI API key not configured"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiave API OpenAI non configurata"
+          }
+        }
+      }
+    },
+    "error.openai.networkError" : {
+      "comment" : "Error: OpenAI network error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Network error"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore di rete"
+          }
+        }
+      }
+    },
+    "error.openai.rateLimitExceeded" : {
+      "comment" : "Error: OpenAI rate limit exceeded",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rate limit exceeded. Please wait."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Limite richieste superato. Attendi."
+          }
+        }
+      }
+    },
+    "error.openai.timeout" : {
+      "comment" : "Error: OpenAI timeout",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Request timed out"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Richiesta scaduta"
+          }
+        }
+      }
+    },
+    "error.openai.unknown" : {
+      "comment" : "Error: Unknown OpenAI error",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unknown error"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Errore sconosciuto"
           }
         }
       }
@@ -699,56 +882,20 @@
         }
       }
     },
-    "sync.status.idle" : {
-      "comment" : "Sync status: Idle",
+    "sync.manual.button" : {
+      "comment" : "Button to manually trigger sync",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Idle"
+            "value" : "Sync Now"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inattivo"
-          }
-        }
-      }
-    },
-    "sync.status.syncing" : {
-      "comment" : "Sync status: Syncing",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Syncing..."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronizzazione..."
-          }
-        }
-      }
-    },
-    "sync.status.synced" : {
-      "comment" : "Sync status: Synced",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Synced"
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronizzato"
+            "value" : "Sincronizza Ora"
           }
         }
       }
@@ -771,20 +918,56 @@
         }
       }
     },
-    "sync.manual.button" : {
-      "comment" : "Button to manually trigger sync",
+    "sync.status.idle" : {
+      "comment" : "Sync status: Idle",
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sync Now"
+            "value" : "Idle"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sincronizza Ora"
+            "value" : "Inattivo"
+          }
+        }
+      }
+    },
+    "sync.status.synced" : {
+      "comment" : "Sync status: Synced",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synced"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzato"
+          }
+        }
+      }
+    },
+    "sync.status.syncing" : {
+      "comment" : "Sync status: Syncing",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syncing..."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sincronizzazione..."
           }
         }
       }
