@@ -20,7 +20,11 @@ struct MirrorBuddyApp: App {
             Task.self,
             UserProgress.self
         ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .private("iCloud.com.mirrorbuddy.MirrorBuddy")
+        )
 
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])

@@ -1,688 +1,704 @@
 {
-  "sourceLanguage": "it",
-  "strings": {
-    "common.add": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aggiungi"
+  "sourceLanguage" : "it",
+  "strings" : {
+    "%@ %@" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
           }
         }
       }
     },
-    "dashboard.title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MirrorBuddy"
+    "achievement.%@" : {
+
+    },
+    "achievement.%@.desc" : {
+
+    },
+    "achievement.complete100Flashcards" : {
+      "comment" : "Achievement: Complete 100 Flashcards",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete 100 Flashcards"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MirrorBuddy"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "100 Flashcard Completate"
           }
         }
       }
     },
-    "materials.empty.title": {
-      "comment": "Title shown when no materials are available",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Materials Yet"
+    "achievement.complete100Flashcards.desc" : {
+      "comment" : "Achievement: Completed 100 flashcards",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed 100 flashcards"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nessun Materiale"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai completato 100 flashcard"
           }
         }
       }
     },
-    "materials.empty.description": {
-      "comment": "Description shown when no materials are available",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Materials from Google Drive will appear here"
+    "achievement.completeAllSubjects" : {
+      "comment" : "Achievement: Complete All Subjects",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete All Subjects"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "I materiali da Google Drive appariranno qui"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tutte le Materie"
           }
         }
       }
     },
-    "materials.select.title": {
-      "comment": "Title shown in detail view when no material is selected",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Select a Material"
+    "achievement.completeAllSubjects.desc" : {
+      "comment" : "Achievement: Created materials in all subjects",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created materials in all subjects"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Seleziona un Materiale"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai creato materiali in tutte le materie"
           }
         }
       }
     },
-    "materials.select.description": {
-      "comment": "Description shown in detail view when no material is selected",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose a material to view details, mind maps, and flashcards"
+    "achievement.firstFlashcard" : {
+      "comment" : "Achievement: First Flashcard",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First Flashcard"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scegli un materiale per vedere dettagli, mappe mentali e flashcard"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prima Flashcard"
           }
         }
       }
     },
-    "materials.add.sample": {
-      "comment": "Button label to add a sample material",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add Sample"
+    "achievement.firstFlashcard.desc" : {
+      "comment" : "Achievement: Created your first flashcard",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Created your first flashcard"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aggiungi Esempio"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai creato la tua prima flashcard"
           }
         }
       }
     },
-    "materials.add.accessibility": {
-      "comment": "Accessibility label for add sample button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add sample material"
+    "achievement.firstMaterial" : {
+      "comment" : "Achievement: First Material",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First Material"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aggiungi materiale di esempio"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Primo Materiale"
           }
         }
       }
     },
-    "materials.add.hint": {
-      "comment": "Accessibility hint for add sample button",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Double tap to create a sample material"
+    "achievement.firstMaterial.desc" : {
+      "comment" : "Achievement: Added your first material",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Added your first material"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Doppio tap per creare un materiale di esempio"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai aggiunto il tuo primo materiale"
           }
         }
       }
     },
-    "materials.sample.title": {
-      "comment": "Title of sample material",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sample Material"
+    "achievement.firstMindMap" : {
+      "comment" : "Achievement: First Mind Map",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First Mind Map"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Materiale di esempio"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prima Mappa Mentale"
           }
         }
       }
     },
-    "materials.detail.prefix": {
-      "comment": "Prefix for material detail",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Material:"
+    "achievement.firstMindMap.desc" : {
+      "comment" : "Achievement: Generated your first mind map",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generated your first mind map"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Materiale:"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai generato la tua prima mappa mentale"
           }
         }
       }
     },
-    "subject.educazioneCivica": {
-      "comment": "Subject name: Civic Education",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Civic Education"
+    "achievement.streak7Days" : {
+      "comment" : "Achievement: 7 Day Streak",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 Day Streak"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Educazione Civica"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serie da 7 Giorni"
           }
         }
       }
     },
-    "subject.fisica": {
-      "comment": "Subject name: Physics",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Physics"
+    "achievement.streak7Days.desc" : {
+      "comment" : "Achievement: Studied for 7 consecutive days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Studied for 7 consecutive days"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fisica"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai studiato per 7 giorni consecutivi"
           }
         }
       }
     },
-    "subject.inglese": {
-      "comment": "Subject name: English",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "English"
+    "achievement.streak30Days" : {
+      "comment" : "Achievement: 30 Day Streak",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Day Streak"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Inglese"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serie da 30 Giorni"
           }
         }
       }
     },
-    "subject.italiano": {
-      "comment": "Subject name: Italian",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Italian"
+    "achievement.streak30Days.desc" : {
+      "comment" : "Achievement: Studied for 30 consecutive days",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Studied for 30 consecutive days"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Italiano"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai studiato per 30 giorni consecutivi"
           }
         }
       }
     },
-    "subject.matematica": {
-      "comment": "Subject name: Mathematics",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mathematics"
+    "common.add" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Matematica"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi"
           }
         }
       }
     },
-    "subject.religione": {
-      "comment": "Subject name: Religion",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Religion"
+    "dashboard.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MirrorBuddy"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Religione"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MirrorBuddy"
           }
         }
       }
     },
-    "subject.scienzeMotorie": {
-      "comment": "Subject name: Physical Education",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Physical Education"
+    "error.subject.cannotDeleteDefault" : {
+      "comment" : "Error message: Cannot delete default subjects. You can deactivate them instead.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot delete default subjects. You can deactivate them instead."
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scienze Motorie"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossibile eliminare le materie predefinite. Puoi disattivarle."
           }
         }
       }
     },
-    "subject.scienzeNaturali": {
-      "comment": "Subject name: Natural Sciences",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Natural Sciences"
+    "error.subject.hasAssociatedContent" : {
+      "comment" : "Error message: This subject has associated materials or tasks and cannot be deleted.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This subject has associated materials or tasks and cannot be deleted."
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scienze Naturali"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questa materia ha materiali o compiti associati e non può essere eliminata."
           }
         }
       }
     },
-    "subject.sostegno": {
-      "comment": "Subject name: Support",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Support"
+    "materials.add.accessibility" : {
+      "comment" : "Accessibility label for add sample button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add sample material"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "SOSTEGNO"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi materiale di esempio"
           }
         }
       }
     },
-    "subject.storiaGeografia": {
-      "comment": "Subject name: History and Geography",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "History and Geography"
+    "materials.add.hint" : {
+      "comment" : "Accessibility hint for add sample button",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double tap to create a sample material"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Storia e Geografia"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doppio tap per creare un materiale di esempio"
           }
         }
       }
     },
-    "subject.other": {
-      "comment": "Subject name: Other",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Other"
+    "materials.add.sample" : {
+      "comment" : "Button label to add a sample material",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Sample"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Altro"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi Esempio"
           }
         }
       }
     },
-    "achievement.firstMaterial": {
-      "comment": "Achievement: First Material",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "First Material"
+    "materials.detail.prefix" : {
+      "comment" : "Prefix for material detail",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Material:"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primo Materiale"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Materiale:"
           }
         }
       }
     },
-    "achievement.firstMaterial.desc": {
-      "comment": "Achievement: Added your first material",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Added your first material"
+    "materials.empty.description" : {
+      "comment" : "Description shown when no materials are available",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Materials from Google Drive will appear here"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hai aggiunto il tuo primo materiale"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I materiali da Google Drive appariranno qui"
           }
         }
       }
     },
-    "achievement.firstFlashcard": {
-      "comment": "Achievement: First Flashcard",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "First Flashcard"
+    "materials.empty.title" : {
+      "comment" : "Title shown when no materials are available",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Materials Yet"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prima Flashcard"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun Materiale"
           }
         }
       }
     },
-    "achievement.firstFlashcard.desc": {
-      "comment": "Achievement: Created your first flashcard",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Created your first flashcard"
+    "materials.sample.title" : {
+      "comment" : "Title of sample material",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sample Material"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hai creato la tua prima flashcard"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Materiale di esempio"
           }
         }
       }
     },
-    "achievement.firstMindMap": {
-      "comment": "Achievement: First Mind Map",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "First Mind Map"
+    "materials.select.description" : {
+      "comment" : "Description shown in detail view when no material is selected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a material to view details, mind maps, and flashcards"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prima Mappa Mentale"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scegli un materiale per vedere dettagli, mappe mentali e flashcard"
           }
         }
       }
     },
-    "achievement.firstMindMap.desc": {
-      "comment": "Achievement: Generated your first mind map",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Generated your first mind map"
+    "materials.select.title" : {
+      "comment" : "Title shown in detail view when no material is selected",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a Material"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hai generato la tua prima mappa mentale"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seleziona un Materiale"
           }
         }
       }
     },
-    "achievement.streak7Days": {
-      "comment": "Achievement: 7 Day Streak",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "7 Day Streak"
+    "subject.educazioneCivica" : {
+      "comment" : "Subject name: Civic Education",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Civic Education"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Serie da 7 Giorni"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Educazione Civica"
           }
         }
       }
     },
-    "achievement.streak7Days.desc": {
-      "comment": "Achievement: Studied for 7 consecutive days",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Studied for 7 consecutive days"
+    "subject.fisica" : {
+      "comment" : "Subject name: Physics",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Physics"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hai studiato per 7 giorni consecutivi"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fisica"
           }
         }
       }
     },
-    "achievement.streak30Days": {
-      "comment": "Achievement: 30 Day Streak",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "30 Day Streak"
+    "subject.inglese" : {
+      "comment" : "Subject name: English",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "English"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Serie da 30 Giorni"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inglese"
           }
         }
       }
     },
-    "achievement.streak30Days.desc": {
-      "comment": "Achievement: Studied for 30 consecutive days",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Studied for 30 consecutive days"
+    "subject.italiano" : {
+      "comment" : "Subject name: Italian",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italian"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hai studiato per 30 giorni consecutivi"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Italiano"
           }
         }
       }
     },
-    "achievement.complete100Flashcards": {
-      "comment": "Achievement: Complete 100 Flashcards",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Complete 100 Flashcards"
+    "subject.matematica" : {
+      "comment" : "Subject name: Mathematics",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mathematics"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "100 Flashcard Completate"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matematica"
           }
         }
       }
     },
-    "achievement.complete100Flashcards.desc": {
-      "comment": "Achievement: Completed 100 flashcards",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Completed 100 flashcards"
+    "subject.other" : {
+      "comment" : "Subject name: Other",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hai completato 100 flashcard"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Altro"
           }
         }
       }
     },
-    "achievement.completeAllSubjects": {
-      "comment": "Achievement: Complete All Subjects",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Complete All Subjects"
+    "subject.religione" : {
+      "comment" : "Subject name: Religion",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Religion"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tutte le Materie"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Religione"
           }
         }
       }
     },
-    "achievement.completeAllSubjects.desc": {
-      "comment": "Achievement: Created materials in all subjects",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Created materials in all subjects"
+    "subject.scienzeMotorie" : {
+      "comment" : "Subject name: Physical Education",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Physical Education"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hai creato materiali in tutte le materie"
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scienze Motorie"
           }
         }
       }
     },
-    "error.subject.cannotDeleteDefault": {
-      "comment": "Error message: Cannot delete default subjects. You can deactivate them instead.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cannot delete default subjects. You can deactivate them instead."
+    "subject.scienzeNaturali" : {
+      "comment" : "Subject name: Natural Sciences",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Natural Sciences"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impossibile eliminare le materie predefinite. Puoi disattivarle."
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scienze Naturali"
           }
         }
       }
     },
-    "error.subject.hasAssociatedContent": {
-      "comment": "Error message: This subject has associated materials or tasks and cannot be deleted.",
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This subject has associated materials or tasks and cannot be deleted."
+    "subject.sostegno" : {
+      "comment" : "Subject name: Support",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
           }
         },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Questa materia ha materiali o compiti associati e non può essere eliminata."
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "SOSTEGNO"
+          }
+        }
+      }
+    },
+    "subject.storiaGeografia" : {
+      "comment" : "Subject name: History and Geography",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History and Geography"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storia e Geografia"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
