@@ -10,61 +10,67 @@ import SwiftUI
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var items: [Item]
+    @Query private var materials: [Material]
 
     var body: some View {
         NavigationSplitView {
             List {
-                ForEach(items) { item in
-                    NavigationLink {
-                        Text("Item at \(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))")
-                    } label: {
-                        Text(item.timestamp, format: Date.FormatStyle(date: .numeric, time: .standard))
+                if materials.isEmpty {
+                    ContentUnavailableView {
+                        Label("No Materials Yet", systemImage: "book.closed")
+                    } description: {
+                        Text("Materials from Google Drive will appear here")
+                    }
+                } else {
+                    ForEach(materials) { material in
+                        NavigationLink {
+                            Text("Material: \(material.title)")
+                        } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(material.title)
+                                    .font(.headline)
+                                Text(material.subject.rawValue)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
                     }
                 }
-                .onDelete(perform: deleteItems)
             }
 #if os(macOS)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif
+            .navigationTitle("MirrorBuddy")
             .toolbar {
-#if os(iOS)
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                        .accessibilityLabel("Edit list")
-                        .accessibilityHint("Double tap to edit or delete items")
-                }
-#endif
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button(action: addSampleMaterial) {
+                        Label("Add Sample", systemImage: "plus")
                     }
-                    .accessibilityLabel("Add new item")
-                    .accessibilityHint("Double tap to create a new item")
+                    .accessibilityLabel("Add sample material")
+                    .accessibilityHint("Double tap to create a sample material")
                 }
             }
         } detail: {
-            Text("Select an item")
-        }
-    }
-
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(timestamp: Date())
-            modelContext.insert(newItem)
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            for index in offsets {
-                modelContext.delete(items[index])
+            ContentUnavailableView {
+                Label("Select a Material", systemImage: "book")
+            } description: {
+                Text("Choose a material to view details, mind maps, and flashcards")
             }
+        }
+    }
+
+    private func addSampleMaterial() {
+        withAnimation {
+            let sample = Material(
+                title: "Sample Material",
+                subject: .mathematics
+            )
+            modelContext.insert(sample)
         }
     }
 }
 
 #Preview {
     ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+        .modelContainer(for: Material.self, inMemory: true)
 }

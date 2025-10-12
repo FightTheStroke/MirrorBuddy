@@ -12,7 +12,12 @@ import SwiftUI
 struct MirrorBuddyApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self
+            Material.self,
+            MindMap.self,
+            MindMapNode.self,
+            Flashcard.self,
+            Task.self,
+            UserProgress.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
