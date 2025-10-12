@@ -59,6 +59,15 @@ Every decision, every line of code, every interaction must serve Mario's needs:
 - API keys in Keychain only
 - No telemetry without consent
 
+### 6. Verification & Truth
+**Never assume. Always verify. When uncertain, escalate.**
+
+- Every technical claim MUST be verified against official documentation
+- Every API assumption MUST be tested with real requests
+- Every architectural decision MUST be validated with working code
+- When documentation conflicts, escalate to human for resolution
+- Never provide information without being 100% certain of its accuracy
+
 ---
 
 ## 🚫 Hard Constraints (NEVER Violate)
@@ -87,9 +96,147 @@ Every decision, every line of code, every interaction must serve Mario's needs:
 - ❌ NEVER modify .env or config files directly
 - ❌ NEVER change API providers without human approval
 
+### 5. Never Make Unverified Claims
+- ❌ NEVER provide technical information without verification
+- ❌ NEVER assume API behavior without testing
+- ❌ NEVER state compatibility without checking official docs
+- ❌ NEVER recommend solutions without validating them work
+- ❌ NEVER provide code examples without ensuring they compile
+
+### 6. Never Accumulate Technical Debt
+- ❌ NEVER leave TODO comments without creating tracking issues
+- ❌ NEVER skip refactoring when code becomes complex
+- ❌ NEVER accept "good enough" when "perfect" is achievable
+- ❌ NEVER defer cleanup that can be done immediately
+- ❌ NEVER ignore code smells or architectural inconsistencies
+
 ---
 
 ## 📐 Development Principles
+
+### Technical Debt Management
+
+#### Zero Technical Debt Policy
+**Every piece of code must be production-ready from day one.**
+
+```swift
+// ✅ Good: Complete, tested, documented code
+class MindMapGenerator {
+    private let apiClient: OpenAIClient
+    private let logger: Logger
+    
+    /// Generates a mind map from material content
+    /// - Parameter material: The material to process
+    /// - Returns: A complete mind map with nodes and relationships
+    /// - Throws: MindMapError if generation fails
+    func generateMindMap(for material: Material) async throws -> MindMap {
+        // Implementation with proper error handling and logging
+    }
+}
+
+// ❌ Bad: Incomplete code with technical debt
+class MindMapGenerator {
+    func generateMindMap(for material: Material) -> MindMap {
+        // TODO: Add error handling
+        // TODO: Add logging
+        // TODO: Add validation
+        return MindMap() // Returns empty map - technical debt!
+    }
+}
+```
+
+#### Immediate Refactoring Rules
+```swift
+// ✅ Good: Refactor immediately when complexity increases
+func processMaterial(_ material: Material) async throws -> ProcessedMaterial {
+    let extractedContent = try await extractContent(from: material)
+    let validatedContent = try validateContent(extractedContent)
+    let processedContent = try await processContent(validatedContent)
+    return ProcessedMaterial(content: processedContent)
+}
+
+// ❌ Bad: Accepting complex, hard-to-maintain code
+func processMaterial(_ material: Material) async throws -> ProcessedMaterial {
+    // 200 lines of complex logic in one function - REFACTOR IMMEDIATELY!
+    // This is technical debt that will compound over time
+}
+```
+
+### Verification & Validation Standards
+
+#### Documentation Verification
+**Every technical claim must be verified against official sources.**
+
+```swift
+// ✅ Good: Verified against Apple's official documentation
+// Reference: https://developer.apple.com/documentation/swiftdata/model
+@Model
+final class Material {
+    // Implementation verified against SwiftData documentation
+}
+
+// ❌ Bad: Assumptions without verification
+@Model
+final class Material {
+    // Assuming this works based on similar patterns - VERIFY FIRST!
+}
+```
+
+#### API Testing Requirements
+```swift
+// ✅ Good: Every API call must be tested
+@Test func openAIAPICall_withValidRequest_returnsExpectedResponse() async throws {
+    // Given
+    let client = OpenAIClient(apiKey: "test-key")
+    let request = ChatCompletionRequest(messages: [.user("test")])
+    
+    // When
+    let response = try await client.chatCompletion(request)
+    
+    // Then
+    #expect(response.choices.count > 0)
+    #expect(response.choices[0].message.content != nil)
+}
+
+// ❌ Bad: Assuming API behavior without testing
+// This might work, but we haven't verified it
+let response = try await openAI.chatCompletion(request)
+```
+
+### Critical Decision Escalation
+
+#### Mandatory Human Review Triggers
+```yaml
+escalation_triggers:
+  - new_dependency: "Adding any external library requires human approval"
+  - architecture_change: "Modifying core data models or service architecture"
+  - security_decision: "Any security-related implementation or configuration"
+  - performance_critical: "Changes that might impact app performance significantly"
+  - api_provider_change: "Switching between OpenAI, Apple Intelligence, or other AI providers"
+  - cost_impact: "Changes that might significantly impact API costs"
+  - timeline_risk: "Any decision that might delay project milestones"
+```
+
+#### Escalation Format
+```yaml
+critical_decision_required:
+  agent: "swiftui-agent"
+  decision_type: "new_dependency"
+  issue: "Need to add SwiftUI-Introspect for custom styling"
+  impact_analysis:
+    pros:
+      - "Enables custom styling of native components"
+      - "Widely used and maintained library"
+    cons:
+      - "Adds external dependency"
+      - "Might break with iOS updates"
+    alternatives:
+      - "Custom implementation (2-3 days extra work)"
+      - "Use native SwiftUI only (limited styling)"
+  recommendation: "Add dependency with fallback plan"
+  requires_human_decision: true
+  deadline: "2025-01-15 18:00"
+```
 
 ### Code Quality Standards
 
@@ -453,14 +600,20 @@ git commit -m "updated files"
 3. Commit frequently with descriptive messages
 4. Update task status in Task Master
 5. Document complex decisions inline
+6. **Verify every technical claim against official documentation**
+7. **Test every API assumption with real requests**
+8. **Refactor immediately when code complexity increases**
+9. **Escalate any decision requiring human judgment**
 
 ### Before Completing Task
 1. All tests pass (unit + integration) on **IpadDiMario simulator**
 2. SwiftLint: 0 warnings
 3. Accessibility: VoiceOver works
 4. Documentation updated
-5. Task marked complete in Task Master
-6. **Git commit created with task number reference** (e.g., "Task 11: OpenAI API Client Infrastructure")
+5. **Technical debt audit: No TODO comments, no incomplete implementations**
+6. **Verification complete: All technical claims validated**
+7. Task marked complete in Task Master
+8. **Git commit created with task number reference** (e.g., "Task 11: OpenAI API Client Infrastructure")
 
 ### When Blocked
 1. Document blocker clearly
@@ -524,6 +677,10 @@ A task is DONE only when:
 - [ ] SwiftLint: 0 warnings
 - [ ] Performance acceptable (no lag, no memory leaks)
 - [ ] **Build and tests verified on IpadDiMario simulator**
+- [ ] **Zero technical debt: No TODO comments, no incomplete implementations**
+- [ ] **All technical claims verified against official documentation**
+- [ ] **All API assumptions tested with real requests**
+- [ ] **Code complexity kept to minimum (functions <50 lines)**
 - [ ] QA agent approved
 - [ ] Documentation updated
 - [ ] Task marked complete in Task Master
@@ -541,6 +698,11 @@ A task is DONE only when:
 5. Critical bug in production code discovered
 6. Cost estimates exceeded by >20%
 7. Timeline at risk (phase running behind)
+8. **Technical documentation conflicts or unclear**
+9. **API behavior differs from official documentation**
+10. **Uncertain about technical implementation approach**
+11. **Need to make assumptions about system behavior**
+12. **Any decision that might introduce technical debt**
 
 **Format for escalation:**
 ```yaml
@@ -582,7 +744,28 @@ escalation:
 
 **This constitution is the source of truth for all development decisions.**
 **When in doubt, ask: "Does this serve Mario's learning?"**
+**When uncertain, ask: "Have I verified this claim?"**
+**When complex, ask: "Can this be simplified without compromising quality?"**
 
-**Last Updated**: 2025-10-12
-**Version**: 1.0
+---
+
+## 🔍 Verification Checklist
+
+Before making any technical statement or recommendation:
+
+- [ ] **Have I verified this against official documentation?**
+- [ ] **Have I tested this with real API calls or code?**
+- [ ] **Am I 100% certain this information is accurate?**
+- [ ] **If not certain, have I escalated to human for verification?**
+- [ ] **Does this code have zero technical debt?**
+- [ ] **Can this implementation be simplified further?**
+- [ ] **Have I validated all assumptions with concrete tests?**
+
+**Remember: It's better to escalate and wait for verification than to provide unverified information that could mislead development.**
+
+---
+
+**Last Updated**: 2025-01-15
+**Version**: 2.0
 **Binding**: All agents
+**Status**: ACTIVE - Enhanced with verification and technical debt management

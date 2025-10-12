@@ -741,11 +741,120 @@
           "16",
           "17"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up Google Drive API authentication",
+            "description": "Implement OAuth 2.0 authentication flow to connect with Google Drive API and obtain necessary access tokens.",
+            "dependencies": [],
+            "details": "Create authentication manager class that handles OAuth 2.0 flow, token storage, refresh logic, and permission scopes for file downloads. Implement secure storage for credentials using Keychain.",
+            "status": "done",
+            "testStrategy": "Test authentication flow with valid and invalid credentials. Verify token refresh works correctly when tokens expire.",
+            "updatedAt": "2025-10-12T17:11:17.732Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create file metadata retrieval service",
+            "description": "Develop a service to fetch file metadata from Google Drive before initiating downloads.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement methods to query file information including name, size, MIME type, and modification date. Create models to represent Google Drive file metadata. Add pagination support for listing multiple files.",
+            "status": "done",
+            "testStrategy": "Test metadata retrieval with various file types. Verify pagination works correctly for large file collections.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:11:17.736Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement core file download functionality",
+            "description": "Create the main download service that handles fetching files from Google Drive to local storage.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement download manager using URLSession for handling file downloads. Create methods for initiating downloads with proper authentication headers. Implement file stream handling for efficient memory usage during downloads.",
+            "status": "done",
+            "testStrategy": "Test downloading files of various sizes and types. Verify downloads complete successfully and match source file size and content.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:11:17.738Z"
+          },
+          {
+            "id": 4,
+            "title": "Add download progress tracking",
+            "description": "Implement a system to track and report download progress to the user interface.",
+            "dependencies": [
+              3
+            ],
+            "details": "Create progress tracking using URLSession delegate methods. Implement progress reporting using Combine publishers or callback closures. Add support for calculating download speed and estimated time remaining.",
+            "status": "done",
+            "testStrategy": "Test progress reporting accuracy with files of known sizes. Verify UI updates correctly reflect download progress.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:11:17.748Z"
+          },
+          {
+            "id": 5,
+            "title": "Implement background download support",
+            "description": "Add support for continuing downloads when the app is in the background using BGTransferTask.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Configure URLSession for background transfers. Implement BGProcessingTask for handling background downloads. Add notification handling for completed background downloads. Create system to resume tracking when app returns to foreground.",
+            "status": "done",
+            "testStrategy": "Test background downloads by sending app to background during active downloads. Verify downloads complete and app properly handles completion notifications.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:11:17.751Z"
+          },
+          {
+            "id": 6,
+            "title": "Create download queue management",
+            "description": "Implement a queue system to manage multiple file downloads with prioritization and parallel download limits.",
+            "dependencies": [
+              3,
+              4
+            ],
+            "details": "Create download queue manager with configurable concurrency limits. Implement priority-based queuing system. Add pause/resume functionality for individual downloads. Create methods for canceling and reordering queued downloads.",
+            "status": "done",
+            "testStrategy": "Test queue behavior with multiple simultaneous downloads. Verify priority system works correctly. Test pause/resume/cancel functionality.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:11:17.753Z"
+          },
+          {
+            "id": 7,
+            "title": "Implement retry logic and error handling",
+            "description": "Add robust error handling and automatic retry mechanisms for failed or interrupted downloads.",
+            "dependencies": [
+              3,
+              6
+            ],
+            "details": "Create retry system with configurable attempt limits and backoff strategy. Implement comprehensive error handling for network issues, authentication failures, and server errors. Add user notification for critical download failures.",
+            "status": "done",
+            "testStrategy": "Test retry logic by simulating network failures. Verify appropriate errors are presented to users. Test backoff strategy works correctly.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:11:17.755Z"
+          },
+          {
+            "id": 8,
+            "title": "Implement file storage and integrity verification",
+            "description": "Create a system for securely storing downloaded files and verifying their integrity after download.",
+            "dependencies": [
+              3,
+              7
+            ],
+            "details": "Implement file manager for organizing downloaded files in app container. Create checksum verification using MD5 or SHA-256 to ensure file integrity. Add cleanup mechanism for temporary files and managing storage limits. Implement file metadata database for tracking downloaded files.",
+            "status": "done",
+            "testStrategy": "Test file integrity verification with intentionally corrupted files. Verify storage organization works correctly. Test cleanup mechanisms properly manage storage usage.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:11:17.757Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement google drive file download."
+        "expansionPrompt": "Break down this task with a focus on implement google drive file download.",
+        "updatedAt": "2025-10-12T17:11:17.757Z"
       },
       {
         "id": "19",
@@ -757,8 +866,43 @@
         "dependencies": [
           "18"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement PDF Loading and Rendering",
+            "description": "Create functionality to load PDF files and render them for processing with VisionKit.",
+            "dependencies": [],
+            "details": "Implement PDF document loading using PDFKit. Create a rendering pipeline that converts PDF pages to images at appropriate resolution for OCR. Handle large PDFs efficiently with pagination. Implement caching mechanism for rendered pages to improve performance. Support various PDF formats and versions.",
+            "status": "done",
+            "testStrategy": "Test with various PDF types (scanned documents, digital PDFs, forms). Verify rendering quality at different resolutions. Measure performance with large multi-page documents.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement VisionKit OCR Text Extraction",
+            "description": "Use VisionKit to perform OCR on rendered PDF pages and extract raw text content.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate VisionKit's OCR capabilities to process rendered PDF pages. Implement VNRecognizeTextRequest with appropriate recognition level settings. Process PDF pages in parallel using DispatchGroup for improved performance. Handle text recognition errors and implement retry mechanisms. Extract text with position information for layout reconstruction.",
+            "status": "done",
+            "testStrategy": "Test OCR accuracy with different document types. Verify text extraction works with multiple languages. Benchmark parallel processing performance with large documents.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Create Structured Document Model",
+            "description": "Process extracted text to identify structure elements and create a hierarchical document model.",
+            "dependencies": [
+              2
+            ],
+            "details": "Analyze text position and formatting to identify headings, paragraphs, and lists. Implement algorithms to detect multi-column layouts and preserve reading order. Extract text formatting information (bold, italic, font size) when available. Identify and extract embedded images from PDFs. Create a structured document model that preserves the semantic hierarchy and can be used by other application components.",
+            "status": "done",
+            "testStrategy": "Test structure detection with various document layouts. Verify heading levels are correctly identified. Test multi-column detection accuracy. Validate image extraction quality and positioning.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement pdf text extraction with visionkit."
@@ -773,8 +917,43 @@
         "dependencies": [
           "19"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate with Apple Intelligence Foundation Models",
+            "description": "Set up the necessary infrastructure to connect with Apple Intelligence Foundation Models for text summarization capabilities.",
+            "dependencies": [],
+            "details": "Implement the required API connections to Apple Intelligence. Add necessary frameworks and dependencies to the project. Set up authentication and API key management. Create a service layer that handles communication with Apple Intelligence models. Ensure proper error handling and response parsing.",
+            "status": "done",
+            "testStrategy": "Create unit tests for API connection. Test authentication flow. Verify proper handling of API responses and errors. Mock API responses for testing different scenarios.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Text Summarization Core Functionality",
+            "description": "Develop the core functionality to process and summarize text content using Apple Intelligence models with appropriate prompts.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a SummaryGenerator class that handles text processing. Implement methods to chunk large text documents if needed. Design effective prompts for summarization at different detail levels. Ensure key concepts and terminology are preserved in summaries. Add metrics to track summarization quality and performance. Implement caching mechanism for frequently summarized content.",
+            "status": "done",
+            "testStrategy": "Test with various text lengths and complexities. Verify summary quality preserves key concepts. Measure performance metrics for different text sizes. Test chunking mechanism with large documents.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Fallback and Storage Mechanisms",
+            "description": "Create fallback to OpenAI when Apple Intelligence fails and implement SwiftData storage for generated summaries.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement error detection for Apple Intelligence API failures. Create OpenAI fallback service with similar interface. Design and implement SwiftData models for storing summaries. Add relationship between original content and summaries in data model. Implement background processing for summary generation. Create UI indicators for summary generation status. Add refresh mechanisms for regenerating outdated summaries.",
+            "status": "done",
+            "testStrategy": "Test fallback mechanism by simulating Apple Intelligence failures. Verify seamless transition to OpenAI. Test SwiftData storage and retrieval of summaries. Verify proper handling of summary updates and versioning.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement summary generation with apple intelligence."
@@ -791,8 +970,43 @@
           "11",
           "19"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and Implement GPT-5 Prompts for Mind Map Generation",
+            "description": "Create effective prompts for GPT-5 that will generate well-structured mind maps from study materials.",
+            "dependencies": [],
+            "details": "Research prompt engineering techniques for structured outputs. Create prompts that specify the 3-level depth limit, node text brevity (5-7 words), and request concrete examples for concepts. Develop subject-specific templates for different academic disciplines. Test prompts with sample study materials to ensure quality output. Document the final prompt templates for future reference.",
+            "status": "done",
+            "testStrategy": "Test prompts with various study materials across different subjects. Evaluate output quality, adherence to structure requirements, and consistency. Refine prompts based on test results.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement GPT-5 API Integration for Mind Map Structure Generation",
+            "description": "Develop the API integration layer to communicate with GPT-5 for generating mind map structures from study materials.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create a service class to handle API communication with GPT-5. Implement proper error handling, retry logic, and request throttling. Configure API authentication and security. Optimize request payloads to minimize token usage. Implement caching to prevent duplicate requests. Add logging for debugging and monitoring API usage. Create a queue system for handling multiple mind map generation requests.",
+            "status": "done",
+            "testStrategy": "Test API integration with mock responses. Verify error handling with simulated failures. Measure performance metrics for API calls. Test with actual GPT-5 API to validate end-to-end functionality.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Develop Parser and SwiftData Storage for Mind Map Models",
+            "description": "Create a parser to convert GPT-5 API responses into MindMap and MindMapNode models and implement SwiftData storage functionality.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design and implement MindMap and MindMapNode model structures compatible with SwiftData. Create a parser to transform GPT-5 API JSON responses into these model structures. Implement validation to ensure mind maps adhere to the 3-level depth limit. Add functionality to store generated mind maps in SwiftData. Implement CRUD operations for mind map management. Create migration strategy for model updates. Ensure models work with existing CloudKit sync implementation.",
+            "status": "done",
+            "testStrategy": "Test parsing with various API response formats. Verify model persistence in SwiftData. Test CRUD operations for mind maps. Validate CloudKit sync compatibility. Ensure proper handling of malformed API responses.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement mind map generation with gpt-5."
@@ -808,8 +1022,43 @@
           "11",
           "21"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up DALL-E 3 API integration",
+            "description": "Implement the necessary API client to connect with DALL-E 3 for image generation",
+            "dependencies": [],
+            "details": "Create an API client that can communicate with DALL-E 3. This includes setting up authentication, handling API keys securely, implementing request/response handling, and error management. Test the connection to ensure proper communication with the DALL-E service.",
+            "status": "done",
+            "testStrategy": "",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Develop image generation for mind map nodes",
+            "description": "Create functionality to generate relevant images for mind map nodes based on their content",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement a function that takes a mind map node's text content and generates an appropriate prompt for DALL-E 3. The function should handle sending the request to the DALL-E API (using the integration from subtask 1), receiving the generated image, and processing it for display. Include options for image size, style, and other relevant parameters.",
+            "status": "done",
+            "testStrategy": "",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Integrate image display in mind map UI",
+            "description": "Update the mind map UI to display generated images within nodes",
+            "dependencies": [
+              2
+            ],
+            "details": "Modify the mind map node component to support displaying images. Implement UI controls for users to generate/regenerate images for specific nodes. Add image caching to prevent unnecessary API calls. Ensure proper handling of loading states and errors. Test the complete flow from node creation to image generation and display.",
+            "status": "done",
+            "testStrategy": "",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement dall-e 3 image generation for mind map nodes."
@@ -826,11 +1075,50 @@
           "11",
           "19"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design flashcard data structure and API",
+            "description": "Define the structure of flashcards and create the API endpoints for generation and retrieval",
+            "dependencies": [],
+            "details": "Create a data model for flashcards including fields for question, answer, tags, and difficulty level. Design API endpoints for generating flashcards from various content types and retrieving them. Document the API interface for integration with the frontend.",
+            "status": "done",
+            "testStrategy": "",
+            "updatedAt": "2025-10-12T17:50:00.053Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement GPT-5 Nano integration for flashcard generation",
+            "description": "Set up the connection to GPT-5 Nano API and create prompt templates for flashcard generation",
+            "dependencies": [
+              1
+            ],
+            "details": "Establish connection to the GPT-5 Nano API. Create effective prompt templates that instruct the model to generate high-quality flashcards from input content. Implement error handling and retry logic for API calls. Optimize prompts for different types of content (text, articles, notes).",
+            "status": "done",
+            "testStrategy": "",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:50:00.056Z"
+          },
+          {
+            "id": 3,
+            "title": "Develop quality control and testing framework",
+            "description": "Create a system to evaluate and improve the quality of generated flashcards",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement validation checks to ensure generated flashcards meet quality standards. Create a testing framework to evaluate flashcard effectiveness across different subjects. Develop a feedback mechanism to improve generation over time. Set up automated tests to verify the system works correctly with various inputs.",
+            "status": "done",
+            "testStrategy": "",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:50:00.058Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement flashcard generation with gpt-5 nano."
+        "expansionPrompt": "Break down this task with a focus on implement flashcard generation with gpt-5 nano.",
+        "updatedAt": "2025-10-12T17:50:00.058Z"
       },
       {
         "id": "24",
@@ -843,11 +1131,50 @@
           "11",
           "19"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and Implement Prompt Generation for Simplified Explanations",
+            "description": "Develop logic to create prompts that instruct GPT-5 mini to generate simplified explanations of complex concepts, using examples and analogies where appropriate.",
+            "dependencies": [],
+            "details": "Define prompt templates that clearly request simplified, accessible explanations. Include instructions for using analogies and concrete examples. Allow prompt customization based on subject complexity. Ensure prompts are compatible with GPT-5 mini's expected input format.",
+            "status": "done",
+            "testStrategy": "Test prompt templates with a variety of complex topics. Review generated explanations for clarity, simplicity, and use of analogies. Solicit feedback from non-expert users.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:53:23.727Z"
+          },
+          {
+            "id": 2,
+            "title": "Integrate GPT-5 Mini API for Explanation Generation",
+            "description": "Implement backend logic to call the GPT-5 mini API with generated prompts and retrieve simplified explanations.",
+            "dependencies": [
+              1
+            ],
+            "details": "Set up API authentication and environment. Use the appropriate endpoint and parameters for GPT-5 mini (e.g., model, messages, temperature, verbosity). Handle API responses, errors, and rate limits. Support batch processing for multiple concepts. Provide fallback to Apple Intelligence if the API fails or is unavailable.",
+            "status": "done",
+            "testStrategy": "Verify API calls return valid, simplified explanations for a range of prompts. Test error handling and fallback logic. Measure response times and batch processing efficiency.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:53:23.739Z"
+          },
+          {
+            "id": 3,
+            "title": "Store and Associate Generated Explanations with Learning Materials",
+            "description": "Develop functionality to save generated explanations and link them to relevant educational materials for future retrieval and display.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design data structures to store explanations, metadata (e.g., concept, complexity level), and associations with source materials. Implement database or file storage logic. Ensure explanations can be efficiently retrieved and displayed alongside learning content.",
+            "status": "done",
+            "testStrategy": "Test storage and retrieval of explanations for various concepts. Verify correct association with materials. Check for data integrity and performance under batch operations.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:53:23.742Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement simplified explanations generation with gpt-5 mini."
+        "expansionPrompt": "Break down this task with a focus on implement simplified explanations generation with gpt-5 mini.",
+        "updatedAt": "2025-10-12T17:53:23.742Z"
       },
       {
         "id": "25",
@@ -883,11 +1210,66 @@
           "82",
           "83"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Main Dashboard SwiftUI View Structure",
+            "description": "Create the foundational SwiftUI view structure for the dashboard that will house all other components.",
+            "dependencies": [],
+            "details": "Design and implement the main dashboard container view using SwiftUI. Include navigation elements, header area, and container for subject sections. Ensure the view is responsive across different device sizes and orientations. Set up the basic navigation hierarchy and state management for the dashboard.",
+            "status": "done",
+            "testStrategy": "Test the view structure on multiple device sizes (iPhone SE, iPhone 14 Pro Max, iPad). Verify layout constraints work properly in both portrait and landscape orientations.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:12:09.233Z"
+          },
+          {
+            "id": 2,
+            "title": "Develop Subject-Based Organization System",
+            "description": "Implement the core functionality for organizing materials by subject with appropriate grouping and hierarchy.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create data structures and views to group materials by subject categories. Implement collapsible subject sections with headers. Design the visual hierarchy to clearly distinguish between different subjects. Include empty states for subjects with no materials. Implement the logic for adding new subjects and reorganizing existing ones.",
+            "status": "done",
+            "testStrategy": "Test with various numbers of subjects (0, 1, many). Verify correct grouping of materials. Test collapsing/expanding subject sections. Verify performance with large number of subjects.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:12:09.238Z"
+          },
+          {
+            "id": 3,
+            "title": "Design and Implement Material Cards with Thumbnails",
+            "description": "Create visually appealing material cards that display thumbnails and essential information about each learning material.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Design reusable material card components that display thumbnails, title, creation date, and relevant metadata. Implement efficient image loading and caching for thumbnails. Create placeholder states for loading thumbnails. Ensure cards have appropriate touch targets (minimum 44×44pt). Implement card selection and interaction behaviors.",
+            "status": "done",
+            "testStrategy": "Test cards with various content lengths. Verify thumbnail loading performance. Test accessibility of cards with VoiceOver. Measure touch target sizes to ensure they meet minimum requirements.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:12:09.241Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Search, Filtering and Sorting Functionality",
+            "description": "Add comprehensive search, filtering, and sorting capabilities to help users efficiently find materials in the dashboard.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Create a search bar with real-time filtering of materials. Implement filters for different material types, dates, and other metadata. Add sorting options by date, name, and subject. Design filter UI components that are easy to use one-handed. Ensure search results update efficiently without performance issues. Implement search history and suggestions if appropriate.",
+            "status": "done",
+            "testStrategy": "Test search with various queries. Verify filter combinations work correctly. Test sorting options with different data sets. Measure search performance with large collections of materials.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:12:09.250Z"
+          }
+        ],
         "complexity": 8,
         "recommendedSubtasks": 9,
-        "expansionPrompt": "Break down the dashboard UI implementation into subtasks covering the main view, subject organization, material cards, search/filtering, animations, and accessibility features. Consider how to make the interface efficient for navigating a large collection of materials."
+        "expansionPrompt": "Break down the dashboard UI implementation into subtasks covering the main view, subject organization, material cards, search/filtering, animations, and accessibility features. Consider how to make the interface efficient for navigating a large collection of materials.",
+        "updatedAt": "2025-10-12T18:12:09.250Z"
       },
       {
         "id": "27",
@@ -989,11 +1371,122 @@
           "31",
           "82"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design SwiftUI View Structure for Voice Conversation UI",
+            "description": "Create the basic SwiftUI view structure for the voice conversation interface, including layout and component organization.",
+            "dependencies": [],
+            "details": "Design and implement the main SwiftUI view that will contain all voice conversation UI elements. Include container views for conversation history, context banner, and control buttons. Ensure the view adapts to different device sizes and orientations. Follow the app's design system for styling and spacing.",
+            "status": "done",
+            "testStrategy": "Test the view on different device sizes and orientations. Verify that all UI elements are properly positioned and sized.",
+            "updatedAt": "2025-10-12T16:51:45.154Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Start/Stop Conversation Controls",
+            "description": "Create the large 'Start Talking' button in the bottom-right corner and the 'Stop' button for controlling voice conversations.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design and implement a prominent 'Start Talking' button positioned in the bottom-right corner for easy thumb access. Create a 'Stop' button that appears during active conversations. Ensure buttons have appropriate visual states (normal, pressed, disabled) and haptic feedback. Optimize button size and positioning for one-handed operation.",
+            "status": "done",
+            "testStrategy": "Test button interactions, verify haptic feedback works correctly, and ensure buttons are easily accessible with one-handed operation.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:51:45.158Z"
+          },
+          {
+            "id": 3,
+            "title": "Create Waveform Animation for Voice Feedback",
+            "description": "Implement visual feedback with waveform animation that responds to user's voice input during conversations.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design and implement a responsive waveform animation that visualizes the user's voice input. The animation should dynamically respond to audio amplitude changes. Create smooth transitions between idle, listening, and processing states. Optimize the animation for performance to prevent UI lag during conversations.",
+            "status": "done",
+            "testStrategy": "Test animation responsiveness with various voice inputs. Measure performance impact during active conversations. Verify visual feedback accurately represents voice activity.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:51:45.161Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Conversation History Display",
+            "description": "Create the UI component for displaying the history of the conversation between the user and AI coach.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement a scrollable conversation history view that displays messages from both the user and AI coach. Design message bubbles with clear visual distinction between user and AI messages. Include timestamps and read indicators. Implement auto-scrolling to the latest message. Ensure the history maintains context when the keyboard appears or disappears.",
+            "status": "done",
+            "testStrategy": "Test scrolling behavior with long conversations. Verify auto-scroll functionality works correctly. Test history display with various message lengths and content types.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:51:45.170Z"
+          },
+          {
+            "id": 5,
+            "title": "Develop Context Banner for Current Material/Subject",
+            "description": "Implement the context banner that displays information about the current learning material or subject being discussed.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design and implement a collapsible context banner at the top of the conversation view. Display current material title, subject, and progress information. Add functionality to expand/collapse the banner for more details. Ensure the banner provides sufficient context without taking too much screen space. Include visual indicators for active learning contexts.",
+            "status": "done",
+            "testStrategy": "Test banner expansion/collapse functionality. Verify context information is displayed correctly for different materials. Test banner behavior during orientation changes.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:51:45.173Z"
+          },
+          {
+            "id": 6,
+            "title": "Create State Transition Animations",
+            "description": "Implement smooth animations for transitions between different states of the voice conversation UI.",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Design and implement animations for transitions between idle, listening, processing, and response states. Create smooth animations for button state changes, waveform appearance/disappearance, and message additions. Implement loading indicators for processing states. Ensure animations provide clear visual feedback about the current state of the conversation.",
+            "status": "done",
+            "testStrategy": "Test animations for smoothness and clarity. Verify state transitions are visually clear to users. Test animation performance on older devices.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:51:45.176Z"
+          },
+          {
+            "id": 7,
+            "title": "Optimize UI for One-Handed Operation",
+            "description": "Ensure the voice conversation interface is optimized for comfortable one-handed use across different device sizes.",
+            "dependencies": [
+              1,
+              2,
+              4
+            ],
+            "details": "Analyze and optimize button placement, touch targets, and interaction patterns for one-handed operation. Implement reachability considerations for larger devices. Ensure critical controls are within thumb reach. Add gesture support for common actions. Test and refine the interface based on ergonomic principles for mobile device interaction.",
+            "status": "done",
+            "testStrategy": "Conduct usability testing with users holding devices in one hand. Test on various device sizes. Measure success rates for common tasks performed one-handed.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:51:45.177Z"
+          },
+          {
+            "id": 8,
+            "title": "Implement Accessibility Features for Voice UI",
+            "description": "Add accessibility features to ensure the voice conversation UI is usable by people with different abilities.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "details": "Implement VoiceOver support for all UI elements. Add appropriate accessibility labels and hints. Ensure proper focus order for screen readers. Implement alternative visual indicators for users who cannot see the waveform animation. Add support for Dynamic Type to allow text size adjustments. Test and refine accessibility features with assistive technologies.",
+            "status": "done",
+            "testStrategy": "Test with VoiceOver and other assistive technologies. Verify all UI elements are properly labeled and accessible. Test with different Dynamic Type settings.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:51:45.179Z"
+          }
+        ],
         "complexity": 7,
         "recommendedSubtasks": 8,
-        "expansionPrompt": "Break down the voice conversation UI implementation into subtasks covering the main view, conversation display, audio feedback, animations, and accessibility features. Consider how to make the interface intuitive and responsive during voice interactions."
+        "expansionPrompt": "Break down the voice conversation UI implementation into subtasks covering the main view, conversation display, audio feedback, animations, and accessibility features. Consider how to make the interface intuitive and responsive during voice interactions.",
+        "updatedAt": "2025-10-12T16:51:45.179Z"
       },
       {
         "id": "33",
@@ -1006,11 +1499,118 @@
           "31",
           "32"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Define Core Personality Traits for Study Coach",
+            "description": "Establish the fundamental personality traits that will define the AI study coach's interaction style.",
+            "dependencies": [],
+            "details": "Create a comprehensive personality profile including traits like patience, encouragement, and non-judgmental attitude. Define how these traits manifest in different coaching scenarios. Document tone guidelines, empathy levels, and response patterns. Include examples of appropriate and inappropriate responses.",
+            "status": "done",
+            "testStrategy": "Create test scenarios with challenging student interactions and verify coach responses maintain the defined personality traits across different situations.",
+            "updatedAt": "2025-10-12T16:56:10.832Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Develop System Prompts for OpenAI Integration",
+            "description": "Create the system prompts that will guide the OpenAI model to consistently embody the study coach personality.",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop a set of system prompts that effectively communicate the coach personality to the OpenAI model. Include context about educational coaching, boundaries, and interaction guidelines. Create prompt variations for different coaching scenarios (explaining concepts, providing feedback, motivating students). Test prompts with the API to verify consistent personality alignment.",
+            "status": "done",
+            "testStrategy": "Test system prompts with various user inputs to ensure consistent personality manifestation and appropriate coaching responses across different scenarios.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:56:10.836Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement Multilingual Support (Italian and English)",
+            "description": "Add support for both Italian and English languages in the study coach system prompts and responses.",
+            "dependencies": [
+              2
+            ],
+            "details": "Translate all system prompts to Italian while preserving personality traits. Implement language detection to automatically switch between languages. Create language-specific variations of coaching responses that account for cultural differences. Ensure personality consistency across both languages. Document translation guidelines for future language additions.",
+            "status": "done",
+            "testStrategy": "Test with native speakers of both languages to verify natural-sounding responses and consistent personality traits across languages.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:56:10.846Z"
+          },
+          {
+            "id": 4,
+            "title": "Develop Adaptive Pacing Mechanism",
+            "description": "Create a system that adjusts the coach's teaching pace based on user responses and comprehension signals.",
+            "dependencies": [
+              2
+            ],
+            "details": "Implement logic to detect user comprehension signals in responses. Create pacing adjustment algorithms that slow down or speed up based on user understanding. Develop prompts that guide the AI to recognize confusion, confidence, or mastery. Build a feedback loop system that continuously refines pacing based on user interaction patterns. Document pacing strategies for different learning scenarios.",
+            "status": "done",
+            "testStrategy": "Simulate conversations with varying levels of user comprehension and verify the system appropriately adjusts pacing and explanation depth.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:56:10.848Z"
+          },
+          {
+            "id": 5,
+            "title": "Create Concept Simplification Framework",
+            "description": "Develop a framework for the AI coach to simplify complex concepts based on user comprehension level.",
+            "dependencies": [
+              2,
+              4
+            ],
+            "details": "Create guidelines for breaking down complex topics into simpler components. Implement prompting techniques that guide the AI to use analogies, metaphors, and simplified language. Develop a complexity scale to categorize explanations. Build a library of simplification patterns for common academic concepts. Create prompts that encourage the AI to check understanding before proceeding to more complex explanations.",
+            "status": "done",
+            "testStrategy": "Test with complex academic concepts from various fields and verify the AI can effectively simplify them while maintaining accuracy.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:56:10.853Z"
+          },
+          {
+            "id": 6,
+            "title": "Implement Examples Generation System",
+            "description": "Create a system for the AI coach to generate relevant, concrete examples that illustrate concepts being taught.",
+            "dependencies": [
+              2,
+              5
+            ],
+            "details": "Develop prompting techniques that guide the AI to generate domain-specific examples. Create guidelines for examples that are age-appropriate and relevant to the student's context. Implement a framework for examples that progress from simple to complex. Build prompts that encourage the AI to use real-world applications of concepts. Include verification steps to ensure examples are accurate and appropriate.",
+            "status": "done",
+            "testStrategy": "Test example generation across multiple academic subjects and verify examples are relevant, accurate, and effectively illustrate the concepts being taught.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:56:10.855Z"
+          },
+          {
+            "id": 7,
+            "title": "Design Positive Reinforcement System",
+            "description": "Create patterns and prompts for the AI coach to provide effective positive reinforcement to students.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Develop a variety of positive reinforcement phrases and techniques that align with the coach personality. Create guidelines for when and how to provide encouragement. Implement prompts that help the AI recognize achievement milestones. Build a framework for balancing praise with constructive feedback. Design reinforcement patterns that avoid generic praise and instead highlight specific achievements or efforts.",
+            "status": "done",
+            "testStrategy": "Test with various student response scenarios and verify the AI provides appropriate, specific positive reinforcement that motivates without being excessive.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:56:10.857Z"
+          },
+          {
+            "id": 8,
+            "title": "Implement Conversation Memory and Context Management",
+            "description": "Create a system for the AI coach to maintain conversation context and refer back to previous interactions.",
+            "dependencies": [
+              2
+            ],
+            "details": "Design a context management system that tracks key concepts discussed, student progress, and areas of difficulty. Implement prompting techniques that guide the AI to reference previous conversations appropriately. Create a framework for progressive learning that builds on past interactions. Develop methods for summarizing previous sessions for continuity. Build a system for identifying and addressing recurring misconceptions based on conversation history.",
+            "status": "done",
+            "testStrategy": "Test with multi-session conversations and verify the AI appropriately recalls previous discussions and builds upon established knowledge.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:56:10.859Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement study coach personality and prompting."
+        "expansionPrompt": "Break down this task with a focus on implement study coach personality and prompting.",
+        "updatedAt": "2025-10-12T16:56:10.859Z"
       },
       {
         "id": "34",
@@ -1022,12 +1622,12 @@
         "dependencies": [
           "31"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement audio pipeline for voice conversations.",
-        "updatedAt": "2025-10-12T16:11:23.979Z"
+        "updatedAt": "2025-10-12T16:18:06.381Z"
       },
       {
         "id": "35",
@@ -1039,11 +1639,121 @@
         "dependencies": [
           "1"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement AVFoundation Camera Capture",
+            "description": "Set up the core camera functionality using AVFoundation framework to capture images of homework problems.",
+            "dependencies": [],
+            "details": "Implement AVCaptureSession, configure camera input/output, set up preview layer, handle camera initialization and deinitialization. Ensure proper resource management and implement basic capture functionality for taking photos of homework.",
+            "status": "done",
+            "testStrategy": "Test camera initialization on multiple devices. Verify capture functionality works in different lighting conditions. Ensure memory management is correct with no leaks.",
+            "updatedAt": "2025-10-12T16:23:23.774Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create Photo and Video Capture Modes",
+            "description": "Implement both photo and video capture modes to allow students to document homework problems in different formats.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create UI toggle between photo and video modes. Implement photo capture with AVCapturePhotoOutput and video recording with AVCaptureMovieFileOutput. Add duration controls for video mode and burst mode for photos. Ensure proper file handling for both modes.",
+            "status": "done",
+            "testStrategy": "Test switching between modes. Verify photo quality meets requirements. Test video recording with different durations. Check file sizes and formats.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:35:53.409Z"
+          },
+          {
+            "id": 3,
+            "title": "Add Focus and Exposure Controls",
+            "description": "Implement manual and automatic focus/exposure controls to ensure clear captures of homework materials.",
+            "dependencies": [
+              1
+            ],
+            "details": "Add tap-to-focus functionality, implement manual focus slider, create exposure compensation controls, implement auto-focus for document detection, add focus lock for stable captures, and implement white balance adjustments for different lighting conditions.",
+            "status": "done",
+            "testStrategy": "Test focus accuracy on text documents. Verify exposure controls work in various lighting conditions. Test auto-focus speed and accuracy.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:36:06.305Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Gallery Access for Existing Photos",
+            "description": "Add functionality to access the device photo library to import existing homework photos or screenshots.",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement PHPickerViewController for modern photo selection, add multi-select capability for batch processing, implement permission handling for photo library access, create thumbnail preview grid, and add search functionality to find specific photos by date or metadata.",
+            "status": "done",
+            "testStrategy": "Test photo selection from library. Verify permissions are properly requested and handled. Test with various photo formats and sizes.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:39:50.868Z"
+          },
+          {
+            "id": 5,
+            "title": "Create Apple Pencil Photo Markup Functionality",
+            "description": "Implement markup tools that allow students to annotate captured homework photos using Apple Pencil or finger.",
+            "dependencies": [
+              1,
+              4
+            ],
+            "details": "Integrate PencilKit for natural drawing, implement different pen styles and colors, add eraser functionality, create highlighter tool for emphasizing important parts, implement text annotation tool, add shape tools for geometric annotations, and create undo/redo functionality.",
+            "status": "done",
+            "testStrategy": "Test markup with both Apple Pencil and finger input. Verify pressure sensitivity works correctly. Test undo/redo functionality. Verify annotations save correctly with images.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:43:44.732Z"
+          },
+          {
+            "id": 6,
+            "title": "Add Image Optimization for AI Processing",
+            "description": "Implement image processing to optimize captured homework photos for AI analysis and text recognition.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement automatic cropping of homework pages, add perspective correction for angled shots, create contrast enhancement for better text recognition, implement noise reduction filters, add resolution optimization to balance quality and processing speed, and create batch processing for multiple images.",
+            "status": "done",
+            "testStrategy": "Test optimization with various homework samples. Measure improvement in OCR accuracy. Test processing speed on different devices. Verify batch processing works correctly.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:39:52.293Z"
+          },
+          {
+            "id": 7,
+            "title": "Implement Camera Permission Handling",
+            "description": "Create robust permission handling for camera and photo library access with clear user messaging.",
+            "dependencies": [
+              1,
+              4
+            ],
+            "details": "Implement permission requests with clear explanations, create fallback flows for denied permissions, add settings deep links for permission management, implement permission status checking on app launch, create educational UI explaining why permissions are needed, and add analytics for permission conversion rates.",
+            "status": "done",
+            "testStrategy": "Test permission flows with both accept and deny scenarios. Verify proper handling of restricted permissions. Test deep links to settings. Verify educational UI displays correctly.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:39:53.528Z"
+          },
+          {
+            "id": 8,
+            "title": "Create One-Handed Camera UI",
+            "description": "Design and implement a camera interface optimized for one-handed use to make homework capture easier for students.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              5
+            ],
+            "details": "Implement bottom-aligned controls for thumb access, create swipe gestures for common actions, add floating capture button that can be repositioned, implement haptic feedback for actions, create voice command support for hands-free operation, and design adaptive layout for different device sizes and orientations.",
+            "status": "done",
+            "testStrategy": "Test usability with one-handed operation. Verify all controls are accessible with thumb reach. Test on different device sizes. Conduct user testing with student participants.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T16:43:46.048Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement camera integration for homework help."
+        "expansionPrompt": "Break down this task with a focus on implement camera integration for homework help.",
+        "updatedAt": "2025-10-12T16:43:46.048Z"
       },
       {
         "id": "36",
@@ -1056,11 +1766,129 @@
           "11",
           "35"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set up GPT-5 Vision API authentication and configuration",
+            "description": "Implement authentication flow and configuration setup for GPT-5 Vision API integration",
+            "dependencies": [],
+            "details": "Create API keys, set up environment variables, implement authentication handlers, and configure API endpoints. Include rate limiting considerations and API version management.",
+            "status": "done",
+            "testStrategy": "Test authentication with valid and invalid credentials. Verify configuration loads correctly across app restarts.",
+            "updatedAt": "2025-10-12T17:02:45.623Z",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Develop image capture and upload functionality",
+            "description": "Create UI and backend components for capturing and uploading images to GPT-5 Vision API",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement camera access, photo library integration, image preprocessing (compression, format conversion), upload progress indicators, and network request handling for image submission to the API.",
+            "status": "done",
+            "testStrategy": "Test image capture from camera and library. Verify upload success with various image sizes and formats.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:02:45.627Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement textbook page analysis prompts",
+            "description": "Create specialized prompts for GPT-5 Vision API to analyze textbook pages and extract relevant information",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Design prompt templates for different textbook layouts, implement prompt generation logic, create context-aware prompting based on subject matter, and develop prompt optimization for better extraction accuracy.",
+            "status": "done",
+            "testStrategy": "Test with various textbook page samples across different subjects. Measure extraction accuracy and completeness.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:02:45.637Z"
+          },
+          {
+            "id": 4,
+            "title": "Develop math problem recognition and parsing",
+            "description": "Implement specialized handling for mathematical notation and problem structures using GPT-5 Vision API",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Create math-specific prompts, implement LaTeX conversion for mathematical expressions, develop structure recognition for equations, and build parsing logic for different problem types (algebra, calculus, geometry, etc.).",
+            "status": "done",
+            "testStrategy": "Test with various math problem types. Verify correct recognition of equations, symbols, and problem structures.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:02:45.642Z"
+          },
+          {
+            "id": 5,
+            "title": "Implement diagram and visual element understanding",
+            "description": "Create functionality to analyze and interpret diagrams, charts, and other visual elements in homework problems",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Develop specialized prompts for diagram recognition, implement visual element classification, create context-aware interpretation based on surrounding text, and build relationship mapping between diagrams and problem statements.",
+            "status": "done",
+            "testStrategy": "Test with various diagram types (graphs, charts, scientific illustrations). Verify correct interpretation of visual elements and their relationships.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:02:45.644Z"
+          },
+          {
+            "id": 6,
+            "title": "Integrate handwriting recognition capabilities",
+            "description": "Implement handwriting recognition for analyzing handwritten homework problems and notes",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create handwriting-specific prompts for GPT-5 Vision API, implement preprocessing for handwritten input, develop confidence scoring for recognition results, and build fallback mechanisms for low-confidence recognitions.",
+            "status": "done",
+            "testStrategy": "Test with various handwriting samples. Measure recognition accuracy across different handwriting styles and quality levels.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:02:45.646Z"
+          },
+          {
+            "id": 7,
+            "title": "Develop step-by-step problem solving logic",
+            "description": "Create algorithms to generate step-by-step solutions for recognized homework problems",
+            "dependencies": [
+              3,
+              4,
+              5,
+              6
+            ],
+            "details": "Implement problem classification logic, create solution strategy selection based on problem type, develop step generation algorithms, implement explanation generation for each step, and build solution verification mechanisms.",
+            "status": "done",
+            "testStrategy": "Test solution generation for various problem types. Verify correctness of solutions and clarity of step-by-step explanations.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:02:45.648Z"
+          },
+          {
+            "id": 8,
+            "title": "Implement response parsing, formatting and error handling",
+            "description": "Create robust parsing of API responses with proper formatting and comprehensive error handling",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "details": "Develop JSON response parsers, implement structured data extraction, create user-friendly formatting for different response types, build comprehensive error handling with user-friendly messages, and implement retry logic for transient failures.",
+            "status": "done",
+            "testStrategy": "Test with various API response scenarios including success cases and different error conditions. Verify graceful handling of all error types.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:02:45.650Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement gpt-5 vision api integration."
+        "expansionPrompt": "Break down this task with a focus on implement gpt-5 vision api integration.",
+        "updatedAt": "2025-10-12T17:02:45.650Z"
       },
       {
         "id": "37",
@@ -1075,11 +1903,66 @@
           "35",
           "36"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and Implement Vision-Voice Capture Workflow",
+            "description": "Create a seamless workflow for users to capture images of homework problems using the device camera, initiate voice interactions, and discuss the content with the AI assistant.",
+            "dependencies": [],
+            "details": "Develop a UI flow that guides users through capturing images, confirms successful capture, and transitions to voice interaction. Integrate camera access, image processing, and voice input handling. Ensure the system can trigger AI analysis upon image capture and voice command.",
+            "status": "in-progress",
+            "testStrategy": "Test end-to-end workflow: verify image capture, voice command recognition, and AI response. Check for errors in camera or microphone access. Validate smooth transition between vision and voice modes.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:27:05.533Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Core Voice Commands and Continuous Dialogue",
+            "description": "Add support for key voice commands (e.g., 'What's this?') and enable continuous, context-aware conversation about the currently analyzed image.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate speech recognition to detect and process specific commands. Implement a dialogue manager to maintain context during multi-turn conversations about the captured image. Ensure the AI can reference the current image and previous interactions accurately.",
+            "status": "in-progress",
+            "testStrategy": "Test recognition accuracy of voice commands. Verify the AI maintains context during extended dialogue. Check for correct handling of ambiguous or out-of-context queries.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:27:05.536Z"
+          },
+          {
+            "id": 3,
+            "title": "Build Image Context Management and History Features",
+            "description": "Enable users to switch between analyzed images, save problem analyses, and review a history of past interactions.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Develop functionality to save analyzed problems with metadata (e.g., timestamp, subject). Implement context switching to allow users to return to previous images and continue the conversation. Create a UI for browsing and reviewing past analyses, including search and filter options.",
+            "status": "in-progress",
+            "testStrategy": "Test saving and retrieval of analyzed problems. Verify smooth context switching between images. Evaluate the usability and performance of the history review UI.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:27:05.539Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Solution Sharing and Multi-modal Output",
+            "description": "Allow users to share analyzed solutions and receive AI responses in both visual and auditory formats.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Add sharing options for solutions (e.g., export as image, text, or link). Support multi-modal output where the AI can explain solutions using both voice and on-screen visuals. Ensure shared content is accurate and includes relevant context from the conversation.",
+            "status": "in-progress",
+            "testStrategy": "Test all sharing mechanisms for correctness and usability. Verify multi-modal outputs (voice + visual) are synchronized and clear. Check that shared solutions retain necessary context and are accessible.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:27:05.542Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on create combined vision and voice interaction."
+        "expansionPrompt": "Break down this task with a focus on create combined vision and voice interaction.",
+        "updatedAt": "2025-10-12T18:27:05.542Z"
       },
       {
         "id": "38",
@@ -1109,11 +1992,66 @@
           "5",
           "22"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement SwiftUI Canvas-Based Mind Map Renderer",
+            "description": "Build the core rendering engine for the mind map using SwiftUI Canvas, supporting dynamic node and connection drawing with custom styling.",
+            "dependencies": [],
+            "details": "Create a CanvasView that renders nodes and connections based on a graph model. Implement custom drawing for nodes (text, shapes, colors) and connections (lines, arrows, colors). Ensure the renderer is modular for easy maintenance and extension.",
+            "status": "done",
+            "testStrategy": "Test with various graph sizes and node/connection configurations. Verify visual fidelity and correct rendering of all elements.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:58:12.726Z"
+          },
+          {
+            "id": 2,
+            "title": "Add Interactive Gestures and Layout Algorithms",
+            "description": "Enable user interaction through gestures and implement a force-directed graph layout for automatic node positioning.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate zoom, pan, and pinch gestures for navigating the mind map. Implement a force-directed layout algorithm to automatically arrange nodes, avoiding overlaps and optimizing readability. Support real-time updates as the graph changes.",
+            "status": "done",
+            "testStrategy": "Test gesture responsiveness and accuracy. Verify that the layout algorithm produces readable, non-overlapping graphs for various input sizes.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:58:12.729Z"
+          },
+          {
+            "id": 3,
+            "title": "Develop Node Expansion/Collapse and TTS Features",
+            "description": "Allow users to expand/collapse nodes and enable text-to-speech (TTS) explanations for selected nodes.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement tap/gesture handlers to expand or collapse child nodes. Integrate a TTS engine to read aloud node content when selected. Ensure animations are smooth during expansion/collapse and that TTS playback is interruptible and accessible.",
+            "status": "done",
+            "testStrategy": "Test expansion/collapse functionality with nested nodes. Verify TTS playback accuracy and interruptibility. Check accessibility compliance.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:58:12.731Z"
+          },
+          {
+            "id": 4,
+            "title": "Optimize Performance and Polish Visuals",
+            "description": "Ensure the mind map renders at 60 FPS and apply visual polish with animations and connection styling.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Profile and optimize rendering performance to achieve 60 FPS, especially with large graphs. Add smooth animations for node/connection interactions. Enhance visuals with gradients, shadows, and responsive layouts. Implement connection arrows and color coding for clarity.",
+            "status": "done",
+            "testStrategy": "Measure frame rate under stress (large graphs, rapid interactions). Test visual quality and animation smoothness. Verify that all interactive elements remain responsive.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T17:58:12.733Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on create interactive mind map renderer."
+        "expansionPrompt": "Break down this task with a focus on create interactive mind map renderer.",
+        "updatedAt": "2025-10-12T17:58:12.733Z"
       },
       {
         "id": "40",
@@ -1160,11 +2098,63 @@
           "13",
           "16"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Google Calendar API Access and Authentication",
+            "description": "Configure Google Cloud project, enable the Calendar API, and set up OAuth 2.0 or JWT authentication for secure access to user calendars.",
+            "dependencies": [],
+            "details": "Create a Google Cloud project, enable the Google Calendar API, and configure the OAuth consent screen. Generate API credentials (OAuth client ID or service account key) and integrate authentication logic into the app, ensuring proper scopes for calendar read/write access[1][2]. Handle initial token retrieval and refresh logic.",
+            "status": "done",
+            "testStrategy": "Verify successful project setup and API enablement. Test authentication flow end-to-end, including token refresh. Ensure correct scopes are requested and granted.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:03:46.679Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Calendar Event Synchronization Logic",
+            "description": "Develop functionality to fetch, parse, and store calendar events from Google Calendar, focusing on assignment due dates.",
+            "dependencies": [
+              1
+            ],
+            "details": "Write code to call the Google Calendar API (events.list) to retrieve events from the user’s primary calendar. Filter and parse events to identify assignment due dates based on event metadata (e.g., title, description). Store synchronized events locally for further processing[3][4]. Implement incremental sync to fetch only new or modified events after the initial sync.",
+            "status": "done",
+            "testStrategy": "Test with various calendar event types and structures. Verify accurate extraction and parsing of assignment due dates. Validate incremental sync detects and processes calendar changes correctly.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:03:46.684Z"
+          },
+          {
+            "id": 3,
+            "title": "Create and Manage Task Objects from Calendar Events",
+            "description": "Transform synchronized calendar events into app-specific Task objects and manage their lifecycle.",
+            "dependencies": [
+              2
+            ],
+            "details": "For each relevant calendar event, create a corresponding Task object in the app’s data model, preserving due date, title, and other metadata. Implement logic to update or remove Task objects when the underlying calendar event changes or is deleted. Ensure Task objects remain in sync with the calendar source.",
+            "status": "done",
+            "testStrategy": "Verify Task objects are created, updated, and deleted in response to calendar changes. Test with concurrent modifications to both the app and calendar. Check data consistency after sync cycles.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:03:46.695Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Background Sync and Error Handling",
+            "description": "Add background synchronization using BGAppRefreshTask and robust error handling with retry logic.",
+            "dependencies": [
+              3
+            ],
+            "details": "Integrate BGAppRefreshTask to periodically sync calendar events in the background, even when the app is not active. Implement comprehensive error handling for network issues, API limits, and authentication failures. Add automatic retry logic with exponential backoff for failed sync attempts. Log errors for debugging and user notification.",
+            "status": "done",
+            "testStrategy": "Simulate network errors and API failures to verify retry logic. Test background sync reliability and performance. Monitor error logs and user notifications for sync issues.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:03:46.697Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement google calendar integration."
+        "expansionPrompt": "Break down this task with a focus on implement google calendar integration.",
+        "updatedAt": "2025-10-12T18:03:46.697Z"
       },
       {
         "id": "43",
@@ -1178,11 +2168,63 @@
           "13",
           "16"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Gmail API Integration and Authentication",
+            "description": "Configure the iOS app to authenticate with Google using OAuth 2.0, enable the Gmail API in the Google Cloud Console, and obtain necessary credentials for API access.",
+            "dependencies": [],
+            "details": "Create a project in the Google API Console, enable the Gmail API, and generate OAuth client credentials. Integrate Google Sign-In for iOS to handle user authentication and token management. Store credentials securely and ensure the app can request and refresh access tokens as needed.",
+            "status": "done",
+            "testStrategy": "Verify successful OAuth flow, token retrieval, and refresh. Test with multiple Google accounts. Ensure credentials are never exposed in logs or source control.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:07:06.190Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Email Fetching, Filtering, and Parsing Logic",
+            "description": "Fetch emails from Gmail, filter by sender (teacher emails), and parse message content for assignment keywords and due dates.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use the Gmail API to fetch emails, applying filters by sender address. Scan email bodies and subjects for keywords like 'Compito:' and 'Consegna:'. Extract assignment details and due dates using regular expressions or natural language processing. Handle various email formats and encodings.",
+            "status": "done",
+            "testStrategy": "Test with real and mock teacher emails in different formats. Verify accurate extraction of assignments and due dates. Measure parsing performance and error rates.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:07:06.195Z"
+          },
+          {
+            "id": 3,
+            "title": "Create and Sync Task Objects from Parsed Emails",
+            "description": "Transform parsed email data into Task objects, sync them with the local data store, and mark processed emails as read.",
+            "dependencies": [
+              2
+            ],
+            "details": "Map extracted assignment details to Task model objects. Persist tasks using SwiftData. Mark processed emails as read via the Gmail API to avoid duplicate processing. Ensure task creation is atomic and idempotent.",
+            "status": "done",
+            "testStrategy": "Verify Task objects are created correctly and synced to the local store. Test marking emails as read and handling duplicate emails. Check for data consistency after sync.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:07:06.206Z"
+          },
+          {
+            "id": 4,
+            "title": "Implement Background Sync, Error Handling, and Retry Logic",
+            "description": "Add background sync using BGAppRefreshTask, robust error handling, and automatic retry mechanisms for failed operations.",
+            "dependencies": [
+              3
+            ],
+            "details": "Schedule periodic background fetches using BGAppRefreshTask. Implement comprehensive error handling for network, API, and parsing failures. Add exponential backoff and retry logic for transient errors. Log errors for debugging and user feedback.",
+            "status": "done",
+            "testStrategy": "Simulate network failures and API errors to verify retry behavior. Test background sync reliability and battery impact. Monitor error logs for unhandled cases.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-12T18:07:06.209Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement gmail integration for assignment extraction."
+        "expansionPrompt": "Break down this task with a focus on implement gmail integration for assignment extraction.",
+        "updatedAt": "2025-10-12T18:07:06.209Z"
       },
       {
         "id": "44",
@@ -1931,9 +2973,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T16:11:23.980Z",
+      "lastModified": "2025-10-12T18:27:05.542Z",
       "taskCount": 83,
-      "completedCount": 20,
+      "completedCount": 36,
       "tags": [
         "master"
       ]
