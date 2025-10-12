@@ -3,6 +3,19 @@
 import UIKit
 import os.log
 
+/// Capture mode enumeration
+enum CaptureMode: CustomStringConvertible {
+    case photo
+    case video
+
+    var description: String {
+        switch self {
+        case .photo: return "photo"
+        case .video: return "video"
+        }
+    }
+}
+
 /// Manager for camera capture operations for homework help
 @MainActor
 final class CameraManager: NSObject {
@@ -40,11 +53,25 @@ final class CameraManager: NSObject {
     /// Current camera position
     private(set) var currentPosition: AVCaptureDevice.Position = .back
 
+    /// Current capture mode
+    private(set) var currentMode: CaptureMode = .photo
+
+    /// Maximum video duration in seconds (default: 60 seconds)
+    var maxVideoDuration: TimeInterval = 60.0
+
+    /// Video recording timer
+    private var recordingTimer: Timer?
+
+    /// Current recording duration
+    private(set) var currentRecordingDuration: TimeInterval = 0
+
     // MARK: - Callbacks
 
     var onPhotoCapture: ((UIImage) -> Void)?
     var onVideoRecordingStarted: (() -> Void)?
     var onVideoRecordingFinished: ((URL) -> Void)?
+    var onRecordingDurationUpdate: ((TimeInterval) -> Void)?
+    var onModeChanged: ((CaptureMode) -> Void)?
     var onError: ((CameraError) -> Void)?
 
     // MARK: - Initialization
@@ -208,6 +235,35 @@ final class CameraManager: NSObject {
         logger.info("Switched to \(newPosition.rawValue) camera")
     }
 
+    // MARK: - Capture Mode
+
+    /// Switch between photo and video capture modes
+    /// - Parameter mode: Target capture mode
+    func setCaptureMode(_ mode: CaptureMode) {
+        guard currentMode != mode else { return }
+
+        currentMode = mode
+
+        // Update session preset based on mode
+        captureSession.beginConfiguration()
+
+        switch mode {
+        case .photo:
+            if captureSession.canSetSessionPreset(.photo) {
+                captureSession.sessionPreset = .photo
+            }
+        case .video:
+            if captureSession.canSetSessionPreset(.high) {
+                captureSession.sessionPreset = .high
+            }
+        }
+
+        captureSession.commitConfiguration()
+
+        logger.info("Capture mode switched to: \(mode)")
+        onModeChanged?(mode)
+    }
+
     // MARK: - Photo Capture
 
     /// Capture a photo
@@ -234,6 +290,24 @@ final class CameraManager: NSObject {
         logger.info("Photo capture initiated")
     }
 
+    /// Capture burst of photos
+    /// - Parameter count: Number of photos to capture in burst (default: 5)
+    func captureBurst(count: Int = 5) {
+        guard isRunning else {
+            onError?(.sessionNotRunning)
+            return
+        }
+
+        logger.info("Burst capture initiated: \(count) photos")
+
+        // Capture photos with delay between each
+        for i in 0..<count {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.2) { [weak self] in
+                self?.capturePhoto()
+            }
+        }
+    }
+
     // MARK: - Video Capture
 
     /// Start video recording
@@ -258,6 +332,10 @@ final class CameraManager: NSObject {
         videoOutput.startRecording(to: outputURL, recordingDelegate: self)
         isRecording = true
 
+        // Start recording duration timer
+        currentRecordingDuration = 0
+        startRecordingTimer()
+
         logger.info("Video recording started: \(outputURL.path)")
         onVideoRecordingStarted?()
 
@@ -271,10 +349,40 @@ final class CameraManager: NSObject {
             return
         }
 
+        // Stop recording timer
+        stopRecordingTimer()
+
         videoOutput.stopRecording()
         isRecording = false
 
         logger.info("Video recording stopped")
+    }
+
+    // MARK: - Recording Timer
+
+    /// Start recording duration timer
+    private func startRecordingTimer() {
+        recordingTimer?.invalidate()
+        recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            guard let self else { return }
+
+            self.currentRecordingDuration += 0.1
+
+            // Update duration callback
+            self.onRecordingDurationUpdate?(self.currentRecordingDuration)
+
+            // Check if max duration reached
+            if self.currentRecordingDuration >= self.maxVideoDuration {
+                self.stopVideoRecording()
+            }
+        }
+    }
+
+    /// Stop recording duration timer
+    private func stopRecordingTimer() {
+        recordingTimer?.invalidate()
+        recordingTimer = nil
+        currentRecordingDuration = 0
     }
 
     // MARK: - Focus and Exposure
