@@ -3391,12 +3391,12 @@
           "32",
           "44"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement context banner for working memory support.",
-        "updatedAt": "2025-10-13T07:29:19.829Z"
+        "updatedAt": "2025-10-13T07:32:14.452Z"
       },
       {
         "id": "76",
@@ -3413,11 +3413,12 @@
           "39",
           "44"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on optimize ui for one-handed operation."
+        "expansionPrompt": "Break down this task with a focus on optimize ui for one-handed operation.",
+        "updatedAt": "2025-10-13T07:39:56.133Z"
       },
       {
         "id": "77",
@@ -3546,9 +3547,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-13T07:29:19.831Z",
+      "lastModified": "2025-10-13T07:39:56.137Z",
       "taskCount": 83,
-      "completedCount": 49,
+      "completedCount": 50,
       "tags": [
         "master"
       ]
