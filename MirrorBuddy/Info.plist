@@ -12,5 +12,10 @@
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>OpenDyslexic-Regular.otf</string>
+		<string>OpenDyslexic-Bold.otf</string>
+	</array>
 </dict>
 </plist>
