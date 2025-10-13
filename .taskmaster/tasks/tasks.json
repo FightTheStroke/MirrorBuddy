@@ -3413,12 +3413,12 @@
           "39",
           "44"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on optimize ui for one-handed operation.",
-        "updatedAt": "2025-10-13T07:39:56.133Z"
+        "updatedAt": "2025-10-13T07:41:18.940Z"
       },
       {
         "id": "77",
@@ -3435,11 +3435,12 @@
           "39",
           "44"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement large touch targets."
+        "expansionPrompt": "Break down this task with a focus on implement large touch targets.",
+        "updatedAt": "2025-10-13T07:42:07.365Z"
       },
       {
         "id": "78",
@@ -3547,9 +3548,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-13T07:39:56.137Z",
+      "lastModified": "2025-10-13T07:42:07.368Z",
       "taskCount": 83,
-      "completedCount": 50,
+      "completedCount": 51,
       "tags": [
         "master"
       ]
