@@ -44,6 +44,9 @@ struct DyslexiaSettingsView: View {
                     // Color theme section (Subtask 74.3)
                     colorThemeSection
 
+                    // Reading aids section (Subtask 74.3)
+                    ReadingAidsSettings()
+
                     // Preview section
                     previewSection
 
