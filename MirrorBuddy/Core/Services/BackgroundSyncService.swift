@@ -1,6 +1,7 @@
 import Foundation
 import BackgroundTasks
 import SwiftData
+import Combine
 
 /// Background sync service for scheduled material syncs at 13:00 and 18:00 CET (Task 72)
 @MainActor
@@ -11,14 +12,24 @@ final class BackgroundSyncService: ObservableObject {
     @Published var lastSyncDate: Date?
     @Published var nextScheduledSync: Date?
 
+    private var modelContext: ModelContext?
+
     private init() {}
+
+    func configure(modelContext: ModelContext) {
+        self.modelContext = modelContext
+    }
+
+    func register() {
+        registerBackgroundTasks()
+    }
 
     func registerBackgroundTasks() {
         BGTaskScheduler.shared.register(
             forTaskWithIdentifier: Self.backgroundTaskIdentifier,
             using: nil
         ) { task in
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 await self.handleBackgroundSync(task: task as! BGProcessingTask)
             }
         }
