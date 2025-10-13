@@ -1354,11 +1354,48 @@
           "82",
           "83"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create SwiftUI Material Detail View Structure",
+            "description": "Implement the basic structure of the Material Detail View using SwiftUI, including layout and navigation components.",
+            "dependencies": [],
+            "details": "Create a new SwiftUI view file for material details. Implement the basic layout structure with header, content sections, and navigation elements. Set up the view model to handle data flow. Ensure the view adapts to different screen sizes using GeometryReader and responsive layout techniques. Implement basic navigation between sections using TabView or custom navigation.",
+            "status": "pending",
+            "testStrategy": "Test the view with different screen sizes and orientations. Verify navigation between sections works correctly. Test with sample material data to ensure proper layout.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Content Viewers (PDF, Mind Map, Flashcards)",
+            "description": "Develop the specialized content viewers for different material types including PDF viewer with text-to-speech, mind map preview, and flashcard preview.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate PDFKit for PDF viewing capabilities. Implement text-to-speech functionality using AVSpeechSynthesizer. Create a mind map preview component that renders mind map data. Develop a flashcard preview component with flip animation. Ensure each viewer has proper loading states and error handling. Implement content pagination where appropriate. Optimize rendering performance for large documents.",
+            "status": "pending",
+            "testStrategy": "Test PDF viewer with various document sizes and formats. Verify text-to-speech works correctly with different languages. Test mind map rendering with complex structures. Verify flashcard interactions work smoothly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement Accessibility and Action Features",
+            "description": "Add accessibility features, quick action buttons, and sharing functionality to the Material Detail View.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Optimize the view for VoiceOver by adding proper accessibility labels, hints, and traits. Implement large touch targets (minimum 44x44 points) for all interactive elements. Create quick action buttons for study, review, and share functions. Implement sharing functionality using UIActivityViewController. Add haptic feedback for interactions. Ensure proper keyboard navigation support. Test and refine accessibility features with VoiceOver enabled.",
+            "status": "pending",
+            "testStrategy": "Test with VoiceOver enabled to verify all elements are properly announced. Verify touch targets meet size requirements. Test sharing functionality with various apps and services. Verify keyboard navigation works correctly.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement material detail view."
+        "expansionPrompt": "Break down this task with a focus on implement material detail view.",
+        "updatedAt": "2025-10-13T05:26:24.962Z"
       },
       {
         "id": "29",
@@ -1371,11 +1408,51 @@
           "26",
           "28"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Voice Command Recognition with Apple Speech",
+            "description": "Set up the voice recognition system using Apple's Speech framework to capture and process user voice commands for navigation.",
+            "dependencies": [],
+            "details": "Integrate Apple Speech framework into the app. Implement continuous listening mode with appropriate permission handling. Create the audio session configuration for optimal voice recognition. Implement language detection to support both English and Italian inputs. Set up the basic recognition pipeline that converts speech to text for further processing.",
+            "status": "done",
+            "testStrategy": "Test voice recognition accuracy in different environments (quiet, moderate noise, loud). Verify recognition works for both English and Italian speakers. Measure response time from voice input to text conversion.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T07:10:22.094Z"
+          },
+          {
+            "id": 2,
+            "title": "Create Command Registry and Navigation Handlers",
+            "description": "Develop a system to register available voice commands and implement handlers that execute navigation actions based on recognized commands.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design a command registry data structure to store available voice commands and their associated actions. Implement command handlers for basic navigation (go back, go home, open settings, etc.). Create a mapping system between recognized phrases and command actions. Support command variations and synonyms for natural language flexibility. Implement contextual command filtering based on current view/state of the app.",
+            "status": "done",
+            "testStrategy": "Test all registered commands execute the correct navigation actions. Verify commands work across different app contexts. Test command variations and synonyms resolve to the correct actions.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T07:13:13.625Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement Feedback and Error Handling System",
+            "description": "Create visual and audio feedback mechanisms for voice commands and implement robust error handling for misunderstood or invalid commands.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Design and implement visual indicators that show when voice recognition is active, processing, and completed. Create audio feedback (subtle sounds) to confirm command recognition. Implement error handling for misunderstood commands with appropriate user feedback. Design and implement a help system that shows available commands based on current context. Add fallback mechanisms for partially matched commands with confirmation prompts when needed.",
+            "status": "done",
+            "testStrategy": "Test visual feedback visibility across different lighting conditions. Verify error messages are clear and helpful. Test the help system displays relevant commands for each app context. Measure user recovery rate after command errors.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T07:16:20.593Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement voice command system for navigation."
+        "expansionPrompt": "Break down this task with a focus on implement voice command system for navigation.",
+        "updatedAt": "2025-10-13T07:16:20.593Z"
       },
       {
         "id": "30",
@@ -2657,11 +2734,121 @@
           "32",
           "35"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Onboarding UI Wireframes and Flow",
+            "description": "Create comprehensive wireframes and visual designs for the entire onboarding experience, ensuring a cohesive and engaging user journey.",
+            "dependencies": [],
+            "details": "Design wireframes for all onboarding screens including welcome, permissions, Google account connection, API setup, tutorials, and sample demonstrations. Create a visual flow diagram showing the user journey with skip options. Ensure the design is Mario-friendly and follows brand guidelines. Include progress indicators on all screens.",
+            "status": "in-progress",
+            "testStrategy": "Conduct user testing with wireframes to validate flow clarity. Review designs with stakeholders for brand alignment and usability feedback.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T07:19:51.290Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Welcome Video Production",
+            "description": "Create an engaging, Mario-friendly welcome video that introduces users to the app's key features and benefits.",
+            "dependencies": [
+              1
+            ],
+            "details": "Script, storyboard, and produce a 30-60 second welcome video featuring Mario-style elements. Video should highlight key app features, set expectations, and create excitement. Include captions and ensure accessibility. Optimize for mobile viewing with clear visuals that work on smaller screens.",
+            "status": "pending",
+            "testStrategy": "Test video playback on multiple devices. Gather feedback on clarity and engagement. Verify accessibility features work correctly.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Develop Permission Request System",
+            "description": "Implement a user-friendly system for requesting camera, microphone, and notification permissions with clear explanations.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create permission request screens with clear explanations of why each permission is needed. Implement the technical integration with iOS permission APIs. Design fallback flows for users who decline permissions. Include visual indicators showing which permissions are granted/denied. Ensure timing of requests follows best practices.",
+            "status": "pending",
+            "testStrategy": "Test permission flows on actual devices. Verify proper handling of all user response scenarios (accept, deny, later). Test edge cases like users changing permissions in settings.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Google Account Connection",
+            "description": "Create a seamless flow for users to connect their Google accounts, including authentication and data syncing.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate Google Sign-In SDK. Implement OAuth flow for secure authentication. Create UI for account selection and permission granting. Handle error cases gracefully. Implement data syncing between app and Google services. Ensure proper token storage and refresh mechanisms. Add account disconnection capability.",
+            "status": "pending",
+            "testStrategy": "Test authentication flow with various Google account types. Verify proper error handling for network issues. Test account switching and disconnection scenarios.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Build API Key Setup for Developers",
+            "description": "Create a developer-focused flow for setting up and managing API keys within the onboarding process.",
+            "dependencies": [
+              1,
+              4
+            ],
+            "details": "Design and implement screens for API key generation, validation, and management. Create secure storage for API credentials. Implement validation logic to verify key correctness. Add documentation links within the interface. Create a separate developer mode toggle in settings. Include copy/paste functionality for keys.",
+            "status": "pending",
+            "testStrategy": "Test API key validation with valid and invalid keys. Verify secure storage of credentials. Test the entire flow with actual developer accounts.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Develop Interactive Voice and Sample Material Tutorials",
+            "description": "Create interactive tutorials demonstrating the app's voice features and sample materials to help users understand core functionality.",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Implement guided voice tutorial with step-by-step instructions. Create interactive sample material demonstrations that users can explore. Design tutorial cards with clear visuals and minimal text. Implement interactive elements that respond to user actions. Create progress tracking within tutorials. Ensure tutorials can be revisited from settings later.",
+            "status": "pending",
+            "testStrategy": "Conduct usability testing with new users. Measure completion rates and time spent in tutorials. Gather feedback on clarity and helpfulness of instructions.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "Implement Onboarding Progress Tracking System",
+            "description": "Create a system to track user progress through the onboarding flow, allowing for resumption and providing visual feedback.",
+            "dependencies": [
+              1,
+              3,
+              4,
+              5,
+              6
+            ],
+            "details": "Implement persistent storage for tracking onboarding completion status. Create progress indicators showing completed and remaining steps. Design a resume mechanism for interrupted flows. Implement analytics to measure completion rates and drop-off points. Create a dashboard for users to see their onboarding progress. Ensure data synchronization across devices.",
+            "status": "pending",
+            "testStrategy": "Test progress persistence across app restarts. Verify accurate tracking of completed steps. Test synchronization between devices. Analyze collected analytics for accuracy.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "Create Skip Options and Comprehensive Testing Plan",
+            "description": "Implement skip functionality for experienced users and create a comprehensive testing strategy for the entire onboarding flow.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "details": "Design and implement skip options for each section of onboarding. Create a quick-setup path for experienced users. Implement confirmation dialogs for skipped critical steps. Develop a comprehensive test plan covering all onboarding scenarios. Create test cases for different user types and permission combinations. Implement A/B testing framework to measure onboarding effectiveness.",
+            "status": "pending",
+            "testStrategy": "Conduct end-to-end testing of complete flows. Test all skip scenarios and verify proper state management. Perform usability testing with both new and experienced users. Analyze metrics to identify potential improvements.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 8,
         "recommendedSubtasks": 8,
-        "expansionPrompt": "Break down the onboarding flow implementation into subtasks covering UI design, permission handling, account connection, tutorials, and testing. Consider how to make the onboarding experience engaging while collecting necessary permissions and information."
+        "expansionPrompt": "Break down the onboarding flow implementation into subtasks covering UI design, permission handling, account connection, tutorials, and testing. Consider how to make the onboarding experience engaging while collecting necessary permissions and information.",
+        "updatedAt": "2025-10-13T07:19:51.290Z"
       },
       {
         "id": "56",
@@ -2730,7 +2917,7 @@
           "34",
           "39"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -2771,7 +2958,7 @@
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement performance optimization.",
-        "updatedAt": "2025-10-12T21:06:07.722Z"
+        "updatedAt": "2025-10-12T21:08:44.250Z"
       },
       {
         "id": "60",
@@ -3082,11 +3269,51 @@
         "dependencies": [
           "28"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Apple Speech Integration for Text Content",
+            "description": "Set up the core Apple Speech framework integration to enable text-to-speech functionality for all textual content in the application.",
+            "dependencies": [],
+            "details": "1. Import the Apple Speech framework\n2. Create a speech synthesizer service class\n3. Implement basic text-to-speech conversion methods\n4. Handle different content types (plain text, formatted text, etc.)\n5. Set up error handling for speech synthesis failures\n6. Optimize for performance with longer text passages",
+            "status": "done",
+            "testStrategy": "Test with various text content types and lengths. Verify speech output quality and pronunciation. Measure initialization time and memory usage during speech synthesis.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T05:46:09.213Z"
+          },
+          {
+            "id": 2,
+            "title": "Develop TTS Playback Controls and Voice Options",
+            "description": "Create user interface controls for text-to-speech playback and implement voice selection capabilities.",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Design and implement play, pause, and stop controls\n2. Create voice selection interface with available system voices\n3. Implement reading speed adjustment slider\n4. Add volume control integration\n5. Create persistent user preferences for voice settings\n6. Implement preview functionality for voice selection\n7. Add accessibility features to the TTS controls",
+            "status": "done",
+            "testStrategy": "Test all control functions across different device sizes. Verify voice selection works for all available voices. Test speed adjustment at various levels. Ensure controls are fully accessible.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T05:48:30.908Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement Advanced TTS Features and Content Integration",
+            "description": "Develop advanced text-to-speech features including text highlighting, language detection, and integration with various content types.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "1. Implement text highlighting synchronized with speech\n2. Add automatic language detection for multilingual content\n3. Create continuous reading functionality across multiple pages\n4. Implement TTS for mind map nodes and interactive elements\n5. Add support for reading tables and structured content\n6. Optimize performance for long-form content\n7. Implement background playback capabilities\n8. Create user settings for customizing TTS behavior",
+            "status": "done",
+            "testStrategy": "Test text highlighting accuracy with various content layouts. Verify language detection with multilingual content. Test continuous reading across navigation boundaries. Measure performance with complex content structures.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T05:50:59.808Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement text-to-speech for all content."
+        "expansionPrompt": "Break down this task with a focus on implement text-to-speech for all content.",
+        "updatedAt": "2025-10-13T05:50:59.808Z"
       },
       {
         "id": "74",
@@ -3098,11 +3325,51 @@
         "dependencies": [
           "28"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate OpenDyslexic Font and Customize Letter Spacing",
+            "description": "Implement the OpenDyslexic font integration and develop customizable letter spacing controls for dyslexia-friendly text rendering.",
+            "dependencies": [],
+            "details": "Add OpenDyslexic font to the project assets. Create font selection UI controls. Implement letter spacing adjustment slider with range from 1.0 to 2.0. Apply font and spacing changes to text rendering engine. Ensure changes persist across app sessions. Create preview functionality to demonstrate spacing changes in real-time.",
+            "status": "done",
+            "testStrategy": "Test font rendering on different device sizes. Verify letter spacing adjustments work correctly. Conduct user testing with individuals with dyslexia to validate effectiveness.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T05:54:59.758Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Line and Paragraph Spacing Adjustments",
+            "description": "Create controls for adjusting line spacing and paragraph spacing to improve readability for users with dyslexia.",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop line spacing adjustment slider with range from 1.0 to 3.0. Create paragraph spacing controls with options for normal, wide, and extra-wide spacing. Implement real-time preview of spacing changes. Ensure spacing adjustments apply consistently across different text containers. Add default presets for common dyslexia-friendly spacing combinations.",
+            "status": "done",
+            "testStrategy": "Test spacing adjustments across different text lengths and containers. Verify spacing changes persist across app restarts. Compare reading speed and comprehension with different spacing settings.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T05:57:02.325Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement Color Contrast Settings and Reading Aids",
+            "description": "Develop color contrast adjustment options and reading assistance tools including reading ruler and focus mode.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create color theme options optimized for dyslexia (cream background, dark blue text, etc.). Implement contrast adjustment controls. Develop reading ruler feature that highlights current line. Create focus mode that dims surrounding text. Add text simplification option that replaces complex words with simpler alternatives using NLP. Ensure all features can be toggled independently.",
+            "status": "done",
+            "testStrategy": "Test color contrast ratios meet WCAG accessibility standards. Evaluate reading ruler tracking accuracy. Conduct user testing to measure effectiveness of focus mode and text simplification.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-13T05:59:17.969Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on implement dyslexia-friendly text rendering."
+        "expansionPrompt": "Break down this task with a focus on implement dyslexia-friendly text rendering.",
+        "updatedAt": "2025-10-13T05:59:17.969Z"
       },
       {
         "id": "75",
@@ -3271,9 +3538,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-12T21:06:07.724Z",
+      "lastModified": "2025-10-13T07:19:51.293Z",
       "taskCount": 83,
-      "completedCount": 43,
+      "completedCount": 48,
       "tags": [
         "master"
       ]
