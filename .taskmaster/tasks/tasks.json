@@ -2983,11 +2983,12 @@
           "39",
           "44"
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
-        "expansionPrompt": "Break down this task with a focus on conduct accessibility audit."
+        "expansionPrompt": "Break down this task with a focus on conduct accessibility audit.",
+        "updatedAt": "2025-10-13T07:44:02.790Z"
       },
       {
         "id": "61",
@@ -3435,12 +3436,12 @@
           "39",
           "44"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement large touch targets.",
-        "updatedAt": "2025-10-13T07:42:07.365Z"
+        "updatedAt": "2025-10-13T07:43:00.914Z"
       },
       {
         "id": "78",
@@ -3548,9 +3549,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-13T07:42:07.368Z",
+      "lastModified": "2025-10-13T07:44:02.793Z",
       "taskCount": 83,
-      "completedCount": 51,
+      "completedCount": 52,
       "tags": [
         "master"
       ]
