@@ -70,7 +70,7 @@ enum VoiceCommandAction {
 
 // MARK: - Command Context (Task 29.2)
 
-enum VoiceCommandContext {
+enum VoiceCommandContext: Hashable {
     case global // Available everywhere
     case materialDetail // Only in material detail view
     case studySession // Only during study
