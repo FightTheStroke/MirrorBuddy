@@ -422,18 +422,6 @@ enum SortOption: String, CaseIterable, Identifiable {
     }
 }
 
-// MARK: - Placeholder Material Detail View
-
-struct MaterialDetailView: View {
-    let material: Material
-
-    var body: some View {
-        Text("Material Detail: \(material.title)")
-            .navigationTitle(material.title)
-            .navigationBarTitleDisplayMode(.large)
-    }
-}
-
 // MARK: - View Extensions
 
 extension View {
