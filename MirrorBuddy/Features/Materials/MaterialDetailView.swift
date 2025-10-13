@@ -261,17 +261,9 @@ struct MaterialDetailView: View {
                     .font(.body)
                     .lineSpacing(8)
 
-                // Text-to-speech button
-                Button {
-                    speakText(summary)
-                } label: {
-                    Label("Ascolta Riassunto", systemImage: "speaker.wave.2.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.green)
-                        .foregroundStyle(.white)
-                        .cornerRadius(12)
+                // Text-to-speech controls (Task 73.3)
+                TTSCompactControlsView(text: summary) {
+                    TextToSpeechService.shared.speak(summary)
                 }
             }
         } else {
@@ -361,10 +353,6 @@ struct MaterialDetailView: View {
                 isProcessing = false
             }
         }
-    }
-
-    private func speakText(_ text: String) {
-        // TTS implementation would go here
     }
 }
 
