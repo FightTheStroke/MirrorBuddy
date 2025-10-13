@@ -92,7 +92,8 @@ struct GeminiClientTests {
         }
     }
 
-    @Test("GeminiPart text encoding and decoding") throws {
+    @Test("GeminiPart text encoding and decoding")
+    func testGeminiPartTextEncodingDecoding() throws {
         let part = GeminiPart.text("Test message")
 
         let encoder = JSONEncoder()
@@ -108,7 +109,8 @@ struct GeminiClientTests {
         }
     }
 
-    @Test("GeminiPart inline data encoding and decoding") throws {
+    @Test("GeminiPart inline data encoding and decoding")
+    func testGeminiPartInlineDataEncodingDecoding() throws {
         let imageData = Data([0xFF, 0xD8, 0xFF, 0xE0]) // JPEG header
         let base64 = imageData.base64EncodedString()
         let inlineData = GeminiInlineData(mimeType: "image/jpeg", data: base64)
@@ -208,7 +210,8 @@ struct GeminiClientTests {
         #expect(request.safetySettings?.count == 1)
     }
 
-    @Test("GeminiGenerateContentRequest encoding") throws {
+    @Test("GeminiGenerateContentRequest encoding")
+    func testGeminiGenerateContentRequestEncoding() throws {
         let content = GeminiContent.text("Test")
         let request = GeminiGenerateContentRequest(contents: [content])
 
@@ -220,7 +223,8 @@ struct GeminiClientTests {
 
     // MARK: - Response Tests
 
-    @Test("GeminiCandidate decoding from valid JSON") throws {
+    @Test("GeminiCandidate decoding from valid JSON")
+    func testGeminiCandidateDecoding() throws {
         let json = """
         {
             "content": {
@@ -246,7 +250,8 @@ struct GeminiClientTests {
         #expect(candidate.safetyRatings?.count == 1)
     }
 
-    @Test("GeminiUsageMetadata decoding") throws {
+    @Test("GeminiUsageMetadata decoding")
+    func testGeminiUsageMetadataDecoding() throws {
         let json = """
         {
             "promptTokenCount": 10,
@@ -303,7 +308,8 @@ struct GeminiClientTests {
 
     // MARK: - Error Response Tests
 
-    @Test("GeminiErrorResponse decoding") throws {
+    @Test("GeminiErrorResponse decoding")
+    func testGeminiErrorResponseDecoding() throws {
         let json = """
         {
             "error": {
@@ -355,7 +361,8 @@ struct GeminiClientTests {
 
     // MARK: - Supporting Data Models Tests
 
-    @Test("DriveAnalysisResult decoding") throws {
+    @Test("DriveAnalysisResult decoding")
+    func testDriveAnalysisResultDecoding() throws {
         let json = """
         {
             "files": [
@@ -380,7 +387,8 @@ struct GeminiClientTests {
         #expect(result.recommendations.count == 1)
     }
 
-    @Test("CalendarEventData decoding") throws {
+    @Test("CalendarEventData decoding")
+    func testCalendarEventDataDecoding() throws {
         let json = """
         {
             "title": "Math Class",
@@ -402,7 +410,8 @@ struct GeminiClientTests {
         #expect(event.attendees?.count == 1)
     }
 
-    @Test("AssignmentData decoding") throws {
+    @Test("AssignmentData decoding")
+    func testAssignmentDataDecoding() throws {
         let json = """
         {
             "title": "Math Homework",

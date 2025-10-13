@@ -44,7 +44,7 @@ echo ""
 if [ "$USE_XCPRETTY" = true ]; then
     xcodebuild test \
         -scheme "${SCHEME}" \
-        -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=latest' \
+        -destination 'platform=iOS Simulator,name=iPhone 16' \
         -derivedDataPath "${DERIVED_DATA_PATH}" \
         -enableCodeCoverage YES \
         -quiet \
@@ -52,7 +52,7 @@ if [ "$USE_XCPRETTY" = true ]; then
 else
     xcodebuild test \
         -scheme "${SCHEME}" \
-        -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=latest' \
+        -destination 'platform=iOS Simulator,name=iPhone 16' \
         -derivedDataPath "${DERIVED_DATA_PATH}" \
         -enableCodeCoverage YES
 fi
