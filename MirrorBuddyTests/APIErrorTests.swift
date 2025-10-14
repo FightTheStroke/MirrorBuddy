@@ -3,6 +3,7 @@ import Testing
 @testable import MirrorBuddy
 
 @Suite("API Error Tests")
+@MainActor
 struct APIErrorTests {
     // MARK: - UnifiedAPIError Tests
 
