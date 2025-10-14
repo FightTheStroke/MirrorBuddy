@@ -314,7 +314,7 @@ struct OpenAIClientTests {
     @Test("Image quality values")
     func testImageQualityValues() {
         #expect(ImageQuality.standard.rawValue == "standard")
-        #expect(ImageQuality.hd.rawValue == "hd")
+        #expect(ImageQuality.highDefinition.rawValue == "hd")
     }
 
     @Test("Image style values")
