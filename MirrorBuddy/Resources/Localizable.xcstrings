@@ -80,6 +80,15 @@
     "• %@" : {
 
     },
+    "• Date di consegna compiti" : {
+
+    },
+    "• Email dai professori con compiti" : {
+
+    },
+    "• Eventi e scadenze del calendario" : {
+
+    },
     "• Glucosio\n• O₂" : {
 
     },
@@ -488,6 +497,9 @@
     "Avanti 10 secondi" : {
 
     },
+    "Avvia Sincronizzazione" : {
+
+    },
     "Azioni rapide" : {
 
     },
@@ -625,7 +637,13 @@
     "Contrasto Colori" : {
 
     },
+    "Controlla nuove email dai professori e eventi del calendario" : {
+
+    },
     "Cosa produce la fotosintesi?" : {
+
+    },
+    "Cosa viene sincronizzato:" : {
 
     },
     "Credenziali OAuth" : {
@@ -724,6 +742,12 @@
 
     },
     "Elaborazione..." : {
+
+    },
+    "Email e calendario sono stati sincronizzati con successo" : {
+
+    },
+    "Email Professori" : {
 
     },
     "English" : {
@@ -978,6 +1002,9 @@
     "Fai una domanda sul materiale" : {
 
     },
+    "File System" : {
+
+    },
     "Filters & Sort" : {
 
     },
@@ -1047,6 +1074,9 @@
     "Homework Help" : {
 
     },
+    "I Miei Compiti" : {
+
+    },
     "Il Client Secret è opzionale per le app iOS. Alcuni setup potrebbero non richiederlo." : {
 
     },
@@ -1069,6 +1099,9 @@
 
     },
     "Importa da Drive" : {
+
+    },
+    "Importa File" : {
 
     },
     "Importa materiali" : {
@@ -1530,6 +1563,9 @@
     "Pronuncia uno dei comandi seguenti per navigare nell'app senza toccare lo schermo." : {
 
     },
+    "Prossimi Eventi" : {
+
+    },
     "Prossimo comando" : {
 
     },
@@ -1599,6 +1635,9 @@
     "Search tasks..." : {
 
     },
+    "Seleziona File" : {
+
+    },
     "Seleziona una materia per iniziare" : {
 
     },
@@ -1632,7 +1671,22 @@
     "Sign Out" : {
 
     },
+    "Sincronizza Email e Calendar" : {
+
+    },
+    "Sincronizzazione" : {
+
+    },
+    "Sincronizzazione completata!" : {
+
+    },
+    "Sincronizzazione..." : {
+
+    },
     "sk-..." : {
+
+    },
+    "Sorgente" : {
 
     },
     "Sort" : {
@@ -2029,6 +2083,9 @@
 
     },
     "Text detected" : {
+
+    },
+    "Tocca il pulsante + per selezionare file PDF o documenti dal tuo dispositivo" : {
 
     },
     "Tocca per aprire i dettagli del materiale" : {

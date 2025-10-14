@@ -440,44 +440,79 @@ struct TasksView: View {
     }
 }
 
-// MARK: - Voice View Placeholder
+// MARK: - Voice View with Real Conversation
 struct VoiceView: View {
-    @State private var isRecording = false
+    @State private var showingConversation = false
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 40) {
                 Spacer()
 
-                Image(systemName: isRecording ? "waveform.circle.fill" : "waveform.circle")
+                Image(systemName: "waveform.circle")
                     .font(.system(size: 100))
-                    .foregroundStyle(isRecording ? .red : .blue)
-                    .symbolEffect(.pulse, isActive: isRecording)
+                    .foregroundStyle(.blue)
 
                 VStack(spacing: 8) {
-                    Text(isRecording ? "In ascolto..." : "Tocca per iniziare")
+                    Text("Assistente Vocale")
                         .font(.title2)
                         .fontWeight(.semibold)
 
-                    Text(isRecording ? "Fai una domanda sul materiale" : "Assistente vocale per lo studio")
+                    Text("Parla con il tuo coach di studio personale")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
+                        .padding(.horizontal)
                 }
 
                 Button {
-                    isRecording.toggle()
-                    // TODO: Start/stop voice interaction
+                    showingConversation = true
                 } label: {
-                    Image(systemName: isRecording ? "stop.circle.fill" : "mic.circle.fill")
-                        .font(.system(size: 60))
-                        .foregroundStyle(isRecording ? .red : .blue)
+                    HStack {
+                        Image(systemName: "mic.fill")
+                        Text("Inizia Conversazione")
+                    }
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(12)
+                    .padding(.horizontal, 32)
                 }
 
                 Spacer()
+
+                // Info box
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "info.circle.fill")
+                            .font(.title3)
+                            .foregroundStyle(.blue)
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Cosa puoi fare:")
+                                .font(.headline)
+
+                            Text("• Chiedi aiuto con i compiti")
+                            Text("• Fai domande sul materiale")
+                            Text("• Chiedi spiegazioni semplici")
+                            Text("• Parla in italiano naturalmente")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+                .padding()
+                .background(Color.blue.opacity(0.1))
+                .cornerRadius(12)
+                .padding(.horizontal, 32)
             }
             .padding()
-            .navigationTitle("Assistente vocale")
+            .navigationTitle("Voice Coach")
+            .sheet(isPresented: $showingConversation) {
+                VoiceConversationView()
+            }
         }
     }
 }

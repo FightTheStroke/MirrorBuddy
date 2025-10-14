@@ -14,11 +14,6 @@
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
-	<key>UIAppFonts</key>
-	<array>
-		<string>OpenDyslexic-Regular.otf</string>
-		<string>OpenDyslexic-Bold.otf</string>
-	</array>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>MirrorBuddy usa il riconoscimento vocale per i comandi vocali di navigazione</string>
 	<key>NSMicrophoneUsageDescription</key>

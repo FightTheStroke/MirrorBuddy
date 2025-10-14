@@ -39,16 +39,16 @@ struct VoiceConversationView: View {
                     .padding()
             }
         }
-        .navigationTitle("Voice Coach")
+        .navigationTitle("Coach Vocale")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Close") {
+                Button("Chiudi") {
                     dismiss()
                 }
             }
         }
-        .alert("Error", isPresented: $viewModel.showError) {
+        .alert("Errore", isPresented: $viewModel.showError) {
             Button("OK", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage)
@@ -64,7 +64,7 @@ struct VoiceConversationView: View {
                 .foregroundStyle(.blue)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.currentSubject ?? "No Subject Selected")
+                Text(viewModel.currentSubject ?? "Nessuna Materia")
                     .font(.headline)
 
                 if let material = viewModel.currentMaterial {
@@ -81,7 +81,7 @@ struct VoiceConversationView: View {
                     Circle()
                         .fill(Color.green)
                         .frame(width: 8, height: 8)
-                    Text("Active")
+                    Text("Attivo")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -149,8 +149,8 @@ struct VoiceConversationView: View {
 
             // Main control button (bottom-right, optimized for thumb)
             mainControlButton
-                .accessibilityLabel(viewModel.isConversationActive ? "Stop conversation" : "Start conversation")
-                .accessibilityHint("Double tap to \(viewModel.isConversationActive ? "stop" : "start") talking with AI coach")
+                .accessibilityLabel(viewModel.isConversationActive ? "Ferma conversazione" : "Inizia conversazione")
+                .accessibilityHint("Tocca due volte per \(viewModel.isConversationActive ? "fermare" : "iniziare") a parlare con il coach AI")
 
             Spacer()
                 .frame(width: 40)
@@ -196,7 +196,7 @@ struct VoiceConversationView: View {
                     Image(systemName: viewModel.isConversationActive ? "stop.fill" : "mic.fill")
                         .font(.system(size: 30))
 
-                    Text(viewModel.isConversationActive ? "Stop" : "Talk")
+                    Text(viewModel.isConversationActive ? "Ferma" : "Parla")
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
@@ -356,8 +356,8 @@ final class VoiceConversationViewModel: ObservableObject {
 
     private func loadContext() {
         // TODO: Load from user's current subject/material context
-        currentSubject = "Mathematics"
-        currentMaterial = "Quadratic Equations - Chapter 5"
+        currentSubject = "Matematica"
+        currentMaterial = "Equazioni di Secondo Grado - Capitolo 5"
     }
 
     // MARK: - Conversation Control
@@ -372,7 +372,7 @@ final class VoiceConversationViewModel: ObservableObject {
 
     private func startConversation() {
         guard let realtimeClient else {
-            showError("OpenAI API key not configured. Please add your API key in Settings.")
+            showError("Chiave API OpenAI non configurata. Aggiungi la tua chiave nelle Impostazioni.")
             return
         }
 
@@ -391,12 +391,15 @@ final class VoiceConversationViewModel: ObservableObject {
                     startWaveformAnimation()
                 }
 
-                // Send initial context
+                // Send initial context in Italian
                 if let subject = currentSubject {
                     try await realtimeClient.sendText(
-                        "You are an AI coach helping a student with \(subject). " +
-                        "Current material: \(currentMaterial ?? "General topics"). " +
-                        "Be encouraging, clear, and educational."
+                        "Sei un coach AI che aiuta uno studente con \(subject). " +
+                        "Materiale corrente: \(currentMaterial ?? "Argomenti generali"). " +
+                        "Sii incoraggiante, chiaro ed educativo. " +
+                        "Lo studente ha dislessia, discalculia e poca memoria di lavoro. " +
+                        "Usa frasi brevi e semplici. Fai esempi concreti della vita quotidiana. " +
+                        "IMPORTANTE: Rispondi SEMPRE in italiano."
                     )
                 }
             } catch {
