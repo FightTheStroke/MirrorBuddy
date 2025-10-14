@@ -30,11 +30,19 @@ final class GoogleOAuthService: NSObject {
         let redirectURI: String
         let scopes: [String]
 
-        /// Default Google Drive scopes
+        /// Default Google scopes (Drive, Gmail, Calendar)
         static let defaultScopes = [
+            // Drive scopes
             "https://www.googleapis.com/auth/drive.readonly",
             "https://www.googleapis.com/auth/drive.metadata.readonly",
             "https://www.googleapis.com/auth/drive.file",
+            // Gmail scopes
+            "https://www.googleapis.com/auth/gmail.readonly",
+            "https://www.googleapis.com/auth/gmail.modify",
+            // Calendar scopes
+            "https://www.googleapis.com/auth/calendar.readonly",
+            "https://www.googleapis.com/auth/calendar.events.readonly",
+            // User info
             "https://www.googleapis.com/auth/userinfo.profile",
             "https://www.googleapis.com/auth/userinfo.email"
         ]

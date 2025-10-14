@@ -302,25 +302,74 @@ struct StudyView: View {
     }
 }
 
-// MARK: - Tasks View Placeholder
+// MARK: - Tasks View with Email & Calendar
 struct TasksView: View {
     @Query private var tasks: [Task]
+    @State private var showingSyncSheet = false
+    @State private var isSyncing = false
+    @State private var syncError: String?
+    @State private var gmailMessages: [MBGmailMessage] = []
+    @State private var calendarEvents: [GCalendarEvent] = []
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(tasks) { task in
-                    HStack {
-                        Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
-                            .foregroundStyle(task.isCompleted ? .green : .gray)
+                // Calendar Events Section
+                if !calendarEvents.isEmpty {
+                    Section("Prossimi Eventi") {
+                        ForEach(calendarEvents.prefix(5), id: \.id) { event in
+                            HStack {
+                                Image(systemName: "calendar")
+                                    .foregroundStyle(.orange)
 
-                        VStack(alignment: .leading) {
-                            Text(task.title)
-                                .font(.headline)
-                            if let dueDate = task.dueDate {
-                                Text(dueDate, style: .date)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(event.summary)
+                                        .font(.headline)
+                                    Text(event.startDate, style: .date)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Teacher Emails Section
+                if !gmailMessages.isEmpty {
+                    Section("Email Professori") {
+                        ForEach(gmailMessages.prefix(5), id: \.id) { message in
+                            HStack {
+                                Image(systemName: message.isRead ? "envelope.open" : "envelope.badge")
+                                    .foregroundStyle(message.isRead ? .gray : .blue)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(message.subject)
+                                        .font(.headline)
+                                        .lineLimit(1)
+                                    Text(message.from)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Tasks Section
+                Section("I Miei Compiti") {
+                    ForEach(tasks) { task in
+                        HStack {
+                            Image(systemName: task.isCompleted ? "checkmark.circle.fill" : "circle")
+                                .foregroundStyle(task.isCompleted ? .green : .gray)
+
+                            VStack(alignment: .leading) {
+                                Text(task.title)
+                                    .font(.headline)
+                                if let dueDate = task.dueDate {
+                                    Text(dueDate, style: .date)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
@@ -328,6 +377,15 @@ struct TasksView: View {
             }
             .navigationTitle("Compiti")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        showingSyncSheet = true
+                    } label: {
+                        Image(systemName: isSyncing ? "arrow.triangle.2.circlepath" : "envelope.arrow.triangle.branch")
+                    }
+                    .disabled(isSyncing)
+                }
+
                 ToolbarItem {
                     Button {
                         // TODO: Add task
@@ -335,6 +393,48 @@ struct TasksView: View {
                         Image(systemName: "plus")
                     }
                 }
+            }
+            .sheet(isPresented: $showingSyncSheet) {
+                EmailCalendarSyncView(
+                    onSync: {
+                        await syncEmailsAndCalendar()
+                    }
+                )
+            }
+            .task {
+                // Load cached data on appear
+                loadCachedData()
+            }
+            .refreshable {
+                await syncEmailsAndCalendar()
+            }
+        }
+    }
+
+    private func loadCachedData() {
+        // TODO: Load from SwiftData
+    }
+
+    private func syncEmailsAndCalendar() async {
+        guard !isSyncing else { return }
+        isSyncing = true
+        defer { isSyncing = false }
+
+        do {
+            // Sync Gmail
+            let messages = try await GmailService.shared.syncEmails(fromTeachersOnly: true)
+            await MainActor.run {
+                gmailMessages = messages
+            }
+
+            // Sync Calendar
+            let events = try await GoogleCalendarService.shared.syncCalendarEvents()
+            await MainActor.run {
+                calendarEvents = events.filter { $0.startDate > Date() }.sorted { $0.startDate < $1.startDate }
+            }
+        } catch {
+            await MainActor.run {
+                syncError = error.localizedDescription
             }
         }
     }

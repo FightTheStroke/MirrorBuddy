@@ -98,6 +98,12 @@ struct MirrorBuddyApp: App {
                         BackgroundSyncService.shared.scheduleNextSync()
                     }
 
+                    // Configure Gmail and Calendar services
+                    _Concurrency.Task { @MainActor in
+                        GmailService.shared.configure(modelContext: sharedModelContainer.mainContext)
+                        GoogleCalendarService.shared.configure(modelContext: sharedModelContainer.mainContext)
+                    }
+
                     // Request notification authorization
                     _Concurrency.Task {
                         await NotificationManager.shared.checkAuthorization()
