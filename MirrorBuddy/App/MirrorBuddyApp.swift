@@ -41,13 +41,21 @@ struct MirrorBuddyApp: App {
             TrackedDriveFile.self
         ])
 
-        // Use local-only storage for development without CloudKit entitlements
-        // Change back to CloudKit when deploying to device with proper provisioning profile
+        // Automatically enable CloudKit on real devices, disable on simulator
+        // Simulator doesn't have provisioning profile needed for CloudKit
+        #if targetEnvironment(simulator)
         let modelConfiguration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false
-            // cloudKitDatabase: .private("iCloud.com.mirrorbuddy.MirrorBuddy")  // Disabled for simulator
+            // CloudKit disabled on simulator - no provisioning profile
         )
+        #else
+        let modelConfiguration = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .private("iCloud.com.mirrorbuddy.MirrorBuddy")
+        )
+        #endif
 
         do {
             let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
