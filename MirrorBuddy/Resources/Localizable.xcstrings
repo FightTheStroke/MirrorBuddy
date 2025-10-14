@@ -80,6 +80,12 @@
     "• %@" : {
 
     },
+    "• Chiedi aiuto con i compiti" : {
+
+    },
+    "• Chiedi spiegazioni semplici" : {
+
+    },
     "• Date di consegna compiti" : {
 
     },
@@ -89,10 +95,16 @@
     "• Eventi e scadenze del calendario" : {
 
     },
+    "• Fai domande sul materiale" : {
+
+    },
     "• Glucosio\n• O₂" : {
 
     },
     "• Luce\n• CO₂\n• H₂O" : {
+
+    },
+    "• Parla in italiano naturalmente" : {
 
     },
     "+%lld XP" : {
@@ -386,9 +398,6 @@
         }
       }
     },
-    "Active" : {
-
-    },
     "Add" : {
 
     },
@@ -476,10 +485,7 @@
     "Ascolta Nodo" : {
 
     },
-    "Assistente vocale" : {
-
-    },
-    "Assistente vocale per lo studio" : {
+    "Assistente Vocale" : {
 
     },
     "at" : {
@@ -489,6 +495,9 @@
 
     },
     "Attività Corrente" : {
+
+    },
+    "Attivo" : {
 
     },
     "Aumenta la dimensione base del testo" : {
@@ -546,6 +555,9 @@
 
     },
     "Close" : {
+
+    },
+    "Coach Vocale" : {
 
     },
     "Collapse" : {
@@ -643,6 +655,9 @@
     "Cosa produce la fotosintesi?" : {
 
     },
+    "Cosa puoi fare:" : {
+
+    },
     "Cosa viene sincronizzato:" : {
 
     },
@@ -721,9 +736,6 @@
 
     },
     "Done" : {
-
-    },
-    "Double tap to %@ talking with AI coach" : {
 
     },
     "Due date" : {
@@ -999,7 +1011,10 @@
     "Expand" : {
 
     },
-    "Fai una domanda sul materiale" : {
+    "Ferma" : {
+
+    },
+    "Ferma conversazione" : {
 
     },
     "File System" : {
@@ -1138,6 +1153,12 @@
 
     },
     "Inizia" : {
+
+    },
+    "Inizia conversazione" : {
+
+    },
+    "Inizia Conversazione" : {
 
     },
     "Inizia Lettura" : {
@@ -1530,6 +1551,12 @@
     "Parametri Vocali" : {
 
     },
+    "Parla" : {
+
+    },
+    "Parla con il tuo coach di studio personale" : {
+
+    },
     "Pausa" : {
 
     },
@@ -1713,9 +1740,6 @@
     "Stability AI API Key" : {
 
     },
-    "Start conversation" : {
-
-    },
     "Start listening" : {
 
     },
@@ -1732,9 +1756,6 @@
 
     },
     "Stop" : {
-
-    },
-    "Stop conversation" : {
 
     },
     "Stop listening" : {
@@ -2055,9 +2076,6 @@
     "Take Photo" : {
 
     },
-    "Talk" : {
-
-    },
     "Tap" : {
 
     },
@@ -2085,13 +2103,13 @@
     "Text detected" : {
 
     },
+    "Tocca due volte per %@ a parlare con il coach AI" : {
+
+    },
     "Tocca il pulsante + per selezionare file PDF o documenti dal tuo dispositivo" : {
 
     },
     "Tocca per aprire i dettagli del materiale" : {
-
-    },
-    "Tocca per iniziare" : {
 
     },
     "Tocca per parlare" : {
