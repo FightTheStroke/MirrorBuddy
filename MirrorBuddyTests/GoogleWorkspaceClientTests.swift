@@ -165,7 +165,9 @@ struct GoogleWorkspaceClientTests {
             modifiedTime: nil,
             size: nil,
             parents: nil,
-            description: nil
+            description: nil,
+            md5Checksum: nil,
+            trashed: nil
         )
 
         let googleDoc = DriveFile(
@@ -178,7 +180,9 @@ struct GoogleWorkspaceClientTests {
             modifiedTime: nil,
             size: nil,
             parents: nil,
-            description: nil
+            description: nil,
+            md5Checksum: nil,
+            trashed: nil
         )
 
         let folder = DriveFile(
@@ -191,7 +195,9 @@ struct GoogleWorkspaceClientTests {
             modifiedTime: nil,
             size: nil,
             parents: nil,
-            description: nil
+            description: nil,
+            md5Checksum: nil,
+            trashed: nil
         )
 
         #expect(pdfFile.isPDF == true)

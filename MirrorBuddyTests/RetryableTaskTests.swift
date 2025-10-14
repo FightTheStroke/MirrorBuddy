@@ -3,6 +3,7 @@ import Foundation
 import Testing
 
 @Suite("Retryable Task Tests")
+@MainActor
 struct RetryableTaskTests {
     // MARK: - RetryPolicy Tests
 
