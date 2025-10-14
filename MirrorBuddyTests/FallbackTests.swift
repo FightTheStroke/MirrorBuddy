@@ -3,6 +3,7 @@ import Foundation
 import Testing
 
 @Suite("Fallback Strategy Tests")
+@MainActor
 struct FallbackTests {
     // MARK: - FallbackExecutor Tests
 

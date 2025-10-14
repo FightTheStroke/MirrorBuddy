@@ -3,6 +3,7 @@ import Foundation
 import Testing
 
 @Suite("Circuit Breaker Tests")
+@MainActor
 struct CircuitBreakerTests {
     // MARK: - Circuit Breaker State Tests
 
