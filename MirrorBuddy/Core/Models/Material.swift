@@ -28,7 +28,7 @@ final class Material {
     // Processing state
     var processingStatus: ProcessingStatus = ProcessingStatus.pending
 
-    // Relationships
+    // Relationships (NO inverse for one-to-many "one" side)
     @Relationship(deleteRule: .nullify)
     var subject: SubjectEntity?
 

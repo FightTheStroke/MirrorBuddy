@@ -26,7 +26,7 @@ final class Task {
     var createdAt: Date = Date()
     var priority: Int = 3 // 1 (low) to 5 (high)
 
-    // Relationships
+    // Relationships (NO inverse for one-to-many "one" side)
     @Relationship(deleteRule: .nullify)
     var subject: SubjectEntity?
 

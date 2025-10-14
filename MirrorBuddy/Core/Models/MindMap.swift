@@ -13,7 +13,7 @@ final class MindMap {
     @Relationship(deleteRule: .cascade, inverse: \MindMapNode.mindMap)
     var nodes: [MindMapNode]?
 
-    // Inverse relationship to Material
+    // Relationship to Material (inverse specified on Material side)
     @Relationship(deleteRule: .nullify)
     var material: Material?
 
@@ -46,7 +46,7 @@ final class MindMapNode {
     @Relationship(deleteRule: .nullify, inverse: \MindMapNode.parentNode)
     var childNodes: [MindMapNode]?
 
-    // Inverse relationships
+    // Inverse relationships (NO inverse for one-to-many "one" side)
     @Relationship(deleteRule: .nullify)
     var parentNode: MindMapNode?
 

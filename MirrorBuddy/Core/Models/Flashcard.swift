@@ -20,7 +20,7 @@ final class Flashcard {
     var createdAt: Date = Date()
     var lastReviewedAt: Date?
 
-    // Inverse relationship to Material
+    // Relationship to Material (NO inverse for one-to-many "one" side)
     @Relationship(deleteRule: .nullify)
     var material: Material?
 
