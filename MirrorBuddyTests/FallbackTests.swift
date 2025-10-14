@@ -392,4 +392,5 @@ struct FallbackTests {
             Issue.record("Fallback should have succeeded")
         }
     }
+    */
 }
