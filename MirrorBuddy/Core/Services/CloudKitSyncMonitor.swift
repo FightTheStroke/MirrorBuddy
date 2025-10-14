@@ -7,6 +7,7 @@ import SwiftData
 @MainActor
 final class CloudKitSyncMonitor {
     /// Singleton instance
+    /// Note: @MainActor isolation ensures thread-safe access
     static let shared = CloudKitSyncMonitor()
 
     /// Current sync status
@@ -51,13 +52,19 @@ final class CloudKitSyncMonitor {
 
     /// Handle import events from CloudKit
     @objc private func handleImportEvent(_ notification: Notification) {
-        syncStatus = .syncing
+        // NotificationCenter can call from any thread, dispatch to main
+        DispatchQueue.main.async { [weak self] in
+            self?.syncStatus = .syncing
+        }
     }
 
     /// Handle export events to CloudKit
     @objc private func handleExportEvent(_ notification: Notification) {
-        syncStatus = .syncing
-        lastSyncDate = Date()
+        // NotificationCenter can call from any thread, dispatch to main
+        DispatchQueue.main.async { [weak self] in
+            self?.syncStatus = .syncing
+            self?.lastSyncDate = Date()
+        }
     }
 
     /// Manually trigger sync completion (called after successful operations)
