@@ -256,7 +256,7 @@ struct StudyView: View {
         NavigationStack {
             List {
                 Section("Flashcard") {
-                    ForEach(materials.filter { !$0.flashcards.isEmpty }) { material in
+                    ForEach(materials.filter { !($0.flashcards?.isEmpty ?? true) }) { material in
                         NavigationLink {
                             // TODO: FlashcardStudyView(material: material)
                             Text("Flashcard per \(material.title)")
@@ -267,7 +267,7 @@ struct StudyView: View {
                                 VStack(alignment: .leading) {
                                     Text(material.title)
                                         .font(.headline)
-                                    Text("\(material.flashcards.count) flashcard")
+                                    Text("\(material.flashcards?.count ?? 0) flashcard")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }

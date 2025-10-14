@@ -168,12 +168,12 @@ struct MaterialDetailView: View {
                     .font(.title2)
                     .fontWeight(.bold)
 
-                Text("\(mindMap.nodes.count) nodi")
+                Text("\(mindMap.nodesArray.count) nodi")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
                 // Preview of first few nodes
-                ForEach(mindMap.nodes.prefix(5)) { node in
+                ForEach(mindMap.nodesArray.prefix(5)) { node in
                     NodePreviewCard(node: node)
                 }
 

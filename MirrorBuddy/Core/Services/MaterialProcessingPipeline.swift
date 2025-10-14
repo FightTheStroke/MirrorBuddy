@@ -223,11 +223,11 @@ final class MaterialProcessingPipeline {
         // Image generation (requires mind map to be generated first)
         if options.enabledSteps.contains(.images) {
             // Need to re-fetch mindMap after generation
-            if let mindMap = material.mindMap, !mindMap.nodes.isEmpty {
+            if let mindMap = material.mindMap, !mindMap.nodesArray.isEmpty {
                 await reportProgress(.images, status: .inProgress)
                 do {
                     // Generate images for key nodes (e.g., first 5 nodes)
-                    let topNodes = mindMap.nodes.prefix(5)
+                    let topNodes = mindMap.nodesArray.prefix(5)
                     _ = try await imageService.generateImages(for: Array(topNodes))
                     await reportProgress(.images, status: .completed)
                 } catch {

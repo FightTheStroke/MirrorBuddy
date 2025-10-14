@@ -4,21 +4,25 @@ import SwiftData
 /// Flashcard for spaced repetition learning using SuperMemo SM-2 algorithm
 @Model
 final class Flashcard {
-    var id: UUID
-    var materialID: UUID
+    var id: UUID = UUID()
+    var materialID: UUID = UUID()
 
-    var question: String
-    var answer: String
+    var question: String = ""
+    var answer: String = ""
     var explanation: String?
 
     // SM-2 Algorithm parameters
-    var easeFactor: Double // Starts at 2.5
-    var interval: Int // Days until next review
-    var repetitions: Int // Number of consecutive correct answers
-    var nextReviewDate: Date
+    var easeFactor: Double = 2.5 // Starts at 2.5
+    var interval: Int = 1 // Days until next review
+    var repetitions: Int = 0 // Number of consecutive correct answers
+    var nextReviewDate: Date = Date()
 
-    var createdAt: Date
+    var createdAt: Date = Date()
     var lastReviewedAt: Date?
+
+    // Inverse relationship to Material
+    @Relationship(deleteRule: .nullify)
+    var material: Material?
 
     init(
         materialID: UUID,

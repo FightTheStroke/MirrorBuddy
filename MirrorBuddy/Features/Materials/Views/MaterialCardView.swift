@@ -217,9 +217,9 @@ struct MaterialCardView: View {
     private var metadataRow: some View {
         HStack(spacing: 8) {
             // Flashcard count
-            if !material.flashcards.isEmpty {
+            if let flashcards = material.flashcards, !flashcards.isEmpty {
                 Label {
-                    Text("\(material.flashcards.count)")
+                    Text("\(flashcards.count)")
                         .font(.caption2)
                         .fontWeight(.medium)
                 } icon: {
@@ -239,9 +239,9 @@ struct MaterialCardView: View {
             }
 
             // Tasks count
-            if !material.tasks.isEmpty {
+            if let tasks = material.tasks, !tasks.isEmpty {
                 Label {
-                    Text("\(material.tasks.count)")
+                    Text("\(tasks.count)")
                         .font(.caption2)
                         .fontWeight(.medium)
                 } icon: {
@@ -252,8 +252,8 @@ struct MaterialCardView: View {
                 .transition(.scale.combined(with: .opacity))
             }
         }
-        .animation(.easeInOut(duration: 0.3), value: material.flashcards.count)
-        .animation(.easeInOut(duration: 0.3), value: material.tasks.count)
+        .animation(.easeInOut(duration: 0.3), value: material.flashcards?.count)
+        .animation(.easeInOut(duration: 0.3), value: material.tasks?.count)
     }
 
     // MARK: - Computed Properties
@@ -309,16 +309,16 @@ struct MaterialCardView: View {
             break
         }
 
-        if !material.flashcards.isEmpty {
-            label += ", \(material.flashcards.count) flashcard disponibili"
+        if let flashcards = material.flashcards, !flashcards.isEmpty {
+            label += ", \(flashcards.count) flashcard disponibili"
         }
 
         if material.mindMap != nil {
             label += ", Mappa mentale disponibile"
         }
 
-        if !material.tasks.isEmpty {
-            label += ", \(material.tasks.count) compiti associati"
+        if let tasks = material.tasks, !tasks.isEmpty {
+            label += ", \(tasks.count) compiti associati"
         }
 
         return label
@@ -342,7 +342,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
 // MARK: - Previews
 
 #Preview("Completed Material") {
-    let container = try! ModelContainer(
+    @Previewable @State var container = try! ModelContainer(
         for: Material.self, SubjectEntity.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
     )
@@ -358,27 +358,14 @@ struct MaterialCardButtonStyle: ButtonStyle {
         title: "Equazioni Lineari - Capitolo 3",
         subject: subject
     )
-    material.processingStatus = .completed
-    material.createdAt = Date().addingTimeInterval(-86400 * 2) // 2 days ago
+    let _ = {
+        material.processingStatus = .completed
+        material.createdAt = Date().addingTimeInterval(-86400 * 2)
+        container.mainContext.insert(subject)
+        container.mainContext.insert(material)
+    }()
 
-    container.mainContext.insert(subject)
-    container.mainContext.insert(material)
-
-    // Add some flashcards
-    let flashcard1 = Flashcard(
-        materialID: material.id,
-        question: "Che cos'è un'equazione lineare?",
-        answer: "Un'equazione di primo grado"
-    )
-    let flashcard2 = Flashcard(
-        materialID: material.id,
-        question: "Come si risolve ax + b = 0?",
-        answer: "x = -b/a"
-    )
-    material.flashcards.append(flashcard1)
-    material.flashcards.append(flashcard2)
-
-    return ScrollView {
+    ScrollView {
         VStack(spacing: 16) {
             MaterialCardView(material: material) {
                 print("Tapped material: \(material.title)")

@@ -4,14 +4,24 @@ import SwiftData
 /// Visual mind map representation of material content
 @Model
 final class MindMap {
-    var id: UUID
-    var materialID: UUID
+    var id: UUID = UUID()
+    var materialID: UUID = UUID()
     var imageURL: URL?
-    var generatedAt: Date
+    var generatedAt: Date = Date()
     var prompt: String?
 
-    @Relationship(deleteRule: .cascade)
-    var nodes: [MindMapNode] = []
+    @Relationship(deleteRule: .cascade, inverse: \MindMapNode.mindMap)
+    var nodes: [MindMapNode]?
+
+    // Inverse relationship to Material
+    @Relationship(deleteRule: .nullify)
+    var material: Material?
+
+    // Computed property for backwards compatibility
+    var nodesArray: [MindMapNode] {
+        get { nodes ?? [] }
+        set { nodes = newValue }
+    }
 
     init(materialID: UUID, prompt: String? = nil) {
         self.id = UUID()
@@ -24,17 +34,30 @@ final class MindMap {
 /// Individual node in a mind map
 @Model
 final class MindMapNode {
-    var id: UUID
-    var title: String
+    var id: UUID = UUID()
+    var title: String = ""
     var content: String?
-    var positionX: Double
-    var positionY: Double
+    var positionX: Double = 0.0
+    var positionY: Double = 0.0
     var color: String?
 
     var parentNodeID: UUID?
 
+    @Relationship(deleteRule: .nullify, inverse: \MindMapNode.parentNode)
+    var childNodes: [MindMapNode]?
+
+    // Inverse relationships
     @Relationship(deleteRule: .nullify)
-    var childNodes: [MindMapNode] = []
+    var parentNode: MindMapNode?
+
+    @Relationship(deleteRule: .nullify)
+    var mindMap: MindMap?
+
+    // Computed property for backwards compatibility
+    var childNodesArray: [MindMapNode] {
+        get { childNodes ?? [] }
+        set { childNodes = newValue }
+    }
 
     init(
         title: String,

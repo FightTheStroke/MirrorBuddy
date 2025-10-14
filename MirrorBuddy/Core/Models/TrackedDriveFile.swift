@@ -4,14 +4,14 @@ import SwiftData
 /// SwiftData model for tracking Google Drive files locally
 @Model
 final class TrackedDriveFile {
-    /// Unique Drive file ID
-    @Attribute(.unique) var fileID: String
+    /// Unique Drive file ID (CloudKit doesn't support unique constraints)
+    var fileID: String = ""
 
     /// File name
-    var name: String
+    var name: String = ""
 
     /// MIME type
-    var mimeType: String
+    var mimeType: String = ""
 
     /// File size in bytes
     var size: Int?
@@ -29,16 +29,16 @@ final class TrackedDriveFile {
     var webViewLink: String?
 
     /// Parent folder IDs
-    var parents: [String]
+    var parents: [String] = []
 
     /// When this record was last synced
-    var lastSyncedAt: Date
+    var lastSyncedAt: Date = Date()
 
     /// Whether file is trashed
-    var isTrashed: Bool
+    var isTrashed: Bool = false
 
     /// File status
-    var status: FileStatus
+    var status: FileStatus = FileStatus.unchanged
 
     // MARK: - Computed Properties
 

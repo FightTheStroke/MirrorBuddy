@@ -37,28 +37,28 @@ enum Achievement: String, Codable, CaseIterable {
 /// User progress tracking and gamification
 @Model
 final class UserProgress {
-    var id: UUID
+    var id: UUID = UUID()
 
     // Study statistics
-    var totalStudyTimeMinutes: Int
-    var materialsCreated: Int
-    var flashcardsReviewed: Int
-    var tasksCompleted: Int
-    var mindMapsGenerated: Int
+    var totalStudyTimeMinutes: Int = 0
+    var materialsCreated: Int = 0
+    var flashcardsReviewed: Int = 0
+    var tasksCompleted: Int = 0
+    var mindMapsGenerated: Int = 0
 
     // Streak tracking
-    var currentStreak: Int
-    var longestStreak: Int
+    var currentStreak: Int = 0
+    var longestStreak: Int = 0
     var lastStudyDate: Date?
 
     // Achievements
     var unlockedAchievements: [Achievement] = []
 
     // XP and levels (gamification)
-    var totalXP: Int
-    var level: Int
+    var totalXP: Int = 0
+    var level: Int = 1
 
-    var createdAt: Date
+    var createdAt: Date = Date()
 
     init() {
         self.id = UUID()

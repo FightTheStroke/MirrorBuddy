@@ -227,7 +227,7 @@ struct MaterialCard: View {
                             .foregroundStyle(.blue)
                     }
 
-                    if !material.flashcards.isEmpty {
+                    if let flashcards = material.flashcards, !flashcards.isEmpty {
                         Image(systemName: "rectangle.stack")
                             .font(.caption)
                             .foregroundStyle(.orange)

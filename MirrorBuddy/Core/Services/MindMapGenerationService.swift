@@ -89,7 +89,7 @@ final class MindMapGenerationService {
         // Store in SwiftData (Subtask 21.3)
         try storeMindMap(mindMap)
 
-        logger.info("Mind map generated with \(mindMap.nodes.count) nodes")
+        logger.info("Mind map generated with \(mindMap.nodesArray.count) nodes")
         return mindMap
     }
 
@@ -283,7 +283,10 @@ final class MindMapGenerationService {
             color: getColorForLevel(0)
         )
 
-        mindMap.nodes.append(rootNode)
+        if mindMap.nodes == nil {
+            mindMap.nodes = []
+        }
+        mindMap.nodes?.append(rootNode)
 
         // Create child nodes recursively
         createChildNodes(
@@ -320,8 +323,15 @@ final class MindMapGenerationService {
                 parentNodeID: parentNode.id
             )
 
-            parentNode.childNodes.append(childNode)
-            mindMap.nodes.append(childNode)
+            if parentNode.childNodes == nil {
+                parentNode.childNodes = []
+            }
+            parentNode.childNodes?.append(childNode)
+
+            if mindMap.nodes == nil {
+                mindMap.nodes = []
+            }
+            mindMap.nodes?.append(childNode)
 
             // Recursively create grandchildren if they exist
             if !childStructure.children.isEmpty && level < maxDepth - 1 {

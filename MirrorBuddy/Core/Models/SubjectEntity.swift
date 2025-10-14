@@ -5,33 +5,33 @@ import SwiftUI
 /// Database-backed subject entity allowing customization
 @Model
 final class SubjectEntity {
-    var id: UUID
+    var id: UUID = UUID()
 
     /// Subject name (uses localization key)
-    var localizationKey: String
+    var localizationKey: String = ""
 
     /// SF Symbol icon name
-    var iconName: String
+    var iconName: String = ""
 
     /// Color identifier
-    var colorName: String
+    var colorName: String = ""
 
     /// Sort order for display
-    var sortOrder: Int
+    var sortOrder: Int = 0
 
     /// Whether subject is active (shown in UI)
-    var isActive: Bool
+    var isActive: Bool = true
 
     /// Whether subject is custom (user-created) or default
-    var isCustom: Bool
+    var isCustom: Bool = false
 
     /// Materials in this subject
     @Relationship(deleteRule: .nullify, inverse: \Material.subject)
-    var materials: [Material] = []
+    var materials: [Material]?
 
     /// Tasks in this subject
     @Relationship(deleteRule: .nullify, inverse: \Task.subject)
-    var tasks: [Task] = []
+    var tasks: [Task]?
 
     init(
         localizationKey: String,

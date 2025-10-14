@@ -12,9 +12,9 @@ enum ProcessingStatus: String, Codable {
 /// Learning material (PDF, text, or imported from Google Drive)
 @Model
 final class Material {
-    var id: UUID
-    var title: String
-    var createdAt: Date
+    var id: UUID = UUID()
+    var title: String = ""
+    var createdAt: Date = Date()
     var lastAccessedAt: Date?
 
     // Content storage
@@ -26,20 +26,20 @@ final class Material {
     var googleDriveFileID: String?
 
     // Processing state
-    var processingStatus: ProcessingStatus
+    var processingStatus: ProcessingStatus = ProcessingStatus.pending
 
     // Relationships
     @Relationship(deleteRule: .nullify)
     var subject: SubjectEntity?
 
-    @Relationship(deleteRule: .cascade)
+    @Relationship(deleteRule: .cascade, inverse: \MindMap.material)
     var mindMap: MindMap?
 
-    @Relationship(deleteRule: .cascade)
-    var flashcards: [Flashcard] = []
+    @Relationship(deleteRule: .cascade, inverse: \Flashcard.material)
+    var flashcards: [Flashcard]?
 
     @Relationship(deleteRule: .nullify, inverse: \Task.material)
-    var tasks: [Task] = []
+    var tasks: [Task]?
 
     init(
         title: String,

@@ -176,7 +176,7 @@ struct InteractiveMindMapView: View {
             }
 
             // Draw expansion indicator
-            if !node.childNodes.isEmpty {
+            if !node.childNodesArray.isEmpty {
                 let indicatorRect = CGRect(
                     x: position.x + scaledSize / 2 - 12,
                     y: position.y - 6,
@@ -259,7 +259,7 @@ struct InteractiveMindMapView: View {
                 Spacer()
 
                 // Expansion toggle
-                if !node.childNodes.isEmpty {
+                if !node.childNodesArray.isEmpty {
                     Button {
                         viewModel.toggleExpansion(node: node)
                     } label: {
@@ -366,7 +366,7 @@ final class MindMapViewModel {
 
     init(mindMap: MindMap) {
         self.mindMap = mindMap
-        self.allNodes = mindMap.nodes
+        self.allNodes = mindMap.nodesArray
 
         // Expand root node by default
         if let root = allNodes.first(where: { $0.parentNodeID == nil }) {
@@ -392,7 +392,7 @@ final class MindMapViewModel {
             let current = queue.removeFirst()
 
             if expandedNodeIDs.contains(current.id) {
-                for child in current.childNodes {
+                for child in current.childNodesArray {
                     visible.append(child)
                     queue.append(child)
                 }

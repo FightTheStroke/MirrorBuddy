@@ -173,7 +173,7 @@ final class SubjectService {
             throw SubjectError.cannotDeleteDefault
         }
 
-        guard subject.materials.isEmpty && subject.tasks.isEmpty else {
+        guard (subject.materials?.isEmpty ?? true) && (subject.tasks?.isEmpty ?? true) else {
             throw SubjectError.hasAssociatedContent
         }
 

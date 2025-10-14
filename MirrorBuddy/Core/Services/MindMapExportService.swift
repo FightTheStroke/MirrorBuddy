@@ -93,7 +93,7 @@ final class MindMapExportService {
         var exportData: [String: Any] = [
             "format": "MirrorBuddy Mind Map",
             "version": "1.0",
-            "nodes": mindMap.nodes.map { nodeToDict($0) }
+            "nodes": mindMap.nodesArray.map { nodeToDict($0) }
         ]
 
         if includeMetadata {
@@ -101,7 +101,7 @@ final class MindMapExportService {
                 "id": mindMap.id.uuidString,
                 "materialID": mindMap.materialID.uuidString,
                 "exportedAt": ISO8601DateFormatter().string(from: Date()),
-                "nodeCount": mindMap.nodes.count
+                "nodeCount": mindMap.nodesArray.count
             ]
         }
 
@@ -133,8 +133,8 @@ final class MindMapExportService {
             dict["parentID"] = parentID.uuidString
         }
 
-        if !node.childNodes.isEmpty {
-            dict["children"] = node.childNodes.map { $0.id.uuidString }
+        if !node.childNodesArray.isEmpty {
+            dict["children"] = node.childNodesArray.map { $0.id.uuidString }
         }
 
         return dict
@@ -146,18 +146,18 @@ final class MindMapExportService {
         var mermaid = "graph TD\n"
 
         // Find root node
-        guard let root = mindMap.nodes.first(where: { $0.parentNodeID == nil }) else {
+        guard let root = mindMap.nodesArray.first(where: { $0.parentNodeID == nil }) else {
             throw MindMapExportError.noRootNode
         }
 
         // Create node ID mapping (using index for simplicity)
         var nodeIDs: [UUID: String] = [:]
-        for (index, node) in mindMap.nodes.enumerated() {
+        for (index, node) in mindMap.nodesArray.enumerated() {
             nodeIDs[node.id] = "N\(index)"
         }
 
         // Generate node definitions
-        for node in mindMap.nodes {
+        for node in mindMap.nodesArray {
             guard let nodeID = nodeIDs[node.id] else { continue }
 
             let escapedTitle = node.title
@@ -180,7 +180,7 @@ final class MindMapExportService {
         mermaid += "\n"
 
         // Generate connections
-        for node in mindMap.nodes {
+        for node in mindMap.nodesArray {
             guard let nodeID = nodeIDs[node.id],
                   let parentID = node.parentNodeID,
                   let parentNodeID = nodeIDs[parentID] else {
@@ -210,7 +210,7 @@ final class MindMapExportService {
         opml += "  <body>\n"
 
         // Find root and export recursively
-        guard let root = mindMap.nodes.first(where: { $0.parentNodeID == nil }) else {
+        guard let root = mindMap.nodesArray.first(where: { $0.parentNodeID == nil }) else {
             throw MindMapExportError.noRootNode
         }
 
@@ -232,10 +232,10 @@ final class MindMapExportService {
             opml += " _note=\"\(content.xmlEscaped)\""
         }
 
-        if !node.childNodes.isEmpty {
+        if !node.childNodesArray.isEmpty {
             opml += ">\n"
 
-            for child in node.childNodes {
+            for child in node.childNodesArray {
                 opml += exportNodeToOPML(child, mindMap: mindMap, indent: indent + 2)
             }
 
@@ -253,7 +253,7 @@ final class MindMapExportService {
         var markdown = ""
 
         // Find root
-        guard let root = mindMap.nodes.first(where: { $0.parentNodeID == nil }) else {
+        guard let root = mindMap.nodesArray.first(where: { $0.parentNodeID == nil }) else {
             throw MindMapExportError.noRootNode
         }
 
@@ -266,7 +266,7 @@ final class MindMapExportService {
         markdown += "---\n\n"
 
         // Export children recursively
-        for child in root.childNodes {
+        for child in root.childNodesArray {
             markdown += exportNodeToMarkdown(child, level: 2)
         }
 
@@ -285,7 +285,7 @@ final class MindMapExportService {
         }
 
         // Export children
-        for child in node.childNodes {
+        for child in node.childNodesArray {
             markdown += exportNodeToMarkdown(child, level: level + 1)
         }
 
