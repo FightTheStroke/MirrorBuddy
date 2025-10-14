@@ -10,8 +10,6 @@ import SwiftUI
 
 @main
 struct MirrorBuddyApp: App {
-    @State private var syncMonitor = CloudKitSyncMonitor.shared
-
     init() {
         // Start performance monitoring (Task 59)
         _Concurrency.Task { @MainActor in
@@ -81,7 +79,6 @@ struct MirrorBuddyApp: App {
         WindowGroup {
             MainTabView()
                 .environment(LocalizationManager.shared)
-                .environment(syncMonitor)
                 .onAppear {
                     // Complete performance monitoring setup (Task 59)
                     _Concurrency.Task { @MainActor in
@@ -91,12 +88,16 @@ struct MirrorBuddyApp: App {
                         PerformanceMonitor.shared.logBatteryStatus()
                     }
 
-                    // Schedule background sync on app launch
-                    BackgroundSyncManager.shared.scheduleBackgroundSync()
+                    // Schedule background sync on app launch (on main thread)
+                    _Concurrency.Task { @MainActor in
+                        BackgroundSyncManager.shared.scheduleBackgroundSync()
+                    }
 
-                    // Configure Google Drive sync service with model context
-                    DriveSyncService.shared.configure(modelContext: sharedModelContainer.mainContext)
-                    BackgroundTaskScheduler.shared.scheduleNextSync()
+                    // Configure Google Drive sync service with model context (on main thread)
+                    _Concurrency.Task { @MainActor in
+                        DriveSyncService.shared.configure(modelContext: sharedModelContainer.mainContext)
+                        BackgroundTaskScheduler.shared.scheduleNextSync()
+                    }
 
                     // Configure and schedule material sync (Task 72)
                     _Concurrency.Task { @MainActor in
