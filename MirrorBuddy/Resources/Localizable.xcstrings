@@ -446,6 +446,9 @@
     "Applica Impostazioni Consigliate" : {
 
     },
+    "Apri Google Cloud Console" : {
+
+    },
     "Apri la documentazione di aiuto" : {
 
     },
@@ -524,6 +527,12 @@
     "Clear All" : {
 
     },
+    "Client ID" : {
+
+    },
+    "Client Secret (opzionale)" : {
+
+    },
     "Close" : {
 
     },
@@ -583,6 +592,9 @@
     "Configurazione API" : {
 
     },
+    "Configure Google Cloud credentials" : {
+
+    },
     "Connect Google Drive" : {
 
     },
@@ -614,6 +626,12 @@
 
     },
     "Cosa produce la fotosintesi?" : {
+
+    },
+    "Credenziali OAuth" : {
+
+    },
+    "Credenziali salvate con successo. Ora puoi connettere Google Drive." : {
 
     },
     "Critical" : {
@@ -1029,6 +1047,9 @@
     "Homework Help" : {
 
     },
+    "Il Client Secret è opzionale per le app iOS. Alcuni setup potrebbero non richiederlo." : {
+
+    },
     "Il font OpenDyslexic è progettato specificamente per migliorare la leggibilità" : {
 
     },
@@ -1102,6 +1123,9 @@
 
     },
     "Interrompi Anteprima" : {
+
+    },
+    "Istruzioni" : {
 
     },
     "Italiano" : {
@@ -1443,6 +1467,9 @@
     "Normale" : {
 
     },
+    "OAuth Credentials" : {
+
+    },
     "OK" : {
 
     },
@@ -1471,6 +1498,9 @@
 
     },
     "Pausa" : {
+
+    },
+    "Per utilizzare Google Drive, devi configurare le credenziali OAuth 2.0 da Google Cloud Console." : {
 
     },
     "Permessi Necessari" : {
@@ -1551,6 +1581,12 @@
     "Salva Chiavi" : {
 
     },
+    "Salva Credenziali" : {
+
+    },
+    "Salvataggio..." : {
+
+    },
     "Save" : {
 
     },
@@ -1570,6 +1606,9 @@
 
     },
     "Selezione Voce" : {
+
+    },
+    "Setup Guida" : {
 
     },
     "Share" : {
@@ -1856,6 +1895,9 @@
           }
         }
       }
+    },
+    "Successo" : {
+
     },
     "Suggerimento: %@" : {
 

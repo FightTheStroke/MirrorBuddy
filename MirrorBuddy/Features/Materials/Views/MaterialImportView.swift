@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 struct MaterialImportView: View {
     @Environment(\.modelContext) private var modelContext
@@ -16,14 +17,33 @@ struct MaterialImportView: View {
     @State private var selectedFiles: Set<String> = []
     @State private var availableFiles: [DriveFile] = []
     @State private var showError: String?
+    @State private var showingFilePicker = false
+    @State private var importSource: ImportSource = .googleDrive
+
+    enum ImportSource {
+        case googleDrive
+        case fileSystem
+    }
 
     var body: some View {
         NavigationStack {
-            Group {
-                if !authViewModel.isAuthenticated {
+            VStack(spacing: 0) {
+                // Source Picker
+                Picker("Sorgente", selection: $importSource) {
+                    Text("Google Drive").tag(ImportSource.googleDrive)
+                    Text("File System").tag(ImportSource.fileSystem)
+                }
+                .pickerStyle(.segmented)
+                .padding()
+
+                // Content based on source
+                Group {
+                    if importSource == .fileSystem {
+                        fileSystemView
+                    } else if !authViewModel.isAuthenticated {
                     // Not authenticated - show connect button
                     ContentUnavailableView {
-                        Label("Google Drive non connesso", systemImage: "cloud.slash")
+                        Label("Google Drive non connesso", systemImage: "xmark.icloud")
                     } description: {
                         Text("Connetti il tuo account Google Drive per importare materiali di studio")
                     } actions: {
@@ -92,7 +112,8 @@ struct MaterialImportView: View {
                     }
                 }
             }
-            .navigationTitle("Importa da Drive")
+            }
+            .navigationTitle(importSource == .googleDrive ? "Importa da Drive" : "Importa File")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -128,6 +149,29 @@ struct MaterialImportView: View {
         }
     }
 
+    // MARK: - File System View
+    private var fileSystemView: some View {
+        ContentUnavailableView {
+            Label("Seleziona File", systemImage: "doc.badge.plus")
+        } description: {
+            Text("Tocca il pulsante + per selezionare file PDF o documenti dal tuo dispositivo")
+        } actions: {
+            Button {
+                showingFilePicker = true
+            } label: {
+                Label("Seleziona File", systemImage: "folder")
+            }
+            .buttonStyle(.borderedProminent)
+        }
+        .fileImporter(
+            isPresented: $showingFilePicker,
+            allowedContentTypes: [.pdf, .plainText, .rtf, .image],
+            allowsMultipleSelection: true
+        ) { result in
+            handleFileSelection(result)
+        }
+    }
+
     private func toggleSelection(_ id: String) {
         if selectedFiles.contains(id) {
             selectedFiles.remove(id)
@@ -151,6 +195,58 @@ struct MaterialImportView: View {
                 await MainActor.run {
                     showError = "Errore nel caricamento dei file: \(error.localizedDescription)"
                     isImporting = false
+                }
+            }
+        }
+    }
+
+    private func handleFileSelection(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            importLocalFiles(urls)
+        case .failure(let error):
+            showError = "Errore nella selezione dei file: \(error.localizedDescription)"
+        }
+    }
+
+    private func importLocalFiles(_ urls: [URL]) {
+        dismiss()
+
+        _Concurrency.Task {
+            for url in urls {
+                // Access security-scoped resource
+                guard url.startAccessingSecurityScopedResource() else {
+                    continue
+                }
+                defer { url.stopAccessingSecurityScopedResource() }
+
+                do {
+                    // Copy file to app's Documents directory
+                    let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                    let fileName = url.lastPathComponent
+                    let destinationURL = documentsPath.appendingPathComponent(fileName)
+
+                    // Remove existing file if it exists
+                    if FileManager.default.fileExists(atPath: destinationURL.path) {
+                        try FileManager.default.removeItem(at: destinationURL)
+                    }
+
+                    // Copy the file
+                    try FileManager.default.copyItem(at: url, to: destinationURL)
+
+                    // Create Material entry
+                    let material = Material(
+                        title: fileName.replacingOccurrences(of: ".pdf", with: "").replacingOccurrences(of: ".txt", with: ""),
+                        subject: nil
+                    )
+                    material.pdfURL = destinationURL
+
+                    await MainActor.run {
+                        modelContext.insert(material)
+                        try? modelContext.save()
+                    }
+                } catch {
+                    print("Error importing local file \(url.lastPathComponent): \(error)")
                 }
             }
         }

@@ -6,6 +6,8 @@
 	<array>
 		<string>com.mirrorbuddy.sync</string>
 		<string>com.mirrorbuddy.material-sync</string>
+		<string>com.mirrorbuddy.MirrorBuddy.backgroundSync</string>
+		<string>com.mirrorbuddy.materialsync</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
