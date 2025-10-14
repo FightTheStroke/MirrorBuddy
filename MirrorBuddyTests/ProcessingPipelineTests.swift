@@ -5,6 +5,7 @@ import PDFKit
 
 // MARK: - Processing Pipeline Tests (Task 61.3)
 
+@MainActor
 final class ProcessingPipelineTests: XCTestCase {
 
     // MARK: - PDF Text Extraction Tests

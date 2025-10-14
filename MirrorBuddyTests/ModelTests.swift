@@ -4,6 +4,7 @@ import SwiftData
 
 // MARK: - Model Tests (Task 61.1)
 
+@MainActor
 final class ModelTests: XCTestCase {
 
     var modelContainer: ModelContainer!

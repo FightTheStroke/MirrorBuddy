@@ -4,6 +4,7 @@ import Foundation
 
 // MARK: - API Client Tests (Task 61.2)
 
+@MainActor
 final class APIClientTests: XCTestCase {
 
     var mockURLSession: URLSession!
