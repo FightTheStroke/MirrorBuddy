@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var showingGoogleDriveAuth = false
+    @State private var showingOAuthConfig = false
     @StateObject private var authViewModel = GoogleDriveAuthViewModel()
 
     var body: some View {
@@ -50,6 +51,25 @@ struct SettingsView: View {
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
                                     .foregroundStyle(.tertiary)
+                            }
+                        }
+                    }
+
+                    // Google OAuth Configuration
+                    NavigationLink {
+                        GoogleOAuthConfigView()
+                    } label: {
+                        HStack {
+                            Image(systemName: "key.fill")
+                                .foregroundStyle(.orange)
+                                .frame(width: 32)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("OAuth Credentials")
+                                    .font(.headline)
+                                Text("Configure Google Cloud credentials")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }

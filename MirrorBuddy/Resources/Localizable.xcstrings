@@ -36,6 +36,9 @@
     "%lld concepts identified" : {
 
     },
+    "%lld flashcard" : {
+
+    },
     "%lld flashcard disponibili" : {
 
     },
@@ -99,6 +102,9 @@
 
     },
     "Abilitato" : {
+
+    },
+    "Accessibilità" : {
 
     },
     "Accessibilità Dislessia" : {
@@ -458,6 +464,12 @@
     "Ascolta Nodo" : {
 
     },
+    "Assistente vocale" : {
+
+    },
+    "Assistente vocale per lo studio" : {
+
+    },
     "at" : {
 
     },
@@ -473,7 +485,13 @@
     "Avanti 10 secondi" : {
 
     },
+    "Azioni rapide" : {
+
+    },
     "Benvenuto in" : {
+
+    },
+    "Build" : {
 
     },
     "Burst" : {
@@ -492,6 +510,9 @@
 
     },
     "Capture your homework" : {
+
+    },
+    "Caricamento file da Google Drive..." : {
 
     },
     "Chiudi" : {
@@ -538,6 +559,9 @@
         }
       }
     },
+    "Compiti" : {
+
+    },
     "Complete Task" : {
 
     },
@@ -566,6 +590,12 @@
 
     },
     "Connetti Account Google" : {
+
+    },
+    "Connetti Google Drive" : {
+
+    },
+    "Connetti il tuo account Google Drive per importare materiali di studio" : {
 
     },
     "Connetti il tuo account Google per sincronizzare i tuoi materiali di studio su tutti i dispositivi" : {
@@ -637,6 +667,9 @@
 
     },
     "Dimensione Testo" : {
+
+    },
+    "Dislessia" : {
 
     },
     "Dismiss" : {
@@ -924,6 +957,9 @@
     "Expand" : {
 
     },
+    "Fai una domanda sul materiale" : {
+
+    },
     "Filters & Sort" : {
 
     },
@@ -936,7 +972,13 @@
     "Flashcard di Esempio" : {
 
     },
+    "Flashcard per %@" : {
+
+    },
     "Font" : {
+
+    },
+    "Font e spaziatura" : {
 
     },
     "Fotosintesi" : {
@@ -949,6 +991,12 @@
 
     },
     "Glucosio e Ossigeno" : {
+
+    },
+    "Google Drive" : {
+
+    },
+    "Google Drive non connesso" : {
 
     },
     "Google Gemini API Key" : {
@@ -996,6 +1044,21 @@
     "Impara a usare i comandi vocali per navigare MirrorBuddy senza toccare lo schermo" : {
 
     },
+    "Importa (%lld)" : {
+
+    },
+    "Importa da Drive" : {
+
+    },
+    "Importa materiali" : {
+
+    },
+    "Importa materiali da Google Drive per iniziare" : {
+
+    },
+    "Impostazioni" : {
+
+    },
     "Impostazioni voce" : {
 
     },
@@ -1033,6 +1096,9 @@
 
     },
     "Inserisci le tue chiavi API per abilitare le funzionalità avanzate di AI" : {
+
+    },
+    "Integrazione" : {
 
     },
     "Interrompi Anteprima" : {
@@ -1083,10 +1149,19 @@
     "Mano Preferita" : {
 
     },
+    "Mappa mentale" : {
+
+    },
     "Mappa Mentale" : {
 
     },
     "Mappa Mentale Generata" : {
+
+    },
+    "Mappa mentale per %@" : {
+
+    },
+    "Mappe mentali" : {
 
     },
     "Mark as complete" : {
@@ -1102,6 +1177,9 @@
 
     },
     "Materia" : {
+
+    },
+    "Materiali" : {
 
     },
     "Materiali Recenti" : {
@@ -1323,6 +1401,12 @@
     "Nessun contesto attivo" : {
 
     },
+    "Nessun file trovato" : {
+
+    },
+    "Nessun materiale" : {
+
+    },
     "Nessuna" : {
 
     },
@@ -1348,6 +1432,12 @@
 
     },
     "No tasks match your search" : {
+
+    },
+    "Non connesso" : {
+
+    },
+    "Non sono stati trovati file PDF o documenti Google nel tuo Drive" : {
 
     },
     "Normale" : {
@@ -1429,6 +1519,9 @@
 
     },
     "Riassunto" : {
+
+    },
+    "Ricarica" : {
 
     },
     "Righello di Lettura" : {
@@ -1555,6 +1648,9 @@
 
     },
     "Stretta" : {
+
+    },
+    "Studia" : {
 
     },
     "Subject" : {
@@ -1896,6 +1992,9 @@
     "Tocca per aprire i dettagli del materiale" : {
 
     },
+    "Tocca per iniziare" : {
+
+    },
     "Tocca per parlare" : {
 
     },
@@ -1935,6 +2034,9 @@
     "Velocità" : {
 
     },
+    "Versione" : {
+
+    },
     "Video" : {
 
     },
@@ -1954,6 +2056,9 @@
 
     },
     "Visualizzazione" : {
+
+    },
+    "Voice" : {
 
     },
     "Voice Coach" : {
