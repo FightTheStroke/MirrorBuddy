@@ -696,9 +696,10 @@ final class APIClientTests: XCTestCase {
 
 // MARK: - Mock URL Protocol
 
+@MainActor
 class MockURLProtocol: URLProtocol {
-    static var responseQueue: [MockResponse] = []
-    static var requestHistory: [URLRequest] = []
+    nonisolated(unsafe) static var responseQueue: [MockResponse] = []
+    nonisolated(unsafe) static var requestHistory: [URLRequest] = []
 
     override class func canInit(with request: URLRequest) -> Bool {
         return true

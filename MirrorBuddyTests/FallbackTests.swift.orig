@@ -262,8 +262,7 @@ struct FallbackTests {
 
     // MARK: - ResilientAPICall Tests
 
-    // FIXME: Concurrency mutation error
-    /* @Test("Resilient API call succeeds with primary")
+    @Test("Resilient API call succeeds with primary")
     func testResilientAPICallSuccess() async throws {
         var primaryCalled = false
 
@@ -283,9 +282,8 @@ struct FallbackTests {
         #expect(primaryCalled == true)
         #expect(result == "success")
     }
-    */
 
-    /* @Test("Resilient API call uses fallback on failure")
+    @Test("Resilient API call uses fallback on failure")
     func testResilientAPICallFallback() async throws {
         var fallbackCalled = false
 
@@ -305,7 +303,6 @@ struct FallbackTests {
         #expect(fallbackCalled == true)
         #expect(result == "fallback-success")
     }
-    */
 
     @Test("Resilient API call without fallback succeeds")
     func testResilientAPICallWithoutFallback() async throws {
@@ -335,8 +332,7 @@ struct FallbackTests {
 
     // MARK: - Integration Tests
 
-    // FIXME: Concurrency mutation error + type conversion error
-    /* @Test("Full resilience stack: circuit breaker + retry + fallback")
+    @Test("Full resilience stack: circuit breaker + retry + fallback")
     func testFullResilienceStack() async throws {
         var primaryAttempts = 0
         var fallbackCalled = false
@@ -365,10 +361,9 @@ struct FallbackTests {
         #expect(primaryAttempts > 1)  // Should have retried
         #expect(fallbackCalled == true)
         #expect(result == "fallback-result")
-    } */
+    }
 
-    // FIXME: Type conversion error
-    /* @Test("Fallback with cache integration")
+    @Test("Fallback with cache integration")
     func testFallbackWithCache() async throws {
         let cache = SimpleCache()
         await cache.set(key: "api-response", value: "cached-response")
