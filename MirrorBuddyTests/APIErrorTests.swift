@@ -198,13 +198,13 @@ struct APIErrorTests {
 
     @Test("OpenAIError conversion to UnifiedAPIError")
     func testOpenAIErrorConversion() {
-        let configError = OpenAIError.configurationError("Missing key")
+        let configError = OpenAIError.invalidConfiguration
         let unified = configError.toUnifiedError()
 
         #expect(unified.errorCategory == .configuration)
         #expect(unified.context?["source"] as? String == "OpenAI")
 
-        let authError = OpenAIError.authenticationError("Invalid token")
+        let authError = OpenAIError.authenticationFailed
         let unifiedAuth = authError.toUnifiedError()
         #expect(unifiedAuth.errorCategory == .authentication)
 
