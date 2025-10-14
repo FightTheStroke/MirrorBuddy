@@ -51,27 +51,33 @@ final class BackgroundSyncManager {
         // Set expiration handler
         bgTask.expirationHandler = {
             print("[BackgroundSyncManager] Background sync expired")
-            CloudKitSyncMonitor.shared.syncFailed(
-                with: NSError(
-                    domain: "BackgroundSync",
-                    code: -1,
-                    userInfo: [NSLocalizedDescriptionKey: "Background sync expired"]
+            _Concurrency.Task { @MainActor in
+                CloudKitSyncMonitor.shared.syncFailed(
+                    with: NSError(
+                        domain: "BackgroundSync",
+                        code: -1,
+                        userInfo: [NSLocalizedDescriptionKey: "Background sync expired"]
+                    )
                 )
-            )
+            }
             bgTask.setTaskCompleted(success: false)
         }
 
         // Perform sync
-        DispatchQueue.global(qos: .background).async {
+        _Concurrency.Task {
             // CloudKit sync happens automatically via SwiftData
             // This just triggers the monitor update
-            CloudKitSyncMonitor.shared.requestManualSync()
+            await MainActor.run {
+                CloudKitSyncMonitor.shared.requestManualSync()
+            }
 
             // Wait for sync to complete
-            Thread.sleep(forTimeInterval: 5.0)
+            try? await _Concurrency.Task.sleep(for: Duration.seconds(5))
 
             // Mark as completed
-            CloudKitSyncMonitor.shared.syncCompleted()
+            await MainActor.run {
+                CloudKitSyncMonitor.shared.syncCompleted()
+            }
             bgTask.setTaskCompleted(success: true)
             print("[BackgroundSyncManager] Background sync completed")
         }
