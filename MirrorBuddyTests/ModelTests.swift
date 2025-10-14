@@ -622,7 +622,15 @@ final class ModelTests: XCTestCase {
             id: "test1",
             name: "Test.pdf",
             mimeType: "application/pdf",
-            md5Checksum: "def456"
+            webViewLink: nil,
+            thumbnailLink: nil,
+            createdTime: nil,
+            modifiedTime: nil,
+            size: nil,
+            parents: nil,
+            description: nil,
+            md5Checksum: "def456",
+            trashed: nil
         )
 
         XCTAssertTrue(file.hasChanged(comparedTo: driveFile, remoteModifiedDate: nil))
@@ -632,7 +640,15 @@ final class ModelTests: XCTestCase {
             id: "test1",
             name: "Test.pdf",
             mimeType: "application/pdf",
-            md5Checksum: "abc123"
+            webViewLink: nil,
+            thumbnailLink: nil,
+            createdTime: nil,
+            modifiedTime: nil,
+            size: nil,
+            parents: nil,
+            description: nil,
+            md5Checksum: "abc123",
+            trashed: nil
         )
 
         XCTAssertFalse(file.hasChanged(comparedTo: unchangedDriveFile, remoteModifiedDate: nil))

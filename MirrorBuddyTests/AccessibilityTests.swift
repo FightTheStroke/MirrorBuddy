@@ -4,6 +4,7 @@ import SwiftUI
 
 // MARK: - Accessibility Tests (Task 64)
 
+@MainActor
 final class AccessibilityTests: XCTestCase {
 
     override func setUpWithError() throws {
