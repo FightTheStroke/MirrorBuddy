@@ -30,6 +30,12 @@ struct MirrorBuddyApp: App {
     }
 
     var sharedModelContainer: ModelContainer = {
+        // Pre-create Application Support directory to avoid CoreData error logs
+        let fileManager = FileManager.default
+        if let appSupportURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first {
+            try? fileManager.createDirectory(at: appSupportURL, withIntermediateDirectories: true, attributes: nil)
+        }
+
         let schema = Schema([
             SubjectEntity.self,
             Material.self,
