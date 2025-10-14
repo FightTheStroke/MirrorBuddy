@@ -4,6 +4,7 @@ import SwiftData
 
 /// Service for monitoring CloudKit sync status and handling sync events
 @Observable
+@MainActor
 final class CloudKitSyncMonitor {
     /// Singleton instance
     static let shared = CloudKitSyncMonitor()
@@ -50,17 +51,13 @@ final class CloudKitSyncMonitor {
 
     /// Handle import events from CloudKit
     @objc private func handleImportEvent(_ notification: Notification) {
-        DispatchQueue.main.async { [weak self] in
-            self?.syncStatus = .syncing
-        }
+        syncStatus = .syncing
     }
 
     /// Handle export events to CloudKit
     @objc private func handleExportEvent(_ notification: Notification) {
-        DispatchQueue.main.async { [weak self] in
-            self?.syncStatus = .syncing
-            self?.lastSyncDate = Date()
-        }
+        syncStatus = .syncing
+        lastSyncDate = Date()
     }
 
     /// Manually trigger sync completion (called after successful operations)
@@ -82,8 +79,9 @@ final class CloudKitSyncMonitor {
         syncStatus = .syncing
         // SwiftData automatically handles sync when data changes
         // This updates the UI to show sync is in progress
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [weak self] in
-            self?.syncCompleted()
+        _Concurrency.Task { @MainActor in
+            try? await _Concurrency.Task.sleep(for: Duration.seconds(2))
+            syncCompleted()
         }
     }
 
