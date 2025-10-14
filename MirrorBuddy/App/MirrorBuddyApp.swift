@@ -73,7 +73,7 @@ struct MirrorBuddyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
                 .environment(LocalizationManager.shared)
                 .environment(syncMonitor)
                 .onAppear {
