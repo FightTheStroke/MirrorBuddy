@@ -16,12 +16,13 @@ struct MirrorBuddyApp: App {
             PerformanceMonitor.shared.startAppLaunch()
         }
 
-        // Register background tasks
-        BackgroundSyncManager.shared.registerBackgroundTasks()
-        BackgroundTaskScheduler.shared.registerBackgroundTasks()
+        // Register background tasks (must be on MainActor)
+        _Concurrency.Task { @MainActor in
+            BackgroundSyncManager.shared.registerBackgroundTasks()
+            BackgroundTaskScheduler.shared.registerBackgroundTasks()
+        }
 
         // Register scheduled material sync (Task 72)
-        // Note: register() is sync and can be called from init
         _Concurrency.Task { @MainActor in
             BackgroundSyncService.shared.register()
         }

@@ -3,6 +3,7 @@ import SwiftUI
 
 /// Manages app localization and language switching
 @Observable
+@MainActor
 final class LocalizationManager {
     /// Available languages
     enum Language: String, CaseIterable, Identifiable {
