@@ -34,6 +34,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Error recovery for interrupted recordings
   - Files: Core/Services/ExtendedVoiceRecordingService.swift (extended)
 
+- **Subtask 98.1: Redesigned Navigation Structure for Children** (2025-10-15)
+  - Simplified main tab bar from 5 tabs to 4 tabs (removed Settings tab)
+  - Updated "Voice" tab label to Italian "Voce" for consistency
+  - Increased icon size to 28pt (from default) for better child visibility
+  - Enhanced label fonts to headline weight for improved readability
+  - Configured UITabBarAppearance with larger touch targets for child-friendly interaction
+  - Applied custom tab bar item appearance with color-coded selection states
+  - Set consistent font sizing (12pt medium/semibold) for tab labels
+  - Files: Features/Dashboard/Views/MainTabView.swift:15-95
+
 ### Changed
 
 ### Fixed

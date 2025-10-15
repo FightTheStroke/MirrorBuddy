@@ -13,40 +13,85 @@ struct MainTabView: View {
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            // MARK: - Dashboard Tab
+            // MARK: - Dashboard Tab (Materiali)
             DashboardView()
                 .tabItem {
-                    Label("Materiali", systemImage: "books.vertical")
+                    Label {
+                        Text("Materiali")
+                            .font(.headline)
+                    } icon: {
+                        Image(systemName: "books.vertical")
+                            .font(.system(size: 28))
+                    }
                 }
                 .tag(0)
 
-            // MARK: - Study Tab
+            // MARK: - Study Tab (Studia)
             StudyView()
                 .tabItem {
-                    Label("Studia", systemImage: "brain.head.profile")
+                    Label {
+                        Text("Studia")
+                            .font(.headline)
+                    } icon: {
+                        Image(systemName: "brain.head.profile")
+                            .font(.system(size: 28))
+                    }
                 }
                 .tag(1)
 
-            // MARK: - Tasks Tab
+            // MARK: - Tasks Tab (Compiti)
             TasksView()
                 .tabItem {
-                    Label("Compiti", systemImage: "checklist")
+                    Label {
+                        Text("Compiti")
+                            .font(.headline)
+                    } icon: {
+                        Image(systemName: "checklist")
+                            .font(.system(size: 28))
+                    }
                 }
                 .tag(2)
 
-            // MARK: - Voice Tab
+            // MARK: - Voice Tab (Voce)
             VoiceView()
                 .tabItem {
-                    Label("Voice", systemImage: "waveform")
+                    Label {
+                        Text("Voce")
+                            .font(.headline)
+                    } icon: {
+                        Image(systemName: "waveform")
+                            .font(.system(size: 28))
+                    }
                 }
                 .tag(3)
+        }
+        // Larger tab bar for child-friendly touch targets
+        .onAppear {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithDefaultBackground()
 
-            // MARK: - Settings Tab
-            SettingsView()
-                .tabItem {
-                    Label("Impostazioni", systemImage: "gearshape")
-                }
-                .tag(4)
+            // Increase tab bar height and icon size via item appearance
+            let itemAppearance = UITabBarItemAppearance()
+            itemAppearance.normal.iconColor = UIColor.systemGray
+            itemAppearance.selected.iconColor = UIColor.systemBlue
+
+            // Larger font for labels
+            let normalAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 12, weight: .medium)
+            ]
+            let selectedAttributes: [NSAttributedString.Key: Any] = [
+                .font: UIFont.systemFont(ofSize: 12, weight: .semibold)
+            ]
+
+            itemAppearance.normal.titleTextAttributes = normalAttributes
+            itemAppearance.selected.titleTextAttributes = selectedAttributes
+
+            appearance.stackedLayoutAppearance = itemAppearance
+            appearance.inlineLayoutAppearance = itemAppearance
+            appearance.compactInlineLayoutAppearance = itemAppearance
+
+            UITabBar.appearance().standardAppearance = appearance
+            UITabBar.appearance().scrollEdgeAppearance = appearance
         }
     }
 }
