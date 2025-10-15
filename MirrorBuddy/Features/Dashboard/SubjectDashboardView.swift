@@ -376,6 +376,7 @@ struct FiltersSheet: View {
 // MARK: - View Model
 
 @Observable
+@MainActor
 final class DashboardViewModel {
     var groupBySubject = false
     var sortOption: SortOption = .dateDescending

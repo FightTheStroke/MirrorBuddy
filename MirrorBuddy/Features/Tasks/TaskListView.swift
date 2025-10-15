@@ -579,6 +579,7 @@ struct AddTaskView: View {
 // MARK: - View Model
 
 @Observable
+@MainActor
 final class TaskListViewModel {
     var selectedSubject: Subject?
     var showCompletedTasks = false
