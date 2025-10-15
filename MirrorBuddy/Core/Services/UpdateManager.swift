@@ -88,28 +88,28 @@ final class UpdateManager {
             // Step 1: Check authentication (10%)
             try await checkAuthentication()
             progress.progress = 0.1
-            await Task.sleep(nanoseconds: 500_000_000) // 0.5s delay for UX
+            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000) // 0.5s delay for UX
 
             // Step 2: Sync Google Drive (30%)
             progress.currentStep = .syncingDrive
             progress.statusMessage = "Cerco nuovi documenti su Drive..."
             try await syncGoogleDrive()
             progress.progress = 0.4
-            await Task.sleep(nanoseconds: 500_000_000)
+            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000)
 
             // Step 3: Sync Gmail (20%)
             progress.currentStep = .syncingGmail
             progress.statusMessage = "Controllo nuove mail dai professori..."
             try await syncGmail()
             progress.progress = 0.6
-            await Task.sleep(nanoseconds: 500_000_000)
+            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000)
 
             // Step 4: Sync Calendar (15%)
             progress.currentStep = .syncingCalendar
             progress.statusMessage = "Controllo eventi nel calendario..."
             try await syncCalendar()
             progress.progress = 0.75
-            await Task.sleep(nanoseconds: 500_000_000)
+            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000)
 
             // Step 5: Generate mind maps for new documents (25%)
             progress.currentStep = .generatingMindMaps
@@ -130,7 +130,7 @@ final class UpdateManager {
         }
 
         // Keep "isUpdating" true for 2 seconds to show results
-        await Task.sleep(nanoseconds: 2_000_000_000)
+        try? await _Concurrency.Task.sleep(nanoseconds: 2_000_000_000)
         progress.isUpdating = false
     }
 
@@ -210,9 +210,8 @@ final class UpdateManager {
                 // Track file
                 let trackedFile = TrackedDriveFile(
                     fileID: file.id,
-                    fileName: file.name,
-                    lastModified: Date(),
-                    materialID: material.persistentModelID
+                    name: file.name,
+                    mimeType: file.mimeType
                 )
                 context.insert(trackedFile)
 
@@ -239,11 +238,13 @@ final class UpdateManager {
     }
 
     private func syncCalendar() async throws {
-        let events = try await calendarService.syncUpcomingEvents(daysAhead: 30)
-        try await calendarService.syncEventsToTasks(events)
+        let events = try await calendarService.syncCalendarEvents()
+        let assignments = calendarService.extractAssignments(from: events)
+        try await calendarService.syncAssignmentsToTasks(assignments)
 
         progress.newEventsCount = events.count
-        logger.info("Synced \(events.count) calendar events")
+        progress.newTasksCount += assignments.count
+        logger.info("Synced \(events.count) calendar events, created \(assignments.count) tasks")
     }
 
     private func generateMindMapsForNewDocuments() async throws {
@@ -269,22 +270,19 @@ final class UpdateManager {
             guard !material.extractedText.isEmpty else { continue }
 
             // Generate mind map (placeholder - actual implementation uses AI service)
-            let mindMap = MindMap(
-                title: "Mappa: \(material.title)",
-                rootNodeTitle: material.title,
-                subject: material.subject
-            )
+            let mindMap = MindMap(materialID: material.id)
             mindMap.material = material
 
-            // Create root node
+            // Create root node (positioned at center)
             let rootNode = MindMapNode(
                 title: material.title,
                 content: String(material.extractedText.prefix(200)),
-                level: 0,
-                color: material.subject?.color ?? "#3B82F6",
-                mindMap: mindMap
+                positionX: 0,
+                positionY: 0,
+                color: material.subject?.colorName ?? "blue"
             )
-            mindMap.rootNode = rootNode
+            rootNode.mindMap = mindMap
+            mindMap.nodes = [rootNode]
 
             material.mindMap = mindMap
             context.insert(mindMap)

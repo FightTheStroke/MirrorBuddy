@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct UpdateButtonView: View {
     @State private var updateManager = UpdateManager.shared
@@ -326,22 +327,20 @@ struct ResultCard: View {
 }
 
 #Preview("Updating") {
-    let view = UpdateButtonView()
-    view.progress.isUpdating = true
-    view.progress.currentStep = .syncingDrive
-    view.progress.statusMessage = "Cerco nuovi documenti..."
-    view.progress.progress = 0.4
-    return view
+    UpdateManager.shared.progress.isUpdating = true
+    UpdateManager.shared.progress.currentStep = .syncingDrive
+    UpdateManager.shared.progress.statusMessage = "Cerco nuovi documenti..."
+    UpdateManager.shared.progress.progress = 0.4
+    return UpdateButtonView()
         .modelContainer(for: Material.self, inMemory: true)
 }
 
 #Preview("Completed") {
-    let view = UpdateButtonView()
-    view.progress.currentStep = .completed
-    view.progress.statusMessage = "Trovati: 3 nuovi documenti, 2 compiti"
-    view.progress.newDocumentsCount = 3
-    view.progress.newTasksCount = 2
-    view.progress.mindMapsGenerated = 3
-    return view
+    UpdateManager.shared.progress.currentStep = .completed
+    UpdateManager.shared.progress.statusMessage = "Trovati: 3 nuovi documenti, 2 compiti"
+    UpdateManager.shared.progress.newDocumentsCount = 3
+    UpdateManager.shared.progress.newTasksCount = 2
+    UpdateManager.shared.progress.mindMapsGenerated = 3
+    return UpdateButtonView()
         .modelContainer(for: Material.self, inMemory: true)
 }

@@ -21,6 +21,7 @@ final class Material {
     var pdfURL: URL?
     var textContent: String?
     var summary: String?
+    var extractedText: String = "" // OCR extracted text from images
 
     // Google Drive integration
     var googleDriveFileID: String?
