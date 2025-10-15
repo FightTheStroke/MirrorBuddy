@@ -136,6 +136,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Docs/USER_TESTING_GUIDE.md (NEW, comprehensive child testing protocols)
     - Core/Services/FeedbackService.swift (NEW, feedback and usability tracking)
 
+- **Subtask 93.1: Audio Segmentation for Whisper API** (2025-10-15)
+  - Created AudioSegmentationService for splitting long recordings into 30-minute chunks
+  - Implemented AVAssetExportSession-based time range export for segment creation
+  - Added 30-second overlap between segments for better transcription continuity
+  - Created AudioSegment model tracking index, start/end time, duration, file URL
+  - Handles recordings shorter than 30 minutes (returns single segment with original file)
+  - Exports segments to temporary directory with session ID tracking
+  - Implemented cleanup methods for temporary chunk files after transcription
+  - Created SegmentationStats for tracking segmentation metrics (count, duration, file size)
+  - Extracts session ID from recording filename (e.g., "lesson_UUID_merged.m4a")
+  - Added formatted duration and file size helpers for UI display
+  - Comprehensive error handling with SegmentationError enum
+  - Logger integration for debugging segmentation process
+  - NOTE: Uses iOS 17-compatible AVFoundation APIs (iOS 18 async/await methods available for future optimization)
+  - Files:
+    - Core/Services/AudioSegmentationService.swift (NEW, 384 lines)
+
 ### Changed
 
 ### Fixed
