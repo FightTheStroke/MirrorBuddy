@@ -153,6 +153,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Files:
     - Core/Services/AudioSegmentationService.swift (NEW, 384 lines)
 
+- **Subtask 93.2: Whisper API Audio Optimization** (2025-10-15)
+  - Created WhisperAudioOptimizer for validating and optimizing audio chunks for Whisper API
+  - Validates audio format against Whisper-supported formats (M4A, MP3, WAV, WebM, FLAC, OGG)
+  - Checks file size compliance with Whisper 25 MB limit
+  - Analyzes audio properties (sample rate, channel count, format) using AVFoundation
+  - Implements intelligent optimization decision logic (only re-exports if needed)
+  - Re-exports audio with optimal Whisper settings (16kHz sample rate, mono, AAC M4A)
+  - Created OptimizedAudioSegment model tracking optimization results and statistics
+  - Batch optimization support for multiple segments
+  - Validation methods to ensure all segments meet Whisper API requirements
+  - Comprehensive cleanup methods for optimized temporary files
+  - OptimizationStats tracking (total/optimized size, reduction percentage)
+  - Formatted helpers for file size, settings summary, reduction metrics
+  - Logger integration for debugging optimization process
+  - Comprehensive error handling with OptimizationError enum
+  - Supports both optimization and pass-through (when already optimal)
+  - Files:
+    - Core/Services/WhisperAudioOptimizer.swift (NEW, 417 lines)
+
 ### Changed
 
 ### Fixed
