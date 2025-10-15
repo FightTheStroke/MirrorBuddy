@@ -80,6 +80,7 @@ struct MirrorBuddyApp: App {
         WindowGroup {
             MainTabView()
                 .environment(LocalizationManager.shared)
+                .environment(CloudKitSyncMonitor.shared)
                 .onAppear {
                     // Complete performance monitoring setup (Task 59)
                     _Concurrency.Task { @MainActor in
