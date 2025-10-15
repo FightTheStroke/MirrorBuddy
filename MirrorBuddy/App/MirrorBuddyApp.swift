@@ -81,6 +81,7 @@ struct MirrorBuddyApp: App {
             MainTabView()
                 .environment(LocalizationManager.shared)
                 .environment(CloudKitSyncMonitor.shared)
+                .font(.openDyslexicBody) // Apply OpenDyslexic as default font
                 .onAppear {
                     // Complete performance monitoring setup (Task 59)
                     _Concurrency.Task { @MainActor in
@@ -112,6 +113,11 @@ struct MirrorBuddyApp: App {
                     _Concurrency.Task { @MainActor in
                         GmailService.shared.configure(modelContext: sharedModelContainer.mainContext)
                         GoogleCalendarService.shared.configure(modelContext: sharedModelContainer.mainContext)
+                    }
+
+                    // Configure UpdateManager (for "Aggiornami" button)
+                    _Concurrency.Task { @MainActor in
+                        UpdateManager.shared.configure(modelContext: sharedModelContainer.mainContext)
                     }
 
                     // Request notification authorization

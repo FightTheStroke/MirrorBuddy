@@ -71,5 +71,6 @@ Packages/
 Package.resolved
 
 
-# Google OAuth credentials
+# All API Keys and Credentials (unified)
+MirrorBuddy/Resources/APIKeys-Info.plist
 MirrorBuddy/Resources/GoogleService-Info.plist

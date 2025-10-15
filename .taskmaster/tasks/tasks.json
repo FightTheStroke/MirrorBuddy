@@ -3820,16 +3820,198 @@
         ],
         "priority": "critical",
         "subtasks": []
+      },
+      {
+        "id": 84,
+        "title": "Implement Multi-Format Document Import and Viewer",
+        "description": "Enable importing and viewing of images (PNG, JPG, JPEG, HEIC, HEIF) and Google Docs from Google Drive, alongside existing PDF support.",
+        "details": "Integrate Google Drive API for file import. Use Vision framework for OCR on images. Convert Google Docs to PDF or extract text. Update Material storage to handle mixed content. Implement pinch-to-zoom, swipe navigation, and optimized layouts for iPad/iPhone.",
+        "testStrategy": "Test importing each supported format from Drive. Validate correct display in viewer. Confirm OCR text extraction and storage. Check navigation and zoom on both iPad and iPhone.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 85,
+        "title": "Fix and Enhance Document Scanner",
+        "description": "Repair scanner functionality using VisionKit's DocumentCamera, supporting multi-page scanning, auto-crop, enhancement, and saving as PDF/images.",
+        "details": "Replace broken scanner code with VisionKit DocumentCamera. Implement multi-page session, auto-crop, and image enhancement. Save output as PDF or images and link to Material storage. Trigger OCR post-scan.",
+        "testStrategy": "Scan multiple pages, verify auto-crop/enhance, check output format and storage. Confirm OCR runs automatically.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 86,
+        "title": "Integrate OCR for Handwritten and Printed Italian Text",
+        "description": "Use Vision framework to extract Italian text, including handwritten notes, from imported images and scanned documents.",
+        "details": "Configure Vision OCR for Italian language. Enable handwritten text recognition if supported. Store extracted text in Material.extractedText. Handle errors gracefully.",
+        "testStrategy": "Import images with printed and handwritten Italian text. Validate extraction accuracy and storage. Test error handling.",
+        "priority": "high",
+        "dependencies": [
+          84,
+          85
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 87,
+        "title": "Implement Mind Map Generation from Image and Document Content",
+        "description": "Automatically generate mind maps from extracted text and image content using GPT-4.",
+        "details": "Send extracted text to GPT-4 API for topic extraction and mind map structuring. Store and display mind maps linked to materials. Support color-coding by subject.",
+        "testStrategy": "Import documents/images, run OCR, generate mind map. Validate logical structure and subject coloring.",
+        "priority": "medium",
+        "dependencies": [
+          86
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 88,
+        "title": "Enable Screen Capture and Annotation for Homework Help",
+        "description": "Allow users to capture the screen/camera view and annotate problem areas using touch or iPad Pencil.",
+        "details": "Implement screen/camera capture. Add drawing/highlighting tools compatible with iPad Pencil. Save annotated images for analysis.",
+        "testStrategy": "Capture screen, annotate with finger and Pencil. Verify image is saved and ready for AI analysis.",
+        "priority": "medium",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 89,
+        "title": "Integrate GPT-4 Vision for Homework Analysis and Explanation",
+        "description": "Send captured/annotated images to GPT-4 Vision API for problem identification and step-by-step explanations with voice response in Italian.",
+        "details": "Connect to GPT-4 Vision API. Parse response for math, science, history problems. Generate step-by-step explanations. Use TTS for Italian voice output.",
+        "testStrategy": "Capture annotated homework, send to API, verify correct analysis and voice explanation.",
+        "priority": "medium",
+        "dependencies": [
+          88
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 90,
+        "title": "Integrate Voice Coach for Guided Problem Solving",
+        "description": "Enable voice-guided problem solving, linking screen capture, AI analysis, and visual/voice feedback.",
+        "details": "Implement voice command trigger ('Aiutami con questo'). Chain capture, analysis, and explanation. Overlay visual annotations and play voice guidance.",
+        "testStrategy": "Test full workflow: voice command → capture → analyze → explain. Validate clarity and correctness.",
+        "priority": "medium",
+        "dependencies": [
+          89
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 91,
+        "title": "Implement Extended Voice Recording (6 Hours, Background Mode)",
+        "description": "Support up to 6 hours of continuous audio recording, with background operation and auto-save every 30 minutes.",
+        "details": "Use AVAudioRecorder with background mode. Compress audio in real-time to AAC (64 kbps). Implement auto-save and low battery warning. Add controls for start/stop, pause/resume, timer, battery indicator.",
+        "testStrategy": "Record for 6 hours, test background operation, auto-save, and low battery warning. Check file size and audio quality.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 92,
+        "title": "Optimize Audio Storage and Google Drive Backup",
+        "description": "Compress audio files efficiently and provide option to upload recordings to Google Drive for backup.",
+        "details": "Implement AAC compression targeting <500 MB for 6 hours. Integrate Google Drive API for upload. Warn user if storage is low.",
+        "testStrategy": "Record long sessions, verify compression and upload. Test low storage warning.",
+        "priority": "medium",
+        "dependencies": [
+          91
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 93,
+        "title": "Auto-Transcription of Recordings with Whisper API",
+        "description": "Transcribe recorded lessons in Italian using Whisper API, processing in 30-minute chunks and linking transcripts to materials.",
+        "details": "Send audio chunks to Whisper API for transcription. Store plain text transcript and link to lesson/material. Handle errors and retries.",
+        "testStrategy": "Record and transcribe 6-hour lesson. Validate transcript accuracy and linkage.",
+        "priority": "high",
+        "dependencies": [
+          91
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 94,
+        "title": "Implement Subject and Speaker Detection from Transcripts",
+        "description": "Analyze transcript keywords to auto-assign subject and optionally detect speakers (teacher vs student).",
+        "details": "Use keyword matching for subject detection (Matematica, Storia, etc.). Implement speaker diarization if feasible. Allow manual correction of subject.",
+        "testStrategy": "Transcribe lessons, validate subject assignment (>80% accuracy). Test manual correction and speaker tagging.",
+        "priority": "medium",
+        "dependencies": [
+          93
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 95,
+        "title": "Generate Lesson Summaries and Mind Maps from Transcripts",
+        "description": "Use GPT-4 to summarize transcripts and generate hierarchical mind maps with color coding and key concepts.",
+        "details": "Send transcript to GPT-4 for summary and mind map extraction. Structure mind map visually with subject-based colors. Store and link to lesson.",
+        "testStrategy": "Transcribe lesson, generate summary and mind map. Validate structure, readability, and relevance.",
+        "priority": "medium",
+        "dependencies": [
+          94
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 96,
+        "title": "Implement Review Assistant and Quiz Generation",
+        "description": "Enable users to review lessons via summaries, concept extraction, and auto-generated quizzes from lesson content.",
+        "details": "Add commands ('Cosa ho imparato oggi?', 'Spiegami [concept]'). Use GPT-4 to extract concepts and generate quizzes. Display results in child-friendly format.",
+        "testStrategy": "Review lesson, extract concepts, generate quiz. Validate relevance and clarity.",
+        "priority": "medium",
+        "dependencies": [
+          95
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 97,
+        "title": "Improve Mind Map Visualization for Mobile",
+        "description": "Redesign mind map UI for mobile: large fonts, high contrast, icons, color coding, intuitive navigation, and layout for iPhone/iPad.",
+        "details": "Update UI with min 18pt fonts, high contrast, icons for node types, color-coded by subject. Implement tap-to-expand, pinch-to-zoom, pan, double-tap for details, breadcrumbs, vertical scrolling, collapsible sections. Limit depth and node count for clarity.",
+        "testStrategy": "Test mind map readability and navigation on iPhone/iPad. Validate color coding and hierarchy.",
+        "priority": "medium",
+        "dependencies": [
+          95
+        ],
+        "status": "pending",
+        "subtasks": []
+      },
+      {
+        "id": 98,
+        "title": "Enhance Child-Friendly UI and Empathetic Experience",
+        "description": "Simplify navigation, increase touch target size, add visual/haptic feedback, and ensure all text/voice interactions use personalized, empathetic tone.",
+        "details": "Limit to max 4 main tabs, large touch targets (min 44pt), clear Italian labels, icons + text. Add loading animations, success/error icons, progress bars, haptic feedback. Implement color system (max 6, high contrast). Personalize greetings and messages using stored name. Apply empathetic tone guidelines to all text/voice outputs.",
+        "testStrategy": "Test navigation and feedback with child users. Validate tone and personalization in all interactions. Check accessibility and error handling.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "pending",
+        "subtasks": []
       }
     ],
     "metadata": {
-      "version": "1.0.0",
-      "lastModified": "2025-10-13T09:11:12.444Z",
-      "taskCount": 83,
-      "completedCount": 83,
-      "tags": [
-        "master"
-      ]
+      "created": "2025-10-15T16:40:11.297Z",
+      "updated": "2025-10-15T16:40:11.297Z",
+      "description": "Tasks for master context"
     }
   }
 }

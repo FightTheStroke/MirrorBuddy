@@ -1,0 +1,447 @@
+# MirrorBuddy - New Features PRD
+**Date**: October 2025
+**Vision**: Transform MirrorBuddy into a complete AI learning assistant for Mario
+
+## Overview
+MirrorBuddy deve diventare un vero e proprio insegnante di sostegno per Mario, con supporto completo per documenti, lezioni vocali lunghe, analisi visiva in tempo reale, e interfaccia semplificata "a prova di bambino".
+
+---
+
+## Feature 1: Multi-Format Document Support
+
+### Requirements
+- **Supported formats**:
+  - PDF files (already supported)
+  - Images: PNG, JPG, JPEG, HEIC, HEIF
+  - Google Docs (convert to PDF or extract text)
+
+- **Google Drive sync**:
+  - Import images from Google Drive
+  - Download and store locally
+  - Extract text from images using OCR
+  - Support mixed content (PDFs + images in same folder)
+
+- **Document viewer**:
+  - View PDFs with zoom and scroll
+  - View images with pinch-to-zoom
+  - Swipe navigation between pages/images
+  - Optimized for iPad and iPhone
+
+- **Text extraction**:
+  - Use Vision framework for OCR on images
+  - Extract handwritten notes (if possible)
+  - Support Italian text recognition
+  - Store extracted text in Material.extractedText
+
+### Acceptance Criteria
+- User can import PNG/JPG images from Google Drive
+- Images display correctly in material viewer
+- OCR extracts text from images automatically
+- Mind maps can be generated from image content
+
+---
+
+## Feature 2: Document Scanner Fix
+
+### Requirements
+- Fix the broken document scanner functionality
+- Use VisionKit's DocumentCamera for scanning
+- Scan multiple pages in one session
+- Auto-crop and enhance scanned pages
+- Save as PDF or individual images
+- Integrate with Material storage
+
+### Acceptance Criteria
+- Scanner opens when tapping "Scansiona" button
+- Can scan multiple pages continuously
+- Scanned document appears as new Material
+- OCR runs automatically on scanned content
+
+---
+
+## Feature 3: Screen Capture + GPT-4 Vision for Homework Help
+
+### Requirements
+- **Screen capture**:
+  - Capture current screen/camera view
+  - Allow user to draw/highlight problem area
+  - Support iPad Pencil annotations
+
+- **Vision AI analysis**:
+  - Send image to GPT-4 Vision API
+  - Identify math problems, diagrams, text
+  - Provide step-by-step explanations
+  - Voice response in Italian
+
+- **Integration with voice coach**:
+  - "Aiutami con questo esercizio" → capture screen → analyze → explain
+  - Show visual annotations on screen
+  - Voice-guided problem solving
+
+### Acceptance Criteria
+- User can say "aiutami con questo" and app captures screen
+- GPT-4 Vision analyzes homework/exercise correctly
+- Voice explanation is clear and step-by-step
+- Works for math, science, history homework
+
+---
+
+## Feature 4: Extended Voice Recording (6 Hours for Classroom Lessons)
+
+### Requirements
+- **Recording capacity**:
+  - Support up to 6 hours continuous recording
+  - Background recording (app can go to sleep)
+  - Low power consumption mode
+  - Auto-save every 30 minutes to prevent data loss
+
+- **Storage optimization**:
+  - Compress audio using AAC format
+  - Estimate ~500 MB for 6 hours at 64 kbps
+  - Warn user if storage is low
+  - Option to upload to Google Drive for backup
+
+- **Recording controls**:
+  - Big START/STOP button
+  - Pause/resume capability
+  - Timer showing recording duration
+  - Battery level indicator
+
+### Acceptance Criteria
+- Can record 6 hours continuously without crashes
+- Recording continues when screen locks
+- Audio quality is good enough for transcription
+- File size is reasonable (<500 MB for 6 hours)
+
+---
+
+## Feature 5: Auto-Transcription with Subject Detection
+
+### Requirements
+- **Transcription**:
+  - Use Whisper API (OpenAI) for Italian transcription
+  - Process in chunks (every 30 min or when recording stops)
+  - Store transcript as plain text
+  - Link transcript to lesson/material
+
+- **Subject detection**:
+  - Analyze transcript keywords to identify subject
+  - Keywords for Matematica: "equazione", "funzione", "derivata", etc.
+  - Keywords for Storia: "guerra", "rivoluzione", "impero", etc.
+  - Auto-assign subject to lesson
+  - Allow manual correction
+
+- **Speaker detection** (optional):
+  - Identify teacher vs student speaking
+  - Tag teacher explanations differently
+  - Useful for review
+
+### Acceptance Criteria
+- 6-hour lesson is transcribed fully
+- Subject is detected correctly >80% of the time
+- Transcript is readable and accurate
+- User can edit subject if wrong
+
+---
+
+## Feature 6: Lesson Summaries and Mind Maps from Transcripts
+
+### Requirements
+- **Auto-summary generation**:
+  - Use GPT-4 to summarize transcript
+  - Identify key concepts, definitions, examples
+  - Create bullet-point summary (max 500 words)
+  - Highlight important dates, formulas, names
+
+- **Mind map generation**:
+  - Extract main topics from transcript
+  - Create hierarchical mind map structure
+  - Link concepts together
+  - Visual representation with colors by subject
+
+- **Review assistant**:
+  - "Cosa ho imparato oggi?" → show summary
+  - "Spiegami [concept]" → extract from transcript
+  - Quiz generation from lesson content
+
+### Acceptance Criteria
+- Summary captures main points of 6-hour lesson
+- Mind map is logical and well-structured
+- User can review lesson without re-listening
+- Quiz questions are relevant to lesson content
+
+---
+
+## Feature 7: Improved Mind Maps (Mobile-Optimized)
+
+### Requirements
+- **Visual design**:
+  - Large, readable fonts (min 18pt for nodes)
+  - High contrast colors
+  - Icons for node types (definition, example, formula)
+  - Color-coded by subject
+
+- **Navigation**:
+  - Tap node to expand/collapse children
+  - Pinch to zoom
+  - Pan with one finger
+  - Double-tap node to view details
+  - Breadcrumb navigation (where am I?)
+
+- **Mobile layout**:
+  - Vertical scrolling for long branches
+  - Collapsible sections
+  - Optimize for iPhone and iPad screens
+  - Landscape and portrait modes
+
+- **Simplicity**:
+  - Maximum 3 levels deep
+  - 5-7 nodes per level (avoid clutter)
+  - Clear parent-child relationships
+  - Visual hierarchy with size/color
+
+### Acceptance Criteria
+- Mind map is easy to read on iPhone 13 and iPad
+- Navigation is intuitive for child users
+- Text is large and clear
+- Colors help distinguish topics
+
+---
+
+## Feature 8: Unified "Aggiornami" Experience
+
+### Requirements (already partially implemented)
+- **One-button sync**:
+  - Big "Aggiornami" button on dashboard ✅
+  - Syncs Drive + Gmail + Calendar ✅
+  - Shows progress with clear steps ✅
+  - Displays results: X new docs, Y new tasks ✅
+
+- **Post-sync actions**:
+  - Auto-generate mind maps for new docs ✅
+  - Extract homework from emails ✅
+  - Add calendar events as tasks ✅
+  - Notify user with summary
+
+- **Smart suggestions**:
+  - "Mario, hai 2 compiti da fare oggi"
+  - "Vuoi ripassare Matematica per il test di domani?"
+  - Voice prompts for next actions
+
+### Acceptance Criteria
+- Sync completes in <30 seconds for typical data
+- Progress is visible and clear
+- Results are presented in child-friendly way
+- User knows what to do next
+
+---
+
+## Feature 9: Child-Friendly UI Improvements
+
+### Requirements
+- **Simplified navigation**:
+  - Max 4 main tabs (fewer is better)
+  - Large touch targets (min 44pt)
+  - Clear labels in Italian
+  - Icons + text labels
+
+- **Visual feedback**:
+  - Loading states with animations
+  - Success/error messages with icons
+  - Progress bars for long operations
+  - Haptic feedback for actions
+
+- **Color system**:
+  - Consistent color coding by subject
+  - High contrast for readability
+  - Avoid too many colors (max 6)
+
+### Acceptance Criteria
+- Mario can navigate app without help
+- All buttons are easy to tap
+- Feedback is immediate and clear
+- No confusing states or errors
+
+---
+
+## Feature 10: Personalized and Empathetic Experience
+
+### Requirements
+- **User profile setup**:
+  - Ask for student's name during onboarding
+  - Store in UserDefaults/Settings
+  - Optional: age, grade level, learning preferences
+  - Editable in Settings at any time
+
+- **Personalized greetings**:
+  - "Ciao Mario, come stai oggi?"
+  - "Benvenuto Mario!"
+  - Use name in all messages and voice interactions
+  - Contextual greetings (morning/afternoon/evening)
+
+- **Empathetic tone guidelines**:
+  - **Patient**: Never rush, always supportive
+  - **Calm**: Reassuring language, no pressure
+  - **Encouraging**: Celebrate small wins
+  - **Understanding**: Acknowledge difficulty
+  - Examples:
+    - ❌ "Devi finire questo compito"
+    - ✅ "Mario, quando vuoi possiamo lavorare insieme su questo compito"
+    - ❌ "Errore: risposta sbagliata"
+    - ✅ "Va bene Mario, proviamo insieme in un altro modo"
+
+- **Consistent personality**:
+  - Voice: Warm, friendly, supportive (like a kind teacher)
+  - Text: Simple, clear, encouraging
+  - Never condescending or childish
+  - Respectful of user's pace
+
+- **Adaptive language**:
+  - Simplify explanations based on user's level
+  - Use analogies and examples
+  - Check for understanding: "Ha senso Mario?"
+  - Offer more details if needed
+
+- **Emotional support**:
+  - Recognize frustration: "Capisco che può essere difficile"
+  - Celebrate progress: "Bravo Mario, stai andando bene!"
+  - Encourage breaks: "Facciamo una pausa?"
+  - Positive reinforcement throughout
+
+### Voice Tone Examples
+- **Starting session**: "Ciao Mario! Sono qui per aiutarti. Da dove vuoi iniziare oggi?"
+- **During homework**: "Va bene Mario, prendiamola con calma. Guardiamo questo esercizio insieme."
+- **After mistake**: "Nessun problema! Gli errori ci aiutano a imparare. Vuoi che te lo spiego di nuovo?"
+- **Success**: "Fantastico Mario! L'hai capito perfettamente. Vuoi provare il prossimo?"
+- **Break time**: "Hai lavorato bene Mario. Che ne dici di fare una pausa?"
+
+### Expanded Role: Complete Tutor and Friend
+
+The app must be more than just a homework helper - it's a **complete companion** for learning and growth:
+
+- **Conversational partner**: Can discuss any topic, not just school subjects
+  - General knowledge questions
+  - Curiosities about the world
+  - Hobbies and interests
+  - Current events (age-appropriate)
+
+- **Reading encouragement**:
+  - Suggest books based on interests
+  - Read together with voice
+  - Discuss stories and characters
+  - Celebrate reading milestones
+
+- **Emotional support during difficulty**:
+  - "Capisco che questo sembra difficile, Mario. Facciamo un passo alla volta."
+  - "È normale sentirsi frustrati. Vuoi che proviamo in un modo diverso?"
+  - "Hai già fatto progressi! Ricordi quando trovavi anche questo difficile?"
+  - Break down overwhelming tasks into tiny steps
+
+- **Motivation and encouragement**:
+  - Daily check-ins: "Come va oggi, Mario?"
+  - Celebrate small wins
+  - Track progress over time
+  - Positive reinforcement without pressure
+
+- **Friend, not just tutor**:
+  - Remember previous conversations
+  - Show interest in student's life
+  - Be available for non-academic chats
+  - Make learning fun and engaging
+
+### Example Conversations
+
+**General conversation**:
+- Mario: "Perché il cielo è blu?"
+- App: "Bella domanda, Mario! Il cielo è blu perché la luce del sole si divide in tanti colori quando entra nell'atmosfera. Il blu si sparge di più degli altri colori. Ti piace guardare il cielo?"
+
+**Encouraging reading**:
+- App: "Mario, hai mai letto le avventure di Geronimo Stilton? Potrebbero piacerti! Vuoi che te ne legga una parte insieme?"
+
+**Supporting through difficulty**:
+- Mario: "Non ce la faccio, è troppo difficile!"
+- App: "Capisco come ti senti, Mario. Quando le cose sembrano difficili, possiamo rallentare. Facciamo una cosa: dividiamo questo esercizio in parti più piccole. Quale parte ti sembra più facile? Cominciamo da quella!"
+
+### Acceptance Criteria
+- User is greeted by name in every interaction
+- All text and voice use consistent empathetic tone
+- No harsh or pressuring language anywhere in app
+- User feels supported and encouraged, not judged
+- Settings allow changing name and preferences
+- App can discuss non-academic topics naturally
+- Reading encouragement features are present
+- Emotional support for difficult moments is consistent
+
+---
+
+## Feature 11: Integration Testing
+
+### Requirements
+- **End-to-end workflows**:
+  1. Sync from Drive → view document → generate mind map
+  2. Record lesson → transcribe → summarize → create quiz
+  3. Capture homework → analyze with Vision → get help
+  4. Check email → extract task → add to calendar
+
+- **Performance**:
+  - App launch < 2 seconds
+  - Sync operations < 30 seconds
+  - No crashes during long recordings
+  - Smooth scrolling and navigation
+
+### Acceptance Criteria
+- All workflows complete successfully
+- Performance meets targets
+- No regressions from current functionality
+- App is stable and reliable
+
+---
+
+## Technical Considerations
+
+### API Keys Required
+- ✅ OpenAI API (GPT-4, Whisper, Vision)
+- ✅ Anthropic API (Claude - alternative to GPT-4)
+- ✅ Google APIs (Drive, Gmail, Calendar)
+
+### Storage Requirements
+- Audio: ~500 MB per 6-hour lesson
+- Images: ~50 MB per document (high-res scans)
+- Total estimate: 5-10 GB for heavy usage
+
+### Battery Optimization
+- Use background modes for recording
+- Compress audio in real-time
+- Minimize network calls during recording
+- Warn user if battery < 20% before long recording
+
+---
+
+## Priority
+
+### Phase 1 (Immediate - This Sprint)
+1. ✅ "Aggiornami" button with UpdateManager
+2. Multi-format document support (images + OCR)
+3. Fix document scanner
+4. Improved mind map visualization
+
+### Phase 2 (Next Sprint)
+1. Extended voice recording (6 hours)
+2. Auto-transcription with Whisper
+3. Subject detection from transcripts
+4. Lesson summaries
+
+### Phase 3 (Future)
+1. Screen capture + GPT-4 Vision
+2. Mind maps from lesson transcripts
+3. Review assistant and quiz generation
+4. UI polish and child-friendliness improvements
+
+---
+
+## Success Metrics
+- Mario can sync all his materials with one button press
+- Mind maps are readable and helpful on iPad
+- 6-hour lessons are recorded, transcribed, and summarized automatically
+- Homework help with screen capture works accurately
+- Overall: Mario uses the app daily without frustration

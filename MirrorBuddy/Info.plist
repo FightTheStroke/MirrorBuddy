@@ -31,5 +31,12 @@
 			</array>
 		</dict>
 	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/OpenDyslexic-Regular.otf</string>
+		<string>Fonts/OpenDyslexic-Bold.otf</string>
+		<string>Fonts/OpenDyslexic-Italic.otf</string>
+		<string>Fonts/OpenDyslexic-Bold-Italic.otf</string>
+	</array>
 </dict>
 </plist>

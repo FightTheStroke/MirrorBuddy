@@ -63,6 +63,10 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Big "Aggiornami" button - front and center
+                    UpdateButtonView()
+                        .padding(.top)
+
                     QuickActionsSection(showingImport: $showingImport)
                     MaterialsSection(
                         materials: materials,
@@ -100,6 +104,8 @@ struct DashboardView: View {
 // MARK: - Quick Actions Section
 struct QuickActionsSection: View {
     @Binding var showingImport: Bool
+    @State private var showingScanner = false
+    @State private var scannedMaterial: Material?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -122,7 +128,7 @@ struct QuickActionsSection: View {
                         title: "Scansiona",
                         color: .green
                     ) {
-                        // TODO: Open camera scanner
+                        showingScanner = true
                     }
 
                     QuickActionCard(
@@ -135,6 +141,15 @@ struct QuickActionsSection: View {
                 }
                 .padding(.horizontal)
             }
+        }
+        .fullScreenCover(isPresented: $showingScanner) {
+            DocumentScannerView { material in
+                scannedMaterial = material
+            }
+            .ignoresSafeArea()
+        }
+        .sheet(item: $scannedMaterial) { material in
+            MaterialDetailView(material: material)
         }
     }
 }

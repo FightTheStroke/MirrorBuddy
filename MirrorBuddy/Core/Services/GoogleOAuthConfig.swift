@@ -1,6 +1,6 @@
 import Foundation
 
-/// Hardcoded Google OAuth configuration loaded from GoogleService-Info.plist
+/// Google OAuth configuration loaded from unified APIKeys-Info.plist
 struct GoogleOAuthConfig {
     static let shared = GoogleOAuthConfig()
 
@@ -8,12 +8,12 @@ struct GoogleOAuthConfig {
     let reversedClientID: String
 
     private init() {
-        // Load from GoogleService-Info.plist
-        guard let path = Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist"),
+        // Load from APIKeys-Info.plist (unified credentials file)
+        guard let path = Bundle.main.path(forResource: "APIKeys-Info", ofType: "plist"),
               let dict = NSDictionary(contentsOfFile: path) as? [String: Any],
-              let clientID = dict["CLIENT_ID"] as? String,
-              let reversedClientID = dict["REVERSED_CLIENT_ID"] as? String else {
-            fatalError("GoogleService-Info.plist not found or invalid")
+              let clientID = dict["GOOGLE_CLIENT_ID"] as? String,
+              let reversedClientID = dict["GOOGLE_REVERSED_CLIENT_ID"] as? String else {
+            fatalError("APIKeys-Info.plist not found or Google OAuth keys missing")
         }
 
         self.clientID = clientID

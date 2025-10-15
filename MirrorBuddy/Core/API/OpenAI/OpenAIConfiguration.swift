@@ -32,14 +32,14 @@ struct OpenAIConfiguration {
         self.maxRetries = maxRetries
     }
 
-    /// Load configuration from environment or UserDefaults
+    /// Load configuration from APIKeys-Info.plist or UserDefaults
     static func loadFromEnvironment() -> OpenAIConfiguration? {
-        // Try to load from environment variable (for development)
-        if let apiKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"], !apiKey.isEmpty {
+        // Try to load from APIKeys-Info.plist (preferred method)
+        if let apiKey = APIKeysConfig.shared.openAIKey, !apiKey.isEmpty {
             return OpenAIConfiguration(apiKey: apiKey)
         }
 
-        // Try to load from UserDefaults (for production)
+        // Fallback to UserDefaults (for manual configuration)
         if let apiKey = UserDefaults.standard.string(forKey: "openai_api_key"), !apiKey.isEmpty {
             return OpenAIConfiguration(apiKey: apiKey)
         }

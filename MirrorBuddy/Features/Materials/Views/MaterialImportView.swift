@@ -165,7 +165,7 @@ struct MaterialImportView: View {
         }
         .fileImporter(
             isPresented: $showingFilePicker,
-            allowedContentTypes: [.pdf, .plainText, .rtf, .image],
+            allowedContentTypes: [.pdf, .plainText, .rtf, .image, .png, .jpeg, .heic],
             allowsMultipleSelection: true
         ) { result in
             handleFileSelection(result)
@@ -185,8 +185,16 @@ struct MaterialImportView: View {
 
         _Concurrency.Task {
             do {
-                // List files from Google Drive (PDFs and Google Docs)
-                let response = try await GoogleDriveClient.shared.listFiles(query: "mimeType='application/pdf' or mimeType='application/vnd.google-apps.document'")
+                // List files from Google Drive (PDFs, Google Docs, and Images)
+                let query = """
+                    mimeType='application/pdf' or \
+                    mimeType='application/vnd.google-apps.document' or \
+                    mimeType='image/png' or \
+                    mimeType='image/jpeg' or \
+                    mimeType='image/heic' or \
+                    mimeType='image/heif'
+                    """
+                let response = try await GoogleDriveClient.shared.listFiles(query: query)
                 await MainActor.run {
                     availableFiles = response.files
                     isImporting = false
@@ -235,11 +243,29 @@ struct MaterialImportView: View {
                     try FileManager.default.copyItem(at: url, to: destinationURL)
 
                     // Create Material entry
+                    let title = fileName
+                        .replacingOccurrences(of: ".pdf", with: "")
+                        .replacingOccurrences(of: ".txt", with: "")
+                        .replacingOccurrences(of: ".png", with: "")
+                        .replacingOccurrences(of: ".jpg", with: "")
+                        .replacingOccurrences(of: ".jpeg", with: "")
+
                     let material = Material(
-                        title: fileName.replacingOccurrences(of: ".pdf", with: "").replacingOccurrences(of: ".txt", with: ""),
+                        title: title,
                         subject: nil
                     )
                     material.pdfURL = destinationURL
+
+                    // Run OCR if it's an image
+                    if OCRService.isImage(url: destinationURL) {
+                        do {
+                            let extractedText = try await OCRService.shared.extractText(from: destinationURL)
+                            material.extractedText = extractedText
+                        } catch {
+                            print("OCR failed for \(fileName): \(error)")
+                            material.extractedText = "[OCR failed]"
+                        }
+                    }
 
                     await MainActor.run {
                         modelContext.insert(material)
@@ -267,12 +293,29 @@ struct MaterialImportView: View {
                     let localURL = try await GoogleDriveDownloadService.shared.downloadFile(fileId: file.id)
 
                     // Create Material entry
+                    let title = file.name
+                        .replacingOccurrences(of: ".pdf", with: "")
+                        .replacingOccurrences(of: ".png", with: "")
+                        .replacingOccurrences(of: ".jpg", with: "")
+                        .replacingOccurrences(of: ".jpeg", with: "")
+
                     let material = Material(
-                        title: file.name.replacingOccurrences(of: ".pdf", with: ""),
+                        title: title,
                         subject: nil  // User can assign later
                     )
                     material.googleDriveFileID = file.id
                     material.pdfURL = localURL
+
+                    // Run OCR if it's an image
+                    if OCRService.isImage(url: localURL) {
+                        do {
+                            let extractedText = try await OCRService.shared.extractText(from: localURL)
+                            material.extractedText = extractedText
+                        } catch {
+                            print("OCR failed for \(file.name): \(error)")
+                            material.extractedText = "[OCR failed]"
+                        }
+                    }
 
                     await MainActor.run {
                         modelContext.insert(material)

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- AI Service API Keys -->
+	<key>OPENAI_API_KEY</key>
+	<string>sk-proj-YOUR_OPENAI_KEY_HERE</string>
+	<key>ANTHROPIC_API_KEY</key>
+	<string>sk-ant-YOUR_ANTHROPIC_KEY_HERE</string>
+	<key>GEMINI_API_KEY</key>
+	<string>AIza_YOUR_GEMINI_KEY_HERE</string>
+	<key>STABILITY_API_KEY</key>
+	<string>sk-YOUR_STABILITY_KEY_HERE</string>
+
+	<!-- Google OAuth Credentials -->
+	<key>GOOGLE_CLIENT_ID</key>
+	<string>YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com</string>
+	<key>GOOGLE_REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.YOUR_GOOGLE_CLIENT_ID</string>
+	<key>GOOGLE_BUNDLE_ID</key>
+	<string>com.mirror-labs.MirrorBuddy</string>
+</dict>
+</plist>
