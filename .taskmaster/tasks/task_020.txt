@@ -1,0 +1,38 @@
+# Task ID: 20
+# Title: Implement Summary Generation with Apple Intelligence
+# Status: done
+# Dependencies: 19
+# Priority: high
+# Description: Create functionality to generate summaries of study materials using Apple Intelligence.
+# Details:
+1. Integrate with Apple Intelligence Foundation Models
+2. Implement text summarization functionality
+3. Create prompts for effective summarization
+4. Process extracted PDF text in chunks if needed
+5. Generate summaries at different detail levels
+6. Preserve key concepts and terminology
+7. Add fallback to OpenAI if Apple Intelligence fails
+8. Store generated summaries in SwiftData
+
+# Test Strategy:
+Test summary generation with various text types. Verify key concepts are preserved. Test fallback mechanism with simulated failures. Measure performance and quality of summaries.
+
+# Subtasks:
+## 1. Integrate with Apple Intelligence Foundation Models [done]
+### Dependencies: None
+### Description: Set up the necessary infrastructure to connect with Apple Intelligence Foundation Models for text summarization capabilities.
+### Details:
+Implement the required API connections to Apple Intelligence. Add necessary frameworks and dependencies to the project. Set up authentication and API key management. Create a service layer that handles communication with Apple Intelligence models. Ensure proper error handling and response parsing.
+
+## 2. Implement Text Summarization Core Functionality [done]
+### Dependencies: 20.1
+### Description: Develop the core functionality to process and summarize text content using Apple Intelligence models with appropriate prompts.
+### Details:
+Create a SummaryGenerator class that handles text processing. Implement methods to chunk large text documents if needed. Design effective prompts for summarization at different detail levels. Ensure key concepts and terminology are preserved in summaries. Add metrics to track summarization quality and performance. Implement caching mechanism for frequently summarized content.
+
+## 3. Implement Fallback and Storage Mechanisms [done]
+### Dependencies: 20.2
+### Description: Create fallback to OpenAI when Apple Intelligence fails and implement SwiftData storage for generated summaries.
+### Details:
+Implement error detection for Apple Intelligence API failures. Create OpenAI fallback service with similar interface. Design and implement SwiftData models for storing summaries. Add relationship between original content and summaries in data model. Implement background processing for summary generation. Create UI indicators for summary generation status. Add refresh mechanisms for regenerating outdated summaries.
+

@@ -1,0 +1,69 @@
+# Task ID: 104
+# Title: Integrate ContextBannerView into Dashboard
+# Status: pending
+# Dependencies: 32
+# Priority: medium
+# Description: Add ContextBannerView to the top of the ScrollView in MainTabView.swift to provide persistent context awareness of active subject and material across all dashboard interactions.
+# Details:
+1. Locate the ScrollView in MainTabView.swift at line 62 where there is currently empty space.
+
+2. Import the ContextBannerView component if not already imported:
+```swift
+import SwiftUI
+
+struct MainTabView: View {
+    // Existing code...
+```
+
+3. Add the ContextBannerView at the top of the ScrollView:
+```swift
+ScrollView {
+    VStack(spacing: 16) {
+        ContextBannerView() // Add this line
+        
+        // Existing content...
+    }
+    .padding()
+}
+```
+
+4. Ensure the ContextBannerView displays the current context information:
+   - Active subject (name, color)
+   - Current material being studied
+   - Any other relevant context information
+
+5. Style the ContextBannerView to match the dashboard design:
+   - Use appropriate padding and spacing
+   - Ensure text is readable and accessible
+   - Apply consistent color scheme
+
+6. Make sure the ContextBannerView remains visible at the top of the ScrollView even when scrolling down.
+
+7. Test the implementation on different device sizes to ensure proper layout and visibility.
+
+8. Verify that the context information updates correctly when the user switches subjects or materials in other parts of the app.
+
+# Test Strategy:
+1. Visual inspection:
+   - Verify ContextBannerView appears at the top of the ScrollView in MainTabView
+   - Confirm it displays the correct subject and material information
+   - Check that styling is consistent with app design
+
+2. Functional testing:
+   - Change the active subject in the app and verify the banner updates accordingly
+   - Change the active material and verify the banner reflects the change
+   - Test navigation between tabs to ensure context persistence
+
+3. UI testing:
+   - Test on different device sizes (iPhone SE, iPhone 14, iPhone 14 Pro Max, iPad)
+   - Verify the banner is visible and properly sized on all devices
+   - Check that the banner doesn't overlap with other UI elements
+
+4. Accessibility testing:
+   - Verify text contrast meets accessibility standards
+   - Test with VoiceOver to ensure context information is properly announced
+   - Check that the banner works with Dynamic Type settings
+
+5. Performance testing:
+   - Verify that adding the banner doesn't cause performance issues
+   - Check that scrolling remains smooth with the banner in place

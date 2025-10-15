@@ -1,0 +1,18 @@
+# Task ID: 75
+# Title: Implement Context Banner for Working Memory Support
+# Status: done
+# Dependencies: 26, 28, 32, 44
+# Priority: high
+# Description: Create a persistent context banner showing current subject, task, and progress.
+# Details:
+1. Design context banner UI component
+2. Implement current subject display
+3. Add current task information
+4. Create progress indicators
+5. Implement context switching animation
+6. Add voice command for context information
+7. Create expanded context view
+8. Implement context history
+
+# Test Strategy:
+Test context banner visibility across app. Verify context updates correctly when switching tasks. Test voice command for context information. Evaluate usefulness for working memory support.

@@ -1,0 +1,11 @@
+# Task ID: 86
+# Title: Integrate OCR for Handwritten and Printed Italian Text
+# Status: done
+# Dependencies: 84, 85
+# Priority: high
+# Description: Use Vision framework to extract Italian text, including handwritten notes, from imported images and scanned documents.
+# Details:
+Configure Vision OCR for Italian language. Enable handwritten text recognition if supported. Store extracted text in Material.extractedText. Handle errors gracefully.
+
+# Test Strategy:
+Import images with printed and handwritten Italian text. Validate extraction accuracy and storage. Test error handling.

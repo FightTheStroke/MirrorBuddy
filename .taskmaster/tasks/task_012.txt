@@ -1,0 +1,71 @@
+# Task ID: 12
+# Title: Create Google Gemini API Client
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Develop a client for Google Gemini 2.5 Pro API for Google Workspace integration.
+# Details:
+Create a GeminiClient class with:
+1. Configuration for API keys and endpoints
+2. Methods for text generation and analysis
+3. Methods for Drive folder research
+4. Methods for Calendar event parsing
+5. Methods for Gmail assignment extraction
+6. Error handling and retry logic
+7. Rate limiting implementation
+8. Response parsing and model mapping
+
+Implement using Swift concurrency (async/await) and proper error handling.
+
+# Test Strategy:
+Create unit tests with mock responses for each API endpoint. Test error handling, retry logic, and rate limiting. Create integration tests with actual API calls using test credentials.
+
+# Subtasks:
+## 1. Implement GeminiClient Configuration for API Keys and Endpoints [done]
+### Dependencies: None
+### Description: Set up configuration management for API keys and endpoints in GeminiClient, supporting secure storage and environment variable usage.
+### Details:
+Design GeminiClient to accept API keys via environment variables (e.g., GEMINI_API_KEY) or explicit configuration. Ensure endpoints are configurable for different Gemini models and support secure key handling.
+
+## 2. Develop Text Generation and Analysis Methods [done]
+### Dependencies: 12.1
+### Description: Create async methods for text generation and analysis using Gemini 2.5 Pro API endpoints.
+### Details:
+Implement methods like generateText(prompt:) and analyzeText(input:) using Swift concurrency. Ensure requests are properly formed and responses are parsed for text output.
+
+## 3. Implement Drive Folder Research Methods [done]
+### Dependencies: 12.1
+### Description: Add methods to GeminiClient for researching and summarizing Google Drive folder contents via Gemini API.
+### Details:
+Design methods to accept Drive folder identifiers, call Gemini API for summarization or research, and parse structured results. Handle permissions and large folder cases.
+
+## 4. Add Calendar Event Parsing Methods [done]
+### Dependencies: 12.1
+### Description: Implement methods to parse and analyze Google Calendar events using Gemini API.
+### Details:
+Create async methods to send event data to Gemini API, extract insights, and map responses to event models. Support batch processing of multiple events.
+
+## 5. Create Gmail Assignment Extraction Methods [done]
+### Dependencies: 12.1
+### Description: Develop methods for extracting assignments or tasks from Gmail messages using Gemini API.
+### Details:
+Implement methods to process Gmail message content, call Gemini API for assignment extraction, and map results to structured task models.
+
+## 6. Implement Robust Error Handling and Retry Logic [done]
+### Dependencies: 12.2, 12.3, 12.4, 12.5
+### Description: Add comprehensive error handling and retry logic to all GeminiClient methods.
+### Details:
+Define error types for network, API, and parsing failures. Implement exponential backoff for transient errors and ensure all async methods propagate errors correctly.
+
+## 7. Integrate Rate Limiting Mechanism [done]
+### Dependencies: 12.6
+### Description: Implement rate limiting in GeminiClient to comply with Gemini API quotas and prevent throttling.
+### Details:
+Track request counts and timing, enforce per-minute/hour limits, and queue or reject excess requests. Make rate limits configurable.
+
+## 8. Develop Response Parsing and Model Mapping Utilities [done]
+### Dependencies: 12.2, 12.3, 12.4, 12.5
+### Description: Create utilities for parsing Gemini API responses and mapping them to internal models.
+### Details:
+Implement parsers for all expected Gemini API response formats. Map parsed data to Swift models for text, Drive, Calendar, and Gmail outputs.
+

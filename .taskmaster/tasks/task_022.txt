@@ -1,0 +1,38 @@
+# Task ID: 22
+# Title: Implement DALL-E 3 Image Generation for Mind Map Nodes
+# Status: done
+# Dependencies: 11, 21
+# Priority: high
+# Description: Create functionality to generate simplified images for mind map nodes using DALL-E 3.
+# Details:
+1. Create prompts for simplified educational images
+2. Implement DALL-E 3 API calls for image generation
+3. Process and optimize generated images
+4. Store images in app container
+5. Associate images with mind map nodes
+6. Implement image caching for performance
+7. Add fallback to generic icons if image generation fails
+8. Implement batch processing for multiple nodes
+
+# Test Strategy:
+Test image generation for various concepts. Verify image quality and relevance. Test fallback mechanism with simulated failures. Measure performance with batch processing.
+
+# Subtasks:
+## 1. Set up DALL-E 3 API integration [done]
+### Dependencies: None
+### Description: Implement the necessary API client to connect with DALL-E 3 for image generation
+### Details:
+Create an API client that can communicate with DALL-E 3. This includes setting up authentication, handling API keys securely, implementing request/response handling, and error management. Test the connection to ensure proper communication with the DALL-E service.
+
+## 2. Develop image generation for mind map nodes [done]
+### Dependencies: 22.1
+### Description: Create functionality to generate relevant images for mind map nodes based on their content
+### Details:
+Implement a function that takes a mind map node's text content and generates an appropriate prompt for DALL-E 3. The function should handle sending the request to the DALL-E API (using the integration from subtask 1), receiving the generated image, and processing it for display. Include options for image size, style, and other relevant parameters.
+
+## 3. Integrate image display in mind map UI [done]
+### Dependencies: 22.2
+### Description: Update the mind map UI to display generated images within nodes
+### Details:
+Modify the mind map node component to support displaying images. Implement UI controls for users to generate/regenerate images for specific nodes. Add image caching to prevent unnecessary API calls. Ensure proper handling of loading states and errors. Test the complete flow from node creation to image generation and display.
+

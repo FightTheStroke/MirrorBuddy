@@ -1,0 +1,11 @@
+# Task ID: 88
+# Title: Enable Screen Capture and Annotation for Homework Help
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Allow users to capture the screen/camera view and annotate problem areas using touch or iPad Pencil.
+# Details:
+Implement screen/camera capture. Add drawing/highlighting tools compatible with iPad Pencil. Save annotated images for analysis.
+
+# Test Strategy:
+Capture screen, annotate with finger and Pencil. Verify image is saved and ready for AI analysis.

@@ -1,0 +1,68 @@
+# Task ID: 33
+# Title: Implement Study Coach Personality and Prompting
+# Status: done
+# Dependencies: 31, 32
+# Priority: high
+# Description: Create the personality and prompting system for the AI study coach.
+# Details:
+1. Design coach personality traits (patient, encouraging, never judgmental)
+2. Implement system prompts for OpenAI
+3. Add Italian and English language support
+4. Create adaptive pacing based on user responses
+5. Implement concept simplification logic
+6. Add concrete examples generation
+7. Create positive reinforcement patterns
+8. Implement conversation memory and context
+
+# Test Strategy:
+Test coach responses in various scenarios. Verify language support for Italian and English. Test concept simplification with complex topics. Evaluate personality consistency.
+
+# Subtasks:
+## 1. Define Core Personality Traits for Study Coach [done]
+### Dependencies: None
+### Description: Establish the fundamental personality traits that will define the AI study coach's interaction style.
+### Details:
+Create a comprehensive personality profile including traits like patience, encouragement, and non-judgmental attitude. Define how these traits manifest in different coaching scenarios. Document tone guidelines, empathy levels, and response patterns. Include examples of appropriate and inappropriate responses.
+
+## 2. Develop System Prompts for OpenAI Integration [done]
+### Dependencies: 33.1
+### Description: Create the system prompts that will guide the OpenAI model to consistently embody the study coach personality.
+### Details:
+Develop a set of system prompts that effectively communicate the coach personality to the OpenAI model. Include context about educational coaching, boundaries, and interaction guidelines. Create prompt variations for different coaching scenarios (explaining concepts, providing feedback, motivating students). Test prompts with the API to verify consistent personality alignment.
+
+## 3. Implement Multilingual Support (Italian and English) [done]
+### Dependencies: 33.2
+### Description: Add support for both Italian and English languages in the study coach system prompts and responses.
+### Details:
+Translate all system prompts to Italian while preserving personality traits. Implement language detection to automatically switch between languages. Create language-specific variations of coaching responses that account for cultural differences. Ensure personality consistency across both languages. Document translation guidelines for future language additions.
+
+## 4. Develop Adaptive Pacing Mechanism [done]
+### Dependencies: 33.2
+### Description: Create a system that adjusts the coach's teaching pace based on user responses and comprehension signals.
+### Details:
+Implement logic to detect user comprehension signals in responses. Create pacing adjustment algorithms that slow down or speed up based on user understanding. Develop prompts that guide the AI to recognize confusion, confidence, or mastery. Build a feedback loop system that continuously refines pacing based on user interaction patterns. Document pacing strategies for different learning scenarios.
+
+## 5. Create Concept Simplification Framework [done]
+### Dependencies: 33.2, 33.4
+### Description: Develop a framework for the AI coach to simplify complex concepts based on user comprehension level.
+### Details:
+Create guidelines for breaking down complex topics into simpler components. Implement prompting techniques that guide the AI to use analogies, metaphors, and simplified language. Develop a complexity scale to categorize explanations. Build a library of simplification patterns for common academic concepts. Create prompts that encourage the AI to check understanding before proceeding to more complex explanations.
+
+## 6. Implement Examples Generation System [done]
+### Dependencies: 33.2, 33.5
+### Description: Create a system for the AI coach to generate relevant, concrete examples that illustrate concepts being taught.
+### Details:
+Develop prompting techniques that guide the AI to generate domain-specific examples. Create guidelines for examples that are age-appropriate and relevant to the student's context. Implement a framework for examples that progress from simple to complex. Build prompts that encourage the AI to use real-world applications of concepts. Include verification steps to ensure examples are accurate and appropriate.
+
+## 7. Design Positive Reinforcement System [done]
+### Dependencies: 33.1, 33.2
+### Description: Create patterns and prompts for the AI coach to provide effective positive reinforcement to students.
+### Details:
+Develop a variety of positive reinforcement phrases and techniques that align with the coach personality. Create guidelines for when and how to provide encouragement. Implement prompts that help the AI recognize achievement milestones. Build a framework for balancing praise with constructive feedback. Design reinforcement patterns that avoid generic praise and instead highlight specific achievements or efforts.
+
+## 8. Implement Conversation Memory and Context Management [done]
+### Dependencies: 33.2
+### Description: Create a system for the AI coach to maintain conversation context and refer back to previous interactions.
+### Details:
+Design a context management system that tracks key concepts discussed, student progress, and areas of difficulty. Implement prompting techniques that guide the AI to reference previous conversations appropriately. Create a framework for progressive learning that builds on past interactions. Develop methods for summarizing previous sessions for continuity. Build a system for identifying and addressing recurring misconceptions based on conversation history.
+

@@ -1,0 +1,57 @@
+# Task ID: 16
+# Title: Implement Google Drive OAuth 2.0 Login Flow
+# Status: done
+# Dependencies: 13, 15
+# Priority: high
+# Description: Create the OAuth 2.0 authentication flow for Google Drive access.
+# Details:
+1. Register app in Google Cloud Console
+2. Configure OAuth consent screen
+3. Generate client ID and secret
+4. Implement ASWebAuthenticationSession for OAuth flow
+5. Store refresh tokens securely in Keychain
+6. Implement token refresh logic
+7. Add sign-out functionality
+8. Handle authentication errors
+9. Create a user-friendly authentication UI
+
+# Test Strategy:
+Test complete OAuth flow from login to token storage. Verify token refresh works correctly. Test error handling during authentication. Verify sign-out functionality works properly.
+
+# Subtasks:
+## 1. Register App in Google Cloud Console and Configure OAuth Consent Screen [done]
+### Dependencies: None
+### Description: Set up the project in Google Cloud Console and configure the OAuth consent screen with required information.
+### Details:
+Create a new project in Google Cloud Console. Configure the OAuth consent screen with app name, user support email, developer contact information, and app logo. Add required scopes for Google Drive access (https://www.googleapis.com/auth/drive). Set up authorized domains and test users if using external user type.
+
+## 2. Generate OAuth Client ID and Secret [done]
+### Dependencies: 16.1
+### Description: Create OAuth 2.0 client credentials for the application to use in the authentication flow.
+### Details:
+In Google Cloud Console, navigate to Credentials section. Create a new OAuth client ID for iOS application. Add the app's bundle identifier and configure any necessary redirect URIs. Securely store the generated client ID and client secret for use in the application code.
+
+## 3. Implement ASWebAuthenticationSession for OAuth Flow [done]
+### Dependencies: 16.2
+### Description: Create the authentication flow using ASWebAuthenticationSession to handle the OAuth 2.0 authorization process.
+### Details:
+Implement a service class to handle the OAuth flow. Use ASWebAuthenticationSession to present the Google sign-in page. Configure the authorization URL with appropriate scopes, client ID, and redirect URI. Handle the callback URL to extract the authorization code. Implement the code exchange for access and refresh tokens. Create proper error handling for authentication failures.
+
+## 4. Implement Secure Token Storage in Keychain [done]
+### Dependencies: 16.3
+### Description: Create a secure storage mechanism for OAuth tokens using the iOS Keychain.
+### Details:
+Implement a KeychainService class to handle secure storage of tokens. Store refresh tokens, access tokens, and token expiration dates in the Keychain with appropriate access controls. Add methods for retrieving, updating, and deleting tokens. Implement encryption for additional security. Ensure tokens are accessible across app launches but protected from unauthorized access.
+
+## 5. Implement Token Refresh Logic [done]
+### Dependencies: 16.4
+### Description: Create the logic to automatically refresh access tokens when they expire using the stored refresh token.
+### Details:
+Implement a TokenManager class to handle token lifecycle. Add logic to check token expiration before API calls. Create a refresh mechanism that uses the refresh token to obtain a new access token when needed. Implement proper error handling for refresh failures, including prompting for re-authentication when refresh tokens are invalid. Add background refresh capability to ensure tokens are always valid.
+
+## 6. Create User-Friendly Authentication UI and Sign-Out Functionality [done]
+### Dependencies: 16.5
+### Description: Develop a user interface for the authentication process and implement sign-out capability.
+### Details:
+Design and implement a login button and authentication screens. Add loading indicators during the authentication process. Create error messages for authentication failures. Implement a sign-out button and functionality that revokes tokens and clears stored credentials. Add account information display to show the currently authenticated user. Implement proper state management to reflect authentication status throughout the app.
+

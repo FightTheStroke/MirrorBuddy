@@ -1,0 +1,18 @@
+# Task ID: 40
+# Title: Implement Mind Map Voice Navigation
+# Status: done
+# Dependencies: 29, 39
+# Priority: medium
+# Description: Create voice commands for navigating mind maps without touch.
+# Details:
+1. Implement voice commands for mind map navigation
+2. Add "Explain this node" functionality
+3. Create "What's connected to this?" command
+4. Implement "Next topic" navigation
+5. Add "Zoom in on [subject]" functionality
+6. Create visual indicators for voice focus
+7. Implement error handling for ambiguous commands
+8. Add help system for available commands
+
+# Test Strategy:
+Test voice navigation with various mind maps. Verify command recognition accuracy. Test navigation between nodes. Evaluate user experience with voice-only navigation.

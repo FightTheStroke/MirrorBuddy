@@ -1,0 +1,45 @@
+# Task ID: 44
+# Title: Create Task List View
+# Status: done
+# Dependencies: 7, 42, 43, 82
+# Priority: high
+# Description: Design and implement the task list view for assignments and due dates.
+# Details:
+1. Create a SwiftUI view for task lists
+2. Implement today's tasks section
+3. Add upcoming week view
+4. Create overdue tasks section with encouraging messaging
+5. Implement subject color-coding
+6. Add voice command support
+7. Create large checkboxes (44×44pt)
+8. Implement sorting and filtering options
+9. Add search functionality
+
+# Test Strategy:
+Test view with various task combinations. Verify voice commands work correctly. Test sorting and filtering. Measure performance with large number of tasks.
+
+# Subtasks:
+## 1. Design and Implement Main Task List View [done]
+### Dependencies: None
+### Description: Create a SwiftUI view for displaying task lists, including basic UI elements such as task items and checkboxes.
+### Details:
+Use SwiftUI's List structure to create a scrollable list of tasks. Implement large checkboxes (44×44pt) for marking tasks as done. Ensure the view is responsive and adaptable to different screen sizes.
+
+## 2. Implement Task Sections and Color-Coding [done]
+### Dependencies: 44.1
+### Description: Develop sections for today's tasks, upcoming week tasks, and overdue tasks. Implement subject color-coding to differentiate tasks by subject.
+### Details:
+Use SwiftUI's Section structure to organize tasks into different sections. Implement color-coding by using different colors for each subject, ensuring accessibility and visual clarity.
+
+## 3. Add Filtering, Sorting, and Search Functionality [done]
+### Dependencies: 44.1, 44.2
+### Description: Implement features to filter tasks by subject or due date, sort tasks by priority or due date, and add a search bar to find specific tasks.
+### Details:
+Use SwiftUI's ForEach structure with conditional statements to filter tasks. Implement sorting using array sorting methods. Add a search bar that filters tasks based on user input.
+
+## 4. Integrate Voice Commands and Accessibility Features [done]
+### Dependencies: 44.1, 44.3
+### Description: Add voice command support for tasks and ensure accessibility features such as large touch targets are implemented.
+### Details:
+Use speech recognition APIs to enable voice commands for adding, marking, or deleting tasks. Ensure all UI elements have sufficient size and spacing for accessibility.
+

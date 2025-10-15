@@ -1,0 +1,18 @@
+# Task ID: 71
+# Title: Create Deployment Guide
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Document the process for deploying the app to TestFlight and App Store.
+# Details:
+1. Document code signing requirements
+2. Create App Store Connect setup instructions
+3. Add TestFlight distribution process
+4. Document App Store submission process
+5. Create release checklist
+6. Add App Store screenshots preparation guide
+7. Document privacy policy requirements
+8. Create marketing materials guidelines
+
+# Test Strategy:
+Verify guide by following it for a test deployment. Test TestFlight distribution process. Review App Store submission requirements for accuracy. Ensure all required assets are documented.

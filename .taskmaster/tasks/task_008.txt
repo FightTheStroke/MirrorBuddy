@@ -1,0 +1,28 @@
+# Task ID: 8
+# Title: Define SwiftData Models for UserProgress
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create SwiftData models for UserProgress entity to track XP, levels, and achievements.
+# Details:
+Create a UserProgress model with the following properties:
+- id: UUID (primary key, singleton)
+- xp: Int (default: 0)
+- level: Int (default: 1)
+- achievements: Relationship to Achievement entities (to-many)
+- dailyStreak: Int (default: 0)
+- lastActiveDate: Date
+
+Create an Achievement model with:
+- id: UUID (primary key)
+- title: String
+- description: String
+- iconName: String (SF Symbol name)
+- unlockedAt: Date (optional)
+- unlocked: Bool (default: false)
+- xpReward: Int
+
+Implement methods for XP calculation, level progression, and achievement unlocking.
+
+# Test Strategy:
+Create unit tests for UserProgress and Achievement models. Test XP accumulation, level progression logic, and achievement unlocking functionality.

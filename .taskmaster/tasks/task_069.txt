@@ -1,0 +1,19 @@
+# Task ID: 69
+# Title: Create User Guide
+# Status: done
+# Dependencies: 26, 28, 32, 35, 39, 44, 46, 47, 48
+# Priority: medium
+# Description: Create a user-friendly guide for using the app.
+# Details:
+1. Create getting started section
+2. Document material management features
+3. Add voice coach usage instructions
+4. Document vision capabilities
+5. Create mind map usage guide
+6. Add task management instructions
+7. Document gamification features
+8. Create troubleshooting section
+9. Add FAQ section
+
+# Test Strategy:
+Review guide with potential users for clarity. Verify instructions match actual app behavior. Test guide with users unfamiliar with the app. Ensure accessibility of the guide itself.

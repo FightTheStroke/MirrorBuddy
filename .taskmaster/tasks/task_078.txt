@@ -1,0 +1,18 @@
+# Task ID: 78
+# Title: Implement Study Time Tracking
+# Status: done
+# Dependencies: 46
+# Priority: medium
+# Description: Create functionality to track study time for XP rewards and analytics.
+# Details:
+1. Implement study session tracking
+2. Create automatic pause detection
+3. Add manual session control
+4. Implement XP calculation based on time
+5. Create daily and weekly summaries
+6. Add study streak tracking
+7. Implement subject-specific time tracking
+8. Create visualization of study patterns
+
+# Test Strategy:
+Test study time tracking accuracy. Verify pause detection works correctly. Test XP calculation based on time. Evaluate usefulness of study pattern visualization.

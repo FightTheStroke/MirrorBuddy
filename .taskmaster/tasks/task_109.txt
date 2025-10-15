@@ -1,0 +1,68 @@
+# Task ID: 109
+# Title: Refactor MainTabView into Separate Files with Dedicated ViewModels
+# Status: pending
+# Dependencies: 32, 44
+# Priority: medium
+# Description: Split the MainTabView into separate tab view files with dedicated view models to improve code organization, reduce responsibility overlap, and enhance maintainability.
+# Details:
+1. Create the following new files:
+   - DashboardTabView.swift: UI for the dashboard tab
+   - DashboardViewModel.swift: Business logic for dashboard tab
+   - StudyTabView.swift: UI for the study tab
+   - StudyViewModel.swift: Business logic for study tab
+   - TasksTabView.swift: UI for the tasks tab
+   - TasksViewModel.swift: Business logic for tasks tab
+
+2. For each view model:
+   - Implement proper state management using @Published properties
+   - Move relevant business logic from MainTabView
+   - Create initialization methods with necessary dependencies
+   - Implement proper memory management
+
+3. For each view:
+   - Move relevant UI code from MainTabView
+   - Connect to corresponding view model
+   - Ensure consistent styling and behavior
+
+4. Refactor MainTabView.swift to:
+   - Act as a lightweight coordinator
+   - Handle only tab selection
+   - Initialize and inject view models
+   - Use TabView to display the separate tab views
+
+5. Integrate VoiceConversationView (which already exists) as the voice tab
+
+6. Update any references to MainTabView in other parts of the codebase
+
+7. Ensure proper navigation and state persistence between tabs
+
+8. Maintain existing functionality while improving code organization
+
+# Test Strategy:
+1. Unit Tests:
+   - Create unit tests for each new view model
+   - Verify business logic works correctly in isolation
+   - Test state management and data flow
+
+2. UI Tests:
+   - Verify each tab displays correctly
+   - Test navigation between tabs
+   - Ensure tab state is preserved when switching between tabs
+
+3. Integration Tests:
+   - Test the interaction between the tab views and their view models
+   - Verify data flows correctly between components
+
+4. Manual Testing:
+   - Navigate through all tabs and verify functionality matches pre-refactor behavior
+   - Test edge cases like rapid tab switching
+   - Verify performance is maintained or improved
+
+5. Code Review:
+   - Ensure proper separation of concerns
+   - Verify no business logic remains in MainTabView
+   - Check for consistent coding patterns across new files
+
+6. Regression Testing:
+   - Verify all existing functionality continues to work
+   - Test on multiple device sizes to ensure responsive design

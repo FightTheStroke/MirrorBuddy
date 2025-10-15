@@ -1,0 +1,43 @@
+# Task ID: 83
+# Title: Refactor Subject to Database-Backed System
+# Status: done
+# Dependencies: 3, 82
+# Priority: critical
+# Description: Convert Mario's 10 subjects from enum to SwiftData entity, allowing customization via Settings. Depends on localization infrastructure.
+# Details:
+1. Create new SubjectEntity SwiftData model:
+   - id: UUID
+   - name: String (localized)
+   - iconName: String (SF Symbol name)
+   - colorName: String (color identifier)
+   - sortOrder: Int
+   - isActive: Bool
+   - isCustom: Bool (user-created vs. default)
+
+2. Update Material model:
+   - Change subject: Subject enum to subject: SubjectEntity relationship
+   - Add migration logic for existing data
+
+3. Create SubjectService:
+   - CRUD operations for subjects
+   - Default subjects initialization (Mario's specific subjects)
+   - Import/export functionality
+
+4. Seed default subjects for Mario:
+   - Based on Mario's schedule/needs
+   - Mark as non-custom (cannot be deleted, only deactivated)
+
+5. Update all UI code:
+   - Replace Subject enum references with SubjectEntity
+   - Update queries and filters
+   - Handle subject selection in forms
+
+6. Add Subject management in Settings:
+   - List all subjects with active/inactive toggle
+   - Reorder subjects (drag & drop)
+   - Add custom subjects
+   - Edit subject properties (name, icon, color)
+   - Cannot delete default subjects (only deactivate)
+
+# Test Strategy:
+Create, edit, and delete custom subjects. Verify default subjects cannot be deleted. Test subject filtering and sorting. Verify existing materials maintain subject relationships after migration. Test subject localization.

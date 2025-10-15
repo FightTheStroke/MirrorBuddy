@@ -1,0 +1,116 @@
+# Task ID: 105
+# Title: Refactor or Remove Quick Actions Section
+# Status: pending
+# Dependencies: 3, 4, 44, 55
+# Priority: low
+# Description: Evaluate and implement improvements to the "Azioni rapide" (Quick Actions) section by either creating a dynamic carousel based on user context or removing the section if it provides limited value.
+# Details:
+1. Analyze the current implementation of Quick Actions in MainTabView.swift:110
+2. Evaluate two possible approaches:
+   a. Dynamic carousel approach:
+      - Create a QuickActionProvider service that determines relevant actions based on:
+        * Recent materials the user has accessed
+        * Tasks with upcoming deadlines
+        * Calendar events in the next 24-48 hours
+      - Design a horizontally scrollable carousel UI component
+      - Implement action buttons with appropriate icons and labels
+      - Add animations for smooth transitions when actions change
+      - Ensure actions are contextually relevant to Mario's workflow
+   
+   b. Removal approach:
+      - Assess the current usage and value of the section
+      - Consider user testing to determine if the section is helpful
+      - If removing, ensure proper UI adjustments to maintain visual balance
+      - Update spacing and layout to compensate for the removed section
+
+3. Implementation details:
+   - If implementing dynamic carousel:
+     ```swift
+     struct QuickAction {
+         let id: UUID = UUID()
+         let title: String
+         let icon: String // SF Symbol name
+         let action: () -> Void
+         let badgeCount: Int?
+     }
+     
+     class QuickActionProvider {
+         func getRelevantActions() -> [QuickAction] {
+             // Logic to determine contextually relevant actions
+             // based on app state, user history, and upcoming events
+         }
+     }
+     
+     struct QuickActionsCarousel: View {
+         @StateObject private var provider = QuickActionProvider()
+         @State private var actions: [QuickAction] = []
+         
+         var body: some View {
+             ScrollView(.horizontal, showsIndicators: false) {
+                 HStack(spacing: 12) {
+                     ForEach(actions, id: \.id) { action in
+                         Button(action: action.action) {
+                             VStack {
+                                 Image(systemName: action.icon)
+                                     .font(.system(size: 24))
+                                 Text(action.title)
+                                     .font(.caption)
+                             }
+                             .padding()
+                             .background(Color.secondarySystemBackground)
+                             .cornerRadius(12)
+                             .overlay(
+                                 action.badgeCount != nil ?
+                                 BadgeView(count: action.badgeCount!) : nil
+                             )
+                         }
+                     }
+                 }
+                 .padding(.horizontal)
+             }
+             .onAppear {
+                 actions = provider.getRelevantActions()
+             }
+         }
+     }
+     ```
+
+4. Decision criteria:
+   - Conduct a brief user test with 3-5 users to determine if quick actions are useful
+   - Analyze app analytics to see if current static buttons are being used
+   - Consider Mario's workflow and whether contextual actions would improve efficiency
+   - Make final implementation decision based on findings
+
+# Test Strategy:
+1. Functional testing:
+   - If implementing dynamic carousel:
+     * Verify that actions update based on user context
+     * Test that tapping each action performs the expected function
+     * Confirm that the carousel properly handles different numbers of actions
+     * Test horizontal scrolling behavior on different device sizes
+     * Verify badge counts update correctly
+
+   - If removing the section:
+     * Verify that the UI layout adjusts properly without the section
+     * Confirm that no functionality is lost or that alternatives exist
+     * Test that navigation flows remain intuitive
+
+2. User experience testing:
+   - Conduct A/B testing with both implementations
+   - Gather feedback on which approach better serves Mario's workflow
+   - Measure time-to-task completion with and without quick actions
+   - Observe natural usage patterns to determine if quick actions are discovered and used
+
+3. Performance testing:
+   - Measure any impact on app startup time
+   - Test scrolling performance of the carousel with many items
+   - Verify that dynamic content loading doesn't cause UI jank
+
+4. Accessibility testing:
+   - Verify VoiceOver compatibility
+   - Test dynamic text size support
+   - Confirm touch targets meet minimum size requirements (44×44pt)
+
+5. Integration testing:
+   - Verify that the implementation works correctly with the rest of the dashboard
+   - Test that state changes in other parts of the app are reflected in quick actions

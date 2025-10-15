@@ -1,0 +1,18 @@
+# Task ID: 47
+# Title: Implement Achievements and Badges System
+# Status: done
+# Dependencies: 8, 46
+# Priority: medium
+# Description: Create the achievements and badges system for gamification.
+# Details:
+1. Define achievement types and criteria
+2. Implement achievement tracking logic
+3. Create badge unlocking system
+4. Add notifications for unlocked achievements
+5. Implement achievement display UI
+6. Create badge collection view
+7. Add progress tracking for in-progress achievements
+8. Implement sharing of achievements
+
+# Test Strategy:
+Test achievement unlocking with various criteria. Verify notifications work correctly. Test progress tracking for in-progress achievements. Evaluate badge design and visibility.

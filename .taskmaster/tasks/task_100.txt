@@ -1,0 +1,217 @@
+# Task ID: 100
+# Title: Implement Voice Conversation Persistence with SwiftData
+# Status: pending
+# Dependencies: 99, 31, 34
+# Priority: high
+# Description: Create persistent storage for voice conversations using SwiftData, linking them to materials/subjects and ensuring proper UI integration for conversation history.
+# Details:
+1. Create SwiftData models in Core/Models:
+   - VoiceConversation.swift:
+     ```swift
+     @Model
+     final class VoiceConversation {
+         var id: UUID
+         var title: String
+         var createdAt: Date
+         var updatedAt: Date
+         var subjectID: UUID?
+         var materialID: UUID?
+         @Relationship(.cascade) var messages: [VoiceMessage]
+         
+         init(id: UUID = UUID(), title: String, createdAt: Date = Date(), updatedAt: Date = Date()) {
+             self.id = id
+             self.title = title
+             self.createdAt = createdAt
+             self.updatedAt = updatedAt
+             self.messages = []
+         }
+     }
+     ```
+   
+   - VoiceMessage.swift:
+     ```swift
+     @Model
+     final class VoiceMessage {
+         var id: UUID
+         var content: String
+         var isUserMessage: Bool
+         var timestamp: Date
+         var conversation: VoiceConversation?
+         
+         init(id: UUID = UUID(), content: String, isUserMessage: Bool, timestamp: Date = Date()) {
+             self.id = id
+             self.content = content
+             self.isUserMessage = isUserMessage
+             self.timestamp = timestamp
+         }
+     }
+     ```
+
+2. Update VoiceConversationViewModel:
+   - Replace volatile array with SwiftData query:
+     ```swift
+     @Query private var conversations: [VoiceConversation]
+     @Query private var currentMessages: [VoiceMessage]
+     private var modelContext: ModelContext
+     ```
+   - Implement CRUD operations:
+     ```swift
+     func createNewConversation(title: String = "New Conversation") {
+         let conversation = VoiceConversation(title: title)
+         modelContext.insert(conversation)
+         currentConversationID = conversation.id
+         try? modelContext.save()
+     }
+     
+     func addUserMessage(_ content: String) {
+         guard let conversation = getCurrentConversation() else { return }
+         let message = VoiceMessage(content: content, isUserMessage: true)
+         conversation.messages.append(message)
+         conversation.updatedAt = Date()
+         try? modelContext.save()
+     }
+     
+     func addAIMessage(_ content: String) {
+         guard let conversation = getCurrentConversation() else { return }
+         let message = VoiceMessage(content: content, isUserMessage: false)
+         conversation.messages.append(message)
+         conversation.updatedAt = Date()
+         try? modelContext.save()
+     }
+     ```
+
+3. Connect microphone transcription to addUserMessage:
+   - In the voice conversation view, modify the microphone button action:
+     ```swift
+     Button(action: {
+         if isRecording {
+             audioPipeline.stopRecording()
+             if let transcription = audioPipeline.currentTranscription {
+                 viewModel.addUserMessage(transcription)
+             }
+         } else {
+             audioPipeline.startRecording()
+         }
+         isRecording.toggle()
+     }) {
+         // Button UI
+     }
+     ```
+
+4. Connect AI responses to addAIMessage:
+   - In the OpenAIRealtimeClient callback:
+     ```swift
+     func onMessageReceived(_ message: String) {
+         DispatchQueue.main.async {
+             self.conversationViewModel.addAIMessage(message)
+         }
+     }
+     ```
+
+5. Load conversation history on view appear:
+   - Add to VoiceConversationView:
+     ```swift
+     .onAppear {
+         viewModel.loadConversations()
+         if let conversationID = selectedConversationID {
+             viewModel.setCurrentConversation(id: conversationID)
+         }
+     }
+     ```
+
+6. Update UI to display conversation history:
+   - Modify the ScrollView in VoiceConversationView:
+     ```swift
+     ScrollView {
+         LazyVStack(alignment: .leading, spacing: 12) {
+             ForEach(viewModel.currentMessages) { message in
+                 MessageBubble(
+                     content: message.content,
+                     isUserMessage: message.isUserMessage,
+                     timestamp: message.timestamp
+                 )
+             }
+         }
+         .padding()
+     }
+     ```
+
+7. Add conversation management features:
+   - Create a ConversationListView:
+     ```swift
+     struct ConversationListView: View {
+         @ObservedObject var viewModel: VoiceConversationViewModel
+         @State private var searchText = ""
+         @State private var selectedSubject: UUID?
+         
+         var filteredConversations: [VoiceConversation] {
+             viewModel.conversations
+                 .filter { searchText.isEmpty || $0.title.localizedCaseInsensitiveContains(searchText) }
+                 .filter { selectedSubject == nil || $0.subjectID == selectedSubject }
+         }
+         
+         var body: some View {
+             List {
+                 ForEach(filteredConversations) { conversation in
+                     NavigationLink(destination: VoiceConversationView(viewModel: viewModel, conversationID: conversation.id)) {
+                         VStack(alignment: .leading) {
+                             Text(conversation.title)
+                                 .font(.headline)
+                             Text(conversation.updatedAt, style: .date)
+                                 .font(.caption)
+                         }
+                     }
+                 }
+                 .onDelete(perform: deleteConversations)
+             }
+             .searchable(text: $searchText)
+             .toolbar {
+                 ToolbarItem(placement: .navigationBarTrailing) {
+                     Menu {
+                         Picker("Filter by Subject", selection: $selectedSubject) {
+                             Text("All Subjects").tag(nil as UUID?)
+                             ForEach(viewModel.subjects) { subject in
+                                 Text(subject.name).tag(subject.id as UUID?)
+                             }
+                         }
+                     } label: {
+                         Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+                     }
+                 }
+             }
+         }
+         
+         func deleteConversations(at offsets: IndexSet) {
+             for index in offsets {
+                 viewModel.deleteConversation(filteredConversations[index].id)
+             }
+         }
+     }
+     ```
+
+# Test Strategy:
+1. Unit Testing:
+   - Create unit tests for VoiceConversation and VoiceMessage models
+   - Test CRUD operations in VoiceConversationViewModel
+   - Verify proper relationships between models
+   - Test filtering and search functionality
+
+2. Integration Testing:
+   - Test end-to-end flow from microphone input to persistent storage
+   - Verify conversation history loads correctly on app restart
+   - Test conversation management features (delete, search, filter)
+   - Verify UI updates correctly when messages are added
+
+3. Manual Testing:
+   - Record a voice conversation and verify messages appear in the UI
+   - Close and reopen the app to verify persistence
+   - Create multiple conversations and test navigation between them
+   - Test filtering by subject and search functionality
+   - Verify delete functionality works correctly
+   - Test with various message lengths and content types
+
+4. Performance Testing:
+   - Test with large conversation histories (100+ messages)
+   - Measure load time for conversation history
+   - Verify scrolling performance in the conversation view
+   - Test memory usage with multiple active conversations

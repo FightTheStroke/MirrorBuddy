@@ -1,0 +1,81 @@
+# Task ID: 102
+# Title: Implement Voice-First UI Across the App
+# Status: pending
+# Dependencies: 34, 32
+# Priority: high
+# Description: Enhance the application with a comprehensive voice-first UI approach, including context banners, optimized voice activation buttons, and voice indicators to improve accessibility and user experience.
+# Details:
+1. Dashboard Context Banner:
+   - Create a ContextBannerView component to display on DashboardView
+   - Show active subject/material information for quick voice access
+   - Implement auto-updating based on current context
+   - Design with consistent styling matching app theme
+
+2. Voice Activation Button:
+   - Position a persistent 80x80pt voice activation button in the bottom-right corner
+   - Optimize for one-handed thumb use with proper touch target size
+   - Implement haptic feedback on press
+   - Add subtle animation for active/inactive states
+   - Ensure proper contrast and accessibility
+
+3. Voice Conversation Integration:
+   - Wire "Lezione vocale" quick action from DashboardView to launch VoiceConversationView
+   - Implement proper navigation and state preservation
+   - Add transition animations for smooth user experience
+
+4. Voice Settings Panel:
+   - Add settings panel to VoiceConversationView with gear icon
+   - Implement microphone preferences (device selection, sensitivity)
+   - Add voice speed adjustment (0.8x to 1.5x)
+   - Include voice gender/accent options if available
+   - Create persistent user preferences storage
+
+5. Voice Indicator Implementation:
+   - Create VoiceIndicatorView component for navigation bar
+   - Design visual indicators for listening/speaking/processing states
+   - Implement consistent appearance across all app screens
+   - Ensure proper accessibility labeling
+
+6. Voice Shortcuts:
+   - Add voice command shortcuts throughout the app UI
+   - Implement for common actions (create, edit, delete, navigate)
+   - Create consistent voice command patterns
+   - Document all voice commands for user reference
+
+7. Voice Command Labels:
+   - Audit all interactive elements to ensure voice command labels
+   - Update accessibility identifiers to include voice command hints
+   - Implement VoiceOver integration with voice commands
+   - Test with screen readers to verify accessibility
+
+# Test Strategy:
+1. Functional Testing:
+   - Verify ContextBannerView displays correct subject/material information
+   - Test voice activation button positioning and responsiveness
+   - Confirm "Lezione vocale" quick action properly launches VoiceConversationView
+   - Validate all settings in the voice settings panel function correctly
+   - Test VoiceIndicatorView state changes during voice interactions
+   - Verify all voice shortcuts trigger appropriate actions
+   - Confirm all interactive elements have proper voice command labels
+
+2. Usability Testing:
+   - Conduct one-handed usage tests with various device sizes
+   - Measure time to complete common tasks using voice vs. touch
+   - Gather feedback on voice button placement and size
+   - Test with users of different hand sizes and dexterity levels
+
+3. Accessibility Testing:
+   - Verify VoiceOver compatibility with all new voice UI elements
+   - Test with screen readers to ensure proper labeling
+   - Validate color contrast meets accessibility standards
+   - Test with users who have motor impairments
+
+4. Performance Testing:
+   - Measure impact on battery life with voice features active
+   - Test voice response latency across different network conditions
+   - Verify smooth animations and transitions during voice interactions
+
+5. Integration Testing:
+   - Test voice features across all app screens and workflows
+   - Verify consistent behavior between voice and touch interactions
+   - Validate proper state preservation during navigation

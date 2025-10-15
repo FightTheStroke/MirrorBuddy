@@ -1,0 +1,19 @@
+# Task ID: 4
+# Title: Define SwiftData Models for Subjects
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create SwiftData models for Subject entity with relationships to other entities.
+# Details:
+Create a Subject model with the following properties:
+- id: UUID (primary key)
+- name: String (e.g., Math, Italian, Physics, History, English, Science)
+- color: Color (stored as hex string)
+- icon: String (SF Symbol name)
+- materials: Relationship to Material entities (to-many)
+- tasks: Relationship to Task entities (to-many)
+
+Implement proper relationships with cascade delete rules. Add necessary methods for CRUD operations. Create predefined subjects for the initial app launch.
+
+# Test Strategy:
+Create unit tests for Subject model CRUD operations. Test relationships with cascade delete. Verify predefined subjects are created correctly.

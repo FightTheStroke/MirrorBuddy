@@ -1,0 +1,56 @@
+# Task ID: 73
+# Title: Implement Text-to-Speech for All Content
+# Status: done
+# Dependencies: 28
+# Priority: high
+# Description: Create text-to-speech functionality for all textual content using Apple Speech.
+# Details:
+1. Implement Apple Speech integration
+2. Create TTS controls (play, pause, stop)
+3. Add voice selection options
+4. Implement reading speed adjustment
+5. Create text highlighting during reading
+6. Add automatic language detection
+7. Implement continuous reading across pages
+8. Create TTS for mind map nodes
+
+# Test Strategy:
+Test TTS with various content types. Verify pronunciation quality for technical terms. Test language detection accuracy. Measure performance and resource usage during extended reading.
+
+# Subtasks:
+## 1. Implement Apple Speech Integration for Text Content [done]
+### Dependencies: None
+### Description: Set up the core Apple Speech framework integration to enable text-to-speech functionality for all textual content in the application.
+### Details:
+1. Import the Apple Speech framework
+2. Create a speech synthesizer service class
+3. Implement basic text-to-speech conversion methods
+4. Handle different content types (plain text, formatted text, etc.)
+5. Set up error handling for speech synthesis failures
+6. Optimize for performance with longer text passages
+
+## 2. Develop TTS Playback Controls and Voice Options [done]
+### Dependencies: 73.1
+### Description: Create user interface controls for text-to-speech playback and implement voice selection capabilities.
+### Details:
+1. Design and implement play, pause, and stop controls
+2. Create voice selection interface with available system voices
+3. Implement reading speed adjustment slider
+4. Add volume control integration
+5. Create persistent user preferences for voice settings
+6. Implement preview functionality for voice selection
+7. Add accessibility features to the TTS controls
+
+## 3. Implement Advanced TTS Features and Content Integration [done]
+### Dependencies: 73.1, 73.2
+### Description: Develop advanced text-to-speech features including text highlighting, language detection, and integration with various content types.
+### Details:
+1. Implement text highlighting synchronized with speech
+2. Add automatic language detection for multilingual content
+3. Create continuous reading functionality across multiple pages
+4. Implement TTS for mind map nodes and interactive elements
+5. Add support for reading tables and structured content
+6. Optimize performance for long-form content
+7. Implement background playback capabilities
+8. Create user settings for customizing TTS behavior
+

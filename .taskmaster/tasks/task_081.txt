@@ -1,0 +1,38 @@
+# Task ID: 81
+# Title: Design and Implement App Icon
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Create and configure the MirrorBuddy app icon for all platforms (iPhone, iPad, macOS) following iOS Human Interface Guidelines and accessibility best practices.
+# Details:
+1. Design app icon concept:
+   - Represent app purpose (study assistance, mind mapping, learning)
+   - Use mirror/reflection theme combined with educational elements
+   - High contrast and clear shapes for accessibility
+   - Follow iOS Human Interface Guidelines for app icons
+
+2. Generate or create icon:
+   - Can use AI tools like DALL-E 3 for generation
+   - Ensure 1024x1024 base resolution
+   - Test appearance on different backgrounds
+
+3. Create all required icon sizes:
+   - App Store: 1024x1024
+   - iPhone: 180x180, 120x120, 87x87, 80x80, 58x58, 60x60, 40x40
+   - iPad: 167x167, 152x152, 76x76
+   - macOS: 512x512, 256x256, 128x128, 64x64, 32x32, 16x16
+
+4. Add to project:
+   - Place in Assets.xcassets/AppIcon.appiconset
+   - Update Contents.json with all sizes
+   - Remove alpha channel if present
+
+5. Test and verify:
+   - Build and run on simulator
+   - Test on physical devices if available
+   - Verify appearance in Settings, Spotlight, etc.
+
+6. Document design rationale in project docs
+
+# Test Strategy:
+Visual verification: Build app and verify icon appears correctly in simulator and on device. Check icon in multiple contexts: Home screen, Settings, Spotlight search, App Switcher. Verify all required sizes are present and correctly referenced in Contents.json.

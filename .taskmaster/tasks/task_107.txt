@@ -1,0 +1,249 @@
+# Task ID: 107
+# Title: Reorganize VoiceConversationView with Adaptive Layout and Persistence
+# Status: pending
+# Dependencies: 100, 102
+# Priority: high
+# Description: Implement adaptive layout for VoiceConversationView with two-column layout on iPad/landscape and single-column on iPhone/portrait, add settings functionality, and integrate conversation persistence from SwiftData models.
+# Details:
+1. Implement Adaptive Layout:
+   - Modify VoiceConversationView.swift:136 to implement a GeometryReader-based layout
+   - Create a two-column layout for iPad/landscape:
+     ```swift
+     if horizontalSizeClass == .regular && verticalSizeClass == .regular {
+         HStack(spacing: 0) {
+             // Left column: Subject/conversation selector
+             VStack {
+                 ConversationSelectorView(selectedConversation: $selectedConversation)
+             }
+             .frame(width: geometry.size.width * 0.3)
+             
+             Divider()
+             
+             // Right column: Conversation thread
+             VStack {
+                 ConversationThreadView(conversation: selectedConversation)
+             }
+             .frame(width: geometry.size.width * 0.7)
+         }
+     } else {
+         // Single column layout for iPhone/portrait
+         if showingSelector {
+             ConversationSelectorView(selectedConversation: $selectedConversation)
+                 .toolbar {
+                     ToolbarItem(placement: .navigationBarTrailing) {
+                         Button("New Conversation") {
+                             createNewConversation()
+                             showingSelector = false
+                         }
+                     }
+                 }
+         } else {
+             ConversationThreadView(conversation: selectedConversation)
+                 .toolbar {
+                     ToolbarItem(placement: .navigationBarLeading) {
+                         Button("Back") {
+                             showingSelector = true
+                         }
+                     }
+                 }
+         }
+     }
+     ```
+
+2. Implement Settings Functionality:
+   - Complete the showSettings() method at line 502:
+     ```swift
+     func showSettings() {
+         let settingsView = VoiceSettingsView(
+             microphonePreference: $microphonePreference,
+             voiceSpeed: $voiceSpeed,
+             language: $language,
+             onSave: { [weak self] in
+                 self?.dismissSettings()
+                 self?.updateVoiceSettings()
+             }
+         )
+         
+         let hostingController = UIHostingController(rootView: settingsView)
+         settingsSheet = hostingController
+         
+         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+            let rootViewController = windowScene.windows.first?.rootViewController {
+             hostingController.modalPresentationStyle = .formSheet
+             rootViewController.present(hostingController, animated: true)
+         }
+     }
+     
+     private func dismissSettings() {
+         settingsSheet?.dismiss(animated: true)
+         settingsSheet = nil
+     }
+     
+     private func updateVoiceSettings() {
+         // Update voice settings in the audio pipeline
+         audioManager.updateSettings(
+             speed: voiceSpeed,
+             language: language,
+             preferredMicrophone: microphonePreference
+         )
+     }
+     ```
+
+3. Create VoiceSettingsView:
+   - Implement a new SwiftUI view for voice settings:
+     ```swift
+     struct VoiceSettingsView: View {
+         @Binding var microphonePreference: MicrophonePreference
+         @Binding var voiceSpeed: Double
+         @Binding var language: Language
+         var onSave: () -> Void
+         
+         var body: some View {
+             NavigationView {
+                 Form {
+                     Section(header: Text("Microphone")) {
+                         Picker("Microphone", selection: $microphonePreference) {
+                             ForEach(MicrophonePreference.allCases, id: \.self) { preference in
+                                 Text(preference.displayName).tag(preference)
+                             }
+                         }
+                     }
+                     
+                     Section(header: Text("Voice Speed")) {
+                         Slider(value: $voiceSpeed, in: 0.75...1.5, step: 0.05) {
+                             Text("Speed: \(voiceSpeed, specifier: "%.2f")x")
+                         } minimumValueLabel: {
+                             Text("Slow")
+                         } maximumValueLabel: {
+                             Text("Fast")
+                         }
+                     }
+                     
+                     Section(header: Text("Language")) {
+                         Picker("Language", selection: $language) {
+                             ForEach(Language.allCases, id: \.self) { language in
+                                 Text(language.displayName).tag(language)
+                             }
+                         }
+                     }
+                 }
+                 .navigationTitle("Voice Settings")
+                 .toolbar {
+                     ToolbarItem(placement: .navigationBarTrailing) {
+                         Button("Save") {
+                             onSave()
+                         }
+                     }
+                 }
+             }
+         }
+     }
+     ```
+
+4. Wire up Conversation Persistence:
+   - Integrate the SwiftData models from Task 100:
+     ```swift
+     @Query private var conversations: [VoiceConversation]
+     @Environment(\.modelContext) private var modelContext
+     
+     private func loadConversation(_ conversation: VoiceConversation) {
+         selectedConversation = conversation
+         conversationTitle = conversation.title
+         messages = conversation.messages.sorted { $0.timestamp < $1.timestamp }
+     }
+     
+     private func saveCurrentConversation() {
+         if let conversation = selectedConversation {
+             conversation.title = conversationTitle
+             conversation.updatedAt = Date()
+             
+             // Update messages if needed
+             let existingMessageIDs = Set(conversation.messages.map { $0.id })
+             for message in messages {
+                 if !existingMessageIDs.contains(message.id) {
+                     conversation.messages.append(message)
+                 }
+             }
+             
+             try? modelContext.save()
+         }
+     }
+     
+     private func createNewConversation() {
+         let newConversation = VoiceConversation(
+             title: "New Conversation",
+             createdAt: Date(),
+             updatedAt: Date()
+         )
+         modelContext.insert(newConversation)
+         try? modelContext.save()
+         
+         selectedConversation = newConversation
+         conversationTitle = newConversation.title
+         messages = []
+     }
+     ```
+
+5. Update UI to Display Conversation History:
+   - Modify ConversationSelectorView to display saved conversations:
+     ```swift
+     struct ConversationSelectorView: View {
+         @Binding var selectedConversation: VoiceConversation?
+         @Query private var conversations: [VoiceConversation]
+         
+         var body: some View {
+             List {
+                 ForEach(conversations) { conversation in
+                     Button(action: {
+                         selectedConversation = conversation
+                     }) {
+                         VStack(alignment: .leading) {
+                             Text(conversation.title)
+                                 .font(.headline)
+                             Text(conversation.updatedAt, style: .date)
+                                 .font(.caption)
+                                 .foregroundColor(.secondary)
+                         }
+                     }
+                     .padding(.vertical, 8)
+                 }
+             }
+             .navigationTitle("Conversations")
+         }
+     }
+     ```
+
+# Test Strategy:
+1. Adaptive Layout Testing:
+   - Test on iPad in landscape orientation to verify two-column layout appears correctly
+   - Test on iPhone in portrait orientation to verify single-column layout with navigation
+   - Test rotation between orientations to ensure smooth transitions
+   - Verify that the conversation selector and thread views display correctly in both layouts
+   - Test on various device sizes (iPhone SE, iPhone Pro Max, iPad mini, iPad Pro)
+
+2. Settings Functionality Testing:
+   - Verify the settings button opens the VoiceSettingsView
+   - Test each setting control (microphone preference, voice speed, language)
+   - Confirm settings are saved when clicking the Save button
+   - Verify settings persist between app launches
+   - Test that voice speed changes are applied to the audio pipeline
+   - Verify microphone preference changes are respected when starting a new conversation
+
+3. Persistence Integration Testing:
+   - Create a new conversation and verify it's saved to SwiftData
+   - Add messages to a conversation and confirm they persist after navigating away and back
+   - Test loading existing conversations from the conversation selector
+   - Verify conversation timestamps update correctly
+   - Test conversation title updates
+   - Verify conversations are properly sorted by date in the selector view
+
+4. UI Responsiveness Testing:
+   - Test UI performance with large conversation history
+   - Verify smooth animations during layout transitions
+   - Test accessibility features (VoiceOver compatibility, Dynamic Type)
+   - Verify proper keyboard handling when editing conversation titles
+
+5. Integration Testing:
+   - Test end-to-end flow from creating a conversation to saving and retrieving it
+   - Verify integration with the audio pipeline
+   - Test with real voice input to ensure conversation messages are correctly saved

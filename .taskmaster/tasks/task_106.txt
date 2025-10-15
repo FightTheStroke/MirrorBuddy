@@ -1,0 +1,104 @@
+# Task ID: 106
+# Title: Add Persistent Voice Entry Point to App
+# Status: pending
+# Dependencies: 102, 32, 34
+# Priority: high
+# Description: Integrate VoiceCommandButton and VoiceCommandFeedbackView as a persistent UI element that's always accessible throughout the app, ensuring voice activation is available without navigating to a specific tab.
+# Details:
+1. Evaluate integration options:
+   - Option A: Add to MainTabView.swift as a floating action button that overlays all tabs
+   - Option B: Integrate directly into the dashboard view
+
+2. Implement the VoiceCommandButton:
+   - Create a circular button with 80x80pt dimensions
+   - Position in bottom-right corner for easy thumb access
+   - Apply consistent styling with app theme
+   - Add drop shadow for visual separation from background content
+   - Implement haptic feedback on press
+
+3. Connect VoiceCommandFeedbackView:
+   - Show feedback view when voice recognition is active
+   - Position feedback view above the button
+   - Implement smooth transition animations
+   - Ensure feedback view doesn't obstruct critical UI elements
+
+4. Handle view hierarchy and z-index:
+   - Ensure button appears above all other UI elements
+   - Implement proper safe area insets handling
+   - Account for keyboard appearance
+
+5. Implement voice command activation:
+   - Connect to existing voice command infrastructure
+   - Ensure proper audio session handling
+   - Add visual state changes during active listening
+
+6. Optimize for accessibility:
+   - Add proper accessibility labels and hints
+   - Ensure VoiceOver compatibility
+   - Implement alternative activation methods
+
+7. Code implementation in MainTabView.swift:
+```swift
+struct MainTabView: View {
+    @State private var isVoiceActive = false
+    
+    var body: some View {
+        ZStack {
+            // Existing tab view content
+            TabView {
+                // ... existing tabs
+            }
+            
+            // Persistent voice command button
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    VoiceCommandButton(isActive: $isVoiceActive)
+                        .frame(width: 80, height: 80)
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 16)
+                }
+            }
+            
+            // Feedback view that appears when voice is active
+            if isVoiceActive {
+                VoiceCommandFeedbackView()
+                    .transition(.opacity)
+                    .zIndex(100)
+            }
+        }
+    }
+}
+
+# Test Strategy:
+1. UI Integration Testing:
+   - Verify the voice command button appears in the correct position across all app screens
+   - Confirm the button maintains proper z-index and remains accessible when navigating between tabs
+   - Test that the button doesn't interfere with other interactive elements
+
+2. Functional Testing:
+   - Verify tapping the button activates voice recognition
+   - Confirm VoiceCommandFeedbackView appears when recognition is active
+   - Test that voice commands are properly recognized and executed
+   - Verify the feedback view disappears after command completion
+
+3. Usability Testing:
+   - Test one-handed operation with various hand sizes
+   - Verify the button is easily reachable with thumb
+   - Measure time-to-activation compared to previous implementation
+
+4. Accessibility Testing:
+   - Test with VoiceOver enabled
+   - Verify proper accessibility labels and hints
+   - Confirm alternative activation methods work correctly
+
+5. Performance Testing:
+   - Measure any impact on app performance or battery usage
+   - Verify smooth animations and transitions
+   - Test on older devices to ensure acceptable performance
+
+6. Edge Case Testing:
+   - Test behavior when keyboard is visible
+   - Verify proper handling during app backgrounding/foregrounding
+   - Test interaction with system-level interruptions

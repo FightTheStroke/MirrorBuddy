@@ -1,0 +1,11 @@
+# Task ID: 90
+# Title: Integrate Voice Coach for Guided Problem Solving
+# Status: pending
+# Dependencies: 89
+# Priority: medium
+# Description: Enable voice-guided problem solving, linking screen capture, AI analysis, and visual/voice feedback.
+# Details:
+Implement voice command trigger ('Aiutami con questo'). Chain capture, analysis, and explanation. Overlay visual annotations and play voice guidance.
+
+# Test Strategy:
+Test full workflow: voice command → capture → analyze → explain. Validate clarity and correctness.

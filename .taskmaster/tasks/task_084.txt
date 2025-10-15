@@ -1,0 +1,11 @@
+# Task ID: 84
+# Title: Implement Multi-Format Document Import and Viewer
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Enable importing and viewing of images (PNG, JPG, JPEG, HEIC, HEIF) and Google Docs from Google Drive, alongside existing PDF support.
+# Details:
+Integrate Google Drive API for file import. Use Vision framework for OCR on images. Convert Google Docs to PDF or extract text. Update Material storage to handle mixed content. Implement pinch-to-zoom, swipe navigation, and optimized layouts for iPad/iPhone.
+
+# Test Strategy:
+Test importing each supported format from Drive. Validate correct display in viewer. Confirm OCR text extraction and storage. Check navigation and zoom on both iPad and iPhone.

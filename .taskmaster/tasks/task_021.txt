@@ -1,0 +1,38 @@
+# Task ID: 21
+# Title: Implement Mind Map Generation with GPT-5
+# Status: done
+# Dependencies: 5, 11, 19
+# Priority: high
+# Description: Create functionality to generate mind map structures from study materials using GPT-5.
+# Details:
+1. Create prompts for mind map generation
+2. Implement GPT-5 API calls for structure generation
+3. Parse API responses into MindMap and MindMapNode models
+4. Limit mind maps to 3 levels deep
+5. Keep node text short (5-7 words)
+6. Generate concrete examples for concepts
+7. Create subject-specific templates
+8. Store generated mind maps in SwiftData
+
+# Test Strategy:
+Test mind map generation with various subjects. Verify structure adheres to 3-level limit. Test node text brevity. Verify subject-specific templates work correctly.
+
+# Subtasks:
+## 1. Design and Implement GPT-5 Prompts for Mind Map Generation [done]
+### Dependencies: None
+### Description: Create effective prompts for GPT-5 that will generate well-structured mind maps from study materials.
+### Details:
+Research prompt engineering techniques for structured outputs. Create prompts that specify the 3-level depth limit, node text brevity (5-7 words), and request concrete examples for concepts. Develop subject-specific templates for different academic disciplines. Test prompts with sample study materials to ensure quality output. Document the final prompt templates for future reference.
+
+## 2. Implement GPT-5 API Integration for Mind Map Structure Generation [done]
+### Dependencies: 21.1
+### Description: Develop the API integration layer to communicate with GPT-5 for generating mind map structures from study materials.
+### Details:
+Create a service class to handle API communication with GPT-5. Implement proper error handling, retry logic, and request throttling. Configure API authentication and security. Optimize request payloads to minimize token usage. Implement caching to prevent duplicate requests. Add logging for debugging and monitoring API usage. Create a queue system for handling multiple mind map generation requests.
+
+## 3. Develop Parser and SwiftData Storage for Mind Map Models [done]
+### Dependencies: 21.2
+### Description: Create a parser to convert GPT-5 API responses into MindMap and MindMapNode models and implement SwiftData storage functionality.
+### Details:
+Design and implement MindMap and MindMapNode model structures compatible with SwiftData. Create a parser to transform GPT-5 API JSON responses into these model structures. Implement validation to ensure mind maps adhere to the 3-level depth limit. Add functionality to store generated mind maps in SwiftData. Implement CRUD operations for mind map management. Create migration strategy for model updates. Ensure models work with existing CloudKit sync implementation.
+

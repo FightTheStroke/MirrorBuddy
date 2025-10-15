@@ -1,0 +1,56 @@
+# Task ID: 17
+# Title: Implement Google Drive File Listing and Monitoring
+# Status: done
+# Dependencies: 13, 16
+# Priority: high
+# Description: Create functionality to list and monitor files in the 'Mario - Scuola' Google Drive folder.
+# Details:
+1. Implement file listing from specific folder
+2. Add filtering by file type (PDF, DOCX, etc.)
+3. Implement change tracking using Google Drive API
+4. Create a background task for scheduled checks at 13:00 and 18:00 CET
+5. Implement push notifications for new files
+6. Add file metadata extraction
+7. Create a database of known files to detect changes
+8. Implement incremental sync to minimize API usage
+
+# Test Strategy:
+Test file listing with mock and real Drive folders. Verify scheduled checks run at correct times. Test change detection with modified files. Verify push notifications work correctly.
+
+# Subtasks:
+## 1. Set up Google Drive API Authentication [done]
+### Dependencies: None
+### Description: Implement authentication with Google Drive API using OAuth 2.0 to access the 'Mario - Scuola' folder.
+### Details:
+Create service account or OAuth 2.0 credentials in Google Cloud Console. Implement token management including refresh tokens. Store credentials securely using keychain or encrypted storage. Handle authentication errors and token expiration gracefully.
+
+## 2. Implement File Listing and Filtering [done]
+### Dependencies: 17.1
+### Description: Create functionality to list all files in the specified Google Drive folder with filtering capabilities by file type.
+### Details:
+Use Google Drive API to query files in 'Mario - Scuola' folder. Implement pagination for large folders. Add filtering by MIME type for PDFs, DOCXs, etc. Create data models to store file metadata. Implement sorting options by name, date, and size. Add caching layer to improve performance.
+
+## 3. Create Database for File Tracking [done]
+### Dependencies: 17.2
+### Description: Implement a local database to store file metadata and track changes over time.
+### Details:
+Design database schema to store file IDs, names, modification dates, and checksums. Implement SwiftData models for file metadata. Create functions to compare local database with Drive API results. Add methods to detect new, modified, and deleted files. Implement database migration strategy for future schema changes.
+
+## 4. Implement Change Tracking and Incremental Sync [done]
+### Dependencies: 17.3
+### Description: Create functionality to efficiently track file changes using Google Drive API's change tracking features.
+### Details:
+Implement Google Drive API's changes.list endpoint with pageToken for efficient change tracking. Store and update startPageToken for incremental sync. Create logic to process change events (created, modified, deleted). Implement bandwidth-efficient sync by only downloading changed files. Add conflict resolution for simultaneous changes.
+
+## 5. Create Scheduled Background Tasks [done]
+### Dependencies: 17.4
+### Description: Implement background tasks to check for file changes at scheduled times (13:00 and 18:00 CET).
+### Details:
+Use BackgroundTasks framework to register background processing tasks. Implement scheduling logic for 13:00 and 18:00 CET checks. Add time zone handling for correct execution regardless of device location. Implement retry mechanism for failed background tasks. Add power and network efficiency considerations. Create logging for background task execution.
+
+## 6. Implement Push Notifications for File Changes [done]
+### Dependencies: 17.5
+### Description: Create a notification system to alert users when new files are added or existing files are modified.
+### Details:
+Implement local notifications using UNUserNotificationCenter. Create notification categories for different file types and change types. Add deep linking from notifications to the relevant files. Implement notification grouping for multiple changes. Add user preferences for notification types. Create rich notifications with file previews when available.
+

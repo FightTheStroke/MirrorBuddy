@@ -1,0 +1,43 @@
+# Task ID: 91
+# Title: Implement Extended Voice Recording (6 Hours, Background Mode)
+# Status: in-progress
+# Dependencies: None
+# Priority: high
+# Description: Support up to 6 hours of continuous audio recording, with background operation and auto-save every 30 minutes.
+# Details:
+Use AVAudioRecorder with background mode. Compress audio in real-time to AAC (64 kbps). Implement auto-save and low battery warning. Add controls for start/stop, pause/resume, timer, battery indicator.
+
+# Test Strategy:
+Record for 6 hours, test background operation, auto-save, and low battery warning. Check file size and audio quality.
+
+# Subtasks:
+## 1. Configure AVAudioRecorder with background mode [done]
+### Dependencies: None
+### Description: Set up the AVAudioRecorder with proper configuration to support background recording and audio session management.
+### Details:
+Implement AVAudioRecorder with background audio capability. Configure audio session category to .playAndRecord with .allowsRecordingDuringBackgroundTasks option. Set up proper audio format with AAC compression at 64 kbps. Request necessary permissions in Info.plist for background audio. Handle audio interruptions and route changes.
+
+## 2. Implement auto-save functionality [done]
+### Dependencies: 91.1
+### Description: Create a mechanism to automatically save recording progress every 30 minutes to prevent data loss.
+### Details:
+Implement a timer that triggers every 30 minutes to save the current recording. Create a file management system to handle multiple recording segments. Implement seamless continuation of recording after auto-save. Add metadata to track recording segments. Ensure auto-save works in background mode without interrupting recording.
+
+## 3. Develop battery monitoring and low battery warning [done]
+### Dependencies: 91.1
+### Description: Create a system to monitor battery levels and warn users when battery is low during recording.
+### Details:
+Implement UIDevice battery monitoring. Create a threshold-based warning system (e.g., warnings at 20%, 10%, 5%). Design and implement a non-intrusive UI for battery warnings. Add automatic recording save when battery is critically low. Implement power-saving mode options for extended recording.
+
+## 4. Build recording control UI [pending]
+### Dependencies: 91.1
+### Description: Create user interface elements for controlling the recording process including start/stop, pause/resume, and timer display.
+### Details:
+Design and implement UI controls for recording: start/stop button, pause/resume button, elapsed time display, recording indicator. Add visual feedback for recording states. Implement accessibility features for all controls. Create animations for state transitions. Ensure controls are usable in both light and dark mode.
+
+## 5. Implement extended recording session management [pending]
+### Dependencies: 91.1, 91.2, 91.3, 91.4
+### Description: Create a robust system to manage extended recording sessions up to 6 hours with proper error handling and resource management.
+### Details:
+Implement session management to handle 6-hour recordings. Create a file merging system to combine auto-saved segments. Add error recovery mechanisms for unexpected interruptions. Implement memory management to prevent crashes during long sessions. Add recording statistics (file size, duration, quality). Create notification for recording completion. Implement recording cleanup for failed or abandoned sessions.
+

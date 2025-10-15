@@ -1,0 +1,18 @@
+# Task ID: 79
+# Title: Implement Spaced Repetition System for Flashcards
+# Status: done
+# Dependencies: 6, 23
+# Priority: medium
+# Description: Create a spaced repetition system for effective flashcard review.
+# Details:
+1. Implement SM-2 algorithm for spacing
+2. Create review queue management
+3. Add quality rating input (1-5)
+4. Implement next review date calculation
+5. Create daily review suggestions
+6. Add streak and consistency tracking
+7. Implement analytics for retention
+8. Create visualization of learning progress
+
+# Test Strategy:
+Test spacing algorithm with various quality inputs. Verify next review dates are calculated correctly. Test review queue management. Evaluate effectiveness of learning progress visualization.

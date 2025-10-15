@@ -1,0 +1,11 @@
+# Task ID: 92
+# Title: Optimize Audio Storage and Google Drive Backup
+# Status: pending
+# Dependencies: 91
+# Priority: medium
+# Description: Compress audio files efficiently and provide option to upload recordings to Google Drive for backup.
+# Details:
+Implement AAC compression targeting <500 MB for 6 hours. Integrate Google Drive API for upload. Warn user if storage is low.
+
+# Test Strategy:
+Record long sessions, verify compression and upload. Test low storage warning.

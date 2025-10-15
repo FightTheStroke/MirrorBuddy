@@ -1,0 +1,23 @@
+# Task ID: 3
+# Title: Define SwiftData Models for Materials
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create SwiftData models for Material entity with relationships to other entities.
+# Details:
+Create a Material model with the following properties:
+- id: UUID (primary key)
+- title: String
+- subject: Relationship to Subject entity
+- pdfUrl: URL (optional)
+- mindMapId: Relationship to MindMap entity (optional)
+- flashcards: Relationship to Flashcard entities (to-many)
+- summary: String (optional)
+- createdAt: Date
+- updatedAt: Date
+- processed: Bool
+
+Implement proper relationships with cascade delete rules. Add necessary methods for CRUD operations. Implement Codable conformance for data export/import.
+
+# Test Strategy:
+Create unit tests for Material model CRUD operations. Test relationships with cascade delete. Verify data persistence and retrieval works correctly.

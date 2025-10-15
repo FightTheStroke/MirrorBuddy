@@ -1,0 +1,45 @@
+# Task ID: 26
+# Title: Create Subject-Organized Dashboard UI
+# Status: done
+# Dependencies: 3, 4, 82, 83
+# Priority: high
+# Description: Design and implement the main dashboard UI organized by subject.
+# Details:
+1. Create a SwiftUI view for the main dashboard
+2. Implement subject-based organization
+3. Design material cards with thumbnails
+4. Add search and filter functionality
+5. Implement sorting options (date, name, subject)
+6. Create animations for smooth transitions
+7. Optimize for one-handed operation
+8. Implement VoiceOver support
+9. Add large touch targets (min 44×44pt)
+
+# Test Strategy:
+Test UI on various device sizes. Verify VoiceOver functionality. Test one-handed operation. Measure performance with large number of materials.
+
+# Subtasks:
+## 1. Implement Main Dashboard SwiftUI View Structure [done]
+### Dependencies: None
+### Description: Create the foundational SwiftUI view structure for the dashboard that will house all other components.
+### Details:
+Design and implement the main dashboard container view using SwiftUI. Include navigation elements, header area, and container for subject sections. Ensure the view is responsive across different device sizes and orientations. Set up the basic navigation hierarchy and state management for the dashboard.
+
+## 2. Develop Subject-Based Organization System [done]
+### Dependencies: 26.1
+### Description: Implement the core functionality for organizing materials by subject with appropriate grouping and hierarchy.
+### Details:
+Create data structures and views to group materials by subject categories. Implement collapsible subject sections with headers. Design the visual hierarchy to clearly distinguish between different subjects. Include empty states for subjects with no materials. Implement the logic for adding new subjects and reorganizing existing ones.
+
+## 3. Design and Implement Material Cards with Thumbnails [done]
+### Dependencies: 26.1, 26.2
+### Description: Create visually appealing material cards that display thumbnails and essential information about each learning material.
+### Details:
+Design reusable material card components that display thumbnails, title, creation date, and relevant metadata. Implement efficient image loading and caching for thumbnails. Create placeholder states for loading thumbnails. Ensure cards have appropriate touch targets (minimum 44×44pt). Implement card selection and interaction behaviors.
+
+## 4. Implement Search, Filtering and Sorting Functionality [done]
+### Dependencies: 26.1, 26.2, 26.3
+### Description: Add comprehensive search, filtering, and sorting capabilities to help users efficiently find materials in the dashboard.
+### Details:
+Create a search bar with real-time filtering of materials. Implement filters for different material types, dates, and other metadata. Add sorting options by date, name, and subject. Design filter UI components that are easy to use one-handed. Ensure search results update efficiently without performance issues. Implement search history and suggestions if appropriate.
+

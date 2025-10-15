@@ -1,0 +1,11 @@
+# Task ID: 97
+# Title: Improve Mind Map Visualization for Mobile
+# Status: pending
+# Dependencies: 95
+# Priority: medium
+# Description: Redesign mind map UI for mobile: large fonts, high contrast, icons, color coding, intuitive navigation, and layout for iPhone/iPad.
+# Details:
+Update UI with min 18pt fonts, high contrast, icons for node types, color-coded by subject. Implement tap-to-expand, pinch-to-zoom, pan, double-tap for details, breadcrumbs, vertical scrolling, collapsible sections. Limit depth and node count for clarity.
+
+# Test Strategy:
+Test mind map readability and navigation on iPhone/iPad. Validate color coding and hierarchy.

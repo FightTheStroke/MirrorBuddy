@@ -1,0 +1,25 @@
+# Task ID: 7
+# Title: Define SwiftData Models for Tasks
+# Status: done
+# Dependencies: 1, 3, 4
+# Priority: high
+# Description: Create SwiftData models for Task entity with relationships to other entities.
+# Details:
+Create a Task model with the following properties:
+- id: UUID (primary key)
+- title: String
+- description: String (optional)
+- dueDate: Date (optional)
+- subject: Relationship to Subject entity
+- material: Relationship to Material entity (optional)
+- completed: Bool (default: false)
+- completedDate: Date (optional)
+- source: String (e.g., 'calendar', 'email', 'manual')
+- sourceId: String (optional, for tracking external IDs)
+- createdAt: Date
+- updatedAt: Date
+
+Implement proper relationships with cascade delete rules. Add methods for completion tracking and due date calculations.
+
+# Test Strategy:
+Create unit tests for Task model CRUD operations. Test task completion logic and due date calculations. Verify relationships with Subject and Material entities.

@@ -1,0 +1,44 @@
+# Task ID: 39
+# Title: Create Interactive Mind Map Renderer
+# Status: done
+# Dependencies: 5, 22
+# Priority: high
+# Description: Implement an interactive mind map visualization using SwiftUI Canvas.
+# Details:
+1. Create a SwiftUI Canvas-based renderer
+2. Implement force-directed graph layout
+3. Add zoom, pan, and pinch gestures
+4. Create node expansion/collapse functionality
+5. Implement TTS for node explanations
+6. Add visual connections with arrows and colors
+7. Create animations for interactions
+8. Optimize for performance (60 FPS target)
+
+# Test Strategy:
+Test renderer with various mind map sizes. Verify gesture handling works correctly. Test node expansion/collapse. Measure rendering performance and frame rate.
+
+# Subtasks:
+## 1. Implement SwiftUI Canvas-Based Mind Map Renderer [done]
+### Dependencies: None
+### Description: Build the core rendering engine for the mind map using SwiftUI Canvas, supporting dynamic node and connection drawing with custom styling.
+### Details:
+Create a CanvasView that renders nodes and connections based on a graph model. Implement custom drawing for nodes (text, shapes, colors) and connections (lines, arrows, colors). Ensure the renderer is modular for easy maintenance and extension.
+
+## 2. Add Interactive Gestures and Layout Algorithms [done]
+### Dependencies: 39.1
+### Description: Enable user interaction through gestures and implement a force-directed graph layout for automatic node positioning.
+### Details:
+Integrate zoom, pan, and pinch gestures for navigating the mind map. Implement a force-directed layout algorithm to automatically arrange nodes, avoiding overlaps and optimizing readability. Support real-time updates as the graph changes.
+
+## 3. Develop Node Expansion/Collapse and TTS Features [done]
+### Dependencies: 39.1, 39.2
+### Description: Allow users to expand/collapse nodes and enable text-to-speech (TTS) explanations for selected nodes.
+### Details:
+Implement tap/gesture handlers to expand or collapse child nodes. Integrate a TTS engine to read aloud node content when selected. Ensure animations are smooth during expansion/collapse and that TTS playback is interruptible and accessible.
+
+## 4. Optimize Performance and Polish Visuals [done]
+### Dependencies: 39.1, 39.2, 39.3
+### Description: Ensure the mind map renders at 60 FPS and apply visual polish with animations and connection styling.
+### Details:
+Profile and optimize rendering performance to achieve 60 FPS, especially with large graphs. Add smooth animations for node/connection interactions. Enhance visuals with gradients, shadows, and responsive layouts. Implement connection arrows and color coding for clarity.
+

@@ -1,0 +1,11 @@
+# Task ID: 94
+# Title: Implement Subject and Speaker Detection from Transcripts
+# Status: pending
+# Dependencies: 93
+# Priority: medium
+# Description: Analyze transcript keywords to auto-assign subject and optionally detect speakers (teacher vs student).
+# Details:
+Use keyword matching for subject detection (Matematica, Storia, etc.). Implement speaker diarization if feasible. Allow manual correction of subject.
+
+# Test Strategy:
+Transcribe lessons, validate subject assignment (>80% accuracy). Test manual correction and speaker tagging.

@@ -1,0 +1,38 @@
+# Task ID: 29
+# Title: Implement Voice Command System for Navigation
+# Status: done
+# Dependencies: 26, 28
+# Priority: high
+# Description: Create a voice command system for navigating the app without touch.
+# Details:
+1. Implement voice command recognition using Apple Speech
+2. Create a command registry for available commands
+3. Implement command handlers for navigation
+4. Add support for Italian and English commands
+5. Create visual feedback for recognized commands
+6. Implement error handling for misunderstood commands
+7. Add contextual commands based on current view
+8. Create a help system for available commands
+
+# Test Strategy:
+Test voice commands in various environments. Verify Italian and English command recognition. Test error handling with incorrect commands. Measure recognition accuracy.
+
+# Subtasks:
+## 1. Implement Voice Command Recognition with Apple Speech [done]
+### Dependencies: None
+### Description: Set up the voice recognition system using Apple's Speech framework to capture and process user voice commands for navigation.
+### Details:
+Integrate Apple Speech framework into the app. Implement continuous listening mode with appropriate permission handling. Create the audio session configuration for optimal voice recognition. Implement language detection to support both English and Italian inputs. Set up the basic recognition pipeline that converts speech to text for further processing.
+
+## 2. Create Command Registry and Navigation Handlers [done]
+### Dependencies: 29.1
+### Description: Develop a system to register available voice commands and implement handlers that execute navigation actions based on recognized commands.
+### Details:
+Design a command registry data structure to store available voice commands and their associated actions. Implement command handlers for basic navigation (go back, go home, open settings, etc.). Create a mapping system between recognized phrases and command actions. Support command variations and synonyms for natural language flexibility. Implement contextual command filtering based on current view/state of the app.
+
+## 3. Implement Feedback and Error Handling System [done]
+### Dependencies: 29.1, 29.2
+### Description: Create visual and audio feedback mechanisms for voice commands and implement robust error handling for misunderstood or invalid commands.
+### Details:
+Design and implement visual indicators that show when voice recognition is active, processing, and completed. Create audio feedback (subtle sounds) to confirm command recognition. Implement error handling for misunderstood commands with appropriate user feedback. Design and implement a help system that shows available commands based on current context. Add fallback mechanisms for partially matched commands with confirmation prompts when needed.
+

@@ -1,0 +1,63 @@
+# Task ID: 99
+# Title: Fix Audio Pipeline for Bidirectional Streaming
+# Status: pending
+# Dependencies: 31, 34
+# Priority: high
+# Description: Repair the broken voice pipeline by implementing proper audio data flow between the microphone and OpenAI Realtime API, and correctly parse audio responses for playback.
+# Details:
+1. Fix AudioPipelineManager.swift:
+   - Connect the AVCaptureAudioDataOutput's captureOutput delegate method to forward microphone samples
+   - Implement PCM16 audio encoding from raw microphone input
+   - Add buffering mechanism to collect appropriate chunk sizes before sending
+   - Create a method to forward encoded audio chunks to the WebSocket connection
+
+2. Fix OpenAIRealtimeClient.swift:
+   - Complete the parseServerEvent method to properly handle all event types:
+     - response.audio.delta: Accumulate audio data chunks
+     - response.audio.done: Signal completion of audio response
+     - message.content.delta: Handle text content updates
+     - message.content.done: Handle completion of text content
+   - Implement proper JSON decoding for each event type
+   - Add error handling for malformed responses
+
+3. Implement audio playback:
+   - Create an audio playback queue using AVAudioPlayer or AVAudioEngine
+   - Implement onAudioData callback to process received audio chunks
+   - Handle audio buffering to ensure smooth playback
+   - Add proper synchronization between receiving and playing audio
+
+4. Add error handling and diagnostics:
+   - Implement logging for audio pipeline events
+   - Add error recovery mechanisms for connection issues
+   - Create diagnostic tools to monitor audio flow
+
+5. Optimize performance:
+   - Ensure low latency for real-time conversation
+   - Implement proper thread management for audio processing
+   - Balance audio quality with bandwidth usage
+
+# Test Strategy:
+1. Unit Testing:
+   - Create unit tests for PCM16 encoding/decoding
+   - Test JSON event parsing with sample responses
+   - Verify audio buffer management works correctly
+
+2. Integration Testing:
+   - Test end-to-end audio flow from microphone to OpenAI API
+   - Verify bidirectional streaming with test conversations
+   - Test with various network conditions (good, poor, intermittent)
+
+3. Manual Testing:
+   - Conduct real voice conversations to verify natural interaction
+   - Test with different microphone sources (built-in, AirPods, wired headset)
+   - Verify audio quality and latency are acceptable
+   - Test interruption scenarios (incoming calls, app switching)
+
+4. Performance Testing:
+   - Measure CPU and memory usage during active conversations
+   - Test battery impact during extended voice sessions
+   - Verify audio pipeline works efficiently on older devices
+
+5. Regression Testing:
+   - Ensure fixes don't break other functionality
+   - Verify all voice conversation features still work

@@ -1,0 +1,11 @@
+# Task ID: 87
+# Title: Implement Mind Map Generation from Image and Document Content
+# Status: pending
+# Dependencies: 86
+# Priority: medium
+# Description: Automatically generate mind maps from extracted text and image content using GPT-4.
+# Details:
+Send extracted text to GPT-4 API for topic extraction and mind map structuring. Store and display mind maps linked to materials. Support color-coding by subject.
+
+# Test Strategy:
+Import documents/images, run OCR, generate mind map. Validate logical structure and subject coloring.

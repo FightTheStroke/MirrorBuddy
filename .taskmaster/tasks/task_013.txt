@@ -1,0 +1,41 @@
+# Task ID: 13
+# Title: Create Google APIs Client for Workspace Integration
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Develop a client for Google Drive, Calendar, and Gmail APIs for material and task management.
+# Details:
+Create a GoogleAPIClient class with:
+1. OAuth 2.0 authentication flow
+2. Methods for Google Drive file listing and download
+3. Methods for Google Calendar event retrieval
+4. Methods for Gmail message retrieval and parsing
+5. Webhook setup for Drive file changes
+6. Error handling and retry logic
+7. Rate limiting implementation
+8. Response parsing and model mapping
+
+Implement using Swift concurrency (async/await) and proper error handling.
+
+# Test Strategy:
+Create unit tests with mock responses for each API endpoint. Test OAuth flow, error handling, retry logic, and rate limiting. Create integration tests with actual API calls using test credentials.
+
+# Subtasks:
+## 1. Implement OAuth 2.0 Authentication Flow for Google Workspace APIs [done]
+### Dependencies: None
+### Description: Develop the authentication layer using OAuth 2.0 to securely access Google Drive, Calendar, and Gmail APIs in Swift.
+### Details:
+Set up OAuth 2.0 using Google Sign-In for iOS. Ensure the app requests and manages the correct scopes for Drive, Calendar, and Gmail. Implement token refresh logic and error handling for authentication failures. Integrate with Swift concurrency (async/await) for all authentication-related operations.
+
+## 2. Develop GoogleAPIClient Methods for Drive, Calendar, and Gmail Operations [done]
+### Dependencies: 13.1
+### Description: Create async methods in GoogleAPIClient for Drive file listing/download, Calendar event retrieval, and Gmail message retrieval/parsing.
+### Details:
+Implement Swift async/await methods for: listing and downloading files from Drive, retrieving events from Calendar, and fetching/parsing messages from Gmail. Ensure all requests use valid OAuth tokens. Parse API responses into Swift models. Add error handling, retry logic, and rate limiting for each method.
+
+## 3. Integrate Webhook Setup and Advanced Error Handling in GoogleAPIClient [done]
+### Dependencies: 13.2
+### Description: Add webhook registration for Drive file changes and implement comprehensive error handling and rate limiting across all API interactions.
+### Details:
+Implement webhook setup for Google Drive file change notifications. Ensure webhook endpoints are registered and verified. Extend error handling to cover all API methods, including exponential backoff for retries and global rate limiting. Document all error and retry scenarios.
+

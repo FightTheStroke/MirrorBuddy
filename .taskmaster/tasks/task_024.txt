@@ -1,0 +1,38 @@
+# Task ID: 24
+# Title: Implement Simplified Explanations Generation with GPT-5 Mini
+# Status: done
+# Dependencies: 11, 19
+# Priority: medium
+# Description: Create functionality to generate simplified explanations of complex concepts using GPT-5 mini.
+# Details:
+1. Create prompts for simplified explanations
+2. Implement GPT-5 mini API calls
+3. Generate explanations for difficult concepts
+4. Use concrete examples and analogies
+5. Adapt explanation complexity to subject
+6. Store explanations with associated materials
+7. Implement batch processing for efficiency
+8. Add fallback to Apple Intelligence if needed
+
+# Test Strategy:
+Test explanation generation for various concepts. Verify simplification quality. Test with complex scientific and mathematical concepts. Measure performance with batch processing.
+
+# Subtasks:
+## 1. Design and Implement Prompt Generation for Simplified Explanations [done]
+### Dependencies: None
+### Description: Develop logic to create prompts that instruct GPT-5 mini to generate simplified explanations of complex concepts, using examples and analogies where appropriate.
+### Details:
+Define prompt templates that clearly request simplified, accessible explanations. Include instructions for using analogies and concrete examples. Allow prompt customization based on subject complexity. Ensure prompts are compatible with GPT-5 mini's expected input format.
+
+## 2. Integrate GPT-5 Mini API for Explanation Generation [done]
+### Dependencies: 24.1
+### Description: Implement backend logic to call the GPT-5 mini API with generated prompts and retrieve simplified explanations.
+### Details:
+Set up API authentication and environment. Use the appropriate endpoint and parameters for GPT-5 mini (e.g., model, messages, temperature, verbosity). Handle API responses, errors, and rate limits. Support batch processing for multiple concepts. Provide fallback to Apple Intelligence if the API fails or is unavailable.
+
+## 3. Store and Associate Generated Explanations with Learning Materials [done]
+### Dependencies: 24.2
+### Description: Develop functionality to save generated explanations and link them to relevant educational materials for future retrieval and display.
+### Details:
+Design data structures to store explanations, metadata (e.g., concept, complexity level), and associations with source materials. Implement database or file storage logic. Ensure explanations can be efficiently retrieved and displayed alongside learning content.
+

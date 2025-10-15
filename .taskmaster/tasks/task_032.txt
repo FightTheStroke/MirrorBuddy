@@ -1,0 +1,68 @@
+# Task ID: 32
+# Title: Create Voice Conversation UI
+# Status: done
+# Dependencies: 31, 82
+# Priority: high
+# Description: Design and implement the UI for voice conversations with the AI coach.
+# Details:
+1. Create a SwiftUI view for voice conversations
+2. Implement large "Start Talking" button (bottom-right)
+3. Add visual feedback with waveform animation
+4. Display conversation history
+5. Add "Stop" button
+6. Implement context banner for current material/subject
+7. Create animations for state transitions
+8. Optimize for one-handed operation
+
+# Test Strategy:
+Test UI on various device sizes. Verify visual feedback during conversation. Test one-handed operation. Measure performance during active conversations.
+
+# Subtasks:
+## 1. Design SwiftUI View Structure for Voice Conversation UI [done]
+### Dependencies: None
+### Description: Create the basic SwiftUI view structure for the voice conversation interface, including layout and component organization.
+### Details:
+Design and implement the main SwiftUI view that will contain all voice conversation UI elements. Include container views for conversation history, context banner, and control buttons. Ensure the view adapts to different device sizes and orientations. Follow the app's design system for styling and spacing.
+
+## 2. Implement Start/Stop Conversation Controls [done]
+### Dependencies: 32.1
+### Description: Create the large 'Start Talking' button in the bottom-right corner and the 'Stop' button for controlling voice conversations.
+### Details:
+Design and implement a prominent 'Start Talking' button positioned in the bottom-right corner for easy thumb access. Create a 'Stop' button that appears during active conversations. Ensure buttons have appropriate visual states (normal, pressed, disabled) and haptic feedback. Optimize button size and positioning for one-handed operation.
+
+## 3. Create Waveform Animation for Voice Feedback [done]
+### Dependencies: 32.2
+### Description: Implement visual feedback with waveform animation that responds to user's voice input during conversations.
+### Details:
+Design and implement a responsive waveform animation that visualizes the user's voice input. The animation should dynamically respond to audio amplitude changes. Create smooth transitions between idle, listening, and processing states. Optimize the animation for performance to prevent UI lag during conversations.
+
+## 4. Implement Conversation History Display [done]
+### Dependencies: 32.1
+### Description: Create the UI component for displaying the history of the conversation between the user and AI coach.
+### Details:
+Implement a scrollable conversation history view that displays messages from both the user and AI coach. Design message bubbles with clear visual distinction between user and AI messages. Include timestamps and read indicators. Implement auto-scrolling to the latest message. Ensure the history maintains context when the keyboard appears or disappears.
+
+## 5. Develop Context Banner for Current Material/Subject [done]
+### Dependencies: 32.1
+### Description: Implement the context banner that displays information about the current learning material or subject being discussed.
+### Details:
+Design and implement a collapsible context banner at the top of the conversation view. Display current material title, subject, and progress information. Add functionality to expand/collapse the banner for more details. Ensure the banner provides sufficient context without taking too much screen space. Include visual indicators for active learning contexts.
+
+## 6. Create State Transition Animations [done]
+### Dependencies: 32.2, 32.3
+### Description: Implement smooth animations for transitions between different states of the voice conversation UI.
+### Details:
+Design and implement animations for transitions between idle, listening, processing, and response states. Create smooth animations for button state changes, waveform appearance/disappearance, and message additions. Implement loading indicators for processing states. Ensure animations provide clear visual feedback about the current state of the conversation.
+
+## 7. Optimize UI for One-Handed Operation [done]
+### Dependencies: 32.1, 32.2, 32.4
+### Description: Ensure the voice conversation interface is optimized for comfortable one-handed use across different device sizes.
+### Details:
+Analyze and optimize button placement, touch targets, and interaction patterns for one-handed operation. Implement reachability considerations for larger devices. Ensure critical controls are within thumb reach. Add gesture support for common actions. Test and refine the interface based on ergonomic principles for mobile device interaction.
+
+## 8. Implement Accessibility Features for Voice UI [done]
+### Dependencies: 32.1, 32.2, 32.3, 32.4, 32.5
+### Description: Add accessibility features to ensure the voice conversation UI is usable by people with different abilities.
+### Details:
+Implement VoiceOver support for all UI elements. Add appropriate accessibility labels and hints. Ensure proper focus order for screen readers. Implement alternative visual indicators for users who cannot see the waveform animation. Add support for Dynamic Type to allow text size adjustments. Test and refine accessibility features with assistive technologies.
+

@@ -1,0 +1,38 @@
+# Task ID: 41
+# Title: Implement Mind Map Export Functionality
+# Status: done
+# Dependencies: 39
+# Priority: low
+# Description: Create functionality to export mind maps in various formats.
+# Details:
+1. Implement Mermaid Markdown export
+2. Add OPML export functionality
+3. Create JSON export (native format)
+4. Implement optional XMind format export
+5. Add sharing via Files app
+6. Create export settings UI
+7. Implement background export for large mind maps
+8. Add success/failure notifications
+
+# Test Strategy:
+Test export in all supported formats. Verify exported files can be opened in appropriate applications. Test sharing functionality. Measure export performance with large mind maps.
+
+# Subtasks:
+## 1. Implement Core Export Formats (Markdown, OPML, JSON) [done]
+### Dependencies: None
+### Description: Develop the essential export functionality for the three primary formats: Mermaid Markdown, OPML, and JSON (native format).
+### Details:
+Create a unified export service that handles the conversion of mind map data structures to Mermaid Markdown, OPML, and JSON formats. Implement proper formatting for each export type, ensuring hierarchical relationships are preserved. Add file naming conventions and appropriate file extensions. Test each format with various mind map complexities to ensure accuracy and completeness of exported data.
+
+## 2. Develop Export UI and Sharing Integration [done]
+### Dependencies: 41.1
+### Description: Create a user interface for export settings and implement sharing functionality via the Files app.
+### Details:
+Design and implement an export settings UI that allows users to select format, customize export options, and initiate the export process. Add a preview capability when possible. Integrate with the iOS Files app for saving exports to user-selected locations. Implement share sheet functionality to allow direct sharing to other apps. Include appropriate icons and visual feedback during the export process.
+
+## 3. Implement Advanced Export Features (XMind, Background Processing) [done]
+### Dependencies: 41.1, 41.2
+### Description: Add support for XMind format export and implement background processing for large mind maps with appropriate notifications.
+### Details:
+Research and implement the XMind file format specification. Create a converter from the app's native mind map structure to XMind format. Develop background processing capability using iOS background tasks for handling large mind maps without blocking the UI. Implement a notification system to inform users of export completion or failures. Add progress indicators for lengthy exports. Optimize export algorithms for performance with large data sets.
+

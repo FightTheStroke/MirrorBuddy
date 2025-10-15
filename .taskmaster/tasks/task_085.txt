@@ -1,0 +1,11 @@
+# Task ID: 85
+# Title: Fix and Enhance Document Scanner
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Repair scanner functionality using VisionKit's DocumentCamera, supporting multi-page scanning, auto-crop, enhancement, and saving as PDF/images.
+# Details:
+Replace broken scanner code with VisionKit DocumentCamera. Implement multi-page session, auto-crop, and image enhancement. Save output as PDF or images and link to Material storage. Trigger OCR post-scan.
+
+# Test Strategy:
+Scan multiple pages, verify auto-crop/enhance, check output format and storage. Confirm OCR runs automatically.

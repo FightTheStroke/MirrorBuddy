@@ -1,0 +1,18 @@
+# Task ID: 38
+# Title: Implement Handwriting Recognition with Apple Pencil
+# Status: done
+# Dependencies: 35, 36
+# Priority: medium
+# Description: Create handwriting recognition functionality using Apple Pencil and VisionKit.
+# Details:
+1. Implement PencilKit canvas for input
+2. Integrate VisionKit for handwriting recognition
+3. Add GPT-5 vision for math notation
+4. Create correction and feedback mechanisms
+5. Implement real-time recognition
+6. Add support for mathematical symbols
+7. Create UI for editing recognized text
+8. Implement sharing of recognized content
+
+# Test Strategy:
+Test handwriting recognition with various writing styles. Verify math notation recognition. Test correction mechanisms. Measure recognition accuracy and speed.

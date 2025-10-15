@@ -1,0 +1,11 @@
+# Task ID: 98
+# Title: Enhance Child-Friendly UI and Empathetic Experience
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Simplify navigation, increase touch target size, add visual/haptic feedback, and ensure all text/voice interactions use personalized, empathetic tone.
+# Details:
+Limit to max 4 main tabs, large touch targets (min 44pt), clear Italian labels, icons + text. Add loading animations, success/error icons, progress bars, haptic feedback. Implement color system (max 6, high contrast). Personalize greetings and messages using stored name. Apply empathetic tone guidelines to all text/voice outputs.
+
+# Test Strategy:
+Test navigation and feedback with child users. Validate tone and personalization in all interactions. Check accessibility and error handling.

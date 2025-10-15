@@ -1,0 +1,44 @@
+# Task ID: 43
+# Title: Implement Gmail Integration for Assignment Extraction
+# Status: done
+# Dependencies: 7, 13, 16
+# Priority: high
+# Description: Integrate with Gmail to extract assignments from teacher emails.
+# Details:
+1. Implement Gmail API integration
+2. Create email filtering by sender
+3. Add parsing for assignment keywords ("Compito:", "Consegna:")
+4. Implement due date extraction from emails
+5. Create Task objects from parsed emails
+6. Add marking emails as read when processed
+7. Implement background sync using BGAppRefreshTask
+8. Create error handling and retry logic
+
+# Test Strategy:
+Test email parsing with various formats. Verify assignment and due date extraction accuracy. Test with real teacher emails. Measure parsing accuracy and performance.
+
+# Subtasks:
+## 1. Set Up Gmail API Integration and Authentication [done]
+### Dependencies: None
+### Description: Configure the iOS app to authenticate with Google using OAuth 2.0, enable the Gmail API in the Google Cloud Console, and obtain necessary credentials for API access.
+### Details:
+Create a project in the Google API Console, enable the Gmail API, and generate OAuth client credentials. Integrate Google Sign-In for iOS to handle user authentication and token management. Store credentials securely and ensure the app can request and refresh access tokens as needed.
+
+## 2. Implement Email Fetching, Filtering, and Parsing Logic [done]
+### Dependencies: 43.1
+### Description: Fetch emails from Gmail, filter by sender (teacher emails), and parse message content for assignment keywords and due dates.
+### Details:
+Use the Gmail API to fetch emails, applying filters by sender address. Scan email bodies and subjects for keywords like 'Compito:' and 'Consegna:'. Extract assignment details and due dates using regular expressions or natural language processing. Handle various email formats and encodings.
+
+## 3. Create and Sync Task Objects from Parsed Emails [done]
+### Dependencies: 43.2
+### Description: Transform parsed email data into Task objects, sync them with the local data store, and mark processed emails as read.
+### Details:
+Map extracted assignment details to Task model objects. Persist tasks using SwiftData. Mark processed emails as read via the Gmail API to avoid duplicate processing. Ensure task creation is atomic and idempotent.
+
+## 4. Implement Background Sync, Error Handling, and Retry Logic [done]
+### Dependencies: 43.3
+### Description: Add background sync using BGAppRefreshTask, robust error handling, and automatic retry mechanisms for failed operations.
+### Details:
+Schedule periodic background fetches using BGAppRefreshTask. Implement comprehensive error handling for network, API, and parsing failures. Add exponential backoff and retry logic for transient errors. Log errors for debugging and user feedback.
+

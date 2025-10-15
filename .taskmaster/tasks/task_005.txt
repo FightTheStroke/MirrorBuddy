@@ -1,0 +1,29 @@
+# Task ID: 5
+# Title: Define SwiftData Models for MindMaps
+# Status: done
+# Dependencies: 1, 3
+# Priority: high
+# Description: Create SwiftData models for MindMap entity with nodes and relationships.
+# Details:
+Create a MindMap model with the following properties:
+- id: UUID (primary key)
+- title: String
+- material: Relationship to Material entity
+- nodes: Relationship to MindMapNode entities (to-many)
+- createdAt: Date
+- updatedAt: Date
+
+Create a MindMapNode model with:
+- id: UUID (primary key)
+- text: String
+- imageUrl: URL (optional)
+- x: Double (position)
+- y: Double (position)
+- mindMap: Relationship to MindMap entity
+- parentNode: Relationship to MindMapNode entity (optional)
+- childNodes: Relationship to MindMapNode entities (to-many)
+
+Implement proper relationships with cascade delete rules.
+
+# Test Strategy:
+Create unit tests for MindMap and MindMapNode models. Test node creation, relationship establishment, and cascade delete functionality.
