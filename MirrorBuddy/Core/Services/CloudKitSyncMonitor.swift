@@ -51,7 +51,8 @@ final class CloudKitSyncMonitor {
     }
 
     /// Handle import events from CloudKit
-    @objc private func handleImportEvent(_ notification: Notification) {
+    /// nonisolated allows this @objc method to be called from any thread
+    @objc nonisolated private func handleImportEvent(_ notification: Notification) {
         // NotificationCenter can call from any thread, dispatch to main
         DispatchQueue.main.async { [weak self] in
             self?.syncStatus = .syncing
@@ -59,7 +60,8 @@ final class CloudKitSyncMonitor {
     }
 
     /// Handle export events to CloudKit
-    @objc private func handleExportEvent(_ notification: Notification) {
+    /// nonisolated allows this @objc method to be called from any thread
+    @objc nonisolated private func handleExportEvent(_ notification: Notification) {
         // NotificationCenter can call from any thread, dispatch to main
         DispatchQueue.main.async { [weak self] in
             self?.syncStatus = .syncing
