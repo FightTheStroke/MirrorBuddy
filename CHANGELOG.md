@@ -113,6 +113,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Docs/CONTENT_STYLE_GUIDE.md (NEW, comprehensive empathetic content guidelines)
     - Core/Services/EncouragementService.swift (NEW, encouragement message system)
 
+- **Subtask 98.5: User Testing Framework and Feedback Collection** (2025-10-15)
+  - Created comprehensive USER_TESTING_GUIDE.md for conducting child user testing
+  - Implemented FeedbackService for in-app feedback collection and usability tracking
+  - Established ethical testing guidelines (consent, comfort, no pressure)
+  - Defined recruitment criteria (ages 6-10, DSA representation, diversity)
+  - Created 45-minute testing protocol (welcome, first impressions, tasks, exploration, interview)
+  - Designed 5 core testing tasks (navigate, import, voice, tasks, customize)
+  - Developed observation checklist (touch targets, navigation, content, visual, engagement)
+  - Created feedback questions for children and parents
+  - Established quantitative metrics (completion rate, task time, error rate, accuracy)
+  - Defined severity rating system (Critical/High/Medium/Low)
+  - Documented refinement process (prioritize, quick wins, iterate, document)
+  - Created success criteria (80%+ completion, <20% errors, 70%+ positive)
+  - Implemented UserFeedback model with feedback types (bug, suggestion, compliment, usability, accessibility)
+  - Created UsabilityEvent tracking (task completion, touch misses, navigation, errors)
+  - Built FeedbackView SwiftUI component for easy feedback submission
+  - Added withFeedbackButton view modifier for any screen
+  - Implemented local feedback storage with pending sync capability
+  - Created usability event logging for analytics integration
+  - Files:
+    - Docs/USER_TESTING_GUIDE.md (NEW, comprehensive child testing protocols)
+    - Core/Services/FeedbackService.swift (NEW, feedback and usability tracking)
+
 ### Changed
 
 ### Fixed
