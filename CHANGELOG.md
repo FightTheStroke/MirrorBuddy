@@ -195,6 +195,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Files:
     - Core/Services/WhisperTranscriptionService.swift (NEW, 428 lines)
 
+- **Subtask 93.4: Transcript Merging and Timestamp Adjustment** (2025-10-15)
+  - Created TranscriptMergeService for combining chunk transcripts into complete lesson transcript
+  - Merges multiple TranscriptionResult objects into unified MergedTranscript
+  - Validates chunk continuity (no missing segments) before merging
+  - Sorts chunks by segment index for proper chronological order
+  - Preserves original recording timestamps (startTime/endTime from audio segments)
+  - Combines text from all chunks with proper spacing
+  - Creates TranscriptSegment for each chunk with metadata (index, text, timestamps, word count)
+  - Calculates overall statistics (total duration, word count, words per minute)
+  - MergedTranscript model with complete text, segments array, metadata
+  - Multiple output formats: Plain Text, Timestamped, SRT, WebVTT, JSON
+  - SRT subtitle format with proper timestamp syntax (HH:MM:SS,mmm)
+  - WebVTT subtitle format for web video players
+  - JSON export with pretty-printed formatting
+  - Timestamped text format with segment markers
+  - File export functionality to save transcripts in any format
+  - Timestamp formatting utilities (SRT, VTT, plain text)
+  - Formatted duration helpers (Xh Xm Xs format)
+  - Logger integration for debugging merge process
+  - Comprehensive error handling with MergeError enum (noTranscripts, discontinuousChunks)
+  - Files:
+    - Core/Services/TranscriptMergeService.swift (NEW, 374 lines)
+
 ### Changed
 
 ### Fixed
