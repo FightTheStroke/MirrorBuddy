@@ -4073,7 +4073,7 @@
         "testStrategy": "Test navigation and feedback with child users. Validate tone and personalization in all interactions. Check accessibility and error handling.",
         "priority": "high",
         "dependencies": [],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -4081,8 +4081,10 @@
             "description": "Simplify the navigation system and tab structure to be more intuitive for children, reducing cognitive load and improving discoverability.",
             "dependencies": [],
             "details": "Create wireframes for simplified navigation, limit menu depth to 2 levels, implement larger tab buttons with clear iconography, reduce text-heavy navigation, and ensure consistent placement of navigation elements across screens.\n<info added on 2025-10-15T18:45:40.393Z>\nNavigation structure redesign for children has been completed with the following implementation details:\n\nImplementation:\n- Reduced MainTabView from 5 tabs to 4 tabs (removed Settings tab per child-friendly guidelines)\n- Updated 'Voice' tab to Italian 'Voce' for language consistency\n- Increased all tab icons to 28pt (from default ~22pt) for better visibility\n- Enhanced tab labels with .headline font weight for improved readability\n- Configured UITabBarAppearance in onAppear to customize tab bar appearance\n- Applied larger fonts to tab labels (12pt medium for normal, 12pt semibold for selected)\n- Set color-coded icon states (gray for normal, blue for selected)\n\nTesting:\n- Built successfully on IpadDiMario simulator\n- Verified tab bar renders correctly with larger icons and labels\n- Navigation is simplified with only 4 essential tabs\n\nChild-Friendly Improvements:\n- Clearer iconography with larger icons (28pt)\n- Simplified navigation reduces cognitive load (4 tabs vs 5)\n- Better touch targets for small fingers (UITabBarAppearance configuration)\n- Consistent visual feedback for selection states\n\nFiles Modified:\n- MirrorBuddy/Features/Dashboard/Views/MainTabView.swift:15-95\n\nNext Steps:\n- Subtask 98.2 will optimize touch targets throughout the app to minimum 44x44px\n- Need to ensure all interactive elements meet child-friendly size requirements\n</info added on 2025-10-15T18:45:40.393Z>",
-            "status": "in-progress",
-            "testStrategy": ""
+            "status": "done",
+            "testStrategy": "",
+            "updatedAt": "2025-10-15T18:46:43.453Z",
+            "parentId": "undefined"
           },
           {
             "id": 2,
@@ -4091,9 +4093,11 @@
             "dependencies": [
               1
             ],
-            "details": "Increase touch target sizes to minimum 44x44px, add visual and audio feedback for interactions, implement forgiving touch areas, reduce accidental touch issues, and create a touch interaction style guide for developers.",
-            "status": "pending",
-            "testStrategy": ""
+            "details": "Increase touch target sizes to minimum 44x44px, add visual and audio feedback for interactions, implement forgiving touch areas, reduce accidental touch issues, and create a touch interaction style guide for developers.\n<info added on 2025-10-15T18:52:17.264Z>\n## Implementation Summary\n\nTouch target and feedback system optimization has been completed with comprehensive implementation of reusable components:\n\n- Created TouchTargetStyle.swift (421 lines) with multiple button styles:\n  * ChildFriendlyButtonStyle (48px minimum)\n  * IconButtonStyle (48px minimum)\n  * PrimaryActionButtonStyle (56px minimum)\n  * CardButtonStyle for large tappable areas\n  * ForgivingTouchAreaModifier for small visuals\n  * TouchTargetModifier for minimum size compliance\n  * HapticFeedback utility with 7 standardized types\n\n- Applied to MainTabView:\n  * QuickActionCard using .childFriendly style with haptic feedback\n  * Toolbar buttons using .icon style with 48px minimum\n  * Added accessibility labels and hints in Italian\n  * Integrated sensory feedback with scale animations (0.92-0.97)\n\n- Created comprehensive TOUCH_TARGET_GUIDE.md covering:\n  * Size standards (44/48/56/64px)\n  * Button style usage examples\n  * Feedback guidelines and animation standards\n  * WCAG compliance checklist\n  * Testing procedures\n\n- Testing confirmed successful implementation on IpadDiMario simulator\n\n- Child-friendly improvements include:\n  * 48px minimum touch targets (exceeding WCAG requirements)\n  * Sensory feedback on all interactions\n  * Subtle scale animations\n  * Forgiving touch areas\n  * Comprehensive accessibility support\n\nFiles created/modified include TouchTargetStyle.swift, TOUCH_TARGET_GUIDE.md, MainTabView.swift, and CHANGELOG.md.\n</info added on 2025-10-15T18:52:17.264Z>",
+            "status": "in-progress",
+            "testStrategy": "",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-15T18:47:18.416Z"
           },
           {
             "id": 3,
@@ -4104,7 +4108,8 @@
             ],
             "details": "Create a vibrant but non-distracting color palette, ensure WCAG AA compliance for text contrast, test with color vision deficiency simulations, implement consistent color coding for navigation, and document the color system for future reference.",
             "status": "pending",
-            "testStrategy": ""
+            "testStrategy": "",
+            "parentId": "undefined"
           },
           {
             "id": 4,
@@ -4117,7 +4122,8 @@
             ],
             "details": "Implement customizable avatars/themes, create age-appropriate content templates, develop encouraging feedback messages, establish voice and tone guidelines for all text, and create a content style guide for writers and designers.",
             "status": "pending",
-            "testStrategy": ""
+            "testStrategy": "",
+            "parentId": "undefined"
           },
           {
             "id": 5,
@@ -4130,9 +4136,14 @@
             ],
             "details": "Recruit diverse group of children for testing, design age-appropriate testing protocols, analyze usability metrics specific to children, identify pain points and opportunities for improvement, and implement refinements based on testing results.",
             "status": "pending",
-            "testStrategy": ""
+            "testStrategy": "",
+            "parentId": "undefined"
           }
-        ]
+        ],
+        "complexity": 7,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Break down the 'Enhance Child-Friendly UI and Empathetic Experience' task into subtasks covering: 1) Navigation simplification and tab structure, 2) Touch target optimization and feedback mechanisms, 3) Color system and visual accessibility implementation, 4) Personalization and empathetic tone guidelines, 5) Testing and validation with child users.",
+        "updatedAt": "2025-10-15T18:47:18.416Z"
       },
       {
         "id": 99,
@@ -4142,8 +4153,8 @@
         "testStrategy": "1. Unit Testing:\n   - Create unit tests for PCM16 encoding/decoding\n   - Test JSON event parsing with sample responses\n   - Verify audio buffer management works correctly\n\n2. Integration Testing:\n   - Test end-to-end audio flow from microphone to OpenAI API\n   - Verify bidirectional streaming with test conversations\n   - Test with various network conditions (good, poor, intermittent)\n\n3. Manual Testing:\n   - Conduct real voice conversations to verify natural interaction\n   - Test with different microphone sources (built-in, AirPods, wired headset)\n   - Verify audio quality and latency are acceptable\n   - Test interruption scenarios (incoming calls, app switching)\n\n4. Performance Testing:\n   - Measure CPU and memory usage during active conversations\n   - Test battery impact during extended voice sessions\n   - Verify audio pipeline works efficiently on older devices\n\n5. Regression Testing:\n   - Ensure fixes don't break other functionality\n   - Verify all voice conversation features still work",
         "status": "pending",
         "dependencies": [
-          31,
-          34
+          "31",
+          "34"
         ],
         "priority": "high",
         "subtasks": []
@@ -4156,9 +4167,9 @@
         "testStrategy": "1. Unit Testing:\n   - Create unit tests for VoiceConversation and VoiceMessage models\n   - Test CRUD operations in VoiceConversationViewModel\n   - Verify proper relationships between models\n   - Test filtering and search functionality\n\n2. Integration Testing:\n   - Test end-to-end flow from microphone input to persistent storage\n   - Verify conversation history loads correctly on app restart\n   - Test conversation management features (delete, search, filter)\n   - Verify UI updates correctly when messages are added\n\n3. Manual Testing:\n   - Record a voice conversation and verify messages appear in the UI\n   - Close and reopen the app to verify persistence\n   - Create multiple conversations and test navigation between them\n   - Test filtering by subject and search functionality\n   - Verify delete functionality works correctly\n   - Test with various message lengths and content types\n\n4. Performance Testing:\n   - Test with large conversation histories (100+ messages)\n   - Measure load time for conversation history\n   - Verify scrolling performance in the conversation view\n   - Test memory usage with multiple active conversations",
         "status": "pending",
         "dependencies": [
-          99,
-          31,
-          34
+          "99",
+          "31",
+          "34"
         ],
         "priority": "high",
         "subtasks": []
@@ -4171,11 +4182,11 @@
         "testStrategy": "1. Unit Testing:\n   - Create unit tests for StudyCoachPersonality service adapter\n   - Test fallback detection and transition logic\n   - Verify context switching functionality\n   - Test difficulty adjustment algorithms with simulated conversation history\n\n2. Integration Testing:\n   - Test end-to-end voice conversation with context integration\n   - Verify proper context propagation from SwiftData models\n   - Test offline mode by simulating API unavailability\n   - Verify learning profile preferences affect conversation style\n\n3. Performance Testing:\n   - Measure response time with and without context integration\n   - Test battery impact during extended conversations\n   - Measure memory usage during context switching\n   - Verify network efficiency with large conversation history\n\n4. User Scenario Testing:\n   - Create test scenarios for different learning disabilities\n   - Test with various subject materials and difficulty levels\n   - Verify error recovery in different failure scenarios\n   - Test with simulated poor network conditions\n\n5. Accessibility Testing:\n   - Verify voice coach accommodates dyslexia/dyscalculia needs\n   - Test with screen readers and other accessibility tools\n   - Verify error messages are clear and actionable\n   - Test color contrast and visual elements for accessibility",
         "status": "pending",
         "dependencies": [
-          31,
-          34,
-          3,
-          4,
-          11
+          "31",
+          "34",
+          "3",
+          "4",
+          "11"
         ],
         "priority": "high",
         "subtasks": []
@@ -4188,8 +4199,8 @@
         "testStrategy": "1. Functional Testing:\n   - Verify ContextBannerView displays correct subject/material information\n   - Test voice activation button positioning and responsiveness\n   - Confirm \"Lezione vocale\" quick action properly launches VoiceConversationView\n   - Validate all settings in the voice settings panel function correctly\n   - Test VoiceIndicatorView state changes during voice interactions\n   - Verify all voice shortcuts trigger appropriate actions\n   - Confirm all interactive elements have proper voice command labels\n\n2. Usability Testing:\n   - Conduct one-handed usage tests with various device sizes\n   - Measure time to complete common tasks using voice vs. touch\n   - Gather feedback on voice button placement and size\n   - Test with users of different hand sizes and dexterity levels\n\n3. Accessibility Testing:\n   - Verify VoiceOver compatibility with all new voice UI elements\n   - Test with screen readers to ensure proper labeling\n   - Validate color contrast meets accessibility standards\n   - Test with users who have motor impairments\n\n4. Performance Testing:\n   - Measure impact on battery life with voice features active\n   - Test voice response latency across different network conditions\n   - Verify smooth animations and transitions during voice interactions\n\n5. Integration Testing:\n   - Test voice features across all app screens and workflows\n   - Verify consistent behavior between voice and touch interactions\n   - Validate proper state preservation during navigation",
         "status": "pending",
         "dependencies": [
-          34,
-          32
+          "34",
+          "32"
         ],
         "priority": "high",
         "subtasks": []
@@ -4202,8 +4213,8 @@
         "testStrategy": "1. Create comprehensive test suite for voice command recognition:\n   - Test each command pattern with multiple variations and accents\n   - Verify correct routing of commands to appropriate features\n   - Test in noisy environments to ensure reliability\n\n2. Perform UI integration testing:\n   - Verify VoiceCommandFeedbackView appears correctly on all screens\n   - Test VoiceCommandButton functionality and visual feedback\n   - Ensure haptic and audio feedback work as expected\n\n3. Conduct navigation testing:\n   - Test all voice-first navigation commands across the app\n   - Verify context-aware navigation works correctly\n   - Test navigation between deeply nested screens\n\n4. Test dictation functionality:\n   - Verify accurate transcription of dictated tasks and notes\n   - Test editing commands during dictation\n   - Measure dictation accuracy across different content types\n\n5. Perform accessibility testing:\n   - Verify voice commands work alongside VoiceOver\n   - Test with different accessibility settings enabled\n   - Ensure feedback is perceivable for users with disabilities\n\n6. Conduct user testing:\n   - Have test users try voice commands without prior instruction\n   - Measure success rate of natural language commands\n   - Gather feedback on command discoverability\n\n7. Performance testing:\n   - Measure battery impact during extended voice command usage\n   - Test memory usage during continuous listening\n   - Verify app responsiveness during voice processing",
         "status": "pending",
         "dependencies": [
-          34,
-          101,
+          "34",
+          "101",
           "102"
         ],
         "priority": "high",
@@ -4217,7 +4228,7 @@
         "testStrategy": "1. Visual inspection:\n   - Verify ContextBannerView appears at the top of the ScrollView in MainTabView\n   - Confirm it displays the correct subject and material information\n   - Check that styling is consistent with app design\n\n2. Functional testing:\n   - Change the active subject in the app and verify the banner updates accordingly\n   - Change the active material and verify the banner reflects the change\n   - Test navigation between tabs to ensure context persistence\n\n3. UI testing:\n   - Test on different device sizes (iPhone SE, iPhone 14, iPhone 14 Pro Max, iPad)\n   - Verify the banner is visible and properly sized on all devices\n   - Check that the banner doesn't overlap with other UI elements\n\n4. Accessibility testing:\n   - Verify text contrast meets accessibility standards\n   - Test with VoiceOver to ensure context information is properly announced\n   - Check that the banner works with Dynamic Type settings\n\n5. Performance testing:\n   - Verify that adding the banner doesn't cause performance issues\n   - Check that scrolling remains smooth with the banner in place",
         "status": "pending",
         "dependencies": [
-          32
+          "32"
         ],
         "priority": "medium",
         "subtasks": []
@@ -4230,10 +4241,10 @@
         "testStrategy": "1. Functional testing:\n   - If implementing dynamic carousel:\n     * Verify that actions update based on user context\n     * Test that tapping each action performs the expected function\n     * Confirm that the carousel properly handles different numbers of actions\n     * Test horizontal scrolling behavior on different device sizes\n     * Verify badge counts update correctly\n\n   - If removing the section:\n     * Verify that the UI layout adjusts properly without the section\n     * Confirm that no functionality is lost or that alternatives exist\n     * Test that navigation flows remain intuitive\n\n2. User experience testing:\n   - Conduct A/B testing with both implementations\n   - Gather feedback on which approach better serves Mario's workflow\n   - Measure time-to-task completion with and without quick actions\n   - Observe natural usage patterns to determine if quick actions are discovered and used\n\n3. Performance testing:\n   - Measure any impact on app startup time\n   - Test scrolling performance of the carousel with many items\n   - Verify that dynamic content loading doesn't cause UI jank\n\n4. Accessibility testing:\n   - Verify VoiceOver compatibility\n   - Test dynamic text size support\n   - Confirm touch targets meet minimum size requirements (44×44pt)\n\n5. Integration testing:\n   - Verify that the implementation works correctly with the rest of the dashboard\n   - Test that state changes in other parts of the app are reflected in quick actions",
         "status": "pending",
         "dependencies": [
-          3,
-          4,
-          44,
-          55
+          "3",
+          "4",
+          "44",
+          "55"
         ],
         "priority": "low",
         "subtasks": []
@@ -4246,9 +4257,9 @@
         "testStrategy": "1. UI Integration Testing:\n   - Verify the voice command button appears in the correct position across all app screens\n   - Confirm the button maintains proper z-index and remains accessible when navigating between tabs\n   - Test that the button doesn't interfere with other interactive elements\n\n2. Functional Testing:\n   - Verify tapping the button activates voice recognition\n   - Confirm VoiceCommandFeedbackView appears when recognition is active\n   - Test that voice commands are properly recognized and executed\n   - Verify the feedback view disappears after command completion\n\n3. Usability Testing:\n   - Test one-handed operation with various hand sizes\n   - Verify the button is easily reachable with thumb\n   - Measure time-to-activation compared to previous implementation\n\n4. Accessibility Testing:\n   - Test with VoiceOver enabled\n   - Verify proper accessibility labels and hints\n   - Confirm alternative activation methods work correctly\n\n5. Performance Testing:\n   - Measure any impact on app performance or battery usage\n   - Verify smooth animations and transitions\n   - Test on older devices to ensure acceptable performance\n\n6. Edge Case Testing:\n   - Test behavior when keyboard is visible\n   - Verify proper handling during app backgrounding/foregrounding\n   - Test interaction with system-level interruptions",
         "status": "pending",
         "dependencies": [
-          102,
-          32,
-          34
+          "102",
+          "32",
+          "34"
         ],
         "priority": "high",
         "subtasks": []
@@ -4261,8 +4272,8 @@
         "testStrategy": "1. Adaptive Layout Testing:\n   - Test on iPad in landscape orientation to verify two-column layout appears correctly\n   - Test on iPhone in portrait orientation to verify single-column layout with navigation\n   - Test rotation between orientations to ensure smooth transitions\n   - Verify that the conversation selector and thread views display correctly in both layouts\n   - Test on various device sizes (iPhone SE, iPhone Pro Max, iPad mini, iPad Pro)\n\n2. Settings Functionality Testing:\n   - Verify the settings button opens the VoiceSettingsView\n   - Test each setting control (microphone preference, voice speed, language)\n   - Confirm settings are saved when clicking the Save button\n   - Verify settings persist between app launches\n   - Test that voice speed changes are applied to the audio pipeline\n   - Verify microphone preference changes are respected when starting a new conversation\n\n3. Persistence Integration Testing:\n   - Create a new conversation and verify it's saved to SwiftData\n   - Add messages to a conversation and confirm they persist after navigating away and back\n   - Test loading existing conversations from the conversation selector\n   - Verify conversation timestamps update correctly\n   - Test conversation title updates\n   - Verify conversations are properly sorted by date in the selector view\n\n4. UI Responsiveness Testing:\n   - Test UI performance with large conversation history\n   - Verify smooth animations during layout transitions\n   - Test accessibility features (VoiceOver compatibility, Dynamic Type)\n   - Verify proper keyboard handling when editing conversation titles\n\n5. Integration Testing:\n   - Test end-to-end flow from creating a conversation to saving and retrieving it\n   - Verify integration with the audio pipeline\n   - Test with real voice input to ensure conversation messages are correctly saved",
         "status": "pending",
         "dependencies": [
-          100,
-          102
+          "100",
+          "102"
         ],
         "priority": "high",
         "subtasks": []
@@ -4275,7 +4286,7 @@
         "testStrategy": "1. Verify all content from the original four tabs is correctly displayed in the new layout.\n\n2. Test with VoiceOver enabled to ensure all content is properly announced and navigable.\n\n3. Test with different content volumes:\n   - Materials with minimal content in each section\n   - Materials with extensive content in all sections\n   - Materials with uneven content distribution\n\n4. Perform usability testing with users who have learning disabilities to validate the improved cognitive load:\n   - Measure time to find specific information\n   - Track error rates when navigating between different content types\n   - Collect qualitative feedback on perceived ease of use\n\n5. Test on various device sizes to ensure the layout adapts appropriately:\n   - iPhone SE (smallest supported device)\n   - iPhone Pro Max (largest supported device)\n   - iPad (if applicable)\n\n6. Verify performance metrics:\n   - Measure scroll performance with large content sets\n   - Check memory usage compared to the previous implementation\n   - Ensure no regression in load times\n\n7. Conduct A/B testing with both implementations to gather quantitative data on user preference and efficiency.",
         "status": "pending",
         "dependencies": [
-          3
+          "3"
         ],
         "priority": "medium",
         "subtasks": []
@@ -4288,8 +4299,8 @@
         "testStrategy": "1. Unit Tests:\n   - Create unit tests for each new view model\n   - Verify business logic works correctly in isolation\n   - Test state management and data flow\n\n2. UI Tests:\n   - Verify each tab displays correctly\n   - Test navigation between tabs\n   - Ensure tab state is preserved when switching between tabs\n\n3. Integration Tests:\n   - Test the interaction between the tab views and their view models\n   - Verify data flows correctly between components\n\n4. Manual Testing:\n   - Navigate through all tabs and verify functionality matches pre-refactor behavior\n   - Test edge cases like rapid tab switching\n   - Verify performance is maintained or improved\n\n5. Code Review:\n   - Ensure proper separation of concerns\n   - Verify no business logic remains in MainTabView\n   - Check for consistent coding patterns across new files\n\n6. Regression Testing:\n   - Verify all existing functionality continues to work\n   - Test on multiple device sizes to ensure responsive design",
         "status": "pending",
         "dependencies": [
-          32,
-          44
+          "32",
+          "44"
         ],
         "priority": "medium",
         "subtasks": []
@@ -4297,15 +4308,14 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-15T17:23:09.224Z",
-      "taskCount": 98,
-      "completedCount": 86,
+      "lastModified": "2025-10-15T18:47:18.418Z",
+      "taskCount": 109,
+      "completedCount": 87,
       "tags": [
         "master"
       ],
-      "created": "2025-10-15T17:25:38.289Z",
-      "description": "Tasks for master context",
-      "updated": "2025-10-15T18:41:50.460Z"
+      "created": "2025-10-15T18:52:07.443Z",
+      "description": "Tasks for master context"
     }
   }
 }

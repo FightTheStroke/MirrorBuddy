@@ -134,6 +134,9 @@ struct DashboardView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .buttonStyle(.icon(color: .blue, size: 48))
+                    .accessibilityLabel("Aggiungi materiale")
+                    .accessibilityHint("Tocca due volte per importare nuovo materiale")
                 }
             }
             .sheet(isPresented: $showingImport) {
@@ -304,6 +307,9 @@ struct QuickActionCard: View {
             .background(color.opacity(0.1))
             .cornerRadius(12)
         }
+        .buttonStyle(.childFriendly)
+        .accessibilityLabel(title)
+        .accessibilityHint("Tocca due volte per aprire")
     }
 }
 
@@ -443,7 +449,10 @@ struct TasksView: View {
                     } label: {
                         Image(systemName: isSyncing ? "arrow.triangle.2.circlepath" : "envelope.arrow.triangle.branch")
                     }
+                    .buttonStyle(.icon(color: .blue, size: 48))
                     .disabled(isSyncing)
+                    .accessibilityLabel(isSyncing ? "Sincronizzazione in corso" : "Sincronizza email e calendario")
+                    .accessibilityHint("Tocca due volte per aprire le impostazioni di sincronizzazione")
                 }
 
                 ToolbarItem {
@@ -452,6 +461,9 @@ struct TasksView: View {
                     } label: {
                         Image(systemName: "plus")
                     }
+                    .buttonStyle(.icon(color: .blue, size: 48))
+                    .accessibilityLabel("Aggiungi compito")
+                    .accessibilityHint("Tocca due volte per creare un nuovo compito")
                 }
             }
             .sheet(isPresented: $showingSyncSheet) {
