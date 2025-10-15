@@ -22,6 +22,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Preview states: Idle, Recording, Paused, Low Battery
   - Files: Features/Voice/Views/ExtendedVoiceRecordingView.swift
 
+- **Subtask 91.5: Extended Recording Session Management** (2025-10-15)
+  - Implemented file merging system using AVComposition for auto-saved segments
+  - Automatic segment merging on recording stop (exports to single .m4a file)
+  - Backup segment tracking and cleanup after successful merge
+  - Memory warning monitoring with automatic save trigger
+  - Recording statistics tracking (duration, file size, segment count, quality)
+  - Completion notifications in Italian with formatted duration
+  - Abandoned session cleanup (removes backups older than 7 days on init)
+  - RecordingStats struct with formatted helpers (fileSizeMB, formattedDuration, formattedFileSize)
+  - Error recovery for interrupted recordings
+  - Files: Core/Services/ExtendedVoiceRecordingService.swift (extended)
+
 ### Changed
 
 ### Fixed

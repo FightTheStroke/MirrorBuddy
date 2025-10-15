@@ -27,6 +27,7 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
     @Published var currentRecordingURL: URL?
     @Published var batteryLevel: Float = 1.0
     @Published var isLowBattery: Bool = false
+    @Published var recordingStats: RecordingStats?
 
     // MARK: - Configuration
 
@@ -46,6 +47,8 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
     private var autoSaveTimer: Timer?
     private var recordingStartTime: Date?
     private var sessionIdentifier: String?
+    private var backupSegments: [URL] = []
+    private var memoryWarningObserver: NSObjectProtocol?
 
     // MARK: - Initialization
 
@@ -53,6 +56,8 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
         super.init()
         setupAudioSession()
         setupBatteryMonitoring()
+        setupMemoryMonitoring()
+        cleanupAbandonedSessions()
     }
 
     // MARK: - Audio Session Setup (Subtask 91.1)
@@ -175,20 +180,43 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
         audioRecorder?.stop()
         stopTimers()
 
+        // Calculate final stats
+        let finalDuration = recordingDuration
+        let fileSize = try? currentRecordingURL.flatMap {
+            try FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int64
+        }
+
+        // Merge segments if there are backups
+        let finalURL: URL?
+        if !backupSegments.isEmpty, let mainURL = currentRecordingURL {
+            finalURL = try await mergeRecordingSegments(mainURL: mainURL, backups: backupSegments)
+        } else {
+            finalURL = currentRecordingURL
+        }
+
+        // Create final stats
+        recordingStats = RecordingStats(
+            duration: finalDuration,
+            fileSize: fileSize ?? 0,
+            segmentCount: backupSegments.count + 1,
+            quality: "64 kbps AAC",
+            sessionID: sessionIdentifier ?? "unknown"
+        )
+
+        // Send completion notification
+        sendCompletionNotification(duration: finalDuration)
+
         // Update state
         isRecording = false
         isPaused = false
-
-        let url = currentRecordingURL
         currentRecordingURL = nil
         sessionIdentifier = nil
         recordingStartTime = nil
+        backupSegments.removeAll()
 
-        logger.info("Recording stopped. Duration: \(self.recordingDuration) seconds")
+        logger.info("Recording stopped. Duration: \(finalDuration) seconds. Final URL: \(finalURL?.lastPathComponent ?? "none")")
 
-        return await MainActor.run {
-            url
-        }
+        return finalURL
     }
 
     // MARK: - Auto-Save (Subtask 91.2)
@@ -218,6 +246,12 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
                 )
 
                 try FileManager.default.copyItem(at: currentURL, to: backupURL)
+
+                // Track backup segment
+                await MainActor.run {
+                    self.backupSegments.append(backupURL)
+                }
+
                 logger.info("Auto-save completed: \(backupURL.lastPathComponent)")
 
             } catch {
@@ -379,6 +413,229 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
         let seconds = Int(self.recordingDuration) % 60
 
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    // MARK: - Session Management (Subtask 91.5)
+
+    /// Merge recording segments into single file
+    private func mergeRecordingSegments(mainURL: URL, backups: [URL]) async throws -> URL {
+        logger.info("Merging \(backups.count + 1) recording segments...")
+
+        let composition = AVMutableComposition()
+
+        guard let audioTrack = composition.addMutableTrack(
+            withMediaType: .audio,
+            preferredTrackID: kCMPersistentTrackID_Invalid
+        ) else {
+            throw RecordingError.recordingFailed
+        }
+
+        var currentTime = CMTime.zero
+
+        // Add all backup segments first (in order)
+        for backupURL in backups.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }) {
+            let asset = AVAsset(url: backupURL)
+
+            guard let assetTrack = try await asset.loadTracks(withMediaType: .audio).first else {
+                logger.warning("Skipping invalid backup segment: \(backupURL.lastPathComponent)")
+                continue
+            }
+
+            let duration = try await asset.load(.duration)
+            let timeRange = CMTimeRange(start: .zero, duration: duration)
+
+            try audioTrack.insertTimeRange(timeRange, of: assetTrack, at: currentTime)
+            currentTime = CMTimeAdd(currentTime, duration)
+        }
+
+        // Add main recording file last
+        let mainAsset = AVAsset(url: mainURL)
+        if let mainTrack = try await mainAsset.loadTracks(withMediaType: .audio).first {
+            let duration = try await mainAsset.load(.duration)
+            let timeRange = CMTimeRange(start: .zero, duration: duration)
+            try audioTrack.insertTimeRange(timeRange, of: mainTrack, at: currentTime)
+        }
+
+        // Export merged file
+        let mergedURL = try createMergedURL(sessionID: sessionIdentifier ?? "unknown")
+
+        guard let exporter = AVAssetExportSession(asset: composition, presetName: AVAssetExportPresetAppleM4A) else {
+            throw RecordingError.recordingFailed
+        }
+
+        exporter.outputURL = mergedURL
+        exporter.outputFileType = .m4a
+
+        await exporter.export()
+
+        if exporter.status == .completed {
+            logger.info("Merge completed successfully: \(mergedURL.lastPathComponent)")
+
+            // Clean up backup segments
+            for backupURL in backups {
+                try? FileManager.default.removeItem(at: backupURL)
+            }
+
+            // Remove original main file if different from merged
+            if mainURL != mergedURL {
+                try? FileManager.default.removeItem(at: mainURL)
+            }
+
+            return mergedURL
+        } else {
+            throw RecordingError.recordingFailed
+        }
+    }
+
+    /// Create URL for merged recording
+    private func createMergedURL(sessionID: String) throws -> URL {
+        let documentsPath = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask
+        )[0]
+
+        let recordingsPath = documentsPath.appendingPathComponent("Recordings", isDirectory: true)
+
+        let fileName = "lesson_\(sessionID)_merged.m4a"
+        return recordingsPath.appendingPathComponent(fileName)
+    }
+
+    /// Setup memory monitoring for long recordings
+    private func setupMemoryMonitoring() {
+        memoryWarningObserver = NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            self?.handleMemoryWarning()
+        }
+    }
+
+    /// Handle memory warning during recording
+    @MainActor private func handleMemoryWarning() {
+        guard isRecording else { return }
+
+        logger.warning("Memory warning received during recording")
+
+        // Trigger immediate auto-save to free memory
+        autoSaveRecording()
+
+        // Consider reducing recording quality if needed (future enhancement)
+    }
+
+    /// Send notification when recording completes
+    private func sendCompletionNotification(duration: TimeInterval) {
+        _Concurrency.Task {
+            let content = UNMutableNotificationContent()
+            content.title = "Registrazione Completata"
+
+            let hours = Int(duration) / 3600
+            let minutes = (Int(duration) % 3600) / 60
+
+            if hours > 0 {
+                content.body = "Lezione registrata: \(hours)h \(minutes)m salvata con successo."
+            } else {
+                content.body = "Lezione registrata: \(minutes) minuti salvata con successo."
+            }
+
+            content.sound = .default
+
+            let request = UNNotificationRequest(
+                identifier: "recording-complete-\(Date().timeIntervalSince1970)",
+                content: content,
+                trigger: nil
+            )
+
+            try? await UNUserNotificationCenter.current().add(request)
+        }
+    }
+
+    /// Clean up abandoned recording sessions on init
+    private func cleanupAbandonedSessions() {
+        _Concurrency.Task { [weak self] in
+            guard let self else { return }
+
+            do {
+                let documentsPath = FileManager.default.urls(
+                    for: .documentDirectory,
+                    in: .userDomainMask
+                )[0]
+
+                let backupsPath = documentsPath.appendingPathComponent("Recordings/Backups", isDirectory: true)
+
+                // Check if backups directory exists
+                guard FileManager.default.fileExists(atPath: backupsPath.path) else {
+                    return
+                }
+
+                let backupFiles = try FileManager.default.contentsOfDirectory(
+                    at: backupsPath,
+                    includingPropertiesForKeys: [.creationDateKey],
+                    options: .skipsHiddenFiles
+                )
+
+                // Remove backup files older than 7 days
+                let sevenDaysAgo = Date().addingTimeInterval(-7 * 24 * 60 * 60)
+
+                for fileURL in backupFiles {
+                    let attributes = try FileManager.default.attributesOfItem(atPath: fileURL.path)
+                    if let creationDate = attributes[.creationDate] as? Date,
+                       creationDate < sevenDaysAgo {
+                        try FileManager.default.removeItem(at: fileURL)
+                        logger.info("Cleaned up old backup: \(fileURL.lastPathComponent)")
+                    }
+                }
+
+            } catch {
+                logger.error("Cleanup failed: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Get current recording statistics
+    @MainActor func getRecordingStatistics() -> RecordingStats? {
+        guard isRecording else { return recordingStats }
+
+        let fileSize = try? currentRecordingURL.flatMap {
+            try FileManager.default.attributesOfItem(atPath: $0.path)[.size] as? Int64
+        }
+
+        return RecordingStats(
+            duration: recordingDuration,
+            fileSize: fileSize ?? 0,
+            segmentCount: backupSegments.count + 1,
+            quality: "64 kbps AAC",
+            sessionID: sessionIdentifier ?? "unknown"
+        )
+    }
+}
+
+// MARK: - Recording Statistics
+
+struct RecordingStats {
+    let duration: TimeInterval
+    let fileSize: Int64
+    let segmentCount: Int
+    let quality: String
+    let sessionID: String
+
+    var fileSizeMB: Double {
+        Double(fileSize) / (1024 * 1024)
+    }
+
+    var formattedDuration: String {
+        let hours = Int(duration) / 3600
+        let minutes = (Int(duration) % 3600) / 60
+        let seconds = Int(duration) % 60
+        return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    var formattedFileSize: String {
+        if fileSizeMB < 1 {
+            return String(format: "%.1f KB", Double(fileSize) / 1024)
+        } else {
+            return String(format: "%.1f MB", fileSizeMB)
+        }
     }
 }
 
