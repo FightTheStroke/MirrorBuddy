@@ -86,7 +86,8 @@ struct MirrorBuddyApp: App {
                     _Concurrency.Task { @MainActor in
                         PerformanceMonitor.shared.completeAppLaunch()
                         PerformanceMonitor.shared.setMemoryBaseline()
-                        PerformanceMonitor.shared.startFPSMonitoring()
+                        // FPS monitoring disabled - causes severe performance degradation
+                        // PerformanceMonitor.shared.startFPSMonitoring()
                         PerformanceMonitor.shared.logBatteryStatus()
                     }
 
