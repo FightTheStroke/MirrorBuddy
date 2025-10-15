@@ -70,3 +70,6 @@ build/
 Packages/
 Package.resolved
 
+
+# Google OAuth credentials
+MirrorBuddy/Resources/GoogleService-Info.plist
