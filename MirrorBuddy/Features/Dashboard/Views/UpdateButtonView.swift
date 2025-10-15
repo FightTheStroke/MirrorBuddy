@@ -327,20 +327,26 @@ struct ResultCard: View {
 }
 
 #Preview("Updating") {
-    UpdateManager.shared.progress.isUpdating = true
-    UpdateManager.shared.progress.currentStep = .syncingDrive
-    UpdateManager.shared.progress.statusMessage = "Cerco nuovi documenti..."
-    UpdateManager.shared.progress.progress = 0.4
-    return UpdateButtonView()
+    let _ = {
+        UpdateManager.shared.progress.isUpdating = true
+        UpdateManager.shared.progress.currentStep = .syncingDrive
+        UpdateManager.shared.progress.statusMessage = "Cerco nuovi documenti..."
+        UpdateManager.shared.progress.progress = 0.4
+    }()
+
+    UpdateButtonView()
         .modelContainer(for: Material.self, inMemory: true)
 }
 
 #Preview("Completed") {
-    UpdateManager.shared.progress.currentStep = .completed
-    UpdateManager.shared.progress.statusMessage = "Trovati: 3 nuovi documenti, 2 compiti"
-    UpdateManager.shared.progress.newDocumentsCount = 3
-    UpdateManager.shared.progress.newTasksCount = 2
-    UpdateManager.shared.progress.mindMapsGenerated = 3
-    return UpdateButtonView()
+    let _ = {
+        UpdateManager.shared.progress.currentStep = .completed
+        UpdateManager.shared.progress.statusMessage = "Trovati: 3 nuovi documenti, 2 compiti"
+        UpdateManager.shared.progress.newDocumentsCount = 3
+        UpdateManager.shared.progress.newTasksCount = 2
+        UpdateManager.shared.progress.mindMapsGenerated = 3
+    }()
+
+    UpdateButtonView()
         .modelContainer(for: Material.self, inMemory: true)
 }

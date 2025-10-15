@@ -419,6 +419,12 @@
     "Add your first task to get started" : {
 
     },
+    "Aggiornamento completato!" : {
+
+    },
+    "Aggiornami" : {
+
+    },
     "Aiuti alla Lettura" : {
 
     },
@@ -1530,6 +1536,9 @@
     "OpenAI API Key" : {
 
     },
+    "Ops! C'è un problema" : {
+
+    },
     "Options menu" : {
 
     },
@@ -1653,6 +1662,9 @@
     "Save" : {
 
     },
+    "Scansiona Documento" : {
+
+    },
     "Scopri le Funzionalità" : {
 
     },
@@ -1696,6 +1708,9 @@
 
     },
     "Sign Out" : {
+
+    },
+    "Sincronizza documenti, mail e calendario" : {
 
     },
     "Sincronizza Email e Calendar" : {
