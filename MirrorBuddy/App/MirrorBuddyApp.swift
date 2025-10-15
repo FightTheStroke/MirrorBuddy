@@ -43,7 +43,8 @@ struct MirrorBuddyApp: App {
             Flashcard.self,
             Task.self,
             UserProgress.self,
-            TrackedDriveFile.self
+            TrackedDriveFile.self,
+            Transcript.self
         ])
 
         // Automatically enable CloudKit on real devices, disable on simulator

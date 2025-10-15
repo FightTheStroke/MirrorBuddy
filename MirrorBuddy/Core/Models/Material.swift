@@ -42,6 +42,9 @@ final class Material {
     @Relationship(deleteRule: .nullify, inverse: \Task.material)
     var tasks: [Task]?
 
+    @Relationship(deleteRule: .cascade)
+    var transcript: Transcript?
+
     init(
         title: String,
         subject: SubjectEntity? = nil,

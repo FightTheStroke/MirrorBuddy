@@ -218,6 +218,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Files:
     - Core/Services/TranscriptMergeService.swift (NEW, 374 lines)
 
+- **Subtask 93.5: Transcript Storage and Material Linking** (2025-10-15)
+  - Created Transcript SwiftData model for persisting lesson transcripts
+  - Integrated Transcript into SwiftData schema with CloudKit sync support
+  - Added Material.transcript relationship (one-to-one, cascade delete)
+  - TranscriptStorageService for managing transcript persistence
+  - Store transcript text with full metadata (duration, words, language, timestamps)
+  - Link transcripts to Material entities for lesson association
+  - Store transcript segments as JSON in external storage (@Attribute(.externalStorage))
+  - Export transcripts to multiple formats (SRT, VTT, JSON) with URL tracking
+  - Full CRUD operations: create, read, update, delete with relationship management
+  - Search transcripts by text content (localizedCaseInsensitiveContains)
+  - Get excerpt around search terms with configurable context length
+  - Fetch transcripts by date range with predicate filtering
+  - TranscriptStatistics for analytics (total count, words, duration, linkage %)
+  - Automatic file cleanup on transcript deletion (SRT, VTT, JSON exports)
+  - Formatted duration helpers (Xh Xm Xs format)
+  - Words per minute calculation
+  - Update tracking with lastModifiedAt timestamps
+  - Logger integration for debugging storage operations
+  - Comprehensive SwiftData relationships and delete rules
+  - Files:
+    - Core/Models/Transcript.swift (NEW, 94 lines)
+    - Core/Services/TranscriptStorageService.swift (NEW, 268 lines)
+    - Core/Models/Material.swift (MODIFIED: added transcript relationship)
+    - App/MirrorBuddyApp.swift (MODIFIED: added Transcript to schema)
+
 ### Changed
 
 ### Fixed
