@@ -172,6 +172,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Files:
     - Core/Services/WhisperAudioOptimizer.swift (NEW, 417 lines)
 
+- **Subtask 93.3: Whisper API Transcription Integration** (2025-10-15)
+  - Created WhisperTranscriptionService for OpenAI Whisper API integration
+  - Implements OpenAI Whisper API v1 audio transcription endpoint
+  - Multipart form data HTTP request construction for audio file upload
+  - API key management (environment variable, programmatic setting, keychain ready)
+  - Single segment and batch transcription support
+  - Robust error handling with retry logic (3 attempts, exponential backoff)
+  - Rate limiting (max 3 concurrent requests) to avoid API throttling
+  - Request timeout configuration (60 seconds per request)
+  - Italian language support (language: "it" parameter)
+  - Verbose JSON response format for detailed transcription metadata
+  - TranscriptionResult model with segment index, text, timestamps, metadata
+  - WhisperAPIResponse decoder for Whisper verbose_json format
+  - Batch transcription progress callbacks
+  - BatchTranscriptionStats for tracking success rate, duration, word count
+  - Formatted timestamp helpers (HH:MM:SS format)
+  - Comprehensive error classification (retryable vs non-retryable)
+  - Error types: missingAPIKey, badRequest, authenticationFailed, rateLimitExceeded, serverError
+  - Logger integration for debugging API calls and responses
+  - Supports optional prompt parameter for improved transcription accuracy
+  - Files:
+    - Core/Services/WhisperTranscriptionService.swift (NEW, 428 lines)
+
 ### Changed
 
 ### Fixed
