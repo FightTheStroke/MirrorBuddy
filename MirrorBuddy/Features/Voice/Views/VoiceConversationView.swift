@@ -308,19 +308,25 @@ final class VoiceConversationViewModel: ObservableObject {
     // MARK: - Setup
 
     private func setupCallbacks() {
-        // Audio pipeline callbacks
+        // Audio pipeline callbacks (wrap in MainActor to avoid crashes)
         audioPipeline.onAudioLevelChanged = { [weak self] level in
-            self?.updateWaveform(with: level)
+            _Concurrency.Task { @MainActor in
+                self?.updateWaveform(with: level)
+            }
         }
 
         audioPipeline.onInterruption = { [weak self] began in
-            if began {
-                self?.stopConversation()
+            _Concurrency.Task { @MainActor in
+                if began {
+                    self?.stopConversation()
+                }
             }
         }
 
         audioPipeline.onError = { [weak self] (error: Error) in
-            self?.showError(error.localizedDescription)
+            _Concurrency.Task { @MainActor in
+                self?.showError(error.localizedDescription)
+            }
         }
 
         // Realtime client callbacks
