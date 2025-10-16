@@ -10,9 +10,12 @@ import SwiftData
 
 struct MainTabView: View {
     @State private var selectedTab = 0
+    @State private var showingVoiceInterface = false
 
     var body: some View {
-        TabView(selection: $selectedTab) {
+        ZStack {
+            // Main tab view
+            TabView(selection: $selectedTab) {
             // MARK: - Dashboard Tab (Materiali)
             DashboardView()
                 .tabItem {
@@ -92,6 +95,28 @@ struct MainTabView: View {
 
             UITabBar.appearance().standardAppearance = appearance
             UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+
+            // MARK: - Persistent Voice Button (Task 106)
+            // Floating voice activation button accessible from all tabs
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    PersistentVoiceButton(isPresented: $showingVoiceInterface)
+                        .padding(.trailing, 16)
+                        .padding(.bottom, 90) // Position above tab bar
+                        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                }
+            }
+            .allowsHitTesting(true)
+
+            // Voice interface sheet
+            .sheet(isPresented: $showingVoiceInterface) {
+                NavigationStack {
+                    VoiceConversationView()
+                }
+            }
         }
     }
 }
