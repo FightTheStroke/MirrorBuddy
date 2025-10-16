@@ -106,21 +106,26 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Big "Aggiornami" button - front and center
-                    UpdateButtonView()
-                        .padding(.top)
+            VStack(spacing: 0) {
+                // Context Banner at the top (Task 102.1)
+                ContextBannerView()
 
-                    QuickActionsSection(showingImport: $showingImport)
-                    MaterialsSection(
-                        materials: materials,
-                        subjects: subjects,
-                        showingImport: $showingImport,
-                        selectedMaterial: $selectedMaterial
-                    )
+                ScrollView {
+                    VStack(spacing: 20) {
+                        // Big "Aggiornami" button - front and center
+                        UpdateButtonView()
+                            .padding(.top)
+
+                        QuickActionsSection(showingImport: $showingImport)
+                        MaterialsSection(
+                            materials: materials,
+                            subjects: subjects,
+                            showingImport: $showingImport,
+                            selectedMaterial: $selectedMaterial
+                        )
+                    }
+                    .padding(.vertical)
                 }
-                .padding(.vertical)
             }
             .navigationTitle("MirrorBuddy")
             .toolbar {
@@ -154,6 +159,7 @@ struct QuickActionsSection: View {
     @Binding var showingImport: Bool
     @State private var showingScanner = false
     @State private var scannedMaterial: Material?
+    @State private var showingVoiceConversation = false // Task 102.3
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -184,7 +190,8 @@ struct QuickActionsSection: View {
                         title: "Lezione vocale",
                         color: .purple
                     ) {
-                        // TODO: Start voice lesson
+                        // Launch voice conversation (Task 102.3)
+                        showingVoiceConversation = true
                     }
                 }
                 .padding(.horizontal)
@@ -198,6 +205,12 @@ struct QuickActionsSection: View {
         }
         .sheet(item: $scannedMaterial) { material in
             MaterialDetailView(material: material)
+        }
+        .sheet(isPresented: $showingVoiceConversation) {
+            // Task 102.3: Wire voice conversation integration
+            NavigationStack {
+                VoiceConversationView()
+            }
         }
     }
 }

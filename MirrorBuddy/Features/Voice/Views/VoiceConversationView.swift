@@ -1,10 +1,21 @@
 import SwiftUI
+import SwiftData
 @preconcurrency import Combine
 
 /// Voice conversation UI for AI coach interactions
 struct VoiceConversationView: View {
-    @StateObject private var viewModel = VoiceConversationViewModel()
+    @StateObject private var viewModel: VoiceConversationViewModel
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+
+    // Optional conversation ID to load existing conversation
+    let conversationID: UUID?
+
+    init(conversationID: UUID? = nil) {
+        self.conversationID = conversationID
+        // Note: We can't access @Environment in init, so we'll configure in onAppear
+        _viewModel = StateObject(wrappedValue: VoiceConversationViewModel())
+    }
 
     var body: some View {
         ZStack {
@@ -52,6 +63,19 @@ struct VoiceConversationView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage)
+        }
+        .sheet(isPresented: $viewModel.showSettings) {
+            // Task 102.4: Voice Settings Panel
+            VoiceSettingsView()
+        }
+        .onAppear {
+            // Configure ViewModel with modelContext
+            viewModel.configure(modelContext: modelContext)
+
+            // Load existing conversation if ID provided
+            if let conversationID = conversationID {
+                viewModel.loadConversation(id: conversationID)
+            }
         }
     }
 
@@ -135,9 +159,9 @@ struct VoiceConversationView: View {
 
     private var controlsView: some View {
         HStack(spacing: 24) {
-            // Settings button (left)
+            // Settings button (left) - Task 102.4
             Button {
-                viewModel.showSettings()
+                viewModel.toggleSettings()
             } label: {
                 Image(systemName: "gearshape.fill")
                     .font(.title2)
@@ -210,7 +234,7 @@ struct VoiceConversationView: View {
 // MARK: - Message Bubble View
 
 struct MessageBubbleView: View {
-    let message: VoiceMessage
+    let message: MessageBubbleModel
 
     var body: some View {
         HStack {
@@ -260,9 +284,9 @@ struct WaveformBarView: View {
     }
 }
 
-// MARK: - Voice Message Model
+// MARK: - Message Bubble View Model (temporary UI model)
 
-struct VoiceMessage: Identifiable {
+struct MessageBubbleModel: Identifiable {
     let id = UUID()
     let content: String
     let isFromUser: Bool
@@ -276,7 +300,7 @@ final class VoiceConversationViewModel: ObservableObject {
     // MARK: - Published State
 
     @Published var isConversationActive = false
-    @Published var conversationHistory: [VoiceMessage] = []
+    @Published var conversationHistory: [MessageBubbleModel] = []
     @Published var waveformAmplitudes: [CGFloat] = Array(repeating: 0.3, count: 20)
     @Published var pulseAnimation = false
     @Published var isUserSpeaking = false
@@ -284,21 +308,56 @@ final class VoiceConversationViewModel: ObservableObject {
     @Published var currentMaterial: String?
     @Published var showError = false
     @Published var errorMessage = ""
+    @Published var showSettings = false // Task 102.4
 
     // MARK: - Dependencies
 
     private let audioPipeline = AudioPipelineManager.shared
     private var realtimeClient: OpenAIRealtimeClient?
+    private var conversationService: VoiceConversationService?
 
     private var waveformTimer: Timer?
     private var cancellables = Set<AnyCancellable>()
 
+    // MARK: - Persistence
+
+    /// Current active conversation
+    private var currentConversation: VoiceConversation?
+
+    /// Subject for current conversation
+    private var currentSubjectEntity: SubjectEntity?
+
+    /// Material for current conversation
+    private var currentMaterialEntity: Material?
+
+    // MARK: - Audio Buffering
+
+    /// Audio buffer for accumulating chunks before sending
+    private var audioBuffer = Data()
+
+    /// Buffer size threshold (100ms at 24kHz PCM16 mono = 4800 bytes)
+    private let bufferSizeThreshold = 4800
+
+    /// Timer for periodic audio buffer commits
+    private var audioCommitTimer: Timer?
+
+    /// Time since last audio activity (for auto-commit)
+    private var lastAudioTime = Date()
+
+    /// Accumulated AI response text for streaming
+    private var currentAIResponseText = ""
+
     // MARK: - Initialization
 
-    init() {
+    init(modelContext: ModelContext? = nil) {
         // Initialize OpenAI client if configuration available
         if let config = OpenAIConfiguration.loadFromEnvironment() {
             realtimeClient = OpenAIRealtimeClient(configuration: config)
+        }
+
+        // Initialize conversation service if modelContext provided
+        if let context = modelContext {
+            conversationService = VoiceConversationService(modelContext: context)
         }
 
         setupCallbacks()
@@ -312,6 +371,12 @@ final class VoiceConversationViewModel: ObservableObject {
         audioPipeline.onAudioLevelChanged = { [weak self] level in
             _Concurrency.Task { @MainActor in
                 self?.updateWaveform(with: level)
+            }
+        }
+
+        audioPipeline.onAudioData = { [weak self] audioData in
+            _Concurrency.Task { @MainActor in
+                await self?.bufferAndSendAudio(audioData)
             }
         }
 
@@ -336,20 +401,80 @@ final class VoiceConversationViewModel: ObservableObject {
             switch message {
             case .serverEvent(let event):
                 switch event {
+                case .sessionCreated(let session):
+                    // Session initialized successfully
+                    break
+
+                case .responseCreated(let response):
+                    // New response started
+                    break
+
                 case .responseTextDelta(let textDelta):
                     // Handle incremental text from AI
                     _Concurrency.Task { @MainActor in
-                        // TODO: Handle text delta streaming
-                        self.addAIMessage(textDelta.delta)
+                        self.handleTextDelta(textDelta.delta)
                     }
-                case .responseDone:
-                    // Response completed
+
+                case .responseAudioDelta:
+                    // Audio handled via onAudioData callback
                     break
+
+                case .responseDone(let responseDone):
+                    // Response completed - finalize AI message
+                    _Concurrency.Task { @MainActor in
+                        self.finalizeAIResponse()
+                    }
+
+                case .error(let error):
+                    // Error events handled via onError callback
+                    _Concurrency.Task { @MainActor in
+                        self.showError(error.message)
+                    }
+
+                case .inputAudioBufferSpeechStarted:
+                    // User started speaking
+                    _Concurrency.Task { @MainActor in
+                        self.isUserSpeaking = true
+                    }
+
+                case .inputAudioBufferSpeechStopped:
+                    // User stopped speaking
+                    _Concurrency.Task { @MainActor in
+                        self.isUserSpeaking = false
+                    }
+
+                case .rateLimitsUpdated(let rateLimits):
+                    // Could log rate limit info for debugging
+                    break
+
+                case .inputAudioBufferCommitted:
+                    // Audio buffer committed, transcription will follow
+                    break
+
+                case .conversationItemCreated(let item):
+                    // Handle user transcription from conversation item
+                    _Concurrency.Task { @MainActor in
+                        self.handleConversationItemCreated(item)
+                    }
+
                 default:
+                    // Handle other events as needed
                     break
                 }
             case .clientEvent:
                 break
+            }
+        }
+
+        realtimeClient?.onAudioData = { [weak self] audioData in
+            _Concurrency.Task { @MainActor in
+                self?.playAIResponse(audioData)
+            }
+        }
+
+        realtimeClient?.onTextDelta = { [weak self] textDelta in
+            _Concurrency.Task { @MainActor in
+                self?.handleTextDelta(textDelta)
             }
         }
 
@@ -364,6 +489,53 @@ final class VoiceConversationViewModel: ObservableObject {
         // TODO: Load from user's current subject/material context
         currentSubject = "Matematica"
         currentMaterial = "Equazioni di Secondo Grado - Capitolo 5"
+    }
+
+    // MARK: - Configuration
+
+    /// Configure the ViewModel with a ModelContext (called from view's onAppear)
+    func configure(modelContext: ModelContext) {
+        if conversationService == nil {
+            conversationService = VoiceConversationService(modelContext: modelContext)
+        }
+    }
+
+    /// Load an existing conversation by ID
+    func loadConversation(id: UUID) {
+        guard let service = conversationService else {
+            showError("Servizio conversazioni non disponibile")
+            return
+        }
+
+        do {
+            guard let conversation = try service.fetchConversation(id: id) else {
+                showError("Conversazione non trovata")
+                return
+            }
+
+            currentConversation = conversation
+            currentSubjectEntity = conversation.subject
+            currentMaterialEntity = conversation.material
+
+            // Update UI with conversation context
+            currentSubject = conversation.subject?.displayName ?? "Nessuna Materia"
+            if let material = conversation.material {
+                currentMaterial = material.title
+            }
+
+            // Load conversation history
+            conversationHistory = conversation.messages
+                .sorted { $0.timestamp < $1.timestamp }
+                .map { message in
+                    MessageBubbleModel(
+                        content: message.content,
+                        isFromUser: message.isFromUser,
+                        timestamp: message.timestamp
+                    )
+                }
+        } catch {
+            showError("Errore caricamento conversazione: \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Conversation Control
@@ -384,6 +556,16 @@ final class VoiceConversationViewModel: ObservableObject {
 
         _Concurrency.Task {
             do {
+                // Create a new conversation in the database
+                if let service = conversationService {
+                    let title = currentSubject ?? "New Conversation"
+                    currentConversation = try service.createConversation(
+                        title: title,
+                        subject: currentSubjectEntity,
+                        material: currentMaterialEntity
+                    )
+                }
+
                 // Start audio pipeline
                 try await audioPipeline.start()
 
@@ -395,6 +577,7 @@ final class VoiceConversationViewModel: ObservableObject {
                     isConversationActive = true
                     pulseAnimation = true
                     startWaveformAnimation()
+                    startAudioCommitTimer()
                 }
 
                 // Send initial context in Italian
@@ -420,6 +603,9 @@ final class VoiceConversationViewModel: ObservableObject {
         // Stop audio pipeline
         audioPipeline.stop()
 
+        // Stop audio commit timer and clear buffer
+        stopAudioCommitTimer()
+
         // Disconnect from realtime API
         if let realtimeClient {
             _Concurrency.Task {
@@ -434,24 +620,162 @@ final class VoiceConversationViewModel: ObservableObject {
         stopWaveformAnimation()
     }
 
+    // MARK: - Audio Buffering and Forwarding
+
+    /// Buffer audio chunks and send to OpenAI when threshold is reached
+    private func bufferAndSendAudio(_ audioData: Data) async {
+        guard let realtimeClient, isConversationActive else { return }
+
+        // Add to buffer
+        audioBuffer.append(audioData)
+        lastAudioTime = Date()
+
+        // Send when buffer reaches threshold
+        if audioBuffer.count >= bufferSizeThreshold {
+            await sendBufferedAudio()
+        }
+    }
+
+    /// Send buffered audio to OpenAI Realtime API
+    private func sendBufferedAudio() async {
+        guard let realtimeClient, !audioBuffer.isEmpty else { return }
+
+        do {
+            try await realtimeClient.sendAudioData(audioBuffer)
+            audioBuffer.removeAll(keepingCapacity: true)
+        } catch {
+            showError("Errore invio audio: \(error.localizedDescription)")
+        }
+    }
+
+    /// Commit audio buffer and trigger AI response (called periodically)
+    private func commitAudioBuffer() async {
+        guard let realtimeClient, isConversationActive else { return }
+
+        // Send any remaining buffered audio first
+        if !audioBuffer.isEmpty {
+            await sendBufferedAudio()
+        }
+
+        // Check if user has been speaking (audio activity in last 500ms)
+        let timeSinceLastAudio = Date().timeIntervalSince(lastAudioTime)
+        guard timeSinceLastAudio < 0.5 else { return }
+
+        // Commit the audio buffer to trigger AI response
+        do {
+            try await realtimeClient.commitAudioBuffer()
+        } catch {
+            showError("Errore commit audio: \(error.localizedDescription)")
+        }
+    }
+
+    /// Start periodic audio buffer commits
+    private func startAudioCommitTimer() {
+        audioCommitTimer?.invalidate()
+        audioCommitTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] _ in
+            _Concurrency.Task { @MainActor in
+                await self?.commitAudioBuffer()
+            }
+        }
+    }
+
+    /// Stop audio buffer commit timer
+    private func stopAudioCommitTimer() {
+        audioCommitTimer?.invalidate()
+        audioCommitTimer = nil
+        audioBuffer.removeAll()
+        lastAudioTime = Date()
+    }
+
     // MARK: - Message Handling
 
     private func addUserMessage(_ content: String) {
-        let message = VoiceMessage(
+        // Add to UI immediately
+        let bubbleMessage = MessageBubbleModel(
             content: content,
             isFromUser: true,
             timestamp: Date()
         )
-        conversationHistory.append(message)
+        conversationHistory.append(bubbleMessage)
+
+        // Persist to database
+        if let conversation = currentConversation,
+           let service = conversationService {
+            do {
+                try service.addMessage(
+                    to: conversation,
+                    content: content,
+                    isFromUser: true
+                )
+            } catch {
+                showError("Errore salvataggio messaggio: \(error.localizedDescription)")
+            }
+        }
     }
 
     private func addAIMessage(_ content: String) {
-        let message = VoiceMessage(
+        // Add to UI immediately
+        let bubbleMessage = MessageBubbleModel(
             content: content,
             isFromUser: false,
             timestamp: Date()
         )
-        conversationHistory.append(message)
+        conversationHistory.append(bubbleMessage)
+
+        // Persist to database
+        if let conversation = currentConversation,
+           let service = conversationService {
+            do {
+                try service.addMessage(
+                    to: conversation,
+                    content: content,
+                    isFromUser: false
+                )
+
+                // Generate title from first user message if needed
+                if conversation.title == "New Conversation" || conversation.title.isEmpty {
+                    try service.generateTitleFromContent(for: conversation)
+                }
+            } catch {
+                showError("Errore salvataggio messaggio: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    /// Handle streaming text delta from AI response
+    private func handleTextDelta(_ delta: String) {
+        currentAIResponseText += delta
+
+        // Update last message if it exists, or create new one
+        if let lastMessage = conversationHistory.last, !lastMessage.isFromUser {
+            conversationHistory.removeLast()
+        }
+
+        addAIMessage(currentAIResponseText)
+    }
+
+    /// Finalize AI response when complete
+    private func finalizeAIResponse() {
+        if !currentAIResponseText.isEmpty {
+            currentAIResponseText = ""
+        }
+    }
+
+    /// Handle conversation item created event (contains user transcription)
+    private func handleConversationItemCreated(_ item: ConversationItemCreated) {
+        // Only process user messages (role = "user")
+        guard item.item.role == "user" else { return }
+
+        // Extract transcript from content
+        if let content = item.item.content,
+           let firstContent = content.first {
+            // Try to get transcript or text
+            let userMessage = firstContent.transcript ?? firstContent.text
+
+            if let message = userMessage, !message.isEmpty {
+                addUserMessage(message)
+            }
+        }
     }
 
     private func playAIResponse(_ audioData: Data) {
@@ -499,8 +823,8 @@ final class VoiceConversationViewModel: ObservableObject {
 
     // MARK: - Settings
 
-    func showSettings() {
-        // TODO: Navigate to voice settings
+    func toggleSettings() {
+        showSettings.toggle()
     }
 
     // MARK: - Error Handling
