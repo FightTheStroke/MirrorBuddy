@@ -176,6 +176,7 @@ struct QuickActionsSection: View {
                     ) {
                         showingImport = true
                     }
+                    .accessibilityLabelWithVoiceCommand("Importa materiali da Google Drive", voiceCommand: "importa materiale")
 
                     QuickActionCard(
                         icon: "doc.text.viewfinder",
@@ -184,6 +185,7 @@ struct QuickActionsSection: View {
                     ) {
                         showingScanner = true
                     }
+                    .accessibilityLabelWithVoiceCommand("Scansiona documento", voiceCommand: "fotografa")
 
                     QuickActionCard(
                         icon: "waveform",
@@ -193,6 +195,7 @@ struct QuickActionsSection: View {
                         // Launch voice conversation (Task 102.3)
                         showingVoiceConversation = true
                     }
+                    .accessibilityLabelWithVoiceCommand("Avvia lezione vocale", voiceCommand: QuickActionVoiceCommands.voiceLesson)
                 }
                 .padding(.horizontal)
             }

@@ -1,5 +1,6 @@
 import SwiftUI
 import AVFoundation
+import Combine
 
 // MARK: - Voice Settings View (Task 102.4)
 
@@ -16,8 +17,8 @@ struct VoiceSettingsView: View {
                     Picker("Microfono", selection: $settings.selectedMicrophoneID) {
                         Text("Predefinito").tag(nil as String?)
 
-                        ForEach(settings.availableMicrophones, id: \.uid) { device in
-                            Text(device.localizedName).tag(device.uid as String?)
+                        ForEach(Array(settings.availableMicrophones.enumerated()), id: \.offset) { _, device in
+                            Text(device.portName).tag(device.uid as String?)
                         }
                     }
 
@@ -207,8 +208,9 @@ enum AudioQuality: String, CaseIterable, Identifiable {
 
 // MARK: - Voice Settings Manager (Task 102.4)
 
+@MainActor
 final class VoiceSettings: ObservableObject {
-    @MainActor static let shared = VoiceSettings()
+    static let shared = VoiceSettings()
 
     // MARK: - Published Settings
 

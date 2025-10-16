@@ -4,8 +4,6 @@ import SwiftUI
 
 /// Visual indicator for voice conversation states shown in navigation bar
 struct VoiceIndicatorView: View {
-    @ObservedObject var audioPipeline = AudioPipelineManager.shared
-
     enum VoiceState {
         case idle
         case listening

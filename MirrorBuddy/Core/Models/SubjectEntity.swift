@@ -33,6 +33,10 @@ final class SubjectEntity {
     @Relationship(deleteRule: .nullify, inverse: \Task.subject)
     var tasks: [Task]?
 
+    /// Voice conversations in this subject
+    @Relationship(deleteRule: .nullify, inverse: \VoiceConversation.subject)
+    var voiceConversations: [VoiceConversation]?
+
     init(
         localizationKey: String,
         iconName: String,

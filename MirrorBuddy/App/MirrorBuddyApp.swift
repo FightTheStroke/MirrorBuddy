@@ -44,7 +44,9 @@ struct MirrorBuddyApp: App {
             Task.self,
             UserProgress.self,
             TrackedDriveFile.self,
-            Transcript.self
+            Transcript.self,
+            VoiceMessage.self,
+            VoiceConversation.self
         ])
 
         // Automatically enable CloudKit on real devices, disable on simulator

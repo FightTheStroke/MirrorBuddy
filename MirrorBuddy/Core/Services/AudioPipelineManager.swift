@@ -37,10 +37,33 @@ final class AudioPipelineManager: NSObject {
     /// Whether audio pipeline is active
     private(set) var isActive = false
 
+    /// Whether audio is currently playing
+    private(set) var isPlaying = false
+
+    /// Queue for managing audio playback
+    private var playbackQueue = DispatchQueue(label: "com.mirrorbuddy.audio.playback", qos: .userInteractive)
+
+    /// Scheduled audio buffers count (for queue monitoring)
+    private var scheduledBuffersCount = 0
+
+    /// Maximum queued buffers before dropping
+    private let maxQueuedBuffers = 10
+
     /// Audio level monitoring
     private var audioLevelTimer: Timer?
     var currentInputLevel: Float = 0.0
     var currentOutputLevel: Float = 0.0
+
+    // MARK: - Diagnostics & Performance
+
+    /// Pipeline statistics
+    private var stats = PipelineStatistics()
+
+    /// Last error timestamp for throttling
+    private var lastErrorTime: Date?
+
+    /// Error throttle interval (don't spam error callbacks)
+    private let errorThrottleInterval: TimeInterval = 1.0
 
     // MARK: - Callbacks
 
@@ -48,6 +71,7 @@ final class AudioPipelineManager: NSObject {
     var onAudioLevelChanged: ((Float) -> Void)?
     var onError: ((Error) -> Void)?
     var onInterruption: ((Bool) -> Void)?  // true = began, false = ended
+    var onDiagnostics: ((PipelineStatistics) -> Void)?  // Performance diagnostics
 
     // MARK: - Initialization
 
@@ -116,6 +140,11 @@ final class AudioPipelineManager: NSObject {
             // Update audio level
             self.updateInputAudioLevel(from: buffer)
 
+            // Track statistics
+            _Concurrency.Task { @MainActor in
+                self.stats.audioDataCaptured += 1
+            }
+
             // Send audio data
             _Concurrency.Task { @MainActor in
                 self.onAudioData?(convertedData)
@@ -145,13 +174,16 @@ final class AudioPipelineManager: NSObject {
             try audioEngine.start()
 
             isActive = true
+            stats.startTime = Date()
+            stats.errors = 0
 
             // Start audio level monitoring
             startAudioLevelMonitoring()
 
             logger.info("Audio pipeline started")
+            logDiagnostics()
         } catch {
-            logger.error("Failed to start audio pipeline: \(error.localizedDescription)")
+            reportError(AudioPipelineError.startFailed(error))
             throw AudioPipelineError.startFailed(error)
         }
     }
@@ -162,6 +194,9 @@ final class AudioPipelineManager: NSObject {
 
         // Stop audio level monitoring
         stopAudioLevelMonitoring()
+
+        // Stop playback and clear queue
+        stopPlayback()
 
         // Remove tap
         inputNode.removeTap(onBus: 0)
@@ -201,23 +236,120 @@ final class AudioPipelineManager: NSObject {
 
     // MARK: - Audio Playback
 
-    /// Play audio data through the output
+    /// Play audio data through the output with queue management
     func play(audioData: Data) throws {
         guard isActive else {
             throw AudioPipelineError.pipelineNotActive
         }
 
+        // Check queue capacity
+        guard scheduledBuffersCount < maxQueuedBuffers else {
+            logger.warning("Audio playback queue full, dropping buffer")
+            stats.droppedBuffers += 1
+            return
+        }
+
         // Convert data to audio buffer
         let audioBuffer = try convertDataToAudioBuffer(audioData, format: recordingFormat)
 
-        // Schedule buffer for playback
-        playerNode.scheduleBuffer(audioBuffer) {
-            self.logger.debug("Audio playback completed")
-        }
+        // Schedule buffer for playback on dedicated queue
+        playbackQueue.async { [weak self] in
+            guard let self else { return }
 
-        // Start player if not already playing
-        if !playerNode.isPlaying {
-            playerNode.play()
+            // Increment scheduled buffers count
+            _Concurrency.Task { @MainActor in
+                self.scheduledBuffersCount += 1
+            }
+
+            // Schedule buffer with completion handler
+            self.playerNode.scheduleBuffer(audioBuffer) {
+                // Decrement scheduled buffers count on completion
+                _Concurrency.Task { @MainActor in
+                    self.scheduledBuffersCount -= 1
+                    self.stats.audioDataPlayed += 1
+
+                    // Stop player if no more buffers and pipeline inactive
+                    if self.scheduledBuffersCount == 0 && !self.isActive {
+                        self.stopPlayback()
+                    }
+                }
+            }
+
+            // Start player if not already playing
+            if !self.playerNode.isPlaying {
+                self.playerNode.play()
+
+                _Concurrency.Task { @MainActor in
+                    self.isPlaying = true
+                    self.logger.info("Audio playback started")
+                }
+            }
+        }
+    }
+
+    /// Stop audio playback
+    func stopPlayback() {
+        playbackQueue.async { [weak self] in
+            guard let self else { return }
+
+            if self.playerNode.isPlaying {
+                self.playerNode.stop()
+
+                _Concurrency.Task { @MainActor in
+                    self.isPlaying = false
+                    self.scheduledBuffersCount = 0
+                    self.logger.info("Audio playback stopped")
+                }
+            }
+        }
+    }
+
+    /// Pause audio playback
+    func pausePlayback() {
+        playbackQueue.async { [weak self] in
+            guard let self else { return }
+
+            if self.playerNode.isPlaying {
+                self.playerNode.pause()
+
+                _Concurrency.Task { @MainActor in
+                    self.isPlaying = false
+                    self.logger.info("Audio playback paused")
+                }
+            }
+        }
+    }
+
+    /// Resume audio playback
+    func resumePlayback() {
+        playbackQueue.async { [weak self] in
+            guard let self else { return }
+
+            if !self.playerNode.isPlaying && self.scheduledBuffersCount > 0 {
+                self.playerNode.play()
+
+                _Concurrency.Task { @MainActor in
+                    self.isPlaying = true
+                    self.logger.info("Audio playback resumed")
+                }
+            }
+        }
+    }
+
+    /// Clear all scheduled audio buffers
+    func clearPlaybackQueue() {
+        playbackQueue.async { [weak self] in
+            guard let self else { return }
+
+            self.playerNode.stop()
+            // Reset the player node to clear buffers
+            self.playerNode.reset()
+
+            _Concurrency.Task { @MainActor in
+                self.isPlaying = false
+                self.scheduledBuffersCount = 0
+                self.logger.info("Audio playback queue cleared")
+            }
         }
     }
 
@@ -432,12 +564,83 @@ final class AudioPipelineManager: NSObject {
         return false
     }
 
+    // MARK: - Diagnostics
+
+    /// Get current pipeline statistics
+    func getStatistics() -> PipelineStatistics {
+        stats.currentInputLevel = currentInputLevel
+        stats.currentOutputLevel = currentOutputLevel
+        stats.queuedBuffers = scheduledBuffersCount
+        stats.isActive = isActive
+        stats.isPlaying = isPlaying
+        return stats
+    }
+
+    /// Reset statistics
+    func resetStatistics() {
+        stats = PipelineStatistics()
+        logger.info("Pipeline statistics reset")
+    }
+
+    /// Log diagnostics
+    private func logDiagnostics() {
+        let currentStats = getStatistics()
+        logger.info("""
+            Pipeline Diagnostics:
+            - Active: \(currentStats.isActive)
+            - Playing: \(currentStats.isPlaying)
+            - Audio Captured: \(currentStats.audioDataCaptured) chunks
+            - Audio Played: \(currentStats.audioDataPlayed) chunks
+            - Queued Buffers: \(currentStats.queuedBuffers)/\(self.maxQueuedBuffers)
+            - Dropped Buffers: \(currentStats.droppedBuffers)
+            - Errors: \(currentStats.errors)
+            - Input Level: \(String(format: "%.2f", currentStats.currentInputLevel))
+            - Output Level: \(String(format: "%.2f", currentStats.currentOutputLevel))
+            """)
+
+        onDiagnostics?(currentStats)
+    }
+
+    /// Report error with throttling
+    private func reportError(_ error: Error) {
+        // Throttle errors to avoid spam
+        if let lastError = lastErrorTime,
+           Date().timeIntervalSince(lastError) < errorThrottleInterval {
+            return
+        }
+
+        lastErrorTime = Date()
+        stats.errors += 1
+
+        logger.error("Pipeline error: \(error.localizedDescription)")
+        onError?(error)
+    }
+
     // MARK: - Cleanup
 
     nonisolated deinit {
         NotificationCenter.default.removeObserver(self)
         // Note: Cannot call @MainActor method from deinit
         // Caller is responsible for calling stop() before deallocation
+    }
+}
+
+// MARK: - Pipeline Statistics
+
+struct PipelineStatistics {
+    var isActive: Bool = false
+    var isPlaying: Bool = false
+    var audioDataCaptured: Int = 0
+    var audioDataPlayed: Int = 0
+    var queuedBuffers: Int = 0
+    var droppedBuffers: Int = 0
+    var errors: Int = 0
+    var currentInputLevel: Float = 0.0
+    var currentOutputLevel: Float = 0.0
+    var startTime: Date?
+    var uptime: TimeInterval {
+        guard let start = startTime else { return 0 }
+        return Date().timeIntervalSince(start)
     }
 }
 

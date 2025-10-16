@@ -330,12 +330,12 @@ struct EncouragementBanner: View {
 
             if let actionTitle = message.actionTitle, let action = message.action {
                 Button(actionTitle, action: action)
-                    .buttonStyle(.primaryAction())
+                    .buttonStyle(.borderedProminent)
                     .padding(.top, 8)
             }
         }
         .padding(24)
-        .background(Color.mbSuccess.opacity(0.1))
+        .background(Color.green.opacity(0.1))
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
     }

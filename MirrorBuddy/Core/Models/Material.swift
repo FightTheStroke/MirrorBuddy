@@ -45,6 +45,9 @@ final class Material {
     @Relationship(deleteRule: .cascade)
     var transcript: Transcript?
 
+    @Relationship(deleteRule: .nullify, inverse: \VoiceConversation.material)
+    var voiceConversations: [VoiceConversation]?
+
     init(
         title: String,
         subject: SubjectEntity? = nil,
