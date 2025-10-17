@@ -179,24 +179,94 @@ struct InteractiveMindMapView: View {
                 )
             }
 
-            // Draw expansion indicator
+            // Draw expansion indicator (Task 97.3: Enhanced with SF Symbols)
             if !node.childNodesArray.isEmpty {
-                let indicatorRect = CGRect(
-                    x: position.x + scaledSize / 2 - 12,
-                    y: position.y - 6,
-                    width: 12,
-                    height: 12
-                )
+                let indicatorSize: CGFloat = 20 * viewModel.zoomScale
+                let indicatorX = position.x + scaledSize / 2 - indicatorSize / 2
+                let indicatorY = position.y - indicatorSize / 2
 
+                // Use SF Symbol for expansion state
+                let symbolName = isExpanded ? MindMapTheme.NodeIcon.expanded : MindMapTheme.NodeIcon.collapsed
+                if let resolved = context.resolveSymbol(id: "expand_\(node.id)_\(symbolName)") {
+                    context.draw(resolved, at: CGPoint(x: indicatorX, y: indicatorY))
+                } else {
+                    // Fallback to text if symbol not resolved
+                    let symbol = isExpanded ? "−" : "+"
+                    let text = Text(symbol).font(.system(size: 14 * viewModel.zoomScale, weight: .bold)).foregroundStyle(.white)
+                    context.draw(text, at: CGPoint(x: indicatorX, y: indicatorY))
+                }
+            }
+
+            // Draw node type indicator (Task 97.3: Simple circle/half circle/dot)
+            let typeIndicatorRadius: CGFloat = 6 * viewModel.zoomScale
+            let typeIndicatorPos = CGPoint(
+                x: position.x - scaledSize / 3,
+                y: position.y - scaledSize / 3
+            )
+
+            if isRoot {
+                // Full circle for root
                 context.fill(
-                    Path(ellipseIn: indicatorRect),
-                    with: .color(.white)
+                    Path(ellipseIn: CGRect(
+                        x: typeIndicatorPos.x - typeIndicatorRadius,
+                        y: typeIndicatorPos.y - typeIndicatorRadius,
+                        width: typeIndicatorRadius * 2,
+                        height: typeIndicatorRadius * 2
+                    )),
+                    with: .color(.white.opacity(0.9))
+                )
+            } else if !node.childNodesArray.isEmpty {
+                // Half circle for branch nodes
+                var path = Path()
+                path.addArc(
+                    center: typeIndicatorPos,
+                    radius: typeIndicatorRadius,
+                    startAngle: .degrees(-90),
+                    endAngle: .degrees(90),
+                    clockwise: false
+                )
+                path.closeSubpath()
+                context.fill(path, with: .color(.white.opacity(0.7)))
+            } else {
+                // Small dot for leaf nodes
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: typeIndicatorPos.x - typeIndicatorRadius / 2,
+                        y: typeIndicatorPos.y - typeIndicatorRadius / 2,
+                        width: typeIndicatorRadius,
+                        height: typeIndicatorRadius
+                    )),
+                    with: .color(.white.opacity(0.6))
+                )
+            }
+
+            // Draw subject indicator badge on root node (Task 97.3)
+            if isRoot, let material = mindMap.material, let subjectEntity = material.subject {
+                let badgeRadius: CGFloat = 12 * viewModel.zoomScale
+                let badgePos = CGPoint(
+                    x: position.x + scaledSize / 3,
+                    y: position.y + scaledSize / 3
                 )
 
-                // Plus or minus icon
-                let symbol = isExpanded ? "−" : "+"
-                let text = Text(symbol).font(.system(size: 10, weight: .bold))
-                context.draw(text, at: CGPoint(x: indicatorRect.midX, y: indicatorRect.midY))
+                // Badge background
+                context.fill(
+                    Path(ellipseIn: CGRect(
+                        x: badgePos.x - badgeRadius,
+                        y: badgePos.y - badgeRadius,
+                        width: badgeRadius * 2,
+                        height: badgeRadius * 2
+                    )),
+                    with: .color(.white.opacity(0.9))
+                )
+
+                // Subject initial letter
+                let subject = subjectEntity.toSubject()
+                let initial = String(subjectEntity.displayName.prefix(1))
+                let badgeText = Text(initial)
+                    .font(.system(size: badgeRadius, weight: .bold))
+                    .foregroundStyle(Color(hexString: node.color ?? "#4A90E2") ?? .blue)
+
+                context.draw(badgeText, at: badgePos)
             }
 
             // Draw title text (Task 97.2: Large fonts for mobile readability)

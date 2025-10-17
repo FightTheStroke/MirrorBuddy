@@ -4457,9 +4457,10 @@
               1
             ],
             "details": "Design or source a set of clear, scalable icons for different node types. Define a color palette for subject-based color coding. Update the node rendering logic to display the correct icon and color for each node.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Check that each node displays the correct icon and color. Test for visual clarity and distinguishability, including for users with color vision deficiencies.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T06:04:43.557Z"
           },
           {
             "id": 4,
@@ -4503,7 +4504,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2025-10-17T06:02:10.509Z"
+        "updatedAt": "2025-10-17T06:04:43.557Z"
       },
       {
         "id": "98",
@@ -4975,7 +4976,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T06:02:10.512Z",
+      "lastModified": "2025-10-17T06:04:43.559Z",
       "taskCount": 109,
       "completedCount": 105,
       "tags": [
