@@ -93,10 +93,11 @@ struct InteractiveMindMapView: View {
 
             let color = Color(hexString: node.color ?? "#4A90E2") ?? .blue
 
+            // Task 97.2: Thicker connection lines for better visibility
             context.stroke(
                 path,
-                with: .color(color.opacity(0.6)),
-                lineWidth: 2 * viewModel.zoomScale
+                with: .color(color.opacity(MindMapTheme.ColorSettings.connectionOpacity)),
+                lineWidth: MindMapTheme.Connection.lineWidth * viewModel.zoomScale
             )
 
             // Draw arrow at end
@@ -106,7 +107,8 @@ struct InteractiveMindMapView: View {
 
     private func drawArrow(context: GraphicsContext, at point: CGPoint, towards: CGPoint, color: Color) {
         let angle = atan2(point.y - towards.y, point.x - towards.x)
-        let arrowSize = 10.0 * viewModel.zoomScale
+        // Task 97.2: Larger arrow for visibility
+        let arrowSize = MindMapTheme.Connection.arrowSize * viewModel.zoomScale
 
         var path = Path()
         path.move(to: point)
@@ -141,7 +143,8 @@ struct InteractiveMindMapView: View {
             let isSelected = viewModel.selectedNode?.id == node.id
             let isExpanded = viewModel.isExpanded(node: node)
 
-            let nodeSize = isRoot ? 80.0 : 60.0
+            // Use mobile-optimized sizing (Task 97.2)
+            let nodeSize = isRoot ? MindMapTheme.NodeSize.rootDiameter : MindMapTheme.NodeSize.childDiameter
             let scaledSize = nodeSize * viewModel.zoomScale
 
             // Draw node circle
@@ -153,7 +156,8 @@ struct InteractiveMindMapView: View {
             )
 
             let color = Color(hexString: node.color ?? "#4A90E2") ?? .blue
-            let fillColor = isSelected ? color : color.opacity(0.8)
+            // High contrast mode (Task 97.2)
+            let fillColor = isSelected ? color : color.opacity(MindMapTheme.ColorSettings.highContrastNodeOpacity)
 
             // Shadow for depth
             context.fill(
@@ -166,12 +170,12 @@ struct InteractiveMindMapView: View {
                 with: .color(fillColor)
             )
 
-            // Border for selected node
+            // Border for selected node (Task 97.2: High contrast)
             if isSelected {
                 context.stroke(
                     Path(ellipseIn: rect),
-                    with: .color(.white),
-                    lineWidth: 3
+                    with: .color(MindMapTheme.ColorSettings.selectedBorderColor),
+                    lineWidth: MindMapTheme.ColorSettings.selectedBorderWidth
                 )
             }
 
@@ -195,10 +199,13 @@ struct InteractiveMindMapView: View {
                 context.draw(text, at: CGPoint(x: indicatorRect.midX, y: indicatorRect.midY))
             }
 
-            // Draw title text (optimized for readability)
+            // Draw title text (Task 97.2: Large fonts for mobile readability)
+            let fontSize = isRoot ? MindMapTheme.FontSize.rootNodeTitle : MindMapTheme.FontSize.childNodeTitle
+            let fontWeight = isRoot ? MindMapTheme.FontWeight.rootNode : MindMapTheme.FontWeight.childNode
+
             let titleText = Text(node.title)
-                .font(.system(size: isRoot ? 10 : 8, weight: isRoot ? .bold : .regular))
-                .foregroundStyle(.white)
+                .font(.system(size: fontSize, weight: fontWeight))
+                .foregroundStyle(MindMapTheme.ColorSettings.textOnColoredBackground)
 
             context.draw(titleText, at: position)
         }
@@ -228,8 +235,9 @@ struct InteractiveMindMapView: View {
     private func nodeDetailOverlay(node: MindMapNode) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
+                // Task 97.2: Larger fonts for detail overlay
                 Text(node.title)
-                    .font(.headline)
+                    .font(.system(size: MindMapTheme.FontSize.detailOverlayHeadline, weight: MindMapTheme.FontWeight.detailHeadline))
 
                 Spacer()
 
@@ -242,8 +250,9 @@ struct InteractiveMindMapView: View {
             }
 
             if let content = node.content {
+                // Task 97.2: Readable body text
                 Text(content)
-                    .font(.body)
+                    .font(.system(size: MindMapTheme.FontSize.detailOverlayBody, weight: MindMapTheme.FontWeight.detailBody))
                     .foregroundStyle(.secondary)
             }
 
@@ -357,10 +366,10 @@ final class MindMapViewModel {
     // Expansion state (Subtask 39.3)
     private var expandedNodeIDs: Set<UUID> = []
 
-    // Performance optimization (Subtask 39.4)
-    private let minZoom = 0.3
-    private let maxZoom = 3.0
-    private let zoomStep = 0.2
+    // Performance optimization (Subtask 39.4) + Task 97.2: Mobile-optimized zoom
+    private let minZoom = MindMapTheme.Zoom.minimum
+    private let maxZoom = MindMapTheme.Zoom.maximum
+    private let zoomStep = MindMapTheme.Zoom.step
 
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "MindMapViewModel")
 

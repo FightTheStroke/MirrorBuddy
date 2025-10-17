@@ -4423,8 +4423,87 @@
         "dependencies": [
           "95"
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design Wireframes for Mobile Mind Map UI",
+            "description": "Create detailed wireframes for the redesigned mind map interface optimized for iPhone and iPad, focusing on layout, navigation, and key UI elements.",
+            "dependencies": [],
+            "details": "Develop low- and high-fidelity wireframes that incorporate large fonts (minimum 18pt), high contrast, intuitive navigation, and space for icons and color coding. Ensure the wireframes illustrate tap-to-expand, pinch-to-zoom, pan, double-tap for details, breadcrumbs, vertical scrolling, and collapsible sections.\n<info added on 2025-10-17T05:58:27.266Z>\nCURRENT STATE ANALYSIS:\n- Fonts: 8-10pt (too small for mobile)\n- Node sizes: 60-80px (adequate but could improve touch target)\n- Colors: Already using subject-based colors from Task 87.3\n- Gestures: Only drag (pan) and pinch (zoom)\n- Layout: Circular nodes with canvas rendering\n- Detail view: Bottom overlay with TTS and expand/collapse\n\nMOBILE WIREFRAME DESIGN:\n\n1. TYPOGRAPHY IMPROVEMENTS:\n   - Node title font: 18pt minimum (root: 24pt, children: 18pt)\n   - Detail overlay: 16pt body, 20pt headline\n   - High contrast: White text on colored backgrounds\n   - Bold weight for important nodes\n\n2. TOUCH TARGETS & NODE SIZING:\n   - Root node: 120px diameter (was 80px)\n   - Child nodes: 90px diameter (was 60px)\n   - Touch target padding: 44x44pt minimum\n   - Node spacing: Minimum 120px between nodes\n\n3. ICONS & VISUAL HIERARCHY:\n   - SF Symbols for node type indicators:\n     * Root: circle.fill\n     * Branch: circle.lefthalf.filled\n     * Leaf: circle.dotted\n   - Subject-specific icons:\n     * Matematica: function\n     * Fisica: waveform.path.ecg\n     * Scienze: leaf.fill\n     * Storia: book.fill\n     * Italiano: text.quote\n     * Inglese: globe\n     * Ed. Civica: building.columns\n     * Religione: heart.fill\n     * Scienze Motorie: figure.run\n   - Expansion indicator: chevron.right.circle.fill (16pt)\n\n4. COLOR CODING ENHANCEMENTS:\n   - Existing subject colors (from Task 87.3) maintained\n   - High contrast mode: Increase opacity to 1.0\n   - Selected state: White border + glow effect\n   - Connection lines: 3pt width (was 2pt)\n\n5. GESTURE CONTROLS:\n   - Single tap: Select node\n   - Double tap: Expand/collapse node\n   - Tap on canvas: Deselect\n   - Pinch: Zoom (0.5x - 2.0x range, was 0.3x-3.0x)\n   - Pan: Two-finger drag\n   - Long press: Show context menu (export, share)\n\n6. NAVIGATION ENHANCEMENTS:\n   - Breadcrumb bar at top:\n     * Shows: Root → Parent → Current\n     * Tap to navigate up hierarchy\n     * Collapsible to save screen space\n   - Mini-map in top-right corner:\n     * 80x80pt thumbnail showing full mind map\n     * Current viewport highlighted\n     * Tap to jump to area\n\n7. LAYOUT OPTIMIZATIONS:\n   - Vertical bias: Prefer vertical layout for portrait mode\n   - Depth limit: Display max 3 levels at once\n   - Node culling: Skip nodes outside viewport + 200pt margin\n   - Automatic layout: Radial for root, tree for branches\n   - Collapsible sections: Hide nodes beyond depth 3\n\n8. CONTROLS BAR REDESIGN:\n   - Position: Bottom floating toolbar\n   - Buttons (32pt icons):\n     * Zoom in/out\n     * Fit to screen\n     * Expand all / Collapse all\n     * Export / Share\n     * Settings (layout preferences)\n   - Auto-hide after 3 seconds of inactivity\n   - Show on any interaction\n\n9. DETAIL OVERLAY IMPROVEMENTS:\n   - Full-width bottom sheet (not floating card)\n   - Drag handle for resize/dismiss\n   - Content:\n     * Node icon + title (20pt bold)\n     * Node content (16pt body)\n     * Child count indicator\n     * TTS button (enlarged)\n     * Quick actions: Expand children, Focus, Edit\n   - Keyboard avoidance for note-taking\n\n10. ACCESSIBILITY:\n    - VoiceOver labels for all nodes\n    - Dynamic Type support (scale fonts)\n    - High contrast mode support\n    - Reduced motion option (disable animations)\n    - Voice Control support (numbered nodes)\n\nWIREFRAME LAYOUT (Portrait):\n┌─────────────────────┐\n│ Root → Node → Child │ ← Breadcrumbs\n├─────────────────────┤\n│                   ┌─┐│ ← Mini-map\n│                   └─┘│\n│                     │\n│     ┌─────┐         │\n│     │Root │         │ ← Larger nodes\n│     └─────┘         │   with icons\n│   ┌───┘ └───┐       │\n│ ┌─▼─┐     ┌─▼─┐     │\n│ │Ch1│     │Ch2│     │\n│ └───┘     └───┘     │\n│                     │\n│                     │\n├─────────────────────┤\n│ ╔═════════════════╗ │ ← Detail overlay\n│ ║ Selected Node   ║ │   (full width)\n│ ║ Content here... ║ │\n│ ╚═════════════════╝ │\n├─────────────────────┤\n│ [+][-][○][↗][···] │ ← Controls bar\n└─────────────────────┘\n\nIMPLEMENTATION APPROACH:\n1. Create MobileOptimizedMindMapView (new view)\n2. Enhance InteractiveMindMapView with mobile-specific modifiers\n3. Add MindMapTheme struct for typography/sizing constants\n4. Implement BreadcrumbNavigationView component\n5. Implement MiniMapView component\n6. Add gesture recognizers for tap/double-tap\n7. Implement auto-hiding controls bar\n8. Add accessibility labels and traits\n</info added on 2025-10-17T05:58:27.266Z>",
+            "status": "done",
+            "testStrategy": "Review wireframes with stakeholders and conduct usability walkthroughs to validate layout and navigation flow.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T05:58:44.058Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Large Fonts and High Contrast Styles",
+            "description": "Update the mind map UI to use a minimum 18pt font size and high-contrast color schemes for all text and interactive elements.",
+            "dependencies": [
+              1
+            ],
+            "details": "Apply accessibility best practices by ensuring all text is at least 18pt and meets WCAG contrast guidelines. Test with both light and dark modes. Adjust spacing and layout to accommodate larger text without clutter.",
+            "status": "done",
+            "testStrategy": "Verify font sizes and contrast ratios on multiple devices. Use accessibility tools to confirm compliance with WCAG standards.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T06:02:10.509Z"
+          },
+          {
+            "id": 3,
+            "title": "Add Icons and Color Coding for Node Types and Subjects",
+            "description": "Integrate icons representing node types and apply color coding to nodes based on their subject or category.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design or source a set of clear, scalable icons for different node types. Define a color palette for subject-based color coding. Update the node rendering logic to display the correct icon and color for each node.",
+            "status": "pending",
+            "testStrategy": "Check that each node displays the correct icon and color. Test for visual clarity and distinguishability, including for users with color vision deficiencies.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Intuitive Mobile Navigation and Gestures",
+            "description": "Develop and refine mobile navigation features: tap-to-expand, pinch-to-zoom, pan, double-tap for details, breadcrumbs, vertical scrolling, and collapsible sections.",
+            "dependencies": [
+              1
+            ],
+            "details": "Use established mobile gesture patterns for navigation. Ensure gestures do not conflict. Add breadcrumbs for orientation and implement vertical scrolling and collapsible sections to manage map depth and node count.",
+            "status": "pending",
+            "testStrategy": "Test all navigation gestures and features on iPhone and iPad. Validate that gestures are responsive and do not interfere with each other. Conduct user testing for intuitiveness.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Optimize Layout for Clarity and Limited Node Depth",
+            "description": "Adjust the mind map layout to limit visible depth and node count, reducing clutter and improving readability on small screens.",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Implement logic to restrict the number of visible nodes and depth based on screen size. Use collapsible sections and dynamic loading to keep the interface clean. Ensure negative space is used effectively to avoid UI noise.",
+            "status": "pending",
+            "testStrategy": "Test mind maps of varying sizes to ensure clarity and performance. Validate that the UI remains uncluttered and readable at all times.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Conduct Comprehensive Usability and Accessibility Testing",
+            "description": "Test the redesigned mind map UI for readability, navigation, accessibility, and overall user experience on iPhone and iPad.",
+            "dependencies": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "details": "Perform usability testing with diverse users, including those with accessibility needs. Validate all accessibility features (font size, contrast, icons, color coding, gestures). Collect feedback and iterate as needed.",
+            "status": "pending",
+            "testStrategy": "Run structured usability sessions, accessibility audits, and gather user feedback. Use device simulators and real devices for thorough coverage.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-10-17T06:02:10.509Z"
       },
       {
         "id": "98",
@@ -4896,7 +4975,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T05:55:18.115Z",
+      "lastModified": "2025-10-17T06:02:10.512Z",
       "taskCount": 109,
       "completedCount": 105,
       "tags": [
