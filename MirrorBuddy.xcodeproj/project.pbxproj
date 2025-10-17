@@ -50,11 +50,15 @@
 		};
 		C2DDF29F2E9BA66A00E76D0A /* MirrorBuddyTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = MirrorBuddyTests;
 			sourceTree = "<group>";
 		};
 		C2DDF2A92E9BA66A00E76D0A /* MirrorBuddyUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = MirrorBuddyUITests;
 			sourceTree = "<group>";
 		};
@@ -124,8 +128,6 @@
 				C2DDF28D2E9BA66800E76D0A /* MirrorBuddy */,
 			);
 			name = MirrorBuddy;
-			packageProductDependencies = (
-			);
 			productName = MirrorBuddy;
 			productReference = C2DDF28B2E9BA66800E76D0A /* MirrorBuddy.app */;
 			productType = "com.apple.product-type.application";
@@ -147,8 +149,6 @@
 				C2DDF29F2E9BA66A00E76D0A /* MirrorBuddyTests */,
 			);
 			name = MirrorBuddyTests;
-			packageProductDependencies = (
-			);
 			productName = MirrorBuddyTests;
 			productReference = C2DDF29C2E9BA66A00E76D0A /* MirrorBuddyTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -170,8 +170,6 @@
 				C2DDF2A92E9BA66A00E76D0A /* MirrorBuddyUITests */,
 			);
 			name = MirrorBuddyUITests;
-			packageProductDependencies = (
-			);
 			productName = MirrorBuddyUITests;
 			productReference = C2DDF2A62E9BA66A00E76D0A /* MirrorBuddyUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
