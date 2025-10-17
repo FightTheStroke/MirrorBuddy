@@ -111,6 +111,11 @@ struct MainTabView: View {
             }
             .allowsHitTesting(true)
 
+            // MARK: - Voice Command Feedback (Task 103)
+            // Global feedback overlay for voice commands
+            VoiceCommandFeedbackView()
+                .zIndex(999)
+
             // Voice interface sheet
             .sheet(isPresented: $showingVoiceInterface) {
                 NavigationStack {

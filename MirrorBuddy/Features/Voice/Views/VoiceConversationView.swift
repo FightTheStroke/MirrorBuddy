@@ -773,6 +773,31 @@ final class VoiceConversationViewModel: ObservableObject {
             let userMessage = firstContent.transcript ?? firstContent.text
 
             if let message = userMessage, !message.isEmpty {
+                // Task 103: Check if message is a voice command before proceeding
+                let commandRegistry = VoiceCommandRegistry.shared
+                let commandHandler = AppVoiceCommandHandler.shared
+
+                // Try to process as voice command
+                commandRegistry.processCommand(message, handler: commandHandler)
+
+                // Check if command was recognized
+                if let result = commandHandler.lastCommandResult {
+                    switch result {
+                    case .success(let feedback):
+                        // Command executed successfully - show feedback instead of adding to conversation
+                        addAIMessage("✓ \(feedback)")
+                        return
+                    case .unrecognized:
+                        // Not a command - proceed with normal conversation
+                        break
+                    case .failure(let error):
+                        // Command failed - show error and continue
+                        addAIMessage("⚠️ \(error)")
+                        return
+                    }
+                }
+
+                // Normal conversation message - add to history
                 addUserMessage(message)
             }
         }
