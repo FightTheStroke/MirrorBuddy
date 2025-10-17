@@ -28,7 +28,30 @@ struct InteractiveMindMapView: View {
                     magnificationGesture
                 )
             )
+            // Task 97.4: Tap gestures for mobile interaction
+            .gesture(
+                TapGesture(count: 2)
+                    .onEnded { _ in
+                        handleDoubleTap()
+                    }
+            )
+            .gesture(
+                TapGesture()
+                    .onEnded { _ in
+                        handleSingleTap()
+                    }
+            )
+            .contentShape(Rectangle()) // Make entire canvas tappable
             .background(Color(.systemBackground))
+
+            // Breadcrumb navigation (Task 97.4)
+            VStack {
+                if let selectedNode = viewModel.selectedNode {
+                    breadcrumbView(for: selectedNode)
+                        .padding(.top, 8)
+                }
+                Spacer()
+            }
 
             // Node detail overlay
             if let selectedNode = viewModel.selectedNode {
@@ -43,6 +66,21 @@ struct InteractiveMindMapView: View {
         }
         .navigationTitle("Mind Map")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    // MARK: - Tap Handlers (Task 97.4)
+
+    private func handleSingleTap() {
+        // Deselect if no node hit
+        // Note: Actual node selection happens in drawNodes when we can do hit testing
+        viewModel.deselectNode()
+    }
+
+    private func handleDoubleTap() {
+        // Toggle expansion of selected node
+        if let selected = viewModel.selectedNode {
+            viewModel.toggleExpansion(node: selected)
+        }
     }
 
     // MARK: - Canvas Rendering (Subtask 39.1)
@@ -300,6 +338,43 @@ struct InteractiveMindMapView: View {
             }
     }
 
+    // MARK: - Breadcrumb Navigation (Task 97.4)
+
+    private func breadcrumbView(for node: MindMapNode) -> some View {
+        let path = viewModel.getNodePath(node: node)
+
+        return ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(Array(path.enumerated()), id: \.element.id) { index, pathNode in
+                    Button {
+                        viewModel.selectNode(pathNode)
+                        viewModel.focusOnNode(pathNode)
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(pathNode.title)
+                                .font(.system(size: MindMapTheme.FontSize.breadcrumbText, weight: .medium))
+                                .lineLimit(1)
+
+                            if index < path.count - 1 {
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 10))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color(hexString: pathNode.color ?? "#4A90E2")?.opacity(0.2) ?? Color.blue.opacity(0.2))
+                        .cornerRadius(8)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal)
+        }
+        .frame(height: MindMapTheme.Layout.breadcrumbHeight)
+        .background(.ultraThinMaterial)
+    }
+
     // MARK: - Node Detail Overlay (Subtask 39.3)
 
     private func nodeDetailOverlay(node: MindMapNode) -> some View {
@@ -520,6 +595,35 @@ final class MindMapViewModel {
 
     func deselectNode() {
         selectedNode = nil
+    }
+
+    // MARK: - Navigation (Task 97.4)
+
+    /// Get the path from root to the specified node
+    func getNodePath(node: MindMapNode) -> [MindMapNode] {
+        var path: [MindMapNode] = [node]
+        var current = node
+
+        // Traverse up to root
+        while let parentID = current.parentNodeID,
+              let parent = getNode(by: parentID) {
+            path.insert(parent, at: 0)
+            current = parent
+        }
+
+        return path
+    }
+
+    /// Focus on a node by centering it in the viewport
+    func focusOnNode(_ node: MindMapNode) {
+        withAnimation(MindMapTheme.Animation.panSmooth) {
+            // Center the node by calculating required pan offset
+            panOffset = CGSize(
+                width: -node.positionX * zoomScale,
+                height: -node.positionY * zoomScale
+            )
+        }
+        logger.info("Focused on node: \(node.title)")
     }
 
     // MARK: - Zoom & Pan (Subtask 39.2)
