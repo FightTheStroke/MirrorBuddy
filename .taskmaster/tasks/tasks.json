@@ -3870,8 +3870,81 @@
         "dependencies": [
           "86"
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Integrate OCR and Text Extraction for Images and Documents",
+            "description": "Develop and integrate OCR functionality to extract text from uploaded images and documents as the first step in mind map generation.",
+            "dependencies": [],
+            "details": "Implement or connect to an OCR library/service (e.g., Vision, Tesseract) to process images and PDF documents, extracting all readable text and metadata for downstream processing.",
+            "status": "done",
+            "testStrategy": "Upload various images and documents, verify that extracted text matches visible content, and handle edge cases (e.g., low-quality scans).",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T05:36:08.362Z"
+          },
+          {
+            "id": 2,
+            "title": "Preprocess and Clean Extracted Text for GPT-4 Input",
+            "description": "Prepare and clean the extracted text to ensure optimal input quality for GPT-4 topic extraction and mind map structuring.",
+            "dependencies": [
+              1
+            ],
+            "details": "Remove irrelevant content, normalize whitespace, and segment text into logical sections. Optionally, summarize or chunk large documents to fit GPT-4 input limits.",
+            "status": "pending",
+            "testStrategy": "Feed sample extracted texts through preprocessing, check for removal of noise and preservation of key information.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Design and Implement GPT-4 Prompting for Mind Map Generation",
+            "description": "Create and refine prompts for GPT-4 to extract topics and generate structured mind map data from preprocessed text.",
+            "dependencies": [
+              2
+            ],
+            "details": "Develop prompt templates that instruct GPT-4 to identify main topics, subtopics, and relationships, and return results in a structured format (e.g., JSON or Markdown suitable for mind map rendering)[1][2][3].",
+            "status": "pending",
+            "testStrategy": "Send various preprocessed texts to GPT-4, review output for logical structure, completeness, and suitability for mind mapping.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement Mind Map Data Storage and Linking to Materials",
+            "description": "Store generated mind map structures and associate them with their source materials for retrieval and display.",
+            "dependencies": [
+              3
+            ],
+            "details": "Extend the data model to save mind map structures (e.g., as JSON blobs) and link them to the original document/image records. Ensure efficient retrieval and update mechanisms.",
+            "status": "pending",
+            "testStrategy": "Generate mind maps for multiple materials, verify correct storage, retrieval, and linkage between mind maps and their sources.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Develop Mind Map Visualization and Color-Coding by Subject",
+            "description": "Create a UI component to render mind maps interactively, supporting color-coding nodes by subject or topic.",
+            "dependencies": [
+              4
+            ],
+            "details": "Use a visualization library (e.g., D3.js, SwiftUI, or a mind map-specific library) to display mind maps. Implement color-coding logic based on subject metadata or GPT-4 output.",
+            "status": "pending",
+            "testStrategy": "Display generated mind maps, verify correct structure, interactivity, and color-coding for different subjects.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "End-to-End Testing and Validation of Mind Map Generation Workflow",
+            "description": "Test the complete workflow from image/document upload to mind map display, ensuring logical structure and subject coloring.",
+            "dependencies": [
+              5
+            ],
+            "details": "Perform comprehensive tests covering all steps: extraction, preprocessing, GPT-4 generation, storage, and visualization. Validate logical consistency and user experience.",
+            "status": "pending",
+            "testStrategy": "Import diverse materials, run the full pipeline, and review mind maps for accuracy, structure, and correct subject color-coding.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-10-17T05:36:08.362Z"
       },
       {
         "id": "88",
@@ -4601,7 +4674,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T05:31:48.943Z",
+      "lastModified": "2025-10-17T05:36:08.364Z",
       "taskCount": 109,
       "completedCount": 98,
       "tags": [
