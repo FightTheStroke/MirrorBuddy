@@ -4353,15 +4353,51 @@
       {
         "id": "95",
         "title": "Generate Lesson Summaries and Mind Maps from Transcripts",
-        "description": "Use GPT-4 to summarize transcripts and generate hierarchical mind maps with color coding and key concepts.",
-        "details": "Send transcript to GPT-4 for summary and mind map extraction. Structure mind map visually with subject-based colors. Store and link to lesson.",
-        "testStrategy": "Transcribe lesson, generate summary and mind map. Validate structure, readability, and relevance.",
-        "priority": "medium",
+        "description": "Integrate existing services to generate summaries and hierarchical mind maps from lesson transcripts using GPT-4, with subject-based color coding and key concepts extraction.",
+        "status": "done",
         "dependencies": [
           "94"
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "medium",
+        "details": "This task requires integration of existing components:\n- MindMapGenerationService from Task 87 for generating mind maps with subject-based colors\n- TextPreprocessingService for preparing transcript text\n- SubjectDetectionService from Task 94 for identifying subject from transcript\n- OpenAIClient for GPT-4 summarization capabilities\n\nThe integration should connect transcript data to these services, store the generated summaries and mind maps, and link them to the appropriate lesson. No new core functionality needs to be developed, as the generateMindMap(from: text) method already works with transcript text.",
+        "testStrategy": "1. Test integration with existing services using sample transcripts\n2. Verify summary generation using OpenAIClient chatCompletion\n3. Confirm mind map generation with proper subject-based colors\n4. Test storage and linking of generated content to lessons\n5. Validate structure, readability, and relevance of outputs\n6. Test UI integration for displaying summaries and mind maps",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create TranscriptProcessingService",
+            "description": "Develop a service that coordinates the processing of transcripts through existing components to generate summaries and mind maps.",
+            "dependencies": [],
+            "details": "Implement a TranscriptProcessingService that:\n1. Takes transcript text as input\n2. Uses TextPreprocessingService to clean and prepare the text\n3. Uses SubjectDetectionService to identify the subject\n4. Uses OpenAIClient to generate a summary\n5. Uses MindMapGenerationService to create a mind map\n6. Returns both summary and mind map for storage",
+            "status": "pending",
+            "testStrategy": "Create unit tests with mock services to verify proper coordination between components. Test with various transcript samples.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement UI for Displaying Transcript Summaries and Mind Maps",
+            "description": "Create or update UI components to display the generated summaries and mind maps from transcripts.",
+            "dependencies": [
+              1
+            ],
+            "details": "Extend the existing UI to:\n1. Show a summary section in the lesson detail view\n2. Display the mind map with proper rendering of hierarchical structure\n3. Implement color coding based on subject\n4. Add controls for regenerating or editing summaries/mind maps if needed\n5. Ensure responsive layout works on all device sizes",
+            "status": "pending",
+            "testStrategy": "Test UI rendering with various summary lengths and mind map complexities. Verify proper display on different device sizes and orientations.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Connect Transcript Processing to Data Storage",
+            "description": "Implement the connection between transcript processing results and SwiftData storage.",
+            "dependencies": [
+              1
+            ],
+            "details": "Create functionality to:\n1. Store generated summaries in the appropriate SwiftData model\n2. Store mind maps with proper linking to lessons\n3. Update lesson metadata to indicate processing status\n4. Implement caching for efficient retrieval\n5. Handle updates when transcripts change",
+            "status": "pending",
+            "testStrategy": "Test data persistence and retrieval. Verify proper relationships between entities. Test update scenarios when transcript content changes.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-10-17T05:51:27.260Z"
       },
       {
         "id": "96",
@@ -4373,8 +4409,9 @@
         "dependencies": [
           "95"
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2025-10-17T05:55:18.113Z"
       },
       {
         "id": "97",
@@ -4859,9 +4896,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T05:50:17.228Z",
+      "lastModified": "2025-10-17T05:55:18.115Z",
       "taskCount": 109,
-      "completedCount": 103,
+      "completedCount": 105,
       "tags": [
         "master"
       ]
