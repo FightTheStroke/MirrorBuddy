@@ -12,6 +12,7 @@ import SwiftData
 /// Main tab coordinator - lightweight container for app navigation (Task 109)
 
 struct MainTabView: View {
+    @EnvironmentObject var voiceCommandHandler: AppVoiceCommandHandler
     @State private var selectedTab = 0
     @State private var showingVoiceInterface = false
 
@@ -100,12 +101,20 @@ struct MainTabView: View {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
 
-            // MARK: - Persistent Voice Button (Task 106)
-            // Floating voice activation button accessible from all tabs
+            // MARK: - Voice Command Buttons (Assessment fix: mount VoiceCommandButton)
+            // Floating buttons for voice features accessible from all tabs
             VStack {
                 Spacer()
                 HStack {
+                    // Voice Command Button (left side) - Quick commands
+                    VoiceCommandButton()
+                        .padding(.leading, 16)
+                        .padding(.bottom, 90) // Position above tab bar
+                        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+
                     Spacer()
+
+                    // Persistent Voice Button (right side) - Full conversation (Task 106)
                     PersistentVoiceButton(isPresented: $showingVoiceInterface)
                         .padding(.trailing, 16)
                         .padding(.bottom, 90) // Position above tab bar
@@ -124,6 +133,23 @@ struct MainTabView: View {
             NavigationStack {
                 VoiceConversationView()
             }
+        }
+        // Voice command navigation bindings (Assessment fix)
+        .onChange(of: voiceCommandHandler.showMaterials) { _, newValue in
+            if newValue {
+                selectedTab = 0 // Dashboard/Materials tab
+                voiceCommandHandler.showMaterials = false // Reset flag
+            }
+        }
+        .onChange(of: voiceCommandHandler.showTasks) { _, newValue in
+            if newValue {
+                selectedTab = 2 // Tasks tab
+                voiceCommandHandler.showTasks = false // Reset flag
+            }
+        }
+        // Additional sheets for voice commands
+        .sheet(isPresented: $voiceCommandHandler.showMaterialImport) {
+            MaterialImportView()
         }
     }
 }
