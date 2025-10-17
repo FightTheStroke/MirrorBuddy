@@ -4990,21 +4990,21 @@
         "description": "Split the MainTabView into separate tab view files with dedicated view models to improve code organization, reduce responsibility overlap, and enhance maintainability.",
         "details": "1. Create the following new files:\n   - DashboardTabView.swift: UI for the dashboard tab\n   - DashboardViewModel.swift: Business logic for dashboard tab\n   - StudyTabView.swift: UI for the study tab\n   - StudyViewModel.swift: Business logic for study tab\n   - TasksTabView.swift: UI for the tasks tab\n   - TasksViewModel.swift: Business logic for tasks tab\n\n2. For each view model:\n   - Implement proper state management using @Published properties\n   - Move relevant business logic from MainTabView\n   - Create initialization methods with necessary dependencies\n   - Implement proper memory management\n\n3. For each view:\n   - Move relevant UI code from MainTabView\n   - Connect to corresponding view model\n   - Ensure consistent styling and behavior\n\n4. Refactor MainTabView.swift to:\n   - Act as a lightweight coordinator\n   - Handle only tab selection\n   - Initialize and inject view models\n   - Use TabView to display the separate tab views\n\n5. Integrate VoiceConversationView (which already exists) as the voice tab\n\n6. Update any references to MainTabView in other parts of the codebase\n\n7. Ensure proper navigation and state persistence between tabs\n\n8. Maintain existing functionality while improving code organization",
         "testStrategy": "1. Unit Tests:\n   - Create unit tests for each new view model\n   - Verify business logic works correctly in isolation\n   - Test state management and data flow\n\n2. UI Tests:\n   - Verify each tab displays correctly\n   - Test navigation between tabs\n   - Ensure tab state is preserved when switching between tabs\n\n3. Integration Tests:\n   - Test the interaction between the tab views and their view models\n   - Verify data flows correctly between components\n\n4. Manual Testing:\n   - Navigate through all tabs and verify functionality matches pre-refactor behavior\n   - Test edge cases like rapid tab switching\n   - Verify performance is maintained or improved\n\n5. Code Review:\n   - Ensure proper separation of concerns\n   - Verify no business logic remains in MainTabView\n   - Check for consistent coding patterns across new files\n\n6. Regression Testing:\n   - Verify all existing functionality continues to work\n   - Test on multiple device sizes to ensure responsive design",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "32",
           "44"
         ],
         "priority": "medium",
         "subtasks": [],
-        "updatedAt": "2025-10-17T06:10:37.161Z"
+        "updatedAt": "2025-10-17T16:17:20.669Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T16:07:41.000Z",
+      "lastModified": "2025-10-17T16:17:20.674Z",
       "taskCount": 109,
-      "completedCount": 108,
+      "completedCount": 109,
       "tags": [
         "master"
       ]
