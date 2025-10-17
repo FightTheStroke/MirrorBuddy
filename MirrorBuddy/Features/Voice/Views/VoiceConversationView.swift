@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 @preconcurrency import Combine
+import os.log
 
 /// Voice conversation UI for AI coach interactions
 struct VoiceConversationView: View {
@@ -313,11 +314,13 @@ final class VoiceConversationViewModel: ObservableObject {
     // MARK: - Dependencies
 
     private let audioPipeline = AudioPipelineManager.shared
+    private let coachPersonality = StudyCoachPersonality.shared // Task 101
     private var realtimeClient: OpenAIRealtimeClient?
     private var conversationService: VoiceConversationService?
 
     private var waveformTimer: Timer?
     private var cancellables = Set<AnyCancellable>()
+    private let logger = Logger(subsystem: "com.mirrorbuddy", category: "VoiceConversation")
 
     // MARK: - Persistence
 
@@ -329,6 +332,9 @@ final class VoiceConversationViewModel: ObservableObject {
 
     /// Material for current conversation
     private var currentMaterialEntity: Material?
+
+    /// ModelContext for accessing SwiftData (Task 101)
+    private var modelContext: ModelContext?
 
     // MARK: - Audio Buffering
 
@@ -485,19 +491,77 @@ final class VoiceConversationViewModel: ObservableObject {
         }
     }
 
+    // Task 101: Load current subject/material context from SwiftData
     private func loadContext() {
-        // TODO: Load from user's current subject/material context
-        currentSubject = "Matematica"
-        currentMaterial = "Equazioni di Secondo Grado - Capitolo 5"
+        guard let modelContext = modelContext else {
+            // Fallback to placeholder if no context available
+            currentSubject = "Matematica"
+            currentMaterial = "Argomenti Generali"
+            return
+        }
+
+        do {
+            // Try to load the most recently accessed material
+            let descriptor = FetchDescriptor<Material>(
+                sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+            )
+            let materials = try modelContext.fetch(descriptor)
+
+            if let latestMaterial = materials.first {
+                currentMaterialEntity = latestMaterial
+                currentMaterial = latestMaterial.title
+                currentSubjectEntity = latestMaterial.subject
+                currentSubject = latestMaterial.subject?.displayName ?? "Materia Sconosciuta"
+            } else {
+                // No materials yet - try to load any subject
+                let subjectDescriptor = FetchDescriptor<SubjectEntity>()
+                let subjects = try modelContext.fetch(subjectDescriptor)
+
+                if let firstSubject = subjects.first {
+                    currentSubjectEntity = firstSubject
+                    currentSubject = firstSubject.displayName
+                    currentMaterial = "Argomenti Generali"
+                } else {
+                    // Complete fallback
+                    currentSubject = "Studio"
+                    currentMaterial = "Argomenti Generali"
+                }
+            }
+
+            // Update StudyCoachPersonality context
+            if let subject = currentSubject, let material = currentMaterial {
+                let context = ConversationContext(
+                    subject: subject,
+                    material: material,
+                    topicsCovered: [],
+                    strugglingConcepts: [],
+                    currentDifficultyLevel: .intermediate,
+                    sessionStartTime: Date(),
+                    totalQuestionsAsked: 0,
+                    correctAnswers: 0
+                )
+                coachPersonality.updateContext(context)
+            }
+        } catch {
+            logger.error("Failed to load context: \(error.localizedDescription)")
+            // Fallback
+            currentSubject = "Studio"
+            currentMaterial = "Argomenti Generali"
+        }
     }
 
     // MARK: - Configuration
 
     /// Configure the ViewModel with a ModelContext (called from view's onAppear)
     func configure(modelContext: ModelContext) {
+        self.modelContext = modelContext // Task 101: Save for loadContext
+
         if conversationService == nil {
             conversationService = VoiceConversationService(modelContext: modelContext)
         }
+
+        // Load context after modelContext is set
+        loadContext()
     }
 
     /// Load an existing conversation by ID
@@ -580,17 +644,12 @@ final class VoiceConversationViewModel: ObservableObject {
                     startAudioCommitTimer()
                 }
 
-                // Send initial context in Italian
-                if let subject = currentSubject {
-                    try await realtimeClient.sendText(
-                        "Sei un coach AI che aiuta uno studente con \(subject). " +
-                        "Materiale corrente: \(currentMaterial ?? "Argomenti generali"). " +
-                        "Sii incoraggiante, chiaro ed educativo. " +
-                        "Lo studente ha dislessia, discalculia e poca memoria di lavoro. " +
-                        "Usa frasi brevi e semplici. Fai esempi concreti della vita quotidiana. " +
-                        "IMPORTANTE: Rispondi SEMPRE in italiano."
-                    )
-                }
+                // Task 101: Send context-aware system prompt from StudyCoachPersonality
+                let systemPrompt = await coachPersonality.generateSystemPrompt(
+                    for: currentSubject,
+                    material: currentMaterial
+                )
+                try await realtimeClient.sendText(systemPrompt)
             } catch {
                 await MainActor.run {
                     showError(error.localizedDescription)
