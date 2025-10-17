@@ -1,465 +1,197 @@
-# MirrorBuddy 🎓✨
+# MirrorBuddy · The Empathic Learning OS
 
-**Your AI Learning Companion - Insegnante di Sostegno Personale**
-
-MirrorBuddy is more than a study app — it's a complete AI-powered learning companion designed to be a personal tutor, friend, and support system for students, especially those with learning differences like dyslexia.
+*An aspirational platform that transforms AI into a neurodiverse-ready co-teacher, study partner, and homework hero.*
 
 ---
 
-## 🌟 Vision & Mission
+## Why MirrorBuddy exists
 
-### Vision
-Transform learning for every student by providing an empathetic, patient, and always-available AI tutor that makes education accessible, engaging, and personalized.
+Traditional learning tools were designed for “average” students with full executive function, two free hands, perfect reading fluency, and unlimited patience. That student rarely exists.
 
-### Mission
-**MirrorBuddy è un vero e proprio insegnante di sostegno** - a dedicated support teacher powered by AI that:
+MirrorBuddy is a moonshot to build the first **voice-first, multimodal learning operating system** that:
 
-- 📚 **Organizes all study materials** from Google Drive, Gmail, and Calendar
-- 🗣️ **Speaks and listens** in natural Italian conversations
-- 🧠 **Creates visual mind maps** from any document or lesson
-- 📸 **Helps with homework** using camera and AI vision
-- 🎯 **Encourages reading and learning** even when things are difficult
-- 💬 **Is always there** - not just for homework, but as a friend to talk to about anything
+- treats every learner like a whole human, not a checklist of deficits,
+- understands context across voice, vision, and documents,
+- adapts language, pacing, and encouragement to neurodiverse needs,
+- stays with a student through school, homework, and life skills.
+
+Think of it as **a 1:1 support teacher, speech therapist, note taker, and gaming buddy rolled into one persistent AI companion.**
 
 ---
 
-## 🚀 **Project Status**
+## Who we serve (and why the market cares)
 
-**Current Phase**: ✅ Core Features Implemented - Active Development  
-**Last Updated**: October 15, 2025  
-**Target Launch**: Q1 2026  
+We started with Mario, a bright teenager navigating dyslexia, dyscalculia, dysgraphia, and left hemiplegia. Very quickly, the use cases expanded:
 
-### Recently Completed ✅
-- **"Aggiornami" One-Button Sync** (October 2025)
-- **Multi-Format Document Support** with OCR (October 2025)
-- **Document Scanner** with VisionKit (October 2025)
-- **OpenDyslexic Font Integration** (October 2025)
-- **Unified API Keys Management** (October 2025)
+| Persona | Pain Point | Why MirrorBuddy matters |
+| --- | --- | --- |
+| **Neurodiverse learners (K‑12)** | Reading fatigue, working-memory overload, executive function deficits | Natural-language voice guidance, visual mind maps, one-button syncing eliminate context juggling |
+| **Inclusive classrooms & resource teachers** | High caseload, limited prep time, inconsistent accommodations | Auto-generated summaries, task digestion, lesson capture, and dashboards scale support without burning out staff |
+| **Homeschool cooperatives** | Parents juggling curricula, assessments, and individualized plans | Unified workspace blends Google Drive assets, voice coaching, and progress overviews |
+| **University disability centers** | Access services struggle to keep up with demand | Always-on coach provides note expansion, reading support, and conversational check-ins |
+| **Adult upskillers & career changers** | Need patient learning companion beyond school | Voice-first coaching and just-in-time summaries make self-study sustainable |
 
----
-
-## ✨ Implemented Features
-
-### 🔄 One-Button Sync ("Aggiornami")
-Press one big button to:
-- ✅ Sync new documents from Google Drive (PDFs + images)
-- ✅ Check emails from teachers for assignments
-- ✅ Import calendar events and deadlines
-- ✅ Auto-generate mind maps for new materials
-- ✅ Get a summary: "3 new documents, 2 tasks, 3 mind maps created"
-
-**Implementation**: `UpdateManager.swift` + `UpdateButtonView.swift`  
-**Status**: ✅ **Fully Implemented** (October 15, 2025)
-
-### 📸 Multi-Format Document Support
-- ✅ Import PDFs, images (PNG, JPG, HEIC) from Google Drive
-- ✅ Import from local file system
-- ✅ **Automatic OCR** with Vision framework
-- ✅ Extract text from images, even handwritten notes
-- ✅ Italian + English text recognition
-- ✅ All materials ready for mind map generation
-
-**Implementation**: `OCRService.swift` + `MaterialImportView.swift`  
-**Status**: ✅ **Fully Implemented** (October 15, 2025)
-
-### 📷 Document Scanner
-- ✅ Scan paper documents with camera
-- ✅ Auto-crop and enhance quality (VisionKit)
-- ✅ Multi-page scanning in one session
-- ✅ Automatic OCR after scanning
-- ✅ Save as Material for instant study
-
-**Implementation**: `DocumentScannerView.swift`  
-**Status**: ✅ **Fully Implemented** (October 15, 2025)
-
-### 🔤 Accessibility: OpenDyslexic Font
-- ✅ OpenDyslexic font integrated (all variants)
-- ✅ Applied as default throughout the app
-- ✅ Large, readable text (minimum 18pt)
-- ✅ Optimized for dyslexic users
-
-**Implementation**: `Font+OpenDyslexic.swift`  
-**Status**: ✅ **Fully Implemented** (October 15, 2025)
-
-### 🔐 Unified API Keys Management
-- ✅ Single `APIKeys-Info.plist` for all credentials
-- ✅ OpenAI, Anthropic, Google OAuth all in one file
-- ✅ Protected by `.gitignore`
-- ✅ Easy setup with `.example` template
-
-**Files**: `APIKeys-Info.plist`, `APIKeysConfig.swift`, `GoogleOAuthConfig.swift`  
-**Status**: ✅ **Fully Implemented** (October 15, 2025)
-
-### 🗣️ Voice Conversation (Italian)
-- ✅ Natural conversations in Italian
-- ✅ Real-time audio with OpenAI Realtime API
-- ✅ Patient, empathetic tone
-- ✅ "Aiutami con questo esercizio" triggers help
-
-**Status**: ✅ **Implemented**
-
-### 📬 Google Integrations
-- ✅ Google Drive file sync
-- ✅ Gmail assignment extraction
-- ✅ Calendar event import
-- ✅ OAuth 2.0 authentication
-- ✅ Background sync scheduling
-
-**Status**: ✅ **Implemented**
+The global assistive education technology sector is accelerating (various analyst reports project double-digit CAGR toward the end of the decade), driven by mandates for inclusive classrooms, rising diagnoses, and post-pandemic comfort with remote support. MirrorBuddy aims to be the **experience layer** stitching together the fractured tooling in that market.
 
 ---
 
-## 🚧 In Development
+## Product promise
 
-### 🧠 Improved Mind Maps (Phase 2)
-- [ ] Mobile-optimized layout (vertical scrolling)
-- [ ] Large fonts (18pt minimum)
-- [ ] Tap to expand/collapse nodes
-- [ ] Pinch to zoom
-- [ ] Color-coded by subject
-- [ ] Breadcrumb navigation
+MirrorBuddy focuses on five pillars:
 
-**Priority**: HIGH - Next Sprint
+1. **Voice-first & interrupt friendly** — Speak naturally (“Explain this fraction like Fortnite”), interrupt mid-sentence, pick up the thread minutes later.
+2. **Multimodal cognition** — Camera, PDFs, emails, mind maps, and voice recordings collapse into a shared context graph.
+3. **Emotionally safe coaching** — Tone calibrated for encouragement, neurodiverse pacing, and shame-free retries.
+4. **Autopilot organization** — One button (“Aggiornami”) corrals Drive files, Gmail assignments, Calendar events, plus auto-summaries.
+5. **Trust-by-design** — On-device personalization, CloudKit sync, robust transparency around API usage; no data hoarding.
 
-### 🎙️ Extended Voice Recording (Phase 2)
-- [ ] 6-hour continuous recording for classroom lessons
-- [ ] Background recording (screen can lock)
-- [ ] Auto-save every 30 minutes
-- [ ] Compression (AAC format, ~500MB for 6h)
-- [ ] Upload to Google Drive for backup
-
-**Priority**: HIGH - Phase 2
-
-### 📝 Auto-Transcription (Phase 2)
-- [ ] Whisper API integration (Italian)
-- [ ] Process in chunks (30 min intervals)
-- [ ] Subject detection from keywords
-- [ ] Link transcripts to materials
-- [ ] Manual subject correction option
-
-**Priority**: HIGH - Phase 2
+We are building toward **an “OS layer” that constantly knows what the learner is working on, senses overwhelm, and offers the next best action through voice or visuals.**
 
 ---
 
-## 🔮 Planned Features
+## Current build snapshot (October 17, 2025)
 
-### 📸 Screen Capture + GPT-4 Vision (Phase 3)
-- [ ] Capture homework from screen/camera
-- [ ] GPT-4 Vision analysis of math problems, diagrams
-- [ ] Voice-guided step-by-step solutions
-- [ ] iPad Pencil annotations support
+The repository already includes a functional SwiftUI app with the following maturity levels:
 
-### 🗺️ Mind Maps from Lesson Transcripts (Phase 3)
-- [ ] Auto-generate mind maps from recorded lessons
-- [ ] Extract key concepts, definitions, examples
-- [ ] Visual hierarchy with color coding
-- [ ] Review assistant: "Cosa ho imparato oggi?"
+| Capability | Status | Notes |
+| --- | --- | --- |
+| **Voice Coach (Italian)** | Prototype | Realtime streaming via OpenAI Realtime API, empathy-tuned prompts, conversation persistence. Next step: Apple Speech fallback & richer command routing. |
+| **One-Button Sync** | Alpha | `UpdateManager` orchestrates Google Drive, Gmail, Calendar ingestion with background tasks. |
+| **Document pipeline** | Alpha | VisionKit scanner, OCR service, dyslexia-friendly text rendering, mind map seeds. |
+| **Accessibility shell** | Alpha | OpenDyslexic defaults, large touch targets, context banner, voice command registry scaffolding. |
+| **Data layer** | Foundations | SwiftData models for materials, mind maps, flashcards, voice transcripts, CloudKit-ready container. |
 
-### 🎯 Personalized Learning Path (Phase 3)
-- [ ] Track progress over time
-- [ ] Identify strengths and challenges
-- [ ] Suggest review topics
-- [ ] Adaptive difficulty
+See `Docs/PROJECT_STATUS.md` and `.taskmaster/tasks/tasks.json` for the granular task tracker.
 
 ---
 
-## 📋 Technical Stack
+## Near-term roadmap
 
-### Frontend
-- **SwiftUI** - Modern iOS UI framework
-- **SwiftData** - Local persistence + iCloud sync (CloudKit)
-- **Vision Framework** - OCR for images
-- **VisionKit** - Document scanning
-- **AVFoundation** - Audio recording
-- **PDFKit** - PDF rendering
+1. **Voice Autonomy**
+   - Apple Speech offline fallback & seamless network handover
+   - Context-aware command parsing (“Show me the math map for today”)
+   - Tone modulation based on frustration signals
+2. **Mind Map 2.0**
+   - Mobile-first zoomable flow
+   - Voice navigation through nodes (“Jump to the physics example”)
+   - Export bridges into classroom tools (Google Classroom, Notability)
+3. **Lesson Memory**
+   - 6-hour ambient recording with Whisper chunking
+   - Automatic timeline + mind map synthesis
+   - “Replay the part where the teacher explained parabolas”
+4. **Progress Intelligence**
+   - Working-memory aware planner
+   - Micro achievements (“Two focused sprints today!”)
+   - Parent/teacher digest with encouraging framing
 
-### AI Services
-- **OpenAI API**:
-  - GPT-4/GPT-4o for summaries and explanations
-  - Whisper for audio transcription
-  - Realtime API for voice conversations
-  - Vision API for image analysis
-- **Anthropic Claude** (optional):
-  - Alternative to GPT-4 for text generation
-- **Google APIs**:
-  - Drive API for document sync
-  - Gmail API for assignment extraction
-  - Calendar API for event management
-
-### Backend
-- **CloudKit** - iCloud sync across devices
-- **Background Tasks** - Scheduled syncing
-- **Keychain** - Secure token storage
+The public roadmap lives in `Docs/ExecutionPlan.md` and is mirrored into `.taskmaster`.
 
 ---
 
-## 🔧 Setup & Installation
+## Market & ecosystem signals
 
-### Prerequisites
-- **Xcode 15+**
-- **iOS 17+** / **iPadOS 17+**
-- **Apple Developer Account** (for CloudKit)
-- **Google Cloud Project** (for Drive/Gmail/Calendar)
-- **OpenAI API key** (required)
-- **Anthropic API key** (optional)
+- **Inclusive education mandates** (US IDEA, EU accessibility directives) are pushing schools to adopt tech that works for diverse cognitive profiles. Districts now budget specifically for AI-assisted accommodations.
+- **Assistive EdTech spend** is accelerating as neurodiversity diagnoses rise (ADHD, dyslexia, autism spectrum). Tools that couple academic support with emotional scaffolding are in demand for both K‑12 and higher education.
+- **Parents and homeschool networks** are increasingly tech-forward, searching for AI copilots that can collaborate with their family’s Google Drive/Calendar stack and reduce planning overhead.
+- **Wellness & mental health** cross over: many learners want an empathetic voice that celebrates progress and regulates pace to reduce anxiety.
 
-### Quick Start
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/your-org/MirrorBuddy.git
-   cd MirrorBuddy
-   ```
-
-2. **Setup API Keys** (IMPORTANT)
-   ```bash
-   # Copy example file
-   cp MirrorBuddy/Resources/APIKeys-Info.plist.example \
-      MirrorBuddy/Resources/APIKeys-Info.plist
-   ```
-
-   Edit `APIKeys-Info.plist` with your keys:
-   ```xml
-   <key>OPENAI_API_KEY</key>
-   <string>sk-proj-YOUR_OPENAI_KEY</string>
-   
-   <key>GOOGLE_CLIENT_ID</key>
-   <string>YOUR_CLIENT_ID.apps.googleusercontent.com</string>
-   
-   <key>GOOGLE_REVERSED_CLIENT_ID</key>
-   <string>com.googleusercontent.apps.YOUR_CLIENT_ID</string>
-   ```
-
-   **Where to get keys**:
-   - OpenAI: https://platform.openai.com/api-keys
-   - Anthropic: https://console.anthropic.com/account/keys
-   - Google OAuth: See [docs/GOOGLE_SETUP_COMPLETE.md](docs/GOOGLE_SETUP_COMPLETE.md)
-
-3. **Configure Google OAuth**
-
-   Follow the step-by-step guide: **[docs/GOOGLE_SETUP_COMPLETE.md](docs/GOOGLE_SETUP_COMPLETE.md)**
-
-4. **Build and Run**
-   ```bash
-   open MirrorBuddy.xcodeproj
-   # Select your device or simulator
-   # Press Cmd+R to build and run
-   ```
-
-5. **Test "Aggiornami" Button**
-   - Launch app
-   - Go to Settings → Connect Google Drive
-   - Sign in with Google
-   - Return to Dashboard
-   - Press big "Aggiornami" button
-   - Watch automatic sync in action!
+MirrorBuddy aspires to be the connective tissue in this ecosystem—an extensible client orchestrating best-in-class AI providers, campus systems, and human caregivers.
 
 ---
 
-## 📖 Documentation
+## Use case vignettes (future-facing)
 
-### **Essential Guides**
-- **[docs/GOOGLE_SETUP_COMPLETE.md](docs/GOOGLE_SETUP_COMPLETE.md)** - Complete Google OAuth setup
-- **[docs/API_KEYS_SETUP.md](docs/API_KEYS_SETUP.md)** - OpenAI, Anthropic, Gemini keys
-- **[GOOGLE_API_SETUP.md](GOOGLE_API_SETUP.md)** - Fix 403 API errors
-
-### **Architecture & Planning**
-- **[Docs/FINAL_BRIEFING.md](Docs/FINAL_BRIEFING.md)** - Project summary & action plan
-- **[Docs/STACK_FINAL.md](Docs/STACK_FINAL.md)** - Technology stack
-- **[Docs/ADR/](Docs/ADR/)** - Architectural Decision Records
-- **[.taskmaster/docs/new-features-prd.txt](.taskmaster/docs/new-features-prd.txt)** - Product Requirements
-
-### **Development**
-- **[Docs/NEXT_STEPS.md](Docs/NEXT_STEPS.md)** - Development roadmap
-- **[Docs/ExecutionPlan.md](Docs/ExecutionPlan.md)** - Backlog & tracking
+- **Night-before-exam triage**: Mario snaps a photo of a physics worksheet. MirrorBuddy extracts the diagram, explains it with Fortnite analogies, and generates a voice-guided walkthrough he can replay on the bus.
+- **Inclusive classroom station**: A resource teacher runs MirrorBuddy on an iPad at the support desk. Students drop off PDFs or voice questions; the system prepares simplified mind maps and suggests conversation starters.
+- **Parent review loop**: After homework, MirrorBuddy summarizes what Mario tackled, highlights sticking points with recommended games or videos, and nudges his parent (“Celebrate the geometry win!”).
+- **Workplace upskilling**: An adult learner feeds onboarding manuals into MirrorBuddy, which turns them into bite-sized flashcards, mock Q&A sessions, and daily voice check-ins.
 
 ---
 
-## 🎯 Core Philosophy
-
-### 🧠 Accessibility First
-- **OpenDyslexic font** by default
-- Large, readable text (minimum 18pt)
-- High contrast colors
-- Simple, child-friendly UI
-- Voice-first interaction option
-- One-handed operation support
-
-### 💙 Empathetic Design
-
-All interactions follow these principles:
-
-✅ **Patient**: "Va bene Mario, prendiamola con calma. Guardiamo questo esercizio insieme."
-
-✅ **Encouraging**: "Bravo Mario! L'hai capito perfettamente. Vuoi provare il prossimo?"
-
-✅ **Understanding**: "Capisco che può essere difficile. Facciamo un passo alla volta."
-
-✅ **Supportive**: "Hai già fatto progressi! Ricordi quando trovavi anche questo difficile?"
-
-✅ **Conversational**: Can discuss any topic, not just school subjects
-
-✅ **Reading Encouragement**: Suggests books, reads together
-
-❌ **Never**:
-- ❌ "Devi finire questo compito" → ✅ "Mario, quando vuoi possiamo lavorare insieme su questo compito"
-- ❌ "Errore: risposta sbagliata" → ✅ "Va bene Mario, proviamo insieme in un altro modo"
-- ❌ Rushing, pressuring, or judging
-
-### 🔐 Privacy & Security
-- **Local-first** - All data stays on device or in your iCloud
-- **No analytics** - We don't track or collect usage data
-- **API keys secured** - Stored locally in ignored files
-- **Credentials protected** - Comprehensive `.gitignore`
-- **Open source** - Transparent about what we do with your data
-
----
-
-## 🛠️ File Structure
+## Product architecture (high level)
 
 ```
-MirrorBuddy/
-├── App/
-│   └── MirrorBuddyApp.swift           # App entry point
-├── Core/
-│   ├── API/                            # AI service clients
-│   │   └── OpenAI/
-│   ├── Config/                         # Configuration
-│   │   └── APIKeysConfig.swift         # Loads from plist
-│   ├── Extensions/
-│   │   └── Font+OpenDyslexic.swift     # Font extensions
-│   ├── Services/
-│   │   ├── UpdateManager.swift         # "Aggiornami" orchestrator
-│   │   ├── OCRService.swift            # Image text extraction
-│   │   ├── GoogleOAuthService.swift    # OAuth flow
-│   │   ├── GmailService.swift          # Email sync
-│   │   └── GoogleCalendarService.swift # Calendar sync
-│   └── Models/                         # SwiftData models
-├── Features/
-│   ├── Dashboard/
-│   │   └── Views/
-│   │       ├── MainTabView.swift       # Main UI
-│   │       └── UpdateButtonView.swift  # "Aggiornami" button
-│   ├── Materials/
-│   │   └── Views/
-│   │       ├── MaterialImportView.swift    # Import UI
-│   │       └── DocumentScannerView.swift   # Scanner
-│   ├── Settings/                       # Settings screens
-│   └── Voice/                          # Voice coach
-├── Resources/
-│   ├── Fonts/
-│   │   └── OpenDyslexic-*.otf          # Dyslexia-friendly fonts
-│   └── APIKeys-Info.plist              # ⚠️ NOT in Git (your keys)
-└── docs/                               # Documentation
-    ├── GOOGLE_SETUP_COMPLETE.md
-    └── API_KEYS_SETUP.md
+┌────────────────────────────────────────────────────────────┐
+│                      MirrorBuddy Client                     │
+│                                                            │
+│  SwiftUI experience · Voice-first shell · Dyslexia design  │
+│                                                            │
+│  ┌──────────────┐   ┌──────────────┐   ┌────────────────┐  │
+│  │ Voice Layer  │←→│ Context Stack │←→│ Assistive Views │  │
+│  └──────────────┘   └──────────────┘   └────────────────┘  │
+│         │                    │                    │         │
+└─────────┼────────────────────┼────────────────────┼─────────┘
+          │                    │                    │
+┌─────────▼───────┐  ┌─────────▼────────┐  ┌────────▼────────┐
+│ OpenAI Realtime │  │ CloudKit + Swift │  │ Google Workspace │
+│ GPT-5 / Whisper │  │ Data graph       │  │ Drive · Gmail    │
+└─────────┬───────┘  └─────────┬────────┘  └────────┬────────┘
+          │                    │                    │
+      (Future) Anthropic · Apple Intelligence · LMS APIs
 ```
 
----
-
-## 🚀 Development Roadmap
-
-### ✅ Phase 1 - Foundation (COMPLETED)
-- [x] SwiftUI + SwiftData + CloudKit setup
-- [x] Google Drive/Gmail/Calendar integration
-- [x] OAuth 2.0 authentication
-- [x] "Aggiornami" one-button sync
-- [x] Multi-format document support (PDFs + images)
-- [x] OCR with Vision framework
-- [x] Document scanner with VisionKit
-- [x] OpenDyslexic font integration
-- [x] Unified API keys management
-- [x] Voice conversation (Italian)
-
-### 🚧 Phase 2 - Advanced Features (IN PROGRESS)
-- [ ] Improved mind maps (mobile-optimized)
-- [ ] Extended voice recording (6 hours)
-- [ ] Auto-transcription with Whisper
-- [ ] Subject detection from transcripts
-- [ ] Lesson summaries
-
-### 🔮 Phase 3 - Vision & Intelligence (PLANNED)
-- [ ] Screen capture + GPT-4 Vision
-- [ ] Live homework help with camera
-- [ ] Mind maps from lesson transcripts
-- [ ] Review assistant and quiz generation
-
-### 🎯 Phase 4 - Personalization (FUTURE)
-- [ ] Personalized learning paths
-- [ ] Progress tracking over time
-- [ ] Reading recommendations
-- [ ] Adaptive difficulty
+Key components (see `/MirrorBuddy/Core`):
+- `OpenAIRealtimeClient` — websocket streaming with audio & text delta handling
+- `AudioPipelineManager` — microphone capture, playback queue, diagnostics
+- `VoiceConversationService` — SwiftData persistence for transcripts
+- `UpdateManager` — sync orchestration across Drive/Gmail/Calendar
+- `ContextBannerView` + `VoiceCommandRegistry` — scaffolding for working-memory support and hands-free navigation
 
 ---
 
-## 💰 Estimated Costs
+## Getting started (developer preview)
 
-### Monthly Operating Costs (per active user)
-- **OpenAI APIs**: $50-150/month
-  - GPT-4: ~$0.03 per 1K tokens
-  - Whisper: ~$0.006 per minute
-  - Realtime API: ~$0.06 per minute
-- **Anthropic (optional)**: $20-50/month
-- **Google APIs**: $0 (free tier sufficient)
-- **Apple CloudKit**: $0 (free with Apple ID)
+> **Prerequisites**
+> - macOS 15 + Xcode 16 beta (or newer supporting Swift 6 concurrency checks)
+> - iOS/iPadOS 17 simulator or device
+> - Apple Developer account with CloudKit entitlements
+> - Google Cloud project (Drive, Gmail, Calendar APIs enabled & OAuth consent)
+> - OpenAI API key (Realtime + Chat), optional Anthropic key
+> - Update `com.mirrorbuddy.MirrorBuddy` bundle ID if you do not control this domain
 
-**Total**: ~$70-200/month per heavy user
+```bash
+git clone https://github.com/your-org/MirrorBuddy.git
+cd MirrorBuddy
 
-### Development
-- Solo developer: 18-24 weeks (part-time)
-- With AI agents (Cursor, Claude Code): 6-8 weeks
+# Copy credential template
+cp MirrorBuddy/Resources/APIKeys-Info.plist.example \
+   MirrorBuddy/Resources/APIKeys-Info.plist
 
----
+# Fill in API keys, OAuth identifiers, and set permitted URL schemes.
+```
 
-## 🤝 Contributing
+1. Enable CloudKit in the Xcode target (`Signing & Capabilities → + Capability → iCloud`).
+2. Register background tasks used by `UpdateManager` (`BGTaskSchedulerPermittedIdentifiers` already listed in `Info.plist`; ensure your bundle ID matches).
+3. Create an OAuth client, download `GoogleService-Info.plist`, and follow `Docs/GOOGLE_SETUP_COMPLETE.md`.
+4. Open `MirrorBuddy.xcodeproj`, select a device, run (`⌘R`). On first launch:
+   - Grant microphone, camera, photo library permissions.
+   - Sign into Google via Settings → Integrations → “Connect Drive”.
+   - Tap **Aggiornami** to trigger the multi-service sync prototype.
 
-We welcome contributions that align with our mission to make learning accessible!
-
-### Priority Areas
-1. ✅ Improving mind map visualization for mobile
-2. 🎙️ Extending voice recording capacity
-3. 🔤 Enhancing OCR accuracy for Italian handwriting
-4. 💬 Adding more empathetic voice responses
-5. ♿ UI/UX improvements for accessibility
-
-### Guidelines
-- Follow Swift style guide
-- Maintain accessibility standards
-- Test on real devices
-- Write patient, clear error messages
-- Use OpenDyslexic font for new UI elements
-- Document AI prompts and interactions
+See `Docs/GOOGLE_API_SETUP.md`, `Docs/CLOUDKIT_SETUP.md`, and `Docs/ExecutionPlan.md` for deep dives.
 
 ---
 
-## 📄 License
+## Contribution philosophy
 
-MIT License - see [LICENSE](LICENSE)
+MirrorBuddy is early, ambitious, and opinionated. Contributions we value most:
 
----
+1. **Neurodiversity-first UI** — richer voice command flows, low-cognitive-load layouts, courageously simple copy.
+2. **Explainable AI** — translation layers that help students understand *why* an answer is correct.
+3. **Safeguards & trust** — audit trails, parent/teacher controls, privacy guardrails.
+4. **Context expansion** — connectors to additional ecosystems (Canvas, Notion, Microsoft 365) while honoring privacy.
 
-## 🙏 Acknowledgments
-
-- **OpenDyslexic** - Font for improved dyslexic readability
-- **OpenAI** - GPT-4, Whisper, Realtime API
-- **Anthropic** - Claude for AI capabilities
-- **Apple** - Vision Framework, VisionKit, CloudKit
-- **Google** - Drive, Gmail, Calendar APIs
+Please review `Docs/AGENT_DRIVEN_DEVELOPMENT.md` for the tasking model and submit PRs with accessibility considerations documented.
 
 ---
 
-## 💬 Support & Contact
+## License & acknowledgements
 
-- **Issues**: [GitHub Issues](https://github.com/your-org/MirrorBuddy/issues)
-- **Documentation**: [docs/](docs/)
-- **Discussions**: [GitHub Discussions](https://github.com/your-org/MirrorBuddy/discussions)
+- Licensed under the MIT License – see [LICENSE](LICENSE).
+- Built on top of SwiftUI, SwiftData, CloudKit, Apple Vision/VisionKit, OpenAI’s Realtime/Chat/Whisper APIs, and the OpenDyslexic type family.
+- Special thanks to educators, therapists, parents, and learners who have shared the daily frictions we are working to dissolve.
 
----
+**MirrorBuddy**  
+*Because every learner deserves an always-on teammate who listens, adapts, and celebrates the journey.*
 
-**MirrorBuddy** - Your personal AI learning companion 🎓✨
-
-*"Learning should be accessible, engaging, and empathetic for every student."*
-
----
-
-**Last Updated**: October 15, 2025
+**Last updated:** October 17, 2025

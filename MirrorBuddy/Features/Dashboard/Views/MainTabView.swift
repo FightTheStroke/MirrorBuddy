@@ -115,12 +115,11 @@ struct MainTabView: View {
             // Global feedback overlay for voice commands
             VoiceCommandFeedbackView()
                 .zIndex(999)
-
-            // Voice interface sheet
-            .sheet(isPresented: $showingVoiceInterface) {
-                NavigationStack {
-                    VoiceConversationView()
-                }
+        }
+        // Voice interface sheet (attached to ZStack, not to VoiceCommandFeedbackView)
+        .sheet(isPresented: $showingVoiceInterface) {
+            NavigationStack {
+                VoiceConversationView()
             }
         }
     }

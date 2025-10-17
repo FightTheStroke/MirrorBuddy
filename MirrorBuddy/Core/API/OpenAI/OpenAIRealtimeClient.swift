@@ -158,6 +158,26 @@ final class OpenAIRealtimeClient: NSObject {
         try await send(responseMessage)
     }
 
+    /// Send system prompt with system role
+    func sendSystemPrompt(_ text: String) async throws {
+        let message = RealtimeMessage.clientEvent(
+            .conversationItemCreate(
+                .init(
+                    eventID: UUID().uuidString,
+                    item: .message(
+                        .init(
+                            id: UUID().uuidString,
+                            role: "system",
+                            content: [.text(text)]
+                        )
+                    )
+                )
+            )
+        )
+        try await send(message)
+        // Note: No response generation for system messages
+    }
+
     /// Send audio input (PCM16 data, base64-encoded)
     func sendAudioData(_ audioData: Data) async throws {
         guard isConnected, webSocketTask != nil else {

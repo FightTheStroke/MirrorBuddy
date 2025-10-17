@@ -4976,13 +4976,13 @@
         "description": "Redesign the MaterialDetailView to replace the current four-tab switch with a more accessible layout that eliminates tab switching and reduces cognitive load for users with learning disabilities.",
         "details": "1. Analyze the current implementation in MaterialDetailView.swift, focusing on line 28 where the tab switch is defined.\n\n2. Design and implement one of the following alternatives:\n   a. A List-based layout with distinct sections:\n      - Create a ScrollView with LazyVStack containing separate sections for Overview, Mind Map, Tasks, and Notes\n      - Each section should have a clear header and visual separation\n      - Implement collapsible sections for better content management\n      \n   b. A compact card-based layout:\n      - Design visually distinct cards for each content type\n      - Arrange cards vertically in a ScrollView\n      - Ensure proper spacing and visual hierarchy between cards\n      - Add subtle animations for focus changes\n\n3. Ensure the new layout maintains all existing functionality while improving accessibility:\n   - Preserve all data and interactions from the original tabs\n   - Ensure VoiceOver compatibility with the new layout\n   - Add clear section headers with appropriate accessibility labels\n   - Implement proper focus management for keyboard navigation\n\n4. Optimize performance for the vertical scrolling experience:\n   - Use LazyVStack to load content on-demand\n   - Implement content prefetching for smoother scrolling\n   - Consider pagination for very large content sections\n\n5. Update any related navigation or state management code that previously relied on tab selection.\n\n6. Add appropriate comments explaining the accessibility improvements made.",
         "testStrategy": "1. Verify all content from the original four tabs is correctly displayed in the new layout.\n\n2. Test with VoiceOver enabled to ensure all content is properly announced and navigable.\n\n3. Test with different content volumes:\n   - Materials with minimal content in each section\n   - Materials with extensive content in all sections\n   - Materials with uneven content distribution\n\n4. Perform usability testing with users who have learning disabilities to validate the improved cognitive load:\n   - Measure time to find specific information\n   - Track error rates when navigating between different content types\n   - Collect qualitative feedback on perceived ease of use\n\n5. Test on various device sizes to ensure the layout adapts appropriately:\n   - iPhone SE (smallest supported device)\n   - iPhone Pro Max (largest supported device)\n   - iPad (if applicable)\n\n6. Verify performance metrics:\n   - Measure scroll performance with large content sets\n   - Check memory usage compared to the previous implementation\n   - Ensure no regression in load times\n\n7. Conduct A/B testing with both implementations to gather quantitative data on user preference and efficiency.",
-        "status": "done",
+        "status": "pending",
         "dependencies": [
           "3"
         ],
         "priority": "medium",
         "subtasks": [],
-        "updatedAt": "2025-10-17T06:10:37.156Z"
+        "updatedAt": "2025-10-17T07:45:00.000Z"
       },
       {
         "id": "109",
@@ -4990,7 +4990,7 @@
         "description": "Split the MainTabView into separate tab view files with dedicated view models to improve code organization, reduce responsibility overlap, and enhance maintainability.",
         "details": "1. Create the following new files:\n   - DashboardTabView.swift: UI for the dashboard tab\n   - DashboardViewModel.swift: Business logic for dashboard tab\n   - StudyTabView.swift: UI for the study tab\n   - StudyViewModel.swift: Business logic for study tab\n   - TasksTabView.swift: UI for the tasks tab\n   - TasksViewModel.swift: Business logic for tasks tab\n\n2. For each view model:\n   - Implement proper state management using @Published properties\n   - Move relevant business logic from MainTabView\n   - Create initialization methods with necessary dependencies\n   - Implement proper memory management\n\n3. For each view:\n   - Move relevant UI code from MainTabView\n   - Connect to corresponding view model\n   - Ensure consistent styling and behavior\n\n4. Refactor MainTabView.swift to:\n   - Act as a lightweight coordinator\n   - Handle only tab selection\n   - Initialize and inject view models\n   - Use TabView to display the separate tab views\n\n5. Integrate VoiceConversationView (which already exists) as the voice tab\n\n6. Update any references to MainTabView in other parts of the codebase\n\n7. Ensure proper navigation and state persistence between tabs\n\n8. Maintain existing functionality while improving code organization",
         "testStrategy": "1. Unit Tests:\n   - Create unit tests for each new view model\n   - Verify business logic works correctly in isolation\n   - Test state management and data flow\n\n2. UI Tests:\n   - Verify each tab displays correctly\n   - Test navigation between tabs\n   - Ensure tab state is preserved when switching between tabs\n\n3. Integration Tests:\n   - Test the interaction between the tab views and their view models\n   - Verify data flows correctly between components\n\n4. Manual Testing:\n   - Navigate through all tabs and verify functionality matches pre-refactor behavior\n   - Test edge cases like rapid tab switching\n   - Verify performance is maintained or improved\n\n5. Code Review:\n   - Ensure proper separation of concerns\n   - Verify no business logic remains in MainTabView\n   - Check for consistent coding patterns across new files\n\n6. Regression Testing:\n   - Verify all existing functionality continues to work\n   - Test on multiple device sizes to ensure responsive design",
-        "status": "done",
+        "status": "pending",
         "dependencies": [
           "32",
           "44"
@@ -5002,9 +5002,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T07:29:50.460Z",
+      "lastModified": "2025-10-17T07:45:00.000Z",
       "taskCount": 109,
-      "completedCount": 109,
+      "completedCount": 107,
       "tags": [
         "master"
       ]

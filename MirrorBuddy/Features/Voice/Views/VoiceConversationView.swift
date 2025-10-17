@@ -89,9 +89,9 @@ struct VoiceConversationView: View {
             if viewModel.isConversationActive {
                 HStack(spacing: 4) {
                     Circle()
-                        .fill(Color.green)
+                        .fill(viewModel.isOfflineMode ? Color.orange : Color.green)
                         .frame(width: 8, height: 8)
-                    Text("Attivo")
+                    Text(viewModel.isOfflineMode ? "Offline" : "Attivo")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -464,6 +464,7 @@ final class VoiceConversationViewModel: ObservableObject {
     @Published var showError = false
     @Published var errorMessage = ""
     @Published var showSettings = false // Task 102.4
+    @Published var isOfflineMode = false // Task 101: Fallback to Apple Speech
 
     // MARK: - Dependencies
 
@@ -471,6 +472,11 @@ final class VoiceConversationViewModel: ObservableObject {
     private let coachPersonality = StudyCoachPersonality.shared // Task 101
     private var realtimeClient: OpenAIRealtimeClient?
     private var conversationService: VoiceConversationService?
+
+    // Task 101: Fallback services for offline mode
+    private let localSpeechRecognition = VoiceCommandRecognitionService.shared
+    private let localTextToSpeech = TextToSpeechService.shared
+    private var openAIClient: OpenAIClient? // For text-based fallback
 
     private var waveformTimer: Timer?
     private var cancellables = Set<AnyCancellable>()
@@ -767,8 +773,10 @@ final class VoiceConversationViewModel: ObservableObject {
     }
 
     private func startConversation() {
+        // Task 101: Try OpenAI first, fallback to local Apple Speech if it fails
         guard let realtimeClient else {
-            showError("Chiave API OpenAI non configurata. Aggiungi la tua chiave nelle Impostazioni.")
+            // No API key configured, use offline mode directly
+            startOfflineConversation()
             return
         }
 
@@ -787,12 +795,13 @@ final class VoiceConversationViewModel: ObservableObject {
                 // Start audio pipeline
                 try await audioPipeline.start()
 
-                // Connect to OpenAI Realtime API
+                // Try to connect to OpenAI Realtime API
                 try await realtimeClient.connect()
 
                 // Update state
                 await MainActor.run {
                     isConversationActive = true
+                    isOfflineMode = false
                     pulseAnimation = true
                     startWaveformAnimation()
                     startAudioCommitTimer()
@@ -803,12 +812,117 @@ final class VoiceConversationViewModel: ObservableObject {
                     for: currentSubject,
                     material: currentMaterial
                 )
-                try await realtimeClient.sendText(systemPrompt)
+                try await realtimeClient.sendSystemPrompt(systemPrompt)
             } catch {
+                // Task 101: Connection failed, fallback to offline mode
+                logger.warning("OpenAI connection failed, falling back to local Apple Speech: \(error.localizedDescription)")
                 await MainActor.run {
-                    showError(error.localizedDescription)
+                    startOfflineConversation()
                 }
             }
+        }
+    }
+
+    /// Task 101: Fallback to local Apple Speech when OpenAI is unavailable
+    private func startOfflineConversation() {
+        _Concurrency.Task {
+            do {
+                // Create conversation in database
+                if let service = conversationService {
+                    let title = currentSubject ?? "New Conversation"
+                    currentConversation = try service.createConversation(
+                        title: title,
+                        subject: currentSubjectEntity,
+                        material: currentMaterialEntity
+                    )
+                }
+
+                // Request speech recognition permission
+                let authorized = await localSpeechRecognition.requestAuthorization()
+                guard authorized else {
+                    await MainActor.run {
+                        showError("Permesso riconoscimento vocale richiesto per modalità offline")
+                    }
+                    return
+                }
+
+                // Configure speech recognition callbacks
+                localSpeechRecognition.onCommandRecognized = { [weak self] recognizedText in
+                    _Concurrency.Task { @MainActor [weak self] in
+                        guard let self = self else { return }
+                        // Add user message to UI
+                        self.addUserMessage(recognizedText)
+                        // Generate AI response using text-based OpenAI
+                        try await self.generateOfflineResponse(for: recognizedText)
+                    }
+                }
+
+                // Start listening
+                try localSpeechRecognition.startListening()
+
+                await MainActor.run {
+                    isConversationActive = true
+                    isOfflineMode = true
+                    pulseAnimation = true
+                    startWaveformAnimation()
+
+                    // Show offline mode message
+                    let offlineMessage = "Modalità offline attiva. Usando Apple Speech per riconoscimento vocale."
+                    addAIMessage(offlineMessage)
+                    localTextToSpeech.speak(offlineMessage, language: "it-IT")
+                }
+
+                logger.info("Offline conversation mode started successfully")
+            } catch {
+                await MainActor.run {
+                    showError("Errore avvio modalità offline: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    /// Task 101: Generate AI response using text-based API in offline mode
+    private func generateOfflineResponse(for userMessage: String) async throws {
+        // Initialize OpenAI client for text-based chat if needed
+        if openAIClient == nil {
+            if let config = OpenAIConfiguration.loadFromEnvironment() {
+                self.openAIClient = OpenAIClient(configuration: config)
+            } else {
+                throw NSError(domain: "VoiceConversation", code: -1,
+                             userInfo: [NSLocalizedDescriptionKey: "OpenAI client not configured"])
+            }
+        }
+
+        guard let client = openAIClient else {
+            throw NSError(domain: "VoiceConversation", code: -1,
+                         userInfo: [NSLocalizedDescriptionKey: "OpenAI client not configured"])
+        }
+
+        // Generate response using GPT-5
+        let systemPrompt = await coachPersonality.generateSystemPrompt(
+            for: currentSubject,
+            material: currentMaterial
+        )
+
+        let response = try await client.chatCompletion(
+            model: .gpt5,
+            messages: [
+                ChatMessage(role: .system, content: .text(systemPrompt)),
+                ChatMessage(role: .user, content: .text(userMessage))
+            ],
+            temperature: 0.7,
+            maxTokens: 500
+        )
+
+        guard let aiResponse = response.choices.first?.message.content else {
+            throw NSError(domain: "VoiceConversation", code: -1,
+                         userInfo: [NSLocalizedDescriptionKey: "Empty AI response"])
+        }
+
+        // Add AI response to UI and speak it
+        await MainActor.run {
+            addAIMessage(aiResponse)
+            localTextToSpeech.speak(aiResponse, language: "it-IT")
         }
     }
 
@@ -819,15 +933,26 @@ final class VoiceConversationViewModel: ObservableObject {
         // Stop audio commit timer and clear buffer
         stopAudioCommitTimer()
 
-        // Disconnect from realtime API
-        if let realtimeClient {
-            _Concurrency.Task {
-                await realtimeClient.disconnect()
+        // Task 101: Stop offline mode services if active
+        if isOfflineMode {
+            do {
+                try localSpeechRecognition.stopListening()
+            } catch {
+                logger.error("Error stopping speech recognition: \(error.localizedDescription)")
+            }
+            localTextToSpeech.stop()
+        } else {
+            // Disconnect from realtime API
+            if let realtimeClient {
+                _Concurrency.Task {
+                    await realtimeClient.disconnect()
+                }
             }
         }
 
         // Update state
         isConversationActive = false
+        isOfflineMode = false
         pulseAnimation = false
         isUserSpeaking = false
         stopWaveformAnimation()
@@ -959,17 +1084,44 @@ final class VoiceConversationViewModel: ObservableObject {
     private func handleTextDelta(_ delta: String) {
         currentAIResponseText += delta
 
-        // Update last message if it exists, or create new one
+        // Update last message in UI only (don't persist every delta)
         if let lastMessage = conversationHistory.last, !lastMessage.isFromUser {
             conversationHistory.removeLast()
         }
 
-        addAIMessage(currentAIResponseText)
+        // Add to UI without persisting
+        let bubbleMessage = MessageBubbleModel(
+            content: currentAIResponseText,
+            isFromUser: false,
+            timestamp: Date()
+        )
+        conversationHistory.append(bubbleMessage)
     }
 
     /// Finalize AI response when complete
     private func finalizeAIResponse() {
         if !currentAIResponseText.isEmpty {
+            // Persist the complete message to database
+            if let conversation = currentConversation,
+               let service = conversationService {
+                do {
+                    try service.addMessage(
+                        to: conversation,
+                        content: currentAIResponseText,
+                        isFromUser: false
+                    )
+
+                    // Generate title from first messages if needed
+                    if conversation.title == "New Conversation" || conversation.title.isEmpty {
+                        _Concurrency.Task {
+                            try service.generateTitleFromContent(for: conversation)
+                        }
+                    }
+                } catch {
+                    showError("Errore salvataggio messaggio: \(error.localizedDescription)")
+                }
+            }
+
             currentAIResponseText = ""
         }
     }

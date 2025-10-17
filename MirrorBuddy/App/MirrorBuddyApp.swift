@@ -84,6 +84,7 @@ struct MirrorBuddyApp: App {
             MainTabView()
                 .environment(LocalizationManager.shared)
                 .environment(CloudKitSyncMonitor.shared)
+                .environmentObject(AppVoiceCommandHandler.shared) // Task 103: Inject voice command handler
                 .font(.openDyslexicBody) // Apply OpenDyslexic as default font
                 .onAppear {
                     // Complete performance monitoring setup (Task 59)
