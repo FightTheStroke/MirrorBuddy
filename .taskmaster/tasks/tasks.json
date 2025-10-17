@@ -1199,10 +1199,10 @@
             "description": "Create a comprehensive architecture for the parallel material processing pipeline that defines components, data flow, and concurrency model.",
             "dependencies": [],
             "details": "Design a modular pipeline architecture with clear input/output interfaces. Define processing stages including material parsing, content extraction, metadata generation, and storage. Create diagrams showing data flow and concurrency patterns. Document the architecture with performance considerations and scalability options.",
-            "status": "blocked",
+            "status": "done",
             "testStrategy": "Review architecture with team. Create proof-of-concept prototype to validate key concepts. Test with sample materials to verify pipeline stages work as expected.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:45:23.419Z"
+            "updatedAt": "2025-10-17T07:29:04.788Z"
           },
           {
             "id": 2,
@@ -1212,10 +1212,10 @@
               1
             ],
             "details": "Implement async processing functions for each pipeline stage. Create task groups to process multiple materials concurrently. Use actors to manage shared state safely. Implement proper cancellation handling. Create throttling mechanisms to prevent system overload. Use structured concurrency patterns to maintain clean task hierarchies.",
-            "status": "blocked",
+            "status": "done",
             "testStrategy": "Unit test each processing function. Measure performance with varying concurrency levels. Test cancellation scenarios. Verify memory usage remains stable during extended processing.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:45:23.422Z"
+            "updatedAt": "2025-10-17T07:29:04.795Z"
           },
           {
             "id": 3,
@@ -1225,10 +1225,10 @@
               2
             ],
             "details": "Implement a TaskCoordinator class that manages the lifecycle of processing tasks. Create a progress tracking system with support for overall and per-task progress. Implement a notification system for progress updates. Add support for pausing and resuming tasks. Create a dashboard UI for monitoring active processing tasks with detailed statistics.",
-            "status": "blocked",
+            "status": "done",
             "testStrategy": "Test coordinator with multiple simultaneous materials. Verify progress reporting accuracy. Test pause/resume functionality. Ensure UI updates correctly reflect processing state.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:45:23.424Z"
+            "updatedAt": "2025-10-17T07:29:04.808Z"
           },
           {
             "id": 4,
@@ -1238,16 +1238,16 @@
               3
             ],
             "details": "Implement comprehensive error handling for all pipeline stages. Create recovery strategies for common failure scenarios. Develop a retry mechanism with exponential backoff. Implement BGProcessingTask integration for background execution. Add persistence for task state to survive app termination. Create a processing queue that prioritizes tasks appropriately. Optimize for battery efficiency during background processing.",
-            "status": "blocked",
+            "status": "done",
             "testStrategy": "Test error recovery with simulated failures at each stage. Verify background processing continues after app is backgrounded. Test app restoration after termination during processing. Measure battery impact during extended processing sessions.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:45:23.427Z"
+            "updatedAt": "2025-10-17T07:29:04.813Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement parallel material processing pipeline.",
-        "updatedAt": "2025-10-12T21:00:26.368Z"
+        "updatedAt": "2025-10-17T07:29:04.813Z"
       },
       {
         "id": "26",
@@ -1402,9 +1402,10 @@
             "description": "Implement the basic structure of the Material Detail View using SwiftUI, including layout and navigation components.",
             "dependencies": [],
             "details": "Create a new SwiftUI view file for material details. Implement the basic layout structure with header, content sections, and navigation elements. Set up the view model to handle data flow. Ensure the view adapts to different screen sizes using GeometryReader and responsive layout techniques. Implement basic navigation between sections using TabView or custom navigation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test the view with different screen sizes and orientations. Verify navigation between sections works correctly. Test with sample material data to ensure proper layout.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:24.375Z"
           },
           {
             "id": 2,
@@ -1414,9 +1415,10 @@
               1
             ],
             "details": "Integrate PDFKit for PDF viewing capabilities. Implement text-to-speech functionality using AVSpeechSynthesizer. Create a mind map preview component that renders mind map data. Develop a flashcard preview component with flip animation. Ensure each viewer has proper loading states and error handling. Implement content pagination where appropriate. Optimize rendering performance for large documents.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test PDF viewer with various document sizes and formats. Verify text-to-speech works correctly with different languages. Test mind map rendering with complex structures. Verify flashcard interactions work smoothly.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:24.382Z"
           },
           {
             "id": 3,
@@ -1427,15 +1429,16 @@
               2
             ],
             "details": "Optimize the view for VoiceOver by adding proper accessibility labels, hints, and traits. Implement large touch targets (minimum 44x44 points) for all interactive elements. Create quick action buttons for study, review, and share functions. Implement sharing functionality using UIActivityViewController. Add haptic feedback for interactions. Ensure proper keyboard navigation support. Test and refine accessibility features with VoiceOver enabled.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with VoiceOver enabled to verify all elements are properly announced. Verify touch targets meet size requirements. Test sharing functionality with various apps and services. Verify keyboard navigation works correctly.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:24.394Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement material detail view.",
-        "updatedAt": "2025-10-13T05:26:24.962Z"
+        "updatedAt": "2025-10-17T07:29:24.394Z"
       },
       {
         "id": "29",
@@ -2586,10 +2589,10 @@
             "description": "Develop the core logic for XP accumulation and define rewards for various user activities within the app.",
             "dependencies": [],
             "details": "Create a centralized XP service that tracks and awards points for different user actions. Implement the base XP accumulation logic with appropriate data models. Define specific XP rewards for various activities including task completion, study time tracking, flashcard reviews, and daily streaks. Ensure the system is extensible for future gamification features.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Unit test XP calculation for different activities. Verify XP accumulation works correctly across multiple user sessions. Test edge cases like maximum daily XP limits.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:53:29.992Z"
+            "updatedAt": "2025-10-17T07:29:15.490Z"
           },
           {
             "id": 2,
@@ -2599,10 +2602,10 @@
               1
             ],
             "details": "Design and implement the level progression algorithm with increasing XP requirements for higher levels. Create a mathematical formula for XP thresholds that provides a satisfying progression curve. Implement level-up detection logic that triggers when a user accumulates enough XP to advance. Store current level and progress data in the user profile. Ensure the system handles edge cases like maximum level cap.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test level calculations at various XP thresholds. Verify level-up triggers work correctly. Test progression through multiple levels in sequence.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:53:30.001Z"
+            "updatedAt": "2025-10-17T07:29:15.496Z"
           },
           {
             "id": 3,
@@ -2612,16 +2615,16 @@
               2
             ],
             "details": "Design and implement a visual progress bar showing current XP and progress toward the next level. Create engaging level-up animations and celebration sequences that trigger when a user advances to a new level. Implement subtle visual feedback for small XP gains during normal app usage. Ensure all animations are performant and can be disabled in accessibility settings. Add sound effects for level-up events with appropriate volume controls.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test visual elements across different device sizes. Measure performance impact of animations. Verify accessibility compliance for all visual elements.",
             "parentId": "undefined",
-            "updatedAt": "2025-10-12T18:53:30.004Z"
+            "updatedAt": "2025-10-17T07:29:15.501Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement xp and leveling system.",
-        "updatedAt": "2025-10-12T20:51:17.531Z"
+        "updatedAt": "2025-10-17T07:29:15.501Z"
       },
       {
         "id": "47",
@@ -3024,9 +3027,10 @@
             "description": "Optimize app launch time to under 2 seconds and ensure smooth 60 FPS animations throughout the application.",
             "dependencies": [],
             "details": "Profile app launch sequence to identify bottlenecks. Implement lazy loading of non-critical components. Optimize asset loading during startup. Use Instruments to identify animation hitches and optimize rendering pipeline. Implement frame rate monitoring. Test on oldest supported devices to ensure performance targets are met.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Measure app cold and warm launch times across different devices. Use Instruments to verify 60 FPS animations are maintained. Create automated performance tests to verify improvements.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:24.398Z"
           },
           {
             "id": 2,
@@ -3036,9 +3040,10 @@
               1
             ],
             "details": "Profile memory usage during extended app sessions. Implement proper object lifecycle management. Fix memory leaks and reduce retain cycles. Optimize image caching and processing. Implement background task coalescing. Reduce network polling frequency when on battery. Optimize location services usage. Implement proper background modes to minimize battery drain.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Monitor memory usage during extended testing sessions. Compare battery consumption before and after optimizations. Test under various device conditions including low battery and low memory scenarios.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:24.407Z"
           },
           {
             "id": 3,
@@ -3049,15 +3054,16 @@
               2
             ],
             "details": "Develop a performance monitoring dashboard to track key metrics. Implement custom logging for performance-critical operations. Create automated alerts for performance regressions. Implement disk caching for network responses. Add memory caching for frequently accessed data. Optimize database queries with proper indexing. Implement preloading strategies for anticipated user actions. Create cache invalidation policies.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify monitoring tools accurately capture performance metrics. Test caching strategies under various network conditions. Measure performance improvements from caching implementations.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:24.413Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement performance optimization.",
-        "updatedAt": "2025-10-12T21:08:44.250Z"
+        "updatedAt": "2025-10-17T07:29:24.413Z"
       },
       {
         "id": "60",
@@ -3981,9 +3987,10 @@
             "description": "Thoroughly review the existing VisionAnalysisService.swift implementation to confirm it meets all requirements for GPT-4 Vision integration.",
             "dependencies": [],
             "details": "Examine the analyzeHomework() method and verify it supports multiple analysis types including textbook pages, math problems, diagrams, handwriting, and step-by-step explanations. Confirm both Italian and English language support is implemented. Review structured prompts for each content type, circuit breaker pattern implementation, Base64 image encoding, and response parsing with concept/problem extraction.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Code review against requirements checklist. Document any gaps or improvements needed.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:32.421Z"
           },
           {
             "id": 2,
@@ -3993,9 +4000,10 @@
               1
             ],
             "details": "Test the TTS functionality with GPT-4 Vision responses to ensure proper pronunciation and natural-sounding Italian voice output. Verify that the voice output correctly reads the step-by-step explanations generated by the Vision API. Check for any latency issues or pronunciation errors with technical terms.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test with various homework samples across different subjects. Verify Italian pronunciation accuracy with native speakers if possible.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:32.428Z"
           },
           {
             "id": 3,
@@ -4005,9 +4013,10 @@
               1
             ],
             "details": "Review Task 36 documentation and implementation details. Create a comparison matrix between Task 36 deliverables and current task requirements. Identify any gaps or overlaps. Ensure that the implementation leverages existing work rather than duplicating functionality.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Document comparison findings and any action items needed to complete this task.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:32.439Z"
           },
           {
             "id": 4,
@@ -4019,12 +4028,13 @@
               3
             ],
             "details": "Create comprehensive documentation of the GPT-4 Vision integration including API usage, response handling, and TTS integration. Include examples of successful analyses and explanations. Document any known limitations or edge cases. Prepare handover notes for the team.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Review documentation for completeness and clarity. Ensure all implementation details are accurately captured.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:32.443Z"
           }
         ],
-        "updatedAt": "2025-10-17T05:44:41.841Z"
+        "updatedAt": "2025-10-17T07:29:32.443Z"
       },
       {
         "id": "90",
@@ -4092,9 +4102,10 @@
               4
             ],
             "details": "Create comprehensive documentation of the existing implementation, including the processVoiceCommand() function, startSession() method, speak() method with AVSpeechSynthesizer, session management with conversation history, integration with VisionAnalysisService, and the HomeworkHelpView UI components.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Review documentation for completeness and accuracy. Ensure all key components and their interactions are properly documented.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:32.448Z"
           },
           {
             "id": 6,
@@ -4104,12 +4115,13 @@
               5
             ],
             "details": "Verify that the Voice Coach feature correctly integrates with VisionAnalysisService for homework analysis, camera functionality, and any other related components. Ensure that the integration points are robust and handle edge cases appropriately.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test integration points with related services. Verify that data flows correctly between components and that error handling is appropriate.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:32.454Z"
           }
         ],
-        "updatedAt": "2025-10-17T05:46:54.697Z"
+        "updatedAt": "2025-10-17T07:29:32.454Z"
       },
       {
         "id": "91",
@@ -4206,9 +4218,10 @@
             "description": "Evaluate the WhisperAudioOptimizer with AAC codec at 32kbps, 16kHz mono to confirm it meets the target of <500 MB for 6 hours of recording.",
             "dependencies": [],
             "details": "Review the existing WhisperAudioOptimizer implementation. Run tests with sample recordings of various lengths to verify compression ratios. Document the actual file sizes achieved and confirm they meet the target requirements.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Record audio samples of 10 minutes, 1 hour, and 6 hours. Measure resulting file sizes and extrapolate for longer recordings.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:41.438Z"
           },
           {
             "id": 2,
@@ -4216,9 +4229,10 @@
             "description": "Examine the Google Drive API integration from Tasks 16-18 to understand the available functionality and identify any gaps for automatic backup.",
             "dependencies": [],
             "details": "Review the OAuth implementation, upload and download functionality. Document the API endpoints and methods currently available. Identify if there are any missing components needed for automatic backup functionality.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test existing upload and download functionality with sample audio files. Document API response times and reliability.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:41.444Z"
           },
           {
             "id": 3,
@@ -4229,9 +4243,10 @@
               2
             ],
             "details": "Develop a service that monitors for new audio recordings, triggers compression if needed, and uploads to Google Drive. Implement user settings to control automatic backup behavior (on/off, Wi-Fi only, etc.). Add background task handling for large files.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test automatic backup with recordings of various lengths. Verify uploads complete successfully in different network conditions. Test background upload functionality.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:41.458Z"
           },
           {
             "id": 4,
@@ -4239,9 +4254,10 @@
             "description": "Create a system to monitor device storage and warn users when available space is running low.",
             "dependencies": [],
             "details": "Implement storage space monitoring. Create warning thresholds (e.g., warn at 500MB, 200MB, 100MB remaining). Design and implement user interface for warnings. Add options for users to manage storage directly from warning dialogs.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Simulate low storage conditions and verify warnings appear at appropriate thresholds. Test user actions from warning dialogs.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:41.462Z"
           },
           {
             "id": 5,
@@ -4251,12 +4267,13 @@
               3
             ],
             "details": "Design and implement settings screens for backup configuration. Create status indicators for backup progress. Implement error handling and retry mechanisms with user feedback. Add ability to view backed-up files and restore if needed.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test all UI components for usability. Verify settings are correctly saved and applied. Test error scenarios and recovery options.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:41.466Z"
           }
         ],
-        "updatedAt": "2025-10-17T05:48:30.466Z"
+        "updatedAt": "2025-10-17T07:29:41.466Z"
       },
       {
         "id": "93",
@@ -4368,9 +4385,10 @@
             "description": "Develop a service that coordinates the processing of transcripts through existing components to generate summaries and mind maps.",
             "dependencies": [],
             "details": "Implement a TranscriptProcessingService that:\n1. Takes transcript text as input\n2. Uses TextPreprocessingService to clean and prepare the text\n3. Uses SubjectDetectionService to identify the subject\n4. Uses OpenAIClient to generate a summary\n5. Uses MindMapGenerationService to create a mind map\n6. Returns both summary and mind map for storage",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Create unit tests with mock services to verify proper coordination between components. Test with various transcript samples.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:50.442Z"
           },
           {
             "id": 2,
@@ -4380,9 +4398,10 @@
               1
             ],
             "details": "Extend the existing UI to:\n1. Show a summary section in the lesson detail view\n2. Display the mind map with proper rendering of hierarchical structure\n3. Implement color coding based on subject\n4. Add controls for regenerating or editing summaries/mind maps if needed\n5. Ensure responsive layout works on all device sizes",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test UI rendering with various summary lengths and mind map complexities. Verify proper display on different device sizes and orientations.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:50.454Z"
           },
           {
             "id": 3,
@@ -4392,12 +4411,13 @@
               1
             ],
             "details": "Create functionality to:\n1. Store generated summaries in the appropriate SwiftData model\n2. Store mind maps with proper linking to lessons\n3. Update lesson metadata to indicate processing status\n4. Implement caching for efficient retrieval\n5. Handle updates when transcripts change",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test data persistence and retrieval. Verify proper relationships between entities. Test update scenarios when transcript content changes.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T07:29:50.459Z"
           }
         ],
-        "updatedAt": "2025-10-17T05:51:27.260Z"
+        "updatedAt": "2025-10-17T07:29:50.459Z"
       },
       {
         "id": "96",
@@ -4982,7 +5002,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T06:10:37.162Z",
+      "lastModified": "2025-10-17T07:29:50.460Z",
       "taskCount": 109,
       "completedCount": 109,
       "tags": [
