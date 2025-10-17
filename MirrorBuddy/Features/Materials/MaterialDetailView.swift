@@ -2,44 +2,100 @@ import SwiftUI
 import SwiftData
 import PDFKit
 
-/// Material detail view with comprehensive features (Task 28)
+/// Material detail view with comprehensive features (Task 28, refactored in Task 108)
+/// Simplified vertical layout with collapsible sections for better accessibility
 struct MaterialDetailView: View {
     @Bindable var material: Material
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
-    @State private var selectedTab: DetailTab = .overview
     @State private var showShareSheet = false
     @State private var isProcessing = false
 
-    enum DetailTab: String, CaseIterable {
-        case overview = "Panoramica"
-        case mindMap = "Mappa Mentale"
-        case flashcards = "Flashcard"
-        case summary = "Riassunto"
-    }
+    // Task 108: Collapsible section states (default all expanded for discoverability)
+    @State private var isOverviewExpanded = true
+    @State private var isMindMapExpanded = true
+    @State private var isFlashcardsExpanded = true
+    @State private var isSummaryExpanded = true
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 24) {
+                // Task 108: Vertical layout with collapsible sections
+                // Eliminates cognitive load of tab switching for users with learning disabilities
+                LazyVStack(spacing: 20, pinnedViews: []) {
                     // Header with quick actions (Subtask 28.1)
                     headerSection
+                        .padding(.bottom, 8)
 
-                    // Tab selector
-                    tabSelector
+                    // Task 108: Collapsible sections replace tab navigation
+                    // All content visible in single scrollable view
 
-                    // Content based on selected tab (Subtask 28.2)
-                    switch selectedTab {
-                    case .overview:
-                        overviewContent
-                    case .mindMap:
-                        mindMapContent
-                    case .flashcards:
-                        flashcardsContent
-                    case .summary:
-                        summaryContent
-                    }
+                    // Section 1: Overview (always visible, contains primary content)
+                    DisclosureGroup(
+                        isExpanded: $isOverviewExpanded,
+                        content: { overviewContent.padding(.top, 12) },
+                        label: {
+                            SectionHeaderLabel(
+                                icon: "book.fill",
+                                title: "Panoramica",
+                                color: .blue
+                            )
+                        }
+                    )
+                    .accessibilityLabel("Sezione Panoramica, \(isOverviewExpanded ? "espansa" : "compressa")")
+                    .accessibilityHint("Doppio tap per \(isOverviewExpanded ? "comprimere" : "espandere")")
+
+                    Divider()
+
+                    // Section 2: Mind Map
+                    DisclosureGroup(
+                        isExpanded: $isMindMapExpanded,
+                        content: { mindMapContent.padding(.top, 12) },
+                        label: {
+                            SectionHeaderLabel(
+                                icon: "brain.head.profile",
+                                title: "Mappa Mentale",
+                                color: .purple
+                            )
+                        }
+                    )
+                    .accessibilityLabel("Sezione Mappa Mentale, \(isMindMapExpanded ? "espansa" : "compressa")")
+                    .accessibilityHint("Doppio tap per \(isMindMapExpanded ? "comprimere" : "espandere")")
+
+                    Divider()
+
+                    // Section 3: Flashcards
+                    DisclosureGroup(
+                        isExpanded: $isFlashcardsExpanded,
+                        content: { flashcardsContent.padding(.top, 12) },
+                        label: {
+                            SectionHeaderLabel(
+                                icon: "rectangle.portrait.on.rectangle.portrait.fill",
+                                title: "Flashcard",
+                                color: .orange
+                            )
+                        }
+                    )
+                    .accessibilityLabel("Sezione Flashcard, \(isFlashcardsExpanded ? "espansa" : "compressa")")
+                    .accessibilityHint("Doppio tap per \(isFlashcardsExpanded ? "comprimere" : "espandere")")
+
+                    Divider()
+
+                    // Section 4: Summary
+                    DisclosureGroup(
+                        isExpanded: $isSummaryExpanded,
+                        content: { summaryContent.padding(.top, 12) },
+                        label: {
+                            SectionHeaderLabel(
+                                icon: "doc.text.fill",
+                                title: "Riassunto",
+                                color: .green
+                            )
+                        }
+                    )
+                    .accessibilityLabel("Sezione Riassunto, \(isSummaryExpanded ? "espansa" : "compressa")")
+                    .accessibilityHint("Doppio tap per \(isSummaryExpanded ? "comprimere" : "espandere")")
                 }
                 .padding()
             }
@@ -75,14 +131,14 @@ struct MaterialDetailView: View {
                 }
             }
 
-            // Quick action buttons (Subtask 28.1)
+            // Task 108: Quick action buttons now expand/collapse sections
             HStack(spacing: 12) {
                 QuickActionButton(
                     icon: "book.fill",
-                    title: "Studia",
+                    title: "Panoramica",
                     color: .blue
                 ) {
-                    // Start study session
+                    withAnimation { isOverviewExpanded.toggle() }
                 }
 
                 QuickActionButton(
@@ -90,7 +146,7 @@ struct MaterialDetailView: View {
                     title: "Mappa",
                     color: .purple
                 ) {
-                    selectedTab = .mindMap
+                    withAnimation { isMindMapExpanded.toggle() }
                 }
 
                 QuickActionButton(
@@ -98,7 +154,7 @@ struct MaterialDetailView: View {
                     title: "Flashcard",
                     color: .orange
                 ) {
-                    selectedTab = .flashcards
+                    withAnimation { isFlashcardsExpanded.toggle() }
                 }
 
                 QuickActionButton(
@@ -106,7 +162,7 @@ struct MaterialDetailView: View {
                     title: "Riassunto",
                     color: .green
                 ) {
-                    selectedTab = .summary
+                    withAnimation { isSummaryExpanded.toggle() }
                 }
             }
 
@@ -118,25 +174,7 @@ struct MaterialDetailView: View {
         }
     }
 
-    // MARK: - Tab Selector (Subtask 28.2)
-
-    private var tabSelector: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(DetailTab.allCases, id: \.self) { tab in
-                    TabButton(
-                        title: tab.rawValue,
-                        isSelected: selectedTab == tab
-                    ) {
-                        withAnimation(.spring(response: 0.3)) {
-                            selectedTab = tab
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 4)
-        }
-    }
+    // Task 108: Tab selector removed - replaced with collapsible sections
 
     // MARK: - Overview Content (Subtask 28.2)
 
@@ -627,5 +665,31 @@ extension Color {
             blue: Double(b) / 255,
             opacity: Double(a) / 255
         )
+    }
+}
+
+// MARK: - Section Header Label (Task 108)
+
+/// Section header label for collapsible sections
+struct SectionHeaderLabel: View {
+    let icon: String
+    let title: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title2)
+                .foregroundStyle(color)
+                .frame(width: 32)
+
+            Text(title)
+                .font(.title3)
+                .fontWeight(.semibold)
+
+            Spacer()
+        }
+        .padding(.vertical, 8)
+        .contentShape(Rectangle())
     }
 }
