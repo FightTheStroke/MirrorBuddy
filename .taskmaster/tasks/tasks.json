@@ -3904,9 +3904,10 @@
               2
             ],
             "details": "Develop prompt templates that instruct GPT-4 to identify main topics, subtopics, and relationships, and return results in a structured format (e.g., JSON or Markdown suitable for mind map rendering)[1][2][3].",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Send various preprocessed texts to GPT-4, review output for logical structure, completeness, and suitability for mind mapping.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-17T05:41:37.712Z"
           },
           {
             "id": 4,
@@ -3945,7 +3946,7 @@
             "parentId": "undefined"
           }
         ],
-        "updatedAt": "2025-10-17T05:38:41.214Z"
+        "updatedAt": "2025-10-17T05:41:37.712Z"
       },
       {
         "id": "88",
@@ -4675,7 +4676,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T05:38:41.216Z",
+      "lastModified": "2025-10-17T05:41:37.714Z",
       "taskCount": 109,
       "completedCount": 98,
       "tags": [

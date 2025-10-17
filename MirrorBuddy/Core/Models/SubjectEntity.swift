@@ -84,4 +84,36 @@ final class SubjectEntity {
         default: return .gray
         }
     }
+
+    /// Convert SubjectEntity to Subject enum (Task 87.3)
+    nonisolated func toSubject() -> Subject? {
+        // Map by localization key
+        switch localizationKey {
+        case "subject.matematica":
+            return .matematica
+        case "subject.fisica":
+            return .fisica
+        case "subject.scienzeNaturali":
+            return .scienzeNaturali
+        case "subject.storiaGeografia":
+            return .storiaGeografia
+        case "subject.italiano":
+            return .italiano
+        case "subject.inglese":
+            return .inglese
+        case "subject.educazioneCivica":
+            return .educazioneCivica
+        case "subject.religione":
+            return .religione
+        case "subject.scienzeMotorie":
+            return .scienzeMotorie
+        case "subject.sostegno":
+            return .sostegno
+        case "subject.other":
+            return .other
+        default:
+            // For custom subjects, default to .other
+            return .other
+        }
+    }
 }

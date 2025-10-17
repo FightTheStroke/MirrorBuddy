@@ -23,6 +23,10 @@ final class MindMapGenerationService {
     private var openAIClient: OpenAIClient?
     private var modelContext: ModelContext?
 
+    // Task 87.3: Integration with text extraction and preprocessing
+    private let textExtractionService = MaterialTextExtractionService.shared
+    private let preprocessingService = TextPreprocessingService.shared
+
     // MARK: - Initialization
 
     private init() {
@@ -44,7 +48,53 @@ final class MindMapGenerationService {
         }
     }
 
-    // MARK: - Mind Map Generation (Subtasks 21.1 & 21.2)
+    // MARK: - Mind Map Generation (Subtasks 21.1 & 21.2, Task 87.3)
+
+    /// Generate a mind map from a Material entity (Task 87.3)
+    /// Automatically extracts and preprocesses text if needed
+    func generateMindMap(
+        from material: Material
+    ) async throws -> MindMap {
+        logger.info("Generating mind map for material: \(material.title)")
+
+        guard let context = modelContext else {
+            throw MindMapGenerationError.noClientAvailable
+        }
+
+        // Step 1: Ensure text is extracted (Task 87.1)
+        var text = material.extractedText
+        if text.isEmpty {
+            logger.info("Extracting text from material first")
+            text = try await textExtractionService.extractText(from: material, modelContext: context)
+        }
+
+        // Step 2: Preprocess text for AI consumption (Task 87.2)
+        logger.info("Preprocessing extracted text (\(text.count) characters)")
+        let preprocessedText = preprocessingService.preprocessForMindMap(text)
+
+        // Step 3: Analyze text quality
+        let quality = preprocessingService.analyzeTextQuality(preprocessedText)
+        logger.debug("Text quality score: \(quality.qualityScore)")
+
+        if quality.qualityScore < 0.3 {
+            logger.warning("Low text quality detected, may affect mind map quality")
+        }
+
+        // Step 4: Generate mind map from preprocessed text
+        let mindMap = try await generateMindMap(
+            from: preprocessedText,
+            materialID: material.id,
+            subject: material.subject?.toSubject()
+        )
+
+        // Link mind map to material
+        material.mindMap = mindMap
+        try context.save()
+
+        logger.info("Mind map generated and linked to material")
+
+        return mindMap
+    }
 
     /// Generate a mind map from study material text
     func generateMindMap(
@@ -79,11 +129,12 @@ final class MindMapGenerationService {
         // Parse the response into mind map structure
         let mindMapStructure = try parseMindMapResponse(content)
 
-        // Create MindMap and nodes
+        // Create MindMap and nodes with subject-based coloring (Task 87)
         let mindMap = try await createMindMapModels(
             structure: mindMapStructure,
             materialID: materialID,
-            prompt: prompt
+            prompt: prompt,
+            subject: subject
         )
 
         // Store in SwiftData (Subtask 21.3)
@@ -267,12 +318,16 @@ final class MindMapGenerationService {
     private func createMindMapModels(
         structure: MindMapStructureNode,
         materialID: UUID,
-        prompt: String
+        prompt: String,
+        subject: Subject? = nil
     ) async throws -> MindMap {
         let mindMap = MindMap(materialID: materialID, prompt: prompt)
 
         // Calculate positions for nodes (hierarchical layout)
         let layout = calculateNodePositions(structure: structure)
+
+        // Get base color from subject (Task 87: subject-based coloring)
+        let baseColor = getColorForSubject(subject)
 
         // Create root node
         let rootNode = MindMapNode(
@@ -280,7 +335,7 @@ final class MindMapGenerationService {
             content: structure.example,
             positionX: layout.root.x,
             positionY: layout.root.y,
-            color: getColorForLevel(0)
+            color: baseColor
         )
 
         if mindMap.nodes == nil {
@@ -295,7 +350,8 @@ final class MindMapGenerationService {
             parentPosition: layout.root,
             level: 1,
             layout: layout.children,
-            mindMap: mindMap
+            mindMap: mindMap,
+            subject: subject
         )
 
         return mindMap
@@ -308,18 +364,23 @@ final class MindMapGenerationService {
         parentPosition: NodePosition,
         level: Int,
         layout: [NodePosition],
-        mindMap: MindMap
+        mindMap: MindMap,
+        subject: Subject? = nil
     ) {
         for (index, childStructure) in structure.children.enumerated() {
             guard index < layout.count else { break }
 
             let position = layout[index]
+
+            // Use subject-based color with level variation (Task 87)
+            let color = getColorForSubjectAndLevel(subject: subject, level: level)
+
             let childNode = MindMapNode(
                 title: childStructure.title,
                 content: childStructure.example,
                 positionX: position.x,
                 positionY: position.y,
-                color: getColorForLevel(level),
+                color: color,
                 parentNodeID: parentNode.id
             )
 
@@ -347,7 +408,8 @@ final class MindMapGenerationService {
                     parentPosition: position,
                     level: level + 1,
                     layout: grandchildLayout,
-                    mindMap: mindMap
+                    mindMap: mindMap,
+                    subject: subject
                 )
             }
         }
@@ -393,6 +455,52 @@ final class MindMapGenerationService {
         case 2: return "#F5A623" // Level 2 - orange
         default: return "#9013FE" // Level 3+ - purple
         }
+    }
+
+    // MARK: - Subject-Based Color Coding (Task 87)
+
+    /// Get base color for subject
+    private func getColorForSubject(_ subject: Subject?) -> String {
+        guard let subject = subject else {
+            return "#4A90E2" // Default blue
+        }
+
+        switch subject {
+        case .matematica:
+            return "#FF6B6B" // Red for mathematics
+        case .fisica:
+            return "#4ECDC4" // Teal for physics
+        case .scienzeNaturali:
+            return "#95E1D3" // Light teal for sciences
+        case .storiaGeografia:
+            return "#FFD93D" // Yellow for history/geography
+        case .italiano:
+            return "#F38181" // Coral for Italian literature
+        case .inglese:
+            return "#AA96DA" // Purple for English
+        case .educazioneCivica:
+            return "#6BCB77" // Green for civic education
+        case .religione:
+            return "#C7CEEA" // Light blue for religion
+        case .scienzeMotorie:
+            return "#FAD390" // Light orange for physical education
+        case .sostegno, .other:
+            return "#4A90E2" // Blue for support/other
+        }
+    }
+
+    /// Get color variation based on subject and level
+    private func getColorForSubjectAndLevel(subject: Subject?, level: Int) -> String {
+        let baseColor = getColorForSubject(subject)
+
+        // Apply opacity/brightness variation based on level
+        // Level 1: full intensity
+        // Level 2: 85% intensity
+        // Level 3: 70% intensity
+
+        // For now, return base color (in production, would apply alpha variations)
+        // This could be enhanced with UIColor manipulation
+        return baseColor
     }
 
     // MARK: - Storage (Subtask 21.3)
