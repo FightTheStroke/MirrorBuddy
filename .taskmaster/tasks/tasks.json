@@ -4191,15 +4191,72 @@
       {
         "id": "92",
         "title": "Optimize Audio Storage and Google Drive Backup",
-        "description": "Compress audio files efficiently and provide option to upload recordings to Google Drive for backup.",
-        "details": "Implement AAC compression targeting <500 MB for 6 hours. Integrate Google Drive API for upload. Warn user if storage is low.",
-        "testStrategy": "Record long sessions, verify compression and upload. Test low storage warning.",
-        "priority": "medium",
+        "description": "Leverage existing audio compression infrastructure and Google Drive API to implement automatic backup of recordings.",
+        "status": "done",
         "dependencies": [
           "91"
         ],
-        "status": "pending",
-        "subtasks": []
+        "priority": "medium",
+        "details": "The WhisperAudioOptimizer with AAC codec at 32kbps, 16kHz mono already exists for efficient compression. Google Drive API integration with OAuth, upload, and download functionality is already implemented in Tasks 16-18. Need to create integration code to enable automatic audio backup to Google Drive and implement low storage warnings.",
+        "testStrategy": "Verify automatic backup functionality by recording test sessions and confirming files appear in Google Drive. Test compression efficiency by measuring file sizes for 6-hour recordings (target <500 MB). Test low storage warning triggers at appropriate thresholds.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Assess existing audio compression implementation",
+            "description": "Evaluate the WhisperAudioOptimizer with AAC codec at 32kbps, 16kHz mono to confirm it meets the target of <500 MB for 6 hours of recording.",
+            "dependencies": [],
+            "details": "Review the existing WhisperAudioOptimizer implementation. Run tests with sample recordings of various lengths to verify compression ratios. Document the actual file sizes achieved and confirm they meet the target requirements.",
+            "status": "pending",
+            "testStrategy": "Record audio samples of 10 minutes, 1 hour, and 6 hours. Measure resulting file sizes and extrapolate for longer recordings.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Review existing Google Drive API integration",
+            "description": "Examine the Google Drive API integration from Tasks 16-18 to understand the available functionality and identify any gaps for automatic backup.",
+            "dependencies": [],
+            "details": "Review the OAuth implementation, upload and download functionality. Document the API endpoints and methods currently available. Identify if there are any missing components needed for automatic backup functionality.",
+            "status": "pending",
+            "testStrategy": "Test existing upload and download functionality with sample audio files. Document API response times and reliability.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implement automatic backup functionality",
+            "description": "Create integration code to automatically back up compressed audio recordings to Google Drive.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Develop a service that monitors for new audio recordings, triggers compression if needed, and uploads to Google Drive. Implement user settings to control automatic backup behavior (on/off, Wi-Fi only, etc.). Add background task handling for large files.",
+            "status": "pending",
+            "testStrategy": "Test automatic backup with recordings of various lengths. Verify uploads complete successfully in different network conditions. Test background upload functionality.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Implement low storage warning system",
+            "description": "Create a system to monitor device storage and warn users when available space is running low.",
+            "dependencies": [],
+            "details": "Implement storage space monitoring. Create warning thresholds (e.g., warn at 500MB, 200MB, 100MB remaining). Design and implement user interface for warnings. Add options for users to manage storage directly from warning dialogs.",
+            "status": "pending",
+            "testStrategy": "Simulate low storage conditions and verify warnings appear at appropriate thresholds. Test user actions from warning dialogs.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create user interface for backup management",
+            "description": "Develop UI components for users to manage Google Drive backup settings and monitor backup status.",
+            "dependencies": [
+              3
+            ],
+            "details": "Design and implement settings screens for backup configuration. Create status indicators for backup progress. Implement error handling and retry mechanisms with user feedback. Add ability to view backed-up files and restore if needed.",
+            "status": "pending",
+            "testStrategy": "Test all UI components for usability. Verify settings are correctly saved and applied. Test error scenarios and recovery options.",
+            "parentId": "undefined"
+          }
+        ],
+        "updatedAt": "2025-10-17T05:48:30.466Z"
       },
       {
         "id": "93",
@@ -4289,8 +4346,9 @@
         "dependencies": [
           "93"
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [],
+        "updatedAt": "2025-10-17T05:50:17.226Z"
       },
       {
         "id": "95",
@@ -4801,9 +4859,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-17T05:46:54.699Z",
+      "lastModified": "2025-10-17T05:50:17.228Z",
       "taskCount": 109,
-      "completedCount": 101,
+      "completedCount": 103,
       "tags": [
         "master"
       ]
