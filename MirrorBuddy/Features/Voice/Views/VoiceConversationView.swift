@@ -8,6 +8,13 @@ struct VoiceConversationView: View {
     @StateObject private var viewModel: VoiceConversationViewModel
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    @Query(sort: \VoiceConversation.updatedAt, order: .reverse)
+    private var allConversations: [VoiceConversation]
+
+    @State private var showingConversationList = false
 
     // Optional conversation ID to load existing conversation
     let conversationID: UUID?
@@ -19,36 +26,14 @@ struct VoiceConversationView: View {
     }
 
     var body: some View {
-        ZStack {
-            // Background gradient
-            LinearGradient(
-                colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                // Context banner
-                contextBannerView
-                    .padding()
-                    .background(.ultraThinMaterial)
-
-                // Conversation history
-                conversationHistoryView
-
-                // Waveform visualization
-                if viewModel.isConversationActive {
-                    waveformView
-                        .frame(height: 100)
-                        .padding(.horizontal)
-                }
-
-                Spacer()
-
-                // Controls
-                controlsView
-                    .padding()
+        // Task 107: Adaptive layout for iPad (two-column) vs iPhone (single-column)
+        Group {
+            if horizontalSizeClass == .regular && verticalSizeClass == .regular {
+                // iPad layout: Two columns
+                adaptiveLayoutForIPad
+            } else {
+                // iPhone layout: Single column
+                adaptiveLayoutForIPhone
             }
         }
         .navigationTitle("Coach Vocale")
@@ -229,6 +214,175 @@ struct VoiceConversationView: View {
             }
         }
         .sensoryFeedback(.impact(intensity: 0.7), trigger: viewModel.isConversationActive)
+    }
+
+    // MARK: - Adaptive Layouts (Task 107)
+
+    /// iPad two-column layout
+    private var adaptiveLayoutForIPad: some View {
+        HStack(spacing: 0) {
+            // Left column: Conversation list (30%)
+            compactConversationList
+                .frame(maxWidth: .infinity)
+                .frame(minWidth: 250, maxWidth: 350)
+
+            Divider()
+
+            // Right column: Active conversation (70%)
+            conversationMainContent
+                .frame(maxWidth: .infinity)
+        }
+        .sheet(isPresented: $viewModel.showSettings) {
+            VoiceSettingsView()
+        }
+        .alert("Errore", isPresented: $viewModel.showError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage)
+        }
+        .onAppear {
+            viewModel.configure(modelContext: modelContext)
+            if let conversationID = conversationID {
+                viewModel.loadConversation(id: conversationID)
+            }
+        }
+    }
+
+    /// iPhone single-column layout
+    private var adaptiveLayoutForIPhone: some View {
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+
+            if showingConversationList {
+                // Show conversation list
+                compactConversationList
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Nuova") {
+                                // Create new conversation
+                                showingConversationList = false
+                            }
+                        }
+                    }
+            } else {
+                // Show active conversation
+                conversationMainContent
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                showingConversationList = true
+                            } label: {
+                                Image(systemName: "list.bullet")
+                            }
+                        }
+                    }
+            }
+        }
+        .sheet(isPresented: $viewModel.showSettings) {
+            VoiceSettingsView()
+        }
+        .alert("Errore", isPresented: $viewModel.showError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage)
+        }
+        .onAppear {
+            viewModel.configure(modelContext: modelContext)
+            if let conversationID = conversationID {
+                viewModel.loadConversation(id: conversationID)
+            }
+        }
+    }
+
+    /// Main conversation content (shared between layouts)
+    private var conversationMainContent: some View {
+        VStack(spacing: 0) {
+            // Context banner
+            contextBannerView
+                .padding()
+                .background(.ultraThinMaterial)
+
+            // Conversation history
+            conversationHistoryView
+
+            // Waveform visualization
+            if viewModel.isConversationActive {
+                waveformView
+                    .frame(height: 100)
+                    .padding(.horizontal)
+            }
+
+            Spacer()
+
+            // Controls
+            controlsView
+                .padding()
+        }
+    }
+
+    /// Compact conversation list for iPad sidebar and iPhone modal
+    private var compactConversationList: some View {
+        List {
+            if allConversations.isEmpty {
+                ContentUnavailableView(
+                    "Nessuna Conversazione",
+                    systemImage: "bubble.left.and.bubble.right",
+                    description: Text("Inizia una nuova conversazione per vedere la cronologia")
+                )
+            } else {
+                ForEach(allConversations) { conversation in
+                    Button {
+                        viewModel.loadConversation(id: conversation.id)
+                        if horizontalSizeClass != .regular || verticalSizeClass != .regular {
+                            // Close list on iPhone
+                            showingConversationList = false
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(conversation.title)
+                                .font(.headline)
+                                .foregroundStyle(.primary)
+
+                            if let subject = conversation.subject {
+                                Text(subject.displayName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+
+                            HStack {
+                                Text(conversation.updatedAt, style: .relative)
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+
+                                Spacer()
+
+                                if conversation.messages.count > 0 {
+                                    Text("\(conversation.messages.count) messaggi")
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
+                        }
+                        .padding(.vertical, 8)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .onDelete { indexSet in
+                    for index in indexSet {
+                        let conversation = allConversations[index]
+                        modelContext.delete(conversation)
+                    }
+                    try? modelContext.save()
+                }
+            }
+        }
+        .navigationTitle("Conversazioni")
     }
 }
 
