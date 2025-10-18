@@ -27,7 +27,7 @@ struct FallbackExecutor {
             return .primary(result)
         } catch let primaryError {
             // Log primary failure
-            _Concurrency.Task { @MainActor in
+            await MainActor.run {
                 APIErrorLogger.shared.log(primaryError, additionalContext: [
                     "fallback": "attempting",
                     "primaryFailure": true
@@ -39,7 +39,7 @@ struct FallbackExecutor {
                 return .fallback(fallbackResult, primaryError)
             } catch let fallbackError {
                 // Log fallback failure
-                _Concurrency.Task { @MainActor in
+                await MainActor.run {
                     APIErrorLogger.shared.log(fallbackError, additionalContext: [
                         "fallback": "failed",
                         "primaryError": primaryError.localizedDescription
