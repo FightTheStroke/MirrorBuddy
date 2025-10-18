@@ -23,6 +23,7 @@ final class NotificationManager: NSObject {
         case fileModified = "FILE_MODIFIED"
         case fileDeleted = "FILE_DELETED"
         case syncCompleted = "SYNC_COMPLETED"
+        case materialReady = "MATERIAL_READY"
 
         var title: String {
             switch self {
@@ -30,6 +31,7 @@ final class NotificationManager: NSObject {
             case .fileModified: return "File Updated"
             case .fileDeleted: return "File Deleted"
             case .syncCompleted: return "Sync Completed"
+            case .materialReady: return "Material Ready"
             }
         }
     }
@@ -49,6 +51,7 @@ final class NotificationManager: NSObject {
         var enableFileModified: Bool = true
         var enableFileDeleted: Bool = true
         var enableSyncCompleted: Bool = true
+        var enableMaterialReady: Bool = true
         var soundEnabled: Bool = true
         var groupNotifications: Bool = true
 
@@ -152,11 +155,19 @@ final class NotificationManager: NSObject {
             options: []
         )
 
+        let materialReadyCategory = UNNotificationCategory(
+            identifier: NotificationCategory.materialReady.rawValue,
+            actions: [viewFileAction, dismissAction],
+            intentIdentifiers: [],
+            options: []
+        )
+
         center.setNotificationCategories([
             fileAddedCategory,
             fileModifiedCategory,
             fileDeletedCategory,
-            syncCompletedCategory
+            syncCompletedCategory,
+            materialReadyCategory
         ])
 
         logger.info("Notification categories registered")
@@ -302,6 +313,62 @@ final class NotificationManager: NSObject {
 
         try await center.add(request)
         logger.info("Notification sent for sync completed: \(stats.hasChanges ? "changes detected" : "no changes")")
+    }
+
+    /// Notify when a material is ready for study (Task 138.4)
+    /// - Parameters:
+    ///   - materialID: The material's UUID
+    ///   - title: The material's title
+    ///   - hasMindMap: Whether mind map was generated
+    ///   - hasFlashcards: Whether flashcards were generated
+    func notifyMaterialReady(
+        materialID: UUID,
+        title: String,
+        hasMindMap: Bool,
+        hasFlashcards: Bool
+    ) async throws {
+        guard preferences.enableMaterialReady, isAuthorized else { return }
+
+        let content = UNMutableNotificationContent()
+        content.title = "Materiale Pronto"
+
+        // Build notification body based on what was generated
+        var bodyParts: [String] = []
+        if hasMindMap {
+            bodyParts.append("mappa mentale")
+        }
+        if hasFlashcards {
+            bodyParts.append("flashcard")
+        }
+
+        if bodyParts.isEmpty {
+            content.body = "\(title) è pronto"
+        } else {
+            content.body = "\(title) è pronto con \(bodyParts.joined(separator: " e "))"
+        }
+
+        content.categoryIdentifier = NotificationCategory.materialReady.rawValue
+        content.sound = preferences.soundEnabled ? .default : nil
+        content.userInfo = [
+            "materialID": materialID.uuidString,
+            "materialTitle": title,
+            "hasMindMap": hasMindMap,
+            "hasFlashcards": hasFlashcards,
+            "category": NotificationCategory.materialReady.rawValue
+        ]
+
+        if preferences.groupNotifications {
+            content.threadIdentifier = "material-processing"
+        }
+
+        let request = UNNotificationRequest(
+            identifier: "material-ready-\(materialID.uuidString)",
+            content: content,
+            trigger: nil
+        )
+
+        try await center.add(request)
+        logger.info("Notification sent for material ready: \(title)")
     }
 
     /// Notify about batch file changes

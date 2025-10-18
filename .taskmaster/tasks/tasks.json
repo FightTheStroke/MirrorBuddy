@@ -6519,11 +6519,11 @@
             "title": "Map UX pain points",
             "description": "",
             "details": "- Review current dashboard/import flow, list issues (missing feedback, scattered actions, redundant icons) with screenshots",
-            "status": "in-progress",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 137,
             "parentId": "undefined",
-            "updatedAt": "2025-10-18T19:24:45.160Z"
+            "updatedAt": "2025-10-18T19:43:39.612Z"
           },
           {
             "id": 2,
@@ -6559,7 +6559,7 @@
         "complexity": 6,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break into: (1) mapping UX pain points, (2) designing new dashboard layout, (3) implementing dashboard components, and (4) UX testing and iteration.",
-        "updatedAt": "2025-10-18T19:24:45.160Z"
+        "updatedAt": "2025-10-18T19:43:39.612Z"
       },
       {
         "id": "138",
@@ -6567,7 +6567,7 @@
         "description": "Ensure imported materials automatically trigger text extraction, summary generation, mind map creation, and UI updates.",
         "details": "- Hook Material import to processing pipeline with progress states\n- Notify dashboard when resources ready (mind maps, Flashcards)\n- Provide error handling & retry UI",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -6576,45 +6576,50 @@
             "title": "Hook import pipeline",
             "description": "",
             "details": "- When Material saved, enqueue processing job (text extraction, summarization, map generation) with status updates",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 138,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T19:53:13.563Z"
           },
           {
             "id": 2,
             "title": "Implement processing status tracking",
             "description": "",
             "details": "- Extend Material model with processing states/timestamps and update UI to show 'In elaborazione', 'Pronto'",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 138,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T19:53:13.578Z"
           },
           {
             "id": 3,
             "title": "Auto-create study assets",
             "description": "",
             "details": "- Trigger summaries, mind maps, and flashcards upon processing completion; store errors for review",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 138,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T19:53:13.584Z"
           },
           {
             "id": 4,
             "title": "Notify user when assets ready",
             "description": "",
             "details": "- Surface push/voice notifications when processing completes and link to new materials",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 138,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T19:53:13.589Z"
           }
         ],
         "complexity": 6,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Expand into: (1) hooking import pipeline, (2) implementing processing status tracking, (3) auto-creating study assets, and (4) notifying user when assets ready."
+        "expansionPrompt": "Expand into: (1) hooking import pipeline, (2) implementing processing status tracking, (3) auto-creating study assets, and (4) notifying user when assets ready.",
+        "updatedAt": "2025-10-18T19:53:13.589Z"
       },
       {
         "id": "139",
@@ -6674,9 +6679,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-18T19:42:10.914Z",
+      "lastModified": "2025-10-18T19:53:13.590Z",
       "taskCount": 139,
-      "completedCount": 120,
+      "completedCount": 121,
       "tags": [
         "master"
       ]

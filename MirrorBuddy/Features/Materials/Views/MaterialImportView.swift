@@ -271,6 +271,9 @@ struct MaterialImportView: View {
                         modelContext.insert(material)
                         try? modelContext.save()
                     }
+
+                    // Trigger automatic processing pipeline (Task 138.1)
+                    await triggerProcessing(for: material)
                 } catch {
                     print("Error importing local file \(url.lastPathComponent): \(error)")
                 }
@@ -322,12 +325,65 @@ struct MaterialImportView: View {
                         try? modelContext.save()
                     }
 
-                    // Queue for processing (extract text, generate mind map, flashcards)
-                    // This will be handled by background processing pipeline
+                    // Trigger automatic processing pipeline (Task 138.1)
+                    await triggerProcessing(for: material)
                 } catch {
                     print("Error importing file \(file.name): \(error)")
                 }
             }
+        }
+    }
+
+    // MARK: - Processing Pipeline Hook (Task 138.1)
+
+    /// Trigger automatic material processing after import
+    private func triggerProcessing(for material: Material) async {
+        // Only process if material has content
+        guard !material.extractedText.isEmpty || material.pdfURL != nil else {
+            return
+        }
+
+        // Mark as processing
+        await MainActor.run {
+            material.processingStatus = .processing
+            try? modelContext.save()
+        }
+
+        // Use MaterialProcessingPipeline for full processing
+        let pipeline = MaterialProcessingPipeline.shared
+
+        do {
+            try await pipeline.processMaterial(
+                material,
+                options: ProcessingOptions(
+                    enabledSteps: [.mindMap, .flashcards],  // Generate mind maps and flashcards
+                    failFast: false,
+                    priority: .normal
+                )
+            ) { progress in
+                print("Processing \(material.title): \(progress.currentStep) - \(progress.stepStatus)")
+            }
+
+            await MainActor.run {
+                material.processingStatus = .completed
+                try? modelContext.save()
+            }
+
+            // Send notification that material is ready (Task 138.4)
+            try? await NotificationManager.shared.notifyMaterialReady(
+                materialID: material.id,
+                title: material.title,
+                hasMindMap: material.mindMap != nil,
+                hasFlashcards: !(material.flashcards?.isEmpty ?? true)
+            )
+
+            print("Successfully processed: \(material.title)")
+        } catch {
+            await MainActor.run {
+                material.processingStatus = .failed
+                try? modelContext.save()
+            }
+            print("Failed to process \(material.title): \(error.localizedDescription)")
         }
     }
 }

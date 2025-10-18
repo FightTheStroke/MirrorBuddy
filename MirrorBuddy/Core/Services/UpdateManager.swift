@@ -250,49 +250,70 @@ final class UpdateManager {
             throw UpdateError.noModelContext
         }
 
-        // Find materials without mind maps
+        // Find materials that need processing
         let descriptor = FetchDescriptor<Material>(
             predicate: #Predicate { material in
-                material.mindMap == nil
+                material.needsReprocessing
             }
         )
 
-        let materialsWithoutMindMaps = try context.fetch(descriptor)
+        let materialsToProcess = try context.fetch(descriptor)
 
-        logger.debug("Generating mind maps for \(materialsWithoutMindMaps.count) materials")
+        logger.debug("Processing \(materialsToProcess.count) materials")
+
+        // Use MaterialProcessingPipeline for full AI-powered processing
+        let pipeline = MaterialProcessingPipeline.shared
 
         var generatedCount = 0
 
-        for material in materialsWithoutMindMaps {
+        for material in materialsToProcess {
             // Skip if no text content
-            guard !material.extractedText.isEmpty else { continue }
+            guard !material.extractedText.isEmpty else {
+                logger.debug("Skipping \(material.title) - no extracted text")
+                continue
+            }
 
-            // Generate mind map (placeholder - actual implementation uses AI service)
-            let mindMap = MindMap(materialID: material.id)
-            mindMap.material = material
+            // Mark as processing
+            material.processingStatus = .processing
+            try context.save()
 
-            // Create root node (positioned at center)
-            let rootNode = MindMapNode(
-                title: material.title,
-                content: String(material.extractedText.prefix(200)),
-                positionX: 0,
-                positionY: 0,
-                color: material.subject?.colorName ?? "blue"
-            )
-            rootNode.mindMap = mindMap
-            mindMap.nodes = [rootNode]
+            do {
+                // Process material with mind map generation enabled
+                try await pipeline.processMaterial(
+                    material,
+                    options: ProcessingOptions(
+                        enabledSteps: [.mindMap],  // Only mind maps during sync
+                        failFast: false,
+                        priority: .normal
+                    )
+                ) { progress in
+                    // Update progress in real-time
+                    self.logger.debug("Processing \(material.title): \(progress.currentStep.displayName)")
+                }
 
-            material.mindMap = mindMap
-            context.insert(mindMap)
-            context.insert(rootNode)
+                material.processingStatus = .completed
+                generatedCount += 1
+                logger.debug("Processed: \(material.title)")
 
-            generatedCount += 1
-            logger.debug("Generated mind map for: \(material.title)")
+                // Send notification that material is ready (Task 138.4)
+                _Concurrency.Task {
+                    try? await NotificationManager.shared.notifyMaterialReady(
+                        materialID: material.id,
+                        title: material.title,
+                        hasMindMap: material.mindMap != nil,
+                        hasFlashcards: !(material.flashcards?.isEmpty ?? true)
+                    )
+                }
+            } catch {
+                material.processingStatus = .failed
+                logger.error("Failed to process \(material.title): \(error.localizedDescription)")
+            }
+
+            try context.save()
         }
 
-        try context.save()
         progress.mindMapsGenerated = generatedCount
-        logger.info("Generated \(generatedCount) mind maps")
+        logger.info("Generated \(generatedCount) mind maps using AI processing")
     }
 
     // MARK: - Helpers
