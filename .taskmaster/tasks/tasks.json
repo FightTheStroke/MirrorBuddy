@@ -5079,6 +5079,371 @@
         "dependencies": [],
         "priority": "medium",
         "subtasks": []
+      },
+      {
+        "id": 116,
+        "title": "Harden resilience stack and restore fallback tests",
+        "description": "Refactor ResilientAPICall, RetryExecutor, and circuit breaker helpers to be actor-safe, eliminate concurrency mutation errors, and re-enable the disabled fallback test suite.",
+        "details": "- Convert shared state to actors (retry counters, breaker registries)\n- Update FallbackTests to cover primary/fallback success + integration path\n- Verify concurrency with swift test --parallel\n- Document new concurrency design",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Audit resilience implementation",
+            "description": "",
+            "details": "- Review ResilientAPICall, RetryExecutor, CircuitBreakerRegistry and SimpleCache to identify shared mutable state and current concurrency issues\n- Document which components need actor isolation or sendable conformance",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 116
+          },
+          {
+            "id": 2,
+            "title": "Refactor shared state into actors",
+            "description": "",
+            "details": "- Convert retry counters, breaker registries, and cache storage to dedicated actors with Sendable compliance\n- Update call sites to interact via async actor methods",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 116
+          },
+          {
+            "id": 3,
+            "title": "Re-enable and extend fallback tests",
+            "description": "",
+            "details": "- Restore the commented ResilientAPICall tests and add coverage for primary success, fallback usage, and integration stack\n- Ensure tests run reliably in parallel and address any actor isolation issues",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 116
+          },
+          {
+            "id": 4,
+            "title": "Stress test resilience stack",
+            "description": "",
+            "details": "- Run swift test --parallel and targeted stress scenarios to verify no data races remain\n- Simulate API failures/timeouts to confirm fallback behaviour",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 116
+          },
+          {
+            "id": 5,
+            "title": "Document concurrency design",
+            "description": "",
+            "details": "- Update docs/ or code comments explaining new actor boundaries, retry behaviour, and testing expectations",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 116
+          }
+        ]
+      },
+      {
+        "id": 117,
+        "title": "Normalize deployment targets for real devices",
+        "description": "Update Xcode project deployment targets to current iOS/iPadOS versions (>=17), adjust availability annotations, and verify builds/run on physical devices.",
+        "details": "- Update MirrorBuddy.xcodeproj targets (app, tests, widgets if any)\n- Re-run build on device + simulator\n- Fix any API availability warnings or guard code",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Audit current deployment targets",
+            "description": "",
+            "details": "- Inspect all targets (app, tests, extensions) in MirrorBuddy.xcodeproj to record current iOS/iPadOS/macOS versions",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 117
+          },
+          {
+            "id": 2,
+            "title": "Update project deployment settings",
+            "description": "",
+            "details": "- Set minimum iOS/iPadOS/macOS versions to supported releases (e.g. iOS 17)\n- Adjust Info.plist or availability annotations if necessary",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 117
+          },
+          {
+            "id": 3,
+            "title": "Verify builds on devices",
+            "description": "",
+            "details": "- Build & run on physical iPhone/iPad with updated targets, resolving availability warnings or guard clauses",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 117
+          },
+          {
+            "id": 4,
+            "title": "Document deployment requirements",
+            "description": "",
+            "details": "- Update README/setup docs to reflect new OS minimums and testing expectations",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 117
+          }
+        ]
+      },
+      {
+        "id": 118,
+        "title": "Eliminate SwiftLint debt and enforce zero-warning policy",
+        "description": "Resolve existing ~30 SwiftLint violations, tune configuration if needed, and wire lint checks into the CI/pre-commit workflow.",
+        "details": "- Run swiftlint to capture current warnings\n- Fix code style/complexity issues or document justified exceptions\n- Update lint config for new rules if necessary\n- Add CI/pre-commit step ensuring lint passes",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Capture current SwiftLint violations",
+            "description": "",
+            "details": "- Run swiftlint and export the list of warnings with file/line references",
+            "status": "pending",
+            "dependencies": [],
+            "parentTaskId": 118
+          }
+        ]
+      },
+      {
+        "id": 119,
+        "title": "Secure API configuration via Keychain and xcconfig",
+        "description": "Store all API keys in the Keychain/config files instead of plist/env, update loading code, and document the setup for developers.",
+        "details": "- Move OpenAI, Anthropic, Google credentials to KeychainManager/xcconfig\n- Update services (WhisperTranscriptionService etc.) to read from secure storage\n- Ensure build scripts ignore secret files\n- Update docs (README/setup guides) with new steps",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 120,
+        "title": "Audit and resolve TODO/FIXME debt",
+        "description": "Review all TODO/FIXME comments, implement high-priority items (study flows, TTS, search focus), and convert leftover items into tracked tasks.",
+        "details": "- Use rg to list TODO/FIXME\n- Implement critical missing features or stub gracefully\n- Create new Task Master entries for deferred work and remove inline comments",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 121,
+        "title": "Expand baseline test coverage for core services",
+        "description": "Add unit tests for VoiceConversationViewModel, UpdateManager, StudyView workflows, and resilience utilities to lift coverage and protect regressions.",
+        "details": "- Write async tests simulating voice session toggles and offline fallback\n- Cover UpdateManager orchestration with mocked services\n- Add StudyView tests (e.g., using ViewInspector)\n- Ensure circuit breaker/retry tests assert actor behaviour",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 122,
+        "title": "Establish performance harness for sync, transcription, and mind maps",
+        "description": "Create performance tests and benchmarking scripts for Drive sync (100+ files), Whisper transcription (multi-hour input), and mind map rendering (100+ nodes).",
+        "details": "- Add XCTest performance cases measuring latency/memory\n- Provide fixtures/mocks for large data sets\n- Document thresholds and capture baseline metrics",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 123,
+        "title": "Author manual QA & offline/resilience checklist",
+        "description": "Document repeatable QA scenarios covering online/offline switches, backgrounding, low storage, and voice command regressions.",
+        "details": "- Create checklist markdown in docs/\n- Include steps for switching network states, aggressive user flows, device matrix\n- Integrate into release criteria",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 124,
+        "title": "Build Today companion card and voice summary",
+        "description": "Design a Today dashboard card with top tasks/materials and trigger a spoken summary after Aggiornami completes.",
+        "details": "- Aggregate Drive/Gmail/Calendar findings into Today model\n- Render card with quick voice buttons and working-memory friendly copy\n- Hook UpdateManager to speak summary + offer next steps",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "116",
+          "117",
+          "118",
+          "119",
+          "121"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 125,
+        "title": "Add proactive coaching and working-memory checkpoints",
+        "description": "Detect idle moments, sentiment, and current subject to propose next steps, and inject periodic recaps during study flows.",
+        "details": "- Intent engine using context banner + activity logs\n- Voice prompts like 'Vuoi ripassare X?' when idle or confused\n- Mid-session recap command 'Ricapitolami' with voice + text",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "121",
+          "124"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 126,
+        "title": "Implement natural-language task capture and planning",
+        "description": "Allow Mario to add tasks via voice (e.g. 'Ricordami di...'), infer subject, schedule reminders, and wrap with end-of-day planning dialogue.",
+        "details": "- Extend VoiceCommandRegistry/AppVoiceCommandHandler with capture flow\n- Parse text to deadlines/subjects\n- Add nightly summary + tomorrow plan routine",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "121",
+          "124"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 127,
+        "title": "Design guided flashcard coach experience",
+        "description": "Transform FlashcardStudyView into a voice-coached session with warm-up, adaptive pacing, encouragement, and micro-rewards.",
+        "details": "- Script session phases (intro, practice, wrap)\n- Track performance to adjust explanation depth\n- Add celebratory effects and XP hooks",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "124",
+          "125",
+          "126"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 128,
+        "title": "Ship interactive mind map 2.0",
+        "description": "Deliver zoomable mind map navigation with voice commands, narrated walkthroughs, and voice note capture for each node.",
+        "details": "- Implement gesture + accessibility-friendly navigation\n- Add 'Explain this node' narration using TTS/LLM\n- Allow voice notes per node and sync to storage",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "124",
+          "125"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 129,
+        "title": "Deliver lesson recording, transcription, and review",
+        "description": "Create the ambient recorder UI, chunked Whisper transcription pipeline, and review experience that turns recordings into summaries + mind maps.",
+        "details": "- Build recording controls with storage monitoring and background support\n- Implement segmented upload + transcription workers\n- Auto-generate summaries/mind maps per segment and integrate with review screen",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "116",
+          "119",
+          "121"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 130,
+        "title": "Implement emotion-aware coaching & persona tuning",
+        "description": "Detect sentiment from voice, adjust pacing/tone, and allow Mario to choose between playful or calm coaching styles.",
+        "details": "- Add sentiment detection to voice pipeline\n- Map sentiment to coaching responses and pacing adjustments\n- Build settings UI for persona selection",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "127",
+          "128"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 131,
+        "title": "Roll out curiosity prompts and weekly quests",
+        "description": "Serve curiosity suggestions after topics, introduce weekly challenges with rewards, and surface celebration moments in the coach.",
+        "details": "- Build content recommender (videos, experiments) per subject\n- Implement quest tracking and badge unlock flow\n- Integrate celebrations into voice responses and ProfileView",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "127"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 132,
+        "title": "Generate weekly parent/teacher digest",
+        "description": "Create opt-in digest emails or voice notes summarizing achievements, struggles, and suggested follow-ups for guardians.",
+        "details": "- Aggregate progress metrics and sentiment from the week\n- Produce empathetic copy and optional audio summary\n- Provide settings to control frequency and privacy",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "124",
+          "126"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 133,
+        "title": "Implement guardian consent and privacy controls",
+        "description": "Deliver parental control surfaces for recordings, sharing, and coach tone; include clear privacy states and overrides.",
+        "details": "- Add settings UI for guardians (PIN protected)\n- Gate recording/export features behind consent\n- Surface privacy indicators in UI",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "129"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 134,
+        "title": "Define data governance, logging, and offline matrix",
+        "description": "Document PII flows, add structured audit logging, and clarify offline capabilities with UI states.",
+        "details": "- Create privacy dashboard documentation\n- Instrument structured logs for voice commands/suggestions/errors\n- Update UI to show offline capabilities/limitations",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "133"
+        ],
+        "priority": "high",
+        "subtasks": []
+      },
+      {
+        "id": 135,
+        "title": "Integrate LMS/knowledge exports and Notion bridge",
+        "description": "Add connectors for Canvas/Google Classroom assignment ingestion and export mind maps/summaries to PDF/Notion.",
+        "details": "- Implement API clients or importers per LMS\n- Provide export options (PDF, Markdown, Notion API)\n- Respect privacy and guardian settings",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "124"
+        ],
+        "priority": "medium",
+        "subtasks": []
+      },
+      {
+        "id": 136,
+        "title": "Finalize QA automation, metrics, and release readiness",
+        "description": "Add UI automation for voice flows, integrate crash/metrics monitoring, complete accessibility audits, and prepare App Store assets/privacy disclosures.",
+        "details": "- Write UI tests simulating voice commands via accessibility APIs\n- Hook privacy-safe crash/latency monitoring\n- Run full accessibility audit (VoiceOver, Switch Control, Reduce Motion)\n- Produce App Privacy labels, localization checklist, release playbook",
+        "testStrategy": "",
+        "status": "pending",
+        "dependencies": [
+          "122",
+          "133",
+          "135"
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
@@ -5091,7 +5456,7 @@
       ],
       "created": "2025-10-18T08:28:43.514Z",
       "description": "Tasks for master context",
-      "updated": "2025-10-18T08:29:58.247Z"
+      "updated": "2025-10-18T08:38:42.420Z"
     }
   }
 }
