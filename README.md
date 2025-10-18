@@ -145,6 +145,7 @@ Key components (see `/MirrorBuddy/Core`):
 > - **macOS 14.0+** (Development requires macOS 15 + Xcode 16 beta or newer with Swift 6 concurrency support)
 > - **iOS/iPadOS 17.0+** (minimum deployment target)
 > - Apple Developer account with CloudKit entitlements
+>
 > - Google Cloud project (Drive, Gmail, Calendar APIs enabled & OAuth consent)
 > - OpenAI API key (Realtime + Chat), optional Anthropic key
 > - Update `com.mirrorbuddy.MirrorBuddy` bundle ID if you do not control this domain
