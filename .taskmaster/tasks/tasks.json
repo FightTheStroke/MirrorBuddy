@@ -5514,7 +5514,7 @@
         "description": "Review all TODO/FIXME comments, implement high-priority items (study flows, TTS, search focus), and convert leftover items into tracked tasks.",
         "details": "- Use rg to list TODO/FIXME\n- Implement critical missing features or stub gracefully\n- Create new Task Master entries for deferred work and remove inline comments",
         "testStrategy": "",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5527,7 +5527,7 @@
             "dependencies": [],
             "parentTaskId": 120,
             "parentId": "undefined",
-            "updatedAt": "2025-10-18T10:01:00.287Z"
+            "updatedAt": "2025-10-18T10:47:14.266Z"
           },
           {
             "id": 2,
@@ -5549,24 +5549,24 @@
             "dependencies": [],
             "parentTaskId": 120,
             "parentId": "undefined",
-            "updatedAt": "2025-10-18T10:01:02.822Z"
+            "updatedAt": "2025-10-18T10:48:12.914Z"
           },
           {
             "id": 4,
             "title": "Clean up code annotations",
             "description": "",
             "details": "- Remove resolved TODO/FIXME comments and ensure code reflects current status",
-            "status": "done",
+            "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 120,
             "parentId": "undefined",
-            "updatedAt": "2025-10-18T10:01:04.070Z"
+            "updatedAt": "2025-10-18T10:48:14.191Z"
           }
         ],
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break into: (1) inventorying TODO/FIXME comments, (2) addressing critical TODOs, (3) creating follow-up tasks, and (4) cleaning up code annotations.",
-        "updatedAt": "2025-10-18T10:09:43.600Z"
+        "updatedAt": "2025-10-18T10:48:14.191Z"
       },
       {
         "id": "121",
@@ -6653,7 +6653,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-18T10:25:08.144Z",
+      "lastModified": "2025-10-18T10:48:14.193Z",
       "taskCount": 139,
       "completedCount": 116,
       "tags": [

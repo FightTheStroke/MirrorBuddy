@@ -98,7 +98,8 @@ struct TasksView: View {
 
                 ToolbarItem {
                     Button {
-                        // TODO: Add task
+                        // Future Enhancement: Add task functionality
+                        // See Docs/FUTURE_ENHANCEMENTS.md - "TasksView - SwiftData Integration"
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -123,7 +124,8 @@ struct TasksView: View {
     }
 
     private func loadCachedData() {
-        // TODO: Load from SwiftData
+        // Future Enhancement: Load persisted tasks from SwiftData
+        // See Docs/FUTURE_ENHANCEMENTS.md - "TasksView - SwiftData Integration"
     }
 
     private func syncEmailsAndCalendar() async {

@@ -225,10 +225,35 @@ final class GoogleDriveDownloadService: ObservableObject {
             throw GoogleAPIError.invalidResponse
         }
 
-        // Handle 401 - token might need refresh
+        // Handle 401 - token expired, attempt refresh and retry
         if httpResponse.statusCode == 401 {
-            // TODO: Implement token refresh
-            throw GoogleAPIError.oauthError("Token expired, please re-authenticate")
+            logger.info("Access token expired (401), attempting refresh...")
+
+            do {
+                // Attempt to refresh the token using GoogleOAuthService
+                let newTokens = try await GoogleOAuthService.shared.refreshToken()
+                logger.info("Token refresh successful, retrying download")
+
+                // Retry the download request with refreshed token
+                var retryRequest = URLRequest(url: downloadURL)
+                retryRequest.setValue("Bearer \(newTokens.accessToken)", forHTTPHeaderField: "Authorization")
+                retryRequest.timeoutInterval = 300
+
+                let (retryData, retryResponse) = try await URLSession.shared.data(for: retryRequest)
+
+                guard let retryHttpResponse = retryResponse as? HTTPURLResponse,
+                      (200...299).contains(retryHttpResponse.statusCode) else {
+                    throw GoogleAPIError.oauthError("Download failed after token refresh")
+                }
+
+                // Update progress with retry data
+                updateProgress(fileId: fileId, downloaded: Int64(retryData.count), total: metadata.size)
+                return retryData
+
+            } catch {
+                logger.error("Token refresh failed: \(error.localizedDescription)")
+                throw GoogleAPIError.oauthError("Token expired and refresh failed: \(error.localizedDescription)")
+            }
         }
 
         guard (200...299).contains(httpResponse.statusCode) else {

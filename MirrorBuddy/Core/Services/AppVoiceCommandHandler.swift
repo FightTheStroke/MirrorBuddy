@@ -167,7 +167,12 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
     private func handleSearchMaterials() {
         showMaterials = true
         lastCommandResult = .success("Cerca materiali")
-        // TODO: Focus search field
+
+        // Post notification to focus search field in materials view
+        NotificationCenter.default.post(
+            name: NSNotification.Name("FocusSearchField"),
+            object: nil
+        )
     }
 
     // MARK: - Study Handlers (Task 111)
@@ -207,15 +212,34 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
     }
 
     private func handleReadScreen() {
+        // Request current screen text via notification and speak it
+        // The active view should respond with its readable content
+        NotificationCenter.default.post(
+            name: NSNotification.Name("RequestScreenText"),
+            object: nil,
+            userInfo: ["callback": { (text: String) in
+                MainActor.assumeIsolated {
+                    TextToSpeechService.shared.speak(text, language: "it-IT")
+                }
+            } as Any]
+        )
         lastCommandResult = .success("Lettura schermo")
-        // TODO: Integrate with TTS service
     }
 
     // MARK: - TTS Handlers
 
     private func handleStartReading() {
-        // TODO: Get current screen text and speak it
-        // TextToSpeechService.shared.speak(currentScreenText)
+        // Request current screen text and speak it using TTS service
+        // The active view should respond to this notification with its readable content
+        NotificationCenter.default.post(
+            name: NSNotification.Name("RequestScreenText"),
+            object: nil,
+            userInfo: ["callback": { (text: String) in
+                MainActor.assumeIsolated {
+                    TextToSpeechService.shared.speak(text, language: "it-IT")
+                }
+            } as Any]
+        )
         lastCommandResult = .success("Inizio lettura")
     }
 
