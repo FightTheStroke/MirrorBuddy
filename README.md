@@ -142,12 +142,17 @@ Key components (see `/MirrorBuddy/Core`):
 ## Getting started (developer preview)
 
 > **Prerequisites**
-> - macOS 15 + Xcode 16 beta (or newer supporting Swift 6 concurrency checks)
-> - iOS/iPadOS 17 simulator or device
+> - **macOS 14.0+** (Development requires macOS 15 + Xcode 16 beta or newer with Swift 6 concurrency support)
+> - **iOS/iPadOS 17.0+** (minimum deployment target)
 > - Apple Developer account with CloudKit entitlements
 > - Google Cloud project (Drive, Gmail, Calendar APIs enabled & OAuth consent)
 > - OpenAI API key (Realtime + Chat), optional Anthropic key
 > - Update `com.mirrorbuddy.MirrorBuddy` bundle ID if you do not control this domain
+>
+> **Verified Devices:**
+> - iPhone 15 Pro, iPhone 14, iPad 13
+> - iOS Simulator (iOS 17.0+)
+> - Deployment targets: iOS 17.0, macOS 14.0
 
 ```bash
 git clone https://github.com/your-org/MirrorBuddy.git
