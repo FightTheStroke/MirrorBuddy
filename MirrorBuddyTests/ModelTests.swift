@@ -123,7 +123,7 @@ final class ModelTests: XCTestCase {
         try modelContext.save()
 
         XCTAssertEqual(material.subject?.localizationKey, "math")
-        XCTAssertTrue(subject.materials.contains { $0.id == material.id })
+        XCTAssertTrue(subject.materials?.contains { $0.id == material.id } ?? false)
     }
 
     // MARK: - Task Tests
@@ -532,7 +532,7 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(mindMap.materialID, materialID)
         XCTAssertEqual(mindMap.prompt, "Test prompt")
         XCTAssertNotNil(mindMap.generatedAt)
-        XCTAssertTrue(mindMap.nodes.isEmpty)
+        XCTAssertTrue(mindMap.nodes?.isEmpty ?? true)
     }
 
     func testMindMapNodeInitialization() throws {
@@ -662,8 +662,12 @@ final class ModelTests: XCTestCase {
             question: "Q",
             answer: "A"
         )
+        flashcard.material = material
 
-        material.flashcards.append(flashcard)
+        if material.flashcards == nil {
+            material.flashcards = []
+        }
+        material.flashcards?.append(flashcard)
 
         modelContext.insert(material)
         modelContext.insert(flashcard)
@@ -674,8 +678,8 @@ final class ModelTests: XCTestCase {
         let materials = try modelContext.fetch(descriptor)
 
         XCTAssertEqual(materials.count, 1)
-        XCTAssertEqual(materials.first?.flashcards.count, 1)
-        XCTAssertEqual(materials.first?.flashcards.first?.question, "Q")
+        XCTAssertEqual(materials.first?.flashcards?.count, 1)
+        XCTAssertEqual(materials.first?.flashcards?.first?.question, "Q")
     }
 
     func testSubjectMaterialTaskRelationships() throws {
@@ -695,9 +699,9 @@ final class ModelTests: XCTestCase {
         try modelContext.save()
 
         // Verify relationships
-        XCTAssertEqual(subject.materials.count, 1)
-        XCTAssertEqual(subject.tasks.count, 1)
-        XCTAssertEqual(material.tasks.count, 1)
+        XCTAssertEqual(subject.materials?.count, 1)
+        XCTAssertEqual(subject.tasks?.count, 1)
+        XCTAssertEqual(material.tasks?.count, 1)
         XCTAssertEqual(task.subject?.localizationKey, "math")
         XCTAssertEqual(task.material?.title, "Math Material")
     }

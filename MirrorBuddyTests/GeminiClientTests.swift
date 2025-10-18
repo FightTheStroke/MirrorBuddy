@@ -33,9 +33,9 @@ struct GeminiClientTests {
     }
 
     @Test("Configuration save and load from UserDefaults")
-    func testConfigurationPersistence() {
+    func testConfigurationPersistence() throws {
         let config = GeminiConfiguration(apiKey: "persistent-key")
-        config.save()
+        try config.save()
 
         let loaded = GeminiConfiguration.loadFromEnvironment()
         #expect(loaded?.apiKey == "persistent-key")

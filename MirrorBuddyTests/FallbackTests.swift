@@ -55,7 +55,7 @@ struct FallbackTests {
     @Test("Fallback executor uses fallback on primary failure")
     func testFallbackOnPrimaryFailure() async {
         let result = await FallbackExecutor.executeWithFallback(
-            primary: {
+            primary: { () -> String in
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { _ in
@@ -110,7 +110,7 @@ struct FallbackTests {
     @Test("Fallback executor throwing variant succeeds with fallback")
     func testThrowingVariantFallbackSuccess() async throws {
         let result = try await FallbackExecutor.executeWithFallbackThrowing(
-            primary: {
+            primary: { () -> String in
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { _ in
@@ -318,7 +318,7 @@ struct FallbackTests {
             endpoint: "test-endpoint",
             retryPolicy: .none,
             circuitBreakerConfig: .lenient,
-            primary: {
+            primary: { () -> String in
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { _ in
@@ -376,7 +376,7 @@ struct FallbackTests {
                 useJitter: false
             ),
             circuitBreakerConfig: .lenient,
-            primary: {
+            primary: { () -> String in
                 await attemptCounter.increment()
                 throw UnifiedAPIError.timeout(context: nil)
             },
@@ -399,12 +399,14 @@ struct FallbackTests {
         await cache.set(key: "api-response", value: "cached-response")
 
         let result = await FallbackExecutor.executeWithFallback(
-            primary: {
+            primary: { () -> String in
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { error in
-                let fallback = CachedDataFallback<String>(cacheKey: "api-response", cache: cache)
-                return try await fallback.execute(primaryError: error)
+                guard let cached = await cache.get(key: "api-response", type: String.self) else {
+                    throw FallbackError.noCachedData(key: "api-response", primaryError: error)
+                }
+                return cached
             }
         )
 

@@ -23,13 +23,13 @@ struct GoogleWorkspaceClientTests {
     }
 
     @Test("Configuration save and load from UserDefaults")
-    func testConfigurationPersistence() {
+    func testConfigurationPersistence() throws {
         let config = GoogleWorkspaceConfiguration(
             clientID: "persist-id",
             clientSecret: "persist-secret",
             redirectURI: "https://persist.com/callback"
         )
-        config.save()
+        try config.save()
 
         let loaded = GoogleWorkspaceConfiguration.loadFromEnvironment()
         #expect(loaded?.clientID == "persist-id")
@@ -91,7 +91,7 @@ struct GoogleWorkspaceClientTests {
     }
 
     @Test("OAuthToken save and load from UserDefaults")
-    func testOAuthTokenPersistence() {
+    func testOAuthTokenPersistence() throws {
         let token = OAuthToken(
             accessToken: "test-access",
             refreshToken: "test-refresh",
@@ -99,7 +99,7 @@ struct GoogleWorkspaceClientTests {
             tokenType: "Bearer",
             scope: nil
         )
-        token.save()
+        try token.save()
 
         let loaded = OAuthToken.load()
         #expect(loaded?.accessToken == "test-access")
@@ -110,7 +110,7 @@ struct GoogleWorkspaceClientTests {
     }
 
     @Test("OAuthToken expiration check")
-    func testTokenExpiration() {
+    func testTokenExpiration() throws {
         let expiredToken = OAuthToken(
             accessToken: "expired",
             refreshToken: "refresh",
@@ -118,7 +118,7 @@ struct GoogleWorkspaceClientTests {
             tokenType: "Bearer",
             scope: nil
         )
-        expiredToken.save()
+        try expiredToken.save()
 
         let loaded = OAuthToken.load()
         #expect(loaded?.isExpired == true)
