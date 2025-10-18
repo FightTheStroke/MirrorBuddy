@@ -187,7 +187,7 @@ Please review `Docs/AGENT_DRIVEN_DEVELOPMENT.md` for the tasking model and submi
 
 ## License & acknowledgements
 
-- Licensed under the MIT License – see [LICENSE](LICENSE).
+- Licensed under the Business Source License – see [LICENSE](LICENSE).
 - Built on top of SwiftUI, SwiftData, CloudKit, Apple Vision/VisionKit, OpenAI’s Realtime/Chat/Whisper APIs, and the OpenDyslexic type family.
 - Special thanks to educators, therapists, parents, and learners who have shared the daily frictions we are working to dissolve.
 
