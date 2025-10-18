@@ -1,597 +1,221 @@
 {
 	"meta": {
-		"generatedAt": "2025-10-16T19:20:50.095Z",
-		"tasksAnalyzed": 1,
-		"totalTasks": 109,
-		"analysisCount": 73,
+		"generatedAt": "2025-10-18T09:21:22.340Z",
+		"tasksAnalyzed": 26,
+		"totalTasks": 139,
+		"analysisCount": 26,
 		"thresholdScore": 5,
 		"projectName": "Taskmaster",
-		"usedResearch": false
+		"usedResearch": true
 	},
 	"complexityAnalysis": [
 		{
-			"taskId": 69,
-			"taskTitle": "Create User Guide",
+			"taskId": 113,
+			"taskTitle": "Improve Floating Voice Button Positioning with SafeAreaInset",
 			"complexityScore": 6,
-			"recommendedSubtasks": 9,
-			"expansionPrompt": "Break down the user guide creation into subtasks covering each major feature area. Include tasks for content planning, writing, reviewing, and formatting. Consider how to make the guide accessible and user-friendly for different user types.",
-			"reasoning": "Creating a comprehensive user guide requires understanding of all app features and the ability to explain them clearly. The task involves documenting 8 different feature areas plus an FAQ section. While not technically complex, it requires significant content creation, organization, and user testing. The guide must be accessible and match the actual app behavior, requiring coordination with the development team. The medium complexity score reflects the substantial content creation effort balanced by the non-technical nature of the task."
-		},
-		{
-			"taskId": 68,
-			"taskTitle": "Create API Documentation",
-			"complexityScore": 7,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Break down the API documentation task into subtasks for each API category. Include tasks for documenting interfaces, creating examples, reviewing for accuracy, and ensuring security. Consider how to structure the documentation for both internal and external developers.",
-			"reasoning": "API documentation requires deep technical understanding of multiple complex systems. The developer must document 7 different API categories including SwiftData models, API clients, voice/vision integrations, and external APIs. This requires precise technical writing and code examples that must be tested for correctness. The documentation must be comprehensive enough for other developers while ensuring no sensitive information is exposed. The complexity is increased by the need to coordinate with multiple development teams responsible for different APIs."
-		},
-		{
-			"taskId": 55,
-			"taskTitle": "Create Onboarding Flow",
-			"complexityScore": 8,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Break down the onboarding flow implementation into subtasks covering UI design, permission handling, account connection, tutorials, and testing. Consider how to make the onboarding experience engaging while collecting necessary permissions and information.",
-			"reasoning": "Creating an effective onboarding flow is highly complex as it's the user's first experience with the app and requires integration with multiple systems. The task involves creating welcome content, implementing permission requests for camera/microphone/notifications, connecting to Google accounts, setting up API keys, creating interactive tutorials, and implementing progress tracking. The flow must be both informative and engaging while handling critical setup tasks. The high priority indicates its importance to the project. Technical complexity comes from integrating with multiple permission systems and external authentication."
-		},
-		{
-			"taskId": 70,
-			"taskTitle": "Create Developer Notes",
-			"complexityScore": 5,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Break down the developer notes creation into subtasks for documenting architecture, code organization, performance considerations, limitations, and setup instructions. Consider how to make the documentation useful for current and future developers.",
-			"reasoning": "Creating developer notes requires comprehensive understanding of the system architecture and implementation details. The task involves documenting architectural decisions, code organization, performance optimizations, limitations, and future improvements. While technically detailed, it's primarily a documentation task rather than implementation. The low priority reflects that it's not critical for initial app functionality. The complexity comes from needing to understand and document the entire system architecture and technical decisions."
-		},
-		{
-			"taskId": 71,
-			"taskTitle": "Create Deployment Guide",
-			"complexityScore": 5,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Break down the deployment guide creation into subtasks covering code signing, App Store setup, TestFlight distribution, submission process, and required assets. Consider how to make the guide useful for both initial and ongoing deployments.",
-			"reasoning": "Creating a deployment guide requires detailed knowledge of Apple's deployment processes. The task involves documenting code signing, App Store Connect setup, TestFlight distribution, App Store submission, and required assets. While technically detailed, it's primarily a documentation task rather than implementation. The medium priority reflects its importance for eventual app distribution. The complexity comes from needing to understand and document Apple's complex deployment processes and requirements."
-		},
-		{
-			"taskId": 32,
-			"taskTitle": "Create Voice Conversation UI",
-			"complexityScore": 7,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Break down the voice conversation UI implementation into subtasks covering the main view, conversation display, audio feedback, animations, and accessibility features. Consider how to make the interface intuitive and responsive during voice interactions.",
-			"reasoning": "Creating a voice conversation UI involves complex UI design and real-time feedback systems. The task requires implementing a SwiftUI view with waveform animations, conversation history display, context awareness, and one-handed optimization. The high priority indicates its importance to the core app experience. Technical complexity comes from creating responsive animations that provide feedback during voice conversations, implementing a context banner, and ensuring the UI works well with one-handed operation. Performance optimization for active conversations adds additional complexity."
-		},
-		{
-			"taskId": 44,
-			"taskTitle": "Create Task List View",
-			"complexityScore": 7,
-			"recommendedSubtasks": 9,
-			"expansionPrompt": "Break down the task list view implementation into subtasks covering the main view, different task sections, filtering/sorting, voice commands, and accessibility features. Consider how to make the interface efficient for managing multiple tasks.",
-			"reasoning": "Creating a task list view involves complex UI design with multiple sections and interaction methods. The task requires implementing a SwiftUI view with today's tasks, upcoming tasks, overdue tasks, subject color-coding, voice commands, and search functionality. The high priority indicates its importance to the core app experience. Technical complexity comes from implementing efficient filtering and sorting for potentially large task lists, integrating voice commands, and ensuring accessibility with large touch targets. Performance optimization for large datasets adds additional complexity."
-		},
-		{
-			"taskId": 26,
-			"taskTitle": "Create Subject-Organized Dashboard UI",
-			"complexityScore": 8,
-			"recommendedSubtasks": 9,
-			"expansionPrompt": "Break down the dashboard UI implementation into subtasks covering the main view, subject organization, material cards, search/filtering, animations, and accessibility features. Consider how to make the interface efficient for navigating a large collection of materials.",
-			"reasoning": "Creating a subject-organized dashboard UI is highly complex as it's the main navigation hub for the app. The task involves implementing a SwiftUI view with subject-based organization, material cards, search/filtering, sorting options, smooth animations, one-handed optimization, and VoiceOver support. The high priority indicates its critical importance to the app experience. Technical complexity comes from creating an efficient organization system for potentially large numbers of materials, implementing smooth animations, and ensuring accessibility with VoiceOver and large touch targets. Performance optimization for large datasets adds significant complexity."
-		},
-		{
-			"taskId": 12,
-			"taskTitle": "Create Google Gemini API Client",
-			"complexityScore": 7,
-			"recommendedSubtasks": 8,
-			"expansionPrompt": "Break down the Google Gemini API client implementation into subtasks covering configuration, different API methods, error handling, rate limiting, and response parsing. Consider how to make the client robust and efficient for various Workspace integrations.",
-			"reasoning": "Creating a Google Gemini API client involves complex networking and integration with Google's AI services. The task requires implementing configuration, methods for text generation, Drive research, Calendar parsing, Gmail extraction, error handling, rate limiting, and response parsing. The high priority indicates its importance to core app functionality. Technical complexity comes from working with multiple Google API endpoints, implementing proper error handling and retry logic, managing rate limits, and parsing complex response structures. Swift concurrency implementation adds additional complexity."
-		},
-		{
-			"taskId": 11,
-			"taskTitle": "Create OpenAI API Client Infrastructure",
-			"complexityScore": 8,
-			"recommendedSubtasks": 9,
-			"expansionPrompt": "Break down the OpenAI API client implementation into subtasks covering configuration, different API endpoints (Chat, Vision, DALL-E, Realtime), WebSocket handling, error management, rate limiting, and response parsing. Consider how to make the client robust and efficient for various AI interactions.",
-			"reasoning": "Creating an OpenAI API client infrastructure is highly complex as it involves multiple API endpoints and real-time communication. The task requires implementing configuration, methods for GPT-5 chat, vision analysis, Q&A, DALL-E image generation, WebSocket handling for Realtime API, error handling, rate limiting, and response parsing. The high priority and in-progress status indicate its critical importance to the project. Technical complexity comes from implementing WebSocket connections for real-time audio, managing multiple API endpoints with different requirements, implementing proper error handling and retry logic, and parsing complex response structures. Swift concurrency implementation adds additional complexity."
-		},
-		{
-			"taskId": 13,
-			"taskTitle": "Create Google APIs Client for Workspace Integration",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on create google apis client for workspace integration.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 14,
-			"taskTitle": "Implement API Error Handling and Retry Logic",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement api error handling and retry logic.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 15,
-			"taskTitle": "Implement Secure Keychain Storage for API Keys",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement secure keychain storage for api keys.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 16,
-			"taskTitle": "Implement Google Drive OAuth 2.0 Login Flow",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement google drive oauth 2.0 login flow.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 17,
-			"taskTitle": "Implement Google Drive File Listing and Monitoring",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement google drive file listing and monitoring.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 18,
-			"taskTitle": "Implement Google Drive File Download",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement google drive file download.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 19,
-			"taskTitle": "Implement PDF Text Extraction with VisionKit",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement pdf text extraction with visionkit.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 20,
-			"taskTitle": "Implement Summary Generation with Apple Intelligence",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement summary generation with apple intelligence.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 21,
-			"taskTitle": "Implement Mind Map Generation with GPT-5",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement mind map generation with gpt-5.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 22,
-			"taskTitle": "Implement DALL-E 3 Image Generation for Mind Map Nodes",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement dall-e 3 image generation for mind map nodes.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 23,
-			"taskTitle": "Implement Flashcard Generation with GPT-5 Nano",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement flashcard generation with gpt-5 nano.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 24,
-			"taskTitle": "Implement Simplified Explanations Generation with GPT-5 Mini",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement simplified explanations generation with gpt-5 mini.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 25,
-			"taskTitle": "Implement Parallel Material Processing Pipeline",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement parallel material processing pipeline.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 27,
-			"taskTitle": "Implement Material Cards UI Component",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement material cards ui component.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 28,
-			"taskTitle": "Implement Material Detail View",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement material detail view.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 29,
-			"taskTitle": "Implement Voice Command System for Navigation",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement voice command system for navigation.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 30,
-			"taskTitle": "Implement Push Notification System",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement push notification system.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 31,
-			"taskTitle": "Implement OpenAI Realtime API Integration",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement openai realtime api integration.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 33,
-			"taskTitle": "Implement Study Coach Personality and Prompting",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement study coach personality and prompting.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 34,
-			"taskTitle": "Implement Audio Pipeline for Voice Conversations",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement audio pipeline for voice conversations.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 35,
-			"taskTitle": "Implement Camera Integration for Homework Help",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement camera integration for homework help.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 36,
-			"taskTitle": "Implement GPT-5 Vision API Integration",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement gpt-5 vision api integration.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 37,
-			"taskTitle": "Create Combined Vision and Voice Interaction",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on create combined vision and voice interaction.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 38,
-			"taskTitle": "Implement Handwriting Recognition with Apple Pencil",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement handwriting recognition with apple pencil.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 39,
-			"taskTitle": "Create Interactive Mind Map Renderer",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on create interactive mind map renderer.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 40,
-			"taskTitle": "Implement Mind Map Voice Navigation",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement mind map voice navigation.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 41,
-			"taskTitle": "Implement Mind Map Export Functionality",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement mind map export functionality.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 42,
-			"taskTitle": "Implement Google Calendar Integration",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement google calendar integration.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 43,
-			"taskTitle": "Implement Gmail Integration for Assignment Extraction",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement gmail integration for assignment extraction.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 45,
-			"taskTitle": "Implement Task Detail and Completion UI",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement task detail and completion ui.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 46,
-			"taskTitle": "Implement XP and Leveling System",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement xp and leveling system.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 47,
-			"taskTitle": "Implement Achievements and Badges System",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement achievements and badges system.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 48,
-			"taskTitle": "Implement Daily Challenges System",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement daily challenges system.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 49,
-			"taskTitle": "Implement Rewards and Customization System",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement rewards and customization system.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 50,
-			"taskTitle": "Implement Math Mode Specialized Features",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement math mode specialized features.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 51,
-			"taskTitle": "Implement Italian Mode Specialized Features",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement italian mode specialized features.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 52,
-			"taskTitle": "Implement History Mode Specialized Features",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement history mode specialized features.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 53,
-			"taskTitle": "Implement Physics/Science Mode Specialized Features",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement physics/science mode specialized features.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 54,
-			"taskTitle": "Implement Language Mode Specialized Features",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement language mode specialized features.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 56,
-			"taskTitle": "Implement Settings and Preferences UI",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement settings and preferences ui.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 57,
-			"taskTitle": "Implement Offline Mode Functionality",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement offline mode functionality.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 58,
-			"taskTitle": "Implement Error Handling and Recovery UI",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement error handling and recovery ui.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 59,
-			"taskTitle": "Implement Performance Optimization",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement performance optimization.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 60,
-			"taskTitle": "Conduct Accessibility Audit",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on conduct accessibility audit.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 61,
-			"taskTitle": "Implement Unit Tests for Core Functionality",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement unit tests for core functionality.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 62,
-			"taskTitle": "Implement Integration Tests",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement integration tests.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 63,
-			"taskTitle": "Implement UI Tests",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement ui tests.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 64,
-			"taskTitle": "Implement Accessibility Tests",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement accessibility tests.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 65,
-			"taskTitle": "Implement Performance Tests",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement performance tests.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 66,
-			"taskTitle": "Conduct Real Device Testing",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on conduct real device testing.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 67,
-			"taskTitle": "Update Project README",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on update project readme.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 72,
-			"taskTitle": "Implement Background Tasks for Scheduled Syncs",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement background tasks for scheduled syncs.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 73,
-			"taskTitle": "Implement Text-to-Speech for All Content",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement text-to-speech for all content.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 74,
-			"taskTitle": "Implement Dyslexia-Friendly Text Rendering",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement dyslexia-friendly text rendering.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 75,
-			"taskTitle": "Implement Context Banner for Working Memory Support",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement context banner for working memory support.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 76,
-			"taskTitle": "Optimize UI for One-Handed Operation",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on optimize ui for one-handed operation.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 77,
-			"taskTitle": "Implement Large Touch Targets",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement large touch targets.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 78,
-			"taskTitle": "Implement Study Time Tracking",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement study time tracking.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 79,
-			"taskTitle": "Implement Spaced Repetition System for Flashcards",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on implement spaced repetition system for flashcards.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 80,
-			"taskTitle": "Prepare for TestFlight Distribution",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on prepare for testflight distribution.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 81,
-			"taskTitle": "Design and Implement App Icon",
-			"complexityScore": 5,
-			"recommendedSubtasks": 3,
-			"expansionPrompt": "Break down this task with a focus on design and implement app icon.",
-			"reasoning": "Automatically added due to missing analysis in AI response."
-		},
-		{
-			"taskId": 98,
-			"taskTitle": "Enhance Child-Friendly UI and Empathetic Experience",
-			"complexityScore": 7,
 			"recommendedSubtasks": 5,
-			"expansionPrompt": "Break down the 'Enhance Child-Friendly UI and Empathetic Experience' task into subtasks covering: 1) Navigation simplification and tab structure, 2) Touch target optimization and feedback mechanisms, 3) Color system and visual accessibility implementation, 4) Personalization and empathetic tone guidelines, 5) Testing and validation with child users.",
-			"reasoning": "This task involves multiple UI/UX components (navigation, touch targets, feedback systems), accessibility considerations, and empathetic design principles. It requires both technical implementation and user experience design with special consideration for children as users. The task spans visual design, interaction design, content strategy, and user testing, making it moderately complex but well-defined in scope."
+			"expansionPrompt": "Break down the refactor into: (1) auditing all fixed padding usages, (2) integrating SafeAreaInset utilities for both iOS and Android, (3) implementing responsive positioning for orientation and edge cases, (4) adding orientation and keyboard visibility listeners, and (5) updating animations and validating accessibility.",
+			"reasoning": "This task requires cross-platform UI refactoring, dynamic layout logic, and robust device/orientation handling. It involves both iOS and Android platform specifics, must account for edge cases (notches, keyboard, split-screen), and requires thorough device and accessibility testing. While not algorithmically complex, the breadth of device scenarios and the need for regression-proofing and accessibility validation elevate its complexity above a simple UI tweak."
 		},
 		{
-			"taskId": 102,
-			"taskTitle": "Implement Voice-First UI Across the App",
+			"taskId": 114,
+			"taskTitle": "Comprehensive Voice Command System Testing on Device",
+			"complexityScore": 5,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide the testing process into: (1) preparing device and environment matrix, (2) testing voice recognition activation/deactivation and visual feedback, (3) validating command pattern recognition and functional responses, (4) assessing sheet dismissal, error handling, and touch interaction integrity, and (5) conducting accessibility and speech pattern testing across accents and assistive technologies.",
+			"reasoning": "This is a broad, methodical QA task rather than a technical implementation. It requires significant manual effort, coordination of devices/environments, and systematic documentation, but does not involve deep technical or architectural changes. The main challenge is coverage and thoroughness, not technical risk."
+		},
+		{
+			"taskId": 115,
+			"taskTitle": "Enhance Smart Material Query Parsing with Natural Language Support",
 			"complexityScore": 8,
-			"recommendedSubtasks": 10,
-			"expansionPrompt": "Break down the 'Implement Voice-First UI Across the App' task into 10 detailed subtasks, including: 1) Context banner design and implementation, 2) Voice activation button development, 3) Voice conversation view integration, 4) Voice settings panel creation, 5) Voice indicator component development, 6) Voice command recognition system, 7) Voice shortcuts implementation, 8) Accessibility audit and enhancement, 9) Voice UI testing framework, and 10) Voice UI documentation and user guide. For each subtask, include specific technical requirements, dependencies, and testing criteria.",
-			"reasoning": "This task has high complexity (8/10) because it involves multiple UI components, voice recognition integration, accessibility considerations, and cross-application functionality. The task requires both frontend development (UI components) and backend integration (voice processing). The existing 7 subtasks are well-defined but could benefit from further breakdown, particularly in areas of testing, documentation, and the voice command recognition system. The task has dependencies on other components and requires coordination across multiple app screens, increasing its complexity."
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Expand into: (1) implementing natural language pattern recognition for temporal and relative references, (2) enhancing fuzzy matching algorithm for material titles, (3) designing and implementing user-defined material aliases system, (4) documenting voice command support and usage, and (5) integrating telemetry and error handling for new query features.",
+			"reasoning": "This task involves advanced NLP, fuzzy matching, and user customization features, all of which must integrate with existing parsing and search infrastructure. It requires careful schema design, performance optimization, internationalization, and robust error handling. The technical depth (NLP, phonetic matching, alias resolution) and the need for backward compatibility and telemetry make this a high-complexity, multi-disciplinary engineering effort."
+		},
+		{
+			"taskId": 117,
+			"taskTitle": "Normalize deployment targets for real devices",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) auditing current deployment targets, (2) updating project deployment settings, (3) verifying builds on devices, and (4) documenting deployment requirements.",
+			"reasoning": "This is a standard platform maintenance task involving project configuration, device testing, and documentation. It may surface some API deprecation or compatibility issues, but these are generally well-understood and supported by tooling. The main risk is missing a target or not catching a runtime issue, but the technical challenge is moderate."
+		},
+		{
+			"taskId": 118,
+			"taskTitle": "Eliminate SwiftLint debt and enforce zero-warning policy",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into: (1) capturing current SwiftLint violations, (2) resolving lint findings, (3) enforcing lint in automation, and (4) documenting lint policy.",
+			"reasoning": "This is a code quality and process improvement task. It involves some refactoring and configuration, but the work is well-bounded and supported by existing tools. The main effort is in resolving violations and ensuring CI integration, with minimal architectural risk."
+		},
+		{
+			"taskId": 119,
+			"taskTitle": "Secure API configuration via Keychain and xcconfig",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) designing secure key storage plan, (2) implementing Keychain/xcconfig loading, (3) migrating existing secrets, and (4) updating developer documentation.",
+			"reasoning": "This task involves sensitive configuration changes, secure storage implementation, and developer onboarding/documentation. While the technical patterns are established, mistakes can lead to security vulnerabilities or broken builds. The complexity is moderate due to the need for careful migration and cross-team communication."
+		},
+		{
+			"taskId": 120,
+			"taskTitle": "Audit and resolve TODO/FIXME debt",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) inventorying TODO/FIXME comments, (2) addressing critical TODOs, (3) creating follow-up tasks, and (4) cleaning up code annotations.",
+			"reasoning": "This is a codebase hygiene and technical debt reduction task. The complexity depends on the nature of the TODOs, but the process itself is systematic and supported by tooling. The main risk is missing critical items or introducing regressions during cleanup."
+		},
+		{
+			"taskId": 121,
+			"taskTitle": "Expand baseline test coverage for core services",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into: (1) identifying key modules for coverage, (2) authoring unit/integration tests, (3) running coverage and ensuring >80%, and (4) adding regression tests for resilience.",
+			"reasoning": "This is a test engineering task requiring knowledge of core services, mocking, and coverage tooling. The main challenge is ensuring meaningful coverage and regression protection, but the patterns are standard in modern development."
+		},
+		{
+			"taskId": 122,
+			"taskTitle": "Establish performance harness for sync, transcription, and mind maps",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) designing performance scenarios, (2) implementing performance harness, (3) capturing baseline metrics, and (4) documenting thresholds and automation.",
+			"reasoning": "This task requires designing realistic benchmarks, implementing performance tests, and integrating them into CI. It involves large data fixtures and careful measurement of latency/memory. The complexity is elevated by the need for reliable, repeatable metrics and automation."
+		},
+		{
+			"taskId": 123,
+			"taskTitle": "Author manual QA & offline/resilience checklist",
+			"complexityScore": 3,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break into: (1) drafting QA scenario list, (2) publishing QA checklist doc, and (3) integrating into release process.",
+			"reasoning": "This is a documentation and process task. It requires thoroughness and domain knowledge but is not technically complex. The main challenge is completeness and clarity."
+		},
+		{
+			"taskId": 124,
+			"taskTitle": "Build Today companion card and voice summary",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) aggregating sync results into Today model, (2) designing Today card UI, (3) implementing voice summary after Aggiornami, and (4) testing Today experience.",
+			"reasoning": "This task involves data aggregation, UI/UX design, voice integration, and cross-feature orchestration. It requires coordination between backend aggregation, UI rendering, and voice feedback, with dependencies on several core systems. The need for a seamless, accessible, and engaging user experience increases its complexity."
+		},
+		{
+			"taskId": 125,
+			"taskTitle": "Add proactive coaching and working-memory checkpoints",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) instrumenting context and idle tracking, (2) implementing proactive voice prompts, (3) adding working-memory checkpoints, and (4) testing proactive coaching flows.",
+			"reasoning": "This task requires real-time context tracking, intent inference, voice prompt orchestration, and integration with study flows. It involves analytics, UX, and voice systems, with a need for robust testing of edge cases (idle, confusion, interruptions). The technical and behavioral complexity is significant."
+		},
+		{
+			"taskId": 126,
+			"taskTitle": "Implement natural-language task capture and planning",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) extending voice command grammar, (2) parsing natural language into tasks, (3) scheduling reminders and nightly plan, and (4) UX validation.",
+			"reasoning": "This task combines NLP for intent extraction, integration with reminders/calendar, and conversational UX. It requires robust parsing, error handling, and user feedback, as well as voice and touch validation. The cross-cutting nature and need for reliability in task capture/planning elevate its complexity."
+		},
+		{
+			"taskId": 127,
+			"taskTitle": "Design guided flashcard coach experience",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) designing session script, (2) upgrading FlashcardStudyView, (3) tracking performance and adjusting difficulty, and (4) integrating rewards and UX polish.",
+			"reasoning": "This task involves session scripting, adaptive feedback, performance tracking, and gamification. It requires a blend of UX design, state management, and voice/animation integration. The need for a polished, adaptive, and motivating experience adds to the technical and design complexity."
+		},
+		{
+			"taskId": 128,
+			"taskTitle": "Ship interactive mind map 2.0",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) implementing gesture and layout engine, (2) adding voice navigation commands, (3) narrated walkthroughs, and (4) persisting notes and export.",
+			"reasoning": "This task requires advanced UI (zoom/pan, accessibility), voice command integration, TTS/LLM narration, and persistent note management. The technical depth (gesture handling, accessibility, voice, export) and the need for seamless user experience across modalities make this a high-complexity, multi-disciplinary effort."
+		},
+		{
+			"taskId": 129,
+			"taskTitle": "Deliver lesson recording, transcription, and review",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) designing ambient recording UI, (2) implementing segmented transcription pipeline, (3) auto-generating summaries and mind maps, and (4) building review experience UI.",
+			"reasoning": "This task spans audio recording, chunked transcription (with retries), automated summarization/mind mapping, and review UI. It requires robust background handling, storage management, and integration with AI/LLM services. The technical and UX complexity is high, especially for reliability and user feedback."
+		},
+		{
+			"taskId": 130,
+			"taskTitle": "Implement emotion-aware coaching & persona tuning",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) integrating sentiment detection, (2) persona and tone configuration, (3) adaptive pacing engine, and (4) testing with personas.",
+			"reasoning": "This task involves real-time sentiment analysis, adaptive coaching logic, persona configuration, and robust testing. It requires integration with voice analysis, UI, and feedback systems. The need for accurate emotion detection and seamless persona switching increases its complexity."
+		},
+		{
+			"taskId": 131,
+			"taskTitle": "Roll out curiosity prompts and weekly quests",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) building curiosity content recommender, (2) implementing weekly quest system, (3) celebrating curiosity milestones, and (4) testing and analytics.",
+			"reasoning": "This task involves content recommendation, quest tracking, reward systems, and analytics. It requires backend integration, UI feedback, and event tracking. The complexity is moderate to high due to the need for engaging, personalized, and measurable experiences."
+		},
+		{
+			"taskId": 132,
+			"taskTitle": "Generate weekly parent/teacher digest",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) aggregating weekly metrics, (2) generating empathetic copy and audio, (3) implementing delivery mechanism and settings, and (4) QA digest content.",
+			"reasoning": "This task requires data aggregation, empathetic copy/voice generation (potentially with LLM/TTS), delivery via email/voice, and privacy controls. The technical and UX complexity is moderate, with additional considerations for privacy and opt-in management."
+		},
+		{
+			"taskId": 133,
+			"taskTitle": "Implement guardian consent and privacy controls",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) designing guardian settings UI, (2) enforcing consent in features, (3) implementing privacy indicators, and (4) QA guardian flows.",
+			"reasoning": "This task involves secure settings UI, feature gating, privacy state management, and robust QA. It requires careful handling of sensitive flows (PIN, consent), integration with multiple features, and clear user feedback. The risk and complexity are elevated by privacy and compliance requirements."
+		},
+		{
+			"taskId": 134,
+			"taskTitle": "Define data governance, logging, and offline matrix",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) documenting data flows, (2) implementing structured audit logging, (3) clarifying offline capabilities, and (4) updating privacy documentation.",
+			"reasoning": "This task requires mapping PII flows, implementing privacy-compliant logging, clarifying offline/online states, and updating documentation. The complexity is moderate due to the need for accuracy, compliance, and clear communication."
+		},
+		{
+			"taskId": 135,
+			"taskTitle": "Integrate LMS/knowledge exports and Notion bridge",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) researching LMS APIs, (2) implementing LMS connectors, (3) providing knowledge export options, and (4) QA exports and privacy.",
+			"reasoning": "This task involves third-party API integration (Canvas, Google Classroom, Notion), export formatting, and privacy compliance. The technical and interoperability challenges, as well as the need for robust error handling and user feedback, make this a high-complexity integration effort."
+		},
+		{
+			"taskId": 136,
+			"taskTitle": "Finalize QA automation, metrics, and release readiness",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) automating voice flow UI tests, (2) integrating crash and metrics monitoring, (3) conducting accessibility and localization audit, and (4) preparing release readiness checklist.",
+			"reasoning": "This task spans UI automation (including voice flows), crash/metrics integration, accessibility/localization audits, and release documentation. The breadth of coverage, need for automation, and compliance with App Store requirements increase its complexity."
+		},
+		{
+			"taskId": 137,
+			"taskTitle": "Redesign dashboard experience with clear states",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) mapping UX pain points, (2) designing new dashboard layout, (3) implementing dashboard components, and (4) UX testing and iteration.",
+			"reasoning": "This task involves UX research, UI redesign, state management, and iterative testing. The complexity is moderate to high due to the need for clarity, accessibility, and seamless integration with existing flows."
+		},
+		{
+			"taskId": 138,
+			"taskTitle": "Automate post-import material processing",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Expand into: (1) hooking import pipeline, (2) implementing processing status tracking, (3) auto-creating study assets, and (4) notifying user when assets ready.",
+			"reasoning": "This task requires automation of multi-step processing, status tracking, error handling, and user notification. The technical challenge is in reliable orchestration and UI feedback, with moderate complexity."
+		},
+		{
+			"taskId": 139,
+			"taskTitle": "Consolidate voice interaction entry points",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into: (1) auditing voice controls, (2) defining unified voice model, (3) updating UI and removing redundant buttons, and (4) onboarding and testing.",
+			"reasoning": "This task involves UI/UX audit, design simplification, and onboarding updates. The technical risk is moderate, with the main challenge being user clarity and regression avoidance."
 		}
 	]
 }

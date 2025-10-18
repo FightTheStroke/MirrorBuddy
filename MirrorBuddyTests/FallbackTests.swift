@@ -2,6 +2,32 @@ import Foundation
 @testable import MirrorBuddy
 import Testing
 
+// MARK: - Concurrency Helpers
+
+private actor BoolFlag {
+    private var value = false
+
+    func setTrue() {
+        value = true
+    }
+
+    func read() -> Bool {
+        value
+    }
+}
+
+private actor Counter {
+    private var value = 0
+
+    func increment() {
+        value += 1
+    }
+
+    func read() -> Int {
+        value
+    }
+}
+
 @Suite("Fallback Strategy Tests")
 @MainActor
 struct FallbackTests {
@@ -262,17 +288,16 @@ struct FallbackTests {
 
     // MARK: - ResilientAPICall Tests
 
-    // FIXME: Concurrency mutation error
-    /* @Test("Resilient API call succeeds with primary")
+    @Test("Resilient API call succeeds with primary")
     func testResilientAPICallSuccess() async throws {
-        var primaryCalled = false
+        let primaryFlag = BoolFlag()
 
         let result = try await ResilientAPICall.execute(
             endpoint: "test-endpoint",
             retryPolicy: .none,
             circuitBreakerConfig: .lenient,
             primary: {
-                primaryCalled = true
+                await primaryFlag.setTrue()
                 return "success"
             },
             fallback: { _ in
@@ -280,14 +305,14 @@ struct FallbackTests {
             }
         )
 
-        #expect(primaryCalled == true)
+        let wasPrimaryCalled = await primaryFlag.read()
+        #expect(wasPrimaryCalled == true)
         #expect(result == "success")
     }
-    */
 
-    /* @Test("Resilient API call uses fallback on failure")
+    @Test("Resilient API call uses fallback on failure")
     func testResilientAPICallFallback() async throws {
-        var fallbackCalled = false
+        let fallbackFlag = BoolFlag()
 
         let result = try await ResilientAPICall.execute(
             endpoint: "test-endpoint",
@@ -297,15 +322,15 @@ struct FallbackTests {
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { _ in
-                fallbackCalled = true
+                await fallbackFlag.setTrue()
                 return "fallback-success"
             }
         )
 
-        #expect(fallbackCalled == true)
+        let wasFallbackCalled = await fallbackFlag.read()
+        #expect(wasFallbackCalled == true)
         #expect(result == "fallback-success")
     }
-    */
 
     @Test("Resilient API call without fallback succeeds")
     func testResilientAPICallWithoutFallback() async throws {
@@ -335,11 +360,10 @@ struct FallbackTests {
 
     // MARK: - Integration Tests
 
-    // FIXME: Concurrency mutation error + type conversion error
-    /* @Test("Full resilience stack: circuit breaker + retry + fallback")
+    @Test("Full resilience stack: circuit breaker + retry + fallback")
     func testFullResilienceStack() async throws {
-        var primaryAttempts = 0
-        var fallbackCalled = false
+        let attemptCounter = Counter()
+        let fallbackFlag = BoolFlag()
 
         let result = try await ResilientAPICall.execute(
             endpoint: "full-test-endpoint",
@@ -353,22 +377,23 @@ struct FallbackTests {
             ),
             circuitBreakerConfig: .lenient,
             primary: {
-                primaryAttempts += 1
+                await attemptCounter.increment()
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { _ in
-                fallbackCalled = true
+                await fallbackFlag.setTrue()
                 return "fallback-result"
             }
         )
 
-        #expect(primaryAttempts > 1)  // Should have retried
-        #expect(fallbackCalled == true)
+        let attempts = await attemptCounter.read()
+        let wasFallbackCalled = await fallbackFlag.read()
+        #expect(attempts > 1)  // Should have retried
+        #expect(wasFallbackCalled == true)
         #expect(result == "fallback-result")
-    } */
+    }
 
-    // FIXME: Type conversion error
-    /* @Test("Fallback with cache integration")
+    @Test("Fallback with cache integration")
     func testFallbackWithCache() async throws {
         let cache = SimpleCache()
         await cache.set(key: "api-response", value: "cached-response")
@@ -392,5 +417,4 @@ struct FallbackTests {
             Issue.record("Fallback should have succeeded")
         }
     }
-    */
 }

@@ -1,15 +1,23 @@
-# Execute All Remaining Tasks
+# Execute All Remaining Tasks (FULLY AUTOMATED)
 
-**COMANDO PRINCIPALE** per eseguire tutti i task pendenti di Task Master con espansione, comprensione, implementazione, test, documentazione e commit.
+**COMANDO PRINCIPALE** per eseguire AUTOMATICAMENTE tutti i task pendenti di Task Master in un loop continuo senza mai bloccarsi, con:
+- ✅ Espansione automatica dei task complessi
+- ✅ Implementazione, test e commit automatici
+- ✅ Retry automatico in caso di errore
+- ✅ Continuazione automatica al prossimo task
+- ✅ NESSUN intervento umano richiesto
 
-Questo comando garantisce che:
-- ✅ Tutti i task vengano CAPITI ED ESPANSI prima dell'esecuzione
-- ✅ Ogni subtask venga implementato con test appropriati
-- ✅ La documentazione venga SEMPRE aggiornata
-- ✅ Un commit Git venga fatto DOPO OGNI TASK completato
-- ✅ Non si dica mai "funziona" senza testare ("non fa un cazzo" è INACCETTABILE)
+## ⚡ Quick Start
 
-## Workflow Completo
+```bash
+# OPZIONE 1: Usa lo script bash (RACCOMANDATO - completamente automatico)
+bash .claude/scripts/execute-all-tasks.sh
+
+# OPZIONE 2: Usa il workflow manuale qui sotto (richiede il mio intervento)
+# → Vedi "Workflow Completo" sotto
+```
+
+## Workflow Completo (Manuale - Richiede intervento)
 
 Per ogni task pendente fino al completamento totale:
 
