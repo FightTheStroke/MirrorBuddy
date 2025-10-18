@@ -120,29 +120,32 @@ struct MainTabView: View {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
 
-            // MARK: - Voice Command Buttons (Assessment fix: mount VoiceCommandButton)
+            // MARK: - Voice Command Buttons (Task 113: Safe area positioning)
             // Floating buttons for voice features accessible from all tabs
-            VStack {
-                Spacer()
-                HStack {
-                    // Voice Command Button (left side) - Quick commands
-                    VoiceCommandButton()
-                        .padding(.leading, 16)
-                        .padding(.bottom, 90) // Position above tab bar
-                        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-
+            GeometryReader { geometry in
+                VStack {
                     Spacer()
+                    HStack {
+                        // Voice Command Button (left side) - Quick commands
+                        VoiceCommandButton()
+                            .padding(.leading, max(16, geometry.safeAreaInsets.leading + 8))
+                            .padding(.bottom, geometry.safeAreaInsets.bottom + 90)
+                            .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
 
-                    // Persistent Voice Button (right side) - Full conversation (Task 106)
-                    PersistentVoiceButton(isPresented: Binding(
-                        get: { activeSheet == .voiceConversation },
-                        set: { if $0 { activeSheet = .voiceConversation } else { activeSheet = nil } }
-                    ))
-                        .padding(.trailing, 16)
-                        .padding(.bottom, 90) // Position above tab bar
-                        .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                        Spacer()
+
+                        // Persistent Voice Button (right side) - Full conversation (Task 106)
+                        PersistentVoiceButton(isPresented: Binding(
+                            get: { activeSheet == .voiceConversation },
+                            set: { if $0 { activeSheet = .voiceConversation } else { activeSheet = nil } }
+                        ))
+                            .padding(.trailing, max(16, geometry.safeAreaInsets.trailing + 8))
+                            .padding(.bottom, geometry.safeAreaInsets.bottom + 90)
+                            .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                    }
                 }
             }
+            .ignoresSafeArea(edges: .bottom)
             .allowsHitTesting(true)
 
             // MARK: - Voice Command Feedback (Task 103)
