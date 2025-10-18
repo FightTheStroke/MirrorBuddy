@@ -19,6 +19,19 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
     @Published var showHelp = false
     @Published var showMaterialImport = false
 
+    // Task 111: Study navigation
+    @Published var showStudy = false
+    @Published var studyMode: StudyMode?
+
+    enum StudyMode {
+        case flashcards
+        case mindMap
+        case general
+    }
+
+    // Task 112: Material detail navigation
+    @Published var selectedMaterialID: String?
+
     // MARK: - Command Execution Result
 
     @Published var lastCommandResult: CommandResult?
@@ -141,7 +154,9 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
 
     private func handleOpenMaterial(_ materialID: String?) {
         if let materialID = materialID {
-            // Navigate to specific material
+            // Navigate to specific material (Task 112)
+            selectedMaterialID = materialID
+            showMaterials = true // Also switch to materials tab
             lastCommandResult = .success("Apertura materiale \(materialID)")
         } else {
             showMaterials = true
@@ -155,21 +170,24 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
         // TODO: Focus search field
     }
 
-    // MARK: - Study Handlers
+    // MARK: - Study Handlers (Task 111)
 
     private func handleStartStudy() {
+        studyMode = .general
+        showStudy = true
         lastCommandResult = .success("Inizia sessione di studio")
-        // TODO: Navigate to study session
     }
 
     private func handleReviewFlashcards() {
+        studyMode = .flashcards
+        showStudy = true
         lastCommandResult = .success("Ripassa flashcard")
-        // TODO: Navigate to flashcard review
     }
 
     private func handleViewMindMap() {
+        studyMode = .mindMap
+        showStudy = true
         lastCommandResult = .success("Visualizza mappa mentale")
-        // TODO: Navigate to mind map view
     }
 
     // MARK: - Accessibility Handlers

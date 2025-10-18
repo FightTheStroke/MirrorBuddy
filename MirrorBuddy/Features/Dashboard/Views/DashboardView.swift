@@ -12,6 +12,7 @@ import SwiftData
 /// Main dashboard view for materials and quick actions (Task 109)
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var voiceCommandHandler: AppVoiceCommandHandler
     @Query private var materials: [Material]
     @Query private var subjects: [SubjectEntity]
     @State private var showingImport = false
@@ -62,6 +63,16 @@ struct DashboardView: View {
             }
             .sheet(item: $selectedMaterial) { material in
                 MaterialDetailView(material: material)
+            }
+            // Task 112: Voice command material detail navigation
+            .onChange(of: voiceCommandHandler.selectedMaterialID) { _, materialID in
+                guard let materialID = materialID else { return }
+
+                // Find material by ID (UUID string)
+                if let material = materials.first(where: { $0.id.uuidString == materialID }) {
+                    selectedMaterial = material
+                    voiceCommandHandler.selectedMaterialID = nil // Reset flag
+                }
             }
         }
     }

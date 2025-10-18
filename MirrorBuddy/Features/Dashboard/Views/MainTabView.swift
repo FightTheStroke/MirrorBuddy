@@ -147,9 +147,25 @@ struct MainTabView: View {
                 voiceCommandHandler.showTasks = false // Reset flag
             }
         }
-        // Additional sheets for voice commands
+        .onChange(of: voiceCommandHandler.showStudy) { _, newValue in
+            if newValue {
+                selectedTab = 1 // Study tab (Task 111)
+                voiceCommandHandler.showStudy = false // Reset flag
+                // studyMode is maintained for StudyView to use
+            }
+        }
+        // Additional sheets for voice commands (Task 110)
         .sheet(isPresented: $voiceCommandHandler.showMaterialImport) {
             MaterialImportView()
+        }
+        .sheet(isPresented: $voiceCommandHandler.showSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $voiceCommandHandler.showProfile) {
+            ProfileView()
+        }
+        .sheet(isPresented: $voiceCommandHandler.showHelp) {
+            VoiceCommandHelpView()
         }
     }
 }
