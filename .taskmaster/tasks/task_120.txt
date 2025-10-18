@@ -1,0 +1,39 @@
+# Task ID: 120
+# Title: Audit and resolve TODO/FIXME debt
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Review all TODO/FIXME comments, implement high-priority items (study flows, TTS, search focus), and convert leftover items into tracked tasks.
+# Details:
+- Use rg to list TODO/FIXME
+- Implement critical missing features or stub gracefully
+- Create new Task Master entries for deferred work and remove inline comments
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Inventory TODO/FIXME comments [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Use rg or custom script to list all TODO and FIXME occurrences with file/line references
+
+## 2. Address critical TODOs [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Implement or provide proper stubs for high-priority TODOs (study views, TTS, search focus, etc.)
+
+## 3. Create follow-up tasks [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- For non-critical TODOs, add dedicated Task Master items and remove inline comments
+
+## 4. Clean up code annotations [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Remove resolved TODO/FIXME comments and ensure code reflects current status
+

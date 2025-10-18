@@ -1,0 +1,40 @@
+# Task ID: 136
+# Title: Finalize QA automation, metrics, and release readiness
+# Status: pending
+# Dependencies: 122, 133, 135
+# Priority: high
+# Description: Add UI automation for voice flows, integrate crash/metrics monitoring, complete accessibility audits, and prepare App Store assets/privacy disclosures.
+# Details:
+- Write UI tests simulating voice commands via accessibility APIs
+- Hook privacy-safe crash/latency monitoring
+- Run full accessibility audit (VoiceOver, Switch Control, Reduce Motion)
+- Produce App Privacy labels, localization checklist, release playbook
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Automate voice flow UI tests [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Create UI tests that simulate voice commands via accessibility APIs to ensure navigation works
+
+## 2. Integrate crash & metrics monitoring [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Add privacy-safe crash reporting and metrics dashboards for latency, fallback rate, storage
+
+## 3. Accessibility & localization audit [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Conduct VoiceOver, Switch Control, Reduce Motion, and localization reviews; fix issues
+
+## 4. Release readiness checklist [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Prepare App Store assets, App Privacy labels, localization files, and overall release playbook
+

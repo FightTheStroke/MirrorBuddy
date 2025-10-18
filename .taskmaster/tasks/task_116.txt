@@ -1,0 +1,50 @@
+# Task ID: 116
+# Title: Harden resilience stack and restore fallback tests
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Refactor ResilientAPICall, RetryExecutor, and circuit breaker helpers to be actor-safe, eliminate concurrency mutation errors, and re-enable the disabled fallback test suite.
+# Details:
+- Convert shared state to actors (retry counters, breaker registries)
+- Update FallbackTests to cover primary/fallback success + integration path
+- Verify concurrency with swift test --parallel
+- Document new concurrency design
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Audit resilience implementation [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Review ResilientAPICall, RetryExecutor, CircuitBreakerRegistry and SimpleCache to identify shared mutable state and current concurrency issues
+- Document which components need actor isolation or sendable conformance
+
+## 2. Refactor shared state into actors [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Convert retry counters, breaker registries, and cache storage to dedicated actors with Sendable compliance
+- Update call sites to interact via async actor methods
+
+## 3. Re-enable and extend fallback tests [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Restore the commented ResilientAPICall tests and add coverage for primary success, fallback usage, and integration stack
+- Ensure tests run reliably in parallel and address any actor isolation issues
+
+## 4. Stress test resilience stack [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Run swift test --parallel and targeted stress scenarios to verify no data races remain
+- Simulate API failures/timeouts to confirm fallback behaviour
+
+## 5. Document concurrency design [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Update docs/ or code comments explaining new actor boundaries, retry behaviour, and testing expectations
+

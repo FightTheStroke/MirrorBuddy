@@ -1,0 +1,39 @@
+# Task ID: 132
+# Title: Generate weekly parent/teacher digest
+# Status: pending
+# Dependencies: 124, 126
+# Priority: medium
+# Description: Create opt-in digest emails or voice notes summarizing achievements, struggles, and suggested follow-ups for guardians.
+# Details:
+- Aggregate progress metrics and sentiment from the week
+- Produce empathetic copy and optional audio summary
+- Provide settings to control frequency and privacy
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Aggregate weekly metrics [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Collect XP gains, streaks, subject difficulties, sentiment into digest model
+
+## 2. Generate empathetic copy & audio [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Use templates/LLM to produce supportive summaries; optionally synthesize voice note
+
+## 3. Delivery mechanism & settings [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Provide email/voice note delivery options with guardian consent and frequency controls
+
+## 4. QA digest content [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Review generated digests for tone accuracy, privacy filters, and ensure opt-out works
+

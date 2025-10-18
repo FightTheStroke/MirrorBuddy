@@ -1,0 +1,39 @@
+# Task ID: 124
+# Title: Build Today companion card and voice summary
+# Status: pending
+# Dependencies: 116, 117, 118, 119, 121
+# Priority: high
+# Description: Design a Today dashboard card with top tasks/materials and trigger a spoken summary after Aggiornami completes.
+# Details:
+- Aggregate Drive/Gmail/Calendar findings into Today model
+- Render card with quick voice buttons and working-memory friendly copy
+- Hook UpdateManager to speak summary + offer next steps
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Aggregate sync results into Today model [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Extend UpdateManager to produce a structured summary (new materials, tasks, events) for Today card
+
+## 2. Design Today card UI [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Create a SwiftUI component summarizing top tasks/materials with child-friendly copy and quick action buttons
+
+## 3. Implement voice summary after Aggiornami [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Hook UpdateManager completion to trigger a spoken summary with options (listen now, start suggested activity)
+
+## 4. Test Today experience [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Write unit/UI tests ensuring Today card updates correctly and voice summary triggers in various scenarios
+

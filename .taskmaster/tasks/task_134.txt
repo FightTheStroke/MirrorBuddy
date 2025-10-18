@@ -1,0 +1,39 @@
+# Task ID: 134
+# Title: Define data governance, logging, and offline matrix
+# Status: pending
+# Dependencies: 133
+# Priority: high
+# Description: Document PII flows, add structured audit logging, and clarify offline capabilities with UI states.
+# Details:
+- Create privacy dashboard documentation
+- Instrument structured logs for voice commands/suggestions/errors
+- Update UI to show offline capabilities/limitations
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Document data flows [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Map all PII sources, destinations, and retention to update privacy docs
+
+## 2. Implement structured audit logging [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Log key events (voice commands, suggestions, API failures) with privacy-compliant fields
+
+## 3. Clarify offline capabilities [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Define which features work offline and surface clear UI indicators
+
+## 4. Update privacy documentation [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Refresh docs/ and README privacy sections with governance, logging, offline matrix
+

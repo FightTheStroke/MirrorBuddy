@@ -1,0 +1,39 @@
+# Task ID: 133
+# Title: Implement guardian consent and privacy controls
+# Status: pending
+# Dependencies: 129
+# Priority: high
+# Description: Deliver parental control surfaces for recordings, sharing, and coach tone; include clear privacy states and overrides.
+# Details:
+- Add settings UI for guardians (PIN protected)
+- Gate recording/export features behind consent
+- Surface privacy indicators in UI
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Design guardian settings UI [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Create PIN-protected settings for consent toggles (recording, sharing, persona controls)
+
+## 2. Enforce consent in features [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Gate recording, exports, persona adjustments based on guardian toggles and surface status in UI
+
+## 3. Privacy indicators [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Display clear UI states showing what data is being recorded/shared and allow quick toggles
+
+## 4. QA guardian flows [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Test consent toggles across app startup, offline, and ensure PIN security works
+

@@ -1,0 +1,39 @@
+# Task ID: 129
+# Title: Deliver lesson recording, transcription, and review
+# Status: pending
+# Dependencies: 116, 119, 121
+# Priority: high
+# Description: Create the ambient recorder UI, chunked Whisper transcription pipeline, and review experience that turns recordings into summaries + mind maps.
+# Details:
+- Build recording controls with storage monitoring and background support
+- Implement segmented upload + transcription workers
+- Auto-generate summaries/mind maps per segment and integrate with review screen
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Design ambient recording UI [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Create recorder controls with clear status, storage indicator, and background mode messaging
+
+## 2. Implement segmented transcription pipeline [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Chunk recordings, upload to Whisper, handle retries, and associate timestamps with segments
+
+## 3. Auto-generate summaries & mind maps [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- After transcription, create summaries per segment and use existing mind map generation to visualize lessons
+
+## 4. Review experience UI [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Build review screen to play audio segments, read transcripts, and jump into generated mind maps
+

@@ -1,0 +1,40 @@
+# Task ID: 121
+# Title: Expand baseline test coverage for core services
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Add unit tests for VoiceConversationViewModel, UpdateManager, StudyView workflows, and resilience utilities to lift coverage and protect regressions.
+# Details:
+- Write async tests simulating voice session toggles and offline fallback
+- Cover UpdateManager orchestration with mocked services
+- Add StudyView tests (e.g., using ViewInspector)
+- Ensure circuit breaker/retry tests assert actor behaviour
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Identify key modules for coverage [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- List services/view models lacking tests (VoiceConversationViewModel, UpdateManager, StudyView, Resilience utilities)
+
+## 2. Author unit/integration tests [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Write async tests for VoiceConversationViewModel (session control, fallback), UpdateManager orchestration, StudyView navigation, and resilience utilities
+
+## 3. Run coverage & ensure >80% [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Execute swift test with coverage, ensure new suites push coverage toward target, and add to CI
+
+## 4. Add regression tests for resilience [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Ensure actor-based resilience stack has tests covering concurrency edge cases and regression checks
+

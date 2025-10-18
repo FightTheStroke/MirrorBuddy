@@ -1,0 +1,39 @@
+# Task ID: 137
+# Title: Redesign dashboard experience with clear states
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Rebuild the main dashboard to show sync/import progress, accessible sections for new materials, and transparent status messaging.
+# Details:
+- Create processing status module after Aggiornami (e.g., 'Sto generando mappe mentali')
+- Organize materials into 'In lavorazione', 'Pronte', 'Da ascoltare'
+- Provide visible affordances for voice coach, Today card, and quick next steps
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Map UX pain points [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Review current dashboard/import flow, list issues (missing feedback, scattered actions, redundant icons) with screenshots
+
+## 2. Design new dashboard layout [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Produce wireframes showing processing status, Today card, materials by state, unified voice entry point
+
+## 3. Implement dashboard components [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Build new SwiftUI views (ProcessingStatusView, MaterialsByStateView, unified voice coach banner) and wire to UpdateManager/VoiceCommandHandler
+
+## 4. UX testing & iteration [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Conduct usability tests (voice + touch) ensuring users see progress, know where materials go, and find next steps
+

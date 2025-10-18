@@ -1,0 +1,39 @@
+# Task ID: 135
+# Title: Integrate LMS/knowledge exports and Notion bridge
+# Status: pending
+# Dependencies: 124
+# Priority: medium
+# Description: Add connectors for Canvas/Google Classroom assignment ingestion and export mind maps/summaries to PDF/Notion.
+# Details:
+- Implement API clients or importers per LMS
+- Provide export options (PDF, Markdown, Notion API)
+- Respect privacy and guardian settings
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Research LMS APIs [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Determine Canvas/Google Classroom endpoints and authentication needed for assignment ingestion
+
+## 2. Implement LMS connectors [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Build services to import assignments/events from Canvas/Google Classroom respecting guardian consent
+
+## 3. Knowledge export options [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Provide UI/actions to export mind maps & summaries to PDF, Markdown, and Notion
+
+## 4. QA exports & privacy [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Validate exports respect consent settings and formatting requirements
+

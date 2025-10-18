@@ -1,0 +1,39 @@
+# Task ID: 125
+# Title: Add proactive coaching and working-memory checkpoints
+# Status: pending
+# Dependencies: 121, 124
+# Priority: high
+# Description: Detect idle moments, sentiment, and current subject to propose next steps, and inject periodic recaps during study flows.
+# Details:
+- Intent engine using context banner + activity logs
+- Voice prompts like 'Vuoi ripassare X?' when idle or confused
+- Mid-session recap command 'Ricapitolami' with voice + text
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Instrument context & idle tracking [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Extend analytics/context manager to track last action timestamp, active subject/material, and voice sentiment markers
+
+## 2. Implement proactive voice prompts [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Add service that triggers voice suggestions when idle or frustration detected (e.g., 'Vuoi ripassare...?')
+
+## 3. Add working-memory checkpoints [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Inject periodic recaps and 'Ricapitolami' voice command during study flows to repeat key info
+
+## 4. Test proactive coaching flows [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Write tests covering idle detection, suggestion prompts, and ability to accept/decline recommendations
+

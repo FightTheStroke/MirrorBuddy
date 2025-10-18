@@ -1,0 +1,39 @@
+# Task ID: 130
+# Title: Implement emotion-aware coaching & persona tuning
+# Status: pending
+# Dependencies: 127, 128
+# Priority: medium
+# Description: Detect sentiment from voice, adjust pacing/tone, and allow Mario to choose between playful or calm coaching styles.
+# Details:
+- Add sentiment detection to voice pipeline
+- Map sentiment to coaching responses and pacing adjustments
+- Build settings UI for persona selection
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Integrate sentiment detection [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Analyze voice amplitude/pacing or use LLM to infer encouragement vs frustration, surface signal to coach
+
+## 2. Persona & tone configuration [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Add settings allowing selection between playful vs calm coach, wire into voice prompts and UI
+
+## 3. Adaptive pacing engine [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Modify coach responses to slow down, simplify, or celebrate based on sentiment signals
+
+## 4. Testing with personas [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Validate emotion detection and persona responses via unit tests and manual sessions
+

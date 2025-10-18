@@ -1,0 +1,39 @@
+# Task ID: 131
+# Title: Roll out curiosity prompts and weekly quests
+# Status: pending
+# Dependencies: 127
+# Priority: medium
+# Description: Serve curiosity suggestions after topics, introduce weekly challenges with rewards, and surface celebration moments in the coach.
+# Details:
+- Build content recommender (videos, experiments) per subject
+- Implement quest tracking and badge unlock flow
+- Integrate celebrations into voice responses and ProfileView
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Build curiosity content recommender [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Map subjects/topics to curated videos, experiments, or articles; store metadata for suggestions
+
+## 2. Weekly quest system [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Define quest templates, track progress, unlock badges, and surface in ProfileView
+
+## 3. Celebrate curiosity milestones [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Add celebratory voice/UI feedback when Mario explores new content or completes quests
+
+## 4. Testing & analytics [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Log curiosity interactions, ensure quests update correctly, and gather metrics for iteration
+

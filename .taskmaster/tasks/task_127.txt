@@ -1,0 +1,39 @@
+# Task ID: 127
+# Title: Design guided flashcard coach experience
+# Status: pending
+# Dependencies: 124, 125, 126
+# Priority: high
+# Description: Transform FlashcardStudyView into a voice-coached session with warm-up, adaptive pacing, encouragement, and micro-rewards.
+# Details:
+- Script session phases (intro, practice, wrap)
+- Track performance to adjust explanation depth
+- Add celebratory effects and XP hooks
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Design session script [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Outline warm-up, practice, wrap-up phases with voice prompts and encouragement dialog
+
+## 2. Upgrade FlashcardStudyView [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Implement new UI/logic for guided coach (animations, feedback, voice prompts, XP hooks)
+
+## 3. Track performance & adjust difficulty [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Record correct/incorrect answers, adjust explanation depth and pacing based on responses
+
+## 4. Integrate rewards & UX polish [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Trigger XP gains, celebrate streaks, and ensure the coach’s voice matches the chosen persona
+

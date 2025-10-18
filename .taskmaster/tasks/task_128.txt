@@ -1,0 +1,39 @@
+# Task ID: 128
+# Title: Ship interactive mind map 2.0
+# Status: pending
+# Dependencies: 124, 125
+# Priority: high
+# Description: Deliver zoomable mind map navigation with voice commands, narrated walkthroughs, and voice note capture for each node.
+# Details:
+- Implement gesture + accessibility-friendly navigation
+- Add 'Explain this node' narration using TTS/LLM
+- Allow voice notes per node and sync to storage
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Implement gesture & layout engine [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Build zoom/pan gestures, hit testing, and high-contrast layout for large mind maps
+
+## 2. Add voice navigation commands [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Support commands like 'zoom in', 'explora nodo X', 'vai al collegamento successivo'
+
+## 3. Narrated walkthroughs [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Integrate TTS/LLM to explain selected nodes and allow voice notes per node
+
+## 4. Persist notes & export [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Save voice/text notes per node and provide export functions (PDF/Markdown/Notion)
+

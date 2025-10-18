@@ -1,0 +1,39 @@
+# Task ID: 126
+# Title: Implement natural-language task capture and planning
+# Status: pending
+# Dependencies: 121, 124
+# Priority: high
+# Description: Allow Mario to add tasks via voice (e.g. 'Ricordami di...'), infer subject, schedule reminders, and wrap with end-of-day planning dialogue.
+# Details:
+- Extend VoiceCommandRegistry/AppVoiceCommandHandler with capture flow
+- Parse text to deadlines/subjects
+- Add nightly summary + tomorrow plan routine
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Extend voice command grammar [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Add commands for 'ricordami di...' and similar phrases, capturing raw text and intent
+
+## 2. Parse natural language into tasks [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Use heuristics or NLP to extract subject, due date, and priority from captured phrases
+
+## 3. Schedule reminders and nightly plan [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Integrate with NotificationManager/Calendar to set reminders and build end-of-day summary dialogue
+
+## 4. UX validation [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Test task capture and nightly plan flow with voice/touch, ensure confirmations and error handling
+

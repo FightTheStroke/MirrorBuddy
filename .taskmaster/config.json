@@ -1,9 +1,9 @@
 {
   "models": {
     "main": {
-      "provider": "anthropic",
-      "modelId": "claude-3-7-sonnet-20250219",
-      "maxTokens": 120000,
+      "provider": "azure",
+      "modelId": "gpt-4o-mini",
+      "maxTokens": 16384,
       "temperature": 0.2
     },
     "research": {
@@ -13,9 +13,9 @@
       "temperature": 0.1
     },
     "fallback": {
-      "provider": "anthropic",
-      "modelId": "claude-3-7-sonnet-20250219",
-      "maxTokens": 120000,
+      "provider": "azure",
+      "modelId": "gpt-4o-mini",
+      "maxTokens": 16384,
       "temperature": 0.2
     }
   },

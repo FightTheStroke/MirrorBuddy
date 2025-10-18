@@ -1,0 +1,40 @@
+# Task ID: 118
+# Title: Eliminate SwiftLint debt and enforce zero-warning policy
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Resolve existing ~30 SwiftLint violations, tune configuration if needed, and wire lint checks into the CI/pre-commit workflow.
+# Details:
+- Run swiftlint to capture current warnings
+- Fix code style/complexity issues or document justified exceptions
+- Update lint config for new rules if necessary
+- Add CI/pre-commit step ensuring lint passes
+
+# Test Strategy:
+
+
+# Subtasks:
+## 1. Capture current SwiftLint violations [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Run swiftlint and export the list of warnings with file/line references
+
+## 2. Resolve lint findings [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Fix style/format issues, refactor complex functions, or explicitly document justified disable rules
+
+## 3. Enforce lint in automation [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Update CI and/or pre-commit hooks to run swiftlint and fail on warnings
+
+## 4. Document lint policy [pending]
+### Dependencies: None
+### Description: 
+### Details:
+- Update CONTRIBUTING or docs to describe zero-warning expectation and how to run lint locally
+
