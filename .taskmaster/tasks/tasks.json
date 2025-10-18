@@ -5053,7 +5053,7 @@
         "description": "Refactor the floating voice button positioning to use safeAreaInset instead of fixed padding to prevent content obstruction on smaller screens and in landscape orientation.",
         "details": "This task involves updating the positioning logic for the floating voice button to ensure proper display across all device sizes and orientations:\n\n1. Identify all instances where the floating voice button positioning is currently defined with fixed padding values.\n\n2. Replace fixed padding values with dynamic calculations using SafeAreaInset:\n   - Import the necessary SafeArea utilities from the platform-specific libraries\n   - For iOS: Use `SafeAreaInsets.bottom` and `SafeAreaInsets.right` \n   - For Android: Implement equivalent functionality using `WindowInsets`\n\n3. Create a responsive positioning system that:\n   - Maintains proper distance from screen edges in both portrait and landscape orientations\n   - Adjusts position based on available safe area\n   - Handles notches, rounded corners, and other device-specific features\n\n4. Implement orientation change listeners to reposition the button when device orientation changes:\n   ```javascript\n   // Example implementation\n   useEffect(() => {\n     const handleOrientationChange = () => {\n       // Recalculate button position based on new orientation\n       const safeArea = getSafeAreaInsets();\n       setButtonPosition({\n         bottom: safeArea.bottom + 16, // Base padding + safe area\n         right: safeArea.right + 16\n       });\n     };\n     \n     // Add orientation change listener\n     Dimensions.addEventListener('change', handleOrientationChange);\n     \n     // Initial calculation\n     handleOrientationChange();\n     \n     return () => {\n       Dimensions.removeEventListener('change', handleOrientationChange);\n     };\n   }, []);\n   ```\n\n5. Ensure the button remains accessible and visible in all scenarios, particularly:\n   - When keyboard is visible\n   - During split-screen multitasking\n   - On devices with unusual aspect ratios\n\n6. Update any related animations or transitions to work with the new dynamic positioning system.",
         "testStrategy": "1. Device Testing:\n   - Test on at least 3 different physical device sizes (small, medium, large)\n   - Test in both portrait and landscape orientations\n   - Test on devices with notches, punch-holes, or other screen irregularities\n   - Verify button remains visible and accessible in all scenarios\n\n2. Simulator/Emulator Testing:\n   - Use iOS Simulator and Android Emulator to test various device configurations\n   - Test with different safe area configurations (notches, rounded corners, etc.)\n   - Verify correct positioning across all simulated devices\n\n3. Orientation Change Testing:\n   - Rotate devices between portrait and landscape multiple times\n   - Verify button smoothly transitions to correct position\n   - Check that button remains accessible during and after rotation\n\n4. Edge Case Testing:\n   - Test with keyboard open\n   - Test in split-screen/multi-window mode\n   - Test with system UI elements visible (status bars, navigation bars)\n   - Test with system gestures (swipe up for home, etc.)\n\n5. Visual Regression Testing:\n   - Compare screenshots before and after implementation\n   - Verify button positioning is consistent or improved across all test cases\n\n6. Accessibility Testing:\n   - Verify button remains tappable with adequate touch target size\n   - Ensure button doesn't obstruct critical UI elements\n   - Test with screen readers and other accessibility tools",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "medium",
         "subtasks": [
@@ -5063,9 +5063,10 @@
             "description": "Identify every instance in the codebase where the floating voice button uses fixed padding or margin values for positioning.",
             "dependencies": [],
             "details": "Search for all hardcoded padding or margin values (e.g., 16, 24) applied to the floating voice button in both portrait and landscape layouts. Document each location for refactoring.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Code review: Confirm all fixed padding usages are found and listed.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T19:57:20.389Z"
           },
           {
             "id": 2,
@@ -5075,9 +5076,10 @@
               1
             ],
             "details": "Import SafeAreaInset utilities (e.g., SafeAreaInsets.bottom/right for iOS, WindowInsets for Android). Refactor button positioning logic to use these values plus a base margin (e.g., 16px) instead of fixed padding.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Device testing: Verify button position updates correctly on devices with notches, rounded corners, and various safe area configurations.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T19:57:20.403Z"
           },
           {
             "id": 3,
@@ -5118,7 +5120,8 @@
         ],
         "complexity": 6,
         "recommendedSubtasks": 5,
-        "expansionPrompt": "Break down the refactor into: (1) auditing all fixed padding usages, (2) integrating SafeAreaInset utilities for both iOS and Android, (3) implementing responsive positioning for orientation and edge cases, (4) adding orientation and keyboard visibility listeners, and (5) updating animations and validating accessibility."
+        "expansionPrompt": "Break down the refactor into: (1) auditing all fixed padding usages, (2) integrating SafeAreaInset utilities for both iOS and Android, (3) implementing responsive positioning for orientation and edge cases, (4) adding orientation and keyboard visibility listeners, and (5) updating animations and validating accessibility.",
+        "updatedAt": "2025-10-18T19:57:20.403Z"
       },
       {
         "id": "114",
@@ -6530,10 +6533,11 @@
             "title": "Design new dashboard layout",
             "description": "",
             "details": "- Produce wireframes showing processing status, Today card, materials by state, unified voice entry point",
-            "status": "pending",
+            "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 137,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T19:57:36.077Z"
           },
           {
             "id": 3,
@@ -6559,7 +6563,7 @@
         "complexity": 6,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break into: (1) mapping UX pain points, (2) designing new dashboard layout, (3) implementing dashboard components, and (4) UX testing and iteration.",
-        "updatedAt": "2025-10-18T19:43:39.612Z"
+        "updatedAt": "2025-10-18T19:57:36.077Z"
       },
       {
         "id": "138",
@@ -6679,7 +6683,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-18T19:53:13.590Z",
+      "lastModified": "2025-10-18T19:57:36.080Z",
       "taskCount": 139,
       "completedCount": 121,
       "tags": [
