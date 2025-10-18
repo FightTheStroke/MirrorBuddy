@@ -5686,7 +5686,7 @@
         "description": "Document repeatable QA scenarios covering online/offline switches, backgrounding, low storage, and voice command regressions.",
         "details": "- Create checklist markdown in docs/\n- Include steps for switching network states, aggressive user flows, device matrix\n- Integrate into release criteria",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [],
         "priority": "medium",
         "subtasks": [
@@ -5717,17 +5717,17 @@
             "title": "Integrate into release process",
             "description": "",
             "details": "- Update release checklist so QA tests run before builds ship",
-            "status": "in-progress",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 123,
             "parentId": "undefined",
-            "updatedAt": "2025-10-18T10:24:15.418Z"
+            "updatedAt": "2025-10-18T10:25:08.142Z"
           }
         ],
         "complexity": 3,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break into: (1) drafting QA scenario list, (2) publishing QA checklist doc, and (3) integrating into release process.",
-        "updatedAt": "2025-10-18T10:24:15.418Z"
+        "updatedAt": "2025-10-18T10:25:08.142Z"
       },
       {
         "id": "124",
@@ -6653,9 +6653,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-18T10:24:15.420Z",
+      "lastModified": "2025-10-18T10:25:08.144Z",
       "taskCount": 139,
-      "completedCount": 115,
+      "completedCount": 116,
       "tags": [
         "master"
       ]
