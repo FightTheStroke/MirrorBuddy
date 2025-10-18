@@ -362,8 +362,8 @@ struct VoiceConversationView: View {
 
                                 Spacer()
 
-                                if conversation.messages.count > 0 {
-                                    Text("\(conversation.messages.count) messaggi")
+                                if conversation.messageCount > 0 {
+                                    Text("\(conversation.messageCount) messaggi")
                                         .font(.caption2)
                                         .foregroundStyle(.tertiary)
                                 }
@@ -747,8 +747,8 @@ final class VoiceConversationViewModel: ObservableObject {
                 currentMaterial = material.title
             }
 
-            // Load conversation history
-            conversationHistory = conversation.messages
+            // Load conversation history (CloudKit requires optional relationships)
+            conversationHistory = (conversation.messages ?? [])
                 .sorted { $0.timestamp < $1.timestamp }
                 .map { message in
                     MessageBubbleModel(

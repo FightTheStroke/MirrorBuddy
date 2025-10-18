@@ -47,7 +47,12 @@ final class VoiceConversationService {
         )
 
         message.conversation = conversation
-        conversation.messages.append(message)
+
+        // Ensure messages array exists (CloudKit requires optional relationships)
+        if conversation.messages == nil {
+            conversation.messages = []
+        }
+        conversation.messages?.append(message)
         conversation.touch()
 
         modelContext.insert(message)

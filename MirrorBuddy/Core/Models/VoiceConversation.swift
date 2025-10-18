@@ -13,9 +13,9 @@ final class VoiceConversation {
     var subjectID: UUID?
     var materialID: UUID?
 
-    // Relationships
+    // Relationships (CloudKit requires all relationships to be optional)
     @Relationship(deleteRule: .cascade, inverse: \VoiceMessage.conversation)
-    var messages: [VoiceMessage] = []
+    var messages: [VoiceMessage]? = []
 
     // NO inverse for one-side of one-to-many relationships
     @Relationship(deleteRule: .nullify)
@@ -47,22 +47,23 @@ final class VoiceConversation {
 
     /// Get message count
     var messageCount: Int {
-        messages.count
+        messages?.count ?? 0
     }
 
     /// Get user message count
     var userMessageCount: Int {
-        messages.filter { $0.isFromUser }.count
+        messages?.filter { $0.isFromUser }.count ?? 0
     }
 
     /// Get AI message count
     var aiMessageCount: Int {
-        messages.filter { !$0.isFromUser }.count
+        messages?.filter { !$0.isFromUser }.count ?? 0
     }
 
     /// Get conversation duration (time between first and last message)
     var duration: TimeInterval? {
-        guard let first = messages.first?.timestamp,
+        guard let messages = messages,
+              let first = messages.first?.timestamp,
               let last = messages.last?.timestamp else {
             return nil
         }
@@ -71,7 +72,8 @@ final class VoiceConversation {
 
     /// Generate a title from the first user message
     func generateTitleFromContent() {
-        guard let firstUserMessage = messages.first(where: { $0.isFromUser }) else {
+        guard let messages = messages,
+              let firstUserMessage = messages.first(where: { $0.isFromUser }) else {
             return
         }
 
