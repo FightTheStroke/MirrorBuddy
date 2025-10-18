@@ -192,8 +192,12 @@ struct MaterialCardView: View {
                         .tint(.white)
                     Text("Elaborazione...")
                 case .failed:
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .symbolEffect(.bounce, options: .repeat(2))
+                    if #available(iOS 18.0, *) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .symbolEffect(.bounce, options: .repeat(2))
+                    } else {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                    }
                     Text("Errore")
                 case .completed:
                     EmptyView()
