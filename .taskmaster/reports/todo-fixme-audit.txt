@@ -1,0 +1,18 @@
+MirrorBuddy/Core/Services/MaterialProcessingPipeline.swift:            // TODO: Refactor FlashcardGenerationService to return Sendable types (e.g., IDs instead of models)
+MirrorBuddy/Core/Services/WhisperTranscriptionService.swift:        // TODO: Load from secure keychain storage in production
+MirrorBuddy/Core/Services/FeedbackService.swift:        // TODO: Integrate with backend API or analytics service
+MirrorBuddy/Core/Services/FeedbackService.swift:        // TODO: Integrate with analytics (e.g., Firebase, Mixpanel)
+MirrorBuddy/Core/Services/FeedbackService.swift:        // TODO: Use Core Data or file system for production
+MirrorBuddy/Core/Services/GoogleDriveDownloadService.swift:            // TODO: Implement token refresh
+MirrorBuddy/Core/Services/AppVoiceCommandHandler.swift:        // TODO: Focus search field
+MirrorBuddy/Core/Services/AppVoiceCommandHandler.swift:        // TODO: Integrate with TTS service
+MirrorBuddy/Core/Services/AppVoiceCommandHandler.swift:        // TODO: Get current screen text and speak it
+MirrorBuddy/Features/Tasks/Views/TasksView.swift:                        // TODO: Add task
+MirrorBuddy/Features/Tasks/Views/TasksView.swift:        // TODO: Load from SwiftData
+MirrorBuddy/Features/Flashcards/FlashcardStudyView.swift://  TODO: Expand with spaced repetition, flip animations, progress tracking
+MirrorBuddy/Features/Camera/CameraView.swift:            // TODO: Show photo picker or recent photo
+MirrorBuddy/Features/Dashboard/SubjectDashboardView.swift:                    // TODO: Add material action
+MirrorBuddy/Features/Dashboard/SubjectDashboardView.swift:                // TODO: Add material action
+MirrorBuddy/Features/Voice/Views/VoiceSettingsView.swift:        // TODO: Play a sample voice response with current settings
+MirrorBuddy/Features/Voice/Views/VoiceSettingsView.swift:        // TODO: Show audio debug logs
+MirrorBuddy/Features/Voice/Views/VoiceSettingsView.swift:        // TODO: Test OpenAI Realtime API connection
