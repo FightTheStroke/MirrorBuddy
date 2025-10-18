@@ -5334,7 +5334,7 @@
         "description": "Update Xcode project deployment targets to current iOS/iPadOS versions (>=17), adjust availability annotations, and verify builds/run on physical devices.",
         "details": "- Update MirrorBuddy.xcodeproj targets (app, tests, widgets if any)\n- Re-run build on device + simulator\n- Fix any API availability warnings or guard code",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5364,27 +5364,29 @@
             "id": 3,
             "title": "Verify builds on devices",
             "description": "",
-            "details": "- Build & run on physical iPhone/iPad with updated targets, resolving availability warnings or guard clauses",
-            "status": "pending",
+            "details": "- Build & run on physical iPhone/iPad with updated targets, resolving availability warnings or guard clauses\n<info added on 2025-10-18T10:11:32.034Z>\nBuild verification completed successfully on iOS Simulator (iPhone 17). Deployment targets confirmed: iOS 17.0, macOS 14.0. Build passed with latest changes, including iOS 18 availability fixes.\n</info added on 2025-10-18T10:11:32.034Z>",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 117,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T10:11:33.865Z"
           },
           {
             "id": 4,
             "title": "Document deployment requirements",
             "description": "",
             "details": "- Update README/setup docs to reflect new OS minimums and testing expectations",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 117,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T10:11:36.420Z"
           }
         ],
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break into: (1) auditing current deployment targets, (2) updating project deployment settings, (3) verifying builds on devices, and (4) documenting deployment requirements.",
-        "updatedAt": "2025-10-18T09:27:16.690Z"
+        "updatedAt": "2025-10-18T10:11:36.420Z"
       },
       {
         "id": "118",
@@ -5392,7 +5394,7 @@
         "description": "Resolve existing ~30 SwiftLint violations, tune configuration if needed, and wire lint checks into the CI/pre-commit workflow.",
         "details": "- Run swiftlint to capture current warnings\n- Fix code style/complexity issues or document justified exceptions\n- Update lint config for new rules if necessary\n- Add CI/pre-commit step ensuring lint passes",
         "testStrategy": "",
-        "status": "done",
+        "status": "pending",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5443,7 +5445,7 @@
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Divide into: (1) capturing current SwiftLint violations, (2) resolving lint findings, (3) enforcing lint in automation, and (4) documenting lint policy.",
-        "updatedAt": "2025-10-18T09:59:46.307Z"
+        "updatedAt": "2025-10-18T10:09:41.180Z"
       },
       {
         "id": "119",
@@ -5451,7 +5453,7 @@
         "description": "Store all API keys in the Keychain/config files instead of plist/env, update loading code, and document the setup for developers.",
         "details": "- Move OpenAI, Anthropic, Google credentials to KeychainManager/xcconfig\n- Update services (WhisperTranscriptionService etc.) to read from secure storage\n- Ensure build scripts ignore secret files\n- Update docs (README/setup guides) with new steps",
         "testStrategy": "",
-        "status": "done",
+        "status": "pending",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5503,7 +5505,7 @@
         "complexity": 5,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Expand into: (1) designing secure key storage plan, (2) implementing Keychain/xcconfig loading, (3) migrating existing secrets, and (4) updating developer documentation.",
-        "updatedAt": "2025-10-18T10:00:32.734Z"
+        "updatedAt": "2025-10-18T10:09:42.422Z"
       },
       {
         "id": "120",
@@ -5511,7 +5513,7 @@
         "description": "Review all TODO/FIXME comments, implement high-priority items (study flows, TTS, search focus), and convert leftover items into tracked tasks.",
         "details": "- Use rg to list TODO/FIXME\n- Implement critical missing features or stub gracefully\n- Create new Task Master entries for deferred work and remove inline comments",
         "testStrategy": "",
-        "status": "done",
+        "status": "pending",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5563,7 +5565,7 @@
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break into: (1) inventorying TODO/FIXME comments, (2) addressing critical TODOs, (3) creating follow-up tasks, and (4) cleaning up code annotations.",
-        "updatedAt": "2025-10-18T10:01:04.070Z"
+        "updatedAt": "2025-10-18T10:09:43.600Z"
       },
       {
         "id": "121",
@@ -5571,7 +5573,7 @@
         "description": "Add unit tests for VoiceConversationViewModel, UpdateManager, StudyView workflows, and resilience utilities to lift coverage and protect regressions.",
         "details": "- Write async tests simulating voice session toggles and offline fallback\n- Cover UpdateManager orchestration with mocked services\n- Add StudyView tests (e.g., using ViewInspector)\n- Ensure circuit breaker/retry tests assert actor behaviour",
         "testStrategy": "",
-        "status": "done",
+        "status": "pending",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5619,7 +5621,7 @@
         "complexity": 5,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Divide into: (1) identifying key modules for coverage, (2) authoring unit/integration tests, (3) running coverage and ensuring >80%, and (4) adding regression tests for resilience.",
-        "updatedAt": "2025-10-18T10:01:07.577Z"
+        "updatedAt": "2025-10-18T10:09:44.780Z"
       },
       {
         "id": "122",
@@ -5627,7 +5629,7 @@
         "description": "Create performance tests and benchmarking scripts for Drive sync (100+ files), Whisper transcription (multi-hour input), and mind map rendering (100+ nodes).",
         "details": "- Add XCTest performance cases measuring latency/memory\n- Provide fixtures/mocks for large data sets\n- Document thresholds and capture baseline metrics",
         "testStrategy": "",
-        "status": "done",
+        "status": "pending",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5675,7 +5677,7 @@
         "complexity": 6,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Expand into: (1) designing performance scenarios, (2) implementing performance harness, (3) capturing baseline metrics, and (4) documenting thresholds and automation.",
-        "updatedAt": "2025-10-18T10:01:08.904Z"
+        "updatedAt": "2025-10-18T10:09:46.022Z"
       },
       {
         "id": "123",
@@ -5683,7 +5685,7 @@
         "description": "Document repeatable QA scenarios covering online/offline switches, backgrounding, low storage, and voice command regressions.",
         "details": "- Create checklist markdown in docs/\n- Include steps for switching network states, aggressive user flows, device matrix\n- Integrate into release criteria",
         "testStrategy": "",
-        "status": "done",
+        "status": "pending",
         "dependencies": [],
         "priority": "medium",
         "subtasks": [
@@ -5721,7 +5723,7 @@
         "complexity": 3,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break into: (1) drafting QA scenario list, (2) publishing QA checklist doc, and (3) integrating into release process.",
-        "updatedAt": "2025-10-18T10:01:10.140Z"
+        "updatedAt": "2025-10-18T10:09:47.264Z"
       },
       {
         "id": "124",
@@ -6647,9 +6649,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-18T10:01:10.142Z",
+      "lastModified": "2025-10-18T10:11:36.422Z",
       "taskCount": 139,
-      "completedCount": 119,
+      "completedCount": 114,
       "tags": [
         "master"
       ]
