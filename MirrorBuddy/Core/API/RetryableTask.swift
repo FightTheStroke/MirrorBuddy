@@ -58,7 +58,7 @@ extension RetryableTask {
 }
 
 /// Retry policy configuration
-struct RetryPolicy {
+struct RetryPolicy: Sendable {
     /// Maximum number of retry attempts
     let maxRetries: Int
 
@@ -119,7 +119,7 @@ struct RetryPolicy {
 }
 
 /// Exponential backoff strategy for retry delays
-struct ExponentialBackoffStrategy {
+struct ExponentialBackoffStrategy: Sendable {
     let policy: RetryPolicy
 
     /// Calculate delay for a given attempt number
@@ -149,7 +149,7 @@ struct ExponentialBackoffStrategy {
 }
 
 /// Executor for retrying operations with exponential backoff
-struct RetryExecutor {
+struct RetryExecutor: Sendable {
     private let policy: RetryPolicy
     private let backoffStrategy: ExponentialBackoffStrategy
 
@@ -197,8 +197,8 @@ struct RetryExecutor {
                 let delay = task.retryDelay(for: error, attempt: attempt) ??
                            backoffStrategy.delay(for: attempt, error: error)
 
-                // Log retry attempt (fire and forget on main actor)
-                _Concurrency.Task { @MainActor in
+                // Log retry attempt on the main actor for UI-safe diagnostics
+                await MainActor.run {
                     APIErrorLogger.shared.log(
                         UnifiedAPIError.network(error, context: [
                             "retryAttempt": attempt,
