@@ -1,11 +1,58 @@
 # Task ID: 95
 # Title: Generate Lesson Summaries and Mind Maps from Transcripts
-# Status: pending
-# Dependencies: 94
+# Status: done
+# Dependencies: 94 (Not found)
 # Priority: medium
-# Description: Use GPT-4 to summarize transcripts and generate hierarchical mind maps with color coding and key concepts.
+# Description: Integrate existing services to generate summaries and hierarchical mind maps from lesson transcripts using GPT-4, with subject-based color coding and key concepts extraction.
 # Details:
-Send transcript to GPT-4 for summary and mind map extraction. Structure mind map visually with subject-based colors. Store and link to lesson.
+This task requires integration of existing components:
+- MindMapGenerationService from Task 87 for generating mind maps with subject-based colors
+- TextPreprocessingService for preparing transcript text
+- SubjectDetectionService from Task 94 for identifying subject from transcript
+- OpenAIClient for GPT-4 summarization capabilities
+
+The integration should connect transcript data to these services, store the generated summaries and mind maps, and link them to the appropriate lesson. No new core functionality needs to be developed, as the generateMindMap(from: text) method already works with transcript text.
 
 # Test Strategy:
-Transcribe lesson, generate summary and mind map. Validate structure, readability, and relevance.
+1. Test integration with existing services using sample transcripts
+2. Verify summary generation using OpenAIClient chatCompletion
+3. Confirm mind map generation with proper subject-based colors
+4. Test storage and linking of generated content to lessons
+5. Validate structure, readability, and relevance of outputs
+6. Test UI integration for displaying summaries and mind maps
+
+# Subtasks:
+## 1. Create TranscriptProcessingService [done]
+### Dependencies: None
+### Description: Develop a service that coordinates the processing of transcripts through existing components to generate summaries and mind maps.
+### Details:
+Implement a TranscriptProcessingService that:
+1. Takes transcript text as input
+2. Uses TextPreprocessingService to clean and prepare the text
+3. Uses SubjectDetectionService to identify the subject
+4. Uses OpenAIClient to generate a summary
+5. Uses MindMapGenerationService to create a mind map
+6. Returns both summary and mind map for storage
+
+## 2. Implement UI for Displaying Transcript Summaries and Mind Maps [done]
+### Dependencies: 95.1
+### Description: Create or update UI components to display the generated summaries and mind maps from transcripts.
+### Details:
+Extend the existing UI to:
+1. Show a summary section in the lesson detail view
+2. Display the mind map with proper rendering of hierarchical structure
+3. Implement color coding based on subject
+4. Add controls for regenerating or editing summaries/mind maps if needed
+5. Ensure responsive layout works on all device sizes
+
+## 3. Connect Transcript Processing to Data Storage [done]
+### Dependencies: 95.1
+### Description: Implement the connection between transcript processing results and SwiftData storage.
+### Details:
+Create functionality to:
+1. Store generated summaries in the appropriate SwiftData model
+2. Store mind maps with proper linking to lessons
+3. Update lesson metadata to indicate processing status
+4. Implement caching for efficient retrieval
+5. Handle updates when transcripts change
+

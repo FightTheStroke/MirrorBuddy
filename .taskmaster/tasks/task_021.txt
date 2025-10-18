@@ -1,7 +1,7 @@
 # Task ID: 21
 # Title: Implement Mind Map Generation with GPT-5
 # Status: done
-# Dependencies: 5, 11, 19
+# Dependencies: 5 (Not found), 11 (Not found), 19 (Not found)
 # Priority: high
 # Description: Create functionality to generate mind map structures from study materials using GPT-5.
 # Details:

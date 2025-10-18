@@ -1,7 +1,7 @@
 # Task ID: 80
 # Title: Prepare for TestFlight Distribution
 # Status: done
-# Dependencies: 60, 61, 62, 63, 64, 65, 66
+# Dependencies: 60 (Not found), 61 (Not found), 62 (Not found), 63 (Not found), 64 (Not found), 65 (Not found), 66 (Not found)
 # Priority: high
 # Description: Prepare the app for TestFlight distribution and testing.
 # Details:

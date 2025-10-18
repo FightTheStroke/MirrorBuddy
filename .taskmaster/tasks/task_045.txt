@@ -1,7 +1,7 @@
 # Task ID: 45
 # Title: Implement Task Detail and Completion UI
 # Status: done
-# Dependencies: 7, 8, 44
+# Dependencies: 7 (Not found), 8 (Not found), 44 (Not found)
 # Priority: high
 # Description: Create the detailed view and completion functionality for tasks.
 # Details:

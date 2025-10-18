@@ -1,7 +1,7 @@
 # Task ID: 83
 # Title: Refactor Subject to Database-Backed System
 # Status: done
-# Dependencies: 3, 82
+# Dependencies: 3 (Not found), 82 (Not found)
 # Priority: critical
 # Description: Convert Mario's 10 subjects from enum to SwiftData entity, allowing customization via Settings. Depends on localization infrastructure.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 99
 # Title: Fix Audio Pipeline for Bidirectional Streaming
-# Status: pending
-# Dependencies: 31, 34
+# Status: done
+# Dependencies: 31 (Not found), 34 (Not found)
 # Priority: high
 # Description: Repair the broken voice pipeline by implementing proper audio data flow between the microphone and OpenAI Realtime API, and correctly parse audio responses for playback.
 # Details:
@@ -61,3 +61,35 @@
 5. Regression Testing:
    - Ensure fixes don't break other functionality
    - Verify all voice conversation features still work
+
+# Subtasks:
+## 1. Implement Microphone Audio Capture and PCM16 Encoding [done]
+### Dependencies: None
+### Description: Set up microphone input capture using AVCaptureAudioDataOutput and encode raw audio samples to PCM16 format.
+### Details:
+Connect AVCaptureAudioDataOutput's captureOutput delegate to receive microphone samples. Implement conversion of raw audio buffers to PCM16 format. Ensure thread safety and efficient buffer management for real-time audio capture.
+
+## 2. Buffer and Forward Encoded Audio Chunks to WebSocket [done]
+### Dependencies: 99.1
+### Description: Add a buffering mechanism to collect and forward appropriately sized PCM16 audio chunks to the OpenAI Realtime API via WebSocket.
+### Details:
+Implement a buffer that accumulates PCM16 samples until a defined chunk size is reached. Create a method to send these chunks over the WebSocket connection, ensuring minimal latency and proper error handling for transmission failures.
+
+## 3. Parse and Handle OpenAI Realtime API Events [done]
+### Dependencies: 99.2
+### Description: Complete event parsing for all relevant OpenAI Realtime API event types, including audio and text responses, with robust error handling.
+### Details:
+Implement parseServerEvent to handle response.audio.delta, response.audio.done, message.content.delta, and message.content.done. Decode JSON payloads for each event type and accumulate audio data as needed. Add error handling for malformed or unexpected responses.
+
+## 4. Implement Audio Playback Queue and Synchronization [done]
+### Dependencies: 99.3
+### Description: Create an audio playback queue to process and play received audio chunks, ensuring smooth playback and proper synchronization.
+### Details:
+Use AVAudioPlayer or AVAudioEngine to play accumulated audio data. Implement an onAudioData callback to enqueue audio chunks for playback. Handle buffering and synchronization to avoid playback gaps or stuttering, and coordinate playback completion signals.
+
+## 5. Add Diagnostics, Error Recovery, and Performance Optimization [done]
+### Dependencies: 99.4
+### Description: Implement logging, diagnostics, error recovery mechanisms, and optimize pipeline for low latency and efficient resource usage.
+### Details:
+Add detailed logging for audio pipeline events and errors. Implement error recovery for connection drops and audio processing failures. Create diagnostic tools to monitor audio flow and thread usage. Optimize thread management and buffer sizes to minimize latency and balance audio quality with bandwidth.
+

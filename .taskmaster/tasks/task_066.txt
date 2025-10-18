@@ -1,7 +1,7 @@
 # Task ID: 66
 # Title: Conduct Real Device Testing
 # Status: done
-# Dependencies: 61, 62, 63, 64, 65
+# Dependencies: 61 (Not found), 62 (Not found), 63 (Not found), 64 (Not found), 65 (Not found)
 # Priority: high
 # Description: Test the app on real iPad and iPhone devices with various configurations.
 # Details:

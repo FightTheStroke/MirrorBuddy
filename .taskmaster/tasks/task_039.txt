@@ -1,7 +1,7 @@
 # Task ID: 39
 # Title: Create Interactive Mind Map Renderer
 # Status: done
-# Dependencies: 5, 22
+# Dependencies: 5 (Not found), 22 (Not found)
 # Priority: high
 # Description: Implement an interactive mind map visualization using SwiftUI Canvas.
 # Details:

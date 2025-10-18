@@ -1,7 +1,7 @@
 # Task ID: 12
 # Title: Create Google Gemini API Client
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: high
 # Description: Develop a client for Google Gemini 2.5 Pro API for Google Workspace integration.
 # Details:

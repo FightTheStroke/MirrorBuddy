@@ -1,7 +1,7 @@
 # Task ID: 23
 # Title: Implement Flashcard Generation with GPT-5 Nano
 # Status: done
-# Dependencies: 6, 11, 19
+# Dependencies: 6 (Not found), 11 (Not found), 19 (Not found)
 # Priority: medium
 # Description: Create functionality to generate flashcards from study materials using GPT-5 nano.
 # Details:

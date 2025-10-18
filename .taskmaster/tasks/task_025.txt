@@ -1,7 +1,7 @@
 # Task ID: 25
 # Title: Implement Parallel Material Processing Pipeline
 # Status: done
-# Dependencies: 19, 20, 21, 22, 23, 24
+# Dependencies: 19 (Not found), 20 (Not found), 21 (Not found), 22 (Not found), 23 (Not found), 24 (Not found)
 # Priority: high
 # Description: Create a pipeline to process study materials in parallel for maximum efficiency.
 # Details:
@@ -18,25 +18,25 @@
 Test pipeline with various material types. Measure processing time improvements. Test error recovery with simulated failures. Verify background processing works correctly.
 
 # Subtasks:
-## 1. Design Processing Pipeline Architecture [blocked]
+## 1. Design Processing Pipeline Architecture [done]
 ### Dependencies: None
 ### Description: Create a comprehensive architecture for the parallel material processing pipeline that defines components, data flow, and concurrency model.
 ### Details:
 Design a modular pipeline architecture with clear input/output interfaces. Define processing stages including material parsing, content extraction, metadata generation, and storage. Create diagrams showing data flow and concurrency patterns. Document the architecture with performance considerations and scalability options.
 
-## 2. Implement Swift Concurrency for Parallel Processing [blocked]
+## 2. Implement Swift Concurrency for Parallel Processing [done]
 ### Dependencies: 25.1
 ### Description: Develop the core parallel processing functionality using Swift's modern concurrency features like async/await and task groups.
 ### Details:
 Implement async processing functions for each pipeline stage. Create task groups to process multiple materials concurrently. Use actors to manage shared state safely. Implement proper cancellation handling. Create throttling mechanisms to prevent system overload. Use structured concurrency patterns to maintain clean task hierarchies.
 
-## 3. Create Task Coordinator and Progress Tracking [blocked]
+## 3. Create Task Coordinator and Progress Tracking [done]
 ### Dependencies: 25.2
 ### Description: Develop a coordinator component that manages processing tasks and provides detailed progress reporting.
 ### Details:
 Implement a TaskCoordinator class that manages the lifecycle of processing tasks. Create a progress tracking system with support for overall and per-task progress. Implement a notification system for progress updates. Add support for pausing and resuming tasks. Create a dashboard UI for monitoring active processing tasks with detailed statistics.
 
-## 4. Implement Error Handling and Background Processing [blocked]
+## 4. Implement Error Handling and Background Processing [done]
 ### Dependencies: 25.3
 ### Description: Add robust error handling, recovery mechanisms, and support for background processing using BGProcessingTask.
 ### Details:

@@ -1,7 +1,7 @@
 # Task ID: 79
 # Title: Implement Spaced Repetition System for Flashcards
 # Status: done
-# Dependencies: 6, 23
+# Dependencies: 6 (Not found), 23 (Not found)
 # Priority: medium
 # Description: Create a spaced repetition system for effective flashcard review.
 # Details:

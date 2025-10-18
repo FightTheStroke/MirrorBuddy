@@ -1,7 +1,7 @@
 # Task ID: 100
 # Title: Implement Voice Conversation Persistence with SwiftData
-# Status: pending
-# Dependencies: 99, 31, 34
+# Status: done
+# Dependencies: 99 (Not found), 31 (Not found), 34 (Not found)
 # Priority: high
 # Description: Create persistent storage for voice conversations using SwiftData, linking them to materials/subjects and ensuring proper UI integration for conversation history.
 # Details:
@@ -215,3 +215,35 @@
    - Measure load time for conversation history
    - Verify scrolling performance in the conversation view
    - Test memory usage with multiple active conversations
+
+# Subtasks:
+## 1. Define SwiftData Models for Voice Conversations and Messages [done]
+### Dependencies: None
+### Description: Create and configure SwiftData model classes for VoiceConversation and VoiceMessage, ensuring proper relationships and attributes for persistence.
+### Details:
+Implement @Model classes for VoiceConversation and VoiceMessage in Core/Models. Ensure VoiceConversation has properties for id, title, createdAt, updatedAt, subjectID, materialID, and a cascade relationship to messages. VoiceMessage should include id, content, isUserMessage, timestamp, and a reference to its parent conversation. Validate model relationships and persistence attributes.
+
+## 2. Integrate SwiftData Queries and CRUD Operations in ViewModel [done]
+### Dependencies: 100.1
+### Description: Update VoiceConversationViewModel to use SwiftData queries and implement CRUD operations for conversations and messages.
+### Details:
+Replace any in-memory arrays with @Query properties for VoiceConversation and VoiceMessage. Implement create, read, update, and delete methods for conversations and messages using the modelContext. Ensure that all operations persist data correctly and update the UI as needed.
+
+## 3. Connect Microphone Transcription and AI Responses to Persistence [done]
+### Dependencies: 100.2
+### Description: Wire up the microphone transcription and AI response callbacks to add messages to the persistent conversation using SwiftData.
+### Details:
+Modify the microphone button action to call addUserMessage with the transcribed text, and ensure this message is persisted. Update the OpenAIRealtimeClient callback to call addAIMessage, persisting AI responses. Ensure both user and AI messages are correctly linked to the current conversation.
+
+## 4. Load and Display Conversation History in the UI [done]
+### Dependencies: 100.3
+### Description: Implement logic to load conversation history on view appearance and update the UI to display persisted messages.
+### Details:
+In VoiceConversationView, load conversations and set the current conversation on appear. Update the ScrollView to display messages from viewModel.currentMessages, ensuring the UI reflects the persisted conversation history.
+
+## 5. Implement Conversation Management and Filtering in the UI [done]
+### Dependencies: 100.4
+### Description: Create a ConversationListView to manage, search, and filter conversations by subject, and enable deletion of conversations.
+### Details:
+Develop ConversationListView with search and subject filter capabilities. Implement deletion of conversations and ensure the UI updates accordingly. Integrate with the ViewModel to manage the filtered list and handle navigation to selected conversations.
+

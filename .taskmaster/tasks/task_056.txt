@@ -1,7 +1,7 @@
 # Task ID: 56
 # Title: Implement Settings and Preferences UI
 # Status: done
-# Dependencies: 10, 30, 33, 82, 83
+# Dependencies: 10 (Not found), 30 (Not found), 33 (Not found), 82 (Not found), 83 (Not found)
 # Priority: high
 # Description: Settings UI including language selector and subject management (task 83). High priority as it contains essential configuration.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 75
 # Title: Implement Context Banner for Working Memory Support
 # Status: done
-# Dependencies: 26, 28, 32, 44
+# Dependencies: 26 (Not found), 28 (Not found), 32 (Not found), 44 (Not found)
 # Priority: high
 # Description: Create a persistent context banner showing current subject, task, and progress.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 53
 # Title: Implement Physics/Science Mode Specialized Features
 # Status: done
-# Dependencies: 33, 36, 37
+# Dependencies: 33 (Not found), 36 (Not found), 37 (Not found)
 # Priority: medium
 # Description: Create specialized features for physics and science study assistance.
 # Details:

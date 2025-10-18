@@ -1,7 +1,7 @@
 # Task ID: 35
 # Title: Implement Camera Integration for Homework Help
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: high
 # Description: Integrate camera functionality for capturing homework problems.
 # Details:

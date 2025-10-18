@@ -1,7 +1,7 @@
 # Task ID: 24
 # Title: Implement Simplified Explanations Generation with GPT-5 Mini
 # Status: done
-# Dependencies: 11, 19
+# Dependencies: 11 (Not found), 19 (Not found)
 # Priority: medium
 # Description: Create functionality to generate simplified explanations of complex concepts using GPT-5 mini.
 # Details:

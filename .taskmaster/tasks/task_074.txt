@@ -1,7 +1,7 @@
 # Task ID: 74
 # Title: Implement Dyslexia-Friendly Text Rendering
 # Status: done
-# Dependencies: 28
+# Dependencies: 28 (Not found)
 # Priority: high
 # Description: Create dyslexia-friendly text rendering with customizable fonts and spacing.
 # Details:

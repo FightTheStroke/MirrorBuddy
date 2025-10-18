@@ -1,7 +1,7 @@
 # Task ID: 36
 # Title: Implement GPT-5 Vision API Integration
 # Status: done
-# Dependencies: 11, 35
+# Dependencies: 11 (Not found), 35 (Not found)
 # Priority: high
 # Description: Integrate with GPT-5 Vision API for analyzing homework problems.
 # Details:

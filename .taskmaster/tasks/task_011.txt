@@ -1,7 +1,7 @@
 # Task ID: 11
 # Title: Create OpenAI API Client Infrastructure
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: high
 # Description: Develop a client for OpenAI APIs including Realtime, Chat, and DALL-E endpoints.
 # Details:

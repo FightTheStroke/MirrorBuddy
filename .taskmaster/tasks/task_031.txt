@@ -1,7 +1,7 @@
 # Task ID: 31
 # Title: Implement OpenAI Realtime API Integration
 # Status: done
-# Dependencies: 11
+# Dependencies: 11 (Not found)
 # Priority: high
 # Description: Integrate with OpenAI Realtime API for voice conversations.
 # Details:

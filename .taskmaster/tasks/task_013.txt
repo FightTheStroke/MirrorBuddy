@@ -1,7 +1,7 @@
 # Task ID: 13
 # Title: Create Google APIs Client for Workspace Integration
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: high
 # Description: Develop a client for Google Drive, Calendar, and Gmail APIs for material and task management.
 # Details:

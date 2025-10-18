@@ -1,7 +1,7 @@
 # Task ID: 73
 # Title: Implement Text-to-Speech for All Content
 # Status: done
-# Dependencies: 28
+# Dependencies: 28 (Not found)
 # Priority: high
 # Description: Create text-to-speech functionality for all textual content using Apple Speech.
 # Details:

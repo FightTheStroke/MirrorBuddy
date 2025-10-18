@@ -1,7 +1,7 @@
 # Task ID: 93
 # Title: Auto-Transcription of Recordings with Whisper API
-# Status: pending
-# Dependencies: 91
+# Status: done
+# Dependencies: 91 (Not found)
 # Priority: high
 # Description: Transcribe recorded lessons in Italian using Whisper API, processing in 30-minute chunks and linking transcripts to materials.
 # Details:
@@ -9,3 +9,35 @@ Send audio chunks to Whisper API for transcription. Store plain text transcript 
 
 # Test Strategy:
 Record and transcribe 6-hour lesson. Validate transcript accuracy and linkage.
+
+# Subtasks:
+## 1. Segment Recorded Lessons into 30-Minute Audio Chunks [done]
+### Dependencies: None
+### Description: Divide each recorded lesson into sequential 30-minute audio segments for processing.
+### Details:
+Implement logic to split lesson recordings into 30-minute chunks, ensuring no data loss or overlap. Handle edge cases where the final chunk is shorter than 30 minutes.
+
+## 2. Optimize Audio Chunks for Whisper API Compatibility [done]
+### Dependencies: 93.1
+### Description: Convert and prepare each audio chunk to meet Whisper API format and quality requirements.
+### Details:
+Ensure each chunk is in a supported format (e.g., MP3, WAV), with recommended settings (e.g., MP3, 16 kbps, 12 kHz, mono)[2][1]. Remove unnecessary metadata and minimize background noise.
+
+## 3. Transcribe Audio Chunks Using Whisper API with Error Handling [done]
+### Dependencies: 93.2
+### Description: Send each prepared audio chunk to Whisper API for transcription, implementing robust error handling and retry logic.
+### Details:
+Integrate Whisper API calls for each chunk. Implement error handling for API failures, rate limits, and retries. Store raw transcript and metadata for each chunk[1][5].
+
+## 4. Merge Chunk Transcripts and Adjust Timestamps [done]
+### Dependencies: 93.3
+### Description: Combine transcripts from all chunks into a single lesson transcript, adjusting timestamps to maintain continuity.
+### Details:
+Merge text and word-level timestamps from each chunk, offsetting timestamps to reflect their position in the full lesson[4]. Ensure transcript continuity and correct time alignment.
+
+## 5. Link Final Transcript to Lesson Materials and Store [done]
+### Dependencies: 93.4
+### Description: Associate the merged transcript with the corresponding lesson and related materials, and store in the database.
+### Details:
+Implement logic to link the final transcript to lesson metadata and materials. Store transcript in plain text format and ensure retrievability. Handle edge cases for missing or incomplete transcripts.
+

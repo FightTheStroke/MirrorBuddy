@@ -1,7 +1,7 @@
 # Task ID: 19
 # Title: Implement PDF Text Extraction with VisionKit
 # Status: done
-# Dependencies: 18
+# Dependencies: 18 (Not found)
 # Priority: high
 # Description: Create functionality to extract text from PDF files using VisionKit OCR.
 # Details:

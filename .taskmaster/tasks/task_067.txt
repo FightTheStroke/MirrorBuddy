@@ -1,7 +1,7 @@
 # Task ID: 67
 # Title: Update Project README
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: medium
 # Description: Create comprehensive README documentation for the project.
 # Details:

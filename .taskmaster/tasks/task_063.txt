@@ -1,7 +1,7 @@
 # Task ID: 63
 # Title: Implement UI Tests
 # Status: done
-# Dependencies: 26, 28, 32, 35, 39, 44, 55, 56
+# Dependencies: 26 (Not found), 28 (Not found), 32 (Not found), 35 (Not found), 39 (Not found), 44 (Not found), 55 (Not found), 56 (Not found)
 # Priority: medium
 # Description: Create UI tests for main user flows and interactions.
 # Details:

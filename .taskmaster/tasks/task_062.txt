@@ -1,7 +1,7 @@
 # Task ID: 62
 # Title: Implement Integration Tests
 # Status: done
-# Dependencies: 17, 18, 25, 31, 36, 42, 43
+# Dependencies: 17 (Not found), 18 (Not found), 25 (Not found), 31 (Not found), 36 (Not found), 42 (Not found), 43 (Not found)
 # Priority: medium
 # Description: Create integration tests for end-to-end functionality verification.
 # Details:

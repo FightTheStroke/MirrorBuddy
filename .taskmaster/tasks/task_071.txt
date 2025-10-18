@@ -1,7 +1,7 @@
 # Task ID: 71
 # Title: Create Deployment Guide
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: medium
 # Description: Document the process for deploying the app to TestFlight and App Store.
 # Details:

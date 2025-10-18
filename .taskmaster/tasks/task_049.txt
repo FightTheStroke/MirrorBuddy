@@ -1,7 +1,7 @@
 # Task ID: 49
 # Title: Implement Rewards and Customization System
 # Status: done
-# Dependencies: 46, 47
+# Dependencies: 46 (Not found), 47 (Not found)
 # Priority: low
 # Description: Create the rewards and customization system for app personalization.
 # Details:

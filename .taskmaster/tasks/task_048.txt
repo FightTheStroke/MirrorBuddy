@@ -1,7 +1,7 @@
 # Task ID: 48
 # Title: Implement Daily Challenges System
 # Status: done
-# Dependencies: 8, 46
+# Dependencies: 8 (Not found), 46 (Not found)
 # Priority: medium
 # Description: Create the daily challenges system for engagement and motivation.
 # Details:

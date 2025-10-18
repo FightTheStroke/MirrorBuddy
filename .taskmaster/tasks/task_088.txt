@@ -1,6 +1,6 @@
 # Task ID: 88
 # Title: Enable Screen Capture and Annotation for Homework Help
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: medium
 # Description: Allow users to capture the screen/camera view and annotate problem areas using touch or iPad Pencil.

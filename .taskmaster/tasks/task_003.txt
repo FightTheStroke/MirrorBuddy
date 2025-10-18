@@ -1,7 +1,7 @@
 # Task ID: 3
 # Title: Define SwiftData Models for Materials
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: high
 # Description: Create SwiftData models for Material entity with relationships to other entities.
 # Details:

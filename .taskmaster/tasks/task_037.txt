@@ -1,7 +1,7 @@
 # Task ID: 37
 # Title: Create Combined Vision and Voice Interaction
 # Status: done
-# Dependencies: 32, 33, 35, 36
+# Dependencies: 32 (Not found), 33 (Not found), 35 (Not found), 36 (Not found)
 # Priority: high
 # Description: Implement the combined vision and voice interaction for homework help.
 # Details:

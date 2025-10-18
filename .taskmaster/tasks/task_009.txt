@@ -1,7 +1,7 @@
 # Task ID: 9
 # Title: Setup CloudKit Container and Configuration
 # Status: done
-# Dependencies: 1
+# Dependencies: 1 (Not found)
 # Priority: high
 # Description: Configure CloudKit container for the app and set up necessary entitlements and capabilities.
 # Details:

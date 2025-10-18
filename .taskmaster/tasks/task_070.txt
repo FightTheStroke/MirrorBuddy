@@ -1,7 +1,7 @@
 # Task ID: 70
 # Title: Create Developer Notes
 # Status: done
-# Dependencies: 1, 61, 62, 63, 64, 65
+# Dependencies: 1 (Not found), 61 (Not found), 62 (Not found), 63 (Not found), 64 (Not found), 65 (Not found)
 # Priority: low
 # Description: Document technical details and implementation notes for developers.
 # Details:
