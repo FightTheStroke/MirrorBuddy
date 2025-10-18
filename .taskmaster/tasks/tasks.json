@@ -5514,7 +5514,7 @@
         "description": "Review all TODO/FIXME comments, implement high-priority items (study flows, TTS, search focus), and convert leftover items into tracked tasks.",
         "details": "- Use rg to list TODO/FIXME\n- Implement critical missing features or stub gracefully\n- Create new Task Master entries for deferred work and remove inline comments",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5556,17 +5556,17 @@
             "title": "Clean up code annotations",
             "description": "",
             "details": "- Remove resolved TODO/FIXME comments and ensure code reflects current status",
-            "status": "in-progress",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 120,
             "parentId": "undefined",
-            "updatedAt": "2025-10-18T10:48:14.191Z"
+            "updatedAt": "2025-10-18T10:52:14.682Z"
           }
         ],
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break into: (1) inventorying TODO/FIXME comments, (2) addressing critical TODOs, (3) creating follow-up tasks, and (4) cleaning up code annotations.",
-        "updatedAt": "2025-10-18T10:48:14.191Z"
+        "updatedAt": "2025-10-18T10:52:14.682Z"
       },
       {
         "id": "121",
@@ -6653,9 +6653,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-18T10:48:14.193Z",
+      "lastModified": "2025-10-18T10:52:14.685Z",
       "taskCount": 139,
-      "completedCount": 116,
+      "completedCount": 117,
       "tags": [
         "master"
       ]

@@ -48,17 +48,27 @@ final class WhisperTranscriptionService {
 
     // MARK: - API Key Management
 
-    /// Load OpenAI API key from environment or configuration
+    /// Load OpenAI API key from secure keychain storage
     private func loadAPIKey() {
-        // Try to load from environment variable first
+        // Try to load from keychain first (production)
+        do {
+            if let keychainKey = try KeychainManager.shared.getOpenAIAPIKey() {
+                apiKey = keychainKey
+                logger.info("Loaded OpenAI API key from keychain")
+                return
+            }
+        } catch {
+            logger.error("Failed to load OpenAI API key from keychain: \(error.localizedDescription)")
+        }
+
+        // Fallback: Try environment variable (development/testing only)
         if let envKey = ProcessInfo.processInfo.environment["OPENAI_API_KEY"] {
             apiKey = envKey
-            logger.info("Loaded OpenAI API key from environment")
+            logger.info("Loaded OpenAI API key from environment (development mode)")
             return
         }
 
-        // TODO: Load from secure keychain storage in production
-        // For now, log warning if no key found
+        // No key found
         logger.warning("No OpenAI API key found. Transcription will fail.")
     }
 

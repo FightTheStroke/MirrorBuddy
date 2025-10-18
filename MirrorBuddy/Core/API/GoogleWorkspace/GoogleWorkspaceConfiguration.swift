@@ -49,9 +49,28 @@ struct GoogleWorkspaceConfiguration {
         "https://www.googleapis.com/auth/gmail.readonly"
     ]
 
-    /// Load configuration from environment or UserDefaults
+    /// Load configuration from secure keychain storage
+    @MainActor
     static func loadFromEnvironment() -> GoogleWorkspaceConfiguration? {
-        // Try to load from environment variables (for development)
+        // Try to load from keychain first (production)
+        do {
+            let (clientID, clientSecret) = try KeychainManager.shared.getGoogleClientCredentials()
+            // Note: Redirect URI is not a secret, can stay in UserDefaults
+            if let clientID = clientID,
+               let clientSecret = clientSecret,
+               let redirectURI = UserDefaults.standard.string(forKey: "google_redirect_uri"),
+               !clientID.isEmpty, !clientSecret.isEmpty, !redirectURI.isEmpty {
+                return GoogleWorkspaceConfiguration(
+                    clientID: clientID,
+                    clientSecret: clientSecret,
+                    redirectURI: redirectURI
+                )
+            }
+        } catch {
+            print("Failed to load Google credentials from keychain: \(error.localizedDescription)")
+        }
+
+        // Fallback: Try environment variables (development/testing only)
         if let clientID = ProcessInfo.processInfo.environment["GOOGLE_CLIENT_ID"],
            let clientSecret = ProcessInfo.processInfo.environment["GOOGLE_CLIENT_SECRET"],
            let redirectURI = ProcessInfo.processInfo.environment["GOOGLE_REDIRECT_URI"],
@@ -63,25 +82,14 @@ struct GoogleWorkspaceConfiguration {
             )
         }
 
-        // Try to load from UserDefaults (for production)
-        if let clientID = UserDefaults.standard.string(forKey: "google_client_id"),
-           let clientSecret = UserDefaults.standard.string(forKey: "google_client_secret"),
-           let redirectURI = UserDefaults.standard.string(forKey: "google_redirect_uri"),
-           !clientID.isEmpty, !clientSecret.isEmpty, !redirectURI.isEmpty {
-            return GoogleWorkspaceConfiguration(
-                clientID: clientID,
-                clientSecret: clientSecret,
-                redirectURI: redirectURI
-            )
-        }
-
         return nil
     }
 
-    /// Save configuration to UserDefaults
-    func save() {
-        UserDefaults.standard.set(clientID, forKey: "google_client_id")
-        UserDefaults.standard.set(clientSecret, forKey: "google_client_secret")
+    /// Save configuration to secure keychain storage
+    @MainActor
+    func save() throws {
+        try KeychainManager.shared.saveGoogleClientCredentials(clientID: clientID, clientSecret: clientSecret)
+        // Redirect URI is not secret, store in UserDefaults for convenience
         UserDefaults.standard.set(redirectURI, forKey: "google_redirect_uri")
     }
 }
@@ -172,49 +180,59 @@ struct OAuthToken: Codable {
 
     /// Check if token is expired
     var isExpired: Bool {
-        guard let expirationDate = UserDefaults.standard.object(
-            forKey: "google_token_expiration"
-        ) as? Date else {
-            return true
-        }
+        let expirationDate = Date().addingTimeInterval(TimeInterval(expiresIn))
         return Date() >= expirationDate
     }
 
-    /// Save token to UserDefaults
-    func save() {
-        UserDefaults.standard.set(accessToken, forKey: "google_access_token")
-        if let refreshToken {
-            UserDefaults.standard.set(refreshToken, forKey: "google_refresh_token")
-        }
+    /// Save token to secure keychain storage
+    @MainActor
+    func save() throws {
         let expirationDate = Date().addingTimeInterval(TimeInterval(expiresIn))
-        UserDefaults.standard.set(expirationDate, forKey: "google_token_expiration")
-    }
-
-    /// Load token from UserDefaults
-    static func load() -> OAuthToken? {
-        guard let accessToken = UserDefaults.standard.string(forKey: "google_access_token"),
-              let expirationDate = UserDefaults.standard.object(
-                forKey: "google_token_expiration"
-              ) as? Date else {
-            return nil
-        }
-
-        let refreshToken = UserDefaults.standard.string(forKey: "google_refresh_token")
-        let expiresIn = Int(expirationDate.timeIntervalSinceNow)
-
-        return OAuthToken(
+        let tokens = OAuthTokens(
             accessToken: accessToken,
             refreshToken: refreshToken,
-            expiresIn: max(0, expiresIn),
-            tokenType: "Bearer",
-            scope: nil
+            expiresAt: expirationDate,
+            tokenType: tokenType,
+            scope: scope
         )
+        try KeychainManager.shared.saveOAuthTokens(tokens, for: .google)
     }
 
-    /// Clear token from UserDefaults
+    /// Load token from secure keychain storage
+    @MainActor
+    static func load() -> OAuthToken? {
+        do {
+            guard let tokens = try KeychainManager.shared.getOAuthTokens(for: .google) else {
+                return nil
+            }
+
+            let expiresIn: Int
+            if let expiresAt = tokens.expiresAt {
+                expiresIn = max(0, Int(expiresAt.timeIntervalSinceNow))
+            } else {
+                expiresIn = 3_600 // Default 1 hour
+            }
+
+            return OAuthToken(
+                accessToken: tokens.accessToken,
+                refreshToken: tokens.refreshToken,
+                expiresIn: expiresIn,
+                tokenType: tokens.tokenType,
+                scope: tokens.scope
+            )
+        } catch {
+            print("Failed to load OAuth token from keychain: \(error.localizedDescription)")
+            return nil
+        }
+    }
+
+    /// Clear token from secure keychain storage
+    @MainActor
     static func clear() {
-        UserDefaults.standard.removeObject(forKey: "google_access_token")
-        UserDefaults.standard.removeObject(forKey: "google_refresh_token")
-        UserDefaults.standard.removeObject(forKey: "google_token_expiration")
+        do {
+            try KeychainManager.shared.deleteOAuthTokens(for: .google)
+        } catch {
+            print("Failed to clear OAuth token from keychain: \(error.localizedDescription)")
+        }
     }
 }

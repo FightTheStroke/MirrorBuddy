@@ -27,24 +27,30 @@ struct GeminiConfiguration {
         self.maxRetries = maxRetries
     }
 
-    /// Load configuration from environment or UserDefaults
+    /// Load configuration from secure keychain storage
+    @MainActor
     static func loadFromEnvironment() -> GeminiConfiguration? {
-        // Try to load from environment variable (for development)
-        if let apiKey = ProcessInfo.processInfo.environment["GEMINI_API_KEY"], !apiKey.isEmpty {
-            return GeminiConfiguration(apiKey: apiKey)
+        // Try to load from keychain first (production)
+        do {
+            if let apiKey = try KeychainManager.shared.getGeminiAPIKey(), !apiKey.isEmpty {
+                return GeminiConfiguration(apiKey: apiKey)
+            }
+        } catch {
+            print("Failed to load Gemini API key from keychain: \(error.localizedDescription)")
         }
 
-        // Try to load from UserDefaults (for production)
-        if let apiKey = UserDefaults.standard.string(forKey: "gemini_api_key"), !apiKey.isEmpty {
+        // Fallback: Try environment variable (development/testing only)
+        if let apiKey = ProcessInfo.processInfo.environment["GEMINI_API_KEY"], !apiKey.isEmpty {
             return GeminiConfiguration(apiKey: apiKey)
         }
 
         return nil
     }
 
-    /// Save API key to UserDefaults
-    func save() {
-        UserDefaults.standard.set(apiKey, forKey: "gemini_api_key")
+    /// Save API key to secure keychain storage
+    @MainActor
+    func save() throws {
+        try KeychainManager.shared.saveGeminiAPIKey(apiKey)
     }
 }
 

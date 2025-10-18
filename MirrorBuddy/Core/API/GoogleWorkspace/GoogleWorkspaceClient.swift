@@ -39,7 +39,7 @@ final class GoogleWorkspaceClient {
 
         let token = try await requestToken(request: request)
         currentToken = token
-        token.save()
+        try token.save()
         return token
     }
 
@@ -68,7 +68,7 @@ final class GoogleWorkspaceClient {
             scope: token.scope
         )
         currentToken = updatedToken
-        updatedToken.save()
+        try updatedToken.save()
         return updatedToken
     }
 
