@@ -18,6 +18,8 @@
 	<string>MirrorBuddy usa il riconoscimento vocale per i comandi vocali di navigazione</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>MirrorBuddy ha bisogno del microfono per il riconoscimento vocale dei comandi</string>
+	<key>NSCameraUsageDescription</key>
+	<string>MirrorBuddy usa la fotocamera per scansionare documenti e materiali di studio</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

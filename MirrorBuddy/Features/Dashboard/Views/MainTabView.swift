@@ -9,12 +9,31 @@
 import SwiftUI
 import SwiftData
 
+/// Sheet type for consolidated sheet presentation (Fix: SwiftUI allows only 1 sheet per view)
+enum MainTabSheet: Identifiable {
+    case voiceConversation
+    case materialImport
+    case settings
+    case profile
+    case help
+
+    var id: String {
+        switch self {
+        case .voiceConversation: return "voice"
+        case .materialImport: return "import"
+        case .settings: return "settings"
+        case .profile: return "profile"
+        case .help: return "help"
+        }
+    }
+}
+
 /// Main tab coordinator - lightweight container for app navigation (Task 109)
 
 struct MainTabView: View {
     @EnvironmentObject var voiceCommandHandler: AppVoiceCommandHandler
     @State private var selectedTab = 0
-    @State private var showingVoiceInterface = false
+    @State private var activeSheet: MainTabSheet?
 
     var body: some View {
         ZStack {
@@ -115,7 +134,10 @@ struct MainTabView: View {
                     Spacer()
 
                     // Persistent Voice Button (right side) - Full conversation (Task 106)
-                    PersistentVoiceButton(isPresented: $showingVoiceInterface)
+                    PersistentVoiceButton(isPresented: Binding(
+                        get: { activeSheet == .voiceConversation },
+                        set: { if $0 { activeSheet = .voiceConversation } else { activeSheet = nil } }
+                    ))
                         .padding(.trailing, 16)
                         .padding(.bottom, 90) // Position above tab bar
                         .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
@@ -128,10 +150,21 @@ struct MainTabView: View {
             VoiceCommandFeedbackView()
                 .zIndex(999)
         }
-        // Voice interface sheet (attached to ZStack, not to VoiceCommandFeedbackView)
-        .sheet(isPresented: $showingVoiceInterface) {
-            NavigationStack {
-                VoiceConversationView()
+        // Consolidated sheet presentation (Fix: SwiftUI allows only 1 sheet per view)
+        .sheet(item: $activeSheet) { sheetType in
+            switch sheetType {
+            case .voiceConversation:
+                NavigationStack {
+                    VoiceConversationView()
+                }
+            case .materialImport:
+                MaterialImportView()
+            case .settings:
+                SettingsView()
+            case .profile:
+                ProfileView()
+            case .help:
+                VoiceCommandHelpView()
             }
         }
         // Voice command navigation bindings (Assessment fix)
@@ -154,18 +187,30 @@ struct MainTabView: View {
                 // studyMode is maintained for StudyView to use
             }
         }
-        // Additional sheets for voice commands (Task 110)
-        .sheet(isPresented: $voiceCommandHandler.showMaterialImport) {
-            MaterialImportView()
+        // Voice command sheet triggers (consolidated via activeSheet)
+        .onChange(of: voiceCommandHandler.showMaterialImport) { _, show in
+            if show {
+                activeSheet = .materialImport
+                voiceCommandHandler.showMaterialImport = false
+            }
         }
-        .sheet(isPresented: $voiceCommandHandler.showSettings) {
-            SettingsView()
+        .onChange(of: voiceCommandHandler.showSettings) { _, show in
+            if show {
+                activeSheet = .settings
+                voiceCommandHandler.showSettings = false
+            }
         }
-        .sheet(isPresented: $voiceCommandHandler.showProfile) {
-            ProfileView()
+        .onChange(of: voiceCommandHandler.showProfile) { _, show in
+            if show {
+                activeSheet = .profile
+                voiceCommandHandler.showProfile = false
+            }
         }
-        .sheet(isPresented: $voiceCommandHandler.showHelp) {
-            VoiceCommandHelpView()
+        .onChange(of: voiceCommandHandler.showHelp) { _, show in
+            if show {
+                activeSheet = .help
+                voiceCommandHandler.showHelp = false
+            }
         }
     }
 }
