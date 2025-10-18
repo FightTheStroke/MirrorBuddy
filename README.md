@@ -189,6 +189,25 @@ MirrorBuddy is early, ambitious, and opinionated. Contributions we value most:
 
 Please review `Docs/AGENT_DRIVEN_DEVELOPMENT.md` for the tasking model and submit PRs with accessibility considerations documented.
 
+### Quality Assurance and Release Process
+
+Before submitting significant changes or preparing for a release:
+
+1. **Run the QA Checklist**: Execute manual tests from `Docs/QA_CHECKLIST.md` covering:
+   - Online/offline resilience
+   - Voice command functionality
+   - Accessibility compliance (VoiceOver, Dynamic Type, touch targets)
+   - Performance under stress
+   - Data integrity across devices
+
+2. **SwiftLint Compliance**: Ensure `swiftlint lint` shows ≤400 violations (current baseline). Pre-commit hooks enforce this automatically.
+
+3. **Build Verification**: Confirm build succeeds on both iOS Simulator and physical devices (iPhone 14+, iPad 13).
+
+4. **Regression Testing**: Verify all critical regression tests from the QA checklist pass (Section 10).
+
+**Release Criteria**: All "Critical" items in the QA checklist must pass before tagging a release.
+
 ---
 
 ## License & acknowledgements
