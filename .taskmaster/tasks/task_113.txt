@@ -1,0 +1,84 @@
+# Task ID: 113
+# Title: Improve Floating Voice Button Positioning with SafeAreaInset
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Refactor the floating voice button positioning to use safeAreaInset instead of fixed padding to prevent content obstruction on smaller screens and in landscape orientation.
+# Details:
+This task involves updating the positioning logic for the floating voice button to ensure proper display across all device sizes and orientations:
+
+1. Identify all instances where the floating voice button positioning is currently defined with fixed padding values.
+
+2. Replace fixed padding values with dynamic calculations using SafeAreaInset:
+   - Import the necessary SafeArea utilities from the platform-specific libraries
+   - For iOS: Use `SafeAreaInsets.bottom` and `SafeAreaInsets.right` 
+   - For Android: Implement equivalent functionality using `WindowInsets`
+
+3. Create a responsive positioning system that:
+   - Maintains proper distance from screen edges in both portrait and landscape orientations
+   - Adjusts position based on available safe area
+   - Handles notches, rounded corners, and other device-specific features
+
+4. Implement orientation change listeners to reposition the button when device orientation changes:
+   ```javascript
+   // Example implementation
+   useEffect(() => {
+     const handleOrientationChange = () => {
+       // Recalculate button position based on new orientation
+       const safeArea = getSafeAreaInsets();
+       setButtonPosition({
+         bottom: safeArea.bottom + 16, // Base padding + safe area
+         right: safeArea.right + 16
+       });
+     };
+     
+     // Add orientation change listener
+     Dimensions.addEventListener('change', handleOrientationChange);
+     
+     // Initial calculation
+     handleOrientationChange();
+     
+     return () => {
+       Dimensions.removeEventListener('change', handleOrientationChange);
+     };
+   }, []);
+   ```
+
+5. Ensure the button remains accessible and visible in all scenarios, particularly:
+   - When keyboard is visible
+   - During split-screen multitasking
+   - On devices with unusual aspect ratios
+
+6. Update any related animations or transitions to work with the new dynamic positioning system.
+
+# Test Strategy:
+1. Device Testing:
+   - Test on at least 3 different physical device sizes (small, medium, large)
+   - Test in both portrait and landscape orientations
+   - Test on devices with notches, punch-holes, or other screen irregularities
+   - Verify button remains visible and accessible in all scenarios
+
+2. Simulator/Emulator Testing:
+   - Use iOS Simulator and Android Emulator to test various device configurations
+   - Test with different safe area configurations (notches, rounded corners, etc.)
+   - Verify correct positioning across all simulated devices
+
+3. Orientation Change Testing:
+   - Rotate devices between portrait and landscape multiple times
+   - Verify button smoothly transitions to correct position
+   - Check that button remains accessible during and after rotation
+
+4. Edge Case Testing:
+   - Test with keyboard open
+   - Test in split-screen/multi-window mode
+   - Test with system UI elements visible (status bars, navigation bars)
+   - Test with system gestures (swipe up for home, etc.)
+
+5. Visual Regression Testing:
+   - Compare screenshots before and after implementation
+   - Verify button positioning is consistent or improved across all test cases
+
+6. Accessibility Testing:
+   - Verify button remains tappable with adequate touch target size
+   - Ensure button doesn't obstruct critical UI elements
+   - Test with screen readers and other accessibility tools

@@ -335,6 +335,14 @@ final class VoiceCommandRegistry: ObservableObject {
     func processCommand(_ phrase: String, handler: VoiceCommandHandler) {
         logger.info("Processing command: \(phrase)")
 
+        // Try smart material lookup patterns first
+        if let materialQuery = extractMaterialQuery(from: phrase) {
+            logger.info("Material query extracted: \(materialQuery)")
+            handler.executeCommand(.openMaterial(materialQuery))
+            return
+        }
+
+        // Fall back to standard command matching
         guard let command = findCommand(for: phrase) else {
             logger.warning("No matching command found for: \(phrase)")
             handler.handleUnrecognizedCommand(phrase)
@@ -343,6 +351,53 @@ final class VoiceCommandRegistry: ObservableObject {
 
         logger.info("Executing command: \(command.name)")
         handler.executeCommand(command.action)
+    }
+
+    // MARK: - Smart Material Query Extraction
+
+    /// Extract material query from natural language phrases
+    /// - Examples:
+    ///   - "apri ultimo materiale" → "newest"
+    ///   - "apri ultimo materiale di geometria" → "last:geometria"
+    ///   - "apri materiale storia romana" → "title:storia romana"
+    private func extractMaterialQuery(from phrase: String) -> String? {
+        let lowercasePhrase = phrase.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Pattern: "apri ultimo materiale (di [subject])"
+        if lowercasePhrase.contains("ultimo materiale") ||
+           lowercasePhrase.contains("last material") ||
+           lowercasePhrase.contains("materiale più recente") ||
+           lowercasePhrase.contains("newest material") {
+
+            // Check for subject specification
+            if let subjectMatch = lowercasePhrase.range(of: "di ") {
+                let afterDi = lowercasePhrase[subjectMatch.upperBound...].trimmingCharacters(in: .whitespaces)
+                let subjectName = String(afterDi)
+                return "last:\(subjectName)"
+            }
+
+            // No subject specified - return newest overall
+            return "newest"
+        }
+
+        // Pattern: "apri materiale [title]"
+        if lowercasePhrase.hasPrefix("apri materiale ") ||
+           lowercasePhrase.hasPrefix("open material ") ||
+           lowercasePhrase.hasPrefix("mostra materiale ") {
+
+            let prefixes = ["apri materiale ", "open material ", "mostra materiale "]
+            for prefix in prefixes {
+                if lowercasePhrase.hasPrefix(prefix) {
+                    let titlePart = String(lowercasePhrase.dropFirst(prefix.count))
+                        .trimmingCharacters(in: .whitespaces)
+                    if !titlePart.isEmpty {
+                        return "title:\(titlePart)"
+                    }
+                }
+            }
+        }
+
+        return nil
     }
 }
 

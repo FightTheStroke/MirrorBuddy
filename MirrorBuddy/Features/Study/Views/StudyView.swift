@@ -22,8 +22,7 @@ struct StudyView: View {
                 Section("Flashcard") {
                     ForEach(materials.filter { !($0.flashcards?.isEmpty ?? true) }) { material in
                         NavigationLink {
-                            // TODO: FlashcardStudyView(material: material)
-                            Text("Flashcard per \(material.title)")
+                            FlashcardStudyView(material: material)
                         } label: {
                             HStack {
                                 Image(systemName: "rectangle.portrait.on.rectangle.portrait")
@@ -43,8 +42,9 @@ struct StudyView: View {
                 Section("Mappe mentali") {
                     ForEach(materials.filter { $0.mindMap != nil }) { material in
                         NavigationLink {
-                            // TODO: MindMapView(material: material)
-                            Text("Mappa mentale per \(material.title)")
+                            if let mindMap = material.mindMap {
+                                InteractiveMindMapView(mindMap: mindMap)
+                            }
                         } label: {
                             HStack {
                                 Image(systemName: "brain.head.profile")
@@ -92,67 +92,39 @@ struct StudyView: View {
             .sheet(item: $selectedMaterial) { material in
                 // Show appropriate study view based on mode
                 if selectedStudyMode == .flashcards {
-                    // TODO: Replace with FlashcardStudyView when implemented
                     NavigationStack {
-                        VStack(spacing: 20) {
-                            Image(systemName: "rectangle.portrait.on.rectangle.portrait")
-                                .font(.system(size: 60))
-                                .foregroundStyle(.blue)
-
-                            Text("Ripasso Flashcard")
-                                .font(.title)
-                                .fontWeight(.bold)
-
-                            Text(material.title)
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-
-                            Text("\(material.flashcards?.count ?? 0) flashcard disponibili")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-
-                            Spacer()
-                        }
-                        .padding()
-                        .navigationTitle("Flashcard")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Chiudi") {
-                                    selectedMaterial = nil
-                                }
-                            }
-                        }
+                        FlashcardStudyView(material: material)
                     }
                 } else if selectedStudyMode == .mindMap {
-                    // TODO: Replace with InteractiveMindMapView when ready
-                    NavigationStack {
-                        VStack(spacing: 20) {
-                            Image(systemName: "brain.head.profile")
-                                .font(.system(size: 60))
-                                .foregroundStyle(.purple)
-
-                            Text("Mappa Mentale")
-                                .font(.title)
-                                .fontWeight(.bold)
-
-                            Text(material.title)
-                                .font(.headline)
-                                .foregroundStyle(.secondary)
-
-                            Text("Vista mappa mentale interattiva")
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-
-                            Spacer()
+                    // Real InteractiveMindMapView
+                    if let mindMap = material.mindMap {
+                        NavigationStack {
+                            InteractiveMindMapView(mindMap: mindMap)
+                                .navigationTitle(material.title)
+                                .navigationBarTitleDisplayMode(.inline)
+                                .toolbar {
+                                    ToolbarItem(placement: .confirmationAction) {
+                                        Button("Chiudi") {
+                                            selectedMaterial = nil
+                                        }
+                                    }
+                                }
                         }
-                        .padding()
-                        .navigationTitle("Mappa Mentale")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Chiudi") {
-                                    selectedMaterial = nil
+                    } else {
+                        // Fallback if no mind map exists
+                        NavigationStack {
+                            ContentUnavailableView {
+                                Label("Nessuna Mappa Mentale", systemImage: "brain.head.profile")
+                            } description: {
+                                Text("Questo materiale non ha ancora una mappa mentale")
+                            }
+                            .navigationTitle(material.title)
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .confirmationAction) {
+                                    Button("Chiudi") {
+                                        selectedMaterial = nil
+                                    }
                                 }
                             }
                         }

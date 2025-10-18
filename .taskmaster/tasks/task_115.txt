@@ -1,0 +1,69 @@
+# Task ID: 115
+# Title: Enhance Smart Material Query Parsing with Natural Language Support
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Improve the smart material query parsing system to support natural language patterns, enhance fuzzy matching for material titles, add voice command documentation, and implement user-defined material aliases.
+# Details:
+This task involves enhancing the existing smart material query parsing system with the following improvements:
+
+1. Natural Language Pattern Support:
+   - Implement parsing for temporal references like "the last thing I studied" or "my most recent material"
+   - Add support for relative references such as "the chapter before this one" or "related to what I studied yesterday"
+   - Create a pattern recognition system that maps natural language queries to specific database queries
+
+2. Fuzzy Matching Algorithm Enhancement:
+   - Improve the existing fuzzy matching algorithm for material titles
+   - Implement Levenshtein distance or similar algorithms with configurable thresholds
+   - Add phonetic matching capabilities (e.g., Soundex or Metaphone) for handling pronunciation variations
+   - Optimize performance for large material libraries
+
+3. Voice Command Documentation:
+   - Create comprehensive examples of voice commands for the help documentation
+   - Include common variations and phrasings that users might employ
+   - Organize voice commands by category (navigation, search, bookmarking, etc.)
+   - Add troubleshooting tips for voice recognition issues
+
+4. Material Aliases Implementation:
+   - Design and implement a system allowing users to define custom aliases for materials
+   - Create database schema for storing user-defined aliases
+   - Develop UI components for managing aliases (create, edit, delete)
+   - Ensure aliases are properly indexed for quick retrieval
+   - Implement alias resolution in the query parsing pipeline
+
+Technical considerations:
+- Ensure backward compatibility with existing query formats
+- Maintain performance benchmarks for query parsing speed
+- Consider internationalization aspects for non-English queries
+- Implement proper error handling for ambiguous queries
+- Add telemetry to track which new features are most used
+
+# Test Strategy:
+1. Unit Testing:
+   - Create unit tests for each new natural language pattern with various inputs
+   - Test fuzzy matching algorithm with similar but not identical material titles
+   - Verify correct alias resolution with mock database entries
+   - Test edge cases like very short aliases or aliases similar to existing commands
+
+2. Integration Testing:
+   - Verify that the enhanced query parser integrates correctly with the existing search system
+   - Test that aliases work properly across different user sessions
+   - Ensure voice command examples are correctly displayed in the help documentation
+   - Validate that fuzzy matching doesn't impact system performance
+
+3. User Acceptance Testing:
+   - Create a test script with scenarios covering all new features
+   - Recruit a diverse group of users to test natural language queries
+   - Collect feedback on the intuitiveness of the alias system
+   - Measure success rates for voice commands using the new documentation
+
+4. Performance Testing:
+   - Benchmark query parsing speed before and after changes
+   - Test system performance with a large number of user-defined aliases
+   - Measure memory usage during complex natural language query resolution
+   - Verify that fuzzy matching remains performant with large material libraries
+
+5. Regression Testing:
+   - Ensure all existing query formats still work correctly
+   - Verify that search results remain consistent for identical queries
+   - Check that the UI properly displays all new features

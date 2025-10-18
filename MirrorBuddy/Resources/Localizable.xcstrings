@@ -30,16 +30,42 @@
         }
       }
     },
+    "%@. Comando vocale: %@" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@. Comando vocale: %2$@"
+          }
+        }
+      }
+    },
+    "%@×" : {
+
+    },
     "%lld" : {
 
     },
     "%lld concepts identified" : {
 
     },
+    "%lld di %lld" : {
+      "localizations" : {
+        "it" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld di %2$lld"
+          }
+        }
+      }
+    },
     "%lld flashcard" : {
 
     },
     "%lld flashcard disponibili" : {
+
+    },
+    "%lld messaggi" : {
 
     },
     "%lld min" : {
@@ -49,6 +75,9 @@
 
     },
     "%lld problems found" : {
+
+    },
+    "%lld XP" : {
 
     },
     "%lld/%lld" : {
@@ -108,6 +137,57 @@
 
     },
     "+%lld XP" : {
+
+    },
+    "♿ Accessibilità" : {
+
+    },
+    "❤️ Complimento" : {
+
+    },
+    "🐛 Problema" : {
+
+    },
+    "💡 Suggerimento" : {
+
+    },
+    "💬 Altro" : {
+
+    },
+    "🤔 Difficoltà d'uso" : {
+
+    },
+    "0.8×" : {
+
+    },
+    "1 minuto" : {
+
+    },
+    "1.5×" : {
+
+    },
+    "2 minuti" : {
+
+    },
+    "5 minuti" : {
+
+    },
+    "30 secondi" : {
+
+    },
+    "Aa" : {
+
+    },
+    "AA ✓" : {
+
+    },
+    "AA ✗" : {
+
+    },
+    "AAA ✓" : {
+
+    },
+    "AAA ✗" : {
 
     },
     "Abilita" : {
@@ -425,6 +505,12 @@
     "Aggiornami" : {
 
     },
+    "Aggiungi compito" : {
+
+    },
+    "Aggiungi materiale" : {
+
+    },
     "Aiuti alla Lettura" : {
 
     },
@@ -438,6 +524,9 @@
 
     },
     "All Subjects" : {
+
+    },
+    "Alta (consigliata)" : {
 
     },
     "Ampia" : {
@@ -506,16 +595,34 @@
     "Attivo" : {
 
     },
+    "Audio Input" : {
+
+    },
+    "Aumenta Contrasto" : {
+
+    },
     "Aumenta la dimensione base del testo" : {
 
     },
     "Avanti 10 secondi" : {
 
     },
+    "Avanzate" : {
+
+    },
     "Avvia Sincronizzazione" : {
 
     },
     "Azioni rapide" : {
+
+    },
+    "Bassa (risparmio dati)" : {
+
+    },
+    "Batteria" : {
+
+    },
+    "Batteria al %lld percento" : {
 
     },
     "Benvenuto in" : {
@@ -528,6 +635,9 @@
 
     },
     "Camera Error" : {
+
+    },
+    "Campo messaggio feedback" : {
 
     },
     "Cancel" : {
@@ -543,6 +653,9 @@
 
     },
     "Caricamento file da Google Drive..." : {
+
+    },
+    "Cerca conversazioni..." : {
 
     },
     "Chiudi" : {
@@ -581,6 +694,9 @@
     "Comando Non Riconosciuto" : {
 
     },
+    "Comando vocale: '%@'" : {
+
+    },
     "common.add" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -607,10 +723,16 @@
     "Compliant" : {
 
     },
+    "Comportamento" : {
+
+    },
     "Comprimi contesto" : {
 
     },
     "Condividi materiale" : {
+
+    },
+    "Conferma Comandi Vocali" : {
 
     },
     "Configura API Keys" : {
@@ -652,10 +774,16 @@
     "Continua con queste chiavi" : {
 
     },
+    "Continua Registrazione" : {
+
+    },
     "Contrasto Colori" : {
 
     },
     "Controlla nuove email dai professori e eventi del calendario" : {
+
+    },
+    "Conversazioni" : {
 
     },
     "Cosa produce la fotosintesi?" : {
@@ -677,6 +805,9 @@
 
     },
     "Cronologia Contesto" : {
+
+    },
+    "Da Sbloccare" : {
 
     },
     "dashboard.title" : {
@@ -744,10 +875,16 @@
     "Done" : {
 
     },
+    "Doppio tap per %@" : {
+
+    },
     "Due date" : {
 
     },
     "Due Date" : {
+
+    },
+    "Durata registrazione: %@" : {
 
     },
     "Edit" : {
@@ -760,6 +897,9 @@
 
     },
     "Elaborazione..." : {
+
+    },
+    "Elimina" : {
 
     },
     "Email e calendario sono stati sincronizzati con successo" : {
@@ -1017,10 +1157,25 @@
     "Expand" : {
 
     },
+    "Extra Grande" : {
+
+    },
+    "Feedback Aptici" : {
+
+    },
     "Ferma" : {
 
     },
     "Ferma conversazione" : {
+
+    },
+    "Ferma conversazione vocale" : {
+
+    },
+    "Ferma e Chiudi" : {
+
+    },
+    "Ferma registrazione" : {
 
     },
     "File System" : {
@@ -1036,9 +1191,6 @@
 
     },
     "Flashcard di Esempio" : {
-
-    },
-    "Flashcard per %@" : {
 
     },
     "Font" : {
@@ -1068,6 +1220,12 @@
     "Google Gemini API Key" : {
 
     },
+    "Grande" : {
+
+    },
+    "Grazie!" : {
+
+    },
     "Group by Subject" : {
 
     },
@@ -1078,6 +1236,9 @@
 
     },
     "Hai imparato i comandi vocali base" : {
+
+    },
+    "Hai una registrazione in corso. Vuoi fermarla?" : {
 
     },
     "Hide Completed" : {
@@ -1111,6 +1272,18 @@
 
     },
     "Il tuo compagno di studio con AI" : {
+
+    },
+    "Il Tuo Feedback" : {
+
+    },
+    "Il tuo feedback ci aiuta a migliorare MirrorBuddy per tutti i bambini!" : {
+
+    },
+    "Il tuo feedback è stato ricevuto. Grazie per aiutarci a migliorare!" : {
+
+    },
+    "Il Tuo Profilo" : {
 
     },
     "Impara a usare i comandi vocali per navigare MirrorBuddy senza toccare lo schermo" : {
@@ -1167,10 +1340,22 @@
     "Inizia Conversazione" : {
 
     },
+    "Inizia conversazione vocale" : {
+
+    },
     "Inizia Lettura" : {
 
     },
+    "Inizia registrazione" : {
+
+    },
     "Inizia Studio" : {
+
+    },
+    "Inizia una nuova conversazione con il Coach Vocale" : {
+
+    },
+    "Inizia una nuova conversazione per vedere la cronologia" : {
 
     },
     "Input" : {
@@ -1183,6 +1368,12 @@
 
     },
     "Interrompi Anteprima" : {
+
+    },
+    "Invia" : {
+
+    },
+    "Invia Feedback" : {
 
     },
     "Istruzioni" : {
@@ -1221,6 +1412,9 @@
     "List View" : {
 
     },
+    "Livello %lld" : {
+
+    },
     "Low" : {
 
     },
@@ -1228,6 +1422,9 @@
 
     },
     "Maggiore spazio tra le righe rende il testo più facile da seguire" : {
+
+    },
+    "Mai" : {
 
     },
     "Mano Preferita" : {
@@ -1240,9 +1437,6 @@
 
     },
     "Mappa Mentale Generata" : {
-
-    },
-    "Mappa mentale per %@" : {
 
     },
     "Mappe mentali" : {
@@ -1431,16 +1625,28 @@
         }
       }
     },
+    "Media" : {
+
+    },
     "Medium" : {
 
     },
     "Medium-High Priority" : {
 
     },
+    "Metti in pausa" : {
+
+    },
+    "Microfono" : {
+
+    },
     "Mind Map" : {
 
     },
     "MirrorBuddy" : {
+
+    },
+    "Modalità Debug" : {
 
     },
     "Modalità Focus" : {
@@ -1453,6 +1659,9 @@
 
     },
     "Molto Ampia" : {
+
+    },
+    "Molto Grande" : {
 
     },
     "More options" : {
@@ -1468,6 +1677,15 @@
 
     },
     "Mostra Dimensioni Touch Target" : {
+
+    },
+    "Mostra Domanda" : {
+
+    },
+    "Mostra Log Audio" : {
+
+    },
+    "Mostra Risposta" : {
 
     },
     "Mostra Zone Pollice" : {
@@ -1491,10 +1709,22 @@
     "Nessun materiale" : {
 
     },
+    "Nessun traguardo sbloccato ancora" : {
+
+    },
     "Nessuna" : {
 
     },
+    "Nessuna Conversazione" : {
+
+    },
     "Nessuna Cronologia" : {
+
+    },
+    "Nessuna Flashcard" : {
+
+    },
+    "Nessuna Mappa Mentale" : {
 
     },
     "Nessuna voce disponibile per questa lingua" : {
@@ -1527,7 +1757,16 @@
     "Normale" : {
 
     },
+    "Nuova" : {
+
+    },
+    "Nuova Conversazione" : {
+
+    },
     "OAuth Credentials" : {
+
+    },
+    "Offline" : {
 
     },
     "OK" : {
@@ -1569,16 +1808,31 @@
     "Pausa" : {
 
     },
+    "Pausa Automatica Dopo" : {
+
+    },
+    "Per registrare le lezioni, devi consentire l'accesso al microfono nelle impostazioni." : {
+
+    },
     "Per utilizzare Google Drive, devi configurare le credenziali OAuth 2.0 da Google Cloud Console." : {
 
     },
     "Permessi Necessari" : {
 
     },
+    "Permesso Microfono" : {
+
+    },
     "Permissions Required:" : {
 
     },
+    "Personalizza il comportamento delle conversazioni vocali" : {
+
+    },
     "Photo" : {
+
+    },
+    "Predefinito" : {
 
     },
     "Preferenza Mano" : {
@@ -1605,16 +1859,46 @@
     "Prossimo comando" : {
 
     },
+    "Prossimo livello" : {
+
+    },
     "Prova a dire:" : {
 
     },
+    "Puoi dire '%@' per attivare questa azione" : {
+
+    },
     "Puoi modificare questi permessi in qualsiasi momento dalle Impostazioni di iOS" : {
+
+    },
+    "Qualità Audio" : {
+
+    },
+    "Questo materiale non ha ancora flashcard" : {
+
+    },
+    "Questo materiale non ha ancora una mappa mentale" : {
 
     },
     "Raggiungibilità" : {
 
     },
     "Read Aloud" : {
+
+    },
+    "Registrazione in Corso" : {
+
+    },
+    "Registrazione Lezione" : {
+
+    },
+    "Regola la sensibilità del microfono per ridurre i rumori di fondo" : {
+
+    },
+    "Regola la velocità e la qualità della voce del coach AI" : {
+
+    },
+    "Regolazioni per migliorare l'accessibilità" : {
 
     },
     "Retake Photo" : {
@@ -1626,7 +1910,19 @@
     "Ricarica" : {
 
     },
+    "Riduzione Trasparenze" : {
+
+    },
     "Righello di Lettura" : {
+
+    },
+    "Riprendi" : {
+
+    },
+    "Riprendi registrazione" : {
+
+    },
+    "Ripristina Impostazioni Predefinite" : {
 
     },
     "Ripristina Predefiniti" : {
@@ -1642,6 +1938,9 @@
 
     },
     "Risposta" : {
+
+    },
+    "Risposta Vocale" : {
 
     },
     "Salta" : {
@@ -1677,6 +1976,9 @@
     "Seleziona File" : {
 
     },
+    "Seleziona il microfono da utilizzare per le conversazioni vocali" : {
+
+    },
     "Seleziona una materia per iniziare" : {
 
     },
@@ -1686,7 +1988,25 @@
     "Selezione Voce" : {
 
     },
+    "Sensibilità Microfono" : {
+
+    },
+    "Serie di Studio" : {
+
+    },
     "Setup Guida" : {
+
+    },
+    "Sezione Flashcard, %@" : {
+
+    },
+    "Sezione Mappa Mentale, %@" : {
+
+    },
+    "Sezione Panoramica, %@" : {
+
+    },
+    "Sezione Riassunto, %@" : {
 
     },
     "Share" : {
@@ -1716,10 +2036,16 @@
     "Sincronizza Email e Calendar" : {
 
     },
+    "Sincronizza email e calendario" : {
+
+    },
     "Sincronizzazione" : {
 
     },
     "Sincronizzazione completata!" : {
+
+    },
+    "Sincronizzazione in corso" : {
 
     },
     "Sincronizzazione..." : {
@@ -1992,6 +2318,9 @@
     "Suggerimento: %@" : {
 
     },
+    "Suoni di Sistema" : {
+
+    },
     "Sviluppo" : {
 
     },
@@ -2112,13 +2441,43 @@
     "Tempo: %@" : {
 
     },
+    "Test Connessione OpenAI" : {
+
+    },
     "Test Live" : {
 
     },
     "Text detected" : {
 
     },
+    "Tipo" : {
+
+    },
+    "Tipo di Feedback" : {
+
+    },
     "Tocca due volte per %@ a parlare con il coach AI" : {
+
+    },
+    "Tocca due volte per %@ la conversazione con il coach AI" : {
+
+    },
+    "Tocca due volte per %@ la registrazione" : {
+
+    },
+    "Tocca due volte per %@ la registrazione della lezione" : {
+
+    },
+    "Tocca due volte per aprire" : {
+
+    },
+    "Tocca due volte per aprire le impostazioni di sincronizzazione" : {
+
+    },
+    "Tocca due volte per creare un nuovo compito" : {
+
+    },
+    "Tocca due volte per importare nuovo materiale" : {
 
     },
     "Tocca il pulsante + per selezionare file PDF o documenti dal tuo dispositivo" : {
@@ -2137,6 +2496,9 @@
 
     },
     "Touch Target Minimi" : {
+
+    },
+    "Traguardi" : {
 
     },
     "Troppo Piccolo" : {
@@ -2166,6 +2528,9 @@
     "Velocità" : {
 
     },
+    "Velocità Voce" : {
+
+    },
     "Versione" : {
 
     },
@@ -2188,6 +2553,9 @@
 
     },
     "Visualizzazione" : {
+
+    },
+    "Voce" : {
 
     },
     "Voice" : {

@@ -50,15 +50,11 @@
 		};
 		C2DDF29F2E9BA66A00E76D0A /* MirrorBuddyTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = MirrorBuddyTests;
 			sourceTree = "<group>";
 		};
 		C2DDF2A92E9BA66A00E76D0A /* MirrorBuddyUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = MirrorBuddyUITests;
 			sourceTree = "<group>";
 		};

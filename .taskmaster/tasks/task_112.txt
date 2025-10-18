@@ -1,0 +1,31 @@
+# Task ID: 112
+# Title: Implement Voice Command Material Detail Navigation
+# Status: done
+# Dependencies: 28 (Not found), 57 (Not found), 111 (Not found)
+# Priority: medium
+# Description: Implement the navigation logic for voice commands to open specific study materials by their ID in the MaterialDetailView when users issue voice commands.
+# Details:
+1. Locate the handleOpenMaterial function in the voice command handler that currently accepts a materialID parameter
+2. Implement the logic to find the material by ID in the data store (likely using SwiftData query)
+3. Once the material is found, implement navigation to the MaterialDetailView with the selected material
+4. Add state management to trigger the navigation from the voice command context to the detail view
+5. Ensure the navigation works from any tab or view in the application
+6. Handle edge cases such as:
+   - Material not found (provide voice feedback)
+   - Invalid material ID format
+   - Navigation while already in detail view (refresh or provide feedback)
+7. Add logging for analytics to track voice command usage
+8. Ensure the implementation maintains accessibility support during navigation
+9. Optimize the material lookup for performance to minimize delay between command and navigation
+
+# Test Strategy:
+1. Test voice commands with various material IDs to verify correct navigation
+2. Verify navigation works from different app contexts (home screen, study tab, settings, etc.)
+3. Test edge cases including:
+   - Non-existent material IDs
+   - Navigation while already viewing the requested material
+   - Rapid sequential commands
+4. Measure and verify the response time between command and navigation completion
+5. Test with VoiceOver enabled to ensure accessibility is maintained
+6. Verify proper error handling and user feedback when material cannot be found
+7. Test with offline mode to ensure cached materials can be accessed via voice commands

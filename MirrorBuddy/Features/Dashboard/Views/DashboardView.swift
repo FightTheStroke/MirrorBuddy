@@ -64,15 +64,24 @@ struct DashboardView: View {
             .sheet(item: $selectedMaterial) { material in
                 MaterialDetailView(material: material)
             }
-            // Task 112: Voice command material detail navigation
-            .onChange(of: voiceCommandHandler.selectedMaterialID) { _, materialID in
-                guard let materialID = materialID else { return }
+            // Task 112: Voice command material detail navigation (enhanced with smart parsing)
+            .onChange(of: voiceCommandHandler.selectedMaterialID) { _, materialQuery in
+                guard let materialQuery = materialQuery else { return }
 
-                // Find material by ID (UUID string)
-                if let material = materials.first(where: { $0.id.uuidString == materialID }) {
-                    selectedMaterial = material
-                    voiceCommandHandler.selectedMaterialID = nil // Reset flag
+                // Parse query using smart material query parser
+                // Supports: UUIDs, "last:geometry", "newest", "title:Storia", or direct title match
+                if let materialID = MaterialQueryParser.findMaterial(
+                    query: materialQuery,
+                    in: materials,
+                    subjects: subjects
+                ) {
+                    if let material = materials.first(where: { $0.id == materialID }) {
+                        selectedMaterial = material
+                    }
                 }
+
+                // Reset flag
+                voiceCommandHandler.selectedMaterialID = nil
             }
         }
     }

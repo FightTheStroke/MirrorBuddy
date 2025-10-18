@@ -1,0 +1,39 @@
+# Task ID: 110
+# Title: Implement Voice Command Sheets for Settings, Profile, and Help Views
+# Status: done
+# Dependencies: 63 (Not found), 64 (Not found)
+# Priority: medium
+# Description: Create modal sheets for Settings, Profile, and Help views that respond to voice commands already handled by AppVoiceCommandHandler in MainTabView.
+# Details:
+1. Examine the existing AppVoiceCommandHandler to understand how showSettings, showProfile, and showHelp flags are currently set
+2. Create three SwiftUI sheet views:
+   - SettingsSheetView: Display app settings with appropriate controls
+   - ProfileSheetView: Show user profile information and editing options
+   - HelpSheetView: Provide help documentation and guidance
+3. Modify MainTabView to bind these sheets to the corresponding boolean flags:
+   ```swift
+   .sheet(isPresented: $appVoiceCommandHandler.showSettings) {
+       SettingsSheetView()
+   }
+   .sheet(isPresented: $appVoiceCommandHandler.showProfile) {
+       ProfileSheetView()
+   }
+   .sheet(isPresented: $appVoiceCommandHandler.showHelp) {
+       HelpSheetView()
+   }
+   ```
+4. Ensure each sheet has a proper dismissal mechanism (both manual and voice-activated)
+5. Add voice command handlers within each sheet for navigation
+6. Implement accessibility features in all sheets
+7. Add appropriate animations for sheet presentation
+8. Update voice command documentation to include these new sheet interactions
+
+# Test Strategy:
+1. Test that voice commands "show settings", "show profile", and "show help" correctly display the appropriate sheets
+2. Verify that each sheet can be dismissed both manually and with voice commands
+3. Test accessibility features in each sheet, particularly VoiceOver compatibility
+4. Verify that the sheets display correctly on different device sizes
+5. Test that the sheets don't interfere with other voice commands when open
+6. Verify proper state management when rapidly switching between sheets
+7. Test performance to ensure sheet presentation is smooth and responsive
+8. Conduct user testing to verify the sheets are intuitive and useful
