@@ -1,6 +1,6 @@
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Mind map generation service using GPT-5 (Task 21)
 @MainActor
@@ -119,7 +119,7 @@ final class MindMapGenerationService {
                 ChatMessage(role: .user, content: .text(prompt))
             ],
             temperature: 0.7,
-            maxTokens: 2000
+            maxTokens: 2_000
         )
 
         guard let content = response.choices.first?.message.content else {

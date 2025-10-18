@@ -57,7 +57,7 @@ actor CircuitBreaker {
     private var failureCount: Int = 0
     private var successCount: Int = 0
     private var lastFailureTime: Date?
-    private var stateChangeTime: Date = Date()
+    private var stateChangeTime = Date()
     private var failureTimes: [Date] = []
 
     // MARK: - Initialization

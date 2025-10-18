@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import MirrorBuddy
+import Testing
 
 @Suite("API Error Tests")
 @MainActor

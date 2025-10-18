@@ -6,8 +6,8 @@
 //  Simple and child-friendly UI
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct UpdateButtonView: View {
     @State private var updateManager = UpdateManager.shared

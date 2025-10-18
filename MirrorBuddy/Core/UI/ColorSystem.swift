@@ -13,7 +13,6 @@ import SwiftUI
 /// Semantic color palette optimized for children with DSA needs
 /// All colors meet WCAG 2.1 Level AA contrast requirements
 extension Color {
-
     // MARK: - Primary Brand Colors
 
     /// Primary brand blue - cheerful and trustworthy
@@ -272,7 +271,7 @@ enum WCAGLevel {
 extension Color {
     /// Returns appropriate color for current color scheme
     static func adaptive(light: Color, dark: Color) -> Color {
-        return Color(UIColor { traitCollection in
+        Color(UIColor { traitCollection in
             traitCollection.userInterfaceStyle == .dark ? UIColor(dark) : UIColor(light)
         })
     }

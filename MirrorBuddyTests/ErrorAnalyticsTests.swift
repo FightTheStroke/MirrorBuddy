@@ -152,7 +152,7 @@ struct ErrorAnalyticsTests {
         #expect(recentErrors.count >= 1)
 
         let oldErrors = logger.getErrors(from: twoMinutesAgo, to: oneMinuteAgo)
-        #expect(oldErrors.count == 0)
+        #expect(oldErrors.isEmpty)
     }
 
     @Test("Error logger calculates error rate")

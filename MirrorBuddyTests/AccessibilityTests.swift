@@ -1,12 +1,11 @@
-import XCTest
-import SwiftUI
 @testable import MirrorBuddy
+import SwiftUI
+import XCTest
 
 // MARK: - Accessibility Tests (Task 64)
 
 @MainActor
 final class AccessibilityTests: XCTestCase {
-
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
@@ -265,7 +264,7 @@ final class AccessibilityTests: XCTestCase {
 
 extension UIContentSizeCategory: CaseIterable {
     public static var allCases: [UIContentSizeCategory] {
-        return [
+        [
             .extraSmall,
             .small,
             .medium,

@@ -25,7 +25,7 @@ struct FallbackExecutor {
         do {
             let result = try await primary()
             return .primary(result)
-        } catch let primaryError {
+        } catch let primaryError as Error {
             // Log primary failure
             await MainActor.run {
                 APIErrorLogger.shared.log(primaryError, additionalContext: [
@@ -37,7 +37,7 @@ struct FallbackExecutor {
             do {
                 let fallbackResult = try await fallback(primaryError)
                 return .fallback(fallbackResult, primaryError)
-            } catch let fallbackError {
+            } catch let fallbackError as Error {
                 // Log fallback failure
                 await MainActor.run {
                     APIErrorLogger.shared.log(fallbackError, additionalContext: [

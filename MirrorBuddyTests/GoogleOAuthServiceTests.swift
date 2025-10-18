@@ -59,7 +59,7 @@ struct GoogleOAuthServiceTests {
         let tokens = OAuthTokens(
             accessToken: "test-access-token",
             refreshToken: "test-refresh-token",
-            expiresAt: Date().addingTimeInterval(3600),
+            expiresAt: Date().addingTimeInterval(3_600),
             tokenType: "Bearer",
             scope: "drive.readonly"
         )
@@ -82,7 +82,7 @@ struct GoogleOAuthServiceTests {
         let tokens = OAuthTokens(
             accessToken: "valid-token",
             refreshToken: "refresh-token",
-            expiresAt: Date().addingTimeInterval(3600),
+            expiresAt: Date().addingTimeInterval(3_600),
             tokenType: "Bearer",
             scope: nil
         )
@@ -193,7 +193,7 @@ struct GoogleOAuthServiceTests {
         let tokens = OAuthTokens(
             accessToken: "access-token",
             refreshToken: nil,
-            expiresAt: Date().addingTimeInterval(3600),
+            expiresAt: Date().addingTimeInterval(3_600),
             tokenType: "Bearer",
             scope: nil
         )
@@ -311,7 +311,7 @@ struct GoogleOAuthServiceTests {
         let tokens = OAuthTokens(
             accessToken: "test-token",
             refreshToken: "refresh-token",
-            expiresAt: Date().addingTimeInterval(3600),
+            expiresAt: Date().addingTimeInterval(3_600),
             tokenType: "Bearer",
             scope: nil
         )

@@ -1,6 +1,6 @@
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Summary generation service using Apple Intelligence with OpenAI fallback (Task 20)
 @MainActor
@@ -13,7 +13,7 @@ final class SummaryGenerationService {
     // MARK: - Configuration
 
     /// Maximum text length per chunk (tokens approximate)
-    private let maxChunkSize = 4000
+    private let maxChunkSize = 4_000
 
     /// Summary detail levels
     enum DetailLevel: String, Codable {
@@ -356,7 +356,7 @@ final class SummaryGenerationService {
 
         // Check if cache is still fresh (within 7 days)
         let cacheAge = Date().timeIntervalSince(latest.generatedAt)
-        guard cacheAge < 7 * 24 * 3600 else {
+        guard cacheAge < 7 * 24 * 3_600 else {
             logger.debug("Cached summary expired")
             return nil
         }
@@ -375,7 +375,7 @@ final class SummaryGenerationService {
     func cleanOldCache(olderThan days: Int = 30) async throws {
         guard let context = modelContext else { return }
 
-        let cutoffDate = Date().addingTimeInterval(-Double(days * 24 * 3600))
+        let cutoffDate = Date().addingTimeInterval(-Double(days * 24 * 3_600))
 
         let descriptor = FetchDescriptor<SummaryModel>(
             predicate: #Predicate { summary in

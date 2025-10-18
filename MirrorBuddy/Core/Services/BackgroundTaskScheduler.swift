@@ -1,5 +1,5 @@
-import Foundation
 import BackgroundTasks
+import Foundation
 import os.log
 
 /// Service for scheduling and managing background sync tasks
@@ -165,7 +165,6 @@ final class BackgroundTaskScheduler {
                 if stats.hasChanges {
                     postSyncNotification(stats: stats)
                 }
-
             } catch {
                 logger.error("Background sync failed: \(error.localizedDescription)")
                 task.setTaskCompleted(success: false)

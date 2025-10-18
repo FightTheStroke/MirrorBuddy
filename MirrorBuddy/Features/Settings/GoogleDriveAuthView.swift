@@ -1,6 +1,6 @@
-import SwiftUI
 import AuthenticationServices
 import Combine
+import SwiftUI
 
 /// View for Google Drive authentication
 struct GoogleDriveAuthView: View {
@@ -199,7 +199,6 @@ final class GoogleDriveAuthViewModel: NSObject, ObservableObject {
                 // Update state on success
                 isAuthenticated = true
                 isLoading = false
-
             } catch {
                 isLoading = false
 

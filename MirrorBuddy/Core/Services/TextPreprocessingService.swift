@@ -143,7 +143,7 @@ final class TextPreprocessingService {
             (#"(\d)\s*=\s*(\d)"#, "$1 = $2"),
 
             // Remove zero-width characters
-            (#"[\u200B-\u200D\uFEFF]"#, ""),
+            (#"[\u200B-\u200D\uFEFF]"#, "")
         ]
 
         for (pattern, replacement) in corrections {
@@ -284,7 +284,7 @@ final class TextPreprocessingService {
             (#"∞"#, "infinity"),
 
             // Integral
-            (#"∫"#, "integral"),
+            (#"∫"#, "integral")
         ]
 
         for (pattern, replacement) in mathSymbols {
@@ -311,7 +311,7 @@ final class TextPreprocessingService {
             #"\d+ di \d+"#,
             #"Copyright ©.*"#,
             #"Tutti i diritti riservati"#,
-            #"All rights reserved"#,
+            #"All rights reserved"#
         ]
 
         for pattern in footerPatterns {
@@ -391,7 +391,7 @@ final class TextPreprocessingService {
     /// Split long text into manageable chunks for AI processing
     func chunkText(
         _ text: String,
-        maxChunkSize: Int = 4000,
+        maxChunkSize: Int = 4_000,
         overlap: Int = 200
     ) -> [String] {
         guard text.count > maxChunkSize else {
@@ -523,6 +523,6 @@ struct TextQualityMetrics {
 
 extension String {
     func contains(_ pattern: String, options: NSString.CompareOptions) -> Bool {
-        return self.range(of: pattern, options: options) != nil
+        self.range(of: pattern, options: options) != nil
     }
 }

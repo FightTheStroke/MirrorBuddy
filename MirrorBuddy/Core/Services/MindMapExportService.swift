@@ -1,7 +1,7 @@
 import Foundation
+import os.log
 import SwiftData
 import UIKit
-import os.log
 
 /// Mind map export service supporting multiple formats (Task 41)
 @MainActor
@@ -348,12 +348,12 @@ struct ExportResult {
 
     var formattedSize: String {
         let bytes = Double(sizeInBytes)
-        if bytes < 1024 {
+        if bytes < 1_024 {
             return "\(Int(bytes)) B"
-        } else if bytes < 1024 * 1024 {
-            return String(format: "%.1f KB", bytes / 1024)
+        } else if bytes < 1_024 * 1_024 {
+            return String(format: "%.1f KB", bytes / 1_024)
         } else {
-            return String(format: "%.1f MB", bytes / (1024 * 1024))
+            return String(format: "%.1f MB", bytes / (1_024 * 1_024))
         }
     }
 }

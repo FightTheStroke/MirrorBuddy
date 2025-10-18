@@ -1,7 +1,7 @@
-import Foundation
-import SwiftData
 import BackgroundTasks
+import Foundation
 import os.log
+import SwiftData
 
 /// Gmail API integration for assignment extraction (Task 43)
 @MainActor
@@ -567,7 +567,7 @@ final class GmailService {
         let identifier = "com.mirrorbuddy.gmail.refresh"
 
         let request = BGAppRefreshTaskRequest(identifier: identifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 1800) // 30 minutes
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 1_800) // 30 minutes
 
         do {
             try BGTaskScheduler.shared.submit(request)

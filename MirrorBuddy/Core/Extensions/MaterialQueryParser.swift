@@ -25,7 +25,7 @@ struct MaterialQueryParser {
 
         // Try UUID format first
         if let uuid = UUID(uuidString: trimmedQuery) {
-            return materials.first(where: { $0.id == uuid })?.id
+            return materials.first { $0.id == uuid }?.id
         }
 
         // Parse special formats
@@ -73,7 +73,7 @@ struct MaterialQueryParser {
 
     /// Find most recently created material overall
     private static func findNewestMaterial(in materials: [Material]) -> UUID? {
-        return materials
+        materials
             .sorted { $0.createdAt > $1.createdAt }
             .first?.id
     }

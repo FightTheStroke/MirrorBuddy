@@ -234,9 +234,8 @@ extension View {
 #Preview("Status Bar") {
     VoiceStatusBar(
         state: .listening,
-        message: "Pronuncia il tuo comando",
-        onDismiss: {}
-    )
+        message: "Pronuncia il tuo comando"
+    )        {}
 }
 
 #Preview("In Navigation") {

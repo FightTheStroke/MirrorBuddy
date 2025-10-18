@@ -5,7 +5,7 @@ import SwiftUI
 /// Database-backed subject entity allowing customization
 @Model
 final class SubjectEntity {
-    var id: UUID = UUID()
+    var id = UUID()
 
     /// Subject name (uses localization key)
     var localizationKey: String = ""

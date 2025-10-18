@@ -4,10 +4,10 @@ import SwiftData
 /// Visual mind map representation of material content
 @Model
 final class MindMap {
-    var id: UUID = UUID()
-    var materialID: UUID = UUID()
+    var id = UUID()
+    var materialID = UUID()
     var imageURL: URL?
-    var generatedAt: Date = Date()
+    var generatedAt = Date()
     var prompt: String?
 
     @Relationship(deleteRule: .cascade, inverse: \MindMapNode.mindMap)
@@ -34,7 +34,7 @@ final class MindMap {
 /// Individual node in a mind map
 @Model
 final class MindMapNode {
-    var id: UUID = UUID()
+    var id = UUID()
     var title: String = ""
     var content: String?
     var positionX: Double = 0.0

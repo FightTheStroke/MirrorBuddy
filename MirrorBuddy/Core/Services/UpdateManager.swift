@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Progress state for the update process
 @Observable
@@ -121,7 +121,6 @@ final class UpdateManager {
             progress.currentStep = .completed
             progress.statusMessage = buildCompletionMessage()
             logger.info("Full update completed successfully")
-
         } catch {
             logger.error("Update failed: \(error.localizedDescription)")
             progress.currentStep = .failed
@@ -217,7 +216,6 @@ final class UpdateManager {
 
                 newFilesCount += 1
                 logger.debug("Imported new file: \(file.name)")
-
             } catch {
                 logger.warning("Failed to import file \(file.name): \(error.localizedDescription)")
             }

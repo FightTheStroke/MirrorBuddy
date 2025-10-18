@@ -37,10 +37,10 @@ struct FallbackTests {
     func testPrimarySuccess() async {
         let result = await FallbackExecutor.executeWithFallback(
             primary: {
-                return "primary-success"
+                "primary-success"
             },
             fallback: { _ in
-                return "fallback-value"
+                "fallback-value"
             }
         )
 
@@ -59,7 +59,7 @@ struct FallbackTests {
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { _ in
-                return "fallback-success"
+                "fallback-success"
             }
         )
 
@@ -97,10 +97,10 @@ struct FallbackTests {
     func testThrowingVariantPrimarySuccess() async throws {
         let result = try await FallbackExecutor.executeWithFallbackThrowing(
             primary: {
-                return "primary-success"
+                "primary-success"
             },
             fallback: { _ in
-                return "fallback-value"
+                "fallback-value"
             }
         )
 
@@ -114,7 +114,7 @@ struct FallbackTests {
                 throw UnifiedAPIError.timeout(context: nil)
             },
             fallback: { _ in
-                return "fallback-success"
+                "fallback-success"
             }
         )
 
@@ -301,7 +301,7 @@ struct FallbackTests {
                 return "success"
             },
             fallback: { _ in
-                return "fallback"
+                "fallback"
             }
         )
 
@@ -339,7 +339,7 @@ struct FallbackTests {
             retryPolicy: .none,
             circuitBreakerConfig: .lenient
         ) {
-            return "success"
+            "success"
         }
 
         #expect(result == "success")

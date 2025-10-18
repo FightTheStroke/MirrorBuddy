@@ -1,12 +1,11 @@
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 // MARK: - Model Tests (Task 61.1)
 
 @MainActor
 final class ModelTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 
@@ -579,13 +578,13 @@ final class ModelTests: XCTestCase {
             fileID: "test123",
             name: "Test.pdf",
             mimeType: "application/pdf",
-            size: 1024
+            size: 1_024
         )
 
         XCTAssertEqual(file.fileID, "test123")
         XCTAssertEqual(file.name, "Test.pdf")
         XCTAssertEqual(file.mimeType, "application/pdf")
-        XCTAssertEqual(file.size, 1024)
+        XCTAssertEqual(file.size, 1_024)
         XCTAssertFalse(file.isTrashed)
         XCTAssertEqual(file.status, .unchanged)
     }
@@ -715,9 +714,9 @@ final class ModelTests: XCTestCase {
 
     func testMaximumValueEdgeCases() throws {
         // Test with very long strings
-        let longTitle = String(repeating: "A", count: 10000)
+        let longTitle = String(repeating: "A", count: 10_000)
         let material = Material(title: longTitle)
-        XCTAssertEqual(material.title.count, 10000)
+        XCTAssertEqual(material.title.count, 10_000)
 
         // Test with maximum priority
         let task = Task(title: "Max Priority", priority: Int.max)

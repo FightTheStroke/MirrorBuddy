@@ -112,7 +112,7 @@ final class QuizGenerationService {
                 ChatMessage(role: .user, content: .text(prompt))
             ],
             temperature: 0.7,
-            maxTokens: 2000
+            maxTokens: 2_000
         )
 
         guard let content = response.choices.first?.message.content else {

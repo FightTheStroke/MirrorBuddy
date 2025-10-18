@@ -126,7 +126,7 @@ struct EmailCalendarSyncView: View {
 }
 
 #Preview {
-    EmailCalendarSyncView(onSync: {
+    EmailCalendarSyncView {
         try? await _Concurrency.Task.sleep(nanoseconds: 2_000_000_000)
-    })
+    }
 }

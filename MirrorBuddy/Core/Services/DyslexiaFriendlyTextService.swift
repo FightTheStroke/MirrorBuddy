@@ -1,6 +1,6 @@
+import Combine
 import Foundation
 import SwiftUI
-import Combine
 
 /// Service for managing dyslexia-friendly text rendering settings (Task 74)
 @MainActor
@@ -190,7 +190,7 @@ final class DyslexiaFriendlyTextService: ObservableObject {
 
     /// Check if OpenDyslexic font is available
     var isOpenDyslexicAvailable: Bool {
-        return DyslexiaFont.openDyslexic.isAvailable
+        DyslexiaFont.openDyslexic.isAvailable
     }
 
     // MARK: - Reset Methods

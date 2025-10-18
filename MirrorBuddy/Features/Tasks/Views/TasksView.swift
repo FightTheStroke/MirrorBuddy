@@ -6,8 +6,8 @@
 //  Tasks tab showing personal tasks, calendar events, and teacher emails
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Tasks view with email and calendar integration (Task 109)
 struct TasksView: View {
@@ -108,11 +108,9 @@ struct TasksView: View {
                 }
             }
             .sheet(isPresented: $showingSyncSheet) {
-                EmailCalendarSyncView(
-                    onSync: {
+                EmailCalendarSyncView                    {
                         await syncEmailsAndCalendar()
                     }
-                )
             }
             .task {
                 // Load cached data on appear

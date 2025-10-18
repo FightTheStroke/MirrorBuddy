@@ -12,9 +12,9 @@ import SwiftData
 /// Lesson transcript from audio recording
 @Model
 final class Transcript {
-    var id: UUID = UUID()
-    var createdAt: Date = Date()
-    var lastModifiedAt: Date = Date()
+    var id = UUID()
+    var createdAt = Date()
+    var lastModifiedAt = Date()
 
     // Transcript content
     var text: String = ""
@@ -26,7 +26,7 @@ final class Transcript {
     var audioFileURL: URL?
 
     // Transcription metadata
-    var transcriptionDate: Date = Date()
+    var transcriptionDate = Date()
     var chunkCount: Int = 0
     var totalWords: Int = 0
     var wordsPerMinute: Double = 0
@@ -77,8 +77,8 @@ final class Transcript {
 
     /// Formatted duration string
     var formattedDuration: String {
-        let hours = Int(recordingDuration) / 3600
-        let minutes = (Int(recordingDuration) % 3600) / 60
+        let hours = Int(recordingDuration) / 3_600
+        let minutes = (Int(recordingDuration) % 3_600) / 60
         let seconds = Int(recordingDuration) % 60
 
         if hours > 0 {

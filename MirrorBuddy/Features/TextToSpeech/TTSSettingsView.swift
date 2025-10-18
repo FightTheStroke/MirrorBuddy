@@ -1,5 +1,5 @@
-import SwiftUI
 import AVFoundation
+import SwiftUI
 
 /// TTS settings view for voice selection and configuration (Task 73.2)
 struct TTSSettingsView: View {
@@ -7,7 +7,7 @@ struct TTSSettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @AppStorage("ttsVoiceIdentifier") private var savedVoiceIdentifier: String = ""
-    @AppStorage("ttsRate") private var savedRate: Double = Double(AVSpeechUtteranceDefaultSpeechRate)
+    @AppStorage("ttsRate") private var savedRate = Double(AVSpeechUtteranceDefaultSpeechRate)
     @AppStorage("ttsPitch") private var savedPitch: Double = 1.0
     @AppStorage("ttsVolume") private var savedVolume: Double = 1.0
 

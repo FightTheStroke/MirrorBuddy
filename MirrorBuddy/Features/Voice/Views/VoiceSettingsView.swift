@@ -1,6 +1,6 @@
-import SwiftUI
 import AVFoundation
 import Combine
+import SwiftUI
 
 // MARK: - Voice Settings View (Task 102.4)
 
@@ -199,9 +199,9 @@ enum AudioQuality: String, CaseIterable, Identifiable {
 
     var sampleRate: Double {
         switch self {
-        case .low: return 16000
-        case .medium: return 24000
-        case .high: return 48000
+        case .low: return 16_000
+        case .medium: return 24_000
+        case .high: return 48_000
         }
     }
 }

@@ -1,7 +1,7 @@
-import Foundation
 import BackgroundTasks
-import SwiftData
 import Combine
+import Foundation
+import SwiftData
 
 /// Background sync service for scheduled material syncs at 13:00 and 18:00 CET (Task 72)
 @MainActor

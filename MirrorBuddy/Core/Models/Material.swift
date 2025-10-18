@@ -12,9 +12,9 @@ enum ProcessingStatus: String, Codable {
 /// Learning material (PDF, text, or imported from Google Drive)
 @Model
 final class Material {
-    var id: UUID = UUID()
+    var id = UUID()
     var title: String = ""
-    var createdAt: Date = Date()
+    var createdAt = Date()
     var lastAccessedAt: Date?
 
     // Content storage
@@ -27,7 +27,7 @@ final class Material {
     var googleDriveFileID: String?
 
     // Processing state
-    var processingStatus: ProcessingStatus = ProcessingStatus.pending
+    var processingStatus = ProcessingStatus.pending
 
     // Relationships (NO inverse for one-to-many "one" side)
     @Relationship(deleteRule: .nullify)

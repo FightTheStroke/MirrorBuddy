@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Material card component for displaying materials in the dashboard
 ///
@@ -364,7 +364,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
     )
     let _ = {
         material.processingStatus = .completed
-        material.createdAt = Date().addingTimeInterval(-86400 * 2)
+        material.createdAt = Date().addingTimeInterval(-86_400 * 2)
         container.mainContext.insert(subject)
         container.mainContext.insert(material)
     }()

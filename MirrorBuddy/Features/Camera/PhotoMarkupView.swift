@@ -1,7 +1,7 @@
-import SwiftUI
-import PencilKit
 import Combine
 import os.log
+import PencilKit
+import SwiftUI
 
 /// View for marking up photos with Apple Pencil or finger
 struct PhotoMarkupView: View {
@@ -195,7 +195,7 @@ final class PhotoMarkupViewModel: NSObject, ObservableObject {
 
         let renderer = UIGraphicsImageRenderer(size: size, format: format)
 
-        let markedUpImage = renderer.image { context in
+        let markedUpImage = renderer.image { _ in
             // Draw base image
             baseImage.draw(in: CGRect(origin: .zero, size: size))
 

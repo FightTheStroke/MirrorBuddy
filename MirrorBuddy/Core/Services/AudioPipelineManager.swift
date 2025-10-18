@@ -1,5 +1,5 @@
-import Foundation
 @preconcurrency import AVFoundation
+import Foundation
 import os.log
 
 /// Manager for audio pipeline operations for voice conversations
@@ -28,7 +28,7 @@ final class AudioPipelineManager: NSObject {
     private var recordingFormat: AVAudioFormat {
         AVAudioFormat(
             commonFormat: .pcmFormatInt16,
-            sampleRate: 24000,
+            sampleRate: 24_000,
             channels: 1,
             interleaved: false
         )!
@@ -75,7 +75,7 @@ final class AudioPipelineManager: NSObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         super.init()
         setupNotifications()
     }
@@ -99,7 +99,7 @@ final class AudioPipelineManager: NSObject {
             )
 
             // Configure for optimal voice quality
-            try audioSession.setPreferredSampleRate(24000)
+            try audioSession.setPreferredSampleRate(24_000)
             try audioSession.setPreferredIOBufferDuration(0.005) // 5ms for low latency
 
             // Activate session
@@ -129,9 +129,9 @@ final class AudioPipelineManager: NSObject {
 
         inputNode.installTap(
             onBus: 0,
-            bufferSize: 4096,
+            bufferSize: 4_096,
             format: inputFormat
-        ) { [weak self] buffer, time in
+        ) { [weak self] buffer, _ in
             guard let self else { return }
 
             // Convert to target format if needed
@@ -372,7 +372,7 @@ final class AudioPipelineManager: NSObject {
         }
 
         var error: NSError?
-        let inputBlock: AVAudioConverterInputBlock = { inNumPackets, outStatus in
+        let inputBlock: AVAudioConverterInputBlock = { _, outStatus in
             outStatus.pointee = .haveData
             return buffer
         }

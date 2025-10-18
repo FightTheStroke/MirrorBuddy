@@ -1,13 +1,12 @@
-import XCTest
-import UIKit
-import PDFKit
 @testable import MirrorBuddy
+import PDFKit
+import UIKit
+import XCTest
 
 // MARK: - Processing Pipeline Tests (Task 61.3)
 
 @MainActor
 final class ProcessingPipelineTests: XCTestCase {
-
     // MARK: - PDF Text Extraction Tests
 
     func testPDFDocumentLoading() throws {

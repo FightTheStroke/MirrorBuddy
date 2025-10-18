@@ -201,20 +201,20 @@ final class TranscriptMergeService {
 
     /// Format timestamp for SRT (HH:MM:SS,mmm)
     private func formatSRTTimestamp(_ time: TimeInterval) -> String {
-        let hours = Int(time) / 3600
-        let minutes = (Int(time) % 3600) / 60
+        let hours = Int(time) / 3_600
+        let minutes = (Int(time) % 3_600) / 60
         let seconds = Int(time) % 60
-        let milliseconds = Int((time.truncatingRemainder(dividingBy: 1.0)) * 1000)
+        let milliseconds = Int((time.truncatingRemainder(dividingBy: 1.0)) * 1_000)
 
         return String(format: "%02d:%02d:%02d,%03d", hours, minutes, seconds, milliseconds)
     }
 
     /// Format timestamp for VTT (HH:MM:SS.mmm)
     private func formatVTTTimestamp(_ time: TimeInterval) -> String {
-        let hours = Int(time) / 3600
-        let minutes = (Int(time) % 3600) / 60
+        let hours = Int(time) / 3_600
+        let minutes = (Int(time) % 3_600) / 60
         let seconds = Int(time) % 60
-        let milliseconds = Int((time.truncatingRemainder(dividingBy: 1.0)) * 1000)
+        let milliseconds = Int((time.truncatingRemainder(dividingBy: 1.0)) * 1_000)
 
         return String(format: "%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds)
     }
@@ -299,8 +299,8 @@ struct MergedTranscript: Codable, Identifiable {
 
     /// Formatted duration
     var formattedDuration: String {
-        let hours = Int(duration) / 3600
-        let minutes = (Int(duration) % 3600) / 60
+        let hours = Int(duration) / 3_600
+        let minutes = (Int(duration) % 3_600) / 60
         let seconds = Int(duration) % 60
 
         if hours > 0 {
@@ -346,16 +346,16 @@ struct TranscriptSegment: Codable, Identifiable {
 
     /// Formatted start time
     var formattedStartTime: String {
-        let hours = Int(startTime) / 3600
-        let minutes = (Int(startTime) % 3600) / 60
+        let hours = Int(startTime) / 3_600
+        let minutes = (Int(startTime) % 3_600) / 60
         let seconds = Int(startTime) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
 
     /// Formatted end time
     var formattedEndTime: String {
-        let hours = Int(endTime) / 3600
-        let minutes = (Int(endTime) % 3600) / 60
+        let hours = Int(endTime) / 3_600
+        let minutes = (Int(endTime) % 3_600) / 60
         let seconds = Int(endTime) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }

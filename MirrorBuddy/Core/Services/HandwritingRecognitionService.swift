@@ -1,8 +1,8 @@
 import Foundation
-import Vision
+import os.log
 import PencilKit
 import UIKit
-import os.log
+import Vision
 
 /// Handwriting recognition service using VisionKit and Apple Pencil (Task 38)
 @MainActor
@@ -190,7 +190,7 @@ final class HandwritingRecognitionService {
             // Exponents: x^2, a^n
             ("\\^", MathExpressionType.exponent),
             // Square roots: √
-            ("√", MathExpressionType.root),
+            ("√", MathExpressionType.root)
         ]
 
         for recognizedText in result.recognizedTexts {
@@ -215,7 +215,7 @@ final class HandwritingRecognitionService {
     // MARK: - Domain-Specific Terms
 
     private func getMathematicalTerms() -> [String] {
-        return [
+        [
             // Greek letters
             "alpha", "beta", "gamma", "delta", "epsilon", "theta", "lambda", "mu", "pi", "sigma", "omega",
             // Mathematical terms
@@ -228,7 +228,7 @@ final class HandwritingRecognitionService {
     }
 
     private func getCommonAcademicTerms() -> [String] {
-        return [
+        [
             // Science
             "atom", "molecule", "element", "compound", "reaction", "energy", "force", "velocity",
             "acceleration", "mass", "volume", "density", "pressure", "temperature", "nucleus",

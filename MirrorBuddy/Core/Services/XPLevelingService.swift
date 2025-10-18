@@ -1,6 +1,6 @@
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// XP and Leveling service for gamification (Task 46)
 @MainActor

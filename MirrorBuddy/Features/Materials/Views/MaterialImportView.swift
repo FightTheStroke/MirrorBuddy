@@ -5,8 +5,8 @@
 //  View for importing materials from Google Drive
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 import UniformTypeIdentifiers
 
 struct MaterialImportView: View {
@@ -111,7 +111,7 @@ struct MaterialImportView: View {
                         }
                     }
                 }
-            }
+                }
             }
             .navigationTitle(importSource == .googleDrive ? "Importa da Drive" : "Importa File")
             .navigationBarTitleDisplayMode(.inline)

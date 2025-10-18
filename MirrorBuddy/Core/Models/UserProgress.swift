@@ -37,7 +37,7 @@ enum Achievement: String, Codable, CaseIterable {
 /// User progress tracking and gamification
 @Model
 final class UserProgress {
-    var id: UUID = UUID()
+    var id = UUID()
 
     // Study statistics
     var totalStudyTimeMinutes: Int = 0
@@ -58,7 +58,7 @@ final class UserProgress {
     var totalXP: Int = 0
     var level: Int = 1
 
-    var createdAt: Date = Date()
+    var createdAt = Date()
 
     init() {
         self.id = UUID()

@@ -1,7 +1,7 @@
 @preconcurrency import AVFoundation
+import os.log
 @preconcurrency import Photos
 import UIKit
-import os.log
 
 /// Capture mode enumeration
 enum CaptureMode: CustomStringConvertible {
@@ -76,7 +76,7 @@ final class CameraManager: NSObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         super.init()
     }
 
@@ -488,7 +488,7 @@ final class CameraManager: NSObject {
     /// Check camera permission status
     /// - Returns: Current authorization status
     func checkCameraPermission() async -> AVAuthorizationStatus {
-        return AVCaptureDevice.authorizationStatus(for: .video)
+        AVCaptureDevice.authorizationStatus(for: .video)
     }
 
     /// Request camera permission

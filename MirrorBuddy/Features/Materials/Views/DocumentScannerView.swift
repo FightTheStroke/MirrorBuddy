@@ -6,9 +6,9 @@
 //  Scans multiple pages, auto-crops, and runs OCR
 //
 
+import SwiftData
 import SwiftUI
 import VisionKit
-import SwiftData
 
 struct DocumentScannerView: UIViewControllerRepresentable {
     @Environment(\.dismiss) private var dismiss
@@ -129,7 +129,6 @@ struct DocumentScannerView: UIViewControllerRepresentable {
 
                 // Notify completion
                 onComplete(material)
-
             } catch {
                 print("❌ Failed to process scanned document: \(error)")
             }

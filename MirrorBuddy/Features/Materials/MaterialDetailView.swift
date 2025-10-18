@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import PDFKit
+import SwiftData
+import SwiftUI
 
 /// Material detail view with comprehensive features (Task 28, refactored in Task 108)
 /// Simplified vertical layout with collapsible sections for better accessibility
@@ -234,9 +234,8 @@ struct MaterialDetailView: View {
                 icon: "brain.head.profile",
                 title: "Nessuna Mappa Mentale",
                 message: "Genera una mappa mentale per questo materiale",
-                actionTitle: "Genera Mappa",
-                action: { generateMindMap() }
-            )
+                actionTitle: "Genera Mappa"
+            )                { generateMindMap() }
         }
     }
 
@@ -279,9 +278,8 @@ struct MaterialDetailView: View {
                 icon: "rectangle.portrait.on.rectangle.portrait.fill",
                 title: "Nessuna Flashcard",
                 message: "Genera flashcard per questo materiale",
-                actionTitle: "Genera Flashcard",
-                action: { generateFlashcards() }
-            )
+                actionTitle: "Genera Flashcard"
+            )                { generateFlashcards() }
         }
     }
 
@@ -309,9 +307,8 @@ struct MaterialDetailView: View {
                 icon: "doc.text.fill",
                 title: "Nessun Riassunto",
                 message: "Genera un riassunto per questo materiale",
-                actionTitle: "Genera Riassunto",
-                action: { generateSummary() }
-            )
+                actionTitle: "Genera Riassunto"
+            )                { generateSummary() }
         }
     }
 

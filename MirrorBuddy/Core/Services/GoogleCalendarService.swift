@@ -1,7 +1,7 @@
-import Foundation
-import SwiftData
 import BackgroundTasks
+import Foundation
 import os.log
+import SwiftData
 
 /// Google Calendar API integration for assignment due dates (Task 42)
 @MainActor
@@ -361,7 +361,7 @@ final class GoogleCalendarService {
         let identifier = "com.mirrorbuddy.calendar.refresh"
 
         let request = BGAppRefreshTaskRequest(identifier: identifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 3600) // 1 hour
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 3_600) // 1 hour
 
         do {
             try BGTaskScheduler.shared.submit(request)

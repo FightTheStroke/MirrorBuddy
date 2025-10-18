@@ -1,6 +1,6 @@
 import Foundation
-import Testing
 @testable import MirrorBuddy
+import Testing
 
 @Suite("Google Workspace Client Tests")
 @MainActor

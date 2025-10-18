@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import os.log
+import SwiftData
+import SwiftUI
 
 /// Task detail view with completion functionality (Task 45)
 struct TaskDetailView: View {

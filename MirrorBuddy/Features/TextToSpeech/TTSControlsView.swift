@@ -1,5 +1,5 @@
-import SwiftUI
 import AVFoundation
+import SwiftUI
 
 /// TTS playback controls UI (Task 73.2)
 struct TTSControlsView: View {

@@ -1,6 +1,6 @@
 import Foundation
-import UserNotifications
 import os.log
+import UserNotifications
 
 /// Manager for handling local notifications for file changes
 @MainActor
@@ -73,7 +73,7 @@ final class NotificationManager: NSObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         super.init()
         center.delegate = self
     }
@@ -338,13 +338,13 @@ final class NotificationManager: NSObject {
         content.title = "Files Updated"
 
         var bodyParts: [String] = []
-        if newFiles.count > 0 && preferences.enableFileAdded {
+        if !newFiles.isEmpty && preferences.enableFileAdded {
             bodyParts.append("\(newFiles.count) new")
         }
-        if modifiedFiles.count > 0 && preferences.enableFileModified {
+        if !modifiedFiles.isEmpty && preferences.enableFileModified {
             bodyParts.append("\(modifiedFiles.count) modified")
         }
-        if deletedFiles.count > 0 && preferences.enableFileDeleted {
+        if !deletedFiles.isEmpty && preferences.enableFileDeleted {
             bodyParts.append("\(deletedFiles.count) deleted")
         }
 

@@ -1,5 +1,5 @@
-import SwiftUI
 import AVFoundation
+import SwiftUI
 
 // MARK: - Voice Command Feedback View (Task 29.3)
 
@@ -140,13 +140,13 @@ struct VoiceCommandFeedbackView: View {
 
         switch type {
         case .success:
-            soundID = 1054 // Tock
+            soundID = 1_054 // Tock
         case .error:
-            soundID = 1053 // Tink
+            soundID = 1_053 // Tink
         case .processing:
-            soundID = 1105 // Begin recording
+            soundID = 1_105 // Begin recording
         case .listening:
-            soundID = 1106 // End recording
+            soundID = 1_106 // End recording
         }
 
         AudioServicesPlaySystemSound(soundID)

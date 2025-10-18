@@ -156,7 +156,7 @@ enum UnifiedAPIError: @preconcurrency APIErrorProtocol {
 
     var documentationURL: URL? {
         // Could be customized per app or error type
-        return URL(string: "https://docs.mirrorbuddy.app/errors/\(errorCode.lowercased())")
+        URL(string: "https://docs.mirrorbuddy.app/errors/\(errorCode.lowercased())")
     }
 
     var isRetryable: Bool {
@@ -359,7 +359,7 @@ final class APIErrorLogger {
     private var errorHistory: [ErrorLogEntry] = []
     private var errorCounts: [String: Int] = [:]
     private var categoryCount: [APIErrorCategory: Int] = [:]
-    private let maxHistorySize = 1000
+    private let maxHistorySize = 1_000
 
     private init() {}
 
@@ -439,8 +439,8 @@ final class APIErrorLogger {
     /// Get error analytics report
     func getAnalytics() -> ErrorAnalytics {
         let now = Date()
-        let oneHourAgo = now.addingTimeInterval(-3600)
-        let oneDayAgo = now.addingTimeInterval(-86400)
+        let oneHourAgo = now.addingTimeInterval(-3_600)
+        let oneDayAgo = now.addingTimeInterval(-86_400)
 
         let recentErrors = errorHistory.filter { $0.timestamp > oneHourAgo }
         let dailyErrors = errorHistory.filter { $0.timestamp > oneDayAgo }
@@ -451,8 +451,8 @@ final class APIErrorLogger {
             errorsLastDay: dailyErrors.count,
             errorsByCode: errorCounts,
             errorsByCategory: categoryCount,
-            mostCommonError: errorCounts.max(by: { $0.value < $1.value })?.key,
-            mostCommonCategory: categoryCount.max(by: { $0.value < $1.value })?.key,
+            mostCommonError: errorCounts.max { $0.value < $1.value }?.key,
+            mostCommonCategory: categoryCount.max { $0.value < $1.value }?.key,
             recentErrors: Array(errorHistory.suffix(10))
         )
     }
@@ -481,7 +481,7 @@ final class APIErrorLogger {
 
     /// Get error rate per minute over the last hour
     func getErrorRate() -> Double {
-        let oneHourAgo = Date().addingTimeInterval(-3600)
+        let oneHourAgo = Date().addingTimeInterval(-3_600)
         let recentErrors = errorHistory.filter { $0.timestamp > oneHourAgo }
         return Double(recentErrors.count) / 60.0
     }

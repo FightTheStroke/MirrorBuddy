@@ -1,6 +1,6 @@
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Flashcard generation service using GPT-5 Nano (Task 23)
 @MainActor
@@ -65,7 +65,7 @@ final class FlashcardGenerationService {
 
         // Calculate target number of flashcards
         let wordCount = text.split(separator: " ").count
-        let calculatedTarget = max(5, (wordCount * cardsPerThousandWords) / 1000)
+        let calculatedTarget = max(5, (wordCount * cardsPerThousandWords) / 1_000)
         let finalTarget = targetCount ?? calculatedTarget
 
         logger.debug("Target flashcard count: \(finalTarget)")
@@ -81,7 +81,7 @@ final class FlashcardGenerationService {
                 ChatMessage(role: .user, content: .text(prompt))
             ],
             temperature: 0.7,
-            maxTokens: 2000
+            maxTokens: 2_000
         )
 
         guard let content = response.choices.first?.message.content else {
@@ -369,7 +369,6 @@ final class FlashcardGenerationService {
                 if index < materials.count - 1 {
                     try await _Concurrency.Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
                 }
-
             } catch {
                 logger.warning("Failed to generate flashcards for material \(material.materialID): \(error.localizedDescription)")
                 // Continue with other materials

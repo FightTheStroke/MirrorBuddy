@@ -6,8 +6,8 @@
 //  Study tab showing flashcards and mind maps
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Study view for flashcards and mind maps (Task 109)
 struct StudyView: View {

@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Main dashboard UI organized by subject (Task 26)
 struct SubjectDashboardView: View {
@@ -8,7 +8,7 @@ struct SubjectDashboardView: View {
     @Query(sort: \Material.createdAt, order: .reverse) private var allMaterials: [Material]
 
     @State private var viewModel = DashboardViewModel()
-    @State private var selectedSubject: Subject? = nil
+    @State private var selectedSubject: Subject?
     @State private var searchText = ""
     @State private var showFilters = false
 
@@ -271,7 +271,6 @@ struct MaterialCard: View {
     private var subjectColor: Color {
         material.subject?.color ?? .gray
     }
-
 }
 
 // MARK: - Subject Badge

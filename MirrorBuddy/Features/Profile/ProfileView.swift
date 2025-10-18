@@ -6,8 +6,8 @@
 //  Shows user statistics, level, achievements, and study streak
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// User profile view with gamification stats (Task 110)
 struct ProfileView: View {

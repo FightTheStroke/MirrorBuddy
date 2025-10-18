@@ -7,9 +7,9 @@
 //
 
 import Foundation
+import os.log
 import SwiftData
 import UIKit
-import os.log
 
 /// Unified service for extracting text from materials (PDFs, images, documents)
 @MainActor
@@ -213,7 +213,7 @@ final class MaterialTextExtractionService {
         // 1. extractedText is empty
         // 2. Processing status is pending or failed
         // 3. Has PDF but no extracted text
-        return material.extractedText.isEmpty &&
+        material.extractedText.isEmpty &&
                (material.processingStatus == .pending || material.processingStatus == .failed) &&
                (material.pdfURL != nil || material.googleDriveFileID != nil)
     }

@@ -1,6 +1,6 @@
-import Testing
 import Foundation
 @testable import MirrorBuddy
+import Testing
 
 @Suite("Gemini Client Tests")
 @MainActor
@@ -149,14 +149,14 @@ struct GeminiClientTests {
             temperature: 0.9,
             topP: 0.95,
             topK: 40,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 2_048,
             stopSequences: ["END", "STOP"]
         )
 
         #expect(config.temperature == 0.9)
         #expect(config.topP == 0.95)
         #expect(config.topK == 40)
-        #expect(config.maxOutputTokens == 2048)
+        #expect(config.maxOutputTokens == 2_048)
         #expect(config.stopSequences?.count == 2)
     }
 
@@ -218,7 +218,7 @@ struct GeminiClientTests {
         let encoder = JSONEncoder()
         let data = try encoder.encode(request)
 
-        #expect(data.count > 0)
+        #expect(!data.isEmpty)
     }
 
     // MARK: - Response Tests

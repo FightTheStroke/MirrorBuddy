@@ -6,12 +6,12 @@
 //  Features: background recording, auto-save, battery monitoring
 //
 
-import Foundation
 import AVFoundation
+import Combine
+import Foundation
+import os.log
 import UIKit
 import UserNotifications
-import Combine
-import os.log
 
 /// Extended voice recording service for long classroom recordings
 final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
@@ -52,7 +52,7 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         super.init()
         setupAudioSession()
         setupBatteryMonitoring()
@@ -78,7 +78,6 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
             try audioSession.setActive(true)
 
             logger.info("Audio session configured for background recording")
-
         } catch {
             logger.error("Failed to setup audio session: \(error.localizedDescription)")
         }
@@ -124,10 +123,10 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
         // Configure audio recorder with AAC compression
         let settings: [String: Any] = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 44100.0,
+            AVSampleRateKey: 44_100.0,
             AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue,
-            AVEncoderBitRateKey: 64000 // 64 kbps for efficient storage
+            AVEncoderBitRateKey: 64_000 // 64 kbps for efficient storage
         ]
 
         // Create and start recorder
@@ -253,7 +252,6 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
                 }
 
                 logger.info("Auto-save completed: \(backupURL.lastPathComponent)")
-
             } catch {
                 logger.error("Auto-save failed: \(error.localizedDescription)")
             }
@@ -408,8 +406,8 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
     // MARK: - Formatted Duration
 
     @MainActor var formattedDuration: String {
-        let hours = Int(self.recordingDuration) / 3600
-        let minutes = (Int(self.recordingDuration) % 3600) / 60
+        let hours = Int(self.recordingDuration) / 3_600
+        let minutes = (Int(self.recordingDuration) % 3_600) / 60
         let seconds = Int(self.recordingDuration) % 60
 
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
@@ -529,8 +527,8 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
             let content = UNMutableNotificationContent()
             content.title = "Registrazione Completata"
 
-            let hours = Int(duration) / 3600
-            let minutes = (Int(duration) % 3600) / 60
+            let hours = Int(duration) / 3_600
+            let minutes = (Int(duration) % 3_600) / 60
 
             if hours > 0 {
                 content.body = "Lezione registrata: \(hours)h \(minutes)m salvata con successo."
@@ -585,7 +583,6 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
                         logger.info("Cleaned up old backup: \(fileURL.lastPathComponent)")
                     }
                 }
-
             } catch {
                 logger.error("Cleanup failed: \(error.localizedDescription)")
             }
@@ -620,19 +617,19 @@ struct RecordingStats {
     let sessionID: String
 
     var fileSizeMB: Double {
-        Double(fileSize) / (1024 * 1024)
+        Double(fileSize) / (1_024 * 1_024)
     }
 
     var formattedDuration: String {
-        let hours = Int(duration) / 3600
-        let minutes = (Int(duration) % 3600) / 60
+        let hours = Int(duration) / 3_600
+        let minutes = (Int(duration) % 3_600) / 60
         let seconds = Int(duration) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
 
     var formattedFileSize: String {
         if fileSizeMB < 1 {
-            return String(format: "%.1f KB", Double(fileSize) / 1024)
+            return String(format: "%.1f KB", Double(fileSize) / 1_024)
         } else {
             return String(format: "%.1f MB", fileSizeMB)
         }

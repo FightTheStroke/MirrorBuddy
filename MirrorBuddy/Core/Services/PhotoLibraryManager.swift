@@ -1,6 +1,6 @@
+import os.log
 @preconcurrency import Photos
 import UIKit
-import os.log
 
 /// Manager for photo library access and operations
 @MainActor
@@ -18,7 +18,7 @@ final class PhotoLibraryManager {
 
     /// Check photo library permission status
     func checkPermission() -> PHAuthorizationStatus {
-        return PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        PHPhotoLibrary.authorizationStatus(for: .readWrite)
     }
 
     /// Request photo library permission

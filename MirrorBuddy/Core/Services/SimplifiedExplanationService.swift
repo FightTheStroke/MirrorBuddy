@@ -1,6 +1,6 @@
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Simplified explanation generation service using GPT-5 Mini (Task 24)
 @MainActor
@@ -128,7 +128,7 @@ final class SimplifiedExplanationService {
                     ChatMessage(role: .user, content: .text(prompt))
                 ],
                 temperature: 0.7,
-                maxTokens: 1500
+                maxTokens: 1_500
             )
 
             guard let content = response.choices.first?.message.content else {
@@ -136,7 +136,6 @@ final class SimplifiedExplanationService {
             }
 
             return content
-
         } catch {
             logger.warning("GPT-5 Mini failed, attempting fallback: \(error.localizedDescription)")
 
@@ -148,7 +147,7 @@ final class SimplifiedExplanationService {
                     ChatMessage(role: .user, content: .text(prompt))
                 ],
                 temperature: 0.7,
-                maxTokens: 1500
+                maxTokens: 1_500
             )
 
             guard let content = fallbackResponse.choices.first?.message.content else {
@@ -340,7 +339,7 @@ final class SimplifiedExplanationService {
             throw SimplifiedExplanationError.emptyExplanation
         }
 
-        guard data.explanation.count <= 2000 else {
+        guard data.explanation.count <= 2_000 else {
             throw SimplifiedExplanationError.explanationTooLong
         }
 
@@ -387,7 +386,7 @@ final class SimplifiedExplanationService {
 
         // Check if cache is still fresh (within 30 days)
         let cacheAge = Date().timeIntervalSince(latest.createdAt)
-        guard cacheAge < 30 * 24 * 3600 else {
+        guard cacheAge < 30 * 24 * 3_600 else {
             logger.debug("Cached explanation expired")
             return nil
         }
@@ -460,7 +459,6 @@ final class SimplifiedExplanationService {
                 if index < concepts.count - 1 {
                     try await _Concurrency.Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds
                 }
-
             } catch {
                 logger.warning("Failed to generate explanation for '\(item.concept)': \(error.localizedDescription)")
                 // Continue with other concepts

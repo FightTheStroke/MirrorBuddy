@@ -146,7 +146,7 @@ struct MindMapTheme {
 
     /// Dynamic Type scaling support
     static func scaledFont(size: CGFloat, weight: Font.Weight = .regular, relativeTo textStyle: Font.TextStyle = .body) -> Font {
-        return .system(size: size, weight: weight).monospacedDigit()
+        .system(size: size, weight: weight).monospacedDigit()
     }
 
     // MARK: - Animations

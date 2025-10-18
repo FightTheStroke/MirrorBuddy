@@ -338,7 +338,7 @@ struct ExtendedVoiceRecordingView: View {
         _Concurrency.Task { @MainActor in
             ExtendedVoiceRecordingService.shared.isRecording = true
             ExtendedVoiceRecordingService.shared.isPaused = true
-            ExtendedVoiceRecordingService.shared.recordingDuration = 1845.0
+            ExtendedVoiceRecordingService.shared.recordingDuration = 1_845.0
             ExtendedVoiceRecordingService.shared.batteryLevel = 0.42
         }
     }()
@@ -352,7 +352,7 @@ struct ExtendedVoiceRecordingView: View {
     let _ = {
         _Concurrency.Task { @MainActor in
             ExtendedVoiceRecordingService.shared.isRecording = true
-            ExtendedVoiceRecordingService.shared.recordingDuration = 5432.0
+            ExtendedVoiceRecordingService.shared.recordingDuration = 5_432.0
             ExtendedVoiceRecordingService.shared.batteryLevel = 0.15
             ExtendedVoiceRecordingService.shared.isLowBattery = true
         }

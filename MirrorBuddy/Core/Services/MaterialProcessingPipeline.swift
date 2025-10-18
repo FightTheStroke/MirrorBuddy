@@ -1,6 +1,6 @@
 import Foundation
-@preconcurrency import SwiftData
 import os.log
+@preconcurrency import SwiftData
 
 /// Parallel material processing pipeline coordinator (Task 25)
 @MainActor

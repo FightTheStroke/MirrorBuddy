@@ -1,8 +1,8 @@
 import Foundation
-import PDFKit
-import Vision
-import UIKit
 import os.log
+import PDFKit
+import UIKit
+import Vision
 
 /// PDF text extraction service using VisionKit OCR (Task 19)
 @MainActor

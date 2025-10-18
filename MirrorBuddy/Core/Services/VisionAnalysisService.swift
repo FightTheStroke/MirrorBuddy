@@ -1,5 +1,5 @@
-import UIKit
 import os.log
+import UIKit
 
 /// Comprehensive service for GPT-5 Vision API integration for homework analysis
 @MainActor
@@ -111,7 +111,7 @@ final class VisionAnalysisService {
                     ]
                 ]
             ],
-            "max_tokens": 2000,
+            "max_tokens": 2_000,
             "temperature": 0.7
         ]
 

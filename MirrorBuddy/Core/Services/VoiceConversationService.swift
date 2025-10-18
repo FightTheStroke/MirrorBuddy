@@ -1,6 +1,6 @@
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Service for managing voice conversations with SwiftData
 @MainActor

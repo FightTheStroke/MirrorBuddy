@@ -1,6 +1,6 @@
-import SwiftUI
 import AVFoundation
 import Combine
+import SwiftUI
 
 /// One-handed optimized camera interface for homework capture
 struct CameraView: View {

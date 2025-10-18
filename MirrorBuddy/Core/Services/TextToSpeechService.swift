@@ -1,6 +1,6 @@
-import Foundation
 import AVFoundation
 import Combine
+import Foundation
 import os.log
 
 /// Text-to-Speech service using Apple Speech framework (Task 73.1)
@@ -57,7 +57,7 @@ final class TextToSpeechService: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         super.init()
         synthesizer.delegate = self
         configureAudioSession()
@@ -190,7 +190,7 @@ final class TextToSpeechService: NSObject, ObservableObject {
         let tagger = NSLinguisticTagger(tagSchemes: [.language], options: 0)
         tagger.string = text
 
-        let _ = NSRange(location: 0, length: min(text.count, 200)) // Sample first 200 chars
+        _ = NSRange(location: 0, length: min(text.count, 200)) // Sample first 200 chars
         let language = tagger.tag(at: 0, scheme: .language, tokenRange: nil, sentenceRange: nil)
 
         if let detectedLanguage = language?.rawValue {
@@ -250,12 +250,12 @@ final class TextToSpeechService: NSObject, ObservableObject {
 
     /// Get all available voices
     static func getAvailableVoices() -> [AVSpeechSynthesisVoice] {
-        return AVSpeechSynthesisVoice.speechVoices()
+        AVSpeechSynthesisVoice.speechVoices()
     }
 
     /// Get voices for specific language
     static func getVoices(for languageCode: String) -> [AVSpeechSynthesisVoice] {
-        return AVSpeechSynthesisVoice.speechVoices().filter { $0.language.hasPrefix(languageCode) }
+        AVSpeechSynthesisVoice.speechVoices().filter { $0.language.hasPrefix(languageCode) }
     }
 
     // MARK: - State Management

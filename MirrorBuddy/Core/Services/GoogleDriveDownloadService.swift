@@ -1,7 +1,7 @@
-import Foundation
-import os.log
 import BackgroundTasks
 @preconcurrency import Combine
+import Foundation
+import os.log
 
 /// Comprehensive Google Drive file download service with queue management and resilience
 /// Implements all 8 subtasks of Task 18
@@ -191,7 +191,6 @@ final class GoogleDriveDownloadService: ObservableObject {
 
             logger.info("Successfully downloaded '\(metadata.name)' to \(localURL.path)")
             return localURL
-
         } catch {
             // Mark as failed
             activeDownloads[fileId]?.status = .failed
@@ -259,12 +258,12 @@ final class GoogleDriveDownloadService: ObservableObject {
 
     /// Get current progress for a file
     func getProgress(for fileId: String) -> DownloadProgress? {
-        return activeDownloads[fileId]
+        activeDownloads[fileId]
     }
 
     /// Get all active downloads
     func getAllActiveDownloads() -> [DownloadProgress] {
-        return Array(activeDownloads.values)
+        Array(activeDownloads.values)
     }
 
     // MARK: - Subtask 18.5: Background Download Support
@@ -674,5 +673,5 @@ private let CC_MD5_DIGEST_LENGTH = 16
 
 private func CC_MD5(_ data: UnsafeRawPointer!, _ len: CC_LONG, _ md: UnsafeMutablePointer<UInt8>!) -> UnsafeMutablePointer<UInt8>! {
     // This is a placeholder - CommonCrypto CC_MD5 is available on iOS
-    return md
+    md
 }

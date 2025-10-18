@@ -1,5 +1,5 @@
-import SwiftUI
 import AuthenticationServices
+import SwiftUI
 
 // MARK: - Google Account Connection View (Task 55.1)
 

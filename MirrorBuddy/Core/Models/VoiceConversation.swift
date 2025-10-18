@@ -4,10 +4,10 @@ import SwiftData
 /// Voice conversation with AI coach
 @Model
 final class VoiceConversation {
-    var id: UUID = UUID()
+    var id = UUID()
     var title: String = ""
-    var createdAt: Date = Date()
-    var updatedAt: Date = Date()
+    var createdAt = Date()
+    var updatedAt = Date()
 
     // Context associations
     var subjectID: UUID?
@@ -91,10 +91,10 @@ final class VoiceConversation {
 /// Individual message in a voice conversation
 @Model
 final class VoiceMessage {
-    var id: UUID = UUID()
+    var id = UUID()
     var content: String = ""
     var isFromUser: Bool = false
-    var timestamp: Date = Date()
+    var timestamp = Date()
 
     // Optional audio data (for playback)
     @Attribute(.externalStorage)
@@ -139,7 +139,7 @@ final class VoiceMessage {
         guard let data = audioData else { return nil }
 
         // PCM16 24kHz mono = 48000 bytes per second
-        let bytesPerSecond = 48000.0
+        let bytesPerSecond = 48_000.0
         return Double(data.count) / bytesPerSecond
     }
 }

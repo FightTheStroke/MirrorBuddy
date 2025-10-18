@@ -5394,7 +5394,7 @@
         "description": "Resolve existing ~30 SwiftLint violations, tune configuration if needed, and wire lint checks into the CI/pre-commit workflow.",
         "details": "- Run swiftlint to capture current warnings\n- Fix code style/complexity issues or document justified exceptions\n- Update lint config for new rules if necessary\n- Add CI/pre-commit step ensuring lint passes",
         "testStrategy": "",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -5403,21 +5403,22 @@
             "title": "Capture current SwiftLint violations",
             "description": "",
             "details": "- Run swiftlint and export the list of warnings with file/line references",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 118,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-18T10:13:23.130Z"
           },
           {
             "id": 2,
             "title": "Resolve lint findings",
             "description": "",
             "details": "- Fix style/format issues, refactor complex functions, or explicitly document justified disable rules\n<info added on 2025-10-18T09:59:16.461Z>\nDue to the high number of violations (370) and the risk of breaking builds with aggressive auto-fixes (e.g., unused_closure_parameter removing required parameters), a pragmatic approach is being taken. SwiftLint will be configured with a baseline to accept all current violations, and CI/pre-commit will enforce zero new violations going forward. Technical debt from existing violations will be documented for future cleanup, with the immediate focus on preventing regression rather than refactoring legacy code.\n</info added on 2025-10-18T09:59:16.461Z>",
-            "status": "done",
+            "status": "in-progress",
             "dependencies": [],
             "parentTaskId": 118,
             "parentId": "undefined",
-            "updatedAt": "2025-10-18T09:59:18.493Z"
+            "updatedAt": "2025-10-18T10:13:24.840Z"
           },
           {
             "id": 3,
@@ -5445,7 +5446,7 @@
         "complexity": 4,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Divide into: (1) capturing current SwiftLint violations, (2) resolving lint findings, (3) enforcing lint in automation, and (4) documenting lint policy.",
-        "updatedAt": "2025-10-18T10:09:41.180Z"
+        "updatedAt": "2025-10-18T10:13:24.840Z"
       },
       {
         "id": "119",
@@ -6649,7 +6650,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-18T10:11:36.422Z",
+      "lastModified": "2025-10-18T10:13:24.843Z",
       "taskCount": 139,
       "completedCount": 114,
       "tags": [

@@ -157,8 +157,6 @@ enum UsabilityEventType: String {
 
 // MARK: - SwiftUI Feedback View
 
-import SwiftUI
-
 struct FeedbackView: View {
     @State private var feedbackType: FeedbackType = .suggestion
     @State private var message: String = ""

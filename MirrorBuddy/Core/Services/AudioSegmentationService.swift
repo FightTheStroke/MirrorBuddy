@@ -6,8 +6,8 @@
 //  for Whisper API transcription (Task 93.1)
 //
 
-import Foundation
 import AVFoundation
+import Foundation
 import os.log
 
 /// Service for splitting extended recordings into chunks for Whisper API
@@ -221,7 +221,6 @@ final class AudioSegmentationService {
             }
 
             logger.info("Deleted \(chunkFiles.count) temporary chunk files")
-
         } catch {
             logger.error("Cleanup failed: \(error.localizedDescription)")
         }
@@ -287,8 +286,8 @@ struct AudioSegment: Identifiable, Codable {
 
     /// Formatted start time string
     var formattedStartTime: String {
-        let hours = Int(startTime) / 3600
-        let minutes = (Int(startTime) % 3600) / 60
+        let hours = Int(startTime) / 3_600
+        let minutes = (Int(startTime) % 3_600) / 60
         let seconds = Int(startTime) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
@@ -298,7 +297,7 @@ struct AudioSegment: Identifiable, Codable {
         guard let fileSize = try? FileManager.default.attributesOfItem(atPath: fileURL.path)[.size] as? Int64 else {
             return 0
         }
-        return Double(fileSize) / (1024 * 1024)
+        return Double(fileSize) / (1_024 * 1_024)
     }
 }
 
@@ -312,18 +311,18 @@ struct SegmentationStats {
     let averageFileSize: Int64
 
     var formattedTotalDuration: String {
-        let hours = Int(totalDuration) / 3600
-        let minutes = (Int(totalDuration) % 3600) / 60
+        let hours = Int(totalDuration) / 3_600
+        let minutes = (Int(totalDuration) % 3_600) / 60
         return String(format: "%02d:%02d hours", hours, minutes)
     }
 
     var formattedTotalSize: String {
-        let sizeMB = Double(totalFileSize) / (1024 * 1024)
+        let sizeMB = Double(totalFileSize) / (1_024 * 1_024)
         return String(format: "%.1f MB", sizeMB)
     }
 
     var formattedAverageSize: String {
-        let sizeMB = Double(averageFileSize) / (1024 * 1024)
+        let sizeMB = Double(averageFileSize) / (1_024 * 1_024)
         return String(format: "%.1f MB", sizeMB)
     }
 }

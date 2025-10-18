@@ -1,7 +1,7 @@
-import SwiftUI
-import SwiftData
 @preconcurrency import Combine
 import os.log
+import SwiftData
+import SwiftUI
 
 /// Voice conversation UI for AI coach interactions
 struct VoiceConversationView: View {
@@ -114,7 +114,7 @@ struct VoiceConversationView: View {
                     }
                 }
                 .padding()
-                .onChange(of: viewModel.conversationHistory.count) { oldValue, newValue in
+                .onChange(of: viewModel.conversationHistory.count) { _, _ in
                     if let lastMessage = viewModel.conversationHistory.last {
                         withAnimation {
                             proxy.scrollTo(lastMessage.id, anchor: .bottom)
@@ -502,7 +502,7 @@ final class VoiceConversationViewModel: ObservableObject {
     private var audioBuffer = Data()
 
     /// Buffer size threshold (100ms at 24kHz PCM16 mono = 4800 bytes)
-    private let bufferSizeThreshold = 4800
+    private let bufferSizeThreshold = 4_800
 
     /// Timer for periodic audio buffer commits
     private var audioCommitTimer: Timer?

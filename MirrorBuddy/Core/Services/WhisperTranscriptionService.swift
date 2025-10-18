@@ -119,7 +119,6 @@ final class WhisperTranscriptionService {
                     attemptCount: attempt + 1,
                     timestamp: Date()
                 )
-
             } catch let error as TranscriptionError where error.isRetryable {
                 lastError = error
                 logger.warning("Transcription attempt \(attempt + 1) failed (retryable): \(error.localizedDescription)")
@@ -129,7 +128,6 @@ final class WhisperTranscriptionService {
                     logger.info("Retrying in \(delay) seconds...")
                     try await _Concurrency.Task.sleep(for: .seconds(delay))
                 }
-
             } catch {
                 // Non-retryable error
                 logger.error("Transcription failed with non-retryable error: \(error.localizedDescription)")
@@ -164,7 +162,6 @@ final class WhisperTranscriptionService {
 
                 // Report progress
                 progressHandler?(index + 1, segments.count)
-
             } catch let error as TranscriptionError {
                 logger.error("Failed to transcribe segment \(segment.originalSegment.index): \(error.localizedDescription)")
                 errors.append(error)
@@ -244,7 +241,7 @@ final class WhisperTranscriptionService {
 
         request.httpBody = body
 
-        logger.info("Sending transcription request for segment \(segmentIndex) (\(audioData.count / 1024) KB)")
+        logger.info("Sending transcription request for segment \(segmentIndex) (\(audioData.count / 1_024) KB)")
 
         // Perform request
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -351,8 +348,8 @@ struct TranscriptionResult: Identifiable, Codable {
 
     /// Formatted start time
     var formattedStartTime: String {
-        let hours = Int(startTime) / 3600
-        let minutes = (Int(startTime) % 3600) / 60
+        let hours = Int(startTime) / 3_600
+        let minutes = (Int(startTime) % 3_600) / 60
         let seconds = Int(startTime) % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
     }
@@ -379,8 +376,8 @@ struct BatchTranscriptionStats {
     }
 
     var formattedDuration: String {
-        let hours = Int(totalDuration) / 3600
-        let minutes = (Int(totalDuration) % 3600) / 60
+        let hours = Int(totalDuration) / 3_600
+        let minutes = (Int(totalDuration) % 3_600) / 60
         return String(format: "%02d:%02d hours", hours, minutes)
     }
 }

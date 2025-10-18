@@ -1,7 +1,7 @@
 import Foundation
-import UIKit
-import SwiftData
 import os.log
+import SwiftData
+import UIKit
 
 /// Image generation service for mind map nodes using DALL-E 3 (Task 22)
 @MainActor
@@ -124,7 +124,6 @@ final class MindMapImageGenerationService {
             logger.info("Image generated successfully for node \(node.id)")
 
             return image
-
         } catch {
             generationStatus[node.id] = .failed
             logger.error("Failed to generate image: \(error.localizedDescription)")
@@ -230,7 +229,7 @@ final class MindMapImageGenerationService {
 
     /// Get file URL for node image
     private func getImageFileURL(for nodeID: UUID) -> URL {
-        return imagesDirectory.appendingPathComponent("\(nodeID.uuidString).jpg")
+        imagesDirectory.appendingPathComponent("\(nodeID.uuidString).jpg")
     }
 
     /// Load image from file system
@@ -277,7 +276,7 @@ final class MindMapImageGenerationService {
 
     /// Get cached image
     private func getCachedImage(for nodeID: UUID) -> UIImage? {
-        return imageCache[nodeID]
+        imageCache[nodeID]
     }
 
     /// Clear memory cache
@@ -415,7 +414,7 @@ final class MindMapImageGenerationService {
 
     /// Get generation status for node
     func getGenerationStatus(for nodeID: UUID) -> GenerationStatus {
-        return generationStatus[nodeID] ?? .notStarted
+        generationStatus[nodeID] ?? .notStarted
     }
 }
 

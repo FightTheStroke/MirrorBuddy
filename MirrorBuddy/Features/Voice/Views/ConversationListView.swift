@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 @preconcurrency import Combine
+import SwiftData
+import SwiftUI
 
 /// List view for managing voice conversations
 struct ConversationListView: View {
@@ -84,17 +84,15 @@ struct ConversationListView: View {
                 // "All" filter button
                 FilterButton(
                     title: "Tutte",
-                    isSelected: viewModel.selectedSubject == nil,
-                    action: { viewModel.selectedSubject = nil }
-                )
+                    isSelected: viewModel.selectedSubject == nil
+                )                    { viewModel.selectedSubject = nil }
 
                 // Subject filter buttons
                 ForEach(viewModel.subjects) { subject in
                     FilterButton(
                         title: subject.displayName,
-                        isSelected: viewModel.selectedSubject?.id == subject.id,
-                        action: { viewModel.selectedSubject = subject }
-                    )
+                        isSelected: viewModel.selectedSubject?.id == subject.id
+                    )                        { viewModel.selectedSubject = subject }
                 }
             }
             .padding(.horizontal)

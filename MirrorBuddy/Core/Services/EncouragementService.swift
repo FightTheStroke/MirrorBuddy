@@ -349,9 +349,8 @@ struct EncouragementBanner: View {
             title: "Fantastico!",
             message: "Hai completato 5 esercizi di matematica!",
             emoji: "🎉",
-            actionTitle: "Continua",
-            action: { print("Continue") }
-        )
+            actionTitle: "Continua"
+        )            { print("Continue") }
     )
     .padding()
 }
@@ -364,9 +363,8 @@ struct EncouragementBanner: View {
             title: title,
             message: message,
             emoji: "📚",
-            actionTitle: action,
-            action: { print("Import material") }
-        )
+            actionTitle: action
+        )            { print("Import material") }
     )
     .padding()
 }
@@ -377,9 +375,8 @@ struct EncouragementBanner: View {
             title: EncouragementService.shared.greetingMessage(userName: "Mario"),
             message: "Hai 3 compiti da completare oggi!",
             emoji: "👋",
-            actionTitle: "Inizia",
-            action: { print("Start") }
-        )
+            actionTitle: "Inizia"
+        )            { print("Start") }
     )
     .padding()
 }

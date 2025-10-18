@@ -7,9 +7,9 @@
 //
 
 import Foundation
-import Vision
-import UIKit
 import os.log
+import UIKit
+import Vision
 
 /// OCR service for extracting text from images
 @MainActor
@@ -109,7 +109,7 @@ final class OCRService {
 
     /// Check if file is an image by MIME type
     static func isImage(mimeType: String) -> Bool {
-        return mimeType.hasPrefix("image/")
+        mimeType.hasPrefix("image/")
     }
 }
 

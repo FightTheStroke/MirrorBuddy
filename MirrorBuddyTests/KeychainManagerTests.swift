@@ -86,7 +86,7 @@ struct KeychainManagerTests {
         let tokens = OAuthTokens(
             accessToken: "access-123",
             refreshToken: "refresh-456",
-            expiresAt: Date().addingTimeInterval(3600),
+            expiresAt: Date().addingTimeInterval(3_600),
             tokenType: "Bearer",
             scope: "email profile"
         )
@@ -118,7 +118,7 @@ struct KeychainManagerTests {
         let validTokens = OAuthTokens(
             accessToken: "access",
             refreshToken: "refresh",
-            expiresAt: Date().addingTimeInterval(3600),
+            expiresAt: Date().addingTimeInterval(3_600),
             tokenType: "Bearer",
             scope: nil
         )

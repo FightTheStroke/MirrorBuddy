@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import os.log
+import SwiftData
+import SwiftUI
 
 /// Task list view for assignments and due dates (Task 44)
 struct TaskListView: View {
@@ -54,7 +54,7 @@ struct TaskListView: View {
                             NavigationLink {
                                 TaskDetailView(task: task)
                             } label: {
-                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                                TaskRow(task: task) { toggleTask(task) }
                             }
                             .buttonStyle(.plain)
                         }
@@ -75,7 +75,7 @@ struct TaskListView: View {
                             NavigationLink {
                                 TaskDetailView(task: task)
                             } label: {
-                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                                TaskRow(task: task) { toggleTask(task) }
                             }
                             .buttonStyle(.plain)
                         }
@@ -96,7 +96,7 @@ struct TaskListView: View {
                             NavigationLink {
                                 TaskDetailView(task: task)
                             } label: {
-                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                                TaskRow(task: task) { toggleTask(task) }
                             }
                             .buttonStyle(.plain)
                         }
@@ -117,7 +117,7 @@ struct TaskListView: View {
                             NavigationLink {
                                 TaskDetailView(task: task)
                             } label: {
-                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                                TaskRow(task: task) { toggleTask(task) }
                             }
                             .buttonStyle(.plain)
                         }
@@ -138,7 +138,7 @@ struct TaskListView: View {
                             NavigationLink {
                                 TaskDetailView(task: task)
                             } label: {
-                                TaskRow(task: task, onToggle: { toggleTask(task) })
+                                TaskRow(task: task) { toggleTask(task) }
                             }
                             .buttonStyle(.plain)
                         }

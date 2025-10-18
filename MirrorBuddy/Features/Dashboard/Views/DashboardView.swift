@@ -6,8 +6,8 @@
 //  Main dashboard tab showing materials, quick actions, and context banner
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Main dashboard view for materials and quick actions (Task 109)
 struct DashboardView: View {

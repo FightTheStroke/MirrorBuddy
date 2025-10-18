@@ -75,7 +75,7 @@ struct CircuitBreakerTests {
         // Next request should be blocked
         await #expect(throws: CircuitBreakerError.self) {
             try await breaker.execute {
-                return "success"
+                "success"
             }
         }
     }
@@ -110,7 +110,7 @@ struct CircuitBreakerTests {
         // Execute an operation to trigger state update
         do {
             _ = try await breaker.execute {
-                return "success"
+                "success"
             }
         } catch {
             // May fail or succeed, we just want state update
@@ -148,7 +148,7 @@ struct CircuitBreakerTests {
         for _ in 0..<2 {
             do {
                 _ = try await breaker.execute {
-                    return "success"
+                    "success"
                 }
             } catch {
                 // Ignore
@@ -265,7 +265,7 @@ struct CircuitBreakerTests {
 
         // Should be able to execute now
         let result = try await breaker.execute {
-            return "success"
+            "success"
         }
         #expect(result == "success")
     }

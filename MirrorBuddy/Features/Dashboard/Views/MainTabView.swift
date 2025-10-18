@@ -6,8 +6,8 @@
 //  All tab content extracted to separate view files for better organization
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Sheet type for consolidated sheet presentation (Fix: SwiftUI allows only 1 sheet per view)
 enum MainTabSheet: Identifiable {
@@ -90,7 +90,7 @@ struct MainTabView: View {
                     }
                 }
                 .tag(3)
-        }
+            }
         // Larger tab bar for child-friendly touch targets
         .onAppear {
             let appearance = UITabBarAppearance()

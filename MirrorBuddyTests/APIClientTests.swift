@@ -1,12 +1,11 @@
-import XCTest
 import Foundation
 @testable import MirrorBuddy
+import XCTest
 
 // MARK: - API Client Tests (Task 61.2)
 
 @MainActor
 final class APIClientTests: XCTestCase {
-
     var mockURLSession: URLSession!
     var configuration: URLSessionConfiguration!
 
@@ -71,7 +70,7 @@ final class APIClientTests: XCTestCase {
         let response = try decoder.decode(TokenResponse.self, from: tokenResponse)
         XCTAssertEqual(response.access_token, "test_access_token")
         XCTAssertEqual(response.refresh_token, "test_refresh_token")
-        XCTAssertEqual(response.expires_in, 3600)
+        XCTAssertEqual(response.expires_in, 3_600)
         XCTAssertEqual(response.token_type, "Bearer")
     }
 
@@ -702,11 +701,11 @@ class MockURLProtocol: URLProtocol {
     nonisolated(unsafe) static var requestHistory: [URLRequest] = []
 
     override class func canInit(with request: URLRequest) -> Bool {
-        return true
+        true
     }
 
     override class func canonicalRequest(for request: URLRequest) -> URLRequest {
-        return request
+        request
     }
 
     override func startLoading() {

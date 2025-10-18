@@ -5,15 +5,14 @@
 //  Created on 12/10/25.
 //
 
-import Testing
 import Foundation
 @testable import MirrorBuddy
+import Testing
 
 /// Tests for OpenAIClient infrastructure (Task 11)
 @Suite("OpenAI Client Tests")
 @MainActor
 struct OpenAIClientTests {
-
     // MARK: - Test Configuration
 
     let mockAPIKey = "sk-test-mock-api-key-for-testing-purposes"
@@ -161,7 +160,7 @@ struct OpenAIClientTests {
         let data = try encoder.encode(message)
 
         // Should encode without errors
-        #expect(data.count > 0)
+        #expect(!data.isEmpty)
     }
 
     @Test("ImageGenerationRequest encoding")

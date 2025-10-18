@@ -1,8 +1,8 @@
-import Foundation
-import SwiftData
 import AVFoundation
-import UIKit
+import Foundation
 import os.log
+import SwiftData
+import UIKit
 
 /// Combined vision and voice interaction service for homework help (Task 37)
 @MainActor
@@ -29,7 +29,7 @@ final class VisionVoiceInteractionService: NSObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         if let config = OpenAIConfiguration.loadFromEnvironment() {
             self.openAIClient = OpenAIClient(configuration: config)
         } else {

@@ -11,7 +11,7 @@ enum TaskSource: String, Codable {
 /// Study or assignment task with Google Calendar integration
 @Model
 final class Task {
-    var id: UUID = UUID()
+    var id = UUID()
     var title: String = ""
     var taskDescription: String?
 
@@ -21,9 +21,9 @@ final class Task {
 
     // Google Calendar integration
     var googleCalendarEventID: String?
-    var source: TaskSource = TaskSource.manual
+    var source = TaskSource.manual
 
-    var createdAt: Date = Date()
+    var createdAt = Date()
     var priority: Int = 3 // 1 (low) to 5 (high)
 
     // Relationships (NO inverse for one-to-many "one" side)

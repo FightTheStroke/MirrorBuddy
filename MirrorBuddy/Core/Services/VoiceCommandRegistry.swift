@@ -1,7 +1,7 @@
-import Foundation
-import SwiftUI
 import Combine
+import Foundation
 import os.log
+import SwiftUI
 
 // MARK: - Voice Command Model (Task 29.2)
 
@@ -324,7 +324,7 @@ final class VoiceCommandRegistry: ObservableObject {
 
     /// Get all available commands for current context
     func availableCommands() -> [VoiceCommand] {
-        return commands.filter { command in
+        commands.filter { command in
             command.context == .global || command.context.isActive(in: currentView)
         }
     }
@@ -368,7 +368,6 @@ final class VoiceCommandRegistry: ObservableObject {
            lowercasePhrase.contains("last material") ||
            lowercasePhrase.contains("materiale più recente") ||
            lowercasePhrase.contains("newest material") {
-
             // Check for subject specification
             if let subjectMatch = lowercasePhrase.range(of: "di ") {
                 let afterDi = lowercasePhrase[subjectMatch.upperBound...].trimmingCharacters(in: .whitespaces)
@@ -384,7 +383,6 @@ final class VoiceCommandRegistry: ObservableObject {
         if lowercasePhrase.hasPrefix("apri materiale ") ||
            lowercasePhrase.hasPrefix("open material ") ||
            lowercasePhrase.hasPrefix("mostra materiale ") {
-
             let prefixes = ["apri materiale ", "open material ", "mostra materiale "]
             for prefix in prefixes {
                 if lowercasePhrase.hasPrefix(prefix) {

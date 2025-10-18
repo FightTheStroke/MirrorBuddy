@@ -1,7 +1,7 @@
-import UIKit
 import CoreImage
-import Vision
 import os.log
+import UIKit
+import Vision
 
 /// Utility for processing and optimizing images for AI analysis
 @MainActor
@@ -14,7 +14,7 @@ final class ImageProcessor {
     // MARK: - Configuration
 
     /// Maximum image dimension for AI processing
-    var maxDimension: CGFloat = 2048
+    var maxDimension: CGFloat = 2_048
 
     /// JPEG compression quality (0-1)
     var compressionQuality: CGFloat = 0.85

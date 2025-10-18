@@ -1,5 +1,5 @@
-import Foundation
 import AuthenticationServices
+import Foundation
 import Security
 
 /// Google OAuth 2.0 authentication service for Google Drive access
@@ -22,7 +22,7 @@ final class GoogleOAuthService: NSObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         super.init()
     }
 

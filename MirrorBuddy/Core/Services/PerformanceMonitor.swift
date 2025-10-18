@@ -27,7 +27,7 @@ final class PerformanceMonitor {
 
     var currentMemoryUsage: UInt64 {
         var info = mach_task_basic_info()
-        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size)/4
+        var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size) / 4
 
         let kerr: kern_return_t = withUnsafeMutablePointer(to: &info) {
             $0.withMemoryRebound(to: integer_t.self, capacity: 1) {
@@ -46,7 +46,7 @@ final class PerformanceMonitor {
     }
 
     var memoryUsageMB: Double {
-        Double(currentMemoryUsage) / 1024.0 / 1024.0
+        Double(currentMemoryUsage) / 1_024.0 / 1_024.0
     }
 
     // MARK: - FPS Tracking (Subtask 59.1)
@@ -85,11 +85,11 @@ final class PerformanceMonitor {
     private func setupCaches() {
         // Configure image cache
         imageCache.countLimit = 50 // Max 50 images
-        imageCache.totalCostLimit = 50 * 1024 * 1024 // 50MB
+        imageCache.totalCostLimit = 50 * 1_024 * 1_024 // 50MB
 
         // Configure string cache
         stringCache.countLimit = 100
-        stringCache.totalCostLimit = 10 * 1024 * 1024 // 10MB
+        stringCache.totalCostLimit = 10 * 1_024 * 1_024 // 10MB
 
         logger.info("Performance caches configured")
     }
@@ -178,7 +178,7 @@ final class PerformanceMonitor {
     var memoryIncrease: Double {
         let current = currentMemoryUsage
         guard current > memoryBaseline else { return 0 }
-        return Double(current - memoryBaseline) / 1024.0 / 1024.0
+        return Double(current - memoryBaseline) / 1_024.0 / 1_024.0
     }
 
     /// Log current memory usage
@@ -246,7 +246,7 @@ final class PerformanceMonitor {
 
     /// Retrieve cached image
     func cachedImage(forKey key: String) -> UIImage? {
-        return imageCache.object(forKey: key as NSString)
+        imageCache.object(forKey: key as NSString)
     }
 
     /// Cache a string
@@ -256,7 +256,7 @@ final class PerformanceMonitor {
 
     /// Retrieve cached string
     func cachedString(forKey key: String) -> String? {
-        return stringCache.object(forKey: key as NSString) as String?
+        stringCache.object(forKey: key as NSString) as String?
     }
 
     /// Clear all caches

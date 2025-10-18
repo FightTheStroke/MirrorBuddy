@@ -1,5 +1,5 @@
-import SwiftUI
 @preconcurrency import Combine
+import SwiftUI
 
 /// Combined vision and voice interaction for homework help
 /// Integrates camera capture, vision analysis, and voice coaching (Task 37)
@@ -331,7 +331,6 @@ final class HomeworkHelpViewModel: ObservableObject {
 
             // Prepare context for voice session
             prepareVoiceContext(with: result)
-
         } catch {
             analysisState = .failed
             showError(error.localizedDescription)

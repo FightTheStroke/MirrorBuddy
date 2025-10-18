@@ -32,13 +32,13 @@ final class TrackedDriveFile {
     var parents: [String] = []
 
     /// When this record was last synced
-    var lastSyncedAt: Date = Date()
+    var lastSyncedAt = Date()
 
     /// Whether file is trashed
     var isTrashed: Bool = false
 
     /// File status
-    var status: FileStatus = FileStatus.unchanged
+    var status = FileStatus.unchanged
 
     // MARK: - Computed Properties
 

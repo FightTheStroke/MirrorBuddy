@@ -1,8 +1,8 @@
-import Foundation
-import Speech
 import AVFoundation
 import Combine
+import Foundation
 import os.log
+import Speech
 
 /// Voice command recognition service using Apple Speech framework (Task 29.1)
 @MainActor
@@ -41,7 +41,7 @@ final class VoiceCommandRecognitionService: NSObject, ObservableObject {
 
     // MARK: - Initialization
 
-    private override init() {
+    override private init() {
         super.init()
         setupRecognizer()
         configureAudioSession()
@@ -114,7 +114,7 @@ final class VoiceCommandRecognitionService: NSObject, ObservableObject {
 
     /// Get supported languages
     static func supportedLanguages() -> [String] {
-        return SFSpeechRecognizer.supportedLocales().map { $0.identifier }
+        SFSpeechRecognizer.supportedLocales().map { $0.identifier }
     }
 
     // MARK: - Voice Recognition (Subtask 29.1)
@@ -153,7 +153,7 @@ final class VoiceCommandRecognitionService: NSObject, ObservableObject {
         let recordingFormat = inputNode.outputFormat(forBus: 0)
 
         // Install tap on audio input
-        inputNode.installTap(onBus: 0, bufferSize: 1024, format: recordingFormat) { [weak self] buffer, _ in
+        inputNode.installTap(onBus: 0, bufferSize: 1_024, format: recordingFormat) { [weak self] buffer, _ in
             self?.recognitionRequest?.append(buffer)
         }
 
@@ -238,7 +238,7 @@ final class VoiceCommandRecognitionService: NSObject, ObservableObject {
 
     /// Process a single command and stop
     func recognizeSingleCommand() async throws -> String {
-        return try await withCheckedThrowingContinuation { continuation in
+        try await withCheckedThrowingContinuation { continuation in
             var resumed = false
 
             onCommandRecognized = { [weak self] command in

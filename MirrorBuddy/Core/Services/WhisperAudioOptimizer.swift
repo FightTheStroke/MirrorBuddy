@@ -6,8 +6,8 @@
 //  Validates format, file size, and prepares metadata (Task 93.2)
 //
 
-import Foundation
 import AVFoundation
+import Foundation
 import os.log
 
 /// Service for optimizing and validating audio chunks for Whisper API transcription
@@ -20,7 +20,7 @@ final class WhisperAudioOptimizer {
     // MARK: - Configuration
 
     /// Whisper API maximum file size (25 MB)
-    private let maxFileSizeBytes: Int64 = 25 * 1024 * 1024 // 25 MB
+    private let maxFileSizeBytes: Int64 = 25 * 1_024 * 1_024 // 25 MB
 
     /// Whisper-supported audio formats
     private let supportedFormats: Set<String> = [
@@ -29,8 +29,8 @@ final class WhisperAudioOptimizer {
 
     /// Optimal audio settings for Whisper API
     private struct OptimalSettings {
-        static let sampleRate: Double = 16000.0  // 16 kHz (Whisper's native sample rate)
-        static let bitRate: Int = 32000          // 32 kbps (good balance of quality and size)
+        static let sampleRate: Double = 16_000.0  // 16 kHz (Whisper's native sample rate)
+        static let bitRate: Int = 32_000          // 32 kbps (good balance of quality and size)
         static let channels: UInt32 = 1          // Mono (Whisper works best with mono)
         static let format: String = "m4a"        // M4A with AAC codec
     }
@@ -52,7 +52,7 @@ final class WhisperAudioOptimizer {
 
         // Step 2: Check file size
         let fileSize = try getFileSize(at: segment.fileURL)
-        logger.info("Segment \(segment.index) size: \(fileSize) bytes (\(Double(fileSize) / (1024 * 1024)) MB)")
+        logger.info("Segment \(segment.index) size: \(fileSize) bytes (\(Double(fileSize) / (1_024 * 1_024)) MB)")
 
         // Step 3: Validate format
         let fileExtension = segment.fileURL.pathExtension.lowercased()
@@ -135,8 +135,8 @@ final class WhisperAudioOptimizer {
 
         logger.info("""
             Optimization complete:
-            - Original total size: \(Double(totalOriginalSize) / (1024 * 1024)) MB
-            - Optimized total size: \(Double(totalOptimizedSize) / (1024 * 1024)) MB
+            - Original total size: \(Double(totalOriginalSize) / (1_024 * 1_024)) MB
+            - Optimized total size: \(Double(totalOptimizedSize) / (1_024 * 1_024)) MB
             - Reduction: \(reductionPercent)%
             """)
 
@@ -205,7 +205,7 @@ final class WhisperAudioOptimizer {
         }
 
         let audioStreamBasicDescription = CMAudioFormatDescriptionGetStreamBasicDescription(formatDescription)
-        return audioStreamBasicDescription?.pointee.mSampleRate ?? 44100.0
+        return audioStreamBasicDescription?.pointee.mSampleRate ?? 44_100.0
     }
 
     /// Get channel count from format descriptions
@@ -314,7 +314,6 @@ final class WhisperAudioOptimizer {
             }
 
             logger.info("Deleted \(files.count) optimized files")
-
         } catch {
             logger.error("Cleanup failed: \(error.localizedDescription)")
         }
@@ -358,7 +357,7 @@ struct OptimizedAudioSegment: Identifiable {
 
     /// File size in MB
     var fileSizeMB: Double {
-        Double(optimizedFileSize) / (1024 * 1024)
+        Double(optimizedFileSize) / (1_024 * 1_024)
     }
 
     /// Size reduction percentage (if optimized)
@@ -370,7 +369,7 @@ struct OptimizedAudioSegment: Identifiable {
     /// Formatted file size
     var formattedFileSize: String {
         if fileSizeMB < 1 {
-            return String(format: "%.1f KB", Double(optimizedFileSize) / 1024)
+            return String(format: "%.1f KB", Double(optimizedFileSize) / 1_024)
         } else {
             return String(format: "%.1f MB", fileSizeMB)
         }
@@ -378,7 +377,7 @@ struct OptimizedAudioSegment: Identifiable {
 
     /// Audio settings summary
     var settingsSummary: String {
-        "\(format.uppercased()), \(Int(sampleRate / 1000))kHz, \(channels == 1 ? "Mono" : "Stereo")"
+        "\(format.uppercased()), \(Int(sampleRate / 1_000))kHz, \(channels == 1 ? "Mono" : "Stereo")"
     }
 }
 
@@ -396,12 +395,12 @@ struct OptimizationStats {
     }
 
     var formattedOriginalSize: String {
-        let sizeMB = Double(totalOriginalSize) / (1024 * 1024)
+        let sizeMB = Double(totalOriginalSize) / (1_024 * 1_024)
         return String(format: "%.1f MB", sizeMB)
     }
 
     var formattedOptimizedSize: String {
-        let sizeMB = Double(totalOptimizedSize) / (1024 * 1024)
+        let sizeMB = Double(totalOptimizedSize) / (1_024 * 1_024)
         return String(format: "%.1f MB", sizeMB)
     }
 }
@@ -423,8 +422,8 @@ enum OptimizationError: LocalizedError {
         case .unsupportedFormat(let format):
             return "Formato audio non supportato: \(format)"
         case .fileTooLarge(let size, let max):
-            let sizeMB = Double(size) / (1024 * 1024)
-            let maxMB = Double(max) / (1024 * 1024)
+            let sizeMB = Double(size) / (1_024 * 1_024)
+            let maxMB = Double(max) / (1_024 * 1_024)
             return "File troppo grande: \(String(format: "%.1f", sizeMB)) MB (massimo \(String(format: "%.1f", maxMB)) MB)"
         case .noAudioTrack:
             return "Nessuna traccia audio trovata nel file"

@@ -1,5 +1,5 @@
-import SwiftUI
 import Combine
+import SwiftUI
 
 // MARK: - Accessibility Audit (Task 60)
 
@@ -294,7 +294,7 @@ final class AccessibilityAudit: ObservableObject {
     }
 
     func itemsForCategory(_ category: AuditCategory) -> [AuditItem] {
-        return auditResults[category] ?? []
+        auditResults[category] ?? []
     }
 
     func categoryScore(_ category: AuditCategory) -> Double {

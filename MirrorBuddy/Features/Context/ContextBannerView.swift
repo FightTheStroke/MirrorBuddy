@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import Combine
+import SwiftData
+import SwiftUI
 
 // MARK: - Context Banner View (Task 75)
 

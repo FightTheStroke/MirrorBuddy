@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Service for storing and managing transcripts in SwiftData
 @MainActor
@@ -123,7 +123,6 @@ final class TranscriptStorageService {
                 }
 
                 logger.info("Exported \(format.rawValue) to \(exportURL.lastPathComponent)")
-
             } catch {
                 logger.error("Failed to export \(format.rawValue): \(error.localizedDescription)")
             }
@@ -266,8 +265,8 @@ struct TranscriptStatistics {
     let averageWordsPerMinute: Double
 
     var formattedTotalDuration: String {
-        let hours = Int(totalDuration) / 3600
-        let minutes = (Int(totalDuration) % 3600) / 60
+        let hours = Int(totalDuration) / 3_600
+        let minutes = (Int(totalDuration) % 3_600) / 60
 
         if hours > 0 {
             return String(format: "%dh %dm", hours, minutes)
