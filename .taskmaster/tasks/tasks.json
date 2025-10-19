@@ -1253,7 +1253,7 @@
         "id": "26",
         "title": "Create Subject-Organized Dashboard UI",
         "description": "Design and implement the main dashboard UI organized by subject.",
-        "details": "1. Create a SwiftUI view for the main dashboard\n2. Implement subject-based organization\n3. Design material cards with thumbnails\n4. Add search and filter functionality\n5. Implement sorting options (date, name, subject)\n6. Create animations for smooth transitions\n7. Optimize for one-handed operation\n8. Implement VoiceOver support\n9. Add large touch targets (min 44\u00d744pt)",
+        "details": "1. Create a SwiftUI view for the main dashboard\n2. Implement subject-based organization\n3. Design material cards with thumbnails\n4. Add search and filter functionality\n5. Implement sorting options (date, name, subject)\n6. Create animations for smooth transitions\n7. Optimize for one-handed operation\n8. Implement VoiceOver support\n9. Add large touch targets (min 44×44pt)",
         "testStrategy": "Test UI on various device sizes. Verify VoiceOver functionality. Test one-handed operation. Measure performance with large number of materials.",
         "priority": "high",
         "dependencies": [
@@ -1296,7 +1296,7 @@
               1,
               2
             ],
-            "details": "Design reusable material card components that display thumbnails, title, creation date, and relevant metadata. Implement efficient image loading and caching for thumbnails. Create placeholder states for loading thumbnails. Ensure cards have appropriate touch targets (minimum 44\u00d744pt). Implement card selection and interaction behaviors.",
+            "details": "Design reusable material card components that display thumbnails, title, creation date, and relevant metadata. Implement efficient image loading and caching for thumbnails. Create placeholder states for loading thumbnails. Ensure cards have appropriate touch targets (minimum 44×44pt). Implement card selection and interaction behaviors.",
             "status": "done",
             "testStrategy": "Test cards with various content lengths. Verify thumbnail loading performance. Test accessibility of cards with VoiceOver. Measure touch target sizes to ensure they meet minimum requirements.",
             "parentId": "undefined",
@@ -1327,7 +1327,7 @@
         "id": "27",
         "title": "Implement Material Cards UI Component",
         "description": "Design and implement reusable material card components for the dashboard.",
-        "details": "1. Create a SwiftUI component for material cards\n2. Design visual appearance with thumbnails\n3. Show subject, title, and date information\n4. Add progress indicators for processing status\n5. Implement tap gestures for navigation\n6. Create animations for interactions\n7. Optimize for VoiceOver\n8. Ensure minimum touch target size (44\u00d744pt)",
+        "details": "1. Create a SwiftUI component for material cards\n2. Design visual appearance with thumbnails\n3. Show subject, title, and date information\n4. Add progress indicators for processing status\n5. Implement tap gestures for navigation\n6. Create animations for interactions\n7. Optimize for VoiceOver\n8. Ensure minimum touch target size (44×44pt)",
         "testStrategy": "Test component with various material types. Verify VoiceOver functionality. Test touch target size compliance. Measure rendering performance.",
         "priority": "medium",
         "dependencies": [
@@ -1353,7 +1353,7 @@
             "dependencies": [
               1
             ],
-            "details": "Integrate SwiftUI tap gesture recognizers to trigger navigation actions. Add a progress indicator (e.g., circular or linear) to show processing status. Implement simple animations for tap, hover, or state changes using SwiftUI's animation modifiers.\n<info added on 2025-10-13T08:16:05.142Z>\n## INTERACTIVE FEATURES ADDED:\n1. Tap Gestures - Already implemented via Button wrapper with onTap closure parameter\n2. Progress Indicators - Enhanced processing status badge with ProgressView for active processing\n3. Touch Feedback - MaterialCardButtonStyle provides responsive interaction feedback\n\n## ANIMATION ENHANCEMENTS:\n1. Entry Animation:\n   - Fade-in with opacity transition (0.0 \u2192 1.0)\n   - Scale effect (0.95 \u2192 1.0)\n   - Spring animation with response 0.5 and damping 0.7\n   - Triggered on card appearance\n\n2. Status Badge Animations:\n   - Pending status: Pulsing clock icon (.symbolEffect.pulse repeating)\n   - Processing status: Animated ProgressView with white tint\n   - Failed status: Bouncing warning icon (.symbolEffect.bounce repeat 2 times)\n   - Scale + opacity transition for badge appearance\n\n3. Metadata Animations:\n   - Scale + opacity transitions for flashcard/task count changes\n   - Smooth 0.3s easeInOut animations on data updates\n   - Icons fade in/out smoothly when resources are added/removed\n\n4. Button Interaction:\n   - Spring animation (response 0.3, damping 0.6) on press\n   - Scale effect (0.97x when pressed)\n   - Brightness adjustment for visual feedback (dark/light mode adaptive)\n   - Content shape for precise tap area\n\nAll animations use iOS 17+ symbol effects and SwiftUI's modern animation APIs.\n</info added on 2025-10-13T08:16:05.142Z>",
+            "details": "Integrate SwiftUI tap gesture recognizers to trigger navigation actions. Add a progress indicator (e.g., circular or linear) to show processing status. Implement simple animations for tap, hover, or state changes using SwiftUI's animation modifiers.\n<info added on 2025-10-13T08:16:05.142Z>\n## INTERACTIVE FEATURES ADDED:\n1. Tap Gestures - Already implemented via Button wrapper with onTap closure parameter\n2. Progress Indicators - Enhanced processing status badge with ProgressView for active processing\n3. Touch Feedback - MaterialCardButtonStyle provides responsive interaction feedback\n\n## ANIMATION ENHANCEMENTS:\n1. Entry Animation:\n   - Fade-in with opacity transition (0.0 → 1.0)\n   - Scale effect (0.95 → 1.0)\n   - Spring animation with response 0.5 and damping 0.7\n   - Triggered on card appearance\n\n2. Status Badge Animations:\n   - Pending status: Pulsing clock icon (.symbolEffect.pulse repeating)\n   - Processing status: Animated ProgressView with white tint\n   - Failed status: Bouncing warning icon (.symbolEffect.bounce repeat 2 times)\n   - Scale + opacity transition for badge appearance\n\n3. Metadata Animations:\n   - Scale + opacity transitions for flashcard/task count changes\n   - Smooth 0.3s easeInOut animations on data updates\n   - Icons fade in/out smoothly when resources are added/removed\n\n4. Button Interaction:\n   - Spring animation (response 0.3, damping 0.6) on press\n   - Scale effect (0.97x when pressed)\n   - Brightness adjustment for visual feedback (dark/light mode adaptive)\n   - Content shape for precise tap area\n\nAll animations use iOS 17+ symbol effects and SwiftUI's modern animation APIs.\n</info added on 2025-10-13T08:16:05.142Z>",
             "status": "done",
             "testStrategy": "Test tap gestures for correct navigation. Verify progress indicator updates with state changes. Check animation smoothness and responsiveness.",
             "parentId": "undefined",
@@ -1367,7 +1367,7 @@
               1,
               2
             ],
-            "details": "Add accessibility labels and traits for VoiceOver compatibility. Test with Dynamic Type and color contrast. Ensure all tap targets are at least 44\u00d744pt. Use SwiftUI accessibility modifiers and test on device with accessibility features enabled.\n<info added on 2025-10-13T08:19:07.684Z>\nACCESSIBILITY FEATURES:\n\u2705 Touch Target Compliance:\n- Entire card is tappable with dimensions typically 300\u00d7200pt or larger\n- Significantly exceeds WCAG 2.1 minimum requirement of 44\u00d744pt\n- .contentShape(Rectangle()) ensures precise hit testing across full card area\n\n\u2705 VoiceOver Support:\n- Rich accessibility labels including material title, subject, creation date, processing status\n- Contextual information about available resources (flashcard count, mind map, tasks)\n- Clear accessibility hints: \"Tocca per aprire i dettagli del materiale\"\n- Proper button trait for interactive feedback\n- .accessibilityElement(children: .combine) for cohesive navigation\n\n\u2705 Dynamic Type Support:\n- Title text supports scaling up to .xxxLarge (3x base size)\n- Subject badge text scales up to .accessibility1 (4x base size)\n- .minimumScaleFactor(0.8) prevents truncation on smaller devices\n- All text elements use system fonts with automatic Dynamic Type adjustment\n\n\u2705 Color Contrast & Visual Accessibility:\n- Adaptive dark mode with automatic color adjustments\n- Shadow opacity adapts to color scheme (0.4 dark, 0.1 light)\n- Primary text uses .primary foregroundStyle for optimal contrast\n- Secondary text uses .secondary for proper hierarchical contrast\n- Subject colors maintain sufficient contrast against backgrounds\n\n\u2705 Reduced Motion:\n- Spring animations automatically respect system Reduce Motion setting\n- Symbol effects gracefully degrade when motion is reduced\n- All transitions are optional and enhancement-only\n\n\u2705 Accessibility Documentation:\n- Added comprehensive documentation block at file top\n- Lists all accessibility features and compliance standards\n- References WCAG 2.1 guidelines for touch targets\n- Documents Dynamic Type limits and scaling behavior\n</info added on 2025-10-13T08:19:07.684Z>",
+            "details": "Add accessibility labels and traits for VoiceOver compatibility. Test with Dynamic Type and color contrast. Ensure all tap targets are at least 44×44pt. Use SwiftUI accessibility modifiers and test on device with accessibility features enabled.\n<info added on 2025-10-13T08:19:07.684Z>\nACCESSIBILITY FEATURES:\n✅ Touch Target Compliance:\n- Entire card is tappable with dimensions typically 300×200pt or larger\n- Significantly exceeds WCAG 2.1 minimum requirement of 44×44pt\n- .contentShape(Rectangle()) ensures precise hit testing across full card area\n\n✅ VoiceOver Support:\n- Rich accessibility labels including material title, subject, creation date, processing status\n- Contextual information about available resources (flashcard count, mind map, tasks)\n- Clear accessibility hints: \"Tocca per aprire i dettagli del materiale\"\n- Proper button trait for interactive feedback\n- .accessibilityElement(children: .combine) for cohesive navigation\n\n✅ Dynamic Type Support:\n- Title text supports scaling up to .xxxLarge (3x base size)\n- Subject badge text scales up to .accessibility1 (4x base size)\n- .minimumScaleFactor(0.8) prevents truncation on smaller devices\n- All text elements use system fonts with automatic Dynamic Type adjustment\n\n✅ Color Contrast & Visual Accessibility:\n- Adaptive dark mode with automatic color adjustments\n- Shadow opacity adapts to color scheme (0.4 dark, 0.1 light)\n- Primary text uses .primary foregroundStyle for optimal contrast\n- Secondary text uses .secondary for proper hierarchical contrast\n- Subject colors maintain sufficient contrast against backgrounds\n\n✅ Reduced Motion:\n- Spring animations automatically respect system Reduce Motion setting\n- Symbol effects gracefully degrade when motion is reduced\n- All transitions are optional and enhancement-only\n\n✅ Accessibility Documentation:\n- Added comprehensive documentation block at file top\n- Lists all accessibility features and compliance standards\n- References WCAG 2.1 guidelines for touch targets\n- Documents Dynamic Type limits and scaling behavior\n</info added on 2025-10-13T08:19:07.684Z>",
             "status": "done",
             "testStrategy": "Use XCUITest and manual testing with VoiceOver. Measure touch target sizes and verify accessibility compliance.",
             "parentId": "undefined",
@@ -2333,7 +2333,7 @@
             "dependencies": [
               1
             ],
-            "details": "Write code to call the Google Calendar API (events.list) to retrieve events from the user\u2019s primary calendar. Filter and parse events to identify assignment due dates based on event metadata (e.g., title, description). Store synchronized events locally for further processing[3][4]. Implement incremental sync to fetch only new or modified events after the initial sync.",
+            "details": "Write code to call the Google Calendar API (events.list) to retrieve events from the user’s primary calendar. Filter and parse events to identify assignment due dates based on event metadata (e.g., title, description). Store synchronized events locally for further processing[3][4]. Implement incremental sync to fetch only new or modified events after the initial sync.",
             "status": "done",
             "testStrategy": "Test with various calendar event types and structures. Verify accurate extraction and parsing of assignment due dates. Validate incremental sync detects and processes calendar changes correctly.",
             "parentId": "undefined",
@@ -2346,7 +2346,7 @@
             "dependencies": [
               2
             ],
-            "details": "For each relevant calendar event, create a corresponding Task object in the app\u2019s data model, preserving due date, title, and other metadata. Implement logic to update or remove Task objects when the underlying calendar event changes or is deleted. Ensure Task objects remain in sync with the calendar source.",
+            "details": "For each relevant calendar event, create a corresponding Task object in the app’s data model, preserving due date, title, and other metadata. Implement logic to update or remove Task objects when the underlying calendar event changes or is deleted. Ensure Task objects remain in sync with the calendar source.",
             "status": "done",
             "testStrategy": "Verify Task objects are created, updated, and deleted in response to calendar changes. Test with concurrent modifications to both the app and calendar. Check data consistency after sync cycles.",
             "parentId": "undefined",
@@ -2445,7 +2445,7 @@
         "id": "44",
         "title": "Create Task List View",
         "description": "Design and implement the task list view for assignments and due dates.",
-        "details": "1. Create a SwiftUI view for task lists\n2. Implement today's tasks section\n3. Add upcoming week view\n4. Create overdue tasks section with encouraging messaging\n5. Implement subject color-coding\n6. Add voice command support\n7. Create large checkboxes (44\u00d744pt)\n8. Implement sorting and filtering options\n9. Add search functionality",
+        "details": "1. Create a SwiftUI view for task lists\n2. Implement today's tasks section\n3. Add upcoming week view\n4. Create overdue tasks section with encouraging messaging\n5. Implement subject color-coding\n6. Add voice command support\n7. Create large checkboxes (44×44pt)\n8. Implement sorting and filtering options\n9. Add search functionality",
         "testStrategy": "Test view with various task combinations. Verify voice commands work correctly. Test sorting and filtering. Measure performance with large number of tasks.",
         "priority": "high",
         "dependencies": [
@@ -2461,7 +2461,7 @@
             "title": "Design and Implement Main Task List View",
             "description": "Create a SwiftUI view for displaying task lists, including basic UI elements such as task items and checkboxes.",
             "dependencies": [],
-            "details": "Use SwiftUI's List structure to create a scrollable list of tasks. Implement large checkboxes (44\u00d744pt) for marking tasks as done. Ensure the view is responsive and adaptable to different screen sizes.",
+            "details": "Use SwiftUI's List structure to create a scrollable list of tasks. Implement large checkboxes (44×44pt) for marking tasks as done. Ensure the view is responsive and adaptable to different screen sizes.",
             "status": "done",
             "testStrategy": "Verify the view displays tasks correctly and checkboxes are interactive.",
             "parentId": "undefined",
@@ -2692,12 +2692,51 @@
           "36",
           "37"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop Step-by-Step Math Problem Solving Engine",
+            "description": "Implement a feature that guides users through solving math problems step by step, providing explanations and justifications for each stage.",
+            "dependencies": [],
+            "details": "Design and build a backend module that parses user-submitted math problems, applies a structured problem-solving approach (such as understanding, strategizing, and implementing), and outputs each step with clear explanations. Integrate support for various math domains (algebra, calculus, etc.) and ensure the system can handle both symbolic and numeric problems.\n<info added on 2025-10-19T14:39:16.034Z>\nThe MathProblemSolver.swift module has been implemented with step-by-step solutions for linear and quadratic equations, simplifications, and arithmetic problems. Additionally, AI integration with Gemini has been incorporated to handle complex problems. This implementation supports both symbolic and numeric math domains, aligning with the structured problem-solving approach outlined in the parent task. The next step involves integrating visual equation explanations and graph rendering as per the pending subtask 50.2.\n</info added on 2025-10-19T14:39:16.034Z>",
+            "status": "done",
+            "testStrategy": "Test with a diverse set of math problems across supported domains. Verify that each step is logically sound, explanations are clear, and the final answer is correct. Include edge cases and multi-step problems.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:39:17.231Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Visual Equation Explanation and Graph Rendering",
+            "description": "Create features to visually explain equations and render graphs for mathematical expressions and functions.",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop a frontend component that generates visual representations of equations, highlighting key elements and transformations. Integrate a graphing library to render 2D graphs for functions and equations, supporting interactive features such as zoom, pan, and point inspection. Ensure accessibility and clarity in all visual outputs.\n<info added on 2025-10-19T14:39:34.251Z>\nTask completed with full implementation of visual equation explanation and graph rendering system. MathGraphRenderer.swift now provides comprehensive support for multiple function types including linear, quadratic, cubic, polynomial, exponential, logarithmic, trigonometric (sine, cosine, tangent), absolute value, square root, and rational functions. The implementation includes automatic graph generation capabilities, numerical computation of derivatives and integrals, and detection of critical points such as maxima, minima, and zeros. The rendering system delivers interactive visual representations that highlight equation transformations and key mathematical elements, enabling students to better understand the behavior and characteristics of different function families.\n</info added on 2025-10-19T14:39:34.251Z>",
+            "status": "done",
+            "testStrategy": "Test with a variety of equations and functions, including linear, quadratic, and trigonometric examples. Verify that visual explanations match the underlying math and that graphs are accurate and interactive. Check for usability and accessibility.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:39:35.386Z"
+          },
+          {
+            "id": 3,
+            "title": "Build Math Practice Generator and Formula Reference Library",
+            "description": "Develop a practice problem generator and a searchable formula reference library tailored for math study.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement a system that generates practice problems of varying difficulty, covering key math topics. Create a curated, searchable library of mathematical formulas, organized by topic and including explanations and usage examples. Integrate both features into the user interface, allowing seamless access during study sessions.\n<info added on 2025-10-19T14:39:52.647Z>\nMathPracticeGenerator.swift now generates adaptive-difficulty practice problems for algebra, geometry, trigonometry, calculus, statistics, and probability. FormulaLibrary.swift provides a curated, searchable reference of mathematical formulas across all topics, each with explanations, usage examples, and tags for easy discovery. MathCalculatorView.swift integrates a multi-mode calculator (basic, scientific, graphing, statistics) directly into the study interface. MathPrompts.swift includes specialized AI tutoring prompts to guide users through problem-solving. MathMindMapTemplate.swift generates interactive mind maps to visualize mathematical concepts and relationships. Comprehensive test coverage is implemented in MathModeTests.swift. All features are fully integrated into the user interface for seamless access during study sessions.\n</info added on 2025-10-19T14:39:52.647Z>",
+            "status": "done",
+            "testStrategy": "Test the generator for problem variety, correctness, and appropriate difficulty scaling. Verify the formula library for completeness, search accuracy, and clarity of explanations. Conduct user testing to ensure both features enhance study effectiveness.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:39:53.777Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement math mode specialized features.",
-        "updatedAt": "2025-10-19T09:16:36.333Z"
+        "updatedAt": "2025-10-19T14:39:53.777Z"
       },
       {
         "id": "51",
@@ -2711,12 +2750,50 @@
           "36",
           "37"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Grammar Explanations and Conjugation Tables",
+            "description": "Develop comprehensive grammar explanations and create accurate conjugation tables for Italian language study.",
+            "dependencies": [],
+            "details": "Use existing language resources to create detailed grammar explanations. Develop conjugation tables for common Italian verbs, ensuring accuracy and completeness.\n<info added on 2025-10-19T14:40:59.241Z>\nThe ItalianGrammarHelper.swift and ItalianConjugationTables.swift files have been fully implemented. The grammar helper includes rules for beginner, intermediate, and advanced levels, explanations for eight grammatical concepts, and sentence analysis. The conjugation tables cover all tenses (present, imperfect, remote past, future, conditional, subjunctive, imperative) for regular verbs (-ARE, -ERE, -IRE) and 13 common irregular verbs (essere, avere, fare, andare, venire, dare, stare, sapere, volere, potere, dovere, dire, bere).\n</info added on 2025-10-19T14:40:59.241Z>",
+            "status": "done",
+            "testStrategy": "Test grammar explanations for clarity and verify conjugation tables accuracy.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:41:00.529Z"
+          },
+          {
+            "id": 2,
+            "title": "Develop Literature Summaries and Vocabulary Flashcards",
+            "description": "Create literature summaries for key Italian works and implement vocabulary flashcards to aid language learning.",
+            "dependencies": [
+              1
+            ],
+            "details": "Summarize major Italian literary works to provide context for learners. Develop flashcards with Italian vocabulary, using spaced repetition for effective learning.\n<info added on 2025-10-19T14:41:15.805Z>\nImplementation completed with ItalianLiteratureSummarizer.swift (6.7KB) and ItalianVocabularyBuilder.swift (6.9KB). The literature summarizer provides summaries for classic and modern Italian works, including analysis of themes and characters with historical context. The vocabulary builder includes flashcards for common words, academic vocabulary, idioms, and false friends, featuring a spaced repetition system and progress tracking functionality.\n</info added on 2025-10-19T14:41:15.805Z>",
+            "status": "done",
+            "testStrategy": "Evaluate literature summaries quality and test vocabulary flashcard effectiveness.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:41:16.963Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement AI Prompts, Audio Readings, and Mind Map Templates",
+            "description": "Integrate Italian-specific AI prompts, add audio readings feature, and create specialized mind map templates for Italian language study.",
+            "dependencies": [
+              2
+            ],
+            "details": "Develop AI prompts tailored to Italian language learning. Implement an audio readings feature for listening practice. Design mind map templates to help organize Italian language concepts.\n<info added on 2025-10-19T14:41:30.457Z>\nThe implementation of ItalianPrompts.swift, ItalianAudioReader.swift, ItalianReadingAssistant.swift, and ItalianMindMapTemplate.swift is complete. These files include specialized AI prompts for tutoring Italian grammar, literature, and conversation. The audio reader utilizes speech synthesis for listening practice, while the reading assistant provides text analysis, comprehension support, and identification of grammatical structures. Mind map templates are designed to visually organize linguistic and literary concepts. Comprehensive tests have been completed in ItalianModeTests.swift.\n</info added on 2025-10-19T14:41:30.457Z>",
+            "status": "done",
+            "testStrategy": "Test AI prompts for relevance and verify audio readings functionality. Evaluate mind map templates for usability.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:41:31.630Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement italian mode specialized features.",
-        "updatedAt": "2025-10-19T11:27:37.927Z"
+        "updatedAt": "2025-10-19T14:41:31.630Z"
       },
       {
         "id": "52",
@@ -2730,12 +2807,50 @@
           "36",
           "37"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop Interactive Timeline and Map Visualizations",
+            "description": "Implement interactive timeline and map features to help users visualize historical events and their geographical context.",
+            "dependencies": [],
+            "details": "Create a timeline component that allows users to explore events chronologically, integrating multimedia elements for engagement. Develop interactive maps where users can zoom into regions, view event overlays, and explore how locations relate to historical events. Ensure both features are accessible and responsive.",
+            "status": "done",
+            "testStrategy": "Test timeline for chronological accuracy and smooth navigation. Verify map interactivity, event overlays, and responsiveness across devices.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:32.679Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Event Connection Mind Maps and Character Profiles",
+            "description": "Build mind map tools for visualizing event connections and add functionality for detailed historical character profiles.",
+            "dependencies": [
+              1
+            ],
+            "details": "Design a mind map interface tailored for history, enabling users to connect events, eras, and figures. Integrate a character profile system where users can view and edit detailed information about historical figures, including timelines, relationships, and contributions.",
+            "status": "done",
+            "testStrategy": "Verify mind map creation, editing, and event linking. Test character profile completeness, editing, and integration with mind maps.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:33.966Z"
+          },
+          {
+            "id": 3,
+            "title": "Add Era Summaries, Date Memorization Tools, and History-Specific AI Prompts",
+            "description": "Create concise era summaries, interactive date memorization tools, and specialized AI prompts for history study.",
+            "dependencies": [
+              2
+            ],
+            "details": "Develop modules for summarizing historical eras with key events and figures. Implement date memorization tools using quizzes or spaced repetition. Integrate AI prompts tailored for history, such as generating quiz questions or providing context for events and figures.",
+            "status": "done",
+            "testStrategy": "Test era summary accuracy and clarity. Evaluate effectiveness of date memorization tools. Assess AI prompt relevance and correctness for history topics.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:35.199Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement history mode specialized features.",
-        "updatedAt": "2025-10-19T11:27:37.952Z"
+        "updatedAt": "2025-10-19T14:42:35.199Z"
       },
       {
         "id": "53",
@@ -2749,12 +2864,46 @@
           "36",
           "37"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop Interactive Physics & Science Simulation Engine",
+            "description": "Implement a core engine for running experiment simulations and interactive physics demonstrations, supporting real-time user interaction and accurate physical modeling.",
+            "dependencies": [],
+            "details": "Build a modular simulation engine that can model experiments (e.g., pendulum, circuits, fluid dynamics) and interactive demos (e.g., collisions, gravity, optics). Support user-adjustable parameters (mass, friction, gravity), real-time visualization, and scriptable scenarios. Integrate with diagram annotation tools for overlaying notes and measurements on simulations. Ensure the engine is extensible for future physics domains and compatible with lab report generation.",
+            "status": "done",
+            "testStrategy": "Verify simulation accuracy against known physical laws and real-world experiments. Test interactivity, parameter adjustment responsiveness, and annotation overlay functionality. Conduct user testing for educational value and engagement.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:38.303Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Science Study Assistance Tools",
+            "description": "Create tools for formula explanations, unit conversion, and science-specific AI prompts to enhance learning and problem-solving.",
+            "dependencies": [],
+            "details": "Develop a formula explanation system that parses and annotates physics/math expressions with step-by-step derivations, variable definitions, and contextual examples. Add a unit conversion module supporting SI and customary units, with history and favorites. Implement science-specific AI prompts (e.g., 'explain Newton’s laws', 'solve this kinematics problem') that generate tailored study aids, quizzes, and conceptual summaries. Ensure all tools are accessible within the simulation environment and lab report workflow.",
+            "status": "done",
+            "testStrategy": "Test formula explanation clarity and accuracy with a range of equations. Verify unit conversion correctness across all supported units. Evaluate AI prompt relevance and educational quality via user feedback and expert review.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:39.591Z"
+          },
+          {
+            "id": 3,
+            "title": "Design and Integrate Lab Report & Mind Map Templates",
+            "description": "Create customizable templates for lab reports and science mind maps, streamlining documentation and conceptual organization for students and educators.",
+            "dependencies": [],
+            "details": "Design lab report templates with sections for hypothesis, procedure, data tables, graphs, analysis, and conclusions—pre-populated with simulation data where applicable. Develop specialized mind map templates for physics and science topics, with nodes for concepts, formulas, experiments, and applications. Ensure both templates support export/import, collaboration, and integration with simulation data and annotations. Provide customization options for different educational levels and science disciplines.",
+            "status": "done",
+            "testStrategy": "Evaluate template usability and completeness via educator and student feedback. Test data integration from simulations into reports. Verify mind map organization aids conceptual understanding through user studies.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:40.859Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement physics/science mode specialized features.",
-        "updatedAt": "2025-10-19T11:27:38.094Z"
+        "updatedAt": "2025-10-19T14:42:40.859Z"
       },
       {
         "id": "54",
@@ -2768,12 +2917,50 @@
           "36",
           "37"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop Core English Language Assistance Features",
+            "description": "Implement translation assistance, grammar checker, and vocabulary builder modules for English language study.",
+            "dependencies": [],
+            "details": "Create robust translation assistance using AI or third-party APIs, integrate a grammar checker leveraging NLP, and build a vocabulary builder with spaced repetition and progress tracking. Ensure each module is accessible from the main language mode interface and supports user progress monitoring.",
+            "status": "done",
+            "testStrategy": "Test translation accuracy with sample sentences, verify grammar checker with common error cases, and ensure vocabulary builder tracks and updates user progress correctly.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:44.209Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement Pronunciation and Listening Practice Tools",
+            "description": "Add pronunciation help using TTS and speech recognition, and create listening comprehension exercises.",
+            "dependencies": [
+              1
+            ],
+            "details": "Integrate text-to-speech (TTS) for pronunciation modeling and speech recognition for user pronunciation assessment. Develop listening comprehension exercises using audio clips and interactive questions. Provide real-time feedback on pronunciation and listening tasks.",
+            "status": "done",
+            "testStrategy": "Evaluate TTS output for clarity and naturalness, test speech recognition accuracy with varied accents, and verify listening exercises for correct answer validation and feedback.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:45.385Z"
+          },
+          {
+            "id": 3,
+            "title": "Create Interactive Conversation and Learning Enhancement Features",
+            "description": "Develop conversation practice modules, language-specific AI prompts, and specialized mind map templates for English learning.",
+            "dependencies": [
+              2
+            ],
+            "details": "Build AI-driven conversation practice using chatbots or scenario-based dialogues, implement prompts tailored to English learning goals, and design mind map templates to support vocabulary and grammar visualization. Ensure all features are integrated into the language mode and support adaptive learning paths.",
+            "status": "done",
+            "testStrategy": "Test conversation flows for naturalness and relevance, verify AI prompts for appropriateness and variety, and ensure mind map templates are usable and support learning objectives.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:42:46.627Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement language mode specialized features.",
-        "updatedAt": "2025-10-19T11:27:38.101Z"
+        "updatedAt": "2025-10-19T14:42:46.627Z"
       },
       {
         "id": "55",
@@ -3259,12 +3446,70 @@
           "42",
           "43"
         ],
-        "status": "pending",
-        "subtasks": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement and Test External API Integrations",
+            "description": "Develop and execute integration tests for all external API connections, including Google API, OpenAI API, and task creation from external sources, ensuring end-to-end data flow and error handling.",
+            "dependencies": [
+              17,
+              18,
+              25,
+              31,
+              36,
+              42,
+              43
+            ],
+            "details": "Set up mock servers for Google API and OpenAI API to simulate real interactions without hitting live endpoints. Create test cases that cover authentication, request/response validation, pagination, rate limiting, and error scenarios (e.g., HTTP 404, 500). For task creation from external sources, test the complete workflow from ingestion to internal processing, verifying data consistency and error recovery. Use network request mocking libraries to isolate tests and improve reliability[1]. Document all test cases and results.",
+            "status": "done",
+            "testStrategy": "Test complete workflows from start to finish using mock servers. Verify data consistency across integration points. Test error recovery and boundary cases (e.g., invalid inputs, rate limits).",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:43:16.125Z"
+          },
+          {
+            "id": 2,
+            "title": "Implement and Test Core Application Workflows",
+            "description": "Create integration tests for the application's core workflows: material processing, voice conversation, vision analysis, and data synchronization, ensuring seamless interaction between modules.",
+            "dependencies": [
+              17,
+              18,
+              25,
+              31,
+              36,
+              42,
+              43
+            ],
+            "details": "Develop test suites for the material processing workflow, including ingestion, transformation, and storage. For voice conversation and vision analysis, test the full pipeline from input capture to processing and response generation. Implement tests for data synchronization, verifying that changes propagate correctly between components and that offline changes sync when returning online. Include tests for HTTP methods, status codes, request/response formats, and schema validation[2]. Test across different environments (dev, staging) to ensure consistency.",
+            "status": "done",
+            "testStrategy": "Test complete workflows using mock data and services. Validate data integrity and schema compliance at each step. Include negative testing for error scenarios and verify graceful degradation.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:43:17.307Z"
+          },
+          {
+            "id": 3,
+            "title": "Implement and Test System Transition and Edge Cases",
+            "description": "Develop integration tests for system transitions (offline to online) and edge cases, ensuring robustness under unusual or failure conditions.",
+            "dependencies": [
+              17,
+              18,
+              25,
+              31,
+              36,
+              42,
+              43
+            ],
+            "details": "Create tests that simulate transitions from offline to online states, verifying that pending operations complete and data consistency is maintained. Test edge cases such as network interruptions, invalid inputs, and concurrent modifications. Include performance and load testing to ensure the system handles expected traffic and recovers from failures. Document all edge case scenarios and verify that error messages are clear and actionable[1][2].",
+            "status": "done",
+            "testStrategy": "Simulate failure and recovery scenarios, including network drops and invalid data. Test under load to identify bottlenecks. Verify that the system maintains data consistency and provides useful feedback during and after transitions.",
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:43:18.528Z"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement integration tests.",
-        "updatedAt": "2025-10-19T11:27:40.981Z"
+        "updatedAt": "2025-10-19T14:43:18.528Z"
       },
       {
         "id": "63",
@@ -3284,7 +3529,51 @@
           "56"
         ],
         "status": "pending",
-        "subtasks": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Design and Document UI Test Cases for All Main Flows",
+            "description": "Create detailed, actionable test cases covering onboarding, material browsing, voice interaction, vision analysis, mind map navigation, task management, settings configuration, and accessibility features. Ensure each test case includes expected outcomes and covers both positive and negative scenarios.",
+            "dependencies": [
+              26,
+              28,
+              32,
+              35,
+              39,
+              44,
+              55,
+              56
+            ],
+            "details": "Break down the UI into components and user journeys. Prioritize critical flows and edge cases. Document test cases in a shared repository with clear naming and structure for maintainability. Include verification points for UI elements and app state. Review test cases with the team to ensure coverage aligns with user expectations and business goals.",
+            "status": "pending",
+            "testStrategy": "Use XCUITest to record test sequences for main flows. Add assertions for UI elements and app state. Test on multiple device sizes to ensure responsiveness. Maintain test cases in a version-controlled repository for traceability and updates.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Implement Automated UI Test Scripts Using XCUITest",
+            "description": "Develop automated test scripts in XCUITest for each documented test case, ensuring scripts are modular, repeatable, and handle their own state setup.",
+            "dependencies": [
+              1
+            ],
+            "details": "Translate test cases into XCUITest scripts, focusing on critical user flows first. Ensure scripts are independent and do not rely on the state of other tests. Use clear naming conventions and organize scripts logically. Incorporate checks for UI element visibility, interaction correctness, and state transitions. Regularly refactor scripts for maintainability as the UI evolves.",
+            "status": "pending",
+            "testStrategy": "Automate repetitive and high-value paths to save time and reduce human error. Run tests across multiple device configurations. Use test management tools to track execution and results. Ensure scripts are idempotent and can be run in any order.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Execute, Report, and Iterate on UI Test Results",
+            "description": "Run the automated test suite, analyze failures, document defects, and refine tests based on findings. Ensure all critical issues are tracked and resolved before release.",
+            "dependencies": [
+              2
+            ],
+            "details": "Execute the full suite of UI tests on target devices and iOS versions. Log all test results, including screenshots and videos for failed tests. Report defects with clear reproduction steps and severity. Collaborate with developers to prioritize and fix issues. Update test cases and scripts as the UI changes, and re-run tests to verify fixes. Maintain a living test report for stakeholders.",
+            "status": "pending",
+            "testStrategy": "Use continuous integration to run tests on every build. Analyze trends in test failures to identify flaky or unstable tests. Communicate test findings clearly to the team. Iterate on test coverage based on real user feedback and analytics.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement ui tests.",
@@ -3377,7 +3666,42 @@
           "65"
         ],
         "status": "pending",
-        "subtasks": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Prepare Device and OS Test Matrix",
+            "description": "Create a comprehensive test matrix covering all specified iPad and iPhone models, iOS/iPadOS versions (26+), and device-specific configurations.",
+            "dependencies": [],
+            "details": "List all target devices (iPad Pro, iPad Air, iPad mini, iPhone Pro, iPhone, iPhone SE). For each device, identify available iOS/iPadOS versions (26+). Document hardware configurations (Apple Pencil 1st/2nd gen, external keyboards). Include network condition variations (Wi-Fi, cellular, low bandwidth). Prepare accessibility settings checklist (VoiceOver, Dynamic Type, high contrast, etc.). Organize this into a test matrix for systematic execution.",
+            "status": "pending",
+            "testStrategy": "Review analytics and market data to prioritize device-OS combinations. Validate matrix completeness with stakeholders. Use the matrix to ensure no critical configuration is missed during testing.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Execute Functional and Usability Tests on All Configurations",
+            "description": "Run the full test plan on each device-OS-configuration combination from the matrix, verifying core app functionality and usability.",
+            "dependencies": [
+              1
+            ],
+            "details": "For each entry in the test matrix, install the app and execute test cases covering all critical user journeys. Test with different accessibility settings enabled. Validate Apple Pencil and external keyboard support. Simulate various network conditions. Check for device-specific UI/UX issues, performance, and compatibility. Document any failures or anomalies observed during testing.",
+            "status": "pending",
+            "testStrategy": "Use both manual testing (for UX, accessibility, and hardware interactions) and automated testing (for regression and repetitive checks). Record detailed logs, screenshots, and videos for each test case. Cross-reference results with expected behavior and prior test cycles.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Generate and Review Device-Specific Issue Reports",
+            "description": "Compile, analyze, and prioritize all device-specific issues found during testing, creating actionable reports for the development team.",
+            "dependencies": [
+              2
+            ],
+            "details": "Aggregate all logs, screenshots, videos, and tester notes from the previous subtask. Categorize issues by device, OS version, configuration, and severity. Write clear, reproducible bug reports with steps to reproduce, expected vs. actual results, and environment details. Highlight any patterns or critical failures. Share reports with relevant teams for triage and resolution.",
+            "status": "pending",
+            "testStrategy": "Review reports for completeness and clarity. Prioritize issues based on impact and frequency. Verify that critical functionality is confirmed working on all target devices before closing the task.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on conduct real device testing.",
@@ -3441,7 +3765,124 @@
           "48"
         ],
         "status": "pending",
-        "subtasks": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Draft Getting Started Section",
+            "description": "Create an introductory section that helps new users begin using the app.",
+            "dependencies": [],
+            "details": "Outline the app’s purpose, installation steps, account creation, and initial setup. Use clear language and visuals to guide users through their first experience. Ensure this section is accessible and easy to follow for all user types.",
+            "status": "pending",
+            "testStrategy": "Have new users follow the section and provide feedback on clarity and completeness.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Document Material Management Features",
+            "description": "Explain how users can manage materials within the app.",
+            "dependencies": [
+              1
+            ],
+            "details": "Describe all material management functionalities, including adding, editing, organizing, and deleting materials. Include screenshots and step-by-step instructions. Highlight best practices for efficient material management.",
+            "status": "pending",
+            "testStrategy": "Verify instructions by performing material management tasks and checking for consistency with the app.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Add Voice Coach Usage Instructions",
+            "description": "Provide guidance on using the app’s voice coach features.",
+            "dependencies": [
+              1
+            ],
+            "details": "Detail how to activate, configure, and interact with the voice coach. Include troubleshooting tips for common issues and accessibility notes. Use simple language and visuals to enhance understanding.",
+            "status": "pending",
+            "testStrategy": "Test voice coach instructions with users unfamiliar with the feature and collect feedback.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Document Vision Capabilities",
+            "description": "Explain the app’s vision-related features and how to use them.",
+            "dependencies": [
+              1
+            ],
+            "details": "Describe vision features such as image recognition, scanning, or AR. Provide step-by-step guides, use cases, and troubleshooting advice. Ensure instructions are clear and accessible.",
+            "status": "pending",
+            "testStrategy": "Validate documentation by performing vision tasks and confirming accuracy with actual app behavior.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create Mind Map Usage Guide",
+            "description": "Guide users on creating and managing mind maps within the app.",
+            "dependencies": [
+              1
+            ],
+            "details": "Explain how to start a mind map, add nodes, connect ideas, and customize layouts. Include visuals and examples. Address common user questions and provide tips for effective mind mapping.",
+            "status": "pending",
+            "testStrategy": "Test guide by having users create mind maps and assess ease of use and clarity.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Add Task Management Instructions",
+            "description": "Document how users can manage tasks using the app.",
+            "dependencies": [
+              1
+            ],
+            "details": "Describe task creation, editing, prioritization, and completion. Include workflow examples and best practices. Use screenshots and concise steps to ensure users can follow easily.",
+            "status": "pending",
+            "testStrategy": "Perform all documented task management actions and confirm instructions match app functionality.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "Document Gamification Features",
+            "description": "Explain the app’s gamification elements and how users can benefit from them.",
+            "dependencies": [
+              1
+            ],
+            "details": "List all gamification features such as badges, achievements, and progress tracking. Provide instructions for unlocking and using these features. Include tips for maximizing engagement.",
+            "status": "pending",
+            "testStrategy": "Test gamification features and verify documentation accuracy with actual app behavior.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "Create Troubleshooting Section",
+            "description": "Develop a section to help users resolve common issues.",
+            "dependencies": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "details": "Identify frequent problems and provide clear, step-by-step solutions. Include links to relevant sections and contact information for support. Use plain language and organize by issue type for easy navigation.",
+            "status": "pending",
+            "testStrategy": "Review troubleshooting steps with users experiencing issues and gather feedback on effectiveness.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 9,
+            "title": "Add FAQ Section",
+            "description": "Compile a list of frequently asked questions and answers.",
+            "dependencies": [
+              2,
+              3,
+              4,
+              5,
+              6,
+              7
+            ],
+            "details": "Gather common user questions from support channels and user feedback. Provide concise, accurate answers and link to relevant guide sections. Update regularly based on new queries.",
+            "status": "pending",
+            "testStrategy": "Monitor user interactions with the FAQ and update based on unresolved or recurring questions.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 6,
         "recommendedSubtasks": 9,
         "expansionPrompt": "Break down the user guide creation into subtasks covering each major feature area. Include tasks for content planning, writing, reviewing, and formatting. Consider how to make the guide accessible and user-friendly for different user types.",
@@ -3480,7 +3921,103 @@
           "1"
         ],
         "status": "pending",
-        "subtasks": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Document code signing requirements for iOS deployment",
+            "description": "Detail the process for generating and managing code signing certificates, provisioning profiles, and entitlements required for deploying to TestFlight and the App Store.",
+            "dependencies": [],
+            "details": "Explain how to create and manage Apple Developer certificates, App IDs, and provisioning profiles in Xcode and Apple Developer Portal. Include steps for troubleshooting common code signing errors and best practices for secure certificate management.",
+            "status": "pending",
+            "testStrategy": "Verify by creating a new certificate and provisioning profile, then building and archiving the app. Confirm the app can be installed on a test device.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Create step-by-step App Store Connect setup instructions",
+            "description": "Provide a comprehensive guide for setting up a new app in App Store Connect, including app metadata, pricing, and availability.",
+            "dependencies": [],
+            "details": "Document how to create a new app record, configure app information (name, description, keywords, categories), set pricing and territories, and manage in-app purchases if applicable. Include screenshots and tips for avoiding common setup mistakes.",
+            "status": "pending",
+            "testStrategy": "Follow the guide to create a new app in App Store Connect. Verify all metadata fields are correctly filled and match the intended app release.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Add TestFlight distribution process documentation",
+            "description": "Outline the steps to upload builds to TestFlight, manage beta testers, and collect feedback.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Describe how to archive and upload builds from Xcode to TestFlight, create and manage internal and external tester groups, and monitor feedback and crash reports. Include instructions for inviting testers and handling beta review submissions.",
+            "status": "pending",
+            "testStrategy": "Upload a test build to TestFlight, invite testers, and confirm successful installation and feedback collection.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Document App Store submission process",
+            "description": "Detail the end-to-end process for submitting an app to the App Store, including review guidelines and post-submission steps.",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Explain how to prepare the app for submission (version number, build number, app icon, etc.), fill out App Store submission forms, respond to App Review feedback, and manage app updates. Include a checklist of required assets and common rejection reasons.",
+            "status": "pending",
+            "testStrategy": "Simulate a full App Store submission (without final approval) and verify all steps are correctly documented and executable.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Create a release checklist for deployment",
+            "description": "Compile a comprehensive checklist covering all steps from code signing to App Store release.",
+            "dependencies": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "details": "List every actionable item required for a successful deployment, including code signing, build configuration, metadata preparation, TestFlight setup, App Store submission, and post-release monitoring. Organize the checklist by phase (pre-release, release, post-release).",
+            "status": "pending",
+            "testStrategy": "Use the checklist to guide a test deployment and confirm no steps are missing or unclear.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Add App Store screenshots and preview preparation guide",
+            "description": "Provide instructions for creating, formatting, and uploading App Store screenshots and app previews.",
+            "dependencies": [
+              2
+            ],
+            "details": "Specify required screenshot sizes, formats, and content guidelines for all supported device types. Include tips for creating compelling visuals, localization requirements, and steps for uploading assets in App Store Connect.",
+            "status": "pending",
+            "testStrategy": "Prepare and upload test screenshots and previews according to the guide, verifying they display correctly in App Store Connect.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "Document privacy policy requirements for App Store compliance",
+            "description": "Explain how to create, host, and link a privacy policy that meets App Store guidelines.",
+            "dependencies": [],
+            "details": "Detail what must be included in the privacy policy (data collection, usage, sharing, etc.), how to host it online, and how to link it in App Store Connect. Provide a template or outline for common app scenarios.",
+            "status": "pending",
+            "testStrategy": "Review the privacy policy against App Store guidelines and confirm the link works in the app submission.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 8,
+            "title": "Create marketing materials guidelines for app promotion",
+            "description": "Outline best practices and requirements for creating app marketing assets.",
+            "dependencies": [
+              6
+            ],
+            "details": "Describe how to create press kits, promotional images, app descriptions, and social media assets. Include branding guidelines, tone of voice, and tips for maximizing App Store visibility. Provide templates and examples where possible.",
+            "status": "pending",
+            "testStrategy": "Generate sample marketing materials using the guidelines and review for consistency and effectiveness.",
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 8,
         "expansionPrompt": "Break down the deployment guide creation into subtasks covering code signing, App Store setup, TestFlight distribution, submission process, and required assets. Consider how to make the guide useful for both initial and ongoing deployments.",
@@ -3701,8 +4238,8 @@
       {
         "id": "77",
         "title": "Implement Large Touch Targets",
-        "description": "Ensure all interactive elements have minimum 44\u00d744pt touch targets.",
-        "details": "1. Audit all buttons and controls\n2. Resize elements to minimum 44\u00d744pt\n3. Add padding to small elements\n4. Implement touch target expansion\n5. Create spacing between adjacent targets\n6. Add visual feedback for touch\n7. Implement haptic feedback\n8. Create touch target visualization tool (development only)",
+        "description": "Ensure all interactive elements have minimum 44×44pt touch targets.",
+        "details": "1. Audit all buttons and controls\n2. Resize elements to minimum 44×44pt\n3. Add padding to small elements\n4. Implement touch target expansion\n5. Create spacing between adjacent targets\n6. Add visual feedback for touch\n7. Implement haptic feedback\n8. Create touch target visualization tool (development only)",
         "testStrategy": "Measure touch target sizes throughout app. Test touch accuracy with various finger sizes. Verify spacing between adjacent targets. Evaluate touch feedback clarity.",
         "priority": "high",
         "dependencies": [
@@ -3729,7 +4266,7 @@
           "46"
         ],
         "priority": "medium",
-        "details": "Implementation includes:\n1. StudySession SwiftData model for session tracking, pause detection, and XP calculation\n2. StudyTimerService singleton for session lifecycle management and UserProgress integration\n3. StudyTimerView UI with subject selection, controls, and real-time statistics\n4. StudyStatisticsView for daily/weekly stats, recent sessions, and streaks\n5. StudyInsightsView with charts, subject breakdown, and session history\n6. Dashboard integration with live timer card and voice command support\n7. SwiftData persistence and CloudKit sync for cross-device data\nAll core features\u2014session tracking, pause detection, XP rewards, subject tracking, analytics, charts, and dashboard integration\u2014are complete.",
+        "details": "Implementation includes:\n1. StudySession SwiftData model for session tracking, pause detection, and XP calculation\n2. StudyTimerService singleton for session lifecycle management and UserProgress integration\n3. StudyTimerView UI with subject selection, controls, and real-time statistics\n4. StudyStatisticsView for daily/weekly stats, recent sessions, and streaks\n5. StudyInsightsView with charts, subject breakdown, and session history\n6. Dashboard integration with live timer card and voice command support\n7. SwiftData persistence and CloudKit sync for cross-device data\nAll core features—session tracking, pause detection, XP rewards, subject tracking, analytics, charts, and dashboard integration—are complete.",
         "testStrategy": "Verify end-to-end study session tracking, including pause/resume, XP calculation, and subject selection. Test UI controls for session management. Validate statistics and streaks in StudyStatisticsView. Confirm analytics and charts in StudyInsightsView. Ensure dashboard timer card updates in real time and responds to voice commands. Test SwiftData persistence and CloudKit sync across devices.",
         "subtasks": [
           {
@@ -3830,7 +4367,42 @@
           "66"
         ],
         "status": "pending",
-        "subtasks": [],
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configure App Store Connect and Create App Record",
+            "description": "Set up App Store Connect by creating an app record and configuring necessary metadata for TestFlight distribution.",
+            "dependencies": [],
+            "details": "1. Log in to App Store Connect and navigate to the 'My Apps' section. 2. Create a new app record by clicking the '+' button. 3. Select iOS as the platform and fill in the app name, primary language, bundle ID, and SKU. 4. Set user access levels as needed.",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Prepare App Build for Distribution",
+            "description": "Configure build settings for distribution and add necessary assets like app icons and launch screens.",
+            "dependencies": [
+              1
+            ],
+            "details": "1. Configure build settings in Xcode for distribution. 2. Add app icons and launch screens as required by App Store guidelines. 3. Ensure all necessary assets are uploaded to App Store Connect.",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Set Up TestFlight Beta and Feedback Mechanism",
+            "description": "Create TestFlight beta information, set up test groups and invitations, and prepare a feedback collection mechanism.",
+            "dependencies": [
+              2
+            ],
+            "details": "1. Create TestFlight beta information in App Store Connect. 2. Set up test groups and send invitations to testers. 3. Develop a feedback collection mechanism to gather user input.",
+            "status": "pending",
+            "testStrategy": null,
+            "parentId": "undefined"
+          }
+        ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on prepare for testflight distribution.",
@@ -4104,7 +4676,7 @@
         ],
         "priority": "medium",
         "details": "This task has been verified as already implemented via VisionVoiceInteractionService (Task 37) and HomeworkHelpView. The implementation includes voice command trigger ('Aiutami con questo'), screen capture, AI analysis, visual annotations, and voice guidance synthesis.",
-        "testStrategy": "Verify the existing implementation: voice command \u2192 capture \u2192 analyze \u2192 explain. Confirm that the VisionVoiceInteractionService and HomeworkHelpView correctly handle the entire workflow.",
+        "testStrategy": "Verify the existing implementation: voice command → capture → analyze → explain. Confirm that the VisionVoiceInteractionService and HomeworkHelpView correctly handle the entire workflow.",
         "subtasks": [
           {
             "id": 1,
@@ -4508,7 +5080,7 @@
             "title": "Design Wireframes for Mobile Mind Map UI",
             "description": "Create detailed wireframes for the redesigned mind map interface optimized for iPhone and iPad, focusing on layout, navigation, and key UI elements.",
             "dependencies": [],
-            "details": "Develop low- and high-fidelity wireframes that incorporate large fonts (minimum 18pt), high contrast, intuitive navigation, and space for icons and color coding. Ensure the wireframes illustrate tap-to-expand, pinch-to-zoom, pan, double-tap for details, breadcrumbs, vertical scrolling, and collapsible sections.\n<info added on 2025-10-17T05:58:27.266Z>\nCURRENT STATE ANALYSIS:\n- Fonts: 8-10pt (too small for mobile)\n- Node sizes: 60-80px (adequate but could improve touch target)\n- Colors: Already using subject-based colors from Task 87.3\n- Gestures: Only drag (pan) and pinch (zoom)\n- Layout: Circular nodes with canvas rendering\n- Detail view: Bottom overlay with TTS and expand/collapse\n\nMOBILE WIREFRAME DESIGN:\n\n1. TYPOGRAPHY IMPROVEMENTS:\n   - Node title font: 18pt minimum (root: 24pt, children: 18pt)\n   - Detail overlay: 16pt body, 20pt headline\n   - High contrast: White text on colored backgrounds\n   - Bold weight for important nodes\n\n2. TOUCH TARGETS & NODE SIZING:\n   - Root node: 120px diameter (was 80px)\n   - Child nodes: 90px diameter (was 60px)\n   - Touch target padding: 44x44pt minimum\n   - Node spacing: Minimum 120px between nodes\n\n3. ICONS & VISUAL HIERARCHY:\n   - SF Symbols for node type indicators:\n     * Root: circle.fill\n     * Branch: circle.lefthalf.filled\n     * Leaf: circle.dotted\n   - Subject-specific icons:\n     * Matematica: function\n     * Fisica: waveform.path.ecg\n     * Scienze: leaf.fill\n     * Storia: book.fill\n     * Italiano: text.quote\n     * Inglese: globe\n     * Ed. Civica: building.columns\n     * Religione: heart.fill\n     * Scienze Motorie: figure.run\n   - Expansion indicator: chevron.right.circle.fill (16pt)\n\n4. COLOR CODING ENHANCEMENTS:\n   - Existing subject colors (from Task 87.3) maintained\n   - High contrast mode: Increase opacity to 1.0\n   - Selected state: White border + glow effect\n   - Connection lines: 3pt width (was 2pt)\n\n5. GESTURE CONTROLS:\n   - Single tap: Select node\n   - Double tap: Expand/collapse node\n   - Tap on canvas: Deselect\n   - Pinch: Zoom (0.5x - 2.0x range, was 0.3x-3.0x)\n   - Pan: Two-finger drag\n   - Long press: Show context menu (export, share)\n\n6. NAVIGATION ENHANCEMENTS:\n   - Breadcrumb bar at top:\n     * Shows: Root \u2192 Parent \u2192 Current\n     * Tap to navigate up hierarchy\n     * Collapsible to save screen space\n   - Mini-map in top-right corner:\n     * 80x80pt thumbnail showing full mind map\n     * Current viewport highlighted\n     * Tap to jump to area\n\n7. LAYOUT OPTIMIZATIONS:\n   - Vertical bias: Prefer vertical layout for portrait mode\n   - Depth limit: Display max 3 levels at once\n   - Node culling: Skip nodes outside viewport + 200pt margin\n   - Automatic layout: Radial for root, tree for branches\n   - Collapsible sections: Hide nodes beyond depth 3\n\n8. CONTROLS BAR REDESIGN:\n   - Position: Bottom floating toolbar\n   - Buttons (32pt icons):\n     * Zoom in/out\n     * Fit to screen\n     * Expand all / Collapse all\n     * Export / Share\n     * Settings (layout preferences)\n   - Auto-hide after 3 seconds of inactivity\n   - Show on any interaction\n\n9. DETAIL OVERLAY IMPROVEMENTS:\n   - Full-width bottom sheet (not floating card)\n   - Drag handle for resize/dismiss\n   - Content:\n     * Node icon + title (20pt bold)\n     * Node content (16pt body)\n     * Child count indicator\n     * TTS button (enlarged)\n     * Quick actions: Expand children, Focus, Edit\n   - Keyboard avoidance for note-taking\n\n10. ACCESSIBILITY:\n    - VoiceOver labels for all nodes\n    - Dynamic Type support (scale fonts)\n    - High contrast mode support\n    - Reduced motion option (disable animations)\n    - Voice Control support (numbered nodes)\n\nWIREFRAME LAYOUT (Portrait):\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502 Root \u2192 Node \u2192 Child \u2502 \u2190 Breadcrumbs\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502                   \u250c\u2500\u2510\u2502 \u2190 Mini-map\n\u2502                   \u2514\u2500\u2518\u2502\n\u2502                     \u2502\n\u2502     \u250c\u2500\u2500\u2500\u2500\u2500\u2510         \u2502\n\u2502     \u2502Root \u2502         \u2502 \u2190 Larger nodes\n\u2502     \u2514\u2500\u2500\u2500\u2500\u2500\u2518         \u2502   with icons\n\u2502   \u250c\u2500\u2500\u2500\u2518 \u2514\u2500\u2500\u2500\u2510       \u2502\n\u2502 \u250c\u2500\u25bc\u2500\u2510     \u250c\u2500\u25bc\u2500\u2510     \u2502\n\u2502 \u2502Ch1\u2502     \u2502Ch2\u2502     \u2502\n\u2502 \u2514\u2500\u2500\u2500\u2518     \u2514\u2500\u2500\u2500\u2518     \u2502\n\u2502                     \u2502\n\u2502                     \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 \u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557 \u2502 \u2190 Detail overlay\n\u2502 \u2551 Selected Node   \u2551 \u2502   (full width)\n\u2502 \u2551 Content here... \u2551 \u2502\n\u2502 \u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d \u2502\n\u251c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2524\n\u2502 [+][-][\u25cb][\u2197][\u00b7\u00b7\u00b7] \u2502 \u2190 Controls bar\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n\nIMPLEMENTATION APPROACH:\n1. Create MobileOptimizedMindMapView (new view)\n2. Enhance InteractiveMindMapView with mobile-specific modifiers\n3. Add MindMapTheme struct for typography/sizing constants\n4. Implement BreadcrumbNavigationView component\n5. Implement MiniMapView component\n6. Add gesture recognizers for tap/double-tap\n7. Implement auto-hiding controls bar\n8. Add accessibility labels and traits\n</info added on 2025-10-17T05:58:27.266Z>",
+            "details": "Develop low- and high-fidelity wireframes that incorporate large fonts (minimum 18pt), high contrast, intuitive navigation, and space for icons and color coding. Ensure the wireframes illustrate tap-to-expand, pinch-to-zoom, pan, double-tap for details, breadcrumbs, vertical scrolling, and collapsible sections.\n<info added on 2025-10-17T05:58:27.266Z>\nCURRENT STATE ANALYSIS:\n- Fonts: 8-10pt (too small for mobile)\n- Node sizes: 60-80px (adequate but could improve touch target)\n- Colors: Already using subject-based colors from Task 87.3\n- Gestures: Only drag (pan) and pinch (zoom)\n- Layout: Circular nodes with canvas rendering\n- Detail view: Bottom overlay with TTS and expand/collapse\n\nMOBILE WIREFRAME DESIGN:\n\n1. TYPOGRAPHY IMPROVEMENTS:\n   - Node title font: 18pt minimum (root: 24pt, children: 18pt)\n   - Detail overlay: 16pt body, 20pt headline\n   - High contrast: White text on colored backgrounds\n   - Bold weight for important nodes\n\n2. TOUCH TARGETS & NODE SIZING:\n   - Root node: 120px diameter (was 80px)\n   - Child nodes: 90px diameter (was 60px)\n   - Touch target padding: 44x44pt minimum\n   - Node spacing: Minimum 120px between nodes\n\n3. ICONS & VISUAL HIERARCHY:\n   - SF Symbols for node type indicators:\n     * Root: circle.fill\n     * Branch: circle.lefthalf.filled\n     * Leaf: circle.dotted\n   - Subject-specific icons:\n     * Matematica: function\n     * Fisica: waveform.path.ecg\n     * Scienze: leaf.fill\n     * Storia: book.fill\n     * Italiano: text.quote\n     * Inglese: globe\n     * Ed. Civica: building.columns\n     * Religione: heart.fill\n     * Scienze Motorie: figure.run\n   - Expansion indicator: chevron.right.circle.fill (16pt)\n\n4. COLOR CODING ENHANCEMENTS:\n   - Existing subject colors (from Task 87.3) maintained\n   - High contrast mode: Increase opacity to 1.0\n   - Selected state: White border + glow effect\n   - Connection lines: 3pt width (was 2pt)\n\n5. GESTURE CONTROLS:\n   - Single tap: Select node\n   - Double tap: Expand/collapse node\n   - Tap on canvas: Deselect\n   - Pinch: Zoom (0.5x - 2.0x range, was 0.3x-3.0x)\n   - Pan: Two-finger drag\n   - Long press: Show context menu (export, share)\n\n6. NAVIGATION ENHANCEMENTS:\n   - Breadcrumb bar at top:\n     * Shows: Root → Parent → Current\n     * Tap to navigate up hierarchy\n     * Collapsible to save screen space\n   - Mini-map in top-right corner:\n     * 80x80pt thumbnail showing full mind map\n     * Current viewport highlighted\n     * Tap to jump to area\n\n7. LAYOUT OPTIMIZATIONS:\n   - Vertical bias: Prefer vertical layout for portrait mode\n   - Depth limit: Display max 3 levels at once\n   - Node culling: Skip nodes outside viewport + 200pt margin\n   - Automatic layout: Radial for root, tree for branches\n   - Collapsible sections: Hide nodes beyond depth 3\n\n8. CONTROLS BAR REDESIGN:\n   - Position: Bottom floating toolbar\n   - Buttons (32pt icons):\n     * Zoom in/out\n     * Fit to screen\n     * Expand all / Collapse all\n     * Export / Share\n     * Settings (layout preferences)\n   - Auto-hide after 3 seconds of inactivity\n   - Show on any interaction\n\n9. DETAIL OVERLAY IMPROVEMENTS:\n   - Full-width bottom sheet (not floating card)\n   - Drag handle for resize/dismiss\n   - Content:\n     * Node icon + title (20pt bold)\n     * Node content (16pt body)\n     * Child count indicator\n     * TTS button (enlarged)\n     * Quick actions: Expand children, Focus, Edit\n   - Keyboard avoidance for note-taking\n\n10. ACCESSIBILITY:\n    - VoiceOver labels for all nodes\n    - Dynamic Type support (scale fonts)\n    - High contrast mode support\n    - Reduced motion option (disable animations)\n    - Voice Control support (numbered nodes)\n\nWIREFRAME LAYOUT (Portrait):\n┌─────────────────────┐\n│ Root → Node → Child │ ← Breadcrumbs\n├─────────────────────┤\n│                   ┌─┐│ ← Mini-map\n│                   └─┘│\n│                     │\n│     ┌─────┐         │\n│     │Root │         │ ← Larger nodes\n│     └─────┘         │   with icons\n│   ┌───┘ └───┐       │\n│ ┌─▼─┐     ┌─▼─┐     │\n│ │Ch1│     │Ch2│     │\n│ └───┘     └───┘     │\n│                     │\n│                     │\n├─────────────────────┤\n│ ╔═════════════════╗ │ ← Detail overlay\n│ ║ Selected Node   ║ │   (full width)\n│ ║ Content here... ║ │\n│ ╚═════════════════╝ │\n├─────────────────────┤\n│ [+][-][○][↗][···] │ ← Controls bar\n└─────────────────────┘\n\nIMPLEMENTATION APPROACH:\n1. Create MobileOptimizedMindMapView (new view)\n2. Enhance InteractiveMindMapView with mobile-specific modifiers\n3. Add MindMapTheme struct for typography/sizing constants\n4. Implement BreadcrumbNavigationView component\n5. Implement MiniMapView component\n6. Add gesture recognizers for tap/double-tap\n7. Implement auto-hiding controls bar\n8. Add accessibility labels and traits\n</info added on 2025-10-17T05:58:27.266Z>",
             "status": "done",
             "testStrategy": "Review wireframes with stakeholders and conduct usability walkthroughs to validate layout and navigation flow.",
             "parentId": "undefined",
@@ -4954,7 +5526,7 @@
         "id": "103",
         "title": "Implement Voice Commands and Feedback System",
         "description": "Integrate voice command functionality and feedback throughout the app, enabling voice-first navigation and interaction with all major features.",
-        "details": "1. Integrate VoiceCommandFeedbackView component:\n   - Add to Dashboard, Materials, and Tasks screens\n   - Display recognized commands in a non-intrusive overlay\n   - Implement fade-in/fade-out animations for feedback visibility\n\n2. Add VoiceCommandButton components:\n   - Create reusable VoiceCommandButton component with visual feedback\n   - Add to dashboard for quick actions (\"Aggiornami\", \"Cosa devo studiare oggi?\")\n   - Implement long-press for extended voice command help\n\n3. Implement voice command recognition system:\n   - Create VoiceCommandManager class to handle recognition and routing\n   - Define command patterns and intents (navigation, creation, query)\n   - Implement fuzzy matching for natural language variations\n   - Route recognized commands to appropriate features\n\n4. Make major features voice-accessible:\n   - Material navigation: \"vai a matematica\", \"mostra i materiali di storia\"\n   - Task management: \"crea un nuovo compito\", \"mostra i compiti di oggi\"\n   - Calendar viewing: \"mostra il calendario\", \"cosa ho per luned\u00ec\"\n   - Mind map exploration: \"apri le mappe mentali\", \"zoom sulla mappa\"\n\n5. Add haptic and audio feedback:\n   - Implement subtle haptic feedback for command recognition\n   - Add audio confirmation tones for successful commands\n   - Create error feedback for unrecognized commands\n\n6. Implement voice-first navigation:\n   - Create NavigationManager extension for voice commands\n   - Support commands like \"vai a matematica\", \"apri le mappe mentali\"\n   - Implement context-aware navigation (relative to current screen)\n\n7. Add voice dictation support:\n   - Implement dictation mode for task creation\n   - Add note-taking via dictation\n   - Create editing commands for dictated content\n\n8. Optimize for performance and accessibility:\n   - Ensure voice commands work with VoiceOver enabled\n   - Minimize battery impact during voice listening\n   - Implement offline command recognition for basic navigation",
+        "details": "1. Integrate VoiceCommandFeedbackView component:\n   - Add to Dashboard, Materials, and Tasks screens\n   - Display recognized commands in a non-intrusive overlay\n   - Implement fade-in/fade-out animations for feedback visibility\n\n2. Add VoiceCommandButton components:\n   - Create reusable VoiceCommandButton component with visual feedback\n   - Add to dashboard for quick actions (\"Aggiornami\", \"Cosa devo studiare oggi?\")\n   - Implement long-press for extended voice command help\n\n3. Implement voice command recognition system:\n   - Create VoiceCommandManager class to handle recognition and routing\n   - Define command patterns and intents (navigation, creation, query)\n   - Implement fuzzy matching for natural language variations\n   - Route recognized commands to appropriate features\n\n4. Make major features voice-accessible:\n   - Material navigation: \"vai a matematica\", \"mostra i materiali di storia\"\n   - Task management: \"crea un nuovo compito\", \"mostra i compiti di oggi\"\n   - Calendar viewing: \"mostra il calendario\", \"cosa ho per lunedì\"\n   - Mind map exploration: \"apri le mappe mentali\", \"zoom sulla mappa\"\n\n5. Add haptic and audio feedback:\n   - Implement subtle haptic feedback for command recognition\n   - Add audio confirmation tones for successful commands\n   - Create error feedback for unrecognized commands\n\n6. Implement voice-first navigation:\n   - Create NavigationManager extension for voice commands\n   - Support commands like \"vai a matematica\", \"apri le mappe mentali\"\n   - Implement context-aware navigation (relative to current screen)\n\n7. Add voice dictation support:\n   - Implement dictation mode for task creation\n   - Add note-taking via dictation\n   - Create editing commands for dictated content\n\n8. Optimize for performance and accessibility:\n   - Ensure voice commands work with VoiceOver enabled\n   - Minimize battery impact during voice listening\n   - Implement offline command recognition for basic navigation",
         "testStrategy": "1. Create comprehensive test suite for voice command recognition:\n   - Test each command pattern with multiple variations and accents\n   - Verify correct routing of commands to appropriate features\n   - Test in noisy environments to ensure reliability\n\n2. Perform UI integration testing:\n   - Verify VoiceCommandFeedbackView appears correctly on all screens\n   - Test VoiceCommandButton functionality and visual feedback\n   - Ensure haptic and audio feedback work as expected\n\n3. Conduct navigation testing:\n   - Test all voice-first navigation commands across the app\n   - Verify context-aware navigation works correctly\n   - Test navigation between deeply nested screens\n\n4. Test dictation functionality:\n   - Verify accurate transcription of dictated tasks and notes\n   - Test editing commands during dictation\n   - Measure dictation accuracy across different content types\n\n5. Perform accessibility testing:\n   - Verify voice commands work alongside VoiceOver\n   - Test with different accessibility settings enabled\n   - Ensure feedback is perceivable for users with disabilities\n\n6. Conduct user testing:\n   - Have test users try voice commands without prior instruction\n   - Measure success rate of natural language commands\n   - Gather feedback on command discoverability\n\n7. Performance testing:\n   - Measure battery impact during extended voice command usage\n   - Test memory usage during continuous listening\n   - Verify app responsiveness during voice processing",
         "status": "done",
         "dependencies": [
@@ -4985,7 +5557,7 @@
         "title": "Refactor or Remove Quick Actions Section",
         "description": "Evaluate and implement improvements to the \"Azioni rapide\" (Quick Actions) section by either creating a dynamic carousel based on user context or removing the section if it provides limited value.",
         "details": "1. Analyze the current implementation of Quick Actions in MainTabView.swift:110\n2. Evaluate two possible approaches:\n   a. Dynamic carousel approach:\n      - Create a QuickActionProvider service that determines relevant actions based on:\n        * Recent materials the user has accessed\n        * Tasks with upcoming deadlines\n        * Calendar events in the next 24-48 hours\n      - Design a horizontally scrollable carousel UI component\n      - Implement action buttons with appropriate icons and labels\n      - Add animations for smooth transitions when actions change\n      - Ensure actions are contextually relevant to Mario's workflow\n   \n   b. Removal approach:\n      - Assess the current usage and value of the section\n      - Consider user testing to determine if the section is helpful\n      - If removing, ensure proper UI adjustments to maintain visual balance\n      - Update spacing and layout to compensate for the removed section\n\n3. Implementation details:\n   - If implementing dynamic carousel:\n     ```swift\n     struct QuickAction {\n         let id: UUID = UUID()\n         let title: String\n         let icon: String // SF Symbol name\n         let action: () -> Void\n         let badgeCount: Int?\n     }\n     \n     class QuickActionProvider {\n         func getRelevantActions() -> [QuickAction] {\n             // Logic to determine contextually relevant actions\n             // based on app state, user history, and upcoming events\n         }\n     }\n     \n     struct QuickActionsCarousel: View {\n         @StateObject private var provider = QuickActionProvider()\n         @State private var actions: [QuickAction] = []\n         \n         var body: some View {\n             ScrollView(.horizontal, showsIndicators: false) {\n                 HStack(spacing: 12) {\n                     ForEach(actions, id: \\.id) { action in\n                         Button(action: action.action) {\n                             VStack {\n                                 Image(systemName: action.icon)\n                                     .font(.system(size: 24))\n                                 Text(action.title)\n                                     .font(.caption)\n                             }\n                             .padding()\n                             .background(Color.secondarySystemBackground)\n                             .cornerRadius(12)\n                             .overlay(\n                                 action.badgeCount != nil ?\n                                 BadgeView(count: action.badgeCount!) : nil\n                             )\n                         }\n                     }\n                 }\n                 .padding(.horizontal)\n             }\n             .onAppear {\n                 actions = provider.getRelevantActions()\n             }\n         }\n     }\n     ```\n\n4. Decision criteria:\n   - Conduct a brief user test with 3-5 users to determine if quick actions are useful\n   - Analyze app analytics to see if current static buttons are being used\n   - Consider Mario's workflow and whether contextual actions would improve efficiency\n   - Make final implementation decision based on findings",
-        "testStrategy": "1. Functional testing:\n   - If implementing dynamic carousel:\n     * Verify that actions update based on user context\n     * Test that tapping each action performs the expected function\n     * Confirm that the carousel properly handles different numbers of actions\n     * Test horizontal scrolling behavior on different device sizes\n     * Verify badge counts update correctly\n\n   - If removing the section:\n     * Verify that the UI layout adjusts properly without the section\n     * Confirm that no functionality is lost or that alternatives exist\n     * Test that navigation flows remain intuitive\n\n2. User experience testing:\n   - Conduct A/B testing with both implementations\n   - Gather feedback on which approach better serves Mario's workflow\n   - Measure time-to-task completion with and without quick actions\n   - Observe natural usage patterns to determine if quick actions are discovered and used\n\n3. Performance testing:\n   - Measure any impact on app startup time\n   - Test scrolling performance of the carousel with many items\n   - Verify that dynamic content loading doesn't cause UI jank\n\n4. Accessibility testing:\n   - Verify VoiceOver compatibility\n   - Test dynamic text size support\n   - Confirm touch targets meet minimum size requirements (44\u00d744pt)\n\n5. Integration testing:\n   - Verify that the implementation works correctly with the rest of the dashboard\n   - Test that state changes in other parts of the app are reflected in quick actions",
+        "testStrategy": "1. Functional testing:\n   - If implementing dynamic carousel:\n     * Verify that actions update based on user context\n     * Test that tapping each action performs the expected function\n     * Confirm that the carousel properly handles different numbers of actions\n     * Test horizontal scrolling behavior on different device sizes\n     * Verify badge counts update correctly\n\n   - If removing the section:\n     * Verify that the UI layout adjusts properly without the section\n     * Confirm that no functionality is lost or that alternatives exist\n     * Test that navigation flows remain intuitive\n\n2. User experience testing:\n   - Conduct A/B testing with both implementations\n   - Gather feedback on which approach better serves Mario's workflow\n   - Measure time-to-task completion with and without quick actions\n   - Observe natural usage patterns to determine if quick actions are discovered and used\n\n3. Performance testing:\n   - Measure any impact on app startup time\n   - Test scrolling performance of the carousel with many items\n   - Verify that dynamic content loading doesn't cause UI jank\n\n4. Accessibility testing:\n   - Verify VoiceOver compatibility\n   - Test dynamic text size support\n   - Confirm touch targets meet minimum size requirements (44×44pt)\n\n5. Integration testing:\n   - Verify that the implementation works correctly with the rest of the dashboard\n   - Test that state changes in other parts of the app are reflected in quick actions",
         "status": "done",
         "dependencies": [
           "3",
@@ -5263,7 +5835,7 @@
         "description": "Improve the smart material query parsing system to support natural language patterns, enhance fuzzy matching for material titles, add voice command documentation, and implement user-defined material aliases.",
         "details": "This task involves enhancing the existing smart material query parsing system with the following improvements:\n\n1. Natural Language Pattern Support:\n   - Implement parsing for temporal references like \"the last thing I studied\" or \"my most recent material\"\n   - Add support for relative references such as \"the chapter before this one\" or \"related to what I studied yesterday\"\n   - Create a pattern recognition system that maps natural language queries to specific database queries\n\n2. Fuzzy Matching Algorithm Enhancement:\n   - Improve the existing fuzzy matching algorithm for material titles\n   - Implement Levenshtein distance or similar algorithms with configurable thresholds\n   - Add phonetic matching capabilities (e.g., Soundex or Metaphone) for handling pronunciation variations\n   - Optimize performance for large material libraries\n\n3. Voice Command Documentation:\n   - Create comprehensive examples of voice commands for the help documentation\n   - Include common variations and phrasings that users might employ\n   - Organize voice commands by category (navigation, search, bookmarking, etc.)\n   - Add troubleshooting tips for voice recognition issues\n\n4. Material Aliases Implementation:\n   - Design and implement a system allowing users to define custom aliases for materials\n   - Create database schema for storing user-defined aliases\n   - Develop UI components for managing aliases (create, edit, delete)\n   - Ensure aliases are properly indexed for quick retrieval\n   - Implement alias resolution in the query parsing pipeline\n\nTechnical considerations:\n- Ensure backward compatibility with existing query formats\n- Maintain performance benchmarks for query parsing speed\n- Consider internationalization aspects for non-English queries\n- Implement proper error handling for ambiguous queries\n- Add telemetry to track which new features are most used",
         "testStrategy": "1. Unit Testing:\n   - Create unit tests for each new natural language pattern with various inputs\n   - Test fuzzy matching algorithm with similar but not identical material titles\n   - Verify correct alias resolution with mock database entries\n   - Test edge cases like very short aliases or aliases similar to existing commands\n\n2. Integration Testing:\n   - Verify that the enhanced query parser integrates correctly with the existing search system\n   - Test that aliases work properly across different user sessions\n   - Ensure voice command examples are correctly displayed in the help documentation\n   - Validate that fuzzy matching doesn't impact system performance\n\n3. User Acceptance Testing:\n   - Create a test script with scenarios covering all new features\n   - Recruit a diverse group of users to test natural language queries\n   - Collect feedback on the intuitiveness of the alias system\n   - Measure success rates for voice commands using the new documentation\n\n4. Performance Testing:\n   - Benchmark query parsing speed before and after changes\n   - Test system performance with a large number of user-defined aliases\n   - Measure memory usage during complex natural language query resolution\n   - Verify that fuzzy matching remains performant with large material libraries\n\n5. Regression Testing:\n   - Ensure all existing query formats still work correctly\n   - Verify that search results remain consistent for identical queries\n   - Check that the UI properly displays all new features",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "medium",
         "subtasks": [
@@ -5328,7 +5900,8 @@
         ],
         "complexity": 8,
         "recommendedSubtasks": 5,
-        "expansionPrompt": "Expand into: (1) implementing natural language pattern recognition for temporal and relative references, (2) enhancing fuzzy matching algorithm for material titles, (3) designing and implementing user-defined material aliases system, (4) documenting voice command support and usage, and (5) integrating telemetry and error handling for new query features."
+        "expansionPrompt": "Expand into: (1) implementing natural language pattern recognition for temporal and relative references, (2) enhancing fuzzy matching algorithm for material titles, (3) designing and implementing user-defined material aliases system, (4) documenting voice command support and usage, and (5) integrating telemetry and error handling for new query features.",
+        "updatedAt": "2025-10-19T14:17:44.105Z"
       },
       {
         "id": "116",
@@ -5658,7 +6231,7 @@
             "title": "Add regression tests for resilience",
             "description": "- Ensure actor-based resilience stack has tests covering concurrency edge cases and regression checks",
             "dependencies": [],
-            "details": "- Ensure actor-based resilience stack has tests covering concurrency edge cases and regression checks\n<info added on 2025-10-18T19:42:01.457Z>\nResilience regression testing analysis completed. The current test suite includes 57 resilience test cases across CircuitBreakerTests, RetryableTaskTests, and FallbackTests, with a 93% overall pass rate (53 passing, 4 failing due to timing or implementation changes, not regressions). CircuitBreakerTests achieved 100% pass rate, RetryableTaskTests 96% (one timing-related failure), and FallbackTests 89% (three failures linked to recent ResilientAPICall changes). All resilience components are exercised under actor-based concurrency, with tests covering async/await usage, concurrent access patterns, and state transitions. The suite provides comprehensive regression protection, with failures isolated to specific scenarios rather than systemic issues. Recommendation: The resilience stack demonstrates excellent coverage and stability; remaining failures should be investigated but do not indicate regressions. Task completed\u2014regression tests are comprehensive and effective.\n</info added on 2025-10-18T19:42:01.457Z>",
+            "details": "- Ensure actor-based resilience stack has tests covering concurrency edge cases and regression checks\n<info added on 2025-10-18T19:42:01.457Z>\nResilience regression testing analysis completed. The current test suite includes 57 resilience test cases across CircuitBreakerTests, RetryableTaskTests, and FallbackTests, with a 93% overall pass rate (53 passing, 4 failing due to timing or implementation changes, not regressions). CircuitBreakerTests achieved 100% pass rate, RetryableTaskTests 96% (one timing-related failure), and FallbackTests 89% (three failures linked to recent ResilientAPICall changes). All resilience components are exercised under actor-based concurrency, with tests covering async/await usage, concurrent access patterns, and state transitions. The suite provides comprehensive regression protection, with failures isolated to specific scenarios rather than systemic issues. Recommendation: The resilience stack demonstrates excellent coverage and stability; remaining failures should be investigated but do not indicate regressions. Task completed—regression tests are comprehensive and effective.\n</info added on 2025-10-18T19:42:01.457Z>",
             "status": "done",
             "testStrategy": null,
             "parentId": "undefined",
@@ -6037,7 +6610,7 @@
             "id": 4,
             "title": "Integrate rewards & UX polish",
             "description": "",
-            "details": "- Trigger XP gains, celebrate streaks, and ensure the coach\u2019s voice matches the chosen persona",
+            "details": "- Trigger XP gains, celebrate streaks, and ensure the coach’s voice matches the chosen persona",
             "status": "pending",
             "dependencies": [],
             "parentTaskId": 127,
@@ -6749,9 +7322,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-19T12:44:49.869Z",
+      "lastModified": "2025-10-19T14:43:18.531Z",
       "taskCount": 139,
-      "completedCount": 112,
+      "completedCount": 120,
       "tags": [
         "master"
       ]
