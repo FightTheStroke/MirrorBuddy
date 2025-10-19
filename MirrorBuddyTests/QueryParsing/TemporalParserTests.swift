@@ -12,17 +12,17 @@ import XCTest
 final class TemporalParserTests: XCTestCase {
     // MARK: - Absolute Temporal Tests
 
-    func testParseTodayEnglish() {
+    func testParseTodayEnglish() throws {
         let result = TemporalParser.parseTemporal("show materials from today")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 1.0)
-        XCTAssertEqual(result?.parsedExpression, "today")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 1.0)
+        XCTAssertEqual(unwrapped.parsedExpression, "today")
 
         // Verify date range is for today
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: Date())
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfDay)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfDay)
     }
 
     func testParseTodayItalian() {
@@ -33,19 +33,22 @@ final class TemporalParserTests: XCTestCase {
         XCTAssertEqual(result?.parsedExpression, "today")
     }
 
-    func testParseYesterdayEnglish() {
+    func testParseYesterdayEnglish() throws {
         let result = TemporalParser.parseTemporal("materials from yesterday")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 1.0)
-        XCTAssertEqual(result?.parsedExpression, "yesterday")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 1.0)
+        XCTAssertEqual(unwrapped.parsedExpression, "yesterday")
 
         // Verify date range is for yesterday
         let calendar = Calendar.current
-        let yesterday = calendar.date(byAdding: .day, value: -1, to: Date())!
+        guard let yesterday = calendar.date(byAdding: .day, value: -1, to: Date()) else {
+            XCTFail("Failed to calculate yesterday's date")
+            return
+        }
         let startOfYesterday = calendar.startOfDay(for: yesterday)
 
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfYesterday)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfYesterday)
     }
 
     func testParseYesterdayItalian() {
