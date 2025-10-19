@@ -122,8 +122,10 @@ final class WeeklyQuestService {
 
         let calendar = Calendar.current
         let now = Date()
-        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
-        let endOfWeek = calendar.date(byAdding: .day, value: 7, to: startOfWeek)!
+        guard let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now)),
+              let endOfWeek = calendar.date(byAdding: .day, value: 7, to: startOfWeek) else {
+            throw ServiceError.invalidConfiguration("Failed to calculate week boundaries")
+        }
 
         // Remove old expired quests
         try removeExpiredQuests()
@@ -231,7 +233,9 @@ final class WeeklyQuestService {
                 color: quest.difficulty == .legendary ? "gold" : "silver",
                 questID: quest.id
             )
-            modelContext?.insert(badge!)
+            if let badge = badge {
+                modelContext?.insert(badge)
+            }
         }
 
         try modelContext?.save()

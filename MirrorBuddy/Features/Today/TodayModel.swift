@@ -129,7 +129,9 @@ final class TodayService: ObservableObject {
 
         // Filter to today's tasks and high priority
         let today = Calendar.current.startOfDay(for: Date())
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) else {
+            return []
+        }
 
         return allTasks
             .filter { task in
@@ -181,7 +183,9 @@ final class TodayService: ObservableObject {
     private func fetchTodayProgress() async throws -> TodayModel.TodayProgress {
         let allTasks = await taskRepository.getTasks()
         let today = Calendar.current.startOfDay(for: Date())
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) else {
+            return []
+        }
 
         let todayTasks = allTasks.filter { task in
             guard let dueDate = task.dueDate else { return false }
@@ -247,8 +251,8 @@ final class TodayService: ObservableObject {
         }
 
         // Recommendations
-        if !model.upcomingMaterials.isEmpty {
-            summary += "Ti consiglio di ripassare \(model.upcomingMaterials.first!.title). "
+        if !model.upcomingMaterials.isEmpty, let firstMaterial = model.upcomingMaterials.first {
+            summary += "Ti consiglio di ripassare \(firstMaterial.title). "
         }
 
         summary += "Buono studio!"

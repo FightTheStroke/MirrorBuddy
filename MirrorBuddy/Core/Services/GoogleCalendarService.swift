@@ -111,8 +111,8 @@ final class GoogleCalendarService {
         timeMax: Date? = nil
     ) async throws -> [GCalendarEvent] {
         // Default time range: 1 month ago to 6 months ahead
-        let startDate = timeMin ?? Calendar.current.date(byAdding: .month, value: -1, to: Date())!
-        let endDate = timeMax ?? Calendar.current.date(byAdding: .month, value: 6, to: Date())!
+        let startDate = timeMin ?? (Calendar.current.date(byAdding: .month, value: -1, to: Date()) ?? Date())
+        let endDate = timeMax ?? (Calendar.current.date(byAdding: .month, value: 6, to: Date()) ?? Date())
 
         let iso8601Formatter = ISO8601DateFormatter()
         let timeMinString = iso8601Formatter.string(from: startDate)
