@@ -81,7 +81,8 @@ final class ItalianReadingAssistant {
                 type: .sequence,
                 difficulty: .intermediate
             )
-        ].prefix(count).map { $0 }
+        ]
+        return Array(questions.prefix(count))
     }
 
     /// Provide reading strategies

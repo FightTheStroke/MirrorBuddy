@@ -86,7 +86,7 @@ final class DyslexiaFriendlyTextService: ObservableObject {
             case .system:
                 return .system(size: size)
             case .openDyslexic:
-                if let _ = UIFont(name: "OpenDyslexic", size: size) {
+                if UIFont(name: "OpenDyslexic", size: size) != nil {
                     return .custom("OpenDyslexic", size: size)
                 } else {
                     // Fallback to system if font not available
