@@ -6411,7 +6411,7 @@
         "description": "Design a Today dashboard card with top tasks/materials and trigger a spoken summary after Aggiornami completes.",
         "details": "- Aggregate Drive/Gmail/Calendar findings into Today model\n- Render card with quick voice buttons and working-memory friendly copy\n- Hook UpdateManager to speak summary + offer next steps",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "116",
           "117",
@@ -6426,45 +6426,50 @@
             "title": "Aggregate sync results into Today model",
             "description": "",
             "details": "- Extend UpdateManager to produce a structured summary (new materials, tasks, events) for Today card",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 124,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:58:22.717Z"
           },
           {
             "id": 2,
             "title": "Design Today card UI",
             "description": "",
             "details": "- Create a SwiftUI component summarizing top tasks/materials with child-friendly copy and quick action buttons",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 124,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:58:23.990Z"
           },
           {
             "id": 3,
             "title": "Implement voice summary after Aggiornami",
             "description": "",
             "details": "- Hook UpdateManager completion to trigger a spoken summary with options (listen now, start suggested activity)",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 124,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:58:25.193Z"
           },
           {
             "id": 4,
             "title": "Test Today experience",
             "description": "",
             "details": "- Write unit/UI tests ensuring Today card updates correctly and voice summary triggers in various scenarios",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 124,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:58:26.371Z"
           }
         ],
         "complexity": 7,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Expand into: (1) aggregating sync results into Today model, (2) designing Today card UI, (3) implementing voice summary after Aggiornami, and (4) testing Today experience."
+        "expansionPrompt": "Expand into: (1) aggregating sync results into Today model, (2) designing Today card UI, (3) implementing voice summary after Aggiornami, and (4) testing Today experience.",
+        "updatedAt": "2025-10-19T14:58:26.371Z"
       },
       {
         "id": "125",
@@ -7342,9 +7347,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-19T14:56:30.924Z",
+      "lastModified": "2025-10-19T14:58:26.373Z",
       "taskCount": 139,
-      "completedCount": 123,
+      "completedCount": 124,
       "tags": [
         "master"
       ]
