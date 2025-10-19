@@ -442,7 +442,7 @@ enum MaterialProcessingError: LocalizedError {
             return "Flashcard generation failed: \(error.localizedDescription)"
         case .explanationsFailed(let error):
             return "Explanation generation failed: \(error.localizedDescription)"
-        case .processingFailed(let id, let error):
+        case let .processingFailed(id, error):
             return "Processing failed for material \(id): \(error.localizedDescription)"
         case .cancelled:
             return "Processing was cancelled"

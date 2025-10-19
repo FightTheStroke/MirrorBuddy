@@ -117,7 +117,7 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
             showHelp = true
             lastCommandResult = .success("Mostra comandi vocali")
 
-        case .customAction(let name, let action):
+        case let .customAction(name, action):
             action()
             lastCommandResult = .success("Eseguito: \(name)")
         }

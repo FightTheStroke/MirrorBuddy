@@ -99,16 +99,16 @@ class QueryTelemetry {
         guard isEnabled else { return }
 
         switch event {
-        case .queryParsed(let query, let intent, let confidence, let duration):
+        case let .queryParsed(query, intent, confidence, duration):
             logQueryParsed(query: query, intent: intent, confidence: confidence, duration: duration)
 
-        case .temporalParsed(let expression, let success):
+        case let .temporalParsed(expression, success):
             logTemporalParse(expression: expression, success: success)
 
-        case .fuzzyMatchPerformed(let query, let candidateCount, let matchCount, let duration):
+        case let .fuzzyMatchPerformed(query, candidateCount, matchCount, duration):
             logFuzzyMatch(query: query, candidateCount: candidateCount, matchCount: matchCount, duration: duration)
 
-        case .aliasResolved(let alias, let success):
+        case let .aliasResolved(alias, success):
             logAliasResolve(alias: alias, success: success)
 
         case .aliasCreated(let alias):
@@ -117,10 +117,10 @@ class QueryTelemetry {
         case .aliasDeleted(let alias):
             logAliasDelete(alias: alias)
 
-        case .parseError(let query, let error):
+        case let .parseError(query, error):
             logParseError(query: query, error: error)
 
-        case .ambiguousQuery(let query, let confidence):
+        case let .ambiguousQuery(query, confidence):
             logAmbiguousQuery(query: query, confidence: confidence)
         }
 

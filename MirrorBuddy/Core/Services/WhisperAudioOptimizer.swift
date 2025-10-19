@@ -421,7 +421,7 @@ enum OptimizationError: LocalizedError {
             return "File audio non trovato"
         case .unsupportedFormat(let format):
             return "Formato audio non supportato: \(format)"
-        case .fileTooLarge(let size, let max):
+        case let .fileTooLarge(size, max):
             let sizeMB = Double(size) / (1_024 * 1_024)
             let maxMB = Double(max) / (1_024 * 1_024)
             return "File troppo grande: \(String(format: "%.1f", sizeMB)) MB (massimo \(String(format: "%.1f", maxMB)) MB)"

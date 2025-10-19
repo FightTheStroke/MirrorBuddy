@@ -149,7 +149,7 @@ struct MaterialQueryParser {
                     return displayMatches || keyMatches
                 }
 
-            case .dateRange(let start, let end):
+            case let .dateRange(start, end):
                 filtered = filtered.filter { material in
                     material.createdAt >= start && material.createdAt <= end
                 }

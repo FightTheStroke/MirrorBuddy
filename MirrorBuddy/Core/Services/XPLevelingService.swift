@@ -34,7 +34,7 @@ final class XPLevelingService {
 
         var baseXP: Int {
             switch self {
-            case .taskCompleted(let priority, let onTime):
+            case let .taskCompleted(priority, onTime):
                 let base = 10 + (priority - 1) * 5
                 return onTime ? base + 10 : max(base / 2, 5)
             case .flashcardReviewed(let difficulty):

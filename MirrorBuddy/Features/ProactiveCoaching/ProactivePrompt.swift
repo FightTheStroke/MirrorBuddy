@@ -117,7 +117,7 @@ struct PromptAction: Identifiable, Equatable {
                  (.nextMaterial, .nextMaterial),
                  (.reviewConcepts, .reviewConcepts):
                 return true
-            case (.custom(let lValue), .custom(let rValue)):
+            case let (.custom(lValue), .custom(rValue)):
                 return lValue == rValue
             default:
                 return false

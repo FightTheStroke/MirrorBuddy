@@ -44,21 +44,21 @@ enum QueryFilter: Equatable {
 
     static func == (lhs: QueryFilter, rhs: QueryFilter) -> Bool {
         switch (lhs, rhs) {
-        case (.subject(let a), .subject(let b)):
+        case let (.subject(a), .subject(b)):
             return a == b
-        case (.difficulty(let a), .difficulty(let b)):
+        case let (.difficulty(a), .difficulty(b)):
             return a == b
-        case (.dateRange(let a1, let a2), .dateRange(let b1, let b2)):
+        case let (.dateRange(a1, a2), .dateRange(b1, b2)):
             return a1 == b1 && a2 == b2
-        case (.topic(let a), .topic(let b)):
+        case let (.topic(a), .topic(b)):
             return a == b
-        case (.bloomLevel(let a), .bloomLevel(let b)):
+        case let (.bloomLevel(a), .bloomLevel(b)):
             return a == b
-        case (.reviewed(let a), .reviewed(let b)):
+        case let (.reviewed(a), .reviewed(b)):
             return a == b
-        case (.mastered(let a), .mastered(let b)):
+        case let (.mastered(a), .mastered(b)):
             return a == b
-        case (.processingStatus(let a), .processingStatus(let b)):
+        case let (.processingStatus(a), .processingStatus(b)):
             return a == b
         default:
             return false
@@ -513,7 +513,7 @@ extension SmartQueryParser {
                         matches = false
                     }
 
-                case .dateRange(let start, let end):
+                case let .dateRange(start, end):
                     matches = matches && material.createdAt >= start && material.createdAt <= end
 
                 case .processingStatus(let status):

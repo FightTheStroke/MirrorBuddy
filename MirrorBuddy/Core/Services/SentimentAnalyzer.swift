@@ -181,48 +181,38 @@ final class SentimentAnalyzer {
 
         // Frustrated indicators
         let frustratedWords = ["non capisco", "difficile", "impossibile", "don't understand", "hard", "difficult", "can't", "impossible", "confused", "stuck"]
-        for word in frustratedWords {
-            if lowercased.contains(word) {
-                sentimentScores[.frustrated, default: 0] += 0.3
-                sentimentScores[.confused, default: 0] += 0.2
-                indicators.append("Frustration keywords: \(word)")
-            }
+        for word in frustratedWords where lowercased.contains(word) {
+            sentimentScores[.frustrated, default: 0] += 0.3
+            sentimentScores[.confused, default: 0] += 0.2
+            indicators.append("Frustration keywords: \(word)")
         }
 
         // Uncertain indicators
         let uncertainWords = ["forse", "non sono sicuro", "credo", "penso", "maybe", "not sure", "think", "guess", "probably"]
-        for word in uncertainWords {
-            if lowercased.contains(word) {
-                sentimentScores[.uncertain, default: 0] += 0.3
-                indicators.append("Uncertainty keywords: \(word)")
-            }
+        for word in uncertainWords where lowercased.contains(word) {
+            sentimentScores[.uncertain, default: 0] += 0.3
+            indicators.append("Uncertainty keywords: \(word)")
         }
 
         // Confused indicators
         let confusedWords = ["cosa significa", "perché", "come", "what does", "why", "how", "?"]
-        for word in confusedWords {
-            if lowercased.contains(word) {
-                sentimentScores[.confused, default: 0] += 0.2
-                indicators.append("Question/confusion: \(word)")
-            }
+        for word in confusedWords where lowercased.contains(word) {
+            sentimentScores[.confused, default: 0] += 0.2
+            indicators.append("Question/confusion: \(word)")
         }
 
         // Confident indicators
         let confidentWords = ["capito", "chiaro", "sì", "esatto", "got it", "yes", "clear", "right", "understand", "correct"]
-        for word in confidentWords {
-            if lowercased.contains(word) {
-                sentimentScores[.confident, default: 0] += 0.3
-                indicators.append("Confidence keywords: \(word)")
-            }
+        for word in confidentWords where lowercased.contains(word) {
+            sentimentScores[.confident, default: 0] += 0.3
+            indicators.append("Confidence keywords: \(word)")
         }
 
         // Excited indicators
         let excitedWords = ["fantastico", "ottimo", "grande", "amazing", "great", "awesome", "perfect", "excellent", "!"]
-        for word in excitedWords {
-            if lowercased.contains(word) {
-                sentimentScores[.excited, default: 0] += 0.3
-                indicators.append("Excitement keywords: \(word)")
-            }
+        for word in excitedWords where lowercased.contains(word) {
+            sentimentScores[.excited, default: 0] += 0.3
+            indicators.append("Excitement keywords: \(word)")
         }
 
         // Analyze response length

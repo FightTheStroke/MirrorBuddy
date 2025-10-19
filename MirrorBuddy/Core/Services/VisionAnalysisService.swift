@@ -552,7 +552,7 @@ enum VisionAnalysisError: LocalizedError {
             return "Invalid response from Vision API"
         case .emptyResponse:
             return "Empty response from Vision API"
-        case .apiError(let statusCode, let message):
+        case let .apiError(statusCode, message):
             return "Vision API error (\(statusCode)): \(message)"
         case .rateLimitExceeded:
             return "Rate limit exceeded. Please wait and try again."

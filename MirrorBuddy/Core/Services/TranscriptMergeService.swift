@@ -395,7 +395,7 @@ enum MergeError: LocalizedError {
         switch self {
         case .noTranscripts:
             return "Nessuna trascrizione da unire"
-        case .discontinuousChunks(let expected, let found):
+        case let .discontinuousChunks(expected, found):
             return "Chunk mancante: atteso indice \(expected), trovato \(found)"
         case .exportFailed:
             return "Impossibile esportare la trascrizione"

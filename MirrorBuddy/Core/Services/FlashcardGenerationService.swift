@@ -592,7 +592,7 @@ enum FlashcardGenerationError: LocalizedError {
             return "Invalid response format from API"
         case .noFlashcardsGenerated:
             return "No flashcards were generated"
-        case .invalidFlashcard(let index, let reason):
+        case let .invalidFlashcard(index, reason):
             return "Invalid flashcard at index \(index): \(reason)"
         }
     }
