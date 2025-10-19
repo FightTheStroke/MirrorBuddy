@@ -5,6 +5,8 @@ import SwiftData
 enum TaskSource: String, Codable {
     case manual
     case googleCalendar
+    case googleClassroom
+    case canvas
     case aiSuggested
 }
 
@@ -19,8 +21,10 @@ final class Task {
     var completedAt: Date?
     var isCompleted: Bool = false
 
-    // Google Calendar integration
+    // LMS integration
     var googleCalendarEventID: String?
+    var lmsAssignmentID: String? // Canvas assignment ID or Google Classroom coursework ID
+    var lmsCourseID: String? // Course identifier from LMS
     var source = TaskSource.manual
 
     var createdAt = Date()

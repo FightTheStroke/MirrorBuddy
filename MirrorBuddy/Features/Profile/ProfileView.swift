@@ -9,10 +9,12 @@
 import SwiftData
 import SwiftUI
 
-/// User profile view with gamification stats (Task 110)
+/// User profile view with gamification stats (Task 110, 131)
 struct ProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @Query private var userProgress: [UserProgress]
+
+    @State private var showingQuests = false
 
     private var progress: UserProgress? {
         userProgress.first
@@ -24,6 +26,9 @@ struct ProfileView: View {
                 VStack(spacing: 24) {
                     // Level and XP Section
                     levelSection
+
+                    // Weekly Quests Button (Task 131)
+                    weeklyQuestsButton
 
                     // Streak Section
                     streakSection
@@ -47,6 +52,49 @@ struct ProfileView: View {
                 }
             }
             .background(Color(.systemGroupedBackground))
+            .sheet(isPresented: $showingQuests) {
+                WeeklyQuestsView()
+            }
+        }
+    }
+
+    // MARK: - Weekly Quests Button
+
+    private var weeklyQuestsButton: some View {
+        Button(action: { showingQuests = true }) {
+            HStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .fill(LinearGradient(
+                            colors: [.purple, .blue],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ))
+                        .frame(width: 60, height: 60)
+
+                    Image(systemName: "flag.fill")
+                        .font(.title2)
+                        .foregroundStyle(.white)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Weekly Quests")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+
+                    Text("Complete challenges to earn rewards")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(.secondary)
+            }
+            .padding()
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
         }
     }
 

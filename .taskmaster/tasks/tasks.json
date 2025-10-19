@@ -3296,7 +3296,7 @@
           "31",
           "36"
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -5445,7 +5445,7 @@
         "description": "Enhance the application with a comprehensive voice-first UI approach, including context banners, optimized voice activation buttons, and voice indicators to improve accessibility and user experience.",
         "details": "1. Dashboard Context Banner:\n   - Create a ContextBannerView component to display on DashboardView\n   - Show active subject/material information for quick voice access\n   - Implement auto-updating based on current context\n   - Design with consistent styling matching app theme\n\n2. Voice Activation Button:\n   - Position a persistent 80x80pt voice activation button in the bottom-right corner\n   - Optimize for one-handed thumb use with proper touch target size\n   - Implement haptic feedback on press\n   - Add subtle animation for active/inactive states\n   - Ensure proper contrast and accessibility\n\n3. Voice Conversation Integration:\n   - Wire \"Lezione vocale\" quick action from DashboardView to launch VoiceConversationView\n   - Implement proper navigation and state preservation\n   - Add transition animations for smooth user experience\n\n4. Voice Settings Panel:\n   - Add settings panel to VoiceConversationView with gear icon\n   - Implement microphone preferences (device selection, sensitivity)\n   - Add voice speed adjustment (0.8x to 1.5x)\n   - Include voice gender/accent options if available\n   - Create persistent user preferences storage\n\n5. Voice Indicator Implementation:\n   - Create VoiceIndicatorView component for navigation bar\n   - Design visual indicators for listening/speaking/processing states\n   - Implement consistent appearance across all app screens\n   - Ensure proper accessibility labeling\n\n6. Voice Shortcuts:\n   - Add voice command shortcuts throughout the app UI\n   - Implement for common actions (create, edit, delete, navigate)\n   - Create consistent voice command patterns\n   - Document all voice commands for user reference\n\n7. Voice Command Labels:\n   - Audit all interactive elements to ensure voice command labels\n   - Update accessibility identifiers to include voice command hints\n   - Implement VoiceOver integration with voice commands\n   - Test with screen readers to verify accessibility",
         "testStrategy": "1. Functional Testing:\n   - Verify ContextBannerView displays correct subject/material information\n   - Test voice activation button positioning and responsiveness\n   - Confirm \"Lezione vocale\" quick action properly launches VoiceConversationView\n   - Validate all settings in the voice settings panel function correctly\n   - Test VoiceIndicatorView state changes during voice interactions\n   - Verify all voice shortcuts trigger appropriate actions\n   - Confirm all interactive elements have proper voice command labels\n\n2. Usability Testing:\n   - Conduct one-handed usage tests with various device sizes\n   - Measure time to complete common tasks using voice vs. touch\n   - Gather feedback on voice button placement and size\n   - Test with users of different hand sizes and dexterity levels\n\n3. Accessibility Testing:\n   - Verify VoiceOver compatibility with all new voice UI elements\n   - Test with screen readers to ensure proper labeling\n   - Validate color contrast meets accessibility standards\n   - Test with users who have motor impairments\n\n4. Performance Testing:\n   - Measure impact on battery life with voice features active\n   - Test voice response latency across different network conditions\n   - Verify smooth animations and transitions during voice interactions\n\n5. Integration Testing:\n   - Test voice features across all app screens and workflows\n   - Verify consistent behavior between voice and touch interactions\n   - Validate proper state preservation during navigation",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "34",
           "32"
@@ -6049,7 +6049,7 @@
         "id": 118,
         "title": "Eliminate SwiftLint debt and enforce zero-warning policy",
         "description": "Reduce SwiftLint violations across the codebase, tune configuration as needed, and enforce a zero-new-warning policy via CI and pre-commit hooks. Integrate SwiftLint checks into GitHub Actions and document the linting process and policy for contributors.",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "details": "- Run swiftlint to capture and track current warnings (initial count: 950, reduced to 748)\n- Fix code style/complexity issues or document justified exceptions\n- Update lint config for new rules or to baseline existing violations if necessary\n- Add and verify CI/pre-commit steps ensuring lint passes (GitHub Actions workflow: .github/workflows/swiftlint.yml)\n- Document policy for zero new warnings and how to run lint locally",
@@ -6107,7 +6107,7 @@
         "description": "Store all API keys in the Keychain/config files instead of plist/env, update loading code, and document the setup for developers.",
         "details": "- Move OpenAI, Anthropic, Google credentials to KeychainManager/xcconfig\n- Update services (WhisperTranscriptionService etc.) to read from secure storage\n- Ensure build scripts ignore secret files\n- Update docs (README/setup guides) with new steps",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -6473,7 +6473,7 @@
         "description": "Detect idle moments, sentiment, and current subject to propose next steps, and inject periodic recaps during study flows.",
         "details": "- Intent engine using context banner + activity logs\n- Voice prompts like 'Vuoi ripassare X?' when idle or confused\n- Mid-session recap command 'Ricapitolami' with voice + text",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "121",
           "124"
@@ -6485,7 +6485,7 @@
             "title": "Instrument context & idle tracking",
             "description": "",
             "details": "- Extend analytics/context manager to track last action timestamp, active subject/material, and voice sentiment markers",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 125,
             "parentId": "undefined"
@@ -6495,7 +6495,7 @@
             "title": "Implement proactive voice prompts",
             "description": "",
             "details": "- Add service that triggers voice suggestions when idle or frustration detected (e.g., 'Vuoi ripassare...?')",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 125,
             "parentId": "undefined"
@@ -6505,7 +6505,7 @@
             "title": "Add working-memory checkpoints",
             "description": "",
             "details": "- Inject periodic recaps and 'Ricapitolami' voice command during study flows to repeat key info",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 125,
             "parentId": "undefined"
@@ -6515,7 +6515,7 @@
             "title": "Test proactive coaching flows",
             "description": "",
             "details": "- Write tests covering idle detection, suggestion prompts, and ability to accept/decline recommendations",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 125,
             "parentId": "undefined"
@@ -6532,7 +6532,7 @@
         "description": "Allow Mario to add tasks via voice (e.g. 'Ricordami di...'), infer subject, schedule reminders, and wrap with end-of-day planning dialogue.",
         "details": "- Extend VoiceCommandRegistry/AppVoiceCommandHandler with capture flow\n- Parse text to deadlines/subjects\n- Add nightly summary + tomorrow plan routine",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "121",
           "124"
@@ -6544,7 +6544,7 @@
             "title": "Extend voice command grammar",
             "description": "",
             "details": "- Add commands for 'ricordami di...' and similar phrases, capturing raw text and intent",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 126,
             "parentId": "undefined"
@@ -6554,7 +6554,7 @@
             "title": "Parse natural language into tasks",
             "description": "",
             "details": "- Use heuristics or NLP to extract subject, due date, and priority from captured phrases",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 126,
             "parentId": "undefined"
@@ -6564,7 +6564,7 @@
             "title": "Schedule reminders and nightly plan",
             "description": "",
             "details": "- Integrate with NotificationManager/Calendar to set reminders and build end-of-day summary dialogue",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 126,
             "parentId": "undefined"
@@ -6574,7 +6574,7 @@
             "title": "UX validation",
             "description": "",
             "details": "- Test task capture and nightly plan flow with voice/touch, ensure confirmations and error handling",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 126,
             "parentId": "undefined"
@@ -6591,7 +6591,7 @@
         "description": "Transform FlashcardStudyView into a voice-coached session with warm-up, adaptive pacing, encouragement, and micro-rewards.",
         "details": "- Script session phases (intro, practice, wrap)\n- Track performance to adjust explanation depth\n- Add celebratory effects and XP hooks",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "124",
           "125",
@@ -6604,7 +6604,7 @@
             "title": "Design session script",
             "description": "",
             "details": "- Outline warm-up, practice, wrap-up phases with voice prompts and encouragement dialog",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 127,
             "parentId": "undefined"
@@ -6614,7 +6614,7 @@
             "title": "Upgrade FlashcardStudyView",
             "description": "",
             "details": "- Implement new UI/logic for guided coach (animations, feedback, voice prompts, XP hooks)",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 127,
             "parentId": "undefined"
@@ -6624,7 +6624,7 @@
             "title": "Track performance & adjust difficulty",
             "description": "",
             "details": "- Record correct/incorrect answers, adjust explanation depth and pacing based on responses",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 127,
             "parentId": "undefined"
@@ -6634,7 +6634,7 @@
             "title": "Integrate rewards & UX polish",
             "description": "",
             "details": "- Trigger XP gains, celebrate streaks, and ensure the coach’s voice matches the chosen persona",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 127,
             "parentId": "undefined"
@@ -6651,7 +6651,7 @@
         "description": "Deliver zoomable mind map navigation with voice commands, narrated walkthroughs, and voice note capture for each node.",
         "details": "- Implement gesture + accessibility-friendly navigation\n- Add 'Explain this node' narration using TTS/LLM\n- Allow voice notes per node and sync to storage",
         "testStrategy": "",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "124",
           "125"
@@ -6663,7 +6663,7 @@
             "title": "Implement gesture & layout engine",
             "description": "",
             "details": "- Build zoom/pan gestures, hit testing, and high-contrast layout for large mind maps",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 128,
             "parentId": "undefined"
@@ -6673,7 +6673,7 @@
             "title": "Add voice navigation commands",
             "description": "",
             "details": "- Support commands like 'zoom in', 'explora nodo X', 'vai al collegamento successivo'",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 128,
             "parentId": "undefined"
@@ -6683,7 +6683,7 @@
             "title": "Narrated walkthroughs",
             "description": "",
             "details": "- Integrate TTS/LLM to explain selected nodes and allow voice notes per node",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 128,
             "parentId": "undefined"
@@ -6693,7 +6693,7 @@
             "title": "Persist notes & export",
             "description": "",
             "details": "- Save voice/text notes per node and provide export functions (PDF/Markdown/Notion)",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 128,
             "parentId": "undefined"
@@ -6710,7 +6710,7 @@
         "description": "Create the ambient recorder UI, chunked Whisper transcription pipeline, and review experience that turns recordings into summaries + mind maps.",
         "details": "- Build recording controls with storage monitoring and background support\n- Implement segmented upload + transcription workers\n- Auto-generate summaries/mind maps per segment and integrate with review screen",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "116",
           "119",
@@ -6723,7 +6723,7 @@
             "title": "Design ambient recording UI",
             "description": "",
             "details": "- Create recorder controls with clear status, storage indicator, and background mode messaging",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 129,
             "parentId": "undefined"
@@ -6733,7 +6733,7 @@
             "title": "Implement segmented transcription pipeline",
             "description": "",
             "details": "- Chunk recordings, upload to Whisper, handle retries, and associate timestamps with segments",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 129,
             "parentId": "undefined"
@@ -6743,7 +6743,7 @@
             "title": "Auto-generate summaries & mind maps",
             "description": "",
             "details": "- After transcription, create summaries per segment and use existing mind map generation to visualize lessons",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 129,
             "parentId": "undefined"
@@ -6753,7 +6753,7 @@
             "title": "Review experience UI",
             "description": "",
             "details": "- Build review screen to play audio segments, read transcripts, and jump into generated mind maps",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 129,
             "parentId": "undefined"
@@ -6769,7 +6769,7 @@
         "description": "Detect sentiment from voice, adjust pacing/tone, and allow Mario to choose between playful or calm coaching styles.",
         "details": "- Add sentiment detection to voice pipeline\n- Map sentiment to coaching responses and pacing adjustments\n- Build settings UI for persona selection",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "127",
           "128"
@@ -6781,7 +6781,7 @@
             "title": "Integrate sentiment detection",
             "description": "",
             "details": "- Analyze voice amplitude/pacing or use LLM to infer encouragement vs frustration, surface signal to coach",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 130,
             "parentId": "undefined"
@@ -6791,7 +6791,7 @@
             "title": "Persona & tone configuration",
             "description": "",
             "details": "- Add settings allowing selection between playful vs calm coach, wire into voice prompts and UI",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 130,
             "parentId": "undefined"
@@ -6801,7 +6801,7 @@
             "title": "Adaptive pacing engine",
             "description": "",
             "details": "- Modify coach responses to slow down, simplify, or celebrate based on sentiment signals",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 130,
             "parentId": "undefined"
@@ -6811,7 +6811,7 @@
             "title": "Testing with personas",
             "description": "",
             "details": "- Validate emotion detection and persona responses via unit tests and manual sessions",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 130,
             "parentId": "undefined"
@@ -6827,7 +6827,7 @@
         "description": "Serve curiosity suggestions after topics, introduce weekly challenges with rewards, and surface celebration moments in the coach.",
         "details": "- Build content recommender (videos, experiments) per subject\n- Implement quest tracking and badge unlock flow\n- Integrate celebrations into voice responses and ProfileView",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "127"
         ],
@@ -6838,7 +6838,7 @@
             "title": "Build curiosity content recommender",
             "description": "",
             "details": "- Map subjects/topics to curated videos, experiments, or articles; store metadata for suggestions",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 131,
             "parentId": "undefined"
@@ -6848,7 +6848,7 @@
             "title": "Weekly quest system",
             "description": "",
             "details": "- Define quest templates, track progress, unlock badges, and surface in ProfileView",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 131,
             "parentId": "undefined"
@@ -6858,7 +6858,7 @@
             "title": "Celebrate curiosity milestones",
             "description": "",
             "details": "- Add celebratory voice/UI feedback when Mario explores new content or completes quests",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 131,
             "parentId": "undefined"
@@ -6868,7 +6868,7 @@
             "title": "Testing & analytics",
             "description": "",
             "details": "- Log curiosity interactions, ensure quests update correctly, and gather metrics for iteration",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 131,
             "parentId": "undefined"
@@ -6884,7 +6884,7 @@
         "description": "Create opt-in digest emails or voice notes summarizing achievements, struggles, and suggested follow-ups for guardians.",
         "details": "- Aggregate progress metrics and sentiment from the week\n- Produce empathetic copy and optional audio summary\n- Provide settings to control frequency and privacy",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "124",
           "126"
@@ -6896,7 +6896,7 @@
             "title": "Aggregate weekly metrics",
             "description": "",
             "details": "- Collect XP gains, streaks, subject difficulties, sentiment into digest model",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 132,
             "parentId": "undefined"
@@ -6906,7 +6906,7 @@
             "title": "Generate empathetic copy & audio",
             "description": "",
             "details": "- Use templates/LLM to produce supportive summaries; optionally synthesize voice note",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 132,
             "parentId": "undefined"
@@ -6916,7 +6916,7 @@
             "title": "Delivery mechanism & settings",
             "description": "",
             "details": "- Provide email/voice note delivery options with guardian consent and frequency controls",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 132,
             "parentId": "undefined"
@@ -6926,7 +6926,7 @@
             "title": "QA digest content",
             "description": "",
             "details": "- Review generated digests for tone accuracy, privacy filters, and ensure opt-out works",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 132,
             "parentId": "undefined"
@@ -6942,7 +6942,7 @@
         "description": "Deliver parental control surfaces for recordings, sharing, and coach tone; include clear privacy states and overrides.",
         "details": "- Add settings UI for guardians (PIN protected)\n- Gate recording/export features behind consent\n- Surface privacy indicators in UI",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "129"
         ],
@@ -6953,7 +6953,7 @@
             "title": "Design guardian settings UI",
             "description": "",
             "details": "- Create PIN-protected settings for consent toggles (recording, sharing, persona controls)",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 133,
             "parentId": "undefined"
@@ -6963,7 +6963,7 @@
             "title": "Enforce consent in features",
             "description": "",
             "details": "- Gate recording, exports, persona adjustments based on guardian toggles and surface status in UI",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 133,
             "parentId": "undefined"
@@ -6973,7 +6973,7 @@
             "title": "Privacy indicators",
             "description": "",
             "details": "- Display clear UI states showing what data is being recorded/shared and allow quick toggles",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 133,
             "parentId": "undefined"
@@ -6983,7 +6983,7 @@
             "title": "QA guardian flows",
             "description": "",
             "details": "- Test consent toggles across app startup, offline, and ensure PIN security works",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 133,
             "parentId": "undefined"
@@ -6999,7 +6999,7 @@
         "description": "Document PII flows, add structured audit logging, and clarify offline capabilities with UI states.",
         "details": "- Create privacy dashboard documentation\n- Instrument structured logs for voice commands/suggestions/errors\n- Update UI to show offline capabilities/limitations",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "133"
         ],
@@ -7010,7 +7010,7 @@
             "title": "Document data flows",
             "description": "",
             "details": "- Map all PII sources, destinations, and retention to update privacy docs",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 134,
             "parentId": "undefined"
@@ -7020,7 +7020,7 @@
             "title": "Implement structured audit logging",
             "description": "",
             "details": "- Log key events (voice commands, suggestions, API failures) with privacy-compliant fields",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 134,
             "parentId": "undefined"
@@ -7030,7 +7030,7 @@
             "title": "Clarify offline capabilities",
             "description": "",
             "details": "- Define which features work offline and surface clear UI indicators",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 134,
             "parentId": "undefined"
@@ -7040,7 +7040,7 @@
             "title": "Update privacy documentation",
             "description": "",
             "details": "- Refresh docs/ and README privacy sections with governance, logging, offline matrix",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 134,
             "parentId": "undefined"
@@ -7056,7 +7056,7 @@
         "description": "Add connectors for Canvas/Google Classroom assignment ingestion and export mind maps/summaries to PDF/Notion.",
         "details": "- Implement API clients or importers per LMS\n- Provide export options (PDF, Markdown, Notion API)\n- Respect privacy and guardian settings",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "124"
         ],
@@ -7067,7 +7067,7 @@
             "title": "Research LMS APIs",
             "description": "",
             "details": "- Determine Canvas/Google Classroom endpoints and authentication needed for assignment ingestion",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 135,
             "parentId": "undefined"
@@ -7077,7 +7077,7 @@
             "title": "Implement LMS connectors",
             "description": "",
             "details": "- Build services to import assignments/events from Canvas/Google Classroom respecting guardian consent",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 135,
             "parentId": "undefined"
@@ -7087,7 +7087,7 @@
             "title": "Knowledge export options",
             "description": "",
             "details": "- Provide UI/actions to export mind maps & summaries to PDF, Markdown, and Notion",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 135,
             "parentId": "undefined"
@@ -7097,7 +7097,7 @@
             "title": "QA exports & privacy",
             "description": "",
             "details": "- Validate exports respect consent settings and formatting requirements",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 135,
             "parentId": "undefined"
@@ -7113,7 +7113,7 @@
         "description": "Add UI automation for voice flows, integrate crash/metrics monitoring, complete accessibility audits, and prepare App Store assets/privacy disclosures.",
         "details": "- Write UI tests simulating voice commands via accessibility APIs\n- Hook privacy-safe crash/latency monitoring\n- Run full accessibility audit (VoiceOver, Switch Control, Reduce Motion)\n- Produce App Privacy labels, localization checklist, release playbook",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [
           "122",
           "133",
@@ -7126,7 +7126,7 @@
             "title": "Automate voice flow UI tests",
             "description": "",
             "details": "- Create UI tests that simulate voice commands via accessibility APIs to ensure navigation works",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 136,
             "parentId": "undefined"
@@ -7136,7 +7136,7 @@
             "title": "Integrate crash & metrics monitoring",
             "description": "",
             "details": "- Add privacy-safe crash reporting and metrics dashboards for latency, fallback rate, storage",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 136,
             "parentId": "undefined"
@@ -7146,7 +7146,7 @@
             "title": "Accessibility & localization audit",
             "description": "",
             "details": "- Conduct VoiceOver, Switch Control, Reduce Motion, and localization reviews; fix issues",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 136,
             "parentId": "undefined"
@@ -7156,7 +7156,7 @@
             "title": "Release readiness checklist",
             "description": "",
             "details": "- Prepare App Store assets, App Privacy labels, localization files, and overall release playbook",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 136,
             "parentId": "undefined"
@@ -7354,7 +7354,8 @@
         "master"
       ],
       "created": "2025-10-19T17:04:05.501Z",
-      "description": "Tasks for master context"
+      "description": "Tasks for master context",
+      "updated": "2025-10-19T18:12:08.525Z"
     }
   }
 }

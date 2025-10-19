@@ -79,6 +79,56 @@ struct SettingsView: View {
                     Text("Connetti il tuo account Google Drive per importare materiali di studio")
                 }
 
+                // MARK: - Coach Settings Section
+                Section {
+                    NavigationLink {
+                        CoachPersonaSettingsView()
+                    } label: {
+                        HStack {
+                            Image(systemName: "face.smiling")
+                                .foregroundStyle(.blue)
+                                .frame(width: 32)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Coach Personality")
+                                    .font(.headline)
+                                Text("Tone and teaching style")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Coaching")
+                } footer: {
+                    Text("Customize how your AI coach communicates and teaches")
+                }
+
+                // MARK: - Weekly Digest Section
+                Section {
+                    NavigationLink {
+                        WeeklyDigestSettingsView()
+                    } label: {
+                        HStack {
+                            Image(systemName: "envelope.badge.fill")
+                                .foregroundStyle(.green)
+                                .frame(width: 32)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Weekly Digest")
+                                    .font(.headline)
+                                Text("Progress summaries for parents/teachers")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Reporting")
+                } footer: {
+                    Text("Send weekly progress updates to parents or teachers")
+                }
+
                 // MARK: - Accessibility Section
                 Section {
                     NavigationLink {
