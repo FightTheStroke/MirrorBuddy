@@ -414,10 +414,3 @@ struct ValidationResult {
     let correctAnswer: String
     let feedback: String
 }
-
-// Needed for DifficultyLevel if not imported
-enum DifficultyLevel: String, Codable {
-    case beginner
-    case intermediate
-    case advanced
-}

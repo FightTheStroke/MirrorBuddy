@@ -407,6 +407,18 @@ struct InputAudioBufferCommit: Codable {
 
 enum ConversationItem: Codable {
     case message(ConversationMessage)
+
+    func encode(to encoder: Encoder) throws {
+        switch self {
+        case .message(let conversationMessage):
+            try conversationMessage.encode(to: encoder)
+        }
+    }
+
+    init(from decoder: Decoder) throws {
+        let conversationMessage = try ConversationMessage(from: decoder)
+        self = .message(conversationMessage)
+    }
 }
 
 struct ConversationMessage: Codable {

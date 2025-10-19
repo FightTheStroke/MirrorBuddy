@@ -292,9 +292,9 @@ struct ConversationSession: Identifiable {
     let starterPrompts: [String]
     let vocabularyHints: [String]
     let grammarPoints: [String]
-    var messages: [ConversationMessage] = []
+    var messages: [LanguageConversationMessage] = []
 
-    mutating func addMessage(_ message: ConversationMessage) {
+    mutating func addMessage(_ message: LanguageConversationMessage) {
         messages.append(message)
     }
 }
@@ -306,7 +306,7 @@ struct ConversationSessionData: Codable {
     let grammarPoints: [String]
 }
 
-struct ConversationMessage: Identifiable, Codable {
+struct LanguageConversationMessage: Identifiable, Codable {
     let id: UUID
     let sender: MessageSender
     let text: String

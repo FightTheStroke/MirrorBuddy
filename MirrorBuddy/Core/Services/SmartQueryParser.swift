@@ -34,7 +34,7 @@ enum QueryIntent {
 /// Filter criteria for materials
 enum QueryFilter: Equatable {
     case subject(String)
-    case difficulty(DifficultyLevel)
+    case difficulty(QueryDifficultyLevel)
     case dateRange(Date, Date)
     case topic(String)
     case bloomLevel(BloomTaxonomy)
@@ -66,8 +66,8 @@ enum QueryFilter: Equatable {
     }
 }
 
-/// Difficulty level
-enum DifficultyLevel {
+/// Query difficulty level
+enum QueryDifficultyLevel {
     case easy
     case medium
     case hard
@@ -270,9 +270,9 @@ actor SmartQueryParser {
         let hardKeywords = ["hard", "difficile", "challenging", "complex", "complesso", "advanced"]
 
         if easyKeywords.contains(where: { query.contains($0) }) {
-            filters.append(.difficulty(.easy))
+            filters.append(.difficulty(QueryDifficultyLevel.easy))
         } else if hardKeywords.contains(where: { query.contains($0) }) {
-            filters.append(.difficulty(.hard))
+            filters.append(.difficulty(QueryDifficultyLevel.hard))
         }
 
         // Time-based filters
