@@ -164,7 +164,7 @@ final class ContextTracker: ObservableObject {
               currentActivity != .break else { return false }
 
         let studyMinutes = Int(studyDuration / 60)
-        return studyMinutes > 0 && studyMinutes % 10 == 0
+        return studyMinutes > 0 && studyMinutes.isMultiple(of: 10)
     }
 
     // MARK: - Private Helpers

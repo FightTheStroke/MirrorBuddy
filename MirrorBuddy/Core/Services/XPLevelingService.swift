@@ -180,7 +180,7 @@ final class XPLevelingService {
             try? modelContext?.save()
 
             // Award streak bonus every 7 days
-            if userProgress.currentStreak % 7 == 0 {
+            if userProgress.currentStreak.isMultiple(of: 7) {
                 return awardXP(
                     for: .dailyStreakBonus(days: userProgress.currentStreak),
                     to: userProgress
@@ -251,7 +251,7 @@ final class XPLevelingService {
 
     /// Get milestone rewards for reaching certain levels
     func getMilestoneReward(for level: Int) -> MilestoneReward? {
-        guard level % 10 == 0 else { return nil }
+        guard level.isMultiple(of: 10) else { return nil }
 
         let title: String
         let description: String

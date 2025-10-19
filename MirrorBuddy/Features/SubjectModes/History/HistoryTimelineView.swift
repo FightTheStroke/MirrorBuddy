@@ -128,7 +128,7 @@ struct TimelineEventRow: View {
     private func shouldPlaceLeft(geometry: GeometryProxy) -> Bool {
         // Alternate left and right based on event index
         let index = event.year
-        return index % 2 == 0
+        return index.isMultiple(of: 2)
     }
 
     private func cardWidth(geometry: GeometryProxy) -> CGFloat {
