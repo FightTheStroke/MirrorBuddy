@@ -3767,7 +3767,7 @@
           "47",
           "48"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -3775,9 +3775,10 @@
             "description": "Create an introductory section that helps new users begin using the app.",
             "dependencies": [],
             "details": "Outline the app’s purpose, installation steps, account creation, and initial setup. Use clear language and visuals to guide users through their first experience. Ensure this section is accessible and easy to follow for all user types.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Have new users follow the section and provide feedback on clarity and completeness.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:23.755Z"
           },
           {
             "id": 2,
@@ -3787,9 +3788,10 @@
               1
             ],
             "details": "Describe all material management functionalities, including adding, editing, organizing, and deleting materials. Include screenshots and step-by-step instructions. Highlight best practices for efficient material management.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify instructions by performing material management tasks and checking for consistency with the app.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:24.969Z"
           },
           {
             "id": 3,
@@ -3799,9 +3801,10 @@
               1
             ],
             "details": "Detail how to activate, configure, and interact with the voice coach. Include troubleshooting tips for common issues and accessibility notes. Use simple language and visuals to enhance understanding.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test voice coach instructions with users unfamiliar with the feature and collect feedback.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:26.162Z"
           },
           {
             "id": 4,
@@ -3811,9 +3814,10 @@
               1
             ],
             "details": "Describe vision features such as image recognition, scanning, or AR. Provide step-by-step guides, use cases, and troubleshooting advice. Ensure instructions are clear and accessible.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Validate documentation by performing vision tasks and confirming accuracy with actual app behavior.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:27.366Z"
           },
           {
             "id": 5,
@@ -3823,9 +3827,10 @@
               1
             ],
             "details": "Explain how to start a mind map, add nodes, connect ideas, and customize layouts. Include visuals and examples. Address common user questions and provide tips for effective mind mapping.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test guide by having users create mind maps and assess ease of use and clarity.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:28.535Z"
           },
           {
             "id": 6,
@@ -3835,9 +3840,10 @@
               1
             ],
             "details": "Describe task creation, editing, prioritization, and completion. Include workflow examples and best practices. Use screenshots and concise steps to ensure users can follow easily.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Perform all documented task management actions and confirm instructions match app functionality.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:29.767Z"
           },
           {
             "id": 7,
@@ -3847,9 +3853,10 @@
               1
             ],
             "details": "List all gamification features such as badges, achievements, and progress tracking. Provide instructions for unlocking and using these features. Include tips for maximizing engagement.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test gamification features and verify documentation accuracy with actual app behavior.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:30.994Z"
           },
           {
             "id": 8,
@@ -3864,9 +3871,10 @@
               7
             ],
             "details": "Identify frequent problems and provide clear, step-by-step solutions. Include links to relevant sections and contact information for support. Use plain language and organize by issue type for easy navigation.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Review troubleshooting steps with users experiencing issues and gather feedback on effectiveness.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:32.149Z"
           },
           {
             "id": 9,
@@ -3881,15 +3889,16 @@
               7
             ],
             "details": "Gather common user questions from support channels and user feedback. Provide concise, accurate answers and link to relevant guide sections. Update regularly based on new queries.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Monitor user interactions with the FAQ and update based on unresolved or recurring questions.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:53:33.330Z"
           }
         ],
         "complexity": 6,
         "recommendedSubtasks": 9,
         "expansionPrompt": "Break down the user guide creation into subtasks covering each major feature area. Include tasks for content planning, writing, reviewing, and formatting. Consider how to make the guide accessible and user-friendly for different user types.",
-        "updatedAt": "2025-10-19T11:27:41.008Z"
+        "updatedAt": "2025-10-19T14:53:33.330Z"
       },
       {
         "id": "70",
@@ -7325,9 +7334,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-19T14:51:22.979Z",
+      "lastModified": "2025-10-19T14:53:33.333Z",
       "taskCount": 139,
-      "completedCount": 121,
+      "completedCount": 122,
       "tags": [
         "master"
       ]
