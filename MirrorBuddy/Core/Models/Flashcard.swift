@@ -97,6 +97,7 @@ final class Flashcard {
 
     /// Check if flashcard is due for review
     var isDue: Bool {
-        nextReviewDate <= Date()
+        guard let reviewDate = nextReviewDate else { return true } // Never reviewed = due
+        return reviewDate <= Date()
     }
 }

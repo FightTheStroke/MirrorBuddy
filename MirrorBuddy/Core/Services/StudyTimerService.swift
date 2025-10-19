@@ -36,7 +36,7 @@ class StudyTimerService: ObservableObject {
 
         // Start timer
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self?.elapsedSeconds += 1
             }
         }
@@ -72,7 +72,7 @@ class StudyTimerService: ObservableObject {
 
         // Restart timer
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self?.elapsedSeconds += 1
             }
         }

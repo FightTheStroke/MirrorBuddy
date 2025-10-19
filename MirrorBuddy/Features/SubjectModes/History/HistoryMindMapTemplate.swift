@@ -64,7 +64,7 @@ enum HistoryMindMapTemplate {
     private static func timelineTemplate(topic: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .timeline,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: topic,
                 content: "Historical Timeline"
             ),
@@ -73,27 +73,27 @@ enum HistoryMindMapTemplate {
                     title: "Early Period",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Beginning", content: "Origins and early developments"),
-                        MindMapNode(title: "Key Events", content: "Major early events"),
-                        MindMapNode(title: "Important Figures", content: "Early leaders and contributors")
+                        HistoryMindMapNode(title: "Beginning", content: "Origins and early developments"),
+                        HistoryMindMapNode(title: "Key Events", content: "Major early events"),
+                        HistoryMindMapNode(title: "Important Figures", content: "Early leaders and contributors")
                     ]
                 ),
                 MindMapBranch(
                     title: "Middle Period",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Major Developments", content: "Significant changes"),
-                        MindMapNode(title: "Turning Points", content: "Critical moments"),
-                        MindMapNode(title: "Conflicts", content: "Major conflicts or challenges")
+                        HistoryMindMapNode(title: "Major Developments", content: "Significant changes"),
+                        HistoryMindMapNode(title: "Turning Points", content: "Critical moments"),
+                        HistoryMindMapNode(title: "Conflicts", content: "Major conflicts or challenges")
                     ]
                 ),
                 MindMapBranch(
                     title: "Late Period",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Culmination", content: "How it ended or evolved"),
-                        MindMapNode(title: "Legacy", content: "Long-term impacts"),
-                        MindMapNode(title: "Modern Relevance", content: "Connection to today")
+                        HistoryMindMapNode(title: "Culmination", content: "How it ended or evolved"),
+                        HistoryMindMapNode(title: "Legacy", content: "Long-term impacts"),
+                        HistoryMindMapNode(title: "Modern Relevance", content: "Connection to today")
                     ]
                 )
             ]
@@ -103,7 +103,7 @@ enum HistoryMindMapTemplate {
     private static func causeEffectTemplate(event: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .causeEffect,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: event,
                 content: "Historical Event"
             ),
@@ -112,38 +112,38 @@ enum HistoryMindMapTemplate {
                     title: "Long-term Causes",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Political Factors", content: "Government and power structures"),
-                        MindMapNode(title: "Economic Factors", content: "Economic conditions"),
-                        MindMapNode(title: "Social Factors", content: "Social structures and movements"),
-                        MindMapNode(title: "Cultural Factors", content: "Beliefs and values")
+                        HistoryMindMapNode(title: "Political Factors", content: "Government and power structures"),
+                        HistoryMindMapNode(title: "Economic Factors", content: "Economic conditions"),
+                        HistoryMindMapNode(title: "Social Factors", content: "Social structures and movements"),
+                        HistoryMindMapNode(title: "Cultural Factors", content: "Beliefs and values")
                     ]
                 ),
                 MindMapBranch(
                     title: "Immediate Causes",
                     color: "#e67e22",
                     nodes: [
-                        MindMapNode(title: "Trigger Event", content: "What sparked it"),
-                        MindMapNode(title: "Key Decisions", content: "Critical choices made"),
-                        MindMapNode(title: "Escalation", content: "How it escalated")
+                        HistoryMindMapNode(title: "Trigger Event", content: "What sparked it"),
+                        HistoryMindMapNode(title: "Key Decisions", content: "Critical choices made"),
+                        HistoryMindMapNode(title: "Escalation", content: "How it escalated")
                     ]
                 ),
                 MindMapBranch(
                     title: "Short-term Effects",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Immediate Impact", content: "What happened right after"),
-                        MindMapNode(title: "Initial Reactions", content: "How people responded"),
-                        MindMapNode(title: "Direct Consequences", content: "Immediate results")
+                        HistoryMindMapNode(title: "Immediate Impact", content: "What happened right after"),
+                        HistoryMindMapNode(title: "Initial Reactions", content: "How people responded"),
+                        HistoryMindMapNode(title: "Direct Consequences", content: "Immediate results")
                     ]
                 ),
                 MindMapBranch(
                     title: "Long-term Effects",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Political Changes", content: "Government and power shifts"),
-                        MindMapNode(title: "Social Changes", content: "Society transformation"),
-                        MindMapNode(title: "Legacy", content: "Lasting impact"),
-                        MindMapNode(title: "Historical Significance", content: "Why it matters")
+                        HistoryMindMapNode(title: "Political Changes", content: "Government and power shifts"),
+                        HistoryMindMapNode(title: "Social Changes", content: "Society transformation"),
+                        HistoryMindMapNode(title: "Legacy", content: "Lasting impact"),
+                        HistoryMindMapNode(title: "Historical Significance", content: "Why it matters")
                     ]
                 )
             ]
@@ -153,7 +153,7 @@ enum HistoryMindMapTemplate {
     private static func comparisonTemplate(topic: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .comparison,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: topic,
                 content: "Comparative Analysis"
             ),
@@ -162,36 +162,36 @@ enum HistoryMindMapTemplate {
                     title: "Subject A",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Context", content: "Historical setting"),
-                        MindMapNode(title: "Key Features", content: "Main characteristics"),
-                        MindMapNode(title: "Impact", content: "Effects and outcomes")
+                        HistoryMindMapNode(title: "Context", content: "Historical setting"),
+                        HistoryMindMapNode(title: "Key Features", content: "Main characteristics"),
+                        HistoryMindMapNode(title: "Impact", content: "Effects and outcomes")
                     ]
                 ),
                 MindMapBranch(
                     title: "Subject B",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Context", content: "Historical setting"),
-                        MindMapNode(title: "Key Features", content: "Main characteristics"),
-                        MindMapNode(title: "Impact", content: "Effects and outcomes")
+                        HistoryMindMapNode(title: "Context", content: "Historical setting"),
+                        HistoryMindMapNode(title: "Key Features", content: "Main characteristics"),
+                        HistoryMindMapNode(title: "Impact", content: "Effects and outcomes")
                     ]
                 ),
                 MindMapBranch(
                     title: "Similarities",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Common Features", content: "Shared characteristics"),
-                        MindMapNode(title: "Parallel Developments", content: "Similar patterns"),
-                        MindMapNode(title: "Shared Context", content: "Common background")
+                        HistoryMindMapNode(title: "Common Features", content: "Shared characteristics"),
+                        HistoryMindMapNode(title: "Parallel Developments", content: "Similar patterns"),
+                        HistoryMindMapNode(title: "Shared Context", content: "Common background")
                     ]
                 ),
                 MindMapBranch(
                     title: "Differences",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Contrasting Features", content: "Different characteristics"),
-                        MindMapNode(title: "Unique Aspects", content: "Distinctive elements"),
-                        MindMapNode(title: "Different Outcomes", content: "Varied results")
+                        HistoryMindMapNode(title: "Contrasting Features", content: "Different characteristics"),
+                        HistoryMindMapNode(title: "Unique Aspects", content: "Distinctive elements"),
+                        HistoryMindMapNode(title: "Different Outcomes", content: "Varied results")
                     ]
                 )
             ]
@@ -201,7 +201,7 @@ enum HistoryMindMapTemplate {
     private static func biographyTemplate(person: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .biography,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: person,
                 content: "Historical Figure"
             ),
@@ -210,36 +210,36 @@ enum HistoryMindMapTemplate {
                     title: "Early Life",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Birth & Family", content: "Origins and background"),
-                        MindMapNode(title: "Education", content: "Learning and training"),
-                        MindMapNode(title: "Influences", content: "Early influences")
+                        HistoryMindMapNode(title: "Birth & Family", content: "Origins and background"),
+                        HistoryMindMapNode(title: "Education", content: "Learning and training"),
+                        HistoryMindMapNode(title: "Influences", content: "Early influences")
                     ]
                 ),
                 MindMapBranch(
                     title: "Major Accomplishments",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Key Achievements", content: "Major successes"),
-                        MindMapNode(title: "Important Works", content: "Significant contributions"),
-                        MindMapNode(title: "Leadership", content: "Roles and positions")
+                        HistoryMindMapNode(title: "Key Achievements", content: "Major successes"),
+                        HistoryMindMapNode(title: "Important Works", content: "Significant contributions"),
+                        HistoryMindMapNode(title: "Leadership", content: "Roles and positions")
                     ]
                 ),
                 MindMapBranch(
                     title: "Historical Context",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Time Period", content: "Era they lived in"),
-                        MindMapNode(title: "Contemporary Events", content: "What else was happening"),
-                        MindMapNode(title: "Related Figures", content: "Connections to others")
+                        HistoryMindMapNode(title: "Time Period", content: "Era they lived in"),
+                        HistoryMindMapNode(title: "Contemporary Events", content: "What else was happening"),
+                        HistoryMindMapNode(title: "Related Figures", content: "Connections to others")
                     ]
                 ),
                 MindMapBranch(
                     title: "Legacy",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Immediate Impact", content: "Effects during lifetime"),
-                        MindMapNode(title: "Long-term Influence", content: "Lasting effects"),
-                        MindMapNode(title: "Modern Relevance", content: "Significance today")
+                        HistoryMindMapNode(title: "Immediate Impact", content: "Effects during lifetime"),
+                        HistoryMindMapNode(title: "Long-term Influence", content: "Lasting effects"),
+                        HistoryMindMapNode(title: "Modern Relevance", content: "Significance today")
                     ]
                 )
             ]
@@ -249,7 +249,7 @@ enum HistoryMindMapTemplate {
     private static func revolutionTemplate(movement: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .revolution,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: movement,
                 content: "Revolution/Movement"
             ),
@@ -258,36 +258,36 @@ enum HistoryMindMapTemplate {
                     title: "Causes",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Grievances", content: "What people were unhappy about"),
-                        MindMapNode(title: "Inequality", content: "Social or economic unfairness"),
-                        MindMapNode(title: "Trigger Events", content: "What sparked action")
+                        HistoryMindMapNode(title: "Grievances", content: "What people were unhappy about"),
+                        HistoryMindMapNode(title: "Inequality", content: "Social or economic unfairness"),
+                        HistoryMindMapNode(title: "Trigger Events", content: "What sparked action")
                     ]
                 ),
                 MindMapBranch(
                     title: "Key Figures",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Leaders", content: "Who led the movement"),
-                        MindMapNode(title: "Supporters", content: "Who joined the cause"),
-                        MindMapNode(title: "Opposition", content: "Who resisted")
+                        HistoryMindMapNode(title: "Leaders", content: "Who led the movement"),
+                        HistoryMindMapNode(title: "Supporters", content: "Who joined the cause"),
+                        HistoryMindMapNode(title: "Opposition", content: "Who resisted")
                     ]
                 ),
                 MindMapBranch(
                     title: "Major Events",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Beginning", content: "How it started"),
-                        MindMapNode(title: "Turning Points", content: "Critical moments"),
-                        MindMapNode(title: "Conclusion", content: "How it ended")
+                        HistoryMindMapNode(title: "Beginning", content: "How it started"),
+                        HistoryMindMapNode(title: "Turning Points", content: "Critical moments"),
+                        HistoryMindMapNode(title: "Conclusion", content: "How it ended")
                     ]
                 ),
                 MindMapBranch(
                     title: "Outcomes",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Changes Achieved", content: "What changed"),
-                        MindMapNode(title: "Failed Goals", content: "What didn't change"),
-                        MindMapNode(title: "Legacy", content: "Long-term impact")
+                        HistoryMindMapNode(title: "Changes Achieved", content: "What changed"),
+                        HistoryMindMapNode(title: "Failed Goals", content: "What didn't change"),
+                        HistoryMindMapNode(title: "Legacy", content: "Long-term impact")
                     ]
                 )
             ]
@@ -297,7 +297,7 @@ enum HistoryMindMapTemplate {
     private static func warTemplate(conflict: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .war,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: conflict,
                 content: "War/Conflict"
             ),
@@ -306,36 +306,36 @@ enum HistoryMindMapTemplate {
                     title: "Origins",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Underlying Tensions", content: "Long-term issues"),
-                        MindMapNode(title: "Immediate Cause", content: "What triggered the war"),
-                        MindMapNode(title: "Alliances", content: "Who sided with whom")
+                        HistoryMindMapNode(title: "Underlying Tensions", content: "Long-term issues"),
+                        HistoryMindMapNode(title: "Immediate Cause", content: "What triggered the war"),
+                        HistoryMindMapNode(title: "Alliances", content: "Who sided with whom")
                     ]
                 ),
                 MindMapBranch(
                     title: "Major Battles",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Opening Campaign", content: "Early fighting"),
-                        MindMapNode(title: "Turning Points", content: "Decisive battles"),
-                        MindMapNode(title: "Final Campaigns", content: "End of fighting")
+                        HistoryMindMapNode(title: "Opening Campaign", content: "Early fighting"),
+                        HistoryMindMapNode(title: "Turning Points", content: "Decisive battles"),
+                        HistoryMindMapNode(title: "Final Campaigns", content: "End of fighting")
                     ]
                 ),
                 MindMapBranch(
                     title: "Home Front",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Civilian Impact", content: "Effect on people"),
-                        MindMapNode(title: "Economy", content: "Economic changes"),
-                        MindMapNode(title: "Propaganda", content: "Information campaigns")
+                        HistoryMindMapNode(title: "Civilian Impact", content: "Effect on people"),
+                        HistoryMindMapNode(title: "Economy", content: "Economic changes"),
+                        HistoryMindMapNode(title: "Propaganda", content: "Information campaigns")
                     ]
                 ),
                 MindMapBranch(
                     title: "Aftermath",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Peace Terms", content: "How it ended"),
-                        MindMapNode(title: "Casualties", content: "Human cost"),
-                        MindMapNode(title: "Long-term Effects", content: "Lasting consequences")
+                        HistoryMindMapNode(title: "Peace Terms", content: "How it ended"),
+                        HistoryMindMapNode(title: "Casualties", content: "Human cost"),
+                        HistoryMindMapNode(title: "Long-term Effects", content: "Lasting consequences")
                     ]
                 )
             ]
@@ -345,7 +345,7 @@ enum HistoryMindMapTemplate {
     private static func civilizationTemplate(civilization: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .civilization,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: civilization,
                 content: "Civilization"
             ),
@@ -354,45 +354,45 @@ enum HistoryMindMapTemplate {
                     title: "Geography",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Location", content: "Where they lived"),
-                        MindMapNode(title: "Resources", content: "Natural resources"),
-                        MindMapNode(title: "Climate", content: "Environmental factors")
+                        HistoryMindMapNode(title: "Location", content: "Where they lived"),
+                        HistoryMindMapNode(title: "Resources", content: "Natural resources"),
+                        HistoryMindMapNode(title: "Climate", content: "Environmental factors")
                     ]
                 ),
                 MindMapBranch(
                     title: "Government",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Political Structure", content: "How they governed"),
-                        MindMapNode(title: "Leadership", content: "Who ruled"),
-                        MindMapNode(title: "Law & Order", content: "Legal systems")
+                        HistoryMindMapNode(title: "Political Structure", content: "How they governed"),
+                        HistoryMindMapNode(title: "Leadership", content: "Who ruled"),
+                        HistoryMindMapNode(title: "Law & Order", content: "Legal systems")
                     ]
                 ),
                 MindMapBranch(
                     title: "Culture",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Religion", content: "Beliefs and practices"),
-                        MindMapNode(title: "Art & Architecture", content: "Cultural achievements"),
-                        MindMapNode(title: "Language & Writing", content: "Communication systems")
+                        HistoryMindMapNode(title: "Religion", content: "Beliefs and practices"),
+                        HistoryMindMapNode(title: "Art & Architecture", content: "Cultural achievements"),
+                        HistoryMindMapNode(title: "Language & Writing", content: "Communication systems")
                     ]
                 ),
                 MindMapBranch(
                     title: "Economy",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Agriculture", content: "Food production"),
-                        MindMapNode(title: "Trade", content: "Commerce and exchange"),
-                        MindMapNode(title: "Technology", content: "Innovations")
+                        HistoryMindMapNode(title: "Agriculture", content: "Food production"),
+                        HistoryMindMapNode(title: "Trade", content: "Commerce and exchange"),
+                        HistoryMindMapNode(title: "Technology", content: "Innovations")
                     ]
                 ),
                 MindMapBranch(
                     title: "Society",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Social Classes", content: "Class structure"),
-                        MindMapNode(title: "Daily Life", content: "How people lived"),
-                        MindMapNode(title: "Family Structure", content: "Household organization")
+                        HistoryMindMapNode(title: "Social Classes", content: "Class structure"),
+                        HistoryMindMapNode(title: "Daily Life", content: "How people lived"),
+                        HistoryMindMapNode(title: "Family Structure", content: "Household organization")
                     ]
                 )
             ]
@@ -402,7 +402,7 @@ enum HistoryMindMapTemplate {
     private static func eraTemplate(era: String) -> MindMapTemplate {
         MindMapTemplate(
             type: .era,
-            centralNode: MindMapNode(
+            centralNode: HistoryMindMapNode(
                 title: era,
                 content: "Historical Era"
             ),
@@ -411,45 +411,45 @@ enum HistoryMindMapTemplate {
                     title: "Political",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Governments", content: "Political systems"),
-                        MindMapNode(title: "Leaders", content: "Important rulers"),
-                        MindMapNode(title: "Conflicts", content: "Wars and disputes")
+                        HistoryMindMapNode(title: "Governments", content: "Political systems"),
+                        HistoryMindMapNode(title: "Leaders", content: "Important rulers"),
+                        HistoryMindMapNode(title: "Conflicts", content: "Wars and disputes")
                     ]
                 ),
                 MindMapBranch(
                     title: "Economic",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Trade", content: "Commerce patterns"),
-                        MindMapNode(title: "Industry", content: "Economic activities"),
-                        MindMapNode(title: "Wealth Distribution", content: "Economic structure")
+                        HistoryMindMapNode(title: "Trade", content: "Commerce patterns"),
+                        HistoryMindMapNode(title: "Industry", content: "Economic activities"),
+                        HistoryMindMapNode(title: "Wealth Distribution", content: "Economic structure")
                     ]
                 ),
                 MindMapBranch(
                     title: "Social",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Class Structure", content: "Social hierarchy"),
-                        MindMapNode(title: "Daily Life", content: "How people lived"),
-                        MindMapNode(title: "Movements", content: "Social changes")
+                        HistoryMindMapNode(title: "Class Structure", content: "Social hierarchy"),
+                        HistoryMindMapNode(title: "Daily Life", content: "How people lived"),
+                        HistoryMindMapNode(title: "Movements", content: "Social changes")
                     ]
                 ),
                 MindMapBranch(
                     title: "Cultural",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Arts", content: "Artistic achievements"),
-                        MindMapNode(title: "Philosophy", content: "Ideas and thinkers"),
-                        MindMapNode(title: "Religion", content: "Spiritual life")
+                        HistoryMindMapNode(title: "Arts", content: "Artistic achievements"),
+                        HistoryMindMapNode(title: "Philosophy", content: "Ideas and thinkers"),
+                        HistoryMindMapNode(title: "Religion", content: "Spiritual life")
                     ]
                 ),
                 MindMapBranch(
                     title: "Technological",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Inventions", content: "New technologies"),
-                        MindMapNode(title: "Scientific Progress", content: "Discoveries"),
-                        MindMapNode(title: "Impact", content: "How tech changed life")
+                        HistoryMindMapNode(title: "Inventions", content: "New technologies"),
+                        HistoryMindMapNode(title: "Scientific Progress", content: "Discoveries"),
+                        HistoryMindMapNode(title: "Impact", content: "How tech changed life")
                     ]
                 )
             ]
@@ -461,11 +461,11 @@ enum HistoryMindMapTemplate {
 
 struct MindMapTemplate {
     let type: HistoryMindMapTemplate.TemplateType
-    let centralNode: MindMapNode
+    let centralNode: HistoryMindMapNode
     let branches: [MindMapBranch]
 }
 
-struct MindMapNode {
+struct HistoryMindMapNode {
     let title: String
     let content: String
 }
@@ -473,5 +473,5 @@ struct MindMapNode {
 struct MindMapBranch {
     let title: String
     let color: String // Hex color
-    let nodes: [MindMapNode]
+    let nodes: [HistoryMindMapNode]
 }

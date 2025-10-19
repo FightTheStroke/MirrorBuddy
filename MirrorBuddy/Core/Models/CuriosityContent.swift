@@ -15,7 +15,7 @@ enum CuriosityContentType: String, Codable {
 final class CuriosityContent {
     var id = UUID()
     var title: String
-    var description: String
+    var contentDescription: String
     var contentType: CuriosityContentType
     var url: String?
     var thumbnailURL: String?
@@ -30,7 +30,7 @@ final class CuriosityContent {
 
     init(
         title: String,
-        description: String,
+        contentDescription: String,
         contentType: CuriosityContentType,
         url: String? = nil,
         subject: String,
@@ -39,7 +39,7 @@ final class CuriosityContent {
         estimatedMinutes: Int = 10
     ) {
         self.title = title
-        self.description = description
+        self.contentDescription = contentDescription
         self.contentType = contentType
         self.url = url
         self.subject = subject

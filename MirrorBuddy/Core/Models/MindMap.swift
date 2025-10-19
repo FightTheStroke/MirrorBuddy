@@ -6,6 +6,7 @@ import SwiftData
 final class MindMap {
     var id = UUID()
     var materialID = UUID()
+    var title: String?
     var imageURL: URL?
     var generatedAt = Date()
     var prompt: String?
@@ -23,9 +24,15 @@ final class MindMap {
         set { nodes = newValue }
     }
 
-    init(materialID: UUID, prompt: String? = nil) {
+    // Computed property for root node (first node with no parent)
+    var rootNode: MindMapNode? {
+        nodes?.first { $0.parentNodeID == nil }
+    }
+
+    init(materialID: UUID, title: String? = nil, prompt: String? = nil) {
         self.id = UUID()
         self.materialID = materialID
+        self.title = title
         self.generatedAt = Date()
         self.prompt = prompt
     }
@@ -57,6 +64,11 @@ final class MindMapNode {
     var childNodesArray: [MindMapNode] {
         get { childNodes ?? [] }
         set { childNodes = newValue }
+    }
+
+    // Alias for childNodes (for compatibility with LMSIntegrationService)
+    var children: [MindMapNode] {
+        childNodesArray
     }
 
     init(

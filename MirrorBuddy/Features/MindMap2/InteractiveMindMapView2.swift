@@ -141,7 +141,7 @@ struct InteractiveMindMapView2: View {
         }
     }
 
-    private func nodeDetailPanel(_ node: MindMapNode) -> some View {
+    private func nodeDetailPanel(_ node: MindMapNodeModel) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(node.title)
                 .font(.headline)
@@ -173,7 +173,7 @@ struct InteractiveMindMapView2: View {
 @MainActor
 final class MindMapViewModel: ObservableObject {
     @Published var mindMap: MindMapModel
-    @Published var selectedNode: MindMapNode?
+    @Published var selectedNode: MindMapNodeModel?
     @Published var isVoiceActive = false
 
     private let navigator: MindMapVoiceNavigator
@@ -202,11 +202,11 @@ final class MindMapViewModel: ObservableObject {
         }
     }
 
-    func narrateNode(_ node: MindMapNode) {
+    func narrateNode(_ node: MindMapNodeModel) {
         narrator.explainNode(node)
     }
 
-    func startVoiceNote(for node: MindMapNode) {
+    func startVoiceNote(for node: MindMapNodeModel) {
         // Would implement voice recording
     }
 
@@ -235,7 +235,7 @@ final class MindMapVoiceNavigator {
 }
 
 final class MindMapNarrator {
-    func explainNode(_ node: MindMapNode) {}
+    func explainNode(_ node: MindMapNodeModel) {}
 }
 
 final class MindMapStorage {

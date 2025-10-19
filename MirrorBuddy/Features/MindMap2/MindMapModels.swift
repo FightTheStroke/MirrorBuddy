@@ -1,8 +1,8 @@
 import Foundation
 import SwiftUI
 
-/// Mind map node model
-struct MindMapNode: Identifiable, Codable, Equatable {
+/// Mind map node model for MindMap2 feature
+struct MindMapNodeModel: Identifiable, Codable, Equatable {
     let id: String
     var title: String
     var content: String?
@@ -46,12 +46,12 @@ struct MindMapModel: Identifiable, Codable, Equatable {
     let id: String
     var title: String
     var subject: String?
-    var nodes: [MindMapNode]
+    var nodes: [MindMapNodeModel]
     var centerNodeId: String
     var createdDate: Date
     var lastModifiedDate: Date
 
-    init(id: String = UUID().uuidString, title: String, subject: String? = nil, nodes: [MindMapNode], centerNodeId: String, createdDate: Date = Date(), lastModifiedDate: Date = Date()) {
+    init(id: String = UUID().uuidString, title: String, subject: String? = nil, nodes: [MindMapNodeModel], centerNodeId: String, createdDate: Date = Date(), lastModifiedDate: Date = Date()) {
         self.id = id
         self.title = title
         self.subject = subject
