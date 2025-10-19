@@ -1,6 +1,6 @@
 # Task ID: 57
 # Title: Implement Offline Mode Functionality
-# Status: in-progress
+# Status: done
 # Dependencies: 10, 20, 39
 # Priority: medium
 # Description: Create offline mode with cached materials and limited functionality.
