@@ -91,7 +91,9 @@ final class CloudKitSyncIntegrationTests: XCTestCase {
         try modelContext.save()
 
         // Then: Last write should be preserved
-        XCTAssertGreaterThan(material.lastModifiedAt!, originalModifiedDate!)
+        let currentModified = try XCTUnwrap(material.lastModifiedAt)
+        let originalModified = try XCTUnwrap(originalModifiedDate)
+        XCTAssertGreaterThan(currentModified, originalModified)
         XCTAssertEqual(material.title, "Modified on Device 1")
     }
 

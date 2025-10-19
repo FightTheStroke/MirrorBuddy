@@ -139,7 +139,7 @@ final class FuzzyMatcherTests: XCTestCase {
 
         XCTAssertNotNil(result)
         XCTAssertEqual(result?.matchedString, "quadratic equation")
-        XCTAssertGreaterThan(result!.score, 0.8)
+        XCTAssertGreaterThan(try XCTUnwrap(result).score, 0.8)
     }
 
     func testFindBestMatchPhonetic() {
@@ -206,7 +206,7 @@ final class FuzzyMatcherTests: XCTestCase {
         let result = matcher.findBestMatch(query: "algebra", in: candidates)
 
         XCTAssertNotNil(result)
-        XCTAssertTrue(result!.matchedString.contains("algebra"))
+        XCTAssertTrue(try XCTUnwrap(result).matchedString.contains("algebra"))
     }
 
     func testPartialMatchWordLevel() {
@@ -216,7 +216,7 @@ final class FuzzyMatcherTests: XCTestCase {
         let matches = matcher.findMatches(query: "intro calculus", in: candidates)
 
         XCTAssertGreaterThan(matches.count, 0)
-        XCTAssertTrue(matches.first!.matchedString.contains("calculus"))
+        XCTAssertTrue(matches.first.matchedString.contains("calculus"))
     }
 
     // MARK: - Configuration Tests
@@ -285,7 +285,7 @@ final class FuzzyMatcherTests: XCTestCase {
         let result = matcher.findBestMatch(query: "quadrtatic equations", in: candidates)
 
         XCTAssertNotNil(result)
-        XCTAssertTrue(result!.matchedString.contains("Quadratic"))
+        XCTAssertTrue(try XCTUnwrap(result).matchedString.contains("Quadratic"))
     }
 
     func testPhoneticVariations() {
@@ -300,7 +300,7 @@ final class FuzzyMatcherTests: XCTestCase {
         let result = matcher.findBestMatch(query: "fosforus properties", in: candidates)
 
         XCTAssertNotNil(result)
-        XCTAssertTrue(result!.matchedString.contains("Phosphorus"))
+        XCTAssertTrue(try XCTUnwrap(result).matchedString.contains("Phosphorus"))
     }
 
     func testMultiWordQueries() {

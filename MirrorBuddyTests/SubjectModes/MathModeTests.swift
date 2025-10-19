@@ -86,8 +86,8 @@ final class MathModeTests: XCTestCase {
 
         // Then
         XCTAssertNotNil(solution)
-        XCTAssertFalse(solution!.steps.isEmpty)
-        XCTAssertEqual(solution!.finalAnswer, "4.00")
+        XCTAssertFalse(.first?.steps.isEmpty)
+        XCTAssertEqual(.first?.finalAnswer, "4.00")
     }
 
     func testValidateCorrectAnswer() {
@@ -151,11 +151,11 @@ final class MathModeTests: XCTestCase {
         let derivative = renderer.calculateDerivative(function: function, at: 3)
 
         // Then
-        XCTAssertNotNil(derivative)
-        XCTAssertEqual(derivative!, 6.0, accuracy: 0.01) // f'(3) = 2*3 = 6
+        let unwrappedDerivative = try XCTUnwrap(derivative)
+        XCTAssertEqual(unwrappedDerivative, 6.0, accuracy: 0.01) // f'(3) = 2*3 = 6
     }
 
-    func testCalculateIntegral() {
+    func testCalculateIntegral() throws {
         // Given
         let renderer = MathGraphRenderer()
         let function = MathFunction.linear(m: 1, b: 0) // f(x) = x
@@ -164,8 +164,8 @@ final class MathModeTests: XCTestCase {
         let integral = renderer.calculateIntegral(function: function, from: 0, to: 2)
 
         // Then
-        XCTAssertNotNil(integral)
-        XCTAssertEqual(integral!, 2.0, accuracy: 0.1) // ∫₀² x dx = [x²/2]₀² = 2
+        let unwrappedIntegral = try XCTUnwrap(integral)
+        XCTAssertEqual(unwrappedIntegral, 2.0, accuracy: 0.1) // ∫₀² x dx = [x²/2]₀² = 2
     }
 
     // MARK: - FormulaLibrary Tests

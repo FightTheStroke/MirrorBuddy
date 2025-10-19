@@ -209,7 +209,7 @@ struct OpenAIClientTests {
         }
         """
 
-        let data = jsonString.data(using: .utf8)!
+        let data = jsonString.data(using: .utf8) ?? Data()
         let decoder = JSONDecoder()
         let response = try decoder.decode(ChatCompletionResponse.self, from: data)
 
@@ -232,7 +232,7 @@ struct OpenAIClientTests {
         }
         """
 
-        let data = jsonString.data(using: .utf8)!
+        let data = jsonString.data(using: .utf8) ?? Data()
         let decoder = JSONDecoder()
         let response = try decoder.decode(ImageGenerationResponse.self, from: data)
 
@@ -254,7 +254,7 @@ struct OpenAIClientTests {
         }
         """
 
-        let data = jsonString.data(using: .utf8)!
+        let data = jsonString.data(using: .utf8) ?? Data()
         let decoder = JSONDecoder()
         let response = try decoder.decode(OpenAIErrorResponse.self, from: data)
 

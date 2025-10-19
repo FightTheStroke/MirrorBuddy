@@ -167,9 +167,10 @@ final class MaterialProcessingIntegrationTests: XCTestCase {
 
         // Then: Verify workflow
         XCTAssertNotNil(material.textContent, "Should have extracted text")
-        XCTAssertNotNil(material.summary, "Should have generated summary")
-        XCTAssertTrue(material.summary!.contains("bonding"), "Summary should mention bonding")
-        XCTAssertLessThan(material.summary!.count, material.textContent!.count, "Summary should be shorter than content")
+        let summary = try XCTUnwrap(material.summary, "Should have generated summary")
+        let textContent = try XCTUnwrap(material.textContent, "Should have text content")
+        XCTAssertTrue(summary.contains("bonding"), "Summary should mention bonding")
+        XCTAssertLessThan(summary.count, textContent.count, "Summary should be shorter than content")
     }
 
     /// Test 3: Material processing with error recovery
@@ -435,8 +436,10 @@ final class MaterialProcessingIntegrationTests: XCTestCase {
 
         // Then: Verify reprocessing
         XCTAssertEqual(material.processingStatus, .completed)
-        XCTAssertTrue(material.summary!.contains("Advanced"))
-        XCTAssertTrue(material.textContent!.contains("quadratic"))
+        let reprocessedSummary = try XCTUnwrap(material.summary)
+        let reprocessedContent = try XCTUnwrap(material.textContent)
+        XCTAssertTrue(reprocessedSummary.contains("Advanced"))
+        XCTAssertTrue(reprocessedContent.contains("quadratic"))
         XCTAssertGreaterThan(material.flashcards?.count ?? 0, originalFlashcardCount, "Should have more flashcards after reprocessing")
     }
 

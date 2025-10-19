@@ -63,7 +63,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "total_tokens": 40
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -74,7 +74,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make completion request
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -96,17 +96,17 @@ final class OpenAIIntegrationTests: XCTestCase {
         let chunk1 = """
         data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1729529400,"model":"gpt-4o","choices":[{"index":0,"delta":{"role":"assistant","content":"The"},"finish_reason":null}]}
 
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         let chunk2 = """
         data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1729529400,"model":"gpt-4o","choices":[{"index":0,"delta":{"content":" quadratic formula"},"finish_reason":null}]}
 
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         let chunk3 = """
         data: [DONE]
 
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         let combinedData = chunk1 + chunk2 + chunk3
 
@@ -119,7 +119,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make streaming request
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -159,7 +159,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "total_tokens": 65
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -170,7 +170,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make request with system message
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -213,7 +213,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "total_tokens": 85
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -224,7 +224,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make request with function definitions
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -266,7 +266,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "total_tokens": 1095
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -277,7 +277,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make vision request
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -317,7 +317,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "total_tokens": 2130
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -328,7 +328,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make vision request with base64 image
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -368,7 +368,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "total_tokens": 1840
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -379,7 +379,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Request handwriting recognition
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -403,7 +403,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         {
             "text": "Can you help me understand how to solve quadratic equations using the quadratic formula?"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -414,7 +414,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Submit audio for transcription
-        let url = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
+        let url = URL(string: "https://api.openai.com/v1/audio/transcriptions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -436,7 +436,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         {
             "text": "Puoi aiutarmi a capire come risolvere le equazioni quadratiche?"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -447,7 +447,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Submit audio with language hint
-        let url = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
+        let url = URL(string: "https://api.openai.com/v1/audio/transcriptions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -487,7 +487,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 }
             ]
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -498,7 +498,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Request verbose transcription
-        let url = URL(string: "https://api.openai.com/v1/audio/transcriptions")!
+        let url = URL(string: "https://api.openai.com/v1/audio/transcriptions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -528,7 +528,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "code": "rate_limit_exceeded"
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -539,7 +539,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make request that hits rate limit
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -566,7 +566,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "code": "invalid_api_key"
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -577,7 +577,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make request with invalid API key
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -603,7 +603,7 @@ final class OpenAIIntegrationTests: XCTestCase {
                 "code": "context_length_exceeded"
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -614,7 +614,7 @@ final class OpenAIIntegrationTests: XCTestCase {
         )
 
         // When: Make request exceeding context length
-        let url = URL(string: "https://api.openai.com/v1/chat/completions")!
+        let url = URL(string: "https://api.openai.com/v1/chat/completions") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 

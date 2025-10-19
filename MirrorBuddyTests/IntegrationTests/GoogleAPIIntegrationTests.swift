@@ -50,7 +50,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "token_type": "Bearer",
             "scope": "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -62,7 +62,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
 
         // When: Exchange authorization code for tokens
         let request = try XCTUnwrap(
-            URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
+            URLRequest(url: URL(string: "https://oauth2.googleapis.com/token") ?? URL(fileURLWithPath: ""))
         )
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -88,7 +88,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "token_type": "Bearer",
             "scope": "https://www.googleapis.com/auth/gmail.readonly"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -100,7 +100,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
 
         // When: Refresh access token
         let request = try XCTUnwrap(
-            URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
+            URLRequest(url: URL(string: "https://oauth2.googleapis.com/token") ?? URL(fileURLWithPath: ""))
         )
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -152,7 +152,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
 
         // When: Revoke token
         let request = try XCTUnwrap(
-            URLRequest(url: URL(string: "https://oauth2.googleapis.com/revoke")!)
+            URLRequest(url: URL(string: "https://oauth2.googleapis.com/revoke") ?? URL(fileURLWithPath: ""))
         )
 
         let (_, response) = try await mockURLSession.data(for: request)
@@ -177,7 +177,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "nextPageToken": "page2_token",
             "resultSizeEstimate": 3
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -188,7 +188,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Fetch message list
-        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher")!
+        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -223,7 +223,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             },
             "internalDate": "1729529400000"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -234,7 +234,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Fetch message detail
-        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages/msg001")!
+        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages/msg001") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -252,7 +252,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     /// Test 7: Gmail attachment download
     func testGmailAttachmentDownload() async throws {
         // Given: Mock attachment data
-        let attachmentData = "VGVzdCBQREYgY29udGVudA==".data(using: .utf8)!
+        let attachmentData = "VGVzdCBQREYgY29udGVudA==".data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -263,7 +263,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Download attachment
-        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages/msg001/attachments/att001")!
+        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages/msg001/attachments/att001") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -285,7 +285,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             ],
             "resultSizeEstimate": 2
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -296,7 +296,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Query with filter
-        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher+subject:homework")!
+        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher+subject:homework") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -333,7 +333,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             ],
             "nextPageToken": null
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -344,7 +344,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Fetch calendar events
-        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events")!
+        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -370,7 +370,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "end": {"dateTime": "2024-10-27T17:00:00-07:00"},
             "status": "confirmed"
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -381,7 +381,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Create calendar event
-        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events")!
+        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events") ?? URL(fileURLWithPath: "")
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
 
@@ -412,7 +412,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
                 "timeZone": "America/New_York"
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -423,7 +423,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Fetch event
-        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events/event_tz001")!
+        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events/event_tz001") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -462,7 +462,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             ],
             "nextPageToken": null
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -473,7 +473,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Fetch file list
-        let url = URL(string: "https://www.googleapis.com/drive/v3/files")!
+        let url = URL(string: "https://www.googleapis.com/drive/v3/files") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -490,7 +490,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     /// Test 13: Drive file download
     func testDriveFileDownload() async throws {
         // Given: Mock file content
-        let fileContent = "Sample PDF content data".data(using: .utf8)!
+        let fileContent = "Sample PDF content data".data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -501,7 +501,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Download file
-        let url = URL(string: "https://www.googleapis.com/drive/v3/files/file001?alt=media")!
+        let url = URL(string: "https://www.googleapis.com/drive/v3/files/file001?alt=media") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
@@ -523,7 +523,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
                 "status": "NOT_FOUND"
             }
         }
-        """.data(using: .utf8)!
+        """.data(using: .utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -534,7 +534,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         )
 
         // When: Request non-existent file
-        let url = URL(string: "https://www.googleapis.com/drive/v3/files/nonexistent")!
+        let url = URL(string: "https://www.googleapis.com/drive/v3/files/nonexistent") ?? URL(fileURLWithPath: "")
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)

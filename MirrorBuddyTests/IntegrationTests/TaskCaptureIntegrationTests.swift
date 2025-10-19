@@ -95,7 +95,10 @@ final class TaskCaptureIntegrationTests: XCTestCase {
         XCTAssertNotNil(result.dueDate)
 
         if let dueDate = result.dueDate {
-            let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+            guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: Date()) else {
+                XCTFail("Failed to calculate tomorrow")
+                return
+            }
             XCTAssertTrue(Calendar.current.isDate(dueDate, inSameDayAs: tomorrow))
         }
     }
@@ -114,7 +117,10 @@ final class TaskCaptureIntegrationTests: XCTestCase {
         XCTAssertNotNil(result.dueDate)
 
         if let dueDate = result.dueDate {
-            let dayAfterTomorrow = Calendar.current.date(byAdding: .day, value: 2, to: Date())!
+            guard let dayAfterTomorrow = Calendar.current.date(byAdding: .day, value: 2, to: Date()) else {
+                XCTFail("Failed to calculate day after tomorrow")
+                return
+            }
             XCTAssertTrue(Calendar.current.isDate(dueDate, inSameDayAs: dayAfterTomorrow))
         }
     }

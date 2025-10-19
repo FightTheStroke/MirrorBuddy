@@ -32,9 +32,9 @@ final class ProcessingPipelineTests: XCTestCase {
 
         let image = service.renderPage(page, scale: 2.0)
 
-        XCTAssertNotNil(image)
-        XCTAssertGreaterThan(image!.size.width, 0)
-        XCTAssertGreaterThan(image!.size.height, 0)
+        let unwrappedImage = try XCTUnwrap(image)
+        XCTAssertGreaterThan(unwrappedImage.size.width, 0)
+        XCTAssertGreaterThan(unwrappedImage.size.height, 0)
     }
 
     func testPDFTextBlockSorting() {

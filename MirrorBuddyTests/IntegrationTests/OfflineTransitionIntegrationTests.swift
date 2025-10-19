@@ -166,7 +166,7 @@ final class OfflineTransitionIntegrationTests: XCTestCase {
         modelContext.insert(material)
         try modelContext.save()
 
-        let localModifiedDate = material.lastModifiedAt!
+        let localModifiedDate = try XCTUnwrap(material.lastModifiedAt)
 
         // When: Simulate server has newer version
         try await Task.sleep(nanoseconds: 100_000_000)

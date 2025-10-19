@@ -183,7 +183,10 @@ final class DataFlowIntegrationTests: XCTestCase {
         XCTAssertEqual(flashcard.interval, 1, "Interval should reset to 1 day")
 
         // And: Verify flashcard is marked as due
-        let pastDate = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
+        guard let pastDate = Calendar.current.date(byAdding: .day, value: -2, to: Date()) else {
+            XCTFail("Failed to calculate past date")
+            return
+        }
         flashcard.nextReviewDate = pastDate
         XCTAssertTrue(flashcard.isDue, "Flashcard should be marked as due")
     }

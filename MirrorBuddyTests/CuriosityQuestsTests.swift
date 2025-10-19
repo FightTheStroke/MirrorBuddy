@@ -160,7 +160,7 @@ struct CuriosityQuestsTests {
             targetValue: 5
         )
         // Set deadline in the past
-        quest.deadline = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        quest.deadline = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
         context.insert(quest)
 
         quest.checkExpiration()
