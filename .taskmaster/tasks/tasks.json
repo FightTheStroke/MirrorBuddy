@@ -6477,7 +6477,7 @@
         "description": "Detect idle moments, sentiment, and current subject to propose next steps, and inject periodic recaps during study flows.",
         "details": "- Intent engine using context banner + activity logs\n- Voice prompts like 'Vuoi ripassare X?' when idle or confused\n- Mid-session recap command 'Ricapitolami' with voice + text",
         "testStrategy": "",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           "121",
           "124"
@@ -6527,7 +6527,8 @@
         ],
         "complexity": 7,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Break into: (1) instrumenting context and idle tracking, (2) implementing proactive voice prompts, (3) adding working-memory checkpoints, and (4) testing proactive coaching flows."
+        "expansionPrompt": "Break into: (1) instrumenting context and idle tracking, (2) implementing proactive voice prompts, (3) adding working-memory checkpoints, and (4) testing proactive coaching flows.",
+        "updatedAt": "2025-10-19T14:58:41.214Z"
       },
       {
         "id": "126",
@@ -6535,7 +6536,7 @@
         "description": "Allow Mario to add tasks via voice (e.g. 'Ricordami di...'), infer subject, schedule reminders, and wrap with end-of-day planning dialogue.",
         "details": "- Extend VoiceCommandRegistry/AppVoiceCommandHandler with capture flow\n- Parse text to deadlines/subjects\n- Add nightly summary + tomorrow plan routine",
         "testStrategy": "",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           "121",
           "124"
@@ -6585,7 +6586,8 @@
         ],
         "complexity": 7,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Expand into: (1) extending voice command grammar, (2) parsing natural language into tasks, (3) scheduling reminders and nightly plan, and (4) UX validation."
+        "expansionPrompt": "Expand into: (1) extending voice command grammar, (2) parsing natural language into tasks, (3) scheduling reminders and nightly plan, and (4) UX validation.",
+        "updatedAt": "2025-10-19T14:58:42.324Z"
       },
       {
         "id": "127",
@@ -6593,7 +6595,7 @@
         "description": "Transform FlashcardStudyView into a voice-coached session with warm-up, adaptive pacing, encouragement, and micro-rewards.",
         "details": "- Script session phases (intro, practice, wrap)\n- Track performance to adjust explanation depth\n- Add celebratory effects and XP hooks",
         "testStrategy": "",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           "124",
           "125",
@@ -6644,7 +6646,8 @@
         ],
         "complexity": 7,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Break into: (1) designing session script, (2) upgrading FlashcardStudyView, (3) tracking performance and adjusting difficulty, and (4) integrating rewards and UX polish."
+        "expansionPrompt": "Break into: (1) designing session script, (2) upgrading FlashcardStudyView, (3) tracking performance and adjusting difficulty, and (4) integrating rewards and UX polish.",
+        "updatedAt": "2025-10-19T14:58:43.512Z"
       },
       {
         "id": "128",
@@ -6652,7 +6655,7 @@
         "description": "Deliver zoomable mind map navigation with voice commands, narrated walkthroughs, and voice note capture for each node.",
         "details": "- Implement gesture + accessibility-friendly navigation\n- Add 'Explain this node' narration using TTS/LLM\n- Allow voice notes per node and sync to storage",
         "testStrategy": "",
-        "status": "pending",
+        "status": "in-progress",
         "dependencies": [
           "124",
           "125"
@@ -6702,7 +6705,8 @@
         ],
         "complexity": 8,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Expand into: (1) implementing gesture and layout engine, (2) adding voice navigation commands, (3) narrated walkthroughs, and (4) persisting notes and export."
+        "expansionPrompt": "Expand into: (1) implementing gesture and layout engine, (2) adding voice navigation commands, (3) narrated walkthroughs, and (4) persisting notes and export.",
+        "updatedAt": "2025-10-19T14:58:44.711Z"
       },
       {
         "id": "129",
@@ -7347,7 +7351,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-19T14:58:26.373Z",
+      "lastModified": "2025-10-19T14:58:44.713Z",
       "taskCount": 139,
       "completedCount": 124,
       "tags": [
