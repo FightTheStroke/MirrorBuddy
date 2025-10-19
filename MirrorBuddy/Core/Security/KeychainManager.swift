@@ -190,7 +190,7 @@ enum KeychainKey {
 
 /// Enumeration of OAuth services
 enum OAuthService: String, Codable {
-    case google = "google"
+    case google
     case googleDrive = "google.drive"
     case googleCalendar = "google.calendar"
     case googleGmail = "google.gmail"

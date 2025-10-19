@@ -439,24 +439,24 @@ struct DigestSettings: Codable {
 
 /// Delivery method options
 enum DeliveryMethod: String, Codable {
-    case none = "none"
-    case email = "email"
+    case none
+    case email
     case voiceNote = "voice_note"
-    case both = "both"
+    case both
 }
 
 /// Digest frequency
 enum DigestFrequency: String, Codable {
-    case weekly = "weekly"
-    case biweekly = "biweekly"
-    case monthly = "monthly"
+    case weekly
+    case biweekly
+    case monthly
 }
 
 /// Privacy level for content filtering
 enum PrivacyLevel: String, Codable {
-    case minimal = "minimal" // Show all information
-    case balanced = "balanced" // Filter sensitive terms
-    case strict = "strict" // Maximum privacy
+    case minimal // Show all information
+    case balanced // Filter sensitive terms
+    case strict // Maximum privacy
 }
 
 /// Delivery result

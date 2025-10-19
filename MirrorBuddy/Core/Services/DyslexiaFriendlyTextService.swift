@@ -61,7 +61,7 @@ final class DyslexiaFriendlyTextService: ObservableObject {
     // MARK: - Font Options (Subtask 74.1)
 
     enum DyslexiaFont: String, CaseIterable, Identifiable {
-        case system = "system"
+        case system
         case openDyslexic = "opendyslexic"
 
         var id: String { rawValue }
@@ -109,10 +109,10 @@ final class DyslexiaFriendlyTextService: ObservableObject {
     // MARK: - Color Themes (Subtask 74.3)
 
     enum DyslexiaColorTheme: String, CaseIterable, Identifiable {
-        case standard = "standard"
-        case highContrast = "highContrast"
-        case creamPaper = "creamPaper"
-        case darkMode = "darkMode"
+        case standard
+        case highContrast
+        case creamPaper
+        case darkMode
 
         var id: String { rawValue }
 

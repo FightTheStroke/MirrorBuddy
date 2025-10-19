@@ -384,8 +384,8 @@ final class DigestGenerationService {
 
 /// Recipient type for digest
 enum RecipientType: String, Codable {
-    case parent = "parent"
-    case teacher = "teacher"
+    case parent
+    case teacher
 }
 
 /// Digest content structure
@@ -411,11 +411,11 @@ struct DigestSection: Codable {
 
 /// Section tone for formatting
 enum SectionTone: String, Codable {
-    case warm = "warm"
-    case encouraging = "encouraging"
-    case informative = "informative"
-    case celebratory = "celebratory"
-    case supportive = "supportive"
+    case warm
+    case encouraging
+    case informative
+    case celebratory
+    case supportive
 }
 
 /// Voice settings for audio generation

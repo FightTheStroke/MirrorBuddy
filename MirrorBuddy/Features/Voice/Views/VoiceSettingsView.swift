@@ -191,9 +191,9 @@ struct VoiceSettingsView: View {
 // MARK: - Audio Quality Enum
 
 enum AudioQuality: String, CaseIterable, Identifiable {
-    case low = "low"
-    case medium = "medium"
-    case high = "high"
+    case low
+    case medium
+    case high
 
     var id: String { rawValue }
 

@@ -15,7 +15,7 @@ final class StructuredAuditLogger {
         case consentChange = "consent_change"
         case recordingStart = "recording_start"
         case recordingStop = "recording_stop"
-        case error = "error"
+        case error
     }
 
     struct AuditEvent: Codable {

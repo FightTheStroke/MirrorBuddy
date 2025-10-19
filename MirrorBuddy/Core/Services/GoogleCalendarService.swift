@@ -454,8 +454,8 @@ struct Assignment {
 /// Task source types
 enum TaskSourceType: String, Codable {
     case googleCalendar = "google_calendar"
-    case gmail = "gmail"
-    case manual = "manual"
+    case gmail
+    case manual
 }
 
 // MARK: - SwiftData Models (Subtask 42.3)

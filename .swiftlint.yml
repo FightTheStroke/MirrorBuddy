@@ -110,6 +110,22 @@ identifier_name:
     - x
     - y
     - z
+    - r  # Red component in RGBA
+    - g  # Green component in RGBA
+    - b  # Blue component in RGBA
+    - a  # Alpha component in RGBA
+    - i  # Loop index
+    - j  # Loop index
+    - k  # Loop index
+    - v  # Value in map/reduce
+    - fx # Function short reference
+    - m  # Slope or mathematical coefficient
+    - c  # Constant in mathematical equations
+    - d  # Delta/derivative in math
+    - h  # Height in graphics/math
+    - n  # Count/number variable
+    - t  # Time or parameter in equations
+    - q  # Quotient or queue variable
 
 type_name:
   min_length:

@@ -407,7 +407,7 @@ enum SortOption: String, CaseIterable, Identifiable {
     case dateAscending = "date_asc"
     case nameAscending = "name_asc"
     case nameDescending = "name_desc"
-    case subject = "subject"
+    case subject
 
     var id: String { rawValue }
 

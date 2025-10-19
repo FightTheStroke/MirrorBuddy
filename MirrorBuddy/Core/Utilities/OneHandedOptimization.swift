@@ -27,8 +27,8 @@ final class OneHandedManager: ObservableObject {
     }
 
     enum HandPreference: String, CaseIterable, Identifiable {
-        case right = "right"
-        case left = "left"
+        case right
+        case left
 
         var id: String { rawValue }
 

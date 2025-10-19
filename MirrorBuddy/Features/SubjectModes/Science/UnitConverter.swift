@@ -58,53 +58,53 @@ enum UnitCategory: String, CaseIterable {
 
 enum PhysicsUnit: String, CaseIterable {
     // Length
-    case meter = "meter"
-    case kilometer = "kilometer"
-    case centimeter = "centimeter"
-    case millimeter = "millimeter"
-    case mile = "mile"
-    case yard = "yard"
-    case foot = "foot"
-    case inch = "inch"
+    case meter
+    case kilometer
+    case centimeter
+    case millimeter
+    case mile
+    case yard
+    case foot
+    case inch
 
     // Mass
-    case kilogram = "kilogram"
-    case gram = "gram"
-    case milligram = "milligram"
-    case pound = "pound"
-    case ounce = "ounce"
-    case ton = "ton"
+    case kilogram
+    case gram
+    case milligram
+    case pound
+    case ounce
+    case ton
 
     // Time
-    case second = "second"
-    case minute = "minute"
-    case hour = "hour"
-    case day = "day"
-    case millisecond = "millisecond"
+    case second
+    case minute
+    case hour
+    case day
+    case millisecond
 
     // Temperature
-    case kelvin = "kelvin"
-    case celsius = "celsius"
-    case fahrenheit = "fahrenheit"
+    case kelvin
+    case celsius
+    case fahrenheit
 
     // Energy
-    case joule = "joule"
-    case kilojoule = "kilojoule"
-    case calorie = "calorie"
-    case kilocalorie = "kilocalorie"
-    case electronvolt = "electronvolt"
+    case joule
+    case kilojoule
+    case calorie
+    case kilocalorie
+    case electronvolt
 
     // Force
-    case newton = "newton"
-    case kilonewton = "kilonewton"
+    case newton
+    case kilonewton
     case poundForce = "pound-force"
 
     // Pressure
-    case pascal = "pascal"
-    case kilopascal = "kilopascal"
-    case atmosphere = "atmosphere"
-    case bar = "bar"
-    case psi = "psi"
+    case pascal
+    case kilopascal
+    case atmosphere
+    case bar
+    case psi
 
     // Velocity
     case metersPerSecond = "m/s"
@@ -116,33 +116,33 @@ enum PhysicsUnit: String, CaseIterable {
 
     // Volume
     case cubicMeter = "cubic meter"
-    case liter = "liter"
-    case milliliter = "milliliter"
-    case gallon = "gallon"
+    case liter
+    case milliliter
+    case gallon
 
     // Power
-    case watt = "watt"
-    case kilowatt = "kilowatt"
-    case horsepower = "horsepower"
+    case watt
+    case kilowatt
+    case horsepower
 
     // Electric Current
-    case ampere = "ampere"
-    case milliampere = "milliampere"
+    case ampere
+    case milliampere
 
     // Voltage
-    case volt = "volt"
-    case kilovolt = "kilovolt"
-    case millivolt = "millivolt"
+    case volt
+    case kilovolt
+    case millivolt
 
     // Resistance
-    case ohm = "ohm"
-    case kilohm = "kilohm"
-    case megohm = "megohm"
+    case ohm
+    case kilohm
+    case megohm
 
     // Frequency
-    case hertz = "hertz"
-    case kilohertz = "kilohertz"
-    case megahertz = "megahertz"
+    case hertz
+    case kilohertz
+    case megahertz
 
     var category: UnitCategory {
         switch self {

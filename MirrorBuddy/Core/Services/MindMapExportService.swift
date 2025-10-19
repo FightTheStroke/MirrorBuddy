@@ -15,10 +15,10 @@ final class MindMapExportService {
     // MARK: - Export Formats (Subtask 41.1)
 
     enum ExportFormat: String, CaseIterable, Identifiable {
-        case json = "json"
-        case mermaid = "mermaid"
-        case opml = "opml"
-        case markdown = "markdown"
+        case json
+        case mermaid
+        case opml
+        case markdown
 
         var id: String { rawValue }
 

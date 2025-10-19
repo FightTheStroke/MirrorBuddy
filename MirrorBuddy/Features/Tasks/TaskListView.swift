@@ -607,8 +607,8 @@ final class TaskListViewModel {
 
 enum TaskSortOption: String, CaseIterable, Identifiable {
     case dueDate = "due_date"
-    case priority = "priority"
-    case title = "title"
+    case priority
+    case title
     case createdDate = "created_date"
 
     var id: String { rawValue }

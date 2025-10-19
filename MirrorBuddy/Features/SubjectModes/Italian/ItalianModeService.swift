@@ -122,9 +122,9 @@ enum ItalianTopic: String, CaseIterable, Codable {
 }
 
 enum GrammarLevel: String, Codable {
-    case beginner = "beginner"
-    case intermediate = "intermediate"
-    case advanced = "advanced"
+    case beginner
+    case intermediate
+    case advanced
 
     var description: String {
         switch self {

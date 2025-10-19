@@ -417,7 +417,7 @@ struct ValidationResult {
 
 // Needed for DifficultyLevel if not imported
 enum DifficultyLevel: String, Codable {
-    case beginner = "beginner"
-    case intermediate = "intermediate"
-    case advanced = "advanced"
+    case beginner
+    case intermediate
+    case advanced
 }

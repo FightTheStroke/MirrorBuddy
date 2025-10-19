@@ -122,10 +122,10 @@ struct EventConnection: Codable, Identifiable {
     let description: String
 
     enum ConnectionType: String, Codable {
-        case causal = "causal"
-        case influential = "influential"
-        case contemporary = "contemporary"
-        case thematic = "thematic"
+        case causal
+        case influential
+        case contemporary
+        case thematic
 
         var displayName: String {
             switch self {

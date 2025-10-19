@@ -297,10 +297,10 @@ struct WeeklyMetrics: Codable {
 
 /// Streak status classification
 enum StreakStatus: String, Codable {
-    case strong = "strong"
-    case building = "building"
-    case starting = "starting"
-    case broken = "broken"
+    case strong
+    case building
+    case starting
+    case broken
 
     var description: String {
         switch self {
@@ -337,9 +337,9 @@ struct SubjectPerformance: Codable {
 
 /// Performance level classification
 enum PerformanceLevel: String, Codable {
-    case excelling = "excelling"
-    case progressing = "progressing"
-    case struggling = "struggling"
+    case excelling
+    case progressing
+    case struggling
 }
 
 /// Weekly sentiment analysis
@@ -352,9 +352,9 @@ struct WeeklySentiment: Codable {
 
 /// Overall sentiment score
 enum SentimentScore: String, Codable {
-    case positive = "positive"
-    case neutral = "neutral"
-    case struggling = "struggling"
+    case positive
+    case neutral
+    case struggling
 }
 
 /// Helper for building subject performance

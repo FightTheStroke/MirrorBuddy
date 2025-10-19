@@ -224,9 +224,9 @@ struct HistoricalContext: Codable {
 }
 
 enum SummaryDepth: String {
-    case brief = "brief"
-    case medium = "medium"
-    case detailed = "detailed"
+    case brief
+    case medium
+    case detailed
 
     var description: String {
         switch self {
