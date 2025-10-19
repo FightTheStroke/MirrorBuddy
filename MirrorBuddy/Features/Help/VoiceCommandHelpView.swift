@@ -137,17 +137,17 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Basic Search",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Find materials about algebra",
                         description: "Search for materials by topic or keyword",
                         variations: ["Show me algebra materials", "Materials on algebra", "Search algebra"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show me my math materials",
                         description: "Filter materials by subject",
                         variations: ["Find math materials", "All my physics notes", "Show history materials"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Find the last thing I studied",
                         description: "Get the most recently accessed material",
                         variations: ["What did I study last?", "My most recent material", "Latest material"]
@@ -158,12 +158,12 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Fuzzy Search",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Find quadratic equation",
                         description: "Matches even with typos: 'quadrtatic', 'quadradic'",
                         variations: ["Show me quadradic formulas", "Find quadrtatic equations"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Find mnemonic devices",
                         description: "Handles phonetic variations: 'noomonic', 'neumonic'",
                         variations: ["Show noomonic devices", "Find neumonic tricks"]
@@ -178,12 +178,12 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Material Selection",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Open newest material",
                         description: "Access the most recently created material",
                         variations: ["Show newest", "Latest material", "Most recent"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Open last geometry material",
                         description: "Get the newest material for a specific subject",
                         variations: ["Show last physics material", "Recent biology material"]
@@ -198,17 +198,17 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Absolute Time References",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show materials from today",
                         description: "Get materials created or accessed today",
                         variations: ["Today's materials", "What I studied today"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show materials from yesterday",
                         description: "Get materials from yesterday",
                         variations: ["Yesterday's materials", "What I studied yesterday"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show this week's materials",
                         description: "Get materials from the current week",
                         variations: ["This week's notes", "Materials from this week"]
@@ -219,12 +219,12 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Relative Time References",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show materials from 3 days ago",
                         description: "Get materials from a specific number of days ago",
                         variations: ["Materials from 5 days ago", "2 weeks ago materials"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show materials from last Monday",
                         description: "Get materials from a specific day of the week",
                         variations: ["Last Tuesday's materials", "Materials from last Friday"]
@@ -235,12 +235,12 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Contextual Time References",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show recent materials",
                         description: "Get materials from the last 7 days",
                         variations: ["Recent materials", "Latest materials"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show materials I haven't reviewed",
                         description: "Get materials that need review",
                         variations: ["Unreviewed materials", "Materials to study"]
@@ -255,12 +255,12 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Using Aliases",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Open bio",
                         description: "Use a custom alias to access a material quickly",
                         variations: ["Show bio", "Find bio"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show math notes",
                         description: "Multi-word aliases work too",
                         variations: ["Open history chapter 3", "Find physics formulas"]
@@ -282,7 +282,7 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Subject Filters",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show all math materials",
                         description: "Filter by subject",
                         variations: ["All physics materials", "My history notes"]
@@ -293,12 +293,12 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Difficulty Filters",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show difficult materials",
                         description: "Get materials you struggled with",
                         variations: ["Materials I struggled with", "Hard materials", "Challenging topics"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show easy materials",
                         description: "Get materials you've mastered",
                         variations: ["Simple materials", "Basic materials"]
@@ -309,12 +309,12 @@ struct VoiceCommandHelpView: View {
             CommandGroup(
                 title: "Review Status",
                 commands: [
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show materials I haven't reviewed",
                         description: "Get unreviewed materials",
                         variations: ["Unreviewed materials", "Materials to study", "Not studied yet"]
                     ),
-                    VoiceCommand(
+                    VoiceCommandExample(
                         example: "Show reviewed materials",
                         description: "Get materials you've already studied",
                         variations: ["Studied materials", "Materials I've reviewed"]
@@ -402,7 +402,7 @@ struct CategoryCard: View {
 
 struct CommandGroup: View {
     let title: String
-    let commands: [VoiceCommand]
+    let commands: [VoiceCommandExample]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -417,7 +417,7 @@ struct CommandGroup: View {
     }
 }
 
-struct VoiceCommand: Identifiable {
+struct VoiceCommandExample: Identifiable {
     let id = UUID()
     let example: String
     let description: String
@@ -425,7 +425,7 @@ struct VoiceCommand: Identifiable {
 }
 
 struct CommandCard: View {
-    let command: VoiceCommand
+    let command: VoiceCommandExample
 
     @State private var showVariations = false
 
