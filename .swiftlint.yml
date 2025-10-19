@@ -149,22 +149,6 @@ cyclomatic_complexity:
   warning: 10
   error: 20
 
-file_name:
-  excluded:
-    - ColorSystem.swift        # Multiple Color extensions and types
-    - TouchTargetStyle.swift   # Multiple TouchTarget types
-    - OneHandedOptimization.swift  # Multiple optimization helpers
-    - AccessibilityVoiceCommandLabels.swift  # Utility helpers
-    - TouchTargetHelpers.swift # Helper functions collection
-    - Fallback.swift           # Fallback utilities
-    - APIError.swift           # Error type definitions
-    - PhysicsDemo.swift        # Multiple demo components
-    - MindMapModels.swift      # Multiple model types
-    - OnboardingModels.swift   # Multiple model types
-    - TTSIntegration.swift     # Integration utilities
-    - ReadingAidsView.swift    # Multiple aid views
-    - ".!27616!CoachPersona.swift"  # Temporary file
-
 nesting:
   type_level:
     warning: 2
