@@ -265,7 +265,7 @@ struct TaskListView: View {
     private var todayTasks: [Task] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
-        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: today) else { return [] }
 
         return filteredTasks.filter { task in
             guard let dueDate = task.dueDate, !task.isCompleted else { return false }
@@ -276,8 +276,8 @@ struct TaskListView: View {
     private var upcomingTasks: [Task] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
-        let tomorrow = calendar.date(byAdding: .day, value: 1, to: today)!
-        let nextWeek = calendar.date(byAdding: .day, value: 7, to: today)!
+        guard let tomorrow = calendar.date(byAdding: .day, value: 1, to: today),
+              let nextWeek = calendar.date(byAdding: .day, value: 7, to: today) else { return [] }
 
         return filteredTasks.filter { task in
             guard let dueDate = task.dueDate, !task.isCompleted else { return false }
@@ -288,7 +288,7 @@ struct TaskListView: View {
     private var laterTasks: [Task] {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
-        let nextWeek = calendar.date(byAdding: .day, value: 7, to: today)!
+        guard let nextWeek = calendar.date(byAdding: .day, value: 7, to: today) else { return [] }
 
         return filteredTasks.filter { task in
             guard let dueDate = task.dueDate, !task.isCompleted else { return false }
@@ -627,6 +627,7 @@ enum TaskSortOption: String, CaseIterable, Identifiable {
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    // swiftlint:disable:next force_try
     let container = try! ModelContainer(for: Task.self, Material.self, SubjectEntity.self, configurations: config)
 
     let context = container.mainContext

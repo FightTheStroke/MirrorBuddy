@@ -10,8 +10,8 @@ import SwiftData
 import SwiftUI
 
 /// Sheet type for consolidated sheet presentation (Fix: SwiftUI allows only 1 sheet per view)
+/// Note: Voice conversation removed - now handled by SmartVoiceButton (Task 139.3)
 enum MainTabSheet: Identifiable {
-    case voiceConversation
     case materialImport
     case settings
     case profile
@@ -19,7 +19,6 @@ enum MainTabSheet: Identifiable {
 
     var id: String {
         switch self {
-        case .voiceConversation: return "voice"
         case .materialImport: return "import"
         case .settings: return "settings"
         case .profile: return "profile"
@@ -120,25 +119,16 @@ struct MainTabView: View {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
 
-            // MARK: - Voice Command Buttons (Task 113: Safe area positioning)
-            // Floating buttons for voice features accessible from all tabs
+            // MARK: - Smart Voice Button (Task 139.3: Unified voice entry point)
+            // Single floating button for all voice interactions (commands + conversation)
             GeometryReader { geometry in
                 VStack {
                     Spacer()
                     HStack {
-                        // Voice Command Button (left side) - Quick commands
-                        VoiceCommandButton()
-                            .padding(.leading, max(16, geometry.safeAreaInsets.leading + 8))
-                            .padding(.bottom, geometry.safeAreaInsets.bottom + 90)
-                            .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-
                         Spacer()
 
-                        // Persistent Voice Button (right side) - Full conversation (Task 106)
-                        PersistentVoiceButton(isPresented: Binding(
-                            get: { activeSheet == .voiceConversation },
-                            set: { if $0 { activeSheet = .voiceConversation } else { activeSheet = nil } }
-                        ))
+                        // Smart Voice Button - Unified commands and conversation (Task 139)
+                        SmartVoiceButton()
                             .padding(.trailing, max(16, geometry.safeAreaInsets.trailing + 8))
                             .padding(.bottom, geometry.safeAreaInsets.bottom + 90)
                             .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
@@ -154,12 +144,9 @@ struct MainTabView: View {
                 .zIndex(999)
         }
         // Consolidated sheet presentation (Fix: SwiftUI allows only 1 sheet per view)
+        // Note: Voice conversation sheet removed - now handled by SmartVoiceButton (Task 139.3)
         .sheet(item: $activeSheet) { sheetType in
             switch sheetType {
-            case .voiceConversation:
-                NavigationStack {
-                    VoiceConversationView()
-                }
             case .materialImport:
                 MaterialImportView()
             case .settings:

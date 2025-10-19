@@ -94,7 +94,7 @@ struct QuickActionsSection: View {
     @Binding var showingImport: Bool
     @State private var showingScanner = false
     @State private var scannedMaterial: Material?
-    @State private var showingVoiceConversation = false // Task 102.3
+    // Note: Voice conversation removed - now handled by SmartVoiceButton (Task 139.3)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -122,15 +122,8 @@ struct QuickActionsSection: View {
                     }
                     .accessibilityLabelWithVoiceCommand("Scansiona documento", voiceCommand: "fotografa")
 
-                    QuickActionCard(
-                        icon: "waveform",
-                        title: "Lezione vocale",
-                        color: .purple
-                    ) {
-                        // Launch voice conversation (Task 102.3)
-                        showingVoiceConversation = true
-                    }
-                    .accessibilityLabelWithVoiceCommand("Avvia lezione vocale", voiceCommand: QuickActionVoiceCommands.voiceLesson)
+                    // Note: "Lezione vocale" quick action removed (Task 139.3)
+                    // Use SmartVoiceButton (bottom-right floating button) instead
                 }
                 .padding(.horizontal)
             }
@@ -144,12 +137,7 @@ struct QuickActionsSection: View {
         .sheet(item: $scannedMaterial) { material in
             MaterialDetailView(material: material)
         }
-        .sheet(isPresented: $showingVoiceConversation) {
-            // Task 102.3: Wire voice conversation integration
-            NavigationStack {
-                VoiceConversationView()
-            }
-        }
+        // Note: Voice conversation sheet removed - now handled by SmartVoiceButton (Task 139.3)
     }
 }
 

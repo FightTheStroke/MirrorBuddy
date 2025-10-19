@@ -346,6 +346,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
 // MARK: - Previews
 
 #Preview("Completed Material") {
+    // swiftlint:disable:next force_try
     @Previewable @State var container = try! ModelContainer(
         for: Material.self, SubjectEntity.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -382,6 +383,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
 }
 
 #Preview("Processing Material") {
+    // swiftlint:disable:next force_try
     let container = try! ModelContainer(
         for: Material.self, SubjectEntity.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -412,6 +414,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
 }
 
 #Preview("Failed Material") {
+    // swiftlint:disable:next force_try
     let container = try! ModelContainer(
         for: Material.self, SubjectEntity.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -431,6 +434,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
 }
 
 #Preview("Dark Mode") {
+    // swiftlint:disable:next force_try
     let container = try! ModelContainer(
         for: Material.self, SubjectEntity.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)
@@ -462,6 +466,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
 }
 
 #Preview("Grid Layout") {
+    // swiftlint:disable:next force_try
     let container = try! ModelContainer(
         for: Material.self, SubjectEntity.self,
         configurations: ModelConfiguration(isStoredInMemoryOnly: true)

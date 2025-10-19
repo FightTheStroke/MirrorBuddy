@@ -55,12 +55,7 @@ struct HomeworkHelpView: View {
                         }
                     }
             }
-            .sheet(isPresented: $viewModel.showingVoiceSession) {
-                VoiceConversationView()
-                    .onAppear {
-                        viewModel.startVoiceSessionWithContext()
-                    }
-            }
+            // Note: Voice conversation sheet removed - now handled by SmartVoiceButton (Task 139.3)
             .alert("Error", isPresented: $viewModel.showError) {
                 Button("OK", role: .cancel) {}
             } message: {
@@ -226,29 +221,15 @@ struct HomeworkHelpView: View {
                 }
             }
 
-            // Voice help button (if analysis complete)
+            // Note: Voice help button removed (Task 139.3)
+            // Use SmartVoiceButton (bottom-right floating button) instead
             if viewModel.analysisState == .complete {
-                Button {
-                    viewModel.showingVoiceSession = true
-                } label: {
-                    HStack {
-                        Image(systemName: "mic.fill")
-                            .font(.title3)
-                        Text("Start Voice Help")
-                            .font(.headline)
-                    }
+                Text("Usa il pulsante vocale (in basso a destra) per ottenere aiuto")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(
-                        LinearGradient(
-                            colors: [.green, .teal],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .foregroundStyle(.white)
-                    .cornerRadius(12)
-                }
             }
 
             // Re-capture button (if image exists)

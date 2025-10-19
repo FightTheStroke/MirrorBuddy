@@ -319,7 +319,7 @@ final class StudyCoachPersonality {
                 "Giusto! Ottimo lavoro!",
                 "Bravo! Continua così!",
                 "Eccellente! Stai andando benissimo!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
 
         case .goodProgress:
             return [
@@ -327,7 +327,7 @@ final class StudyCoachPersonality {
                 "Vedo che stai migliorando molto!",
                 "Ottimo lavoro! Continua così!",
                 "Stai andando alla grande!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
 
         case .persistedThroughDifficulty:
             return [
@@ -335,7 +335,7 @@ final class StudyCoachPersonality {
                 "La tua determinazione è fantastica!",
                 "Continuare a provare è la cosa più importante!",
                 "Bravo per non mollare!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
 
         case .improvedUnderstanding:
             return [
@@ -343,7 +343,7 @@ final class StudyCoachPersonality {
                 "Vedi? Ce l'hai fatta!",
                 "Eccellente! Ora è tutto più chiaro!",
                 "Grande! Hai fatto un passo importante!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
         }
     }
 
@@ -356,7 +356,7 @@ final class StudyCoachPersonality {
                 "Right! Great work!",
                 "Nice! Keep it up!",
                 "Excellent! You're doing great!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
 
         case .goodProgress:
             return [
@@ -364,7 +364,7 @@ final class StudyCoachPersonality {
                 "I can see you're improving a lot!",
                 "Great work! Keep going!",
                 "You're doing amazing!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
 
         case .persistedThroughDifficulty:
             return [
@@ -372,7 +372,7 @@ final class StudyCoachPersonality {
                 "Your determination is fantastic!",
                 "Keeping trying is the most important thing!",
                 "Great job for not giving up!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
 
         case .improvedUnderstanding:
             return [
@@ -380,7 +380,7 @@ final class StudyCoachPersonality {
                 "See? You did it!",
                 "Excellent! It's all clear now!",
                 "Great! You've made an important step!"
-            ].randomElement()!
+            ].randomElement() ?? "Great!"
         }
     }
 
