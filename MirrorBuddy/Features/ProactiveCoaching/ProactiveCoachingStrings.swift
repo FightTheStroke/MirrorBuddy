@@ -403,7 +403,7 @@ enum ProactiveCoachingStrings {
 
     // MARK: - UI
 
-    enum UI {
+    enum UIConstants {
         static let dashboardTitle = NSLocalizedString(
             "proactive.coaching.ui.dashboard_title",
             value: "Coaching Proattivo",

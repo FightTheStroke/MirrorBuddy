@@ -158,6 +158,7 @@ final class DriveFileTracker {
 
     let modelContext: ModelContext
 
+    @available(*, unavailable, message: "Use init(modelContext:) instead")
     private init() {
         // Note: In production, modelContext should be injected
         // For now, we'll use a placeholder that will be set from the app

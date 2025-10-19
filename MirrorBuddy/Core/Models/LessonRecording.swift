@@ -198,6 +198,6 @@ extension Material {
     @Relationship(deleteRule: .cascade)
     var lessonRecordings: [LessonRecording]? {
         get { nil }  // Computed property, actual storage in LessonRecording
-        set { }
+        set { _ = newValue }
     }
 }

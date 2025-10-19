@@ -180,7 +180,7 @@ enum TaskCaptureStrings {
 
     // MARK: - UI
 
-    enum UI {
+    enum UIConstants {
         static let addTask = NSLocalizedString(
             "task.capture.ui.add_task",
             value: "Aggiungi Task",
