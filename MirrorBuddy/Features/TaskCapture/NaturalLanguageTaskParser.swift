@@ -60,11 +60,9 @@ struct NaturalLanguageTaskParser {
             "nuovo compito "
         ]
 
-        for prefix in reminderPrefixes {
-            if titleText.hasPrefix(prefix) {
-                titleText.removeFirst(prefix.count)
-                break
-            }
+        for prefix in reminderPrefixes where titleText.hasPrefix(prefix) {
+            titleText.removeFirst(prefix.count)
+            break
         }
 
         // Remove time/date suffixes
@@ -135,10 +133,8 @@ struct NaturalLanguageTaskParser {
         ]
 
         // Check for explicit subject mentions
-        for (keyword, subject) in subjectKeywords {
-            if text.contains(keyword) {
-                return subject
-            }
+        for (keyword, subject) in subjectKeywords where text.contains(keyword) {
+            return subject
         }
 
         // Fall back to current context if available
@@ -186,10 +182,8 @@ struct NaturalLanguageTaskParser {
             ("domenica", 1)
         ]
 
-        for (dayName, targetWeekday) in weekdays {
-            if text.contains(dayName) {
-                return nextDate(for: targetWeekday, from: today)
-            }
+        for (dayName, targetWeekday) in weekdays where text.contains(dayName) {
+            return nextDate(for: targetWeekday, from: today)
         }
 
         // Default to tomorrow if no explicit date
@@ -221,10 +215,8 @@ struct NaturalLanguageTaskParser {
             "critico"
         ]
 
-        for keyword in highPriorityKeywords {
-            if text.contains(keyword) {
-                return .high
-            }
+        for keyword in highPriorityKeywords where text.contains(keyword) {
+            return .high
         }
 
         // Low priority keywords
@@ -236,10 +228,8 @@ struct NaturalLanguageTaskParser {
             "prima o poi"
         ]
 
-        for keyword in lowPriorityKeywords {
-            if text.contains(keyword) {
-                return .low
-            }
+        for keyword in lowPriorityKeywords where text.contains(keyword) {
+            return .low
         }
 
         // Default to medium priority

@@ -323,12 +323,11 @@ final class KnowledgeExportService: ObservableObject {
 
         // Split summary into paragraphs
         let paragraphs = summary.components(separatedBy: "\n\n")
-        for paragraph in paragraphs {
-            if !paragraph.isEmpty {
-                children.append([
-                    "object": "block",
-                    "type": "paragraph",
-                    "paragraph": [
+        for paragraph in paragraphs where !paragraph.isEmpty {
+            children.append([
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": [
                         "rich_text": [["type": "text", "text": ["content": paragraph]]]
                     ]
                 ])

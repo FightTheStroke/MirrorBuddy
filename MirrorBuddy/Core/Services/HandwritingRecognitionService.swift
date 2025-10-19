@@ -196,12 +196,11 @@ final class HandwritingRecognitionService {
         for recognizedText in result.recognizedTexts {
             let text = recognizedText.text
 
-            for (pattern, type) in patterns {
-                if text.range(of: pattern, options: .regularExpression) != nil {
-                    expressions.append(MathExpression(
-                        text: text,
-                        type: type,
-                        confidence: recognizedText.confidence,
+            for (pattern, type) in patterns where text.range(of: pattern, options: .regularExpression) != nil {
+                expressions.append(MathExpression(
+                    text: text,
+                    type: type,
+                    confidence: recognizedText.confidence,
                         boundingBox: recognizedText.boundingBox
                     ))
                     break

@@ -384,12 +384,11 @@ final class VoiceCommandRegistry: ObservableObject {
             lowercasePhrase.hasPrefix("open material ") ||
             lowercasePhrase.hasPrefix("mostra materiale ") {
             let prefixes = ["apri materiale ", "open material ", "mostra materiale "]
-            for prefix in prefixes {
-                if lowercasePhrase.hasPrefix(prefix) {
-                    let titlePart = String(lowercasePhrase.dropFirst(prefix.count))
-                        .trimmingCharacters(in: .whitespaces)
-                    if !titlePart.isEmpty {
-                        return "title:\(titlePart)"
+            for prefix in prefixes where lowercasePhrase.hasPrefix(prefix) {
+                let titlePart = String(lowercasePhrase.dropFirst(prefix.count))
+                    .trimmingCharacters(in: .whitespaces)
+                if !titlePart.isEmpty {
+                    return "title:\(titlePart)"
                     }
                 }
             }

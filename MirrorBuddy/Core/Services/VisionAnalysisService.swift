@@ -414,12 +414,11 @@ final class VisionAnalysisService {
 
         // Extract key concepts (simple heuristic)
         let conceptKeywords = ["formula", "theorem", "definition", "formula", "teorema", "definizione"]
-        for keyword in conceptKeywords {
-            if content.localizedCaseInsensitiveContains(keyword) {
-                let lines = content.components(separatedBy: .newlines)
-                for line in lines where line.localizedCaseInsensitiveContains(keyword) {
-                    concepts.append(line.trimmingCharacters(in: .whitespaces))
-                }
+        for keyword in conceptKeywords where content.localizedCaseInsensitiveContains(keyword) {
+            let lines = content.components(separatedBy: .newlines)
+            for line in lines where line.localizedCaseInsensitiveContains(keyword) {
+                concepts.append(line.trimmingCharacters(in: .whitespaces))
+            }
             }
         }
 

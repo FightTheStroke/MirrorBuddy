@@ -104,11 +104,9 @@ final class BackgroundTaskScheduler {
 
         // Find next scheduled hour
         var nextSyncHour: Int?
-        for hour in scheduledSyncHours {
-            if hour > currentHour {
-                nextSyncHour = hour
-                break
-            }
+        for hour in scheduledSyncHours where hour > currentHour {
+            nextSyncHour = hour
+            break
         }
 
         // If no future hour today, use first hour tomorrow

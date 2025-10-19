@@ -123,11 +123,9 @@ final class TranscriptMergeService {
 
     /// Validate that chunks are continuous (no missing segments)
     private func validateChunkContinuity(_ sortedChunks: [TranscriptionResult]) throws {
-        for (index, chunk) in sortedChunks.enumerated() {
-            if chunk.segmentIndex != index {
-                logger.error("Missing chunk at index \(index). Found chunk with index \(chunk.segmentIndex)")
-                throw MergeError.discontinuousChunks(expected: index, found: chunk.segmentIndex)
-            }
+        for (index, chunk) in sortedChunks.enumerated() where chunk.segmentIndex != index {
+            logger.error("Missing chunk at index \(index). Found chunk with index \(chunk.segmentIndex)")
+            throw MergeError.discontinuousChunks(expected: index, found: chunk.segmentIndex)
         }
     }
 

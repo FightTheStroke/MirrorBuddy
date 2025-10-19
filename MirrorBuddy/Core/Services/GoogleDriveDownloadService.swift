@@ -541,11 +541,9 @@ final class GoogleDriveDownloadService: ObservableObject {
             return nil
         }
 
-        for file in files {
+        for file in files where file.lastPathComponent.contains(fileId) {
             // Match by file ID stored in extended attributes or filename
-            if file.lastPathComponent.contains(fileId) {
-                return file
-            }
+            return file
         }
 
         return nil

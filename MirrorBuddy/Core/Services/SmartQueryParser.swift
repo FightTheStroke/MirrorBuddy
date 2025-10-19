@@ -260,11 +260,9 @@ actor SmartQueryParser {
             "sostegno": "sostegno"
         ]
 
-        for (keyword, subject) in subjectMappings {
-            if query.contains(keyword) {
-                filters.append(.subject(subject))
-                break // Only one subject at a time
-            }
+        for (keyword, subject) in subjectMappings where query.contains(keyword) {
+            filters.append(.subject(subject))
+            break // Only one subject at a time
         }
 
         // Difficulty filters
