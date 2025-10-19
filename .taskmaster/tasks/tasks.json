@@ -3932,7 +3932,7 @@
         "dependencies": [
           "1"
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -3940,9 +3940,10 @@
             "description": "Detail the process for generating and managing code signing certificates, provisioning profiles, and entitlements required for deploying to TestFlight and the App Store.",
             "dependencies": [],
             "details": "Explain how to create and manage Apple Developer certificates, App IDs, and provisioning profiles in Xcode and Apple Developer Portal. Include steps for troubleshooting common code signing errors and best practices for secure certificate management.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Verify by creating a new certificate and provisioning profile, then building and archiving the app. Confirm the app can be installed on a test device.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:22.520Z"
           },
           {
             "id": 2,
@@ -3950,9 +3951,10 @@
             "description": "Provide a comprehensive guide for setting up a new app in App Store Connect, including app metadata, pricing, and availability.",
             "dependencies": [],
             "details": "Document how to create a new app record, configure app information (name, description, keywords, categories), set pricing and territories, and manage in-app purchases if applicable. Include screenshots and tips for avoiding common setup mistakes.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Follow the guide to create a new app in App Store Connect. Verify all metadata fields are correctly filled and match the intended app release.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:23.742Z"
           },
           {
             "id": 3,
@@ -3963,9 +3965,10 @@
               2
             ],
             "details": "Describe how to archive and upload builds from Xcode to TestFlight, create and manage internal and external tester groups, and monitor feedback and crash reports. Include instructions for inviting testers and handling beta review submissions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Upload a test build to TestFlight, invite testers, and confirm successful installation and feedback collection.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:24.943Z"
           },
           {
             "id": 4,
@@ -3976,9 +3979,10 @@
               2
             ],
             "details": "Explain how to prepare the app for submission (version number, build number, app icon, etc.), fill out App Store submission forms, respond to App Review feedback, and manage app updates. Include a checklist of required assets and common rejection reasons.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Simulate a full App Store submission (without final approval) and verify all steps are correctly documented and executable.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:26.113Z"
           },
           {
             "id": 5,
@@ -3991,9 +3995,10 @@
               4
             ],
             "details": "List every actionable item required for a successful deployment, including code signing, build configuration, metadata preparation, TestFlight setup, App Store submission, and post-release monitoring. Organize the checklist by phase (pre-release, release, post-release).",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Use the checklist to guide a test deployment and confirm no steps are missing or unclear.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:27.290Z"
           },
           {
             "id": 6,
@@ -4003,9 +4008,10 @@
               2
             ],
             "details": "Specify required screenshot sizes, formats, and content guidelines for all supported device types. Include tips for creating compelling visuals, localization requirements, and steps for uploading assets in App Store Connect.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Prepare and upload test screenshots and previews according to the guide, verifying they display correctly in App Store Connect.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:28.474Z"
           },
           {
             "id": 7,
@@ -4013,9 +4019,10 @@
             "description": "Explain how to create, host, and link a privacy policy that meets App Store guidelines.",
             "dependencies": [],
             "details": "Detail what must be included in the privacy policy (data collection, usage, sharing, etc.), how to host it online, and how to link it in App Store Connect. Provide a template or outline for common app scenarios.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Review the privacy policy against App Store guidelines and confirm the link works in the app submission.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:29.630Z"
           },
           {
             "id": 8,
@@ -4025,15 +4032,16 @@
               6
             ],
             "details": "Describe how to create press kits, promotional images, app descriptions, and social media assets. Include branding guidelines, tone of voice, and tips for maximizing App Store visibility. Provide templates and examples where possible.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Generate sample marketing materials using the guidelines and review for consistency and effectiveness.",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T14:56:30.921Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 8,
         "expansionPrompt": "Break down the deployment guide creation into subtasks covering code signing, App Store setup, TestFlight distribution, submission process, and required assets. Consider how to make the guide useful for both initial and ongoing deployments.",
-        "updatedAt": "2025-10-19T11:27:41.016Z"
+        "updatedAt": "2025-10-19T14:56:30.921Z"
       },
       {
         "id": "72",
@@ -7334,9 +7342,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-19T14:53:33.333Z",
+      "lastModified": "2025-10-19T14:56:30.924Z",
       "taskCount": 139,
-      "completedCount": 122,
+      "completedCount": 123,
       "tags": [
         "master"
       ]
