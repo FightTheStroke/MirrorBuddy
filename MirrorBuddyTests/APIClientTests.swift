@@ -1,3 +1,5 @@
+// swiftlint:disable file_length type_body_length function_body_length
+
 import Foundation
 @testable import MirrorBuddy
 import XCTest
@@ -31,7 +33,7 @@ final class APIClientTests: XCTestCase {
 
     func testOAuthTokenExchange() async throws {
         // Mock successful token response
-        let tokenResponse = """
+        let tokenResponse = Data("""
         {
             "access_token": "test_access_token",
             "refresh_token": "test_refresh_token",
@@ -39,17 +41,20 @@ final class APIClientTests: XCTestCase {
             "token_type": "Bearer",
             "scope": "https://www.googleapis.com/auth/drive.readonly"
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://oauth2.googleapis.com/token"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: tokenResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://oauth2.googleapis.com/token")!,
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -60,9 +65,13 @@ final class APIClientTests: XCTestCase {
         // Verify token response parsing would work
         let decoder = JSONDecoder()
         struct TokenResponse: Codable {
+            // swiftlint:disable:next identifier_name
             let access_token: String
+            // swiftlint:disable:next identifier_name
             let refresh_token: String?
+            // swiftlint:disable:next identifier_name
             let expires_in: Int?
+            // swiftlint:disable:next identifier_name
             let token_type: String
             let scope: String?
         }
@@ -76,24 +85,27 @@ final class APIClientTests: XCTestCase {
 
     func testOAuthTokenRefresh() async throws {
         // Mock refresh token response
-        let refreshResponse = """
+        let refreshResponse = Data("""
         {
             "access_token": "new_access_token",
             "expires_in": 3600,
             "token_type": "Bearer",
             "scope": "https://www.googleapis.com/auth/drive.readonly"
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://oauth2.googleapis.com/token"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: refreshResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://oauth2.googleapis.com/token")!,
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -101,9 +113,13 @@ final class APIClientTests: XCTestCase {
         // Verify refresh response parsing
         let decoder = JSONDecoder()
         struct TokenResponse: Codable {
+            // swiftlint:disable:next identifier_name
             let access_token: String
+            // swiftlint:disable:next identifier_name
             let refresh_token: String?
+            // swiftlint:disable:next identifier_name
             let expires_in: Int?
+            // swiftlint:disable:next identifier_name
             let token_type: String
         }
 
@@ -114,22 +130,25 @@ final class APIClientTests: XCTestCase {
 
     func testOAuthTokenExchangeFailure() async throws {
         // Mock error response
-        let errorResponse = """
+        let errorResponse = Data("""
         {
             "error": "invalid_grant",
             "error_description": "Bad Request"
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://oauth2.googleapis.com/token"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 400,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: errorResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://oauth2.googleapis.com/token")!,
-                    statusCode: 400,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -137,6 +156,7 @@ final class APIClientTests: XCTestCase {
         // Verify error can be parsed
         struct OAuthError: Codable {
             let error: String
+            // swiftlint:disable:next identifier_name
             let error_description: String
         }
 
@@ -150,7 +170,7 @@ final class APIClientTests: XCTestCase {
 
     func testFetchCalendarList() async throws {
         // Mock calendar list response
-        let calendarResponse = """
+        let calendarResponse = Data("""
         {
             "items": [
                 {
@@ -167,17 +187,20 @@ final class APIClientTests: XCTestCase {
                 }
             ]
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: ["Content-Type": "application/json"]
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: calendarResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList")!,
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: ["Content-Type": "application/json"]
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -206,7 +229,7 @@ final class APIClientTests: XCTestCase {
 
     func testFetchCalendarEvents() async throws {
         // Mock events response
-        let eventsResponse = """
+        let eventsResponse = Data("""
         {
             "items": [
                 {
@@ -237,17 +260,20 @@ final class APIClientTests: XCTestCase {
                 }
             ]
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: eventsResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events")!,
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -285,24 +311,27 @@ final class APIClientTests: XCTestCase {
 
     func testCalendarAPIUnauthorized() async throws {
         // Mock 401 Unauthorized response
-        let errorResponse = """
+        let errorResponse = Data("""
         {
             "error": {
                 "code": 401,
                 "message": "Request is missing required authentication credential."
             }
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 401,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: errorResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList")!,
-                    statusCode: 401,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -326,7 +355,7 @@ final class APIClientTests: XCTestCase {
 
     func testFetchDriveFileList() async throws {
         // Mock Drive files response
-        let filesResponse = """
+        let filesResponse = Data("""
         {
             "files": [
                 {
@@ -350,17 +379,20 @@ final class APIClientTests: XCTestCase {
             ],
             "nextPageToken": null
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://www.googleapis.com/drive/v3/files"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: filesResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://www.googleapis.com/drive/v3/files")!,
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -391,7 +423,7 @@ final class APIClientTests: XCTestCase {
 
     func testDriveFileSearch() async throws {
         // Mock search response
-        let searchResponse = """
+        let searchResponse = Data("""
         {
             "files": [
                 {
@@ -406,17 +438,20 @@ final class APIClientTests: XCTestCase {
             ],
             "nextPageToken": null
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://www.googleapis.com/drive/v3/files"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: searchResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://www.googleapis.com/drive/v3/files")!,
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
@@ -438,7 +473,7 @@ final class APIClientTests: XCTestCase {
 
     // MARK: - Request Formation Tests
 
-    func testOAuthRequestFormation() {
+    func testOAuthRequestFormation() throws {
         // Test OAuth authorization URL construction
         let clientID = "test_client_id"
         let redirectURI = "com.googleusercontent.apps.test_client_id:/oauth2redirect"
@@ -447,7 +482,7 @@ final class APIClientTests: XCTestCase {
             "https://www.googleapis.com/auth/calendar.readonly"
         ]
 
-        var components = URLComponents(string: "https://accounts.google.com/o/oauth2/v2/auth")!
+        var components = try XCTUnwrap(URLComponents(string: "https://accounts.google.com/o/oauth2/v2/auth"))
         components.queryItems = [
             URLQueryItem(name: "client_id", value: clientID),
             URLQueryItem(name: "redirect_uri", value: redirectURI),
@@ -457,16 +492,16 @@ final class APIClientTests: XCTestCase {
             URLQueryItem(name: "prompt", value: "consent")
         ]
 
-        let url = components.url!
+        let url = try XCTUnwrap(components.url)
         XCTAssertTrue(url.absoluteString.contains("client_id=test_client_id"))
         XCTAssertTrue(url.absoluteString.contains("response_type=code"))
         XCTAssertTrue(url.absoluteString.contains("access_type=offline"))
     }
 
-    func testCalendarAPIRequestHeaders() {
+    func testCalendarAPIRequestHeaders() throws {
         // Test calendar API request headers
         let accessToken = "test_access_token"
-        let url = URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList")!
+        let url = try XCTUnwrap(URL(string: "https://www.googleapis.com/calendar/v3/users/me/calendarList"))
 
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
@@ -474,10 +509,10 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(request.value(forHTTPHeaderField: "Authorization"), "Bearer test_access_token")
     }
 
-    func testDriveAPIQueryParameters() {
+    func testDriveAPIQueryParameters() throws {
         // Test Drive API query parameter construction
         let folderID = "test_folder_123"
-        var components = URLComponents(string: "https://www.googleapis.com/drive/v3/files")!
+        var components = try XCTUnwrap(URLComponents(string: "https://www.googleapis.com/drive/v3/files"))
         components.queryItems = [
             URLQueryItem(name: "q", value: "'\(folderID)' in parents and trashed = false"),
             URLQueryItem(name: "pageSize", value: "100"),
@@ -485,7 +520,7 @@ final class APIClientTests: XCTestCase {
             URLQueryItem(name: "orderBy", value: "name")
         ]
 
-        let url = components.url!
+        let url = try XCTUnwrap(components.url)
         XCTAssertTrue(url.absoluteString.contains("pageSize=100"))
         XCTAssertTrue(url.absoluteString.contains("orderBy=name"))
     }
@@ -507,7 +542,7 @@ final class APIClientTests: XCTestCase {
         )
 
         // Verify error can be handled
-        let url = URL(string: "https://example.com")!
+        let url = try XCTUnwrap(URL(string: "https://example.com"))
         let request = URLRequest(url: url)
 
         do {
@@ -522,30 +557,33 @@ final class APIClientTests: XCTestCase {
 
     func testHTTP500Error() async throws {
         // Mock server error
+        let responseURL = try XCTUnwrap(URL(string: "https://api.example.com"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 500,
+            httpVersion: nil,
+            headerFields: nil
+        ))
+
         MockURLProtocol.responseQueue.append(
             MockResponse(
-                data: "Internal Server Error".data(using: .utf8),
-                response: HTTPURLResponse(
-                    url: URL(string: "https://api.example.com")!,
-                    statusCode: 500,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                data: Data("Internal Server Error".utf8),
+                response: httpResponse,
                 error: nil
             )
         )
 
-        let url = URL(string: "https://api.example.com")!
+        let url = try XCTUnwrap(URL(string: "https://api.example.com"))
         let request = URLRequest(url: url)
 
         let (_, response) = try await mockURLSession.data(for: request)
-        let httpResponse = response as! HTTPURLResponse
-        XCTAssertEqual(httpResponse.statusCode, 500)
+        let httpResponseResult = try XCTUnwrap(response as? HTTPURLResponse)
+        XCTAssertEqual(httpResponseResult.statusCode, 500)
     }
 
     func testRateLimitError() async throws {
         // Mock rate limit error (429)
-        let rateLimitResponse = """
+        let rateLimitResponse = Data("""
         {
             "error": {
                 "code": 429,
@@ -553,28 +591,31 @@ final class APIClientTests: XCTestCase {
                 "status": "RESOURCE_EXHAUSTED"
             }
         }
-        """.data(using: .utf8)!
+        """.utf8)
+
+        let responseURL = try XCTUnwrap(URL(string: "https://www.googleapis.com/calendar/v3"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 429,
+            httpVersion: nil,
+            headerFields: ["Retry-After": "60"]
+        ))
 
         MockURLProtocol.responseQueue.append(
             MockResponse(
                 data: rateLimitResponse,
-                response: HTTPURLResponse(
-                    url: URL(string: "https://www.googleapis.com/calendar/v3")!,
-                    statusCode: 429,
-                    httpVersion: nil,
-                    headerFields: ["Retry-After": "60"]
-                )!,
+                response: httpResponse,
                 error: nil
             )
         )
 
-        let url = URL(string: "https://www.googleapis.com/calendar/v3")!
+        let url = try XCTUnwrap(URL(string: "https://www.googleapis.com/calendar/v3"))
         let request = URLRequest(url: url)
 
         let (data, response) = try await mockURLSession.data(for: request)
-        let httpResponse = response as! HTTPURLResponse
-        XCTAssertEqual(httpResponse.statusCode, 429)
-        XCTAssertEqual(httpResponse.value(forHTTPHeaderField: "Retry-After"), "60")
+        let httpResponseResult = try XCTUnwrap(response as? HTTPURLResponse)
+        XCTAssertEqual(httpResponseResult.statusCode, 429)
+        XCTAssertEqual(httpResponseResult.value(forHTTPHeaderField: "Retry-After"), "60")
 
         struct RateLimitError: Codable {
             struct ErrorDetail: Codable {
@@ -592,13 +633,13 @@ final class APIClientTests: XCTestCase {
     // MARK: - Response Parsing Tests
 
     func testJSONParsingSuccess() throws {
-        let jsonData = """
+        let jsonData = Data("""
         {
             "id": "123",
             "name": "Test",
             "created_at": "2025-01-01T00:00:00Z"
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         struct TestModel: Codable {
             let id: String
@@ -617,8 +658,8 @@ final class APIClientTests: XCTestCase {
         XCTAssertEqual(model.name, "Test")
     }
 
-    func testJSONParsingInvalidFormat() {
-        let invalidJSON = "{ invalid json }".data(using: .utf8)!
+    func testJSONParsingInvalidFormat() throws {
+        let invalidJSON = Data("{ invalid json }".utf8)
 
         struct TestModel: Codable {
             let id: String
@@ -628,12 +669,12 @@ final class APIClientTests: XCTestCase {
         XCTAssertThrowsError(try decoder.decode(TestModel.self, from: invalidJSON))
     }
 
-    func testJSONParsingMissingRequiredField() {
-        let jsonData = """
+    func testJSONParsingMissingRequiredField() throws {
+        let jsonData = Data("""
         {
             "id": "123"
         }
-        """.data(using: .utf8)!
+        """.utf8)
 
         struct TestModel: Codable {
             let id: String
@@ -656,21 +697,24 @@ final class APIClientTests: XCTestCase {
             )
         )
 
+        let responseURL = try XCTUnwrap(URL(string: "https://api.example.com"))
+        let httpResponse = try XCTUnwrap(HTTPURLResponse(
+            url: responseURL,
+            statusCode: 200,
+            httpVersion: nil,
+            headerFields: nil
+        ))
+
         MockURLProtocol.responseQueue.append(
             MockResponse(
-                data: "Success".data(using: .utf8),
-                response: HTTPURLResponse(
-                    url: URL(string: "https://api.example.com")!,
-                    statusCode: 200,
-                    httpVersion: nil,
-                    headerFields: nil
-                )!,
+                data: Data("Success".utf8),
+                response: httpResponse,
                 error: nil
             )
         )
 
         // Test retry logic pattern
-        let url = URL(string: "https://api.example.com")!
+        let url = try XCTUnwrap(URL(string: "https://api.example.com"))
         let request = URLRequest(url: url)
         var attempts = 0
         let maxRetries = 2

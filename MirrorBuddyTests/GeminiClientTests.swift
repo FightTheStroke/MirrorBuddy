@@ -241,7 +241,7 @@ struct GeminiClientTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = jsonData(&.utf8)
         let decoder = JSONDecoder()
         let candidate = try decoder.decode(GeminiCandidate.self, from: data)
 
@@ -260,7 +260,7 @@ struct GeminiClientTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = jsonData(&.utf8)
         let decoder = JSONDecoder()
         let usage = try decoder.decode(GeminiUsageMetadata.self, from: data)
 
@@ -320,7 +320,7 @@ struct GeminiClientTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = jsonData(&.utf8)
         let decoder = JSONDecoder()
         let errorResponse = try decoder.decode(GeminiErrorResponse.self, from: data)
 
@@ -377,7 +377,7 @@ struct GeminiClientTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = jsonData(&.utf8)
         let decoder = JSONDecoder()
         let result = try decoder.decode(DriveAnalysisResult.self, from: data)
 
@@ -400,7 +400,7 @@ struct GeminiClientTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = jsonData(&.utf8)
         let decoder = JSONDecoder()
         let event = try decoder.decode(CalendarEventData.self, from: data)
 
@@ -423,7 +423,7 @@ struct GeminiClientTests {
         }
         """
 
-        let data = json.data(using: .utf8)!
+        let data = jsonData(&.utf8)
         let decoder = JSONDecoder()
         let assignment = try decoder.decode(AssignmentData.self, from: data)
 

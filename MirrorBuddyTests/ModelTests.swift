@@ -1,3 +1,5 @@
+// swiftlint:disable type_body_length
+
 @testable import MirrorBuddy
 import SwiftData
 import XCTest
@@ -62,9 +64,9 @@ final class ModelTests: XCTestCase {
 
         material.markAccessed()
 
-        XCTAssertNotNil(material.lastAccessedAt)
+        let lastAccessedAt = try XCTUnwrap(material.lastAccessedAt)
         XCTAssertLessThanOrEqual(
-            abs(material.lastAccessedAt!.timeIntervalSinceNow),
+            abs(lastAccessedAt.timeIntervalSinceNow),
             1.0,
             "Last accessed should be within 1 second"
         )
@@ -161,9 +163,9 @@ final class ModelTests: XCTestCase {
         task.complete()
 
         XCTAssertTrue(task.isCompleted)
-        XCTAssertNotNil(task.completedAt)
+        let completedAt = try XCTUnwrap(task.completedAt)
         XCTAssertLessThanOrEqual(
-            abs(task.completedAt!.timeIntervalSinceNow),
+            abs(completedAt.timeIntervalSinceNow),
             1.0
         )
     }
@@ -186,20 +188,20 @@ final class ModelTests: XCTestCase {
         XCTAssertFalse(taskNoDue.isOverdue)
 
         // Task with past due date
-        let pastDate = Calendar.current.date(
+        let pastDate = try XCTUnwrap(Calendar.current.date(
             byAdding: .day,
             value: -1,
             to: Date()
-        )!
+        ))
         let overdueTask = Task(title: "Overdue", dueDate: pastDate)
         XCTAssertTrue(overdueTask.isOverdue)
 
         // Task with future due date
-        let futureDate = Calendar.current.date(
+        let futureDate = try XCTUnwrap(Calendar.current.date(
             byAdding: .day,
             value: 1,
             to: Date()
-        )!
+        ))
         let futureTask = Task(title: "Future", dueDate: futureDate)
         XCTAssertFalse(futureTask.isOverdue)
 
@@ -210,20 +212,20 @@ final class ModelTests: XCTestCase {
 
     func testTaskIsDueSoon() throws {
         // Task within next 24 hours
-        let tomorrow = Calendar.current.date(
+        let tomorrow = try XCTUnwrap(Calendar.current.date(
             byAdding: .hour,
             value: 12,
             to: Date()
-        )!
+        ))
         let soonTask = Task(title: "Due Soon", dueDate: tomorrow)
         XCTAssertTrue(soonTask.isDueSoon)
 
         // Task beyond 24 hours
-        let laterDate = Calendar.current.date(
+        let laterDate = try XCTUnwrap(Calendar.current.date(
             byAdding: .day,
             value: 2,
             to: Date()
-        )!
+        ))
         let laterTask = Task(title: "Due Later", dueDate: laterDate)
         XCTAssertFalse(laterTask.isDueSoon)
     }
@@ -360,11 +362,11 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(progress.currentStreak, 1)
 
         // Simulate next day
-        let tomorrow = Calendar.current.date(
+        let tomorrow = try XCTUnwrap(Calendar.current.date(
             byAdding: .day,
             value: 1,
             to: Calendar.current.startOfDay(for: Date())
-        )!
+        ))
         progress.lastStudyDate = Calendar.current.date(
             byAdding: .day,
             value: -1,
@@ -490,19 +492,19 @@ final class ModelTests: XCTestCase {
         XCTAssertTrue(flashcard.isDue)
 
         // After review, set next review date to future
-        flashcard.nextReviewDate = Calendar.current.date(
+        flashcard.nextReviewDate = try XCTUnwrap(Calendar.current.date(
             byAdding: .day,
             value: 1,
             to: Date()
-        )!
+        ))
         XCTAssertFalse(flashcard.isDue)
 
         // Set to past date
-        flashcard.nextReviewDate = Calendar.current.date(
+        flashcard.nextReviewDate = try XCTUnwrap(Calendar.current.date(
             byAdding: .day,
             value: -1,
             to: Date()
-        )!
+        ))
         XCTAssertTrue(flashcard.isDue)
     }
 
