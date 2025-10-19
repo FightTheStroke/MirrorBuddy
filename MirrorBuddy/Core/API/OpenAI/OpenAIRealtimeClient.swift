@@ -411,7 +411,7 @@ enum ConversationItem: Codable {
 
 struct ConversationMessage: Codable {
     let id: String
-    let type: String = "message"
+    var type: String = "message"
     let role: String
     let content: [MessageContent]
 }

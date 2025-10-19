@@ -90,7 +90,7 @@ final class AudioPipelineManager: NSObject {
                 .playAndRecord,
                 mode: .voiceChat,
                 options: [
-                    .allowBluetooth,
+                    .allowBluetoothHFP,
                     .allowBluetoothA2DP,
                     .allowAirPlay,
                     .defaultToSpeaker,
@@ -687,3 +687,4 @@ enum AudioPipelineError: LocalizedError {
         }
     }
 }
+

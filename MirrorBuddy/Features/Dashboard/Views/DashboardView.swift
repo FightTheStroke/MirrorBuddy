@@ -15,8 +15,40 @@ struct DashboardView: View {
     @EnvironmentObject var voiceCommandHandler: AppVoiceCommandHandler
     @Query private var materials: [Material]
     @Query private var subjects: [SubjectEntity]
+    @Query private var userProgress: [UserProgress]
+    @Query private var tasks: [Task]
+
     @State private var showingImport = false
     @State private var selectedMaterial: Material?
+    @State private var showingStreakHistory = false
+    @State private var showingGoalSettings = false
+
+    private var currentProgress: UserProgress {
+        if let progress = userProgress.first {
+            return progress
+        } else {
+            let newProgress = UserProgress()
+            modelContext.insert(newProgress)
+            return newProgress
+        }
+    }
+
+    private var todayPriorities: [Material] {
+        calculatePriorities()
+    }
+
+    private var completedToday: Int {
+        tasks.filter { task in
+            guard task.isCompleted, let completedAt = task.completedAt else { return false }
+            return Calendar.current.isDateInToday(completedAt)
+        }.count
+    }
+
+    private var upcomingDeadlines: Int {
+        tasks.filter { task in
+            !task.isCompleted && (task.isDueSoon || task.isOverdue)
+        }.count
+    }
 
     var body: some View {
         NavigationStack {
@@ -26,9 +58,21 @@ struct DashboardView: View {
 
                 ScrollView {
                     VStack(spacing: 20) {
+                        // Task 137.2: Today Card with personalized priorities
+                        TodayCard(
+                            todayPriorities: todayPriorities,
+                            studyStreak: currentProgress.currentStreak,
+                            completedToday: completedToday,
+                            upcomingDeadlines: upcomingDeadlines
+                        )
+                        .padding(.horizontal)
+                        .padding(.top)
+                        .onTapGesture {
+                            showingStreakHistory = true
+                        }
+
                         // Big "Aggiornami" button - front and center
                         UpdateButtonView()
-                            .padding(.top)
 
                         QuickActionsSection(showingImport: $showingImport)
                         MaterialsSection(
@@ -39,6 +83,9 @@ struct DashboardView: View {
                         )
                     }
                     .padding(.vertical)
+                }
+                .refreshable {
+                    await refreshDashboardData()
                 }
             }
             .navigationTitle("MirrorBuddy")
@@ -64,6 +111,12 @@ struct DashboardView: View {
             .sheet(item: $selectedMaterial) { material in
                 MaterialDetailView(material: material)
             }
+            .sheet(isPresented: $showingStreakHistory) {
+                StreakHistoryView(userProgress: currentProgress)
+            }
+            .sheet(isPresented: $showingGoalSettings) {
+                GoalSettingsView(userProgress: currentProgress)
+            }
             // Task 112: Voice command material detail navigation (enhanced with smart parsing)
             .onChange(of: voiceCommandHandler.selectedMaterialID) { _, materialQuery in
                 guard let materialQuery = materialQuery else { return }
@@ -83,6 +136,83 @@ struct DashboardView: View {
                 // Reset flag
                 voiceCommandHandler.selectedMaterialID = nil
             }
+        }
+    }
+
+    // MARK: - Data Functions (Task 137.3)
+
+    /// Calculate priority materials for today based on deadlines, readiness, and activity
+    private func calculatePriorities() -> [Material] {
+        let calendar = Calendar.current
+        let now = Date()
+
+        let scoredMaterials = materials.map { material -> (material: Material, score: Double) in
+            var score: Double = 0
+
+            // 1. Deadline proximity (highest weight: 100 points max)
+            if let task = material.tasks?.first(where: { !$0.isCompleted }), let dueDate = task.dueDate {
+                let daysUntil = calendar.dateComponents([.day], from: now, to: dueDate).day ?? 999
+                if daysUntil < 0 {
+                    score += 100 // Overdue - highest priority
+                } else if daysUntil == 0 {
+                    score += 90 // Due today
+                } else if daysUntil == 1 {
+                    score += 70 // Due tomorrow
+                } else if daysUntil <= 3 {
+                    score += 50 // Due in 3 days
+                } else if daysUntil <= 7 {
+                    score += 30 // Due this week
+                } else {
+                    score += 10 // Future deadline
+                }
+            }
+
+            // 2. Has study assets ready (40 points max)
+            if material.mindMap != nil {
+                score += 20 // Mind map available
+            }
+            if !(material.flashcards?.isEmpty ?? true) {
+                score += 20 // Flashcards available
+            }
+
+            // 3. Recent activity (20 points max)
+            if let lastAccessed = material.lastAccessedAt {
+                let hoursSince = calendar.dateComponents([.hour], from: lastAccessed, to: now).hour ?? 999
+                if hoursSince <= 24 {
+                    score += 20 // Studied today
+                } else if hoursSince <= 48 {
+                    score += 10 // Studied yesterday
+                }
+            }
+
+            // 4. New materials never accessed (15 points)
+            if material.lastAccessedAt == nil && material.processingStatus == .completed {
+                score += 15
+            }
+
+            // 5. Processing completed (5 points)
+            if material.processingStatus == .completed {
+                score += 5
+            }
+
+            return (material, score)
+        }
+
+        // Sort by score descending and return top 3
+        return scoredMaterials
+            .sorted { $0.score > $1.score }
+            .prefix(3)
+            .map { $0.material }
+    }
+
+    /// Refresh dashboard data from Google Calendar and other services
+    private func refreshDashboardData() async {
+        do {
+            try await GoogleCalendarService.shared.syncCalendarEvents()
+            currentProgress.updateStreak()
+            try? modelContext.save()
+        } catch {
+            print("Error refreshing dashboard: \(error)")
         }
     }
 }

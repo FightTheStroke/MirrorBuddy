@@ -774,6 +774,9 @@
     "Continua con queste chiavi" : {
 
     },
+    "Continua Conversazione" : {
+
+    },
     "Continua Registrazione" : {
 
     },
@@ -876,6 +879,9 @@
 
     },
     "Doppio tap per %@" : {
+
+    },
+    "Doppio tocco per parlare con MirrorBuddy" : {
 
     },
     "Due date" : {
@@ -1166,6 +1172,9 @@
     "Ferma" : {
 
     },
+    "Ferma ascolto" : {
+
+    },
     "Ferma conversazione" : {
 
     },
@@ -1332,6 +1341,9 @@
 
     },
     "Inizia" : {
+
+    },
+    "Inizia ascolto" : {
 
     },
     "Inizia conversazione" : {
@@ -1709,6 +1721,9 @@
     "Nessun materiale" : {
 
     },
+    "Nessun materiale in scadenza oggi" : {
+
+    },
     "Nessun traguardo sbloccato ancora" : {
 
     },
@@ -1767,6 +1782,9 @@
 
     },
     "Offline" : {
+
+    },
+    "Oggi" : {
 
     },
     "OK" : {
@@ -1830,6 +1848,9 @@
 
     },
     "Photo" : {
+
+    },
+    "Posso aiutarti con i compiti, navigare l'app, e molto altro." : {
 
     },
     "Predefinito" : {
@@ -2088,9 +2109,6 @@
 
     },
     "Start studying linked material" : {
-
-    },
-    "Start Voice Help" : {
 
     },
     "Statistiche" : {
@@ -2489,6 +2507,9 @@
     "Tocca per parlare" : {
 
     },
+    "Tocca per parlare!" : {
+
+    },
     "Tonalità" : {
 
     },
@@ -2513,7 +2534,13 @@
     "Tutte le lingue" : {
 
     },
+    "Tutto fatto!" : {
+
+    },
     "Tutto Pronto!" : {
+
+    },
+    "Usa il pulsante vocale (in basso a destra) per ottenere aiuto" : {
 
     },
     "Useremo Google solo per l'autenticazione e la sincronizzazione dei dati" : {

@@ -119,24 +119,13 @@ struct MainTabView: View {
             UITabBar.appearance().scrollEdgeAppearance = appearance
         }
 
-            // MARK: - Smart Voice Button (Task 139.3: Unified voice entry point)
+            // MARK: - Smart Voice Button (Task 139.3 + Task 113: Unified voice entry point with safe positioning)
             // Single floating button for all voice interactions (commands + conversation)
-            GeometryReader { geometry in
-                VStack {
-                    Spacer()
-                    HStack {
-                        Spacer()
-
-                        // Smart Voice Button - Unified commands and conversation (Task 139)
-                        SmartVoiceButton()
-                            .padding(.trailing, max(16, geometry.safeAreaInsets.trailing + 8))
-                            .padding(.bottom, geometry.safeAreaInsets.bottom + 90)
-                            .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
-                    }
-                }
-            }
-            .ignoresSafeArea(edges: .bottom)
-            .allowsHitTesting(true)
+            // Task 113: Now handles its own safe area positioning, orientation, and keyboard awareness
+            SmartVoiceButton()
+                .shadow(color: .black.opacity(0.2), radius: 8, y: 4)
+                .ignoresSafeArea(edges: .bottom)
+                .allowsHitTesting(true)
 
             // MARK: - Voice Command Feedback (Task 103)
             // Global feedback overlay for voice commands

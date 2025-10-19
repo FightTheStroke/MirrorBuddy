@@ -71,7 +71,7 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
             try audioSession.setCategory(
                 .playAndRecord,
                 mode: .default,
-                options: [.defaultToSpeaker, .allowBluetooth]
+                options: [.defaultToSpeaker, .allowBluetoothHFP]
             )
 
             // Enable background audio
@@ -85,9 +85,17 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
 
     /// Request microphone permission
     func requestMicrophonePermission() async -> Bool {
-        await withCheckedContinuation { continuation in
-            AVAudioSession.sharedInstance().requestRecordPermission { granted in
-                continuation.resume(returning: granted)
+        if #available(iOS 17.0, *) {
+            return await withCheckedContinuation { continuation in
+                AVAudioApplication.requestRecordPermission { granted in
+                    continuation.resume(returning: granted)
+                }
+            }
+        } else {
+            return await withCheckedContinuation { continuation in
+                AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                    continuation.resume(returning: granted)
+                }
             }
         }
     }
@@ -685,3 +693,4 @@ enum RecordingError: LocalizedError {
         }
     }
 }
+
