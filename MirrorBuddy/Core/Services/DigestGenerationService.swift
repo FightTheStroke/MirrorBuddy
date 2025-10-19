@@ -308,8 +308,8 @@ final class DigestGenerationService {
 
         // Subject-based suggestions
         let struggling = metrics.subjectPerformance.filter { $0.performanceLevel == .struggling }
-        if !struggling.isEmpty {
-            suggestions.append("Consider extra practice in \(struggling.first!.subjectName)")
+        if !struggling.isEmpty, let firstStruggling = struggling.first {
+            suggestions.append("Consider extra practice in \(firstStruggling.subjectName)")
         }
 
         // Study time suggestions

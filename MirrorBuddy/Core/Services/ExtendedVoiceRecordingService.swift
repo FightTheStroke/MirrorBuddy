@@ -122,10 +122,11 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
         }
 
         // Generate session identifier
-        sessionIdentifier = UUID().uuidString
+        let newSessionID = UUID().uuidString
+        sessionIdentifier = newSessionID
 
         // Create recording URL
-        let recordingURL = try createRecordingURL(sessionID: self.sessionIdentifier!)
+        let recordingURL = try createRecordingURL(sessionID: newSessionID)
         currentRecordingURL = recordingURL
 
         // Configure audio recorder with AAC compression

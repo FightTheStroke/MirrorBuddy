@@ -25,14 +25,17 @@ final class AudioPipelineManager: NSObject {
     private let playerNode = AVAudioPlayerNode()
 
     /// Audio format for recording (PCM16 24kHz mono)
-    private var recordingFormat: AVAudioFormat {
-        AVAudioFormat(
+    private lazy var recordingFormat: AVAudioFormat = {
+        guard let format = AVAudioFormat(
             commonFormat: .pcmFormatInt16,
             sampleRate: 24_000,
             channels: 1,
             interleaved: false
-        )!
-    }
+        ) else {
+            fatalError("Failed to create audio format with standard PCM16 24kHz configuration")
+        }
+        return format
+    }()
 
     /// Whether audio pipeline is active
     private(set) var isActive = false
@@ -390,7 +393,10 @@ final class AudioPipelineManager: NSObject {
     /// Convert PCM buffer to Data
     private func bufferToData(_ buffer: AVAudioPCMBuffer) -> Data {
         let audioBuffer = buffer.audioBufferList.pointee.mBuffers
-        return Data(bytes: audioBuffer.mData!, count: Int(audioBuffer.mDataByteSize))
+        guard let mData = audioBuffer.mData else {
+            return Data()
+        }
+        return Data(bytes: mData, count: Int(audioBuffer.mDataByteSize))
     }
 
     /// Convert Data to audio buffer
