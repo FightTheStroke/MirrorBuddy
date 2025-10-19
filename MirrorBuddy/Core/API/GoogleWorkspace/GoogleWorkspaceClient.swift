@@ -85,7 +85,7 @@ final class GoogleWorkspaceClient {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.httpBody = "token=\(token.accessToken)".data(using: .utf8)
+        request.httpBody = Data("token=\(token.accessToken)".utf8)
 
         let (_, response) = try await urlSession.data(for: request)
 

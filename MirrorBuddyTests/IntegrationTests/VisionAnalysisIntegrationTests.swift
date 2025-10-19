@@ -49,7 +49,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: visionResponse, statusCode: 200, delay: 0.5)
@@ -75,7 +75,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: ocrResponse, statusCode: 200, delay: 0.5)
@@ -101,7 +101,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: diagramResponse, statusCode: 200, delay: 0.5)
@@ -127,7 +127,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: problemResponse, statusCode: 200, delay: 0.6)
@@ -154,7 +154,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: chemResponse, statusCode: 200, delay: 0.5)
@@ -180,7 +180,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: graphResponse, statusCode: 200, delay: 0.5)
@@ -206,7 +206,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: tableResponse, statusCode: 200, delay: 0.5)
@@ -232,7 +232,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 }
             }]
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: errorResponse, statusCode: 200, delay: 0.5)
@@ -256,7 +256,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                 "code": "image_quality_error"
             }
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(data: qualityResponse, statusCode: 400, delay: 0.3)
@@ -289,7 +289,7 @@ final class VisionAnalysisIntegrationTests: XCTestCase {
                     }
                 }]
             }
-            """.data(using: .utf8) ?? Data()
+            ""Data(".utf8) ?? Data()
 
             MockURLProtocol.responseQueue.append(
                 MockURLProtocol.MockResponse(data: response, statusCode: 200, delay: 0.5)

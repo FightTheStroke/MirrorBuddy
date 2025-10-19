@@ -50,7 +50,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "token_type": "Bearer",
             "scope": "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly"
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -88,7 +88,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "token_type": "Bearer",
             "scope": "https://www.googleapis.com/auth/gmail.readonly"
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -177,7 +177,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "nextPageToken": "page2_token",
             "resultSizeEstimate": 3
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -223,7 +223,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             },
             "internalDate": "1729529400000"
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -252,7 +252,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     /// Test 7: Gmail attachment download
     func testGmailAttachmentDownload() async throws {
         // Given: Mock attachment data
-        let attachmentData = "VGVzdCBQREYgY29udGVudA==".data(using: .utf8) ?? Data()
+        let attachmentData = "VGVzdCBQREYgY29udGVudA==Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -285,7 +285,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             ],
             "resultSizeEstimate": 2
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -333,7 +333,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             ],
             "nextPageToken": null
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -370,7 +370,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             "end": {"dateTime": "2024-10-27T17:00:00-07:00"},
             "status": "confirmed"
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -412,7 +412,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
                 "timeZone": "America/New_York"
             }
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -462,7 +462,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
             ],
             "nextPageToken": null
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -490,7 +490,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     /// Test 13: Drive file download
     func testDriveFileDownload() async throws {
         // Given: Mock file content
-        let fileContent = "Sample PDF content data".data(using: .utf8) ?? Data()
+        let fileContent = "Sample PDF content dataData(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
@@ -523,7 +523,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
                 "status": "NOT_FOUND"
             }
         }
-        """.data(using: .utf8) ?? Data()
+        ""Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
