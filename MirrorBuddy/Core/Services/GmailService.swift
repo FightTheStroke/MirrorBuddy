@@ -315,8 +315,8 @@ final class GmailService {
         // Extract description
         let description = extractDescription(from: message.body)
 
-        // Extract due date
-        let dueDate = extractDueDate(from: message.body) ?? Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+        // Extract due date (fallback to 7 days from now, or current date if calendar calculation fails)
+        let dueDate = extractDueDate(from: message.body) ?? (Calendar.current.date(byAdding: .day, value: 7, to: Date()) ?? Date())
 
         // Infer subject
         let subject = inferSubject(from: message)

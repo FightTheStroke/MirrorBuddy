@@ -243,10 +243,10 @@ actor MathPracticeGenerator {
 
     private func generateTrigonometryProblem(difficulty: DifficultyLevel, index: Int) -> MathProblem {
         let angles = [30, 45, 60, 90]
-        let angle = angles.randomElement()!
+        let angle = angles.randomElement() ?? 45
 
         let sinValues: [Int: Double] = [30: 0.5, 45: 0.707, 60: 0.866, 90: 1.0]
-        let sinValue = sinValues[angle]!
+        let sinValue = sinValues[angle] ?? 0.707
 
         return MathProblem(
             question: "What is sin(\(angle)°)?",

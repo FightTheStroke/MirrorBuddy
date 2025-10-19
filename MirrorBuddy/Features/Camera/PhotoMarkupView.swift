@@ -226,7 +226,7 @@ extension PhotoMarkupViewModel: PKCanvasViewDelegate {
 
 #Preview {
     PhotoMarkupView(
-        image: UIImage(systemName: "photo")!,
+        image: UIImage(systemName: "photo") ?? UIImage(),
         onSave: { _ in },
         onCancel: {}
     )

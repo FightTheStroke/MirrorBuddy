@@ -33,7 +33,7 @@ final class WeeklyDigestService {
     /// - Returns: Aggregated weekly metrics
     func aggregateWeeklyMetrics(
         for userProgress: UserProgress,
-        startDate: Date = Calendar.current.date(byAdding: .day, value: -7, to: Date())!,
+        startDate: Date = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date(),
         endDate: Date = Date()
     ) async throws -> WeeklyMetrics {
         logger.info("Aggregating weekly metrics from \(startDate) to \(endDate)")

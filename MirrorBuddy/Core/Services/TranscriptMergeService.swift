@@ -67,8 +67,11 @@ final class TranscriptMergeService {
         }
 
         // Calculate overall duration
-        let startTime = sortedChunks.first!.startTime
-        let endTime = sortedChunks.last!.endTime
+        guard let firstChunk = sortedChunks.first, let lastChunk = sortedChunks.last else {
+            throw MergeError.noTranscripts
+        }
+        let startTime = firstChunk.startTime
+        let endTime = lastChunk.endTime
         let totalDuration = endTime - startTime
 
         logger.info("""

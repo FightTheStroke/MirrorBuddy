@@ -95,8 +95,12 @@ final class DriveSyncService {
 
         // Fetch all changes
         repeat {
+            guard let currentToken = nextPageToken else {
+                break
+            }
+
             let changeList = try await driveClient.getChanges(
-                startPageToken: nextPageToken!,
+                startPageToken: currentToken,
                 pageSize: 100
             )
 

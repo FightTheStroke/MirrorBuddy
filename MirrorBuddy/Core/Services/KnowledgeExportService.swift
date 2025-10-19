@@ -346,7 +346,9 @@ final class KnowledgeExportService: ObservableObject {
         notionToken: String,
         parentPageID: String
     ) async throws -> String {
-        let url = URL(string: "https://api.notion.com/v1/pages")!
+        guard let url = URL(string: "https://api.notion.com/v1/pages") else {
+            throw ExportError.invalidConfiguration("Invalid Notion API URL")
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(notionToken)", forHTTPHeaderField: "Authorization")

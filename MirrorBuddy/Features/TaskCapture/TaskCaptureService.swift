@@ -218,7 +218,7 @@ final class TaskCaptureService: NSObject, ObservableObject {
         var plan = TaskCaptureStrings.NightlyPlan.greeting + " "
 
         let today = Calendar.current.startOfDay(for: Date())
-        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) ?? today
 
         // Tasks completed today
         let completedToday = savedTasks.filter { task in

@@ -15,7 +15,7 @@ struct StudyStatisticsView: View {
     }
 
     private var weekSessions: [StudySession] {
-        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date()
         return sessions.filter { $0.date >= weekAgo }
     }
 

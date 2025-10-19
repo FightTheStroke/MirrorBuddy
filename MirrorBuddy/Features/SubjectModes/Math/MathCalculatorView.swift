@@ -265,7 +265,9 @@ final class MathCalculator: ObservableObject {
             handleDecimal()
 
         case .add, .subtract, .multiply, .divide, .power:
-            handleOperation(button.operation!)
+            if let operation = button.operation {
+                handleOperation(operation)
+            }
 
         case .equals:
             handleEquals()

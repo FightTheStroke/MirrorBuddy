@@ -393,9 +393,11 @@ struct NotionSetupView: View {
                     SecureField("secret_xxx...", text: $token)
                         .textContentType(.password)
 
-                    Link(destination: URL(string: "https://www.notion.so/my-integrations")!) {
-                        Label("Create integration token", systemImage: "arrow.up.right.square")
-                            .font(.caption)
+                    if let notionURL = URL(string: "https://www.notion.so/my-integrations") {
+                        Link(destination: notionURL) {
+                            Label("Create integration token", systemImage: "arrow.up.right.square")
+                                .font(.caption)
+                        }
                     }
                 }
 
@@ -409,8 +411,10 @@ struct NotionSetupView: View {
                 }
 
                 Section {
-                    Link(destination: URL(string: "https://developers.notion.com/docs/create-a-notion-integration")!) {
-                        Label("Learn more about Notion integrations", systemImage: "book.fill")
+                    if let docsURL = URL(string: "https://developers.notion.com/docs/create-a-notion-integration") {
+                        Link(destination: docsURL) {
+                            Label("Learn more about Notion integrations", systemImage: "book.fill")
+                        }
                     }
                 }
             }

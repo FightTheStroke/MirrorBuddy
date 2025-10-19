@@ -256,7 +256,7 @@ struct WeeklyDigestSettingsView: View {
     private func hourName(for hour: Int) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:00 a"
-        let date = Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date())!
+        let date = Calendar.current.date(bySettingHour: hour, minute: 0, second: 0, of: Date()) ?? Date()
         return formatter.string(from: date)
     }
 }

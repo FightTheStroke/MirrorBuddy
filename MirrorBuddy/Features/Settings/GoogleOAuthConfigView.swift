@@ -27,13 +27,15 @@ struct GoogleOAuthConfigView: View {
 
             Section {
                 VStack(alignment: .leading, spacing: 8) {
-                    Link(destination: URL(string: "https://console.cloud.google.com/apis/credentials")!) {
-                        HStack {
-                            Image(systemName: "link")
-                            Text("Apri Google Cloud Console")
-                            Spacer()
-                            Image(systemName: "arrow.up.right")
-                                .font(.caption)
+                    if let consoleURL = URL(string: "https://console.cloud.google.com/apis/credentials") {
+                        Link(destination: consoleURL) {
+                            HStack {
+                                Image(systemName: "link")
+                                Text("Apri Google Cloud Console")
+                                Spacer()
+                                Image(systemName: "arrow.up.right")
+                                    .font(.caption)
+                            }
                         }
                     }
                 }

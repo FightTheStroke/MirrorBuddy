@@ -13,7 +13,7 @@ struct StudyInsightsView: View {
         let calendar = Calendar.current
 
         for i in 0..<7 {
-            let date = calendar.date(byAdding: .day, value: -i, to: Date())!
+            let date = calendar.date(byAdding: .day, value: -i, to: Date()) ?? Date()
             let startOfDay = calendar.startOfDay(for: date)
             let daySessions = sessions.filter { session in
                 calendar.isDate(session.date, inSameDayAs: date)
