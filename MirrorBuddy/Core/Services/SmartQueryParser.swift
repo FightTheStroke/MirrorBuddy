@@ -126,14 +126,23 @@ actor SmartQueryParser {
     // MARK: - Public API
 
     /// Parse a natural language query into structured query components
+    /// Enhanced with Task 115 features: temporal parsing, fuzzy matching, alias resolution
     func parse(_ query: String) async throws -> ParsedQuery {
+        let startTime = Date()
         let lowercased = query.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
 
         // Detect intent
         let intent = detectIntent(from: lowercased)
 
-        // Extract filters
-        let filters = extractFilters(from: lowercased)
+        // Extract filters (enhanced with temporal parsing)
+        var filters = extractFilters(from: lowercased)
+
+        // Enhanced: Add temporal filters if temporal reference detected
+        if let temporalRange = TemporalParser.parseTemporal(lowercased) {
+            filters.append(.dateRange(temporalRange.start, temporalRange.end))
+            // Log temporal parse event
+            QueryTelemetry.shared.logEvent(.temporalParsed(expression: temporalRange.parsedExpression, success: true))
+        }
 
         // Determine sort order
         let sortOrder = determineSortOrder(for: intent, query: lowercased)
@@ -143,6 +152,15 @@ actor SmartQueryParser {
 
         // Calculate confidence based on query complexity
         let confidence = calculateConfidence(query: lowercased, intent: intent, filters: filters)
+
+        // Log query parsing event
+        let duration = Date().timeIntervalSince(startTime)
+        QueryTelemetry.shared.logEvent(.queryParsed(query: query, intent: intent, confidence: confidence, duration: duration))
+
+        // Log ambiguous query if confidence is low
+        if confidence < 0.6 {
+            QueryTelemetry.shared.logEvent(.ambiguousQuery(query: query, confidence: confidence))
+        }
 
         return ParsedQuery(
             intent: intent,

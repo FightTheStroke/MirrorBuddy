@@ -49,26 +49,46 @@ struct MaterialQueryParser {
     }
 
     /// Find materials using AI-powered natural language query (Task 115)
+    /// Enhanced with fuzzy matching, alias resolution, and telemetry
     /// - Parameters:
     ///   - query: Natural language query (e.g., "materials I struggled with in math")
     ///   - materials: Array of materials to search
     ///   - subjects: Array of subjects for context
+    ///   - aliasService: Optional alias service for alias resolution
     /// - Returns: Array of matching materials sorted by relevance
     static func findMaterialsWithNaturalLanguage(
         query: String,
         in materials: [Material],
-        subjects: [SubjectEntity]
+        subjects: [SubjectEntity],
+        aliasService: MaterialAliasService? = nil
     ) async -> [Material] {
+        let startTime = Date()
+
+        // Enhanced: Try alias resolution first (fastest path)
+        if let aliasService = aliasService,
+           let materialID = try? aliasService.resolveAlias(query) {
+            // Alias resolved - return single material
+            if let material = materials.first(where: { $0.id == materialID }) {
+                QueryTelemetry.shared.logEvent(.aliasResolved(alias: query, success: true))
+                return [material]
+            }
+            QueryTelemetry.shared.logEvent(.aliasResolved(alias: query, success: false))
+        }
+
         // Parse query with SmartQueryParser
         guard let parsedQuery = try? await SmartQueryParser.shared.parse(query) else {
-            // Fallback to simple search
-            return materials.filter { material in
-                material.title.localizedCaseInsensitiveContains(query)
-            }
+            // Fallback to fuzzy search
+            QueryTelemetry.shared.logEvent(.parseError(query: query, error: NSError(domain: "Parse", code: -1)))
+            return fuzzySearchMaterials(query: query, in: materials)
         }
 
         // Apply filters
         var filtered = applyFilters(parsedQuery.filters, to: materials, subjects: subjects)
+
+        // Enhanced: Apply fuzzy matching if no exact matches found and confidence is low
+        if filtered.isEmpty || parsedQuery.confidence < 0.7 {
+            filtered = fuzzySearchMaterials(query: query, in: materials)
+        }
 
         // Apply intent-specific processing
         filtered = processIntent(parsedQuery.intent, materials: filtered, subjects: subjects)
@@ -81,7 +101,32 @@ struct MaterialQueryParser {
             filtered = Array(filtered.prefix(limit))
         }
 
+        // Log performance
+        let duration = Date().timeIntervalSince(startTime)
+        QueryTelemetry.shared.logEvent(.fuzzyMatchPerformed(
+            query: query,
+            candidateCount: materials.count,
+            matchCount: filtered.count,
+            duration: duration
+        ))
+
         return filtered
+    }
+
+    /// Perform fuzzy search on material titles
+    /// - Parameters:
+    ///   - query: Search query
+    ///   - materials: Materials to search
+    /// - Returns: Matching materials sorted by fuzzy match score
+    private static func fuzzySearchMaterials(query: String, in materials: [Material]) -> [Material] {
+        let matcher = FuzzyMatcher(config: .default)
+        let titles = materials.map { $0.title }
+        let matches = matcher.findMatches(query: query, in: titles)
+
+        // Map matches back to materials and sort by score
+        return matches.compactMap { match in
+            materials.first { $0.title == match.matchedString }
+        }
     }
 
     // MARK: - Private Helpers for Natural Language Queries
