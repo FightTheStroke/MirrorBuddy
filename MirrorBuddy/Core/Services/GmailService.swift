@@ -125,7 +125,10 @@ final class GmailService {
         accessToken: String,
         query: String
     ) async throws -> [String] {
-        var components = URLComponents(string: "\(baseURL)/users/me/messages")!
+        guard var components = URLComponents(string: "\(baseURL)/users/me/messages") else {
+            throw GmailError.invalidURL
+        }
+
         components.queryItems = [
             URLQueryItem(name: "q", value: query),
             URLQueryItem(name: "maxResults", value: "100")
@@ -157,7 +160,10 @@ final class GmailService {
         messageID: String,
         accessToken: String
     ) async throws -> MBGmailMessage {
-        let url = URL(string: "\(baseURL)/users/me/messages/\(messageID)?format=full")!
+        guard let url = URL(string: "\(baseURL)/users/me/messages/\(messageID)?format=full") else {
+            throw GmailError.invalidURL
+        }
+
 
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
@@ -312,6 +318,7 @@ final class GmailService {
 
         // Extract due date
         let dueDate = extractDueDate(from: message.body) ?? Calendar.current.date(byAdding: .day, value: 7, to: Date())!
+
 
         // Infer subject
         let subject = inferSubject(from: message)
@@ -481,7 +488,10 @@ final class GmailService {
         }
 
         let accessToken = tokens.accessToken
-        let url = URL(string: "\(baseURL)/users/me/messages/\(messageID)/modify")!
+        guard let url = URL(string: "\(baseURL)/users/me/messages/\(messageID)/modify") else {
+            throw GmailError.invalidURL
+        }
+
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -556,7 +566,11 @@ final class GmailService {
             forTaskWithIdentifier: identifier,
             using: nil
         ) { task in
-            self.handleBackgroundSync(task: task as! BGAppRefreshTask)
+            guard let refreshTask = task as? BGAppRefreshTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
+            self.handleBackgroundSync(task: refreshTask)
         }
 
         logger.info("Registered background task: \(identifier)")

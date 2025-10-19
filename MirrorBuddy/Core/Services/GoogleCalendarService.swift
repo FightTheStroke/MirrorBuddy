@@ -82,7 +82,10 @@ final class GoogleCalendarService {
 
     /// Fetch list of calendars
     private func fetchCalendarList(accessToken: String) async throws -> [GoogleCalendar] {
-        let url = URL(string: "\(baseURL)/users/me/calendarList")!
+        guard let url = URL(string: "\(baseURL)/users/me/calendarList") else {
+            throw GoogleCalendarError.invalidURL
+        }
+
 
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
@@ -116,7 +119,10 @@ final class GoogleCalendarService {
         let timeMinString = iso8601Formatter.string(from: startDate)
         let timeMaxString = iso8601Formatter.string(from: endDate)
 
-        var components = URLComponents(string: "\(baseURL)/calendars/\(calendarID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? calendarID)/events")!
+        guard var components = URLComponents(string: "\(baseURL)/calendars/\(calendarID.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? calendarID)/events") else {
+            throw GoogleCalendarError.invalidURL
+        }
+
         components.queryItems = [
             URLQueryItem(name: "timeMin", value: timeMinString),
             URLQueryItem(name: "timeMax", value: timeMaxString),
@@ -350,7 +356,11 @@ final class GoogleCalendarService {
             forTaskWithIdentifier: identifier,
             using: nil
         ) { task in
-            self.handleBackgroundSync(task: task as! BGAppRefreshTask)
+            guard let refreshTask = task as? BGAppRefreshTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
+            self.handleBackgroundSync(task: refreshTask)
         }
 
         logger.info("Registered background task: \(identifier)")

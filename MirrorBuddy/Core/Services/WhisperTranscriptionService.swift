@@ -186,8 +186,8 @@ final class WhisperTranscriptionService {
         logger.info("Batch transcription complete: \(results.count) successful, \(errors.count) failed")
 
         // If all failed, throw error
-        if results.isEmpty && !errors.isEmpty {
-            throw errors.first!
+        if results.isEmpty, let firstError = errors.first {
+            throw firstError
         }
 
         return results.sorted { $0.segmentIndex < $1.segmentIndex }
@@ -206,7 +206,11 @@ final class WhisperTranscriptionService {
         // Create multipart form data request
         let boundary = "Boundary-\(UUID().uuidString)"
 
-        var request = URLRequest(url: URL(string: apiEndpoint)!)
+        guard let url = URL(string: apiEndpoint) else {
+            throw TranscriptionError.badRequest
+        }
+
+        var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -216,38 +220,38 @@ final class WhisperTranscriptionService {
         var body = Data()
 
         // Add file
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"file\"; filename=\"\(audioURL.lastPathComponent)\"\r\n".data(using: .utf8)!)
-        body.append("Content-Type: audio/m4a\r\n\r\n".data(using: .utf8)!)
+        body.append(Data("--\(boundary)\r\n".utf8))
+        body.append(Data("Content-Disposition: form-data; name=\"file\"; filename=\"\(audioURL.lastPathComponent)\"\r\n".utf8))
+        body.append(Data("Content-Type: audio/m4a\r\n\r\n".utf8))
 
         let audioData = try Data(contentsOf: audioURL)
         body.append(audioData)
-        body.append("\r\n".data(using: .utf8)!)
+        body.append(Data("\r\n".utf8))
 
         // Add model
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"model\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(model)\r\n".data(using: .utf8)!)
+        body.append(Data("--\(boundary)\r\n".utf8))
+        body.append(Data("Content-Disposition: form-data; name=\"model\"\r\n\r\n".utf8))
+        body.append(Data("\(model)\r\n".utf8))
 
         // Add language
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"language\"\r\n\r\n".data(using: .utf8)!)
-        body.append("\(language)\r\n".data(using: .utf8)!)
+        body.append(Data("--\(boundary)\r\n".utf8))
+        body.append(Data("Content-Disposition: form-data; name=\"language\"\r\n\r\n".utf8))
+        body.append(Data("\(language)\r\n".utf8))
 
         // Add response format
-        body.append("--\(boundary)\r\n".data(using: .utf8)!)
-        body.append("Content-Disposition: form-data; name=\"response_format\"\r\n\r\n".data(using: .utf8)!)
-        body.append("verbose_json\r\n".data(using: .utf8)!)
+        body.append(Data("--\(boundary)\r\n".utf8))
+        body.append(Data("Content-Disposition: form-data; name=\"response_format\"\r\n\r\n".utf8))
+        body.append(Data("verbose_json\r\n".utf8))
 
         // Add prompt if provided
         if let prompt = prompt {
-            body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"prompt\"\r\n\r\n".data(using: .utf8)!)
-            body.append("\(prompt)\r\n".data(using: .utf8)!)
+            body.append(Data("--\(boundary)\r\n".utf8))
+            body.append(Data("Content-Disposition: form-data; name=\"prompt\"\r\n\r\n".utf8))
+            body.append(Data("\(prompt)\r\n".utf8))
         }
 
         // Close boundary
-        body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+        body.append(Data("--\(boundary)--\r\n".utf8))
 
         request.httpBody = body
 
@@ -315,8 +319,11 @@ struct WhisperAPIResponse: Codable {
         let text: String
         let tokens: [Int]
         let temperature: Double
+        // swiftlint:disable:next identifier_name
         let avg_logprob: Double
+        // swiftlint:disable:next identifier_name
         let compression_ratio: Double
+        // swiftlint:disable:next identifier_name
         let no_speech_prob: Double
     }
 }

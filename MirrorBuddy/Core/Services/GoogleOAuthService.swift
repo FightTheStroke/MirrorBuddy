@@ -101,7 +101,9 @@ final class GoogleOAuthService: NSObject {
 
     private func constructAuthorizationURL() throws -> URL {
         let config = GoogleOAuthConfig.shared
-        var components = URLComponents(string: GoogleOAuthConfig.authorizationEndpoint)!
+        guard var components = URLComponents(string: GoogleOAuthConfig.authorizationEndpoint) else {
+            throw GoogleOAuthError.invalidURL("Invalid authorization endpoint URL")
+        }
 
         let redirectURI = "\(config.reversedClientID):/oauth2redirect"
 
@@ -275,9 +277,13 @@ final class GoogleOAuthService: NSObject {
 
     private func parseTokenResponse(data: Data) throws -> OAuthTokens {
         struct TokenResponse: Codable {
+            // swiftlint:disable:next identifier_name
             let access_token: String
+            // swiftlint:disable:next identifier_name
             let refresh_token: String?
+            // swiftlint:disable:next identifier_name
             let expires_in: Int?
+            // swiftlint:disable:next identifier_name
             let token_type: String
             let scope: String?
         }
