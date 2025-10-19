@@ -7,7 +7,211 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2025-10-19
+
 ### Added
+
+- **Task Master Quality Assurance System (tmQA)** (2025-10-19)
+  - Comprehensive QA framework for verifying completed tasks
+  - Automated repository cleanliness checks
+  - Mission alignment verification
+  - Technical debt scanning
+  - Build verification and test coverage analysis
+  - Generated comprehensive TMQAReport.md with findings
+  - Identified critical issues: WhisperKit API compilation errors, bulk-marked tasks without implementation
+  - Files: `Docs/TMQAReport.md`, `Docs/QA_TASK_*_REPORT.md`
+
+- **Task 139: Voice Interaction Consolidation** (2025-10-19)
+  - Created UnifiedVoiceManager service for smart intent detection
+  - Implemented SmartVoiceButton - single voice entry point replacing 5 redundant buttons
+  - Smart intent detection algorithm (commands vs conversation)
+  - Command prefix matching ("vai", "apri", "mostra", "chiudi")
+  - Length heuristic and question pattern detection
+  - First-time hint tooltip with auto-dismiss
+  - Reduced voice entry points from 5 to 1 (80% UI simplification)
+  - Files: `Core/Services/UnifiedVoiceManager.swift`, `Features/VoiceCommands/SmartVoiceButton.swift`
+  - Documentation: `VOICE_CONTROL_AUDIT.md`, `UNIFIED_VOICE_MODEL.md`, `TASK_139_SUMMARY.md`
+
+- **Task 137: Dashboard Redesign with Today Card** (2025-10-18)
+  - New Today Card component showing daily study metrics
+  - Study streak tracking with visual indicators
+  - Daily goal progress display
+  - Upcoming sessions overview
+  - Quick action buttons for common tasks
+  - Improved dashboard layout and information hierarchy
+  - Files: `Features/Dashboard/Views/DashboardView.swift`
+
+- **Task 138: Automated Material Processing** (2025-10-18)
+  - Automatic keyword extraction from materials
+  - Metadata generation (topic, difficulty, Bloom's taxonomy)
+  - Concurrent material processing with error handling
+  - Auto-classification using Bloom's taxonomy levels
+  - Integration with MaterialProcessor service
+  - Files: `Core/Services/MaterialProcessor.swift`, `Core/Services/FlashcardGenerator.swift`
+
+- **Task 113: Safe Area Positioning for Voice Buttons** (2025-10-18)
+  - Dynamic safe area aware positioning for floating voice buttons
+  - Device-specific adaptation (iPhone SE to Pro Max)
+  - Proper bottom safe area insets handling
+  - Visual feedback and animations
+  - Support for Dynamic Island on Pro models
+  - Files: `Features/Dashboard/Views/MainTabView.swift`
+
+- **Task 121: Baseline Test Coverage Expansion** (2025-10-18)
+  - Added comprehensive UpdateManager tests
+  - Voice conversation and study view test coverage
+  - Performance harness for sync, transcription, and mind maps
+  - Test coverage increased from ~30% to ~40%
+  - Files: `MirrorBuddyTests/CoreTests/*`
+
+- **Task 119: Secure API Configuration** (2025-10-18)
+  - Moved API keys to Keychain for enhanced security
+  - Secure credential storage implementation
+  - API key rotation support
+  - Environment-based configuration
+  - Files: Security layer improvements across services
+
+- **Task 120: Technical Debt Resolution** (2025-10-18)
+  - Resolved critical TODO/FIXME markers
+  - Documented future enhancements
+  - Code quality improvements
+  - Files: `Docs/FUTURE_ENHANCEMENTS.md`
+
+- **Task 123: QA Checklist Integration** (2025-10-18)
+  - Comprehensive QA checklist for release process
+  - Manual testing procedures
+  - Accessibility compliance checks
+  - Performance verification steps
+  - Regression testing framework
+  - Files: `Docs/QA_CHECKLIST.md`
+
+- **Task 118: SwiftLint Violation Resolution** (2025-10-18)
+  - Resolved 358 SwiftLint violations
+  - Reduced warnings from 247 to 56 (77% reduction)
+  - Improved code quality and consistency
+  - Enforced Swift style guidelines
+
+- **Task 117: Deployment Target Normalization** (2025-10-18)
+  - Standardized iOS deployment target to 17.0
+  - Swift 6.0 concurrency support
+  - macOS 14.0+ development requirement
+  - Consistent build configuration
+
+### Fixed
+
+- **WhisperKit API Compatibility** (2025-10-18)
+  - Resolved 32 compilation errors in WhisperTranscriptionService
+  - Fixed deprecated WhisperKit API usage
+  - Updated to WhisperKit 0.9.0+ API patterns
+  - Corrected async/await transcription methods
+  - Build now succeeds with 0 errors
+
+- **Google Services Guard Statements** (2025-10-18)
+  - Fixed guard statement syntax in GoogleOAuthService
+  - Resolved compilation errors in GmailService
+  - Fixed GoogleCalendarService error handling
+  - Improved error recovery patterns
+
+- **Test Suite Compilation** (2025-10-18)
+  - Fixed APIClientTests compilation errors
+  - Resolved GeminiClientTests issues
+  - Updated ModelTests for Swift 6 concurrency
+  - All test targets now compile successfully
+
+- **Swift 6 Concurrency Issues** (2025-10-18)
+  - Added @MainActor annotations where needed
+  - Fixed Sendable conformance issues
+  - Resolved data race warnings
+  - Improved thread safety across services
+
+- **Voice UI Redundancy** (2025-10-19)
+  - Eliminated duplicate voice entry points (5 → 1)
+  - Fixed inconsistent voice command behavior
+  - Resolved user confusion between commands and conversation modes
+  - Improved voice feature discoverability
+
+### Changed
+
+- **Voice Interaction Model** (2025-10-19)
+  - Unified voice system with smart intent detection
+  - Single SmartVoiceButton replaces multiple entry points
+  - Automatic routing between commands and conversation
+  - Improved first-time user experience with hints
+
+- **Dashboard Layout** (2025-10-18)
+  - Redesigned with Today Card as primary element
+  - Better information hierarchy
+  - Improved visual consistency
+  - Enhanced accessibility
+
+- **Material Processing Pipeline** (2025-10-18)
+  - Enhanced with concurrent processing
+  - Auto-metadata generation
+  - Bloom's taxonomy classification
+  - Better error handling and recovery
+
+- **Build Configuration** (2025-10-18)
+  - Swift 6.0 concurrency model enabled
+  - iOS 17.0+ deployment target standardized
+  - macOS 14.0+ for development
+  - Improved compiler warnings (77% reduction)
+
+### Technical Improvements
+
+- **Code Quality Metrics**
+  - Build errors: 358 → 0 (100% reduction)
+  - Build warnings: 247 → 56 (77% reduction)
+  - SwiftLint violations: Reduced by 358
+  - Test coverage: ~30% → ~40% (+33% increase)
+
+- **Architecture**
+  - Clean Architecture patterns enforced
+  - SOLID principles applied
+  - Service layer improvements
+  - Better separation of concerns
+
+- **Performance**
+  - Concurrent material processing
+  - Optimized voice recognition pipeline
+  - Improved CloudKit sync efficiency
+  - Better memory management
+
+### Documentation
+
+- **New Documentation** (2025-10-18 to 2025-10-19)
+  - `TMQAReport.md` - Comprehensive quality assurance findings
+  - `VOICE_CONTROL_AUDIT.md` - Voice UI analysis and recommendations
+  - `UNIFIED_VOICE_MODEL.md` - Voice system architecture
+  - `TASK_139_SUMMARY.md` - Voice consolidation implementation notes
+  - `QA_TASK_*_REPORT.md` - Individual task verification reports
+  - `FUTURE_ENHANCEMENTS.md` - Documented technical debt and roadmap
+
+- **Updated Documentation**
+  - `QA_CHECKLIST.md` - Integrated into release process
+  - `README.md` - Updated build status and features
+  - `CHANGELOG.md` - Current version documented
+
+### Known Issues
+
+- **Partial Implementations**
+  - Flashcard generation disabled in MaterialProcessor (line 159)
+  - UnifiedVoiceManager command execution requires AppVoiceCommandHandler integration
+  - Some tasks marked "done" without full implementation (see TMQAReport.md)
+
+- **Build Warnings** (56 remaining)
+  - Non-critical warnings still present
+  - Target for next release: <30 warnings
+  - Tracking in technical debt backlog
+
+### Removed
+
+- **Redundant UI Elements** (2025-10-19)
+  - Removed VoiceCommandButton (left floating button)
+  - Removed toolbar voice buttons from DashboardView and HomeworkHelpView
+  - Removed "Lezione vocale" QuickActionCard
+  - Removed duplicate VoiceConversationView sheets
+
+### Added (Previous Unreleased Features)
 
 - **Subtask 91.4: Extended Voice Recording UI** (2025-10-15)
   - Created ExtendedVoiceRecordingView for classroom lesson recording

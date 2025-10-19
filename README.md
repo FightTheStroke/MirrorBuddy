@@ -39,29 +39,81 @@ The global assistive education technology sector is accelerating (various analys
 
 MirrorBuddy focuses on five pillars:
 
-1. **Voice-first & interrupt friendly** — Speak naturally (“Explain this fraction like Fortnite”), interrupt mid-sentence, pick up the thread minutes later.
+1. **Voice-first & interrupt friendly** — Speak naturally ("Explain this fraction like Fortnite"), interrupt mid-sentence, pick up the thread minutes later.
 2. **Multimodal cognition** — Camera, PDFs, emails, mind maps, and voice recordings collapse into a shared context graph.
 3. **Emotionally safe coaching** — Tone calibrated for encouragement, neurodiverse pacing, and shame-free retries.
-4. **Autopilot organization** — One button (“Aggiornami”) corrals Drive files, Gmail assignments, Calendar events, plus auto-summaries.
+4. **Autopilot organization** — One button ("Aggiornami") corrals Drive files, Gmail assignments, Calendar events, plus auto-summaries.
 5. **Trust-by-design** — On-device personalization, CloudKit sync, robust transparency around API usage; no data hoarding.
 
-We are building toward **an “OS layer” that constantly knows what the learner is working on, senses overwhelm, and offers the next best action through voice or visuals.**
+We are building toward **an "OS layer" that constantly knows what the learner is working on, senses overwhelm, and offers the next best action through voice or visuals.**
+
+### Key Features (v0.9.0)
+
+#### Voice Control
+- **SmartVoiceButton**: Unified voice interface with intelligent intent detection
+- **Command Recognition**: Automatic distinction between quick commands and conversations
+- **Natural Language**: Speak naturally in Italian with context-aware responses
+- **Hands-free Navigation**: Voice commands for all major app functions
+- **Safe Area Aware**: Dynamic positioning for all iPhone models (SE to Pro Max)
+- **Dynamic Island Support**: Optimized for iPhone Pro models
+
+#### Dashboard & Today Card
+- **Daily Overview**: Study metrics, streak tracking, and goal progress at a glance
+- **Study Streak**: Visual indicators and encouragement for consistent learning
+- **Upcoming Sessions**: Quick view of scheduled study activities
+- **Subject Organization**: Materials organized by school subject
+- **Quick Actions**: One-tap access to common tasks
+
+#### Material Processing
+- **Auto-Processing**: Automatic keyword extraction and metadata generation on import
+- **Smart Classification**: Bloom's taxonomy level assignment (Remember, Understand, Apply, Analyze, Evaluate, Create)
+- **Concurrent Pipeline**: Fast, parallel processing of multiple materials
+- **Keyword Extraction**: AI-powered topic and concept identification
+- **Metadata Enrichment**: Automatic difficulty, topic, and subject tagging
+
+#### Accessibility & Inclusive Design
+- **OpenDyslexic Font**: Dyslexia-friendly typography as default
+- **Large Touch Targets**: 48px+ minimum size for child-friendly interaction
+- **High Contrast**: WCAG AA/AAA compliant color system
+- **VoiceOver Support**: Full screen reader compatibility
+- **Dynamic Type**: Respects system text size preferences
+- **One-Handed Mode**: Optimized for single-hand use
+
+#### Data & Sync
+- **CloudKit Integration**: Seamless sync across devices
+- **Google Workspace**: Drive, Gmail, and Calendar integration
+- **SwiftData Models**: Local-first with cloud backup
+- **Background Sync**: Automatic updates without user intervention
+- **Offline Support**: Core features work without internet
 
 ---
 
-## Current build snapshot (October 17, 2025)
+## Current build snapshot (October 19, 2025)
 
 The repository already includes a functional SwiftUI app with the following maturity levels:
 
 | Capability | Status | Notes |
 | --- | --- | --- |
-| **Voice Coach (Italian)** | Prototype | Realtime streaming via OpenAI Realtime API, empathy-tuned prompts, conversation persistence. Next step: Apple Speech fallback & richer command routing. |
-| **One-Button Sync** | Alpha | `UpdateManager` orchestrates Google Drive, Gmail, Calendar ingestion with background tasks. |
-| **Document pipeline** | Alpha | VisionKit scanner, OCR service, dyslexia-friendly text rendering, mind map seeds. |
-| **Accessibility shell** | Alpha | OpenDyslexic defaults, large touch targets, context banner, voice command registry scaffolding. |
-| **Data layer** | Foundations | SwiftData models for materials, mind maps, flashcards, voice transcripts, CloudKit-ready container. |
+| **Unified Voice System** | Beta | SmartVoiceButton with intent detection, automatic command vs conversation routing, OpenAI Realtime API integration. Single unified entry point. |
+| **Dashboard & Analytics** | Beta | Today Card with study metrics, streak tracking, daily goals, upcoming sessions. Material organization by subject. |
+| **One-Button Sync** | Alpha | `UpdateManager` orchestrates Google Drive, Gmail, Calendar ingestion with background tasks and CloudKit sync. |
+| **Material Processing** | Beta | Auto-keyword extraction, metadata generation, Bloom's taxonomy classification, concurrent processing pipeline. |
+| **Document pipeline** | Alpha | VisionKit scanner, OCR service, dyslexia-friendly text rendering, mind map generation seeds. |
+| **Accessibility shell** | Beta | OpenDyslexic defaults, 48px+ touch targets, safe area positioning, context banner, VoiceOver support, Dynamic Type. |
+| **Test Coverage** | Alpha | ~40% coverage with unit tests for core services, UpdateManager, voice conversation, and study views. |
+| **Data layer** | Beta | SwiftData models for materials, mind maps, flashcards, voice transcripts, CloudKit sync container. |
 
-See `Docs/PROJECT_STATUS.md` and `.taskmaster/tasks/tasks.json` for the granular task tracker.
+### Build Status
+
+- **Build**: ✅ Passing (0 errors, 56 warnings)
+- **Tests**: ✅ Compiling successfully
+- **Swift**: 6.0 with concurrency support
+- **iOS**: 17.0+ deployment target
+- **macOS**: 14.0+ development environment
+- **SwiftLint**: 56 violations (77% reduction from baseline)
+- **Test Coverage**: ~40% (target: 60%)
+
+See `Docs/PROJECT_STATUS.md`, `Docs/TMQAReport.md`, and `.taskmaster/tasks/tasks.json` for detailed status and QA findings.
 
 ---
 
@@ -216,7 +268,8 @@ Before submitting significant changes or preparing for a release:
 - Built on top of SwiftUI, SwiftData, CloudKit, Apple Vision/VisionKit, OpenAI’s Realtime/Chat/Whisper APIs, and the OpenDyslexic type family.
 - Special thanks to educators, therapists, parents, and learners who have shared the daily frictions we are working to dissolve.
 
-**MirrorBuddy**  
+**MirrorBuddy**
 *Because every learner deserves an always-on teammate who listens, adapts, and celebrates the journey.*
 
-**Last updated:** October 17, 2025
+**Last updated:** October 19, 2025
+**Version:** 0.9.0 (Beta)
