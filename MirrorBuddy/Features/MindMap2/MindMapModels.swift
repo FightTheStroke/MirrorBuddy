@@ -41,8 +41,8 @@ struct VoiceNote: Identifiable, Codable, Equatable {
     }
 }
 
-/// Complete mind map structure
-struct MindMap: Identifiable, Codable, Equatable {
+/// Complete mind map structure for MindMap2 feature
+struct MindMapModel: Identifiable, Codable, Equatable {
     let id: String
     var title: String
     var subject: String?

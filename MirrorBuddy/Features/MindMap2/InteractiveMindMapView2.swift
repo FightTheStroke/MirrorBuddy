@@ -8,7 +8,7 @@ struct InteractiveMindMapView2: View {
     @State private var offset: CGSize = .zero
     @GestureState private var dragOffset: CGSize = .zero
 
-    init(mindMap: MindMap) {
+    init(mindMap: MindMapModel) {
         _viewModel = StateObject(wrappedValue: MindMapViewModel(mindMap: mindMap))
     }
 
@@ -172,7 +172,7 @@ struct InteractiveMindMapView2: View {
 
 @MainActor
 final class MindMapViewModel: ObservableObject {
-    @Published var mindMap: MindMap
+    @Published var mindMap: MindMapModel
     @Published var selectedNode: MindMapNode?
     @Published var isVoiceActive = false
 
@@ -180,7 +180,7 @@ final class MindMapViewModel: ObservableObject {
     private let narrator: MindMapNarrator
     private let storage: MindMapStorage
 
-    init(mindMap: MindMap) {
+    init(mindMap: MindMapModel) {
         self.mindMap = mindMap
         self.navigator = MindMapVoiceNavigator()
         self.narrator = MindMapNarrator()
