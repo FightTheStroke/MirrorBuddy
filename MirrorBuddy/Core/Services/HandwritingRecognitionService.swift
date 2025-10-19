@@ -201,10 +201,9 @@ final class HandwritingRecognitionService {
                     text: text,
                     type: type,
                     confidence: recognizedText.confidence,
-                        boundingBox: recognizedText.boundingBox
-                    ))
-                    break
-                }
+                    boundingBox: recognizedText.boundingBox
+                ))
+                break
             }
         }
 

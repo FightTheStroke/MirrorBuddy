@@ -419,7 +419,6 @@ final class VisionAnalysisService {
             for line in lines where line.localizedCaseInsensitiveContains(keyword) {
                 concepts.append(line.trimmingCharacters(in: .whitespaces))
             }
-            }
         }
 
         return (problems, concepts, content)

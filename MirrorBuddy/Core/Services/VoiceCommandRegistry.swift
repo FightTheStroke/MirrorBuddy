@@ -389,7 +389,6 @@ final class VoiceCommandRegistry: ObservableObject {
                     .trimmingCharacters(in: .whitespaces)
                 if !titlePart.isEmpty {
                     return "title:\(titlePart)"
-                    }
                 }
             }
         }

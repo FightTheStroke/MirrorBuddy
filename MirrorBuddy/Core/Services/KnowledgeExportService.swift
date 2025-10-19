@@ -328,10 +328,9 @@ final class KnowledgeExportService: ObservableObject {
                 "object": "block",
                 "type": "paragraph",
                 "paragraph": [
-                        "rich_text": [["type": "text", "text": ["content": paragraph]]]
-                    ]
-                ])
-            }
+                    "rich_text": [["type": "text", "text": ["content": paragraph]]]
+                ]
+            ])
         }
 
         notionPage["children"] = children
