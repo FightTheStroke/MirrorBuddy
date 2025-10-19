@@ -58,94 +58,106 @@ final class TemporalParserTests: XCTestCase {
         XCTAssertEqual(result?.parsedExpression, "yesterday")
     }
 
-    func testParseDayBeforeYesterday() {
+    func testParseDayBeforeYesterday() throws {
         let result = TemporalParser.parseTemporal("show materials from day before yesterday")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 1.0)
-        XCTAssertEqual(result?.parsedExpression, "day before yesterday")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 1.0)
+        XCTAssertEqual(unwrapped.parsedExpression, "day before yesterday")
 
         // Verify it's 2 days ago
         let calendar = Calendar.current
-        let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: Date())!
+        guard let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: Date()) else {
+            XCTFail("Failed to calculate 2 days ago")
+            return
+        }
         let startOfDay = calendar.startOfDay(for: twoDaysAgo)
 
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfDay)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfDay)
     }
 
-    func testParseThisWeek() {
+    func testParseThisWeek() throws {
         let result = TemporalParser.parseTemporal("materials from this week")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.9)
-        XCTAssertEqual(result?.parsedExpression, "this week")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.9)
+        XCTAssertEqual(unwrapped.parsedExpression, "this week")
 
         // Verify start is beginning of current week
         let calendar = Calendar.current
         let startOfWeek = calendar.dateInterval(of: .weekOfYear, for: Date())?.start
 
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfWeek)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfWeek)
     }
 
-    func testParseThisMonth() {
+    func testParseThisMonth() throws {
         let result = TemporalParser.parseTemporal("this month's materials")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.9)
-        XCTAssertEqual(result?.parsedExpression, "this month")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.9)
+        XCTAssertEqual(unwrapped.parsedExpression, "this month")
 
         // Verify start is beginning of current month
         let calendar = Calendar.current
         let startOfMonth = calendar.dateInterval(of: .month, for: Date())?.start
 
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfMonth)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfMonth)
     }
 
     // MARK: - Relative Temporal Tests
 
-    func testParseThreeDaysAgo() {
+    func testParseThreeDaysAgo() throws {
         let result = TemporalParser.parseTemporal("show materials from 3 days ago")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.95)
-        XCTAssertEqual(result?.parsedExpression, "3 days ago")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.95)
+        XCTAssertEqual(unwrapped.parsedExpression, "3 days ago")
 
         // Verify it's 3 days ago
         let calendar = Calendar.current
-        let threeDaysAgo = calendar.date(byAdding: .day, value: -3, to: Date())!
+        guard let threeDaysAgo = calendar.date(byAdding: .day, value: -3, to: Date()) else {
+            XCTFail("Failed to calculate 3 days ago")
+            return
+        }
         let startOfDay = calendar.startOfDay(for: threeDaysAgo)
 
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfDay)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfDay)
     }
 
-    func testParseTwoWeeksAgo() {
+    func testParseTwoWeeksAgo() throws {
         let result = TemporalParser.parseTemporal("materials from 2 weeks ago")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.95)
-        XCTAssertEqual(result?.parsedExpression, "2 weeks ago")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.95)
+        XCTAssertEqual(unwrapped.parsedExpression, "2 weeks ago")
 
         // Verify it's 2 weeks ago
         let calendar = Calendar.current
-        let twoWeeksAgo = calendar.date(byAdding: .weekOfYear, value: -2, to: Date())!
+        guard let twoWeeksAgo = calendar.date(byAdding: .weekOfYear, value: -2, to: Date()) else {
+            XCTFail("Failed to calculate 2 weeks ago")
+            return
+        }
         let startOfDay = calendar.startOfDay(for: twoWeeksAgo)
 
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfDay)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfDay)
     }
 
-    func testParseOneMonthAgo() {
+    func testParseOneMonthAgo() throws {
         let result = TemporalParser.parseTemporal("materials from 1 month ago")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.95)
-        XCTAssertEqual(result?.parsedExpression, "1 month ago")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.95)
+        XCTAssertEqual(unwrapped.parsedExpression, "1 month ago")
 
         // Verify it's 1 month ago
         let calendar = Calendar.current
-        let oneMonthAgo = calendar.date(byAdding: .month, value: -1, to: Date())!
+        guard let oneMonthAgo = calendar.date(byAdding: .month, value: -1, to: Date()) else {
+            XCTFail("Failed to calculate 1 month ago")
+            return
+        }
         let startOfDay = calendar.startOfDay(for: oneMonthAgo)
 
-        XCTAssertEqual(calendar.startOfDay(for: result!.start), startOfDay)
+        XCTAssertEqual(calendar.startOfDay(for: unwrapped.start), startOfDay)
     }
 
     func testParseItalianGiorniFa() {
@@ -164,162 +176,162 @@ final class TemporalParserTests: XCTestCase {
 
     // MARK: - Named Day Tests
 
-    func testParseLastMonday() {
+    func testParseLastMonday() throws {
         let result = TemporalParser.parseTemporal("show materials from last Monday")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.9)
-        XCTAssertEqual(result?.parsedExpression, "last monday")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.9)
+        XCTAssertEqual(unwrapped.parsedExpression, "last monday")
 
         // Verify it's a Monday
         let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: result!.start)
+        let weekday = calendar.component(.weekday, from: unwrapped.start)
         XCTAssertEqual(weekday, 2) // Monday = 2
     }
 
-    func testParseLastFriday() {
+    func testParseLastFriday() throws {
         let result = TemporalParser.parseTemporal("materials from last Friday")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.parsedExpression, "last friday")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.parsedExpression, "last friday")
 
         // Verify it's a Friday
         let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: result!.start)
+        let weekday = calendar.component(.weekday, from: unwrapped.start)
         XCTAssertEqual(weekday, 6) // Friday = 6
     }
 
-    func testParseThisTuesday() {
+    func testParseThisTuesday() throws {
         let result = TemporalParser.parseTemporal("materials from this Tuesday")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.85)
-        XCTAssertEqual(result?.parsedExpression, "this tuesday")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.85)
+        XCTAssertEqual(unwrapped.parsedExpression, "this tuesday")
 
         // Verify it's a Tuesday
         let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: result!.start)
+        let weekday = calendar.component(.weekday, from: unwrapped.start)
         XCTAssertEqual(weekday, 3) // Tuesday = 3
     }
 
-    func testParseItalianScorsoMartedi() {
+    func testParseItalianScorsoMartedi() throws {
         let result = TemporalParser.parseTemporal("materiali di martedì scorso")
 
-        XCTAssertNotNil(result)
-        XCTAssertTrue(result!.parsedExpression.contains("mart"))
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertTrue(unwrapped.parsedExpression.contains("mart"))
     }
 
     // MARK: - Last Reference Tests
 
-    func testParseLastWeek() {
+    func testParseLastWeek() throws {
         let result = TemporalParser.parseTemporal("materials from last week")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.95)
-        XCTAssertEqual(result?.parsedExpression, "last week")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.95)
+        XCTAssertEqual(unwrapped.parsedExpression, "last week")
 
         // Verify it's a full week interval
-        let duration = result!.end.timeIntervalSince(result!.start)
+        let duration = unwrapped.end.timeIntervalSince(unwrapped.start)
         XCTAssertEqual(duration, 7 * 24 * 60 * 60, accuracy: 60) // ~7 days
     }
 
-    func testParseLastMonth() {
+    func testParseLastMonth() throws {
         let result = TemporalParser.parseTemporal("last month's materials")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.95)
-        XCTAssertEqual(result?.parsedExpression, "last month")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.95)
+        XCTAssertEqual(unwrapped.parsedExpression, "last month")
 
         // Verify it's a month interval (approximately)
-        let duration = result!.end.timeIntervalSince(result!.start)
+        let duration = unwrapped.end.timeIntervalSince(unwrapped.start)
         XCTAssertGreaterThan(duration, 28 * 24 * 60 * 60) // At least 28 days
         XCTAssertLessThan(duration, 32 * 24 * 60 * 60) // At most 32 days
     }
 
-    func testParseLastYear() {
+    func testParseLastYear() throws {
         let result = TemporalParser.parseTemporal("materials from last year")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.95)
-        XCTAssertEqual(result?.parsedExpression, "last year")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.95)
+        XCTAssertEqual(unwrapped.parsedExpression, "last year")
     }
 
     // MARK: - Contextual Reference Tests
 
-    func testParseRecent() {
+    func testParseRecent() throws {
         let result = TemporalParser.parseTemporal("show recent materials")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.7)
-        XCTAssertEqual(result?.parsedExpression, "recent (last 7 days)")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.7)
+        XCTAssertEqual(unwrapped.parsedExpression, "recent (last 7 days)")
 
         // Verify it's ~7 days
-        let duration = result!.end.timeIntervalSince(result!.start)
+        let duration = unwrapped.end.timeIntervalSince(unwrapped.start)
         XCTAssertEqual(duration, 7 * 24 * 60 * 60, accuracy: 60)
     }
 
-    func testParseLatest() {
+    func testParseLatest() throws {
         let result = TemporalParser.parseTemporal("show latest materials")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.8)
-        XCTAssertEqual(result?.parsedExpression, "latest (last 24 hours)")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.8)
+        XCTAssertEqual(unwrapped.parsedExpression, "latest (last 24 hours)")
 
         // Verify it's ~24 hours
-        let duration = result!.end.timeIntervalSince(result!.start)
+        let duration = unwrapped.end.timeIntervalSince(unwrapped.start)
         XCTAssertEqual(duration, 24 * 60 * 60, accuracy: 60)
     }
 
-    func testParseMostRecent() {
+    func testParseMostRecent() throws {
         let result = TemporalParser.parseTemporal("most recent materials")
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.75)
-        XCTAssertEqual(result?.parsedExpression, "most recent (last 3 days)")
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.75)
+        XCTAssertEqual(unwrapped.parsedExpression, "most recent (last 3 days)")
 
         // Verify it's ~3 days
-        let duration = result!.end.timeIntervalSince(result!.start)
+        let duration = unwrapped.end.timeIntervalSince(unwrapped.start)
         XCTAssertEqual(duration, 3 * 24 * 60 * 60, accuracy: 60)
     }
 
     // MARK: - Relative Reference Tests
 
-    func testParseBeforeReference() {
+    func testParseBeforeReference() throws {
         let referenceDate = Date()
         let result = TemporalParser.parseRelativeReference("before this", relativeTo: referenceDate)
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.7)
-        XCTAssertLessThan(result!.start, referenceDate)
-        XCTAssertEqual(result!.end, referenceDate)
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.7)
+        XCTAssertLessThan(unwrapped.start, referenceDate)
+        XCTAssertEqual(unwrapped.end, referenceDate)
     }
 
-    func testParseAfterReference() {
+    func testParseAfterReference() throws {
         let referenceDate = Date()
         let result = TemporalParser.parseRelativeReference("after that", relativeTo: referenceDate)
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.7)
-        XCTAssertEqual(result!.start, referenceDate)
-        XCTAssertGreaterThan(result!.end, referenceDate)
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.7)
+        XCTAssertEqual(unwrapped.start, referenceDate)
+        XCTAssertGreaterThan(unwrapped.end, referenceDate)
     }
 
-    func testParsePreviousReference() {
+    func testParsePreviousReference() throws {
         let referenceDate = Date()
         let result = TemporalParser.parseRelativeReference("previous", relativeTo: referenceDate)
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.8)
-        XCTAssertLessThan(result!.start, referenceDate)
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.8)
+        XCTAssertLessThan(unwrapped.start, referenceDate)
     }
 
-    func testParseNextReference() {
+    func testParseNextReference() throws {
         let referenceDate = Date()
         let result = TemporalParser.parseRelativeReference("next", relativeTo: referenceDate)
 
-        XCTAssertNotNil(result)
-        XCTAssertEqual(result?.confidence, 0.8)
-        XCTAssertGreaterThan(result!.start, referenceDate)
+        let unwrapped = try XCTUnwrap(result)
+        XCTAssertEqual(unwrapped.confidence, 0.8)
+        XCTAssertGreaterThan(unwrapped.start, referenceDate)
     }
 
     // MARK: - Edge Cases
