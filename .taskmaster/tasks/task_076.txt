@@ -1,7 +1,7 @@
 # Task ID: 76
 # Title: Optimize UI for One-Handed Operation
 # Status: done
-# Dependencies: 26 (Not found), 28 (Not found), 32 (Not found), 35 (Not found), 39 (Not found), 44 (Not found)
+# Dependencies: 26, 28, 32, 35, 39, 44
 # Priority: high
 # Description: Optimize the entire UI for one-handed operation with right thumb.
 # Details:

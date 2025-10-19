@@ -1,7 +1,7 @@
 # Task ID: 46
 # Title: Implement XP and Leveling System
 # Status: done
-# Dependencies: 8 (Not found)
+# Dependencies: 8
 # Priority: medium
 # Description: Create the experience points and leveling system for gamification.
 # Details:

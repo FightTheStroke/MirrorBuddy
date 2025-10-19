@@ -1,7 +1,7 @@
 # Task ID: 52
 # Title: Implement History Mode Specialized Features
-# Status: done
-# Dependencies: 33 (Not found), 36 (Not found), 37 (Not found)
+# Status: pending
+# Dependencies: 33, 36, 37
 # Priority: medium
 # Description: Create specialized features for history study assistance.
 # Details:

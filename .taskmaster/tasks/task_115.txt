@@ -67,3 +67,35 @@ Technical considerations:
    - Ensure all existing query formats still work correctly
    - Verify that search results remain consistent for identical queries
    - Check that the UI properly displays all new features
+
+# Subtasks:
+## 1. Implement Natural Language Pattern Recognition for Temporal and Relative References [pending]
+### Dependencies: None
+### Description: Develop a system to parse and interpret natural language queries involving temporal and relative references, such as 'the last thing I studied' or 'the chapter before this one'.
+### Details:
+Design and implement a pattern recognition module that can identify and map temporal (e.g., 'yesterday', 'last week') and relative (e.g., 'before this', 'after that') references in user queries to specific database queries. Leverage NLP techniques for temporal relation extraction and ensure support for both English and other target languages. Integrate with the existing query parsing pipeline.
+
+## 2. Enhance Fuzzy Matching Algorithm for Material Titles [pending]
+### Dependencies: 115.1
+### Description: Upgrade the fuzzy matching logic to improve accuracy and performance, including support for phonetic matching and configurable thresholds.
+### Details:
+Refactor the fuzzy matching component to use advanced algorithms such as Levenshtein distance with adjustable thresholds. Add phonetic matching (e.g., Soundex, Metaphone) to handle pronunciation variations. Optimize for large datasets to maintain fast query response times.
+
+## 3. Design and Implement User-Defined Material Aliases System [pending]
+### Dependencies: 115.2
+### Description: Allow users to create, edit, and delete custom aliases for materials, and ensure these aliases are integrated into the query parsing process.
+### Details:
+Create a database schema for storing user-defined aliases. Develop UI components for alias management (create, edit, delete). Ensure aliases are indexed for fast lookup and implement alias resolution in the query parsing pipeline. Maintain compatibility with existing material references.
+
+## 4. Document Voice Command Support and Usage [pending]
+### Dependencies: 115.3
+### Description: Create comprehensive documentation for voice command usage, including categorized examples, common variations, and troubleshooting tips.
+### Details:
+Draft and organize help documentation with examples of supported voice commands, grouped by category (navigation, search, bookmarking, etc.). Include common phrasings and troubleshooting advice for voice recognition issues. Ensure documentation is accessible within the app.
+
+## 5. Integrate Telemetry and Error Handling for New Query Features [pending]
+### Dependencies: 115.4
+### Description: Add telemetry to monitor usage of new features and implement robust error handling for ambiguous or unsupported queries.
+### Details:
+Instrument the query parsing system to log usage statistics for natural language patterns, fuzzy matching, and alias resolution. Implement error handling for ambiguous queries, providing user feedback and fallback options. Ensure telemetry respects privacy requirements.
+

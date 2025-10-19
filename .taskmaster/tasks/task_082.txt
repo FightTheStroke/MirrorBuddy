@@ -1,7 +1,7 @@
 # Task ID: 82
 # Title: Implement Localization Infrastructure
 # Status: done
-# Dependencies: 3 (Not found), 4 (Not found), 5 (Not found), 6 (Not found), 7 (Not found), 8 (Not found)
+# Dependencies: 3, 4, 5, 6, 7, 8
 # Priority: critical
 # Description: Set up complete localization infrastructure for Italian (PRIMARY/DEFAULT) and English, with support for additional languages. MUST be done before UI implementation.
 # Details:

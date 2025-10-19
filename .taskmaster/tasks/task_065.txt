@@ -1,7 +1,7 @@
 # Task ID: 65
 # Title: Implement Performance Tests
 # Status: done
-# Dependencies: 59 (Not found)
+# Dependencies: 59
 # Priority: medium
 # Description: Create performance tests to verify app meets performance targets.
 # Details:

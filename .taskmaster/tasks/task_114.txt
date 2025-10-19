@@ -81,3 +81,35 @@ Document all issues found with detailed reproduction steps, device information, 
    - Provide recommendations for improving voice recognition accuracy
 
 Success criteria: 95% or higher recognition rate for all commands across different accents and speech patterns, proper UI responses to all commands, and full compatibility with accessibility features.
+
+# Subtasks:
+## 1. Prepare Device and Environment Matrix for Voice Command Testing [pending]
+### Dependencies: None
+### Description: Set up a comprehensive matrix of physical devices, OS versions, and environmental conditions (quiet, moderate, noisy) for testing the voice command system.
+### Details:
+Gather all supported device models and OS versions. Prepare test environments with controlled ambient noise levels. Ensure the latest app version is installed on each device. Document the matrix for coverage tracking.
+
+## 2. Test Voice Recognition Activation, Deactivation, and Visual Feedback [pending]
+### Dependencies: 114.1
+### Description: Verify that voice recognition starts and stops correctly via UI, responds to command completion/cancellation, and displays accurate visual indicators across all environments.
+### Details:
+On each device and in each environment, activate voice recognition through the UI, issue commands, and observe start/stop behavior. Check visual feedback for listening, processing, and idle states. Repeat in various noise conditions.
+
+## 3. Validate Command Pattern Recognition and Functional Responses [pending]
+### Dependencies: 114.2
+### Description: Test all supported navigation, material selection, and study mode commands, including variations and synonyms, to ensure correct recognition and app response.
+### Details:
+Prepare a list of all supported commands and their synonyms. On each device, issue each command in different phrasings and verify the app performs the correct action. Include edge cases and unexpected inputs.
+
+## 4. Assess Sheet Dismissal, Error Handling, and Touch Interaction Integrity [pending]
+### Dependencies: 114.3
+### Description: Ensure sheets dismiss properly after voice commands, feedback is appropriate, errors are handled gracefully, and voice commands do not interfere with normal touch interactions.
+### Details:
+After issuing commands, check that sheets close as intended and feedback is shown. Deliberately issue unrecognized or ambiguous commands to test error handling. Perform touch interactions before, during, and after voice commands to verify no interference.
+
+## 5. Conduct Accessibility and Speech Pattern Testing Across Accents and Assistive Technologies [pending]
+### Dependencies: 114.4
+### Description: Test the voice command system with VoiceOver and other assistive technologies enabled, using a variety of accents, speech rates, and volumes, including non-native speakers.
+### Details:
+Enable screen readers and assistive tools on each device. Issue commands using different accents and speech patterns. Observe focus management, command recognition, and overall accessibility compliance.
+

@@ -1,7 +1,7 @@
 # Task ID: 90
 # Title: Integrate Voice Coach for Guided Problem Solving
 # Status: done
-# Dependencies: 89 (Not found)
+# Dependencies: 89
 # Priority: medium
 # Description: Enable voice-guided problem solving, linking screen capture, AI analysis, and visual/voice feedback.
 # Details:

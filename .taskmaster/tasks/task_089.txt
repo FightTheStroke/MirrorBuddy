@@ -1,7 +1,7 @@
 # Task ID: 89
 # Title: Integrate GPT-4 Vision for Homework Analysis and Explanation
 # Status: done
-# Dependencies: 88 (Not found)
+# Dependencies: 88
 # Priority: medium
 # Description: Send captured/annotated images to GPT-4 Vision API for problem identification and step-by-step explanations with voice response in Italian.
 # Details:

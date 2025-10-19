@@ -1,7 +1,7 @@
 # Task ID: 47
 # Title: Implement Achievements and Badges System
 # Status: done
-# Dependencies: 8 (Not found), 46 (Not found)
+# Dependencies: 8, 46
 # Priority: medium
 # Description: Create the achievements and badges system for gamification.
 # Details:

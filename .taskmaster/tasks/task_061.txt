@@ -1,7 +1,7 @@
 # Task ID: 61
 # Title: Implement Unit Tests for Core Functionality
 # Status: done
-# Dependencies: 3 (Not found), 4 (Not found), 5 (Not found), 6 (Not found), 7 (Not found), 8 (Not found), 11 (Not found), 12 (Not found), 13 (Not found), 25 (Not found), 31 (Not found), 36 (Not found)
+# Dependencies: 3, 4, 5, 6, 7, 8, 11, 12, 13, 25, 31, 36
 # Priority: high
 # Description: Create comprehensive unit tests for core app functionality.
 # Details:

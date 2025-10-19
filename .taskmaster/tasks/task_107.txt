@@ -1,7 +1,7 @@
 # Task ID: 107
 # Title: Reorganize VoiceConversationView with Adaptive Layout and Persistence
 # Status: done
-# Dependencies: 100 (Not found), 102 (Not found)
+# Dependencies: 100, 102
 # Priority: high
 # Description: Implement adaptive layout for VoiceConversationView with two-column layout on iPad/landscape and single-column on iPhone/portrait, add settings functionality, and integrate conversation persistence from SwiftData models.
 # Details:

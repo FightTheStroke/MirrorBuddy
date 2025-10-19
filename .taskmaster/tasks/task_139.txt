@@ -1,6 +1,6 @@
 # Task ID: 139
 # Title: Consolidate voice interaction entry points
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Simplify voice UI by providing a single clear entry point, removing redundant microphone icons, and aligning command vs conversation flows.
@@ -14,25 +14,25 @@
 
 
 # Subtasks:
-## 1. Audit voice controls [pending]
+## 1. Audit voice controls [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Inventory all microphone/voice buttons across screens and document purpose
 
-## 2. Define unified voice model [pending]
+## 2. Define unified voice model [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Decide single entry (e.g., floating assistant) + secondary affordances; draft UX copy and onboarding tips
 
-## 3. Update UI and remove redundant buttons [pending]
+## 3. Update UI and remove redundant buttons [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Replace scattered microphones with chosen entry point, adjust QuickActions, integrate instructions
 
-## 4. Onboarding & testing [pending]
+## 4. Onboarding & testing [deferred]
 ### Dependencies: None
 ### Description: 
 ### Details:

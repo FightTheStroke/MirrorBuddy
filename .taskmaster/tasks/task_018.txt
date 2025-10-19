@@ -1,7 +1,7 @@
 # Task ID: 18
 # Title: Implement Google Drive File Download
 # Status: done
-# Dependencies: 13 (Not found), 16 (Not found), 17 (Not found)
+# Dependencies: 13, 16, 17
 # Priority: high
 # Description: Create functionality to download files from Google Drive to local storage.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 102
 # Title: Implement Voice-First UI Across the App
 # Status: done
-# Dependencies: 34 (Not found), 32 (Not found)
+# Dependencies: 34, 32
 # Priority: high
 # Description: Enhance the application with a comprehensive voice-first UI approach, including context banners, optimized voice activation buttons, and voice indicators to improve accessibility and user experience.
 # Details:

@@ -1,6 +1,6 @@
 # Task ID: 137
 # Title: Redesign dashboard experience with clear states
-# Status: pending
+# Status: in-progress
 # Dependencies: None
 # Priority: high
 # Description: Rebuild the main dashboard to show sync/import progress, accessible sections for new materials, and transparent status messaging.
@@ -13,13 +13,13 @@
 
 
 # Subtasks:
-## 1. Map UX pain points [pending]
+## 1. Map UX pain points [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Review current dashboard/import flow, list issues (missing feedback, scattered actions, redundant icons) with screenshots
 
-## 2. Design new dashboard layout [pending]
+## 2. Design new dashboard layout [done]
 ### Dependencies: None
 ### Description: 
 ### Details:

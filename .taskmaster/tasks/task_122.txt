@@ -1,6 +1,6 @@
 # Task ID: 122
 # Title: Establish performance harness for sync, transcription, and mind maps
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Create performance tests and benchmarking scripts for Drive sync (100+ files), Whisper transcription (multi-hour input), and mind map rendering (100+ nodes).
@@ -13,25 +13,25 @@
 
 
 # Subtasks:
-## 1. Design performance scenarios [pending]
+## 1. Design performance scenarios [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Define benchmarks for Drive sync (100/500 files), Whisper transcription (1h/6h), mind map rendering (100 nodes)
 
-## 2. Implement performance harness [pending]
+## 2. Implement performance harness [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Add XCTest performance tests (or custom benchmarks) for DriveSyncService, Whisper pipeline, mind map rendering using large fixtures
 
-## 3. Capture baseline metrics [pending]
+## 3. Capture baseline metrics [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Run benchmarks and record latency/memory results for current build; identify regressions
 
-## 4. Document thresholds & automation [pending]
+## 4. Document thresholds & automation [done]
 ### Dependencies: None
 ### Description: 
 ### Details:

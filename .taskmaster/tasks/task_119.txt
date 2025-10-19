@@ -1,6 +1,6 @@
 # Task ID: 119
 # Title: Secure API configuration via Keychain and xcconfig
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Store all API keys in the Keychain/config files instead of plist/env, update loading code, and document the setup for developers.
@@ -14,26 +14,26 @@
 
 
 # Subtasks:
-## 1. Design secure key storage plan [pending]
+## 1. Design secure key storage plan [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Decide mapping of each API credential to Keychain or xcconfig entries and define naming conventions
 
-## 2. Implement Keychain/xcconfig loading [pending]
+## 2. Implement Keychain/xcconfig loading [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Update KeychainManager and configuration loader to fetch OpenAI, Anthropic, Google credentials securely
 - Remove direct environment/plist dependencies
 
-## 3. Migrate existing secrets [pending]
+## 3. Migrate existing secrets [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Update local dev setup to move API keys out of plist/environment files and test app bootstrapping with new storage
 
-## 4. Update developer documentation [pending]
+## 4. Update developer documentation [done]
 ### Dependencies: None
 ### Description: 
 ### Details:

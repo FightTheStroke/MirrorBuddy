@@ -1,7 +1,7 @@
 # Task ID: 96
 # Title: Implement Review Assistant and Quiz Generation
 # Status: done
-# Dependencies: 95 (Not found)
+# Dependencies: 95
 # Priority: medium
 # Description: Enable users to review lessons via summaries, concept extraction, and auto-generated quizzes from lesson content.
 # Details:

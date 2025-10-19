@@ -1,6 +1,6 @@
 # Task ID: 138
 # Title: Automate post-import material processing
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Ensure imported materials automatically trigger text extraction, summary generation, mind map creation, and UI updates.
@@ -13,25 +13,25 @@
 
 
 # Subtasks:
-## 1. Hook import pipeline [pending]
+## 1. Hook import pipeline [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - When Material saved, enqueue processing job (text extraction, summarization, map generation) with status updates
 
-## 2. Implement processing status tracking [pending]
+## 2. Implement processing status tracking [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Extend Material model with processing states/timestamps and update UI to show 'In elaborazione', 'Pronto'
 
-## 3. Auto-create study assets [pending]
+## 3. Auto-create study assets [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Trigger summaries, mind maps, and flashcards upon processing completion; store errors for review
 
-## 4. Notify user when assets ready [pending]
+## 4. Notify user when assets ready [done]
 ### Dependencies: None
 ### Description: 
 ### Details:

@@ -1,7 +1,7 @@
 # Task ID: 58
 # Title: Implement Error Handling and Recovery UI
 # Status: done
-# Dependencies: 14 (Not found)
+# Dependencies: 14
 # Priority: medium
 # Description: Create user-friendly error handling and recovery mechanisms.
 # Details:

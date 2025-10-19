@@ -1,7 +1,7 @@
 # Task ID: 106
 # Title: Add Persistent Voice Entry Point to App
 # Status: done
-# Dependencies: 102 (Not found), 32 (Not found), 34 (Not found)
+# Dependencies: 102, 32, 34
 # Priority: high
 # Description: Integrate VoiceCommandButton and VoiceCommandFeedbackView as a persistent UI element that's always accessible throughout the app, ensuring voice activation is available without navigating to a specific tab.
 # Details:

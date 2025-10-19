@@ -1,7 +1,7 @@
 # Task ID: 72
 # Title: Implement Background Tasks for Scheduled Syncs
 # Status: done
-# Dependencies: 17 (Not found), 18 (Not found), 25 (Not found)
+# Dependencies: 17, 18, 25
 # Priority: high
 # Description: Create background tasks for scheduled material syncs at 13:00 and 18:00 CET.
 # Details:

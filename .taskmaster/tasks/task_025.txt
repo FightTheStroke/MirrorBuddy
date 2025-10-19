@@ -1,7 +1,7 @@
 # Task ID: 25
 # Title: Implement Parallel Material Processing Pipeline
 # Status: done
-# Dependencies: 19 (Not found), 20 (Not found), 21 (Not found), 22 (Not found), 23 (Not found), 24 (Not found)
+# Dependencies: 19, 20, 21, 22, 23, 24
 # Priority: high
 # Description: Create a pipeline to process study materials in parallel for maximum efficiency.
 # Details:

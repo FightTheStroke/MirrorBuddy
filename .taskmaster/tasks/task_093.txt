@@ -1,7 +1,7 @@
 # Task ID: 93
 # Title: Auto-Transcription of Recordings with Whisper API
 # Status: done
-# Dependencies: 91 (Not found)
+# Dependencies: 91
 # Priority: high
 # Description: Transcribe recorded lessons in Italian using Whisper API, processing in 30-minute chunks and linking transcripts to materials.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 108
 # Title: Simplify MaterialDetailView to Reduce Infinite Scrolling
 # Status: done
-# Dependencies: 3 (Not found)
+# Dependencies: 3
 # Priority: medium
 # Description: Redesign the MaterialDetailView to replace the current four-tab switch with a more accessible layout that eliminates tab switching and reduces cognitive load for users with learning disabilities.
 # Details:

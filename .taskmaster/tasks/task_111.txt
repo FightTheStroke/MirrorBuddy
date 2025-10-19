@@ -1,7 +1,7 @@
 # Task ID: 111
 # Title: Implement Voice Command Navigation for Study Features
 # Status: done
-# Dependencies: 57 (Not found), 63 (Not found), 64 (Not found), 78 (Not found)
+# Dependencies: 57, 63, 64, 78
 # Priority: medium
 # Description: Implement the navigation logic for voice commands to switch to the Study tab and open relevant views like Study mode, Flashcard review, and Mind Map viewing.
 # Details:

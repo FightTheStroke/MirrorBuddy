@@ -1,7 +1,7 @@
 # Task ID: 4
 # Title: Define SwiftData Models for Subjects
 # Status: done
-# Dependencies: 1 (Not found)
+# Dependencies: 1
 # Priority: high
 # Description: Create SwiftData models for Subject entity with relationships to other entities.
 # Details:

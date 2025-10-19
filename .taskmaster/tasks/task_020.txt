@@ -1,7 +1,7 @@
 # Task ID: 20
 # Title: Implement Summary Generation with Apple Intelligence
 # Status: done
-# Dependencies: 19 (Not found)
+# Dependencies: 19
 # Priority: high
 # Description: Create functionality to generate summaries of study materials using Apple Intelligence.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 16
 # Title: Implement Google Drive OAuth 2.0 Login Flow
 # Status: done
-# Dependencies: 13 (Not found), 15 (Not found)
+# Dependencies: 13, 15
 # Priority: high
 # Description: Create the OAuth 2.0 authentication flow for Google Drive access.
 # Details:

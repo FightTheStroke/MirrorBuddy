@@ -1,7 +1,7 @@
 # Task ID: 64
 # Title: Implement Accessibility Tests
 # Status: done
-# Dependencies: 60 (Not found)
+# Dependencies: 60
 # Priority: high
 # Description: Create specialized tests for accessibility compliance.
 # Details:

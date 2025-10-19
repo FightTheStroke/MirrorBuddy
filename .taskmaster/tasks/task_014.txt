@@ -1,7 +1,7 @@
 # Task ID: 14
 # Title: Implement API Error Handling and Retry Logic
 # Status: done
-# Dependencies: 11 (Not found), 12 (Not found), 13 (Not found)
+# Dependencies: 11, 12, 13
 # Priority: medium
 # Description: Develop a robust error handling and retry mechanism for all API clients.
 # Details:

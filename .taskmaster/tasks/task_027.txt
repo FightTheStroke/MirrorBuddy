@@ -1,7 +1,7 @@
 # Task ID: 27
 # Title: Implement Material Cards UI Component
 # Status: done
-# Dependencies: 26 (Not found)
+# Dependencies: 26
 # Priority: medium
 # Description: Design and implement reusable material card components for the dashboard.
 # Details:

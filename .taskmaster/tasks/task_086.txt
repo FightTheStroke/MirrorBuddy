@@ -1,7 +1,7 @@
 # Task ID: 86
 # Title: Integrate OCR for Handwritten and Printed Italian Text
 # Status: done
-# Dependencies: 84 (Not found), 85 (Not found)
+# Dependencies: 84, 85
 # Priority: high
 # Description: Use Vision framework to extract Italian text, including handwritten notes, from imported images and scanned documents.
 # Details:

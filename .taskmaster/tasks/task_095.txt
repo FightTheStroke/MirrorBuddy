@@ -1,7 +1,7 @@
 # Task ID: 95
 # Title: Generate Lesson Summaries and Mind Maps from Transcripts
 # Status: done
-# Dependencies: 94 (Not found)
+# Dependencies: 94
 # Priority: medium
 # Description: Integrate existing services to generate summaries and hierarchical mind maps from lesson transcripts using GPT-4, with subject-based color coding and key concepts extraction.
 # Details:

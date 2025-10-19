@@ -1,7 +1,7 @@
 # Task ID: 17
 # Title: Implement Google Drive File Listing and Monitoring
 # Status: done
-# Dependencies: 13 (Not found), 16 (Not found)
+# Dependencies: 13, 16
 # Priority: high
 # Description: Create functionality to list and monitor files in the 'Mario - Scuola' Google Drive folder.
 # Details:

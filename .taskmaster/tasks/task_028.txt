@@ -1,7 +1,7 @@
 # Task ID: 28
 # Title: Implement Material Detail View
 # Status: done
-# Dependencies: 3 (Not found), 5 (Not found), 6 (Not found), 26 (Not found), 82 (Not found), 83 (Not found)
+# Dependencies: 3, 5, 6, 26, 82, 83
 # Priority: high
 # Description: Design and implement the detailed view for study materials.
 # Details:

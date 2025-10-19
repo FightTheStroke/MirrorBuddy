@@ -1,7 +1,7 @@
 # Task ID: 105
 # Title: Refactor or Remove Quick Actions Section
 # Status: done
-# Dependencies: 3 (Not found), 4 (Not found), 44 (Not found), 55 (Not found)
+# Dependencies: 3, 4, 44, 55
 # Priority: low
 # Description: Evaluate and implement improvements to the "Azioni rapide" (Quick Actions) section by either creating a dynamic carousel based on user context or removing the section if it provides limited value.
 # Details:

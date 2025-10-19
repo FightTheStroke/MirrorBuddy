@@ -1,7 +1,7 @@
 # Task ID: 77
 # Title: Implement Large Touch Targets
 # Status: done
-# Dependencies: 26 (Not found), 28 (Not found), 32 (Not found), 35 (Not found), 39 (Not found), 44 (Not found)
+# Dependencies: 26, 28, 32, 35, 39, 44
 # Priority: high
 # Description: Ensure all interactive elements have minimum 44×44pt touch targets.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 68
 # Title: Create API Documentation
-# Status: done
-# Dependencies: 11 (Not found), 12 (Not found), 13 (Not found), 25 (Not found), 31 (Not found), 36 (Not found)
+# Status: in-progress
+# Dependencies: 11, 12, 13, 25, 31, 36
 # Priority: medium
 # Description: Document all internal APIs and external API integrations.
 # Details:

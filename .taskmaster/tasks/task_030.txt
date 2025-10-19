@@ -1,7 +1,7 @@
 # Task ID: 30
 # Title: Implement Push Notification System
 # Status: done
-# Dependencies: 17 (Not found), 18 (Not found), 25 (Not found)
+# Dependencies: 17, 18, 25
 # Priority: medium
 # Description: Create a push notification system for material updates and reminders.
 # Details:

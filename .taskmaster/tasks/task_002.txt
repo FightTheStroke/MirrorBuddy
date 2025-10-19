@@ -1,7 +1,7 @@
 # Task ID: 2
 # Title: Integrate SwiftLint for Code Quality
 # Status: done
-# Dependencies: 1 (Not found)
+# Dependencies: 1
 # Priority: high
 # Description: Integrate SwiftLint into the project to enforce code quality standards with zero warnings requirement.
 # Details:

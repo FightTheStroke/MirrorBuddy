@@ -1,7 +1,7 @@
 # Task ID: 42
 # Title: Implement Google Calendar Integration
 # Status: done
-# Dependencies: 7 (Not found), 13 (Not found), 16 (Not found)
+# Dependencies: 7, 13, 16
 # Priority: high
 # Description: Integrate with Google Calendar to extract assignment due dates.
 # Details:

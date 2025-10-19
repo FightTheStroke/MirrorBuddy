@@ -1,7 +1,7 @@
 # Task ID: 110
 # Title: Implement Voice Command Sheets for Settings, Profile, and Help Views
 # Status: done
-# Dependencies: 63 (Not found), 64 (Not found)
+# Dependencies: 63, 64
 # Priority: medium
 # Description: Create modal sheets for Settings, Profile, and Help views that respond to voice commands already handled by AppVoiceCommandHandler in MainTabView.
 # Details:

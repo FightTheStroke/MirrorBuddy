@@ -1,7 +1,7 @@
 # Task ID: 112
 # Title: Implement Voice Command Material Detail Navigation
 # Status: done
-# Dependencies: 28 (Not found), 57 (Not found), 111 (Not found)
+# Dependencies: 28, 57, 111
 # Priority: medium
 # Description: Implement the navigation logic for voice commands to open specific study materials by their ID in the MaterialDetailView when users issue voice commands.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 26
 # Title: Create Subject-Organized Dashboard UI
 # Status: done
-# Dependencies: 3 (Not found), 4 (Not found), 82 (Not found), 83 (Not found)
+# Dependencies: 3, 4, 82, 83
 # Priority: high
 # Description: Design and implement the main dashboard UI organized by subject.
 # Details:

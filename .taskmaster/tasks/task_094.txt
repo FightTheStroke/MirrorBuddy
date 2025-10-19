@@ -1,7 +1,7 @@
 # Task ID: 94
 # Title: Implement Subject and Speaker Detection from Transcripts
 # Status: done
-# Dependencies: 93 (Not found)
+# Dependencies: 93
 # Priority: medium
 # Description: Analyze transcript keywords to auto-assign subject and optionally detect speakers (teacher vs student).
 # Details:

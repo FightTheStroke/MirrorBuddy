@@ -1,7 +1,7 @@
 # Task ID: 69
 # Title: Create User Guide
-# Status: done
-# Dependencies: 26 (Not found), 28 (Not found), 32 (Not found), 35 (Not found), 39 (Not found), 44 (Not found), 46 (Not found), 47 (Not found), 48 (Not found)
+# Status: pending
+# Dependencies: 26, 28, 32, 35, 39, 44, 46, 47, 48
 # Priority: medium
 # Description: Create a user-friendly guide for using the app.
 # Details:

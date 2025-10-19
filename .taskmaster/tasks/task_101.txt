@@ -1,7 +1,7 @@
 # Task ID: 101
 # Title: Implement Context Integration and Fallback for Voice Coach
 # Status: done
-# Dependencies: 31 (Not found), 34 (Not found), 3 (Not found), 4 (Not found), 11 (Not found)
+# Dependencies: 31, 34, 3, 4, 11
 # Priority: high
 # Description: Integrate StudyCoachPersonality AI service for context-aware responses tailored to learning disabilities and implement fallback mechanisms for offline scenarios.
 # Details:

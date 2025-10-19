@@ -1,7 +1,7 @@
 # Task ID: 109
 # Title: Refactor MainTabView into Separate Files with Dedicated ViewModels
 # Status: done
-# Dependencies: 32 (Not found), 44 (Not found)
+# Dependencies: 32, 44
 # Priority: medium
 # Description: Split the MainTabView into separate tab view files with dedicated view models to improve code organization, reduce responsibility overlap, and enhance maintainability.
 # Details:

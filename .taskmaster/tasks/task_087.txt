@@ -1,7 +1,7 @@
 # Task ID: 87
 # Title: Implement Mind Map Generation from Image and Document Content
 # Status: done
-# Dependencies: 86 (Not found)
+# Dependencies: 86
 # Priority: medium
 # Description: Automatically generate mind maps from extracted text and image content using GPT-4.
 # Details:

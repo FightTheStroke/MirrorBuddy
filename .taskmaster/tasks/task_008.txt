@@ -1,7 +1,7 @@
 # Task ID: 8
 # Title: Define SwiftData Models for UserProgress
 # Status: done
-# Dependencies: 1 (Not found)
+# Dependencies: 1
 # Priority: high
 # Description: Create SwiftData models for UserProgress entity to track XP, levels, and achievements.
 # Details:

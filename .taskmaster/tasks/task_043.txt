@@ -1,7 +1,7 @@
 # Task ID: 43
 # Title: Implement Gmail Integration for Assignment Extraction
 # Status: done
-# Dependencies: 7 (Not found), 13 (Not found), 16 (Not found)
+# Dependencies: 7, 13, 16
 # Priority: high
 # Description: Integrate with Gmail to extract assignments from teacher emails.
 # Details:

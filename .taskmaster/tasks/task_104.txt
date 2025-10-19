@@ -1,7 +1,7 @@
 # Task ID: 104
 # Title: Integrate ContextBannerView into Dashboard
 # Status: done
-# Dependencies: 32 (Not found)
+# Dependencies: 32
 # Priority: medium
 # Description: Add ContextBannerView to the top of the ScrollView in MainTabView.swift to provide persistent context awareness of active subject and material across all dashboard interactions.
 # Details:

@@ -1,7 +1,7 @@
 # Task ID: 78
 # Title: Implement Study Time Tracking
-# Status: done
-# Dependencies: 46 (Not found)
+# Status: in-progress
+# Dependencies: 46
 # Priority: medium
 # Description: Create functionality to track study time for XP rewards and analytics.
 # Details:

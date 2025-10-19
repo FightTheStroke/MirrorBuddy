@@ -1,7 +1,7 @@
 # Task ID: 44
 # Title: Create Task List View
 # Status: done
-# Dependencies: 7 (Not found), 42 (Not found), 43 (Not found), 82 (Not found)
+# Dependencies: 7, 42, 43, 82
 # Priority: high
 # Description: Design and implement the task list view for assignments and due dates.
 # Details:

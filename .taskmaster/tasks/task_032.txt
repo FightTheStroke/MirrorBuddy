@@ -1,7 +1,7 @@
 # Task ID: 32
 # Title: Create Voice Conversation UI
 # Status: done
-# Dependencies: 31 (Not found), 82 (Not found)
+# Dependencies: 31, 82
 # Priority: high
 # Description: Design and implement the UI for voice conversations with the AI coach.
 # Details:

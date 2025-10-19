@@ -1,7 +1,7 @@
 # Task ID: 33
 # Title: Implement Study Coach Personality and Prompting
 # Status: done
-# Dependencies: 31 (Not found), 32 (Not found)
+# Dependencies: 31, 32
 # Priority: high
 # Description: Create the personality and prompting system for the AI study coach.
 # Details:

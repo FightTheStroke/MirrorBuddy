@@ -1,7 +1,7 @@
 # Task ID: 40
 # Title: Implement Mind Map Voice Navigation
 # Status: done
-# Dependencies: 29 (Not found), 39 (Not found)
+# Dependencies: 29, 39
 # Priority: medium
 # Description: Create voice commands for navigating mind maps without touch.
 # Details:

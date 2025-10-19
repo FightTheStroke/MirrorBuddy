@@ -1,7 +1,7 @@
 # Task ID: 15
 # Title: Implement Secure Keychain Storage for API Keys
 # Status: done
-# Dependencies: 1 (Not found)
+# Dependencies: 1
 # Priority: high
 # Description: Create a secure storage mechanism for API keys and OAuth tokens using Keychain.
 # Details:

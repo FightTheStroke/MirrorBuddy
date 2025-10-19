@@ -1,6 +1,6 @@
 # Task ID: 113
 # Title: Improve Floating Voice Button Positioning with SafeAreaInset
-# Status: pending
+# Status: in-progress
 # Dependencies: None
 # Priority: medium
 # Description: Refactor the floating voice button positioning to use safeAreaInset instead of fixed padding to prevent content obstruction on smaller screens and in landscape orientation.
@@ -82,3 +82,35 @@ This task involves updating the positioning logic for the floating voice button 
    - Verify button remains tappable with adequate touch target size
    - Ensure button doesn't obstruct critical UI elements
    - Test with screen readers and other accessibility tools
+
+# Subtasks:
+## 1. Audit All Fixed Padding Usages for Floating Voice Button [done]
+### Dependencies: None
+### Description: Identify every instance in the codebase where the floating voice button uses fixed padding or margin values for positioning.
+### Details:
+Search for all hardcoded padding or margin values (e.g., 16, 24) applied to the floating voice button in both portrait and landscape layouts. Document each location for refactoring.
+
+## 2. Integrate SafeAreaInset Utilities for Dynamic Positioning [done]
+### Dependencies: 113.1
+### Description: Replace fixed padding with dynamic calculations using SafeAreaInset or platform-specific equivalents for both iOS and Android.
+### Details:
+Import SafeAreaInset utilities (e.g., SafeAreaInsets.bottom/right for iOS, WindowInsets for Android). Refactor button positioning logic to use these values plus a base margin (e.g., 16px) instead of fixed padding.
+
+## 3. Implement Responsive Positioning for Orientation and Edge Cases [pending]
+### Dependencies: 113.2
+### Description: Ensure the button maintains proper distance from screen edges in all orientations and device types, accounting for notches and unusual aspect ratios.
+### Details:
+Update the positioning logic to recalculate on orientation change and when safe area insets change. Use alignment and spacing options to keep the button visible and unobstructed in all scenarios, including landscape and split-screen modes.
+
+## 4. Add Orientation and Keyboard Visibility Listeners [pending]
+### Dependencies: 113.3
+### Description: Implement listeners to recalculate button position on orientation changes and when the keyboard appears or disappears.
+### Details:
+Use event listeners (e.g., Dimensions.addEventListener for React Native or equivalent) to detect orientation and keyboard changes. Trigger repositioning logic to ensure the button remains accessible and visible.
+
+## 5. Update Animations and Validate Accessibility in All Scenarios [pending]
+### Dependencies: 113.4
+### Description: Refactor any related animations or transitions to work with dynamic positioning and ensure the button is always accessible, including during multitasking and with assistive technologies.
+### Details:
+Adjust animation logic to use dynamic position values. Test with screen readers and in multitasking modes to confirm the button is never obscured and remains interactive.
+

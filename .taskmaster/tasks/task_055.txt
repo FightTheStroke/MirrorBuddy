@@ -1,7 +1,7 @@
 # Task ID: 55
 # Title: Create Onboarding Flow
 # Status: done
-# Dependencies: 16 (Not found), 29 (Not found), 32 (Not found), 35 (Not found)
+# Dependencies: 16, 29, 32, 35
 # Priority: high
 # Description: Design and implement the onboarding experience for new users.
 # Details:

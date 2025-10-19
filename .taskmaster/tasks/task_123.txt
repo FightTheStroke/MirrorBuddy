@@ -1,6 +1,6 @@
 # Task ID: 123
 # Title: Author manual QA & offline/resilience checklist
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: medium
 # Description: Document repeatable QA scenarios covering online/offline switches, backgrounding, low storage, and voice command regressions.
@@ -13,19 +13,19 @@
 
 
 # Subtasks:
-## 1. Draft QA scenario list [pending]
+## 1. Draft QA scenario list [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Enumerate manual test cases for voice commands, offline mode, backgrounding, low storage
 
-## 2. Publish QA checklist doc [pending]
+## 2. Publish QA checklist doc [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Create docs/qa-checklist.md with detailed steps, device matrix, pass/fail criteria
 
-## 3. Integrate into release process [pending]
+## 3. Integrate into release process [done]
 ### Dependencies: None
 ### Description: 
 ### Details:

@@ -1,7 +1,7 @@
 # Task ID: 41
 # Title: Implement Mind Map Export Functionality
 # Status: done
-# Dependencies: 39 (Not found)
+# Dependencies: 39
 # Priority: low
 # Description: Create functionality to export mind maps in various formats.
 # Details:
