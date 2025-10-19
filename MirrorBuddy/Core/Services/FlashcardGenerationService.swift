@@ -51,7 +51,8 @@ final class FlashcardGenerationService {
         from text: String,
         materialID: UUID,
         subject: Subject? = nil,
-        targetCount: Int? = nil
+        targetCount: Int? = nil,
+        forceOffline: Bool = false
     ) async throws -> [Flashcard] {
         logger.info("Generating flashcards for material \(materialID)")
 
@@ -59,6 +60,16 @@ final class FlashcardGenerationService {
             throw FlashcardGenerationError.contentTooShort
         }
 
+        // Check if we should use offline mode
+        let isOnline = await OfflineManager.shared.isOnline
+        let useOfflineMode = forceOffline || !isOnline || openAIClient == nil
+
+        if useOfflineMode {
+            logger.info("Using offline flashcard generation")
+            return try await generateOfflineFlashcards(from: text, materialID: materialID, subject: subject, targetCount: targetCount)
+        }
+
+        // Online mode - use AI generation
         guard let client = openAIClient else {
             throw FlashcardGenerationError.noClientAvailable
         }
@@ -398,6 +409,131 @@ final class FlashcardGenerationService {
             mastered: mastered,
             averageEaseFactor: avgEaseFactor
         )
+    }
+
+    // MARK: - Offline Flashcard Generation (Task 57)
+
+    /// Generate flashcards using rule-based approach when offline
+    private func generateOfflineFlashcards(
+        from text: String,
+        materialID: UUID,
+        subject: Subject?,
+        targetCount: Int?
+    ) async throws -> [Flashcard] {
+        logger.info("Generating offline flashcards using rule-based approach")
+
+        // Calculate target number of flashcards
+        let wordCount = text.split(separator: " ").count
+        let calculatedTarget = max(3, min(10, (wordCount * cardsPerThousandWords) / 1_000))
+        let finalTarget = targetCount ?? calculatedTarget
+
+        var flashcards: [Flashcard] = []
+
+        // Split text into sentences
+        let sentences = text.components(separatedBy: CharacterSet(charactersIn: ".!?"))
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty && $0.split(separator: " ").count >= 5 }
+
+        // Strategy 1: Extract key sentences and create fill-in-the-blank questions
+        let keywordFlashcards = extractKeywordFlashcards(from: sentences, limit: finalTarget / 2)
+        flashcards.append(contentsOf: keywordFlashcards.map { data in
+            Flashcard(
+                materialID: materialID,
+                question: data.question,
+                answer: data.answer,
+                explanation: "Generated from key content in offline mode"
+            )
+        })
+
+        // Strategy 2: Create definition-style questions from longer sentences
+        let definitionFlashcards = extractDefinitionFlashcards(from: sentences, limit: finalTarget - flashcards.count)
+        flashcards.append(contentsOf: definitionFlashcards.map { data in
+            Flashcard(
+                materialID: materialID,
+                question: data.question,
+                answer: data.answer,
+                explanation: "Generated from material content in offline mode"
+            )
+        })
+
+        // Store in SwiftData
+        try storeFlashcards(flashcards)
+
+        logger.info("Generated \(flashcards.count) offline flashcards")
+        return flashcards
+    }
+
+    /// Extract keyword-based flashcards (fill-in-the-blank style)
+    private func extractKeywordFlashcards(from sentences: [String], limit: Int) -> [FlashcardData] {
+        var flashcards: [FlashcardData] = []
+
+        for sentence in sentences.prefix(limit * 2) {
+            let words = sentence.split(separator: " ")
+            guard words.count >= 5 else { continue }
+
+            // Find important words (longer words that might be key terms)
+            let importantWords = words.filter { $0.count >= 5 && !commonWords.contains($0.lowercased()) }
+
+            guard let keyword = importantWords.randomElement() else { continue }
+
+            let question = sentence.replacingOccurrences(of: String(keyword), with: "_____")
+            let answer = String(keyword)
+
+            flashcards.append(FlashcardData(
+                question: "Fill in the blank: \(question)",
+                answer: answer,
+                explanation: nil,
+                difficulty: nil
+            ))
+
+            if flashcards.count >= limit {
+                break
+            }
+        }
+
+        return flashcards
+    }
+
+    /// Extract definition-style flashcards
+    private func extractDefinitionFlashcards(from sentences: [String], limit: Int) -> [FlashcardData] {
+        var flashcards: [FlashcardData] = []
+
+        for sentence in sentences.prefix(limit * 2) {
+            let words = sentence.split(separator: " ")
+            guard words.count >= 8 else { continue }
+
+            // Extract potential topic from beginning of sentence
+            let topic = words.prefix(3).joined(separator: " ")
+
+            flashcards.append(FlashcardData(
+                question: "What does the material say about \(topic)?",
+                answer: sentence,
+                explanation: nil,
+                difficulty: nil
+            ))
+
+            if flashcards.count >= limit {
+                break
+            }
+        }
+
+        return flashcards
+    }
+
+    /// Common words to exclude from keyword extraction
+    private var commonWords: Set<String> {
+        [
+            "the", "is", "are", "was", "were", "be", "been", "being",
+            "have", "has", "had", "do", "does", "did", "will", "would",
+            "could", "should", "may", "might", "must", "can", "this",
+            "that", "these", "those", "with", "from", "about", "into",
+            "through", "during", "before", "after", "above", "below",
+            "between", "under", "over", "again", "further", "then",
+            "once", "here", "there", "when", "where", "why", "how",
+            "all", "both", "each", "few", "more", "most", "other",
+            "some", "such", "only", "own", "same", "than", "too",
+            "very", "just", "but", "and", "for", "not", "also"
+        ]
     }
 }
 
