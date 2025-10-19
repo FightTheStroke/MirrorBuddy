@@ -1,6 +1,6 @@
 # Task ID: 137
 # Title: Redesign dashboard experience with clear states
-# Status: in-progress
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Rebuild the main dashboard to show sync/import progress, accessible sections for new materials, and transparent status messaging.
@@ -25,13 +25,13 @@
 ### Details:
 - Produce wireframes showing processing status, Today card, materials by state, unified voice entry point
 
-## 3. Implement dashboard components [pending]
+## 3. Implement dashboard components [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
 - Build new SwiftUI views (ProcessingStatusView, MaterialsByStateView, unified voice coach banner) and wire to UpdateManager/VoiceCommandHandler
 
-## 4. UX testing & iteration [pending]
+## 4. UX testing & iteration [done]
 ### Dependencies: None
 ### Description: 
 ### Details:
