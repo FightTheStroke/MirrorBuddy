@@ -2692,12 +2692,12 @@
           "36",
           "37"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement math mode specialized features.",
-        "updatedAt": "2025-10-13T09:11:12.370Z"
+        "updatedAt": "2025-10-19T09:16:36.333Z"
       },
       {
         "id": "51",
@@ -2711,12 +2711,12 @@
           "36",
           "37"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement italian mode specialized features.",
-        "updatedAt": "2025-10-13T09:11:12.377Z"
+        "updatedAt": "2025-10-19T11:27:37.927Z"
       },
       {
         "id": "52",
@@ -2730,12 +2730,12 @@
           "36",
           "37"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement history mode specialized features.",
-        "updatedAt": "2025-10-13T09:11:12.382Z"
+        "updatedAt": "2025-10-19T11:27:37.952Z"
       },
       {
         "id": "53",
@@ -2749,12 +2749,12 @@
           "36",
           "37"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement physics/science mode specialized features.",
-        "updatedAt": "2025-10-13T09:11:12.386Z"
+        "updatedAt": "2025-10-19T11:27:38.094Z"
       },
       {
         "id": "54",
@@ -2768,12 +2768,12 @@
           "36",
           "37"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement language mode specialized features.",
-        "updatedAt": "2025-10-13T09:11:12.391Z"
+        "updatedAt": "2025-10-19T11:27:38.101Z"
       },
       {
         "id": "55",
@@ -2944,12 +2944,12 @@
           "20",
           "39"
         ],
-        "status": "done",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement offline mode functionality.",
-        "updatedAt": "2025-10-13T09:11:12.399Z"
+        "updatedAt": "2025-10-19T11:27:43.156Z"
       },
       {
         "id": "58",
@@ -3259,12 +3259,12 @@
           "42",
           "43"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement integration tests.",
-        "updatedAt": "2025-10-13T09:11:12.403Z"
+        "updatedAt": "2025-10-19T11:27:40.981Z"
       },
       {
         "id": "63",
@@ -3283,12 +3283,12 @@
           "55",
           "56"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement ui tests.",
-        "updatedAt": "2025-10-13T09:11:12.408Z"
+        "updatedAt": "2025-10-19T11:27:40.989Z"
       },
       {
         "id": "64",
@@ -3376,12 +3376,12 @@
           "64",
           "65"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on conduct real device testing.",
-        "updatedAt": "2025-10-13T09:11:12.413Z"
+        "updatedAt": "2025-10-19T11:27:41.002Z"
       },
       {
         "id": "67",
@@ -3415,12 +3415,12 @@
           "31",
           "36"
         ],
-        "status": "done",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 7,
         "recommendedSubtasks": 8,
         "expansionPrompt": "Break down the API documentation task into subtasks for each API category. Include tasks for documenting interfaces, creating examples, reviewing for accuracy, and ensuring security. Consider how to structure the documentation for both internal and external developers.",
-        "updatedAt": "2025-10-13T09:11:12.416Z"
+        "updatedAt": "2025-10-19T11:27:43.163Z"
       },
       {
         "id": "69",
@@ -3440,12 +3440,12 @@
           "47",
           "48"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 6,
         "recommendedSubtasks": 9,
         "expansionPrompt": "Break down the user guide creation into subtasks covering each major feature area. Include tasks for content planning, writing, reviewing, and formatting. Consider how to make the guide accessible and user-friendly for different user types.",
-        "updatedAt": "2025-10-13T09:11:12.420Z"
+        "updatedAt": "2025-10-19T11:27:41.008Z"
       },
       {
         "id": "70",
@@ -3462,12 +3462,12 @@
           "64",
           "65"
         ],
-        "status": "done",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 8,
         "expansionPrompt": "Break down the developer notes creation into subtasks for documenting architecture, code organization, performance considerations, limitations, and setup instructions. Consider how to make the documentation useful for current and future developers.",
-        "updatedAt": "2025-10-13T09:11:12.425Z"
+        "updatedAt": "2025-10-19T11:27:43.168Z"
       },
       {
         "id": "71",
@@ -3479,12 +3479,12 @@
         "dependencies": [
           "1"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 8,
         "expansionPrompt": "Break down the deployment guide creation into subtasks covering code signing, App Store setup, TestFlight distribution, submission process, and required assets. Consider how to make the guide useful for both initial and ongoing deployments.",
-        "updatedAt": "2025-10-13T08:33:00.028Z"
+        "updatedAt": "2025-10-19T11:27:41.016Z"
       },
       {
         "id": "72",
@@ -3730,12 +3730,12 @@
         "dependencies": [
           "46"
         ],
-        "status": "done",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement study time tracking.",
-        "updatedAt": "2025-10-13T09:11:12.429Z"
+        "updatedAt": "2025-10-19T11:27:43.175Z"
       },
       {
         "id": "79",
@@ -3748,12 +3748,12 @@
           "6",
           "23"
         ],
-        "status": "done",
+        "status": "in-progress",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement spaced repetition system for flashcards.",
-        "updatedAt": "2025-10-13T09:11:12.434Z"
+        "updatedAt": "2025-10-19T11:27:43.182Z"
       },
       {
         "id": "80",
@@ -3771,12 +3771,12 @@
           "65",
           "66"
         ],
-        "status": "done",
+        "status": "pending",
         "subtasks": [],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on prepare for testflight distribution.",
-        "updatedAt": "2025-10-13T09:11:12.438Z"
+        "updatedAt": "2025-10-19T11:27:41.024Z"
       },
       {
         "id": "81",
@@ -5053,7 +5053,7 @@
         "description": "Refactor the floating voice button positioning to use safeAreaInset instead of fixed padding to prevent content obstruction on smaller screens and in landscape orientation.",
         "details": "This task involves updating the positioning logic for the floating voice button to ensure proper display across all device sizes and orientations:\n\n1. Identify all instances where the floating voice button positioning is currently defined with fixed padding values.\n\n2. Replace fixed padding values with dynamic calculations using SafeAreaInset:\n   - Import the necessary SafeArea utilities from the platform-specific libraries\n   - For iOS: Use `SafeAreaInsets.bottom` and `SafeAreaInsets.right` \n   - For Android: Implement equivalent functionality using `WindowInsets`\n\n3. Create a responsive positioning system that:\n   - Maintains proper distance from screen edges in both portrait and landscape orientations\n   - Adjusts position based on available safe area\n   - Handles notches, rounded corners, and other device-specific features\n\n4. Implement orientation change listeners to reposition the button when device orientation changes:\n   ```javascript\n   // Example implementation\n   useEffect(() => {\n     const handleOrientationChange = () => {\n       // Recalculate button position based on new orientation\n       const safeArea = getSafeAreaInsets();\n       setButtonPosition({\n         bottom: safeArea.bottom + 16, // Base padding + safe area\n         right: safeArea.right + 16\n       });\n     };\n     \n     // Add orientation change listener\n     Dimensions.addEventListener('change', handleOrientationChange);\n     \n     // Initial calculation\n     handleOrientationChange();\n     \n     return () => {\n       Dimensions.removeEventListener('change', handleOrientationChange);\n     };\n   }, []);\n   ```\n\n5. Ensure the button remains accessible and visible in all scenarios, particularly:\n   - When keyboard is visible\n   - During split-screen multitasking\n   - On devices with unusual aspect ratios\n\n6. Update any related animations or transitions to work with the new dynamic positioning system.",
         "testStrategy": "1. Device Testing:\n   - Test on at least 3 different physical device sizes (small, medium, large)\n   - Test in both portrait and landscape orientations\n   - Test on devices with notches, punch-holes, or other screen irregularities\n   - Verify button remains visible and accessible in all scenarios\n\n2. Simulator/Emulator Testing:\n   - Use iOS Simulator and Android Emulator to test various device configurations\n   - Test with different safe area configurations (notches, rounded corners, etc.)\n   - Verify correct positioning across all simulated devices\n\n3. Orientation Change Testing:\n   - Rotate devices between portrait and landscape multiple times\n   - Verify button smoothly transitions to correct position\n   - Check that button remains accessible during and after rotation\n\n4. Edge Case Testing:\n   - Test with keyboard open\n   - Test in split-screen/multi-window mode\n   - Test with system UI elements visible (status bars, navigation bars)\n   - Test with system gestures (swipe up for home, etc.)\n\n5. Visual Regression Testing:\n   - Compare screenshots before and after implementation\n   - Verify button positioning is consistent or improved across all test cases\n\n6. Accessibility Testing:\n   - Verify button remains tappable with adequate touch target size\n   - Ensure button doesn't obstruct critical UI elements\n   - Test with screen readers and other accessibility tools",
-        "status": "done",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "medium",
         "subtasks": [
@@ -5121,7 +5121,7 @@
         "complexity": 6,
         "recommendedSubtasks": 5,
         "expansionPrompt": "Break down the refactor into: (1) auditing all fixed padding usages, (2) integrating SafeAreaInset utilities for both iOS and Android, (3) implementing responsive positioning for orientation and edge cases, (4) adding orientation and keyboard visibility listeners, and (5) updating animations and validating accessibility.",
-        "updatedAt": "2025-10-19T08:26:52.817Z"
+        "updatedAt": "2025-10-19T11:27:14.864Z"
       },
       {
         "id": "114",
@@ -5575,7 +5575,7 @@
         "id": "121",
         "title": "Expand baseline test coverage for core services",
         "description": "Add unit tests for VoiceConversationViewModel, UpdateManager, StudyView workflows, and resilience utilities to lift coverage and protect regressions. Note: Test execution and coverage measurement are currently blocked by compilation errors in ModelTests.swift (8 optional unwrapping issues). These must be resolved before coverage can be measured or CI integration can proceed.",
-        "status": "done",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "high",
         "details": "- Write async tests simulating voice session toggles and offline fallback\n- Cover UpdateManager orchestration with mocked services\n- Add StudyView tests (e.g., using ViewInspector)\n- Ensure circuit breaker/retry tests assert actor behaviour\n- Resolve ModelTests.swift compilation errors (8 optional unwrapping issues on lines 126, 535, 666, 677, 678, 698, 699, 700) to unblock test execution and coverage measurement",
@@ -5640,7 +5640,7 @@
         "complexity": 5,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Divide into: (1) identifying key modules for coverage, (2) authoring unit/integration tests, (3) running coverage and ensuring >80%, and (4) adding regression tests for resilience.",
-        "updatedAt": "2025-10-18T19:42:10.911Z"
+        "updatedAt": "2025-10-19T11:27:18.311Z"
       },
       {
         "id": "122",
@@ -6513,7 +6513,7 @@
         "description": "Rebuild the main dashboard to show sync/import progress, accessible sections for new materials, and transparent status messaging.",
         "details": "- Create processing status module after Aggiornami (e.g., 'Sto generando mappe mentali')\n- Organize materials into 'In lavorazione', 'Pronte', 'Da ascoltare'\n- Provide visible affordances for voice coach, Today card, and quick next steps",
         "testStrategy": "",
-        "status": "done",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -6563,7 +6563,7 @@
         "complexity": 6,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Break into: (1) mapping UX pain points, (2) designing new dashboard layout, (3) implementing dashboard components, and (4) UX testing and iteration.",
-        "updatedAt": "2025-10-19T08:26:55.329Z"
+        "updatedAt": "2025-10-19T11:27:20.809Z"
       },
       {
         "id": "138",
@@ -6631,7 +6631,7 @@
         "description": "Simplify voice UI by providing a single clear entry point, removing redundant microphone icons, and aligning command vs conversation flows.",
         "details": "- Audit all screens for voice buttons\n- Decide on primary access (e.g., floating assistant + Today suggestions)\n- Update design so commands/conversation share consistent affordances\n- Provide onboarding hints so Mario knows how to speak",
         "testStrategy": "",
-        "status": "pending",
+        "status": "done",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -6640,52 +6640,57 @@
             "title": "Audit voice controls",
             "description": "",
             "details": "- Inventory all microphone/voice buttons across screens and document purpose",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 139,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T08:43:44.264Z"
           },
           {
             "id": 2,
             "title": "Define unified voice model",
             "description": "",
             "details": "- Decide single entry (e.g., floating assistant) + secondary affordances; draft UX copy and onboarding tips",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 139,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T08:43:46.824Z"
           },
           {
             "id": 3,
             "title": "Update UI and remove redundant buttons",
             "description": "",
             "details": "- Replace scattered microphones with chosen entry point, adjust QuickActions, integrate instructions",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 139,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T08:43:49.503Z"
           },
           {
             "id": 4,
             "title": "Onboarding & testing",
             "description": "",
             "details": "- Update onboarding to explain voice usage, run usability tests ensuring Mario understands how to speak",
-            "status": "pending",
+            "status": "deferred",
             "dependencies": [],
             "parentTaskId": 139,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-19T08:43:57.501Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 4,
-        "expansionPrompt": "Break into: (1) auditing voice controls, (2) defining unified voice model, (3) updating UI and removing redundant buttons, and (4) onboarding and testing."
+        "expansionPrompt": "Break into: (1) auditing voice controls, (2) defining unified voice model, (3) updating UI and removing redundant buttons, and (4) onboarding and testing.",
+        "updatedAt": "2025-10-19T08:44:00.142Z"
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-19T08:26:55.333Z",
+      "lastModified": "2025-10-19T11:27:43.183Z",
       "taskCount": 139,
-      "completedCount": 123,
+      "completedCount": 105,
       "tags": [
         "master"
       ]
