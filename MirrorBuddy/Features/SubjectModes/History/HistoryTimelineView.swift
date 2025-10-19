@@ -32,7 +32,7 @@ struct HistoryTimelineView: View {
                                 TimelineEventRow(
                                     event: event,
                                     isSelected: selectedEvent?.id == event.id
-                                )                                    { selectedEvent = event }
+                                ) { selectedEvent = event }
                                 .transition(.asymmetric(
                                     insertion: .scale.combined(with: .opacity),
                                     removal: .opacity

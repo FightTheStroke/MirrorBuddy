@@ -151,54 +151,54 @@ struct LessonRecordingView: View {
     // MARK: - Ready to Record View
 
     private var readyToRecordView: some View {
-    VStack(spacing: 32) {
-    Spacer()
+        VStack(spacing: 32) {
+            Spacer()
 
-    VStack(spacing: 16) {
-    Image(systemName: "waveform.circle.fill")
-    .font(.system(size: 100))
-    .foregroundColor(.blue)
-    .symbolEffect(.pulse)
+            VStack(spacing: 16) {
+                Image(systemName: "waveform.circle.fill")
+                    .font(.system(size: 100))
+                    .foregroundColor(.blue)
+                    .symbolEffect(.pulse)
 
-    Text("Ready to Record")
-    .font(.title)
-    .fontWeight(.bold)
+                Text("Ready to Record")
+                    .font(.title)
+                    .fontWeight(.bold)
 
-    Text("Tap the button below to start recording your lesson. The app will continue recording even when in the background.")
-    .font(.body)
-    .foregroundColor(.secondary)
-    .multilineTextAlignment(.center)
-    .padding(.horizontal)
-    }
+                Text("Tap the button below to start recording your lesson. The app will continue recording even when in the background.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+            }
 
-    // Storage info
-    storageInfoCard
+            // Storage info
+            storageInfoCard
 
-    Spacer()
+            Spacer()
 
-    // Start recording button
-    Button {
-    showingTitleInput = true
-    } label: {
-    HStack {
-    Image(systemName: "mic.fill")
-    Text("Start Recording")
-    .fontWeight(.semibold)
-    }
-    .font(.title3)
-    .foregroundColor(.white)
-    .frame(maxWidth: .infinity)
-    .padding()
-    .background(
-    hasEnoughStorage
-    ? Color.red
-    : Color.gray
-    )
-    .cornerRadius(16)
-    }
-    .disabled(!hasEnoughStorage)
-    .padding(.bottom, 32)
-    }
+            // Start recording button
+            Button {
+                showingTitleInput = true
+            } label: {
+                HStack {
+                    Image(systemName: "mic.fill")
+                    Text("Start Recording")
+                        .fontWeight(.semibold)
+                }
+                .font(.title3)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    hasEnoughStorage
+                        ? Color.red
+                        : Color.gray
+                )
+                .cornerRadius(16)
+            }
+            .disabled(!hasEnoughStorage)
+            .padding(.bottom, 32)
+        }
     }
 
     // MARK: - Storage Monitor Card

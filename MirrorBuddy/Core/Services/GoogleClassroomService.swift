@@ -59,7 +59,10 @@ final class GoogleClassroomService: ObservableObject {
 
     /// Fetch user's courses
     func fetchCourses(accessToken: String) async throws -> [ClassroomCourse] {
-        let url = URL(string: "\(baseURL)/courses")!
+        guard let url = URL(string: "\(baseURL)/courses") else {
+            throw NSError(domain: "GoogleClassroom", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid URL for courses"])
+        }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
@@ -79,7 +82,10 @@ final class GoogleClassroomService: ObservableObject {
         accessToken: String,
         courseID: String
     ) async throws -> [ClassroomCourseWork] {
-        let url = URL(string: "\(baseURL)/courses/\(courseID)/courseWork")!
+        guard let url = URL(string: "\(baseURL)/courses/\(courseID)/courseWork") else {
+            throw NSError(domain: "GoogleClassroom", code: -2,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid URL for coursework"])
+        }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 

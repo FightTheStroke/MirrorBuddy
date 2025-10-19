@@ -92,7 +92,7 @@ struct MathCalculatorView: View {
                     ForEach(row, id: \.self) { button in
                         CalculatorButton(
                             button: button
-                        )                            { calculator.processInput(button) }
+                        ) { calculator.processInput(button) }
                     }
                 }
             }

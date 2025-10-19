@@ -28,7 +28,10 @@ final class LMSIntegrationService {
 
     func fetchCanvasAssignments(apiKey: String, baseURL: String) async throws -> [Assignment] {
         // Canvas API: GET /api/v1/courses/:course_id/assignments
-        let url = URL(string: "\(baseURL)/api/v1/users/self/upcoming_events")!
+        guard let url = URL(string: "\(baseURL)/api/v1/users/self/upcoming_events") else {
+            throw NSError(domain: "LMSIntegration", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid Canvas URL"])
+        }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
 
@@ -41,7 +44,10 @@ final class LMSIntegrationService {
 
     func fetchGoogleClassroomAssignments(accessToken: String) async throws -> [Assignment] {
         // Google Classroom API: GET /v1/courses/{courseId}/courseWork
-        let url = URL(string: "https://classroom.googleapis.com/v1/courses/-/courseWork")!
+        guard let url = URL(string: "https://classroom.googleapis.com/v1/courses/-/courseWork") else {
+            throw NSError(domain: "LMSIntegration", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid Google Classroom URL"])
+        }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
@@ -82,7 +88,10 @@ final class LMSIntegrationService {
 
     func exportToNotion(mindMap: MindMap, apiKey: String, pageId: String) async throws {
         // Notion API: POST /v1/blocks/{block_id}/children
-        let url = URL(string: "https://api.notion.com/v1/blocks/\(pageId)/children")!
+        guard let url = URL(string: "https://api.notion.com/v1/blocks/\(pageId)/children") else {
+            throw NSError(domain: "LMSIntegration", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid Notion URL"])
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")

@@ -1,18 +1,17 @@
-import Foundation
 import Combine
+import Foundation
 import SwiftUI
 
 /// Tracks user context for proactive coaching decisions
 @MainActor
 final class ContextTracker: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var currentSubject: String?
     @Published var currentMaterial: Material?
     @Published var currentActivity: StudyActivity = .idle
     @Published var sessionStartTime: Date?
-    @Published var lastInteractionTime: Date = Date()
+    @Published var lastInteractionTime = Date()
     @Published var emotionalState: EmotionalState = .neutral
     @Published var studyMode: StudyMode?
 

@@ -38,7 +38,10 @@ final class CanvasAPIService: ObservableObject {
 
     /// Fetch user's courses from Canvas
     func fetchCourses(baseURL: String, accessToken: String) async throws -> [CanvasCourse] {
-        let url = URL(string: "https://\(baseURL)/api/v1/courses")!
+        guard let url = URL(string: "https://\(baseURL)/api/v1/courses") else {
+            throw NSError(domain: "CanvasAPI", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid URL for courses"])
+        }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
@@ -58,7 +61,10 @@ final class CanvasAPIService: ObservableObject {
         accessToken: String,
         courseID: Int
     ) async throws -> [CanvasAssignment] {
-        let url = URL(string: "https://\(baseURL)/api/v1/courses/\(courseID)/assignments")!
+        guard let url = URL(string: "https://\(baseURL)/api/v1/courses/\(courseID)/assignments") else {
+            throw NSError(domain: "CanvasAPI", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid URL for assignments"])
+        }
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
@@ -158,7 +164,10 @@ final class CanvasAPIService: ObservableObject {
         clientSecret: String,
         code: String
     ) async throws -> (accessToken: String, refreshToken: String?) {
-        let url = URL(string: "https://\(baseURL)/login/oauth2/token")!
+        guard let url = URL(string: "https://\(baseURL)/login/oauth2/token") else {
+            throw NSError(domain: "CanvasAPI", code: -1,
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid URL for token exchange"])
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")

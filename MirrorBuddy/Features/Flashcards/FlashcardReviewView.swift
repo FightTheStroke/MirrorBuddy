@@ -53,7 +53,7 @@ struct FlashcardReviewView: View {
                     FlashcardView(
                         flashcard: flashcard,
                         showAnswer: showAnswer
-                    )                        { showAnswer.toggle() }
+                    ) { showAnswer.toggle() }
 
                     // Review buttons or show answer button
                     if showAnswer {

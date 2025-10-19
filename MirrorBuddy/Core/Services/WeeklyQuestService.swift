@@ -137,7 +137,7 @@ final class WeeklyQuestService {
         }
 
         // Fill remaining slots with random quests
-        let remaining = questTemplates.filter { !selectedTemplates.contains { $0.type == $0.type }}
+        let remaining = questTemplates.filter { !selectedTemplates.contains { $0.type == $0.type } }
         selectedTemplates.append(contentsOf: remaining.shuffled().prefix(count - 1))
 
         // Create quest instances

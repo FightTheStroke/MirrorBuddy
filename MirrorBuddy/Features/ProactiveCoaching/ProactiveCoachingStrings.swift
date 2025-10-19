@@ -2,7 +2,6 @@ import Foundation
 
 /// Centralized localization for Proactive Coaching feature
 enum ProactiveCoachingStrings {
-
     // MARK: - Context Tracker
 
     enum StudyMode {

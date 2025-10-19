@@ -67,7 +67,7 @@ final class BackgroundSyncService: ObservableObject {
             components.hour = 13
         }
         components.minute = 0
-        return calendar.date(from: components) ?? Date().addingTimeInterval(3600) // Fallback: 1 hour from now
+        return calendar.date(from: components) ?? Date().addingTimeInterval(3_600) // Fallback: 1 hour from now
     }
 
     private func handleBackgroundSync(task: BGProcessingTask) async {
