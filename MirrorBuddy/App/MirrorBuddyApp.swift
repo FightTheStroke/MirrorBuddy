@@ -46,7 +46,8 @@ struct MirrorBuddyApp: App {
             TrackedDriveFile.self,
             Transcript.self,
             VoiceMessage.self,
-            VoiceConversation.self
+            VoiceConversation.self,
+            StudySession.self
         ])
 
         // Automatically enable CloudKit on real devices, disable on simulator
@@ -130,6 +131,11 @@ struct MirrorBuddyApp: App {
                         if !NotificationManager.shared.isAuthorized {
                             _ = try? await NotificationManager.shared.requestAuthorization()
                         }
+                    }
+
+                    // Task 57: Start offline network monitoring
+                    _Concurrency.Task { @MainActor in
+                        OfflineManager.shared.startMonitoring()
                     }
                 }
         }

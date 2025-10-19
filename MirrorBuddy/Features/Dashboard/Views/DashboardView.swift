@@ -56,6 +56,10 @@ struct DashboardView: View {
                 // Context Banner at the top (Task 102.1)
                 ContextBannerView()
 
+                // Task 57: Offline mode banner
+                ConnectionStatusBanner()
+                    .padding(.top, 8)
+
                 ScrollView {
                     VStack(spacing: 20) {
                         // Task 137.2: Today Card with personalized priorities
@@ -91,7 +95,11 @@ struct DashboardView: View {
             .navigationTitle("MirrorBuddy")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    CompactSyncStatusView()
+                    HStack(spacing: 8) {
+                        CompactSyncStatusView()
+                        // Task 57: Connection type indicator
+                        ConnectionTypeIndicator()
+                    }
                 }
 
                 ToolbarItem {
@@ -224,6 +232,8 @@ struct QuickActionsSection: View {
     @Binding var showingImport: Bool
     @State private var showingScanner = false
     @State private var scannedMaterial: Material?
+    @State private var showingStudyTimer = false
+    @StateObject private var timer = StudyTimerService.shared
     // Note: Voice conversation removed - now handled by SmartVoiceButton (Task 139.3)
 
     var body: some View {
@@ -234,6 +244,13 @@ struct QuickActionsSection: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
+                    // Task 78: Study Timer Quick Action
+                    StudyTimerCard(
+                        showingStudyTimer: $showingStudyTimer,
+                        timer: timer
+                    )
+                    .accessibilityLabelWithVoiceCommand("Timer di studio", voiceCommand: "avvia timer")
+
                     QuickActionCard(
                         icon: "cloud.fill",
                         title: "Importa da Drive",
@@ -267,6 +284,11 @@ struct QuickActionsSection: View {
         .sheet(item: $scannedMaterial) { material in
             MaterialDetailView(material: material)
         }
+        .sheet(isPresented: $showingStudyTimer) {
+            NavigationStack {
+                StudyTimerView()
+            }
+        }
         // Note: Voice conversation sheet removed - now handled by SmartVoiceButton (Task 139.3)
     }
 }
@@ -279,13 +301,31 @@ struct MaterialsSection: View {
     let subjects: [SubjectEntity]
     @Binding var showingImport: Bool
     @Binding var selectedMaterial: Material?
+    @StateObject private var offlineManager = OfflineManager.shared
 
     var body: some View {
         Group {
             if materials.isEmpty {
                 emptyState
             } else {
-                materialsList
+                VStack(spacing: 0) {
+                    // Task 57: Offline materials indicator
+                    if !offlineManager.isOnline {
+                        HStack {
+                            Image(systemName: "arrow.down.circle.fill")
+                                .foregroundColor(.green)
+                            Text("Showing cached materials")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color.green.opacity(0.1))
+                    }
+
+                    materialsList
+                }
             }
         }
     }
@@ -294,14 +334,16 @@ struct MaterialsSection: View {
         ContentUnavailableView {
             Label("Nessun materiale", systemImage: "book.closed")
         } description: {
-            Text("Importa materiali da Google Drive per iniziare")
+            Text(offlineManager.isOnline ? "Importa materiali da Google Drive per iniziare" : "Offline - cannot import materials")
         } actions: {
-            Button {
-                showingImport = true
-            } label: {
-                Label("Importa materiali", systemImage: "cloud.fill")
+            if offlineManager.isOnline {
+                Button {
+                    showingImport = true
+                } label: {
+                    Label("Importa materiali", systemImage: "cloud.fill")
+                }
+                .buttonStyle(.borderedProminent)
             }
-            .buttonStyle(.borderedProminent)
         }
         .frame(height: 300)
     }
@@ -385,5 +427,52 @@ struct QuickActionCard: View {
         .buttonStyle(.childFriendly)
         .accessibilityLabel(title)
         .accessibilityHint("Tocca due volte per aprire")
+    }
+}
+
+// MARK: - Study Timer Card (Task 78)
+
+/// Study timer quick action card with live timer display
+struct StudyTimerCard: View {
+    @Binding var showingStudyTimer: Bool
+    @ObservedObject var timer: StudyTimerService
+
+    var body: some View {
+        Button {
+            showingStudyTimer = true
+        } label: {
+            VStack(spacing: 8) {
+                HStack(spacing: 4) {
+                    Image(systemName: timer.isRunning ? "timer.circle.fill" : "timer")
+                        .font(.system(size: 32))
+                        .foregroundStyle(timer.isRunning ? .blue : .orange)
+                        .symbolEffect(.pulse, isActive: timer.isRunning)
+
+                    if timer.isRunning {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(timer.formattedTime)
+                                .font(.caption.bold().monospaced())
+                                .foregroundStyle(.blue)
+                            if timer.isPaused {
+                                Text("In pausa")
+                                    .font(.system(size: 8))
+                                    .foregroundStyle(.orange)
+                            }
+                        }
+                    }
+                }
+
+                Text(timer.isRunning ? "Timer attivo" : "Timer di studio")
+                    .font(.caption)
+                    .foregroundStyle(.primary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(width: 120, height: 100)
+            .background(timer.isRunning ? Color.blue.opacity(0.1) : Color.orange.opacity(0.1))
+            .cornerRadius(12)
+        }
+        .buttonStyle(.childFriendly)
+        .accessibilityLabel("Timer di studio")
+        .accessibilityHint("Tocca due volte per aprire il timer")
     }
 }
