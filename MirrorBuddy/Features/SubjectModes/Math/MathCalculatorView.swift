@@ -399,7 +399,7 @@ final class MathCalculator: ObservableObject {
     }
 
     private func handlePercent() {
-        currentValue = currentValue / 100
+        currentValue /= 100
         displayValue = formatNumber(currentValue)
     }
 
@@ -432,7 +432,7 @@ final class MathCalculator: ObservableObject {
     }
 
     private func handleSquare() {
-        currentValue = currentValue * currentValue
+        currentValue *= currentValue
         displayValue = formatNumber(currentValue)
         shouldResetDisplay = true
     }

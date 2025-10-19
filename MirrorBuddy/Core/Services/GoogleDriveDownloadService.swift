@@ -300,8 +300,12 @@ final class GoogleDriveDownloadService: ObservableObject {
             forTaskWithIdentifier: Self.backgroundTaskIdentifier,
             using: nil
         ) { task in
+            guard let processingTask = task as? BGProcessingTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
             _Concurrency.Task { @MainActor in
-                await self.handleBackgroundDownload(task: task as! BGProcessingTask)
+                await self.handleBackgroundDownload(task: processingTask)
             }
         }
     }
@@ -522,7 +526,7 @@ final class GoogleDriveDownloadService: ObservableObject {
     private func calculateMD5(for url: URL) -> String? {
         guard let data = try? Data(contentsOf: url) else { return nil }
 
-        var digest = [UInt8](repeating: 0, count: Int(CC_MD5_DIGEST_LENGTH))
+        var digest = [UInt8](repeating: 0, count: md5DigestLength)
         data.withUnsafeBytes { buffer in
             _ = CC_MD5(buffer.baseAddress, CC_LONG(data.count), &digest)
         }
@@ -695,7 +699,7 @@ private class DownloadOperation {
 
 import CommonCrypto
 
-private let CC_MD5_DIGEST_LENGTH = 16
+private let md5DigestLength = 16
 
 private func CC_MD5(_ data: UnsafeRawPointer!, _ len: CC_LONG, _ md: UnsafeMutablePointer<UInt8>!) -> UnsafeMutablePointer<UInt8>! {
     // This is a placeholder - CommonCrypto CC_MD5 is available on iOS

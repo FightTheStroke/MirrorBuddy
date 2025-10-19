@@ -433,9 +433,17 @@ final class SimplifiedExplanationService {
 
     // MARK: - Batch Processing (Subtask 24.2)
 
+    /// Concept request for batch generation
+    struct ConceptRequest {
+        let concept: String
+        let context: String?
+        let materialID: UUID
+        let subject: Subject?
+    }
+
     /// Generate explanations for multiple concepts
     func generateExplanationsBatch(
-        concepts: [(concept: String, context: String?, materialID: UUID, subject: Subject?)],
+        concepts: [ConceptRequest],
         level: ExplanationLevel = .simplified
     ) async throws -> [SimplifiedExplanation] {
         var explanations: [SimplifiedExplanation] = []
@@ -513,7 +521,7 @@ final class SimplifiedExplanationService {
 
         // Generate explanations for each concept
         let conceptItems = concepts.map { concept in
-            (concept: concept, context: text, materialID: materialID, subject: subject)
+            ConceptRequest(concept: concept, context: text, materialID: materialID, subject: subject)
         }
 
         return try await generateExplanationsBatch(concepts: conceptItems, level: level)

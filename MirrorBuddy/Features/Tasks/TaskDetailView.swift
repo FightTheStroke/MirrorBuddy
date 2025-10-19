@@ -658,7 +658,9 @@ extension TaskSource {
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Task.self, Material.self, SubjectEntity.self, configurations: config)
+    guard let container = try? ModelContainer(for: Task.self, Material.self, SubjectEntity.self, configurations: config) else {
+        return Text("Preview unavailable")
+    }
 
     let context = container.mainContext
 

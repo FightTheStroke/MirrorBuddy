@@ -264,7 +264,9 @@ struct StatBadge: View {
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Material.self, configurations: config)
+    guard let container = try? ModelContainer(for: Material.self, configurations: config) else {
+        return Text("Preview unavailable")
+    }
 
     // Create sample materials
     let material1 = Material(title: "Matematica - Equazioni", subject: nil)

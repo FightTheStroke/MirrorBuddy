@@ -446,7 +446,9 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: MindMap.self, configurations: config)
+    guard let container = try? ModelContainer(for: MindMap.self, configurations: config) else {
+        return Text("Preview unavailable")
+    }
 
     let mindMap = MindMap(materialID: UUID())
     container.mainContext.insert(mindMap)
