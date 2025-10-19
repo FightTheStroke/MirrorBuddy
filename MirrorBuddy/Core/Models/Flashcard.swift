@@ -15,7 +15,7 @@ final class Flashcard {
     var easeFactor: Double = 2.5 // Starts at 2.5
     var interval: Int = 1 // Days until next review
     var repetitions: Int = 0 // Number of consecutive correct answers
-    var nextReviewDate = Date()
+    var nextReviewDate: Date? // nil = never reviewed, due immediately
 
     var createdAt = Date()
     var lastReviewedAt: Date?
@@ -50,7 +50,7 @@ final class Flashcard {
         self.easeFactor = 2.5
         self.interval = 1
         self.repetitions = 0
-        self.nextReviewDate = Date()
+        self.nextReviewDate = nil // Will be set on first review
         self.createdAt = Date()
     }
 

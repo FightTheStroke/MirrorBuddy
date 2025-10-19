@@ -8,7 +8,7 @@ final class StructuredAuditLogger {
 
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "Audit")
 
-    enum EventType: String {
+    enum EventType: String, Codable {
         case voiceCommand = "voice_command"
         case apiCall = "api_call"
         case dataExport = "data_export"
