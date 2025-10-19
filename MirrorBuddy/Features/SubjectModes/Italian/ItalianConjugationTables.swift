@@ -2,7 +2,6 @@ import Foundation
 
 /// Comprehensive Italian verb conjugation system covering all tenses and moods
 final class ItalianConjugationTables {
-
     // MARK: - Conjugation Retrieval
 
     /// Get full conjugation table for a verb

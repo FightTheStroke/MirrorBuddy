@@ -4,7 +4,6 @@ import os.log
 /// Analyzes voice characteristics and text to detect emotional sentiment
 @MainActor
 final class SentimentAnalyzer {
-
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "SentimentAnalyzer")
 
     // MARK: - Sentiment Types

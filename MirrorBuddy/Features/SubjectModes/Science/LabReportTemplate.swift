@@ -2,7 +2,6 @@ import Foundation
 
 /// Templates for generating structured lab reports
 enum LabReportTemplate {
-
     enum TemplateType: String, CaseIterable {
         case physics = "Physics Lab"
         case chemistry = "Chemistry Lab"

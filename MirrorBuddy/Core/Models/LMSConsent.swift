@@ -51,6 +51,6 @@ final class LMSConsent {
 
     /// Check if consent is valid
     var isValid: Bool {
-        return isGranted && revokedAt == nil
+        isGranted && revokedAt == nil
     }
 }

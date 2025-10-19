@@ -41,6 +41,6 @@ final class StudySession {
 
     /// Calculate XP based on study duration (1 XP per minute)
     func calculateXP() -> Int {
-        return durationMinutes
+        durationMinutes
     }
 }

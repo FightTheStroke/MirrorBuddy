@@ -1,9 +1,8 @@
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 @MainActor
 final class SentimentAnalyzerTests: XCTestCase {
-
     var sut: SentimentAnalyzer!
 
     override func setUp() async throws {

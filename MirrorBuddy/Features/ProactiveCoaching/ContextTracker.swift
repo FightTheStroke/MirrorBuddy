@@ -25,7 +25,7 @@ final class ContextTracker: ObservableObject {
         case mindMap
         case voiceConversation
         case taskWork
-        case break
+        case takingBreak
     }
 
     enum EmotionalState {

@@ -45,7 +45,7 @@ final class MathProblemSolver {
         let normalizedCorrectAnswer = normalizeAnswer(problem.correctAnswer)
 
         let isCorrect = normalizedAnswer == normalizedCorrectAnswer ||
-                       areNumericallyEquivalent(normalizedAnswer, normalizedCorrectAnswer)
+            areNumericallyEquivalent(normalizedAnswer, normalizedCorrectAnswer)
 
         return ValidationResult(
             isCorrect: isCorrect,
@@ -274,7 +274,7 @@ final class MathProblemSolver {
     private func parseQuadraticEquation(_ equation: String) -> (a: Double, b: Double, c: Double)? {
         // Simplified parser - production code would use proper expression parsing
         // For "x^2 + 5x + 6 = 0"
-        return (1, 5, 6) // Placeholder
+        (1, 5, 6) // Placeholder
     }
 
     private func evaluateArithmeticExpression(_ expression: String) -> Double? {

@@ -3,11 +3,10 @@ import os.log
 
 /// Coach persona configuration for tone and personality
 @MainActor
-final class CoachPersona: ObservableObject {
+final class CoachPersonaService: ObservableObject {
+    static let shared = CoachPersonaService()
 
-    static let shared = CoachPersona()
-
-    private let logger = Logger(subsystem: "com.mirrorbuddy", category: "CoachPersona")
+    private let logger = Logger(subsystem: "com.mirrorbuddy", category: "CoachPersonaService")
 
     // MARK: - Persona Types
 

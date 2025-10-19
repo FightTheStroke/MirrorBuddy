@@ -6,11 +6,10 @@
 //  Tests Levenshtein distance, Soundex, and Jaro-Winkler similarity
 //
 
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 final class FuzzyMatcherTests: XCTestCase {
-
     var matcher: FuzzyMatcher!
 
     override func setUp() {
@@ -320,7 +319,7 @@ final class FuzzyMatcherTests: XCTestCase {
     // MARK: - Edge Cases
 
     func testVeryLongStrings() {
-        let longString = String(repeating: "a", count: 1000)
+        let longString = String(repeating: "a", count: 1_000)
         let longStringWithTypo = String(repeating: "a", count: 999) + "b"
 
         let distance = matcher.levenshteinDistance(longString, longStringWithTypo)
@@ -352,7 +351,7 @@ final class FuzzyMatcherTests: XCTestCase {
 
     func testLevenshteinPerformance() {
         measure {
-            for _ in 0..<1000 {
+            for _ in 0..<1_000 {
                 _ = matcher.levenshteinDistance("quadratic equation", "quadrtatic equation")
             }
         }
@@ -361,7 +360,7 @@ final class FuzzyMatcherTests: XCTestCase {
 
     func testSoundexPerformance() {
         measure {
-            for _ in 0..<1000 {
+            for _ in 0..<1_000 {
                 _ = matcher.soundex("phosphorus")
             }
         }
@@ -369,7 +368,7 @@ final class FuzzyMatcherTests: XCTestCase {
     }
 
     func testFuzzyMatchPerformanceLarge() {
-        let candidates = (0..<1000).map { "material \($0)" }
+        let candidates = (0..<1_000).map { "material \($0)" }
 
         measure {
             _ = matcher.findMatches(query: "material 500", in: candidates)

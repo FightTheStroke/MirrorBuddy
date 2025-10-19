@@ -6,8 +6,8 @@
 //  and spaced repetition analytics.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct ReviewScheduleView: View {
     @Query private var flashcards: [Flashcard]

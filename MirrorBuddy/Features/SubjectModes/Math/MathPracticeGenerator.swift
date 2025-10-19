@@ -291,7 +291,7 @@ actor MathPracticeGenerator {
                 question: "Find the derivative of f(x) = \(a)x² + \(b)x",
                 type: .calculus,
                 difficulty: .intermediate,
-                correctAnswer: "\(2*a)x + \(b)",
+                correctAnswer: "\(2 * a)x + \(b)",
                 hints: [
                     "Take the derivative of each term separately",
                     "Power rule: d/dx[x^n] = nx^(n-1)",

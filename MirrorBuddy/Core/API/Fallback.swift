@@ -93,7 +93,7 @@ struct DefaultValueFallback<T>: FallbackStrategy {
     let defaultValue: T
 
     func execute(primaryError: Error) async throws -> T {
-        return defaultValue
+        defaultValue
     }
 }
 
@@ -157,7 +157,7 @@ protocol CacheProtocol {
 actor SimpleCache: CacheProtocol {
     private var storage: [String: Any] = [:]
     private var expirations: [String: Date] = [:]
-    private let defaultTTL: TimeInterval = 3600 // 1 hour
+    private let defaultTTL: TimeInterval = 3_600 // 1 hour
 
     func get<T: Codable & Sendable>(key: String, type: T.Type) async -> T? {
         // Check if expired
@@ -239,48 +239,48 @@ struct ResilientAPICall {
 /*
  // Example 1: Using circuit breaker with retry
  let result = try await ResilientAPICall.execute(
-     endpoint: "https://api.openai.com/v1/chat/completions",
-     retryPolicy: .default,
-     circuitBreakerConfig: .aggressive
+ endpoint: "https://api.openai.com/v1/chat/completions",
+ retryPolicy: .default,
+ circuitBreakerConfig: .aggressive
  ) {
-     try await openAIClient.chat(messages: messages)
+ try await openAIClient.chat(messages: messages)
  }
 
  // Example 2: Using full resilience with fallback to cache
  let cache = SimpleCache()
  let result = try await ResilientAPICall.execute(
-     endpoint: "https://api.openai.com/v1/chat/completions",
-     retryPolicy: .default,
-     circuitBreakerConfig: .default,
-     primary: {
-         let response = try await openAIClient.chat(messages: messages)
-         await cache.set(key: "last_chat_response", value: response)
-         return response
-     },
-     fallback: { error in
-         guard let cached = await cache.get(key: "last_chat_response", type: ChatResponse.self) else {
-             throw FallbackError.noCachedData(key: "last_chat_response", primaryError: error)
-         }
-         return cached
-     }
+ endpoint: "https://api.openai.com/v1/chat/completions",
+ retryPolicy: .default,
+ circuitBreakerConfig: .default,
+ primary: {
+ let response = try await openAIClient.chat(messages: messages)
+ await cache.set(key: "last_chat_response", value: response)
+ return response
+ },
+ fallback: { error in
+ guard let cached = await cache.get(key: "last_chat_response", type: ChatResponse.self) else {
+ throw FallbackError.noCachedData(key: "last_chat_response", primaryError: error)
+ }
+ return cached
+ }
  )
 
  // Example 3: Using FallbackExecutor directly
  let result = await FallbackExecutor.executeWithFallback(
-     primary: {
-         try await primaryAPICall()
-     },
-     fallback: { error in
-         try await fallbackAPICall()
-     }
+ primary: {
+ try await primaryAPICall()
+ },
+ fallback: { error in
+ try await fallbackAPICall()
+ }
  )
 
  switch result {
  case .primary(let value):
-     print("Primary succeeded: \(value)")
+ print("Primary succeeded: \(value)")
  case .fallback(let value, let primaryError):
-     print("Fallback used: \(value), primary error: \(primaryError)")
+ print("Fallback used: \(value), primary error: \(primaryError)")
  case .failed(let error):
-     print("Both failed: \(error)")
+ print("Both failed: \(error)")
  }
  */

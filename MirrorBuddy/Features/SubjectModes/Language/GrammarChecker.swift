@@ -102,7 +102,7 @@ struct GrammarCheckResult: Identifiable, Codable {
     }
 
     var errorsByType: [GrammarErrorType: [GrammarError]] {
-        Dictionary(grouping: errors, by: { $0.type })
+        Dictionary(grouping: errors) { $0.type }
     }
 }
 

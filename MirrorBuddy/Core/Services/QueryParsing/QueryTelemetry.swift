@@ -68,7 +68,7 @@ class QueryTelemetry {
     private var eventLog: [TelemetryEvent] = []
 
     // Configuration
-    private let maxStoredMetrics = 1000 // Limit in-memory storage
+    private let maxStoredMetrics = 1_000 // Limit in-memory storage
     private let metricsRetentionDays = 30
     private var isEnabled = true
 
@@ -153,7 +153,7 @@ class QueryTelemetry {
             timestamp: Date(),
             intent: intentKey,
             confidence: confidence,
-            parseTimeMs: duration * 1000,
+            parseTimeMs: duration * 1_000,
             success: confidence >= 0.6,
             queryLength: query.count,
             wordCount: query.split(separator: " ").count
@@ -167,12 +167,12 @@ class QueryTelemetry {
             metadata: [
                 "intent": intentKey,
                 "confidence": String(format: "%.2f", confidence),
-                "duration_ms": String(format: "%.2f", duration * 1000)
+                "duration_ms": String(format: "%.2f", duration * 1_000)
             ]
         )
         eventLog.append(event)
 
-        logger.info("Query parsed - Intent: \(intentKey), Confidence: \(String(format: "%.2f", confidence)), Duration: \(String(format: "%.2f ms", duration * 1000))")
+        logger.info("Query parsed - Intent: \(intentKey), Confidence: \(String(format: "%.2f", confidence)), Duration: \(String(format: "%.2f ms", duration * 1_000))")
     }
 
     private func logTemporalParse(expression: String, success: Bool) {
@@ -200,12 +200,12 @@ class QueryTelemetry {
             metadata: [
                 "candidate_count": String(candidateCount),
                 "match_count": String(matchCount),
-                "duration_ms": String(format: "%.2f", duration * 1000)
+                "duration_ms": String(format: "%.2f", duration * 1_000)
             ]
         )
         eventLog.append(event)
 
-        logger.debug("Fuzzy match - Candidates: \(candidateCount), Matches: \(matchCount), Duration: \(String(format: "%.2f ms", duration * 1000))")
+        logger.debug("Fuzzy match - Candidates: \(candidateCount), Matches: \(matchCount), Duration: \(String(format: "%.2f ms", duration * 1_000))")
     }
 
     private func logAliasResolve(alias: String, success: Bool) {
@@ -316,7 +316,7 @@ class QueryTelemetry {
 
     /// Get recent events for debugging
     func getRecentEvents(limit: Int = 50) -> [TelemetryEvent] {
-        return Array(eventLog.suffix(limit))
+        Array(eventLog.suffix(limit))
     }
 
     /// Get performance metrics

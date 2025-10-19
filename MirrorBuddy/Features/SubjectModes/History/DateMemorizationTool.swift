@@ -2,7 +2,6 @@ import Foundation
 
 /// Tool for creating and evaluating date memorization exercises
 final class DateMemorizationTool {
-
     /// Create a memorization exercise from historical events
     func createExercise(
         events: [HistoricalEvent],

@@ -2,7 +2,6 @@ import Foundation
 
 /// Specialized mind map templates for history study
 enum HistoryMindMapTemplate {
-
     // MARK: - Template Types
 
     enum TemplateType: String, CaseIterable {

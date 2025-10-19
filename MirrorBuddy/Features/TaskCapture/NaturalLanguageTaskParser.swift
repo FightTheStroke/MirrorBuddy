@@ -2,7 +2,6 @@ import Foundation
 
 /// Parses natural language task descriptions into structured task data
 struct NaturalLanguageTaskParser {
-
     // MARK: - Types
 
     struct ParsedTask {

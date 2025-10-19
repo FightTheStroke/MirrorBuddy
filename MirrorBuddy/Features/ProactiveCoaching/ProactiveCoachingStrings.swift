@@ -113,7 +113,7 @@ enum ProactiveCoachingStrings {
             comment: "Encouraging message for difficult concepts"
         )
 
-        static let continue = NSLocalizedString(
+        static let continueStudying = NSLocalizedString(
             "proactive.coaching.checkpoint.continue",
             value: "Continua così!",
             comment: "Continue studying encouragement"
@@ -341,7 +341,7 @@ enum ProactiveCoachingStrings {
     // MARK: - Actions
 
     enum Actions {
-        static let continue = NSLocalizedString(
+        static let continueAction = NSLocalizedString(
             "proactive.coaching.action.continue",
             value: "Continua",
             comment: "Continue action"

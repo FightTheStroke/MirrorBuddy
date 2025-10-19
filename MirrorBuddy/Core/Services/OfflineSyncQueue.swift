@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Manages a queue of actions to be performed when the device comes back online
 actor OfflineSyncQueue {

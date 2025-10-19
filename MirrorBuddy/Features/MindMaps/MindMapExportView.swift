@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// View for exporting mind maps and summaries
 struct MindMapExportView: View {

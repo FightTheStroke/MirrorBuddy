@@ -6,9 +6,9 @@
 //  Network connectivity monitoring and offline state management
 //
 
+import Combine
 import Foundation
 import Network
-import Combine
 import os.log
 
 /// Monitors network connectivity and manages offline mode state

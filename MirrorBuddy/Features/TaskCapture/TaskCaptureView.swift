@@ -2,7 +2,6 @@ import SwiftUI
 
 /// View for capturing tasks via voice or manual input
 struct TaskCaptureView: View {
-
     @StateObject private var captureService = TaskCaptureService()
     @Environment(\.dismiss) private var dismiss
 
@@ -61,15 +60,15 @@ struct TaskCaptureView: View {
                         .foregroundColor(captureService.isListening ? .red : .blue)
 
                     Text(captureService.isListening ?
-                         "Sto ascoltando..." :
-                         TaskCaptureStrings.UI.voiceCapture)
+                            "Sto ascoltando..." :
+                            TaskCaptureStrings.UI.voiceCapture)
                         .font(.headline)
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(captureService.isListening ?
-                           Color.red.opacity(0.1) :
-                           Color.blue.opacity(0.1))
+                                Color.red.opacity(0.1) :
+                                Color.blue.opacity(0.1))
                 .cornerRadius(12)
             }
 
@@ -304,7 +303,6 @@ struct TaskCaptureView: View {
 // MARK: - Nightly Plan View
 
 struct NightlyPlanView: View {
-
     @StateObject private var captureService = TaskCaptureService()
     @Environment(\.dismiss) private var dismiss
 

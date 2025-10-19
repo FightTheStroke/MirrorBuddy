@@ -43,9 +43,9 @@ struct ContentView: View {
                     }
                 }
             }
-#if os(macOS)
+            #if os(macOS)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
-#endif
+            #endif
             .navigationTitle("dashboard.title")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

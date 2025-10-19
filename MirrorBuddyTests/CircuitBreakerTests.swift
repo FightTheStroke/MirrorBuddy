@@ -374,31 +374,31 @@ struct CircuitBreakerTests {
 
     // FIXME: Concurrency mutation error
     /* @Test("Circuit breaker with retry executor")
-    func testWithRetryExecutor() async throws {
-        var callCount = 0
+     func testWithRetryExecutor() async throws {
+     var callCount = 0
 
-        do {
-            _ = try await RetryExecutor.executeWithCircuitBreaker(
-                endpoint: "test-retry-endpoint",
-                policy: RetryPolicy(
-                    maxRetries: 2,
-                    maxRetryDuration: 10.0,
-                    useExponentialBackoff: false,
-                    baseDelay: 0.1,
-                    maxDelay: 1.0,
-                    useJitter: false
-                )
-            ) {
-                callCount += 1
-                if callCount < 3 {
-                    throw UnifiedAPIError.timeout(context: nil)
-                }
-                return "success"
-            }
-        } catch {
-            // May fail
-        }
+     do {
+     _ = try await RetryExecutor.executeWithCircuitBreaker(
+     endpoint: "test-retry-endpoint",
+     policy: RetryPolicy(
+     maxRetries: 2,
+     maxRetryDuration: 10.0,
+     useExponentialBackoff: false,
+     baseDelay: 0.1,
+     maxDelay: 1.0,
+     useJitter: false
+     )
+     ) {
+     callCount += 1
+     if callCount < 3 {
+     throw UnifiedAPIError.timeout(context: nil)
+     }
+     return "success"
+     }
+     } catch {
+     // May fail
+     }
 
-        #expect(callCount > 1)  // Should have retried
-    } */
+     #expect(callCount > 1)  // Should have retried
+     } */
 }

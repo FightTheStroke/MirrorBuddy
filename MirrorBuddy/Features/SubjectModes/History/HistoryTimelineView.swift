@@ -31,9 +31,8 @@ struct HistoryTimelineView: View {
                             ForEach(sortedEvents) { event in
                                 TimelineEventRow(
                                     event: event,
-                                    isSelected: selectedEvent?.id == event.id,
-                                    onTap: { selectedEvent = event }
-                                )
+                                    isSelected: selectedEvent?.id == event.id
+                                )                                    { selectedEvent = event }
                                 .transition(.asymmetric(
                                     insertion: .scale.combined(with: .opacity),
                                     removal: .opacity
@@ -177,9 +176,9 @@ struct EventCard: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(.systemBackground))
                 .shadow(color: isSelected ? categoryColor.opacity(0.4) : .black.opacity(0.1),
-                       radius: isSelected ? 8 : 4,
-                       x: 0,
-                       y: 2)
+                        radius: isSelected ? 8 : 4,
+                        x: 0,
+                        y: 2)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)
@@ -379,13 +378,13 @@ final class HistoryTimelineGenerator {
     HistoryTimelineView(
         timeline: Timeline(
             topic: "World War II",
-            startYear: 1939,
-            endYear: 1945,
+            startYear: 1_939,
+            endYear: 1_945,
             events: [
                 HistoricalEvent(
                     title: "Germany Invades Poland",
                     date: "September 1, 1939",
-                    year: 1939,
+                    year: 1_939,
                     description: "Nazi Germany invades Poland, marking the beginning of World War II.",
                     significance: "This invasion triggered Britain and France to declare war on Germany.",
                     category: .military
@@ -393,7 +392,7 @@ final class HistoryTimelineGenerator {
                 HistoricalEvent(
                     title: "D-Day Normandy Invasion",
                     date: "June 6, 1944",
-                    year: 1944,
+                    year: 1_944,
                     description: "Allied forces land on the beaches of Normandy, France.",
                     significance: "Largest amphibious invasion in history, beginning the liberation of Western Europe.",
                     category: .military

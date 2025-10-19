@@ -18,7 +18,6 @@ struct DateRange {
 
 /// Temporal reference parser for natural language date/time expressions
 struct TemporalParser {
-
     // MARK: - Public API
 
     /// Parse a temporal reference from natural language text
@@ -78,7 +77,7 @@ struct TemporalParser {
         if text.contains("yesterday") || text.contains("ieri") {
             guard let yesterday = calendar.date(byAdding: .day, value: -1, to: now) else { return nil }
             let startOfDay = calendar.startOfDay(for: yesterday)
-            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+            guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return nil }
             return DateRange(
                 start: startOfDay,
                 end: endOfDay,
@@ -91,7 +90,7 @@ struct TemporalParser {
         if text.contains("day before yesterday") || text.contains("l'altro ieri") || text.contains("altroieri") {
             guard let twoDaysAgo = calendar.date(byAdding: .day, value: -2, to: now) else { return nil }
             let startOfDay = calendar.startOfDay(for: twoDaysAgo)
-            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+            guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return nil }
             return DateRange(
                 start: startOfDay,
                 end: endOfDay,
@@ -138,7 +137,6 @@ struct TemporalParser {
         for pattern in patterns {
             if let regex = try? NSRegularExpression(pattern: pattern, options: .caseInsensitive),
                let match = regex.firstMatch(in: text, range: NSRange(text.startIndex..., in: text)) {
-
                 // Extract number
                 guard let numberRange = Range(match.range(at: 1), in: text),
                       let number = Int(text[numberRange]) else { continue }
@@ -162,7 +160,7 @@ struct TemporalParser {
                 // Calculate date range
                 guard let startDate = calendar.date(byAdding: component, value: -number, to: now) else { continue }
                 let startOfPeriod = calendar.startOfDay(for: startDate)
-                let endOfPeriod = calendar.date(byAdding: .day, value: 1, to: startOfPeriod)!
+                guard let endOfPeriod = calendar.date(byAdding: .day, value: 1, to: startOfPeriod) else { continue }
 
                 return DateRange(
                     start: startOfPeriod,
@@ -197,7 +195,7 @@ struct TemporalParser {
                 // Find the most recent occurrence of this weekday
                 guard let targetDate = findPreviousWeekday(weekday, from: now, calendar: calendar) else { continue }
                 let startOfDay = calendar.startOfDay(for: targetDate)
-                let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+                guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return nil }
 
                 return DateRange(
                     start: startOfDay,
@@ -212,7 +210,7 @@ struct TemporalParser {
                 // Find this week's occurrence of the weekday
                 guard let targetDate = findWeekdayInCurrentWeek(weekday, from: now, calendar: calendar) else { continue }
                 let startOfDay = calendar.startOfDay(for: targetDate)
-                let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+                guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return nil }
 
                 return DateRange(
                     start: startOfDay,
@@ -282,7 +280,7 @@ struct TemporalParser {
 
         // "Latest" or "last thing" - very recent (last 24 hours)
         if text.contains("latest") || text.contains("last thing") ||
-           text.contains("ultimo") || text.contains("ultima cosa") {
+            text.contains("ultimo") || text.contains("ultima cosa") {
             guard let dayAgo = calendar.date(byAdding: .day, value: -1, to: now) else { return nil }
             return DateRange(
                 start: dayAgo,
@@ -333,7 +331,6 @@ struct TemporalParser {
 // MARK: - Relative References Extension
 
 extension TemporalParser {
-
     /// Parse relative references like "before this", "after that", "previous", "next"
     /// Requires context of a reference date
     static func parseRelativeReference(_ text: String, relativeTo referenceDate: Date) -> DateRange? {
@@ -368,7 +365,7 @@ extension TemporalParser {
         if lowercased.contains("previous") || lowercased.contains("precedente") {
             guard let dayBefore = calendar.date(byAdding: .day, value: -1, to: referenceDate) else { return nil }
             let startOfDay = calendar.startOfDay(for: dayBefore)
-            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+            guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return nil }
             return DateRange(
                 start: startOfDay,
                 end: endOfDay,
@@ -381,7 +378,7 @@ extension TemporalParser {
         if lowercased.contains("next") || lowercased.contains("prossimo") || lowercased.contains("prossima") {
             guard let dayAfter = calendar.date(byAdding: .day, value: 1, to: referenceDate) else { return nil }
             let startOfDay = calendar.startOfDay(for: dayAfter)
-            let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay)!
+            guard let endOfDay = calendar.date(byAdding: .day, value: 1, to: startOfDay) else { return nil }
             return DateRange(
                 start: startOfDay,
                 end: endOfDay,

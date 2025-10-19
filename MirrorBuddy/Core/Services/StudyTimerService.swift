@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 import SwiftData
 
 /// Service for managing study timer sessions
@@ -142,8 +142,8 @@ class StudyTimerService: ObservableObject {
 
     /// Format elapsed time as HH:MM:SS or MM:SS
     var formattedTime: String {
-        let hours = elapsedSeconds / 3600
-        let minutes = (elapsedSeconds % 3600) / 60
+        let hours = elapsedSeconds / 3_600
+        let minutes = (elapsedSeconds % 3_600) / 60
         let seconds = elapsedSeconds % 60
 
         if hours > 0 {

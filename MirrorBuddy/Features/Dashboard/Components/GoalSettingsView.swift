@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Goal settings view for configuring daily study goals (Task 137.4)
 struct GoalSettingsView: View {

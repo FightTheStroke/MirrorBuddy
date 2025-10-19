@@ -1,5 +1,5 @@
-import SwiftUI
 import MapKit
+import SwiftUI
 
 /// Interactive map showing historical locations with annotations
 struct HistoricalMapView: View {

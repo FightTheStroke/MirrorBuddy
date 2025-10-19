@@ -1,11 +1,10 @@
-import Foundation
 import AVFoundation
 import Combine
+import Foundation
 
 /// Service for detecting emotional sentiment from voice characteristics
 @MainActor
 final class SentimentDetectionService: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var currentSentiment: Sentiment = .neutral
@@ -247,7 +246,7 @@ final class SentimentDetectionService: ObservableObject {
             sentimentScores[reading.sentiment, default: 0] += reading.confidence
         }
 
-        return sentimentScores.max(by: { $0.value < $1.value })?.key ?? .neutral
+        return sentimentScores.max { $0.value < $1.value }?.key ?? .neutral
     }
 
     /// Reset sentiment tracking

@@ -215,9 +215,9 @@ struct WeeklyDigestSettingsView: View {
         }
         .navigationTitle("Weekly Digest")
         .sheet(isPresented: $showingConsentSheet) {
-            ConsentSheet(settings: $settings, onConsent: {
+            ConsentSheet(settings: $settings) {
                 saveSettings()
-            })
+            }
         }
         .alert("Test Digest", isPresented: $showingTestDigest) {
             Button("Cancel", role: .cancel) {}

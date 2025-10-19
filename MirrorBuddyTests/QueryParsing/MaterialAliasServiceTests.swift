@@ -6,13 +6,12 @@
 //  Tests CRUD operations, caching, and fuzzy resolution
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 @MainActor
 final class MaterialAliasServiceTests: XCTestCase {
-
     var modelContext: ModelContext!
     var service: MaterialAliasService!
     var testMaterial: Material!

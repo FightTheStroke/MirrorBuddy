@@ -436,7 +436,7 @@ final class GmailService {
             let descriptor = FetchDescriptor<TaskModel>(
                 predicate: #Predicate { task in
                     task.sourceID == sourceID &&
-                    task.sourceType == sourceType
+                        task.sourceType == sourceType
                 }
             )
 

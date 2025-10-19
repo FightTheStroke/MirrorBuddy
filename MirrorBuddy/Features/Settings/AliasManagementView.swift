@@ -6,8 +6,8 @@
 //  Allows users to create, edit, delete, and search aliases
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct AliasManagementView: View {
     @Environment(\.modelContext) private var modelContext
@@ -39,7 +39,7 @@ struct AliasManagementView: View {
 
         return filtered.filter { alias in
             alias.alias.localizedCaseInsensitiveContains(searchText) ||
-            alias.materialTitle.localizedCaseInsensitiveContains(searchText)
+                alias.materialTitle.localizedCaseInsensitiveContains(searchText)
         }
     }
 

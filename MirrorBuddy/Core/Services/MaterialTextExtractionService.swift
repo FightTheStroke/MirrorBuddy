@@ -214,8 +214,8 @@ final class MaterialTextExtractionService {
         // 2. Processing status is pending or failed
         // 3. Has PDF but no extracted text
         material.extractedText.isEmpty &&
-               (material.processingStatus == .pending || material.processingStatus == .failed) &&
-               (material.pdfURL != nil || material.googleDriveFileID != nil)
+            (material.processingStatus == .pending || material.processingStatus == .failed) &&
+            (material.pdfURL != nil || material.googleDriveFileID != nil)
     }
 
     /// Get extraction statistics

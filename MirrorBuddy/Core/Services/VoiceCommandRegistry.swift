@@ -21,7 +21,7 @@ struct VoiceCommand: Identifiable {
         return triggers.contains { trigger in
             let lowercaseTrigger = trigger.lowercased()
             return lowercasePhrase.contains(lowercaseTrigger) ||
-                   lowercasePhrase.levenshteinDistance(to: lowercaseTrigger) <= 2
+                lowercasePhrase.levenshteinDistance(to: lowercaseTrigger) <= 2
         }
     }
 }
@@ -365,9 +365,9 @@ final class VoiceCommandRegistry: ObservableObject {
 
         // Pattern: "apri ultimo materiale (di [subject])"
         if lowercasePhrase.contains("ultimo materiale") ||
-           lowercasePhrase.contains("last material") ||
-           lowercasePhrase.contains("materiale più recente") ||
-           lowercasePhrase.contains("newest material") {
+            lowercasePhrase.contains("last material") ||
+            lowercasePhrase.contains("materiale più recente") ||
+            lowercasePhrase.contains("newest material") {
             // Check for subject specification
             if let subjectMatch = lowercasePhrase.range(of: "di ") {
                 let afterDi = lowercasePhrase[subjectMatch.upperBound...].trimmingCharacters(in: .whitespaces)
@@ -381,8 +381,8 @@ final class VoiceCommandRegistry: ObservableObject {
 
         // Pattern: "apri materiale [title]"
         if lowercasePhrase.hasPrefix("apri materiale ") ||
-           lowercasePhrase.hasPrefix("open material ") ||
-           lowercasePhrase.hasPrefix("mostra materiale ") {
+            lowercasePhrase.hasPrefix("open material ") ||
+            lowercasePhrase.hasPrefix("mostra materiale ") {
             let prefixes = ["apri materiale ", "open material ", "mostra materiale "]
             for prefix in prefixes {
                 if lowercasePhrase.hasPrefix(prefix) {
@@ -428,7 +428,7 @@ extension String {
         for i in 1...m {
             for j in 1...n {
                 let cost = self[self.index(self.startIndex, offsetBy: i - 1)] ==
-                           other[other.index(other.startIndex, offsetBy: j - 1)] ? 0 : 1
+                    other[other.index(other.startIndex, offsetBy: j - 1)] ? 0 : 1
 
                 matrix[i][j] = Swift.min(
                     matrix[i - 1][j] + 1,

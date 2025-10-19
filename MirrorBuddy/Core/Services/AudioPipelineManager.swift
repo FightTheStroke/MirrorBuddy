@@ -522,7 +522,7 @@ final class AudioPipelineManager: NSObject {
 
             case .oldDeviceUnavailable:
                 logger.info("Audio device disconnected")
-                // May need to pause or adjust configuration
+            // May need to pause or adjust configuration
 
             case .categoryChange:
                 logger.info("Audio category changed")

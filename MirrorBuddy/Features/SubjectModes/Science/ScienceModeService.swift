@@ -65,7 +65,7 @@ final class ScienceModeService: ObservableObject {
         knowns: [String: Double],
         solveFor: String
     ) async throws -> FormulaSolution {
-        return try await formulaExplainer.solve(
+        try await formulaExplainer.solve(
             formula: formula,
             knowns: knowns,
             solveFor: solveFor
@@ -94,7 +94,7 @@ final class ScienceModeService: ObservableObject {
 
     /// Get all available units for a category
     func getUnitsForCategory(_ category: UnitCategory) -> [PhysicsUnit] {
-        return unitConverter.getUnits(for: category)
+        unitConverter.getUnits(for: category)
     }
 
     // MARK: - Lab Reports

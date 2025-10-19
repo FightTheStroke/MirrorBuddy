@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct StudyStatisticsView: View {
     @Query(sort: \StudySession.date, order: .reverse)

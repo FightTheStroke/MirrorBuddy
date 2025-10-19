@@ -2,7 +2,6 @@ import SwiftUI
 
 /// View displaying proactive coaching prompts
 struct ProactiveCoachingView: View {
-
     @ObservedObject var coachingService: ProactiveCoachingService
     @Environment(\.dismiss) private var dismiss
 
@@ -94,7 +93,6 @@ struct ProactiveCoachingView: View {
 // MARK: - Coaching Dashboard View
 
 struct ProactiveCoachingDashboard: View {
-
     @StateObject private var coachingService = ProactiveCoachingService()
     @State private var isCoachingActive = false
 
@@ -135,8 +133,8 @@ struct ProactiveCoachingDashboard: View {
                         .foregroundColor(.secondary)
 
                     Text(isCoachingActive ?
-                         ProactiveCoachingStrings.UI.active :
-                         ProactiveCoachingStrings.UI.paused)
+                            ProactiveCoachingStrings.UI.active :
+                            ProactiveCoachingStrings.UI.paused)
                         .font(.headline)
                 }
 
@@ -178,11 +176,11 @@ struct ProactiveCoachingDashboard: View {
                     ProactiveCoachingStrings.UI.suggestNextStep,
                     systemImage: "arrow.right.circle"
                 )
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .foregroundColor(.primary)
-                    .cornerRadius(12)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .foregroundColor(.primary)
+                .cornerRadius(12)
             }
             .disabled(!isCoachingActive)
         }

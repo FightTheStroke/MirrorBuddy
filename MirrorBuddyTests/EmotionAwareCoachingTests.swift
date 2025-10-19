@@ -1,11 +1,10 @@
-import Testing
 import Foundation
 @testable import MirrorBuddy
+import Testing
 
 /// Tests for emotion-aware coaching system (Task 130)
 @Suite("Emotion-Aware Coaching Tests")
 struct EmotionAwareCoachingTests {
-
     // MARK: - Sentiment Detection Tests
 
     @Test("Detect frustrated sentiment from low success rate")
@@ -104,7 +103,7 @@ struct EmotionAwareCoachingTests {
 
     @Test("Playful persona uses encouraging language")
     func testPlayfulPersona() async {
-        let persona = CoachPersona.shared
+        let persona = CoachPersonaService.shared
         persona.updateStyle(.playful)
 
         let baseResponse = "Good job on that answer!"
@@ -115,7 +114,7 @@ struct EmotionAwareCoachingTests {
 
     @Test("Calm persona uses gentle language")
     func testCalmPersona() async {
-        let persona = CoachPersona.shared
+        let persona = CoachPersonaService.shared
         persona.updateStyle(.calm)
 
         let adapted = persona.generateResponseStyle(for: .frustrated)
@@ -125,7 +124,7 @@ struct EmotionAwareCoachingTests {
 
     @Test("Persona adjusts based on sentiment")
     func testPersonaSentimentAdaptation() {
-        let persona = CoachPersona.shared
+        let persona = CoachPersonaService.shared
         persona.updateStyle(.enthusiastic)
 
         // Should be extra supportive when frustrated
@@ -143,7 +142,7 @@ struct EmotionAwareCoachingTests {
     func testCompleteEmotionAwareCycle() {
         let analyzer = SentimentAnalyzer()
         let engine = AdaptivePacingEngine(sentimentAnalyzer: analyzer)
-        let persona = CoachPersona.shared
+        let persona = CoachPersonaService.shared
         persona.updateStyle(.playful)
 
         // Simulate learning session with varying performance

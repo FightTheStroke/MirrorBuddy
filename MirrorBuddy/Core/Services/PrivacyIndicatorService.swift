@@ -4,7 +4,6 @@ import SwiftUI
 /// Service for displaying privacy indicators throughout the app
 @MainActor
 final class PrivacyIndicatorService: ObservableObject {
-
     @Published var isRecording: Bool = false
     @Published var isExporting: Bool = false
     @Published var activeDataCollection: Set<DataCollectionType> = []

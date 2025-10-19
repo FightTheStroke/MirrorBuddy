@@ -67,7 +67,7 @@ final class GoogleClassroomService: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw NSError(domain: "GoogleClassroom", code: -1,
-                         userInfo: [NSLocalizedDescriptionKey: "Failed to fetch courses"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch courses"])
         }
 
         let coursesResponse = try JSONDecoder().decode(CoursesResponse.self, from: data)
@@ -87,7 +87,7 @@ final class GoogleClassroomService: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw NSError(domain: "GoogleClassroom", code: -2,
-                         userInfo: [NSLocalizedDescriptionKey: "Failed to fetch coursework"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch coursework"])
         }
 
         let workResponse = try JSONDecoder().decode(CourseWorkResponse.self, from: data)
@@ -115,13 +115,13 @@ final class GoogleClassroomService: ObservableObject {
     ) async throws -> [Task] {
         guard consent.isValid else {
             throw NSError(domain: "GoogleClassroom", code: -3,
-                         userInfo: [NSLocalizedDescriptionKey: "LMS consent not granted"])
+                          userInfo: [NSLocalizedDescriptionKey: "LMS consent not granted"])
         }
 
         guard let accessTokenKey = consent.accessTokenKeychainKey,
               let accessToken = try? keychainManager.retrieve(key: accessTokenKey) else {
             throw NSError(domain: "GoogleClassroom", code: -4,
-                         userInfo: [NSLocalizedDescriptionKey: "Access token not found"])
+                          userInfo: [NSLocalizedDescriptionKey: "Access token not found"])
         }
 
         let courses = try await fetchCourses(accessToken: accessToken)
@@ -144,7 +144,7 @@ final class GoogleClassroomService: ObservableObject {
                 let descriptor = FetchDescriptor<Task>(
                     predicate: #Predicate { task in
                         task.lmsAssignmentID == work.id &&
-                        task.source == .googleClassroom
+                            task.source == .googleClassroom
                     }
                 )
 
@@ -178,6 +178,6 @@ final class GoogleClassroomService: ObservableObject {
 
     /// Request additional scopes for Google Classroom
     func requestClassroomScopes() -> [String] {
-        return Self.requiredScopes
+        Self.requiredScopes
     }
 }

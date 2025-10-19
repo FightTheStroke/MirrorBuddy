@@ -239,7 +239,7 @@ struct LessonReviewView: View {
                     .frame(height: 60)
 
                 HStack(spacing: 2) {
-                    ForEach(0..<50, id: \.self) { index in
+                    ForEach(0..<50, id: \.self) { _ in
                         RoundedRectangle(cornerRadius: 2)
                             .fill(Color.blue.opacity(Double.random(in: 0.3...1.0)))
                             .frame(width: 3)

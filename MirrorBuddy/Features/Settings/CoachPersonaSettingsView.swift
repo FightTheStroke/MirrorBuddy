@@ -2,13 +2,12 @@ import SwiftUI
 
 /// Settings view for configuring coach persona and tone
 struct CoachPersonaSettingsView: View {
-
-    @StateObject private var persona = CoachPersona.shared
-    @State private var selectedPersona: CoachPersona.PersonaType
+    @StateObject private var persona = CoachPersonaService.shared
+    @State private var selectedPersona: CoachPersonaService.PersonaType
     @State private var showingPreview = false
 
     init() {
-        let currentPersona = CoachPersona.shared.currentPersona
+        let currentPersona = CoachPersonaService.shared.currentPersona
         _selectedPersona = State(initialValue: currentPersona)
     }
 
@@ -16,7 +15,7 @@ struct CoachPersonaSettingsView: View {
         List {
             // MARK: - Persona Selection
             Section {
-                ForEach(CoachPersona.PersonaType.allCases) { personaType in
+                ForEach(CoachPersonaService.PersonaType.allCases) { personaType in
                     PersonaOptionRow(
                         personaType: personaType,
                         isSelected: selectedPersona == personaType
@@ -119,7 +118,7 @@ struct CoachPersonaSettingsView: View {
 
     // MARK: - Helper Functions
 
-    private func energyLevelDescription(for personaType: CoachPersona.PersonaType) -> String {
+    private func energyLevelDescription(for personaType: CoachPersonaService.PersonaType) -> String {
         switch personaType {
         case .playful: return "Upbeat"
         case .calm: return "Relaxed"
@@ -128,7 +127,7 @@ struct CoachPersonaSettingsView: View {
         }
     }
 
-    private func formalityDescription(for personaType: CoachPersona.PersonaType) -> String {
+    private func formalityDescription(for personaType: CoachPersonaService.PersonaType) -> String {
         switch personaType {
         case .playful: return "Casual"
         case .calm: return "Gentle"
@@ -141,7 +140,7 @@ struct CoachPersonaSettingsView: View {
 // MARK: - Supporting Views
 
 struct PersonaOptionRow: View {
-    let personaType: CoachPersona.PersonaType
+    let personaType: CoachPersonaService.PersonaType
     let isSelected: Bool
     let action: () -> Void
 
@@ -224,7 +223,7 @@ struct ExampleResponseView: View {
 // MARK: - Preview Sheet
 
 struct PersonaPreviewView: View {
-    let personaType: CoachPersona.PersonaType
+    let personaType: CoachPersonaService.PersonaType
     @Environment(\.dismiss) private var dismiss
     @State private var isPlaying = false
 
@@ -300,14 +299,14 @@ struct PersonaPreviewView: View {
     }
 
     private func getSampleResponse() -> String {
-        CoachPersona.shared.getEncouragementMessage(for: .goodProgress)
+        CoachPersonaService.shared.getEncouragementMessage(for: .goodProgress)
     }
 
     private func playPreview() {
         isPlaying = true
 
         // Use AVSpeechSynthesizer to speak the sample
-        let voiceConfig = CoachPersona.shared.getVoiceConfiguration()
+        let voiceConfig = CoachPersonaService.shared.getVoiceConfiguration()
         let utterance = AVSpeechUtterance(string: getSampleResponse())
         utterance.voice = AVSpeechSynthesisVoice(language: voiceConfig.language)
         utterance.rate = voiceConfig.rate

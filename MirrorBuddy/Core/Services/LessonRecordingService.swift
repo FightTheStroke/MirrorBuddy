@@ -243,7 +243,6 @@ final class LessonRecordingService: ObservableObject {
             await segmentationService.cleanupSegments(audioSegments)
 
             logger.info("Transcription pipeline completed successfully")
-
         } catch {
             logger.error("Transcription pipeline failed: \(error.localizedDescription)")
             await markRecordingFailed(recording, error: error.localizedDescription)

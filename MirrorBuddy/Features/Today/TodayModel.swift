@@ -65,7 +65,6 @@ struct TodayMaterial: Codable, Equatable, Identifiable {
 /// Service to aggregate data for Today view
 @MainActor
 final class TodayService: ObservableObject {
-
     @Published var todayModel: TodayModel?
     @Published var isLoading: Bool = false
     @Published var error: Error?
@@ -137,7 +136,7 @@ final class TodayService: ObservableObject {
                 guard let dueDate = task.dueDate else { return false }
                 return dueDate >= today && dueDate < tomorrow && !task.isCompleted
             }
-            .sorted { (task1, task2) in
+            .sorted { task1, task2 in
                 // Sort by priority, then by due date
                 if task1.priority.rawValue != task2.priority.rawValue {
                     return task1.priority.rawValue > task2.priority.rawValue
@@ -176,7 +175,7 @@ final class TodayService: ObservableObject {
     }
 
     private func fetchStudyStreak() async throws -> Int {
-        return await studyTracker.getCurrentStreak()
+        await studyTracker.getCurrentStreak()
     }
 
     private func fetchTodayProgress() async throws -> TodayModel.TodayProgress {
@@ -265,7 +264,7 @@ class TaskRepository {
 
     func getTasks() async -> [TaskItem] {
         // Placeholder - integrate with actual task storage
-        return []
+        []
     }
 
     struct TaskItem {
@@ -289,12 +288,12 @@ class MaterialRepository {
 
     func getRecommendedMaterials() async -> [MaterialItem] {
         // Placeholder - integrate with actual material storage
-        return []
+        []
     }
 
     func getTodayReviewCount() async -> Int {
         // Placeholder
-        return 0
+        0
     }
 
     struct MaterialItem {
@@ -312,7 +311,7 @@ class SyncManager {
 
     func getLastSyncStatus() async -> SyncStatus {
         // Placeholder - integrate with actual sync logic
-        return SyncStatus(
+        SyncStatus(
             newAssignments: 0,
             upcomingDeadlines: 0,
             newMaterials: 0,
@@ -333,11 +332,11 @@ class StudyTimeTracker {
 
     func getCurrentStreak() async -> Int {
         // Placeholder - integrate with actual streak tracking
-        return 0
+        0
     }
 
     func getTodayMinutes() async -> Int {
         // Placeholder - integrate with actual time tracking
-        return 0
+        0
     }
 }

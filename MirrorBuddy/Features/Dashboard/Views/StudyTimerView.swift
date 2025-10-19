@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct StudyTimerView: View {
     @Environment(\.modelContext) private var modelContext
@@ -120,9 +120,9 @@ struct StudyTimerView: View {
         }
         .navigationTitle("Study Timer")
         .sheet(isPresented: $showingSubjectPicker) {
-            SubjectPickerView(selectedSubject: $selectedSubject, onStart: {
+            SubjectPickerView(selectedSubject: $selectedSubject) {
                 timer.startSession(subject: selectedSubject)
-            })
+            }
         }
         .alert("Session Ended", isPresented: $showAlert) {
             Button("OK", role: .cancel) { }

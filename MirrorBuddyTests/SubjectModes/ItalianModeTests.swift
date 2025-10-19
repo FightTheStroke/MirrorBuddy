@@ -1,9 +1,8 @@
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 @MainActor
 final class ItalianModeTests: XCTestCase {
-
     var italianMode: ItalianModeService!
 
     override func setUp() {

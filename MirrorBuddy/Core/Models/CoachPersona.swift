@@ -4,7 +4,6 @@ import SwiftData
 /// User preference for coaching style and tone
 @Model
 final class CoachPersona {
-
     // MARK: - Persona Types
 
     enum PersonaType: String, Codable, CaseIterable {

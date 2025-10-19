@@ -210,7 +210,9 @@ struct MaterialQueryParser {
 
         case .needsReview:
             // Materials that haven't been accessed or accessed long ago
-            let oneWeekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+            guard let oneWeekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) else {
+                return materials // Return all if date calculation fails
+            }
             return materials.filter { material in
                 if let lastAccessed = material.lastAccessedAt {
                     return lastAccessed < oneWeekAgo
@@ -237,7 +239,7 @@ struct MaterialQueryParser {
             return materials.filter { material in
                 keywords.contains { keyword in
                     material.title.localizedCaseInsensitiveContains(keyword) ||
-                    material.summary?.localizedCaseInsensitiveContains(keyword) ?? false
+                        material.summary?.localizedCaseInsensitiveContains(keyword) ?? false
                 }
             }
 
@@ -316,7 +318,7 @@ struct MaterialQueryParser {
         // Match against both displayName and localizationKey
         guard let subject = subjects.first(where: {
             $0.displayName.lowercased() == subjectName.lowercased() ||
-            $0.localizationKey.lowercased() == subjectName.lowercased()
+                $0.localizationKey.lowercased() == subjectName.lowercased()
         }) else {
             return nil
         }

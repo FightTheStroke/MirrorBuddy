@@ -6,14 +6,13 @@
 //  Tests data synchronization with CloudKit across devices
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 /// Integration tests for CloudKit synchronization
 @MainActor
 final class CloudKitSyncIntegrationTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 

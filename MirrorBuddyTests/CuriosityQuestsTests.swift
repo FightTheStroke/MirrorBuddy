@@ -1,12 +1,11 @@
-import Testing
 import Foundation
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import Testing
 
 /// Tests for curiosity prompts and weekly quests system (Task 131)
 @Suite("Curiosity & Quests Tests")
 struct CuriosityQuestsTests {
-
     // MARK: - Curiosity Recommender Tests
 
     @Test("Recommend curiosity content for subject")

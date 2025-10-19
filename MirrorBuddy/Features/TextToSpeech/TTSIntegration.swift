@@ -110,8 +110,8 @@ struct TTSText: View {
         let after = String(text[end...])
 
         (Text(before) +
-         Text(highlighted).foregroundStyle(.blue).bold() +
-         Text(after))
+            Text(highlighted).foregroundStyle(.blue).bold() +
+            Text(after))
             .font(font)
             .lineSpacing(lineSpacing)
     }

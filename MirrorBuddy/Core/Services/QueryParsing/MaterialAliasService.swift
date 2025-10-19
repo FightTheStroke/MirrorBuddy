@@ -36,7 +36,6 @@ enum AliasError: LocalizedError {
 /// Service for managing material aliases
 @MainActor
 class MaterialAliasService {
-
     private let modelContext: ModelContext
 
     // In-memory cache for fast lookups (alias -> materialID)

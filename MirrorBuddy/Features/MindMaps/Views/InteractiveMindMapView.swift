@@ -173,7 +173,7 @@ struct InteractiveMindMapView: View {
             // Skip if outside visible area (performance optimization - Subtask 39.4)
             let margin = 200.0
             guard position.x > -margin && position.x < canvasSize.width + margin &&
-                  position.y > -margin && position.y < canvasSize.height + margin else {
+                    position.y > -margin && position.y < canvasSize.height + margin else {
                 continue
             }
 

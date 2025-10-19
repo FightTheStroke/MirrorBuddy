@@ -1,12 +1,11 @@
-import Foundation
 import AVFoundation
-import UserNotifications
 import Combine
+import Foundation
+import UserNotifications
 
 /// Service for capturing and managing tasks via voice or manual input
 @MainActor
 final class TaskCaptureService: NSObject, ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var isListening: Bool = false
@@ -180,7 +179,6 @@ final class TaskCaptureService: NSObject, ObservableObject {
         // Adjust to day before
         if let adjustedDate = Calendar.current.date(from: components),
            let dayBefore = Calendar.current.date(byAdding: .day, value: -1, to: adjustedDate) {
-
             let trigger = UNCalendarNotificationTrigger(
                 dateMatching: Calendar.current.dateComponents(
                     [.year, .month, .day, .hour, .minute],

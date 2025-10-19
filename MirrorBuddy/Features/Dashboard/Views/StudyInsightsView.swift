@@ -1,6 +1,6 @@
-import SwiftUI
-import SwiftData
 import Charts
+import SwiftData
+import SwiftUI
 
 struct StudyInsightsView: View {
     @Query(sort: \StudySession.date, order: .reverse)
@@ -32,7 +32,7 @@ struct StudyInsightsView: View {
 
     private var subjectData: [(String, Int)] {
         let grouped = Dictionary(grouping: sessions) { $0.subject ?? "Unknown" }
-        return grouped.map { (subject, sessions) in
+        return grouped.map { subject, sessions in
             let totalMinutes = sessions.reduce(0) { $0 + $1.durationMinutes }
             return (subject, totalMinutes)
         }.sorted { $0.1 > $1.1 }

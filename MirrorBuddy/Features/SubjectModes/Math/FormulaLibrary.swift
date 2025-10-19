@@ -2,7 +2,6 @@ import Foundation
 
 /// Comprehensive library of mathematical formulas organized by topic
 final class FormulaLibrary {
-
     // MARK: - Formula Retrieval
 
     /// Get all formulas for a specific topic
@@ -34,8 +33,8 @@ final class FormulaLibrary {
 
         return allFormulas.filter { formula in
             formula.name.lowercased().contains(lowercaseQuery) ||
-            formula.description.lowercased().contains(lowercaseQuery) ||
-            formula.tags.contains { $0.lowercased().contains(lowercaseQuery) }
+                formula.description.lowercased().contains(lowercaseQuery) ||
+                formula.tags.contains { $0.lowercased().contains(lowercaseQuery) }
         }
     }
 

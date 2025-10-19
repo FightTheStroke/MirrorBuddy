@@ -27,8 +27,8 @@ final class ItalianGrammarHelper {
 
         return allRules.filter { rule in
             rule.title.lowercased().contains(lowercaseQuery) ||
-            rule.category.rawValue.lowercased().contains(lowercaseQuery) ||
-            rule.tags.contains { $0.lowercased().contains(lowercaseQuery) }
+                rule.category.rawValue.lowercased().contains(lowercaseQuery) ||
+                rule.tags.contains { $0.lowercased().contains(lowercaseQuery) }
         }
     }
 

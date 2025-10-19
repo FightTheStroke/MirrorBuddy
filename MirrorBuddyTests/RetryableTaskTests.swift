@@ -199,97 +199,97 @@ struct RetryableTaskTests {
 
     // FIXME: Concurrency mutation errors in all RetryExecutor tests
     /* @Test("RetryExecutor succeeds on first attempt")
-    @MainActor
-    func testRetryExecutorSucceedsFirstAttempt() async throws {
-        let executor = RetryExecutor(policy: .default)
-        var callCount = 0
+     @MainActor
+     func testRetryExecutorSucceedsFirstAttempt() async throws {
+     let executor = RetryExecutor(policy: .default)
+     var callCount = 0
 
-        let result = try await executor.execute {
-            callCount += 1
-            return "success"
-        }
+     let result = try await executor.execute {
+     callCount += 1
+     return "success"
+     }
 
-        #expect(result == "success")
-        #expect(callCount == 1)
-    }
+     #expect(result == "success")
+     #expect(callCount == 1)
+     }
 
-    @Test("RetryExecutor retries on retryable error")
-    @MainActor
-    func testRetryExecutorRetriesOnError() async throws {
-        let executor = RetryExecutor(policy: .default)
-        var callCount = 0
+     @Test("RetryExecutor retries on retryable error")
+     @MainActor
+     func testRetryExecutorRetriesOnError() async throws {
+     let executor = RetryExecutor(policy: .default)
+     var callCount = 0
 
-        let result = try await executor.execute {
-            callCount += 1
-            if callCount < 3 {
-                throw UnifiedAPIError.network(URLError(.timedOut), context: nil)
-            }
-            return "success"
-        }
+     let result = try await executor.execute {
+     callCount += 1
+     if callCount < 3 {
+     throw UnifiedAPIError.network(URLError(.timedOut), context: nil)
+     }
+     return "success"
+     }
 
-        #expect(result == "success")
-        #expect(callCount == 3)
-    }
+     #expect(result == "success")
+     #expect(callCount == 3)
+     }
 
-    @Test("RetryExecutor throws after max retries")
-    @MainActor
-    func testRetryExecutorThrowsAfterMaxRetries() async throws {
-        let executor = RetryExecutor(policy: .default)
-        var callCount = 0
+     @Test("RetryExecutor throws after max retries")
+     @MainActor
+     func testRetryExecutorThrowsAfterMaxRetries() async throws {
+     let executor = RetryExecutor(policy: .default)
+     var callCount = 0
 
-        await #expect(throws: RetryError.self) {
-            try await executor.execute {
-                callCount += 1
-                throw UnifiedAPIError.network(URLError(.timedOut), context: nil)
-            }
-        }
+     await #expect(throws: RetryError.self) {
+     try await executor.execute {
+     callCount += 1
+     throw UnifiedAPIError.network(URLError(.timedOut), context: nil)
+     }
+     }
 
-        // Should try initial attempt + 3 retries = 4 total
-        #expect(callCount == 4)
-    }
+     // Should try initial attempt + 3 retries = 4 total
+     #expect(callCount == 4)
+     }
 
-    @Test("RetryExecutor does not retry non-retryable errors")
-    @MainActor
-    func testRetryExecutorDoesNotRetryNonRetryableErrors() async throws {
-        let executor = RetryExecutor(policy: .default)
-        var callCount = 0
+     @Test("RetryExecutor does not retry non-retryable errors")
+     @MainActor
+     func testRetryExecutorDoesNotRetryNonRetryableErrors() async throws {
+     let executor = RetryExecutor(policy: .default)
+     var callCount = 0
 
-        await #expect(throws: UnifiedAPIError.self) {
-            try await executor.execute {
-                callCount += 1
-                throw UnifiedAPIError.authentication("Invalid token", context: nil)
-            }
-        }
+     await #expect(throws: UnifiedAPIError.self) {
+     try await executor.execute {
+     callCount += 1
+     throw UnifiedAPIError.authentication("Invalid token", context: nil)
+     }
+     }
 
-        // Should only try once
-        #expect(callCount == 1)
-    }
+     // Should only try once
+     #expect(callCount == 1)
+     }
 
-    @Test("RetryExecutor respects custom max retries")
-    @MainActor
-    func testRetryExecutorCustomMaxRetries() async throws {
-        let policy = RetryPolicy(
-            maxRetries: 2,
-            maxRetryDuration: 30.0,
-            useExponentialBackoff: true,
-            baseDelay: 0.1,
-            maxDelay: 1.0,
-            useJitter: false
-        )
-        let executor = RetryExecutor(policy: policy)
-        var callCount = 0
+     @Test("RetryExecutor respects custom max retries")
+     @MainActor
+     func testRetryExecutorCustomMaxRetries() async throws {
+     let policy = RetryPolicy(
+     maxRetries: 2,
+     maxRetryDuration: 30.0,
+     useExponentialBackoff: true,
+     baseDelay: 0.1,
+     maxDelay: 1.0,
+     useJitter: false
+     )
+     let executor = RetryExecutor(policy: policy)
+     var callCount = 0
 
-        await #expect(throws: RetryError.self) {
-            try await executor.execute {
-                callCount += 1
-                throw UnifiedAPIError.timeout(context: nil)
-            }
-        }
+     await #expect(throws: RetryError.self) {
+     try await executor.execute {
+     callCount += 1
+     throw UnifiedAPIError.timeout(context: nil)
+     }
+     }
 
-        // Should try initial attempt + 2 retries = 3 total
-        #expect(callCount == 3)
-    }
-    */
+     // Should try initial attempt + 2 retries = 3 total
+     #expect(callCount == 3)
+     }
+     */
 
     // MARK: - Retry Error Tests
 
@@ -315,75 +315,75 @@ struct RetryableTaskTests {
 
     // FIXME: Concurrency mutation errors
     /* @Test("Full retry cycle with exponential backoff")
-    @MainActor
-    func testFullRetryCycleWithBackoff() async throws {
-        let policy = RetryPolicy(
-            maxRetries: 3,
-            maxRetryDuration: 30.0,
-            useExponentialBackoff: true,
-            baseDelay: 0.1,
-            maxDelay: 1.0,
-            useJitter: false
-        )
-        let executor = RetryExecutor(policy: policy)
+     @MainActor
+     func testFullRetryCycleWithBackoff() async throws {
+     let policy = RetryPolicy(
+     maxRetries: 3,
+     maxRetryDuration: 30.0,
+     useExponentialBackoff: true,
+     baseDelay: 0.1,
+     maxDelay: 1.0,
+     useJitter: false
+     )
+     let executor = RetryExecutor(policy: policy)
 
-        var callTimes: [Date] = []
+     var callTimes: [Date] = []
 
-        let result = try await executor.execute {
-            callTimes.append(Date())
-            if callTimes.count < 3 {
-                throw UnifiedAPIError.timeout(context: nil)
-            }
-            return "success"
-        }
+     let result = try await executor.execute {
+     callTimes.append(Date())
+     if callTimes.count < 3 {
+     throw UnifiedAPIError.timeout(context: nil)
+     }
+     return "success"
+     }
 
-        #expect(result == "success")
-        #expect(callTimes.count == 3)
+     #expect(result == "success")
+     #expect(callTimes.count == 3)
 
-        // Check that delays increase exponentially
-        if callTimes.count >= 3 {
-            let delay1 = callTimes[1].timeIntervalSince(callTimes[0])
-            let delay2 = callTimes[2].timeIntervalSince(callTimes[1])
+     // Check that delays increase exponentially
+     if callTimes.count >= 3 {
+     let delay1 = callTimes[1].timeIntervalSince(callTimes[0])
+     let delay2 = callTimes[2].timeIntervalSince(callTimes[1])
 
-            // Delays should be approximately 0.1s and 0.2s (with some tolerance for execution time)
-            #expect(delay1 >= 0.1 && delay1 < 0.3)
-            #expect(delay2 >= 0.2 && delay2 < 0.4)
-            #expect(delay2 > delay1)
-        }
-    }
+     // Delays should be approximately 0.1s and 0.2s (with some tolerance for execution time)
+     #expect(delay1 >= 0.1 && delay1 < 0.3)
+     #expect(delay2 >= 0.2 && delay2 < 0.4)
+     #expect(delay2 > delay1)
+     }
+     }
 
-    @Test("Convenience method for simple retry")
-    @MainActor
-    func testConvenienceMethodForSimpleRetry() async throws {
-        var callCount = 0
+     @Test("Convenience method for simple retry")
+     @MainActor
+     func testConvenienceMethodForSimpleRetry() async throws {
+     var callCount = 0
 
-        let result = try await RetryExecutor.executeWithRetry {
-            callCount += 1
-            if callCount < 2 {
-                throw UnifiedAPIError.network(URLError(.timedOut), context: nil)
-            }
-            return "success"
-        }
+     let result = try await RetryExecutor.executeWithRetry {
+     callCount += 1
+     if callCount < 2 {
+     throw UnifiedAPIError.network(URLError(.timedOut), context: nil)
+     }
+     return "success"
+     }
 
-        #expect(result == "success")
-        #expect(callCount == 2)
-    }
+     #expect(result == "success")
+     #expect(callCount == 2)
+     }
 
-    @Test("Convenience method with custom policy")
-    @MainActor
-    func testConvenienceMethodWithCustomPolicy() async throws {
-        var callCount = 0
+     @Test("Convenience method with custom policy")
+     @MainActor
+     func testConvenienceMethodWithCustomPolicy() async throws {
+     var callCount = 0
 
-        let result = try await RetryExecutor.executeWithRetry(policy: .aggressive) {
-            callCount += 1
-            if callCount < 4 {
-                throw UnifiedAPIError.timeout(context: nil)
-            }
-            return "success"
-        }
+     let result = try await RetryExecutor.executeWithRetry(policy: .aggressive) {
+     callCount += 1
+     if callCount < 4 {
+     throw UnifiedAPIError.timeout(context: nil)
+     }
+     return "success"
+     }
 
-        #expect(result == "success")
-        #expect(callCount == 4)
-    }
-    */
+     #expect(result == "success")
+     #expect(callCount == 4)
+     }
+     */
 }

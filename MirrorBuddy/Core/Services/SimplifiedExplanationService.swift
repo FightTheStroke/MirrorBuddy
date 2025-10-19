@@ -375,7 +375,7 @@ final class SimplifiedExplanationService {
         let descriptor = FetchDescriptor<SimplifiedExplanation>(
             predicate: #Predicate { explanation in
                 explanation.concept == concept &&
-                explanation.level == level.rawValue
+                    explanation.level == level.rawValue
             },
             sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
         )

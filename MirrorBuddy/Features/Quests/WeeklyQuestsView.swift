@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// View for displaying weekly quests (Task 131.2)
 struct WeeklyQuestsView: View {

@@ -2,7 +2,6 @@ import Foundation
 
 /// Centralized localization for Task Capture feature
 enum TaskCaptureStrings {
-
     // MARK: - Subjects
 
     enum Subject {

@@ -2,7 +2,6 @@ import Foundation
 
 /// Script for guided flashcard coaching sessions
 struct FlashcardCoachScript {
-
     enum SessionPhase {
         case warmUp
         case practice

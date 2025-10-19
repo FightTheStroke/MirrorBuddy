@@ -2,7 +2,6 @@ import Foundation
 
 /// Comprehensive unit conversion tool for physics and chemistry
 final class UnitConverter {
-
     /// Convert a value from one unit to another
     func convert(value: Double, from fromUnit: PhysicsUnit, to toUnit: PhysicsUnit) throws -> UnitConversionResult {
         // Check if units are in the same category
@@ -247,10 +246,10 @@ enum PhysicsUnit: String, CaseIterable {
         switch self {
         // Length (base: meter)
         case .meter: return 1.0
-        case .kilometer: return 1000.0
+        case .kilometer: return 1_000.0
         case .centimeter: return 0.01
         case .millimeter: return 0.001
-        case .mile: return 1609.34
+        case .mile: return 1_609.34
         case .yard: return 0.9144
         case .foot: return 0.3048
         case .inch: return 0.0254
@@ -261,13 +260,13 @@ enum PhysicsUnit: String, CaseIterable {
         case .milligram: return 0.000001
         case .pound: return 0.453592
         case .ounce: return 0.0283495
-        case .ton: return 1000.0
+        case .ton: return 1_000.0
 
         // Time (base: second)
         case .second: return 1.0
         case .minute: return 60.0
-        case .hour: return 3600.0
-        case .day: return 86400.0
+        case .hour: return 3_600.0
+        case .day: return 86_400.0
         case .millisecond: return 0.001
 
         // Temperature (special case, handled separately)
@@ -277,22 +276,22 @@ enum PhysicsUnit: String, CaseIterable {
 
         // Energy (base: joule)
         case .joule: return 1.0
-        case .kilojoule: return 1000.0
+        case .kilojoule: return 1_000.0
         case .calorie: return 4.184
-        case .kilocalorie: return 4184.0
+        case .kilocalorie: return 4_184.0
         case .electronvolt: return 1.60218e-19
 
         // Force (base: newton)
         case .newton: return 1.0
-        case .kilonewton: return 1000.0
+        case .kilonewton: return 1_000.0
         case .poundForce: return 4.44822
 
         // Pressure (base: pascal)
         case .pascal: return 1.0
-        case .kilopascal: return 1000.0
-        case .atmosphere: return 101325.0
-        case .bar: return 100000.0
-        case .psi: return 6894.76
+        case .kilopascal: return 1_000.0
+        case .atmosphere: return 101_325.0
+        case .bar: return 100_000.0
+        case .psi: return 6_894.76
 
         // Velocity (base: m/s)
         case .metersPerSecond: return 1.0
@@ -310,7 +309,7 @@ enum PhysicsUnit: String, CaseIterable {
 
         // Power (base: watt)
         case .watt: return 1.0
-        case .kilowatt: return 1000.0
+        case .kilowatt: return 1_000.0
         case .horsepower: return 745.7
 
         // Electric Current (base: ampere)
@@ -319,18 +318,18 @@ enum PhysicsUnit: String, CaseIterable {
 
         // Voltage (base: volt)
         case .volt: return 1.0
-        case .kilovolt: return 1000.0
+        case .kilovolt: return 1_000.0
         case .millivolt: return 0.001
 
         // Resistance (base: ohm)
         case .ohm: return 1.0
-        case .kilohm: return 1000.0
-        case .megohm: return 1000000.0
+        case .kilohm: return 1_000.0
+        case .megohm: return 1_000_000.0
 
         // Frequency (base: hertz)
         case .hertz: return 1.0
-        case .kilohertz: return 1000.0
-        case .megahertz: return 1000000.0
+        case .kilohertz: return 1_000.0
+        case .megahertz: return 1_000_000.0
         }
     }
 }

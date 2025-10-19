@@ -236,7 +236,7 @@ struct TaskListView: View {
         if !searchText.isEmpty {
             tasks = tasks.filter { task in
                 task.title.localizedCaseInsensitiveContains(searchText) ||
-                (task.taskDescription?.localizedCaseInsensitiveContains(searchText) ?? false)
+                    (task.taskDescription?.localizedCaseInsensitiveContains(searchText) ?? false)
             }
         }
 

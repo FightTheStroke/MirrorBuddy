@@ -8,7 +8,6 @@
 import XCTest
 
 final class MirrorBuddyUITests: XCTestCase {
-
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -90,7 +89,7 @@ final class MirrorBuddyUITests: XCTestCase {
                 applyButton.tap()
 
                 // Verify filtered results
-                XCTAssertTrue(materialsList.cells.count > 0, "Filtered results should appear")
+                XCTAssertTrue(!materialsList.cells.isEmpty, "Filtered results should appear")
             }
         }
     }
@@ -166,7 +165,7 @@ final class MirrorBuddyUITests: XCTestCase {
 
             // Check for example commands
             let exampleCommands = app.staticTexts.containing(NSPredicate(format: "label CONTAINS 'Apri'"))
-            XCTAssertTrue(exampleCommands.count > 0, "Should show example commands")
+            XCTAssertTrue(!exampleCommands.isEmpty, "Should show example commands")
 
             // Close help
             let doneButton = app.buttons["Done"]
@@ -189,7 +188,7 @@ final class MirrorBuddyUITests: XCTestCase {
             let analysisView = app.otherElements["VisionAnalysisView"]
 
             XCTAssertTrue(cameraView.exists || analysisView.exists,
-                         "Vision interface should appear")
+                          "Vision interface should appear")
 
             // Test cancel
             let cancelButton = app.buttons["Cancel"]
@@ -258,8 +257,8 @@ final class MirrorBuddyUITests: XCTestCase {
 
                     // Verify node detail appears
                     let nodeDetail = app.otherElements["NodeDetailView"]
-                    XCTAssert(nodeDetail.exists || app.popovers.count > 0,
-                             "Node selection should show details")
+                    XCTAssert(nodeDetail.exists || !app.popovers.isEmpty,
+                              "Node selection should show details")
                 }
 
                 // Close mind map
@@ -325,7 +324,7 @@ final class MirrorBuddyUITests: XCTestCase {
                 // Verify task marked complete
                 sleep(1)
                 XCTAssertTrue(checkbox.isSelected || firstTask.value as? String == "completed",
-                             "Task should be marked complete")
+                              "Task should be marked complete")
             }
         }
     }
@@ -446,8 +445,8 @@ final class MirrorBuddyUITests: XCTestCase {
 
             // Either have tasks or show empty state
             let tasksList = app.collectionViews["TasksList"]
-            XCTAssertTrue(emptyMessage.exists || tasksList.cells.count > 0,
-                         "Should show empty state or tasks")
+            XCTAssertTrue(emptyMessage.exists || !tasksList.cells.isEmpty,
+                          "Should show empty state or tasks")
         }
     }
 }

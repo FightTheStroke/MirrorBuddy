@@ -1,11 +1,10 @@
-import Foundation
 import AVFoundation
 import Combine
+import Foundation
 
 /// Service for guided flashcard coaching sessions
 @MainActor
 final class GuidedFlashcardService: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var currentPhase: FlashcardCoachScript.SessionPhase = .warmUp
@@ -184,7 +183,7 @@ final class GuidedFlashcardService: ObservableObject {
     }
 
     var progress: Double {
-        guard cards.count > 0 else { return 0 }
+        guard !cards.isEmpty else { return 0 }
         return Double(currentCardIndex) / Double(cards.count)
     }
 }

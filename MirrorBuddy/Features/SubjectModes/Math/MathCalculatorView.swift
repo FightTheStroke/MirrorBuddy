@@ -91,9 +91,8 @@ struct MathCalculatorView: View {
                 HStack(spacing: 12) {
                     ForEach(row, id: \.self) { button in
                         CalculatorButton(
-                            button: button,
-                            action: { calculator.processInput(button) }
-                        )
+                            button: button
+                        )                            { calculator.processInput(button) }
                     }
                 }
             }

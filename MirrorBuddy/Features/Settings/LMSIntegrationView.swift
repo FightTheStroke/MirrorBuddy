@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// View for managing LMS integrations (Canvas, Google Classroom)
 struct LMSIntegrationView: View {

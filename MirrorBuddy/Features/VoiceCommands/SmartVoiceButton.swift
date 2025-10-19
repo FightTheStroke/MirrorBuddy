@@ -6,8 +6,8 @@
 //  Replaces separate VoiceCommandButton and PersistentVoiceButton
 //
 
-import SwiftUI
 import Combine
+import SwiftUI
 
 /// Smart voice button with unified command and conversation detection
 /// Task 113: Safe area-aware positioning with orientation and keyboard support

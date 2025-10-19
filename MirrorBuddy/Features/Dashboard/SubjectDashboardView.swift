@@ -161,7 +161,7 @@ struct SubjectDashboardView: View {
         if !searchText.isEmpty {
             materials = materials.filter { material in
                 material.title.localizedCaseInsensitiveContains(searchText) ||
-                (material.summary?.localizedCaseInsensitiveContains(searchText) ?? false)
+                    (material.summary?.localizedCaseInsensitiveContains(searchText) ?? false)
             }
         }
 

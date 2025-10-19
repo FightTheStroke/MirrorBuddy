@@ -249,7 +249,6 @@ final class GoogleDriveDownloadService: ObservableObject {
                 // Update progress with retry data
                 updateProgress(fileId: fileId, downloaded: Int64(retryData.count), total: metadata.size)
                 return retryData
-
             } catch {
                 logger.error("Token refresh failed: \(error.localizedDescription)")
                 throw GoogleAPIError.oauthError("Token expired and refresh failed: \(error.localizedDescription)")

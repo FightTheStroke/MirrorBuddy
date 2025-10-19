@@ -1,5 +1,5 @@
-import Foundation
 import AVFoundation
+import Foundation
 
 /// Pronunciation assistance using iOS AVSpeechSynthesizer
 @MainActor
@@ -14,7 +14,7 @@ final class PronunciationCoach: NSObject, ObservableObject {
 
     /// Get pronunciation guide for text
     func getPronunciationGuide(text: String, language: SupportedLanguage) -> PronunciationGuide {
-        return PronunciationGuide(
+        PronunciationGuide(
             text: text,
             language: language,
             phoneticSpelling: generatePhoneticSpelling(text: text, language: language),
@@ -71,7 +71,7 @@ final class PronunciationCoach: NSObject, ObservableObject {
     private func generatePhoneticSpelling(text: String, language: SupportedLanguage) -> String {
         // Simplified phonetic spelling
         // In a real implementation, this would use IPA (International Phonetic Alphabet)
-        return text.lowercased()
+        text.lowercased()
     }
 
     private func breakIntoSyllables(text: String) -> [String] {

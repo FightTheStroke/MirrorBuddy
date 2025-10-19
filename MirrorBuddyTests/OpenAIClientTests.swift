@@ -352,47 +352,47 @@ struct OpenAIClientTests {
 /// Integration tests require a real API key and make actual API calls.
 /// These are commented out by default. Uncomment and run manually when needed.
 /*
-@Suite("OpenAI Integration Tests")
-struct OpenAIIntegrationTests {
+ @Suite("OpenAI Integration Tests")
+ struct OpenAIIntegrationTests {
 
-    @Test("Real chat completion request")
-    func testRealChatCompletion() async throws {
-        // This would require a real API key from environment
-        guard let config = OpenAIConfiguration.loadFromEnvironment() else {
-            Issue.record("No API key available for integration test")
-            return
-        }
+ @Test("Real chat completion request")
+ func testRealChatCompletion() async throws {
+ // This would require a real API key from environment
+ guard let config = OpenAIConfiguration.loadFromEnvironment() else {
+ Issue.record("No API key available for integration test")
+ return
+ }
 
-        let client = OpenAIClient(configuration: config)
+ let client = OpenAIClient(configuration: config)
 
-        let response = try await client.chatCompletion(
-            model: .gpt5Nano,
-            messages: [ChatMessage(role: .user, content: .text("Say 'test passed' in 2 words"))],
-            temperature: 0.3,
-            maxTokens: 10
-        )
+ let response = try await client.chatCompletion(
+ model: .gpt5Nano,
+ messages: [ChatMessage(role: .user, content: .text("Say 'test passed' in 2 words"))],
+ temperature: 0.3,
+ maxTokens: 10
+ )
 
-        #expect(response.choices.count > 0)
-        #expect(response.choices[0].message.content.count > 0)
-    }
+ #expect(response.choices.count > 0)
+ #expect(response.choices[0].message.content.count > 0)
+ }
 
-    @Test("Real image generation request")
-    func testRealImageGeneration() async throws {
-        guard let config = OpenAIConfiguration.loadFromEnvironment() else {
-            Issue.record("No API key available for integration test")
-            return
-        }
+ @Test("Real image generation request")
+ func testRealImageGeneration() async throws {
+ guard let config = OpenAIConfiguration.loadFromEnvironment() else {
+ Issue.record("No API key available for integration test")
+ return
+ }
 
-        let client = OpenAIClient(configuration: config)
+ let client = OpenAIClient(configuration: config)
 
-        let response = try await client.generateImage(
-            prompt: "A simple test image",
-            size: .square1024,
-            quality: .standard
-        )
+ let response = try await client.generateImage(
+ prompt: "A simple test image",
+ size: .square1024,
+ quality: .standard
+ )
 
-        #expect(response.data.count > 0)
-        #expect(response.data[0].url != nil)
-    }
-}
-*/
+ #expect(response.data.count > 0)
+ #expect(response.data[0].url != nil)
+ }
+ }
+ */

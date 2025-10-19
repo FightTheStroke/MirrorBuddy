@@ -31,8 +31,8 @@ struct EmailCalendarSyncView: View {
                         .font(.title2.bold())
 
                     Text(syncComplete ?
-                         "Email e calendario sono stati sincronizzati con successo" :
-                         "Controlla nuove email dai professori e eventi del calendario"
+                            "Email e calendario sono stati sincronizzati con successo" :
+                            "Controlla nuove email dai professori e eventi del calendario"
                     )
                     .font(.subheadline)
                     .foregroundStyle(.secondary)

@@ -2,7 +2,6 @@ import Foundation
 
 /// Vocabulary building system with spaced repetition
 final class ItalianVocabularyBuilder {
-
     // MARK: - Vocabulary Management
 
     /// Get vocabulary words for a specific topic
@@ -33,7 +32,7 @@ final class ItalianVocabularyBuilder {
     func search(query: String) -> [VocabularyWord] {
         allWords.filter { word in
             word.italian.lowercased().contains(query.lowercased()) ||
-            word.english.lowercased().contains(query.lowercased())
+                word.english.lowercased().contains(query.lowercased())
         }
     }
 

@@ -110,8 +110,8 @@ struct TasksView: View {
             }
             .sheet(isPresented: $showingSyncSheet) {
                 EmailCalendarSyncView {
-                        await syncEmailsAndCalendar()
-                    }
+                    await syncEmailsAndCalendar()
+                }
             }
             .task {
                 // Load cached data on appear

@@ -129,7 +129,6 @@ struct PromptAction: Identifiable, Equatable {
 // MARK: - Prompt Builders
 
 extension ProactivePrompt {
-
     static func idlePrompt(reason: String) -> ProactivePrompt {
         ProactivePrompt(
             type: .idle,

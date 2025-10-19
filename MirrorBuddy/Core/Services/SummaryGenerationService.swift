@@ -345,7 +345,7 @@ final class SummaryGenerationService {
         let descriptor = FetchDescriptor<SummaryModel>(
             predicate: #Predicate { summary in
                 summary.originalTextHash == textHash &&
-                summary.detailLevel == detailLevel.rawValue
+                    summary.detailLevel == detailLevel.rawValue
             },
             sortBy: [SortDescriptor(\.generatedAt, order: .reverse)]
         )

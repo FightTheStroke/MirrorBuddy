@@ -186,7 +186,7 @@ struct TodayMaterialRow: View {
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color(uiColor: colorScheme == .dark ?
-                    .secondarySystemGroupedBackground : .systemBackground))
+                                .secondarySystemGroupedBackground : .systemBackground))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12)

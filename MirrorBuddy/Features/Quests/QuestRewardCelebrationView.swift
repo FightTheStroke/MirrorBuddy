@@ -177,7 +177,7 @@ struct ConfettiView: View {
     @State private var confettiPieces: [ConfettiPiece] = []
 
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             ZStack {
                 ForEach(confettiPieces) { piece in
                     ConfettiShape()
@@ -259,7 +259,7 @@ struct ConfettiShape: Shape {
                     baseXP: 50
                 ),
                 startDate: Date(),
-                endDate: Date().addingTimeInterval(7 * 24 * 3600)
+                endDate: Date().addingTimeInterval(7 * 24 * 3_600)
             ),
             xpEarned: 50,
             badge: nil,

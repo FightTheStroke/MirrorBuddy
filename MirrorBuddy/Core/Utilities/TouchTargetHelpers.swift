@@ -143,8 +143,8 @@ struct TouchTargetOverlay: ViewModifier {
                         Rectangle()
                             .stroke(
                                 geometry.size.width >= minTouchTargetSize &&
-                                geometry.size.height >= minTouchTargetSize ?
-                                Color.green : Color.red,
+                                    geometry.size.height >= minTouchTargetSize ?
+                                    Color.green : Color.red,
                                 lineWidth: 2
                             )
                             .overlay(

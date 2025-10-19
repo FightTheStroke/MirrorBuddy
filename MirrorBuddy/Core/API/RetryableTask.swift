@@ -195,7 +195,7 @@ struct RetryExecutor: Sendable {
 
                 // Calculate and apply delay
                 let delay = task.retryDelay(for: error, attempt: attempt) ??
-                           backoffStrategy.delay(for: attempt, error: error)
+                    backoffStrategy.delay(for: attempt, error: error)
 
                 // Log retry attempt on the main actor for UI-safe diagnostics
                 await MainActor.run {
@@ -319,15 +319,15 @@ extension RetryExecutor {
 /*
  // Using RetryableTask protocol:
  struct APIRequest: RetryableTask {
-     typealias Result = Data
+ typealias Result = Data
 
-     func execute() async throws -> Data {
-         // Make API request
-     }
+ func execute() async throws -> Data {
+ // Make API request
+ }
 
-     func isRetryable(error: Error) -> Bool {
-         // Custom retry logic
-     }
+ func isRetryable(error: Error) -> Bool {
+ // Custom retry logic
+ }
  }
 
  let executor = RetryExecutor(policy: .default)
@@ -335,11 +335,11 @@ extension RetryExecutor {
 
  // Using convenience method:
  let data = try await RetryExecutor.executeWithRetry {
-     try await makeAPIRequest()
+ try await makeAPIRequest()
  }
 
  // Using custom policy:
  let data = try await RetryExecutor.executeWithRetry(policy: .aggressive) {
-     try await makeCriticalAPIRequest()
+ try await makeCriticalAPIRequest()
  }
  */

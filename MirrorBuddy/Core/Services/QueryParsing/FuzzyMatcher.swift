@@ -24,11 +24,11 @@ struct FuzzyMatchResult: Comparable {
     }
 
     static func < (lhs: FuzzyMatchResult, rhs: FuzzyMatchResult) -> Bool {
-        return lhs.score < rhs.score
+        lhs.score < rhs.score
     }
 
     static func == (lhs: FuzzyMatchResult, rhs: FuzzyMatchResult) -> Bool {
-        return lhs.score == rhs.score
+        lhs.score == rhs.score
     }
 }
 
@@ -68,7 +68,6 @@ struct FuzzyMatchConfig {
 
 /// Fuzzy string matching engine
 struct FuzzyMatcher {
-
     let config: FuzzyMatchConfig
 
     init(config: FuzzyMatchConfig = .default) {
@@ -170,7 +169,7 @@ struct FuzzyMatcher {
                     let matchingWords = queryWords.filter { qWord in
                         candidateWords.contains { cWord in
                             String(cWord).contains(String(qWord)) ||
-                            levenshteinDistance(String(qWord), String(cWord)) <= 1
+                                levenshteinDistance(String(qWord), String(cWord)) <= 1
                         }
                     }
 
@@ -363,8 +362,8 @@ struct FuzzyMatcher {
         }
 
         let jaro = (Double(matches) / Double(s1Array.count) +
-                    Double(matches) / Double(s2Array.count) +
-                    (Double(matches) - Double(transpositions / 2)) / Double(matches)) / 3.0
+                        Double(matches) / Double(s2Array.count) +
+                        (Double(matches) - Double(transpositions / 2)) / Double(matches)) / 3.0
 
         return jaro
     }
@@ -373,7 +372,6 @@ struct FuzzyMatcher {
 // MARK: - Convenience Extensions
 
 extension FuzzyMatcher {
-
     /// Find fuzzy matches for material titles
     static func matchMaterialTitles(query: String, materials: [Material]) -> [(material: Material, score: Double)] {
         let matcher = FuzzyMatcher(config: .default)

@@ -73,7 +73,9 @@ final class GoogleDriveClient {
             queryString = "'\(folderID)' in parents and trashed = false"
         }
 
-        var components = URLComponents(string: "\(baseURL)/files")!
+        guard var components = URLComponents(string: "\(baseURL)/files") else {
+            throw GoogleDriveError.invalidURL("Failed to create URL components for list files")
+        }
         components.queryItems = [
             URLQueryItem(name: "q", value: queryString),
             URLQueryItem(name: "pageSize", value: String(pageSize)),
@@ -135,7 +137,9 @@ final class GoogleDriveClient {
     func getFile(fileID: String) async throws -> DriveFile {
         let accessToken = try await ensureAuthenticated()
 
-        var components = URLComponents(string: "\(baseURL)/files/\(fileID)")!
+        guard var components = URLComponents(string: "\(baseURL)/files/\(fileID)") else {
+            throw GoogleDriveError.invalidURL("Failed to create URL components for get file")
+        }
         components.queryItems = [
             URLQueryItem(name: "fields", value: "id, name, mimeType, modifiedTime, size, webViewLink, parents, createdTime, md5Checksum")
         ]
@@ -182,7 +186,9 @@ final class GoogleDriveClient {
     func getChanges(startPageToken: String, pageSize: Int = 100) async throws -> DriveChangeList {
         let accessToken = try await ensureAuthenticated()
 
-        var components = URLComponents(string: "\(baseURL)/changes")!
+        guard var components = URLComponents(string: "\(baseURL)/changes") else {
+            throw GoogleDriveError.invalidURL("Failed to create URL components for changes")
+        }
         components.queryItems = [
             URLQueryItem(name: "pageToken", value: startPageToken),
             URLQueryItem(name: "pageSize", value: String(pageSize)),

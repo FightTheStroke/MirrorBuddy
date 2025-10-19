@@ -1,9 +1,8 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// Guardian consent and privacy controls UI
 struct GuardianConsentSettingsView: View {
-
     @Environment(\.modelContext) private var modelContext
     @Query private var consents: [GuardianConsent]
 

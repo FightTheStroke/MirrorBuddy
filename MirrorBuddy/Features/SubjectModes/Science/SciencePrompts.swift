@@ -2,7 +2,6 @@ import Foundation
 
 /// Science and Physics-specific prompts for AI interactions
 enum SciencePrompts {
-
     // MARK: - Experiment Simulation Prompts
 
     static func experimentSimulationPrompt(

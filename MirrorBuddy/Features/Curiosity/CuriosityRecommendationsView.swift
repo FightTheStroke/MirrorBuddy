@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 /// View for displaying curiosity content recommendations (Task 131.1)
 struct CuriosityRecommendationsView: View {
@@ -214,7 +214,7 @@ struct CuriosityContentCard: View {
 
     private var difficultyText: String {
         String(repeating: "★", count: content.difficulty) +
-        String(repeating: "☆", count: 5 - content.difficulty)
+            String(repeating: "☆", count: 5 - content.difficulty)
     }
 }
 

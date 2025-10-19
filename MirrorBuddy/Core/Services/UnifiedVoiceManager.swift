@@ -98,7 +98,7 @@ final class UnifiedVoiceManager: ObservableObject {
             guard let self = self else { return }
 
             let recognitionLatency = Date().timeIntervalSince(startTime)
-            self.logger.debug("Recognized text: \(text) (latency: \(Int(recognitionLatency * 1000))ms)")
+            self.logger.debug("Recognized text: \(text) (latency: \(Int(recognitionLatency * 1_000))ms)")
             self.recognizedText = text
             self.isListening = false
 
@@ -138,7 +138,7 @@ final class UnifiedVoiceManager: ObservableObject {
 
             case .conversation:
                 let totalLatency = Date().timeIntervalSince(startTime)
-                self.logger.debug("Conversation mode selected (total latency: \(Int(totalLatency * 1000))ms)")
+                self.logger.debug("Conversation mode selected (total latency: \(Int(totalLatency * 1_000))ms)")
                 completion(.conversation(text))
             }
         }
@@ -205,7 +205,7 @@ final class UnifiedVoiceManager: ObservableObject {
         // 3. Context-specific patterns (Task 114 enhancement)
         if context.currentScreen == "MaterialDetail" {
             if normalizedText.contains("leggi") || normalizedText.contains("spiega") ||
-               normalizedText.contains("read") || normalizedText.contains("explain") {
+                normalizedText.contains("read") || normalizedText.contains("explain") {
                 score += 0.7
                 reasons.append("Material detail context match")
             }
@@ -233,7 +233,7 @@ final class UnifiedVoiceManager: ObservableObject {
 
         // 5. Question detection (likely conversation)
         let questionPatterns = ["?", "spiegami", "come", "perché", "cosa", "quale", "dimmi",
-                               "why", "how", "what", "explain", "tell me", "show me how"]
+                                "why", "how", "what", "explain", "tell me", "show me how"]
         if questionPatterns.contains(where: { normalizedText.contains($0) }) {
             return IntentResult(intent: .conversation, confidence: 0.95, reason: "Question pattern detected")
         }
@@ -259,7 +259,7 @@ final class UnifiedVoiceManager: ObservableObject {
 
     /// Legacy method for backwards compatibility
     func detectIntent(from text: String) -> VoiceIntent {
-        return detectIntentWithConfidence(from: text, context: currentContext).intent
+        detectIntentWithConfidence(from: text, context: currentContext).intent
     }
 
     // MARK: - Command Execution (Enhanced Task 114)
@@ -455,7 +455,7 @@ final class VoiceAnalytics {
 
     private var metrics: [VoiceCommandMetric] = []
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "VoiceAnalytics")
-    private let maxStoredMetrics = 1000
+    private let maxStoredMetrics = 1_000
 
     private init() {}
 
@@ -481,7 +481,7 @@ final class VoiceAnalytics {
 
         // Log slow commands (> 1 second total)
         if totalLatency > 1.0 {
-            logger.warning("Slow voice command: '\(text)' took \(String(format: "%.2f", totalLatency))s (recognition: \(Int(recognitionLatency * 1000))ms, intent: \(Int(intentLatency * 1000))ms, execution: \(Int(executionLatency * 1000))ms)")
+            logger.warning("Slow voice command: '\(text)' took \(String(format: "%.2f", totalLatency))s (recognition: \(Int(recognitionLatency * 1_000))ms, intent: \(Int(intentLatency * 1_000))ms, execution: \(Int(executionLatency * 1_000))ms)")
         }
 
         // Trim old metrics to prevent memory growth

@@ -1,9 +1,8 @@
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 @MainActor
 final class MathModeTests: XCTestCase {
-
     var mathMode: MathModeService!
 
     override func setUp() {

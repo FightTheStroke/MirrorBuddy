@@ -1,11 +1,10 @@
-import Testing
 import Foundation
 @testable import MirrorBuddy
+import Testing
 
 /// Tests for weekly parent/teacher digest system (Task 132)
 @Suite("Weekly Digest Tests")
 struct WeeklyDigestTests {
-
     @Test("Generate weekly digest with metrics")
     func testDigestGeneration() async {
         let service = DigestGenerationService.shared

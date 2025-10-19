@@ -90,7 +90,7 @@ final class MaterialAlias {
 
     /// Normalize alias for storage
     static func normalizeAlias(_ alias: String) -> String {
-        return alias
+        alias
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .lowercased()
             .replacingOccurrences(of: "  ", with: " ") // Collapse multiple spaces

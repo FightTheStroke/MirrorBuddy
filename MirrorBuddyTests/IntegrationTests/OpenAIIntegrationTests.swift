@@ -6,13 +6,12 @@
 //  Tests OpenAI completions, vision analysis, and Whisper transcription
 //
 
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 /// Integration tests for OpenAI API services (Completions, Vision, Whisper)
 @MainActor
 final class OpenAIIntegrationTests: XCTestCase {
-
     var mockURLSession: URLSession!
     var configuration: URLSessionConfiguration!
 
@@ -341,7 +340,7 @@ final class OpenAIIntegrationTests: XCTestCase {
 
         let completion = try JSONDecoder().decode(MockChatCompletion.self, from: data)
         XCTAssertTrue(completion.choices[0].message.content.contains("Pythagorean"))
-        XCTAssertGreaterThan(completion.usage.promptTokens, 1000, "Vision requests use more tokens")
+        XCTAssertGreaterThan(completion.usage.promptTokens, 1_000, "Vision requests use more tokens")
     }
 
     /// Test 7: Vision analysis for handwriting recognition

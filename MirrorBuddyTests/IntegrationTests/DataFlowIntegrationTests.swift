@@ -6,14 +6,13 @@
 //  Testing end-to-end workflows across core services
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 /// Integration tests for critical data flows in MirrorBuddy
 @MainActor
 final class DataFlowIntegrationTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 

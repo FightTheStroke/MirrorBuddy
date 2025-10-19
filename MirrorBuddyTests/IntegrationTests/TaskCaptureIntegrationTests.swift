@@ -1,10 +1,9 @@
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 /// Integration tests for natural language task capture
 @MainActor
 final class TaskCaptureIntegrationTests: XCTestCase {
-
     var parser: NaturalLanguageTaskParser!
     var captureService: TaskCaptureService!
 

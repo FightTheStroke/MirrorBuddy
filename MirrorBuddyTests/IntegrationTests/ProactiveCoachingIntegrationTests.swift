@@ -1,10 +1,9 @@
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 /// Integration tests for proactive coaching system
 @MainActor
 final class ProactiveCoachingIntegrationTests: XCTestCase {
-
     var contextTracker: ContextTracker!
     var idleDetector: IdleDetector!
     var checkpointManager: WorkingMemoryCheckpoint!

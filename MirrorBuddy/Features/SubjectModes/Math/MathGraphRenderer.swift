@@ -1,10 +1,9 @@
-import SwiftUI
 import Charts
+import SwiftUI
 
 /// Graph renderer for mathematical functions and data visualization
 @MainActor
 final class MathGraphRenderer {
-
     // MARK: - Graph Generation
 
     /// Generate data points for a mathematical function
@@ -76,19 +75,21 @@ final class MathGraphRenderer {
     private func calculateY(for x: Double, function: MathFunction) -> Double? {
         switch function.type {
         case .linear:
-            return function.parameters["m"]! * x + function.parameters["b"]!
+            guard let m = function.parameters["m"],
+                  let b = function.parameters["b"] else { return nil }
+            return m * x + b
 
         case .quadratic:
-            let a = function.parameters["a"]!
-            let b = function.parameters["b"]!
-            let c = function.parameters["c"]!
+            guard let a = function.parameters["a"],
+                  let b = function.parameters["b"],
+                  let c = function.parameters["c"] else { return nil }
             return a * x * x + b * x + c
 
         case .cubic:
-            let a = function.parameters["a"]!
-            let b = function.parameters["b"]!
-            let c = function.parameters["c"]!
-            let d = function.parameters["d"]!
+            guard let a = function.parameters["a"],
+                  let b = function.parameters["b"],
+                  let c = function.parameters["c"],
+                  let d = function.parameters["d"] else { return nil }
             return a * pow(x, 3) + b * pow(x, 2) + c * x + d
 
         case .polynomial:
@@ -100,13 +101,13 @@ final class MathGraphRenderer {
             return result
 
         case .exponential:
-            let a = function.parameters["a"]!
-            let b = function.parameters["b"]!
+            guard let a = function.parameters["a"],
+                  let b = function.parameters["b"] else { return nil }
             return a * exp(b * x)
 
         case .logarithmic:
-            let a = function.parameters["a"]!
-            let b = function.parameters["b"]!
+            guard let a = function.parameters["a"],
+                  let b = function.parameters["b"] else { return nil }
             guard x > 0 else { return nil }
             return a * log(x) + b
 
@@ -135,13 +136,13 @@ final class MathGraphRenderer {
             return a * tanValue + d
 
         case .absolute:
-            let a = function.parameters["a"]!
+            guard let a = function.parameters["a"] else { return nil }
             let h = function.parameters["h"] ?? 0.0
             let k = function.parameters["k"] ?? 0.0
             return a * abs(x - h) + k
 
         case .squareRoot:
-            let a = function.parameters["a"]!
+            guard let a = function.parameters["a"] else { return nil }
             let h = function.parameters["h"] ?? 0.0
             let k = function.parameters["k"] ?? 0.0
             guard x - h >= 0 else { return nil }
@@ -149,10 +150,10 @@ final class MathGraphRenderer {
 
         case .rational:
             // f(x) = (ax + b) / (cx + d)
-            let a = function.parameters["a"]!
-            let b = function.parameters["b"]!
-            let c = function.parameters["c"]!
-            let d = function.parameters["d"]!
+            guard let a = function.parameters["a"],
+                  let b = function.parameters["b"],
+                  let c = function.parameters["c"],
+                  let d = function.parameters["d"] else { return nil }
             let denominator = c * x + d
             guard abs(denominator) > 0.001 else { return nil } // Avoid division by zero
             return (a * x + b) / denominator
@@ -170,7 +171,7 @@ final class MathGraphRenderer {
         function: MathFunction,
         inRange range: ClosedRange<Double>
     ) -> CriticalPoints {
-        let data = generateFunctionData(function: function, xRange: range, points: 1000)
+        let data = generateFunctionData(function: function, xRange: range, points: 1_000)
 
         var maxima: [GraphPoint] = []
         var minima: [GraphPoint] = []
@@ -219,7 +220,7 @@ final class MathGraphRenderer {
         function: MathFunction,
         from a: Double,
         to b: Double,
-        intervals: Int = 1000
+        intervals: Int = 1_000
     ) -> Double? {
         let h = (b - a) / Double(intervals)
         var sum = 0.0

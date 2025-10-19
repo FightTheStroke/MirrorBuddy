@@ -6,7 +6,6 @@ import UIKit
 /// Service for exporting mind maps and summaries to various formats
 @MainActor
 final class KnowledgeExportService: ObservableObject {
-
     // MARK: - PDF Export
 
     /// Export mind map to PDF
@@ -363,13 +362,13 @@ final class KnowledgeExportService: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw NSError(domain: "NotionExport", code: -1,
-                         userInfo: [NSLocalizedDescriptionKey: "Failed to create Notion page"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to create Notion page"])
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         guard let pageID = json?["id"] as? String else {
             throw NSError(domain: "NotionExport", code: -2,
-                         userInfo: [NSLocalizedDescriptionKey: "Invalid Notion response"])
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid Notion response"])
         }
 
         return pageID

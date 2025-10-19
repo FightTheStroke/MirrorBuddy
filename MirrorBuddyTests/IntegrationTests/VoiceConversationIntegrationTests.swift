@@ -6,14 +6,13 @@
 //  Tests voice recording → transcription → AI response workflow
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 /// Integration tests for voice conversation workflows
 @MainActor
 final class VoiceConversationIntegrationTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 

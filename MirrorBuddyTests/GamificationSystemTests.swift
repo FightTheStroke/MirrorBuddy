@@ -1,12 +1,11 @@
-import Testing
 import Foundation
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import Testing
 
 /// Tests for gamification system (XP, achievements, streaks, levels)
 @Suite("Gamification System Tests")
 struct GamificationSystemTests {
-
     @Test("Award XP for completing study session")
     func testXPAward() throws {
         // Given: User with initial XP
@@ -38,7 +37,7 @@ struct GamificationSystemTests {
 
         // Then: Should level up
         #expect(user.currentLevel >= 2)
-        #expect(user.totalXP >= 1000)
+        #expect(user.totalXP >= 1_000)
     }
 
     @Test("Calculate current level from XP")
@@ -47,9 +46,9 @@ struct GamificationSystemTests {
         let testCases: [(xp: Int, expectedLevel: Int)] = [
             (0, 1),
             (100, 1),
-            (1000, 2),
-            (2500, 3),
-            (5000, 4)
+            (1_000, 2),
+            (2_500, 3),
+            (5_000, 4)
         ]
 
         // When/Then: Calculating level for each
@@ -124,14 +123,14 @@ struct GamificationSystemTests {
 
         // Then: Achievement should unlock
         // (Specific achievement logic depends on implementation)
-        #expect(user.unlockedAchievements.count >= 0)
+        #expect(user.unlockedAchievements.isEmpty)
     }
 
     @Test("Calculate progress to next level")
     func testProgressToNextLevel() {
         // Given: User with some XP
         let user = UserProgress()
-        user.totalXP = 1500 // Level 2, need 2500 for level 3
+        user.totalXP = 1_500 // Level 2, need 2500 for level 3
 
         // When: Calculating progress
         let progress = user.progressToNextLevel()

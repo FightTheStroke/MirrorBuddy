@@ -77,8 +77,8 @@ final class WhisperAudioOptimizer {
 
         // Step 5: Decide if optimization is needed
         let needsOptimization = fileSize > maxFileSizeBytes ||
-                               currentSampleRate > OptimalSettings.sampleRate * 1.5 ||
-                               currentChannels > OptimalSettings.channels
+            currentSampleRate > OptimalSettings.sampleRate * 1.5 ||
+            currentChannels > OptimalSettings.channels
 
         if needsOptimization {
             logger.info("Segment \(segment.index) needs optimization")

@@ -6,14 +6,13 @@
 //  Tests camera capture → image analysis → homework help workflow
 //
 
-import XCTest
-import UIKit
 @testable import MirrorBuddy
+import UIKit
+import XCTest
 
 /// Integration tests for vision analysis workflows
 @MainActor
 final class VisionAnalysisIntegrationTests: XCTestCase {
-
     var mockURLSession: URLSession!
     var configuration: URLSessionConfiguration!
 

@@ -4,7 +4,6 @@ import SwiftData
 /// Guardian consent and privacy control settings
 @Model
 final class GuardianConsent {
-
     @Attribute(.unique) var id: UUID
     var isPINProtected: Bool
     var pinHash: String?
@@ -51,6 +50,6 @@ final class GuardianConsent {
 
     private func hashPIN(_ pin: String) -> String {
         // Simple hash - in production use proper crypto
-        return String(pin.hashValue)
+        String(pin.hashValue)
     }
 }

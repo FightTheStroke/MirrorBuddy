@@ -6,14 +6,13 @@
 //  Tests OAuth flow, Gmail API, Calendar API, and Drive API integration
 //
 
-import XCTest
 import AuthenticationServices
 @testable import MirrorBuddy
+import XCTest
 
 /// Integration tests for Google API services (OAuth, Gmail, Calendar, Drive)
 @MainActor
 final class GoogleAPIIntegrationTests: XCTestCase {
-
     var mockURLSession: URLSession!
     var configuration: URLSessionConfiguration!
 
@@ -76,7 +75,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         XCTAssertEqual(tokens.tokenType, "Bearer")
         XCTAssertTrue(tokens.accessToken.starts(with: "ya29."))
         XCTAssertNotNil(tokens.refreshToken)
-        XCTAssertEqual(tokens.expiresIn, 3600)
+        XCTAssertEqual(tokens.expiresIn, 3_600)
     }
 
     /// Test 2: OAuth token refresh flow
@@ -121,7 +120,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         let expiredToken = OAuthTokens(
             accessToken: "expired_token",
             refreshToken: "valid_refresh_token",
-            expiresAt: Date().addingTimeInterval(-3600) // Expired 1 hour ago
+            expiresAt: Date().addingTimeInterval(-3_600) // Expired 1 hour ago
         )
 
         // Then: Verify token is expired
@@ -132,7 +131,7 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         let validToken = OAuthTokens(
             accessToken: "valid_token",
             refreshToken: "refresh_token",
-            expiresAt: Date().addingTimeInterval(3600) // Expires in 1 hour
+            expiresAt: Date().addingTimeInterval(3_600) // Expires in 1 hour
         )
 
         // Then: Verify token is valid

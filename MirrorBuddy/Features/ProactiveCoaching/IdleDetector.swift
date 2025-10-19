@@ -1,11 +1,10 @@
-import Foundation
 import Combine
+import Foundation
 import SwiftUI
 
 /// Detects user idle state and triggers proactive interventions
 @MainActor
 final class IdleDetector: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var isIdle: Bool = false

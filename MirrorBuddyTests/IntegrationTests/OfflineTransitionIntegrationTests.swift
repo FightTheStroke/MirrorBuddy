@@ -6,14 +6,13 @@
 //  Tests offline mode behavior and sync when back online
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 /// Integration tests for offline to online transitions
 @MainActor
 final class OfflineTransitionIntegrationTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 

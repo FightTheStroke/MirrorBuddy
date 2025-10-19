@@ -2,7 +2,6 @@ import Foundation
 
 /// AI prompts specialized for Italian language learning
 final class ItalianPrompts {
-
     // MARK: - Topic-Specific Prompts
 
     /// Get AI prompt template for a specific topic

@@ -188,16 +188,16 @@ struct VoiceConversationView: View {
                 Circle()
                     .fill(
                         viewModel.isConversationActive ?
-                        LinearGradient(
-                            colors: [.red, .red.opacity(0.8)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ) :
-                        LinearGradient(
-                            colors: [.blue, .purple],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
+                            LinearGradient(
+                                colors: [.red, .red.opacity(0.8)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ) :
+                            LinearGradient(
+                                colors: [.blue, .purple],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
                     )
                     .frame(width: 80, height: 80)
                     .shadow(radius: 8)
@@ -402,13 +402,13 @@ struct MessageBubbleView: View {
                     .padding(12)
                     .background(
                         message.isFromUser ?
-                        Color.blue :
-                        Color(.systemGray5)
+                            Color.blue :
+                            Color(.systemGray5)
                     )
                     .foregroundStyle(
                         message.isFromUser ?
-                        .white :
-                        .primary
+                            .white :
+                            .primary
                     )
                     .cornerRadius(16)
 
@@ -889,13 +889,13 @@ final class VoiceConversationViewModel: ObservableObject {
                 self.openAIClient = OpenAIClient(configuration: config)
             } else {
                 throw NSError(domain: "VoiceConversation", code: -1,
-                             userInfo: [NSLocalizedDescriptionKey: "OpenAI client not configured"])
+                              userInfo: [NSLocalizedDescriptionKey: "OpenAI client not configured"])
             }
         }
 
         guard let client = openAIClient else {
             throw NSError(domain: "VoiceConversation", code: -1,
-                         userInfo: [NSLocalizedDescriptionKey: "OpenAI client not configured"])
+                          userInfo: [NSLocalizedDescriptionKey: "OpenAI client not configured"])
         }
 
         // Generate response using GPT-5
@@ -916,7 +916,7 @@ final class VoiceConversationViewModel: ObservableObject {
 
         guard let aiResponse = response.choices.first?.message.content else {
             throw NSError(domain: "VoiceConversation", code: -1,
-                         userInfo: [NSLocalizedDescriptionKey: "Empty AI response"])
+                          userInfo: [NSLocalizedDescriptionKey: "Empty AI response"])
         }
 
         // Add AI response to UI and speak it

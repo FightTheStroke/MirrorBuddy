@@ -46,7 +46,7 @@ final class CanvasAPIService: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw NSError(domain: "CanvasAPI", code: -1,
-                         userInfo: [NSLocalizedDescriptionKey: "Failed to fetch courses"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch courses"])
         }
 
         return try JSONDecoder().decode([CanvasCourse].self, from: data)
@@ -66,7 +66,7 @@ final class CanvasAPIService: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw NSError(domain: "CanvasAPI", code: -1,
-                         userInfo: [NSLocalizedDescriptionKey: "Failed to fetch assignments"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to fetch assignments"])
         }
 
         return try JSONDecoder().decode([CanvasAssignment].self, from: data)
@@ -80,13 +80,13 @@ final class CanvasAPIService: ObservableObject {
     ) async throws -> [Task] {
         guard consent.isValid else {
             throw NSError(domain: "CanvasAPI", code: -2,
-                         userInfo: [NSLocalizedDescriptionKey: "LMS consent not granted"])
+                          userInfo: [NSLocalizedDescriptionKey: "LMS consent not granted"])
         }
 
         guard let accessTokenKey = consent.accessTokenKeychainKey,
               let accessToken = try? keychainManager.retrieve(key: accessTokenKey) else {
             throw NSError(domain: "CanvasAPI", code: -3,
-                         userInfo: [NSLocalizedDescriptionKey: "Access token not found"])
+                          userInfo: [NSLocalizedDescriptionKey: "Access token not found"])
         }
 
         let courses = try await fetchCourses(baseURL: baseURL, accessToken: accessToken)
@@ -104,7 +104,7 @@ final class CanvasAPIService: ObservableObject {
                 let descriptor = FetchDescriptor<Task>(
                     predicate: #Predicate { task in
                         task.lmsAssignmentID == String(assignment.id) &&
-                        task.source == .canvas
+                            task.source == .canvas
                     }
                 )
 
@@ -176,13 +176,13 @@ final class CanvasAPIService: ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
             throw NSError(domain: "CanvasAPI", code: -4,
-                         userInfo: [NSLocalizedDescriptionKey: "Failed to exchange code for token"])
+                          userInfo: [NSLocalizedDescriptionKey: "Failed to exchange code for token"])
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
         guard let accessToken = json?["access_token"] as? String else {
             throw NSError(domain: "CanvasAPI", code: -5,
-                         userInfo: [NSLocalizedDescriptionKey: "Invalid token response"])
+                          userInfo: [NSLocalizedDescriptionKey: "Invalid token response"])
         }
 
         let refreshToken = json?["refresh_token"] as? String

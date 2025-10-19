@@ -29,8 +29,12 @@ final class BackgroundSyncService: ObservableObject {
             forTaskWithIdentifier: Self.backgroundTaskIdentifier,
             using: nil
         ) { task in
+            guard let processingTask = task as? BGProcessingTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
             _Concurrency.Task { @MainActor in
-                await self.handleBackgroundSync(task: task as! BGProcessingTask)
+                await self.handleBackgroundSync(task: processingTask)
             }
         }
     }
@@ -45,7 +49,9 @@ final class BackgroundSyncService: ObservableObject {
 
     private func calculateNextSyncTime() -> Date {
         var calendar = Calendar.current
-        calendar.timeZone = TimeZone(identifier: "Europe/Rome")!
+        if let romeTimeZone = TimeZone(identifier: "Europe/Rome") {
+            calendar.timeZone = romeTimeZone
+        }
         let now = Date()
         let currentHour = calendar.component(.hour, from: now)
 
@@ -55,11 +61,13 @@ final class BackgroundSyncService: ObservableObject {
         } else if currentHour < 18 {
             components.hour = 18
         } else {
-            components.day! += 1
+            if let day = components.day {
+                components.day = day + 1
+            }
             components.hour = 13
         }
         components.minute = 0
-        return calendar.date(from: components)!
+        return calendar.date(from: components) ?? Date().addingTimeInterval(3600) // Fallback: 1 hour from now
     }
 
     private func handleBackgroundSync(task: BGProcessingTask) async {

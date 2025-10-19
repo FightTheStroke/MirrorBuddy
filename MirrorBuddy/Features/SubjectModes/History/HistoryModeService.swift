@@ -48,7 +48,7 @@ final class HistoryModeService: ObservableObject {
 
     /// Create a mind map showing connections between historical events
     func createEventConnectionMap(events: [HistoricalEvent]) async throws -> EventConnectionMap {
-        return try await eventMapper.createConnectionMap(events: events)
+        try await eventMapper.createConnectionMap(events: events)
     }
 
     // MARK: - Character Profiles
@@ -118,7 +118,7 @@ final class HistoryModeService: ObservableObject {
         events: [HistoricalEvent],
         difficulty: DateMemorizationDifficulty
     ) -> DateMemorizationExercise {
-        return dateMemorizationTool.createExercise(events: events, difficulty: difficulty)
+        dateMemorizationTool.createExercise(events: events, difficulty: difficulty)
     }
 
     /// Check answers for a date memorization exercise
@@ -126,7 +126,7 @@ final class HistoryModeService: ObservableObject {
         exercise: DateMemorizationExercise,
         answers: [String: String]
     ) -> DateMemorizationResult {
-        return dateMemorizationTool.checkAnswers(exercise: exercise, answers: answers)
+        dateMemorizationTool.checkAnswers(exercise: exercise, answers: answers)
     }
 }
 

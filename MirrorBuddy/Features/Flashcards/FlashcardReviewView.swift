@@ -6,8 +6,8 @@
 //  and quality rating system for optimal learning.
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct FlashcardReviewView: View {
     @Environment(\.modelContext) private var modelContext
@@ -52,9 +52,8 @@ struct FlashcardReviewView: View {
                     // Flashcard
                     FlashcardView(
                         flashcard: flashcard,
-                        showAnswer: showAnswer,
-                        onFlip: { showAnswer.toggle() }
-                    )
+                        showAnswer: showAnswer
+                    )                        { showAnswer.toggle() }
 
                     // Review buttons or show answer button
                     if showAnswer {

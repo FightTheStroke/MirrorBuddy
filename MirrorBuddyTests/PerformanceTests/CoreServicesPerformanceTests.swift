@@ -6,14 +6,13 @@
 //  Measuring performance of critical operations
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 /// Performance benchmarks for core MirrorBuddy services
 @MainActor
 final class CoreServicesPerformanceTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 
@@ -130,7 +129,7 @@ final class CoreServicesPerformanceTests: XCTestCase {
     /// Benchmark flashcard generation from material
     /// Target: < 1 second for 1000 words, generating 10 flashcards
     func testFlashcardGenerationPerformance() throws {
-        let material = createTestMaterial(wordCount: 1000)
+        let material = createTestMaterial(wordCount: 1_000)
         modelContext.insert(material)
 
         measure(metrics: [XCTClockMetric(), XCTMemoryMetric()]) {
@@ -243,7 +242,7 @@ final class CoreServicesPerformanceTests: XCTestCase {
 
         measure(metrics: [XCTClockMetric()]) {
             // Simulate 1000 review cycles
-            for i in 0..<1000 {
+            for i in 0..<1_000 {
                 let quality = (i % 6) // Cycle through 0-5 quality scores
                 flashcard.review(quality: quality)
             }
@@ -263,7 +262,7 @@ final class CoreServicesPerformanceTests: XCTestCase {
     /// Target: < 2 seconds for 1000 materials
     func testBulkMaterialCreationPerformance() {
         measure(metrics: [XCTClockMetric(), XCTMemoryMetric()]) {
-            let materials = (0..<1000).map { i in
+            let materials = (0..<1_000).map { i in
                 Material(title: "Bulk Material \(i)")
             }
 
@@ -275,7 +274,7 @@ final class CoreServicesPerformanceTests: XCTestCase {
                 XCTFail("Failed to save materials: \(error)")
             }
 
-            XCTAssertEqual(materials.count, 1000, "Should create 1000 materials")
+            XCTAssertEqual(materials.count, 1_000, "Should create 1000 materials")
 
             // Cleanup
             materials.forEach { modelContext.delete($0) }

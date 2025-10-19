@@ -2,7 +2,6 @@ import Foundation
 
 /// Mind map templates specialized for mathematical concepts
 final class MathMindMapTemplate {
-
     // MARK: - Template Generation
 
     /// Generate a mind map template for a specific math topic

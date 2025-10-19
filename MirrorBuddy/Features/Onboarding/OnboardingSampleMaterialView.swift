@@ -163,8 +163,8 @@ struct OnboardingSampleMaterialView: View {
                 • Il risultato è glucosio e ossigeno
                 • L'energia viene immagazzinata nei legami chimici
                 """)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
             }
 
         case .mindMap:

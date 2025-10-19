@@ -1,11 +1,10 @@
-import Foundation
-import Combine
 import AVFoundation
+import Combine
+import Foundation
 
 /// Main service coordinating proactive coaching interventions
 @MainActor
 final class ProactiveCoachingService: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var currentPrompt: ProactivePrompt?

@@ -2,7 +2,6 @@ import Foundation
 
 /// Specialized mind map templates for science and physics study
 enum ScienceMindMapTemplate {
-
     // MARK: - Template Types
 
     enum TemplateType: String, CaseIterable {

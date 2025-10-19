@@ -1,5 +1,5 @@
-import Foundation
 import AVFoundation
+import Foundation
 
 /// Service coordinating all Language mode specialized features
 @MainActor
@@ -56,7 +56,7 @@ final class LanguageModeService: ObservableObject {
         text: String,
         language: SupportedLanguage
     ) -> PronunciationGuide {
-        return pronunciationCoach.getPronunciationGuide(
+        pronunciationCoach.getPronunciationGuide(
             text: text,
             language: language
         )
@@ -118,7 +118,7 @@ final class LanguageModeService: ObservableObject {
         words: [VocabularyWord],
         exerciseType: VocabularyExerciseType
     ) async throws -> VocabularyExercise {
-        return try await vocabularyBuilder.generateExercise(
+        try await vocabularyBuilder.generateExercise(
             words: words,
             type: exerciseType
         )
@@ -126,7 +126,7 @@ final class LanguageModeService: ObservableObject {
 
     /// Get vocabulary statistics
     func getVocabularyStats() -> VocabularyStats {
-        return vocabularyBuilder.getStats(for: vocabularyList)
+        vocabularyBuilder.getStats(for: vocabularyList)
     }
 
     // MARK: - Conversation Practice

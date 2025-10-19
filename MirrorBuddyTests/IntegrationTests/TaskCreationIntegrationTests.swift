@@ -6,14 +6,13 @@
 //  Tests task creation from Gmail, Calendar, and voice input
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 /// Integration tests for task creation from external sources
 @MainActor
 final class TaskCreationIntegrationTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 

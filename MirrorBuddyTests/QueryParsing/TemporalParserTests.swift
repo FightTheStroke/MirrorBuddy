@@ -6,11 +6,10 @@
 //  Tests all temporal patterns including edge cases
 //
 
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 final class TemporalParserTests: XCTestCase {
-
     // MARK: - Absolute Temporal Tests
 
     func testParseTodayEnglish() {
@@ -354,7 +353,7 @@ final class TemporalParserTests: XCTestCase {
 
     func testParsePerformance() {
         measure {
-            for _ in 0..<1000 {
+            for _ in 0..<1_000 {
                 _ = TemporalParser.parseTemporal("show materials from 3 days ago")
             }
         }

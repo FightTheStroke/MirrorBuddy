@@ -2,7 +2,6 @@ import Foundation
 
 /// History-specific prompts for AI interactions
 enum HistoryPrompts {
-
     // MARK: - Timeline Prompts
 
     static func timelinePrompt(topic: String, startYear: Int, endYear: Int) -> String {

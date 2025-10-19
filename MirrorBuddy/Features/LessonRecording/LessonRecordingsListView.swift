@@ -5,8 +5,8 @@
 //  List view for managing all lesson recordings (Task 129)
 //
 
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct LessonRecordingsListView: View {
     @Environment(\.modelContext) private var modelContext

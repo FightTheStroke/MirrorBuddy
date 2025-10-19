@@ -4,7 +4,6 @@ import os.log
 /// Engine that adapts coaching pace and complexity based on sentiment and performance
 @MainActor
 final class AdaptivePacingEngine: ObservableObject {
-
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "AdaptivePacing")
 
     // MARK: - Dependencies
@@ -373,7 +372,7 @@ final class AdaptivePacingEngine: ObservableObject {
     // MARK: - Metrics Access
 
     func getCurrentMetrics() -> (successRate: Double, pace: PacingLevel, complexity: ComplexityLevel) {
-        return (metrics.successRate, currentPace, currentComplexity)
+        (metrics.successRate, currentPace, currentComplexity)
     }
 
     func getAdaptationSummary() -> String {

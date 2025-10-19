@@ -2,7 +2,6 @@ import Foundation
 
 /// Mind map templates specialized for Italian language learning
 final class ItalianMindMapTemplate {
-
     // MARK: - Template Generation
 
     /// Generate a mind map template for an Italian topic

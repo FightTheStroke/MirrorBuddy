@@ -1,6 +1,6 @@
 import Foundation
-import SwiftData
 import os.log
+import SwiftData
 
 /// Service for recommending curiosity content based on subjects and topics
 @MainActor

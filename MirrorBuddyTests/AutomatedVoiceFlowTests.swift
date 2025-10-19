@@ -1,9 +1,8 @@
-import XCTest
 @testable import MirrorBuddy
+import XCTest
 
 /// UI automation tests for voice command flows (Task 136.1)
 final class AutomatedVoiceFlowTests: XCTestCase {
-
     func testVoiceCommandNavigationFlow() throws {
         let app = XCUIApplication()
         app.launch()
@@ -36,7 +35,7 @@ final class AutomatedVoiceFlowTests: XCTestCase {
         voiceButton.tap()
 
         // Verify material can be selected via voice
-        XCTAssertTrue(app.collectionViews.cells.count > 0)
+        XCTAssertTrue(!app.collectionViews.cells.isEmpty)
     }
 
     func testVoiceCommandStudyMode() throws {
@@ -49,6 +48,6 @@ final class AutomatedVoiceFlowTests: XCTestCase {
 
         // Verify study modes accessible
         XCTAssertTrue(app.buttons["Start Flashcards"].exists ||
-                     app.buttons["Start Quiz"].exists)
+                        app.buttons["Start Quiz"].exists)
     }
 }

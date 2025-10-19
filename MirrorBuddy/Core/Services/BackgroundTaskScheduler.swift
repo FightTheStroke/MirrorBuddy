@@ -41,8 +41,12 @@ final class BackgroundTaskScheduler {
             forTaskWithIdentifier: Self.syncTaskIdentifier,
             using: nil
         ) { task in
+            guard let processingTask = task as? BGProcessingTask else {
+                task.setTaskCompleted(success: false)
+                return
+            }
             _Concurrency.Task { @MainActor in
-                await self.handleSyncTask(task as! BGProcessingTask)
+                await self.handleSyncTask(task: processingTask)
             }
         }
 
@@ -108,8 +112,14 @@ final class BackgroundTaskScheduler {
         }
 
         // If no future hour today, use first hour tomorrow
-        let daysToAdd = nextSyncHour == nil ? 1 : 0
-        nextSyncHour = nextSyncHour ?? scheduledSyncHours.first!
+        let daysToAdd: Int
+        if let foundHour = nextSyncHour {
+            daysToAdd = 0
+            nextSyncHour = foundHour
+        } else {
+            daysToAdd = 1
+            nextSyncHour = scheduledSyncHours.first ?? 13 // Default to 1 PM
+        }
 
         // Create target date
         var components = calendar.dateComponents([.year, .month, .day], from: now)

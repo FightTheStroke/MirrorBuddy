@@ -177,41 +177,41 @@ actor SmartQueryParser {
     private func detectIntent(from query: String) -> QueryIntent {
         // 1. Difficulty-based queries
         if query.contains("struggled") || query.contains("fatica") ||
-           query.contains("difficoltà") || query.contains("hard time") {
+            query.contains("difficoltà") || query.contains("hard time") {
             return .difficult(threshold: 0.6)
         }
 
         if query.contains("difficult") || query.contains("difficile") ||
-           query.contains("challenging") || query.contains("hard") {
+            query.contains("challenging") || query.contains("hard") {
             return .difficult(threshold: 0.7)
         }
 
         // 2. Recent material queries
         if query.contains("recent") || query.contains("recente") ||
-           query.contains("latest") || query.contains("ultimo") ||
-           query.contains("new") || query.contains("nuovo") {
+            query.contains("latest") || query.contains("ultimo") ||
+            query.contains("new") || query.contains("nuovo") {
             return .recent(timeframe: detectTimeFrame(from: query))
         }
 
         // 3. Recommendation queries
         if query.contains("recommend") || query.contains("suggest") ||
-           query.contains("raccomanda") || query.contains("consiglia") ||
-           query.contains("what should") || query.contains("cosa dovrei") {
+            query.contains("raccomanda") || query.contains("consiglia") ||
+            query.contains("what should") || query.contains("cosa dovrei") {
             return .recommend(based: detectRecommendationBasis(from: query))
         }
 
         // 4. Review queries
         if (query.contains("review") || query.contains("rivedere") ||
-            query.contains("not studied") || query.contains("non studiato") ||
-            query.contains("haven't reviewed") || query.contains("da ripassare")) &&
-           !query.contains("reviewed") {
+                query.contains("not studied") || query.contains("non studiato") ||
+                query.contains("haven't reviewed") || query.contains("da ripassare")) &&
+            !query.contains("reviewed") {
             return .needsReview
         }
 
         // 5. Topic-based search
         if query.contains("about") || query.contains("su") ||
-           query.contains("riguardo") || query.contains("topic") ||
-           query.contains("argomento") {
+            query.contains("riguardo") || query.contains("topic") ||
+            query.contains("argomento") {
             let topic = extractTopic(from: query)
             return .topicSearch(topic: topic)
         }
@@ -281,27 +281,27 @@ actor SmartQueryParser {
         if query.contains("today") || query.contains("oggi") {
             let today = Calendar.current.startOfDay(for: Date())
             filters.append(.dateRange(today, Date()))
-        } else if query.contains("yesterday") || query.contains("ieri") {
-            let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
+        } else if query.contains("yesterday") || query.contains("ieri"),
+                  let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) {
             let yesterdayStart = Calendar.current.startOfDay(for: yesterday)
             filters.append(.dateRange(yesterdayStart, yesterday))
-        } else if query.contains("week") || query.contains("settimana") {
-            let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        } else if query.contains("week") || query.contains("settimana"),
+                  let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) {
             filters.append(.dateRange(weekAgo, Date()))
-        } else if query.contains("month") || query.contains("mese") {
-            let monthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date())!
+        } else if query.contains("month") || query.contains("mese"),
+                  let monthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date()) {
             filters.append(.dateRange(monthAgo, Date()))
         }
 
         // Bloom's taxonomy level filters
         if query.contains("memorize") || query.contains("remember") ||
-           query.contains("ricordare") || query.contains("memorizzare") {
+            query.contains("ricordare") || query.contains("memorizzare") {
             filters.append(.bloomLevel(.remember))
         } else if query.contains("understand") || query.contains("explain") ||
-                  query.contains("capire") || query.contains("spiegare") {
+                    query.contains("capire") || query.contains("spiegare") {
             filters.append(.bloomLevel(.understand))
         } else if query.contains("apply") || query.contains("solve") ||
-                  query.contains("applicare") || query.contains("risolvere") {
+                    query.contains("applicare") || query.contains("risolvere") {
             filters.append(.bloomLevel(.apply))
         } else if query.contains("analyze") || query.contains("analizzare") {
             filters.append(.bloomLevel(.analyze))
@@ -313,20 +313,20 @@ actor SmartQueryParser {
 
         // Review status filters
         if query.contains("not reviewed") || query.contains("non rivisto") ||
-           query.contains("haven't studied") || query.contains("non studiato") ||
-           query.contains("da studiare") {
+            query.contains("haven't studied") || query.contains("non studiato") ||
+            query.contains("da studiare") {
             filters.append(.reviewed(false))
         } else if query.contains("reviewed") || query.contains("rivisto") ||
-                  query.contains("studied") || query.contains("studiato") {
+                    query.contains("studied") || query.contains("studiato") {
             filters.append(.reviewed(true))
         }
 
         // Mastery filters
         if query.contains("mastered") || query.contains("padroneggiato") ||
-           query.contains("know well") || query.contains("so bene") {
+            query.contains("know well") || query.contains("so bene") {
             filters.append(.mastered(true))
         } else if query.contains("not mastered") || query.contains("non padroneggiato") ||
-                  query.contains("need practice") || query.contains("da esercitare") {
+                    query.contains("need practice") || query.contains("da esercitare") {
             filters.append(.mastered(false))
         }
 
@@ -405,13 +405,13 @@ actor SmartQueryParser {
     /// Detect recommendation basis from query
     private func detectRecommendationBasis(from query: String) -> RecommendationBasis {
         if query.contains("exam") || query.contains("esame") ||
-           query.contains("test") || query.contains("verifica") {
+            query.contains("test") || query.contains("verifica") {
             return .upcoming
         } else if query.contains("weak") || query.contains("struggle") ||
-                  query.contains("debole") || query.contains("difficoltà") {
+                    query.contains("debole") || query.contains("difficoltà") {
             return .weak
         } else if query.contains("interest") || query.contains("like") ||
-                  query.contains("interesse") || query.contains("piace") {
+                    query.contains("interesse") || query.contains("piace") {
             return .interests
         } else {
             return .performance
@@ -455,7 +455,7 @@ actor SmartQueryParser {
 
         // Detect urgency
         if query.contains("urgent") || query.contains("urgente") ||
-           query.contains("now") || query.contains("adesso") {
+            query.contains("now") || query.contains("adesso") {
             context["urgent"] = true
         }
 
@@ -497,7 +497,7 @@ actor SmartQueryParser {
 extension SmartQueryParser {
     /// Build a SwiftData predicate from filters
     static func buildPredicate(from filters: [QueryFilter]) -> Predicate<Material> {
-        return #Predicate<Material> { material in
+        #Predicate<Material> { material in
             var matches = true
 
             // Apply each filter

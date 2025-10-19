@@ -50,7 +50,7 @@ struct QueryResult: Identifiable, Comparable {
     }
 
     static func == (lhs: QueryResult, rhs: QueryResult) -> Bool {
-        return lhs.material.id == rhs.material.id
+        lhs.material.id == rhs.material.id
     }
 
     // MARK: - Computed Properties
@@ -85,14 +85,13 @@ struct QueryResult: Identifiable, Comparable {
 
     /// Display text for match type
     var matchTypeDescription: String {
-        return matchType.rawValue
+        matchType.rawValue
     }
 }
 
 // MARK: - Query Result Builder
 
 struct QueryResultBuilder {
-
     /// Build query results from materials with fuzzy matching
     static func buildResults(
         materials: [Material],
@@ -254,7 +253,7 @@ struct QueryResultBuilder {
         let keywords = query.lowercased().components(separatedBy: .whitespaces)
         let matchedKeywords = keywords.filter { keyword in
             material.title.lowercased().contains(keyword) ||
-            material.summary?.lowercased().contains(keyword) ?? false
+                material.summary?.lowercased().contains(keyword) ?? false
         }
         metadata["matchedKeywords"] = matchedKeywords.count
 

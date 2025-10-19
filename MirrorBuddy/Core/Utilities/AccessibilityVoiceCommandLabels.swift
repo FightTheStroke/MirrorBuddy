@@ -137,26 +137,26 @@ struct QuickActionVoiceCommands {
  ### Basic Voice Command Label
  ```swift
  Button("Settings") {
-     openSettings()
+ openSettings()
  }
  .accessibilityWithVoiceCommand(
-     label: "Open Settings",
-     command: VoiceCommandLabels.openSettings
+ label: "Open Settings",
+ command: VoiceCommandLabels.openSettings
  )
  ```
 
  ### Quick Action with Voice Command
  ```swift
  QuickActionCard(
-     icon: "waveform",
-     title: "Voice Lesson",
-     color: .purple
+ icon: "waveform",
+ title: "Voice Lesson",
+ color: .purple
  ) {
-     startVoiceLesson()
+ startVoiceLesson()
  }
  .accessibilityLabelWithVoiceCommand(
-     "Start Voice Lesson",
-     voiceCommand: QuickActionVoiceCommands.voiceLesson
+ "Start Voice Lesson",
+ voiceCommand: QuickActionVoiceCommands.voiceLesson
  )
  ```
 

@@ -2,7 +2,6 @@ import Foundation
 
 /// AI prompts specialized for math tutoring and problem solving
 final class MathPrompts {
-
     // MARK: - Topic-Specific Prompts
 
     /// Get AI prompt template for a specific topic

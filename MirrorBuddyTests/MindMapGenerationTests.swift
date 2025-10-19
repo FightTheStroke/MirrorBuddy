@@ -1,11 +1,10 @@
-import Testing
 import Foundation
 @testable import MirrorBuddy
+import Testing
 
 /// Tests for mind map generation functionality
 @Suite("Mind Map Generation Tests")
 struct MindMapGenerationTests {
-
     @Test("Generate mind map from material content")
     func testMindMapGeneration() async throws {
         // Given: Sample material content

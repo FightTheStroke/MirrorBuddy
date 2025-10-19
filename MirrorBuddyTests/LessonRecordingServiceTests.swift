@@ -5,9 +5,9 @@
 //  Unit tests for LessonRecordingService (Task 129)
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 @MainActor
 final class LessonRecordingServiceTests: XCTestCase {

@@ -1,10 +1,9 @@
-import Foundation
 import AVFoundation
+import Foundation
 
 /// Manages working memory checkpoints during study sessions
 @MainActor
 final class WorkingMemoryCheckpoint: ObservableObject {
-
     // MARK: - Published Properties
 
     @Published var isCheckpointActive: Bool = false

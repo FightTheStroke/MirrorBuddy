@@ -2,7 +2,6 @@ import SwiftUI
 
 /// Guided flashcard study view with voice coaching
 struct GuidedFlashcardView: View {
-
     @StateObject private var coachService: GuidedFlashcardService
     @State private var isFlipped = false
     @State private var showCelebration = false

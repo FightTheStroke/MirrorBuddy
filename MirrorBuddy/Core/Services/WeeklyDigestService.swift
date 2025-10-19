@@ -271,7 +271,7 @@ final class WeeklyDigestService {
     /// Calculate number of level ups in the week
     private func calculateLevelUps(weeklyXP: Int, currentLevel: Int) -> Int {
         // Simplified: each level requires 100 XP
-        return weeklyXP / 100
+        weeklyXP / 100
     }
 }
 

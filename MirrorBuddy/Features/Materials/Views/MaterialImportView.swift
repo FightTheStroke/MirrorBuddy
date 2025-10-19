@@ -41,76 +41,76 @@ struct MaterialImportView: View {
                     if importSource == .fileSystem {
                         fileSystemView
                     } else if !authViewModel.isAuthenticated {
-                    // Not authenticated - show connect button
-                    ContentUnavailableView {
-                        Label("Google Drive non connesso", systemImage: "xmark.icloud")
-                    } description: {
-                        Text("Connetti il tuo account Google Drive per importare materiali di studio")
-                    } actions: {
-                        NavigationLink {
-                            GoogleDriveAuthView()
-                        } label: {
-                            Label("Connetti Google Drive", systemImage: "link")
+                        // Not authenticated - show connect button
+                        ContentUnavailableView {
+                            Label("Google Drive non connesso", systemImage: "xmark.icloud")
+                        } description: {
+                            Text("Connetti il tuo account Google Drive per importare materiali di studio")
+                        } actions: {
+                            NavigationLink {
+                                GoogleDriveAuthView()
+                            } label: {
+                                Label("Connetti Google Drive", systemImage: "link")
+                            }
+                            .buttonStyle(.borderedProminent)
                         }
-                        .buttonStyle(.borderedProminent)
-                    }
-                } else if isImporting {
-                    // Loading state
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .scaleEffect(1.5)
+                    } else if isImporting {
+                        // Loading state
+                        VStack(spacing: 20) {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .scaleEffect(1.5)
 
-                        Text("Caricamento file da Google Drive...")
-                            .font(.headline)
-                            .foregroundStyle(.secondary)
-                    }
-                } else if availableFiles.isEmpty {
-                    // No files found
-                    ContentUnavailableView {
-                        Label("Nessun file trovato", systemImage: "doc.questionmark")
-                    } description: {
-                        Text("Non sono stati trovati file PDF o documenti Google nel tuo Drive")
-                    } actions: {
-                        Button {
-                            loadFiles()
-                        } label: {
-                            Label("Ricarica", systemImage: "arrow.clockwise")
+                            Text("Caricamento file da Google Drive...")
+                                .font(.headline)
+                                .foregroundStyle(.secondary)
                         }
-                        .buttonStyle(.borderedProminent)
-                    }
-                } else {
-                    // File list
-                    List(availableFiles, id: \.id, selection: $selectedFiles) { file in
-                        HStack {
-                            Image(systemName: file.isPDF ? "doc.fill" : "doc.text.fill")
-                                .foregroundStyle(file.isPDF ? .red : .blue)
-                                .frame(width: 32)
+                    } else if availableFiles.isEmpty {
+                        // No files found
+                        ContentUnavailableView {
+                            Label("Nessun file trovato", systemImage: "doc.questionmark")
+                        } description: {
+                            Text("Non sono stati trovati file PDF o documenti Google nel tuo Drive")
+                        } actions: {
+                            Button {
+                                loadFiles()
+                            } label: {
+                                Label("Ricarica", systemImage: "arrow.clockwise")
+                            }
+                            .buttonStyle(.borderedProminent)
+                        }
+                    } else {
+                        // File list
+                        List(availableFiles, id: \.id, selection: $selectedFiles) { file in
+                            HStack {
+                                Image(systemName: file.isPDF ? "doc.fill" : "doc.text.fill")
+                                    .foregroundStyle(file.isPDF ? .red : .blue)
+                                    .frame(width: 32)
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(file.name)
-                                    .font(.headline)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(file.name)
+                                        .font(.headline)
 
-                                if let sizeString = file.size, let sizeInt = Int64(sizeString) {
-                                    Text(ByteCountFormatter.string(fromByteCount: sizeInt, countStyle: .file))
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                    if let sizeString = file.size, let sizeInt = Int64(sizeString) {
+                                        Text(ByteCountFormatter.string(fromByteCount: sizeInt, countStyle: .file))
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+
+                                Spacer()
+
+                                if selectedFiles.contains(file.id) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.blue)
                                 }
                             }
-
-                            Spacer()
-
-                            if selectedFiles.contains(file.id) {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(.blue)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                toggleSelection(file.id)
                             }
                         }
-                        .contentShape(Rectangle())
-                        .onTapGesture {
-                            toggleSelection(file.id)
-                        }
                     }
-                }
                 }
             }
             .navigationTitle(importSource == .googleDrive ? "Importa da Drive" : "Importa File")

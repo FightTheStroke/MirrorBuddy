@@ -6,14 +6,13 @@
 //  Tests end-to-end material processing workflows: PDF → summary → flashcards → mind maps
 //
 
-import XCTest
-import SwiftData
 @testable import MirrorBuddy
+import SwiftData
+import XCTest
 
 /// Integration tests for complete material processing workflows
 @MainActor
 final class MaterialProcessingIntegrationTests: XCTestCase {
-
     var modelContainer: ModelContainer!
     var modelContext: ModelContext!
 
