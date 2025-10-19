@@ -20,9 +20,19 @@ final class Flashcard {
     var createdAt = Date()
     var lastReviewedAt: Date?
 
+    // Statistics tracking
+    var reviewCount: Int = 0
+    var correctCount: Int = 0
+
     // Relationship to Material (NO inverse for one-to-many "one" side)
     @Relationship(deleteRule: .nullify)
     var material: Material?
+
+    /// Accuracy rate (0.0 - 1.0)
+    var accuracy: Double {
+        guard reviewCount > 0 else { return 0.0 }
+        return Double(correctCount) / Double(reviewCount)
+    }
 
     init(
         materialID: UUID,
@@ -49,9 +59,14 @@ final class Flashcard {
     func review(quality: Int) {
         lastReviewedAt = Date()
 
-        // SM-2 algorithm
+        // Update statistics
+        reviewCount += 1
         let qualityScore = Double(min(max(quality, 0), 5))
+        if qualityScore >= 3 {
+            correctCount += 1
+        }
 
+        // SM-2 algorithm
         if qualityScore >= 3 {
             // Correct answer
             if repetitions == 0 {
