@@ -8,7 +8,7 @@ final class ContextTracker: ObservableObject {
     // MARK: - Published Properties
 
     @Published var currentSubject: String?
-    @Published var currentMaterial: Material?
+    @Published var currentMaterial: MaterialStub?
     @Published var currentActivity: StudyActivity = .idle
     @Published var sessionStartTime: Date?
     @Published var lastInteractionTime = Date()
@@ -80,7 +80,7 @@ final class ContextTracker: ObservableObject {
 
     // MARK: - Session Management
 
-    func startStudySession(subject: String?, material: Material?) {
+    func startStudySession(subject: String?, material: MaterialStub?) {
         sessionStartTime = Date()
         currentSubject = subject
         currentMaterial = material
@@ -190,7 +190,7 @@ final class ContextTracker: ObservableObject {
 
 // MARK: - Material Stub
 
-struct Material: Identifiable, Codable {
+struct MaterialStub: Identifiable, Codable {
     let id: String
     let title: String
     let subject: String
