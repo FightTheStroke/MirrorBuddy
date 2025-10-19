@@ -1,0 +1,4 @@
+
+# Merge/rebase artifacts
+*.orig
+*.rej

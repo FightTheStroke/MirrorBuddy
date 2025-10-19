@@ -164,7 +164,6 @@ final class GmailService {
             throw GmailError.invalidURL
         }
 
-
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
@@ -318,7 +317,6 @@ final class GmailService {
 
         // Extract due date
         let dueDate = extractDueDate(from: message.body) ?? Calendar.current.date(byAdding: .day, value: 7, to: Date())!
-
 
         // Infer subject
         let subject = inferSubject(from: message)
@@ -491,7 +489,6 @@ final class GmailService {
         guard let url = URL(string: "\(baseURL)/users/me/messages/\(messageID)/modify") else {
             throw GmailError.invalidURL
         }
-
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

@@ -235,7 +235,7 @@ struct MaterialDetailView: View {
                 title: "Nessuna Mappa Mentale",
                 message: "Genera una mappa mentale per questo materiale",
                 actionTitle: "Genera Mappa"
-            )                { generateMindMap() }
+            ) { generateMindMap() }
         }
     }
 
@@ -279,7 +279,7 @@ struct MaterialDetailView: View {
                 title: "Nessuna Flashcard",
                 message: "Genera flashcard per questo materiale",
                 actionTitle: "Genera Flashcard"
-            )                { generateFlashcards() }
+            ) { generateFlashcards() }
         }
     }
 
@@ -308,7 +308,7 @@ struct MaterialDetailView: View {
                 title: "Nessun Riassunto",
                 message: "Genera un riassunto per questo materiale",
                 actionTitle: "Genera Riassunto"
-            )                { generateSummary() }
+            ) { generateSummary() }
         }
     }
 

@@ -693,4 +693,3 @@ enum RecordingError: LocalizedError {
         }
     }
 }
-

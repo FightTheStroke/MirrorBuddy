@@ -235,7 +235,7 @@ extension View {
     VoiceStatusBar(
         state: .listening,
         message: "Pronuncia il tuo comando"
-    )        {}
+    ) {}
 }
 
 #Preview("In Navigation") {

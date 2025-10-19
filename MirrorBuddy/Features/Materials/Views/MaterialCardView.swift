@@ -363,7 +363,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
         title: "Equazioni Lineari - Capitolo 3",
         subject: subject
     )
-    let _ = {
+    _ = {
         material.processingStatus = .completed
         material.createdAt = Date().addingTimeInterval(-86_400 * 2)
         container.mainContext.insert(subject)

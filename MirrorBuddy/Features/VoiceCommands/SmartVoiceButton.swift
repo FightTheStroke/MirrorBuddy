@@ -275,7 +275,7 @@ struct SmartVoiceButton: View {
             forName: UIResponder.keyboardWillHideNotification,
             object: nil,
             queue: .main
-        ) { [weak self] notification in
+        ) { [weak self] _ in
             guard let self = self else { return }
             withAnimation(.easeInOut(duration: 0.3)) {
                 self.keyboardHeight = 0

@@ -278,14 +278,6 @@ struct HistoricalEra: Codable {
     let endYear: Int
     let region: String
     let description: String
-
-    init(name: String, startYear: Int, endYear: Int, region: String, description: String) {
-        self.name = name
-        self.startYear = startYear
-        self.endYear = endYear
-        self.region = region
-        self.description = description
-    }
 }
 
 struct EraSummary: Codable {

@@ -85,14 +85,14 @@ struct ConversationListView: View {
                 FilterButton(
                     title: "Tutte",
                     isSelected: viewModel.selectedSubject == nil
-                )                    { viewModel.selectedSubject = nil }
+                ) { viewModel.selectedSubject = nil }
 
                 // Subject filter buttons
                 ForEach(viewModel.subjects) { subject in
                     FilterButton(
                         title: subject.displayName,
                         isSelected: viewModel.selectedSubject?.id == subject.id
-                    )                        { viewModel.selectedSubject = subject }
+                    ) { viewModel.selectedSubject = subject }
                 }
             }
             .padding(.horizontal)

@@ -109,7 +109,7 @@ struct TasksView: View {
                 }
             }
             .sheet(isPresented: $showingSyncSheet) {
-                EmailCalendarSyncView                    {
+                EmailCalendarSyncView {
                         await syncEmailsAndCalendar()
                     }
             }

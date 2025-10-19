@@ -2,7 +2,7 @@
   "master": {
     "tasks": [
       {
-        "id": "1",
+        "id": 1,
         "title": "Setup Xcode Project with Required Configurations",
         "description": "Create a new Xcode project for MirrorBuddy with iOS 26+, macOS 26+ targets, Swift 6 strict concurrency, and proper build schemes.",
         "details": "Create a new Xcode project with the following specifications:\n- Project name: MirrorBuddy\n- Organization identifier: com.mirrorbuddy\n- Deployment targets: iOS 26+, iPadOS 26+, macOS 26+\n- Enable Swift 6 strict concurrency\n- Configure build schemes for development, testing, and release\n- Setup project structure with MVVM architecture\n- Create separate targets for iOS, iPadOS, and macOS\n- Configure shared code between platforms\n- Setup development team and signing certificates",
@@ -13,7 +13,7 @@
         "subtasks": []
       },
       {
-        "id": "2",
+        "id": 2,
         "title": "Integrate SwiftLint for Code Quality",
         "description": "Integrate SwiftLint into the project to enforce code quality standards with zero warnings requirement.",
         "details": "1. Add SwiftLint to the project using Swift Package Manager\n2. Create a .swiftlint.yml configuration file in the project root\n3. Configure rules to enforce strict code quality standards\n4. Add a build phase script to run SwiftLint during compilation\n5. Configure CI to fail if any SwiftLint warnings are detected\n6. Document SwiftLint setup in README.md\n7. Create a pre-commit hook to run SwiftLint before commits",
@@ -26,7 +26,7 @@
         "subtasks": []
       },
       {
-        "id": "3",
+        "id": 3,
         "title": "Define SwiftData Models for Materials",
         "description": "Create SwiftData models for Material entity with relationships to other entities.",
         "details": "Create a Material model with the following properties:\n- id: UUID (primary key)\n- title: String\n- subject: Relationship to Subject entity\n- pdfUrl: URL (optional)\n- mindMapId: Relationship to MindMap entity (optional)\n- flashcards: Relationship to Flashcard entities (to-many)\n- summary: String (optional)\n- createdAt: Date\n- updatedAt: Date\n- processed: Bool\n\nImplement proper relationships with cascade delete rules. Add necessary methods for CRUD operations. Implement Codable conformance for data export/import.",
@@ -39,7 +39,7 @@
         "subtasks": []
       },
       {
-        "id": "4",
+        "id": 4,
         "title": "Define SwiftData Models for Subjects",
         "description": "Create SwiftData models for Subject entity with relationships to other entities.",
         "details": "Create a Subject model with the following properties:\n- id: UUID (primary key)\n- name: String (e.g., Math, Italian, Physics, History, English, Science)\n- color: Color (stored as hex string)\n- icon: String (SF Symbol name)\n- materials: Relationship to Material entities (to-many)\n- tasks: Relationship to Task entities (to-many)\n\nImplement proper relationships with cascade delete rules. Add necessary methods for CRUD operations. Create predefined subjects for the initial app launch.",
@@ -52,7 +52,7 @@
         "subtasks": []
       },
       {
-        "id": "5",
+        "id": 5,
         "title": "Define SwiftData Models for MindMaps",
         "description": "Create SwiftData models for MindMap entity with nodes and relationships.",
         "details": "Create a MindMap model with the following properties:\n- id: UUID (primary key)\n- title: String\n- material: Relationship to Material entity\n- nodes: Relationship to MindMapNode entities (to-many)\n- createdAt: Date\n- updatedAt: Date\n\nCreate a MindMapNode model with:\n- id: UUID (primary key)\n- text: String\n- imageUrl: URL (optional)\n- x: Double (position)\n- y: Double (position)\n- mindMap: Relationship to MindMap entity\n- parentNode: Relationship to MindMapNode entity (optional)\n- childNodes: Relationship to MindMapNode entities (to-many)\n\nImplement proper relationships with cascade delete rules.",
@@ -66,7 +66,7 @@
         "subtasks": []
       },
       {
-        "id": "6",
+        "id": 6,
         "title": "Define SwiftData Models for Flashcards",
         "description": "Create SwiftData models for Flashcard entity with SRS data.",
         "details": "Create a Flashcard model with the following properties:\n- id: UUID (primary key)\n- front: String\n- back: String\n- material: Relationship to Material entity\n- lastReviewed: Date (optional)\n- nextReviewDate: Date (optional)\n- easeFactor: Double (default: 2.5)\n- interval: Int (days, default: 1)\n- repetitions: Int (default: 0)\n\nImplement SRS (Spaced Repetition System) algorithm methods:\n- calculateNextReview(quality: Int) -> Date\n- updateSRSData(quality: Int)\n\nImplement proper relationships with cascade delete rules.",
@@ -80,7 +80,7 @@
         "subtasks": []
       },
       {
-        "id": "7",
+        "id": 7,
         "title": "Define SwiftData Models for Tasks",
         "description": "Create SwiftData models for Task entity with relationships to other entities.",
         "details": "Create a Task model with the following properties:\n- id: UUID (primary key)\n- title: String\n- description: String (optional)\n- dueDate: Date (optional)\n- subject: Relationship to Subject entity\n- material: Relationship to Material entity (optional)\n- completed: Bool (default: false)\n- completedDate: Date (optional)\n- source: String (e.g., 'calendar', 'email', 'manual')\n- sourceId: String (optional, for tracking external IDs)\n- createdAt: Date\n- updatedAt: Date\n\nImplement proper relationships with cascade delete rules. Add methods for completion tracking and due date calculations.",
@@ -95,7 +95,7 @@
         "subtasks": []
       },
       {
-        "id": "8",
+        "id": 8,
         "title": "Define SwiftData Models for UserProgress",
         "description": "Create SwiftData models for UserProgress entity to track XP, levels, and achievements.",
         "details": "Create a UserProgress model with the following properties:\n- id: UUID (primary key, singleton)\n- xp: Int (default: 0)\n- level: Int (default: 1)\n- achievements: Relationship to Achievement entities (to-many)\n- dailyStreak: Int (default: 0)\n- lastActiveDate: Date\n\nCreate an Achievement model with:\n- id: UUID (primary key)\n- title: String\n- description: String\n- iconName: String (SF Symbol name)\n- unlockedAt: Date (optional)\n- unlocked: Bool (default: false)\n- xpReward: Int\n\nImplement methods for XP calculation, level progression, and achievement unlocking.",
@@ -108,7 +108,7 @@
         "subtasks": []
       },
       {
-        "id": "9",
+        "id": 9,
         "title": "Setup CloudKit Container and Configuration",
         "description": "Configure CloudKit container for the app and set up necessary entitlements and capabilities.",
         "details": "1. Create a CloudKit container in Apple Developer Portal\n2. Configure app entitlements for CloudKit\n3. Add CloudKit capability to the app targets\n4. Set up iCloud container identifier in project settings\n5. Configure CloudKit Dashboard with necessary record types\n6. Set up development, staging, and production environments\n7. Document CloudKit setup process for the team",
@@ -121,7 +121,7 @@
         "subtasks": []
       },
       {
-        "id": "10",
+        "id": 10,
         "title": "Implement CloudKit Sync for SwiftData Models",
         "description": "Implement automatic CloudKit synchronization for SwiftData models across user devices.",
         "details": "1. Configure SwiftData with CloudKit sync using the `.cloudKit()` modifier\n2. Set up proper CloudKit container identifiers\n3. Implement conflict resolution strategy (last-write-wins for single user)\n4. Add sync status indicators in the UI\n5. Implement error handling for sync failures\n6. Add retry mechanism for failed syncs\n7. Create a manual sync trigger for user-initiated syncs\n8. Implement background sync using BGProcessingTask",
@@ -140,7 +140,7 @@
         "subtasks": []
       },
       {
-        "id": "11",
+        "id": 11,
         "title": "Create OpenAI API Client Infrastructure",
         "description": "Develop a client for OpenAI APIs including Realtime, Chat, and DALL-E endpoints.",
         "details": "Create an OpenAIClient class with:\n1. Configuration for API keys and endpoints\n2. Methods for GPT-5 chat completion\n3. Methods for GPT-5 mini vision analysis\n4. Methods for GPT-5 nano simple Q&A\n5. Methods for DALL-E 3 image generation\n6. WebSocket handling for Realtime API\n7. Error handling and retry logic\n8. Rate limiting implementation\n9. Response parsing and model mapping\n\nImplement using Swift concurrency (async/await) and proper error handling.",
@@ -285,7 +285,7 @@
         "updatedAt": "2025-10-12T14:37:24.131Z"
       },
       {
-        "id": "12",
+        "id": 12,
         "title": "Create Google Gemini API Client",
         "description": "Develop a client for Google Gemini 2.5 Pro API for Google Workspace integration.",
         "details": "Create a GeminiClient class with:\n1. Configuration for API keys and endpoints\n2. Methods for text generation and analysis\n3. Methods for Drive folder research\n4. Methods for Calendar event parsing\n5. Methods for Gmail assignment extraction\n6. Error handling and retry logic\n7. Rate limiting implementation\n8. Response parsing and model mapping\n\nImplement using Swift concurrency (async/await) and proper error handling.",
@@ -411,7 +411,7 @@
         "updatedAt": "2025-10-12T14:54:59.020Z"
       },
       {
-        "id": "13",
+        "id": 13,
         "title": "Create Google APIs Client for Workspace Integration",
         "description": "Develop a client for Google Drive, Calendar, and Gmail APIs for material and task management.",
         "details": "Create a GoogleAPIClient class with:\n1. OAuth 2.0 authentication flow\n2. Methods for Google Drive file listing and download\n3. Methods for Google Calendar event retrieval\n4. Methods for Gmail message retrieval and parsing\n5. Webhook setup for Drive file changes\n6. Error handling and retry logic\n7. Rate limiting implementation\n8. Response parsing and model mapping\n\nImplement using Swift concurrency (async/await) and proper error handling.",
@@ -466,7 +466,7 @@
         "updatedAt": "2025-10-12T15:06:27.921Z"
       },
       {
-        "id": "14",
+        "id": 14,
         "title": "Implement API Error Handling and Retry Logic",
         "description": "Develop a robust error handling and retry mechanism for all API clients.",
         "details": "1. Create a unified APIError enum for all possible error types\n2. Implement exponential backoff retry logic\n3. Create a RetryableTask protocol for retryable operations\n4. Implement circuit breaker pattern for failing endpoints\n5. Add logging for all API errors\n6. Create user-friendly error messages\n7. Implement fallback strategies for critical operations\n8. Add analytics for error tracking",
@@ -523,7 +523,7 @@
         "updatedAt": "2025-10-12T16:10:26.997Z"
       },
       {
-        "id": "15",
+        "id": 15,
         "title": "Implement Secure Keychain Storage for API Keys",
         "description": "Create a secure storage mechanism for API keys and OAuth tokens using Keychain.",
         "details": "1. Create a KeychainManager class for secure storage\n2. Implement methods for storing API keys\n3. Implement methods for storing OAuth tokens\n4. Add encryption for sensitive data\n5. Implement secure retrieval methods\n6. Add error handling for Keychain operations\n7. Create a credential rotation mechanism\n8. Implement biometric authentication for sensitive operations",
@@ -540,7 +540,7 @@
         "updatedAt": "2025-10-12T15:44:37.536Z"
       },
       {
-        "id": "16",
+        "id": 16,
         "title": "Implement Google Drive OAuth 2.0 Login Flow",
         "description": "Create the OAuth 2.0 authentication flow for Google Drive access.",
         "details": "1. Register app in Google Cloud Console\n2. Configure OAuth consent screen\n3. Generate client ID and secret\n4. Implement ASWebAuthenticationSession for OAuth flow\n5. Store refresh tokens securely in Keychain\n6. Implement token refresh logic\n7. Add sign-out functionality\n8. Handle authentication errors\n9. Create a user-friendly authentication UI",
@@ -635,7 +635,7 @@
         "updatedAt": "2025-10-12T15:50:23.808Z"
       },
       {
-        "id": "17",
+        "id": 17,
         "title": "Implement Google Drive File Listing and Monitoring",
         "description": "Create functionality to list and monitor files in the 'Mario - Scuola' Google Drive folder.",
         "details": "1. Implement file listing from specific folder\n2. Add filtering by file type (PDF, DOCX, etc.)\n3. Implement change tracking using Google Drive API\n4. Create a background task for scheduled checks at 13:00 and 18:00 CET\n5. Implement push notifications for new files\n6. Add file metadata extraction\n7. Create a database of known files to detect changes\n8. Implement incremental sync to minimize API usage",
@@ -730,7 +730,7 @@
         "updatedAt": "2025-10-12T16:09:09.700Z"
       },
       {
-        "id": "18",
+        "id": 18,
         "title": "Implement Google Drive File Download",
         "description": "Create functionality to download files from Google Drive to local storage.",
         "details": "1. Implement file download using Google Drive API\n2. Add progress tracking for downloads\n3. Implement background downloads using BGTransferTask\n4. Create a download queue for multiple files\n5. Add retry logic for failed downloads\n6. Implement file integrity verification\n7. Store downloaded files in app container\n8. Create a cleanup mechanism for old files",
@@ -857,7 +857,7 @@
         "updatedAt": "2025-10-12T17:11:17.757Z"
       },
       {
-        "id": "19",
+        "id": 19,
         "title": "Implement PDF Text Extraction with VisionKit",
         "description": "Create functionality to extract text from PDF files using VisionKit OCR.",
         "details": "1. Implement PDF loading and rendering\n2. Use VisionKit for OCR text extraction\n3. Process PDF pages in parallel for speed\n4. Extract text structure (headings, paragraphs, lists)\n5. Preserve text formatting information\n6. Handle multi-column layouts\n7. Extract images from PDFs\n8. Create a structured document model from extracted content",
@@ -908,7 +908,7 @@
         "expansionPrompt": "Break down this task with a focus on implement pdf text extraction with visionkit."
       },
       {
-        "id": "20",
+        "id": 20,
         "title": "Implement Summary Generation with Apple Intelligence",
         "description": "Create functionality to generate summaries of study materials using Apple Intelligence.",
         "details": "1. Integrate with Apple Intelligence Foundation Models\n2. Implement text summarization functionality\n3. Create prompts for effective summarization\n4. Process extracted PDF text in chunks if needed\n5. Generate summaries at different detail levels\n6. Preserve key concepts and terminology\n7. Add fallback to OpenAI if Apple Intelligence fails\n8. Store generated summaries in SwiftData",
@@ -959,7 +959,7 @@
         "expansionPrompt": "Break down this task with a focus on implement summary generation with apple intelligence."
       },
       {
-        "id": "21",
+        "id": 21,
         "title": "Implement Mind Map Generation with GPT-5",
         "description": "Create functionality to generate mind map structures from study materials using GPT-5.",
         "details": "1. Create prompts for mind map generation\n2. Implement GPT-5 API calls for structure generation\n3. Parse API responses into MindMap and MindMapNode models\n4. Limit mind maps to 3 levels deep\n5. Keep node text short (5-7 words)\n6. Generate concrete examples for concepts\n7. Create subject-specific templates\n8. Store generated mind maps in SwiftData",
@@ -1012,7 +1012,7 @@
         "expansionPrompt": "Break down this task with a focus on implement mind map generation with gpt-5."
       },
       {
-        "id": "22",
+        "id": 22,
         "title": "Implement DALL-E 3 Image Generation for Mind Map Nodes",
         "description": "Create functionality to generate simplified images for mind map nodes using DALL-E 3.",
         "details": "1. Create prompts for simplified educational images\n2. Implement DALL-E 3 API calls for image generation\n3. Process and optimize generated images\n4. Store images in app container\n5. Associate images with mind map nodes\n6. Implement image caching for performance\n7. Add fallback to generic icons if image generation fails\n8. Implement batch processing for multiple nodes",
@@ -1064,7 +1064,7 @@
         "expansionPrompt": "Break down this task with a focus on implement dall-e 3 image generation for mind map nodes."
       },
       {
-        "id": "23",
+        "id": 23,
         "title": "Implement Flashcard Generation with GPT-5 Nano",
         "description": "Create functionality to generate flashcards from study materials using GPT-5 nano.",
         "details": "1. Create prompts for flashcard generation\n2. Implement GPT-5 nano API calls\n3. Parse API responses into Flashcard models\n4. Generate appropriate number of cards based on content\n5. Balance question difficulty\n6. Create subject-specific flashcard templates\n7. Store generated flashcards in SwiftData\n8. Implement batch processing for efficiency",
@@ -1121,7 +1121,7 @@
         "updatedAt": "2025-10-12T17:50:00.058Z"
       },
       {
-        "id": "24",
+        "id": 24,
         "title": "Implement Simplified Explanations Generation with GPT-5 Mini",
         "description": "Create functionality to generate simplified explanations of complex concepts using GPT-5 mini.",
         "details": "1. Create prompts for simplified explanations\n2. Implement GPT-5 mini API calls\n3. Generate explanations for difficult concepts\n4. Use concrete examples and analogies\n5. Adapt explanation complexity to subject\n6. Store explanations with associated materials\n7. Implement batch processing for efficiency\n8. Add fallback to Apple Intelligence if needed",
@@ -1177,7 +1177,7 @@
         "updatedAt": "2025-10-12T17:53:23.742Z"
       },
       {
-        "id": "25",
+        "id": 25,
         "title": "Implement Parallel Material Processing Pipeline",
         "description": "Create a pipeline to process study materials in parallel for maximum efficiency.",
         "details": "1. Design a processing pipeline architecture\n2. Implement parallel processing using Swift concurrency\n3. Create a task coordinator for managing subtasks\n4. Implement progress tracking and reporting\n5. Add error handling and recovery\n6. Optimize for performance and battery usage\n7. Implement processing queue for multiple materials\n8. Add background processing using BGProcessingTask",
@@ -1250,7 +1250,7 @@
         "updatedAt": "2025-10-17T07:29:04.813Z"
       },
       {
-        "id": "26",
+        "id": 26,
         "title": "Create Subject-Organized Dashboard UI",
         "description": "Design and implement the main dashboard UI organized by subject.",
         "details": "1. Create a SwiftUI view for the main dashboard\n2. Implement subject-based organization\n3. Design material cards with thumbnails\n4. Add search and filter functionality\n5. Implement sorting options (date, name, subject)\n6. Create animations for smooth transitions\n7. Optimize for one-handed operation\n8. Implement VoiceOver support\n9. Add large touch targets (min 44×44pt)",
@@ -1324,7 +1324,7 @@
         "updatedAt": "2025-10-12T18:12:09.250Z"
       },
       {
-        "id": "27",
+        "id": 27,
         "title": "Implement Material Cards UI Component",
         "description": "Design and implement reusable material card components for the dashboard.",
         "details": "1. Create a SwiftUI component for material cards\n2. Design visual appearance with thumbnails\n3. Show subject, title, and date information\n4. Add progress indicators for processing status\n5. Implement tap gestures for navigation\n6. Create animations for interactions\n7. Optimize for VoiceOver\n8. Ensure minimum touch target size (44×44pt)",
@@ -1380,7 +1380,7 @@
         "updatedAt": "2025-10-13T08:19:36.593Z"
       },
       {
-        "id": "28",
+        "id": 28,
         "title": "Implement Material Detail View",
         "description": "Design and implement the detailed view for study materials.",
         "details": "1. Create a SwiftUI view for material details\n2. Implement PDF viewer with text-to-speech\n3. Add mind map preview\n4. Add flashcard preview\n5. Create quick action buttons (study, review, share)\n6. Implement navigation between sections\n7. Add large touch targets\n8. Optimize for VoiceOver\n9. Implement sharing functionality",
@@ -1441,7 +1441,7 @@
         "updatedAt": "2025-10-17T07:29:24.394Z"
       },
       {
-        "id": "29",
+        "id": 29,
         "title": "Implement Voice Command System for Navigation",
         "description": "Create a voice command system for navigating the app without touch.",
         "details": "1. Implement voice command recognition using Apple Speech\n2. Create a command registry for available commands\n3. Implement command handlers for navigation\n4. Add support for Italian and English commands\n5. Create visual feedback for recognized commands\n6. Implement error handling for misunderstood commands\n7. Add contextual commands based on current view\n8. Create a help system for available commands",
@@ -1498,7 +1498,7 @@
         "updatedAt": "2025-10-13T07:16:20.593Z"
       },
       {
-        "id": "30",
+        "id": 30,
         "title": "Implement Push Notification System",
         "description": "Create a push notification system for material updates and reminders.",
         "details": "1. Configure push notification capabilities\n2. Implement local notification scheduling\n3. Create notification categories and actions\n4. Add notification for new materials\n5. Add notification for processing completion\n6. Implement badge count for unread materials\n7. Create notification settings UI\n8. Add deep linking from notifications",
@@ -1517,7 +1517,7 @@
         "updatedAt": "2025-10-13T09:11:12.341Z"
       },
       {
-        "id": "31",
+        "id": 31,
         "title": "Implement OpenAI Realtime API Integration",
         "description": "Integrate with OpenAI Realtime API for voice conversations.",
         "details": "1. Implement WebSocket connection management\n2. Create bidirectional audio streaming\n3. Implement session management\n4. Add interruption handling\n5. Implement voice activity detection\n6. Create audio format conversion (PCM16 24kHz)\n7. Add error handling and reconnection logic\n8. Implement conversation context management",
@@ -1534,7 +1534,7 @@
         "updatedAt": "2025-10-12T16:10:57.755Z"
       },
       {
-        "id": "32",
+        "id": 32,
         "title": "Create Voice Conversation UI",
         "description": "Design and implement the UI for voice conversations with the AI coach.",
         "details": "1. Create a SwiftUI view for voice conversations\n2. Implement large \"Start Talking\" button (bottom-right)\n3. Add visual feedback with waveform animation\n4. Display conversation history\n5. Add \"Stop\" button\n6. Implement context banner for current material/subject\n7. Create animations for state transitions\n8. Optimize for one-handed operation",
@@ -1662,7 +1662,7 @@
         "updatedAt": "2025-10-12T16:51:45.179Z"
       },
       {
-        "id": "33",
+        "id": 33,
         "title": "Implement Study Coach Personality and Prompting",
         "description": "Create the personality and prompting system for the AI study coach.",
         "details": "1. Design coach personality traits (patient, encouraging, never judgmental)\n2. Implement system prompts for OpenAI\n3. Add Italian and English language support\n4. Create adaptive pacing based on user responses\n5. Implement concept simplification logic\n6. Add concrete examples generation\n7. Create positive reinforcement patterns\n8. Implement conversation memory and context",
@@ -1786,7 +1786,7 @@
         "updatedAt": "2025-10-12T16:56:10.859Z"
       },
       {
-        "id": "34",
+        "id": 34,
         "title": "Implement Audio Pipeline for Voice Conversations",
         "description": "Create the audio processing pipeline for voice conversations.",
         "details": "1. Configure AVFoundation audio session\n2. Implement audio format conversion (PCM16 24kHz)\n3. Add background audio support\n4. Implement interruption handling (phone calls)\n5. Add AirPods support and optimization\n6. Create audio level monitoring\n7. Implement noise reduction\n8. Optimize for battery efficiency",
@@ -1803,7 +1803,7 @@
         "updatedAt": "2025-10-12T16:18:06.381Z"
       },
       {
-        "id": "35",
+        "id": 35,
         "title": "Implement Camera Integration for Homework Help",
         "description": "Integrate camera functionality for capturing homework problems.",
         "details": "1. Implement AVFoundation camera capture\n2. Create photo and video modes\n3. Add focus and exposure controls\n4. Implement gallery access for existing photos\n5. Create Apple Pencil photo markup functionality\n6. Add image optimization for AI processing\n7. Implement camera permission handling\n8. Create a camera UI optimized for one-handed use",
@@ -1929,7 +1929,7 @@
         "updatedAt": "2025-10-12T16:43:46.048Z"
       },
       {
-        "id": "36",
+        "id": 36,
         "title": "Implement GPT-5 Vision API Integration",
         "description": "Integrate with GPT-5 Vision API for analyzing homework problems.",
         "details": "1. Implement image upload to GPT-5 Vision API\n2. Create prompts for textbook page analysis\n3. Add math problem recognition\n4. Implement diagram understanding\n5. Add handwriting recognition integration\n6. Create step-by-step problem solving logic\n7. Implement response parsing and formatting\n8. Add error handling and retry logic",
@@ -2064,7 +2064,7 @@
         "updatedAt": "2025-10-12T17:02:45.650Z"
       },
       {
-        "id": "37",
+        "id": 37,
         "title": "Create Combined Vision and Voice Interaction",
         "description": "Implement the combined vision and voice interaction for homework help.",
         "details": "1. Create a workflow for taking photos and discussing with AI\n2. Implement \"What's this?\" voice command\n3. Add continuous conversation about captured images\n4. Create functionality to save analyzed problems\n5. Implement context switching between images\n6. Add history of analyzed problems\n7. Create UI for reviewing past analyses\n8. Implement sharing of solutions",
@@ -2138,7 +2138,7 @@
         "updatedAt": "2025-10-12T18:34:15.436Z"
       },
       {
-        "id": "38",
+        "id": 38,
         "title": "Implement Handwriting Recognition with Apple Pencil",
         "description": "Create handwriting recognition functionality using Apple Pencil and VisionKit.",
         "details": "1. Implement PencilKit canvas for input\n2. Integrate VisionKit for handwriting recognition\n3. Add GPT-5 vision for math notation\n4. Create correction and feedback mechanisms\n5. Implement real-time recognition\n6. Add support for mathematical symbols\n7. Create UI for editing recognized text\n8. Implement sharing of recognized content",
@@ -2156,7 +2156,7 @@
         "updatedAt": "2025-10-13T09:11:12.347Z"
       },
       {
-        "id": "39",
+        "id": 39,
         "title": "Create Interactive Mind Map Renderer",
         "description": "Implement an interactive mind map visualization using SwiftUI Canvas.",
         "details": "1. Create a SwiftUI Canvas-based renderer\n2. Implement force-directed graph layout\n3. Add zoom, pan, and pinch gestures\n4. Create node expansion/collapse functionality\n5. Implement TTS for node explanations\n6. Add visual connections with arrows and colors\n7. Create animations for interactions\n8. Optimize for performance (60 FPS target)",
@@ -2228,7 +2228,7 @@
         "updatedAt": "2025-10-12T17:58:12.733Z"
       },
       {
-        "id": "40",
+        "id": 40,
         "title": "Implement Mind Map Voice Navigation",
         "description": "Create voice commands for navigating mind maps without touch.",
         "details": "1. Implement voice commands for mind map navigation\n2. Add \"Explain this node\" functionality\n3. Create \"What's connected to this?\" command\n4. Implement \"Next topic\" navigation\n5. Add \"Zoom in on [subject]\" functionality\n6. Create visual indicators for voice focus\n7. Implement error handling for ambiguous commands\n8. Add help system for available commands",
@@ -2246,7 +2246,7 @@
         "updatedAt": "2025-10-13T09:11:12.351Z"
       },
       {
-        "id": "41",
+        "id": 41,
         "title": "Implement Mind Map Export Functionality",
         "description": "Create functionality to export mind maps in various formats.",
         "details": "1. Implement Mermaid Markdown export\n2. Add OPML export functionality\n3. Create JSON export (native format)\n4. Implement optional XMind format export\n5. Add sharing via Files app\n6. Create export settings UI\n7. Implement background export for large mind maps\n8. Add success/failure notifications",
@@ -2302,7 +2302,7 @@
         "updatedAt": "2025-10-12T18:52:49.046Z"
       },
       {
-        "id": "42",
+        "id": 42,
         "title": "Implement Google Calendar Integration",
         "description": "Integrate with Google Calendar to extract assignment due dates.",
         "details": "1. Implement Google Calendar API integration\n2. Create functionality to sync calendar events\n3. Add assignment due date extraction\n4. Create Task objects from calendar events\n5. Implement update logic when calendar changes\n6. Add notification scheduling before due dates\n7. Create background sync using BGAppRefreshTask\n8. Implement error handling and retry logic",
@@ -2372,7 +2372,7 @@
         "updatedAt": "2025-10-12T18:03:46.697Z"
       },
       {
-        "id": "43",
+        "id": 43,
         "title": "Implement Gmail Integration for Assignment Extraction",
         "description": "Integrate with Gmail to extract assignments from teacher emails.",
         "details": "1. Implement Gmail API integration\n2. Create email filtering by sender\n3. Add parsing for assignment keywords (\"Compito:\", \"Consegna:\")\n4. Implement due date extraction from emails\n5. Create Task objects from parsed emails\n6. Add marking emails as read when processed\n7. Implement background sync using BGAppRefreshTask\n8. Create error handling and retry logic",
@@ -2442,7 +2442,7 @@
         "updatedAt": "2025-10-12T18:07:06.209Z"
       },
       {
-        "id": "44",
+        "id": 44,
         "title": "Create Task List View",
         "description": "Design and implement the task list view for assignments and due dates.",
         "details": "1. Create a SwiftUI view for task lists\n2. Implement today's tasks section\n3. Add upcoming week view\n4. Create overdue tasks section with encouraging messaging\n5. Implement subject color-coding\n6. Add voice command support\n7. Create large checkboxes (44×44pt)\n8. Implement sorting and filtering options\n9. Add search functionality",
@@ -2515,7 +2515,7 @@
         "updatedAt": "2025-10-12T18:37:16.327Z"
       },
       {
-        "id": "45",
+        "id": 45,
         "title": "Implement Task Detail and Completion UI",
         "description": "Create the detailed view and completion functionality for tasks.",
         "details": "1. Create a SwiftUI view for task details\n2. Implement task description display\n3. Add linked material navigation\n4. Create due date countdown\n5. Implement \"Start studying\" button\n6. Add completion functionality with haptic feedback\n7. Create XP reward animation\n8. Implement sharing functionality\n9. Add edit and delete options",
@@ -2572,7 +2572,7 @@
         "updatedAt": "2025-10-12T18:40:11.820Z"
       },
       {
-        "id": "46",
+        "id": 46,
         "title": "Implement XP and Leveling System",
         "description": "Create the experience points and leveling system for gamification.",
         "details": "1. Implement XP accumulation logic\n2. Create level progression system (1-100)\n3. Define XP rewards for various activities\n4. Implement XP for completed tasks\n5. Add XP for study time tracking\n6. Create XP for flashcard reviews\n7. Implement daily streak bonuses\n8. Create visual progress bar\n9. Add level-up animations and celebrations",
@@ -2627,7 +2627,7 @@
         "updatedAt": "2025-10-17T07:29:15.501Z"
       },
       {
-        "id": "47",
+        "id": 47,
         "title": "Implement Achievements and Badges System",
         "description": "Create the achievements and badges system for gamification.",
         "details": "1. Define achievement types and criteria\n2. Implement achievement tracking logic\n3. Create badge unlocking system\n4. Add notifications for unlocked achievements\n5. Implement achievement display UI\n6. Create badge collection view\n7. Add progress tracking for in-progress achievements\n8. Implement sharing of achievements",
@@ -2645,7 +2645,7 @@
         "updatedAt": "2025-10-13T09:11:12.357Z"
       },
       {
-        "id": "48",
+        "id": 48,
         "title": "Implement Daily Challenges System",
         "description": "Create the daily challenges system for engagement and motivation.",
         "details": "1. Define challenge types and difficulty levels\n2. Implement daily challenge generation\n3. Create XP reward calculation\n4. Add challenge tracking and completion logic\n5. Implement challenge UI\n6. Create visual progress trackers\n7. Add notifications for new challenges\n8. Implement streak bonuses for consecutive completions",
@@ -2663,7 +2663,7 @@
         "updatedAt": "2025-10-13T09:11:12.361Z"
       },
       {
-        "id": "49",
+        "id": 49,
         "title": "Implement Rewards and Customization System",
         "description": "Create the rewards and customization system for app personalization.",
         "details": "1. Design app themes (Fortnite-style skins)\n2. Implement theme switching functionality\n3. Create voice coach personality options\n4. Add study music/ambience features\n5. Implement profile customization (avatar, colors)\n6. Create unlock criteria based on levels\n7. Add preview functionality for locked items\n8. Implement settings for customization options",
@@ -2681,7 +2681,7 @@
         "updatedAt": "2025-10-13T09:11:12.366Z"
       },
       {
-        "id": "50",
+        "id": 50,
         "title": "Implement Math Mode Specialized Features",
         "description": "Create specialized features for mathematics study assistance.",
         "details": "1. Implement step-by-step problem solving\n2. Create visual equation explanations\n3. Add graph rendering functionality\n4. Implement formula reference library\n5. Create practice problem generator\n6. Add calculator integration\n7. Implement math-specific prompts for AI\n8. Create specialized mind map templates for math",
@@ -2739,7 +2739,7 @@
         "updatedAt": "2025-10-19T14:39:53.777Z"
       },
       {
-        "id": "51",
+        "id": 51,
         "title": "Implement Italian Mode Specialized Features",
         "description": "Create specialized features for Italian language and literature study.",
         "details": "1. Implement grammar explanations\n2. Create conjugation tables\n3. Add literature summaries functionality\n4. Implement vocabulary flashcards\n5. Create reading comprehension assistance\n6. Add audio readings feature\n7. Implement Italian-specific prompts for AI\n8. Create specialized mind map templates for Italian",
@@ -2796,7 +2796,7 @@
         "updatedAt": "2025-10-19T14:41:31.630Z"
       },
       {
-        "id": "52",
+        "id": 52,
         "title": "Implement History Mode Specialized Features",
         "description": "Create specialized features for history study assistance.",
         "details": "1. Implement timeline visualizations\n2. Create event connection mind maps\n3. Add character profiles functionality\n4. Implement interactive maps\n5. Create era summaries\n6. Add date memorization tools\n7. Implement history-specific prompts for AI\n8. Create specialized mind map templates for history",
@@ -2853,7 +2853,7 @@
         "updatedAt": "2025-10-19T14:42:35.199Z"
       },
       {
-        "id": "53",
+        "id": 53,
         "title": "Implement Physics/Science Mode Specialized Features",
         "description": "Create specialized features for physics and science study assistance.",
         "details": "1. Implement experiment simulations\n2. Create diagram annotation tools\n3. Add formula explanations\n4. Implement unit conversion functionality\n5. Create lab report templates\n6. Add interactive physics demonstrations\n7. Implement science-specific prompts for AI\n8. Create specialized mind map templates for science",
@@ -2906,7 +2906,7 @@
         "updatedAt": "2025-10-19T14:42:40.859Z"
       },
       {
-        "id": "54",
+        "id": 54,
         "title": "Implement Language Mode Specialized Features",
         "description": "Create specialized features for English language study assistance.",
         "details": "1. Implement translation assistance\n2. Create pronunciation help using TTS\n3. Add grammar checker functionality\n4. Implement vocabulary builder\n5. Create conversation practice features\n6. Add listening comprehension exercises\n7. Implement language-specific prompts for AI\n8. Create specialized mind map templates for language learning",
@@ -2963,7 +2963,7 @@
         "updatedAt": "2025-10-19T14:42:46.627Z"
       },
       {
-        "id": "55",
+        "id": 55,
         "title": "Create Onboarding Flow",
         "description": "Design and implement the onboarding experience for new users.",
         "details": "1. Create welcome video (Mario-friendly)\n2. Implement permission requests (camera, mic, notifications)\n3. Add Google account connection flow\n4. Create API key setup for development\n5. Implement voice tutorial\n6. Add sample material demonstration\n7. Create skip options for experienced users\n8. Implement progress tracking through onboarding",
@@ -3099,7 +3099,7 @@
         "updatedAt": "2025-10-13T07:28:25.983Z"
       },
       {
-        "id": "56",
+        "id": 56,
         "title": "Implement Settings and Preferences UI",
         "description": "Settings UI including language selector and subject management (task 83). High priority as it contains essential configuration.",
         "details": "1. Implement text size adjustment\n2. Add font selection (including OpenDyslexic)\n3. Create voice coach language settings\n4. Implement notification preferences\n5. Add sync schedule configuration\n6. Create data export/import functionality\n7. Implement account management\n8. Add about section and help resources",
@@ -3120,7 +3120,7 @@
         "updatedAt": "2025-10-13T09:11:12.395Z"
       },
       {
-        "id": "57",
+        "id": 57,
         "title": "Implement Offline Mode Functionality",
         "description": "Create offline mode with cached materials and limited functionality.",
         "details": "1. Implement material caching for offline access\n2. Create offline indicator UI\n3. Add Apple Intelligence offline functionality\n4. Implement Apple Speech TTS/STT for offline use\n5. Create saved mind maps offline viewing\n6. Add action queueing for when online\n7. Implement sync status tracking\n8. Create offline help resources",
@@ -3139,7 +3139,7 @@
         "updatedAt": "2025-10-19T16:00:00.000Z"
       },
       {
-        "id": "58",
+        "id": 58,
         "title": "Implement Error Handling and Recovery UI",
         "description": "Create user-friendly error handling and recovery mechanisms.",
         "details": "1. Design friendly error messages (non-technical)\n2. Implement retry buttons for failed operations\n3. Create fallback strategy indicators\n4. Add help/support section\n5. Implement debug logging (developer only)\n6. Create error reporting mechanism\n7. Add automatic recovery for common errors\n8. Implement user feedback collection for errors",
@@ -3194,7 +3194,7 @@
         "updatedAt": "2025-10-13T08:23:41.203Z"
       },
       {
-        "id": "59",
+        "id": 59,
         "title": "Implement Performance Optimization",
         "description": "Optimize app performance for speed, memory usage, and battery life.",
         "details": "1. Optimize app launch time (target < 2 seconds)\n2. Reduce voice latency (target < 1 second)\n3. Optimize mind map rendering (target < 5 seconds)\n4. Ensure smooth 60 FPS animations\n5. Implement memory usage optimization\n6. Add battery impact reduction techniques\n7. Create performance monitoring tools\n8. Implement caching strategies for frequent operations",
@@ -3253,7 +3253,7 @@
         "updatedAt": "2025-10-17T07:29:24.413Z"
       },
       {
-        "id": "60",
+        "id": 60,
         "title": "Conduct Accessibility Audit",
         "description": "Perform a comprehensive accessibility audit and implement improvements.",
         "details": "1. Test VoiceOver functionality throughout app\n2. Verify Dynamic Type support at all sizes\n3. Test high contrast mode compatibility\n4. Verify voice commands accessibility\n5. Test one-handed operation\n6. Verify Apple Pencil functionality\n7. Implement accessibility improvements\n8. Create accessibility documentation",
@@ -3276,7 +3276,7 @@
         "updatedAt": "2025-10-13T07:45:09.080Z"
       },
       {
-        "id": "61",
+        "id": 61,
         "title": "Implement Unit Tests for Core Functionality",
         "description": "Create comprehensive unit tests for core app functionality.",
         "details": "1. Implement tests for SwiftData models\n2. Create tests for API clients\n3. Add tests for processing pipeline\n4. Implement tests for voice and vision features\n5. Create tests for mind map generation\n6. Add tests for task management\n7. Implement tests for gamification system\n8. Create tests for offline functionality\n9. Aim for >80% code coverage",
@@ -3296,7 +3296,7 @@
           "31",
           "36"
         ],
-        "status": "done",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -3428,10 +3428,10 @@
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implement unit tests for core functionality.",
-        "updatedAt": "2025-10-13T08:07:22.487Z"
+        "updatedAt": "2025-10-19T16:57:43.811Z"
       },
       {
-        "id": "62",
+        "id": 62,
         "title": "Implement Integration Tests",
         "description": "Create integration tests for end-to-end functionality verification.",
         "details": "1. Implement tests for Google API integration\n2. Create tests for OpenAI API integration\n3. Add tests for material processing workflow\n4. Implement tests for voice conversation flow\n5. Create tests for vision analysis workflow\n6. Add tests for task creation from external sources\n7. Implement tests for data synchronization\n8. Create tests for offline to online transitions",
@@ -3512,7 +3512,7 @@
         "updatedAt": "2025-10-19T14:43:18.528Z"
       },
       {
-        "id": "63",
+        "id": 63,
         "title": "Implement UI Tests",
         "description": "Create UI tests for main user flows and interactions.",
         "details": "1. Implement tests for onboarding flow\n2. Create tests for material browsing\n3. Add tests for voice interaction\n4. Implement tests for vision analysis\n5. Create tests for mind map navigation\n6. Add tests for task management\n7. Implement tests for settings configuration\n8. Create tests for accessibility features",
@@ -3583,7 +3583,7 @@
         "updatedAt": "2025-10-19T14:51:22.976Z"
       },
       {
-        "id": "64",
+        "id": 64,
         "title": "Implement Accessibility Tests",
         "description": "Create specialized tests for accessibility compliance.",
         "details": "1. Implement VoiceOver navigation tests\n2. Create Dynamic Type tests at various sizes\n3. Add color contrast tests\n4. Implement voice command accessibility tests\n5. Create one-handed operation tests\n6. Add Apple Pencil accessibility tests\n7. Implement tests for minimum touch target sizes\n8. Create documentation for accessibility test results",
@@ -3600,7 +3600,7 @@
         "updatedAt": "2025-10-13T07:50:09.825Z"
       },
       {
-        "id": "65",
+        "id": 65,
         "title": "Implement Performance Tests",
         "description": "Create performance tests to verify app meets performance targets.",
         "details": "1. Implement app launch time tests\n2. Create voice latency tests\n3. Add mind map rendering performance tests\n4. Implement animation smoothness tests\n5. Create memory usage tests\n6. Add battery impact tests\n7. Implement network efficiency tests\n8. Create documentation for performance test results",
@@ -3655,7 +3655,7 @@
         "updatedAt": "2025-10-13T08:32:24.025Z"
       },
       {
-        "id": "66",
+        "id": 66,
         "title": "Conduct Real Device Testing",
         "description": "Test the app on real iPad and iPhone devices with various configurations.",
         "details": "1. Test on iPad Pro, iPad Air, and iPad mini\n2. Test on iPhone Pro, iPhone, and iPhone SE\n3. Test with various iOS/iPadOS versions (26+)\n4. Test with different accessibility settings\n5. Test with various network conditions\n6. Test with Apple Pencil (1st and 2nd generation)\n7. Test with external keyboards\n8. Create device-specific issue reports",
@@ -3711,7 +3711,7 @@
         "updatedAt": "2025-10-19T11:27:41.002Z"
       },
       {
-        "id": "67",
+        "id": 67,
         "title": "Update Project README",
         "description": "Create comprehensive README documentation for the project.",
         "details": "1. Update project overview and description\n2. Add installation instructions\n3. Document configuration requirements\n4. Add usage instructions\n5. Create troubleshooting section\n6. Document API integrations\n7. Add contribution guidelines\n8. Include license information\n9. Add screenshots and demo videos",
@@ -3728,7 +3728,7 @@
         "updatedAt": "2025-10-13T08:32:47.639Z"
       },
       {
-        "id": "68",
+        "id": 68,
         "title": "Create API Documentation",
         "description": "Document all internal APIs and external API integrations.",
         "details": "1. Document SwiftData model APIs\n2. Create documentation for API client interfaces\n3. Document voice and vision integration APIs\n4. Add mind map generation API documentation\n5. Create task management API documentation\n6. Document gamification system APIs\n7. Add external API integration details\n8. Create API usage examples",
@@ -3750,7 +3750,7 @@
         "updatedAt": "2025-10-19T12:44:08.648Z"
       },
       {
-        "id": "69",
+        "id": 69,
         "title": "Create User Guide",
         "description": "Create a user-friendly guide for using the app.",
         "details": "1. Create getting started section\n2. Document material management features\n3. Add voice coach usage instructions\n4. Document vision capabilities\n5. Create mind map usage guide\n6. Add task management instructions\n7. Document gamification features\n8. Create troubleshooting section\n9. Add FAQ section",
@@ -3901,7 +3901,7 @@
         "updatedAt": "2025-10-19T14:53:33.330Z"
       },
       {
-        "id": "70",
+        "id": 70,
         "title": "Create Developer Notes",
         "description": "Document technical details and implementation notes for developers.",
         "details": "1. Document architecture decisions\n2. Create code organization overview\n3. Add performance optimization notes\n4. Document known limitations\n5. Create future improvement suggestions\n6. Add technical debt tracking\n7. Document third-party dependencies\n8. Create development environment setup guide",
@@ -3923,7 +3923,7 @@
         "updatedAt": "2025-10-19T12:28:03.124Z"
       },
       {
-        "id": "71",
+        "id": 71,
         "title": "Create Deployment Guide",
         "description": "Document the process for deploying the app to TestFlight and App Store.",
         "details": "1. Document code signing requirements\n2. Create App Store Connect setup instructions\n3. Add TestFlight distribution process\n4. Document App Store submission process\n5. Create release checklist\n6. Add App Store screenshots preparation guide\n7. Document privacy policy requirements\n8. Create marketing materials guidelines",
@@ -4044,7 +4044,7 @@
         "updatedAt": "2025-10-19T14:56:30.921Z"
       },
       {
-        "id": "72",
+        "id": 72,
         "title": "Implement Background Tasks for Scheduled Syncs",
         "description": "Create background tasks for scheduled material syncs at 13:00 and 18:00 CET.",
         "details": "1. Register BGProcessingTask for background execution\n2. Implement scheduling logic for 13:00 and 18:00 CET\n3. Create sync task implementation\n4. Add completion handling and error recovery\n5. Implement power and network efficiency\n6. Create notification for sync completion\n7. Add manual trigger option\n8. Implement logging for background execution",
@@ -4102,7 +4102,7 @@
         "updatedAt": "2025-10-13T09:09:17.273Z"
       },
       {
-        "id": "73",
+        "id": 73,
         "title": "Implement Text-to-Speech for All Content",
         "description": "Create text-to-speech functionality for all textual content using Apple Speech.",
         "details": "1. Implement Apple Speech integration\n2. Create TTS controls (play, pause, stop)\n3. Add voice selection options\n4. Implement reading speed adjustment\n5. Create text highlighting during reading\n6. Add automatic language detection\n7. Implement continuous reading across pages\n8. Create TTS for mind map nodes",
@@ -4158,7 +4158,7 @@
         "updatedAt": "2025-10-13T09:07:12.057Z"
       },
       {
-        "id": "74",
+        "id": 74,
         "title": "Implement Dyslexia-Friendly Text Rendering",
         "description": "Create dyslexia-friendly text rendering with customizable fonts and spacing.",
         "details": "1. Integrate OpenDyslexic font\n2. Implement customizable letter spacing\n3. Add line spacing adjustment\n4. Create paragraph spacing options\n5. Implement color contrast settings\n6. Add reading ruler feature\n7. Create focus mode for reading\n8. Implement text simplification option",
@@ -4214,7 +4214,7 @@
         "updatedAt": "2025-10-13T09:07:35.145Z"
       },
       {
-        "id": "75",
+        "id": 75,
         "title": "Implement Context Banner for Working Memory Support",
         "description": "Create a persistent context banner showing current subject, task, and progress.",
         "details": "1. Design context banner UI component\n2. Implement current subject display\n3. Add current task information\n4. Create progress indicators\n5. Implement context switching animation\n6. Add voice command for context information\n7. Create expanded context view\n8. Implement context history",
@@ -4234,7 +4234,7 @@
         "updatedAt": "2025-10-13T09:10:00.083Z"
       },
       {
-        "id": "76",
+        "id": 76,
         "title": "Optimize UI for One-Handed Operation",
         "description": "Optimize the entire UI for one-handed operation with right thumb.",
         "details": "1. Analyze all UI elements for reach\n2. Move critical controls to bottom-right\n3. Implement reachability features\n4. Create swipe gestures for common actions\n5. Add floating action buttons where needed\n6. Implement thumb-friendly navigation\n7. Create one-handed keyboard options\n8. Add accessibility settings for hand preference",
@@ -4256,7 +4256,7 @@
         "updatedAt": "2025-10-13T09:10:00.090Z"
       },
       {
-        "id": "77",
+        "id": 77,
         "title": "Implement Large Touch Targets",
         "description": "Ensure all interactive elements have minimum 44×44pt touch targets.",
         "details": "1. Audit all buttons and controls\n2. Resize elements to minimum 44×44pt\n3. Add padding to small elements\n4. Implement touch target expansion\n5. Create spacing between adjacent targets\n6. Add visual feedback for touch\n7. Implement haptic feedback\n8. Create touch target visualization tool (development only)",
@@ -4278,7 +4278,7 @@
         "updatedAt": "2025-10-13T09:10:00.102Z"
       },
       {
-        "id": "78",
+        "id": 78,
         "title": "Implement Study Time Tracking",
         "description": "Comprehensive study time tracking functionality has been implemented, enabling users to track study sessions for XP rewards and analytics. The system supports session tracking, pause detection, XP calculation, subject-specific tracking, analytics, and dashboard integration.",
         "status": "done",
@@ -4353,7 +4353,7 @@
         "updatedAt": "2025-10-19T12:44:49.867Z"
       },
       {
-        "id": "79",
+        "id": 79,
         "title": "Implement Spaced Repetition System for Flashcards",
         "description": "Create a spaced repetition system for effective flashcard review.",
         "details": "1. Implement SM-2 algorithm for spacing\n2. Create review queue management\n3. Add quality rating input (1-5)\n4. Implement next review date calculation\n5. Create daily review suggestions\n6. Add streak and consistency tracking\n7. Implement analytics for retention\n8. Create visualization of learning progress",
@@ -4371,7 +4371,7 @@
         "updatedAt": "2025-10-19T12:31:15.758Z"
       },
       {
-        "id": "80",
+        "id": 80,
         "title": "Prepare for TestFlight Distribution",
         "description": "Prepare the app for TestFlight distribution and testing.",
         "details": "1. Configure App Store Connect\n2. Create app record and metadata\n3. Configure build settings for distribution\n4. Add app icons and launch screens\n5. Create TestFlight beta information\n6. Set up test groups and invitations\n7. Prepare release notes\n8. Configure crash reporting and analytics\n9. Create feedback collection mechanism",
@@ -4429,7 +4429,7 @@
         "updatedAt": "2025-10-19T11:27:41.024Z"
       },
       {
-        "id": "81",
+        "id": 81,
         "title": "Design and Implement App Icon",
         "description": "Create and configure the MirrorBuddy app icon for all platforms (iPhone, iPad, macOS) following iOS Human Interface Guidelines and accessibility best practices.",
         "details": "1. Design app icon concept:\n   - Represent app purpose (study assistance, mind mapping, learning)\n   - Use mirror/reflection theme combined with educational elements\n   - High contrast and clear shapes for accessibility\n   - Follow iOS Human Interface Guidelines for app icons\n\n2. Generate or create icon:\n   - Can use AI tools like DALL-E 3 for generation\n   - Ensure 1024x1024 base resolution\n   - Test appearance on different backgrounds\n\n3. Create all required icon sizes:\n   - App Store: 1024x1024\n   - iPhone: 180x180, 120x120, 87x87, 80x80, 58x58, 60x60, 40x40\n   - iPad: 167x167, 152x152, 76x76\n   - macOS: 512x512, 256x256, 128x128, 64x64, 32x32, 16x16\n\n4. Add to project:\n   - Place in Assets.xcassets/AppIcon.appiconset\n   - Update Contents.json with all sizes\n   - Remove alpha channel if present\n\n5. Test and verify:\n   - Build and run on simulator\n   - Test on physical devices if available\n   - Verify appearance in Settings, Spotlight, etc.\n\n6. Document design rationale in project docs",
@@ -4446,7 +4446,7 @@
         "updatedAt": "2025-10-13T09:11:12.443Z"
       },
       {
-        "id": "82",
+        "id": 82,
         "title": "Implement Localization Infrastructure",
         "description": "Set up complete localization infrastructure for Italian (PRIMARY/DEFAULT) and English, with support for additional languages. MUST be done before UI implementation.",
         "details": "1. Create Localizable.xcstrings catalog:\n   - Add Italian (it) as base language\n   - Add English (en) as secondary language\n   - Configure for future language additions\n\n2. Extract all hardcoded UI strings:\n   - ContentView and all views\n   - Model descriptions (Subject names, Achievement descriptions, etc.)\n   - Button labels, navigation titles, accessibility labels\n   - Error messages and alerts\n\n3. Convert to localized strings:\n   - Use String catalogs (Xcode 15+) or .strings files\n   - Group by feature/screen for organization\n   - Include context comments for translators\n\n4. Update all SwiftUI views:\n   - Replace hardcoded Text(\"...\") with Text(verbatim:) or Text(LocalizedStringKey(...))\n   - Use .accessibilityLabel with localized strings\n   - Test language switching\n\n5. Add language selector in Settings:\n   - Show current language\n   - Allow switching between Italian and English\n   - Persist preference in UserDefaults\n\n6. Document localization workflow:\n   - How to add new languages\n   - How to add new strings\n   - Translation guidelines",
@@ -4464,7 +4464,7 @@
         "subtasks": []
       },
       {
-        "id": "83",
+        "id": 83,
         "title": "Refactor Subject to Database-Backed System",
         "description": "Convert Mario's 10 subjects from enum to SwiftData entity, allowing customization via Settings. Depends on localization infrastructure.",
         "details": "1. Create new SubjectEntity SwiftData model:\n   - id: UUID\n   - name: String (localized)\n   - iconName: String (SF Symbol name)\n   - colorName: String (color identifier)\n   - sortOrder: Int\n   - isActive: Bool\n   - isCustom: Bool (user-created vs. default)\n\n2. Update Material model:\n   - Change subject: Subject enum to subject: SubjectEntity relationship\n   - Add migration logic for existing data\n\n3. Create SubjectService:\n   - CRUD operations for subjects\n   - Default subjects initialization (Mario's specific subjects)\n   - Import/export functionality\n\n4. Seed default subjects for Mario:\n   - Based on Mario's schedule/needs\n   - Mark as non-custom (cannot be deleted, only deactivated)\n\n5. Update all UI code:\n   - Replace Subject enum references with SubjectEntity\n   - Update queries and filters\n   - Handle subject selection in forms\n\n6. Add Subject management in Settings:\n   - List all subjects with active/inactive toggle\n   - Reorder subjects (drag & drop)\n   - Add custom subjects\n   - Edit subject properties (name, icon, color)\n   - Cannot delete default subjects (only deactivate)",
@@ -4478,7 +4478,7 @@
         "subtasks": []
       },
       {
-        "id": "84",
+        "id": 84,
         "title": "Implement Multi-Format Document Import and Viewer",
         "description": "Enable importing and viewing of images (PNG, JPG, JPEG, HEIC, HEIF) and Google Docs from Google Drive, alongside existing PDF support.",
         "details": "Integrate Google Drive API for file import. Use Vision framework for OCR on images. Convert Google Docs to PDF or extract text. Update Material storage to handle mixed content. Implement pinch-to-zoom, swipe navigation, and optimized layouts for iPad/iPhone.",
@@ -4490,7 +4490,7 @@
         "updatedAt": "2025-10-15T17:15:26.143Z"
       },
       {
-        "id": "85",
+        "id": 85,
         "title": "Fix and Enhance Document Scanner",
         "description": "Repair scanner functionality using VisionKit's DocumentCamera, supporting multi-page scanning, auto-crop, enhancement, and saving as PDF/images.",
         "details": "Replace broken scanner code with VisionKit DocumentCamera. Implement multi-page session, auto-crop, and image enhancement. Save output as PDF or images and link to Material storage. Trigger OCR post-scan.",
@@ -4502,7 +4502,7 @@
         "updatedAt": "2025-10-15T17:15:27.420Z"
       },
       {
-        "id": "86",
+        "id": 86,
         "title": "Integrate OCR for Handwritten and Printed Italian Text",
         "description": "Use Vision framework to extract Italian text, including handwritten notes, from imported images and scanned documents.",
         "details": "Configure Vision OCR for Italian language. Enable handwritten text recognition if supported. Store extracted text in Material.extractedText. Handle errors gracefully.",
@@ -4517,7 +4517,7 @@
         "updatedAt": "2025-10-15T17:15:28.647Z"
       },
       {
-        "id": "87",
+        "id": 87,
         "title": "Implement Mind Map Generation from Image and Document Content",
         "description": "Automatically generate mind maps from extracted text and image content using GPT-4.",
         "details": "Send extracted text to GPT-4 API for topic extraction and mind map structuring. Store and display mind maps linked to materials. Support color-coding by subject.",
@@ -4608,7 +4608,7 @@
         "updatedAt": "2025-10-17T05:43:23.317Z"
       },
       {
-        "id": "88",
+        "id": 88,
         "title": "Enable Screen Capture and Annotation for Homework Help",
         "description": "Allow users to capture the screen/camera view and annotate problem areas using touch or iPad Pencil.",
         "details": "Implement screen/camera capture. Add drawing/highlighting tools compatible with iPad Pencil. Save annotated images for analysis.",
@@ -4620,7 +4620,7 @@
         "updatedAt": "2025-10-16T19:43:27.593Z"
       },
       {
-        "id": "89",
+        "id": 89,
         "title": "Integrate GPT-4 Vision for Homework Analysis and Explanation",
         "description": "Send captured/annotated images to GPT-4 Vision API for problem identification and step-by-step explanations with voice response in Italian.",
         "status": "done",
@@ -4687,7 +4687,7 @@
         "updatedAt": "2025-10-17T07:29:32.443Z"
       },
       {
-        "id": "90",
+        "id": 90,
         "title": "Integrate Voice Coach for Guided Problem Solving",
         "description": "Enable voice-guided problem solving, linking screen capture, AI analysis, and visual/voice feedback.",
         "status": "done",
@@ -4774,7 +4774,7 @@
         "updatedAt": "2025-10-17T07:29:32.454Z"
       },
       {
-        "id": "91",
+        "id": 91,
         "title": "Implement Extended Voice Recording (6 Hours, Background Mode)",
         "description": "Support up to 6 hours of continuous audio recording, with background operation and auto-save every 30 minutes.",
         "details": "Use AVAudioRecorder with background mode. Compress audio in real-time to AAC (64 kbps). Implement auto-save and low battery warning. Add controls for start/stop, pause/resume, timer, battery indicator.",
@@ -4851,7 +4851,7 @@
         "updatedAt": "2025-10-15T17:23:09.222Z"
       },
       {
-        "id": "92",
+        "id": 92,
         "title": "Optimize Audio Storage and Google Drive Backup",
         "description": "Leverage existing audio compression infrastructure and Google Drive API to implement automatic backup of recordings.",
         "status": "done",
@@ -4926,7 +4926,7 @@
         "updatedAt": "2025-10-17T07:29:41.466Z"
       },
       {
-        "id": "93",
+        "id": 93,
         "title": "Auto-Transcription of Recordings with Whisper API",
         "description": "Transcribe recorded lessons in Italian using Whisper API, processing in 30-minute chunks and linking transcripts to materials.",
         "details": "Send audio chunks to Whisper API for transcription. Store plain text transcript and link to lesson/material. Handle errors and retries.",
@@ -5004,7 +5004,7 @@
         "updatedAt": "2025-10-15T19:32:27.654Z"
       },
       {
-        "id": "94",
+        "id": 94,
         "title": "Implement Subject and Speaker Detection from Transcripts",
         "description": "Analyze transcript keywords to auto-assign subject and optionally detect speakers (teacher vs student).",
         "details": "Use keyword matching for subject detection (Matematica, Storia, etc.). Implement speaker diarization if feasible. Allow manual correction of subject.",
@@ -5018,7 +5018,7 @@
         "updatedAt": "2025-10-17T05:50:17.226Z"
       },
       {
-        "id": "95",
+        "id": 95,
         "title": "Generate Lesson Summaries and Mind Maps from Transcripts",
         "description": "Integrate existing services to generate summaries and hierarchical mind maps from lesson transcripts using GPT-4, with subject-based color coding and key concepts extraction.",
         "status": "done",
@@ -5070,7 +5070,7 @@
         "updatedAt": "2025-10-17T07:29:50.459Z"
       },
       {
-        "id": "96",
+        "id": 96,
         "title": "Implement Review Assistant and Quiz Generation",
         "description": "Enable users to review lessons via summaries, concept extraction, and auto-generated quizzes from lesson content.",
         "details": "Add commands ('Cosa ho imparato oggi?', 'Spiegami [concept]'). Use GPT-4 to extract concepts and generate quizzes. Display results in child-friendly format.",
@@ -5084,7 +5084,7 @@
         "updatedAt": "2025-10-17T05:55:18.113Z"
       },
       {
-        "id": "97",
+        "id": 97,
         "title": "Improve Mind Map Visualization for Mobile",
         "description": "Redesign mind map UI for mobile: large fonts, high contrast, icons, color coding, intuitive navigation, and layout for iPhone/iPad.",
         "details": "Update UI with min 18pt fonts, high contrast, icons for node types, color-coded by subject. Implement tap-to-expand, pinch-to-zoom, pan, double-tap for details, breadcrumbs, vertical scrolling, collapsible sections. Limit depth and node count for clarity.",
@@ -5180,7 +5180,7 @@
         "updatedAt": "2025-10-17T06:08:49.281Z"
       },
       {
-        "id": "98",
+        "id": 98,
         "title": "Enhance Child-Friendly UI and Empathetic Experience",
         "description": "Simplify navigation, increase touch target size, add visual/haptic feedback, and ensure all text/voice interactions use personalized, empathetic tone.",
         "details": "Limit to max 4 main tabs, large touch targets (min 44pt), clear Italian labels, icons + text. Add loading animations, success/error icons, progress bars, haptic feedback. Implement color system (max 6, high contrast). Personalize greetings and messages using stored name. Apply empathetic tone guidelines to all text/voice outputs.",
@@ -5263,7 +5263,7 @@
         "updatedAt": "2025-10-15T19:12:50.610Z"
       },
       {
-        "id": "99",
+        "id": 99,
         "title": "Fix Audio Pipeline for Bidirectional Streaming",
         "description": "Repair the broken voice pipeline by implementing proper audio data flow between the microphone and OpenAI Realtime API, and correctly parse audio responses for playback.",
         "details": "1. Fix AudioPipelineManager.swift:\n   - Connect the AVCaptureAudioDataOutput's captureOutput delegate method to forward microphone samples\n   - Implement PCM16 audio encoding from raw microphone input\n   - Add buffering mechanism to collect appropriate chunk sizes before sending\n   - Create a method to forward encoded audio chunks to the WebSocket connection\n\n2. Fix OpenAIRealtimeClient.swift:\n   - Complete the parseServerEvent method to properly handle all event types:\n     - response.audio.delta: Accumulate audio data chunks\n     - response.audio.done: Signal completion of audio response\n     - message.content.delta: Handle text content updates\n     - message.content.done: Handle completion of text content\n   - Implement proper JSON decoding for each event type\n   - Add error handling for malformed responses\n\n3. Implement audio playback:\n   - Create an audio playback queue using AVAudioPlayer or AVAudioEngine\n   - Implement onAudioData callback to process received audio chunks\n   - Handle audio buffering to ensure smooth playback\n   - Add proper synchronization between receiving and playing audio\n\n4. Add error handling and diagnostics:\n   - Implement logging for audio pipeline events\n   - Add error recovery mechanisms for connection issues\n   - Create diagnostic tools to monitor audio flow\n\n5. Optimize performance:\n   - Ensure low latency for real-time conversation\n   - Implement proper thread management for audio processing\n   - Balance audio quality with bandwidth usage",
@@ -5342,7 +5342,7 @@
         "updatedAt": "2025-10-15T19:54:50.862Z"
       },
       {
-        "id": "100",
+        "id": 100,
         "title": "Implement Voice Conversation Persistence with SwiftData",
         "description": "Create persistent storage for voice conversations using SwiftData, linking them to materials/subjects and ensuring proper UI integration for conversation history.",
         "details": "1. Create SwiftData models in Core/Models:\n   - VoiceConversation.swift:\n     ```swift\n     @Model\n     final class VoiceConversation {\n         var id: UUID\n         var title: String\n         var createdAt: Date\n         var updatedAt: Date\n         var subjectID: UUID?\n         var materialID: UUID?\n         @Relationship(.cascade) var messages: [VoiceMessage]\n         \n         init(id: UUID = UUID(), title: String, createdAt: Date = Date(), updatedAt: Date = Date()) {\n             self.id = id\n             self.title = title\n             self.createdAt = createdAt\n             self.updatedAt = updatedAt\n             self.messages = []\n         }\n     }\n     ```\n   \n   - VoiceMessage.swift:\n     ```swift\n     @Model\n     final class VoiceMessage {\n         var id: UUID\n         var content: String\n         var isUserMessage: Bool\n         var timestamp: Date\n         var conversation: VoiceConversation?\n         \n         init(id: UUID = UUID(), content: String, isUserMessage: Bool, timestamp: Date = Date()) {\n             self.id = id\n             self.content = content\n             self.isUserMessage = isUserMessage\n             self.timestamp = timestamp\n         }\n     }\n     ```\n\n2. Update VoiceConversationViewModel:\n   - Replace volatile array with SwiftData query:\n     ```swift\n     @Query private var conversations: [VoiceConversation]\n     @Query private var currentMessages: [VoiceMessage]\n     private var modelContext: ModelContext\n     ```\n   - Implement CRUD operations:\n     ```swift\n     func createNewConversation(title: String = \"New Conversation\") {\n         let conversation = VoiceConversation(title: title)\n         modelContext.insert(conversation)\n         currentConversationID = conversation.id\n         try? modelContext.save()\n     }\n     \n     func addUserMessage(_ content: String) {\n         guard let conversation = getCurrentConversation() else { return }\n         let message = VoiceMessage(content: content, isUserMessage: true)\n         conversation.messages.append(message)\n         conversation.updatedAt = Date()\n         try? modelContext.save()\n     }\n     \n     func addAIMessage(_ content: String) {\n         guard let conversation = getCurrentConversation() else { return }\n         let message = VoiceMessage(content: content, isUserMessage: false)\n         conversation.messages.append(message)\n         conversation.updatedAt = Date()\n         try? modelContext.save()\n     }\n     ```\n\n3. Connect microphone transcription to addUserMessage:\n   - In the voice conversation view, modify the microphone button action:\n     ```swift\n     Button(action: {\n         if isRecording {\n             audioPipeline.stopRecording()\n             if let transcription = audioPipeline.currentTranscription {\n                 viewModel.addUserMessage(transcription)\n             }\n         } else {\n             audioPipeline.startRecording()\n         }\n         isRecording.toggle()\n     }) {\n         // Button UI\n     }\n     ```\n\n4. Connect AI responses to addAIMessage:\n   - In the OpenAIRealtimeClient callback:\n     ```swift\n     func onMessageReceived(_ message: String) {\n         DispatchQueue.main.async {\n             self.conversationViewModel.addAIMessage(message)\n         }\n     }\n     ```\n\n5. Load conversation history on view appear:\n   - Add to VoiceConversationView:\n     ```swift\n     .onAppear {\n         viewModel.loadConversations()\n         if let conversationID = selectedConversationID {\n             viewModel.setCurrentConversation(id: conversationID)\n         }\n     }\n     ```\n\n6. Update UI to display conversation history:\n   - Modify the ScrollView in VoiceConversationView:\n     ```swift\n     ScrollView {\n         LazyVStack(alignment: .leading, spacing: 12) {\n             ForEach(viewModel.currentMessages) { message in\n                 MessageBubble(\n                     content: message.content,\n                     isUserMessage: message.isUserMessage,\n                     timestamp: message.timestamp\n                 )\n             }\n         }\n         .padding()\n     }\n     ```\n\n7. Add conversation management features:\n   - Create a ConversationListView:\n     ```swift\n     struct ConversationListView: View {\n         @ObservedObject var viewModel: VoiceConversationViewModel\n         @State private var searchText = \"\"\n         @State private var selectedSubject: UUID?\n         \n         var filteredConversations: [VoiceConversation] {\n             viewModel.conversations\n                 .filter { searchText.isEmpty || $0.title.localizedCaseInsensitiveContains(searchText) }\n                 .filter { selectedSubject == nil || $0.subjectID == selectedSubject }\n         }\n         \n         var body: some View {\n             List {\n                 ForEach(filteredConversations) { conversation in\n                     NavigationLink(destination: VoiceConversationView(viewModel: viewModel, conversationID: conversation.id)) {\n                         VStack(alignment: .leading) {\n                             Text(conversation.title)\n                                 .font(.headline)\n                             Text(conversation.updatedAt, style: .date)\n                                 .font(.caption)\n                         }\n                     }\n                 }\n                 .onDelete(perform: deleteConversations)\n             }\n             .searchable(text: $searchText)\n             .toolbar {\n                 ToolbarItem(placement: .navigationBarTrailing) {\n                     Menu {\n                         Picker(\"Filter by Subject\", selection: $selectedSubject) {\n                             Text(\"All Subjects\").tag(nil as UUID?)\n                             ForEach(viewModel.subjects) { subject in\n                                 Text(subject.name).tag(subject.id as UUID?)\n                             }\n                         }\n                     } label: {\n                         Label(\"Filter\", systemImage: \"line.3.horizontal.decrease.circle\")\n                     }\n                 }\n             }\n         }\n         \n         func deleteConversations(at offsets: IndexSet) {\n             for index in offsets {\n                 viewModel.deleteConversation(filteredConversations[index].id)\n             }\n         }\n     }\n     ```",
@@ -5422,7 +5422,7 @@
         "updatedAt": "2025-10-16T17:56:05.568Z"
       },
       {
-        "id": "101",
+        "id": 101,
         "title": "Implement Context Integration and Fallback for Voice Coach",
         "description": "Integrate StudyCoachPersonality AI service for context-aware responses tailored to learning disabilities and implement fallback mechanisms for offline scenarios.",
         "details": "1. Integrate StudyCoachPersonality AI service:\n   - Create a service adapter for StudyCoachPersonality API\n   - Implement personality profiles tailored to dyslexia/dyscalculia support\n   - Add context-aware response generation with empathetic tone\n\n2. Implement Apple Speech Recognition fallback:\n   - Create a fallback detection system that monitors OpenAI API availability\n   - Implement local Speech Recognition using Apple's frameworks\n   - Design a graceful transition between online and offline modes\n   - Create simplified response templates for offline mode\n\n3. Wire up real subject/material context:\n   - Replace hardcoded \"Matematica\" strings with dynamic context from SwiftData\n   - Create a ContextProvider class to fetch current subject and material details\n   - Implement context switching based on user navigation\n   - Add subject-specific vocabulary and terminology support\n\n4. Propagate student learning profile:\n   - Create a UserPreferenceManager to access learning profiles\n   - Implement preference propagation to AI services\n   - Add dyslexia/dyscalculia accommodation flags\n   - Create adaptive UI based on learning profile\n\n5. Add adaptive difficulty adjustment:\n   - Implement ConversationHistoryAnalyzer to track user performance\n   - Create difficulty adjustment algorithm based on success/failure patterns\n   - Add metadata to conversation turns for performance tracking\n   - Implement gradual difficulty progression\n\n6. Implement error recovery:\n   - Create an ErrorRecoveryManager for handling API failures\n   - Implement graceful degradation of features based on available services\n   - Add user-friendly error messages and recovery suggestions\n   - Create logging system for error analysis\n\n7. Performance considerations:\n   - Implement caching for frequently used context data\n   - Optimize network requests to minimize latency\n   - Add background prefetching for likely context switches\n   - Implement battery usage optimizations",
@@ -5440,12 +5440,12 @@
         "updatedAt": "2025-10-17T05:17:36.374Z"
       },
       {
-        "id": "102",
+        "id": 102,
         "title": "Implement Voice-First UI Across the App",
         "description": "Enhance the application with a comprehensive voice-first UI approach, including context banners, optimized voice activation buttons, and voice indicators to improve accessibility and user experience.",
         "details": "1. Dashboard Context Banner:\n   - Create a ContextBannerView component to display on DashboardView\n   - Show active subject/material information for quick voice access\n   - Implement auto-updating based on current context\n   - Design with consistent styling matching app theme\n\n2. Voice Activation Button:\n   - Position a persistent 80x80pt voice activation button in the bottom-right corner\n   - Optimize for one-handed thumb use with proper touch target size\n   - Implement haptic feedback on press\n   - Add subtle animation for active/inactive states\n   - Ensure proper contrast and accessibility\n\n3. Voice Conversation Integration:\n   - Wire \"Lezione vocale\" quick action from DashboardView to launch VoiceConversationView\n   - Implement proper navigation and state preservation\n   - Add transition animations for smooth user experience\n\n4. Voice Settings Panel:\n   - Add settings panel to VoiceConversationView with gear icon\n   - Implement microphone preferences (device selection, sensitivity)\n   - Add voice speed adjustment (0.8x to 1.5x)\n   - Include voice gender/accent options if available\n   - Create persistent user preferences storage\n\n5. Voice Indicator Implementation:\n   - Create VoiceIndicatorView component for navigation bar\n   - Design visual indicators for listening/speaking/processing states\n   - Implement consistent appearance across all app screens\n   - Ensure proper accessibility labeling\n\n6. Voice Shortcuts:\n   - Add voice command shortcuts throughout the app UI\n   - Implement for common actions (create, edit, delete, navigate)\n   - Create consistent voice command patterns\n   - Document all voice commands for user reference\n\n7. Voice Command Labels:\n   - Audit all interactive elements to ensure voice command labels\n   - Update accessibility identifiers to include voice command hints\n   - Implement VoiceOver integration with voice commands\n   - Test with screen readers to verify accessibility",
         "testStrategy": "1. Functional Testing:\n   - Verify ContextBannerView displays correct subject/material information\n   - Test voice activation button positioning and responsiveness\n   - Confirm \"Lezione vocale\" quick action properly launches VoiceConversationView\n   - Validate all settings in the voice settings panel function correctly\n   - Test VoiceIndicatorView state changes during voice interactions\n   - Verify all voice shortcuts trigger appropriate actions\n   - Confirm all interactive elements have proper voice command labels\n\n2. Usability Testing:\n   - Conduct one-handed usage tests with various device sizes\n   - Measure time to complete common tasks using voice vs. touch\n   - Gather feedback on voice button placement and size\n   - Test with users of different hand sizes and dexterity levels\n\n3. Accessibility Testing:\n   - Verify VoiceOver compatibility with all new voice UI elements\n   - Test with screen readers to ensure proper labeling\n   - Validate color contrast meets accessibility standards\n   - Test with users who have motor impairments\n\n4. Performance Testing:\n   - Measure impact on battery life with voice features active\n   - Test voice response latency across different network conditions\n   - Verify smooth animations and transitions during voice interactions\n\n5. Integration Testing:\n   - Test voice features across all app screens and workflows\n   - Verify consistent behavior between voice and touch interactions\n   - Validate proper state preservation during navigation",
-        "status": "done",
+        "status": "in-progress",
         "dependencies": [
           "34",
           "32"
@@ -5540,10 +5540,10 @@
         "complexity": 8,
         "recommendedSubtasks": 10,
         "expansionPrompt": "Break down the 'Implement Voice-First UI Across the App' task into 10 detailed subtasks, including: 1) Context banner design and implementation, 2) Voice activation button development, 3) Voice conversation view integration, 4) Voice settings panel creation, 5) Voice indicator component development, 6) Voice command recognition system, 7) Voice shortcuts implementation, 8) Accessibility audit and enhancement, 9) Voice UI testing framework, and 10) Voice UI documentation and user guide. For each subtask, include specific technical requirements, dependencies, and testing criteria.",
-        "updatedAt": "2025-10-16T19:41:38.272Z"
+        "updatedAt": "2025-10-19T16:57:42.659Z"
       },
       {
-        "id": "103",
+        "id": 103,
         "title": "Implement Voice Commands and Feedback System",
         "description": "Integrate voice command functionality and feedback throughout the app, enabling voice-first navigation and interaction with all major features.",
         "details": "1. Integrate VoiceCommandFeedbackView component:\n   - Add to Dashboard, Materials, and Tasks screens\n   - Display recognized commands in a non-intrusive overlay\n   - Implement fade-in/fade-out animations for feedback visibility\n\n2. Add VoiceCommandButton components:\n   - Create reusable VoiceCommandButton component with visual feedback\n   - Add to dashboard for quick actions (\"Aggiornami\", \"Cosa devo studiare oggi?\")\n   - Implement long-press for extended voice command help\n\n3. Implement voice command recognition system:\n   - Create VoiceCommandManager class to handle recognition and routing\n   - Define command patterns and intents (navigation, creation, query)\n   - Implement fuzzy matching for natural language variations\n   - Route recognized commands to appropriate features\n\n4. Make major features voice-accessible:\n   - Material navigation: \"vai a matematica\", \"mostra i materiali di storia\"\n   - Task management: \"crea un nuovo compito\", \"mostra i compiti di oggi\"\n   - Calendar viewing: \"mostra il calendario\", \"cosa ho per lunedì\"\n   - Mind map exploration: \"apri le mappe mentali\", \"zoom sulla mappa\"\n\n5. Add haptic and audio feedback:\n   - Implement subtle haptic feedback for command recognition\n   - Add audio confirmation tones for successful commands\n   - Create error feedback for unrecognized commands\n\n6. Implement voice-first navigation:\n   - Create NavigationManager extension for voice commands\n   - Support commands like \"vai a matematica\", \"apri le mappe mentali\"\n   - Implement context-aware navigation (relative to current screen)\n\n7. Add voice dictation support:\n   - Implement dictation mode for task creation\n   - Add note-taking via dictation\n   - Create editing commands for dictated content\n\n8. Optimize for performance and accessibility:\n   - Ensure voice commands work with VoiceOver enabled\n   - Minimize battery impact during voice listening\n   - Implement offline command recognition for basic navigation",
@@ -5559,7 +5559,7 @@
         "updatedAt": "2025-10-17T05:00:34.157Z"
       },
       {
-        "id": "104",
+        "id": 104,
         "title": "Integrate ContextBannerView into Dashboard",
         "description": "Add ContextBannerView to the top of the ScrollView in MainTabView.swift to provide persistent context awareness of active subject and material across all dashboard interactions.",
         "details": "1. Locate the ScrollView in MainTabView.swift at line 62 where there is currently empty space.\n\n2. Import the ContextBannerView component if not already imported:\n```swift\nimport SwiftUI\n\nstruct MainTabView: View {\n    // Existing code...\n```\n\n3. Add the ContextBannerView at the top of the ScrollView:\n```swift\nScrollView {\n    VStack(spacing: 16) {\n        ContextBannerView() // Add this line\n        \n        // Existing content...\n    }\n    .padding()\n}\n```\n\n4. Ensure the ContextBannerView displays the current context information:\n   - Active subject (name, color)\n   - Current material being studied\n   - Any other relevant context information\n\n5. Style the ContextBannerView to match the dashboard design:\n   - Use appropriate padding and spacing\n   - Ensure text is readable and accessible\n   - Apply consistent color scheme\n\n6. Make sure the ContextBannerView remains visible at the top of the ScrollView even when scrolling down.\n\n7. Test the implementation on different device sizes to ensure proper layout and visibility.\n\n8. Verify that the context information updates correctly when the user switches subjects or materials in other parts of the app.",
@@ -5573,7 +5573,7 @@
         "updatedAt": "2025-10-16T19:43:52.718Z"
       },
       {
-        "id": "105",
+        "id": 105,
         "title": "Refactor or Remove Quick Actions Section",
         "description": "Evaluate and implement improvements to the \"Azioni rapide\" (Quick Actions) section by either creating a dynamic carousel based on user context or removing the section if it provides limited value.",
         "details": "1. Analyze the current implementation of Quick Actions in MainTabView.swift:110\n2. Evaluate two possible approaches:\n   a. Dynamic carousel approach:\n      - Create a QuickActionProvider service that determines relevant actions based on:\n        * Recent materials the user has accessed\n        * Tasks with upcoming deadlines\n        * Calendar events in the next 24-48 hours\n      - Design a horizontally scrollable carousel UI component\n      - Implement action buttons with appropriate icons and labels\n      - Add animations for smooth transitions when actions change\n      - Ensure actions are contextually relevant to Mario's workflow\n   \n   b. Removal approach:\n      - Assess the current usage and value of the section\n      - Consider user testing to determine if the section is helpful\n      - If removing, ensure proper UI adjustments to maintain visual balance\n      - Update spacing and layout to compensate for the removed section\n\n3. Implementation details:\n   - If implementing dynamic carousel:\n     ```swift\n     struct QuickAction {\n         let id: UUID = UUID()\n         let title: String\n         let icon: String // SF Symbol name\n         let action: () -> Void\n         let badgeCount: Int?\n     }\n     \n     class QuickActionProvider {\n         func getRelevantActions() -> [QuickAction] {\n             // Logic to determine contextually relevant actions\n             // based on app state, user history, and upcoming events\n         }\n     }\n     \n     struct QuickActionsCarousel: View {\n         @StateObject private var provider = QuickActionProvider()\n         @State private var actions: [QuickAction] = []\n         \n         var body: some View {\n             ScrollView(.horizontal, showsIndicators: false) {\n                 HStack(spacing: 12) {\n                     ForEach(actions, id: \\.id) { action in\n                         Button(action: action.action) {\n                             VStack {\n                                 Image(systemName: action.icon)\n                                     .font(.system(size: 24))\n                                 Text(action.title)\n                                     .font(.caption)\n                             }\n                             .padding()\n                             .background(Color.secondarySystemBackground)\n                             .cornerRadius(12)\n                             .overlay(\n                                 action.badgeCount != nil ?\n                                 BadgeView(count: action.badgeCount!) : nil\n                             )\n                         }\n                     }\n                 }\n                 .padding(.horizontal)\n             }\n             .onAppear {\n                 actions = provider.getRelevantActions()\n             }\n         }\n     }\n     ```\n\n4. Decision criteria:\n   - Conduct a brief user test with 3-5 users to determine if quick actions are useful\n   - Analyze app analytics to see if current static buttons are being used\n   - Consider Mario's workflow and whether contextual actions would improve efficiency\n   - Make final implementation decision based on findings",
@@ -5590,7 +5590,7 @@
         "updatedAt": "2025-10-17T06:10:37.144Z"
       },
       {
-        "id": "106",
+        "id": 106,
         "title": "Add Persistent Voice Entry Point to App",
         "description": "Integrate VoiceCommandButton and VoiceCommandFeedbackView as a persistent UI element that's always accessible throughout the app, ensuring voice activation is available without navigating to a specific tab.",
         "details": "1. Evaluate integration options:\n   - Option A: Add to MainTabView.swift as a floating action button that overlays all tabs\n   - Option B: Integrate directly into the dashboard view\n\n2. Implement the VoiceCommandButton:\n   - Create a circular button with 80x80pt dimensions\n   - Position in bottom-right corner for easy thumb access\n   - Apply consistent styling with app theme\n   - Add drop shadow for visual separation from background content\n   - Implement haptic feedback on press\n\n3. Connect VoiceCommandFeedbackView:\n   - Show feedback view when voice recognition is active\n   - Position feedback view above the button\n   - Implement smooth transition animations\n   - Ensure feedback view doesn't obstruct critical UI elements\n\n4. Handle view hierarchy and z-index:\n   - Ensure button appears above all other UI elements\n   - Implement proper safe area insets handling\n   - Account for keyboard appearance\n\n5. Implement voice command activation:\n   - Connect to existing voice command infrastructure\n   - Ensure proper audio session handling\n   - Add visual state changes during active listening\n\n6. Optimize for accessibility:\n   - Add proper accessibility labels and hints\n   - Ensure VoiceOver compatibility\n   - Implement alternative activation methods\n\n7. Code implementation in MainTabView.swift:\n```swift\nstruct MainTabView: View {\n    @State private var isVoiceActive = false\n    \n    var body: some View {\n        ZStack {\n            // Existing tab view content\n            TabView {\n                // ... existing tabs\n            }\n            \n            // Persistent voice command button\n            VStack {\n                Spacer()\n                HStack {\n                    Spacer()\n                    VoiceCommandButton(isActive: $isVoiceActive)\n                        .frame(width: 80, height: 80)\n                        .padding(.trailing, 16)\n                        .padding(.bottom, 16)\n                }\n            }\n            \n            // Feedback view that appears when voice is active\n            if isVoiceActive {\n                VoiceCommandFeedbackView()\n                    .transition(.opacity)\n                    .zIndex(100)\n            }\n        }\n    }\n}",
@@ -5606,7 +5606,7 @@
         "updatedAt": "2025-10-16T19:46:01.030Z"
       },
       {
-        "id": "107",
+        "id": 107,
         "title": "Reorganize VoiceConversationView with Adaptive Layout and Persistence",
         "description": "Implement adaptive layout for VoiceConversationView with two-column layout on iPad/landscape and single-column on iPhone/portrait, add settings functionality, and integrate conversation persistence from SwiftData models.",
         "details": "1. Implement Adaptive Layout:\n   - Modify VoiceConversationView.swift:136 to implement a GeometryReader-based layout\n   - Create a two-column layout for iPad/landscape:\n     ```swift\n     if horizontalSizeClass == .regular && verticalSizeClass == .regular {\n         HStack(spacing: 0) {\n             // Left column: Subject/conversation selector\n             VStack {\n                 ConversationSelectorView(selectedConversation: $selectedConversation)\n             }\n             .frame(width: geometry.size.width * 0.3)\n             \n             Divider()\n             \n             // Right column: Conversation thread\n             VStack {\n                 ConversationThreadView(conversation: selectedConversation)\n             }\n             .frame(width: geometry.size.width * 0.7)\n         }\n     } else {\n         // Single column layout for iPhone/portrait\n         if showingSelector {\n             ConversationSelectorView(selectedConversation: $selectedConversation)\n                 .toolbar {\n                     ToolbarItem(placement: .navigationBarTrailing) {\n                         Button(\"New Conversation\") {\n                             createNewConversation()\n                             showingSelector = false\n                         }\n                     }\n                 }\n         } else {\n             ConversationThreadView(conversation: selectedConversation)\n                 .toolbar {\n                     ToolbarItem(placement: .navigationBarLeading) {\n                         Button(\"Back\") {\n                             showingSelector = true\n                         }\n                     }\n                 }\n         }\n     }\n     ```\n\n2. Implement Settings Functionality:\n   - Complete the showSettings() method at line 502:\n     ```swift\n     func showSettings() {\n         let settingsView = VoiceSettingsView(\n             microphonePreference: $microphonePreference,\n             voiceSpeed: $voiceSpeed,\n             language: $language,\n             onSave: { [weak self] in\n                 self?.dismissSettings()\n                 self?.updateVoiceSettings()\n             }\n         )\n         \n         let hostingController = UIHostingController(rootView: settingsView)\n         settingsSheet = hostingController\n         \n         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,\n            let rootViewController = windowScene.windows.first?.rootViewController {\n             hostingController.modalPresentationStyle = .formSheet\n             rootViewController.present(hostingController, animated: true)\n         }\n     }\n     \n     private func dismissSettings() {\n         settingsSheet?.dismiss(animated: true)\n         settingsSheet = nil\n     }\n     \n     private func updateVoiceSettings() {\n         // Update voice settings in the audio pipeline\n         audioManager.updateSettings(\n             speed: voiceSpeed,\n             language: language,\n             preferredMicrophone: microphonePreference\n         )\n     }\n     ```\n\n3. Create VoiceSettingsView:\n   - Implement a new SwiftUI view for voice settings:\n     ```swift\n     struct VoiceSettingsView: View {\n         @Binding var microphonePreference: MicrophonePreference\n         @Binding var voiceSpeed: Double\n         @Binding var language: Language\n         var onSave: () -> Void\n         \n         var body: some View {\n             NavigationView {\n                 Form {\n                     Section(header: Text(\"Microphone\")) {\n                         Picker(\"Microphone\", selection: $microphonePreference) {\n                             ForEach(MicrophonePreference.allCases, id: \\.self) { preference in\n                                 Text(preference.displayName).tag(preference)\n                             }\n                         }\n                     }\n                     \n                     Section(header: Text(\"Voice Speed\")) {\n                         Slider(value: $voiceSpeed, in: 0.75...1.5, step: 0.05) {\n                             Text(\"Speed: \\(voiceSpeed, specifier: \"%.2f\")x\")\n                         } minimumValueLabel: {\n                             Text(\"Slow\")\n                         } maximumValueLabel: {\n                             Text(\"Fast\")\n                         }\n                     }\n                     \n                     Section(header: Text(\"Language\")) {\n                         Picker(\"Language\", selection: $language) {\n                             ForEach(Language.allCases, id: \\.self) { language in\n                                 Text(language.displayName).tag(language)\n                             }\n                         }\n                     }\n                 }\n                 .navigationTitle(\"Voice Settings\")\n                 .toolbar {\n                     ToolbarItem(placement: .navigationBarTrailing) {\n                         Button(\"Save\") {\n                             onSave()\n                         }\n                     }\n                 }\n             }\n         }\n     }\n     ```\n\n4. Wire up Conversation Persistence:\n   - Integrate the SwiftData models from Task 100:\n     ```swift\n     @Query private var conversations: [VoiceConversation]\n     @Environment(\\.modelContext) private var modelContext\n     \n     private func loadConversation(_ conversation: VoiceConversation) {\n         selectedConversation = conversation\n         conversationTitle = conversation.title\n         messages = conversation.messages.sorted { $0.timestamp < $1.timestamp }\n     }\n     \n     private func saveCurrentConversation() {\n         if let conversation = selectedConversation {\n             conversation.title = conversationTitle\n             conversation.updatedAt = Date()\n             \n             // Update messages if needed\n             let existingMessageIDs = Set(conversation.messages.map { $0.id })\n             for message in messages {\n                 if !existingMessageIDs.contains(message.id) {\n                     conversation.messages.append(message)\n                 }\n             }\n             \n             try? modelContext.save()\n         }\n     }\n     \n     private func createNewConversation() {\n         let newConversation = VoiceConversation(\n             title: \"New Conversation\",\n             createdAt: Date(),\n             updatedAt: Date()\n         )\n         modelContext.insert(newConversation)\n         try? modelContext.save()\n         \n         selectedConversation = newConversation\n         conversationTitle = newConversation.title\n         messages = []\n     }\n     ```\n\n5. Update UI to Display Conversation History:\n   - Modify ConversationSelectorView to display saved conversations:\n     ```swift\n     struct ConversationSelectorView: View {\n         @Binding var selectedConversation: VoiceConversation?\n         @Query private var conversations: [VoiceConversation]\n         \n         var body: some View {\n             List {\n                 ForEach(conversations) { conversation in\n                     Button(action: {\n                         selectedConversation = conversation\n                     }) {\n                         VStack(alignment: .leading) {\n                             Text(conversation.title)\n                                 .font(.headline)\n                             Text(conversation.updatedAt, style: .date)\n                                 .font(.caption)\n                                 .foregroundColor(.secondary)\n                         }\n                     }\n                     .padding(.vertical, 8)\n                 }\n             }\n             .navigationTitle(\"Conversations\")\n         }\n     }\n     ```\n<info added on 2025-10-16T19:47:05.459Z>\n6. Implementation Status Update:\n   - Core components from Task 102 have been successfully implemented\n   - VoiceSettingsView is complete with all required functionality:\n     - Microphone selection\n     - Voice speed adjustment\n     - Accessibility settings\n   - Data persistence components are in place:\n     - VoiceConversation SwiftData model\n     - VoiceConversationService for data operations\n     - ConversationListView for displaying conversation history\n   - Settings integration is complete via sheet presentation in VoiceConversationView (line 502)\n   - Remaining implementation item: Adaptive layout for iPad (two-column) vs iPhone (single-column)\n</info added on 2025-10-16T19:47:05.459Z>",
@@ -5621,7 +5621,7 @@
         "updatedAt": "2025-10-17T05:31:48.940Z"
       },
       {
-        "id": "108",
+        "id": 108,
         "title": "Simplify MaterialDetailView to Reduce Infinite Scrolling",
         "description": "Redesign the MaterialDetailView to replace the current four-tab switch with a more accessible layout that eliminates tab switching and reduces cognitive load for users with learning disabilities.",
         "details": "1. Analyze the current implementation in MaterialDetailView.swift, focusing on line 28 where the tab switch is defined.\n\n2. Design and implement one of the following alternatives:\n   a. A List-based layout with distinct sections:\n      - Create a ScrollView with LazyVStack containing separate sections for Overview, Mind Map, Tasks, and Notes\n      - Each section should have a clear header and visual separation\n      - Implement collapsible sections for better content management\n      \n   b. A compact card-based layout:\n      - Design visually distinct cards for each content type\n      - Arrange cards vertically in a ScrollView\n      - Ensure proper spacing and visual hierarchy between cards\n      - Add subtle animations for focus changes\n\n3. Ensure the new layout maintains all existing functionality while improving accessibility:\n   - Preserve all data and interactions from the original tabs\n   - Ensure VoiceOver compatibility with the new layout\n   - Add clear section headers with appropriate accessibility labels\n   - Implement proper focus management for keyboard navigation\n\n4. Optimize performance for the vertical scrolling experience:\n   - Use LazyVStack to load content on-demand\n   - Implement content prefetching for smoother scrolling\n   - Consider pagination for very large content sections\n\n5. Update any related navigation or state management code that previously relied on tab selection.\n\n6. Add appropriate comments explaining the accessibility improvements made.",
@@ -5635,7 +5635,7 @@
         "updatedAt": "2025-10-17T16:07:41.000Z"
       },
       {
-        "id": "109",
+        "id": 109,
         "title": "Refactor MainTabView into Separate Files with Dedicated ViewModels",
         "description": "Split the MainTabView into separate tab view files with dedicated view models to improve code organization, reduce responsibility overlap, and enhance maintainability.",
         "details": "1. Create the following new files:\n   - DashboardTabView.swift: UI for the dashboard tab\n   - DashboardViewModel.swift: Business logic for dashboard tab\n   - StudyTabView.swift: UI for the study tab\n   - StudyViewModel.swift: Business logic for study tab\n   - TasksTabView.swift: UI for the tasks tab\n   - TasksViewModel.swift: Business logic for tasks tab\n\n2. For each view model:\n   - Implement proper state management using @Published properties\n   - Move relevant business logic from MainTabView\n   - Create initialization methods with necessary dependencies\n   - Implement proper memory management\n\n3. For each view:\n   - Move relevant UI code from MainTabView\n   - Connect to corresponding view model\n   - Ensure consistent styling and behavior\n\n4. Refactor MainTabView.swift to:\n   - Act as a lightweight coordinator\n   - Handle only tab selection\n   - Initialize and inject view models\n   - Use TabView to display the separate tab views\n\n5. Integrate VoiceConversationView (which already exists) as the voice tab\n\n6. Update any references to MainTabView in other parts of the codebase\n\n7. Ensure proper navigation and state persistence between tabs\n\n8. Maintain existing functionality while improving code organization",
@@ -5650,7 +5650,7 @@
         "updatedAt": "2025-10-17T16:17:20.669Z"
       },
       {
-        "id": "110",
+        "id": 110,
         "title": "Implement Voice Command Sheets for Settings, Profile, and Help Views",
         "description": "Create modal sheets for Settings, Profile, and Help views that respond to voice commands already handled by AppVoiceCommandHandler in MainTabView.",
         "details": "1. Examine the existing AppVoiceCommandHandler to understand how showSettings, showProfile, and showHelp flags are currently set\n2. Create three SwiftUI sheet views:\n   - SettingsSheetView: Display app settings with appropriate controls\n   - ProfileSheetView: Show user profile information and editing options\n   - HelpSheetView: Provide help documentation and guidance\n3. Modify MainTabView to bind these sheets to the corresponding boolean flags:\n   ```swift\n   .sheet(isPresented: $appVoiceCommandHandler.showSettings) {\n       SettingsSheetView()\n   }\n   .sheet(isPresented: $appVoiceCommandHandler.showProfile) {\n       ProfileSheetView()\n   }\n   .sheet(isPresented: $appVoiceCommandHandler.showHelp) {\n       HelpSheetView()\n   }\n   ```\n4. Ensure each sheet has a proper dismissal mechanism (both manual and voice-activated)\n5. Add voice command handlers within each sheet for navigation\n6. Implement accessibility features in all sheets\n7. Add appropriate animations for sheet presentation\n8. Update voice command documentation to include these new sheet interactions",
@@ -5665,7 +5665,7 @@
         "updatedAt": "2025-10-18T08:11:21.185Z"
       },
       {
-        "id": "111",
+        "id": 111,
         "title": "Implement Voice Command Navigation for Study Features",
         "description": "Implement the navigation logic for voice commands to switch to the Study tab and open relevant views like Study mode, Flashcard review, and Mind Map viewing.",
         "details": "1. Locate and update the handleStartStudy, handleReviewFlashcards, and handleViewMindMap functions in the voice command handler\n2. Implement tab switching logic to navigate to the Study tab using TabView selection state\n3. Add navigation to specific study views based on the command:\n   - For handleStartStudy: Navigate to the study session view with the current material\n   - For handleReviewFlashcards: Navigate to the flashcard review interface\n   - For handleViewMindMap: Navigate to the mind map visualization view\n4. Ensure proper state management to maintain context during navigation\n5. Add error handling for cases where navigation can't be completed (e.g., no active material)\n6. Implement feedback mechanisms to confirm successful navigation via voice\n7. Add logging for voice navigation actions for analytics\n8. Ensure navigation works in both online and offline modes\n9. Update voice command help documentation to reflect new navigation capabilities",
@@ -5682,7 +5682,7 @@
         "updatedAt": "2025-10-18T08:11:21.197Z"
       },
       {
-        "id": "112",
+        "id": 112,
         "title": "Implement Voice Command Material Detail Navigation",
         "description": "Implement the navigation logic for voice commands to open specific study materials by their ID in the MaterialDetailView when users issue voice commands.",
         "details": "1. Locate the handleOpenMaterial function in the voice command handler that currently accepts a materialID parameter\n2. Implement the logic to find the material by ID in the data store (likely using SwiftData query)\n3. Once the material is found, implement navigation to the MaterialDetailView with the selected material\n4. Add state management to trigger the navigation from the voice command context to the detail view\n5. Ensure the navigation works from any tab or view in the application\n6. Handle edge cases such as:\n   - Material not found (provide voice feedback)\n   - Invalid material ID format\n   - Navigation while already in detail view (refresh or provide feedback)\n7. Add logging for analytics to track voice command usage\n8. Ensure the implementation maintains accessibility support during navigation\n9. Optimize the material lookup for performance to minimize delay between command and navigation",
@@ -5698,7 +5698,7 @@
         "updatedAt": "2025-10-18T08:11:21.202Z"
       },
       {
-        "id": "113",
+        "id": 113,
         "title": "Improve Floating Voice Button Positioning with SafeAreaInset",
         "description": "Refactor the floating voice button positioning to use safeAreaInset instead of fixed padding to prevent content obstruction on smaller screens and in landscape orientation.",
         "details": "This task involves updating the positioning logic for the floating voice button to ensure proper display across all device sizes and orientations:\n\n1. Identify all instances where the floating voice button positioning is currently defined with fixed padding values.\n\n2. Replace fixed padding values with dynamic calculations using SafeAreaInset:\n   - Import the necessary SafeArea utilities from the platform-specific libraries\n   - For iOS: Use `SafeAreaInsets.bottom` and `SafeAreaInsets.right` \n   - For Android: Implement equivalent functionality using `WindowInsets`\n\n3. Create a responsive positioning system that:\n   - Maintains proper distance from screen edges in both portrait and landscape orientations\n   - Adjusts position based on available safe area\n   - Handles notches, rounded corners, and other device-specific features\n\n4. Implement orientation change listeners to reposition the button when device orientation changes:\n   ```javascript\n   // Example implementation\n   useEffect(() => {\n     const handleOrientationChange = () => {\n       // Recalculate button position based on new orientation\n       const safeArea = getSafeAreaInsets();\n       setButtonPosition({\n         bottom: safeArea.bottom + 16, // Base padding + safe area\n         right: safeArea.right + 16\n       });\n     };\n     \n     // Add orientation change listener\n     Dimensions.addEventListener('change', handleOrientationChange);\n     \n     // Initial calculation\n     handleOrientationChange();\n     \n     return () => {\n       Dimensions.removeEventListener('change', handleOrientationChange);\n     };\n   }, []);\n   ```\n\n5. Ensure the button remains accessible and visible in all scenarios, particularly:\n   - When keyboard is visible\n   - During split-screen multitasking\n   - On devices with unusual aspect ratios\n\n6. Update any related animations or transitions to work with the new dynamic positioning system.",
@@ -5777,7 +5777,7 @@
         "updatedAt": "2025-10-19T11:59:23.393Z"
       },
       {
-        "id": "114",
+        "id": 114,
         "title": "Comprehensive Voice Command System Testing on Device",
         "description": "Conduct thorough testing of the voice command system on actual devices to verify recognition accuracy, command pattern functionality, proper sheet dismissal, and accessibility compatibility across different speech patterns and accents.",
         "details": "This task involves comprehensive testing of the voice command system on physical devices to ensure robust functionality in real-world conditions:\n\n1. **Recognition Testing**:\n   - Verify voice recognition starts correctly when activated through the appropriate UI element\n   - Confirm recognition stops properly when commands are completed or canceled\n   - Test recognition in various ambient noise conditions (quiet room, moderate background noise, etc.)\n   - Verify visual indicators show recognition state correctly (listening, processing, etc.)\n\n2. **Command Pattern Testing**:\n   - Test all navigation commands (next page, previous page, go to chapter X, etc.)\n   - Verify material selection commands work correctly (select material X, open material Y)\n   - Test all study mode commands (switch to flashcards, start quiz, etc.)\n   - Verify command variations and synonyms are properly recognized\n\n3. **UI Interaction Testing**:\n   - Confirm sheets dismiss properly after voice commands\n   - Verify appropriate feedback is provided for recognized commands\n   - Test error handling for unrecognized or ambiguous commands\n   - Ensure voice commands don't interfere with normal touch interactions\n\n4. **Accessibility Testing**:\n   - Verify compatibility with VoiceOver and other screen readers\n   - Test voice command system with assistive technologies enabled\n   - Ensure proper focus management after voice commands\n\n5. **Speech Pattern Testing**:\n   - Test with different accents (American, British, Australian, etc.)\n   - Verify functionality with different speech patterns (fast/slow speech, different pitches)\n   - Test with non-native English speakers\n   - Verify performance with different voice volumes\n\nDocument all issues found with detailed reproduction steps, device information, and environmental conditions.",
@@ -5850,7 +5850,7 @@
         "expansionPrompt": "Divide the testing process into: (1) preparing device and environment matrix, (2) testing voice recognition activation/deactivation and visual feedback, (3) validating command pattern recognition and functional responses, (4) assessing sheet dismissal, error handling, and touch interaction integrity, and (5) conducting accessibility and speech pattern testing across accents and assistive technologies."
       },
       {
-        "id": "115",
+        "id": 115,
         "title": "Enhance Smart Material Query Parsing with Natural Language Support",
         "description": "Improve the smart material query parsing system to support natural language patterns, enhance fuzzy matching for material titles, add voice command documentation, and implement user-defined material aliases.",
         "details": "This task involves enhancing the existing smart material query parsing system with the following improvements:\n\n1. Natural Language Pattern Support:\n   - Implement parsing for temporal references like \"the last thing I studied\" or \"my most recent material\"\n   - Add support for relative references such as \"the chapter before this one\" or \"related to what I studied yesterday\"\n   - Create a pattern recognition system that maps natural language queries to specific database queries\n\n2. Fuzzy Matching Algorithm Enhancement:\n   - Improve the existing fuzzy matching algorithm for material titles\n   - Implement Levenshtein distance or similar algorithms with configurable thresholds\n   - Add phonetic matching capabilities (e.g., Soundex or Metaphone) for handling pronunciation variations\n   - Optimize performance for large material libraries\n\n3. Voice Command Documentation:\n   - Create comprehensive examples of voice commands for the help documentation\n   - Include common variations and phrasings that users might employ\n   - Organize voice commands by category (navigation, search, bookmarking, etc.)\n   - Add troubleshooting tips for voice recognition issues\n\n4. Material Aliases Implementation:\n   - Design and implement a system allowing users to define custom aliases for materials\n   - Create database schema for storing user-defined aliases\n   - Develop UI components for managing aliases (create, edit, delete)\n   - Ensure aliases are properly indexed for quick retrieval\n   - Implement alias resolution in the query parsing pipeline\n\nTechnical considerations:\n- Ensure backward compatibility with existing query formats\n- Maintain performance benchmarks for query parsing speed\n- Consider internationalization aspects for non-English queries\n- Implement proper error handling for ambiguous queries\n- Add telemetry to track which new features are most used",
@@ -5924,7 +5924,7 @@
         "updatedAt": "2025-10-19T14:17:44.105Z"
       },
       {
-        "id": "116",
+        "id": 116,
         "title": "Harden resilience stack and restore fallback tests",
         "description": "Refactor ResilientAPICall, RetryExecutor, and circuit breaker helpers to be actor-safe, eliminate concurrency mutation errors, and re-enable the disabled fallback test suite.",
         "details": "- Convert shared state to actors (retry counters, breaker registries)\n- Update FallbackTests to cover primary/fallback success + integration path\n- Verify concurrency with swift test --parallel\n- Document new concurrency design",
@@ -5986,7 +5986,7 @@
         ]
       },
       {
-        "id": "117",
+        "id": 117,
         "title": "Normalize deployment targets for real devices",
         "description": "Update Xcode project deployment targets to current iOS/iPadOS versions (>=17), adjust availability annotations, and verify builds/run on physical devices.",
         "details": "- Update MirrorBuddy.xcodeproj targets (app, tests, widgets if any)\n- Re-run build on device + simulator\n- Fix any API availability warnings or guard code",
@@ -6046,14 +6046,14 @@
         "updatedAt": "2025-10-18T10:11:36.420Z"
       },
       {
-        "id": "118",
+        "id": 118,
         "title": "Eliminate SwiftLint debt and enforce zero-warning policy",
-        "description": "Resolve existing ~30 SwiftLint violations, tune configuration if needed, and wire lint checks into the CI/pre-commit workflow.",
-        "details": "- Run swiftlint to capture current warnings\n- Fix code style/complexity issues or document justified exceptions\n- Update lint config for new rules if necessary\n- Add CI/pre-commit step ensuring lint passes",
-        "testStrategy": "",
-        "status": "done",
+        "description": "Reduce SwiftLint violations across the codebase, tune configuration as needed, and enforce a zero-new-warning policy via CI and pre-commit hooks. Integrate SwiftLint checks into GitHub Actions and document the linting process and policy for contributors.",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "high",
+        "details": "- Run swiftlint to capture and track current warnings (initial count: 950, reduced to 748)\n- Fix code style/complexity issues or document justified exceptions\n- Update lint config for new rules or to baseline existing violations if necessary\n- Add and verify CI/pre-commit steps ensuring lint passes (GitHub Actions workflow: .github/workflows/swiftlint.yml)\n- Document policy for zero new warnings and how to run lint locally",
+        "testStrategy": "1. Confirm that running SwiftLint locally and in CI (GitHub Actions) produces consistent results and fails on new violations.\n2. Verify that the pre-commit hook blocks commits introducing new warnings.\n3. Ensure the baseline is respected and only new violations cause failures.\n4. Review documentation for clarity on lint policy and developer workflow.",
         "subtasks": [
           {
             "id": 1,
@@ -6099,19 +6099,15 @@
             "parentId": "undefined",
             "updatedAt": "2025-10-18T09:59:45.068Z"
           }
-        ],
-        "complexity": 4,
-        "recommendedSubtasks": 4,
-        "expansionPrompt": "Divide into: (1) capturing current SwiftLint violations, (2) resolving lint findings, (3) enforcing lint in automation, and (4) documenting lint policy.",
-        "updatedAt": "2025-10-18T10:19:42.236Z"
+        ]
       },
       {
-        "id": "119",
+        "id": 119,
         "title": "Secure API configuration via Keychain and xcconfig",
         "description": "Store all API keys in the Keychain/config files instead of plist/env, update loading code, and document the setup for developers.",
         "details": "- Move OpenAI, Anthropic, Google credentials to KeychainManager/xcconfig\n- Update services (WhisperTranscriptionService etc.) to read from secure storage\n- Ensure build scripts ignore secret files\n- Update docs (README/setup guides) with new steps",
         "testStrategy": "",
-        "status": "done",
+        "status": "in-progress",
         "dependencies": [],
         "priority": "high",
         "subtasks": [
@@ -6163,10 +6159,10 @@
         "complexity": 5,
         "recommendedSubtasks": 4,
         "expansionPrompt": "Expand into: (1) designing secure key storage plan, (2) implementing Keychain/xcconfig loading, (3) migrating existing secrets, and (4) updating developer documentation.",
-        "updatedAt": "2025-10-18T10:57:21.887Z"
+        "updatedAt": "2025-10-19T16:57:41.528Z"
       },
       {
-        "id": "120",
+        "id": 120,
         "title": "Audit and resolve TODO/FIXME debt",
         "description": "Review all TODO/FIXME comments, implement high-priority items (study flows, TTS, search focus), and convert leftover items into tracked tasks.",
         "details": "- Use rg to list TODO/FIXME\n- Implement critical missing features or stub gracefully\n- Create new Task Master entries for deferred work and remove inline comments",
@@ -6226,7 +6222,7 @@
         "updatedAt": "2025-10-18T10:52:14.682Z"
       },
       {
-        "id": "121",
+        "id": 121,
         "title": "Expand baseline test coverage for core services",
         "description": "Add unit tests for VoiceConversationViewModel, UpdateManager, StudyView workflows, and resilience utilities to lift coverage and protect regressions. Note: Test execution and coverage measurement are currently blocked by compilation errors in ModelTests.swift (8 optional unwrapping issues). These must be resolved before coverage can be measured or CI integration can proceed.",
         "status": "done",
@@ -6297,7 +6293,7 @@
         "updatedAt": "2025-10-19T12:18:56.872Z"
       },
       {
-        "id": "122",
+        "id": 122,
         "title": "Establish performance harness for sync, transcription, and mind maps",
         "description": "Create performance tests and benchmarking scripts for Drive sync (100+ files), Whisper transcription (multi-hour input), and mind map rendering (100+ nodes).",
         "details": "- Add XCTest performance cases measuring latency/memory\n- Provide fixtures/mocks for large data sets\n- Document thresholds and capture baseline metrics",
@@ -6357,7 +6353,7 @@
         "updatedAt": "2025-10-18T14:54:22.008Z"
       },
       {
-        "id": "123",
+        "id": 123,
         "title": "Author manual QA & offline/resilience checklist",
         "description": "Document repeatable QA scenarios covering online/offline switches, backgrounding, low storage, and voice command regressions.",
         "details": "- Create checklist markdown in docs/\n- Include steps for switching network states, aggressive user flows, device matrix\n- Integrate into release criteria",
@@ -6406,7 +6402,7 @@
         "updatedAt": "2025-10-18T10:25:08.142Z"
       },
       {
-        "id": "124",
+        "id": 124,
         "title": "Build Today companion card and voice summary",
         "description": "Design a Today dashboard card with top tasks/materials and trigger a spoken summary after Aggiornami completes.",
         "details": "- Aggregate Drive/Gmail/Calendar findings into Today model\n- Render card with quick voice buttons and working-memory friendly copy\n- Hook UpdateManager to speak summary + offer next steps",
@@ -6472,7 +6468,7 @@
         "updatedAt": "2025-10-19T14:58:26.371Z"
       },
       {
-        "id": "125",
+        "id": 125,
         "title": "Add proactive coaching and working-memory checkpoints",
         "description": "Detect idle moments, sentiment, and current subject to propose next steps, and inject periodic recaps during study flows.",
         "details": "- Intent engine using context banner + activity logs\n- Voice prompts like 'Vuoi ripassare X?' when idle or confused\n- Mid-session recap command 'Ricapitolami' with voice + text",
@@ -6531,7 +6527,7 @@
         "updatedAt": "2025-10-19T14:58:41.214Z"
       },
       {
-        "id": "126",
+        "id": 126,
         "title": "Implement natural-language task capture and planning",
         "description": "Allow Mario to add tasks via voice (e.g. 'Ricordami di...'), infer subject, schedule reminders, and wrap with end-of-day planning dialogue.",
         "details": "- Extend VoiceCommandRegistry/AppVoiceCommandHandler with capture flow\n- Parse text to deadlines/subjects\n- Add nightly summary + tomorrow plan routine",
@@ -6590,7 +6586,7 @@
         "updatedAt": "2025-10-19T14:58:42.324Z"
       },
       {
-        "id": "127",
+        "id": 127,
         "title": "Design guided flashcard coach experience",
         "description": "Transform FlashcardStudyView into a voice-coached session with warm-up, adaptive pacing, encouragement, and micro-rewards.",
         "details": "- Script session phases (intro, practice, wrap)\n- Track performance to adjust explanation depth\n- Add celebratory effects and XP hooks",
@@ -6650,7 +6646,7 @@
         "updatedAt": "2025-10-19T14:58:43.512Z"
       },
       {
-        "id": "128",
+        "id": 128,
         "title": "Ship interactive mind map 2.0",
         "description": "Deliver zoomable mind map navigation with voice commands, narrated walkthroughs, and voice note capture for each node.",
         "details": "- Implement gesture + accessibility-friendly navigation\n- Add 'Explain this node' narration using TTS/LLM\n- Allow voice notes per node and sync to storage",
@@ -6709,7 +6705,7 @@
         "updatedAt": "2025-10-19T14:58:44.711Z"
       },
       {
-        "id": "129",
+        "id": 129,
         "title": "Deliver lesson recording, transcription, and review",
         "description": "Create the ambient recorder UI, chunked Whisper transcription pipeline, and review experience that turns recordings into summaries + mind maps.",
         "details": "- Build recording controls with storage monitoring and background support\n- Implement segmented upload + transcription workers\n- Auto-generate summaries/mind maps per segment and integrate with review screen",
@@ -6768,7 +6764,7 @@
         "expansionPrompt": "Break into: (1) designing ambient recording UI, (2) implementing segmented transcription pipeline, (3) auto-generating summaries and mind maps, and (4) building review experience UI."
       },
       {
-        "id": "130",
+        "id": 130,
         "title": "Implement emotion-aware coaching & persona tuning",
         "description": "Detect sentiment from voice, adjust pacing/tone, and allow Mario to choose between playful or calm coaching styles.",
         "details": "- Add sentiment detection to voice pipeline\n- Map sentiment to coaching responses and pacing adjustments\n- Build settings UI for persona selection",
@@ -6826,7 +6822,7 @@
         "expansionPrompt": "Expand into: (1) integrating sentiment detection, (2) persona and tone configuration, (3) adaptive pacing engine, and (4) testing with personas."
       },
       {
-        "id": "131",
+        "id": 131,
         "title": "Roll out curiosity prompts and weekly quests",
         "description": "Serve curiosity suggestions after topics, introduce weekly challenges with rewards, and surface celebration moments in the coach.",
         "details": "- Build content recommender (videos, experiments) per subject\n- Implement quest tracking and badge unlock flow\n- Integrate celebrations into voice responses and ProfileView",
@@ -6883,7 +6879,7 @@
         "expansionPrompt": "Break into: (1) building curiosity content recommender, (2) implementing weekly quest system, (3) celebrating curiosity milestones, and (4) testing and analytics."
       },
       {
-        "id": "132",
+        "id": 132,
         "title": "Generate weekly parent/teacher digest",
         "description": "Create opt-in digest emails or voice notes summarizing achievements, struggles, and suggested follow-ups for guardians.",
         "details": "- Aggregate progress metrics and sentiment from the week\n- Produce empathetic copy and optional audio summary\n- Provide settings to control frequency and privacy",
@@ -6941,7 +6937,7 @@
         "expansionPrompt": "Expand into: (1) aggregating weekly metrics, (2) generating empathetic copy and audio, (3) implementing delivery mechanism and settings, and (4) QA digest content."
       },
       {
-        "id": "133",
+        "id": 133,
         "title": "Implement guardian consent and privacy controls",
         "description": "Deliver parental control surfaces for recordings, sharing, and coach tone; include clear privacy states and overrides.",
         "details": "- Add settings UI for guardians (PIN protected)\n- Gate recording/export features behind consent\n- Surface privacy indicators in UI",
@@ -6998,7 +6994,7 @@
         "expansionPrompt": "Break into: (1) designing guardian settings UI, (2) enforcing consent in features, (3) implementing privacy indicators, and (4) QA guardian flows."
       },
       {
-        "id": "134",
+        "id": 134,
         "title": "Define data governance, logging, and offline matrix",
         "description": "Document PII flows, add structured audit logging, and clarify offline capabilities with UI states.",
         "details": "- Create privacy dashboard documentation\n- Instrument structured logs for voice commands/suggestions/errors\n- Update UI to show offline capabilities/limitations",
@@ -7055,7 +7051,7 @@
         "expansionPrompt": "Expand into: (1) documenting data flows, (2) implementing structured audit logging, (3) clarifying offline capabilities, and (4) updating privacy documentation."
       },
       {
-        "id": "135",
+        "id": 135,
         "title": "Integrate LMS/knowledge exports and Notion bridge",
         "description": "Add connectors for Canvas/Google Classroom assignment ingestion and export mind maps/summaries to PDF/Notion.",
         "details": "- Implement API clients or importers per LMS\n- Provide export options (PDF, Markdown, Notion API)\n- Respect privacy and guardian settings",
@@ -7112,7 +7108,7 @@
         "expansionPrompt": "Break into: (1) researching LMS APIs, (2) implementing LMS connectors, (3) providing knowledge export options, and (4) QA exports and privacy."
       },
       {
-        "id": "136",
+        "id": 136,
         "title": "Finalize QA automation, metrics, and release readiness",
         "description": "Add UI automation for voice flows, integrate crash/metrics monitoring, complete accessibility audits, and prepare App Store assets/privacy disclosures.",
         "details": "- Write UI tests simulating voice commands via accessibility APIs\n- Hook privacy-safe crash/latency monitoring\n- Run full accessibility audit (VoiceOver, Switch Control, Reduce Motion)\n- Produce App Privacy labels, localization checklist, release playbook",
@@ -7171,7 +7167,7 @@
         "expansionPrompt": "Expand into: (1) automating voice flow UI tests, (2) integrating crash and metrics monitoring, (3) conducting accessibility and localization audit, and (4) preparing release readiness checklist."
       },
       {
-        "id": "137",
+        "id": 137,
         "title": "Redesign dashboard experience with clear states",
         "description": "Rebuild the main dashboard to show sync/import progress, accessible sections for new materials, and transparent status messaging.",
         "details": "- Create processing status module after Aggiornami (e.g., 'Sto generando mappe mentali')\n- Organize materials into 'In lavorazione', 'Pronte', 'Da ascoltare'\n- Provide visible affordances for voice coach, Today card, and quick next steps",
@@ -7229,7 +7225,7 @@
         "updatedAt": "2025-10-19T11:27:20.809Z"
       },
       {
-        "id": "138",
+        "id": 138,
         "title": "Automate post-import material processing",
         "description": "Ensure imported materials automatically trigger text extraction, summary generation, mind map creation, and UI updates.",
         "details": "- Hook Material import to processing pipeline with progress states\n- Notify dashboard when resources ready (mind maps, Flashcards)\n- Provide error handling & retry UI",
@@ -7289,7 +7285,7 @@
         "updatedAt": "2025-10-18T19:53:13.589Z"
       },
       {
-        "id": "139",
+        "id": 139,
         "title": "Consolidate voice interaction entry points",
         "description": "Simplify voice UI by providing a single clear entry point, removing redundant microphone icons, and aligning command vs conversation flows.",
         "details": "- Audit all screens for voice buttons\n- Decide on primary access (e.g., floating assistant + Today suggestions)\n- Update design so commands/conversation share consistent affordances\n- Provide onboarding hints so Mario knows how to speak",
@@ -7351,12 +7347,14 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-19T14:58:44.713Z",
+      "lastModified": "2025-10-19T16:57:43.814Z",
       "taskCount": 139,
-      "completedCount": 124,
+      "completedCount": 120,
       "tags": [
         "master"
-      ]
+      ],
+      "created": "2025-10-19T17:04:05.501Z",
+      "description": "Tasks for master context"
     }
   }
 }

@@ -159,7 +159,7 @@ final class TaskCaptureService: NSObject, ObservableObject {
     // MARK: - Reminders
 
     private func requestNotificationPermissions() {
-        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        notificationCenter.requestAuthorization(options: [.alert, .sound, .badge]) { _, error in
             if let error = error {
                 print("Notification permission error: \(error)")
             }

@@ -1,0 +1,45 @@
+name: SwiftLint
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  swiftlint:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install SwiftLint
+      run: brew install swiftlint
+
+    - name: Run SwiftLint
+      run: |
+        VIOLATIONS=$(swiftlint lint --reporter json | jq '.[] | select(.severity == "error") | length' | wc -l)
+        echo "SwiftLint found $VIOLATIONS errors"
+
+        # Fail if more than 188 serious violations (current baseline)
+        # Target: Reduce to 0 over time
+        if [ $VIOLATIONS -gt 188 ]; then
+          echo "❌ FAIL: SwiftLint errors ($VIOLATIONS) exceed baseline (188)"
+          exit 1
+        else
+          echo "✅ PASS: SwiftLint errors ($VIOLATIONS) within baseline (188)"
+        fi
+
+    - name: Check total violations
+      run: |
+        TOTAL=$(swiftlint lint | tail -1 | awk '{print $3}')
+        echo "Total SwiftLint violations: $TOTAL"
+
+        # Fail if more than 750 total violations (current + small buffer)
+        # Target: Reduce to 400 over time
+        if [ $TOTAL -gt 750 ]; then
+          echo "❌ FAIL: Total violations ($TOTAL) exceed threshold (750)"
+          exit 1
+        else
+          echo "✅ PASS: Total violations ($TOTAL) within threshold (750)"
+        fi

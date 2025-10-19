@@ -43,8 +43,8 @@ enum VoiceResult {
 /// Voice context for context-aware intent detection
 struct VoiceContext {
     var currentScreen: String = ""
-    var activeMaterial: String? = nil
-    var activeStudySession: String? = nil
+    var activeMaterial: String?
+    var activeStudySession: String?
     var recentCommands: [String] = []
 }
 

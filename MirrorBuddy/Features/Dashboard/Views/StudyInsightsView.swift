@@ -122,7 +122,7 @@ struct StudyInsightsView: View {
                         }
                     }
                     .chartXAxis {
-                        AxisMarks(values: .stride(by: .day)) { value in
+                        AxisMarks(values: .stride(by: .day)) { _ in
                             AxisValueLabel(format: .dateTime.weekday(.abbreviated))
                         }
                     }

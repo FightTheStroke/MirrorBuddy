@@ -327,7 +327,7 @@ struct ResultCard: View {
 }
 
 #Preview("Updating") {
-    let _ = {
+    _ = {
         UpdateManager.shared.progress.isUpdating = true
         UpdateManager.shared.progress.currentStep = .syncingDrive
         UpdateManager.shared.progress.statusMessage = "Cerco nuovi documenti..."
@@ -339,7 +339,7 @@ struct ResultCard: View {
 }
 
 #Preview("Completed") {
-    let _ = {
+    _ = {
         UpdateManager.shared.progress.currentStep = .completed
         UpdateManager.shared.progress.statusMessage = "Trovati: 3 nuovi documenti, 2 compiti"
         UpdateManager.shared.progress.newDocumentsCount = 3

@@ -211,7 +211,7 @@ Launch task-checker agents for **ALL** completed tasks **IN PARALLEL** for maxim
 
 tmQA uses different Claude models based on task complexity for optimal speed/accuracy balance:
 
-**🚀 Claude 3.5 Haiku** (Fast, Cost-Effective)
+**🚀 Claude 4.5 Haiku** (Fast, Cost-Effective)
 - Repository Cleanliness Inspector
 - Simple file scanning tasks
 - .gitignore verification
@@ -219,7 +219,7 @@ tmQA uses different Claude models based on task complexity for optimal speed/acc
 - **Why**: File operations, pattern matching, no deep reasoning needed
 - **Speed**: ~3-5 min
 
-**⚡ Claude 3.5 Sonnet** (Balanced, Default)
+**⚡ Claude 4.5 Sonnet** (Balanced, Default)
 - Task-checker agents (most tasks)
 - Architecture Analyzer
 - Feature catalog building
@@ -227,7 +227,7 @@ tmQA uses different Claude models based on task complexity for optimal speed/acc
 - **Why**: Requires code understanding, pattern detection, quality assessment
 - **Speed**: ~5-10 min
 
-**🧠 Claude 3 Opus / Extended Thinking** (Deep Reasoning)
+**🧠 Claude Opus 4.1/ Extended Thinking** (Deep Reasoning)
 - Complex architectural decisions
 - Circular dependency analysis
 - Deep coupling/cohesion analysis

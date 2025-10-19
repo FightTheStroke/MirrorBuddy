@@ -86,7 +86,6 @@ final class GoogleCalendarService {
             throw GoogleCalendarError.invalidURL
         }
 
-
         var request = URLRequest(url: url)
         request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
 
