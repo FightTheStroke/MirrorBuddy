@@ -91,6 +91,152 @@ Verifica che un task marcato come "done" funzioni davvero.
 
 ---
 
+### 🔴 `/tmQA` - Comprehensive Quality Assurance
+
+**BRUTALLY HONEST** quality assurance system that verifies ALL completed tasks meet the highest standards.
+
+```bash
+/tmQA
+```
+
+**🎯 Purpose:**
+
+Systematically verify that all tasks marked as "done":
+- ✅ Are **actually complete** and **working**
+- 📚 Have **complete documentation**
+- 🧹 Don't introduce **technical debt**
+- 🎯 Align with **repository mission and objectives**
+- 📁 Fit properly in **repository organization**
+
+**🔴 What Makes tmQA Different:**
+
+**NO SUGARCOATING. NO EXCUSES. ONLY TRUTH.**
+
+- If it doesn't work → **FAIL 🔴** (not "mostly works")
+- Missing documentation → **INCOMPLETE** (not "will add later")
+- Technical debt found → **HIGH SEVERITY** (not "could improve")
+- Fake implementations → **EXPOSED** (tasks marked done with no code)
+
+**What tmQA Checks:**
+
+1. **🧹 Repository Cleanliness** (NEW!)
+   - Git status (untracked files, uncommitted changes)
+   - Junk files (.DS_Store, temp files, logs)
+   - Build artifacts in repo
+   - .gitignore completeness
+   - Documentation freshness
+   - Orphaned files
+
+2. **🎯 Mission Alignment**
+   - Task aligns with project goals
+   - In PRD scope
+   - No scope creep
+   - Fits repository organization
+
+3. **🧹 Technical Debt**
+   - Code quality (no TODO/FIXME/HACK)
+   - Architecture patterns (SOLID, DDD, Clean)
+   - Performance (no N+1, proper indexing)
+   - Security (no secrets, proper validation)
+   - Maintainability (readable, documented)
+   - Module coupling and cohesion
+   - Circular dependencies
+
+4. **📚 Documentation**
+   - Code documentation (docstrings, comments)
+   - Project docs (README, ADRs, CHANGELOG)
+   - Task documentation (subtask notes)
+
+5. **✅ Implementation**
+   - All subtasks complete
+   - Build succeeds
+   - Tests pass (>80% coverage)
+   - Feature works end-to-end
+   - Edge cases handled
+
+6. **📁 Repository Organization**
+   - Complete feature catalog
+   - Feature dependency graph
+   - Module interconnections
+   - Architecture patterns
+   - Completeness map
+
+**🚀 Parallel Execution:**
+
+tmQA uses **maximum parallelism** for speed:
+- Launches **ALL task-checker agents simultaneously**
+- 2 special agents for global analysis (Cleanliness + Architecture)
+- Example: 4 tasks = 6 agents running in parallel
+- **4x faster** than serial execution (10 min vs 40 min)
+
+**Output:**
+
+Generates **`Docs/TMQAReport.md`** with:
+- Executive summary (pass rate, critical issues)
+- **Repository cleanliness report** (NEW!)
+- Repository organization analysis
+- Feature catalog with dependencies
+- Per-task detailed results
+- Technical debt assessment
+- Critical issues requiring immediate action
+- Recommendations and metrics
+
+**Report Language (Brutally Honest):**
+
+❌ **NEVER:**
+- "Could be improved"
+- "Should work fine"
+- "Mostly complete"
+
+✅ **ALWAYS:**
+- "Code quality: **FAIL** - Duplicated logic in 5 places"
+- "Documentation: **INCOMPLETE** - No ADR, no README update"
+- "Implementation: **BROKEN** - Feature crashes on launch"
+- "Technical debt: **HIGH** - 47 TODO comments, no error handling"
+
+**When to Use:**
+
+- **Weekly** - Before sprint planning
+- **Pre-release** - Before major versions
+- **After major features** - Verify quality
+- **When quality concerns** - Find all issues at once
+
+**Example Workflow:**
+
+```bash
+# Run comprehensive QA on all done tasks
+/tmQA
+
+# Review the generated report
+cat Docs/TMQAReport.md
+
+# Fix critical issues found
+/execute-task 99  # Re-implement properly
+
+# Re-run QA after fixes
+/tmQA
+```
+
+**vs `/review-task`:**
+
+| Feature | `/review-task <id>` | `/tmQA` |
+|---------|---------------------|---------|
+| Scope | Single task | ALL done tasks |
+| Depth | Implementation | Implementation + Architecture |
+| Report | Terminal output | `Docs/TMQAReport.md` |
+| Analysis | Task-specific | Repository-wide |
+| Tech Debt | Basic | Comprehensive |
+| Features | No | Complete catalog |
+| Use Case | Quick check | Deep audit |
+
+**🔴 Remember:**
+
+> "Fatto bene è meglio di fatto veloce" - Done well is better than done fast!
+
+The goal is **improvement through honesty**, not comfort through lies.
+
+---
+
 ## 🎯 Workflow Raccomandato
 
 ### Per Task Sequenziali (Approccio Standard)
