@@ -309,8 +309,8 @@ final class ProactiveCoachingService: ObservableObject {
             MaterialStub(
                 id: mat.id.uuidString,
                 title: mat.title,
-                subject: mat.subject ?? "",
-                difficulty: mat.difficulty?.rawValue ?? "medium"
+                subject: mat.subject?.name ?? "",
+                difficulty: "medium"
             )
         }
         contextTracker.startStudySession(subject: subject, material: materialStub)
@@ -322,7 +322,9 @@ final class ProactiveCoachingService: ObservableObject {
         stopCoaching()
     }
 
-    deinit {
-        stopCoaching()
+    nonisolated deinit {
+        Task { @MainActor in
+            self.stopCoaching()
+        }
     }
 }

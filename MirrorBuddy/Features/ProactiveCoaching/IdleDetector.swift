@@ -126,7 +126,9 @@ final class IdleDetector: ObservableObject {
         contextTracker.recordInteraction()
     }
 
-    deinit {
-        stopMonitoring()
+    nonisolated deinit {
+        Task { @MainActor in
+            self.stopMonitoring()
+        }
     }
 }

@@ -173,8 +173,10 @@ final class WorkingMemoryCheckpoint: ObservableObject {
         performCheckpoint()
     }
 
-    deinit {
-        stopCheckpointMonitoring()
-        speechSynthesizer.stopSpeaking(at: .immediate)
+    nonisolated deinit {
+        Task { @MainActor in
+            self.stopCheckpointMonitoring()
+            self.speechSynthesizer.stopSpeaking(at: .immediate)
+        }
     }
 }
