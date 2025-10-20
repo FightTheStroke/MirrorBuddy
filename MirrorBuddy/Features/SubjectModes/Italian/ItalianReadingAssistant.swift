@@ -35,13 +35,13 @@ final class ItalianReadingAssistant {
     }
 
     /// Extract key vocabulary from text
-    func extractKeyVocabulary(_ text: String) -> [VocabularyWord] {
+    func extractKeyVocabulary(_ text: String) -> [ItalianVocabularyWord] {
         // Extract important words (simplified implementation)
         let words = text.split(separator: " ").map { String($0) }
         let uniqueWords = Set(words)
 
         return Array(uniqueWords.prefix(10)).compactMap { word in
-            VocabularyWord(
+            ItalianVocabularyWord(
                 italian: word,
                 english: "", // Would use dictionary lookup in production
                 level: .intermediate,

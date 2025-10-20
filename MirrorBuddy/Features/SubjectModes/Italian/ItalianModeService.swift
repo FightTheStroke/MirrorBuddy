@@ -51,7 +51,7 @@ final class ItalianModeService {
     }
 
     /// Record vocabulary learning progress
-    func recordVocabularyPractice(_ word: VocabularyWord, correct: Bool) {
+    func recordVocabularyPractice(_ word: ItalianVocabularyWord, correct: Bool) {
         vocabularyProgress.recordAttempt(word: word, correct: correct)
     }
 
@@ -85,7 +85,7 @@ final class ItalianModeService {
     }
 
     /// Get vocabulary words for current topic
-    func getCurrentTopicVocabulary() -> [VocabularyWord] {
+    func getCurrentTopicVocabulary() -> [ItalianVocabularyWord] {
         guard let topic = currentTopic else { return [] }
         return vocabularyBuilder.getWords(for: topic)
     }
@@ -151,7 +151,7 @@ struct VocabularyProgress: Codable {
         }.map { $0.key }
     }
 
-    mutating func recordAttempt(word: VocabularyWord, correct: Bool) {
+    mutating func recordAttempt(word: ItalianVocabularyWord, correct: Bool) {
         let attempt = VocabularyAttempt(
             word: word.italian,
             correct: correct,
