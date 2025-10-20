@@ -454,22 +454,40 @@ struct MessageBubbleModel: Identifiable {
 final class VoiceConversationViewModel: ObservableObject {
     // MARK: - Published State
 
-    @Published var isConversationActive = false
+    @Published var sessionState: VoiceSessionState = .inactive
     @Published var conversationHistory: [MessageBubbleModel] = []
     @Published var waveformAmplitudes: [CGFloat] = Array(repeating: 0.3, count: 20)
     @Published var pulseAnimation = false
-    @Published var isUserSpeaking = false
     @Published var currentSubject: String?
     @Published var currentMaterial: String?
     @Published var showError = false
     @Published var errorMessage = ""
-    @Published var showSettings = false // Task 102.4
-    @Published var isOfflineMode = false // Task 101: Fallback to Apple Speech
+    @Published var showSettings = false
+    @Published var isOfflineMode = false
+
+    // MARK: - Configuration
+
+    var sessionConfiguration = VoiceSessionConfiguration()
+
+    // MARK: - Computed Properties (for backward compatibility)
+
+    var isConversationActive: Bool {
+        sessionState.isActive
+    }
+
+    var isUserSpeaking: Bool {
+        if case .listening = sessionState {
+            return true
+        }
+        return false
+    }
 
     // MARK: - Dependencies
 
     private let audioPipeline = AudioPipelineManager.shared
-    private let coachPersonality = StudyCoachPersonality.shared // Task 101
+    private let coachPersonality = StudyCoachPersonality.shared
+    private let hapticFeedback = HapticFeedbackManager.shared
+    private let audioCues = AudioCuesManager.shared
     private var realtimeClient: OpenAIRealtimeClient?
     private var conversationService: VoiceConversationService?
 
@@ -527,7 +545,30 @@ final class VoiceConversationViewModel: ObservableObject {
         }
 
         setupCallbacks()
+        setupStateObserver()
         loadContext()
+    }
+
+    // MARK: - State Management
+
+    /// Setup observer for state changes to trigger feedback
+    private func setupStateObserver() {
+        // Observe state changes for feedback
+        $sessionState
+            .removeDuplicates()
+            .sink { [weak self] newState in
+                guard let self = self else { return }
+
+                // Trigger haptic and audio feedback for state changes
+                self.hapticFeedback.stateChanged(to: newState)
+                self.audioCues.stateChanged(to: newState)
+
+                // Update pulse animation
+                self.pulseAnimation = newState.isActive
+
+                self.logger.info("Voice session state changed to: \(newState.statusText)")
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Setup
@@ -572,8 +613,11 @@ final class VoiceConversationViewModel: ObservableObject {
                     break
 
                 case .responseCreated(let response):
-                    // New response started
-                    break
+                    // New response started - AI is speaking
+                    _Concurrency.Task { @MainActor in
+                        self.sessionState = .speaking
+                        self.logger.debug("AI response started")
+                    }
 
                 case .responseTextDelta(let textDelta):
                     // Handle incremental text from AI
@@ -583,12 +627,19 @@ final class VoiceConversationViewModel: ObservableObject {
 
                 case .responseAudioDelta:
                     // Audio handled via onAudioData callback
-                    break
+                    // Ensure we're in speaking state
+                    _Concurrency.Task { @MainActor in
+                        if self.sessionState != .speaking {
+                            self.sessionState = .speaking
+                        }
+                    }
 
                 case .responseDone(let responseDone):
-                    // Response completed - finalize AI message
+                    // Response completed - finalize AI message and return to passive listening
                     _Concurrency.Task { @MainActor in
                         self.finalizeAIResponse()
+                        self.sessionState = .passive
+                        self.logger.debug("AI response complete, back to passive listening")
                     }
 
                 case .error(let error):
@@ -598,15 +649,17 @@ final class VoiceConversationViewModel: ObservableObject {
                     }
 
                 case .inputAudioBufferSpeechStarted:
-                    // User started speaking
+                    // User started speaking (VAD detected)
                     _Concurrency.Task { @MainActor in
-                        self.isUserSpeaking = true
+                        self.sessionState = .listening
+                        self.logger.debug("VAD: User started speaking")
                     }
 
                 case .inputAudioBufferSpeechStopped:
-                    // User stopped speaking
+                    // User stopped speaking (VAD detected)
                     _Concurrency.Task { @MainActor in
-                        self.isUserSpeaking = false
+                        self.sessionState = .thinking
+                        self.logger.debug("VAD: User stopped speaking, AI processing")
                     }
 
                 case .rateLimitsUpdated(let rateLimits):
@@ -773,12 +826,15 @@ final class VoiceConversationViewModel: ObservableObject {
     }
 
     private func startConversation() {
-        // Task 101: Try OpenAI first, fallback to local Apple Speech if it fails
+        // Try OpenAI with VAD first, fallback to local Apple Speech if it fails
         guard let realtimeClient else {
             // No API key configured, use offline mode directly
             startOfflineConversation()
             return
         }
+
+        sessionState = .connecting
+        logger.info("Starting real-time voice conversation with VAD enabled")
 
         _Concurrency.Task {
             do {
@@ -792,29 +848,38 @@ final class VoiceConversationViewModel: ObservableObject {
                     )
                 }
 
-                // Start audio pipeline
-                try await audioPipeline.start()
-
-                // Try to connect to OpenAI Realtime API
+                // Connect to OpenAI Realtime API
                 try await realtimeClient.connect()
 
-                // Update state
-                await MainActor.run {
-                    isConversationActive = true
-                    isOfflineMode = false
-                    pulseAnimation = true
-                    startWaveformAnimation()
-                    startAudioCommitTimer()
-                }
+                // Configure session with VAD and voice settings
+                try await realtimeClient.configureSession(sessionConfiguration)
+                logger.info("Session configured with VAD enabled (threshold: \(sessionConfiguration.vadThreshold))")
 
-                // Task 101: Send context-aware system prompt from StudyCoachPersonality
+                // Send context-aware system prompt
                 let systemPrompt = await coachPersonality.generateSystemPrompt(
                     for: currentSubject,
                     material: currentMaterial
                 )
                 try await realtimeClient.sendSystemPrompt(systemPrompt)
+
+                // Start audio pipeline for continuous streaming
+                try await audioPipeline.start()
+
+                // Update state to passive (always-listening mode)
+                await MainActor.run {
+                    sessionState = .passive
+                    isOfflineMode = false
+                    startWaveformAnimation()
+                    startAudioCommitTimer()
+
+                    // Success feedback
+                    hapticFeedback.conversationStarted()
+                    audioCues.conversationStarted()
+
+                    logger.info("Voice conversation started successfully in always-listening mode")
+                }
             } catch {
-                // Task 101: Connection failed, fallback to offline mode
+                // Connection failed, fallback to offline mode
                 logger.warning("OpenAI connection failed, falling back to local Apple Speech: \(error.localizedDescription)")
                 await MainActor.run {
                     startOfflineConversation()
@@ -927,13 +992,15 @@ final class VoiceConversationViewModel: ObservableObject {
     }
 
     private func stopConversation() {
+        logger.info("Stopping voice conversation")
+
         // Stop audio pipeline
         audioPipeline.stop()
 
         // Stop audio commit timer and clear buffer
         stopAudioCommitTimer()
 
-        // Task 101: Stop offline mode services if active
+        // Stop offline mode services if active
         if isOfflineMode {
             do {
                 try localSpeechRecognition.stopListening()
@@ -951,11 +1018,15 @@ final class VoiceConversationViewModel: ObservableObject {
         }
 
         // Update state
-        isConversationActive = false
+        sessionState = .inactive
         isOfflineMode = false
-        pulseAnimation = false
-        isUserSpeaking = false
         stopWaveformAnimation()
+
+        // End feedback
+        hapticFeedback.conversationEnded()
+        audioCues.conversationEnded()
+
+        logger.info("Voice conversation stopped successfully")
     }
 
     // MARK: - Audio Buffering and Forwarding
@@ -964,6 +1035,11 @@ final class VoiceConversationViewModel: ObservableObject {
     private func bufferAndSendAudio(_ audioData: Data) async {
         guard let realtimeClient, isConversationActive else { return }
 
+        // Check for barge-in: user starting to speak while AI is speaking
+        if sessionState == .speaking {
+            await handleBargeIn()
+        }
+
         // Add to buffer
         audioBuffer.append(audioData)
         lastAudioTime = Date()
@@ -971,6 +1047,37 @@ final class VoiceConversationViewModel: ObservableObject {
         // Send when buffer reaches threshold
         if audioBuffer.count >= bufferSizeThreshold {
             await sendBufferedAudio()
+        }
+    }
+
+    // MARK: - Barge-in (Interruption) Handling
+
+    /// Handle user interrupting AI response
+    private func handleBargeIn() async {
+        guard let realtimeClient else { return }
+
+        logger.info("Barge-in detected: User interrupted AI")
+
+        do {
+            // Cancel ongoing AI response
+            try await realtimeClient.cancelResponse()
+
+            // Clear audio buffer to stop playback
+            audioPipeline.stop()
+            try await audioPipeline.start()
+
+            // Update state
+            await MainActor.run {
+                sessionState = .listening
+
+                // Feedback
+                hapticFeedback.userInterrupted()
+                audioCues.userInterrupted()
+
+                logger.debug("AI response cancelled, listening to user")
+            }
+        } catch {
+            logger.error("Failed to cancel AI response: \(error.localizedDescription)")
         }
     }
 
