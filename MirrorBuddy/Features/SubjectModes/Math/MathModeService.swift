@@ -128,9 +128,9 @@ enum MathTopic: String, CaseIterable, Codable {
     case linearAlgebra = "Linear Algebra"
     case discreteMath = "Discrete Math"
 
-    var name: String { rawValue }
+    nonisolated var name: String { rawValue }
 
-    var subtopics: [String] {
+    nonisolated var subtopics: [String] {
         switch self {
         case .algebra:
             return ["Linear Equations", "Quadratic Equations", "Polynomials", "Factoring", "Systems of Equations"]

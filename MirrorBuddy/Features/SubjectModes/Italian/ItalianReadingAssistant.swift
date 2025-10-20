@@ -55,7 +55,7 @@ final class ItalianReadingAssistant {
     /// Generate comprehension questions
     func generateComprehensionQuestions(_ text: String, count: Int = 5) -> [ComprehensionQuestion] {
         // Generate questions based on text (simplified)
-        [
+        let questions = [
             ComprehensionQuestion(
                 question: "Qual è l'idea principale del testo?",
                 type: .mainIdea,

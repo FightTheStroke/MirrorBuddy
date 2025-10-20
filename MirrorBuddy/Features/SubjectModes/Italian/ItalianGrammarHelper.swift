@@ -56,13 +56,13 @@ final class ItalianGrammarHelper {
 
     /// Analyze a sentence for grammar errors
     func analyzeSentence(_ sentence: String) -> GrammarAnalysis {
-        var errors: [GrammarError] = []
+        var errors: [ItalianGrammarError] = []
         var suggestions: [String] = []
 
         // Check for common errors (simplified version)
         if sentence.contains("il libro") || sentence.contains("la libro") {
             if sentence.contains("la libro") {
-                errors.append(GrammarError(
+                errors.append(ItalianGrammarError(
                     type: .articleGender,
                     position: sentence.range(of: "la libro")?.lowerBound ?? sentence.startIndex,
                     message: "'Libro' is masculine, should use 'il libro'",
@@ -622,12 +622,12 @@ struct GrammarExplanation {
 
 struct GrammarAnalysis {
     let sentence: String
-    let errors: [GrammarError]
+    let errors: [ItalianGrammarError]
     let suggestions: [String]
     let overallCorrectness: Double
 }
 
-struct GrammarError {
+struct ItalianGrammarError {
     let type: ErrorType
     let position: String.Index
     let message: String

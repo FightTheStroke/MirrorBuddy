@@ -356,7 +356,7 @@ struct MathProblem: Codable, Identifiable {
     let hints: [String]
     let topic: MathTopic
 
-    init(
+    nonisolated init(
         id: UUID = UUID(),
         question: String,
         type: ProblemType,

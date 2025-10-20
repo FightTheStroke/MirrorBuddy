@@ -98,8 +98,20 @@ final class AccessibilityAudit: ObservableObject {
     }
 
     private func loadAuditChecklist() {
-        // VoiceOver
-        auditResults[.voiceOver] = [
+        auditResults[.voiceOver] = createVoiceOverAuditItems()
+        auditResults[.dynamicType] = createDynamicTypeAuditItems()
+        auditResults[.highContrast] = createHighContrastAuditItems()
+        auditResults[.voiceCommands] = createVoiceCommandsAuditItems()
+        auditResults[.oneHanded] = createOneHandedAuditItems()
+        auditResults[.touchTargets] = createTouchTargetsAuditItems()
+        auditResults[.colorBlindness] = createColorBlindnessAuditItems()
+        auditResults[.reducedMotion] = createReducedMotionAuditItems()
+
+        calculateOverallScore()
+    }
+
+    private func createVoiceOverAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "All images have alt text",
                 description: "Images used accessibilityLabel",
@@ -129,9 +141,10 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .aa
             )
         ]
+    }
 
-        // Dynamic Type
-        auditResults[.dynamicType] = [
+    private func createDynamicTypeAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "Text scales properly",
                 description: "All text uses Dynamic Type",
@@ -154,9 +167,10 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .aa
             )
         ]
+    }
 
-        // High Contrast
-        auditResults[.highContrast] = [
+    private func createHighContrastAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "4.5:1 contrast ratio",
                 description: "Text meets WCAG AA contrast requirements",
@@ -179,9 +193,10 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .a
             )
         ]
+    }
 
-        // Voice Commands
-        auditResults[.voiceCommands] = [
+    private func createVoiceCommandsAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "Voice commands functional",
                 description: "All voice commands work correctly",
@@ -204,9 +219,10 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .aa
             )
         ]
+    }
 
-        // One-Handed
-        auditResults[.oneHanded] = [
+    private func createOneHandedAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "Controls reachable",
                 description: "Primary actions in thumb zone",
@@ -222,9 +238,10 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .aaa
             )
         ]
+    }
 
-        // Touch Targets
-        auditResults[.touchTargets] = [
+    private func createTouchTargetsAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "Minimum 44pt targets",
                 description: "All interactive elements ≥44pt",
@@ -247,9 +264,10 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .aa
             )
         ]
+    }
 
-        // Color Blindness
-        auditResults[.colorBlindness] = [
+    private func createColorBlindnessAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "Patterns/textures used",
                 description: "Not relying on color alone",
@@ -265,9 +283,10 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .a
             )
         ]
+    }
 
-        // Reduced Motion
-        auditResults[.reducedMotion] = [
+    private func createReducedMotionAuditItems() -> [AuditItem] {
+        [
             AuditItem(
                 title: "Motion reduced when requested",
                 description: "Respects reduce motion setting",
@@ -283,8 +302,6 @@ final class AccessibilityAudit: ObservableObject {
                 wcagLevel: .aa
             )
         ]
-
-        calculateOverallScore()
     }
 
     func calculateOverallScore() {
