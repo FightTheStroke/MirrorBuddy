@@ -347,7 +347,9 @@ struct VoiceCommandErrorView: View {
 }
 
 #Preview("Help View") {
-    VoiceCommandHelpView()
+    NavigationStack {
+        VoiceCommandHelpView()
+    }
 }
 
 #Preview("Error View") {

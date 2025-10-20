@@ -531,6 +531,8 @@ struct TroubleshootingTip: View {
 
 // MARK: - Preview
 
-#Preview {
-    VoiceCommandHelpView()
+#Preview("Voice Command Help") {
+    NavigationStack {
+        VoiceCommandHelpView()
+    }
 }

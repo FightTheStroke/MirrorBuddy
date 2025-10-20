@@ -98,23 +98,29 @@ final class ItalianAudioReader: NSObject, AVSpeechSynthesizerDelegate {
 
     // MARK: - AVSpeechSynthesizerDelegate
 
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        isPlaying = false
-        isPaused = false
-        logger.info("Finished reading")
-        onFinished?()
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        _Concurrency.Task { @MainActor in
+            self.isPlaying = false
+            self.isPaused = false
+            self.logger.info("Finished reading")
+            self.onFinished?()
+        }
     }
 
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
-        guard let text = currentText else { return }
-        let progress = Double(characterRange.location) / Double(text.count)
-        onProgress?(progress)
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
+        _Concurrency.Task { @MainActor in
+            guard let text = self.currentText else { return }
+            let progress = Double(characterRange.location) / Double(text.count)
+            self.onProgress?(progress)
+        }
     }
 
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        isPlaying = false
-        isPaused = false
-        logger.info("Cancelled reading")
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        _Concurrency.Task { @MainActor in
+            self.isPlaying = false
+            self.isPaused = false
+            self.logger.info("Cancelled reading")
+        }
     }
 }
 
