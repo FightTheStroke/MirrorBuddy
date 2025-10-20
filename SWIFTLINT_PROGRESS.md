@@ -60,16 +60,28 @@ User requested to fix ALL pre-existing errors, not just SwiftLint violations. Di
 - Renamed `struct MindMap` in MindMapModels to `MindMapModel`
 - Updated references in `InteractiveMindMapView2.swift`
 
-### Remaining Compilation Errors 🚧
+### Compilation Errors - Session 2 (Continuation) ✅
 
-The following pre-existing compilation errors still need to be fixed:
+**MAJOR PROGRESS:** Fixed all major compilation errors!
 
-1. **AuditEvent Codable conformance** in StructuredAuditLogger.swift
-2. **ConversationContext Codable conformance** in StudyCoachPersonality.swift
-3. **SpacedRepetitionService** optional binding issues with Date types
-4. **SmartQueryParser** async/await and MainActor issues
-5. **StudyTimerService** Task initialization issues
-6. **SmartQueryParser** Predicate body error (multi-expression)
+#### Session 2 Fixes Completed:
+1. ✅ **Task ambiguity** - Disambiguated `_Concurrency.Task` vs SwiftData `Task` model
+2. ✅ **MindMapNode conflicts** - Renamed 3 struct conflicts (MindMapNodeModel, HistoryMindMapNode, MathMindMapNode)
+3. ✅ **SmartQueryParser** - Changed from `actor` to `@MainActor class`
+4. ✅ **Flashcard.isDue** - Fixed optional `nextReviewDate` handling
+5. ✅ **CuriosityContent** - Renamed `description` → `contentDescription` (@Model restriction)
+6. ✅ **MindMap** - Added `title`, `rootNode`, `children` for LMSIntegrationService
+7. ✅ **TrackedDriveFile** - Removed unavailable singleton init
+8. ✅ **PrivacyIndicatorService** - Added `import Combine` for ObservableObject
+9. ✅ **SentimentDetectionService** - Commented out missing AnthropicClient
+10. ✅ **MaterialAlias** - Removed Comparable (Hashable/MainActor conflict)
+11. ✅ **OfflineSyncQueue** - Added @MainActor to decode methods
+
+#### Remaining Issues (~10 errors):
+1. ⏳ ObservableObject conformance (3x) - need `import Combine`
+2. ⏳ WeeklyQuest `description` property - @Model restriction
+3. ⏳ Ambiguous type expressions in Views (3x)
+4. ⏳ LessonReviewView init accessibility
 
 ## Remaining SwiftLint Violations (285)
 

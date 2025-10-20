@@ -58,7 +58,7 @@ final class WeeklyQuest {
     var id = UUID()
     var questType: QuestType
     var title: String
-    var description: String
+    var questDescription: String
     var iconName: String
     var difficulty: QuestDifficulty
     var targetValue: Int
@@ -73,7 +73,7 @@ final class WeeklyQuest {
     init(template: QuestTemplate, startDate: Date, endDate: Date) {
         self.questType = template.type
         self.title = template.title
-        self.description = template.description
+        self.questDescription = template.description
         self.iconName = template.iconName
         self.difficulty = template.difficulty
         self.targetValue = template.targetValue
@@ -132,7 +132,7 @@ final class WeeklyQuest {
 final class QuestBadge {
     var id = UUID()
     var name: String
-    var description: String
+    var questDescription: String
     var iconName: String
     var color: String
     var unlockedAt: Date
