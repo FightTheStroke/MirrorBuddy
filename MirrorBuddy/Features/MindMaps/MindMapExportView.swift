@@ -131,7 +131,7 @@ struct MindMapExportView: View {
             }
             .sheet(isPresented: $showingShareSheet) {
                 if let url = exportedURL {
-                    ShareSheet(items: [url])
+                    MindMapShareSheet(items: [url])
                 }
             }
             .sheet(isPresented: $showingNotionSetup) {
@@ -147,7 +147,7 @@ struct MindMapExportView: View {
         isExporting = true
         errorMessage = nil
 
-        Task {
+        _Concurrency.Task {
             do {
                 switch selectedFormat {
                 case .pdf:
@@ -306,7 +306,7 @@ struct SummaryExportView: View {
             }
             .sheet(isPresented: $showingShareSheet) {
                 if let url = exportedURL {
-                    ShareSheet(items: [url])
+                    MindMapShareSheet(items: [url])
                 }
             }
             .sheet(isPresented: $showingNotionSetup) {
@@ -322,7 +322,7 @@ struct SummaryExportView: View {
         isExporting = true
         errorMessage = nil
 
-        Task {
+        _Concurrency.Task {
             do {
                 switch selectedFormat {
                 case .pdf:
@@ -434,7 +434,7 @@ struct NotionSetupView: View {
 
 // MARK: - Share Sheet
 
-struct ShareSheet: UIViewControllerRepresentable {
+struct MindMapShareSheet: UIViewControllerRepresentable {
     let items: [Any]
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
