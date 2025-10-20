@@ -1,11 +1,11 @@
 import Foundation
 
 /// Mind map templates specialized for mathematical concepts
-final class MathMindMapTemplate {
+final class MathMathMindMapTemplate {
     // MARK: - Template Generation
 
     /// Generate a mind map template for a specific math topic
-    func generateTemplate(for topic: MathTopic, concept: String? = nil) -> MindMapTemplate {
+    func generateTemplate(for topic: MathTopic, concept: String? = nil) -> MathMindMapTemplate {
         switch topic {
         case .algebra:
             return generateAlgebraTemplate(concept: concept)
@@ -28,7 +28,7 @@ final class MathMindMapTemplate {
 
     // MARK: - Topic-Specific Templates
 
-    private func generateAlgebraTemplate(concept: String?) -> MindMapTemplate {
+    private func generateAlgebraTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Algebra",
@@ -88,7 +88,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .algebra,
             centralNode: centralNode,
             branches: branches,
@@ -104,7 +104,7 @@ final class MathMindMapTemplate {
         )
     }
 
-    private func generateGeometryTemplate(concept: String?) -> MindMapTemplate {
+    private func generateGeometryTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Geometry",
@@ -164,7 +164,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .geometry,
             centralNode: centralNode,
             branches: branches,
@@ -181,7 +181,7 @@ final class MathMindMapTemplate {
         )
     }
 
-    private func generateTrigonometryTemplate(concept: String?) -> MindMapTemplate {
+    private func generateTrigonometryTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Trigonometry",
@@ -241,7 +241,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .trigonometry,
             centralNode: centralNode,
             branches: branches,
@@ -258,7 +258,7 @@ final class MathMindMapTemplate {
         )
     }
 
-    private func generateCalculusTemplate(concept: String?) -> MindMapTemplate {
+    private func generateCalculusTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Calculus",
@@ -318,7 +318,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .calculus,
             centralNode: centralNode,
             branches: branches,
@@ -336,7 +336,7 @@ final class MathMindMapTemplate {
         )
     }
 
-    private func generateStatisticsTemplate(concept: String?) -> MindMapTemplate {
+    private func generateStatisticsTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Statistics",
@@ -396,7 +396,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .statistics,
             centralNode: centralNode,
             branches: branches,
@@ -412,7 +412,7 @@ final class MathMindMapTemplate {
         )
     }
 
-    private func generateProbabilityTemplate(concept: String?) -> MindMapTemplate {
+    private func generateProbabilityTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Probability",
@@ -448,7 +448,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .probability,
             centralNode: centralNode,
             branches: branches,
@@ -461,7 +461,7 @@ final class MathMindMapTemplate {
         )
     }
 
-    private func generateLinearAlgebraTemplate(concept: String?) -> MindMapTemplate {
+    private func generateLinearAlgebraTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Linear Algebra",
@@ -497,7 +497,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .linearAlgebra,
             centralNode: centralNode,
             branches: branches,
@@ -509,7 +509,7 @@ final class MathMindMapTemplate {
         )
     }
 
-    private func generateDiscreteMathTemplate(concept: String?) -> MindMapTemplate {
+    private func generateDiscreteMathTemplate(concept: String?) -> MathMindMapTemplate {
         let centralNode = MathMindMapNode(
             id: "central",
             title: concept ?? "Discrete Math",
@@ -544,7 +544,7 @@ final class MathMindMapTemplate {
             )
         ]
 
-        return MindMapTemplate(
+        return MathMindMapTemplate(
             topic: .discreteMath,
             centralNode: centralNode,
             branches: branches,
@@ -559,7 +559,7 @@ final class MathMindMapTemplate {
 
 // MARK: - Supporting Types
 
-struct MindMapTemplate: Codable {
+struct MathMathMindMapTemplate: Codable {
     let topic: MathTopic
     let centralNode: MathMindMapNode
     let branches: [MathMindMapNode]

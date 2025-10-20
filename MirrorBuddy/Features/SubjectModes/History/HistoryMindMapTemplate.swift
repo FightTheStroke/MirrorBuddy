@@ -38,7 +38,7 @@ enum HistoryMindMapTemplate {
 
     // MARK: - Template Generation
 
-    static func generateTemplate(type: TemplateType, centralTopic: String) -> MindMapTemplate {
+    static func generateTemplate(type: TemplateType, centralTopic: String) -> HistoryMindMapTemplateData {
         switch type {
         case .timeline:
             return timelineTemplate(topic: centralTopic)
@@ -61,8 +61,8 @@ enum HistoryMindMapTemplate {
 
     // MARK: - Template Definitions
 
-    private static func timelineTemplate(topic: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func timelineTemplate(topic: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .timeline,
             centralNode: HistoryMindMapNode(
                 title: topic,
@@ -100,8 +100,8 @@ enum HistoryMindMapTemplate {
         )
     }
 
-    private static func causeEffectTemplate(event: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func causeEffectTemplate(event: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .causeEffect,
             centralNode: HistoryMindMapNode(
                 title: event,
@@ -150,8 +150,8 @@ enum HistoryMindMapTemplate {
         )
     }
 
-    private static func comparisonTemplate(topic: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func comparisonTemplate(topic: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .comparison,
             centralNode: HistoryMindMapNode(
                 title: topic,
@@ -198,8 +198,8 @@ enum HistoryMindMapTemplate {
         )
     }
 
-    private static func biographyTemplate(person: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func biographyTemplate(person: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .biography,
             centralNode: HistoryMindMapNode(
                 title: person,
@@ -246,8 +246,8 @@ enum HistoryMindMapTemplate {
         )
     }
 
-    private static func revolutionTemplate(movement: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func revolutionTemplate(movement: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .revolution,
             centralNode: HistoryMindMapNode(
                 title: movement,
@@ -294,8 +294,8 @@ enum HistoryMindMapTemplate {
         )
     }
 
-    private static func warTemplate(conflict: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func warTemplate(conflict: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .war,
             centralNode: HistoryMindMapNode(
                 title: conflict,
@@ -342,8 +342,8 @@ enum HistoryMindMapTemplate {
         )
     }
 
-    private static func civilizationTemplate(civilization: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func civilizationTemplate(civilization: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .civilization,
             centralNode: HistoryMindMapNode(
                 title: civilization,
@@ -399,8 +399,8 @@ enum HistoryMindMapTemplate {
         )
     }
 
-    private static func eraTemplate(era: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func eraTemplate(era: String) -> HistoryMindMapTemplateData {
+        HistoryMindMapTemplateData(
             type: .era,
             centralNode: HistoryMindMapNode(
                 title: era,
@@ -459,7 +459,7 @@ enum HistoryMindMapTemplate {
 
 // MARK: - Mind Map Data Structures
 
-struct MindMapTemplate {
+struct HistoryMindMapTemplateData {
     let type: HistoryMindMapTemplate.TemplateType
     let centralNode: HistoryMindMapNode
     let branches: [MindMapBranch]
