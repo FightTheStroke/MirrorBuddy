@@ -153,17 +153,7 @@ enum FileStatus: String, Codable {
 /// Service for tracking Drive files in local database
 @MainActor
 final class DriveFileTracker {
-    /// Shared singleton instance
-    static let shared = DriveFileTracker()
-
     let modelContext: ModelContext
-
-    @available(*, unavailable, message: "Use init(modelContext:) instead")
-    private init() {
-        // Note: In production, modelContext should be injected
-        // For now, we'll use a placeholder that will be set from the app
-        fatalError("Use init(modelContext:) instead")
-    }
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext

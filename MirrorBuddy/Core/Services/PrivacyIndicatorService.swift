@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import Combine
 
 /// Service for displaying privacy indicators throughout the app
 @MainActor

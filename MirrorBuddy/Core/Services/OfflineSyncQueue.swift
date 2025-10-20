@@ -116,7 +116,7 @@ actor OfflineSyncQueue {
         }
     }
 
-    nonisolated private func processMaterialImport(_ action: PendingAction) async throws {
+    private func processMaterialImport(_ action: PendingAction) async throws {
         // Decode material import data
         let importData: MaterialImportData
         do {
@@ -131,7 +131,7 @@ actor OfflineSyncQueue {
         // For now, we'll log the action
     }
 
-    nonisolated private func processFlashcardSync(_ action: PendingAction) async throws {
+    private func processFlashcardSync(_ action: PendingAction) async throws {
         // Decode flashcard sync data
         let syncData: FlashcardSyncData
         do {
@@ -144,7 +144,7 @@ actor OfflineSyncQueue {
         // Implementation would sync flashcard review data to cloud
     }
 
-    nonisolated private func processProgressSync(_ action: PendingAction) async throws {
+    private func processProgressSync(_ action: PendingAction) async throws {
         // Decode progress sync data
         let progressData: ProgressSyncData
         do {
@@ -157,7 +157,7 @@ actor OfflineSyncQueue {
         // Implementation would sync user progress to cloud/backend
     }
 
-    nonisolated private func processStudySessionSync(_ action: PendingAction) async throws {
+    private func processStudySessionSync(_ action: PendingAction) async throws {
         // Decode study session data
         let sessionData: StudySessionSyncData
         do {

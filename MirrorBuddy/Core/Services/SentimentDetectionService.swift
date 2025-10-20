@@ -12,7 +12,8 @@ final class SentimentDetectionService: ObservableObject {
 
     // MARK: - Dependencies
 
-    private let anthropicClient: AnthropicClient?
+    // TODO: Reimplement with proper LLM client when available
+    // private let anthropicClient: AnthropicClient?
 
     // MARK: - State
 
@@ -89,8 +90,9 @@ final class SentimentDetectionService: ObservableObject {
 
     // MARK: - Initialization
 
-    init(anthropicClient: AnthropicClient? = nil) {
-        self.anthropicClient = anthropicClient
+    init() {
+        // TODO: Reimplement with proper LLM client when available
+        // self.anthropicClient = anthropicClient
     }
 
     // MARK: - Audio-Based Detection
@@ -173,9 +175,13 @@ final class SentimentDetectionService: ObservableObject {
     // MARK: - LLM-Based Detection
 
     /// Use LLM to analyze conversation transcript for sentiment
+    /// TODO: Reimplement with proper LLM client when available
     func analyzeTranscript(_ transcript: String) async throws {
+        // Fallback to neutral (LLM client not available)
+        updateSentiment(.neutral, confidence: 0.5)
+
+        /* TODO: Reimplement when AnthropicClient is available
         guard let client = anthropicClient else {
-            // Fallback to neutral if no LLM available
             updateSentiment(.neutral, confidence: 0.5)
             return
         }
@@ -208,6 +214,7 @@ final class SentimentDetectionService: ObservableObject {
             print("⚠️ LLM sentiment analysis failed: \(error)")
             updateSentiment(.neutral, confidence: 0.5)
         }
+        */
     }
 
     // MARK: - State Management

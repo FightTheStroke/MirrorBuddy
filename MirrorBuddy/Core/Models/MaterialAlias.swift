@@ -96,15 +96,3 @@ final class MaterialAlias {
             .replacingOccurrences(of: "  ", with: " ") // Collapse multiple spaces
     }
 }
-
-// MARK: - Comparable
-
-extension MaterialAlias: Comparable {
-    static func < (lhs: MaterialAlias, rhs: MaterialAlias) -> Bool {
-        // Sort by usage count (descending), then by creation date (descending)
-        if lhs.usageCount != rhs.usageCount {
-            return lhs.usageCount > rhs.usageCount
-        }
-        return lhs.createdAt > rhs.createdAt
-    }
-}
