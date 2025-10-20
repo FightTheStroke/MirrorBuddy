@@ -64,45 +64,45 @@ enum ScienceMindMapTemplate {
     private static func physicsFormulaTemplate(formula: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .physicsFormula,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: formula,
                 content: "Physics Formula"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Variables",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Variable 1", content: "Name, symbol, unit"),
-                        MindMapNode(title: "Variable 2", content: "Name, symbol, unit"),
-                        MindMapNode(title: "Constants", content: "Any constants involved")
+                        ScienceMindMapNode(title: "Variable 1", content: "Name, symbol, unit"),
+                        ScienceMindMapNode(title: "Variable 2", content: "Name, symbol, unit"),
+                        ScienceMindMapNode(title: "Constants", content: "Any constants involved")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Derivation",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Starting Principle", content: "Fundamental law or principle"),
-                        MindMapNode(title: "Steps", content: "Derivation steps"),
-                        MindMapNode(title: "Assumptions", content: "Conditions or assumptions")
+                        ScienceMindMapNode(title: "Starting Principle", content: "Fundamental law or principle"),
+                        ScienceMindMapNode(title: "Steps", content: "Derivation steps"),
+                        ScienceMindMapNode(title: "Assumptions", content: "Conditions or assumptions")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Applications",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Real World Use 1", content: "Practical application"),
-                        MindMapNode(title: "Real World Use 2", content: "Practical application"),
-                        MindMapNode(title: "Common Problems", content: "Typical problem types")
+                        ScienceMindMapNode(title: "Real World Use 1", content: "Practical application"),
+                        ScienceMindMapNode(title: "Real World Use 2", content: "Practical application"),
+                        ScienceMindMapNode(title: "Common Problems", content: "Typical problem types")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Related Concepts",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Related Formula 1", content: "Connection"),
-                        MindMapNode(title: "Related Formula 2", content: "Connection"),
-                        MindMapNode(title: "Physical Principles", content: "Underlying physics")
+                        ScienceMindMapNode(title: "Related Formula 1", content: "Connection"),
+                        ScienceMindMapNode(title: "Related Formula 2", content: "Connection"),
+                        ScienceMindMapNode(title: "Physical Principles", content: "Underlying physics")
                     ]
                 )
             ]
@@ -112,45 +112,45 @@ enum ScienceMindMapTemplate {
     private static func experimentDesignTemplate(experiment: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .experimentDesign,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: experiment,
                 content: "Experiment Design"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Question & Hypothesis",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Research Question", content: "What are we investigating?"),
-                        MindMapNode(title: "Hypothesis", content: "Predicted outcome"),
-                        MindMapNode(title: "Variables", content: "Independent, dependent, controlled")
+                        ScienceMindMapNode(title: "Research Question", content: "What are we investigating?"),
+                        ScienceMindMapNode(title: "Hypothesis", content: "Predicted outcome"),
+                        ScienceMindMapNode(title: "Variables", content: "Independent, dependent, controlled")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Materials & Setup",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Equipment List", content: "All materials needed"),
-                        MindMapNode(title: "Setup Diagram", content: "How to arrange"),
-                        MindMapNode(title: "Safety Measures", content: "Precautions needed")
+                        ScienceMindMapNode(title: "Equipment List", content: "All materials needed"),
+                        ScienceMindMapNode(title: "Setup Diagram", content: "How to arrange"),
+                        ScienceMindMapNode(title: "Safety Measures", content: "Precautions needed")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Procedure",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Step-by-Step", content: "Detailed instructions"),
-                        MindMapNode(title: "Measurements", content: "What to measure and how"),
-                        MindMapNode(title: "Data Collection", content: "How to record data")
+                        ScienceMindMapNode(title: "Step-by-Step", content: "Detailed instructions"),
+                        ScienceMindMapNode(title: "Measurements", content: "What to measure and how"),
+                        ScienceMindMapNode(title: "Data Collection", content: "How to record data")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Analysis & Conclusion",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Calculations", content: "Formulas to use"),
-                        MindMapNode(title: "Graphs", content: "How to visualize data"),
-                        MindMapNode(title: "Conclusion", content: "Interpret results")
+                        ScienceMindMapNode(title: "Calculations", content: "Formulas to use"),
+                        ScienceMindMapNode(title: "Graphs", content: "How to visualize data"),
+                        ScienceMindMapNode(title: "Conclusion", content: "Interpret results")
                     ]
                 )
             ]
@@ -160,54 +160,54 @@ enum ScienceMindMapTemplate {
     private static func scientificMethodTemplate(problem: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .scientificMethod,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: problem,
                 content: "Scientific Investigation"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Observe",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Phenomenon", content: "What did you notice?"),
-                        MindMapNode(title: "Background Research", content: "What's known?"),
-                        MindMapNode(title: "Question", content: "What do you want to find out?")
+                        ScienceMindMapNode(title: "Phenomenon", content: "What did you notice?"),
+                        ScienceMindMapNode(title: "Background Research", content: "What's known?"),
+                        ScienceMindMapNode(title: "Question", content: "What do you want to find out?")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Hypothesize",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Prediction", content: "What will happen?"),
-                        MindMapNode(title: "Reasoning", content: "Why do you think so?"),
-                        MindMapNode(title: "Testable Statement", content: "If... then... because...")
+                        ScienceMindMapNode(title: "Prediction", content: "What will happen?"),
+                        ScienceMindMapNode(title: "Reasoning", content: "Why do you think so?"),
+                        ScienceMindMapNode(title: "Testable Statement", content: "If... then... because...")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Experiment",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Design", content: "Plan your test"),
-                        MindMapNode(title: "Variables", content: "What changes, what stays same"),
-                        MindMapNode(title: "Execute", content: "Carry out the experiment")
+                        ScienceMindMapNode(title: "Design", content: "Plan your test"),
+                        ScienceMindMapNode(title: "Variables", content: "What changes, what stays same"),
+                        ScienceMindMapNode(title: "Execute", content: "Carry out the experiment")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Analyze",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Data", content: "Organize and examine results"),
-                        MindMapNode(title: "Patterns", content: "What trends do you see?"),
-                        MindMapNode(title: "Errors", content: "What affected accuracy?")
+                        ScienceMindMapNode(title: "Data", content: "Organize and examine results"),
+                        ScienceMindMapNode(title: "Patterns", content: "What trends do you see?"),
+                        ScienceMindMapNode(title: "Errors", content: "What affected accuracy?")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Conclude",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Findings", content: "What did you discover?"),
-                        MindMapNode(title: "Hypothesis", content: "Supported or not?"),
-                        MindMapNode(title: "Next Steps", content: "Further questions?")
+                        ScienceMindMapNode(title: "Findings", content: "What did you discover?"),
+                        ScienceMindMapNode(title: "Hypothesis", content: "Supported or not?"),
+                        ScienceMindMapNode(title: "Next Steps", content: "Further questions?")
                     ]
                 )
             ]
@@ -217,45 +217,45 @@ enum ScienceMindMapTemplate {
     private static func systemAnalysisTemplate(system: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .systemAnalysis,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: system,
                 content: "Physical System"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Components",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Part 1", content: "Function and properties"),
-                        MindMapNode(title: "Part 2", content: "Function and properties"),
-                        MindMapNode(title: "Interactions", content: "How parts connect")
+                        ScienceMindMapNode(title: "Part 1", content: "Function and properties"),
+                        ScienceMindMapNode(title: "Part 2", content: "Function and properties"),
+                        ScienceMindMapNode(title: "Interactions", content: "How parts connect")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Energy",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Input", content: "Energy coming in"),
-                        MindMapNode(title: "Transformations", content: "Energy conversions"),
-                        MindMapNode(title: "Output", content: "Energy leaving")
+                        ScienceMindMapNode(title: "Input", content: "Energy coming in"),
+                        ScienceMindMapNode(title: "Transformations", content: "Energy conversions"),
+                        ScienceMindMapNode(title: "Output", content: "Energy leaving")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Forces",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Acting Forces", content: "What forces are present"),
-                        MindMapNode(title: "Balance", content: "Equilibrium or motion"),
-                        MindMapNode(title: "Effects", content: "What forces cause")
+                        ScienceMindMapNode(title: "Acting Forces", content: "What forces are present"),
+                        ScienceMindMapNode(title: "Balance", content: "Equilibrium or motion"),
+                        ScienceMindMapNode(title: "Effects", content: "What forces cause")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Behavior",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Normal Operation", content: "How it works"),
-                        MindMapNode(title: "Variations", content: "What changes behavior"),
-                        MindMapNode(title: "Limitations", content: "Constraints or limits")
+                        ScienceMindMapNode(title: "Normal Operation", content: "How it works"),
+                        ScienceMindMapNode(title: "Variations", content: "What changes behavior"),
+                        ScienceMindMapNode(title: "Limitations", content: "Constraints or limits")
                     ]
                 )
             ]
@@ -265,45 +265,45 @@ enum ScienceMindMapTemplate {
     private static func chemicalReactionTemplate(reaction: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .chemicalReaction,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: reaction,
                 content: "Chemical Reaction"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Reactants",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Compound 1", content: "Formula and properties"),
-                        MindMapNode(title: "Compound 2", content: "Formula and properties"),
-                        MindMapNode(title: "States", content: "Solid, liquid, gas, aqueous")
+                        ScienceMindMapNode(title: "Compound 1", content: "Formula and properties"),
+                        ScienceMindMapNode(title: "Compound 2", content: "Formula and properties"),
+                        ScienceMindMapNode(title: "States", content: "Solid, liquid, gas, aqueous")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Products",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Compound 1", content: "Formula and properties"),
-                        MindMapNode(title: "Compound 2", content: "Formula and properties"),
-                        MindMapNode(title: "Yield", content: "Expected amount")
+                        ScienceMindMapNode(title: "Compound 1", content: "Formula and properties"),
+                        ScienceMindMapNode(title: "Compound 2", content: "Formula and properties"),
+                        ScienceMindMapNode(title: "Yield", content: "Expected amount")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Conditions",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Temperature", content: "Heat or cold needed"),
-                        MindMapNode(title: "Pressure", content: "Pressure effects"),
-                        MindMapNode(title: "Catalyst", content: "Substances to speed it up")
+                        ScienceMindMapNode(title: "Temperature", content: "Heat or cold needed"),
+                        ScienceMindMapNode(title: "Pressure", content: "Pressure effects"),
+                        ScienceMindMapNode(title: "Catalyst", content: "Substances to speed it up")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Energy",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Type", content: "Endothermic or exothermic"),
-                        MindMapNode(title: "Amount", content: "Energy change"),
-                        MindMapNode(title: "Observations", content: "Temperature, color, gas")
+                        ScienceMindMapNode(title: "Type", content: "Endothermic or exothermic"),
+                        ScienceMindMapNode(title: "Amount", content: "Energy change"),
+                        ScienceMindMapNode(title: "Observations", content: "Temperature, color, gas")
                     ]
                 )
             ]
@@ -313,45 +313,45 @@ enum ScienceMindMapTemplate {
     private static func energyFlowTemplate(process: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .energyFlow,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: process,
                 content: "Energy Flow"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Initial Energy",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Source", content: "Where energy comes from"),
-                        MindMapNode(title: "Type", content: "Form of energy"),
-                        MindMapNode(title: "Amount", content: "Quantity of energy")
+                        ScienceMindMapNode(title: "Source", content: "Where energy comes from"),
+                        ScienceMindMapNode(title: "Type", content: "Form of energy"),
+                        ScienceMindMapNode(title: "Amount", content: "Quantity of energy")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Transformations",
                     color: "#9b59b6",
                     nodes: [
-                        MindMapNode(title: "Step 1", content: "First conversion"),
-                        MindMapNode(title: "Step 2", content: "Second conversion"),
-                        MindMapNode(title: "Efficiency", content: "Energy losses")
+                        ScienceMindMapNode(title: "Step 1", content: "First conversion"),
+                        ScienceMindMapNode(title: "Step 2", content: "Second conversion"),
+                        ScienceMindMapNode(title: "Efficiency", content: "Energy losses")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Final Energy",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Useful Output", content: "Desired energy form"),
-                        MindMapNode(title: "Waste", content: "Lost energy"),
-                        MindMapNode(title: "Applications", content: "What it's used for")
+                        ScienceMindMapNode(title: "Useful Output", content: "Desired energy form"),
+                        ScienceMindMapNode(title: "Waste", content: "Lost energy"),
+                        ScienceMindMapNode(title: "Applications", content: "What it's used for")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Conservation",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Total Energy", content: "Energy conserved"),
-                        MindMapNode(title: "Accounting", content: "Track all forms"),
-                        MindMapNode(title: "Verification", content: "Check conservation")
+                        ScienceMindMapNode(title: "Total Energy", content: "Energy conserved"),
+                        ScienceMindMapNode(title: "Accounting", content: "Track all forms"),
+                        ScienceMindMapNode(title: "Verification", content: "Check conservation")
                     ]
                 )
             ]
@@ -361,46 +361,46 @@ enum ScienceMindMapTemplate {
     private static func forceAnalysisTemplate(scenario: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .forceAnalysis,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: scenario,
                 content: "Force Analysis"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Identify Forces",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Gravity", content: "Weight force"),
-                        MindMapNode(title: "Normal Force", content: "Surface contact"),
-                        MindMapNode(title: "Friction", content: "Resistance to motion"),
-                        MindMapNode(title: "Applied Forces", content: "External forces")
+                        ScienceMindMapNode(title: "Gravity", content: "Weight force"),
+                        ScienceMindMapNode(title: "Normal Force", content: "Surface contact"),
+                        ScienceMindMapNode(title: "Friction", content: "Resistance to motion"),
+                        ScienceMindMapNode(title: "Applied Forces", content: "External forces")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Free Body Diagram",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Object", content: "Draw as point"),
-                        MindMapNode(title: "Force Arrows", content: "Show direction and magnitude"),
-                        MindMapNode(title: "Coordinate System", content: "Choose axes")
+                        ScienceMindMapNode(title: "Object", content: "Draw as point"),
+                        ScienceMindMapNode(title: "Force Arrows", content: "Show direction and magnitude"),
+                        ScienceMindMapNode(title: "Coordinate System", content: "Choose axes")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Calculate",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Net Force", content: "Sum all forces"),
-                        MindMapNode(title: "Components", content: "Break into x and y"),
-                        MindMapNode(title: "Acceleration", content: "Use F = ma")
+                        ScienceMindMapNode(title: "Net Force", content: "Sum all forces"),
+                        ScienceMindMapNode(title: "Components", content: "Break into x and y"),
+                        ScienceMindMapNode(title: "Acceleration", content: "Use F = ma")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Motion",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Equilibrium?", content: "Balanced or unbalanced"),
-                        MindMapNode(title: "Direction", content: "Which way it moves"),
-                        MindMapNode(title: "Speed Change", content: "Speeding up or slowing down")
+                        ScienceMindMapNode(title: "Equilibrium?", content: "Balanced or unbalanced"),
+                        ScienceMindMapNode(title: "Direction", content: "Which way it moves"),
+                        ScienceMindMapNode(title: "Speed Change", content: "Speeding up or slowing down")
                     ]
                 )
             ]
@@ -410,45 +410,45 @@ enum ScienceMindMapTemplate {
     private static func circuitAnalysisTemplate(circuit: String) -> ScienceMindMapTemplateData {
         ScienceMindMapTemplateData(
             type: .circuit,
-            centralNode: MindMapNode(
+            centralNode: ScienceMindMapNode(
                 title: circuit,
                 content: "Circuit Analysis"
             ),
             branches: [
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Components",
                     color: "#3498db",
                     nodes: [
-                        MindMapNode(title: "Power Source", content: "Battery or supply"),
-                        MindMapNode(title: "Resistors", content: "Values and arrangement"),
-                        MindMapNode(title: "Other Elements", content: "Capacitors, LEDs, etc.")
+                        ScienceMindMapNode(title: "Power Source", content: "Battery or supply"),
+                        ScienceMindMapNode(title: "Resistors", content: "Values and arrangement"),
+                        ScienceMindMapNode(title: "Other Elements", content: "Capacitors, LEDs, etc.")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Current",
                     color: "#f39c12",
                     nodes: [
-                        MindMapNode(title: "Path", content: "Direction of flow"),
-                        MindMapNode(title: "Series", content: "Same current everywhere"),
-                        MindMapNode(title: "Parallel", content: "Current divides")
+                        ScienceMindMapNode(title: "Path", content: "Direction of flow"),
+                        ScienceMindMapNode(title: "Series", content: "Same current everywhere"),
+                        ScienceMindMapNode(title: "Parallel", content: "Current divides")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Voltage",
                     color: "#e74c3c",
                     nodes: [
-                        MindMapNode(title: "Source", content: "Total voltage"),
-                        MindMapNode(title: "Drops", content: "Voltage across components"),
-                        MindMapNode(title: "Kirchhoff's Law", content: "Voltage sums to zero")
+                        ScienceMindMapNode(title: "Source", content: "Total voltage"),
+                        ScienceMindMapNode(title: "Drops", content: "Voltage across components"),
+                        ScienceMindMapNode(title: "Kirchhoff's Law", content: "Voltage sums to zero")
                     ]
                 ),
-                MindMapBranch(
+                ScienceMindMapBranch(
                     title: "Calculations",
                     color: "#27ae60",
                     nodes: [
-                        MindMapNode(title: "Ohm's Law", content: "V = IR"),
-                        MindMapNode(title: "Total Resistance", content: "Series or parallel"),
-                        MindMapNode(title: "Power", content: "P = VI")
+                        ScienceMindMapNode(title: "Ohm's Law", content: "V = IR"),
+                        ScienceMindMapNode(title: "Total Resistance", content: "Series or parallel"),
+                        ScienceMindMapNode(title: "Power", content: "P = VI")
                     ]
                 )
             ]
@@ -456,9 +456,22 @@ enum ScienceMindMapTemplate {
     }
 }
 
+/// Science mind map node (simplified structure for templates)
+struct ScienceMindMapNode {
+    let title: String
+    let content: String
+}
+
+/// Science mind map branch
+struct ScienceMindMapBranch {
+    let title: String
+    let color: String
+    let nodes: [ScienceMindMapNode]
+}
+
 /// Science mind map template data structure
 struct ScienceMindMapTemplateData {
     let type: ScienceMindMapTemplate.TemplateType
-    let centralNode: MindMapNode
-    let branches: [MindMapBranch]
+    let centralNode: ScienceMindMapNode
+    let branches: [ScienceMindMapBranch]
 }
