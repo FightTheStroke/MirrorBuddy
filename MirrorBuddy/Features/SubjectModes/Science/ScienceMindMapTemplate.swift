@@ -38,7 +38,7 @@ enum ScienceMindMapTemplate {
 
     // MARK: - Template Generation
 
-    static func generateTemplate(type: TemplateType, centralTopic: String) -> MindMapTemplate {
+    static func generateTemplate(type: TemplateType, centralTopic: String) -> ScienceMindMapTemplateData {
         switch type {
         case .physicsFormula:
             return physicsFormulaTemplate(formula: centralTopic)
@@ -61,8 +61,8 @@ enum ScienceMindMapTemplate {
 
     // MARK: - Template Definitions
 
-    private static func physicsFormulaTemplate(formula: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func physicsFormulaTemplate(formula: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .physicsFormula,
             centralNode: MindMapNode(
                 title: formula,
@@ -109,8 +109,8 @@ enum ScienceMindMapTemplate {
         )
     }
 
-    private static func experimentDesignTemplate(experiment: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func experimentDesignTemplate(experiment: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .experimentDesign,
             centralNode: MindMapNode(
                 title: experiment,
@@ -157,8 +157,8 @@ enum ScienceMindMapTemplate {
         )
     }
 
-    private static func scientificMethodTemplate(problem: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func scientificMethodTemplate(problem: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .scientificMethod,
             centralNode: MindMapNode(
                 title: problem,
@@ -214,8 +214,8 @@ enum ScienceMindMapTemplate {
         )
     }
 
-    private static func systemAnalysisTemplate(system: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func systemAnalysisTemplate(system: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .systemAnalysis,
             centralNode: MindMapNode(
                 title: system,
@@ -262,8 +262,8 @@ enum ScienceMindMapTemplate {
         )
     }
 
-    private static func chemicalReactionTemplate(reaction: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func chemicalReactionTemplate(reaction: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .chemicalReaction,
             centralNode: MindMapNode(
                 title: reaction,
@@ -310,8 +310,8 @@ enum ScienceMindMapTemplate {
         )
     }
 
-    private static func energyFlowTemplate(process: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func energyFlowTemplate(process: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .energyFlow,
             centralNode: MindMapNode(
                 title: process,
@@ -358,8 +358,8 @@ enum ScienceMindMapTemplate {
         )
     }
 
-    private static func forceAnalysisTemplate(scenario: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func forceAnalysisTemplate(scenario: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .forceAnalysis,
             centralNode: MindMapNode(
                 title: scenario,
@@ -407,8 +407,8 @@ enum ScienceMindMapTemplate {
         )
     }
 
-    private static func circuitAnalysisTemplate(circuit: String) -> MindMapTemplate {
-        MindMapTemplate(
+    private static func circuitAnalysisTemplate(circuit: String) -> ScienceMindMapTemplateData {
+        ScienceMindMapTemplateData(
             type: .circuit,
             centralNode: MindMapNode(
                 title: circuit,
@@ -454,4 +454,11 @@ enum ScienceMindMapTemplate {
             ]
         )
     }
+}
+
+/// Science mind map template data structure
+struct ScienceMindMapTemplateData {
+    let type: ScienceMindMapTemplate.TemplateType
+    let centralNode: MindMapNode
+    let branches: [MindMapBranch]
 }

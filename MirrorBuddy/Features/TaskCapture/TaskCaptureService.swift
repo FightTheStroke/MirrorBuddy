@@ -168,7 +168,7 @@ final class TaskCaptureService: NSObject, ObservableObject {
     private func scheduleReminder(for task: CapturedTask, at date: Date) {
         let content = UNMutableNotificationContent()
         content.title = task.title
-        content.body = task.subject ?? TaskCaptureStrings.UI.notes
+        content.body = task.subject ?? TaskCaptureStrings.UIConstants.notes
         content.sound = .default
 
         // Schedule for day before, at 18:00

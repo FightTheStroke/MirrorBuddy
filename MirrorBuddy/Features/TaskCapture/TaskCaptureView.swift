@@ -31,7 +31,7 @@ struct TaskCaptureView: View {
                 }
             }
             .padding()
-            .navigationTitle(TaskCaptureStrings.UI.addTask)
+            .navigationTitle(TaskCaptureStrings.UIConstants.addTask)
             .overlay {
                 if captureService.isConfirming {
                     confirmationOverlay
@@ -61,7 +61,7 @@ struct TaskCaptureView: View {
 
                     Text(captureService.isListening ?
                             "Sto ascoltando..." :
-                            TaskCaptureStrings.UI.voiceCapture)
+                            TaskCaptureStrings.UIConstants.voiceCapture)
                         .font(.headline)
                 }
                 .frame(maxWidth: .infinity)
@@ -89,7 +89,7 @@ struct TaskCaptureView: View {
         Button {
             showManualEntry = true
         } label: {
-            Label(TaskCaptureStrings.UI.manualEntry, systemImage: "square.and.pencil")
+            Label(TaskCaptureStrings.UIConstants.manualEntry, systemImage: "square.and.pencil")
                 .frame(maxWidth: .infinity)
                 .padding()
                 .background(Color(.secondarySystemBackground))
@@ -101,11 +101,11 @@ struct TaskCaptureView: View {
         NavigationView {
             Form {
                 Section {
-                    TextField(TaskCaptureStrings.UI.taskTitle, text: $manualTitle)
+                    TextField(TaskCaptureStrings.UIConstants.taskTitle, text: $manualTitle)
                 }
 
                 Section {
-                    Picker(TaskCaptureStrings.UI.subject, selection: $manualSubject) {
+                    Picker(TaskCaptureStrings.UIConstants.subject, selection: $manualSubject) {
                         Text("Nessuna").tag(nil as String?)
                         Text(TaskCaptureStrings.Subject.math).tag(TaskCaptureStrings.Subject.math as String?)
                         Text(TaskCaptureStrings.Subject.italian).tag(TaskCaptureStrings.Subject.italian as String?)
@@ -114,9 +114,9 @@ struct TaskCaptureView: View {
                         Text(TaskCaptureStrings.Subject.language).tag(TaskCaptureStrings.Subject.language as String?)
                     }
 
-                    DatePicker(TaskCaptureStrings.UI.dueDate, selection: $manualDueDate, displayedComponents: .date)
+                    DatePicker(TaskCaptureStrings.UIConstants.dueDate, selection: $manualDueDate, displayedComponents: .date)
 
-                    Picker(TaskCaptureStrings.UI.priority, selection: $manualPriority) {
+                    Picker(TaskCaptureStrings.UIConstants.priority, selection: $manualPriority) {
                         Text(TaskCaptureStrings.Priority.name(for: .low)).tag(NaturalLanguageTaskParser.ParsedTask.TaskPriority.low)
                         Text(TaskCaptureStrings.Priority.name(for: .medium)).tag(NaturalLanguageTaskParser.ParsedTask.TaskPriority.medium)
                         Text(TaskCaptureStrings.Priority.name(for: .high)).tag(NaturalLanguageTaskParser.ParsedTask.TaskPriority.high)
@@ -127,20 +127,20 @@ struct TaskCaptureView: View {
                     TextEditor(text: $manualNotes)
                         .frame(minHeight: 100)
                 } header: {
-                    Text(TaskCaptureStrings.UI.notes)
+                    Text(TaskCaptureStrings.UIConstants.notes)
                 }
             }
-            .navigationTitle(TaskCaptureStrings.UI.addTask)
+            .navigationTitle(TaskCaptureStrings.UIConstants.addTask)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button(TaskCaptureStrings.UI.cancel) {
+                    Button(TaskCaptureStrings.UIConstants.cancel) {
                         showManualEntry = false
                     }
                 }
 
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(TaskCaptureStrings.UI.save) {
+                    Button(TaskCaptureStrings.UIConstants.save) {
                         saveManualTask()
                     }
                     .disabled(manualTitle.isEmpty)
@@ -215,7 +215,7 @@ struct TaskCaptureView: View {
                         Button {
                             captureService.cancelTask()
                         } label: {
-                            Text(TaskCaptureStrings.UI.cancel)
+                            Text(TaskCaptureStrings.UIConstants.cancel)
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color(.secondarySystemBackground))
@@ -226,7 +226,7 @@ struct TaskCaptureView: View {
                         Button {
                             captureService.confirmAndSaveTask()
                         } label: {
-                            Text(TaskCaptureStrings.UI.confirm)
+                            Text(TaskCaptureStrings.UIConstants.confirm)
                                 .frame(maxWidth: .infinity)
                                 .padding()
                                 .background(Color.blue)
