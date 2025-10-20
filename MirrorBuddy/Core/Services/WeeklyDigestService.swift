@@ -324,7 +324,7 @@ struct SubjectPerformance: Codable {
     let difficultyScore: Double // 0.0 (easy) to 1.0 (very hard)
     let averageReviewCount: Double
 
-    var performanceLevel: PerformanceLevel {
+    var performanceLevel: WeeklyDigestService.PerformanceLevel {
         if difficultyScore < 0.3 {
             return .excelling
         } else if difficultyScore < 0.6 {
