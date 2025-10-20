@@ -149,7 +149,7 @@ final class LanguageModeService: ObservableObject {
             systemInstruction: "You are a language tutor helping students practice conversation. Be encouraging and provide helpful corrections."
         )
 
-        guard let data = response.data(using: .utf8),
+        guard let data = response.data(using: String.Encoding.utf8),
               let sessionData = try? JSONDecoder().decode(ConversationSessionData.self, from: data) else {
             throw LanguageModeError.invalidConversationData
         }
@@ -180,7 +180,7 @@ final class LanguageModeService: ObservableObject {
             systemInstruction: "Respond naturally as a conversation partner. Provide gentle corrections if needed."
         )
 
-        guard let data = response.data(using: .utf8),
+        guard let data = response.data(using: String.Encoding.utf8),
               let responseData = try? JSONDecoder().decode(ConversationResponse.self, from: data) else {
             throw LanguageModeError.invalidResponseData
         }
@@ -207,7 +207,7 @@ final class LanguageModeService: ObservableObject {
             systemInstruction: "Create engaging listening comprehension exercises appropriate for the student's level."
         )
 
-        guard let data = response.data(using: .utf8),
+        guard let data = response.data(using: String.Encoding.utf8),
               let exercise = try? JSONDecoder().decode(ListeningExercise.self, from: data) else {
             throw LanguageModeError.invalidExerciseData
         }
@@ -466,6 +466,17 @@ final class VocabularyBuilder {
         self.geminiClient = geminiClient
     }
 
+    func addWord(word: String, language: SupportedLanguage, context: String?) async throws -> VocabularyWord {
+        // Stub implementation
+        return VocabularyWord(
+            word: word,
+            translation: "", // Would use translation API in production
+            language: language,
+            example: context,
+            notes: nil
+        )
+    }
+
     func generateExercise(words: [VocabularyWord], type: VocabularyExerciseType) async throws -> VocabularyExercise {
         // Stub implementation
         return VocabularyExercise(
@@ -505,6 +516,18 @@ struct LanguagePrompts {
         Check the following \(language.rawValue) text for grammar errors:
         \(text)
         Provide detailed corrections and explanations in JSON format.
+        """
+    }
+
+    static func conversationResponsePrompt(userMessage: String, session: ConversationSession) -> String {
+        """
+        Respond to the user's message in the context of an ongoing conversation practice session.
+        User message: \(userMessage)
+        Language: \(session.language.rawValue)
+        Level: \(session.level.rawValue)
+        Topic: \(session.topic)
+        Provide a natural response with any gentle corrections if needed.
+        Format as JSON with keys: response, corrections, suggestions
         """
     }
 
