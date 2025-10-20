@@ -47,14 +47,14 @@ final class GoogleOAuthService: NSObject {
         let tokens = try await exchangeCodeForTokens(code: authCode)
 
         // Store tokens securely in Keychain
-        try await keychain.saveOAuthTokens(tokens, for: .google)
+        try keychain.saveOAuthTokens(tokens, for: .google)
 
         return tokens
     }
 
     /// Get current OAuth tokens
     func getTokens() async throws -> OAuthTokens? {
-        try await keychain.getOAuthTokens(for: .google)
+        try keychain.getOAuthTokens(for: .google)
     }
 
     /// Check if user is authenticated
@@ -78,7 +78,7 @@ final class GoogleOAuthService: NSObject {
         let newTokens = try await refreshAccessToken(refreshToken: refreshToken)
 
         // Store updated tokens
-        try await keychain.saveOAuthTokens(newTokens, for: .google)
+        try keychain.saveOAuthTokens(newTokens, for: .google)
 
         return newTokens
     }
@@ -94,7 +94,7 @@ final class GoogleOAuthService: NSObject {
         try await revokeToken(token: tokens.accessToken)
 
         // Delete tokens from Keychain
-        try await keychain.deleteOAuthTokens(for: .google)
+        try keychain.deleteOAuthTokens(for: .google)
     }
 
     // MARK: - Private Methods

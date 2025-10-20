@@ -1,8 +1,8 @@
 @preconcurrency import AVFoundation
+import Combine
 import os.log
 @preconcurrency import Photos
 import UIKit
-import Combine
 
 /// Capture mode enumeration
 enum CaptureMode: CustomStringConvertible {
@@ -365,16 +365,16 @@ final class CameraManager: NSObject {
     private func startRecordingTimer() {
         recordingTimer?.invalidate()
         recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            guard let self else { return }
+            _Concurrency.Task { @MainActor [weak self] in
+                guard let self else { return }
 
-            self.currentRecordingDuration += 0.1
+                self.currentRecordingDuration += 0.1
 
-            // Update duration callback
-            self.onRecordingDurationUpdate?(self.currentRecordingDuration)
+                self.onRecordingDurationUpdate?(self.currentRecordingDuration)
 
-            // Check if max duration reached
-            if self.currentRecordingDuration >= self.maxVideoDuration {
-                self.stopVideoRecording()
+                if self.currentRecordingDuration >= self.maxVideoDuration {
+                    self.stopVideoRecording()
+                }
             }
         }
     }

@@ -72,7 +72,7 @@ actor CircuitBreaker {
     /// Execute an operation through the circuit breaker
     func execute<T: Sendable>(_ operation: @escaping @Sendable () async throws -> T) async throws -> T {
         // Check current state and transition if needed
-        await updateState()
+        updateState()
 
         switch state {
         case .open:
@@ -84,10 +84,10 @@ actor CircuitBreaker {
         case .closed, .halfOpen:
             do {
                 let result = try await operation()
-                await recordSuccess()
+                recordSuccess()
                 return result
             } catch {
-                await recordFailure()
+                recordFailure()
                 throw error
             }
         }

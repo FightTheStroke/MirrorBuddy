@@ -362,8 +362,10 @@ enum ClientEvent: Codable {
 }
 
 struct ConversationItemCreate: Codable {
+    private static let expectedType = "conversation.item.create"
+
     let eventID: String
-    let type: String = "conversation.item.create"
+    let type: String
     let item: ConversationItem
 
     enum CodingKeys: String, CodingKey {
@@ -371,21 +373,82 @@ struct ConversationItemCreate: Codable {
         case type
         case item
     }
+
+    init(eventID: String, item: ConversationItem) {
+        self.eventID = eventID
+        self.type = Self.expectedType
+        self.item = item
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        eventID = try container.decode(String.self, forKey: .eventID)
+        item = try container.decode(ConversationItem.self, forKey: .item)
+        let decodedType = try container.decode(String.self, forKey: .type)
+
+        guard decodedType == Self.expectedType else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Expected type \(Self.expectedType) but found \(decodedType)"
+            )
+        }
+
+        type = decodedType
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventID, forKey: .eventID)
+        try container.encode(type, forKey: .type)
+        try container.encode(item, forKey: .item)
+    }
 }
 
 struct ResponseCreate: Codable {
+    private static let expectedType = "response.create"
+
     let eventID: String
-    let type: String = "response.create"
+    let type: String
 
     enum CodingKeys: String, CodingKey {
         case eventID = "event_id"
         case type
     }
+
+    init(eventID: String) {
+        self.eventID = eventID
+        self.type = Self.expectedType
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        eventID = try container.decode(String.self, forKey: .eventID)
+        let decodedType = try container.decode(String.self, forKey: .type)
+
+        guard decodedType == Self.expectedType else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Expected type \(Self.expectedType) but found \(decodedType)"
+            )
+        }
+
+        type = decodedType
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventID, forKey: .eventID)
+        try container.encode(type, forKey: .type)
+    }
 }
 
 struct InputAudioBufferAppend: Codable {
+    private static let expectedType = "input_audio_buffer.append"
+
     let eventID: String
-    let type: String = "input_audio_buffer.append"
+    let type: String
     let audio: String  // base64-encoded PCM16 audio
 
     enum CodingKeys: String, CodingKey {
@@ -393,15 +456,74 @@ struct InputAudioBufferAppend: Codable {
         case type
         case audio
     }
+
+    init(eventID: String, audio: String) {
+        self.eventID = eventID
+        self.type = Self.expectedType
+        self.audio = audio
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        eventID = try container.decode(String.self, forKey: .eventID)
+        audio = try container.decode(String.self, forKey: .audio)
+        let decodedType = try container.decode(String.self, forKey: .type)
+
+        guard decodedType == Self.expectedType else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Expected type \(Self.expectedType) but found \(decodedType)"
+            )
+        }
+
+        type = decodedType
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventID, forKey: .eventID)
+        try container.encode(type, forKey: .type)
+        try container.encode(audio, forKey: .audio)
+    }
 }
 
 struct InputAudioBufferCommit: Codable {
+    private static let expectedType = "input_audio_buffer.commit"
+
     let eventID: String
-    let type: String = "input_audio_buffer.commit"
+    let type: String
 
     enum CodingKeys: String, CodingKey {
         case eventID = "event_id"
         case type
+    }
+
+    init(eventID: String) {
+        self.eventID = eventID
+        self.type = Self.expectedType
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        eventID = try container.decode(String.self, forKey: .eventID)
+        let decodedType = try container.decode(String.self, forKey: .type)
+
+        guard decodedType == Self.expectedType else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Expected type \(Self.expectedType) but found \(decodedType)"
+            )
+        }
+
+        type = decodedType
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventID, forKey: .eventID)
+        try container.encode(type, forKey: .type)
     }
 }
 

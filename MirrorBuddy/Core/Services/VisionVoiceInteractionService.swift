@@ -96,7 +96,7 @@ final class VisionVoiceInteractionService: NSObject {
             throw VisionVoiceError.noClientAvailable
         }
 
-        guard let session = currentSession else {
+        guard currentSession != nil else {
             throw VisionVoiceError.noActiveSession
         }
 
@@ -294,9 +294,11 @@ final class VisionVoiceInteractionService: NSObject {
 
     /// Summarize conversation
     private func summarizeConversation() -> String {
-        conversationHistory.map { turn in
-            "Q: \(turn.userInput)\nA: \(turn.aiResponse)"
-        }.joined(separator: "\n\n")
+        conversationHistory
+            .map { turn in
+                "Q: \(turn.userInput)\nA: \(turn.aiResponse)"
+            }
+            .joined(separator: "\n\n")
     }
 
     // MARK: - History (Subtask 37.3)

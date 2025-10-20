@@ -256,33 +256,26 @@ final class AudioPipelineManager: NSObject {
         let audioBuffer = try convertDataToAudioBuffer(audioData, format: recordingFormat)
 
         // Schedule buffer for playback on dedicated queue
-        playbackQueue.async { [weak self] in
-            guard let self else { return }
+        playbackQueue.async { [audioBuffer, weak self] in
+            _Concurrency.Task { @MainActor [weak self] in
+                guard let self else { return }
 
-            // Increment scheduled buffers count
-            _Concurrency.Task { @MainActor in
                 self.scheduledBuffersCount += 1
-            }
 
-            // Schedule buffer with completion handler
-            self.playerNode.scheduleBuffer(audioBuffer) {
-                // Decrement scheduled buffers count on completion
-                _Concurrency.Task { @MainActor in
-                    self.scheduledBuffersCount -= 1
-                    self.stats.audioDataPlayed += 1
+                self.playerNode.scheduleBuffer(audioBuffer) {
+                    _Concurrency.Task { @MainActor [weak self] in
+                        guard let self else { return }
+                        self.scheduledBuffersCount -= 1
+                        self.stats.audioDataPlayed += 1
 
-                    // Stop player if no more buffers and pipeline inactive
-                    if self.scheduledBuffersCount == 0 && !self.isActive {
-                        self.stopPlayback()
+                        if self.scheduledBuffersCount == 0 && !self.isActive {
+                            self.stopPlayback()
+                        }
                     }
                 }
-            }
 
-            // Start player if not already playing
-            if !self.playerNode.isPlaying {
-                self.playerNode.play()
-
-                _Concurrency.Task { @MainActor in
+                if !self.playerNode.isPlaying {
+                    self.playerNode.play()
                     self.isPlaying = true
                     self.logger.info("Audio playback started")
                 }
@@ -293,12 +286,11 @@ final class AudioPipelineManager: NSObject {
     /// Stop audio playback
     func stopPlayback() {
         playbackQueue.async { [weak self] in
-            guard let self else { return }
+            _Concurrency.Task { @MainActor [weak self] in
+                guard let self else { return }
 
-            if self.playerNode.isPlaying {
-                self.playerNode.stop()
-
-                _Concurrency.Task { @MainActor in
+                if self.playerNode.isPlaying {
+                    self.playerNode.stop()
                     self.isPlaying = false
                     self.scheduledBuffersCount = 0
                     self.logger.info("Audio playback stopped")
@@ -310,12 +302,11 @@ final class AudioPipelineManager: NSObject {
     /// Pause audio playback
     func pausePlayback() {
         playbackQueue.async { [weak self] in
-            guard let self else { return }
+            _Concurrency.Task { @MainActor [weak self] in
+                guard let self else { return }
 
-            if self.playerNode.isPlaying {
-                self.playerNode.pause()
-
-                _Concurrency.Task { @MainActor in
+                if self.playerNode.isPlaying {
+                    self.playerNode.pause()
                     self.isPlaying = false
                     self.logger.info("Audio playback paused")
                 }
@@ -326,12 +317,11 @@ final class AudioPipelineManager: NSObject {
     /// Resume audio playback
     func resumePlayback() {
         playbackQueue.async { [weak self] in
-            guard let self else { return }
+            _Concurrency.Task { @MainActor [weak self] in
+                guard let self else { return }
 
-            if !self.playerNode.isPlaying && self.scheduledBuffersCount > 0 {
-                self.playerNode.play()
-
-                _Concurrency.Task { @MainActor in
+                if !self.playerNode.isPlaying && self.scheduledBuffersCount > 0 {
+                    self.playerNode.play()
                     self.isPlaying = true
                     self.logger.info("Audio playback resumed")
                 }
@@ -342,13 +332,11 @@ final class AudioPipelineManager: NSObject {
     /// Clear all scheduled audio buffers
     func clearPlaybackQueue() {
         playbackQueue.async { [weak self] in
-            guard let self else { return }
+            _Concurrency.Task { @MainActor [weak self] in
+                guard let self else { return }
 
-            self.playerNode.stop()
-            // Reset the player node to clear buffers
-            self.playerNode.reset()
-
-            _Concurrency.Task { @MainActor in
+                self.playerNode.stop()
+                self.playerNode.reset()
                 self.isPlaying = false
                 self.scheduledBuffersCount = 0
                 self.logger.info("Audio playback queue cleared")

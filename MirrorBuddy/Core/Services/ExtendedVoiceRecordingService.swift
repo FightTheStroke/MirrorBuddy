@@ -330,7 +330,11 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
                 trigger: nil
             )
 
-            try? await UNUserNotificationCenter.current().add(request)
+            do {
+                try await UNUserNotificationCenter.current().add(request)
+            } catch {
+                self.logger.error("Failed to schedule low battery notification: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -348,7 +352,11 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
 
                     // Check max duration
                     if self.recordingDuration >= self.maxRecordingDuration {
-                        try? await self.stopRecording()
+                        do {
+                            try await self.stopRecording()
+                        } catch {
+                            self.logger.error("Failed to stop recording after reaching max duration: \(error.localizedDescription)")
+                        }
                         self.logger.warning("Maximum recording duration reached (6 hours)")
                     }
                 }
@@ -361,7 +369,7 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
             repeats: true
         ) { [weak self] _ in
             _Concurrency.Task { @MainActor [weak self] in
-                await self?.autoSaveRecording()
+                self?.autoSaveRecording()
             }
         }
     }
@@ -514,7 +522,9 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
             object: nil,
             queue: .main
         ) { [weak self] _ in
-            self?.handleMemoryWarning()
+            _Concurrency.Task { @MainActor [weak self] in
+                self?.handleMemoryWarning()
+            }
         }
     }
 
@@ -553,7 +563,11 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
                 trigger: nil
             )
 
-            try? await UNUserNotificationCenter.current().add(request)
+            do {
+                try await UNUserNotificationCenter.current().add(request)
+            } catch {
+                self.logger.error("Failed to schedule recording completion notification: \(error.localizedDescription)")
+            }
         }
     }
 
