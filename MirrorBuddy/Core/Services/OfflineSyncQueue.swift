@@ -116,6 +116,7 @@ actor OfflineSyncQueue {
         }
     }
 
+    @MainActor
     private func processMaterialImport(_ action: PendingAction) async throws {
         // Decode material import data
         let importData: MaterialImportData
@@ -131,6 +132,7 @@ actor OfflineSyncQueue {
         // For now, we'll log the action
     }
 
+    @MainActor
     private func processFlashcardSync(_ action: PendingAction) async throws {
         // Decode flashcard sync data
         let syncData: FlashcardSyncData
@@ -144,6 +146,7 @@ actor OfflineSyncQueue {
         // Implementation would sync flashcard review data to cloud
     }
 
+    @MainActor
     private func processProgressSync(_ action: PendingAction) async throws {
         // Decode progress sync data
         let progressData: ProgressSyncData
@@ -157,6 +160,7 @@ actor OfflineSyncQueue {
         // Implementation would sync user progress to cloud/backend
     }
 
+    @MainActor
     private func processStudySessionSync(_ action: PendingAction) async throws {
         // Decode study session data
         let sessionData: StudySessionSyncData
