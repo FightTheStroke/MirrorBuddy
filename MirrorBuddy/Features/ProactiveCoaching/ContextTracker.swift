@@ -66,12 +66,12 @@ final class ContextTracker: ObservableObject {
 
     // MARK: - Context Metrics
 
-    private(set) var studyDuration: TimeInterval {
+    var studyDuration: TimeInterval {
         guard let start = sessionStartTime else { return 0 }
         return Date().timeIntervalSince(start)
     }
 
-    private(set) var idleDuration: TimeInterval {
+    var idleDuration: TimeInterval {
         Date().timeIntervalSince(lastInteractionTime)
     }
 

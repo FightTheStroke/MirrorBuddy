@@ -113,7 +113,7 @@ struct ProactiveCoachingDashboard: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle(ProactiveCoachingStrings.UI.dashboardTitle)
+            .navigationTitle(ProactiveCoachingStrings.UIConstants.dashboardTitle)
             .overlay(alignment: .bottom) {
                 ProactiveCoachingView(coachingService: coachingService)
             }
@@ -128,13 +128,13 @@ struct ProactiveCoachingDashboard: View {
                     .font(.title)
 
                 VStack(alignment: .leading) {
-                    Text(ProactiveCoachingStrings.UI.coachingStatus)
+                    Text(ProactiveCoachingStrings.UIConstants.coachingStatus)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
 
                     Text(isCoachingActive ?
-                            ProactiveCoachingStrings.UI.active :
-                            ProactiveCoachingStrings.UI.paused)
+                            ProactiveCoachingStrings.UIConstants.active :
+                            ProactiveCoachingStrings.UIConstants.paused)
                         .font(.headline)
                 }
 
@@ -158,8 +158,8 @@ struct ProactiveCoachingDashboard: View {
             } label: {
                 Label(
                     isCoachingActive ?
-                        ProactiveCoachingStrings.UI.deactivateCoaching :
-                        ProactiveCoachingStrings.UI.activateCoaching,
+                        ProactiveCoachingStrings.UIConstants.deactivateCoaching :
+                        ProactiveCoachingStrings.UIConstants.activateCoaching,
                     systemImage: isCoachingActive ? "stop.fill" : "play.fill"
                 )
                 .frame(maxWidth: .infinity)
@@ -173,7 +173,7 @@ struct ProactiveCoachingDashboard: View {
                 coachingService.suggestNextStep()
             } label: {
                 Label(
-                    ProactiveCoachingStrings.UI.suggestNextStep,
+                    ProactiveCoachingStrings.UIConstants.suggestNextStep,
                     systemImage: "arrow.right.circle"
                 )
                 .frame(maxWidth: .infinity)
@@ -188,7 +188,7 @@ struct ProactiveCoachingDashboard: View {
 
     private var historySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(ProactiveCoachingStrings.UI.promptHistory)
+            Text(ProactiveCoachingStrings.UIConstants.promptHistory)
                 .font(.headline)
 
             ScrollView {
