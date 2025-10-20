@@ -46,7 +46,7 @@ final class BackgroundTaskScheduler {
                 return
             }
             _Concurrency.Task { @MainActor in
-                await self.handleSyncTask(task: processingTask)
+                await self.handleSyncTask(processingTask)
             }
         }
 

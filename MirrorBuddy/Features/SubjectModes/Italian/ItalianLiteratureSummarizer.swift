@@ -228,7 +228,7 @@ enum SummaryDepth: String {
     case medium
     case detailed
 
-    var description: String {
+    nonisolated var description: String {
         switch self {
         case .brief: return "concise 2-3 paragraph"
         case .medium: return "moderate 5-7 paragraph"

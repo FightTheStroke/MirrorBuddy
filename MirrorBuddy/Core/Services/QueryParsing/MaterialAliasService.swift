@@ -133,7 +133,8 @@ class MaterialAliasService {
             let normalized = MaterialAlias.normalizeAlias(newAlias)
 
             // Check for duplicates (excluding current alias)
-            if normalized != existingAlias.alias && try aliasExists(normalized) {
+            let exists = try aliasExists(normalized)
+            if normalized != existingAlias.alias && exists {
                 throw AliasError.duplicateAlias(normalized)
             }
 
@@ -360,7 +361,7 @@ class MaterialAliasService {
     /// Check if an alias already exists
     private func aliasExists(_ alias: String) throws -> Bool {
         let predicate = #Predicate<MaterialAlias> { $0.alias == alias }
-        let descriptor = FetchDescriptor(predicate: predicate)
+        var descriptor = FetchDescriptor(predicate: predicate)
         descriptor.fetchLimit = 1
 
         return (try? modelContext.fetchCount(descriptor)) ?? 0 > 0

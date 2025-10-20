@@ -137,7 +137,7 @@ final class LessonRecordingService: ObservableObject {
         stopRecordingTimer()
 
         // Stop recording and get final URL
-        guard let recordingURL = await extendedRecorder.stopRecording() else {
+        guard let recordingURL = try await extendedRecorder.stopRecording() else {
             throw LessonRecordingError.recordingFailed
         }
 
@@ -166,7 +166,7 @@ final class LessonRecordingService: ObservableObject {
         logger.info("Stopped recording, starting transcription pipeline")
 
         // Start background transcription process
-        Task {
+        _Concurrency.Task {
             await processRecording(recording)
         }
 
@@ -382,7 +382,7 @@ final class LessonRecordingService: ObservableObject {
     private func startRecordingTimer() {
         recordingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             guard let self = self else { return }
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self.recordingDuration += 1
                 self.currentRecording?.recordingDuration = self.recordingDuration
             }

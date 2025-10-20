@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import os.log
 
@@ -142,7 +143,7 @@ final class AdaptivePacingEngine: ObservableObject {
 
     init(
         sentimentAnalyzer: SentimentAnalyzer = SentimentAnalyzer(),
-        coachPersona: CoachPersona = .shared
+        coachPersona: CoachPersona = CoachPersona()
     ) {
         self.sentimentAnalyzer = sentimentAnalyzer
         self.coachPersona = coachPersona
@@ -238,8 +239,8 @@ final class AdaptivePacingEngine: ObservableObject {
             adaptationHistory.append(adaptation)
 
             logger.info("""
-                Pacing adapted: \(previousPace.rawValue) → \(currentPace.rawValue), \
-                Complexity: \(previousComplexity.rawValue) → \(currentComplexity.rawValue). \
+                Pacing adapted: \(previousPace.rawValue) → \(self.currentPace.rawValue), \
+                Complexity: \(previousComplexity.rawValue) → \(self.currentComplexity.rawValue). \
                 Reason: \(adaptation.reason)
                 """)
         }
@@ -294,7 +295,8 @@ final class AdaptivePacingEngine: ObservableObject {
     func generateCompletePromptModifier(
         currentSentiment: SentimentAnalyzer.Sentiment
     ) -> String {
-        let personaModifier = coachPersona.generateResponseStyle(for: currentSentiment)
+        // TODO: Implement generateResponseStyle method on CoachPersona
+        let personaModifier = "Be \(coachPersona.personaType.displayName.lowercased()) in your responses."
         let pacingInstructions = generatePacingInstructions()
 
         return """
@@ -334,7 +336,7 @@ final class AdaptivePacingEngine: ObservableObject {
         let previous = currentPace
         currentPace = currentPace.adjusted(by: 1)
         if previous != currentPace {
-            logger.info("Pace manually increased to: \(currentPace.rawValue)")
+            logger.info("Pace manually increased to: \(self.currentPace.rawValue)")
         }
     }
 
@@ -342,7 +344,7 @@ final class AdaptivePacingEngine: ObservableObject {
         let previous = currentPace
         currentPace = currentPace.adjusted(by: -1)
         if previous != currentPace {
-            logger.info("Pace manually decreased to: \(currentPace.rawValue)")
+            logger.info("Pace manually decreased to: \(self.currentPace.rawValue)")
         }
     }
 
@@ -350,7 +352,7 @@ final class AdaptivePacingEngine: ObservableObject {
         let previous = currentComplexity
         currentComplexity = currentComplexity.adjusted(by: 1)
         if previous != currentComplexity {
-            logger.info("Complexity manually increased to: \(currentComplexity.rawValue)")
+            logger.info("Complexity manually increased to: \(self.currentComplexity.rawValue)")
         }
     }
 
@@ -358,7 +360,7 @@ final class AdaptivePacingEngine: ObservableObject {
         let previous = currentComplexity
         currentComplexity = currentComplexity.adjusted(by: -1)
         if previous != currentComplexity {
-            logger.info("Complexity manually decreased to: \(currentComplexity.rawValue)")
+            logger.info("Complexity manually decreased to: \(self.currentComplexity.rawValue)")
         }
     }
 

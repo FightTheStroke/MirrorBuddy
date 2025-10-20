@@ -214,7 +214,7 @@ final class KnowledgeExportService: ObservableObject {
         dateFormatter.dateStyle = .medium
         markdown += "*Summary generated: \(dateFormatter.string(from: Date()))*\n\n"
 
-        if let subject = material.subject?.name {
+        if let subject = material.subject?.localizationKey {
             markdown += "**Subject:** \(subject)\n\n"
         }
 
@@ -316,7 +316,7 @@ final class KnowledgeExportService: ObservableObject {
                 ]
             ],
             "Type": ["select": ["name": "Summary"]],
-            "Subject": ["select": ["name": material.subject?.name ?? "General"]]
+            "Subject": ["select": ["name": material.subject?.localizationKey ?? "General"]]
         ]
 
         // Content blocks
@@ -373,5 +373,24 @@ final class KnowledgeExportService: ObservableObject {
         }
 
         return pageID
+    }
+}
+
+// MARK: - Export Errors
+
+enum ExportError: LocalizedError {
+    case invalidConfiguration(String)
+    case exportFailed(String)
+    case unsupportedFormat(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .invalidConfiguration(let message):
+            return "Export configuration error: \(message)"
+        case .exportFailed(let message):
+            return "Export failed: \(message)"
+        case .unsupportedFormat(let message):
+            return "Unsupported export format: \(message)"
+        }
     }
 }

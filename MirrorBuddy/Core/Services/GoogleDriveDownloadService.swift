@@ -207,7 +207,7 @@ final class GoogleDriveDownloadService: ObservableObject {
     private func downloadFileData(fileId: String, workspace: GoogleWorkspaceClient, metadata: DriveFileMetadata) async throws -> Data {
         // Use Google Drive API's download endpoint
         guard let downloadURL = URL(string: "https://www.googleapis.com/drive/v3/files/\(fileId)?alt=media") else {
-            throw GoogleAPIError.invalidURL("Invalid download URL for file: \(fileId)")
+            throw GoogleAPIError.configurationError("Invalid download URL for file: \(fileId)")
         }
 
         // Get access token from stored OAuthToken

@@ -27,7 +27,7 @@ enum QuestDifficulty: String, Codable {
     case hard
     case legendary
 
-    var xpMultiplier: Double {
+    nonisolated var xpMultiplier: Double {
         switch self {
         case .easy: return 1.0
         case .medium: return 1.5
@@ -140,7 +140,7 @@ final class QuestBadge {
 
     init(name: String, description: String, iconName: String, color: String, questID: UUID? = nil) {
         self.name = name
-        self.description = description
+        self.questDescription = description
         self.iconName = iconName
         self.color = color
         self.unlockedAt = Date()
