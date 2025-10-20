@@ -50,7 +50,7 @@ struct LessonRecordingView: View {
                 titleVisibility: .visible
             ) {
                 Button("Stop and Transcribe", role: .destructive) {
-                    Task {
+                    _Concurrency.Task {
                         await stopRecording()
                     }
                 }
@@ -117,11 +117,11 @@ struct LessonRecordingView: View {
             HStack(spacing: 20) {
                 // Pause/Resume button
                 Button {
-                    Task {
+                    _Concurrency.Task {
                         await togglePause()
                     }
                 } label: {
-                    Image(systemName: recordingService.extendedRecorder.isPaused ? "play.fill" : "pause.fill")
+                    Image(systemName: recordingService.isPaused ? "play.fill" : "pause.fill")
                         .font(.title2)
                         .frame(width: 64, height: 64)
                         .background(Color.blue)
@@ -364,7 +364,7 @@ struct LessonRecordingView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Start") {
                         showingTitleInput = false
-                        Task {
+                        _Concurrency.Task {
                             await startRecording()
                         }
                     }
@@ -444,7 +444,7 @@ struct LessonRecordingView: View {
 
     private func togglePause() async {
         do {
-            if recordingService.extendedRecorder.isPaused {
+            if recordingService.isPaused {
                 try await recordingService.resumeRecording()
             } else {
                 try await recordingService.pauseRecording()

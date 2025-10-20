@@ -124,7 +124,7 @@ struct FlashcardReviewView: View {
     }
 
     private func reviewFlashcard(_ flashcard: Flashcard, quality: ReviewQuality) {
-        Task {
+        _Concurrency.Task {
             let service = SpacedRepetitionService.shared
             let result = await service.calculateNextReview(
                 for: flashcard,

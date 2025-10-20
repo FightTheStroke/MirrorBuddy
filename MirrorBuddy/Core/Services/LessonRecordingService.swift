@@ -27,6 +27,10 @@ final class LessonRecordingService: ObservableObject {
     @Published var storageAvailable: Int64 = 0
     @Published var estimatedStorageNeeded: Int64 = 0
 
+    var isPaused: Bool {
+        extendedRecorder.isPaused
+    }
+
     // MARK: - Dependencies
 
     private let extendedRecorder = ExtendedVoiceRecordingService.shared

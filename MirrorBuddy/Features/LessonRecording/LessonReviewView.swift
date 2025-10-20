@@ -68,7 +68,7 @@ struct LessonReviewView: View {
         .sheet(isPresented: $showingMindMap) {
             if let mindMap = recording.mindMap {
                 NavigationStack {
-                    MindMapView(mindMap: mindMap)
+                    InteractiveMindMapView(mindMap: mindMap)
                         .navigationTitle("Lesson Mind Map")
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
@@ -121,15 +121,13 @@ struct LessonReviewView: View {
                 statusBadge
             }
 
-            if let date = recording.recordingDate {
-                HStack {
-                    Image(systemName: "calendar")
-                        .foregroundColor(.secondary)
-                    Text(date, style: .date)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                    Spacer()
-                }
+            HStack {
+                Image(systemName: "calendar")
+                    .foregroundColor(.secondary)
+                Text(recording.recordingDate, style: .date)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                Spacer()
             }
         }
         .padding()

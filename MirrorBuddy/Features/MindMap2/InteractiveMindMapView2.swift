@@ -240,7 +240,7 @@ final class MindMapNarrator {
 }
 
 final class MindMapStorage {
-    func save(_ mindMap: MindMap) {}
-    func exportToPDF(_ mindMap: MindMap) {}
-    func exportToMarkdown(_ mindMap: MindMap) {}
+    func save(_ mindMap: MindMapModel) {}
+    func exportToPDF(_ mindMap: MindMapModel) {}
+    func exportToMarkdown(_ mindMap: MindMapModel) {}
 }
