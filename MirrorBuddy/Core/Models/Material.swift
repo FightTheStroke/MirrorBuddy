@@ -11,7 +11,7 @@ enum ProcessingStatus: String, Codable {
 
 /// Learning material (PDF, text, or imported from Google Drive)
 @Model
-final class Material {
+final class Material: @unchecked Sendable {
     var id = UUID()
     var title: String = ""
     var createdAt = Date()

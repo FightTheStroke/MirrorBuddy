@@ -3,7 +3,7 @@ import SwiftData
 
 /// Flashcard for spaced repetition learning using SuperMemo SM-2 algorithm
 @Model
-final class Flashcard {
+final class Flashcard: @unchecked Sendable {
     var id = UUID()
     var materialID = UUID()
 
