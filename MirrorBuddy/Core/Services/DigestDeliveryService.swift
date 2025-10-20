@@ -423,7 +423,7 @@ struct DigestSettings: Codable {
 
     // Audio preferences
     var includeAudio: Bool = false
-    var voiceSettings: VoiceSettings = VoiceSettings.default
+    var voiceSettings: DigestVoiceSettings = DigestVoiceSettings.default
 
     // Privacy settings
     var applyPrivacyFilters: Bool = true

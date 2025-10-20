@@ -54,7 +54,7 @@ final class DigestGenerationService {
     /// - Returns: Audio data (optional, as it may be disabled)
     func generateAudio(
         from content: DigestContent,
-        voiceSettings: VoiceSettings = .default
+        voiceSettings: DigestVoiceSettings = .default
     ) async throws -> Data? {
         logger.info("Generating audio digest")
 
@@ -419,11 +419,11 @@ enum SectionTone: String, Codable {
 }
 
 /// Voice settings for audio generation
-struct VoiceSettings {
+struct DigestVoiceSettings {
     let voiceIdentifier: String
     let rate: Float
 
-    static let `default` = VoiceSettings(
+    static let `default` = DigestVoiceSettings(
         voiceIdentifier: "com.apple.ttsbundle.Samantha-compact",
         rate: 0.5
     )

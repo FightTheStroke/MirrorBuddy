@@ -248,6 +248,26 @@ final class TextToSpeechService: NSObject, ObservableObject {
 
     // MARK: - Voice Management
 
+    /// Synthesize speech to audio data (for digest generation)
+    /// - Parameters:
+    ///   - text: Text to synthesize
+    ///   - voice: Voice identifier
+    ///   - rate: Speech rate
+    /// - Returns: Audio data
+    func synthesizeSpeech(
+        text: String,
+        voice: String,
+        rate: Float
+    ) async throws -> Data {
+        logger.info("Synthesizing speech to audio data")
+
+        // Note: AVSpeechSynthesizer doesn't directly produce audio files
+        // This is a stub that would need AVAudioEngine integration for actual file output
+        // For now, return empty data as placeholder
+        logger.warning("synthesizeSpeech is a stub - requires AVAudioEngine integration for actual audio file generation")
+        return Data()
+    }
+
     /// Get all available voices
     static func getAvailableVoices() -> [AVSpeechSynthesisVoice] {
         AVSpeechSynthesisVoice.speechVoices()
