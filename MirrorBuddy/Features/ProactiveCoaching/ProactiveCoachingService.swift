@@ -244,7 +244,7 @@ final class ProactiveCoachingService: ObservableObject {
     func handleAction(_ action: PromptAction.ActionType) {
         switch action {
         case .takeBreak:
-            contextTracker.updateActivity(.break)
+            contextTracker.updateActivity(.takingBreak)
             dismissCurrentPrompt()
 
         case .continueStudying:

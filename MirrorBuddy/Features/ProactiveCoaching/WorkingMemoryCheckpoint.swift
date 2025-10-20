@@ -50,7 +50,7 @@ final class WorkingMemoryCheckpoint: ObservableObject {
     private func triggerCheckpointIfNeeded() {
         // Only trigger checkpoints during active study
         guard contextTracker.currentActivity != .idle,
-              contextTracker.currentActivity != .break else { return }
+              contextTracker.currentActivity != .takingBreak else { return }
 
         // Skip if already in a checkpoint
         guard !isCheckpointActive else { return }

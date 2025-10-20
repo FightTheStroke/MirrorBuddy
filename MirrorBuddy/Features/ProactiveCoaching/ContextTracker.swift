@@ -147,7 +147,7 @@ final class ContextTracker: ObservableObject {
     func shouldOfferBreak() -> Bool {
         // Suggest break after 25-30 minutes of continuous study
         guard studyDuration >= 25 * 60 else { return false }
-        return currentActivity != .break
+        return currentActivity != .takingBreak
     }
 
     func shouldOfferEncouragement() -> Bool {
@@ -161,7 +161,7 @@ final class ContextTracker: ObservableObject {
     func needsWorkingMemoryCheckpoint() -> Bool {
         // Checkpoint every 10 minutes during active study
         guard currentActivity != .idle,
-              currentActivity != .break else { return false }
+              currentActivity != .takingBreak else { return false }
 
         let studyMinutes = Int(studyDuration / 60)
         return studyMinutes > 0 && studyMinutes.isMultiple(of: 10)
