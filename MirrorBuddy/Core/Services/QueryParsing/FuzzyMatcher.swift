@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 
 /// Result of a fuzzy match operation
 struct FuzzyMatchResult: Comparable {

@@ -8,6 +8,7 @@
 
 import Foundation
 import os.log
+import Combine
 
 /// Query parsing event types
 enum QueryEvent {

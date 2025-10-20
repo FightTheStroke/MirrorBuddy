@@ -173,7 +173,7 @@ final class CuriosityRecommenderService {
         let mathContent = [
             CuriosityContent(
                 title: "Fractals in Nature",
-                description: "Explore the mathematical patterns found in snowflakes, trees, and coastlines",
+                contentDescription: "Explore the mathematical patterns found in snowflakes, trees, and coastlines",
                 contentType: .video,
                 subject: Subject.matematica.rawValue,
                 topics: ["geometry", "patterns", "nature"],
@@ -182,7 +182,7 @@ final class CuriosityRecommenderService {
             ),
             CuriosityContent(
                 title: "Build a Fibonacci Spiral",
-                description: "Create your own golden spiral using paper and compass",
+                contentDescription: "Create your own golden spiral using paper and compass",
                 contentType: .experiment,
                 subject: Subject.matematica.rawValue,
                 topics: ["fibonacci", "geometry", "art"],
@@ -194,7 +194,7 @@ final class CuriosityRecommenderService {
         let scienceContent = [
             CuriosityContent(
                 title: "Water Cycle Experiment",
-                description: "Create a mini water cycle in a jar",
+                contentDescription: "Create a mini water cycle in a jar",
                 contentType: .experiment,
                 subject: Subject.scienzeNaturali.rawValue,
                 topics: ["water", "climate", "environment"],
@@ -203,7 +203,7 @@ final class CuriosityRecommenderService {
             ),
             CuriosityContent(
                 title: "How Plants Breathe",
-                description: "Learn about photosynthesis through interactive demonstrations",
+                contentDescription: "Learn about photosynthesis through interactive demonstrations",
                 contentType: .interactive,
                 subject: Subject.scienzeNaturali.rawValue,
                 topics: ["plants", "photosynthesis", "biology"],
@@ -215,7 +215,7 @@ final class CuriosityRecommenderService {
         let physicsContent = [
             CuriosityContent(
                 title: "Build a Simple Circuit",
-                description: "Learn about electricity by building your first circuit",
+                contentDescription: "Learn about electricity by building your first circuit",
                 contentType: .experiment,
                 subject: Subject.fisica.rawValue,
                 topics: ["electricity", "circuits", "energy"],
@@ -224,7 +224,7 @@ final class CuriosityRecommenderService {
             ),
             CuriosityContent(
                 title: "Newton's Laws in Action",
-                description: "See how forces work in everyday life",
+                contentDescription: "See how forces work in everyday life",
                 contentType: .video,
                 subject: Subject.fisica.rawValue,
                 topics: ["forces", "motion", "mechanics"],
@@ -236,7 +236,7 @@ final class CuriosityRecommenderService {
         let historyContent = [
             CuriosityContent(
                 title: "Ancient Rome Virtual Tour",
-                description: "Explore the Colosseum and Roman Forum in 3D",
+                contentDescription: "Explore the Colosseum and Roman Forum in 3D",
                 contentType: .interactive,
                 subject: Subject.storiaGeografia.rawValue,
                 topics: ["rome", "ancient", "architecture"],

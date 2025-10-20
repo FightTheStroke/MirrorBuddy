@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import os.log
 
@@ -107,7 +108,7 @@ final class CoachPersonaService: ObservableObject {
     @Published private(set) var currentPersona: PersonaType {
         didSet {
             savePersona()
-            logger.info("Persona changed to: \(currentPersona.name)")
+            logger.info("Persona changed to: \(self.currentPersona.name)")
         }
     }
 

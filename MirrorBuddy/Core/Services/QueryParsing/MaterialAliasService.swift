@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftData
+import Combine
 
 /// Error types for alias operations
 enum AliasError: LocalizedError {

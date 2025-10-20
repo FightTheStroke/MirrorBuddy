@@ -2,6 +2,7 @@
 import os.log
 @preconcurrency import Photos
 import UIKit
+import Combine
 
 /// Capture mode enumeration
 enum CaptureMode: CustomStringConvertible {

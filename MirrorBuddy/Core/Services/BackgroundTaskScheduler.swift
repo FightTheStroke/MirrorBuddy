@@ -1,6 +1,7 @@
 import BackgroundTasks
 import Foundation
 import os.log
+import Combine
 
 /// Service for scheduling and managing background sync tasks
 @MainActor

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 
 /// Date range result from temporal parsing
 struct DateRange {
