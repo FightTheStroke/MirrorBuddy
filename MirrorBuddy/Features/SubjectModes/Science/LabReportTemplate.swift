@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 /// Templates for generating structured lab reports
 enum LabReportTemplate {
