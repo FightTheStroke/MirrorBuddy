@@ -198,13 +198,9 @@ struct LMSIntegrationView: View {
     private func disconnectLMS(consent: LMSConsent) {
         consent.revoke()
 
-        // Clear tokens from Keychain
-        if let accessKey = consent.accessTokenKeychainKey {
-            try? KeychainManager.shared.delete(key: accessKey)
-        }
-        if let refreshKey = consent.refreshTokenKeychainKey {
-            try? KeychainManager.shared.delete(key: refreshKey)
-        }
+        // Clear tokens from Keychain based on platform
+        let service: OAuthService = consent.platform == .canvas ? .canvas : .googleClassroom
+        try? KeychainManager.shared.delete(.oauthToken(service))
 
         try? modelContext.save()
     }

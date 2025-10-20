@@ -305,7 +305,15 @@ final class ProactiveCoachingService: ObservableObject {
     }
 
     func startStudySession(subject: String?, material: Material?) {
-        contextTracker.startStudySession(subject: subject, material: material)
+        let materialStub = material.map { mat in
+            MaterialStub(
+                id: mat.id.uuidString,
+                title: mat.title,
+                subject: mat.subject ?? "",
+                difficulty: mat.difficulty?.rawValue ?? "medium"
+            )
+        }
+        contextTracker.startStudySession(subject: subject, material: materialStub)
         startCoaching()
     }
 

@@ -195,6 +195,8 @@ enum OAuthService: String, Codable {
     case googleDrive = "google.drive"
     case googleCalendar = "google.calendar"
     case googleGmail = "google.gmail"
+    case canvas
+    case googleClassroom = "google.classroom"
 }
 
 // MARK: - OAuth Tokens
