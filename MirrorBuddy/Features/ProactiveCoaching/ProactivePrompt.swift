@@ -135,7 +135,7 @@ extension ProactivePrompt {
             message: reason,
             actions: [
                 PromptAction(
-                    title: ProactiveCoachingStrings.Actions.continue,
+                    title: ProactiveCoachingStrings.Actions.continueAction,
                     icon: "play.fill",
                     handler: .continueStudying
                 ),
@@ -180,7 +180,7 @@ extension ProactivePrompt {
                     handler: .takeBreak
                 ),
                 PromptAction(
-                    title: ProactiveCoachingStrings.Actions.continue,
+                    title: ProactiveCoachingStrings.Actions.continueAction,
                     icon: "play.fill",
                     handler: .continueStudying
                 )
@@ -220,7 +220,7 @@ extension ProactivePrompt {
             message: summary,
             actions: [
                 PromptAction(
-                    title: ProactiveCoachingStrings.Actions.continue,
+                    title: ProactiveCoachingStrings.Actions.continueAction,
                     icon: "play.fill",
                     handler: .continueStudying
                 ),

@@ -203,78 +203,6 @@ struct VoiceCommandButton: View {
     }
 }
 
-// MARK: - Voice Command Help View (Task 29.3)
-
-/// Help view showing available voice commands
-struct VoiceCommandHelpView: View {
-    @ObservedObject var registry = VoiceCommandRegistry.shared
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    Text("Pronuncia uno dei comandi seguenti per navigare nell'app senza toccare lo schermo.")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                }
-
-                ForEach(Array(groupedCommands.keys), id: \.self) { context in
-                    Section(contextName(context)) {
-                        ForEach(groupedCommands[context] ?? []) { command in
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(command.name)
-                                    .font(.headline)
-
-                                Text(command.description)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-
-                                // Show some example triggers
-                                HStack {
-                                    ForEach(command.triggers.prefix(3), id: \.self) { trigger in
-                                        Text("\"\(trigger)\"")
-                                            .font(.caption)
-                                            .padding(.horizontal, 8)
-                                            .padding(.vertical, 4)
-                                            .background(Color.blue.opacity(0.1))
-                                            .foregroundStyle(.blue)
-                                            .cornerRadius(8)
-                                    }
-                                }
-                            }
-                            .padding(.vertical, 4)
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Comandi Vocali")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Chiudi") {
-                        dismiss()
-                    }
-                }
-            }
-        }
-    }
-
-    private var groupedCommands: [VoiceCommandContext: [VoiceCommand]] {
-        Dictionary(grouping: registry.availableCommands()) { $0.context }
-    }
-
-    private func contextName(_ context: VoiceCommandContext) -> String {
-        switch context {
-        case .global: return "Comandi Globali"
-        case .materialDetail: return "Vista Materiale"
-        case .studySession: return "Sessione Studio"
-        case .settings: return "Impostazioni"
-        case .dashboard: return "Dashboard"
-        }
-    }
-}
-
 // MARK: - Error Message View (Task 29.3)
 
 /// View for displaying voice command errors
@@ -347,9 +275,7 @@ struct VoiceCommandErrorView: View {
 }
 
 #Preview("Help View") {
-    NavigationStack {
-        VoiceCommandHelpView()
-    }
+    VoiceCommandHelpView()
 }
 
 #Preview("Error View") {

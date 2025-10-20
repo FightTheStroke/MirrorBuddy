@@ -50,15 +50,15 @@ struct CoachPersonaSettingsView: View {
                     Divider()
 
                     VStack(alignment: .leading, spacing: 8) {
-                        DetailRow(
+                        CoachPersonaDetailRow(
                             label: "Speech Rate",
                             value: String(format: "%.0f%%", selectedPersona.speechRate * 100)
                         )
-                        DetailRow(
+                        CoachPersonaDetailRow(
                             label: "Energy Level",
                             value: energyLevelDescription(for: selectedPersona)
                         )
-                        DetailRow(
+                        CoachPersonaDetailRow(
                             label: "Formality",
                             value: formalityDescription(for: selectedPersona)
                         )
@@ -185,7 +185,7 @@ struct PersonaOptionRow: View {
     }
 }
 
-struct DetailRow: View {
+struct CoachPersonaDetailRow: View {
     let label: String
     let value: String
 

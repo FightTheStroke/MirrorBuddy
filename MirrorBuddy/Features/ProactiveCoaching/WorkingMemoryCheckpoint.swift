@@ -103,7 +103,7 @@ final class WorkingMemoryCheckpoint: ObservableObject {
         content += prompts.randomElement() ?? ProactiveCoachingStrings.Checkpoints.mentalRepeat + " "
 
         // Next steps
-        content += ProactiveCoachingStrings.Checkpoints.continue
+        content += ProactiveCoachingStrings.Checkpoints.continueStudying
 
         return content
     }
