@@ -39,7 +39,7 @@ The global assistive education technology sector is accelerating (various analys
 
 MirrorBuddy focuses on five pillars:
 
-1. **Voice-first & interrupt friendly** — Speak naturally ("Explain this fraction like Fortnite"), interrupt mid-sentence, pick up the thread minutes later.
+1. **Voice-first & interrupt friendly** — Use Siri to start ("Hey Siri, parla con MirrorBuddy"), speak naturally ("Explain this fraction like Fortnite"), interrupt mid-sentence with automatic barge-in, pick up the thread minutes later. Zero-touch conversation flow with server-side Voice Activity Detection.
 2. **Multimodal cognition** — Camera, PDFs, emails, mind maps, and voice recordings collapse into a shared context graph.
 3. **Emotionally safe coaching** — Tone calibrated for encouragement, neurodiverse pacing, and shame-free retries.
 4. **Autopilot organization** — One button ("Aggiornami") corrals Drive files, Gmail assignments, Calendar events, plus auto-summaries.
@@ -49,13 +49,22 @@ We are building toward **an "OS layer" that constantly knows what the learner is
 
 ### Key Features (v0.9.0)
 
-#### Voice Control
-- **SmartVoiceButton**: Unified voice interface with intelligent intent detection
-- **Command Recognition**: Automatic distinction between quick commands and conversations
+#### Voice-First Conversation (NEW)
+- **Siri Integration**: Start with "Hey Siri, parla con MirrorBuddy" - no touch needed
+- **Always-On Listening**: Server-side Voice Activity Detection for natural conversation flow
+- **Automatic Barge-In**: Interrupt AI mid-sentence, response cancels instantly
+- **Multi-Sensory Feedback**: Haptic patterns, audio cues, and calming breathing animations
+- **8 Conversation States**: Clear visual/tactile/audio feedback (passive → listening → thinking → speaking)
+- **OpenAI Realtime API**: Low-latency bidirectional audio streaming (300-500ms)
+- **Context-Aware**: Automatically loads subject/material context from your study session
+- **Subject-Specific Shortcuts**: "Hey Siri, aiutami con la matematica" opens in math mode
+- **Offline Fallback**: Automatic switch to Apple Speech when network unavailable
+
+#### Voice Commands (Legacy)
+- **SmartVoiceButton**: Quick commands for navigation and control
+- **Command Recognition**: Automatic distinction between commands ("vai alla home") and conversations
 - **Natural Language**: Speak naturally in Italian with context-aware responses
 - **Hands-free Navigation**: Voice commands for all major app functions
-- **Safe Area Aware**: Dynamic positioning for all iPhone models (SE to Pro Max)
-- **Dynamic Island Support**: Optimized for iPhone Pro models
 
 #### Dashboard & Today Card
 - **Daily Overview**: Study metrics, streak tracking, and goal progress at a glance
@@ -94,7 +103,8 @@ The repository already includes a functional SwiftUI app with the following matu
 
 | Capability | Status | Notes |
 | --- | --- | --- |
-| **Unified Voice System** | Beta | SmartVoiceButton with intent detection, automatic command vs conversation routing, OpenAI Realtime API integration. Single unified entry point. |
+| **Voice-First Conversation** | Production | Siri-activated real-time conversation with VAD, barge-in, multi-sensory feedback. OpenAI Realtime API with 300-500ms latency. 8-state system with haptic/audio/visual cues. Always-on listening mode. |
+| **Voice Commands** | Beta | SmartVoiceButton with intent detection, automatic command vs conversation routing. Quick navigation commands. |
 | **Dashboard & Analytics** | Beta | Today Card with study metrics, streak tracking, daily goals, upcoming sessions. Material organization by subject. |
 | **One-Button Sync** | Alpha | `UpdateManager` orchestrates Google Drive, Gmail, Calendar ingestion with background tasks and CloudKit sync. |
 | **Material Processing** | Beta | Auto-keyword extraction, metadata generation, Bloom's taxonomy classification, concurrent processing pipeline. |
