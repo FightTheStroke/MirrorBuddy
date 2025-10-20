@@ -62,6 +62,12 @@ struct VoiceConversationView: View {
             if let conversationID = conversationID {
                 viewModel.loadConversation(id: conversationID)
             }
+
+            // Setup Siri intent listener
+            viewModel.setupSiriIntentListener()
+        }
+        .onDisappear {
+            viewModel.removeSiriIntentListener()
         }
     }
 
@@ -581,6 +587,9 @@ final class VoiceConversationViewModel: ObservableObject {
 
     /// Accumulated AI response text for streaming
     private var currentAIResponseText = ""
+
+    /// Siri intent observer
+    private var siriIntentObserver: NSObjectProtocol?
 
     // MARK: - Initialization
 
@@ -1373,6 +1382,63 @@ final class VoiceConversationViewModel: ObservableObject {
 
     func toggleSettings() {
         showSettings.toggle()
+    }
+
+    // MARK: - Siri Intent Handling
+
+    /// Setup listener for Siri intent notifications
+    func setupSiriIntentListener() {
+        siriIntentObserver = NotificationCenter.default.addObserver(
+            forName: .startVoiceConversation,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.handleSiriIntent(notification)
+        }
+        logger.info("Siri intent listener setup complete")
+    }
+
+    /// Remove Siri intent listener
+    func removeSiriIntentListener() {
+        if let observer = siriIntentObserver {
+            NotificationCenter.default.removeObserver(observer)
+            siriIntentObserver = nil
+            logger.debug("Siri intent listener removed")
+        }
+    }
+
+    /// Handle Siri intent to start conversation
+    private func handleSiriIntent(_ notification: Notification) {
+        guard let userInfo = notification.userInfo else { return }
+
+        logger.info("Received Siri intent to start conversation")
+
+        // Extract parameters
+        let subject = userInfo["subject"] as? String
+        let topic = userInfo["topic"] as? String
+        let autoStart = userInfo["autoStart"] as? Bool ?? true
+
+        // Update context if subject provided
+        if let subject = subject {
+            currentSubject = subject
+            logger.debug("Siri intent: subject set to \(subject)")
+        }
+
+        if let topic = topic {
+            currentMaterial = topic
+            logger.debug("Siri intent: topic set to \(topic)")
+        }
+
+        // Auto-start conversation if requested and not already active
+        if autoStart && !isConversationActive {
+            logger.info("Auto-starting conversation from Siri intent")
+
+            // Small delay to ensure UI is ready
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                self?.startConversation()
+            }
+        }
     }
 
     // MARK: - Error Handling
