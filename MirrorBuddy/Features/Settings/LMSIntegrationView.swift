@@ -139,13 +139,13 @@ struct LMSIntegrationView: View {
             }
 
             HStack(spacing: 12) {
-                Button(action: {
+                Button {
                     Task {
                         isSyncing = true
                         await onSync()
                         isSyncing = false
                     }
-                }) {
+                } label: {
                     Label("Sync Now", systemImage: "arrow.triangle.2.circlepath")
                         .font(.subheadline)
                 }
