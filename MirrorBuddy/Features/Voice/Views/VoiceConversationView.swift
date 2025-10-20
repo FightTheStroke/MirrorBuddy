@@ -68,38 +68,73 @@ struct VoiceConversationView: View {
     // MARK: - Context Banner
 
     private var contextBannerView: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "book.fill")
-                .font(.title3)
-                .foregroundStyle(.blue)
+        VStack(spacing: 12) {
+            // Subject and material
+            HStack(spacing: 12) {
+                Image(systemName: "book.fill")
+                    .font(.title3)
+                    .foregroundStyle(viewModel.sessionState.primaryColor)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.currentSubject ?? "Nessuna Materia")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.currentSubject ?? "Nessuna Materia")
+                        .font(.headline)
 
-                if let material = viewModel.currentMaterial {
-                    Text(material)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let material = viewModel.currentMaterial {
+                        Text(material)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+
+                Spacer()
             }
 
-            Spacer()
-
+            // Voice session status bar
             if viewModel.isConversationActive {
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(viewModel.isOfflineMode ? Color.orange : Color.green)
-                        .frame(width: 8, height: 8)
-                    Text(viewModel.isOfflineMode ? "Offline" : "Attivo")
+                HStack(spacing: 8) {
+                    // State icon
+                    Image(systemName: viewModel.sessionState.systemIcon)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(viewModel.sessionState.primaryColor)
+
+                    // State text
+                    Text(viewModel.sessionState.statusText)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundStyle(viewModel.sessionState.primaryColor)
+
+                    Spacer()
+
+                    // Mode indicator
+                    HStack(spacing: 4) {
+                        Circle()
+                            .fill(viewModel.isOfflineMode ? Color.orange : viewModel.sessionState.primaryColor)
+                            .frame(width: 6, height: 6)
+                        Text(viewModel.isOfflineMode ? "Offline" : "Online")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            viewModel.sessionState.primaryColor.opacity(0.1),
+                            viewModel.sessionState.secondaryColor.opacity(0.1)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(8)
+                .accessibilityLabel(viewModel.sessionState.accessibilityLabel)
             }
         }
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
     }
 
     // MARK: - Conversation History
@@ -125,20 +160,28 @@ struct VoiceConversationView: View {
         }
     }
 
-    // MARK: - Waveform Visualization
+    // MARK: - Voice State Visualization
 
-    private var waveformView: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<20, id: \.self) { index in
-                WaveformBarView(
-                    amplitude: viewModel.waveformAmplitudes[index],
-                    color: viewModel.isUserSpeaking ? .blue : .purple
-                )
-            }
+    private var voiceStateView: some View {
+        VStack(spacing: 16) {
+            // Main state visualization
+            VoiceStateVisualization(
+                state: viewModel.sessionState,
+                waveformAmplitudes: viewModel.waveformAmplitudes,
+                size: 200
+            )
+            .frame(height: 240)
+            .accessibilityLabel(viewModel.sessionState.accessibilityLabel)
+
+            // State description
+            Text(viewModel.sessionState.statusText)
+                .font(.headline)
+                .foregroundStyle(viewModel.sessionState.primaryColor)
+                .accessibilityHidden(true)
         }
         .padding()
         .background(.ultraThinMaterial)
-        .cornerRadius(16)
+        .cornerRadius(20)
     }
 
     // MARK: - Controls
@@ -176,7 +219,7 @@ struct VoiceConversationView: View {
                 // Pulsing ring when active
                 if viewModel.isConversationActive {
                     Circle()
-                        .stroke(Color.blue.opacity(0.3), lineWidth: 4)
+                        .stroke(viewModel.sessionState.primaryColor.opacity(0.3), lineWidth: 4)
                         .scaleEffect(viewModel.pulseAnimation ? 1.2 : 1.0)
                         .opacity(viewModel.pulseAnimation ? 0 : 1)
                         .animation(
@@ -194,25 +237,31 @@ struct VoiceConversationView: View {
                                 endPoint: .bottomTrailing
                             ) :
                             LinearGradient(
-                                colors: [.blue, .purple],
+                                colors: [viewModel.sessionState.primaryColor, viewModel.sessionState.secondaryColor],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                     )
                     .frame(width: 80, height: 80)
-                    .shadow(radius: 8)
+                    .shadow(
+                        color: viewModel.sessionState.primaryColor.opacity(0.3),
+                        radius: 8,
+                        y: 4
+                    )
 
                 VStack(spacing: 4) {
                     Image(systemName: viewModel.isConversationActive ? "stop.fill" : "mic.fill")
                         .font(.system(size: 30))
 
-                    Text(viewModel.isConversationActive ? "Ferma" : "Parla")
+                    Text(viewModel.isConversationActive ? "Ferma" : "Inizia")
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
                 .foregroundStyle(.white)
             }
         }
+        .accessibilityLabel(viewModel.isConversationActive ? "Ferma conversazione" : "Inizia conversazione vocale")
+        .accessibilityHint(viewModel.isConversationActive ? "La conversazione è attiva in modalità always-listening" : "Avvia una conversazione vocale con MirrorBuddy")
         .sensoryFeedback(.impact(intensity: 0.7), trigger: viewModel.isConversationActive)
     }
 
@@ -303,22 +352,37 @@ struct VoiceConversationView: View {
     /// Main conversation content (shared between layouts)
     private var conversationMainContent: some View {
         VStack(spacing: 0) {
-            // Context banner
+            // Context banner with state
             contextBannerView
                 .padding()
                 .background(.ultraThinMaterial)
 
             // Conversation history
-            conversationHistoryView
+            if !viewModel.conversationHistory.isEmpty {
+                conversationHistoryView
+            } else {
+                // Empty state with voice visualization
+                VStack(spacing: 24) {
+                    Spacer()
 
-            // Waveform visualization
-            if viewModel.isConversationActive {
-                waveformView
-                    .frame(height: 100)
-                    .padding(.horizontal)
+                    voiceStateView
+
+                    Text("Inizia a parlare quando vuoi")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+
+                    Spacer()
+                }
             }
 
-            Spacer()
+            // Voice state visualization when conversation active
+            if viewModel.isConversationActive && !viewModel.conversationHistory.isEmpty {
+                voiceStateView
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+            }
 
             // Controls
             controlsView
@@ -425,19 +489,6 @@ struct MessageBubbleView: View {
     }
 }
 
-// MARK: - Waveform Bar View
-
-struct WaveformBarView: View {
-    let amplitude: CGFloat
-    let color: Color
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 2)
-            .fill(color)
-            .frame(width: 4, height: max(4, amplitude * 80))
-            .animation(.easeInOut(duration: 0.1), value: amplitude)
-    }
-}
 
 // MARK: - Message Bubble View Model (temporary UI model)
 
