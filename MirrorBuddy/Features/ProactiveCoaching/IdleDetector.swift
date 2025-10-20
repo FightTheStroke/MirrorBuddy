@@ -36,13 +36,13 @@ final class IdleDetector: ObservableObject {
             withTimeInterval: checkInterval,
             repeats: true
         ) { [weak self] _ in
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self?.checkIdleState()
             }
         }
     }
 
-    func stopMonitoring() {
+    nonisolated func stopMonitoring() {
         idleCheckTimer?.invalidate()
         idleCheckTimer = nil
         isIdle = false

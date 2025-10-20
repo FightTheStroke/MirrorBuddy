@@ -328,7 +328,7 @@ struct ExtendedVoiceRecordingView: View {
         }
     }()
 
-    NavigationStack {
+    return NavigationStack {
         ExtendedVoiceRecordingView()
     }
 }
@@ -343,7 +343,7 @@ struct ExtendedVoiceRecordingView: View {
         }
     }()
 
-    NavigationStack {
+    return NavigationStack {
         ExtendedVoiceRecordingView()
     }
 }

@@ -21,6 +21,10 @@ struct LessonReviewView: View {
 
     private var timer = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
 
+    init(recording: LessonRecording) {
+        self.recording = recording
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {

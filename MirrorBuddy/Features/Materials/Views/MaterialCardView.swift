@@ -370,7 +370,7 @@ struct MaterialCardButtonStyle: ButtonStyle {
         container.mainContext.insert(material)
     }()
 
-    ScrollView {
+    return ScrollView {
         VStack(spacing: 16) {
             MaterialCardView(material: material) {
                 print("Tapped material: \(material.title)")

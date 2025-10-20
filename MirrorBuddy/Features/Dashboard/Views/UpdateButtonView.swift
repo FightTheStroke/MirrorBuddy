@@ -334,7 +334,7 @@ struct ResultCard: View {
         UpdateManager.shared.progress.progress = 0.4
     }()
 
-    UpdateButtonView()
+    return UpdateButtonView()
         .modelContainer(for: Material.self, inMemory: true)
 }
 
@@ -347,6 +347,6 @@ struct ResultCard: View {
         UpdateManager.shared.progress.mindMapsGenerated = 3
     }()
 
-    UpdateButtonView()
+    return UpdateButtonView()
         .modelContainer(for: Material.self, inMemory: true)
 }
