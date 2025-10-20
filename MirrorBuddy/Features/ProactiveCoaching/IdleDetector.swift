@@ -42,7 +42,7 @@ final class IdleDetector: ObservableObject {
         }
     }
 
-    nonisolated func stopMonitoring() {
+    func stopMonitoring() {
         idleCheckTimer?.invalidate()
         idleCheckTimer = nil
         isIdle = false

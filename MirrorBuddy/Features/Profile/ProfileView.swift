@@ -161,7 +161,7 @@ struct ProfileView: View {
 
             HStack(spacing: 20) {
                 // Current Streak
-                StatCard(
+                ProfileStatCard(
                     icon: "flame.fill",
                     title: "Serie Attuale",
                     value: "\(progress?.currentStreak ?? 0)",
@@ -170,7 +170,7 @@ struct ProfileView: View {
                 )
 
                 // Longest Streak
-                StatCard(
+                ProfileStatCard(
                     icon: "star.fill",
                     title: "Record",
                     value: "\(progress?.longestStreak ?? 0)",
@@ -285,7 +285,7 @@ struct ProfileView: View {
 // MARK: - Supporting Views
 
 /// Stat card for streak display
-struct StatCard: View {
+struct ProfileStatCard: View {
     let icon: String
     let title: String
     let value: String
