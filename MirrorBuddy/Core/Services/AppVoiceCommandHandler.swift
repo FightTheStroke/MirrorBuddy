@@ -47,8 +47,25 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
     // MARK: - VoiceCommandHandler Protocol
 
     func executeCommand(_ action: VoiceCommandAction) {
+        if handleNavigationCommand(action) { return }
+        if handleMaterialCommand(action) { return }
+        if handleStudyCommand(action) { return }
+        if handleAccessibilityCommand(action) { return }
+        if handleSpeechCommand(action) { return }
+        if handleAppControlCommand(action) { return }
+
+        if case let .customAction(name, actionClosure) = action {
+            actionClosure()
+            lastCommandResult = .success("Eseguito: \(name)")
+            playHapticFeedback()
+            return
+        }
+
+        assertionFailure("Unhandled voice command action: \(action)")
+    }
+
+    private func handleNavigationCommand(_ action: VoiceCommandAction) -> Bool {
         switch action {
-        // Navigation commands
         case .goBack:
             handleGoBack()
         case .goHome:
@@ -68,8 +85,16 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
         case .openHelp:
             showHelp = true
             lastCommandResult = .success("Apertura aiuto")
+        default:
+            return false
+        }
 
-        // Material actions
+        playHapticFeedback()
+        return true
+    }
+
+    private func handleMaterialCommand(_ action: VoiceCommandAction) -> Bool {
+        switch action {
         case .openMaterial(let materialID):
             handleOpenMaterial(materialID)
         case .createMaterial:
@@ -77,16 +102,32 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
             lastCommandResult = .success("Crea nuovo materiale")
         case .searchMaterials:
             handleSearchMaterials()
+        default:
+            return false
+        }
 
-        // Study actions
+        playHapticFeedback()
+        return true
+    }
+
+    private func handleStudyCommand(_ action: VoiceCommandAction) -> Bool {
+        switch action {
         case .startStudy:
             handleStartStudy()
         case .reviewFlashcards:
             handleReviewFlashcards()
         case .viewMindMap:
             handleViewMindMap()
+        default:
+            return false
+        }
 
-        // Accessibility commands
+        playHapticFeedback()
+        return true
+    }
+
+    private func handleAccessibilityCommand(_ action: VoiceCommandAction) -> Bool {
+        switch action {
         case .enableDyslexiaMode:
             handleToggleDyslexiaMode(enable: true)
         case .disableDyslexiaMode:
@@ -97,8 +138,16 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
             handleAdjustFontSize(increase: false)
         case .readScreen:
             handleReadScreen()
+        default:
+            return false
+        }
 
-        // TTS controls
+        playHapticFeedback()
+        return true
+    }
+
+    private func handleSpeechCommand(_ action: VoiceCommandAction) -> Bool {
+        switch action {
         case .startReading:
             handleStartReading()
         case .stopReading:
@@ -107,8 +156,16 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
             handlePauseReading()
         case .resumeReading:
             handleResumeReading()
+        default:
+            return false
+        }
 
-        // App controls
+        playHapticFeedback()
+        return true
+    }
+
+    private func handleAppControlCommand(_ action: VoiceCommandAction) -> Bool {
+        switch action {
         case .refresh:
             handleRefresh()
         case .closeView:
@@ -116,14 +173,12 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
         case .showHelp:
             showHelp = true
             lastCommandResult = .success("Mostra comandi vocali")
-
-        case let .customAction(name, action):
-            action()
-            lastCommandResult = .success("Eseguito: \(name)")
+        default:
+            return false
         }
 
-        // Play success feedback
         playHapticFeedback()
+        return true
     }
 
     func handleUnrecognizedCommand(_ phrase: String) {
@@ -217,11 +272,13 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
         NotificationCenter.default.post(
             name: NSNotification.Name("RequestScreenText"),
             object: nil,
-            userInfo: ["callback": { (text: String) in
-                MainActor.assumeIsolated {
-                    TextToSpeechService.shared.speak(text, language: "it-IT")
-                }
-            } as Any]
+            userInfo: [
+                "callback": { (text: String) in
+                    MainActor.assumeIsolated {
+                        TextToSpeechService.shared.speak(text, language: "it-IT")
+                    }
+                } as Any
+            ]
         )
         lastCommandResult = .success("Lettura schermo")
     }
@@ -234,11 +291,13 @@ final class AppVoiceCommandHandler: ObservableObject, VoiceCommandHandler {
         NotificationCenter.default.post(
             name: NSNotification.Name("RequestScreenText"),
             object: nil,
-            userInfo: ["callback": { (text: String) in
-                MainActor.assumeIsolated {
-                    TextToSpeechService.shared.speak(text, language: "it-IT")
-                }
-            } as Any]
+            userInfo: [
+                "callback": { (text: String) in
+                    MainActor.assumeIsolated {
+                        TextToSpeechService.shared.speak(text, language: "it-IT")
+                    }
+                } as Any
+            ]
         )
         lastCommandResult = .success("Inizio lettura")
     }
