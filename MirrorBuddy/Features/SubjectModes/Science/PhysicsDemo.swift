@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 /// Interactive physics demonstrations with visual animations

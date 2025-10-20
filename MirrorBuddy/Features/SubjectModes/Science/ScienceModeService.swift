@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 
 /// Service coordinating all Science/Physics mode specialized features

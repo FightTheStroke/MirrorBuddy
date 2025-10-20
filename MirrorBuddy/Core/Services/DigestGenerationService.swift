@@ -419,7 +419,7 @@ enum SectionTone: String, Codable {
 }
 
 /// Voice settings for audio generation
-struct DigestVoiceSettings {
+struct DigestVoiceSettings: Codable {
     let voiceIdentifier: String
     let rate: Float
 
