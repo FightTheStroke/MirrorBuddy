@@ -1,7 +1,7 @@
 import Foundation
 
 /// Mind map templates specialized for mathematical concepts
-final class MathMathMindMapTemplate {
+final class MathMindMapTemplateGenerator {
     // MARK: - Template Generation
 
     /// Generate a mind map template for a specific math topic
@@ -559,7 +559,7 @@ final class MathMathMindMapTemplate {
 
 // MARK: - Supporting Types
 
-struct MathMathMindMapTemplate: Codable {
+struct MathMindMapTemplate: Codable {
     let topic: MathTopic
     let centralNode: MathMindMapNode
     let branches: [MathMindMapNode]

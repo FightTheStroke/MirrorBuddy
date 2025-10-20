@@ -16,7 +16,7 @@ final class MathModeService {
     let formulaLibrary: FormulaLibrary
     let practiceGenerator: MathPracticeGenerator
     let prompts: MathPrompts
-    let mindMapTemplate: MathMindMapTemplate
+    let mindMapTemplate: MathMindMapTemplateGenerator
 
     // Current session state
     private(set) var currentTopic: MathTopic?
@@ -31,7 +31,7 @@ final class MathModeService {
         self.formulaLibrary = FormulaLibrary()
         self.practiceGenerator = MathPracticeGenerator()
         self.prompts = MathPrompts()
-        self.mindMapTemplate = MathMindMapTemplate()
+        self.mindMapTemplate = MathMindMapTemplateGenerator()
 
         logger.info("MathModeService initialized")
     }
@@ -56,12 +56,12 @@ final class MathModeService {
             let recentProblems = sessionProblems.suffix(3)
             let successRate = Double(recentProblems.filter { $0.wasCorrect }.count) / 3.0
 
-            if successRate >= 0.8 && difficultyLevel != .advanced {
-                difficultyLevel = difficultyLevel == .beginner ? .intermediate : .advanced
-                logger.info("Difficulty increased to \(difficultyLevel.rawValue)")
-            } else if successRate < 0.4 && difficultyLevel != .beginner {
-                difficultyLevel = difficultyLevel == .advanced ? .intermediate : .beginner
-                logger.info("Difficulty decreased to \(difficultyLevel.rawValue)")
+            if successRate >= 0.8 && self.difficultyLevel != .advanced {
+                self.difficultyLevel = self.difficultyLevel == .beginner ? .intermediate : .advanced
+                logger.info("Difficulty increased to \(self.difficultyLevel.rawValue)")
+            } else if successRate < 0.4 && self.difficultyLevel != .beginner {
+                self.difficultyLevel = self.difficultyLevel == .advanced ? .intermediate : .beginner
+                logger.info("Difficulty decreased to \(self.difficultyLevel.rawValue)")
             }
         }
     }
@@ -83,7 +83,7 @@ final class MathModeService {
 
     /// End the current session
     func endSession() {
-        logger.info("Ended math session: \(sessionProblems.count) problems completed")
+        logger.info("Ended math session: \(self.sessionProblems.count) problems completed")
         currentTopic = nil
         sessionProblems = []
     }
