@@ -100,7 +100,7 @@ final class ProactiveCoachingService: ObservableObject {
             withTimeInterval: 30, // Check every 30 seconds
             repeats: true
         ) { [weak self] _ in
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self?.evaluateProactiveActions()
             }
         }
@@ -220,8 +220,8 @@ final class ProactiveCoachingService: ObservableObject {
 
         // Auto-dismiss low-priority prompts after 15 seconds
         if prompt.priority == .low {
-            Task {
-                try? await Task.sleep(nanoseconds: 15_000_000_000)
+            _Concurrency.Task {
+                try? await _Concurrency.Task.sleep(nanoseconds: 15_000_000_000)
                 if currentPrompt?.id == prompt.id {
                     dismissCurrentPrompt()
                 }
@@ -309,7 +309,7 @@ final class ProactiveCoachingService: ObservableObject {
             MaterialStub(
                 id: mat.id.uuidString,
                 title: mat.title,
-                subject: mat.subject?.name ?? "",
+                subject: mat.subject?.localizationKey ?? "",
                 difficulty: "medium"
             )
         }
@@ -322,9 +322,4 @@ final class ProactiveCoachingService: ObservableObject {
         stopCoaching()
     }
 
-    nonisolated deinit {
-        Task { @MainActor in
-            self.stopCoaching()
-        }
-    }
 }

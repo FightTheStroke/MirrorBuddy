@@ -35,7 +35,7 @@ final class WorkingMemoryCheckpoint: ObservableObject {
             withTimeInterval: checkpointInterval,
             repeats: true
         ) { [weak self] _ in
-            Task { @MainActor in
+            _Concurrency.Task { @MainActor in
                 self?.triggerCheckpointIfNeeded()
             }
         }
@@ -173,10 +173,4 @@ final class WorkingMemoryCheckpoint: ObservableObject {
         performCheckpoint()
     }
 
-    nonisolated deinit {
-        Task { @MainActor in
-            self.stopCheckpointMonitoring()
-            self.speechSynthesizer.stopSpeaking(at: .immediate)
-        }
-    }
 }

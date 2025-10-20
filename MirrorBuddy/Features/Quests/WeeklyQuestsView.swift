@@ -172,10 +172,12 @@ struct WeeklyQuestsView: View {
             Text("No Active Quests")
                 .font(.headline)
 
-            Button("Generate New Quests") {
+            Button {
                 Task {
                     await generateNewQuests()
                 }
+            } label: {
+                Text("Generate New Quests")
             }
             .buttonStyle(.bordered)
         }
