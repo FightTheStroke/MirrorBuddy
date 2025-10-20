@@ -134,8 +134,8 @@ type_name:
     warning: 50
 
 file_length:
-  warning: 2000
-  error: 4000
+  warning: 1500
+  error: 2000
 
 function_body_length:
   warning: 50
