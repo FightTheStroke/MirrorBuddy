@@ -124,6 +124,63 @@ enum SortOrder {
 final class SmartQueryParser {
     static let shared = SmartQueryParser()
 
+    private let subjectKeywordMap: [String: String] = [
+        "math": "matematica",
+        "matematica": "matematica",
+        "physics": "fisica",
+        "fisica": "fisica",
+        "italian": "italiano",
+        "italiano": "italiano",
+        "english": "inglese",
+        "inglese": "inglese",
+        "history": "storia",
+        "storia": "storia",
+        "geography": "geografia",
+        "geografia": "geografia",
+        "science": "scienze",
+        "scienze": "scienze",
+        "naturali": "scienze naturali",
+        "civic": "educazione civica",
+        "civica": "educazione civica",
+        "religion": "religione",
+        "religione": "religione",
+        "pe": "scienze motorie",
+        "motorie": "scienze motorie",
+        "support": "sostegno",
+        "sostegno": "sostegno"
+    ]
+
+    private let easyDifficultyKeywords = ["easy", "facile", "simple", "semplice", "basic", "base"]
+    private let hardDifficultyKeywords = ["hard", "difficile", "challenging", "complex", "complesso", "advanced"]
+
+    private let bloomKeywordMap: [(keywords: [String], level: BloomTaxonomy)] = [
+        (["memorize", "remember", "ricordare", "memorizzare"], .remember),
+        (["understand", "explain", "capire", "spiegare"], .understand),
+        (["apply", "solve", "applicare", "risolvere"], .apply),
+        (["analyze", "analizzare"], .analyze),
+        (["evaluate", "valutare"], .evaluate),
+        (["create", "creare"], .create)
+    ]
+
+    private let notReviewedKeywords = [
+        "not reviewed", "non rivisto", "haven't studied", "non studiato", "da studiare"
+    ]
+    private let reviewedKeywords = [
+        "reviewed", "rivisto", "studied", "studiato"
+    ]
+    private let highProficiencyKeywords = [
+        "mastered", "padroneggiato", "know well", "so bene"
+    ]
+    private let needsPracticeKeywords = [
+        "not mastered", "non padroneggiato", "need practice", "da esercitare"
+    ]
+    private let processingKeywordMap: [(keywords: [String], status: ProcessingStatus)] = [
+        (["pending", "in attesa"], .pending),
+        (["processing", "elaborazione"], .processing),
+        (["completed", "completato"], .completed),
+        (["failed", "fallito"], .failed)
+    ]
+
     // MARK: - Public API
 
     /// Parse a natural language query into structured query components
@@ -234,116 +291,123 @@ final class SmartQueryParser {
     private func extractFilters(from query: String) -> [QueryFilter] {
         var filters: [QueryFilter] = []
 
-        // Subject filters (multilingual)
-        let subjectMappings: [String: String] = [
-            "math": "matematica",
-            "matematica": "matematica",
-            "physics": "fisica",
-            "fisica": "fisica",
-            "italian": "italiano",
-            "italiano": "italiano",
-            "english": "inglese",
-            "inglese": "inglese",
-            "history": "storia",
-            "storia": "storia",
-            "geography": "geografia",
-            "geografia": "geografia",
-            "science": "scienze",
-            "scienze": "scienze",
-            "naturali": "scienze naturali",
-            "civic": "educazione civica",
-            "civica": "educazione civica",
-            "religion": "religione",
-            "religione": "religione",
-            "pe": "scienze motorie",
-            "motorie": "scienze motorie",
-            "support": "sostegno",
-            "sostegno": "sostegno"
-        ]
-
-        for (keyword, subject) in subjectMappings where query.contains(keyword) {
-            filters.append(.subject(subject))
-            break // Only one subject at a time
+        if let subjectFilter = extractSubjectFilter(from: query) {
+            filters.append(subjectFilter)
         }
 
-        // Difficulty filters
-        let easyKeywords = ["easy", "facile", "simple", "semplice", "basic", "base"]
-        let hardKeywords = ["hard", "difficile", "challenging", "complex", "complesso", "advanced"]
-
-        if easyKeywords.contains(where: { query.contains($0) }) {
-            filters.append(.difficulty(QueryDifficultyLevel.easy))
-        } else if hardKeywords.contains(where: { query.contains($0) }) {
-            filters.append(.difficulty(QueryDifficultyLevel.hard))
+        if let difficultyFilter = extractDifficultyFilter(from: query) {
+            filters.append(difficultyFilter)
         }
 
-        // Time-based filters
-        if query.contains("today") || query.contains("oggi") {
-            let today = Calendar.current.startOfDay(for: Date())
-            filters.append(.dateRange(today, Date()))
-        } else if query.contains("yesterday") || query.contains("ieri"),
-                  let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) {
-            let yesterdayStart = Calendar.current.startOfDay(for: yesterday)
-            filters.append(.dateRange(yesterdayStart, yesterday))
-        } else if query.contains("week") || query.contains("settimana"),
-                  let weekAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date()) {
-            filters.append(.dateRange(weekAgo, Date()))
-        } else if query.contains("month") || query.contains("mese"),
-                  let monthAgo = Calendar.current.date(byAdding: .month, value: -1, to: Date()) {
-            filters.append(.dateRange(monthAgo, Date()))
+        if let dateRangeFilter = extractDateRangeFilter(from: query) {
+            filters.append(dateRangeFilter)
         }
 
-        // Bloom's taxonomy level filters
-        if query.contains("memorize") || query.contains("remember") ||
-            query.contains("ricordare") || query.contains("memorizzare") {
-            filters.append(.bloomLevel(.remember))
-        } else if query.contains("understand") || query.contains("explain") ||
-                    query.contains("capire") || query.contains("spiegare") {
-            filters.append(.bloomLevel(.understand))
-        } else if query.contains("apply") || query.contains("solve") ||
-                    query.contains("applicare") || query.contains("risolvere") {
-            filters.append(.bloomLevel(.apply))
-        } else if query.contains("analyze") || query.contains("analizzare") {
-            filters.append(.bloomLevel(.analyze))
-        } else if query.contains("evaluate") || query.contains("valutare") {
-            filters.append(.bloomLevel(.evaluate))
-        } else if query.contains("create") || query.contains("creare") {
-            filters.append(.bloomLevel(.create))
+        if let bloomFilter = extractBloomFilter(from: query) {
+            filters.append(bloomFilter)
         }
 
-        // Review status filters
-        if query.contains("not reviewed") || query.contains("non rivisto") ||
-            query.contains("haven't studied") || query.contains("non studiato") ||
-            query.contains("da studiare") {
-            filters.append(.reviewed(false))
-        } else if query.contains("reviewed") || query.contains("rivisto") ||
-                    query.contains("studied") || query.contains("studiato") {
-            filters.append(.reviewed(true))
+        if let reviewFilter = extractReviewFilter(from: query) {
+            filters.append(reviewFilter)
         }
 
-        // Mastery filters
-        if query.contains("mastered") || query.contains("padroneggiato") ||
-            query.contains("know well") || query.contains("so bene") {
-            filters.append(.mastered(true))
-        } else if query.contains("not mastered") || query.contains("non padroneggiato") ||
-                    query.contains("need practice") || query.contains("da esercitare") {
-            filters.append(.mastered(false))
+        if let proficiencyFilter = extractProficiencyFilter(from: query) {
+            filters.append(proficiencyFilter)
         }
 
-        // Processing status filters
-        if query.contains("pending") || query.contains("in attesa") {
-            filters.append(.processingStatus(.pending))
-        } else if query.contains("processing") || query.contains("elaborazione") {
-            filters.append(.processingStatus(.processing))
-        } else if query.contains("completed") || query.contains("completato") {
-            filters.append(.processingStatus(.completed))
-        } else if query.contains("failed") || query.contains("fallito") {
-            filters.append(.processingStatus(.failed))
+        if let processingFilter = extractProcessingStatusFilter(from: query) {
+            filters.append(processingFilter)
         }
 
         return filters
     }
 
     // MARK: - Helper Functions
+
+    private func extractSubjectFilter(from query: String) -> QueryFilter? {
+        for (keyword, subject) in subjectKeywordMap where query.contains(keyword) {
+            return .subject(subject)
+        }
+        return nil
+    }
+
+    private func extractDifficultyFilter(from query: String) -> QueryFilter? {
+        if easyDifficultyKeywords.contains(where: { query.contains($0) }) {
+            return .difficulty(.easy)
+        }
+
+        if hardDifficultyKeywords.contains(where: { query.contains($0) }) {
+            return .difficulty(.hard)
+        }
+
+        return nil
+    }
+
+    private func extractDateRangeFilter(from query: String) -> QueryFilter? {
+        let now = Date()
+        let calendar = Calendar.current
+
+        if query.contains("today") || query.contains("oggi") {
+            let startOfDay = calendar.startOfDay(for: now)
+            return .dateRange(startOfDay, now)
+        }
+
+        if query.contains("yesterday") || query.contains("ieri"),
+           let yesterday = calendar.date(byAdding: .day, value: -1, to: now) {
+            let startOfYesterday = calendar.startOfDay(for: yesterday)
+            return .dateRange(startOfYesterday, yesterday)
+        }
+
+        if query.contains("week") || query.contains("settimana"),
+           let weekAgo = calendar.date(byAdding: .day, value: -7, to: now) {
+            return .dateRange(weekAgo, now)
+        }
+
+        if query.contains("month") || query.contains("mese"),
+           let monthAgo = calendar.date(byAdding: .month, value: -1, to: now) {
+            return .dateRange(monthAgo, now)
+        }
+
+        return nil
+    }
+
+    private func extractBloomFilter(from query: String) -> QueryFilter? {
+        for mapping in bloomKeywordMap where mapping.keywords.contains(where: { query.contains($0) }) {
+            return .bloomLevel(mapping.level)
+        }
+        return nil
+    }
+
+    private func extractReviewFilter(from query: String) -> QueryFilter? {
+        if notReviewedKeywords.contains(where: { query.contains($0) }) {
+            return .reviewed(false)
+        }
+
+        if reviewedKeywords.contains(where: { query.contains($0) }) {
+            return .reviewed(true)
+        }
+
+        return nil
+    }
+
+    private func extractProficiencyFilter(from query: String) -> QueryFilter? {
+        if highProficiencyKeywords.contains(where: { query.contains($0) }) {
+            return .mastered(true)
+        }
+
+        if needsPracticeKeywords.contains(where: { query.contains($0) }) {
+            return .mastered(false)
+        }
+
+        return nil
+    }
+
+    private func extractProcessingStatusFilter(from query: String) -> QueryFilter? {
+        for mapping in processingKeywordMap where mapping.keywords.contains(where: { query.contains($0) }) {
+            return .processingStatus(mapping.status)
+        }
+        return nil
+    }
 
     /// Extract keywords for search
     private func extractKeywords(from query: String) -> [String] {
@@ -501,7 +565,7 @@ extension SmartQueryParser {
     static func buildPredicate(from filters: [QueryFilter]) -> Predicate<Material> {
         // Simplified placeholder - returns all materials
         // Proper implementation requires building predicates compositionally
-        #Predicate<Material> { material in
+        #Predicate<Material> { _ in
             true  // Placeholder - actual filtering should be done in-memory after fetch
         }
     }
