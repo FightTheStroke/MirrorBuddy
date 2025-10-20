@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 
 /// Settings view for dyslexia-friendly text rendering (Task 74.2)
 struct DyslexiaSettingsView: View {

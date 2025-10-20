@@ -92,7 +92,7 @@ final class WeeklyDigestService {
             studyMinutes: weeklyStudyMinutes,
             materialsCreated: weekMaterials.count,
             flashcardsReviewed: weekFlashcards.filter { $0.reviewCount > 0 }.count,
-            mindMapsGenerated: weekMaterials.filter { $0.mindMapNodes != nil }.count,
+            mindMapsGenerated: weekMaterials.filter { $0.mindMap != nil }.count,
             subjectPerformance: subjectPerformance,
             sentiment: sentiment,
             achievementsUnlocked: weeklyAchievements
@@ -141,27 +141,39 @@ final class WeeklyDigestService {
 
         // Analyze flashcard performance per subject
         for flashcard in flashcards {
-            guard let subject = flashcard.subject else { continue }
+            guard let subjectEntity = flashcard.material?.subject else { continue }
+            let subjectKey = subjectEntity.localizationKey
 
-            if performanceMap[subject] == nil {
-                performanceMap[subject] = SubjectPerformanceBuilder(subjectName: subject)
+            if performanceMap[subjectKey] == nil {
+                performanceMap[subjectKey] = SubjectPerformanceBuilder(subjectName: subjectKey)
             }
 
-            performanceMap[subject]?.addFlashcard(
-                difficulty: flashcard.difficulty,
+            // Infer difficulty from accuracy: high accuracy = easy, low accuracy = hard
+            let inferredDifficulty: String
+            if flashcard.accuracy >= 0.75 {
+                inferredDifficulty = "easy"
+            } else if flashcard.accuracy >= 0.50 {
+                inferredDifficulty = "medium"
+            } else {
+                inferredDifficulty = "hard"
+            }
+
+            performanceMap[subjectKey]?.addFlashcard(
+                difficulty: inferredDifficulty,
                 reviewCount: flashcard.reviewCount
             )
         }
 
         // Add material counts per subject
         for material in materials {
-            guard let subject = material.subject else { continue }
+            guard let subjectEntity = material.subject else { continue }
+            let subjectKey = subjectEntity.localizationKey
 
-            if performanceMap[subject] == nil {
-                performanceMap[subject] = SubjectPerformanceBuilder(subjectName: subject)
+            if performanceMap[subjectKey] == nil {
+                performanceMap[subjectKey] = SubjectPerformanceBuilder(subjectName: subjectKey)
             }
 
-            performanceMap[subject]?.addMaterial()
+            performanceMap[subjectKey]?.addMaterial()
         }
 
         // Convert to performance objects
@@ -184,10 +196,10 @@ final class WeeklyDigestService {
         var positiveSignals: [String] = []
         var concernSignals: [String] = []
 
-        // Count difficulty distribution
-        let easyCount = flashcards.filter { $0.difficulty == "easy" }.count
-        let mediumCount = flashcards.filter { $0.difficulty == "medium" }.count
-        let hardCount = flashcards.filter { $0.difficulty == "hard" }.count
+        // Count difficulty distribution (inferred from accuracy)
+        let easyCount = flashcards.filter { $0.accuracy >= 0.75 }.count
+        let mediumCount = flashcards.filter { $0.accuracy >= 0.50 && $0.accuracy < 0.75 }.count
+        let hardCount = flashcards.filter { $0.accuracy < 0.50 }.count
 
         let totalReviewed = flashcards.filter { $0.reviewCount > 0 }.count
         let avgReviewCount = flashcards.reduce(0) { $0 + $1.reviewCount } / max(1, flashcards.count)
@@ -316,6 +328,13 @@ enum StreakStatus: String, Codable {
     }
 }
 
+/// Performance level classification for weekly digest
+enum WeeklyPerformanceLevel: String, Codable {
+    case excelling
+    case progressing
+    case struggling
+}
+
 /// Subject performance metrics
 struct SubjectPerformance: Codable {
     let subjectName: String
@@ -324,7 +343,7 @@ struct SubjectPerformance: Codable {
     let difficultyScore: Double // 0.0 (easy) to 1.0 (very hard)
     let averageReviewCount: Double
 
-    var performanceLevel: WeeklyDigestService.PerformanceLevel {
+    var performanceLevel: WeeklyPerformanceLevel {
         if difficultyScore < 0.3 {
             return .excelling
         } else if difficultyScore < 0.6 {
@@ -333,13 +352,6 @@ struct SubjectPerformance: Codable {
             return .struggling
         }
     }
-}
-
-/// Performance level classification
-enum PerformanceLevel: String, Codable {
-    case excelling
-    case progressing
-    case struggling
 }
 
 /// Weekly sentiment analysis
