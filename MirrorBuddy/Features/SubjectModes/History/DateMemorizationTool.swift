@@ -96,7 +96,7 @@ final class DateMemorizationTool {
         for event: HistoricalEvent,
         difficulty: DateMemorizationDifficulty
     ) -> DateMemorizationQuestion {
-        let questionType: QuestionType
+        let questionType: DateMemorizationQuestion.QuestionType
         let hint: String?
 
         switch difficulty {
