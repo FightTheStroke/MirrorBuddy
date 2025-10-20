@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 /// Advanced calculator integrated with Math Mode
