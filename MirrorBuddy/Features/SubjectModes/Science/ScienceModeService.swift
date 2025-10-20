@@ -83,11 +83,9 @@ final class ScienceModeService: ObservableObject {
     ) throws -> UnitConversionResult {
         let result = try unitConverter.convert(value: value, from: fromUnit, to: toUnit)
 
-        await MainActor.run {
-            self.recentConversions.insert(result, at: 0)
-            if self.recentConversions.count > 20 {
-                self.recentConversions.removeLast()
-            }
+        recentConversions.insert(result, at: 0)
+        if recentConversions.count > 20 {
+            recentConversions.removeLast()
         }
 
         return result

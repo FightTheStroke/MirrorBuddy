@@ -6,14 +6,14 @@ import SwiftUI
 struct InteractiveMindMapView: View {
     let mindMap: MindMap
 
-    @State private var viewModel: MindMapViewModel
+    @State private var viewModel: InteractiveMindMapViewModel
     @State private var synthesizer = AVSpeechSynthesizer()
 
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "MindMapView")
 
     init(mindMap: MindMap) {
         self.mindMap = mindMap
-        _viewModel = State(initialValue: MindMapViewModel(mindMap: mindMap))
+        _viewModel = State(initialValue: InteractiveMindMapViewModel(mindMap: mindMap))
     }
 
     var body: some View {
@@ -499,7 +499,7 @@ struct InteractiveMindMapView: View {
 
 @Observable
 @MainActor
-final class MindMapViewModel {
+final class InteractiveMindMapViewModel {
     private let mindMap: MindMap
     private var allNodes: [MindMapNode]
 

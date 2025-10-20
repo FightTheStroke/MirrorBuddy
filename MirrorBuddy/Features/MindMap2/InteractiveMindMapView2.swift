@@ -1,15 +1,16 @@
+import Combine
 import SwiftUI
 
 /// Interactive mind map 2.0 with zoom, pan, and voice navigation
 struct InteractiveMindMapView2: View {
-    @StateObject private var viewModel: MindMapViewModel
+    @StateObject private var viewModel: MindMapV2ViewModel
     @GestureState private var magnification: CGFloat = 1.0
     @State private var currentScale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @GestureState private var dragOffset: CGSize = .zero
 
     init(mindMap: MindMapModel) {
-        _viewModel = StateObject(wrappedValue: MindMapViewModel(mindMap: mindMap))
+        _viewModel = StateObject(wrappedValue: MindMapV2ViewModel(mindMap: mindMap))
     }
 
     var body: some View {
@@ -171,7 +172,7 @@ struct InteractiveMindMapView2: View {
 // MARK: - ViewModel
 
 @MainActor
-final class MindMapViewModel: ObservableObject {
+final class MindMapV2ViewModel: ObservableObject {
     @Published var mindMap: MindMapModel
     @Published var selectedNode: MindMapNodeModel?
     @Published var isVoiceActive = false

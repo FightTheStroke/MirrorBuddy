@@ -20,6 +20,10 @@ final class GuidedFlashcardService: ObservableObject {
 
     private let cards: [FlashcardItem]
     private let subject: String?
+
+    var totalCards: Int {
+        cards.count
+    }
     private var sessionStartTime: Date?
     private let speechSynthesizer = AVSpeechSynthesizer()
 

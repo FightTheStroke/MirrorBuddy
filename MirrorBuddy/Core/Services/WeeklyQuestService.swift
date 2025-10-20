@@ -124,7 +124,7 @@ final class WeeklyQuestService {
         let now = Date()
         guard let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now)),
               let endOfWeek = calendar.date(byAdding: .day, value: 7, to: startOfWeek) else {
-            throw ServiceError.invalidConfiguration("Failed to calculate week boundaries")
+            throw ServiceError.notConfigured
         }
 
         // Remove old expired quests
@@ -164,16 +164,12 @@ final class WeeklyQuestService {
             throw ServiceError.notConfigured
         }
 
-        let predicate = #Predicate<WeeklyQuest> { quest in
-            quest.status == .active || quest.status == .completed
-        }
-
         let descriptor = FetchDescriptor<WeeklyQuest>(
-            predicate: predicate,
             sortBy: [SortDescriptor(\.startDate, order: .reverse)]
         )
 
         var quests = try context.fetch(descriptor)
+        quests = quests.filter { $0.status == .active || $0.status == .completed }
 
         // Check for expirations
         for quest in quests {
@@ -230,7 +226,7 @@ final class WeeklyQuestService {
         if quest.difficulty == .hard || quest.difficulty == .legendary {
             badge = QuestBadge(
                 name: quest.title,
-                description: quest.description,
+                description: quest.questDescription,
                 iconName: quest.iconName,
                 color: quest.difficulty == .legendary ? "gold" : "silver",
                 questID: quest.id
@@ -257,12 +253,9 @@ final class WeeklyQuestService {
             throw ServiceError.notConfigured
         }
 
-        let predicate = #Predicate<WeeklyQuest> { quest in
-            quest.status == .expired
-        }
-
-        let descriptor = FetchDescriptor<WeeklyQuest>(predicate: predicate)
-        let expiredQuests = try context.fetch(descriptor)
+        let descriptor = FetchDescriptor<WeeklyQuest>()
+        let allQuests = try context.fetch(descriptor)
+        let expiredQuests = allQuests.filter { $0.status == .expired }
 
         for quest in expiredQuests {
             context.delete(quest)

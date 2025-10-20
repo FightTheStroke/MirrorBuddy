@@ -6,6 +6,7 @@
 //  UI indicator showing offline status
 //
 
+import Network
 import SwiftUI
 
 /// Visual indicator displayed when the app is in offline mode

@@ -179,6 +179,14 @@ struct SmartVoiceButton: View {
             // Show error with option to continue as conversation
             errorMessage = message
             showError = true
+
+        case .suggestions(let commands, let originalText):
+            // Show disambiguation UI
+            print("Voice suggestions for '\(originalText)': \(commands.count) commands")
+
+        case .requiresConfirmation(let command):
+            // Show confirmation dialog
+            print("Voice command requires confirmation: \(command)")
         }
     }
 
@@ -262,11 +270,10 @@ struct SmartVoiceButton: View {
             forName: UIResponder.keyboardWillShowNotification,
             object: nil,
             queue: .main
-        ) { [weak self] notification in
-            guard let self = self else { return }
+        ) { notification in
             if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
                 withAnimation(.easeInOut(duration: 0.3)) {
-                    self.keyboardHeight = keyboardFrame.height
+                    keyboardHeight = keyboardFrame.height
                 }
             }
         }
@@ -275,10 +282,9 @@ struct SmartVoiceButton: View {
             forName: UIResponder.keyboardWillHideNotification,
             object: nil,
             queue: .main
-        ) { [weak self] _ in
-            guard let self = self else { return }
+        ) { _ in
             withAnimation(.easeInOut(duration: 0.3)) {
-                self.keyboardHeight = 0
+                keyboardHeight = 0
             }
         }
     }

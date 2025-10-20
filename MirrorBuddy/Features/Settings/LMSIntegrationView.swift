@@ -140,7 +140,7 @@ struct LMSIntegrationView: View {
 
             HStack(spacing: 12) {
                 Button {
-                    Task {
+                    _Concurrency.Task {
                         isSyncing = true
                         await onSync()
                         isSyncing = false

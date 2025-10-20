@@ -38,7 +38,7 @@ struct StudyStatisticsView: View {
 
             VStack(spacing: 12) {
                 HStack(spacing: 12) {
-                    StatCard(
+                    StudyStatCard(
                         title: "Today",
                         value: formatMinutes(totalMinutesToday),
                         subtitle: "\(todaySessions.count) sessions",
@@ -46,7 +46,7 @@ struct StudyStatisticsView: View {
                         color: .blue
                     )
 
-                    StatCard(
+                    StudyStatCard(
                         title: "This Week",
                         value: formatMinutes(totalMinutesWeek),
                         subtitle: "\(weekSessions.count) sessions",
@@ -56,7 +56,7 @@ struct StudyStatisticsView: View {
                 }
 
                 if currentStreak > 0 {
-                    StatCard(
+                    StudyStatCard(
                         title: "Current Streak",
                         value: "\(currentStreak)",
                         subtitle: currentStreak == 1 ? "day" : "days",
@@ -111,7 +111,7 @@ struct StudyStatisticsView: View {
     }
 }
 
-struct StatCard: View {
+struct StudyStatCard: View {
     let title: String
     let value: String
     let subtitle: String

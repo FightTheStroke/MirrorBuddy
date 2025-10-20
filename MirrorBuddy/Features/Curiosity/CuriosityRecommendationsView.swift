@@ -164,7 +164,7 @@ struct CuriosityContentCard: View {
                         .foregroundStyle(.secondary)
                 }
 
-                Text(content.description)
+                Text(content.contentDescription)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)

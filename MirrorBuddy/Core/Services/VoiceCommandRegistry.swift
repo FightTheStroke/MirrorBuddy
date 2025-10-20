@@ -112,7 +112,17 @@ final class VoiceCommandRegistry: ObservableObject {
 
     /// Register default voice commands
     private func registerDefaultCommands() {
-        // Navigation commands - Italian
+        registerNavigationCommands()
+        registerMaterialCommands()
+        registerStudyCommands()
+        registerAccessibilityCommands()
+        registerSpeechCommands()
+        registerAppControlCommands()
+
+        logger.info("Registered \(self.commands.count) default voice commands")
+    }
+
+    private func registerNavigationCommands() {
         registerCommand(
             name: "Indietro",
             triggers: ["indietro", "torna indietro", "vai indietro", "back"],
@@ -152,8 +162,9 @@ final class VoiceCommandRegistry: ObservableObject {
             context: .global,
             description: "Vai ai materiali di studio"
         )
+    }
 
-        // Material actions
+    private func registerMaterialCommands() {
         registerCommand(
             name: "Crea Materiale",
             triggers: ["crea materiale", "nuovo materiale", "aggiungi materiale", "create material", "new material"],
@@ -169,8 +180,9 @@ final class VoiceCommandRegistry: ObservableObject {
             context: .dashboard,
             description: "Cerca tra i materiali"
         )
+    }
 
-        // Study actions
+    private func registerStudyCommands() {
         registerCommand(
             name: "Inizia Studio",
             triggers: ["inizia studio", "studia", "comincia", "start study", "study"],
@@ -194,8 +206,9 @@ final class VoiceCommandRegistry: ObservableObject {
             context: .materialDetail,
             description: "Visualizza la mappa mentale"
         )
+    }
 
-        // Accessibility commands
+    private func registerAccessibilityCommands() {
         registerCommand(
             name: "Attiva Dislessia",
             triggers: ["attiva modalità dislessia", "abilita dislessia", "modalità dislessia on"],
@@ -227,8 +240,9 @@ final class VoiceCommandRegistry: ObservableObject {
             context: .global,
             description: "Riduci la dimensione del testo"
         )
+    }
 
-        // TTS commands
+    private func registerSpeechCommands() {
         registerCommand(
             name: "Leggi",
             triggers: ["leggi", "leggi testo", "ascolta", "read", "read text", "listen"],
@@ -260,8 +274,9 @@ final class VoiceCommandRegistry: ObservableObject {
             context: .global,
             description: "Riprendi la lettura"
         )
+    }
 
-        // App controls
+    private func registerAppControlCommands() {
         registerCommand(
             name: "Aggiorna",
             triggers: ["aggiorna", "ricarica", "refresh", "reload"],
@@ -285,8 +300,6 @@ final class VoiceCommandRegistry: ObservableObject {
             context: .global,
             description: "Mostra i comandi disponibili"
         )
-
-        logger.info("Registered \(self.commands.count) default voice commands")
     }
 
     /// Register a new voice command

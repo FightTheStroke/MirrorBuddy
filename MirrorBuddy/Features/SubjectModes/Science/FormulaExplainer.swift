@@ -31,11 +31,26 @@ final class FormulaExplainer {
             latexFormula: explanationData.latexFormula,
             name: explanationData.name,
             description: explanationData.description,
-            variables: explanationData.variables,
-            units: explanationData.units,
+            variables: explanationData.variables.map { variable in
+                FormulaExplanation.Variable(
+                    symbol: variable.symbol,
+                    name: variable.name,
+                    description: variable.description
+                )
+            },
+            units: FormulaExplanation.Units(
+                SI: explanationData.units.SI,
+                common: explanationData.units.common
+            ),
             derivation: explanationData.derivation,
             applications: explanationData.applications,
-            examples: explanationData.examples,
+            examples: explanationData.examples.map { example in
+                FormulaExplanation.Example(
+                    problem: example.problem,
+                    solution: example.solution,
+                    result: example.result
+                )
+            },
             relatedFormulas: explanationData.relatedFormulas
         )
     }

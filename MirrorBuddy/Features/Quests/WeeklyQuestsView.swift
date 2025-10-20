@@ -98,18 +98,16 @@ struct WeeklyQuestsView: View {
 
             HStack(spacing: 16) {
                 StatCard(
+                    icon: "checkmark.circle.fill",
                     title: "Completed",
                     value: "\(stats.totalQuestsCompleted)",
-                    subtitle: "quests",
-                    icon: "checkmark.circle.fill",
                     color: .green
                 )
 
                 StatCard(
+                    icon: "trophy.fill",
                     title: "Badges",
                     value: "\(stats.badgesEarned)",
-                    subtitle: "earned",
-                    icon: "trophy.fill",
                     color: .yellow
                 )
             }
@@ -173,7 +171,7 @@ struct WeeklyQuestsView: View {
                 .font(.headline)
 
             Button {
-                Task {
+                _Concurrency.Task {
                     await generateNewQuests()
                 }
             } label: {
@@ -257,7 +255,7 @@ struct WeeklyQuestsView: View {
             showingCelebration = true
 
             // Reload data
-            Task {
+            _Concurrency.Task {
                 await loadQuestData()
             }
         } catch {

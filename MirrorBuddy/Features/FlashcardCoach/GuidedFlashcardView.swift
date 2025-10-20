@@ -132,7 +132,7 @@ struct GuidedFlashcardView: View {
 
                 Spacer()
 
-                Text("\(coachService.currentCardIndex + 1) / \(coachService.cards.count)")
+                Text("\(coachService.currentCardIndex + 1) / \(coachService.totalCards)")
                     .font(.caption)
                     .foregroundColor(.secondary)
             }

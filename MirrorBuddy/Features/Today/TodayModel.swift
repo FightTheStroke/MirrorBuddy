@@ -185,7 +185,12 @@ final class TodayService: ObservableObject {
         let allTasks = await taskRepository.getTasks()
         let today = Calendar.current.startOfDay(for: Date())
         guard let tomorrow = Calendar.current.date(byAdding: .day, value: 1, to: today) else {
-            return []
+            return TodayModel.TodayProgress(
+                completedTasks: 0,
+                totalTasks: 0,
+                studyMinutes: 0,
+                materialsReviewed: 0
+            )
         }
 
         let todayTasks = allTasks.filter { task in

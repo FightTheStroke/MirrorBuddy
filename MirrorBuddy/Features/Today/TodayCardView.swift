@@ -243,7 +243,7 @@ struct TodayCardView: View {
     private var actionsSection: some View {
         HStack(spacing: 12) {
             Button {
-                Task {
+                _Concurrency.Task {
                     await todayService.refreshTodayData()
                 }
             } label: {
@@ -293,7 +293,7 @@ struct TodayCardView: View {
                 .multilineTextAlignment(.center)
 
             Button("Retry") {
-                Task {
+                _Concurrency.Task {
                     await todayService.refreshTodayData()
                 }
             }

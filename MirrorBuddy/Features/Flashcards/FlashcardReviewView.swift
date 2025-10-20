@@ -364,7 +364,7 @@ struct FlashcardStatsView: View {
 
     var body: some View {
         HStack(spacing: 20) {
-            StatItem(
+            FlashcardStatItem(
                 icon: "repeat",
                 label: "Reviews",
                 value: "\(flashcard.reviewCount)"
@@ -373,7 +373,7 @@ struct FlashcardStatsView: View {
             Divider()
                 .frame(height: 30)
 
-            StatItem(
+            FlashcardStatItem(
                 icon: "percent",
                 label: "Accuracy",
                 value: String(format: "%.0f%%", flashcard.accuracy * 100)
@@ -382,7 +382,7 @@ struct FlashcardStatsView: View {
             Divider()
                 .frame(height: 30)
 
-            StatItem(
+            FlashcardStatItem(
                 icon: "calendar",
                 label: "Next",
                 value: "\(flashcard.interval)d"
@@ -395,7 +395,7 @@ struct FlashcardStatsView: View {
     }
 }
 
-struct StatItem: View {
+struct FlashcardStatItem: View {
     let icon: String
     let label: String
     let value: String

@@ -11,7 +11,7 @@ struct NaturalLanguageTaskParser {
         let priority: TaskPriority
         let notes: String?
 
-        enum TaskPriority: String, CaseIterable {
+        enum TaskPriority: String, CaseIterable, Codable {
             case high = "High"
             case medium = "Medium"
             case low = "Low"

@@ -649,6 +649,8 @@ extension TaskSource {
         switch self {
         case .manual: return "Manual"
         case .googleCalendar: return "Google Calendar"
+        case .googleClassroom: return "Google Classroom"
+        case .canvas: return "Canvas"
         case .aiSuggested: return "AI Suggested"
         }
     }
