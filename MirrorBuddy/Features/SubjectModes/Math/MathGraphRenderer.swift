@@ -74,6 +74,19 @@ final class MathGraphRenderer {
 
     private func calculateY(for x: Double, function: MathFunction) -> Double? {
         switch function.type {
+        case .linear, .quadratic, .cubic, .polynomial:
+            return calculatePolynomialY(for: x, function: function)
+        case .exponential, .logarithmic:
+            return calculateTranscendentalY(for: x, function: function)
+        case .sine, .cosine, .tangent:
+            return calculateTrigonometricY(for: x, function: function)
+        case .absolute, .squareRoot, .rational, .custom:
+            return calculateOtherY(for: x, function: function)
+        }
+    }
+
+    private func calculatePolynomialY(for x: Double, function: MathFunction) -> Double? {
+        switch function.type {
         case .linear:
             guard let m = function.parameters["m"],
                   let b = function.parameters["b"] else { return nil }
@@ -100,6 +113,13 @@ final class MathGraphRenderer {
             }
             return result
 
+        default:
+            return nil
+        }
+    }
+
+    private func calculateTranscendentalY(for x: Double, function: MathFunction) -> Double? {
+        switch function.type {
         case .exponential:
             guard let a = function.parameters["a"],
                   let b = function.parameters["b"] else { return nil }
@@ -111,6 +131,13 @@ final class MathGraphRenderer {
             guard x > 0 else { return nil }
             return a * log(x) + b
 
+        default:
+            return nil
+        }
+    }
+
+    private func calculateTrigonometricY(for x: Double, function: MathFunction) -> Double? {
+        switch function.type {
         case .sine:
             let a = function.parameters["a"] ?? 1.0  // amplitude
             let b = function.parameters["b"] ?? 1.0  // frequency
@@ -135,6 +162,13 @@ final class MathGraphRenderer {
             guard abs(tanValue) < 100 else { return nil }
             return a * tanValue + d
 
+        default:
+            return nil
+        }
+    }
+
+    private func calculateOtherY(for x: Double, function: MathFunction) -> Double? {
+        switch function.type {
         case .absolute:
             guard let a = function.parameters["a"] else { return nil }
             let h = function.parameters["h"] ?? 0.0
@@ -160,6 +194,9 @@ final class MathGraphRenderer {
 
         case .custom:
             // Custom functions would need expression evaluation
+            return nil
+
+        default:
             return nil
         }
     }

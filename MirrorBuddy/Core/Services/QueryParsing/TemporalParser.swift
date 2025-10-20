@@ -6,8 +6,8 @@
 //  Parses expressions like "last Tuesday", "3 weeks ago", "yesterday", "the last thing I studied"
 //
 
-import Foundation
 import Combine
+import Foundation
 
 /// Date range result from temporal parsing
 struct DateRange {

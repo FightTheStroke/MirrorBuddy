@@ -1,6 +1,6 @@
+import Combine
 import Foundation
 import SwiftData
-import Combine
 
 /// Quest type for weekly challenges
 enum QuestType: String, Codable {
@@ -65,7 +65,7 @@ final class WeeklyQuest {
     var targetValue: Int
     var currentValue: Int = 0
     var baseXP: Int
-    var status: QuestStatus = QuestStatus.active
+    var status = QuestStatus.active
     var startDate: Date
     var endDate: Date
     var completedAt: Date?

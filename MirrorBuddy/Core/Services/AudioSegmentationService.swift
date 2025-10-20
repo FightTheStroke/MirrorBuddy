@@ -7,10 +7,9 @@
 //
 
 import AVFoundation
+import Combine
 import Foundation
 import os.log
-import Combine
-
 
 /// Service for splitting extended recordings into chunks for Whisper API
 @MainActor

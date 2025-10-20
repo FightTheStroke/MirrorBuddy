@@ -6,9 +6,9 @@
 //  Tracks usage statistics, performance metrics, and error handling
 //
 
+import Combine
 import Foundation
 import os.log
-import Combine
 
 /// Query parsing event types
 enum QueryEvent {

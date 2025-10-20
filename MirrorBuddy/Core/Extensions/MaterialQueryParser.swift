@@ -326,14 +326,14 @@ struct MaterialQueryParser {
         // Find most recent material for this subject
         return materials
             .filter { $0.subject?.id == subject.id }
-            .max(by: { $0.createdAt < $1.createdAt })?
+            .max { $0.createdAt < $1.createdAt }?
             .id
     }
 
     /// Find most recently created material overall
     private static func findNewestMaterial(in materials: [Material]) -> UUID? {
         materials
-            .max(by: { $0.createdAt < $1.createdAt })?
+            .max { $0.createdAt < $1.createdAt }?
             .id
     }
 

@@ -125,5 +125,4 @@ final class IdleDetector: ObservableObject {
         idleDuration = 0
         contextTracker.recordInteraction()
     }
-
 }

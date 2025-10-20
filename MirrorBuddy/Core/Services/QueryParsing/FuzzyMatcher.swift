@@ -6,8 +6,8 @@
 //  Handles typos, phonetic variations, and approximate string matching
 //
 
-import Foundation
 import Combine
+import Foundation
 
 /// Result of a fuzzy match operation
 struct FuzzyMatchResult: Comparable {

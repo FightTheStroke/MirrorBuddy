@@ -43,44 +43,44 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     func testOAuthTokenExchangeFlow() async throws {
         // Given: Mock token response
         let tokenResponse = """
-        {
+            {
             "access_token": "ya29.test_access_token",
             "refresh_token": "1//test_refresh_token",
             "expires_in": 3600,
             "token_type": "Bearer",
             "scope": "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/calendar.readonly"
-        }
-        ""Data(".utf8) ?? Data()
+            }
+            ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: tokenResponse,
-                statusCode: 200,
-                delay: 0.1
+            data: tokenResponse,
+            statusCode: 200,
+            delay: 0.1
             )
-        )
+            )
 
-        // When: Exchange authorization code for tokens
-        let request = try XCTUnwrap(
+            // When: Exchange authorization code for tokens
+            let request = try XCTUnwrap(
             URLRequest(url: URL(string: "https://oauth2.googleapis.com/token") ?? URL(fileURLWithPath: ""))
-        )
+            )
 
-        let (data, response) = try await mockURLSession.data(for: request)
+            let (data, response) = try await mockURLSession.data(for: request)
 
-        // Then: Verify token response
-        let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
-        XCTAssertEqual(httpResponse.statusCode, 200, "Token exchange should succeed")
+            // Then: Verify token response
+            let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
+            XCTAssertEqual(httpResponse.statusCode, 200, "Token exchange should succeed")
 
-        let tokens = try JSONDecoder().decode(MockOAuthTokenResponse.self, from: data)
-        XCTAssertEqual(tokens.tokenType, "Bearer")
-        XCTAssertTrue(tokens.accessToken.starts(with: "ya29."))
-        XCTAssertNotNil(tokens.refreshToken)
-        XCTAssertEqual(tokens.expiresIn, 3_600)
-    }
+            let tokens = try JSONDecoder().decode(MockOAuthTokenResponse.self, from: data)
+            XCTAssertEqual(tokens.tokenType, "Bearer")
+            XCTAssertTrue(tokens.accessToken.starts(with: "ya29."))
+            XCTAssertNotNil(tokens.refreshToken)
+            XCTAssertEqual(tokens.expiresIn, 3_600)
+            }
 
-    /// Test 2: OAuth token refresh flow
-    func testOAuthTokenRefreshFlow() async throws {
-        // Given: Mock refresh token response
+            /// Test 2: OAuth token refresh flow
+            func testOAuthTokenRefreshFlow() async throws {
+            // Given: Mock refresh token response
         let refreshResponse = """
         {
             "access_token": "ya29.new_access_token",
@@ -90,11 +90,11 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         }
         ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: refreshResponse,
-                statusCode: 200,
-                delay: 0.1
+            data: refreshResponse,
+            statusCode: 200,
+            delay: 0.1
             )
         )
 
@@ -168,68 +168,68 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     func testGmailMessageListRetrieval() async throws {
         // Given: Mock Gmail messages response
         let messagesResponse = """
-        {
+            {
             "messages": [
-                {"id": "msg001", "threadId": "thread001"},
-                {"id": "msg002", "threadId": "thread001"},
-                {"id": "msg003", "threadId": "thread002"}
+            {"id": "msg001", "threadId": "thread001"},
+            {"id": "msg002", "threadId": "thread001"},
+            {"id": "msg003", "threadId": "thread002"}
             ],
             "nextPageToken": "page2_token",
             "resultSizeEstimate": 3
-        }
-        ""Data(".utf8) ?? Data()
+            }
+            ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: messagesResponse,
-                statusCode: 200,
-                delay: 0.1
+            data: messagesResponse,
+            statusCode: 200,
+            delay: 0.1
             )
-        )
+            )
 
-        // When: Fetch message list
-        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher") ?? URL(fileURLWithPath: "")
-        let request = URLRequest(url: url)
+            // When: Fetch message list
+            let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher") ?? URL(fileURLWithPath: "")
+            let request = URLRequest(url: url)
 
-        let (data, response) = try await mockURLSession.data(for: request)
+            let (data, response) = try await mockURLSession.data(for: request)
 
-        // Then: Verify message list
-        let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
-        XCTAssertEqual(httpResponse.statusCode, 200)
+            // Then: Verify message list
+            let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
+            XCTAssertEqual(httpResponse.statusCode, 200)
 
-        let messageList = try JSONDecoder().decode(MockGmailMessageList.self, from: data)
-        XCTAssertEqual(messageList.messages.count, 3, "Should have 3 messages")
-        XCTAssertEqual(messageList.nextPageToken, "page2_token")
-        XCTAssertEqual(messageList.resultSizeEstimate, 3)
-    }
+            let messageList = try JSONDecoder().decode(MockGmailMessageList.self, from: data)
+            XCTAssertEqual(messageList.messages.count, 3, "Should have 3 messages")
+            XCTAssertEqual(messageList.nextPageToken, "page2_token")
+            XCTAssertEqual(messageList.resultSizeEstimate, 3)
+            }
 
-    /// Test 6: Gmail message detail retrieval
-    func testGmailMessageDetailRetrieval() async throws {
-        // Given: Mock Gmail message detail
+            /// Test 6: Gmail message detail retrieval
+            func testGmailMessageDetailRetrieval() async throws {
+            // Given: Mock Gmail message detail
         let messageDetail = """
         {
             "id": "msg001",
             "threadId": "thread001",
             "snippet": "Assignment: Complete Chapter 5 problems",
             "payload": {
-                "headers": [
-                    {"name": "Subject", "value": "Math Homework - Due Friday"},
-                    {"name": "From", "value": "teacher@school.edu"},
-                    {"name": "Date", "value": "Mon, 21 Oct 2024 10:30:00 -0700"}
-                ],
-                "body": {
-                    "data": "Q29tcGxldGUgQ2hhcHRlciA1IHByb2JsZW1zIDE1"
-                }
+            "headers": [
+            {"name": "Subject", "value": "Math Homework - Due Friday"},
+            {"name": "From", "value": "teacher@school.edu"},
+            {"name": "Date", "value": "Mon, 21 Oct 2024 10:30:00 -0700"}
+            ],
+            "body": {
+            "data": "Q29tcGxldGUgQ2hhcHRlciA1IHByb2JsZW1zIDE1"
+            }
             },
             "internalDate": "1729529400000"
         }
         ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: messageDetail,
-                statusCode: 200,
-                delay: 0.1
+            data: messageDetail,
+            statusCode: 200,
+            delay: 0.1
             )
         )
 
@@ -255,11 +255,11 @@ final class GoogleAPIIntegrationTests: XCTestCase {
         let attachmentData = "VGVzdCBQREYgY29udGVudA==Data(".utf8) ?? Data()
 
         MockURLProtocol.responseQueue.append(
-            MockURLProtocol.MockResponse(
-                data: attachmentData,
-                statusCode: 200,
-                delay: 0.2
-            )
+        MockURLProtocol.MockResponse(
+        data: attachmentData,
+        statusCode: 200,
+        delay: 0.2
+        )
         )
 
         // When: Download attachment
@@ -278,68 +278,68 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     func testGmailQueryFiltering() async throws {
         // Given: Multiple mock responses for different queries
         let teacherMessages = """
-        {
+            {
             "messages": [
-                {"id": "msg001", "threadId": "thread001"},
-                {"id": "msg002", "threadId": "thread001"}
+            {"id": "msg001", "threadId": "thread001"},
+            {"id": "msg002", "threadId": "thread001"}
             ],
             "resultSizeEstimate": 2
-        }
-        ""Data(".utf8) ?? Data()
+            }
+            ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: teacherMessages,
-                statusCode: 200,
-                delay: 0.1
+            data: teacherMessages,
+            statusCode: 200,
+            delay: 0.1
             )
-        )
+            )
 
-        // When: Query with filter
-        let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher+subject:homework") ?? URL(fileURLWithPath: "")
-        let request = URLRequest(url: url)
+            // When: Query with filter
+            let url = URL(string: "https://www.googleapis.com/gmail/v1/users/me/messages?q=from:teacher+subject:homework") ?? URL(fileURLWithPath: "")
+            let request = URLRequest(url: url)
 
-        let (data, response) = try await mockURLSession.data(for: request)
+            let (data, response) = try await mockURLSession.data(for: request)
 
-        // Then: Verify filtered results
-        let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
-        XCTAssertEqual(httpResponse.statusCode, 200)
+            // Then: Verify filtered results
+            let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
+            XCTAssertEqual(httpResponse.statusCode, 200)
 
-        let messageList = try JSONDecoder().decode(MockGmailMessageList.self, from: data)
-        XCTAssertEqual(messageList.messages.count, 2, "Should have 2 teacher messages")
-    }
+            let messageList = try JSONDecoder().decode(MockGmailMessageList.self, from: data)
+            XCTAssertEqual(messageList.messages.count, 2, "Should have 2 teacher messages")
+            }
 
-    // MARK: - Google Calendar API Integration Tests
+            // MARK: - Google Calendar API Integration Tests
 
-    /// Test 9: Calendar event list retrieval
-    func testCalendarEventListRetrieval() async throws {
-        // Given: Mock calendar events response
+            /// Test 9: Calendar event list retrieval
+            func testCalendarEventListRetrieval() async throws {
+            // Given: Mock calendar events response
         let eventsResponse = """
         {
             "items": [
-                {
-                    "id": "event001",
-                    "summary": "Math Exam",
-                    "description": "Chapter 1-5 coverage",
-                    "start": {"dateTime": "2024-10-25T10:00:00-07:00"},
-                    "end": {"dateTime": "2024-10-25T12:00:00-07:00"}
-                },
-                {
-                    "id": "event002",
-                    "summary": "Physics Lab Due",
-                    "start": {"dateTime": "2024-10-26T23:59:00-07:00"},
-                    "end": {"dateTime": "2024-10-26T23:59:00-07:00"}
-                }
+            {
+            "id": "event001",
+            "summary": "Math Exam",
+            "description": "Chapter 1-5 coverage",
+            "start": {"dateTime": "2024-10-25T10:00:00-07:00"},
+            "end": {"dateTime": "2024-10-25T12:00:00-07:00"}
+            },
+            {
+            "id": "event002",
+            "summary": "Physics Lab Due",
+            "start": {"dateTime": "2024-10-26T23:59:00-07:00"},
+            "end": {"dateTime": "2024-10-26T23:59:00-07:00"}
+            }
             ],
             "nextPageToken": null
         }
         ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: eventsResponse,
-                statusCode: 200,
-                delay: 0.1
+            data: eventsResponse,
+            statusCode: 200,
+            delay: 0.1
             )
         )
 
@@ -362,63 +362,63 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     func testCalendarEventCreation() async throws {
         // Given: Mock event creation response
         let createdEvent = """
-        {
+            {
             "id": "event_new001",
             "summary": "Study Session",
             "description": "Review math concepts",
             "start": {"dateTime": "2024-10-27T15:00:00-07:00"},
             "end": {"dateTime": "2024-10-27T17:00:00-07:00"},
             "status": "confirmed"
-        }
-        ""Data(".utf8) ?? Data()
+            }
+            ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: createdEvent,
-                statusCode: 200,
-                delay: 0.1
+            data: createdEvent,
+            statusCode: 200,
+            delay: 0.1
             )
-        )
+            )
 
-        // When: Create calendar event
-        let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events") ?? URL(fileURLWithPath: "")
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+            // When: Create calendar event
+            let url = URL(string: "https://www.googleapis.com/calendar/v3/calendars/primary/events") ?? URL(fileURLWithPath: "")
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
 
-        let (data, response) = try await mockURLSession.data(for: request)
+            let (data, response) = try await mockURLSession.data(for: request)
 
-        // Then: Verify event creation
-        let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
-        XCTAssertEqual(httpResponse.statusCode, 200)
+            // Then: Verify event creation
+            let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
+            XCTAssertEqual(httpResponse.statusCode, 200)
 
-        let event = try JSONDecoder().decode(MockCalendarEvent.self, from: data)
-        XCTAssertEqual(event.summary, "Study Session")
-        XCTAssertEqual(event.status, "confirmed")
-    }
+            let event = try JSONDecoder().decode(MockCalendarEvent.self, from: data)
+            XCTAssertEqual(event.summary, "Study Session")
+            XCTAssertEqual(event.status, "confirmed")
+            }
 
-    /// Test 11: Calendar time zone handling
-    func testCalendarTimeZoneHandling() async throws {
-        // Given: Mock event with different time zones
+            /// Test 11: Calendar time zone handling
+            func testCalendarTimeZoneHandling() async throws {
+            // Given: Mock event with different time zones
         let eventWithTimezone = """
         {
             "id": "event_tz001",
             "summary": "International Meeting",
             "start": {
-                "dateTime": "2024-10-25T14:00:00-04:00",
-                "timeZone": "America/New_York"
+            "dateTime": "2024-10-25T14:00:00-04:00",
+            "timeZone": "America/New_York"
             },
             "end": {
-                "dateTime": "2024-10-25T15:00:00-04:00",
-                "timeZone": "America/New_York"
+            "dateTime": "2024-10-25T15:00:00-04:00",
+            "timeZone": "America/New_York"
             }
         }
         ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: eventWithTimezone,
-                statusCode: 200,
-                delay: 0.1
+            data: eventWithTimezone,
+            statusCode: 200,
+            delay: 0.1
             )
         )
 
@@ -443,93 +443,93 @@ final class GoogleAPIIntegrationTests: XCTestCase {
     func testDriveFileListRetrieval() async throws {
         // Given: Mock Drive files response
         let filesResponse = """
-        {
+            {
             "files": [
-                {
-                    "id": "file001",
-                    "name": "Lecture Notes.pdf",
-                    "mimeType": "application/pdf",
-                    "size": "1048576",
-                    "modifiedTime": "2024-10-20T10:30:00.000Z"
-                },
-                {
-                    "id": "file002",
-                    "name": "Assignment.docx",
-                    "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    "size": "524288",
-                    "modifiedTime": "2024-10-21T15:45:00.000Z"
-                }
+            {
+            "id": "file001",
+            "name": "Lecture Notes.pdf",
+            "mimeType": "application/pdf",
+            "size": "1048576",
+            "modifiedTime": "2024-10-20T10:30:00.000Z"
+            },
+            {
+            "id": "file002",
+            "name": "Assignment.docx",
+            "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "size": "524288",
+            "modifiedTime": "2024-10-21T15:45:00.000Z"
+            }
             ],
             "nextPageToken": null
-        }
-        ""Data(".utf8) ?? Data()
+            }
+            ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: filesResponse,
-                statusCode: 200,
-                delay: 0.1
+            data: filesResponse,
+            statusCode: 200,
+            delay: 0.1
             )
-        )
+            )
 
-        // When: Fetch file list
-        let url = URL(string: "https://www.googleapis.com/drive/v3/files") ?? URL(fileURLWithPath: "")
-        let request = URLRequest(url: url)
+            // When: Fetch file list
+            let url = URL(string: "https://www.googleapis.com/drive/v3/files") ?? URL(fileURLWithPath: "")
+            let request = URLRequest(url: url)
 
-        let (data, response) = try await mockURLSession.data(for: request)
+            let (data, response) = try await mockURLSession.data(for: request)
 
-        // Then: Verify file list
-        let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
-        XCTAssertEqual(httpResponse.statusCode, 200)
+            // Then: Verify file list
+            let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
+            XCTAssertEqual(httpResponse.statusCode, 200)
 
-        let fileList = try JSONDecoder().decode(MockDriveFileList.self, from: data)
-        XCTAssertEqual(fileList.files.count, 2, "Should have 2 files")
-        XCTAssertTrue(fileList.files[0].name.contains("Lecture"))
-    }
+            let fileList = try JSONDecoder().decode(MockDriveFileList.self, from: data)
+            XCTAssertEqual(fileList.files.count, 2, "Should have 2 files")
+            XCTAssertTrue(fileList.files[0].name.contains("Lecture"))
+            }
 
-    /// Test 13: Drive file download
-    func testDriveFileDownload() async throws {
-        // Given: Mock file content
-        let fileContent = "Sample PDF content dataData(".utf8) ?? Data()
+            /// Test 13: Drive file download
+            func testDriveFileDownload() async throws {
+            // Given: Mock file content
+            let fileContent = "Sample PDF content dataData(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: fileContent,
-                statusCode: 200,
-                delay: 0.3
+            data: fileContent,
+            statusCode: 200,
+            delay: 0.3
             )
-        )
+            )
 
-        // When: Download file
-        let url = URL(string: "https://www.googleapis.com/drive/v3/files/file001?alt=media") ?? URL(fileURLWithPath: "")
-        let request = URLRequest(url: url)
+            // When: Download file
+            let url = URL(string: "https://www.googleapis.com/drive/v3/files/file001?alt=media") ?? URL(fileURLWithPath: "")
+            let request = URLRequest(url: url)
 
-        let (data, response) = try await mockURLSession.data(for: request)
+            let (data, response) = try await mockURLSession.data(for: request)
 
-        // Then: Verify download
-        let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
-        XCTAssertEqual(httpResponse.statusCode, 200)
-        XCTAssertFalse(data.isEmpty, "Downloaded file should have content")
-    }
+            // Then: Verify download
+            let httpResponse = try XCTUnwrap(response as? HTTPURLResponse)
+            XCTAssertEqual(httpResponse.statusCode, 200)
+            XCTAssertFalse(data.isEmpty, "Downloaded file should have content")
+            }
 
-    /// Test 14: Drive API error handling
-    func testDriveAPIErrorHandling() async throws {
-        // Given: Mock error response
+            /// Test 14: Drive API error handling
+            func testDriveAPIErrorHandling() async throws {
+            // Given: Mock error response
         let errorResponse = """
         {
             "error": {
-                "code": 404,
-                "message": "File not found",
-                "status": "NOT_FOUND"
+            "code": 404,
+            "message": "File not found",
+            "status": "NOT_FOUND"
             }
         }
         ""Data(".utf8) ?? Data()
 
-        MockURLProtocol.responseQueue.append(
+            MockURLProtocol.responseQueue.append(
             MockURLProtocol.MockResponse(
-                data: errorResponse,
-                statusCode: 404,
-                delay: 0.1
+            data: errorResponse,
+            statusCode: 404,
+            delay: 0.1
             )
         )
 

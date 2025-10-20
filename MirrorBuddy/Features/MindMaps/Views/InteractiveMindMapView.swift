@@ -180,143 +180,152 @@ struct InteractiveMindMapView: View {
             let isRoot = node.parentNodeID == nil
             let isSelected = viewModel.selectedNode?.id == node.id
             let isExpanded = viewModel.isExpanded(node: node)
-
-            // Use mobile-optimized sizing (Task 97.2)
             let nodeSize = isRoot ? MindMapTheme.NodeSize.rootDiameter : MindMapTheme.NodeSize.childDiameter
             let scaledSize = nodeSize * viewModel.zoomScale
-
-            // Draw node circle
-            let rect = CGRect(
-                x: position.x - scaledSize / 2,
-                y: position.y - scaledSize / 2,
-                width: scaledSize,
-                height: scaledSize
-            )
-
             let color = Color(hexString: node.color ?? "#4A90E2") ?? .blue
-            // High contrast mode (Task 97.2)
-            let fillColor = isSelected ? color : color.opacity(MindMapTheme.ColorSettings.highContrastNodeOpacity)
 
-            // Shadow for depth
-            context.fill(
-                Path(ellipseIn: rect.insetBy(dx: -2, dy: -2)),
-                with: .color(.black.opacity(0.2))
-            )
-
-            context.fill(
-                Path(ellipseIn: rect),
-                with: .color(fillColor)
-            )
-
-            // Border for selected node (Task 97.2: High contrast)
-            if isSelected {
-                context.stroke(
-                    Path(ellipseIn: rect),
-                    with: .color(MindMapTheme.ColorSettings.selectedBorderColor),
-                    lineWidth: MindMapTheme.ColorSettings.selectedBorderWidth
-                )
-            }
-
-            // Draw expansion indicator (Task 97.3: Enhanced with SF Symbols)
-            if !node.childNodesArray.isEmpty {
-                let indicatorSize: CGFloat = 20 * viewModel.zoomScale
-                let indicatorX = position.x + scaledSize / 2 - indicatorSize / 2
-                let indicatorY = position.y - indicatorSize / 2
-
-                // Use SF Symbol for expansion state
-                let symbolName = isExpanded ? MindMapTheme.NodeIcon.expanded : MindMapTheme.NodeIcon.collapsed
-                if let resolved = context.resolveSymbol(id: "expand_\(node.id)_\(symbolName)") {
-                    context.draw(resolved, at: CGPoint(x: indicatorX, y: indicatorY))
-                } else {
-                    // Fallback to text if symbol not resolved
-                    let symbol = isExpanded ? "−" : "+"
-                    let text = Text(symbol).font(.system(size: 14 * viewModel.zoomScale, weight: .bold)).foregroundStyle(.white)
-                    context.draw(text, at: CGPoint(x: indicatorX, y: indicatorY))
-                }
-            }
-
-            // Draw node type indicator (Task 97.3: Simple circle/half circle/dot)
-            let typeIndicatorRadius: CGFloat = 6 * viewModel.zoomScale
-            let typeIndicatorPos = CGPoint(
-                x: position.x - scaledSize / 3,
-                y: position.y - scaledSize / 3
-            )
-
-            if isRoot {
-                // Full circle for root
-                context.fill(
-                    Path(ellipseIn: CGRect(
-                        x: typeIndicatorPos.x - typeIndicatorRadius,
-                        y: typeIndicatorPos.y - typeIndicatorRadius,
-                        width: typeIndicatorRadius * 2,
-                        height: typeIndicatorRadius * 2
-                    )),
-                    with: .color(.white.opacity(0.9))
-                )
-            } else if !node.childNodesArray.isEmpty {
-                // Half circle for branch nodes
-                var path = Path()
-                path.addArc(
-                    center: typeIndicatorPos,
-                    radius: typeIndicatorRadius,
-                    startAngle: .degrees(-90),
-                    endAngle: .degrees(90),
-                    clockwise: false
-                )
-                path.closeSubpath()
-                context.fill(path, with: .color(.white.opacity(0.7)))
-            } else {
-                // Small dot for leaf nodes
-                context.fill(
-                    Path(ellipseIn: CGRect(
-                        x: typeIndicatorPos.x - typeIndicatorRadius / 2,
-                        y: typeIndicatorPos.y - typeIndicatorRadius / 2,
-                        width: typeIndicatorRadius,
-                        height: typeIndicatorRadius
-                    )),
-                    with: .color(.white.opacity(0.6))
-                )
-            }
-
-            // Draw subject indicator badge on root node (Task 97.3)
-            if isRoot, let material = mindMap.material, let subjectEntity = material.subject {
-                let badgeRadius: CGFloat = 12 * viewModel.zoomScale
-                let badgePos = CGPoint(
-                    x: position.x + scaledSize / 3,
-                    y: position.y + scaledSize / 3
-                )
-
-                // Badge background
-                context.fill(
-                    Path(ellipseIn: CGRect(
-                        x: badgePos.x - badgeRadius,
-                        y: badgePos.y - badgeRadius,
-                        width: badgeRadius * 2,
-                        height: badgeRadius * 2
-                    )),
-                    with: .color(.white.opacity(0.9))
-                )
-
-                // Subject initial letter
-                let subject = subjectEntity.toSubject()
-                let initial = String(subjectEntity.displayName.prefix(1))
-                let badgeText = Text(initial)
-                    .font(.system(size: badgeRadius, weight: .bold))
-                    .foregroundStyle(Color(hexString: node.color ?? "#4A90E2") ?? .blue)
-
-                context.draw(badgeText, at: badgePos)
-            }
-
-            // Draw title text (Task 97.2: Large fonts for mobile readability)
-            let fontSize = isRoot ? MindMapTheme.FontSize.rootNodeTitle : MindMapTheme.FontSize.childNodeTitle
-            let fontWeight = isRoot ? MindMapTheme.FontWeight.rootNode : MindMapTheme.FontWeight.childNode
-
-            let titleText = Text(node.title)
-                .font(.system(size: fontSize, weight: fontWeight))
-                .foregroundStyle(MindMapTheme.ColorSettings.textOnColoredBackground)
-
-            context.draw(titleText, at: position)
+            // Delegate to specialized drawing methods
+            drawNodeCircleAndShadow(context: context, position: position, scaledSize: scaledSize, color: color, isSelected: isSelected)
+            drawExpansionIndicator(context: context, node: node, position: position, scaledSize: scaledSize, isExpanded: isExpanded)
+            drawTypeIndicator(context: context, node: node, position: position, scaledSize: scaledSize, isRoot: isRoot)
+            drawSubjectBadge(context: context, node: node, position: position, scaledSize: scaledSize, color: color, isRoot: isRoot)
+            drawNodeTitle(context: context, node: node, position: position, isRoot: isRoot)
         }
+    }
+
+    private func drawNodeCircleAndShadow(context: GraphicsContext, position: CGPoint, scaledSize: CGFloat, color: Color, isSelected: Bool) {
+        let rect = CGRect(
+            x: position.x - scaledSize / 2,
+            y: position.y - scaledSize / 2,
+            width: scaledSize,
+            height: scaledSize
+        )
+
+        let fillColor = isSelected ? color : color.opacity(MindMapTheme.ColorSettings.highContrastNodeOpacity)
+
+        // Shadow for depth
+        context.fill(
+            Path(ellipseIn: rect.insetBy(dx: -2, dy: -2)),
+            with: .color(.black.opacity(0.2))
+        )
+
+        context.fill(
+            Path(ellipseIn: rect),
+            with: .color(fillColor)
+        )
+
+        // Border for selected node (Task 97.2: High contrast)
+        if isSelected {
+            context.stroke(
+                Path(ellipseIn: rect),
+                with: .color(MindMapTheme.ColorSettings.selectedBorderColor),
+                lineWidth: MindMapTheme.ColorSettings.selectedBorderWidth
+            )
+        }
+    }
+
+    private func drawExpansionIndicator(context: GraphicsContext, node: MindMapNode, position: CGPoint, scaledSize: CGFloat, isExpanded: Bool) {
+        guard !node.childNodesArray.isEmpty else { return }
+
+        let indicatorSize: CGFloat = 20 * viewModel.zoomScale
+        let indicatorX = position.x + scaledSize / 2 - indicatorSize / 2
+        let indicatorY = position.y - indicatorSize / 2
+
+        // Use SF Symbol for expansion state
+        let symbolName = isExpanded ? MindMapTheme.NodeIcon.expanded : MindMapTheme.NodeIcon.collapsed
+        if let resolved = context.resolveSymbol(id: "expand_\(node.id)_\(symbolName)") {
+            context.draw(resolved, at: CGPoint(x: indicatorX, y: indicatorY))
+        } else {
+            // Fallback to text if symbol not resolved
+            let symbol = isExpanded ? "−" : "+"
+            let text = Text(symbol).font(.system(size: 14 * viewModel.zoomScale, weight: .bold)).foregroundStyle(.white)
+            context.draw(text, at: CGPoint(x: indicatorX, y: indicatorY))
+        }
+    }
+
+    private func drawTypeIndicator(context: GraphicsContext, node: MindMapNode, position: CGPoint, scaledSize: CGFloat, isRoot: Bool) {
+        let typeIndicatorRadius: CGFloat = 6 * viewModel.zoomScale
+        let typeIndicatorPos = CGPoint(
+            x: position.x - scaledSize / 3,
+            y: position.y - scaledSize / 3
+        )
+
+        if isRoot {
+            // Full circle for root
+            context.fill(
+                Path(ellipseIn: CGRect(
+                    x: typeIndicatorPos.x - typeIndicatorRadius,
+                    y: typeIndicatorPos.y - typeIndicatorRadius,
+                    width: typeIndicatorRadius * 2,
+                    height: typeIndicatorRadius * 2
+                )),
+                with: .color(.white.opacity(0.9))
+            )
+        } else if !node.childNodesArray.isEmpty {
+            // Half circle for branch nodes
+            var path = Path()
+            path.addArc(
+                center: typeIndicatorPos,
+                radius: typeIndicatorRadius,
+                startAngle: .degrees(-90),
+                endAngle: .degrees(90),
+                clockwise: false
+            )
+            path.closeSubpath()
+            context.fill(path, with: .color(.white.opacity(0.7)))
+        } else {
+            // Small dot for leaf nodes
+            context.fill(
+                Path(ellipseIn: CGRect(
+                    x: typeIndicatorPos.x - typeIndicatorRadius / 2,
+                    y: typeIndicatorPos.y - typeIndicatorRadius / 2,
+                    width: typeIndicatorRadius,
+                    height: typeIndicatorRadius
+                )),
+                with: .color(.white.opacity(0.6))
+            )
+        }
+    }
+
+    private func drawSubjectBadge(context: GraphicsContext, node: MindMapNode, position: CGPoint, scaledSize: CGFloat, color: Color, isRoot: Bool) {
+        guard isRoot, let material = mindMap.material, let subjectEntity = material.subject else { return }
+
+        let badgeRadius: CGFloat = 12 * viewModel.zoomScale
+        let badgePos = CGPoint(
+            x: position.x + scaledSize / 3,
+            y: position.y + scaledSize / 3
+        )
+
+        // Badge background
+        context.fill(
+            Path(ellipseIn: CGRect(
+                x: badgePos.x - badgeRadius,
+                y: badgePos.y - badgeRadius,
+                width: badgeRadius * 2,
+                height: badgeRadius * 2
+            )),
+            with: .color(.white.opacity(0.9))
+        )
+
+        // Subject initial letter
+        let subject = subjectEntity.toSubject()
+        let initial = String(subjectEntity.displayName.prefix(1))
+        let badgeText = Text(initial)
+            .font(.system(size: badgeRadius, weight: .bold))
+            .foregroundStyle(color)
+
+        context.draw(badgeText, at: badgePos)
+    }
+
+    private func drawNodeTitle(context: GraphicsContext, node: MindMapNode, position: CGPoint, isRoot: Bool) {
+        let fontSize = isRoot ? MindMapTheme.FontSize.rootNodeTitle : MindMapTheme.FontSize.childNodeTitle
+        let fontWeight = isRoot ? MindMapTheme.FontWeight.rootNode : MindMapTheme.FontWeight.childNode
+
+        let titleText = Text(node.title)
+            .font(.system(size: fontSize, weight: fontWeight))
+            .foregroundStyle(MindMapTheme.ColorSettings.textOnColoredBackground)
+
+        context.draw(titleText, at: position)
     }
 
     // MARK: - Gestures (Subtask 39.2)

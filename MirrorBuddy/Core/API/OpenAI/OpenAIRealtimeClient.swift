@@ -612,6 +612,21 @@ enum ServerEvent: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         switch self {
+        case .sessionCreated, .sessionUpdated, .conversationCreated, .conversationItemCreated:
+            try encodeSessionEvents(to: encoder, container: &container)
+        case .inputAudioBufferCommitted, .inputAudioBufferCleared, .inputAudioBufferSpeechStarted, .inputAudioBufferSpeechStopped:
+            try encodeAudioBufferEvents(to: encoder, container: &container)
+        case .responseCreated, .responseOutputItemAdded, .responseOutputItemDone, .responseContentPartAdded, .responseContentPartDone:
+            try encodeResponseStructureEvents(to: encoder, container: &container)
+        case .responseTextDelta, .responseTextDone, .responseAudioTranscriptDelta, .responseAudioTranscriptDone, .responseAudioDelta, .responseAudioDone:
+            try encodeResponseContentEvents(to: encoder, container: &container)
+        case .responseDone, .rateLimitsUpdated, .error:
+            try encodeMetaEvents(to: encoder, container: &container)
+        }
+    }
+
+    private func encodeSessionEvents(to encoder: Encoder, container: inout KeyedEncodingContainer<CodingKeys>) throws {
+        switch self {
         case .sessionCreated(let event):
             try container.encode("session.created", forKey: .type)
             try event.encode(to: encoder)
@@ -624,6 +639,12 @@ enum ServerEvent: Codable {
         case .conversationItemCreated(let event):
             try container.encode("conversation.item.created", forKey: .type)
             try event.encode(to: encoder)
+        default: break
+        }
+    }
+
+    private func encodeAudioBufferEvents(to encoder: Encoder, container: inout KeyedEncodingContainer<CodingKeys>) throws {
+        switch self {
         case .inputAudioBufferCommitted(let event):
             try container.encode("input_audio_buffer.committed", forKey: .type)
             try event.encode(to: encoder)
@@ -635,6 +656,12 @@ enum ServerEvent: Codable {
         case .inputAudioBufferSpeechStopped(let event):
             try container.encode("input_audio_buffer.speech_stopped", forKey: .type)
             try event.encode(to: encoder)
+        default: break
+        }
+    }
+
+    private func encodeResponseStructureEvents(to encoder: Encoder, container: inout KeyedEncodingContainer<CodingKeys>) throws {
+        switch self {
         case .responseCreated(let event):
             try container.encode("response.created", forKey: .type)
             try event.encode(to: encoder)
@@ -650,6 +677,12 @@ enum ServerEvent: Codable {
         case .responseContentPartDone(let event):
             try container.encode("response.content_part.done", forKey: .type)
             try event.encode(to: encoder)
+        default: break
+        }
+    }
+
+    private func encodeResponseContentEvents(to encoder: Encoder, container: inout KeyedEncodingContainer<CodingKeys>) throws {
+        switch self {
         case .responseTextDelta(let event):
             try container.encode("response.text.delta", forKey: .type)
             try event.encode(to: encoder)
@@ -667,6 +700,12 @@ enum ServerEvent: Codable {
             try event.encode(to: encoder)
         case .responseAudioDone:
             try container.encode("response.audio.done", forKey: .type)
+        default: break
+        }
+    }
+
+    private func encodeMetaEvents(to encoder: Encoder, container: inout KeyedEncodingContainer<CodingKeys>) throws {
+        switch self {
         case .responseDone(let event):
             try container.encode("response.done", forKey: .type)
             try event.encode(to: encoder)
@@ -676,6 +715,7 @@ enum ServerEvent: Codable {
         case .error(let event):
             try container.encode("error", forKey: .type)
             try event.encode(to: encoder)
+        default: break
         }
     }
 
@@ -683,77 +723,95 @@ enum ServerEvent: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(String.self, forKey: .type)
 
+        if type.hasPrefix("session.") || type.hasPrefix("conversation.") {
+            self = try Self.decodeSessionEvent(type: type, decoder: decoder, container: container)
+        } else if type.hasPrefix("input_audio_buffer.") {
+            self = try Self.decodeAudioBufferEvent(type: type, decoder: decoder)
+        } else if type.hasPrefix("response.output") || type.hasPrefix("response.content") || type == "response.created" {
+            self = try Self.decodeResponseStructureEvent(type: type, decoder: decoder)
+        } else if type.hasPrefix("response.text") || type.hasPrefix("response.audio") {
+            self = try Self.decodeResponseContentEvent(type: type, decoder: decoder)
+        } else {
+            self = try Self.decodeMetaEvent(type: type, decoder: decoder, container: container)
+        }
+    }
+
+    private static func decodeSessionEvent(type: String, decoder: Decoder, container: KeyedDecodingContainer<CodingKeys>) throws -> ServerEvent {
         switch type {
         case "session.created":
-            let event = try SessionCreated(from: decoder)
-            self = .sessionCreated(event)
+            return .sessionCreated(try SessionCreated(from: decoder))
         case "session.updated":
-            let event = try SessionUpdated(from: decoder)
-            self = .sessionUpdated(event)
+            return .sessionUpdated(try SessionUpdated(from: decoder))
         case "conversation.created":
-            let event = try ConversationCreated(from: decoder)
-            self = .conversationCreated(event)
+            return .conversationCreated(try ConversationCreated(from: decoder))
         case "conversation.item.created":
-            let event = try ConversationItemCreated(from: decoder)
-            self = .conversationItemCreated(event)
-        case "input_audio_buffer.committed":
-            let event = try InputAudioBufferCommitted(from: decoder)
-            self = .inputAudioBufferCommitted(event)
-        case "input_audio_buffer.cleared":
-            self = .inputAudioBufferCleared
-        case "input_audio_buffer.speech_started":
-            let event = try SpeechEvent(from: decoder)
-            self = .inputAudioBufferSpeechStarted(event)
-        case "input_audio_buffer.speech_stopped":
-            let event = try SpeechEvent(from: decoder)
-            self = .inputAudioBufferSpeechStopped(event)
-        case "response.created":
-            let event = try ResponseCreated(from: decoder)
-            self = .responseCreated(event)
-        case "response.output_item.added":
-            let event = try ResponseOutputItem(from: decoder)
-            self = .responseOutputItemAdded(event)
-        case "response.output_item.done":
-            let event = try ResponseOutputItem(from: decoder)
-            self = .responseOutputItemDone(event)
-        case "response.content_part.added":
-            let event = try ResponseContentPart(from: decoder)
-            self = .responseContentPartAdded(event)
-        case "response.content_part.done":
-            let event = try ResponseContentPart(from: decoder)
-            self = .responseContentPartDone(event)
-        case "response.text.delta":
-            let event = try TextDelta(from: decoder)
-            self = .responseTextDelta(event)
-        case "response.text.done":
-            let event = try TextDone(from: decoder)
-            self = .responseTextDone(event)
-        case "response.audio_transcript.delta":
-            let event = try AudioTranscriptDelta(from: decoder)
-            self = .responseAudioTranscriptDelta(event)
-        case "response.audio_transcript.done":
-            let event = try AudioTranscriptDone(from: decoder)
-            self = .responseAudioTranscriptDone(event)
-        case "response.audio.delta":
-            let event = try AudioDelta(from: decoder)
-            self = .responseAudioDelta(event)
-        case "response.audio.done":
-            self = .responseAudioDone
-        case "response.done":
-            let event = try ResponseDone(from: decoder)
-            self = .responseDone(event)
-        case "rate_limits.updated":
-            let event = try RateLimits(from: decoder)
-            self = .rateLimitsUpdated(event)
-        case "error":
-            let event = try ServerError(from: decoder)
-            self = .error(event)
+            return .conversationItemCreated(try ConversationItemCreated(from: decoder))
         default:
-            throw DecodingError.dataCorruptedError(
-                forKey: .type,
-                in: container,
-                debugDescription: "Unknown event type: \(type)"
-            )
+            throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown event type: \(type)")
+        }
+    }
+
+    private static func decodeAudioBufferEvent(type: String, decoder: Decoder) throws -> ServerEvent {
+        switch type {
+        case "input_audio_buffer.committed":
+            return .inputAudioBufferCommitted(try InputAudioBufferCommitted(from: decoder))
+        case "input_audio_buffer.cleared":
+            return .inputAudioBufferCleared
+        case "input_audio_buffer.speech_started":
+            return .inputAudioBufferSpeechStarted(try SpeechEvent(from: decoder))
+        case "input_audio_buffer.speech_stopped":
+            return .inputAudioBufferSpeechStopped(try SpeechEvent(from: decoder))
+        default:
+            fatalError("Unknown audio buffer event: \(type)")
+        }
+    }
+
+    private static func decodeResponseStructureEvent(type: String, decoder: Decoder) throws -> ServerEvent {
+        switch type {
+        case "response.created":
+            return .responseCreated(try ResponseCreated(from: decoder))
+        case "response.output_item.added":
+            return .responseOutputItemAdded(try ResponseOutputItem(from: decoder))
+        case "response.output_item.done":
+            return .responseOutputItemDone(try ResponseOutputItem(from: decoder))
+        case "response.content_part.added":
+            return .responseContentPartAdded(try ResponseContentPart(from: decoder))
+        case "response.content_part.done":
+            return .responseContentPartDone(try ResponseContentPart(from: decoder))
+        default:
+            fatalError("Unknown response structure event: \(type)")
+        }
+    }
+
+    private static func decodeResponseContentEvent(type: String, decoder: Decoder) throws -> ServerEvent {
+        switch type {
+        case "response.text.delta":
+            return .responseTextDelta(try TextDelta(from: decoder))
+        case "response.text.done":
+            return .responseTextDone(try TextDone(from: decoder))
+        case "response.audio_transcript.delta":
+            return .responseAudioTranscriptDelta(try AudioTranscriptDelta(from: decoder))
+        case "response.audio_transcript.done":
+            return .responseAudioTranscriptDone(try AudioTranscriptDone(from: decoder))
+        case "response.audio.delta":
+            return .responseAudioDelta(try AudioDelta(from: decoder))
+        case "response.audio.done":
+            return .responseAudioDone
+        case "response.done":
+            return .responseDone(try ResponseDone(from: decoder))
+        default:
+            fatalError("Unknown response content event: \(type)")
+        }
+    }
+
+    private static func decodeMetaEvent(type: String, decoder: Decoder, container: KeyedDecodingContainer<CodingKeys>) throws -> ServerEvent {
+        switch type {
+        case "rate_limits.updated":
+            return .rateLimitsUpdated(try RateLimits(from: decoder))
+        case "error":
+            return .error(try ServerError(from: decoder))
+        default:
+            throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown event type: \(type)")
         }
     }
 

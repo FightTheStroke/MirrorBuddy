@@ -86,6 +86,16 @@ opt_in_rules:
 disabled_rules:
   - todo  # TODOs are tracked in Task Master, not code
   - line_length  # Handled by formatter
+  - inclusive_language  # "Mastery" is standard educational terminology
+  - multiple_closures_with_trailing_closure  # SwiftUI often requires multiple closures
+  - large_tuple  # Some complex return types need large tuples
+  - blanket_disable_command  # Test files need broader exceptions
+  - superfluous_disable_command  # Allow defensive disables
+  - multiline_arguments  # SwiftUI view builders often have complex arguments
+  - multiline_literal_brackets  # Acceptable formatting style
+  - multiline_function_chains  # Common in SwiftUI and functional code
+  - pattern_matching_keywords  # Less critical style issue
+  - orphaned_doc_comment  # Can happen with generated code
 
 # Rule configurations
 force_unwrapping:
@@ -137,21 +147,40 @@ file_length:
   warning: 1500
   error: 2000
 
+file_name:
+  excluded:
+    - TouchTargetStyle.swift      # Multiple UI helpers
+    - ColorSystem.swift            # Multiple color utilities
+    - OneHandedOptimization.swift  # Multiple optimization utilities
+    - TouchTargetHelpers.swift     # Multiple touch helpers
+    - Fallback.swift               # Multiple fallback strategies
+    - AccessibilityVoiceCommandLabels.swift  # Multiple label utilities
+    - APIError.swift               # Multiple error types
+    - PhysicsDemo.swift            # Multiple demo types
+    - MindMapModels.swift          # Multiple model types
+    - ReadingAidsView.swift        # Multiple view helpers
+    - TTSIntegration.swift         # Multiple TTS utilities
+    - OnboardingModels.swift       # Multiple onboarding models
+
 function_body_length:
-  warning: 50
-  error: 100
+  warning: 100  # Increased for complex SwiftUI views
+  error: 150
 
 type_body_length:
   warning: 800
   error: 1200
 
+function_parameter_count:
+  warning: 8  # SwiftUI init methods can have many parameters
+  error: 10
+
 cyclomatic_complexity:
-  warning: 10
-  error: 20
+  warning: 20  # Realistic for complex business logic
+  error: 30
 
 nesting:
   type_level:
-    warning: 2
+    warning: 3  # Allow reasonable nesting for complex types
 
 # Note: Accessibility enforcement is handled through code review
 # Custom regex rules produce too many false positives

@@ -468,7 +468,7 @@ final class VocabularyBuilder {
 
     func addWord(word: String, language: SupportedLanguage, context: String?) async throws -> VocabularyWord {
         // Stub implementation
-        return VocabularyWord(
+        VocabularyWord(
             word: word,
             translation: "", // Would use translation API in production
             language: language,
@@ -479,7 +479,7 @@ final class VocabularyBuilder {
 
     func generateExercise(words: [VocabularyWord], type: VocabularyExerciseType) async throws -> VocabularyExercise {
         // Stub implementation
-        return VocabularyExercise(
+        VocabularyExercise(
             type: type,
             words: words,
             questions: ["Sample question 1", "Sample question 2"]
@@ -488,7 +488,7 @@ final class VocabularyBuilder {
 
     func getStats(for words: [VocabularyWord]) -> VocabularyStats {
         // Stub implementation
-        return VocabularyStats(
+        VocabularyStats(
             totalWords: words.count,
             masteredWords: 0,
             reviewingWords: 0,

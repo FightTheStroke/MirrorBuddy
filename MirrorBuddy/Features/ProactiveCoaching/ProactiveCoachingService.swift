@@ -321,5 +321,4 @@ final class ProactiveCoachingService: ObservableObject {
         contextTracker.endStudySession()
         stopCoaching()
     }
-
 }

@@ -181,40 +181,40 @@ final class SentimentDetectionService: ObservableObject {
         updateSentiment(.neutral, confidence: 0.5)
 
         /* TODO: Reimplement when AnthropicClient is available
-        guard let client = anthropicClient else {
-            updateSentiment(.neutral, confidence: 0.5)
-            return
-        }
+         guard let client = anthropicClient else {
+         updateSentiment(.neutral, confidence: 0.5)
+         return
+         }
 
-        let prompt = """
-        Analyze the following student speech for emotional sentiment.
-        Respond with ONLY one word: enthusiastic, neutral, frustrated, confused, or tired.
+         let prompt = """
+         Analyze the following student speech for emotional sentiment.
+         Respond with ONLY one word: enthusiastic, neutral, frustrated, confused, or tired.
 
-        Student: "\(transcript)"
+         Student: "\(transcript)"
 
-        Sentiment:
-        """
+         Sentiment:
+         """
 
-        let request = AnthropicCompletionRequest(
-            model: "claude-3-5-sonnet-20241022",
-            messages: [
-                AnthropicMessage(role: "user", content: prompt)
-            ],
-            maxTokens: 10,
-            temperature: 0.3
-        )
+         let request = AnthropicCompletionRequest(
+         model: "claude-3-5-sonnet-20241022",
+         messages: [
+         AnthropicMessage(role: "user", content: prompt)
+         ],
+         maxTokens: 10,
+         temperature: 0.3
+         )
 
-        do {
-            let response = try await client.sendMessage(request)
-            let sentimentText = response.content.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? "neutral"
+         do {
+         let response = try await client.sendMessage(request)
+         let sentimentText = response.content.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() ?? "neutral"
 
-            let sentiment = Sentiment(rawValue: sentimentText) ?? .neutral
-            updateSentiment(sentiment, confidence: 0.85)
-        } catch {
-            print("⚠️ LLM sentiment analysis failed: \(error)")
-            updateSentiment(.neutral, confidence: 0.5)
-        }
-        */
+         let sentiment = Sentiment(rawValue: sentimentText) ?? .neutral
+         updateSentiment(sentiment, confidence: 0.85)
+         } catch {
+         print("⚠️ LLM sentiment analysis failed: \(error)")
+         updateSentiment(.neutral, confidence: 0.5)
+         }
+         */
     }
 
     // MARK: - State Management

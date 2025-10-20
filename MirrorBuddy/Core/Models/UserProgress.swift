@@ -1,6 +1,6 @@
+import Combine
 import Foundation
 import SwiftData
-import Combine
 
 /// Achievement types for gamification
 enum Achievement: String, Codable, CaseIterable {

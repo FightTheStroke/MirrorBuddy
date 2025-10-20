@@ -6,9 +6,9 @@
 //  Provides CRUD operations and fast alias resolution
 //
 
+import Combine
 import Foundation
 import SwiftData
-import Combine
 
 /// Error types for alias operations
 enum AliasError: LocalizedError {

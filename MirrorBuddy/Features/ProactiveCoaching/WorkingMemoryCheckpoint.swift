@@ -172,5 +172,4 @@ final class WorkingMemoryCheckpoint: ObservableObject {
     func triggerManualCheckpoint() {
         performCheckpoint()
     }
-
 }
