@@ -64,7 +64,7 @@ final class WeeklyQuest {
     var targetValue: Int
     var currentValue: Int = 0
     var baseXP: Int
-    var status: QuestStatus = .active
+    var status: QuestStatus = QuestStatus.active
     var startDate: Date
     var endDate: Date
     var completedAt: Date?
