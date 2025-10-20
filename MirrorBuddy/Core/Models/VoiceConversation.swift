@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import Combine
 
 /// Voice conversation with AI coach
 @Model

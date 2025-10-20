@@ -409,3 +409,114 @@ enum LanguageModeError: Error, LocalizedError {
         }
     }
 }
+
+// MARK: - Vocabulary Types (Stub Implementation)
+
+struct VocabularyWord: Codable, Identifiable {
+    let id: UUID
+    let word: String
+    let translation: String
+    let language: SupportedLanguage
+    let example: String?
+    let notes: String?
+
+    init(word: String, translation: String, language: SupportedLanguage, example: String? = nil, notes: String? = nil) {
+        self.id = UUID()
+        self.word = word
+        self.translation = translation
+        self.language = language
+        self.example = example
+        self.notes = notes
+    }
+}
+
+struct VocabularyExercise: Codable, Identifiable {
+    let id: UUID
+    let type: VocabularyExerciseType
+    let words: [VocabularyWord]
+    let questions: [String]
+
+    init(type: VocabularyExerciseType, words: [VocabularyWord], questions: [String]) {
+        self.id = UUID()
+        self.type = type
+        self.words = words
+        self.questions = questions
+    }
+}
+
+enum VocabularyExerciseType: String, Codable {
+    case matching
+    case fillInTheBlank
+    case multipleChoice
+    case flashcards
+}
+
+struct VocabularyStats {
+    let totalWords: Int
+    let masteredWords: Int
+    let reviewingWords: Int
+    let newWords: Int
+}
+
+@MainActor
+final class VocabularyBuilder {
+    private let geminiClient: GeminiClient
+
+    init(geminiClient: GeminiClient) {
+        self.geminiClient = geminiClient
+    }
+
+    func generateExercise(words: [VocabularyWord], type: VocabularyExerciseType) async throws -> VocabularyExercise {
+        // Stub implementation
+        return VocabularyExercise(
+            type: type,
+            words: words,
+            questions: ["Sample question 1", "Sample question 2"]
+        )
+    }
+
+    func getStats(for words: [VocabularyWord]) -> VocabularyStats {
+        // Stub implementation
+        return VocabularyStats(
+            totalWords: words.count,
+            masteredWords: 0,
+            reviewingWords: 0,
+            newWords: words.count
+        )
+    }
+}
+
+struct LanguagePrompts {
+    static func conversationPracticePrompt(
+        topic: String,
+        language: SupportedLanguage,
+        level: LanguageProficiencyLevel
+    ) -> String {
+        """
+        Create a conversation practice scenario in \(language.rawValue) for a \(level.rawValue) level student.
+        Topic: \(topic)
+        Provide a realistic dialogue scenario with starter prompts and vocabulary hints.
+        Format as JSON with keys: scenario, starterPrompts, vocabularyHints, grammarPoints
+        """
+    }
+
+    static func grammarCheckPrompt(text: String, language: SupportedLanguage) -> String {
+        """
+        Check the following \(language.rawValue) text for grammar errors:
+        \(text)
+        Provide detailed corrections and explanations in JSON format.
+        """
+    }
+
+    static func listeningExercisePrompt(
+        topic: String,
+        language: SupportedLanguage,
+        level: LanguageProficiencyLevel
+    ) -> String {
+        """
+        Create a listening comprehension exercise in \(language.rawValue) for \(level.rawValue) learners.
+        Topic: \(topic)
+        Format as JSON with keys: title, audioText, level, questions, transcript, vocabularyNotes
+        """
+    }
+}

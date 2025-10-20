@@ -170,19 +170,19 @@ final class PronunciationCoach: NSObject, ObservableObject {
 
 extension PronunciationCoach: AVSpeechSynthesizerDelegate {
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
-        Task { @MainActor in
+        _Concurrency.Task { @MainActor in
             self.isSpeaking = true
         }
     }
 
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        Task { @MainActor in
+        _Concurrency.Task { @MainActor in
             self.isSpeaking = false
         }
     }
 
     nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        Task { @MainActor in
+        _Concurrency.Task { @MainActor in
             self.isSpeaking = false
         }
     }

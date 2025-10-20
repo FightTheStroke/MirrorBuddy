@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import Combine
 
 /// Quest type for weekly challenges
 enum QuestType: String, Codable {
