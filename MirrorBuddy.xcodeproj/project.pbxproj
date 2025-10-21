@@ -115,6 +115,7 @@
 				C2DDF2872E9BA66800E76D0A /* Sources */,
 				C2DDF2882E9BA66800E76D0A /* Frameworks */,
 				C2DDF2892E9BA66800E76D0A /* Resources */,
+				84D74845BC1A4340A3E0C3C7 /* Copy OpenDyslexic Fonts */,
 			);
 			buildRules = (
 			);
@@ -237,6 +238,36 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		84D74845BC1A4340A3E0C3C7 /* Copy OpenDyslexic Fonts */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/MirrorBuddy/Resources/Fonts/OpenDyslexic-Regular.otf",
+				"$(SRCROOT)/MirrorBuddy/Resources/Fonts/OpenDyslexic-Bold.otf",
+				"$(SRCROOT)/MirrorBuddy/Resources/Fonts/OpenDyslexic-Italic.otf",
+				"$(SRCROOT)/MirrorBuddy/Resources/Fonts/OpenDyslexic-Bold-Italic.otf",
+			);
+			name = "Copy OpenDyslexic Fonts";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Fonts/OpenDyslexic-Regular.otf",
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Fonts/OpenDyslexic-Bold.otf",
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Fonts/OpenDyslexic-Italic.otf",
+				"$(BUILT_PRODUCTS_DIR)/$(PRODUCT_NAME).app/Fonts/OpenDyslexic-Bold-Italic.otf",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copy OpenDyslexic fonts to app bundle\nFONTS_SRC=\"${SRCROOT}/MirrorBuddy/Resources/Fonts\"\nFONTS_DEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Fonts\"\n\necho \"Copying OpenDyslexic fonts...\"\nmkdir -p \"${FONTS_DEST}\"\ncp \"${FONTS_SRC}\"/OpenDyslexic-*.otf \"${FONTS_DEST}/\"\necho \"✅ Fonts copied to ${FONTS_DEST}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		C2DDF2872E9BA66800E76D0A /* Sources */ = {
@@ -418,7 +449,7 @@
 				DEVELOPMENT_TEAM = 93T3LG4NPG;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -480,7 +511,7 @@
 				DEVELOPMENT_TEAM = 93T3LG4NPG;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
