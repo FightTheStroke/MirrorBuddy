@@ -4,12 +4,15 @@ import SwiftData
 /// Represents a single study session for tracking study time
 @Model
 final class StudySession {
-    var id: UUID
-    var date: Date
-    var durationMinutes: Int
+    // CloudKit requires all non-optional properties to have default values
+    var id = UUID()
+    var date = Date()
+    var durationMinutes: Int = 0
     var subject: String?
 
-    @Relationship(deleteRule: .nullify)
+    // CloudKit requires all relationships to have an inverse
+    // For many-to-many, use @Relationship on both sides but ONLY specify inverse on one side
+    @Relationship
     var materialsStudied: [Material]?
 
     var startTime: Date?
@@ -25,14 +28,14 @@ final class StudySession {
         id: UUID = UUID(),
         date: Date = Date(),
         durationMinutes: Int = 0,
-        subject: String? = nil,
-        materialsStudied: [Material]? = nil
+        subject: String? = nil
     ) {
+        // CloudKit-compliant initialization with default values
         self.id = id
         self.date = date
         self.durationMinutes = durationMinutes
         self.subject = subject
-        self.materialsStudied = materialsStudied
+        // Note: materialsStudied relationship managed by SwiftData @Relationship macro
         self.startTime = date
         self.isPaused = false
         self.totalPausedMinutes = 0

@@ -8,9 +8,23 @@
 import SwiftData
 import SwiftUI
 
+/// Wrapper view that applies localization dynamically
+private struct LocalizedContentView: View {
+    @Environment(\.localizationManager) private var localizationManager
+
+    var body: some View {
+        MainTabView()
+            .environment(\.locale, localizationManager.currentLanguage.locale)
+            .id(localizationManager.currentLanguage.rawValue) // Force refresh on language change
+    }
+}
+
 @main
 struct MirrorBuddyApp: App {
     init() {
+        // Configure OpenDyslexic font for navigation bars
+        configureNavigationBarFont()
+
         // Start performance monitoring (Task 59)
         _Concurrency.Task { @MainActor in
             PerformanceMonitor.shared.startAppLaunch()
@@ -25,6 +39,47 @@ struct MirrorBuddyApp: App {
         // Register scheduled material sync (Task 72)
         _Concurrency.Task { @MainActor in
             BackgroundSyncService.shared.register()
+        }
+    }
+
+    /// Configure OpenDyslexic font for UIKit navigation bars
+    private func configureNavigationBarFont() {
+        // Verify OpenDyslexic fonts are loaded
+        #if DEBUG
+        verifyOpenDyslexicFonts()
+        #endif
+
+        // Navigation bar large title
+        let largeTitleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont(name: "OpenDyslexic-Bold", size: 34) ?? UIFont.systemFont(ofSize: 34, weight: .bold)
+        ]
+        UINavigationBar.appearance().largeTitleTextAttributes = largeTitleAttributes
+
+        // Navigation bar regular title
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont(name: "OpenDyslexic-Bold", size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .semibold)
+        ]
+        UINavigationBar.appearance().titleTextAttributes = titleAttributes
+    }
+
+    /// Verify that OpenDyslexic fonts are properly loaded (DEBUG only)
+    private func verifyOpenDyslexicFonts() {
+        let requiredFonts = ["OpenDyslexic-Regular", "OpenDyslexic-Bold", "OpenDyslexic-Italic", "OpenDyslexic-Bold-Italic"]
+        var allLoaded = true
+
+        for fontName in requiredFonts {
+            if UIFont(name: fontName, size: 12) != nil {
+                print("✅ Font loaded: \(fontName)")
+            } else {
+                print("❌ Font NOT loaded: \(fontName)")
+                allLoaded = false
+            }
+        }
+
+        if allLoaded {
+            print("✅ All OpenDyslexic fonts loaded successfully!")
+        } else {
+            print("⚠️ WARNING: Some OpenDyslexic fonts failed to load. Check Info.plist UIAppFonts configuration.")
         }
     }
 
@@ -74,6 +129,19 @@ struct MirrorBuddyApp: App {
             let subjectService = SubjectService(modelContext: context)
             try? subjectService.initializeDefaultSubjects()
 
+            // Task 83.5: Migrate existing data to use SubjectEntity
+            let migrationService = DataMigrationService(modelContext: context)
+            if migrationService.isMigrationNeeded() {
+                _Concurrency.Task { @MainActor in
+                    do {
+                        let result = try await migrationService.performMigration()
+                        print("✅ Data migration completed: \(result.summary)")
+                    } catch {
+                        print("⚠️ Data migration failed: \(error.localizedDescription)")
+                    }
+                }
+            }
+
             return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
@@ -82,11 +150,11 @@ struct MirrorBuddyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            LocalizedContentView()
                 .environment(LocalizationManager.shared)
                 .environment(CloudKitSyncMonitor.shared)
                 .environmentObject(AppVoiceCommandHandler.shared) // Task 103: Inject voice command handler
-                .font(.openDyslexicBody) // Apply OpenDyslexic as default font
+                .environment(\.font, .openDyslexicBody) // Apply OpenDyslexic as default font (modern best practice)
                 .onAppear {
                     // Complete performance monitoring setup (Task 59)
                     _Concurrency.Task { @MainActor in

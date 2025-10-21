@@ -321,12 +321,12 @@ final class HomeworkHelpViewModel: ObservableObject {
     // MARK: - Voice Session Management
 
     private func prepareVoiceContext(with analysis: AnalysisResult) {
-        // Extract subject and concepts from analysis
+        // Extract subject from analysis
         let subject = extractSubject(from: analysis)
-        let concepts = analysis.identifiedConcepts
+        // Note: concepts will be used in future for personalized coaching context
 
         // Update coach personality context
-        var context = ConversationContext(
+        let context = ConversationContext(
             subject: subject,
             material: "Homework captured via camera",
             topicsCovered: [],

@@ -65,7 +65,7 @@ final class KnowledgeExportService: ObservableObject {
 
                 // Node content
                 if let content = node.content, !content.isEmpty {
-                    let contentRect = CGRect(x: padding + 20, y: yPosition, width: pageWidth - 2 * padding - 20, height: 0)
+                    _ = CGRect(x: padding + 20, y: yPosition, width: pageWidth - 2 * padding - 20, height: 0)
                     let contentSize = content.boundingRect(
                         with: CGSize(width: pageWidth - 2 * padding - 20, height: .greatestFiniteMagnitude),
                         options: [.usesLineFragmentOrigin],

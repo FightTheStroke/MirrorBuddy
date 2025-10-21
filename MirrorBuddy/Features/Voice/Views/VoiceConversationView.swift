@@ -668,7 +668,7 @@ final class VoiceConversationViewModel: ObservableObject {
             switch message {
             case .serverEvent(let event):
                 switch event {
-                case .sessionCreated(let session):
+                case .sessionCreated:
                     // Session initialized successfully
                     break
 
@@ -696,6 +696,7 @@ final class VoiceConversationViewModel: ObservableObject {
 
                 case .responseDone(let responseDone):
                     // Response completed - finalize AI message and return to passive listening
+
                     _Concurrency.Task { @MainActor in
                         self.finalizeAIResponse()
                         self.sessionState = .passive
@@ -722,7 +723,7 @@ final class VoiceConversationViewModel: ObservableObject {
                         self.logger.debug("VAD: User stopped speaking, AI processing")
                     }
 
-                case .rateLimitsUpdated(let rateLimits):
+                case .rateLimitsUpdated:
                     // Could log rate limit info for debugging
                     break
 
@@ -917,6 +918,7 @@ final class VoiceConversationViewModel: ObservableObject {
 
                 // Send context-aware system prompt
                 let systemPrompt = await coachPersonality.generateSystemPrompt(
+
                     for: currentSubject,
                     material: currentMaterial
                 )
@@ -1024,7 +1026,7 @@ final class VoiceConversationViewModel: ObservableObject {
         }
 
         // Generate response using GPT-5
-        let systemPrompt = await coachPersonality.generateSystemPrompt(
+        let systemPrompt = coachPersonality.generateSystemPrompt(
             for: currentSubject,
             material: currentMaterial
         )
@@ -1062,18 +1064,12 @@ final class VoiceConversationViewModel: ObservableObject {
 
         // Stop offline mode services if active
         if isOfflineMode {
-            do {
-                try localSpeechRecognition.stopListening()
-            } catch {
-                logger.error("Error stopping speech recognition: \(error.localizedDescription)")
-            }
+            localSpeechRecognition.stopListening()
             localTextToSpeech.stop()
         } else {
             // Disconnect from realtime API
             if let realtimeClient {
-                _Concurrency.Task {
-                    await realtimeClient.disconnect()
-                }
+                realtimeClient.disconnect()
             }
         }
 
@@ -1093,7 +1089,7 @@ final class VoiceConversationViewModel: ObservableObject {
 
     /// Buffer audio chunks and send to OpenAI when threshold is reached
     private func bufferAndSendAudio(_ audioData: Data) async {
-        guard let realtimeClient, isConversationActive else { return }
+        guard realtimeClient != nil, isConversationActive else { return }
 
         // Check for barge-in: user starting to speak while AI is speaking
         if sessionState == .speaking {
@@ -1207,7 +1203,7 @@ final class VoiceConversationViewModel: ObservableObject {
         if let conversation = currentConversation,
            let service = conversationService {
             do {
-                try service.addMessage(
+                _ = try service.addMessage(
                     to: conversation,
                     content: content,
                     isFromUser: true
@@ -1231,7 +1227,7 @@ final class VoiceConversationViewModel: ObservableObject {
         if let conversation = currentConversation,
            let service = conversationService {
             do {
-                try service.addMessage(
+                _ = try service.addMessage(
                     to: conversation,
                     content: content,
                     isFromUser: false
@@ -1272,7 +1268,7 @@ final class VoiceConversationViewModel: ObservableObject {
             if let conversation = currentConversation,
                let service = conversationService {
                 do {
-                    try service.addMessage(
+                    _ = try service.addMessage(
                         to: conversation,
                         content: currentAIResponseText,
                         isFromUser: false

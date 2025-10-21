@@ -13,7 +13,7 @@ FAILED=0
 # Check 1: Build succeeds
 echo "1️⃣ Checking build..."
 if command -v xcodebuild &> /dev/null; then
-    if xcodebuild -quiet clean build -scheme MirrorBuddy -destination 'platform=iOS Simulator,name=iPhone 15' 2>&1; then
+    if xcodebuild -quiet clean build -scheme MirrorBuddy -destination 'platform=iOS Simulator,name=iPhone 16' 2>&1; then
         echo "   ✅ Build succeeds"
     else
         echo "   ❌ Build fails"
@@ -42,7 +42,7 @@ echo ""
 # Check 3: Tests pass
 echo "3️⃣ Checking tests..."
 if command -v xcodebuild &> /dev/null; then
-    if xcodebuild test -quiet -scheme MirrorBuddy -destination 'platform=iOS Simulator,name=iPhone 15' 2>&1 | grep -q "Test Suite.*passed"; then
+    if xcodebuild test -quiet -scheme MirrorBuddy -destination 'platform=iOS Simulator,name=iPhone 16' 2>&1 | grep -q "Test Suite.*passed"; then
         echo "   ✅ All tests pass"
     else
         echo "   ❌ Tests fail"

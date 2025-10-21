@@ -45,6 +45,9 @@ final class Material: @unchecked Sendable {
     @Relationship(deleteRule: .cascade)
     var transcript: Transcript?
 
+    @Relationship(deleteRule: .nullify, inverse: \StudySession.materialsStudied)
+    var studySessions: [StudySession]?
+
     @Relationship(deleteRule: .nullify, inverse: \VoiceConversation.material)
     var voiceConversations: [VoiceConversation]?
 

@@ -165,7 +165,7 @@ struct LMSIntegrationView: View {
     private func syncGoogleClassroom(consent: LMSConsent) async {
         do {
             lastSyncError = nil
-            let tasks = try await classroomService.importAssignments(
+            _ = try await classroomService.importAssignments(
                 consent: consent,
                 modelContext: modelContext
             )
@@ -183,7 +183,7 @@ struct LMSIntegrationView: View {
                 return
             }
             lastSyncError = nil
-            let tasks = try await canvasService.importAssignments(
+            _ = try await canvasService.importAssignments(
                 baseURL: baseURL,
                 consent: consent,
                 modelContext: modelContext

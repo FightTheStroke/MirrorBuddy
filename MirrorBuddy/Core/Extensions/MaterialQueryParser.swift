@@ -76,7 +76,7 @@ struct MaterialQueryParser {
         }
 
         // Parse query with SmartQueryParser
-        guard let parsedQuery = try? await SmartQueryParser.shared.parse(query) else {
+        guard let parsedQuery = try? SmartQueryParser.shared.parse(query) else {
             // Fallback to fuzzy search
             QueryTelemetry.shared.logEvent(.parseError(query: query, error: NSError(domain: "Parse", code: -1)))
             return fuzzySearchMaterials(query: query, in: materials)
@@ -189,9 +189,9 @@ struct MaterialQueryParser {
         subjects: [SubjectEntity]
     ) -> [Material] {
         switch intent {
-        case .difficult(let threshold):
+        case .difficult:
             // For now, return materials without filtering by accuracy
-            // In the future, integrate with performance tracking
+            // In the future, integrate with performance tracking (will use threshold parameter)
             return materials
 
         case .recent(let timeframe):
@@ -220,8 +220,9 @@ struct MaterialQueryParser {
                 return true // Never accessed
             }
 
-        case .recommend(let basis):
+        case .recommend:
             // Simple recommendation: prioritize unprocessed or unreviewed materials
+            // Future: use basis parameter for personalized recommendations
             return materials.filter { material in
                 material.processingStatus != .completed || material.lastAccessedAt == nil
             }
@@ -279,7 +280,6 @@ struct MaterialQueryParser {
     /// Calculate relevance score for a material based on query
     private static func calculateRelevanceScore(_ material: Material, query: String) -> Int {
         var score = 0
-        let searchText = "\(material.title) \(material.summary ?? "") \(material.textContent ?? "")".lowercased()
         let keywords = query.lowercased().components(separatedBy: .whitespaces)
 
         for keyword in keywords where keyword.count > 2 {

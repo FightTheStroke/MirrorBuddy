@@ -195,9 +195,10 @@ final class LessonRecording {
 
 extension Material {
     /// Relationship to lesson recordings
-    @Relationship(deleteRule: .cascade)
+    /// Note: @Relationship can only be used on stored properties in the main class definition
+    /// This is a placeholder computed property - actual relationship managed via LessonRecording.material
     var lessonRecordings: [LessonRecording]? {
-        get { nil }  // Computed property, actual storage in LessonRecording
+        get { nil }  // Placeholder - relationship managed from LessonRecording side
         set { _ = newValue }
     }
 }

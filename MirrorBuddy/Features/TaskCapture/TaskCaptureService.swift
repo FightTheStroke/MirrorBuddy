@@ -170,6 +170,12 @@ final class TaskCaptureService: NSObject, ObservableObject {
         content.title = task.title
         content.body = task.subject ?? TaskCaptureStrings.UIConstants.notes
         content.sound = .default
+        content.userInfo = [
+            "type": "task-reminder",
+            "taskID": task.id,
+            "taskTitle": task.title,
+            "dueDate": date.timeIntervalSince1970
+        ]
 
         // Schedule for day before, at 18:00
         var components = Calendar.current.dateComponents([.year, .month, .day], from: date)

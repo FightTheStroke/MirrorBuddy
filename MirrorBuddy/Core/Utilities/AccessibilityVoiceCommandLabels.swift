@@ -81,7 +81,7 @@ enum VoiceCommandLabels {
 struct VoiceCommandAccessibilityAudit {
     /// Check if a view has proper voice command labels
     static func checkAccessibilityLabels(in viewName: String) -> [AccessibilityIssue] {
-        var issues: [AccessibilityIssue] = []
+        let issues: [AccessibilityIssue] = []
 
         // This would be expanded with actual runtime checks
         // For now, it serves as documentation structure

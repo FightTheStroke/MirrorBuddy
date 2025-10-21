@@ -216,7 +216,7 @@ struct DashboardView: View {
     /// Refresh dashboard data from Google Calendar and other services
     private func refreshDashboardData() async {
         do {
-            try await GoogleCalendarService.shared.syncCalendarEvents()
+            _ = try await GoogleCalendarService.shared.syncCalendarEvents()
             currentProgress.updateStreak()
             try? modelContext.save()
         } catch {

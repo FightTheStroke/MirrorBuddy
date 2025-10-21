@@ -112,7 +112,7 @@ final class PronunciationCoach: NSObject, ObservableObject {
 
         // Typically stress first syllable of multi-syllable words
         var index = 0
-        var wordStart = 0
+        let wordStart = 0
         for i in syllables.indices {
             if i == wordStart && syllables.count > wordStart + 1 {
                 stressPoints.append(i)

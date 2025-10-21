@@ -610,8 +610,8 @@ struct Connection: Codable {
     }
 }
 
-// CGPoint codable conformance
-extension CGPoint: Codable {
+// CGPoint extension
+extension CGPoint {
     public static var zero: CGPoint {
         CGPoint(x: 0, y: 0)
     }

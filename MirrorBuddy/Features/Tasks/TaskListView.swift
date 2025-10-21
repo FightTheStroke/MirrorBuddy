@@ -243,7 +243,7 @@ struct TaskListView: View {
         // Filter by subject
         if let selectedSubject = viewModel.selectedSubject {
             tasks = tasks.filter { task in
-                task.subject?.displayName == selectedSubject.rawValue
+                task.subject?.id == selectedSubject.id
             }
         }
 
@@ -455,11 +455,12 @@ struct SectionHeader: View {
 // MARK: - Filters Sheet (Subtask 44.3)
 
 struct TaskFiltersSheet: View {
-    @Binding var selectedSubject: Subject?
+    @Binding var selectedSubject: SubjectEntity?
     @Binding var showCompletedTasks: Bool
     @Binding var sortOption: TaskSortOption
 
     @Environment(\.dismiss) private var dismiss
+    @Query(sort: \SubjectEntity.sortOrder) private var allSubjects: [SubjectEntity]
 
     var body: some View {
         NavigationStack {
@@ -467,14 +468,14 @@ struct TaskFiltersSheet: View {
                 Section("Subject Filter") {
                     Picker("Subject", selection: $selectedSubject) {
                         Text("All Subjects")
-                            .tag(Subject?.none)
+                            .tag(SubjectEntity?.none)
 
-                        ForEach(Subject.allCases) { subject in
+                        ForEach(allSubjects) { subject in
                             HStack {
                                 Image(systemName: subject.iconName)
-                                Text(subject.rawValue)
+                                Text(subject.displayName)
                             }
-                            .tag(Subject?.some(subject))
+                            .tag(SubjectEntity?.some(subject))
                         }
                     }
                     .pickerStyle(.inline)
@@ -581,7 +582,7 @@ struct AddTaskView: View {
 @Observable
 @MainActor
 final class TaskListViewModel {
-    var selectedSubject: Subject?
+    var selectedSubject: SubjectEntity?
     var showCompletedTasks = false
     var sortOption: TaskSortOption = .dueDate
 

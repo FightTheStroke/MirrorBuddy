@@ -114,7 +114,7 @@ final class LessonRecordingService: ObservableObject {
             throw LessonRecordingError.notRecording
         }
 
-        await extendedRecorder.pauseRecording()
+        extendedRecorder.pauseRecording()
         stopRecordingTimer()
 
         logger.info("Paused lesson recording")
@@ -126,7 +126,7 @@ final class LessonRecordingService: ObservableObject {
             throw LessonRecordingError.notRecording
         }
 
-        await extendedRecorder.resumeRecording()
+        extendedRecorder.resumeRecording()
         startRecordingTimer()
 
         logger.info("Resumed lesson recording")

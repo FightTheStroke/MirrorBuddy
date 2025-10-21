@@ -308,7 +308,7 @@ struct InteractiveMindMapView: View {
         )
 
         // Subject initial letter
-        let subject = subjectEntity.toSubject()
+        _ = subjectEntity.toSubject()
         let initial = String(subjectEntity.displayName.prefix(1))
         let badgeText = Text(initial)
             .font(.system(size: badgeRadius, weight: .bold))

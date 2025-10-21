@@ -46,7 +46,7 @@ struct ContextBannerView: View {
                     .frame(width: 8, height: 8)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(subject.rawValue)
+                    Text(subject.displayName)
                         .font(.headline)
                         .lineLimit(1)
 
@@ -116,7 +116,7 @@ struct ContextBannerView: View {
                                 .fill(colorForSubject(subject))
                                 .frame(width: 12, height: 12)
 
-                            Text(subject.rawValue)
+                            Text(subject.displayName)
                                 .font(.title3.bold())
                         }
                     }
@@ -235,7 +235,7 @@ struct ContextBannerView: View {
         }
     }
 
-    private func colorForSubject(_ subject: Subject) -> Color {
+    private func colorForSubject(_ subject: SubjectEntity) -> Color {
         switch subject.colorName {
         case "purple": return .purple
         case "blue": return .blue
@@ -365,7 +365,7 @@ private struct ContextHistoryRow: View {
 final class ContextManager: ObservableObject {
     static let shared = ContextManager()
 
-    @Published var currentSubject: Subject?
+    @Published var currentSubject: SubjectEntity?
     @Published var currentTask: Task?
     @Published var currentProgress: Double?
     @Published var recentMaterials: [Material] = []
@@ -380,7 +380,7 @@ final class ContextManager: ObservableObject {
 
     private init() {}
 
-    func setContext(subject: Subject?, task: Task? = nil, progress: Double? = nil) {
+    func setContext(subject: SubjectEntity?, task: Task? = nil, progress: Double? = nil) {
         // Save current context to history if there was one
         if let currentSubject = self.currentSubject {
             saveToHistory(subject: currentSubject, task: self.currentTask, progress: self.currentProgress)
@@ -420,13 +420,13 @@ final class ContextManager: ObservableObject {
         contextStartTime = nil
     }
 
-    private func saveToHistory(subject: Subject, task: Task?, progress: Double?) {
+    private func saveToHistory(subject: SubjectEntity, task: Task?, progress: Double?) {
         guard let startTime = contextStartTime else { return }
 
         let duration = Date().timeIntervalSince(startTime)
 
         let entry = ContextHistoryEntry(
-            subjectName: subject.rawValue,
+            subjectName: subject.displayName,
             subjectColorName: subject.colorName,
             taskTitle: task?.title,
             duration: duration,
@@ -478,10 +478,19 @@ struct ContextHistoryEntry: Identifiable {
 // MARK: - Preview
 
 #Preview("Compact") {
-    ContextBannerView()
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    // swiftlint:disable:next force_try
+    let container = try! ModelContainer(for: SubjectEntity.self, configurations: config)
+    let context = container.mainContext
+
+    let math = SubjectEntity(localizationKey: "Matematica", iconName: "function", colorName: "blue", sortOrder: 1)
+    context.insert(math)
+
+    return ContextBannerView()
+        .modelContainer(container)
         .onAppear {
             ContextManager.shared.setContext(
-                subject: .matematica,
+                subject: math,
                 task: nil,
                 progress: 0.45
             )
@@ -489,10 +498,19 @@ struct ContextHistoryEntry: Identifiable {
 }
 
 #Preview("Expanded") {
-    ContextBannerView()
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    // swiftlint:disable:next force_try
+    let container = try! ModelContainer(for: SubjectEntity.self, configurations: config)
+    let context = container.mainContext
+
+    let physics = SubjectEntity(localizationKey: "Fisica", iconName: "atom", colorName: "purple", sortOrder: 2)
+    context.insert(physics)
+
+    return ContextBannerView()
+        .modelContainer(container)
         .onAppear {
             ContextManager.shared.setContext(
-                subject: .fisica,
+                subject: physics,
                 task: nil,
                 progress: 0.65
             )

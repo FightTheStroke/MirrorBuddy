@@ -28,8 +28,19 @@ final class TrackedDriveFile {
     /// Web view link
     var webViewLink: String?
 
-    /// Parent folder IDs
-    var parents: [String] = []
+    /// Parent folder IDs (stored as Data for SwiftData compatibility)
+    private var parentsData: Data?
+
+    /// Parent folder IDs accessor
+    var parents: [String] {
+        get {
+            guard let data = parentsData else { return [] }
+            return (try? JSONDecoder().decode([String].self, from: data)) ?? []
+        }
+        set {
+            parentsData = try? JSONEncoder().encode(newValue)
+        }
+    }
 
     /// When this record was last synced
     var lastSyncedAt = Date()
