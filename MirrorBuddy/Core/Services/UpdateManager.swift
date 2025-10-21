@@ -251,13 +251,15 @@ final class UpdateManager {
         }
 
         // Find materials that need processing
-        let descriptor = FetchDescriptor<Material>(
-            predicate: #Predicate { material in
-                material.needsReprocessing
-            }
-        )
+        // Note: Cannot use computed property 'needsReprocessing' in Predicate
+        // Fetch all materials and filter in-memory (Predicate doesn't support enum comparisons)
+        let descriptor = FetchDescriptor<Material>()
+        let allMaterials = try context.fetch(descriptor)
 
-        let materialsToProcess = try context.fetch(descriptor)
+        // Filter for materials that need reprocessing (failed or pending)
+        let materialsToProcess = allMaterials.filter { material in
+            material.processingStatus == .failed || material.processingStatus == .pending
+        }
 
         logger.debug("Processing \(materialsToProcess.count) materials")
 

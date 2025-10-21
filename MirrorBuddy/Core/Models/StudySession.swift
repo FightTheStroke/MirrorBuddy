@@ -5,8 +5,8 @@ import SwiftData
 @Model
 final class StudySession {
     // CloudKit requires all non-optional properties to have default values
-    var id: UUID = UUID()
-    var date: Date = Date()
+    var id = UUID()
+    var date = Date()
     var durationMinutes: Int = 0
     var subject: String?
 

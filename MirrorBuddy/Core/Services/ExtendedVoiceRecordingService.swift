@@ -323,6 +323,11 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
             content.title = "Batteria scarica"
             content.body = "La batteria è al \(Int(self.batteryLevel * 100))%. Collega il caricatore per continuare la registrazione."
             content.sound = .default
+            content.userInfo = [
+                "type": "low-battery",
+                "batteryLevel": self.batteryLevel,
+                "timestamp": Date().timeIntervalSince1970
+            ]
 
             let request = UNNotificationRequest(
                 identifier: "low-battery-\(Date().timeIntervalSince1970)",
@@ -556,6 +561,11 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
             }
 
             content.sound = .default
+            content.userInfo = [
+                "type": "recording-complete",
+                "duration": duration,
+                "timestamp": Date().timeIntervalSince1970
+            ]
 
             let request = UNNotificationRequest(
                 identifier: "recording-complete-\(Date().timeIntervalSince1970)",

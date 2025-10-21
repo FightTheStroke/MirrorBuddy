@@ -239,7 +239,7 @@ MirrorBuddy is early, ambitious, and opinionated. Contributions we value most:
 3. **Safeguards & trust** — audit trails, parent/teacher controls, privacy guardrails.
 4. **Context expansion** — connectors to additional ecosystems (Canvas, Notion, Microsoft 365) while honoring privacy.
 
-Please review `Docs/AGENT_DRIVEN_DEVELOPMENT.md` for the tasking model and submit PRs with accessibility considerations documented.
+Please review `Docs/AGENT_DRIVEN_DEVELOPMENT.md` for the tasking model and submit PRs with accessibility considerations documented. New contributors should also read `AGENTS.md` for repository guidelines, tooling expectations, and security practices.
 
 ### Quality Assurance and Release Process
 
