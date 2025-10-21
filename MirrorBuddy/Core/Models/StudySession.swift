@@ -4,12 +4,12 @@ import SwiftData
 /// Represents a single study session for tracking study time
 @Model
 final class StudySession {
-    var id: UUID
-    var date: Date
-    var durationMinutes: Int
+    var id: UUID = UUID()
+    var date: Date = Date()
+    var durationMinutes: Int = 0
     var subject: String?
 
-    @Relationship(deleteRule: .nullify)
+    @Relationship(deleteRule: .nullify, inverse: \Material.studySessions)
     var materialsStudied: [Material]?
 
     var startTime: Date?
