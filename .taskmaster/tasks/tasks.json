@@ -4544,11 +4544,11 @@
             "title": "Create SubjectSettingsView for subject management",
             "description": "Implement new SettingsView section with: List of all subjects (default + custom), Active/inactive toggles, Drag & drop reordering, Add custom subject form, Edit subject properties (name, icon, color), Delete custom subjects (with confirmation). Cannot delete default subjects (only deactivate).",
             "details": "",
-            "status": "deferred",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 83,
             "parentId": "undefined",
-            "updatedAt": "2025-10-21T05:37:30.399Z"
+            "updatedAt": "2025-10-21T06:26:01.864Z"
           },
           {
             "id": 4,
@@ -4583,7 +4583,7 @@
             "updatedAt": "2025-10-21T05:37:22.947Z"
           }
         ],
-        "updatedAt": "2025-10-21T05:37:32.910Z"
+        "updatedAt": "2025-10-21T06:26:01.864Z"
       },
       {
         "id": "84",
@@ -7458,7 +7458,7 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-21T05:42:42.519Z",
+      "lastModified": "2025-10-21T06:26:01.867Z",
       "taskCount": 139,
       "completedCount": 135,
       "tags": [
