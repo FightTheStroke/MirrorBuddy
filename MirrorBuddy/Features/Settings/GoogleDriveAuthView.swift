@@ -187,7 +187,7 @@ final class GoogleDriveAuthViewModel: NSObject, ObservableObject {
                 let windowScene = UIApplication.shared.connectedScenes
                     .first as? UIWindowScene
 
-                guard let window = windowScene?.windows.first else {
+                guard windowScene?.windows.first != nil else {
                     throw GoogleOAuthError.sessionStartFailed
                 }
 

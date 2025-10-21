@@ -293,7 +293,7 @@ class QueryTelemetry {
             filteredMetrics = queryMetrics
         }
 
-        let successCount = filteredMetrics.filter { $0.success }.count
+        _ = filteredMetrics.filter { $0.success }.count
         let avgConfidence = filteredMetrics.isEmpty ? 0 : filteredMetrics.reduce(0.0) { $0 + $1.confidence } / Double(filteredMetrics.count)
         let avgParseTime = parseTimes.isEmpty ? 0 : parseTimes.reduce(0.0, +) / Double(parseTimes.count)
 

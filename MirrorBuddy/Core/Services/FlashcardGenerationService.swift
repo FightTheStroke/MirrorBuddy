@@ -61,7 +61,7 @@ final class FlashcardGenerationService {
         }
 
         // Check if we should use offline mode
-        let isOnline = await OfflineManager.shared.isOnline
+        let isOnline = OfflineManager.shared.isOnline
         let useOfflineMode = forceOffline || !isOnline || openAIClient == nil
 
         if useOfflineMode {

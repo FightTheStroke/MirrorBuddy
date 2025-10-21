@@ -114,8 +114,8 @@ final class DigestDeliveryService {
         }
 
         // Build email HTML
-        let htmlBody = buildEmailHTML(content: content, studentName: studentName)
-        let plainTextBody = buildEmailPlainText(content: content)
+        _ = buildEmailHTML(content: content, studentName: studentName)
+        _ = buildEmailPlainText(content: content)
 
         // Send via Gmail service
         let subject = content.textSummary.title

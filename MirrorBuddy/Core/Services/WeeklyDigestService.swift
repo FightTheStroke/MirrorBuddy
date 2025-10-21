@@ -59,7 +59,7 @@ final class WeeklyDigestService {
         let weekMaterials = try context.fetch(materialDescriptor)
 
         // Calculate XP gains for the week
-        let currentXP = userProgress.totalXP
+        _ = userProgress.totalXP
         let weeklyXPGain = calculateWeeklyXPGain(userProgress: userProgress)
 
         // Calculate streak status
@@ -198,7 +198,7 @@ final class WeeklyDigestService {
 
         // Count difficulty distribution (inferred from accuracy)
         let easyCount = flashcards.filter { $0.accuracy >= 0.75 }.count
-        let mediumCount = flashcards.filter { $0.accuracy >= 0.50 && $0.accuracy < 0.75 }.count
+        _ = flashcards.filter { $0.accuracy >= 0.50 && $0.accuracy < 0.75 }.count
         let hardCount = flashcards.filter { $0.accuracy < 0.50 }.count
 
         let totalReviewed = flashcards.filter { $0.reviewCount > 0 }.count

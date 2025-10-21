@@ -358,7 +358,7 @@ final class ExtendedVoiceRecordingService: NSObject, ObservableObject {
                     // Check max duration
                     if self.recordingDuration >= self.maxRecordingDuration {
                         do {
-                            try await self.stopRecording()
+                            _ = try await self.stopRecording()
                         } catch {
                             self.logger.error("Failed to stop recording after reaching max duration: \(error.localizedDescription)")
                         }
