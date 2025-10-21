@@ -74,3 +74,11 @@ Package.resolved
 # All API Keys and Credentials (unified)
 MirrorBuddy/Resources/APIKeys-Info.plist
 MirrorBuddy/Resources/GoogleService-Info.plist
+
+# Backup and temporary documentation files
+*.old.md
+*Plan*.md
+
+# Merge/rebase artifacts
+*.orig
+*.rej
