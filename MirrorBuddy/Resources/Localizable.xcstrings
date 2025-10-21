@@ -1,2602 +1,6334 @@
 {
-  "sourceLanguage" : "it",
-  "strings" : {
-    "\"%@\"" : {
-
-    },
-    "(Non disponibile)" : {
-
-    },
-    "%@" : {
-
-    },
-    "%@ %@" : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ %2$@"
+  "sourceLanguage": "it",
+  "strings": {
+    "\"%@\"": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "\"%@\""
           }
         }
       }
     },
-    "%@, %@" : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@, %2$@"
+    "(Non disponibile)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(Not available)"
           }
         }
       }
     },
-    "%@. Comando vocale: %@" : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@. Comando vocale: %2$@"
+    "%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
           }
         }
       }
     },
-    "%@×" : {
-
-    },
-    "%lld" : {
-
-    },
-    "%lld concepts identified" : {
-
-    },
-    "%lld di %lld" : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld di %2$lld"
-          }
-        }
-      }
-    },
-    "%lld flashcard" : {
-
-    },
-    "%lld flashcard disponibili" : {
-
-    },
-    "%lld messaggi" : {
-
-    },
-    "%lld min" : {
-
-    },
-    "%lld nodi" : {
-
-    },
-    "%lld problems found" : {
-
-    },
-    "%lld XP" : {
-
-    },
-    "%lld/%lld" : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld/%2$lld"
-          }
-        }
-      }
-    },
-    "%lld%%" : {
-
-    },
-    "%lld×%lld" : {
-      "localizations" : {
-        "it" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld×%2$lld"
-          }
-        }
-      }
-    },
-    "%lldpt" : {
-
-    },
-    "• %@" : {
-
-    },
-    "• Chiedi aiuto con i compiti" : {
-
-    },
-    "• Chiedi spiegazioni semplici" : {
-
-    },
-    "• Date di consegna compiti" : {
-
-    },
-    "• Email dai professori con compiti" : {
-
-    },
-    "• Eventi e scadenze del calendario" : {
-
-    },
-    "• Fai domande sul materiale" : {
-
-    },
-    "• Glucosio\n• O₂" : {
-
-    },
-    "• Luce\n• CO₂\n• H₂O" : {
-
-    },
-    "• Parla in italiano naturalmente" : {
-
-    },
-    "+%lld XP" : {
-
-    },
-    "♿ Accessibilità" : {
-
-    },
-    "❤️ Complimento" : {
-
-    },
-    "🐛 Problema" : {
-
-    },
-    "💡 Suggerimento" : {
-
-    },
-    "💬 Altro" : {
-
-    },
-    "🤔 Difficoltà d'uso" : {
-
-    },
-    "0.8×" : {
-
-    },
-    "1 minuto" : {
-
-    },
-    "1.5×" : {
-
-    },
-    "2 minuti" : {
-
-    },
-    "5 minuti" : {
-
-    },
-    "30 secondi" : {
-
-    },
-    "Aa" : {
-
-    },
-    "AA ✓" : {
-
-    },
-    "AA ✗" : {
-
-    },
-    "AAA ✓" : {
-
-    },
-    "AAA ✗" : {
-
-    },
-    "Abilita" : {
-
-    },
-    "Abilita i permessi per utilizzare tutte le funzionalità di MirrorBuddy" : {
-
-    },
-    "Abilita Modalità Dislessia" : {
-
-    },
-    "Abilita Modalità Una Mano" : {
-
-    },
-    "Abilitato" : {
-
-    },
-    "Accessibilità" : {
-
-    },
-    "Accessibilità Dislessia" : {
-
-    },
-    "Accessibility Audit" : {
-
-    },
-    "Account Connesso" : {
-
-    },
-    "Account Google" : {
-
-    },
-    "achievement.%@" : {
-
-    },
-    "achievement.%@.desc" : {
-
-    },
-    "achievement.complete100Flashcards" : {
-      "comment" : "Achievement: Complete 100 Flashcards",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Complete 100 Flashcards"
+    "%@ %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ %2$@"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "100 Flashcard Completate"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@"
           }
         }
       }
     },
-    "achievement.complete100Flashcards.desc" : {
-      "comment" : "Achievement: Completed 100 flashcards",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Completed 100 flashcards"
+    "%@, %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hai completato 100 flashcard"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, %2$@"
           }
         }
       }
     },
-    "achievement.completeAllSubjects" : {
-      "comment" : "Achievement: Complete All Subjects",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Complete All Subjects"
+    "%@. Comando vocale: %@": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@. Comando vocale: %2$@"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tutte le Materie"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@. Voice command: %2$@"
           }
         }
       }
     },
-    "achievement.completeAllSubjects.desc" : {
-      "comment" : "Achievement: Created materials in all subjects",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Created materials in all subjects"
+    "%@×": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@×"
+          }
+        }
+      }
+    },
+    "%lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld"
+          }
+        }
+      }
+    },
+    "%lld concepts identified": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld concepts identified"
+          }
+        }
+      }
+    },
+    "%lld di %lld": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld di %2$lld"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hai creato materiali in tutte le materie"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld of %2$lld"
           }
         }
       }
     },
-    "achievement.firstFlashcard" : {
-      "comment" : "Achievement: First Flashcard",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First Flashcard"
+    "%lld flashcard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld flashcards"
+          }
+        }
+      }
+    },
+    "%lld flashcard disponibili": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld flashcards available"
+          }
+        }
+      }
+    },
+    "%lld messaggi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld messages"
+          }
+        }
+      }
+    },
+    "%lld min": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld min"
+          }
+        }
+      }
+    },
+    "%lld nodi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld nodes"
+          }
+        }
+      }
+    },
+    "%lld problems found": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld problems found"
+          }
+        }
+      }
+    },
+    "%lld XP": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld XP"
+          }
+        }
+      }
+    },
+    "%lld/%lld": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld/%2$lld"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prima Flashcard"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld/%2$lld"
           }
         }
       }
     },
-    "achievement.firstFlashcard.desc" : {
-      "comment" : "Achievement: Created your first flashcard",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Created your first flashcard"
+    "%lld%%": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld%%"
+          }
+        }
+      }
+    },
+    "%lld×%lld": {
+      "localizations": {
+        "it": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$lld×%2$lld"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hai creato la tua prima flashcard"
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld×%2$lld"
           }
         }
       }
     },
-    "achievement.firstMaterial" : {
-      "comment" : "Achievement: First Material",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First Material"
+    "%lldpt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lldpt"
+          }
+        }
+      }
+    },
+    "• %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• %@"
+          }
+        }
+      }
+    },
+    "• Chiedi aiuto con i compiti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Ask for homework help"
+          }
+        }
+      }
+    },
+    "• Chiedi spiegazioni semplici": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Ask for simple explanations"
+          }
+        }
+      }
+    },
+    "• Date di consegna compiti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Homework due dates"
+          }
+        }
+      }
+    },
+    "• Email dai professori con compiti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Emails from teachers with assignments"
+          }
+        }
+      }
+    },
+    "• Eventi e scadenze del calendario": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Calendar events and deadlines"
+          }
+        }
+      }
+    },
+    "• Fai domande sul materiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Ask questions about the material"
+          }
+        }
+      }
+    },
+    "• Glucosio\n• O₂": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Glucose\n• O₂"
+          }
+        }
+      }
+    },
+    "• Luce\n• CO₂\n• H₂O": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Light\n• CO₂\n• H₂O"
+          }
+        }
+      }
+    },
+    "• Parla in italiano naturalmente": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Speak naturally in Italian"
+          }
+        }
+      }
+    },
+    "+%lld XP": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld XP"
+          }
+        }
+      }
+    },
+    "♿ Accessibilità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "♿ Accessibility"
+          }
+        }
+      }
+    },
+    "❤️ Complimento": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "❤️ Compliment"
+          }
+        }
+      }
+    },
+    "🐛 Problema": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🐛 Problem"
+          }
+        }
+      }
+    },
+    "💡 Suggerimento": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "💡 Suggestion"
+          }
+        }
+      }
+    },
+    "💬 Altro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "💬 Other"
+          }
+        }
+      }
+    },
+    "🤔 Difficoltà d'uso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "🤔 Usability Issue"
+          }
+        }
+      }
+    },
+    "0.8×": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "0.8×"
+          }
+        }
+      }
+    },
+    "1 minuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 minute"
+          }
+        }
+      }
+    },
+    "1.5×": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1.5×"
+          }
+        }
+      }
+    },
+    "2 minuti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2 minutes"
+          }
+        }
+      }
+    },
+    "5 minuti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "5 minutes"
+          }
+        }
+      }
+    },
+    "30 secondi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 seconds"
+          }
+        }
+      }
+    },
+    "Aa": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aa"
+          }
+        }
+      }
+    },
+    "AA ✓": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AA ✓"
+          }
+        }
+      }
+    },
+    "AA ✗": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AA ✗"
+          }
+        }
+      }
+    },
+    "AAA ✓": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AAA ✓"
+          }
+        }
+      }
+    },
+    "AAA ✗": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AAA ✗"
+          }
+        }
+      }
+    },
+    "Abilita": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable"
+          }
+        }
+      }
+    },
+    "Abilita i permessi per utilizzare tutte le funzionalità di MirrorBuddy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable permissions to use all MirrorBuddy features"
+          }
+        }
+      }
+    },
+    "Abilita Modalità Dislessia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable Dyslexia Mode"
+          }
+        }
+      }
+    },
+    "Abilita Modalità Una Mano": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable One-Hand Mode"
+          }
+        }
+      }
+    },
+    "Abilitato": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abilitato"
+          }
+        }
+      }
+    },
+    "Accessibilità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessibility"
+          }
+        }
+      }
+    },
+    "Accessibilità Dislessia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dyslexia Accessibility"
+          }
+        }
+      }
+    },
+    "Accessibility Audit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accessibility Audit"
+          }
+        }
+      }
+    },
+    "Account Connesso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account Connesso"
+          }
+        }
+      }
+    },
+    "Account Google": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account Google"
+          }
+        }
+      }
+    },
+    "achievement.%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "achievement.%@"
+          }
+        }
+      }
+    },
+    "achievement.%@.desc": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "achievement.%@.desc"
+          }
+        }
+      }
+    },
+    "achievement.complete100Flashcards": {
+      "comment": "Achievement: Complete 100 Flashcards",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete 100 Flashcards"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Primo Materiale"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100 Flashcard Completate"
           }
         }
       }
     },
-    "achievement.firstMaterial.desc" : {
-      "comment" : "Achievement: Added your first material",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Added your first material"
+    "achievement.complete100Flashcards.desc": {
+      "comment": "Achievement: Completed 100 flashcards",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Completed 100 flashcards"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hai aggiunto il tuo primo materiale"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai completato 100 flashcard"
           }
         }
       }
     },
-    "achievement.firstMindMap" : {
-      "comment" : "Achievement: First Mind Map",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "First Mind Map"
+    "achievement.completeAllSubjects": {
+      "comment": "Achievement: Complete All Subjects",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete All Subjects"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prima Mappa Mentale"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutte le Materie"
           }
         }
       }
     },
-    "achievement.firstMindMap.desc" : {
-      "comment" : "Achievement: Generated your first mind map",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generated your first mind map"
+    "achievement.completeAllSubjects.desc": {
+      "comment": "Achievement: Created materials in all subjects",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Created materials in all subjects"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hai generato la tua prima mappa mentale"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai creato materiali in tutte le materie"
           }
         }
       }
     },
-    "achievement.streak7Days" : {
-      "comment" : "Achievement: 7 Day Streak",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "7 Day Streak"
+    "achievement.firstFlashcard": {
+      "comment": "Achievement: First Flashcard",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First Flashcard"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Serie da 7 Giorni"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prima Flashcard"
           }
         }
       }
     },
-    "achievement.streak7Days.desc" : {
-      "comment" : "Achievement: Studied for 7 consecutive days",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Studied for 7 consecutive days"
+    "achievement.firstFlashcard.desc": {
+      "comment": "Achievement: Created your first flashcard",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Created your first flashcard"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hai studiato per 7 giorni consecutivi"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai creato la tua prima flashcard"
           }
         }
       }
     },
-    "achievement.streak30Days" : {
-      "comment" : "Achievement: 30 Day Streak",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 Day Streak"
+    "achievement.firstMaterial": {
+      "comment": "Achievement: First Material",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First Material"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Serie da 30 Giorni"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primo Materiale"
           }
         }
       }
     },
-    "achievement.streak30Days.desc" : {
-      "comment" : "Achievement: Studied for 30 consecutive days",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Studied for 30 consecutive days"
+    "achievement.firstMaterial.desc": {
+      "comment": "Achievement: Added your first material",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added your first material"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hai studiato per 30 giorni consecutivi"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai aggiunto il tuo primo materiale"
           }
         }
       }
     },
-    "Add" : {
-
-    },
-    "Add material" : {
-
-    },
-    "Add Material" : {
-
-    },
-    "Add task" : {
-
-    },
-    "Add Task" : {
-
-    },
-    "Add your first study material to get started" : {
-
-    },
-    "Add your first task to get started" : {
-
-    },
-    "Aggiornamento completato!" : {
-
-    },
-    "Aggiornami" : {
-
-    },
-    "Aggiungi compito" : {
-
-    },
-    "Aggiungi materiale" : {
-
-    },
-    "Aiuti alla Lettura" : {
-
-    },
-    "Aiuto" : {
-
-    },
-    "AIza..." : {
-
-    },
-    "Alcuni contrasti di colore possono rendere la lettura più confortevole" : {
-
-    },
-    "All Subjects" : {
-
-    },
-    "Alta (consigliata)" : {
-
-    },
-    "Ampia" : {
-
-    },
-    "Analysis Complete" : {
-
-    },
-    "Analyze Homework" : {
-
-    },
-    "Analyzing your homework..." : {
-
-    },
-    "Annulla" : {
-
-    },
-    "Anteprima" : {
-
-    },
-    "Anteprima Impostazioni" : {
-
-    },
-    "Anteprima PDF" : {
-
-    },
-    "Applica font e spaziature ottimizzati per la lettura" : {
-
-    },
-    "Applica Impostazioni Consigliate" : {
-
-    },
-    "Apri Google Cloud Console" : {
-
-    },
-    "Apri la documentazione di aiuto" : {
-
-    },
-    "Are you sure you want to delete this task? This action cannot be undone." : {
-
-    },
-    "Ascolta Anteprima" : {
-
-    },
-    "Ascolta come suonerà la voce con le impostazioni correnti." : {
-
-    },
-    "Ascolta il testo" : {
-
-    },
-    "Ascolta Nodo" : {
-
-    },
-    "Assistente Vocale" : {
-
-    },
-    "at" : {
-
-    },
-    "Attendi %llds" : {
-
-    },
-    "Attività Corrente" : {
-
-    },
-    "Attivo" : {
-
-    },
-    "Audio Input" : {
-
-    },
-    "Aumenta Contrasto" : {
-
-    },
-    "Aumenta la dimensione base del testo" : {
-
-    },
-    "Avanti 10 secondi" : {
-
-    },
-    "Avanzate" : {
-
-    },
-    "Avvia Sincronizzazione" : {
-
-    },
-    "Azioni rapide" : {
-
-    },
-    "Bassa (risparmio dati)" : {
-
-    },
-    "Batteria" : {
-
-    },
-    "Batteria al %lld percento" : {
-
-    },
-    "Benvenuto in" : {
-
-    },
-    "Build" : {
-
-    },
-    "Burst" : {
-
-    },
-    "Camera Error" : {
-
-    },
-    "Campo messaggio feedback" : {
-
-    },
-    "Cancel" : {
-
-    },
-    "Cancella" : {
-
-    },
-    "Cancella contesto" : {
-
-    },
-    "Capture your homework" : {
-
-    },
-    "Caricamento file da Google Drive..." : {
-
-    },
-    "Cerca conversazioni..." : {
-
-    },
-    "Chiudi" : {
-
-    },
-    "Chiudi avviso errore" : {
-
-    },
-    "Clear All" : {
-
-    },
-    "Client ID" : {
-
-    },
-    "Client Secret (opzionale)" : {
-
-    },
-    "Close" : {
-
-    },
-    "Coach Vocale" : {
-
-    },
-    "Collapse" : {
-
-    },
-    "Comandi Comuni" : {
-
-    },
-    "Comandi Disponibili" : {
-
-    },
-    "Comandi Vocali" : {
-
-    },
-    "Comando Non Riconosciuto" : {
-
-    },
-    "Comando vocale: '%@'" : {
-
-    },
-    "common.add" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add"
+    "achievement.firstMindMap": {
+      "comment": "Achievement: First Mind Map",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First Mind Map"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aggiungi"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prima Mappa Mentale"
           }
         }
       }
     },
-    "Compiti" : {
-
-    },
-    "Complete Task" : {
-
-    },
-    "Compliant" : {
-
-    },
-    "Comportamento" : {
-
-    },
-    "Comprimi contesto" : {
-
-    },
-    "Condividi materiale" : {
-
-    },
-    "Conferma Comandi Vocali" : {
-
-    },
-    "Configura API Keys" : {
-
-    },
-    "Configura Chiavi API" : {
-
-    },
-    "Configurazione API" : {
-
-    },
-    "Configure Google Cloud credentials" : {
-
-    },
-    "Connect Google Drive" : {
-
-    },
-    "Connected" : {
-
-    },
-    "Connetti Account Google" : {
-
-    },
-    "Connetti Google Drive" : {
-
-    },
-    "Connetti il tuo account Google Drive per importare materiali di studio" : {
-
-    },
-    "Connetti il tuo account Google per sincronizzare i tuoi materiali di studio su tutti i dispositivi" : {
-
-    },
-    "Contenuto" : {
-
-    },
-    "Continua" : {
-
-    },
-    "Continua con queste chiavi" : {
-
-    },
-    "Continua Conversazione" : {
-
-    },
-    "Continua Registrazione" : {
-
-    },
-    "Contrasto Colori" : {
-
-    },
-    "Controlla nuove email dai professori e eventi del calendario" : {
-
-    },
-    "Conversazioni" : {
-
-    },
-    "Cosa produce la fotosintesi?" : {
-
-    },
-    "Cosa puoi fare:" : {
-
-    },
-    "Cosa viene sincronizzato:" : {
-
-    },
-    "Credenziali OAuth" : {
-
-    },
-    "Credenziali salvate con successo. Ora puoi connettere Google Drive." : {
-
-    },
-    "Critical" : {
-
-    },
-    "Cronologia Contesto" : {
-
-    },
-    "Da Sbloccare" : {
-
-    },
-    "dashboard.title" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MirrorBuddy"
+    "achievement.firstMindMap.desc": {
+      "comment": "Achievement: Generated your first mind map",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generated your first mind map"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MirrorBuddy"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai generato la tua prima mappa mentale"
           }
         }
       }
     },
-    "Delete" : {
-
-    },
-    "Delete Task" : {
-
-    },
-    "Description" : {
-
-    },
-    "Description (optional)" : {
-
-    },
-    "Details" : {
-
-    },
-    "Dettagli materiale: %@" : {
-
-    },
-    "Deutsch" : {
-
-    },
-    "Dimensione Corretta" : {
-
-    },
-    "Dimensione Grande" : {
-
-    },
-    "Dimensione Testo" : {
-
-    },
-    "Dislessia" : {
-
-    },
-    "Dismiss" : {
-
-    },
-    "Display Options" : {
-
-    },
-    "Documento PDF" : {
-
-    },
-    "Domanda" : {
-
-    },
-    "Done" : {
-
-    },
-    "Doppio tap per %@" : {
-
-    },
-    "Doppio tocco per parlare con MirrorBuddy" : {
-
-    },
-    "Due date" : {
-
-    },
-    "Due Date" : {
-
-    },
-    "Durata registrazione: %@" : {
-
-    },
-    "Edit" : {
-
-    },
-    "Edit Task" : {
-
-    },
-    "Elaborazione in corso..." : {
-
-    },
-    "Elaborazione..." : {
-
-    },
-    "Elimina" : {
-
-    },
-    "Email e calendario sono stati sincronizzati con successo" : {
-
-    },
-    "Email Professori" : {
-
-    },
-    "English" : {
-
-    },
-    "Error" : {
-
-    },
-    "error.openai.authenticationFailed" : {
-      "comment" : "Error: OpenAI authentication failed",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authentication failed. Check your API key."
+    "achievement.streak7Days": {
+      "comment": "Achievement: 7 Day Streak",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "7 Day Streak"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autenticazione fallita. Verifica la chiave API."
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serie da 7 Giorni"
           }
         }
       }
     },
-    "error.openai.cancelled" : {
-      "comment" : "Error: OpenAI request cancelled",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Request cancelled"
+    "achievement.streak7Days.desc": {
+      "comment": "Achievement: Studied for 7 consecutive days",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Studied for 7 consecutive days"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Richiesta annullata"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai studiato per 7 giorni consecutivi"
           }
         }
       }
     },
-    "error.openai.decodingError" : {
-      "comment" : "Error: OpenAI decoding error",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to parse response"
+    "achievement.streak30Days": {
+      "comment": "Achievement: 30 Day Streak",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 Day Streak"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Errore parsing risposta"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serie da 30 Giorni"
           }
         }
       }
     },
-    "error.openai.invalidConfiguration" : {
-      "comment" : "Error: Invalid OpenAI configuration",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invalid OpenAI configuration"
+    "achievement.streak30Days.desc": {
+      "comment": "Achievement: Studied for 30 consecutive days",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Studied for 30 consecutive days"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Configurazione OpenAI non valida"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai studiato per 30 giorni consecutivi"
           }
         }
       }
     },
-    "error.openai.invalidRequest" : {
-      "comment" : "Error: Invalid OpenAI request",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Invalid request"
+    "Add": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        }
+      }
+    },
+    "Add material": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add material"
+          }
+        }
+      }
+    },
+    "Add Material": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Material"
+          }
+        }
+      }
+    },
+    "Add task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add task"
+          }
+        }
+      }
+    },
+    "Add Task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Task"
+          }
+        }
+      }
+    },
+    "Add your first study material to get started": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add your first study material to get started"
+          }
+        }
+      }
+    },
+    "Add your first task to get started": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add your first task to get started"
+          }
+        }
+      }
+    },
+    "Aggiornamento completato!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiornamento completato!"
+          }
+        }
+      }
+    },
+    "Aggiornami": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiornami"
+          }
+        }
+      }
+    },
+    "Aggiungi compito": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi compito"
+          }
+        }
+      }
+    },
+    "Aggiungi materiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi materiale"
+          }
+        }
+      }
+    },
+    "Aiuti alla Lettura": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aiuti alla Lettura"
+          }
+        }
+      }
+    },
+    "Aiuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Help"
+          }
+        }
+      }
+    },
+    "AIza...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIza..."
+          }
+        }
+      }
+    },
+    "Alcuni contrasti di colore possono rendere la lettura più confortevole": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Some color contrasts can make reading more comfortable"
+          }
+        }
+      }
+    },
+    "All Subjects": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All Subjects"
+          }
+        }
+      }
+    },
+    "Alta (consigliata)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alta (consigliata)"
+          }
+        }
+      }
+    },
+    "Ampia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wide"
+          }
+        }
+      }
+    },
+    "Analysis Complete": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analysis Complete"
+          }
+        }
+      }
+    },
+    "Analyze Homework": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyze Homework"
+          }
+        }
+      }
+    },
+    "Analyzing your homework...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyzing your homework..."
+          }
+        }
+      }
+    },
+    "Annulla": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "Anteprima": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anteprima"
+          }
+        }
+      }
+    },
+    "Anteprima Impostazioni": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anteprima Impostazioni"
+          }
+        }
+      }
+    },
+    "Anteprima PDF": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anteprima PDF"
+          }
+        }
+      }
+    },
+    "Applica font e spaziature ottimizzati per la lettura": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Applica font e spaziature ottimizzati per la lettura"
+          }
+        }
+      }
+    },
+    "Applica Impostazioni Consigliate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Applica Impostazioni Consigliate"
+          }
+        }
+      }
+    },
+    "Apri Google Cloud Console": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri Google Cloud Console"
+          }
+        }
+      }
+    },
+    "Apri la documentazione di aiuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri la documentazione di aiuto"
+          }
+        }
+      }
+    },
+    "Are you sure you want to delete this task? This action cannot be undone.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Are you sure you want to delete this task? This action cannot be undone."
+          }
+        }
+      }
+    },
+    "Ascolta Anteprima": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ascolta Anteprima"
+          }
+        }
+      }
+    },
+    "Ascolta come suonerà la voce con le impostazioni correnti.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listen to how the voice will sound with current settings."
+          }
+        }
+      }
+    },
+    "Ascolta il testo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ascolta il testo"
+          }
+        }
+      }
+    },
+    "Ascolta Nodo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ascolta Nodo"
+          }
+        }
+      }
+    },
+    "Assistente Vocale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Assistente Vocale"
+          }
+        }
+      }
+    },
+    "at": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "at"
+          }
+        }
+      }
+    },
+    "Attendi %llds": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attendi %llds"
+          }
+        }
+      }
+    },
+    "Attività Corrente": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current Activity"
+          }
+        }
+      }
+    },
+    "Attivo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attivo"
+          }
+        }
+      }
+    },
+    "Audio Input": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio Input"
+          }
+        }
+      }
+    },
+    "Aumenta Contrasto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumenta Contrasto"
+          }
+        }
+      }
+    },
+    "Aumenta la dimensione base del testo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aumenta la dimensione base del testo"
+          }
+        }
+      }
+    },
+    "Avanti 10 secondi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avanti 10 secondi"
+          }
+        }
+      }
+    },
+    "Avanzate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avanzate"
+          }
+        }
+      }
+    },
+    "Avvia Sincronizzazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia Sincronizzazione"
+          }
+        }
+      }
+    },
+    "Azioni rapide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Azioni rapide"
+          }
+        }
+      }
+    },
+    "Bassa (risparmio dati)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bassa (risparmio dati)"
+          }
+        }
+      }
+    },
+    "Batteria": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Batteria"
+          }
+        }
+      }
+    },
+    "Batteria al %lld percento": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Batteria al %lld percento"
+          }
+        }
+      }
+    },
+    "Benvenuto in": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benvenuto in"
+          }
+        }
+      }
+    },
+    "Build": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Build"
+          }
+        }
+      }
+    },
+    "Burst": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Burst"
+          }
+        }
+      }
+    },
+    "Camera Error": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camera Error"
+          }
+        }
+      }
+    },
+    "Campo messaggio feedback": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Campo messaggio feedback"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "Cancella": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancella"
+          }
+        }
+      }
+    },
+    "Cancella contesto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancella contesto"
+          }
+        }
+      }
+    },
+    "Capture your homework": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture your homework"
+          }
+        }
+      }
+    },
+    "Caricamento file da Google Drive...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Caricamento file da Google Drive..."
+          }
+        }
+      }
+    },
+    "Cerca conversazioni...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerca conversazioni..."
+          }
+        }
+      }
+    },
+    "Chiudi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        }
+      }
+    },
+    "Chiudi avviso errore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiudi avviso errore"
+          }
+        }
+      }
+    },
+    "Clear All": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear All"
+          }
+        }
+      }
+    },
+    "Client ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Client ID"
+          }
+        }
+      }
+    },
+    "Client Secret (opzionale)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Client Secret (opzionale)"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        }
+      }
+    },
+    "Coach Vocale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach Vocale"
+          }
+        }
+      }
+    },
+    "Collapse": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse"
+          }
+        }
+      }
+    },
+    "Comandi Comuni": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandi Comuni"
+          }
+        }
+      }
+    },
+    "Comandi Disponibili": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandi Disponibili"
+          }
+        }
+      }
+    },
+    "Comandi Vocali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comandi Vocali"
+          }
+        }
+      }
+    },
+    "Comando Non Riconosciuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comando Non Riconosciuto"
+          }
+        }
+      }
+    },
+    "Comando vocale: '%@'": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comando vocale: '%@'"
+          }
+        }
+      }
+    },
+    "common.add": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Richiesta non valida"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi"
           }
         }
       }
     },
-    "error.openai.missingAPIKey" : {
-      "comment" : "Error: Missing OpenAI API key",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OpenAI API key not configured"
+    "Compiti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compiti"
+          }
+        }
+      }
+    },
+    "Complete Task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Complete Task"
+          }
+        }
+      }
+    },
+    "Compliant": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compliant"
+          }
+        }
+      }
+    },
+    "Comportamento": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comportamento"
+          }
+        }
+      }
+    },
+    "Comprimi contesto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprimi contesto"
+          }
+        }
+      }
+    },
+    "Condividi materiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi materiale"
+          }
+        }
+      }
+    },
+    "Conferma Comandi Vocali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conferma Comandi Vocali"
+          }
+        }
+      }
+    },
+    "Configura API Keys": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura API Keys"
+          }
+        }
+      }
+    },
+    "Configura Chiavi API": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configura Chiavi API"
+          }
+        }
+      }
+    },
+    "Configurazione API": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurazione API"
+          }
+        }
+      }
+    },
+    "Configure Google Cloud credentials": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configure Google Cloud credentials"
+          }
+        }
+      }
+    },
+    "Connect Google Drive": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connect Google Drive"
+          }
+        }
+      }
+    },
+    "Connected": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connected"
+          }
+        }
+      }
+    },
+    "Connetti Account Google": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connetti Account Google"
+          }
+        }
+      }
+    },
+    "Connetti Google Drive": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connetti Google Drive"
+          }
+        }
+      }
+    },
+    "Connetti il tuo account Google Drive per importare materiali di studio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connetti il tuo account Google Drive per importare materiali di studio"
+          }
+        }
+      }
+    },
+    "Connetti il tuo account Google per sincronizzare i tuoi materiali di studio su tutti i dispositivi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connetti il tuo account Google per sincronizzare i tuoi materiali di studio su tutti i dispositivi"
+          }
+        }
+      }
+    },
+    "Contenuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contenuto"
+          }
+        }
+      }
+    },
+    "Continua": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continue"
+          }
+        }
+      }
+    },
+    "Continua con queste chiavi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continua con queste chiavi"
+          }
+        }
+      }
+    },
+    "Continua Conversazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continua Conversazione"
+          }
+        }
+      }
+    },
+    "Continua Registrazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continua Registrazione"
+          }
+        }
+      }
+    },
+    "Contrasto Colori": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrasto Colori"
+          }
+        }
+      }
+    },
+    "Controlla nuove email dai professori e eventi del calendario": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlla nuove email dai professori e eventi del calendario"
+          }
+        }
+      }
+    },
+    "Conversazioni": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conversazioni"
+          }
+        }
+      }
+    },
+    "Cosa produce la fotosintesi?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cosa produce la fotosintesi?"
+          }
+        }
+      }
+    },
+    "Cosa puoi fare:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cosa puoi fare:"
+          }
+        }
+      }
+    },
+    "Cosa viene sincronizzato:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cosa viene sincronizzato:"
+          }
+        }
+      }
+    },
+    "Credenziali OAuth": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credenziali OAuth"
+          }
+        }
+      }
+    },
+    "Credenziali salvate con successo. Ora puoi connettere Google Drive.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credenziali salvate con successo. Ora puoi connettere Google Drive."
+          }
+        }
+      }
+    },
+    "Critical": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Critical"
+          }
+        }
+      }
+    },
+    "Cronologia Contesto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cronologia Contesto"
+          }
+        }
+      }
+    },
+    "Da Sbloccare": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Da Sbloccare"
+          }
+        }
+      }
+    },
+    "dashboard.title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MirrorBuddy"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chiave API OpenAI non configurata"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MirrorBuddy"
           }
         }
       }
     },
-    "error.openai.networkError" : {
-      "comment" : "Error: OpenAI network error",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Network error"
+    "Delete": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        }
+      }
+    },
+    "Delete Task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Task"
+          }
+        }
+      }
+    },
+    "Description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Description"
+          }
+        }
+      }
+    },
+    "Description (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Description (optional)"
+          }
+        }
+      }
+    },
+    "Details": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        }
+      }
+    },
+    "Dettagli materiale: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dettagli materiale: %@"
+          }
+        }
+      }
+    },
+    "Deutsch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deutsch"
+          }
+        }
+      }
+    },
+    "Dimensione Corretta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimensione Corretta"
+          }
+        }
+      }
+    },
+    "Dimensione Grande": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimensione Grande"
+          }
+        }
+      }
+    },
+    "Dimensione Testo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimensione Testo"
+          }
+        }
+      }
+    },
+    "Dislessia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dislessia"
+          }
+        }
+      }
+    },
+    "Dismiss": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss"
+          }
+        }
+      }
+    },
+    "Display Options": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display Options"
+          }
+        }
+      }
+    },
+    "Documento PDF": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Documento PDF"
+          }
+        }
+      }
+    },
+    "Domanda": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Domanda"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Doppio tap per %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doppio tap per %@"
+          }
+        }
+      }
+    },
+    "Doppio tocco per parlare con MirrorBuddy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doppio tocco per parlare con MirrorBuddy"
+          }
+        }
+      }
+    },
+    "Due date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Due date"
+          }
+        }
+      }
+    },
+    "Due Date": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Due Date"
+          }
+        }
+      }
+    },
+    "Durata registrazione: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durata registrazione: %@"
+          }
+        }
+      }
+    },
+    "Edit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit"
+          }
+        }
+      }
+    },
+    "Edit Task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Task"
+          }
+        }
+      }
+    },
+    "Elaborazione in corso...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elaborazione in corso..."
+          }
+        }
+      }
+    },
+    "Elaborazione...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elaborazione..."
+          }
+        }
+      }
+    },
+    "Elimina": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        }
+      }
+    },
+    "Email e calendario sono stati sincronizzati con successo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email e calendario sono stati sincronizzati con successo"
+          }
+        }
+      }
+    },
+    "Email Professori": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Email Professori"
+          }
+        }
+      }
+    },
+    "English": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
+          }
+        }
+      }
+    },
+    "Error": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error"
+          }
+        }
+      }
+    },
+    "error.openai.authenticationFailed": {
+      "comment": "Error: OpenAI authentication failed",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authentication failed. Check your API key."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Errore di rete"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autenticazione fallita. Verifica la chiave API."
           }
         }
       }
     },
-    "error.openai.rateLimitExceeded" : {
-      "comment" : "Error: OpenAI rate limit exceeded",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rate limit exceeded. Please wait."
+    "error.openai.cancelled": {
+      "comment": "Error: OpenAI request cancelled",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request cancelled"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Limite richieste superato. Attendi."
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesta annullata"
           }
         }
       }
     },
-    "error.openai.timeout" : {
-      "comment" : "Error: OpenAI timeout",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Request timed out"
+    "error.openai.decodingError": {
+      "comment": "Error: OpenAI decoding error",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to parse response"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Richiesta scaduta"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Errore parsing risposta"
           }
         }
       }
     },
-    "error.openai.unknown" : {
-      "comment" : "Error: Unknown OpenAI error",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unknown error"
+    "error.openai.invalidConfiguration": {
+      "comment": "Error: Invalid OpenAI configuration",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid OpenAI configuration"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Errore sconosciuto"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurazione OpenAI non valida"
           }
         }
       }
     },
-    "error.subject.cannotDeleteDefault" : {
-      "comment" : "Error message: Cannot delete default subjects. You can deactivate them instead.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cannot delete default subjects. You can deactivate them instead."
+    "error.openai.invalidRequest": {
+      "comment": "Error: Invalid OpenAI request",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid request"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Impossibile eliminare le materie predefinite. Puoi disattivarle."
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesta non valida"
           }
         }
       }
     },
-    "error.subject.hasAssociatedContent" : {
-      "comment" : "Error message: This subject has associated materials or tasks and cannot be deleted.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This subject has associated materials or tasks and cannot be deleted."
+    "error.openai.missingAPIKey": {
+      "comment": "Error: Missing OpenAI API key",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpenAI API key not configured"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Questa materia ha materiali o compiti associati e non può essere eliminata."
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiave API OpenAI non configurata"
           }
         }
       }
     },
-    "Errore" : {
-
-    },
-    "Errore di Connessione" : {
-
-    },
-    "Errore: %@" : {
-
-    },
-    "Esempi" : {
-
-    },
-    "Esempio di Riassunto" : {
-
-    },
-    "Espandi contesto" : {
-
-    },
-    "Español" : {
-
-    },
-    "Esplora cosa può fare MirrorBuddy con un materiale di esempio" : {
-
-    },
-    "Expand" : {
-
-    },
-    "Extra Grande" : {
-
-    },
-    "Feedback Aptici" : {
-
-    },
-    "Ferma" : {
-
-    },
-    "Ferma ascolto" : {
-
-    },
-    "Ferma conversazione" : {
-
-    },
-    "Ferma conversazione vocale" : {
-
-    },
-    "Ferma e Chiudi" : {
-
-    },
-    "Ferma registrazione" : {
-
-    },
-    "File System" : {
-
-    },
-    "Filters & Sort" : {
-
-    },
-    "Fine" : {
-
-    },
-    "Flashcard" : {
-
-    },
-    "Flashcard di Esempio" : {
-
-    },
-    "Font" : {
-
-    },
-    "Font e spaziatura" : {
-
-    },
-    "Fotosintesi" : {
-
-    },
-    "Français" : {
-
-    },
-    "Funzionalità" : {
-
-    },
-    "Glucosio e Ossigeno" : {
-
-    },
-    "Google Drive" : {
-
-    },
-    "Google Drive non connesso" : {
-
-    },
-    "Google Gemini API Key" : {
-
-    },
-    "Grande" : {
-
-    },
-    "Grazie!" : {
-
-    },
-    "Group by Subject" : {
-
-    },
-    "Hai completato la configurazione di MirrorBuddy" : {
-
-    },
-    "Hai detto:" : {
-
-    },
-    "Hai imparato i comandi vocali base" : {
-
-    },
-    "Hai una registrazione in corso. Vuoi fermarla?" : {
-
-    },
-    "Hide Completed" : {
-
-    },
-    "High" : {
-
-    },
-    "High Priority" : {
-
-    },
-    "Ho capito, continua" : {
-
-    },
-    "Homework Help" : {
-
-    },
-    "I Miei Compiti" : {
-
-    },
-    "Il Client Secret è opzionale per le app iOS. Alcuni setup potrebbero non richiederlo." : {
-
-    },
-    "Il font OpenDyslexic è progettato specificamente per migliorare la leggibilità" : {
-
-    },
-    "Il font OpenDyslexic non è disponibile su questo dispositivo" : {
-
-    },
-    "Il righello evidenzia la riga corrente. La modalità focus oscura il testo circostante." : {
-
-    },
-    "Il tuo compagno di studio con AI" : {
-
-    },
-    "Il Tuo Feedback" : {
-
-    },
-    "Il tuo feedback ci aiuta a migliorare MirrorBuddy per tutti i bambini!" : {
-
-    },
-    "Il tuo feedback è stato ricevuto. Grazie per aiutarci a migliorare!" : {
-
-    },
-    "Il Tuo Profilo" : {
-
-    },
-    "Impara a usare i comandi vocali per navigare MirrorBuddy senza toccare lo schermo" : {
-
-    },
-    "Importa (%lld)" : {
-
-    },
-    "Importa da Drive" : {
-
-    },
-    "Importa File" : {
-
-    },
-    "Importa materiali" : {
-
-    },
-    "Importa materiali da Google Drive per iniziare" : {
-
-    },
-    "Impostazioni" : {
-
-    },
-    "Impostazioni voce" : {
-
-    },
-    "Impostazioni Voce" : {
-
-    },
-    "In ascolto..." : {
-
-    },
-    "In attesa" : {
-
-    },
-    "In riproduzione..." : {
-
-    },
-    "Indietro" : {
-
-    },
-    "Indietro 10 secondi" : {
-
-    },
-    "Informazioni" : {
-
-    },
-    "Inizia" : {
-
-    },
-    "Inizia ascolto" : {
-
-    },
-    "Inizia conversazione" : {
-
-    },
-    "Inizia Conversazione" : {
-
-    },
-    "Inizia conversazione vocale" : {
-
-    },
-    "Inizia Lettura" : {
-
-    },
-    "Inizia registrazione" : {
-
-    },
-    "Inizia Studio" : {
-
-    },
-    "Inizia una nuova conversazione con il Coach Vocale" : {
-
-    },
-    "Inizia una nuova conversazione per vedere la cronologia" : {
-
-    },
-    "Input" : {
-
-    },
-    "Inserisci le tue chiavi API per abilitare le funzionalità avanzate di AI" : {
-
-    },
-    "Integrazione" : {
-
-    },
-    "Interrompi Anteprima" : {
-
-    },
-    "Invia" : {
-
-    },
-    "Invia Feedback" : {
-
-    },
-    "Istruzioni" : {
-
-    },
-    "Italiano" : {
-
-    },
-    "La fotosintesi è il processo attraverso cui le piante convertono la luce solare in energia chimica.\n\n• Le piante usano clorofilla per catturare la luce\n• L'anidride carbonica e l'acqua vengono trasformate\n• Il risultato è glucosio e ossigeno\n• L'energia viene immagazzinata nei legami chimici" : {
-
-    },
-    "La tua cronologia dei contesti apparirà qui" : {
-
-    },
-    "Le impostazioni consigliate applicano valori ottimizzati per la dislessia" : {
-
-    },
-    "Leggi Domanda" : {
-
-    },
-    "Leggi Risposta" : {
-
-    },
-    "Leggi Tutto" : {
-
-    },
-    "Linee Guida" : {
-
-    },
-    "Lingua" : {
-
-    },
-    "Linked Material" : {
-
-    },
-    "List View" : {
-
-    },
-    "Livello %lld" : {
-
-    },
-    "Low" : {
-
-    },
-    "Maggiore spaziatura tra le lettere può migliorare la leggibilità" : {
-
-    },
-    "Maggiore spazio tra le righe rende il testo più facile da seguire" : {
-
-    },
-    "Mai" : {
-
-    },
-    "Mano Preferita" : {
-
-    },
-    "Mappa mentale" : {
-
-    },
-    "Mappa Mentale" : {
-
-    },
-    "Mappa Mentale Generata" : {
-
-    },
-    "Mappe mentali" : {
-
-    },
-    "Mark as complete" : {
-
-    },
-    "Mark as incomplete" : {
-
-    },
-    "Mark task as complete with XP reward" : {
-
-    },
-    "Markup Photo" : {
-
-    },
-    "Materia" : {
-
-    },
-    "Materiali" : {
-
-    },
-    "Materiali Recenti" : {
-
-    },
-    "materials.add.accessibility" : {
-      "comment" : "Accessibility label for add sample button",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add sample material"
+    "error.openai.networkError": {
+      "comment": "Error: OpenAI network error",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Network error"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aggiungi materiale di esempio"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Errore di rete"
           }
         }
       }
     },
-    "materials.add.hint" : {
-      "comment" : "Accessibility hint for add sample button",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double tap to create a sample material"
+    "error.openai.rateLimitExceeded": {
+      "comment": "Error: OpenAI rate limit exceeded",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rate limit exceeded. Please wait."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Doppio tap per creare un materiale di esempio"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limite richieste superato. Attendi."
           }
         }
       }
     },
-    "materials.add.sample" : {
-      "comment" : "Button label to add a sample material",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Sample"
+    "error.openai.timeout": {
+      "comment": "Error: OpenAI timeout",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request timed out"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aggiungi Esempio"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesta scaduta"
           }
         }
       }
     },
-    "materials.detail.prefix" : {
-      "comment" : "Prefix for material detail",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Material:"
+    "error.openai.unknown": {
+      "comment": "Error: Unknown OpenAI error",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown error"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Materiale:"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Errore sconosciuto"
           }
         }
       }
     },
-    "materials.empty.description" : {
-      "comment" : "Description shown when no materials are available",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Materials from Google Drive will appear here"
+    "error.subject.cannotDeleteDefault": {
+      "comment": "Error message: Cannot delete default subjects. You can deactivate them instead.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot delete default subjects. You can deactivate them instead."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "I materiali da Google Drive appariranno qui"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile eliminare le materie predefinite. Puoi disattivarle."
           }
         }
       }
     },
-    "materials.empty.title" : {
-      "comment" : "Title shown when no materials are available",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Materials Yet"
+    "error.subject.hasAssociatedContent": {
+      "comment": "Error message: This subject has associated materials or tasks and cannot be deleted.",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This subject has associated materials or tasks and cannot be deleted."
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nessun Materiale"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa materia ha materiali o compiti associati e non può essere eliminata."
           }
         }
       }
     },
-    "materials.sample.title" : {
-      "comment" : "Title of sample material",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sample Material"
+    "Errore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Error"
+          }
+        }
+      }
+    },
+    "Errore di Connessione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Errore di Connessione"
+          }
+        }
+      }
+    },
+    "Errore: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Errore: %@"
+          }
+        }
+      }
+    },
+    "Esempi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esempi"
+          }
+        }
+      }
+    },
+    "Esempio di Riassunto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esempio di Riassunto"
+          }
+        }
+      }
+    },
+    "Espandi contesto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espandi contesto"
+          }
+        }
+      }
+    },
+    "Español": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Español"
+          }
+        }
+      }
+    },
+    "Esplora cosa può fare MirrorBuddy con un materiale di esempio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore what MirrorBuddy can do with a sample material"
+          }
+        }
+      }
+    },
+    "Expand": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expand"
+          }
+        }
+      }
+    },
+    "Extra Grande": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extra Grande"
+          }
+        }
+      }
+    },
+    "Feedback Aptici": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feedback Aptici"
+          }
+        }
+      }
+    },
+    "Ferma": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop"
+          }
+        }
+      }
+    },
+    "Ferma ascolto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ferma ascolto"
+          }
+        }
+      }
+    },
+    "Ferma conversazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ferma conversazione"
+          }
+        }
+      }
+    },
+    "Ferma conversazione vocale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ferma conversazione vocale"
+          }
+        }
+      }
+    },
+    "Ferma e Chiudi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ferma e Chiudi"
+          }
+        }
+      }
+    },
+    "Ferma registrazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ferma registrazione"
+          }
+        }
+      }
+    },
+    "File System": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File System"
+          }
+        }
+      }
+    },
+    "Filters & Sort": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Filters & Sort"
+          }
+        }
+      }
+    },
+    "Fine": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End"
+          }
+        }
+      }
+    },
+    "Flashcard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flashcard"
+          }
+        }
+      }
+    },
+    "Flashcard di Esempio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flashcard di Esempio"
+          }
+        }
+      }
+    },
+    "Font": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Font"
+          }
+        }
+      }
+    },
+    "Font e spaziatura": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Font e spaziatura"
+          }
+        }
+      }
+    },
+    "Fotosintesi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fotosintesi"
+          }
+        }
+      }
+    },
+    "Français": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Français"
+          }
+        }
+      }
+    },
+    "Funzionalità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Features"
+          }
+        }
+      }
+    },
+    "Glucosio e Ossigeno": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glucosio e Ossigeno"
+          }
+        }
+      }
+    },
+    "Google Drive": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Drive"
+          }
+        }
+      }
+    },
+    "Google Drive non connesso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Drive non connesso"
+          }
+        }
+      }
+    },
+    "Google Gemini API Key": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Google Gemini API Key"
+          }
+        }
+      }
+    },
+    "Grande": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grande"
+          }
+        }
+      }
+    },
+    "Grazie!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grazie!"
+          }
+        }
+      }
+    },
+    "Group by Subject": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Group by Subject"
+          }
+        }
+      }
+    },
+    "Hai completato la configurazione di MirrorBuddy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai completato la configurazione di MirrorBuddy"
+          }
+        }
+      }
+    },
+    "Hai detto:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai detto:"
+          }
+        }
+      }
+    },
+    "Hai imparato i comandi vocali base": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai imparato i comandi vocali base"
+          }
+        }
+      }
+    },
+    "Hai una registrazione in corso. Vuoi fermarla?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai una registrazione in corso. Vuoi fermarla?"
+          }
+        }
+      }
+    },
+    "Hide Completed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide Completed"
+          }
+        }
+      }
+    },
+    "High": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High"
+          }
+        }
+      }
+    },
+    "High Priority": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "High Priority"
+          }
+        }
+      }
+    },
+    "Ho capito, continua": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ho capito, continua"
+          }
+        }
+      }
+    },
+    "Homework Help": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Homework Help"
+          }
+        }
+      }
+    },
+    "I Miei Compiti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I Miei Compiti"
+          }
+        }
+      }
+    },
+    "Il Client Secret è opzionale per le app iOS. Alcuni setup potrebbero non richiederlo.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Client Secret is optional for iOS apps. Some setups may not require it."
+          }
+        }
+      }
+    },
+    "Il font OpenDyslexic è progettato specificamente per migliorare la leggibilità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The OpenDyslexic font is specifically designed to improve readability"
+          }
+        }
+      }
+    },
+    "Il font OpenDyslexic non è disponibile su questo dispositivo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The OpenDyslexic font is not available on this device"
+          }
+        }
+      }
+    },
+    "Il righello evidenzia la riga corrente. La modalità focus oscura il testo circostante.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The ruler highlights the current line. Focus mode dims surrounding text."
+          }
+        }
+      }
+    },
+    "Il tuo compagno di studio con AI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo compagno di studio con AI"
+          }
+        }
+      }
+    },
+    "Il Tuo Feedback": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Tuo Feedback"
+          }
+        }
+      }
+    },
+    "Il tuo feedback ci aiuta a migliorare MirrorBuddy per tutti i bambini!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo feedback ci aiuta a migliorare MirrorBuddy per tutti i bambini!"
+          }
+        }
+      }
+    },
+    "Il tuo feedback è stato ricevuto. Grazie per aiutarci a migliorare!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your feedback has been received. Thank you for helping us improve!"
+          }
+        }
+      }
+    },
+    "Il Tuo Profilo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Tuo Profilo"
+          }
+        }
+      }
+    },
+    "Impara a usare i comandi vocali per navigare MirrorBuddy senza toccare lo schermo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impara a usare i comandi vocali per navigare MirrorBuddy senza toccare lo schermo"
+          }
+        }
+      }
+    },
+    "Importa (%lld)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa (%lld)"
+          }
+        }
+      }
+    },
+    "Importa da Drive": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa da Drive"
+          }
+        }
+      }
+    },
+    "Importa File": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa File"
+          }
+        }
+      }
+    },
+    "Importa materiali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa materiali"
+          }
+        }
+      }
+    },
+    "Importa materiali da Google Drive per iniziare": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importa materiali da Google Drive per iniziare"
+          }
+        }
+      }
+    },
+    "Impostazioni": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings"
+          }
+        }
+      }
+    },
+    "Impostazioni voce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni voce"
+          }
+        }
+      }
+    },
+    "Impostazioni Voce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni Voce"
+          }
+        }
+      }
+    },
+    "In ascolto...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In ascolto..."
+          }
+        }
+      }
+    },
+    "In attesa": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa"
+          }
+        }
+      }
+    },
+    "In riproduzione...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In riproduzione..."
+          }
+        }
+      }
+    },
+    "Indietro": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Back"
+          }
+        }
+      }
+    },
+    "Indietro 10 secondi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indietro 10 secondi"
+          }
+        }
+      }
+    },
+    "Informazioni": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Information"
+          }
+        }
+      }
+    },
+    "Inizia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia"
+          }
+        }
+      }
+    },
+    "Inizia ascolto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia ascolto"
+          }
+        }
+      }
+    },
+    "Inizia conversazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia conversazione"
+          }
+        }
+      }
+    },
+    "Inizia Conversazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia Conversazione"
+          }
+        }
+      }
+    },
+    "Inizia conversazione vocale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia conversazione vocale"
+          }
+        }
+      }
+    },
+    "Inizia Lettura": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia Lettura"
+          }
+        }
+      }
+    },
+    "Inizia registrazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia registrazione"
+          }
+        }
+      }
+    },
+    "Inizia Studio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia Studio"
+          }
+        }
+      }
+    },
+    "Inizia una nuova conversazione con il Coach Vocale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia una nuova conversazione con il Coach Vocale"
+          }
+        }
+      }
+    },
+    "Inizia una nuova conversazione per vedere la cronologia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia una nuova conversazione per vedere la cronologia"
+          }
+        }
+      }
+    },
+    "Input": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input"
+          }
+        }
+      }
+    },
+    "Inserisci le tue chiavi API per abilitare le funzionalità avanzate di AI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter your API keys to enable advanced AI features"
+          }
+        }
+      }
+    },
+    "Integrazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Integrazione"
+          }
+        }
+      }
+    },
+    "Interrompi Anteprima": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompi Anteprima"
+          }
+        }
+      }
+    },
+    "Invia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send"
+          }
+        }
+      }
+    },
+    "Invia Feedback": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invia Feedback"
+          }
+        }
+      }
+    },
+    "Istruzioni": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Istruzioni"
+          }
+        }
+      }
+    },
+    "Italiano": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italian"
+          }
+        }
+      }
+    },
+    "La fotosintesi è il processo attraverso cui le piante convertono la luce solare in energia chimica.\n\n• Le piante usano clorofilla per catturare la luce\n• L'anidride carbonica e l'acqua vengono trasformate\n• Il risultato è glucosio e ossigeno\n• L'energia viene immagazzinata nei legami chimici": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photosynthesis is the process by which plants convert sunlight into chemical energy.\n\n• Plants use chlorophyll to capture light\n• Carbon dioxide and water are transformed\n• The result is glucose and oxygen\n• Energy is stored in chemical bonds"
+          }
+        }
+      }
+    },
+    "La tua cronologia dei contesti apparirà qui": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your context history will appear here"
+          }
+        }
+      }
+    },
+    "Le impostazioni consigliate applicano valori ottimizzati per la dislessia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le impostazioni consigliate applicano valori ottimizzati per la dislessia"
+          }
+        }
+      }
+    },
+    "Leggi Domanda": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leggi Domanda"
+          }
+        }
+      }
+    },
+    "Leggi Risposta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leggi Risposta"
+          }
+        }
+      }
+    },
+    "Leggi Tutto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leggi Tutto"
+          }
+        }
+      }
+    },
+    "Linee Guida": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linee Guida"
+          }
+        }
+      }
+    },
+    "Lingua": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
+          }
+        }
+      }
+    },
+    "Linked Material": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Linked Material"
+          }
+        }
+      }
+    },
+    "List View": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "List View"
+          }
+        }
+      }
+    },
+    "Livello %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Livello %lld"
+          }
+        }
+      }
+    },
+    "Low": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Low"
+          }
+        }
+      }
+    },
+    "Maggiore spaziatura tra le lettere può migliorare la leggibilità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Greater spacing between letters can improve readability"
+          }
+        }
+      }
+    },
+    "Maggiore spazio tra le righe rende il testo più facile da seguire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Greater spacing between lines makes text easier to follow"
+          }
+        }
+      }
+    },
+    "Mai": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Never"
+          }
+        }
+      }
+    },
+    "Mano Preferita": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mano Preferita"
+          }
+        }
+      }
+    },
+    "Mappa mentale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mappa mentale"
+          }
+        }
+      }
+    },
+    "Mappa Mentale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mappa Mentale"
+          }
+        }
+      }
+    },
+    "Mappa Mentale Generata": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mappa Mentale Generata"
+          }
+        }
+      }
+    },
+    "Mappe mentali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mappe mentali"
+          }
+        }
+      }
+    },
+    "Mark as complete": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as complete"
+          }
+        }
+      }
+    },
+    "Mark as incomplete": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark as incomplete"
+          }
+        }
+      }
+    },
+    "Mark task as complete with XP reward": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mark task as complete with XP reward"
+          }
+        }
+      }
+    },
+    "Markup Photo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markup Photo"
+          }
+        }
+      }
+    },
+    "Materia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Materia"
+          }
+        }
+      }
+    },
+    "Materiali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Materiali"
+          }
+        }
+      }
+    },
+    "Materiali Recenti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Materiali Recenti"
+          }
+        }
+      }
+    },
+    "materials.add.accessibility": {
+      "comment": "Accessibility label for add sample button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add sample material"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Materiale di esempio"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi materiale di esempio"
           }
         }
       }
     },
-    "materials.select.description" : {
-      "comment" : "Description shown in detail view when no material is selected",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a material to view details, mind maps, and flashcards"
+    "materials.add.hint": {
+      "comment": "Accessibility hint for add sample button",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double tap to create a sample material"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scegli un materiale per vedere dettagli, mappe mentali e flashcard"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doppio tap per creare un materiale di esempio"
           }
         }
       }
     },
-    "materials.select.title" : {
-      "comment" : "Title shown in detail view when no material is selected",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a Material"
+    "materials.add.sample": {
+      "comment": "Button label to add a sample material",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Sample"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Seleziona un Materiale"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi Esempio"
           }
         }
       }
     },
-    "Media" : {
-
-    },
-    "Medium" : {
-
-    },
-    "Medium-High Priority" : {
-
-    },
-    "Metti in pausa" : {
-
-    },
-    "Microfono" : {
-
-    },
-    "Mind Map" : {
-
-    },
-    "MirrorBuddy" : {
-
-    },
-    "Modalità Debug" : {
-
-    },
-    "Modalità Focus" : {
-
-    },
-    "Modalità Raggiungibilità" : {
-
-    },
-    "Modalità una mano" : {
-
-    },
-    "Molto Ampia" : {
-
-    },
-    "Molto Grande" : {
-
-    },
-    "More options" : {
-
-    },
-    "Mostra cronologia" : {
-
-    },
-    "Mostra dettagli" : {
-
-    },
-    "Mostra dettagli errore" : {
-
-    },
-    "Mostra Dimensioni Touch Target" : {
-
-    },
-    "Mostra Domanda" : {
-
-    },
-    "Mostra Log Audio" : {
-
-    },
-    "Mostra Risposta" : {
-
-    },
-    "Mostra Zone Pollice" : {
-
-    },
-    "My Materials" : {
-
-    },
-    "Nascondi dettagli" : {
-
-    },
-    "Nascondi dettagli errore" : {
-
-    },
-    "Nessun contesto attivo" : {
-
-    },
-    "Nessun file trovato" : {
-
-    },
-    "Nessun materiale" : {
-
-    },
-    "Nessun materiale in scadenza oggi" : {
-
-    },
-    "Nessun traguardo sbloccato ancora" : {
-
-    },
-    "Nessuna" : {
-
-    },
-    "Nessuna Conversazione" : {
-
-    },
-    "Nessuna Cronologia" : {
-
-    },
-    "Nessuna Flashcard" : {
-
-    },
-    "Nessuna Mappa Mentale" : {
-
-    },
-    "Nessuna voce disponibile per questa lingua" : {
-
-    },
-    "New Task" : {
-
-    },
-    "No due date set" : {
-
-    },
-    "No Materials" : {
-
-    },
-    "No materials match your search" : {
-
-    },
-    "No Tasks" : {
-
-    },
-    "No tasks match your search" : {
-
-    },
-    "Non connesso" : {
-
-    },
-    "Non sono stati trovati file PDF o documenti Google nel tuo Drive" : {
-
-    },
-    "Normale" : {
-
-    },
-    "Nuova" : {
-
-    },
-    "Nuova Conversazione" : {
-
-    },
-    "OAuth Credentials" : {
-
-    },
-    "Offline" : {
-
-    },
-    "Oggi" : {
-
-    },
-    "OK" : {
-
-    },
-    "OpenAI API Key" : {
-
-    },
-    "Ops! C'è un problema" : {
-
-    },
-    "Options menu" : {
-
-    },
-    "Ottieni la chiave da makersuite.google.com" : {
-
-    },
-    "Ottieni la chiave da platform.openai.com" : {
-
-    },
-    "Ottieni la chiave da platform.stability.ai" : {
-
-    },
-    "Ottimizza l'interfaccia per l'uso con una sola mano" : {
-
-    },
-    "Output" : {
-
-    },
-    "Parametri Vocali" : {
-
-    },
-    "Parla" : {
-
-    },
-    "Parla con il tuo coach di studio personale" : {
-
-    },
-    "Pausa" : {
-
-    },
-    "Pausa Automatica Dopo" : {
-
-    },
-    "Per registrare le lezioni, devi consentire l'accesso al microfono nelle impostazioni." : {
-
-    },
-    "Per utilizzare Google Drive, devi configurare le credenziali OAuth 2.0 da Google Cloud Console." : {
-
-    },
-    "Permessi Necessari" : {
-
-    },
-    "Permesso Microfono" : {
-
-    },
-    "Permissions Required:" : {
-
-    },
-    "Personalizza il comportamento delle conversazioni vocali" : {
-
-    },
-    "Photo" : {
-
-    },
-    "Posso aiutarti con i compiti, navigare l'app, e molto altro." : {
-
-    },
-    "Predefinito" : {
-
-    },
-    "Preferenza Mano" : {
-
-    },
-    "Preimpostazioni" : {
-
-    },
-    "Priority" : {
-
-    },
-    "Progresso" : {
-
-    },
-    "Pronto" : {
-
-    },
-    "Pronuncia uno dei comandi seguenti per navigare nell'app senza toccare lo schermo." : {
-
-    },
-    "Prossimi Eventi" : {
-
-    },
-    "Prossimo comando" : {
-
-    },
-    "Prossimo livello" : {
-
-    },
-    "Prova a dire:" : {
-
-    },
-    "Puoi dire '%@' per attivare questa azione" : {
-
-    },
-    "Puoi modificare questi permessi in qualsiasi momento dalle Impostazioni di iOS" : {
-
-    },
-    "Qualità Audio" : {
-
-    },
-    "Questo materiale non ha ancora flashcard" : {
-
-    },
-    "Questo materiale non ha ancora una mappa mentale" : {
-
-    },
-    "Raggiungibilità" : {
-
-    },
-    "Read Aloud" : {
-
-    },
-    "Registrazione in Corso" : {
-
-    },
-    "Registrazione Lezione" : {
-
-    },
-    "Regola la sensibilità del microfono per ridurre i rumori di fondo" : {
-
-    },
-    "Regola la velocità e la qualità della voce del coach AI" : {
-
-    },
-    "Regolazioni per migliorare l'accessibilità" : {
-
-    },
-    "Retake Photo" : {
-
-    },
-    "Riassunto" : {
-
-    },
-    "Ricarica" : {
-
-    },
-    "Riduzione Trasparenze" : {
-
-    },
-    "Righello di Lettura" : {
-
-    },
-    "Riprendi" : {
-
-    },
-    "Riprendi registrazione" : {
-
-    },
-    "Ripristina Impostazioni Predefinite" : {
-
-    },
-    "Ripristina Predefiniti" : {
-
-    },
-    "Riproduci" : {
-
-    },
-    "Riprova" : {
-
-    },
-    "Riprova l'operazione fallita" : {
-
-    },
-    "Risposta" : {
-
-    },
-    "Risposta Vocale" : {
-
-    },
-    "Salta" : {
-
-    },
-    "Salva" : {
-
-    },
-    "Salva Chiavi" : {
-
-    },
-    "Salva Credenziali" : {
-
-    },
-    "Salvataggio..." : {
-
-    },
-    "Save" : {
-
-    },
-    "Scansiona Documento" : {
-
-    },
-    "Scopri le Funzionalità" : {
-
-    },
-    "Search materials..." : {
-
-    },
-    "Search tasks..." : {
-
-    },
-    "Seleziona File" : {
-
-    },
-    "Seleziona il microfono da utilizzare per le conversazioni vocali" : {
-
-    },
-    "Seleziona una materia per iniziare" : {
-
-    },
-    "Seleziona una voce dal tuo dispositivo. Le voci possono essere scaricate dalle Impostazioni di sistema." : {
-
-    },
-    "Selezione Voce" : {
-
-    },
-    "Sensibilità Microfono" : {
-
-    },
-    "Serie di Studio" : {
-
-    },
-    "Setup Guida" : {
-
-    },
-    "Sezione Flashcard, %@" : {
-
-    },
-    "Sezione Mappa Mentale, %@" : {
-
-    },
-    "Sezione Panoramica, %@" : {
-
-    },
-    "Sezione Riassunto, %@" : {
-
-    },
-    "Share" : {
-
-    },
-    "Show Completed" : {
-
-    },
-    "Show Completed Tasks" : {
-
-    },
-    "Show voice commands help" : {
-
-    },
-    "Sign in to access your Google Drive files" : {
-
-    },
-    "Sign in with Google" : {
-
-    },
-    "Sign Out" : {
-
-    },
-    "Sincronizza documenti, mail e calendario" : {
-
-    },
-    "Sincronizza Email e Calendar" : {
-
-    },
-    "Sincronizza email e calendario" : {
-
-    },
-    "Sincronizzazione" : {
-
-    },
-    "Sincronizzazione completata!" : {
-
-    },
-    "Sincronizzazione in corso" : {
-
-    },
-    "Sincronizzazione..." : {
-
-    },
-    "sk-..." : {
-
-    },
-    "Sorgente" : {
-
-    },
-    "Sort" : {
-
-    },
-    "Sort By" : {
-
-    },
-    "Spaziatura Lettere" : {
-
-    },
-    "Spaziatura Paragrafi" : {
-
-    },
-    "Spaziatura Righe" : {
-
-    },
-    "Spazio aggiuntivo tra i paragrafi aiuta a distinguere i blocchi di testo" : {
-
-    },
-    "Sposta i controlli nella zona facilmente raggiungibile dal pollice" : {
-
-    },
-    "Stability AI API Key" : {
-
-    },
-    "Start listening" : {
-
-    },
-    "Start Studying" : {
-
-    },
-    "Start studying linked material" : {
-
-    },
-    "Statistiche" : {
-
-    },
-    "Stop" : {
-
-    },
-    "Stop listening" : {
-
-    },
-    "Stretta" : {
-
-    },
-    "Studia" : {
-
-    },
-    "Subject" : {
-
-    },
-    "Subject Filter" : {
-
-    },
-    "subject.educazioneCivica" : {
-      "comment" : "Subject name: Civic Education",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Civic Education"
+    "materials.detail.prefix": {
+      "comment": "Prefix for material detail",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Material:"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Educazione Civica"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Materiale:"
           }
         }
       }
     },
-    "subject.fisica" : {
-      "comment" : "Subject name: Physics",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Physics"
+    "materials.empty.description": {
+      "comment": "Description shown when no materials are available",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Materials from Google Drive will appear here"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fisica"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I materiali da Google Drive appariranno qui"
           }
         }
       }
     },
-    "subject.inglese" : {
-      "comment" : "Subject name: English",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "English"
+    "materials.empty.title": {
+      "comment": "Title shown when no materials are available",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Materials Yet"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inglese"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun Materiale"
           }
         }
       }
     },
-    "subject.italiano" : {
-      "comment" : "Subject name: Italian",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Italian"
+    "materials.sample.title": {
+      "comment": "Title of sample material",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample Material"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Italiano"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Materiale di esempio"
           }
         }
       }
     },
-    "subject.matematica" : {
-      "comment" : "Subject name: Mathematics",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mathematics"
+    "materials.select.description": {
+      "comment": "Description shown in detail view when no material is selected",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a material to view details, mind maps, and flashcards"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Matematica"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli un materiale per vedere dettagli, mappe mentali e flashcard"
           }
         }
       }
     },
-    "subject.other" : {
-      "comment" : "Subject name: Other",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Other"
+    "materials.select.title": {
+      "comment": "Title shown in detail view when no material is selected",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select a Material"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Altro"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona un Materiale"
           }
         }
       }
     },
-    "subject.religione" : {
-      "comment" : "Subject name: Religion",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Religion"
+    "Media": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Average"
+          }
+        }
+      }
+    },
+    "Medium": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medium"
+          }
+        }
+      }
+    },
+    "Medium-High Priority": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Medium-High Priority"
+          }
+        }
+      }
+    },
+    "Metti in pausa": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metti in pausa"
+          }
+        }
+      }
+    },
+    "Microfono": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microfono"
+          }
+        }
+      }
+    },
+    "Mind Map": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mind Map"
+          }
+        }
+      }
+    },
+    "MirrorBuddy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MirrorBuddy"
+          }
+        }
+      }
+    },
+    "Modalità Debug": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Debug Mode"
+          }
+        }
+      }
+    },
+    "Modalità Focus": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Focus Mode"
+          }
+        }
+      }
+    },
+    "Modalità Raggiungibilità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reachability Mode"
+          }
+        }
+      }
+    },
+    "Modalità una mano": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One-hand Mode"
+          }
+        }
+      }
+    },
+    "Molto Ampia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Molto Ampia"
+          }
+        }
+      }
+    },
+    "Molto Grande": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Molto Grande"
+          }
+        }
+      }
+    },
+    "More options": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More options"
+          }
+        }
+      }
+    },
+    "Mostra cronologia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra cronologia"
+          }
+        }
+      }
+    },
+    "Mostra dettagli": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra dettagli"
+          }
+        }
+      }
+    },
+    "Mostra dettagli errore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra dettagli errore"
+          }
+        }
+      }
+    },
+    "Mostra Dimensioni Touch Target": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra Dimensioni Touch Target"
+          }
+        }
+      }
+    },
+    "Mostra Domanda": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra Domanda"
+          }
+        }
+      }
+    },
+    "Mostra Log Audio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra Log Audio"
+          }
+        }
+      }
+    },
+    "Mostra Risposta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra Risposta"
+          }
+        }
+      }
+    },
+    "Mostra Zone Pollice": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra Zone Pollice"
+          }
+        }
+      }
+    },
+    "My Materials": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My Materials"
+          }
+        }
+      }
+    },
+    "Nascondi dettagli": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nascondi dettagli"
+          }
+        }
+      }
+    },
+    "Nascondi dettagli errore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nascondi dettagli errore"
+          }
+        }
+      }
+    },
+    "Nessun contesto attivo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun contesto attivo"
+          }
+        }
+      }
+    },
+    "Nessun file trovato": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun file trovato"
+          }
+        }
+      }
+    },
+    "Nessun materiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun materiale"
+          }
+        }
+      }
+    },
+    "Nessun materiale in scadenza oggi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun materiale in scadenza oggi"
+          }
+        }
+      }
+    },
+    "Nessun traguardo sbloccato ancora": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun traguardo sbloccato ancora"
+          }
+        }
+      }
+    },
+    "Nessuna": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna"
+          }
+        }
+      }
+    },
+    "Nessuna Conversazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna Conversazione"
+          }
+        }
+      }
+    },
+    "Nessuna Cronologia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna Cronologia"
+          }
+        }
+      }
+    },
+    "Nessuna Flashcard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna Flashcard"
+          }
+        }
+      }
+    },
+    "Nessuna Mappa Mentale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna Mappa Mentale"
+          }
+        }
+      }
+    },
+    "Nessuna voce disponibile per questa lingua": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna voce disponibile per questa lingua"
+          }
+        }
+      }
+    },
+    "New Task": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Task"
+          }
+        }
+      }
+    },
+    "No due date set": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No due date set"
+          }
+        }
+      }
+    },
+    "No Materials": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Materials"
+          }
+        }
+      }
+    },
+    "No materials match your search": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No materials match your search"
+          }
+        }
+      }
+    },
+    "No Tasks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Tasks"
+          }
+        }
+      }
+    },
+    "No tasks match your search": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No tasks match your search"
+          }
+        }
+      }
+    },
+    "Non connesso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non connesso"
+          }
+        }
+      }
+    },
+    "Non sono stati trovati file PDF o documenti Google nel tuo Drive": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non sono stati trovati file PDF o documenti Google nel tuo Drive"
+          }
+        }
+      }
+    },
+    "Normale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Normale"
+          }
+        }
+      }
+    },
+    "Nuova": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New"
+          }
+        }
+      }
+    },
+    "Nuova Conversazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuova Conversazione"
+          }
+        }
+      }
+    },
+    "OAuth Credentials": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OAuth Credentials"
+          }
+        }
+      }
+    },
+    "Offline": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline"
+          }
+        }
+      }
+    },
+    "Oggi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
+          }
+        }
+      }
+    },
+    "OK": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        }
+      }
+    },
+    "OpenAI API Key": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OpenAI API Key"
+          }
+        }
+      }
+    },
+    "Ops! C'è un problema": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oops! There's a problem"
+          }
+        }
+      }
+    },
+    "Options menu": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Options menu"
+          }
+        }
+      }
+    },
+    "Ottieni la chiave da makersuite.google.com": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottieni la chiave da makersuite.google.com"
+          }
+        }
+      }
+    },
+    "Ottieni la chiave da platform.openai.com": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottieni la chiave da platform.openai.com"
+          }
+        }
+      }
+    },
+    "Ottieni la chiave da platform.stability.ai": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottieni la chiave da platform.stability.ai"
+          }
+        }
+      }
+    },
+    "Ottimizza l'interfaccia per l'uso con una sola mano": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottimizza l'interfaccia per l'uso con una sola mano"
+          }
+        }
+      }
+    },
+    "Output": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output"
+          }
+        }
+      }
+    },
+    "Parametri Vocali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parametri Vocali"
+          }
+        }
+      }
+    },
+    "Parla": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speak"
+          }
+        }
+      }
+    },
+    "Parla con il tuo coach di studio personale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parla con il tuo coach di studio personale"
+          }
+        }
+      }
+    },
+    "Pausa": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause"
+          }
+        }
+      }
+    },
+    "Pausa Automatica Dopo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausa Automatica Dopo"
+          }
+        }
+      }
+    },
+    "Per registrare le lezioni, devi consentire l'accesso al microfono nelle impostazioni.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per registrare le lezioni, devi consentire l'accesso al microfono nelle impostazioni."
+          }
+        }
+      }
+    },
+    "Per utilizzare Google Drive, devi configurare le credenziali OAuth 2.0 da Google Cloud Console.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per utilizzare Google Drive, devi configurare le credenziali OAuth 2.0 da Google Cloud Console."
+          }
+        }
+      }
+    },
+    "Permessi Necessari": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permessi Necessari"
+          }
+        }
+      }
+    },
+    "Permesso Microfono": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permesso Microfono"
+          }
+        }
+      }
+    },
+    "Permissions Required:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permissions Required:"
+          }
+        }
+      }
+    },
+    "Personalizza il comportamento delle conversazioni vocali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizza il comportamento delle conversazioni vocali"
+          }
+        }
+      }
+    },
+    "Photo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo"
+          }
+        }
+      }
+    },
+    "Posso aiutarti con i compiti, navigare l'app, e molto altro.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posso aiutarti con i compiti, navigare l'app, e molto altro."
+          }
+        }
+      }
+    },
+    "Predefinito": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Predefinito"
+          }
+        }
+      }
+    },
+    "Preferenza Mano": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preferenza Mano"
+          }
+        }
+      }
+    },
+    "Preimpostazioni": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preimpostazioni"
+          }
+        }
+      }
+    },
+    "Priority": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Priority"
+          }
+        }
+      }
+    },
+    "Progresso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progress"
+          }
+        }
+      }
+    },
+    "Pronto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pronto"
+          }
+        }
+      }
+    },
+    "Pronuncia uno dei comandi seguenti per navigare nell'app senza toccare lo schermo.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pronuncia uno dei comandi seguenti per navigare nell'app senza toccare lo schermo."
+          }
+        }
+      }
+    },
+    "Prossimi Eventi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prossimi Eventi"
+          }
+        }
+      }
+    },
+    "Prossimo comando": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prossimo comando"
+          }
+        }
+      }
+    },
+    "Prossimo livello": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prossimo livello"
+          }
+        }
+      }
+    },
+    "Prova a dire:": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prova a dire:"
+          }
+        }
+      }
+    },
+    "Puoi dire '%@' per attivare questa azione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puoi dire '%@' per attivare questa azione"
+          }
+        }
+      }
+    },
+    "Puoi modificare questi permessi in qualsiasi momento dalle Impostazioni di iOS": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puoi modificare questi permessi in qualsiasi momento dalle Impostazioni di iOS"
+          }
+        }
+      }
+    },
+    "Qualità Audio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio Quality"
+          }
+        }
+      }
+    },
+    "Questo materiale non ha ancora flashcard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo materiale non ha ancora flashcard"
+          }
+        }
+      }
+    },
+    "Questo materiale non ha ancora una mappa mentale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo materiale non ha ancora una mappa mentale"
+          }
+        }
+      }
+    },
+    "Raggiungibilità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reachability"
+          }
+        }
+      }
+    },
+    "Read Aloud": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read Aloud"
+          }
+        }
+      }
+    },
+    "Registrazione in Corso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrazione in Corso"
+          }
+        }
+      }
+    },
+    "Registrazione Lezione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registrazione Lezione"
+          }
+        }
+      }
+    },
+    "Regola la sensibilità del microfono per ridurre i rumori di fondo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjust microphone sensitivity to reduce background noise"
+          }
+        }
+      }
+    },
+    "Regola la velocità e la qualità della voce del coach AI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjust the speed and quality of the AI coach voice"
+          }
+        }
+      }
+    },
+    "Regolazioni per migliorare l'accessibilità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adjustments to improve accessibility"
+          }
+        }
+      }
+    },
+    "Retake Photo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retake Photo"
+          }
+        }
+      }
+    },
+    "Riassunto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riassunto"
+          }
+        }
+      }
+    },
+    "Ricarica": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reload"
+          }
+        }
+      }
+    },
+    "Riduzione Trasparenze": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riduzione Trasparenze"
+          }
+        }
+      }
+    },
+    "Righello di Lettura": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Righello di Lettura"
+          }
+        }
+      }
+    },
+    "Riprendi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprendi"
+          }
+        }
+      }
+    },
+    "Riprendi registrazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprendi registrazione"
+          }
+        }
+      }
+    },
+    "Ripristina Impostazioni Predefinite": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina Impostazioni Predefinite"
+          }
+        }
+      }
+    },
+    "Ripristina Predefiniti": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina Predefiniti"
+          }
+        }
+      }
+    },
+    "Riproduci": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduci"
+          }
+        }
+      }
+    },
+    "Riprova": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        }
+      }
+    },
+    "Riprova l'operazione fallita": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprova l'operazione fallita"
+          }
+        }
+      }
+    },
+    "Risposta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risposta"
+          }
+        }
+      }
+    },
+    "Risposta Vocale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risposta Vocale"
+          }
+        }
+      }
+    },
+    "Salta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "Salva": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        }
+      }
+    },
+    "Salva Chiavi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva Chiavi"
+          }
+        }
+      }
+    },
+    "Salva Credenziali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva Credenziali"
+          }
+        }
+      }
+    },
+    "Salvataggio...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salvataggio..."
+          }
+        }
+      }
+    },
+    "Save": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        }
+      }
+    },
+    "Scansiona Documento": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scansiona Documento"
+          }
+        }
+      }
+    },
+    "Scopri le Funzionalità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discover Features"
+          }
+        }
+      }
+    },
+    "Search materials...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search materials..."
+          }
+        }
+      }
+    },
+    "Search tasks...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search tasks..."
+          }
+        }
+      }
+    },
+    "Seleziona File": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona File"
+          }
+        }
+      }
+    },
+    "Seleziona il microfono da utilizzare per le conversazioni vocali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona il microfono da utilizzare per le conversazioni vocali"
+          }
+        }
+      }
+    },
+    "Seleziona una materia per iniziare": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona una materia per iniziare"
+          }
+        }
+      }
+    },
+    "Seleziona una voce dal tuo dispositivo. Le voci possono essere scaricate dalle Impostazioni di sistema.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seleziona una voce dal tuo dispositivo. Le voci possono essere scaricate dalle Impostazioni di sistema."
+          }
+        }
+      }
+    },
+    "Selezione Voce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selezione Voce"
+          }
+        }
+      }
+    },
+    "Sensibilità Microfono": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone Sensitivity"
+          }
+        }
+      }
+    },
+    "Serie di Studio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serie di Studio"
+          }
+        }
+      }
+    },
+    "Setup Guida": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setup Guida"
+          }
+        }
+      }
+    },
+    "Sezione Flashcard, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sezione Flashcard, %@"
+          }
+        }
+      }
+    },
+    "Sezione Mappa Mentale, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sezione Mappa Mentale, %@"
+          }
+        }
+      }
+    },
+    "Sezione Panoramica, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sezione Panoramica, %@"
+          }
+        }
+      }
+    },
+    "Sezione Riassunto, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sezione Riassunto, %@"
+          }
+        }
+      }
+    },
+    "Share": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        }
+      }
+    },
+    "Show Completed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Completed"
+          }
+        }
+      }
+    },
+    "Show Completed Tasks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Completed Tasks"
+          }
+        }
+      }
+    },
+    "Show voice commands help": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show voice commands help"
+          }
+        }
+      }
+    },
+    "Sign in to access your Google Drive files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to access your Google Drive files"
+          }
+        }
+      }
+    },
+    "Sign in with Google": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in with Google"
+          }
+        }
+      }
+    },
+    "Sign Out": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign Out"
+          }
+        }
+      }
+    },
+    "Sincronizza documenti, mail e calendario": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizza documenti, mail e calendario"
+          }
+        }
+      }
+    },
+    "Sincronizza Email e Calendar": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizza Email e Calendar"
+          }
+        }
+      }
+    },
+    "Sincronizza email e calendario": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizza email e calendario"
+          }
+        }
+      }
+    },
+    "Sincronizzazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione"
+          }
+        }
+      }
+    },
+    "Sincronizzazione completata!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione completata!"
+          }
+        }
+      }
+    },
+    "Sincronizzazione in corso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione in corso"
+          }
+        }
+      }
+    },
+    "Sincronizzazione...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione..."
+          }
+        }
+      }
+    },
+    "sk-...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sk-..."
+          }
+        }
+      }
+    },
+    "Sorgente": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorgente"
+          }
+        }
+      }
+    },
+    "Sort": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort"
+          }
+        }
+      }
+    },
+    "Sort By": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sort By"
+          }
+        }
+      }
+    },
+    "Spaziatura Lettere": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spaziatura Lettere"
+          }
+        }
+      }
+    },
+    "Spaziatura Paragrafi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spaziatura Paragrafi"
+          }
+        }
+      }
+    },
+    "Spaziatura Righe": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spaziatura Righe"
+          }
+        }
+      }
+    },
+    "Spazio aggiuntivo tra i paragrafi aiuta a distinguere i blocchi di testo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spazio aggiuntivo tra i paragrafi aiuta a distinguere i blocchi di testo"
+          }
+        }
+      }
+    },
+    "Sposta i controlli nella zona facilmente raggiungibile dal pollice": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sposta i controlli nella zona facilmente raggiungibile dal pollice"
+          }
+        }
+      }
+    },
+    "Stability AI API Key": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stability AI API Key"
+          }
+        }
+      }
+    },
+    "Start listening": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start listening"
+          }
+        }
+      }
+    },
+    "Start Studying": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Studying"
+          }
+        }
+      }
+    },
+    "Start studying linked material": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start studying linked material"
+          }
+        }
+      }
+    },
+    "Statistiche": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Statistiche"
+          }
+        }
+      }
+    },
+    "Stop": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop"
+          }
+        }
+      }
+    },
+    "Stop listening": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop listening"
+          }
+        }
+      }
+    },
+    "Stretta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stretta"
+          }
+        }
+      }
+    },
+    "Studia": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Studia"
+          }
+        }
+      }
+    },
+    "Subject": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subject"
+          }
+        }
+      }
+    },
+    "Subject Filter": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Subject Filter"
+          }
+        }
+      }
+    },
+    "subject.educazioneCivica": {
+      "comment": "Subject name: Civic Education",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Civic Education"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Religione"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Educazione Civica"
           }
         }
       }
     },
-    "subject.scienzeMotorie" : {
-      "comment" : "Subject name: Physical Education",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Physical Education"
+    "subject.fisica": {
+      "comment": "Subject name: Physics",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Physics"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scienze Motorie"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fisica"
           }
         }
       }
     },
-    "subject.scienzeNaturali" : {
-      "comment" : "Subject name: Natural Sciences",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Natural Sciences"
+    "subject.inglese": {
+      "comment": "Subject name: English",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "English"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scienze Naturali"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inglese"
           }
         }
       }
     },
-    "subject.sostegno" : {
-      "comment" : "Subject name: Support",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Support"
+    "subject.italiano": {
+      "comment": "Subject name: Italian",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italian"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "SOSTEGNO"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Italiano"
           }
         }
       }
     },
-    "subject.storiaGeografia" : {
-      "comment" : "Subject name: History and Geography",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "History and Geography"
+    "subject.matematica": {
+      "comment": "Subject name: Mathematics",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mathematics"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Storia e Geografia"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Matematica"
           }
         }
       }
     },
-    "Successo" : {
-
-    },
-    "Suggerimento: %@" : {
-
-    },
-    "Suoni di Sistema" : {
-
-    },
-    "Sviluppo" : {
-
-    },
-    "sync.manual.button" : {
-      "comment" : "Button to manually trigger sync",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sync Now"
+    "subject.other": {
+      "comment": "Subject name: Other",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronizza Ora"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altro"
           }
         }
       }
     },
-    "sync.status.failed" : {
-      "comment" : "Sync status: Failed",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sync Failed"
+    "subject.religione": {
+      "comment": "Subject name: Religion",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Religion"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronizzazione Fallita"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Religione"
           }
         }
       }
     },
-    "sync.status.idle" : {
-      "comment" : "Sync status: Idle",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Idle"
+    "subject.scienzeMotorie": {
+      "comment": "Subject name: Physical Education",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Physical Education"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inattivo"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scienze Motorie"
           }
         }
       }
     },
-    "sync.status.synced" : {
-      "comment" : "Sync status: Synced",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Synced"
+    "subject.scienzeNaturali": {
+      "comment": "Subject name: Natural Sciences",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Natural Sciences"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronizzato"
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scienze Naturali"
           }
         }
       }
     },
-    "sync.status.syncing" : {
-      "comment" : "Sync status: Syncing",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Syncing..."
+    "subject.sostegno": {
+      "comment": "Subject name: Support",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Support"
           }
         },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sincronizzazione..."
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SOSTEGNO"
           }
         }
       }
     },
-    "Take a photo to get started with voice assistance" : {
-
+    "subject.storiaGeografia": {
+      "comment": "Subject name: History and Geography",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "History and Geography"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storia e Geografia"
+          }
+        }
+      }
     },
-    "Take Photo" : {
-
+    "Successo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Successo"
+          }
+        }
+      }
     },
-    "Tap" : {
-
+    "Suggerimento: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suggerimento: %@"
+          }
+        }
+      }
     },
-    "Task Completed!" : {
-
+    "Suoni di Sistema": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suoni di Sistema"
+          }
+        }
+      }
     },
-    "Task Details" : {
-
+    "Sviluppo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sviluppo"
+          }
+        }
+      }
     },
-    "Task title" : {
-
+    "sync.manual.button": {
+      "comment": "Button to manually trigger sync",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sync Now"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizza Ora"
+          }
+        }
+      }
     },
-    "Tasks" : {
-
+    "sync.status.failed": {
+      "comment": "Sync status: Failed",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sync Failed"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione Fallita"
+          }
+        }
+      }
     },
-    "Tema Colore" : {
-
+    "sync.status.idle": {
+      "comment": "Sync status: Idle",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idle"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inattivo"
+          }
+        }
+      }
     },
-    "Tempo: %@" : {
-
+    "sync.status.synced": {
+      "comment": "Sync status: Synced",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synced"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzato"
+          }
+        }
+      }
     },
-    "Test Connessione OpenAI" : {
-
+    "sync.status.syncing": {
+      "comment": "Sync status: Syncing",
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Syncing..."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione..."
+          }
+        }
+      }
     },
-    "Test Live" : {
-
+    "Take a photo to get started with voice assistance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take a photo to get started with voice assistance"
+          }
+        }
+      }
     },
-    "Text detected" : {
-
+    "Take Photo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Take Photo"
+          }
+        }
+      }
     },
-    "Tipo" : {
-
+    "Tap": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap"
+          }
+        }
+      }
     },
-    "Tipo di Feedback" : {
-
+    "Task Completed!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Task Completed!"
+          }
+        }
+      }
     },
-    "Tocca due volte per %@ a parlare con il coach AI" : {
-
+    "Task Details": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Task Details"
+          }
+        }
+      }
     },
-    "Tocca due volte per %@ la conversazione con il coach AI" : {
-
+    "Task title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Task title"
+          }
+        }
+      }
     },
-    "Tocca due volte per %@ la registrazione" : {
-
+    "Tasks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasks"
+          }
+        }
+      }
     },
-    "Tocca due volte per %@ la registrazione della lezione" : {
-
+    "Tema Colore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tema Colore"
+          }
+        }
+      }
     },
-    "Tocca due volte per aprire" : {
-
+    "Tempo: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tempo: %@"
+          }
+        }
+      }
     },
-    "Tocca due volte per aprire le impostazioni di sincronizzazione" : {
-
+    "Test Connessione OpenAI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Connessione OpenAI"
+          }
+        }
+      }
     },
-    "Tocca due volte per creare un nuovo compito" : {
-
+    "Test Live": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Live"
+          }
+        }
+      }
     },
-    "Tocca due volte per importare nuovo materiale" : {
-
+    "Text detected": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text detected"
+          }
+        }
+      }
     },
-    "Tocca il pulsante + per selezionare file PDF o documenti dal tuo dispositivo" : {
-
+    "Tipo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type"
+          }
+        }
+      }
     },
-    "Tocca per aprire i dettagli del materiale" : {
-
+    "Tipo di Feedback": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipo di Feedback"
+          }
+        }
+      }
     },
-    "Tocca per parlare" : {
-
+    "Tocca due volte per %@ a parlare con il coach AI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per %@ a parlare con il coach AI"
+          }
+        }
+      }
     },
-    "Tocca per parlare!" : {
-
+    "Tocca due volte per %@ la conversazione con il coach AI": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per %@ la conversazione con il coach AI"
+          }
+        }
+      }
     },
-    "Tonalità" : {
-
+    "Tocca due volte per %@ la registrazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per %@ la registrazione"
+          }
+        }
+      }
     },
-    "Touch Target Developer" : {
-
+    "Tocca due volte per %@ la registrazione della lezione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per %@ la registrazione della lezione"
+          }
+        }
+      }
     },
-    "Touch Target Minimi" : {
-
+    "Tocca due volte per aprire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per aprire"
+          }
+        }
+      }
     },
-    "Traguardi" : {
-
+    "Tocca due volte per aprire le impostazioni di sincronizzazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per aprire le impostazioni di sincronizzazione"
+          }
+        }
+      }
     },
-    "Troppo Piccolo" : {
-
+    "Tocca due volte per creare un nuovo compito": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per creare un nuovo compito"
+          }
+        }
+      }
     },
-    "Tutorial Comandi Vocali" : {
-
+    "Tocca due volte per importare nuovo materiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca due volte per importare nuovo materiale"
+          }
+        }
+      }
     },
-    "Tutorial Completato!" : {
-
+    "Tocca il pulsante + per selezionare file PDF o documenti dal tuo dispositivo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca il pulsante + per selezionare file PDF o documenti dal tuo dispositivo"
+          }
+        }
+      }
     },
-    "Tutte le lingue" : {
-
+    "Tocca per aprire i dettagli del materiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca per aprire i dettagli del materiale"
+          }
+        }
+      }
     },
-    "Tutto fatto!" : {
-
+    "Tocca per parlare": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca per parlare"
+          }
+        }
+      }
     },
-    "Tutto Pronto!" : {
-
+    "Tocca per parlare!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca per parlare!"
+          }
+        }
+      }
     },
-    "Usa il pulsante vocale (in basso a destra) per ottenere aiuto" : {
-
+    "Tonalità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tone"
+          }
+        }
+      }
     },
-    "Useremo Google solo per l'autenticazione e la sincronizzazione dei dati" : {
-
+    "Touch Target Developer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch Target Developer"
+          }
+        }
+      }
     },
-    "Uso con Una Mano" : {
-
+    "Touch Target Minimi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch Target Minimi"
+          }
+        }
+      }
     },
-    "Vedi tutti i comandi" : {
-
+    "Traguardi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traguardi"
+          }
+        }
+      }
     },
-    "Velocità" : {
-
+    "Troppo Piccolo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Troppo Piccolo"
+          }
+        }
+      }
     },
-    "Velocità Voce" : {
-
+    "Tutorial Comandi Vocali": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutorial Comandi Vocali"
+          }
+        }
+      }
     },
-    "Versione" : {
-
+    "Tutorial Completato!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutorial Completato!"
+          }
+        }
+      }
     },
-    "Video" : {
-
+    "Tutte le lingue": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutte le lingue"
+          }
+        }
+      }
     },
-    "Vista completa mappa mentale" : {
-
+    "Tutto fatto!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutto fatto!"
+          }
+        }
+      }
     },
-    "Vista studio flashcard" : {
-
+    "Tutto Pronto!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutto Pronto!"
+          }
+        }
+      }
     },
-    "Visualizza le dimensioni dei touch target nell'app. Verde = ≥44pt, Rosso = <44pt" : {
-
+    "Usa il pulsante vocale (in basso a destra) per ottenere aiuto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usa il pulsante vocale (in basso a destra) per ottenere aiuto"
+          }
+        }
+      }
     },
-    "Visualizza Mappa Completa" : {
-
+    "Useremo Google solo per l'autenticazione e la sincronizzazione dei dati": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Useremo Google solo per l'autenticazione e la sincronizzazione dei dati"
+          }
+        }
+      }
     },
-    "Visualizza overlay delle zone di raggiungibilità del pollice" : {
-
+    "Uso con Una Mano": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uso con Una Mano"
+          }
+        }
+      }
     },
-    "Visualizzazione" : {
-
+    "Vedi tutti i comandi": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vedi tutti i comandi"
+          }
+        }
+      }
     },
-    "Voce" : {
-
+    "Velocità": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speed"
+          }
+        }
+      }
     },
-    "Voice" : {
-
+    "Velocità Voce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice Speed"
+          }
+        }
+      }
     },
-    "Voice Coach" : {
-
+    "Versione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        }
+      }
     },
-    "Volume" : {
-
+    "Video": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Video"
+          }
+        }
+      }
     },
-    "WCAG %@" : {
-
+    "Vista completa mappa mentale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vista completa mappa mentale"
+          }
+        }
+      }
+    },
+    "Vista studio flashcard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vista studio flashcard"
+          }
+        }
+      }
+    },
+    "Visualizza le dimensioni dei touch target nell'app. Verde = ≥44pt, Rosso = <44pt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display touch target sizes in the app. Green = ≥44pt, Red = <44pt"
+          }
+        }
+      }
+    },
+    "Visualizza Mappa Completa": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizza Mappa Completa"
+          }
+        }
+      }
+    },
+    "Visualizza overlay delle zone di raggiungibilità del pollice": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Display thumb reachability zone overlay"
+          }
+        }
+      }
+    },
+    "Visualizzazione": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizzazione"
+          }
+        }
+      }
+    },
+    "Voce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice"
+          }
+        }
+      }
+    },
+    "Voice": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice"
+          }
+        }
+      }
+    },
+    "Voice Coach": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice Coach"
+          }
+        }
+      }
+    },
+    "Volume": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume"
+          }
+        }
+      }
+    },
+    "WCAG %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WCAG %@"
+          }
+        }
+      }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
