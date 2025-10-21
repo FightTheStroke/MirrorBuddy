@@ -24,11 +24,11 @@ struct NaturalLanguageTaskParser {
 
     // MARK: - Parsing
 
-    func parse(_ text: String, currentContext: TaskContext? = nil) -> ParsedTask {
+    func parse(_ text: String, currentContext: TaskContext? = nil, availableSubjects: [SubjectEntity] = []) -> ParsedTask {
         let normalizedText = text.lowercased().trimmingCharacters(in: .whitespaces)
 
         let title = extractTitle(from: normalizedText)
-        let subject = extractSubject(from: normalizedText, context: currentContext)
+        let subject = extractSubject(from: normalizedText, context: currentContext, availableSubjects: availableSubjects)
         let dueDate = extractDueDate(from: normalizedText)
         let priority = extractPriority(from: normalizedText)
         let notes = extractNotes(from: normalizedText)
@@ -97,44 +97,38 @@ struct NaturalLanguageTaskParser {
 
     // MARK: - Subject Extraction
 
-    private func extractSubject(from text: String, context: TaskContext?) -> String? {
-        // Subject keywords mapping
-        let subjectKeywords: [String: String] = [
-            // Math
-            "matematica": TaskCaptureStrings.Subject.math,
-            "mate": TaskCaptureStrings.Subject.math,
-            "algebra": TaskCaptureStrings.Subject.math,
-            "geometria": TaskCaptureStrings.Subject.math,
-            "calcolo": TaskCaptureStrings.Subject.math,
-
-            // Italian
-            "italiano": TaskCaptureStrings.Subject.italian,
-            "ita": TaskCaptureStrings.Subject.italian,
-            "grammatica": TaskCaptureStrings.Subject.italian,
-            "letteratura": TaskCaptureStrings.Subject.italian,
-
-            // History
-            "storia": TaskCaptureStrings.Subject.history,
-            "storia antica": TaskCaptureStrings.Subject.history,
-            "storia moderna": TaskCaptureStrings.Subject.history,
-
-            // Science
-            "scienze": TaskCaptureStrings.Subject.science,
-            "scienza": TaskCaptureStrings.Subject.science,
-            "fisica": TaskCaptureStrings.Subject.science,
-            "chimica": TaskCaptureStrings.Subject.science,
-            "biologia": TaskCaptureStrings.Subject.science,
-
-            // Languages
-            "inglese": TaskCaptureStrings.Subject.language,
-            "francese": TaskCaptureStrings.Subject.language,
-            "spagnolo": TaskCaptureStrings.Subject.language,
-            "tedesco": TaskCaptureStrings.Subject.language
+    private func extractSubject(from text: String, context: TaskContext?, availableSubjects: [SubjectEntity]) -> String? {
+        // Common keyword mappings for subject detection
+        let commonKeywords: [String: [String]] = [
+            "matematica": ["matematica", "mate", "algebra", "geometria", "calcolo"],
+            "italiano": ["italiano", "ita", "grammatica", "letteratura"],
+            "storia": ["storia", "storia antica", "storia moderna"],
+            "fisica": ["fisica", "fisico"],
+            "chimica": ["chimica", "chimico"],
+            "biologia": ["biologia", "biologico"],
+            "scienze": ["scienze", "scienza"],
+            "inglese": ["inglese", "english"],
+            "francese": ["francese", "french"],
+            "spagnolo": ["spagnolo", "spanish"],
+            "tedesco": ["tedesco", "german"]
         ]
 
-        // Check for explicit subject mentions
-        for (keyword, subject) in subjectKeywords where text.contains(keyword) {
-            return subject
+        // Try to match against available subjects
+        for subject in availableSubjects where subject.isActive {
+            let subjectNameLower = subject.displayName.lowercased()
+            let localizationKeyLower = subject.localizationKey.lowercased()
+
+            // Direct match on display name or localization key
+            if text.contains(subjectNameLower) || text.contains(localizationKeyLower) {
+                return subject.displayName
+            }
+
+            // Check common keyword mappings
+            if let keywords = commonKeywords[localizationKeyLower] {
+                for keyword in keywords where text.contains(keyword) {
+                    return subject.displayName
+                }
+            }
         }
 
         // Fall back to current context if available

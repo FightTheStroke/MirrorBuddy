@@ -4546,7 +4546,7 @@
             "title": "Update NaturalLanguageTaskParser for SubjectEntity",
             "description": "Refactor NaturalLanguageTaskParser to query SubjectEntity instead of hardcoded Subject enum mappings. Support both default and custom subjects in natural language parsing.",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 83
           },
@@ -7452,7 +7452,7 @@
       ],
       "created": "2025-10-21T04:54:21.830Z",
       "description": "Tasks for master context",
-      "updated": "2025-10-21T05:15:54.966Z"
+      "updated": "2025-10-21T05:18:32.147Z"
     }
   }
 }
