@@ -230,9 +230,7 @@ struct SettingsView: View {
         }
         .onAppear {
             // Check authentication status
-            _Concurrency.Task {
-                await authViewModel.checkAuthenticationStatus()
-            }
+            authViewModel.checkAuthenticationStatus()
         }
     }
 }

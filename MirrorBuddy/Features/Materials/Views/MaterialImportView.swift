@@ -140,11 +140,9 @@ struct MaterialImportView: View {
             }
         }
         .onAppear {
-            _Concurrency.Task {
-                await authViewModel.checkAuthenticationStatus()
-                if authViewModel.isAuthenticated {
-                    loadFiles()
-                }
+            authViewModel.checkAuthenticationStatus()
+            if authViewModel.isAuthenticated {
+                loadFiles()
             }
         }
     }
