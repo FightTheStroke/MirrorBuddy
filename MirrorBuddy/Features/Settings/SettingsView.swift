@@ -130,6 +130,31 @@ struct SettingsView: View {
                     Text("Send weekly progress updates to parents or teachers")
                 }
 
+                // MARK: - Subjects Section
+                Section {
+                    NavigationLink {
+                        SubjectSettingsView()
+                    } label: {
+                        HStack {
+                            Image(systemName: "books.vertical.fill")
+                                .foregroundStyle(.blue)
+                                .frame(width: 32)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Subjects")
+                                    .font(.headline)
+                                Text("Manage your subjects")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                } header: {
+                    Text("Learning")
+                } footer: {
+                    Text("Add custom subjects, reorder, or hide subjects you don't need")
+                }
+
                 // MARK: - Accessibility Section
                 Section {
                     NavigationLink {
