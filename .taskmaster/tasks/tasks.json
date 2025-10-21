@@ -4467,7 +4467,7 @@
             "title": "Implement language selector in SettingsView",
             "description": "Add Picker component to SettingsView with LocalizationManager.Language options (Italian/English). Bind to @Environment(\\.localizationManager).currentLanguage and test runtime language switching.",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 82
           },
@@ -7452,7 +7452,7 @@
       ],
       "created": "2025-10-21T04:54:21.830Z",
       "description": "Tasks for master context",
-      "updated": "2025-10-21T05:18:32.147Z"
+      "updated": "2025-10-21T05:20:22.068Z"
     }
   }
 }

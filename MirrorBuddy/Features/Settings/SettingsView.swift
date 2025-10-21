@@ -11,6 +11,7 @@ struct SettingsView: View {
     @State private var showingGoogleDriveAuth = false
     @State private var showingOAuthConfig = false
     @StateObject private var authViewModel = GoogleDriveAuthViewModel()
+    @Environment(\.localizationManager) private var localizationManager
 
     var body: some View {
         NavigationStack {
@@ -148,8 +149,34 @@ struct SettingsView: View {
                             }
                         }
                     }
+
+                    // Language Selector (Task 82.1)
+                    Picker(selection: Binding(
+                        get: { localizationManager.currentLanguage },
+                        set: { localizationManager.switchLanguage(to: $0) }
+                    )) {
+                        ForEach(LocalizationManager.Language.allCases) { language in
+                            Text(language.displayName).tag(language)
+                        }
+                    } label: {
+                        HStack {
+                            Image(systemName: "globe")
+                                .foregroundStyle(.blue)
+                                .frame(width: 32)
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Lingua")
+                                    .font(.headline)
+                                Text(localizationManager.currentLanguage.displayName)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
                 } header: {
                     Text("Accessibilità")
+                } footer: {
+                    Text("La lingua dell'app si aggiornerà immediatamente")
                 }
 
                 // MARK: - App Info Section
