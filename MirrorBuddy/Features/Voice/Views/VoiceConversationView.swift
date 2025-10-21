@@ -62,44 +62,85 @@ struct VoiceConversationView: View {
             if let conversationID = conversationID {
                 viewModel.loadConversation(id: conversationID)
             }
+
+            // Setup Siri intent listener
+            viewModel.setupSiriIntentListener()
+        }
+        .onDisappear {
+            viewModel.removeSiriIntentListener()
         }
     }
 
     // MARK: - Context Banner
 
     private var contextBannerView: some View {
-        HStack(spacing: 12) {
-            Image(systemName: "book.fill")
-                .font(.title3)
-                .foregroundStyle(.blue)
+        VStack(spacing: 12) {
+            // Subject and material
+            HStack(spacing: 12) {
+                Image(systemName: "book.fill")
+                    .font(.title3)
+                    .foregroundStyle(viewModel.sessionState.primaryColor)
 
-            VStack(alignment: .leading, spacing: 4) {
-                Text(viewModel.currentSubject ?? "Nessuna Materia")
-                    .font(.headline)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(viewModel.currentSubject ?? "Nessuna Materia")
+                        .font(.headline)
 
-                if let material = viewModel.currentMaterial {
-                    Text(material)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if let material = viewModel.currentMaterial {
+                        Text(material)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+
+                Spacer()
             }
 
-            Spacer()
-
+            // Voice session status bar
             if viewModel.isConversationActive {
-                HStack(spacing: 4) {
-                    Circle()
-                        .fill(viewModel.isOfflineMode ? Color.orange : Color.green)
-                        .frame(width: 8, height: 8)
-                    Text(viewModel.isOfflineMode ? "Offline" : "Attivo")
+                HStack(spacing: 8) {
+                    // State icon
+                    Image(systemName: viewModel.sessionState.systemIcon)
                         .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(viewModel.sessionState.primaryColor)
+
+                    // State text
+                    Text(viewModel.sessionState.statusText)
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                        .foregroundStyle(viewModel.sessionState.primaryColor)
+
+                    Spacer()
+
+                    // Mode indicator
+                    HStack(spacing: 4) {
+                        Circle()
+                            .fill(viewModel.isOfflineMode ? Color.orange : viewModel.sessionState.primaryColor)
+                            .frame(width: 6, height: 6)
+                        Text(viewModel.isOfflineMode ? "Offline" : "Online")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(
+                    LinearGradient(
+                        colors: [
+                            viewModel.sessionState.primaryColor.opacity(0.1),
+                            viewModel.sessionState.secondaryColor.opacity(0.1)
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .cornerRadius(8)
+                .accessibilityLabel(viewModel.sessionState.accessibilityLabel)
             }
         }
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
+        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
     }
 
     // MARK: - Conversation History
@@ -125,20 +166,28 @@ struct VoiceConversationView: View {
         }
     }
 
-    // MARK: - Waveform Visualization
+    // MARK: - Voice State Visualization
 
-    private var waveformView: some View {
-        HStack(spacing: 4) {
-            ForEach(0..<20, id: \.self) { index in
-                WaveformBarView(
-                    amplitude: viewModel.waveformAmplitudes[index],
-                    color: viewModel.isUserSpeaking ? .blue : .purple
-                )
-            }
+    private var voiceStateView: some View {
+        VStack(spacing: 16) {
+            // Main state visualization
+            VoiceStateVisualization(
+                state: viewModel.sessionState,
+                waveformAmplitudes: viewModel.waveformAmplitudes,
+                size: 200
+            )
+            .frame(height: 240)
+            .accessibilityLabel(viewModel.sessionState.accessibilityLabel)
+
+            // State description
+            Text(viewModel.sessionState.statusText)
+                .font(.headline)
+                .foregroundStyle(viewModel.sessionState.primaryColor)
+                .accessibilityHidden(true)
         }
         .padding()
         .background(.ultraThinMaterial)
-        .cornerRadius(16)
+        .cornerRadius(20)
     }
 
     // MARK: - Controls
@@ -176,7 +225,7 @@ struct VoiceConversationView: View {
                 // Pulsing ring when active
                 if viewModel.isConversationActive {
                     Circle()
-                        .stroke(Color.blue.opacity(0.3), lineWidth: 4)
+                        .stroke(viewModel.sessionState.primaryColor.opacity(0.3), lineWidth: 4)
                         .scaleEffect(viewModel.pulseAnimation ? 1.2 : 1.0)
                         .opacity(viewModel.pulseAnimation ? 0 : 1)
                         .animation(
@@ -194,25 +243,31 @@ struct VoiceConversationView: View {
                                 endPoint: .bottomTrailing
                             ) :
                             LinearGradient(
-                                colors: [.blue, .purple],
+                                colors: [viewModel.sessionState.primaryColor, viewModel.sessionState.secondaryColor],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                     )
                     .frame(width: 80, height: 80)
-                    .shadow(radius: 8)
+                    .shadow(
+                        color: viewModel.sessionState.primaryColor.opacity(0.3),
+                        radius: 8,
+                        y: 4
+                    )
 
                 VStack(spacing: 4) {
                     Image(systemName: viewModel.isConversationActive ? "stop.fill" : "mic.fill")
                         .font(.system(size: 30))
 
-                    Text(viewModel.isConversationActive ? "Ferma" : "Parla")
+                    Text(viewModel.isConversationActive ? "Ferma" : "Inizia")
                         .font(.caption)
                         .fontWeight(.semibold)
                 }
                 .foregroundStyle(.white)
             }
         }
+        .accessibilityLabel(viewModel.isConversationActive ? "Ferma conversazione" : "Inizia conversazione vocale")
+        .accessibilityHint(viewModel.isConversationActive ? "La conversazione è attiva in modalità always-listening" : "Avvia una conversazione vocale con MirrorBuddy")
         .sensoryFeedback(.impact(intensity: 0.7), trigger: viewModel.isConversationActive)
     }
 
@@ -303,22 +358,37 @@ struct VoiceConversationView: View {
     /// Main conversation content (shared between layouts)
     private var conversationMainContent: some View {
         VStack(spacing: 0) {
-            // Context banner
+            // Context banner with state
             contextBannerView
                 .padding()
                 .background(.ultraThinMaterial)
 
             // Conversation history
-            conversationHistoryView
+            if !viewModel.conversationHistory.isEmpty {
+                conversationHistoryView
+            } else {
+                // Empty state with voice visualization
+                VStack(spacing: 24) {
+                    Spacer()
 
-            // Waveform visualization
-            if viewModel.isConversationActive {
-                waveformView
-                    .frame(height: 100)
-                    .padding(.horizontal)
+                    voiceStateView
+
+                    Text("Inizia a parlare quando vuoi")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal)
+
+                    Spacer()
+                }
             }
 
-            Spacer()
+            // Voice state visualization when conversation active
+            if viewModel.isConversationActive && !viewModel.conversationHistory.isEmpty {
+                voiceStateView
+                    .padding(.horizontal)
+                    .padding(.bottom, 8)
+            }
 
             // Controls
             controlsView
@@ -425,19 +495,6 @@ struct MessageBubbleView: View {
     }
 }
 
-// MARK: - Waveform Bar View
-
-struct WaveformBarView: View {
-    let amplitude: CGFloat
-    let color: Color
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 2)
-            .fill(color)
-            .frame(width: 4, height: max(4, amplitude * 80))
-            .animation(.easeInOut(duration: 0.1), value: amplitude)
-    }
-}
 
 // MARK: - Message Bubble View Model (temporary UI model)
 
@@ -454,22 +511,40 @@ struct MessageBubbleModel: Identifiable {
 final class VoiceConversationViewModel: ObservableObject {
     // MARK: - Published State
 
-    @Published var isConversationActive = false
+    @Published var sessionState: VoiceSessionState = .inactive
     @Published var conversationHistory: [MessageBubbleModel] = []
     @Published var waveformAmplitudes: [CGFloat] = Array(repeating: 0.3, count: 20)
     @Published var pulseAnimation = false
-    @Published var isUserSpeaking = false
     @Published var currentSubject: String?
     @Published var currentMaterial: String?
     @Published var showError = false
     @Published var errorMessage = ""
-    @Published var showSettings = false // Task 102.4
-    @Published var isOfflineMode = false // Task 101: Fallback to Apple Speech
+    @Published var showSettings = false
+    @Published var isOfflineMode = false
+
+    // MARK: - Configuration
+
+    var sessionConfiguration = VoiceSessionConfiguration()
+
+    // MARK: - Computed Properties (for backward compatibility)
+
+    var isConversationActive: Bool {
+        sessionState.isActive
+    }
+
+    var isUserSpeaking: Bool {
+        if case .listening = sessionState {
+            return true
+        }
+        return false
+    }
 
     // MARK: - Dependencies
 
     private let audioPipeline = AudioPipelineManager.shared
-    private let coachPersonality = StudyCoachPersonality.shared // Task 101
+    private let coachPersonality = StudyCoachPersonality.shared
+    private let hapticFeedback = HapticFeedbackManager.shared
+    private let audioCues = AudioCuesManager.shared
     private var realtimeClient: OpenAIRealtimeClient?
     private var conversationService: VoiceConversationService?
 
@@ -513,6 +588,9 @@ final class VoiceConversationViewModel: ObservableObject {
     /// Accumulated AI response text for streaming
     private var currentAIResponseText = ""
 
+    /// Siri intent observer
+    private var siriIntentObserver: NSObjectProtocol?
+
     // MARK: - Initialization
 
     init(modelContext: ModelContext? = nil) {
@@ -527,7 +605,30 @@ final class VoiceConversationViewModel: ObservableObject {
         }
 
         setupCallbacks()
+        setupStateObserver()
         loadContext()
+    }
+
+    // MARK: - State Management
+
+    /// Setup observer for state changes to trigger feedback
+    private func setupStateObserver() {
+        // Observe state changes for feedback
+        $sessionState
+            .removeDuplicates()
+            .sink { [weak self] newState in
+                guard let self = self else { return }
+
+                // Trigger haptic and audio feedback for state changes
+                self.hapticFeedback.stateChanged(to: newState)
+                self.audioCues.stateChanged(to: newState)
+
+                // Update pulse animation
+                self.pulseAnimation = newState.isActive
+
+                self.logger.info("Voice session state changed to: \(newState.statusText)")
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Setup
@@ -571,9 +672,12 @@ final class VoiceConversationViewModel: ObservableObject {
                     // Session initialized successfully
                     break
 
-                case .responseCreated:
-                    // New response started
-                    break
+                case .responseCreated(let response):
+                    // New response started - AI is speaking
+                    _Concurrency.Task { @MainActor in
+                        self.sessionState = .speaking
+                        self.logger.debug("AI response started")
+                    }
 
                 case .responseTextDelta(let textDelta):
                     // Handle incremental text from AI
@@ -583,12 +687,20 @@ final class VoiceConversationViewModel: ObservableObject {
 
                 case .responseAudioDelta:
                     // Audio handled via onAudioData callback
-                    break
+                    // Ensure we're in speaking state
+                    _Concurrency.Task { @MainActor in
+                        if self.sessionState != .speaking {
+                            self.sessionState = .speaking
+                        }
+                    }
 
-                case .responseDone:
-                    // Response completed - finalize AI message
+                case .responseDone(let responseDone):
+                    // Response completed - finalize AI message and return to passive listening
+
                     _Concurrency.Task { @MainActor in
                         self.finalizeAIResponse()
+                        self.sessionState = .passive
+                        self.logger.debug("AI response complete, back to passive listening")
                     }
 
                 case .error(let error):
@@ -598,15 +710,17 @@ final class VoiceConversationViewModel: ObservableObject {
                     }
 
                 case .inputAudioBufferSpeechStarted:
-                    // User started speaking
+                    // User started speaking (VAD detected)
                     _Concurrency.Task { @MainActor in
-                        self.isUserSpeaking = true
+                        self.sessionState = .listening
+                        self.logger.debug("VAD: User started speaking")
                     }
 
                 case .inputAudioBufferSpeechStopped:
-                    // User stopped speaking
+                    // User stopped speaking (VAD detected)
                     _Concurrency.Task { @MainActor in
-                        self.isUserSpeaking = false
+                        self.sessionState = .thinking
+                        self.logger.debug("VAD: User stopped speaking, AI processing")
                     }
 
                 case .rateLimitsUpdated:
@@ -773,12 +887,15 @@ final class VoiceConversationViewModel: ObservableObject {
     }
 
     private func startConversation() {
-        // Task 101: Try OpenAI first, fallback to local Apple Speech if it fails
+        // Try OpenAI with VAD first, fallback to local Apple Speech if it fails
         guard let realtimeClient else {
             // No API key configured, use offline mode directly
             startOfflineConversation()
             return
         }
+
+        sessionState = .connecting
+        logger.info("Starting real-time voice conversation with VAD enabled")
 
         _Concurrency.Task {
             do {
@@ -792,29 +909,39 @@ final class VoiceConversationViewModel: ObservableObject {
                     )
                 }
 
-                // Start audio pipeline
-                try await audioPipeline.start()
-
-                // Try to connect to OpenAI Realtime API
+                // Connect to OpenAI Realtime API
                 try await realtimeClient.connect()
 
-                // Update state
-                await MainActor.run {
-                    isConversationActive = true
-                    isOfflineMode = false
-                    pulseAnimation = true
-                    startWaveformAnimation()
-                    startAudioCommitTimer()
-                }
+                // Configure session with VAD and voice settings
+                try await realtimeClient.configureSession(sessionConfiguration)
+                logger.info("Session configured with VAD enabled (threshold: \(sessionConfiguration.vadThreshold))")
 
-                // Task 101: Send context-aware system prompt from StudyCoachPersonality
-                let systemPrompt = coachPersonality.generateSystemPrompt(
+                // Send context-aware system prompt
+                let systemPrompt = await coachPersonality.generateSystemPrompt(
+
                     for: currentSubject,
                     material: currentMaterial
                 )
                 try await realtimeClient.sendSystemPrompt(systemPrompt)
+
+                // Start audio pipeline for continuous streaming
+                try await audioPipeline.start()
+
+                // Update state to passive (always-listening mode)
+                await MainActor.run {
+                    sessionState = .passive
+                    isOfflineMode = false
+                    startWaveformAnimation()
+                    startAudioCommitTimer()
+
+                    // Success feedback
+                    hapticFeedback.conversationStarted()
+                    audioCues.conversationStarted()
+
+                    logger.info("Voice conversation started successfully in always-listening mode")
+                }
             } catch {
-                // Task 101: Connection failed, fallback to offline mode
+                // Connection failed, fallback to offline mode
                 logger.warning("OpenAI connection failed, falling back to local Apple Speech: \(error.localizedDescription)")
                 await MainActor.run {
                     startOfflineConversation()
@@ -927,13 +1054,15 @@ final class VoiceConversationViewModel: ObservableObject {
     }
 
     private func stopConversation() {
+        logger.info("Stopping voice conversation")
+
         // Stop audio pipeline
         audioPipeline.stop()
 
         // Stop audio commit timer and clear buffer
         stopAudioCommitTimer()
 
-        // Task 101: Stop offline mode services if active
+        // Stop offline mode services if active
         if isOfflineMode {
             localSpeechRecognition.stopListening()
             localTextToSpeech.stop()
@@ -945,11 +1074,15 @@ final class VoiceConversationViewModel: ObservableObject {
         }
 
         // Update state
-        isConversationActive = false
+        sessionState = .inactive
         isOfflineMode = false
-        pulseAnimation = false
-        isUserSpeaking = false
         stopWaveformAnimation()
+
+        // End feedback
+        hapticFeedback.conversationEnded()
+        audioCues.conversationEnded()
+
+        logger.info("Voice conversation stopped successfully")
     }
 
     // MARK: - Audio Buffering and Forwarding
@@ -958,6 +1091,11 @@ final class VoiceConversationViewModel: ObservableObject {
     private func bufferAndSendAudio(_ audioData: Data) async {
         guard realtimeClient != nil, isConversationActive else { return }
 
+        // Check for barge-in: user starting to speak while AI is speaking
+        if sessionState == .speaking {
+            await handleBargeIn()
+        }
+
         // Add to buffer
         audioBuffer.append(audioData)
         lastAudioTime = Date()
@@ -965,6 +1103,37 @@ final class VoiceConversationViewModel: ObservableObject {
         // Send when buffer reaches threshold
         if audioBuffer.count >= bufferSizeThreshold {
             await sendBufferedAudio()
+        }
+    }
+
+    // MARK: - Barge-in (Interruption) Handling
+
+    /// Handle user interrupting AI response
+    private func handleBargeIn() async {
+        guard let realtimeClient else { return }
+
+        logger.info("Barge-in detected: User interrupted AI")
+
+        do {
+            // Cancel ongoing AI response
+            try await realtimeClient.cancelResponse()
+
+            // Clear audio buffer to stop playback
+            audioPipeline.stop()
+            try await audioPipeline.start()
+
+            // Update state
+            await MainActor.run {
+                sessionState = .listening
+
+                // Feedback
+                hapticFeedback.userInterrupted()
+                audioCues.userInterrupted()
+
+                logger.debug("AI response cancelled, listening to user")
+            }
+        } catch {
+            logger.error("Failed to cancel AI response: \(error.localizedDescription)")
         }
     }
 
@@ -1209,6 +1378,63 @@ final class VoiceConversationViewModel: ObservableObject {
 
     func toggleSettings() {
         showSettings.toggle()
+    }
+
+    // MARK: - Siri Intent Handling
+
+    /// Setup listener for Siri intent notifications
+    func setupSiriIntentListener() {
+        siriIntentObserver = NotificationCenter.default.addObserver(
+            forName: .startVoiceConversation,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self else { return }
+            self.handleSiriIntent(notification)
+        }
+        logger.info("Siri intent listener setup complete")
+    }
+
+    /// Remove Siri intent listener
+    func removeSiriIntentListener() {
+        if let observer = siriIntentObserver {
+            NotificationCenter.default.removeObserver(observer)
+            siriIntentObserver = nil
+            logger.debug("Siri intent listener removed")
+        }
+    }
+
+    /// Handle Siri intent to start conversation
+    private func handleSiriIntent(_ notification: Notification) {
+        guard let userInfo = notification.userInfo else { return }
+
+        logger.info("Received Siri intent to start conversation")
+
+        // Extract parameters
+        let subject = userInfo["subject"] as? String
+        let topic = userInfo["topic"] as? String
+        let autoStart = userInfo["autoStart"] as? Bool ?? true
+
+        // Update context if subject provided
+        if let subject = subject {
+            currentSubject = subject
+            logger.debug("Siri intent: subject set to \(subject)")
+        }
+
+        if let topic = topic {
+            currentMaterial = topic
+            logger.debug("Siri intent: topic set to \(topic)")
+        }
+
+        // Auto-start conversation if requested and not already active
+        if autoStart && !isConversationActive {
+            logger.info("Auto-starting conversation from Siri intent")
+
+            // Small delay to ensure UI is ready
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                self?.startConversation()
+            }
+        }
     }
 
     // MARK: - Error Handling

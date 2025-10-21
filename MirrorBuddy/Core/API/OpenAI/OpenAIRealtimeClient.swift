@@ -133,6 +133,53 @@ final class OpenAIRealtimeClient: NSObject {
         try await webSocketTask.send(.string(messageString))
     }
 
+    /// Configure session with VAD and voice settings
+    func configureSession(_ configuration: VoiceSessionConfiguration) async throws {
+        let turnDetection: TurnDetectionConfig? = configuration.enableVAD ? TurnDetectionConfig(
+            type: "server_vad",
+            threshold: configuration.vadThreshold,
+            prefixPaddingMs: configuration.prefixPaddingMs,
+            silenceDurationMs: configuration.silenceDurationMs
+        ) : nil
+
+        let message = RealtimeMessage.clientEvent(
+            .sessionUpdate(
+                .init(
+                    eventID: UUID().uuidString,
+                    session: SessionConfig(
+                        modalities: ["text", "audio"],
+                        voice: configuration.voice.rawValue,
+                        inputAudioFormat: "pcm16",
+                        outputAudioFormat: "pcm16",
+                        inputAudioTranscription: InputAudioTranscriptionConfig(
+                            enabled: configuration.enableTranscription,
+                            model: "whisper-1"
+                        ),
+                        turnDetection: turnDetection,
+                        temperature: configuration.temperature
+                    )
+                )
+            )
+        )
+        try await send(message)
+    }
+
+    /// Cancel ongoing AI response (for barge-in/interruption)
+    func cancelResponse() async throws {
+        let message = RealtimeMessage.clientEvent(
+            .responseCancel(.init(eventID: UUID().uuidString))
+        )
+        try await send(message)
+    }
+
+    /// Clear audio input buffer
+    func clearAudioBuffer() async throws {
+        let message = RealtimeMessage.clientEvent(
+            .inputAudioBufferClear(.init(eventID: UUID().uuidString))
+        )
+        try await send(message)
+    }
+
     /// Send text input
     func sendText(_ text: String) async throws {
         let message = RealtimeMessage.clientEvent(
@@ -355,10 +402,13 @@ enum RealtimeMessage: Codable {
 // MARK: - Client Events
 
 enum ClientEvent: Codable {
+    case sessionUpdate(SessionUpdate)
     case conversationItemCreate(ConversationItemCreate)
     case responseCreate(ResponseCreate)
+    case responseCancel(ResponseCancel)
     case inputAudioBufferAppend(InputAudioBufferAppend)
     case inputAudioBufferCommit(InputAudioBufferCommit)
+    case inputAudioBufferClear(InputAudioBufferClear)
 }
 
 struct ConversationItemCreate: Codable {
@@ -524,6 +574,165 @@ struct InputAudioBufferCommit: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(eventID, forKey: .eventID)
         try container.encode(type, forKey: .type)
+    }
+}
+
+struct InputAudioBufferClear: Codable {
+    private static let expectedType = "input_audio_buffer.clear"
+
+    let eventID: String
+    let type: String
+
+    enum CodingKeys: String, CodingKey {
+        case eventID = "event_id"
+        case type
+    }
+
+    init(eventID: String) {
+        self.eventID = eventID
+        self.type = Self.expectedType
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        eventID = try container.decode(String.self, forKey: .eventID)
+        let decodedType = try container.decode(String.self, forKey: .type)
+
+        guard decodedType == Self.expectedType else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Expected type \(Self.expectedType) but found \(decodedType)"
+            )
+        }
+
+        type = decodedType
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventID, forKey: .eventID)
+        try container.encode(type, forKey: .type)
+    }
+}
+
+struct ResponseCancel: Codable {
+    private static let expectedType = "response.cancel"
+
+    let eventID: String
+    let type: String
+
+    enum CodingKeys: String, CodingKey {
+        case eventID = "event_id"
+        case type
+    }
+
+    init(eventID: String) {
+        self.eventID = eventID
+        self.type = Self.expectedType
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        eventID = try container.decode(String.self, forKey: .eventID)
+        let decodedType = try container.decode(String.self, forKey: .type)
+
+        guard decodedType == Self.expectedType else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Expected type \(Self.expectedType) but found \(decodedType)"
+            )
+        }
+
+        type = decodedType
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventID, forKey: .eventID)
+        try container.encode(type, forKey: .type)
+    }
+}
+
+struct SessionUpdate: Codable {
+    private static let expectedType = "session.update"
+
+    let eventID: String
+    let type: String
+    let session: SessionConfig
+
+    enum CodingKeys: String, CodingKey {
+        case eventID = "event_id"
+        case type
+        case session
+    }
+
+    init(eventID: String, session: SessionConfig) {
+        self.eventID = eventID
+        self.type = Self.expectedType
+        self.session = session
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        eventID = try container.decode(String.self, forKey: .eventID)
+        session = try container.decode(SessionConfig.self, forKey: .session)
+        let decodedType = try container.decode(String.self, forKey: .type)
+
+        guard decodedType == Self.expectedType else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Expected type \(Self.expectedType) but found \(decodedType)"
+            )
+        }
+
+        type = decodedType
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(eventID, forKey: .eventID)
+        try container.encode(type, forKey: .type)
+        try container.encode(session, forKey: .session)
+    }
+}
+
+struct SessionConfig: Codable {
+    let modalities: [String]?
+    let voice: String?
+    let inputAudioFormat: String?
+    let outputAudioFormat: String?
+    let inputAudioTranscription: InputAudioTranscriptionConfig?
+    let turnDetection: TurnDetectionConfig?
+    let temperature: Double?
+
+    enum CodingKeys: String, CodingKey {
+        case modalities, voice
+        case inputAudioFormat = "input_audio_format"
+        case outputAudioFormat = "output_audio_format"
+        case inputAudioTranscription = "input_audio_transcription"
+        case turnDetection = "turn_detection"
+        case temperature
+    }
+}
+
+struct InputAudioTranscriptionConfig: Codable {
+    let enabled: Bool?
+    let model: String?
+}
+
+struct TurnDetectionConfig: Codable {
+    let type: String?
+    let threshold: Double?
+    let prefixPaddingMs: Int?
+    let silenceDurationMs: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case type, threshold
+        case prefixPaddingMs = "prefix_padding_ms"
+        case silenceDurationMs = "silence_duration_ms"
     }
 }
 
