@@ -8,6 +8,17 @@
 import SwiftData
 import SwiftUI
 
+/// Wrapper view that applies localization dynamically
+private struct LocalizedContentView: View {
+    @Environment(\.localizationManager) private var localizationManager
+
+    var body: some View {
+        MainTabView()
+            .environment(\.locale, localizationManager.currentLanguage.locale)
+            .id(localizationManager.currentLanguage.rawValue) // Force refresh on language change
+    }
+}
+
 @main
 struct MirrorBuddyApp: App {
     init() {
@@ -139,7 +150,7 @@ struct MirrorBuddyApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            LocalizedContentView()
                 .environment(LocalizationManager.shared)
                 .environment(CloudKitSyncMonitor.shared)
                 .environmentObject(AppVoiceCommandHandler.shared) // Task 103: Inject voice command handler

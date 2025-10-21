@@ -50,14 +50,21 @@ final class LocalizationManager {
     func switchLanguage(to language: Language) {
         currentLanguage = language
     }
+
+    /// Get localized string for a key
+    func localizedString(for key: String) -> String {
+        String(localized: String.LocalizationValue(key), locale: currentLanguage.locale)
+    }
 }
 
 // MARK: - Notification Names
+
 extension Notification.Name {
     static let languageChanged = Notification.Name("languageChanged")
 }
 
 // MARK: - SwiftUI Environment
+
 private struct LocalizationManagerKey: EnvironmentKey {
     static let defaultValue = LocalizationManager.shared
 }
