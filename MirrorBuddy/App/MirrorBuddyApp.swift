@@ -11,6 +11,9 @@ import SwiftUI
 @main
 struct MirrorBuddyApp: App {
     init() {
+        // Configure OpenDyslexic font for navigation bars
+        configureNavigationBarFont()
+
         // Start performance monitoring (Task 59)
         _Concurrency.Task { @MainActor in
             PerformanceMonitor.shared.startAppLaunch()
@@ -25,6 +28,47 @@ struct MirrorBuddyApp: App {
         // Register scheduled material sync (Task 72)
         _Concurrency.Task { @MainActor in
             BackgroundSyncService.shared.register()
+        }
+    }
+
+    /// Configure OpenDyslexic font for UIKit navigation bars
+    private func configureNavigationBarFont() {
+        // Verify OpenDyslexic fonts are loaded
+        #if DEBUG
+        verifyOpenDyslexicFonts()
+        #endif
+
+        // Navigation bar large title
+        let largeTitleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont(name: "OpenDyslexic-Bold", size: 34) ?? UIFont.systemFont(ofSize: 34, weight: .bold)
+        ]
+        UINavigationBar.appearance().largeTitleTextAttributes = largeTitleAttributes
+
+        // Navigation bar regular title
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont(name: "OpenDyslexic-Bold", size: 18) ?? UIFont.systemFont(ofSize: 18, weight: .semibold)
+        ]
+        UINavigationBar.appearance().titleTextAttributes = titleAttributes
+    }
+
+    /// Verify that OpenDyslexic fonts are properly loaded (DEBUG only)
+    private func verifyOpenDyslexicFonts() {
+        let requiredFonts = ["OpenDyslexic-Regular", "OpenDyslexic-Bold", "OpenDyslexic-Italic", "OpenDyslexic-Bold-Italic"]
+        var allLoaded = true
+
+        for fontName in requiredFonts {
+            if UIFont(name: fontName, size: 12) != nil {
+                print("✅ Font loaded: \(fontName)")
+            } else {
+                print("❌ Font NOT loaded: \(fontName)")
+                allLoaded = false
+            }
+        }
+
+        if allLoaded {
+            print("✅ All OpenDyslexic fonts loaded successfully!")
+        } else {
+            print("⚠️ WARNING: Some OpenDyslexic fonts failed to load. Check Info.plist UIAppFonts configuration.")
         }
     }
 
@@ -86,7 +130,7 @@ struct MirrorBuddyApp: App {
                 .environment(LocalizationManager.shared)
                 .environment(CloudKitSyncMonitor.shared)
                 .environmentObject(AppVoiceCommandHandler.shared) // Task 103: Inject voice command handler
-                .font(.openDyslexicBody) // Apply OpenDyslexic as default font
+                .environment(\.font, .openDyslexicBody) // Apply OpenDyslexic as default font (modern best practice)
                 .onAppear {
                     // Complete performance monitoring setup (Task 59)
                     _Concurrency.Task { @MainActor in
