@@ -272,8 +272,10 @@ struct SmartVoiceButton: View {
             queue: .main
         ) { notification in
             if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    keyboardHeight = keyboardFrame.height
+                _Concurrency.Task { @MainActor in
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        keyboardHeight = keyboardFrame.height
+                    }
                 }
             }
         }
@@ -283,8 +285,10 @@ struct SmartVoiceButton: View {
             object: nil,
             queue: .main
         ) { _ in
-            withAnimation(.easeInOut(duration: 0.3)) {
-                keyboardHeight = 0
+            _Concurrency.Task { @MainActor in
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    keyboardHeight = 0
+                }
             }
         }
     }

@@ -64,7 +64,7 @@ final class LMSIntegrationService {
     }
 
     func exportMindMapToMarkdown(_ mindMap: MindMap) -> String {
-        var markdown = "# \(mindMap.title)\n\n"
+        var markdown = "# \(mindMap.title ?? "Untitled")\n\n"
 
         func traverse(_ node: MindMapNode, level: Int) {
             let indent = String(repeating: "  ", count: level)

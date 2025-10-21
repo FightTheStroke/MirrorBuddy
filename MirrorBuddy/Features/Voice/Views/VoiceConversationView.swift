@@ -808,7 +808,7 @@ final class VoiceConversationViewModel: ObservableObject {
                 }
 
                 // Task 101: Send context-aware system prompt from StudyCoachPersonality
-                let systemPrompt = await coachPersonality.generateSystemPrompt(
+                let systemPrompt = coachPersonality.generateSystemPrompt(
                     for: currentSubject,
                     material: currentMaterial
                 )
@@ -899,7 +899,7 @@ final class VoiceConversationViewModel: ObservableObject {
         }
 
         // Generate response using GPT-5
-        let systemPrompt = await coachPersonality.generateSystemPrompt(
+        let systemPrompt = coachPersonality.generateSystemPrompt(
             for: currentSubject,
             material: currentMaterial
         )
@@ -940,9 +940,7 @@ final class VoiceConversationViewModel: ObservableObject {
         } else {
             // Disconnect from realtime API
             if let realtimeClient {
-                _Concurrency.Task {
-                    await realtimeClient.disconnect()
-                }
+                realtimeClient.disconnect()
             }
         }
 

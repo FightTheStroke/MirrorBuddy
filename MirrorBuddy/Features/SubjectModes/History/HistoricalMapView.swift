@@ -5,28 +5,27 @@ import SwiftUI
 struct HistoricalMapView: View {
     let locations: [HistoricalLocation]
     @State private var selectedLocation: HistoricalLocation?
-    @State private var region: MKCoordinateRegion
+    @State private var position: MapCameraPosition
 
     init(locations: [HistoricalLocation]) {
         self.locations = locations
-        _region = State(initialValue: Self.calculateRegion(for: locations))
+        _position = State(initialValue: Self.calculatePosition(for: locations))
     }
 
     var body: some View {
         ZStack(alignment: .bottom) {
             // Map
-            Map(
-                coordinateRegion: $region,
-                annotationItems: locations
-            ) { location in
-                MapAnnotation(coordinate: location.coordinate) {
-                    LocationMarker(
-                        location: location,
-                        isSelected: selectedLocation?.id == location.id
-                    )
-                    .onTapGesture {
-                        withAnimation(.spring()) {
-                            selectedLocation = location
+            Map(position: $position) {
+                ForEach(locations) { location in
+                    Annotation(location.name, coordinate: location.coordinate) {
+                        LocationMarker(
+                            location: location,
+                            isSelected: selectedLocation?.id == location.id
+                        )
+                        .onTapGesture {
+                            withAnimation(.spring()) {
+                                selectedLocation = location
+                            }
                         }
                     }
                 }
@@ -62,12 +61,12 @@ struct HistoricalMapView: View {
         }
     }
 
-    private static func calculateRegion(for locations: [HistoricalLocation]) -> MKCoordinateRegion {
+    private static func calculatePosition(for locations: [HistoricalLocation]) -> MapCameraPosition {
         guard !locations.isEmpty else {
-            return MKCoordinateRegion(
+            return .region(MKCoordinateRegion(
                 center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
                 span: MKCoordinateSpan(latitudeDelta: 180, longitudeDelta: 180)
-            )
+            ))
         }
 
         var minLat = locations[0].latitude
@@ -92,18 +91,18 @@ struct HistoricalMapView: View {
             longitudeDelta: (maxLon - minLon) * 1.5
         )
 
-        return MKCoordinateRegion(center: center, span: span)
+        return .region(MKCoordinateRegion(center: center, span: span))
     }
 
     private func zoomToFitAll() {
         withAnimation {
-            region = Self.calculateRegion(for: locations)
+            position = Self.calculatePosition(for: locations)
         }
     }
 
     private func resetZoom() {
         withAnimation {
-            region = Self.calculateRegion(for: locations)
+            position = Self.calculatePosition(for: locations)
         }
     }
 }
