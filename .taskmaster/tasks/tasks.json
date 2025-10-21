@@ -4519,7 +4519,7 @@
             "title": "Migrate TaskListView to use SubjectEntity",
             "description": "Replace ForEach(Subject.allCases) with @Query fetching SubjectEntity. Update TaskListViewModel.selectedSubject from Subject? to SubjectEntity?. Fix filter comparison logic to use SubjectEntity.id instead of enum rawValue.",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 83
           },
@@ -4528,7 +4528,7 @@
             "title": "Migrate ContextManager to use SubjectEntity",
             "description": "Change ContextManager.currentSubject from Subject? to SubjectEntity?. Update ContextBannerView to work with SubjectEntity. Fix colorForSubject() helper to accept SubjectEntity. Update all view references.",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 83
           },
@@ -7451,7 +7451,8 @@
         "master"
       ],
       "created": "2025-10-21T04:54:21.830Z",
-      "description": "Tasks for master context"
+      "description": "Tasks for master context",
+      "updated": "2025-10-21T05:15:54.966Z"
     }
   }
 }
