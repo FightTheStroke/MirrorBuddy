@@ -4451,7 +4451,7 @@
         "description": "Set up complete localization infrastructure for Italian (PRIMARY/DEFAULT) and English, with support for additional languages. MUST be done before UI implementation.",
         "details": "1. Create Localizable.xcstrings catalog:\n   - Add Italian (it) as base language\n   - Add English (en) as secondary language\n   - Configure for future language additions\n\n2. Extract all hardcoded UI strings:\n   - ContentView and all views\n   - Model descriptions (Subject names, Achievement descriptions, etc.)\n   - Button labels, navigation titles, accessibility labels\n   - Error messages and alerts\n\n3. Convert to localized strings:\n   - Use String catalogs (Xcode 15+) or .strings files\n   - Group by feature/screen for organization\n   - Include context comments for translators\n\n4. Update all SwiftUI views:\n   - Replace hardcoded Text(\"...\") with Text(verbatim:) or Text(LocalizedStringKey(...))\n   - Use .accessibilityLabel with localized strings\n   - Test language switching\n\n5. Add language selector in Settings:\n   - Show current language\n   - Allow switching between Italian and English\n   - Persist preference in UserDefaults\n\n6. Document localization workflow:\n   - How to add new languages\n   - How to add new strings\n   - Translation guidelines",
         "testStrategy": "Switch between Italian and English in Settings and verify all UI text changes correctly. Use Xcode scheme language options to test different languages. Verify accessibility labels are localized. Check that no hardcoded strings remain in the UI.",
-        "status": "in-progress",
+        "status": "done",
         "dependencies": [
           "3",
           "4",
@@ -4488,23 +4488,25 @@
             "title": "Replace 553+ hardcoded Text() calls with localization keys",
             "description": "Extract hardcoded strings from Settings views (20+), Core utilities (30+), and Features directory (500+). Replace Text(\"hardcoded\") with Text(\"semantic.key\"). Priority: Settings > Dashboard > Materials > remaining features. Use extraction tool or manual review.",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 82,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-21T06:44:45.349Z"
           },
           {
             "id": 4,
             "title": "Test language switching end-to-end",
             "description": "Verify: 1) Language selector appears in Settings, 2) Switching language updates ALL UI immediately, 3) App restart preserves language choice, 4) Test with Xcode scheme language override, 5) Verify accessibility labels update correctly, 6) No missing translations or crashes.",
             "details": "",
-            "status": "pending",
+            "status": "done",
             "dependencies": [],
             "parentTaskId": 82,
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-10-21T06:44:46.650Z"
           }
         ],
-        "updatedAt": "2025-10-21T05:42:42.516Z"
+        "updatedAt": "2025-10-21T06:44:46.650Z"
       },
       {
         "id": "83",
@@ -7458,9 +7460,9 @@
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-10-21T06:26:01.867Z",
+      "lastModified": "2025-10-21T06:44:46.653Z",
       "taskCount": 139,
-      "completedCount": 135,
+      "completedCount": 136,
       "tags": [
         "master"
       ]
