@@ -14822,6 +14822,54 @@
           }
         }
       }
+    },
+    "MirrorBuddy will access:\\n• Your courses\\n• Course assignments\\n• Due dates": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MirrorBuddy will access:\\n• Your courses\\n• Course assignments\\n• Due dates"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MirrorBuddy accederà a:\\n• I tuoi corsi\\n• Compiti del corso\\n• Scadenze"
+          }
+        }
+      }
+    },
+    "• Glucosio\\n• O₂": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Glucosio\\n• O₂"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Glucosio\\n• O₂"
+          }
+        }
+      }
+    },
+    "• Luce\\n• CO₂\\n• H₂O": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Luce\\n• CO₂\\n• H₂O"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Luce\\n• CO₂\\n• H₂O"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

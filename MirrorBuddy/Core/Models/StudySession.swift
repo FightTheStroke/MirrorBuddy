@@ -5,9 +5,9 @@ import SwiftData
 @Model
 final class StudySession {
     // CloudKit requires all non-optional properties to have default values
-    var id: UUID
-    var date: Date
-    var durationMinutes: Int
+    var id: UUID = UUID()
+    var date: Date = Date()
+    var durationMinutes: Int = 0
     var subject: String?
 
     // CloudKit requires all relationships to have an inverse
@@ -17,12 +17,12 @@ final class StudySession {
 
     var startTime: Date?
     var endTime: Date?
-    var isPaused: Bool
+    var isPaused: Bool = false
     var pauseStartTime: Date?
-    var totalPausedMinutes: Int
+    var totalPausedMinutes: Int = 0
 
     // XP earned from this session
-    var xpEarned: Int
+    var xpEarned: Int = 0
 
     init(
         id: UUID = UUID(),
