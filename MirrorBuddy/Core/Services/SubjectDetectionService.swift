@@ -4,10 +4,12 @@
 //
 //  Task 94: Subject and speaker detection from transcripts
 //  Uses keyword matching to auto-assign subjects from transcript content
+//  Updated for Task 83: Now uses SubjectEntity instead of Subject enum
 //
 
 import Foundation
 import os.log
+import SwiftData
 
 /// Service for detecting subjects from transcript keywords
 @MainActor
@@ -20,17 +22,19 @@ final class SubjectDetectionService {
 
     // MARK: - Subject Detection
 
-    /// Detect subject from transcript text using keyword matching
-    /// - Parameter text: Transcript text to analyze
-    /// - Returns: Detected subject or nil if no clear match
-    func detectSubject(from text: String) -> Subject? {
+    /// Detect subject from text using keyword matching with SubjectEntity
+    /// - Parameters:
+    ///   - text: Text to analyze
+    ///   - availableSubjects: List of available SubjectEntity to match against
+    /// - Returns: Detected SubjectEntity or nil if no clear match
+    func detectSubject(from text: String, availableSubjects: [SubjectEntity]) -> SubjectEntity? {
         let lowercasedText = text.lowercased()
 
         // Count keywords for each subject
-        var subjectScores: [Subject: Int] = [:]
+        var subjectScores: [SubjectEntity: Int] = [:]
 
-        for subject in Subject.allCases where subject != .other && subject != .sostegno {
-            let keywords = getKeywords(for: subject)
+        for subject in availableSubjects where subject.isActive {
+            let keywords = getKeywords(for: subject.localizationKey)
             let score = keywords.reduce(0) { count, keyword in
                 count + countOccurrences(of: keyword, in: lowercasedText)
             }
@@ -41,7 +45,7 @@ final class SubjectDetectionService {
 
         // Return subject with highest score
         guard let bestMatch = subjectScores.max(by: { $0.value < $1.value }) else {
-            logger.info("No subject detected from transcript")
+            logger.info("No subject detected from text")
             return nil
         }
 
@@ -51,17 +55,17 @@ final class SubjectDetectionService {
             return nil
         }
 
-        logger.info("Detected subject: \(bestMatch.key.rawValue) (score: \(bestMatch.value))")
+        logger.info("Detected subject: \(bestMatch.key.displayName) (score: \(bestMatch.value))")
         return bestMatch.key
     }
 
-    /// Detect multiple subjects from transcript (for multidisciplinary content)
-    func detectSubjects(from text: String, threshold: Int = 3) -> [Subject] {
+    /// Detect multiple subjects from text (for multidisciplinary content)
+    func detectSubjects(from text: String, availableSubjects: [SubjectEntity], threshold: Int = 3) -> [SubjectEntity] {
         let lowercasedText = text.lowercased()
-        var subjectScores: [Subject: Int] = [:]
+        var subjectScores: [SubjectEntity: Int] = [:]
 
-        for subject in Subject.allCases where subject != .other && subject != .sostegno {
-            let keywords = getKeywords(for: subject)
+        for subject in availableSubjects where subject.isActive {
+            let keywords = getKeywords(for: subject.localizationKey)
             let score = keywords.reduce(0) { count, keyword in
                 count + countOccurrences(of: keyword, in: lowercasedText)
             }
@@ -71,17 +75,20 @@ final class SubjectDetectionService {
         }
 
         let detectedSubjects = subjectScores.sorted { $0.value > $1.value }.map { $0.key }
-        logger.info("Detected \(detectedSubjects.count) subjects from transcript")
+        logger.info("Detected \(detectedSubjects.count) subjects from text")
 
         return detectedSubjects
     }
 
     // MARK: - Subject Keywords
 
-    /// Get keywords for subject detection
-    private func getKeywords(for subject: Subject) -> [String] {
-        switch subject {
-        case .matematica:
+    /// Get keywords for subject detection based on localization key
+    private func getKeywords(for localizationKey: String) -> [String] {
+        // Extract the subject identifier from localization key (e.g., "subject.matematica" -> "matematica")
+        let subjectKey = localizationKey.components(separatedBy: ".").last ?? localizationKey
+
+        switch subjectKey.lowercased() {
+        case "matematica":
             return [
                 "matematica", "algebra", "geometria", "calcolo", "equazione", "funzione",
                 "derivata", "integrale", "limite", "frazione", "radice", "potenza",
@@ -89,7 +96,7 @@ final class SubjectDetectionService {
                 "trigonometria", "seno", "coseno", "tangente", "logaritmo", "esponenziale"
             ]
 
-        case .fisica:
+        case "fisica":
             return [
                 "fisica", "forza", "energia", "velocità", "accelerazione", "massa",
                 "lavoro", "potenza", "newton", "joule", "watt", "pressione",
@@ -98,7 +105,7 @@ final class SubjectDetectionService {
                 "meccanica", "cinematica", "dinamica"
             ]
 
-        case .scienzeNaturali:
+        case "scienzenaturali":
             return [
                 "scienza", "scienze", "biologia", "chimica", "cellula", "organismo",
                 "ecosistema", "dna", "proteina", "enzima", "molecola", "atomo",
@@ -106,7 +113,7 @@ final class SubjectDetectionService {
                 "evoluzione", "genetica", "ecologia", "ambiente"
             ]
 
-        case .storiaGeografia:
+        case "storiageografia":
             return [
                 "storia", "geografia", "secolo", "guerra", "impero", "regno",
                 "rivoluzione", "costituzione", "democrazia", "repubblica", "monarchia",
@@ -114,7 +121,7 @@ final class SubjectDetectionService {
                 "clima", "popolazione", "città", "battaglia", "trattato", "re", "regina"
             ]
 
-        case .italiano:
+        case "italiano":
             return [
                 "letteratura", "poesia", "romanzo", "racconto", "autore", "scrittore",
                 "poeta", "dante", "petrarca", "boccaccio", "manzoni", "leopardi",
@@ -123,7 +130,7 @@ final class SubjectDetectionService {
                 "trama", "tema", "stile", "sintassi", "grammatica"
             ]
 
-        case .inglese:
+        case "inglese":
             return [
                 "english", "inglese", "grammar", "verb", "tense", "present", "past",
                 "future", "vocabulary", "pronunciation", "listening", "speaking",
@@ -131,7 +138,7 @@ final class SubjectDetectionService {
                 "idiom", "preposition", "article", "adjective", "adverb"
             ]
 
-        case .educazioneCivica:
+        case "educazionecivica":
             return [
                 "costituzione", "diritto", "cittadinanza", "legge", "parlamento",
                 "governo", "presidente", "elezioni", "democrazia", "libertà",
@@ -139,7 +146,7 @@ final class SubjectDetectionService {
                 "stato", "regione", "comune", "europa", "unione europea"
             ]
 
-        case .religione:
+        case "religione":
             return [
                 "religione", "dio", "fede", "chiesa", "bibbia", "vangelo",
                 "gesù", "cristo", "santo", "sacramento", "preghiera", "messa",
@@ -147,7 +154,7 @@ final class SubjectDetectionService {
                 "ebraismo", "spiritualità", "morale", "etica"
             ]
 
-        case .scienzeMotorie:
+        case "scienzemotorie":
             return [
                 "sport", "ginnastica", "educazione fisica", "allenamento", "esercizio",
                 "muscolo", "articolazione", "coordinazione", "resistenza", "forza",
@@ -155,8 +162,12 @@ final class SubjectDetectionService {
                 "corsa", "salto", "lancio", "squadra", "gioco"
             ]
 
-        case .sostegno, .other:
+        case "sostegno", "other":
             return []
+
+        default:
+            // For custom subjects, use the name itself as keyword
+            return [subjectKey]
         }
     }
 
@@ -169,10 +180,10 @@ final class SubjectDetectionService {
     }
 
     /// Get confidence score for detected subject
-    func getConfidenceScore(for subject: Subject?, in text: String) -> Double {
+    func getConfidenceScore(for subject: SubjectEntity?, in text: String) -> Double {
         guard let subject = subject else { return 0.0 }
 
-        let keywords = getKeywords(for: subject)
+        let keywords = getKeywords(for: subject.localizationKey)
         let lowercasedText = text.lowercased()
 
         let matchCount = keywords.reduce(0) { count, keyword in
@@ -193,9 +204,9 @@ final class SubjectDetectionService {
 
 /// Result of subject detection with confidence
 struct SubjectDetectionResult {
-    let subject: Subject?
+    let subject: SubjectEntity?
     let confidence: Double
-    let alternativeSubjects: [Subject]
+    let alternativeSubjects: [SubjectEntity]
 
     var isConfident: Bool {
         confidence >= 30.0 // 30% keyword match is considered confident

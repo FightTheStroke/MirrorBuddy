@@ -118,6 +118,19 @@ struct MirrorBuddyApp: App {
             let subjectService = SubjectService(modelContext: context)
             try? subjectService.initializeDefaultSubjects()
 
+            // Task 83.5: Migrate existing data to use SubjectEntity
+            let migrationService = DataMigrationService(modelContext: context)
+            if migrationService.isMigrationNeeded() {
+                _Concurrency.Task { @MainActor in
+                    do {
+                        let result = try await migrationService.performMigration()
+                        print("✅ Data migration completed: \(result.summary)")
+                    } catch {
+                        print("⚠️ Data migration failed: \(error.localizedDescription)")
+                    }
+                }
+            }
+
             return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
