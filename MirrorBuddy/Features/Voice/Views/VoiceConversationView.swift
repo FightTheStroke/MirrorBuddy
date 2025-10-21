@@ -567,11 +567,11 @@ final class VoiceConversationViewModel: ObservableObject {
             switch message {
             case .serverEvent(let event):
                 switch event {
-                case .sessionCreated(let session):
+                case .sessionCreated:
                     // Session initialized successfully
                     break
 
-                case .responseCreated(let response):
+                case .responseCreated:
                     // New response started
                     break
 
@@ -585,7 +585,7 @@ final class VoiceConversationViewModel: ObservableObject {
                     // Audio handled via onAudioData callback
                     break
 
-                case .responseDone(let responseDone):
+                case .responseDone:
                     // Response completed - finalize AI message
                     _Concurrency.Task { @MainActor in
                         self.finalizeAIResponse()
@@ -609,7 +609,7 @@ final class VoiceConversationViewModel: ObservableObject {
                         self.isUserSpeaking = false
                     }
 
-                case .rateLimitsUpdated(let rateLimits):
+                case .rateLimitsUpdated:
                     // Could log rate limit info for debugging
                     break
 
@@ -935,11 +935,7 @@ final class VoiceConversationViewModel: ObservableObject {
 
         // Task 101: Stop offline mode services if active
         if isOfflineMode {
-            do {
-                try localSpeechRecognition.stopListening()
-            } catch {
-                logger.error("Error stopping speech recognition: \(error.localizedDescription)")
-            }
+            localSpeechRecognition.stopListening()
             localTextToSpeech.stop()
         } else {
             // Disconnect from realtime API
@@ -962,7 +958,7 @@ final class VoiceConversationViewModel: ObservableObject {
 
     /// Buffer audio chunks and send to OpenAI when threshold is reached
     private func bufferAndSendAudio(_ audioData: Data) async {
-        guard let realtimeClient, isConversationActive else { return }
+        guard realtimeClient != nil, isConversationActive else { return }
 
         // Add to buffer
         audioBuffer.append(audioData)
@@ -1040,7 +1036,7 @@ final class VoiceConversationViewModel: ObservableObject {
         if let conversation = currentConversation,
            let service = conversationService {
             do {
-                try service.addMessage(
+                _ = try service.addMessage(
                     to: conversation,
                     content: content,
                     isFromUser: true
@@ -1064,7 +1060,7 @@ final class VoiceConversationViewModel: ObservableObject {
         if let conversation = currentConversation,
            let service = conversationService {
             do {
-                try service.addMessage(
+                _ = try service.addMessage(
                     to: conversation,
                     content: content,
                     isFromUser: false
@@ -1105,7 +1101,7 @@ final class VoiceConversationViewModel: ObservableObject {
             if let conversation = currentConversation,
                let service = conversationService {
                 do {
-                    try service.addMessage(
+                    _ = try service.addMessage(
                         to: conversation,
                         content: currentAIResponseText,
                         isFromUser: false
