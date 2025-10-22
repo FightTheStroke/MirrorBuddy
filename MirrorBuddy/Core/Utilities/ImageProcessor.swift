@@ -3,9 +3,9 @@ import os.log
 import UIKit
 import Vision
 
-/// Utility for processing and optimizing images for AI analysis
+/// Utility for processing and optimizing images for AI analysis (iOS)
 @MainActor
-final class ImageProcessor {
+final class ImageProcessor: ImageProcessing {
     /// Shared singleton instance
     static let shared = ImageProcessor()
 

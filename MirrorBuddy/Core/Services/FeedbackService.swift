@@ -9,9 +9,9 @@
 import Foundation
 import SwiftUI
 
-/// Service for collecting and managing user feedback
+/// Service for collecting and managing user feedback (iOS)
 @MainActor
-final class FeedbackService {
+final class FeedbackService: FeedbackProviding {
     static let shared = FeedbackService()
 
     private init() {}

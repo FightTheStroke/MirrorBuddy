@@ -3,9 +3,9 @@ import Combine
 import Foundation
 import os.log
 
-/// Service for scheduling and managing background sync tasks
+/// Service for scheduling and managing background sync tasks (iOS)
 @MainActor
-final class BackgroundTaskScheduler {
+final class BackgroundTaskScheduler: BackgroundTaskManaging {
     /// Shared singleton instance
     static let shared = BackgroundTaskScheduler()
 

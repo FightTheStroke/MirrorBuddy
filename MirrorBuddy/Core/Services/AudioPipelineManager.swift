@@ -2,9 +2,9 @@
 import Foundation
 import os.log
 
-/// Manager for audio pipeline operations for voice conversations
+/// Manager for audio pipeline operations for voice conversations (iOS)
 @MainActor
-final class AudioPipelineManager: NSObject {
+final class AudioPipelineManager: NSObject, AudioManaging {
     /// Shared singleton instance
     static let shared = AudioPipelineManager()
 

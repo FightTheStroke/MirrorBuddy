@@ -4,8 +4,9 @@ import Foundation
 import os.log
 
 /// Text-to-Speech service using Apple Speech framework (Task 73.1)
+/// Cross-platform implementation works on both iOS and macOS
 @MainActor
-final class TextToSpeechService: NSObject, ObservableObject {
+final class TextToSpeechService: NSObject, ObservableObject, TextToSpeechManaging {
     static let shared = TextToSpeechService()
 
     private let logger = Logger(subsystem: "com.mirrorbuddy", category: "TextToSpeech")

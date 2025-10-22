@@ -17,9 +17,9 @@ enum CaptureMode: CustomStringConvertible {
     }
 }
 
-/// Manager for camera capture operations for homework help
+/// Manager for camera capture operations for homework help (iOS)
 @MainActor
-final class CameraManager: NSObject {
+final class CameraManager: NSObject, CameraManaging {
     /// Shared singleton instance
     static let shared = CameraManager()
 
