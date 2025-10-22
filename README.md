@@ -119,11 +119,84 @@ The repository already includes a functional SwiftUI app with the following matu
 - **Tests**: ✅ Compiling successfully
 - **Swift**: 6.0 with concurrency support
 - **iOS**: 17.0+ deployment target
-- **macOS**: 14.0+ development environment
+- **macOS**: 26.0+ "Tahoe" native app ✨ NEW!
 - **SwiftLint**: ✅ 0 violations (100% clean - 950 → 0)
 - **Test Coverage**: ~40% (target: 60%)
 
 See `Docs/PROJECT_STATUS.md`, `Docs/TMQAReport.md`, and `.taskmaster/tasks/tasks.json` for detailed status and QA findings.
+
+---
+
+## 🍎 macOS Native App (NEW!)
+
+MirrorBuddy is now available as a **native macOS 26 "Tahoe" application** with stunning Liquid Glass UI and full Apple Intelligence integration!
+
+### Platform: macOS 26.0+ "Tahoe" (Apple Silicon only)
+
+**What's Special**:
+- ✨ **Liquid Glass Design** - Beautiful translucent UI that reduces visual clutter
+- 🤖 **Apple Intelligence** - Writing Tools (Cmd+Shift+W), Siri 2.0, AI-powered Spotlight
+- ⌨️ **One-Handed Optimized** - All keyboard shortcuts work with right hand only (critical for Mario)
+- 🪟 **Native macOS** - Full menu bar, window management, trackpad gestures
+- 🔄 **Perfect Sync** - CloudKit keeps iOS and macOS in perfect harmony
+- ♿️ **Accessibility First** - Same OpenDyslexic fonts, VoiceOver support, WCAG AAA compliance
+
+### Key macOS Features
+
+#### Liquid Glass UI (macOS 26)
+- Translucent sidebar that blurs desktop background
+- Floating toolbar with glass materials
+- Subject-colored tinted glass for context
+- Respects system "Reduce Transparency" setting
+
+#### Apple Intelligence Integration
+- **Writing Tools** (Cmd+Shift+W) - Helps Mario with dysgraphia
+  - Rewrite, Proofread, Summarize, Key Points
+  - Works in all text fields
+- **Siri 2.0** - Natural language commands
+  - "Hey Siri, add this PDF to math materials"
+  - "Hey Siri, explain fractions like Fortnite"
+- **AI Spotlight** - Search materials by concept
+  - "materials about fractions with visual examples"
+  - Quick actions: "Summarize physics chapter 2"
+
+#### Keyboard Shortcuts (Right-Hand Friendly)
+| Shortcut | Action |
+|----------|--------|
+| **Cmd+1-4** | Navigate sections (Materials/Study/Tasks/Voice) |
+| **Cmd+Shift+V** | Voice Conversation (PRIMARY) |
+| **Cmd+Shift+W** | Writing Tools AI |
+| **Cmd+Shift+T** | Always on Top (for study sessions) |
+| **Cmd+/** | Show All Shortcuts |
+
+#### Window Management
+- Default 1200×800 (perfect for split screen)
+- Position/size persistence across launches
+- Always on Top mode (Cmd+Shift+T)
+- Resizable 900px → 2000px+
+
+### Getting Started (macOS)
+
+**Prerequisites**:
+- Mac with Apple Silicon (M1/M2/M3/M4)
+- macOS 15.0+ (ideally macOS 26 Tahoe for Liquid Glass)
+- Xcode 16.0+ (for macOS 26 SDK)
+- Apple Developer Account
+
+**Setup Guide**: See comprehensive walkthrough in [`Docs/MACOS_SETUP_GUIDE.md`](Docs/MACOS_SETUP_GUIDE.md)
+
+**Quick Start**:
+1. Open `MirrorBuddy.xcodeproj` in Xcode 16+
+2. Create macOS target (File → New → Target → macOS → App)
+3. Add files from `MirrorBuddy/macOS/` to target
+4. Add shared code (Core/, Features/) to both iOS and macOS targets
+5. Build and Run! (Cmd+R)
+
+**Architecture**: 95% code shared with iOS, 5% macOS-specific (window management, menu bar, glass effects)
+
+**Documentation**:
+- [macOS Native PRD](.taskmaster/docs/macos-native-prd.md) - Complete product requirements (1,019 lines)
+- [macOS Setup Guide](Docs/MACOS_SETUP_GUIDE.md) - Step-by-step Xcode configuration (498 lines)
 
 ---
 
