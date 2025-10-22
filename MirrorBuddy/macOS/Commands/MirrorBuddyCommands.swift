@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  MirrorBuddyCommands.swift
 //  MirrorBuddy macOS
@@ -251,3 +252,5 @@ extension FocusedValues {
         set { self[SelectedSectionKey.self] = newValue }
     }
 }
+
+#endif

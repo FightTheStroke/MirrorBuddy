@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  MirrorBuddyMacApp.swift
 //  MirrorBuddy macOS
@@ -141,3 +142,5 @@ struct MirrorBuddyMacApp: App {
         }
     }
 }
+
+#endif

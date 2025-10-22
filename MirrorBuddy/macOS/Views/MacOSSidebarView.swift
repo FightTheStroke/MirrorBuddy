@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  MacOSSidebarView.swift
 //  MirrorBuddy macOS
@@ -60,3 +61,5 @@ struct MacOSSidebarView: View {
     MacOSSidebarView(selectedSection: .constant(.materials))
         .frame(width: 220, height: 600)
 }
+
+#endif

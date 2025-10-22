@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  FeedbackManager.swift
 //  MirrorBuddy macOS
@@ -82,5 +83,7 @@ class FeedbackManager {
         NSSound(named: name)?.play()
     }
 }
+
+#endif
 
 #endif

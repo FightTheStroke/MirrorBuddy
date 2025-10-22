@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  MacOSContentView.swift
 //  MirrorBuddy macOS
@@ -181,3 +182,5 @@ struct KeyboardShortcutRow: View {
     MacOSContentView(section: .help)
         .frame(width: 800, height: 600)
 }
+
+#endif

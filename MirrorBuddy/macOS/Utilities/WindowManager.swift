@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  WindowManager.swift
 //  MirrorBuddy macOS
@@ -140,5 +141,7 @@ extension Notification.Name {
     static let windowDidBecomeKey = Notification.Name("windowDidBecomeKey")
     static let windowDidResignKey = Notification.Name("windowDidResignKey")
 }
+
+#endif
 
 #endif

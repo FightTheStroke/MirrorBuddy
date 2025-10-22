@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  MacOSToolbar.swift
 //  MirrorBuddy macOS
@@ -98,6 +99,8 @@ struct MacOSToolbar: ToolbarContent {
 
 // MARK: - Notification Names
 extension Notification.Name {
-    static let startVoiceConversation = Notification.Name("startVoiceConversation")
+    // Note: startVoiceConversation is defined in StartConversationIntent.swift
     static let showMaterialImport = Notification.Name("showMaterialImport")
 }
+
+#endif

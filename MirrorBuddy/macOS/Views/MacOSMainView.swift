@@ -1,3 +1,4 @@
+#if os(macOS)
 //
 //  MacOSMainView.swift
 //  MirrorBuddy macOS
@@ -92,3 +93,5 @@ enum SidebarSection: String, CaseIterable, Identifiable {
         .frame(width: 1200, height: 800)
         .modelContainer(for: [Material.self, SubjectEntity.self])
 }
+
+#endif
