@@ -9,6 +9,7 @@
 #if os(macOS)
 import AppKit
 import SwiftUI
+import Combine
 
 /// Manages macOS-specific window behaviors
 @MainActor

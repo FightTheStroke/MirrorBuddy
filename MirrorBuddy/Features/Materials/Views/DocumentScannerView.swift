@@ -5,7 +5,10 @@
 //  Document scanner using VisionKit's DocumentCamera
 //  Scans multiple pages, auto-crops, and runs OCR
 //
+//  Note: VisionKit's VNDocumentCameraViewController is iOS-only
+//
 
+#if os(iOS)
 import SwiftData
 import SwiftUI
 import VisionKit
@@ -167,3 +170,5 @@ struct ScanDocumentButton: View {
     ScanDocumentButton()
         .modelContainer(for: Material.self, inMemory: true)
 }
+
+#endif

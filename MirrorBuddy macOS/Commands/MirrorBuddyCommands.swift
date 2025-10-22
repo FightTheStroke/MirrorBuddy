@@ -8,6 +8,8 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
+import Combine
 
 struct MirrorBuddyCommands: Commands {
     @FocusedValue(\.selectedSection) private var selectedSection

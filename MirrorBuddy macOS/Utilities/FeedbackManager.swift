@@ -54,28 +54,28 @@ class FeedbackManager {
 
     /// Play success sound (pleasant tone)
     func playSuccess() {
-        NSSound(named: .glass)?.play()
+        NSSound(named: "Glass")?.play()
     }
 
     /// Play error sound (gentle alert)
     func playError() {
-        NSSound(named: .pop)?.play()
+        NSSound(named: "Basso")?.play()
     }
 
     /// Play warning sound
     func playWarning() {
-        NSSound(named: .purr)?.play()
+        NSSound(named: "Purr")?.play()
     }
 
     /// Play impact sound (click/tap)
     func playImpact(style: String = "medium") {
         // macOS doesn't have haptics, use subtle click sound
-        NSSound(named: .pop)?.play()
+        NSSound(named: "Tink")?.play()
     }
 
     /// Play selection sound (navigation change)
     func playSelection() {
-        NSSound(named: .pop)?.play()
+        NSSound(named: "Pop")?.play()
     }
 
     /// Play custom sound by name
