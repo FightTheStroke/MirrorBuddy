@@ -13,10 +13,10 @@ import SwiftUI
 /// Invoked via Siri: "Hey Siri, parla con MirrorBuddy"
 @available(iOS 16.0, *)
 struct StartConversationIntent: AppIntent {
-    static var title: LocalizedStringResource = "Parla con MirrorBuddy"
-    static var description = IntentDescription("Inizia una conversazione vocale con il tuo coach AI")
+    static let title: LocalizedStringResource = "Parla con MirrorBuddy"
+    static let description = IntentDescription("Inizia una conversazione vocale con il tuo coach AI")
 
-    static var openAppWhenRun: Bool = true
+    static let openAppWhenRun: Bool = true
 
     // Optional parameters for subject-specific conversations
     @Parameter(title: "Materia")
@@ -35,7 +35,7 @@ struct StartConversationIntent: AppIntent {
 
     // Perform the intent
     @MainActor
-    func perform() async throws -> some IntentResult & OpensIntent {
+    func perform() async throws -> some ProvidesDialog {
         // Store intent parameters for the app to pick up
         NotificationCenter.default.post(
             name: .startVoiceConversation,
@@ -47,19 +47,19 @@ struct StartConversationIntent: AppIntent {
             ]
         )
 
-        return .result()
+        return .result(dialog: "Avvio conversazione con MirrorBuddy")
     }
 }
 
-/// Entity for subject selection
+/// Entity for subject selection (Siri Shortcuts)
 @available(iOS 16.0, *)
-struct SubjectEntity: AppEntity {
-    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Materia"
+struct SiriSubjectEntity: AppEntity {
+    static let typeDisplayRepresentation: TypeDisplayRepresentation = "Materia"
 
     var id: String
     var displayString: String
 
-    static var defaultQuery = SubjectEntityQuery()
+    static let defaultQuery = SiriSubjectEntityQuery()
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(title: "\(displayString)")
@@ -68,29 +68,29 @@ struct SubjectEntity: AppEntity {
 
 /// Query for subject entities
 @available(iOS 16.0, *)
-struct SubjectEntityQuery: EntityQuery {
-    func entities(for identifiers: [String]) async throws -> [SubjectEntity] {
+struct SiriSubjectEntityQuery: EntityQuery {
+    func entities(for identifiers: [String]) async throws -> [SiriSubjectEntity] {
         identifiers.compactMap { id in
-            SubjectEntity.allSubjects.first { $0.id == id }
+            SiriSubjectEntity.allSubjects.first { $0.id == id }
         }
     }
 
-    func suggestedEntities() async throws -> [SubjectEntity] {
-        SubjectEntity.allSubjects
+    func suggestedEntities() async throws -> [SiriSubjectEntity] {
+        SiriSubjectEntity.allSubjects
     }
 }
 
 @available(iOS 16.0, *)
-extension SubjectEntity {
+extension SiriSubjectEntity {
     static let allSubjects = [
-        SubjectEntity(id: "matematica", displayString: "Matematica"),
-        SubjectEntity(id: "italiano", displayString: "Italiano"),
-        SubjectEntity(id: "inglese", displayString: "Inglese"),
-        SubjectEntity(id: "scienze", displayString: "Scienze"),
-        SubjectEntity(id: "storia", displayString: "Storia"),
-        SubjectEntity(id: "geografia", displayString: "Geografia"),
-        SubjectEntity(id: "arte", displayString: "Arte"),
-        SubjectEntity(id: "musica", displayString: "Musica")
+        SiriSubjectEntity(id: "matematica", displayString: "Matematica"),
+        SiriSubjectEntity(id: "italiano", displayString: "Italiano"),
+        SiriSubjectEntity(id: "inglese", displayString: "Inglese"),
+        SiriSubjectEntity(id: "scienze", displayString: "Scienze"),
+        SiriSubjectEntity(id: "storia", displayString: "Storia"),
+        SiriSubjectEntity(id: "geografia", displayString: "Geografia"),
+        SiriSubjectEntity(id: "arte", displayString: "Arte"),
+        SiriSubjectEntity(id: "musica", displayString: "Musica")
     ]
 }
 

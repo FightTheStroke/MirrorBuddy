@@ -136,19 +136,19 @@ struct OnboardingVoiceFirstTutorialView: View {
 
                 // Instructions
                 VStack(spacing: 16) {
-                    InstructionStep(
+                    VoiceTutorialInstructionStep(
                         number: 1,
                         title: "Attiva Siri",
                         description: "Dì \"Hey Siri\" oppure premi il tasto laterale"
                     )
 
-                    InstructionStep(
+                    VoiceTutorialInstructionStep(
                         number: 2,
                         title: "Avvia MirrorBuddy",
                         description: "Dì \"Parla con MirrorBuddy\""
                     )
 
-                    InstructionStep(
+                    VoiceTutorialInstructionStep(
                         number: 3,
                         title: "Inizia a parlare",
                         description: "L'app si apre e inizia ad ascoltarti automaticamente!"
@@ -354,25 +354,25 @@ struct OnboardingVoiceFirstTutorialView: View {
                     Text("Come funziona")
                         .font(.headline)
 
-                    InstructionStep(
+                    VoiceTutorialInstructionStep(
                         number: 1,
                         title: "AI sta parlando",
                         description: "Vedi lo stato viola e l'animazione waveform"
                     )
 
-                    InstructionStep(
+                    VoiceTutorialInstructionStep(
                         number: 2,
                         title: "Inizia a parlare",
                         description: "Non aspettare che finisca, inizia a parlare quando vuoi"
                     )
 
-                    InstructionStep(
+                    VoiceTutorialInstructionStep(
                         number: 3,
                         title: "Interruzione automatica",
                         description: "L'AI si ferma immediatamente e inizia ad ascoltarti"
                     )
 
-                    InstructionStep(
+                    VoiceTutorialInstructionStep(
                         number: 4,
                         title: "Nuova domanda",
                         description: "Continua la conversazione con la tua nuova domanda"
@@ -517,7 +517,7 @@ struct OnboardingVoiceFirstTutorialView: View {
 
 // MARK: - Supporting Views
 
-private struct InstructionStep: View {
+private struct VoiceTutorialInstructionStep: View {
     let number: Int
     let title: String
     let description: String

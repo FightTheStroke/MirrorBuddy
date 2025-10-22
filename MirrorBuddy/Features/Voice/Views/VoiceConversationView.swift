@@ -913,8 +913,8 @@ final class VoiceConversationViewModel: ObservableObject {
                 try await realtimeClient.connect()
 
                 // Configure session with VAD and voice settings
-                try await realtimeClient.configureSession(sessionConfiguration)
-                logger.info("Session configured with VAD enabled (threshold: \(sessionConfiguration.vadThreshold))")
+                try await realtimeClient.configureSession(self.sessionConfiguration)
+                logger.info("Session configured with VAD enabled (threshold: \(self.sessionConfiguration.vadThreshold))")
 
                 // Send context-aware system prompt
                 let systemPrompt = await coachPersonality.generateSystemPrompt(
@@ -988,7 +988,7 @@ final class VoiceConversationViewModel: ObservableObject {
                 try localSpeechRecognition.startListening()
 
                 await MainActor.run {
-                    isConversationActive = true
+                    // Session state is managed automatically by sessionState
                     isOfflineMode = true
                     pulseAnimation = true
                     startWaveformAnimation()
@@ -1334,7 +1334,7 @@ final class VoiceConversationViewModel: ObservableObject {
     private func playAIResponse(_ audioData: Data) {
         do {
             try audioPipeline.play(audioData: audioData)
-            isUserSpeaking = false
+            // User speaking state managed by sessionState
         } catch {
             showError(error.localizedDescription)
         }
@@ -1370,8 +1370,7 @@ final class VoiceConversationViewModel: ObservableObject {
             waveformAmplitudes[i] = normalizedLevel + CGFloat.random(in: -0.2...0.2)
         }
 
-        // Detect if user is speaking (level above threshold)
-        isUserSpeaking = level > 0.3
+        // User speaking detection handled by sessionState and VAD
     }
 
     // MARK: - Settings
@@ -1390,7 +1389,14 @@ final class VoiceConversationViewModel: ObservableObject {
             queue: .main
         ) { [weak self] notification in
             guard let self = self else { return }
-            self.handleSiriIntent(notification)
+            // Extract and copy userInfo values to avoid data races
+            let subject = notification.userInfo?["subject"] as? String
+            let topic = notification.userInfo?["topic"] as? String
+            let autoStart = notification.userInfo?["autoStart"] as? Bool ?? true
+
+            _Concurrency.Task { @MainActor in
+                self.handleSiriIntent(subject: subject, topic: topic, autoStart: autoStart)
+            }
         }
         logger.info("Siri intent listener setup complete")
     }
@@ -1405,15 +1411,8 @@ final class VoiceConversationViewModel: ObservableObject {
     }
 
     /// Handle Siri intent to start conversation
-    private func handleSiriIntent(_ notification: Notification) {
-        guard let userInfo = notification.userInfo else { return }
-
+    private func handleSiriIntent(subject: String?, topic: String?, autoStart: Bool) {
         logger.info("Received Siri intent to start conversation")
-
-        // Extract parameters
-        let subject = userInfo["subject"] as? String
-        let topic = userInfo["topic"] as? String
-        let autoStart = userInfo["autoStart"] as? Bool ?? true
 
         // Update context if subject provided
         if let subject = subject {
