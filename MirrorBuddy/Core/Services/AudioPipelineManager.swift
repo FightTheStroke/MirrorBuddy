@@ -1,4 +1,5 @@
 @preconcurrency import AVFoundation
+import Combine
 import Foundation
 import os.log
 
@@ -24,9 +25,15 @@ final class AudioPipelineManager: NSObject, AudioManaging {
     /// Audio player node for playback
     private let playerNode = AVAudioPlayerNode()
 
+    // MARK: - AudioManaging Protocol Properties
+
+    @Published private(set) var isRecording = false
+    @Published private(set) var isPaused = false
+    @Published private(set) var recordingDuration: TimeInterval = 0
+
     /// Audio format for recording (PCM16 24kHz mono)
     /// Falls back to input format if standard format creation fails
-    private lazy var recordingFormat: AVAudioFormat = {
+    internal lazy var recordingFormat: AVAudioFormat = {
         // Try to create standard 24kHz PCM16 format
         if let format = AVAudioFormat(
             commonFormat: .pcmFormatInt16,
@@ -624,6 +631,48 @@ final class AudioPipelineManager: NSObject, AudioManaging {
 
         logger.error("Pipeline error: \(error.localizedDescription)")
         onError?(error)
+    }
+
+    // MARK: - AudioManaging Protocol Stub Methods
+    // Note: This class is primarily for playback. Recording functionality
+    // is delegated to ExtendedVoiceRecordingService. These stubs allow
+    // protocol conformance while maintaining separation of concerns.
+
+    func deactivateAudioSession() throws {
+        // Audio session management handled in configureAudioSession/stop
+    }
+
+    func startRecording() throws {
+        // Recording delegated to ExtendedVoiceRecordingService
+        throw AudioPipelineError.pipelineNotActive
+    }
+
+    func stopRecording() throws -> Data {
+        // Recording delegated to ExtendedVoiceRecordingService
+        throw AudioPipelineError.pipelineNotActive
+    }
+
+    func pauseRecording() throws {
+        // Recording delegated to ExtendedVoiceRecordingService
+        throw AudioPipelineError.pipelineNotActive
+    }
+
+    func resumeRecording() throws {
+        // Recording delegated to ExtendedVoiceRecordingService
+        throw AudioPipelineError.pipelineNotActive
+    }
+
+    func cancelRecording() {
+        // Recording delegated to ExtendedVoiceRecordingService
+    }
+
+    func convertToBase64PCM16(_ audioData: Data) throws -> String {
+        // Simple base64 encoding for PCM16 data
+        return audioData.base64EncodedString()
+    }
+
+    func getAudioLevel() -> Float {
+        return currentInputLevel
     }
 
     // MARK: - Cleanup

@@ -10,8 +10,9 @@ import Foundation
 import SwiftUI
 
 /// Service for collecting and managing user feedback (iOS)
+/// TODO: Implement FeedbackProviding protocol conformance
 @MainActor
-final class FeedbackService: FeedbackProviding {
+final class FeedbackService {
     static let shared = FeedbackService()
 
     private init() {}

@@ -4,8 +4,9 @@ import Foundation
 import os.log
 
 /// Service for scheduling and managing background sync tasks (iOS)
+/// TODO: Implement BackgroundTaskManaging protocol conformance
 @MainActor
-final class BackgroundTaskScheduler: BackgroundTaskManaging {
+final class BackgroundTaskScheduler {
     /// Shared singleton instance
     static let shared = BackgroundTaskScheduler()
 

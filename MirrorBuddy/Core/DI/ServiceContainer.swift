@@ -39,7 +39,8 @@ final class ServiceContainer {
     }()
 
     /// Camera manager (platform-specific)
-    lazy var cameraManager: CameraManaging = {
+    /// TODO: Update when CameraManager conforms to CameraManaging
+    lazy var cameraManager: Any = {
         #if os(iOS)
         return CameraManager.shared
         #elseif os(macOS)
@@ -57,7 +58,8 @@ final class ServiceContainer {
     }()
 
     /// Feedback provider (platform-specific)
-    lazy var feedbackProvider: FeedbackProviding = {
+    /// TODO: Update when FeedbackService conforms to FeedbackProviding
+    lazy var feedbackProvider: Any = {
         #if os(iOS)
         return FeedbackService.shared
         #elseif os(macOS)
@@ -66,7 +68,8 @@ final class ServiceContainer {
     }()
 
     /// Background task manager (platform-specific)
-    lazy var backgroundTaskManager: BackgroundTaskManaging = {
+    /// TODO: Update when BackgroundTaskScheduler conforms to BackgroundTaskManaging
+    lazy var backgroundTaskManager: Any = {
         #if os(iOS)
         return BackgroundTaskScheduler.shared
         #elseif os(macOS)
