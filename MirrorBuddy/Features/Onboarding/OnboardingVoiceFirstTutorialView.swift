@@ -495,7 +495,7 @@ struct OnboardingVoiceFirstTutorialView: View {
 
                         TroubleshootingRow(
                             problem: "Siri non trova MirrorBuddy",
-                            solution: "Apri l'app una volta, poi riprova con Siri"
+                            solution: "Apri l'app una volta, poi verifica i permessi Siri in Impostazioni → Siri e Ricerca → MirrorBuddy"
                         )
 
                         TroubleshootingRow(

@@ -35,7 +35,7 @@ enum VoiceSessionState: Equatable {
         case .speaking:
             return "Sto parlando. Interrompimi quando vuoi."
         case .paused:
-            return "In pausa. Pronta a riprenderti quando vuoi."
+            return "In pausa. Pronta a riprendere quando vuoi."
         case .error(let message):
             return "Errore: \(message)"
         }

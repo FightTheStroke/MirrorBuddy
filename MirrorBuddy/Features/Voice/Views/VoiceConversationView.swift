@@ -588,6 +588,9 @@ final class VoiceConversationViewModel: ObservableObject {
     /// Accumulated AI response text for streaming
     private var currentAIResponseText = ""
 
+    /// Barge-in debounce flag (prevents redundant cancellation attempts)
+    private var isBargeInInProgress = false
+
     /// Siri intent observer
     private var siriIntentObserver: NSObjectProtocol?
 
@@ -1092,7 +1095,9 @@ final class VoiceConversationViewModel: ObservableObject {
         guard realtimeClient != nil, isConversationActive else { return }
 
         // Check for barge-in: user starting to speak while AI is speaking
-        if sessionState == .speaking {
+        // Debounce to prevent redundant cancellation attempts
+        if sessionState == .speaking && !isBargeInInProgress {
+            isBargeInInProgress = true
             await handleBargeIn()
         }
 
@@ -1130,10 +1135,17 @@ final class VoiceConversationViewModel: ObservableObject {
                 hapticFeedback.userInterrupted()
                 audioCues.userInterrupted()
 
+                // Reset barge-in flag
+                isBargeInInProgress = false
+
                 logger.debug("AI response cancelled, listening to user")
             }
         } catch {
             logger.error("Failed to cancel AI response: \(error.localizedDescription)")
+            // Reset flag even on error
+            await MainActor.run {
+                isBargeInInProgress = false
+            }
         }
     }
 

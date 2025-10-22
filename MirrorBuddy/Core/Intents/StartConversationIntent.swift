@@ -36,15 +36,20 @@ struct StartConversationIntent: AppIntent {
     // Perform the intent
     @MainActor
     func perform() async throws -> some ProvidesDialog {
+        // Build userInfo dictionary conditionally to avoid Optional wrapper issues
+        var userInfo: [String: Any] = ["autoStart": true]
+        if let subject = subject {
+            userInfo["subject"] = subject
+        }
+        if let topic = topic {
+            userInfo["topic"] = topic
+        }
+
         // Store intent parameters for the app to pick up
         NotificationCenter.default.post(
             name: .startVoiceConversation,
             object: nil,
-            userInfo: [
-                "subject": subject as Any,
-                "topic": topic as Any,
-                "autoStart": true
-            ]
+            userInfo: userInfo
         )
 
         return .result(dialog: "Avvio conversazione con MirrorBuddy")
