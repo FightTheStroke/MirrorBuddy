@@ -39,6 +39,37 @@ enum UpdateStep: String {
     case failed = "Errore durante l'aggiornamento"
 }
 
+/// Configuration for update timing and UX behavior
+struct UpdateConfiguration {
+    /// Delay between update steps for progressive UX (in seconds)
+    var stepDelay: TimeInterval = 0.5
+
+    /// Final delay to show results before clearing UI (in seconds)
+    var resultsDisplayDelay: TimeInterval = 2.0
+
+    /// Whether to show progressive updates (disable for testing/automation)
+    var enableProgressiveUX: Bool = true
+
+    /// Default configuration with standard delays
+    static let standard = UpdateConfiguration()
+
+    /// Fast configuration for testing/automation (minimal delays)
+    static let fast = UpdateConfiguration(
+        stepDelay: 0.0,
+        resultsDisplayDelay: 0.0,
+        enableProgressiveUX: false
+    )
+
+    /// Custom configuration
+    static func custom(stepDelay: TimeInterval, resultsDelay: TimeInterval) -> UpdateConfiguration {
+        UpdateConfiguration(
+            stepDelay: stepDelay,
+            resultsDisplayDelay: resultsDelay,
+            enableProgressiveUX: true
+        )
+    }
+}
+
 /// Central update manager - orchestrates all sync operations
 @MainActor
 final class UpdateManager {
@@ -55,6 +86,9 @@ final class UpdateManager {
     // State
     let progress = UpdateProgress()
     private var modelContext: ModelContext?
+
+    /// Update configuration (can be changed for testing or custom UX)
+    var configuration: UpdateConfiguration = .standard
 
     private init() {}
 
@@ -88,28 +122,28 @@ final class UpdateManager {
             // Step 1: Check authentication (10%)
             try await checkAuthentication()
             progress.progress = 0.1
-            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000) // 0.5s delay for UX
+            try await delayIfNeeded()
 
             // Step 2: Sync Google Drive (30%)
             progress.currentStep = .syncingDrive
             progress.statusMessage = "Cerco nuovi documenti su Drive..."
             try await syncGoogleDrive()
             progress.progress = 0.4
-            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000)
+            try await delayIfNeeded()
 
             // Step 3: Sync Gmail (20%)
             progress.currentStep = .syncingGmail
             progress.statusMessage = "Controllo nuove mail dai professori..."
             try await syncGmail()
             progress.progress = 0.6
-            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000)
+            try await delayIfNeeded()
 
             // Step 4: Sync Calendar (15%)
             progress.currentStep = .syncingCalendar
             progress.statusMessage = "Controllo eventi nel calendario..."
             try await syncCalendar()
             progress.progress = 0.75
-            try await _Concurrency.Task.sleep(nanoseconds: 500_000_000)
+            try await delayIfNeeded()
 
             // Step 5: Generate mind maps for new documents (25%)
             progress.currentStep = .generatingMindMaps
@@ -128,8 +162,8 @@ final class UpdateManager {
             progress.statusMessage = "Errore: \(error.localizedDescription)"
         }
 
-        // Keep "isUpdating" true for 2 seconds to show results
-        try? await _Concurrency.Task.sleep(nanoseconds: 2_000_000_000)
+        // Keep "isUpdating" true to show results (configurable delay)
+        try? await delayResults()
         progress.isUpdating = false
     }
 
@@ -341,6 +375,20 @@ final class UpdateManager {
         } else {
             return "Trovati: " + parts.joined(separator: ", ")
         }
+    }
+
+    // MARK: - UX Delay Helpers
+
+    /// Progressive UX delay between steps (configurable)
+    private func delayIfNeeded() async throws {
+        guard configuration.enableProgressiveUX, configuration.stepDelay > 0 else { return }
+        try await _Concurrency.Task.sleep(nanoseconds: UInt64(configuration.stepDelay * 1_000_000_000))
+    }
+
+    /// Final delay to show results (configurable)
+    private func delayResults() async throws {
+        guard configuration.enableProgressiveUX, configuration.resultsDisplayDelay > 0 else { return }
+        try await _Concurrency.Task.sleep(nanoseconds: UInt64(configuration.resultsDisplayDelay * 1_000_000_000))
     }
 }
 

@@ -25,16 +25,32 @@ final class AudioPipelineManager: NSObject {
     private let playerNode = AVAudioPlayerNode()
 
     /// Audio format for recording (PCM16 24kHz mono)
+    /// Falls back to input format if standard format creation fails
     private lazy var recordingFormat: AVAudioFormat = {
-        guard let format = AVAudioFormat(
+        // Try to create standard 24kHz PCM16 format
+        if let format = AVAudioFormat(
             commonFormat: .pcmFormatInt16,
             sampleRate: 24_000,
             channels: 1,
             interleaved: false
-        ) else {
-            fatalError("Failed to create audio format with standard PCM16 24kHz configuration")
+        ) {
+            return format
         }
-        return format
+
+        // Fallback 1: Try 16kHz (common fallback)
+        if let format = AVAudioFormat(
+            commonFormat: .pcmFormatInt16,
+            sampleRate: 16_000,
+            channels: 1,
+            interleaved: false
+        ) {
+            logger.warning("Using fallback 16kHz audio format (24kHz not available)")
+            return format
+        }
+
+        // Fallback 2: Use input node's native format as last resort
+        logger.error("Standard audio formats unavailable, using input node native format")
+        return audioEngine.inputNode.outputFormat(forBus: 0)
     }()
 
     /// Whether audio pipeline is active
