@@ -29,10 +29,14 @@ struct FallbackExecutor {
             let primaryError = error
             // Log primary failure
             await MainActor.run {
+                #if os(iOS)
                 APIErrorLogger.shared.log(primaryError, additionalContext: [
                     "fallback": "attempting",
                     "primaryFailure": true
                 ])
+                #elseif os(macOS)
+                print("⚠️ Primary API failed, attempting fallback: \(primaryError.localizedDescription)")
+                #endif
             }
 
             do {
@@ -42,10 +46,14 @@ struct FallbackExecutor {
                 let fallbackError = error
                 // Log fallback failure
                 await MainActor.run {
+                    #if os(iOS)
                     APIErrorLogger.shared.log(fallbackError, additionalContext: [
                         "fallback": "failed",
                         "primaryError": primaryError.localizedDescription
                     ])
+                    #elseif os(macOS)
+                    print("❌ Fallback also failed: \(fallbackError.localizedDescription)")
+                    #endif
                 }
 
                 return .failed(fallbackError)

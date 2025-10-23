@@ -91,7 +91,7 @@ enum SidebarSection: String, CaseIterable, Identifiable {
 #Preview {
     MacOSMainView()
         .frame(width: 1200, height: 800)
-        .modelContainer(for: [Material.self, SubjectEntity.self])
+        // .modelContainer(for: [Material.self, SubjectEntity.self]) // TODO: Add these models to macOS
 }
 
 #endif

@@ -5,7 +5,7 @@ import SwiftData
 /// macOS-native Gmail API integration for assignment extraction
 /// Uses Timer-based scheduling instead of BGTaskScheduler
 @MainActor
-final class macOSGmailService {
+final class macOSGmailService: GmailManaging {
     /// Shared singleton instance
     static let shared = macOSGmailService()
 
@@ -101,7 +101,7 @@ final class macOSGmailService {
     // MARK: - macOS Background Sync (Timer-based)
 
     /// Start automatic background sync
-    func startBackgroundSync(interval: TimeInterval? = nil) {
+    func startBackgroundSync(interval: TimeInterval?) {
         stopBackgroundSync()
 
         let syncInterval = interval ?? defaultSyncInterval
@@ -427,38 +427,4 @@ enum GmailError: LocalizedError {
 }
 
 // MARK: - Gmail Message Model
-
-@Model
-final class MBGmailMessage {
-    @Attribute(.unique) var id: String
-    var threadId: String
-    var subject: String
-    var from: String
-    var snippet: String
-    var body: String
-    var receivedDate: Date
-    var isRead: Bool
-    var hasAttachments: Bool
-
-    init(
-        id: String,
-        threadId: String,
-        subject: String,
-        from: String,
-        snippet: String,
-        body: String,
-        receivedDate: Date,
-        isRead: Bool,
-        hasAttachments: Bool
-    ) {
-        self.id = id
-        self.threadId = threadId
-        self.subject = subject
-        self.from = from
-        self.snippet = snippet
-        self.body = body
-        self.receivedDate = receivedDate
-        self.isRead = isRead
-        self.hasAttachments = hasAttachments
-    }
-}
+// Note: MBGmailMessage is now defined in MirrorBuddy/Core/Models/MBGmailMessage.swift

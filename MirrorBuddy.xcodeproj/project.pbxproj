@@ -47,174 +47,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A93A5F862EA8D78E00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy macOSTests" target */ = {
+		A9F8AE822EAAB2C7007B36F1 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOS" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Commands/MirrorBuddyCommands.swift,
-				Utilities/FeedbackManager.swift,
-				Utilities/WindowManager.swift,
-				Views/MacOSContentView.swift,
-				Views/MacOSMainView.swift,
-				Views/MacOSSidebarView.swift,
-				Views/MacOSToolbar.swift,
-			);
-			target = A93A5F532EA8D72B00FCB2F2 /* MirrorBuddy macOSTests */;
-		};
-		A93A5F872EA8D78E00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy macOSUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Commands/MirrorBuddyCommands.swift,
-				Utilities/FeedbackManager.swift,
-				Utilities/WindowManager.swift,
-				Views/MacOSContentView.swift,
-				Views/MacOSMainView.swift,
-				Views/MacOSSidebarView.swift,
-				Views/MacOSToolbar.swift,
-			);
-			target = A93A5F5D2EA8D72B00FCB2F2 /* MirrorBuddy macOSUITests */;
-		};
-		A93A5FBE2EA8D83100FCB2F2 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOS" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Core/API/APIError.swift,
-				Core/API/CircuitBreaker.swift,
-				Core/API/Fallback.swift,
-				Core/API/Gemini/GeminiClient.swift,
-				Core/API/Gemini/GeminiConfiguration.swift,
-				Core/API/Gemini/GeminiError.swift,
-				Core/API/Gemini/GeminiModels.swift,
-				Core/API/GoogleDrive/GoogleDriveClient.swift,
-				Core/API/GoogleWorkspace/GoogleAPIError.swift,
-				Core/API/GoogleWorkspace/GoogleAPIModels.swift,
-				Core/API/GoogleWorkspace/GoogleWorkspaceClient.swift,
-				Core/API/GoogleWorkspace/GoogleWorkspaceConfiguration.swift,
-				Core/API/OpenAI/ChatCompletionModels.swift,
-				Core/API/OpenAI/OpenAIClient.swift,
-				Core/API/OpenAI/OpenAIConfiguration.swift,
-				Core/API/OpenAI/OpenAIError.swift,
-				Core/API/OpenAI/OpenAIRealtimeClient.swift,
-				Core/API/RetryableTask.swift,
-				Core/Config/APIKeysConfig.swift,
-				Core/DI/ServiceContainer.swift,
-				Core/Models/VoiceSessionState.swift,
-				Core/Protocols/AudioManaging.swift,
-				Core/Protocols/BackgroundTaskManaging.swift,
-				Core/Protocols/CameraManaging.swift,
-				Core/Protocols/FeedbackProviding.swift,
-				Core/Protocols/ImageProcessing.swift,
-				Core/Protocols/PerformanceMonitoring.swift,
-				Core/Protocols/TextToSpeechManaging.swift,
-				Core/Security/KeychainManager.swift,
-				Core/Services/GmailService.swift,
-				Core/Services/GoogleCalendarService.swift,
-				Core/Services/GoogleDriveDownloadService.swift,
-				Core/Services/GoogleOAuthConfig.swift,
-				Core/Services/GoogleOAuthService.swift,
-				Core/Services/UpdateManager.swift,
-				Features/Materials/MaterialDetailView.swift,
-				Features/Materials/Views/DocumentScannerView.swift,
-				Features/Materials/Views/MaterialCardView.swift,
-				Features/Materials/Views/MaterialImportView.swift,
-				Features/Onboarding/OnboardingAPIKeysView.swift,
-				Features/Onboarding/OnboardingGoogleAccountView.swift,
-				Features/Onboarding/OnboardingModels.swift,
-				Features/Onboarding/OnboardingPermissionsView.swift,
-				Features/Onboarding/OnboardingProgressIndicator.swift,
-				Features/Onboarding/OnboardingSampleMaterialView.swift,
-				Features/Onboarding/OnboardingView.swift,
-				Features/Onboarding/OnboardingVoiceFirstTutorialView.swift,
-				Features/Onboarding/OnboardingVoiceTutorialView.swift,
-				Features/Settings/AliasManagementView.swift,
-				Features/Settings/CoachPersonaSettingsView.swift,
-				Features/Settings/DyslexiaSettingsView.swift,
-				Features/Settings/GoogleDriveAuthView.swift,
-				Features/Settings/GoogleOAuthConfigView.swift,
-				Features/Settings/GuardianConsentSettingsView.swift,
-				Features/Settings/LMSIntegrationView.swift,
-				Features/Settings/SettingsView.swift,
-				Features/Settings/SubjectSettingsView.swift,
-				Features/Settings/WeeklyDigestSettingsView.swift,
-				Features/Study/Views/StudyView.swift,
-				Features/Tasks/EmailCalendarSyncView.swift,
-				Features/Tasks/TaskDetailView.swift,
-				Features/Tasks/TaskListView.swift,
-				Features/Tasks/Views/TasksView.swift,
-				Features/Voice/Views/BreathingAnimationView.swift,
-				Features/Voice/Views/ConversationListView.swift,
-				Features/Voice/Views/ExtendedVoiceRecordingView.swift,
-				Features/Voice/Views/VoiceConversationView.swift,
-				Features/Voice/Views/VoiceSettingsView.swift,
-				Features/Voice/Views/VoiceView.swift,
-			);
-			target = A93A5F452EA8D72A00FCB2F2 /* MirrorBuddy macOS */;
-		};
-		A93A5FBF2EA8D83100FCB2F2 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOSTests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Core/API/APIError.swift,
-				Core/API/CircuitBreaker.swift,
-				Core/API/Fallback.swift,
-				Core/API/Gemini/GeminiClient.swift,
-				Core/API/Gemini/GeminiConfiguration.swift,
-				Core/API/Gemini/GeminiError.swift,
-				Core/API/Gemini/GeminiModels.swift,
-				Core/API/GoogleDrive/GoogleDriveClient.swift,
-				Core/API/GoogleWorkspace/GoogleAPIError.swift,
-				Core/API/GoogleWorkspace/GoogleAPIModels.swift,
-				Core/API/GoogleWorkspace/GoogleWorkspaceClient.swift,
-				Core/API/GoogleWorkspace/GoogleWorkspaceConfiguration.swift,
-				Core/API/OpenAI/ChatCompletionModels.swift,
-				Core/API/OpenAI/OpenAIClient.swift,
-				Core/API/OpenAI/OpenAIConfiguration.swift,
-				Core/API/OpenAI/OpenAIError.swift,
-				Core/API/OpenAI/OpenAIRealtimeClient.swift,
-				Core/API/RetryableTask.swift,
-				Features/Materials/MaterialDetailView.swift,
-				Features/Materials/Views/DocumentScannerView.swift,
-				Features/Materials/Views/MaterialCardView.swift,
-				Features/Materials/Views/MaterialImportView.swift,
-			);
-			target = A93A5F532EA8D72B00FCB2F2 /* MirrorBuddy macOSTests */;
-		};
-		A93A5FC02EA8D83100FCB2F2 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOSUITests" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Core/API/APIError.swift,
-				Core/API/CircuitBreaker.swift,
-				Core/API/Fallback.swift,
-				Core/API/Gemini/GeminiClient.swift,
-				Core/API/Gemini/GeminiConfiguration.swift,
-				Core/API/Gemini/GeminiError.swift,
-				Core/API/Gemini/GeminiModels.swift,
-				Core/API/GoogleDrive/GoogleDriveClient.swift,
-				Core/API/GoogleWorkspace/GoogleAPIError.swift,
-				Core/API/GoogleWorkspace/GoogleAPIModels.swift,
-				Core/API/GoogleWorkspace/GoogleWorkspaceClient.swift,
-				Core/API/GoogleWorkspace/GoogleWorkspaceConfiguration.swift,
-				Core/API/OpenAI/ChatCompletionModels.swift,
-				Core/API/OpenAI/OpenAIClient.swift,
-				Core/API/OpenAI/OpenAIConfiguration.swift,
-				Core/API/OpenAI/OpenAIError.swift,
-				Core/API/OpenAI/OpenAIRealtimeClient.swift,
-				Core/API/RetryableTask.swift,
-				Features/Materials/MaterialDetailView.swift,
-				Features/Materials/Views/DocumentScannerView.swift,
-				Features/Materials/Views/MaterialCardView.swift,
-				Features/Materials/Views/MaterialImportView.swift,
-			);
-			target = A93A5F5D2EA8D72B00FCB2F2 /* MirrorBuddy macOSUITests */;
-		};
-		A93A5FD42EA8D8AD00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				MirrorBuddyMacApp.swift,
-			);
-			target = C2DDF28A2E9BA66800E76D0A /* MirrorBuddy */;
-		};
-		A93A5FD52EA8D8AD00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy macOS" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				MirrorBuddyMacApp.swift,
+				macOS/Assets.xcassets,
+				macOS/Commands/MirrorBuddyCommands.swift,
+				macOS/MirrorBuddyMacApp.swift,
+				macOS/Models/GoogleCalendarEvent.swift,
+				macOS/Models/MBGmailMessage.swift,
+				macOS/Services/macOSAudioPipelineManager.swift,
+				macOS/Services/macOSBackgroundTaskManager.swift,
+				macOS/Services/macOSCameraManager.swift,
+				macOS/Services/macOSGmailService.swift,
+				macOS/Services/macOSGoogleCalendarService.swift,
+				macOS/Services/macOSImageProcessor.swift,
+				macOS/Services/macOSPerformanceMonitor.swift,
+				macOS/Utilities/FeedbackManager.swift,
+				macOS/Utilities/WindowManager.swift,
+				macOS/Views/MacOSContentView.swift,
+				macOS/Views/MacOSMainView.swift,
+				macOS/Views/MacOSSidebarView.swift,
+				macOS/Views/MacOSToolbar.swift,
 			);
 			target = A93A5F452EA8D72A00FCB2F2 /* MirrorBuddy macOS */;
 		};
@@ -222,23 +75,30 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				macOS/Assets.xcassets,
+				macOS/Commands/MirrorBuddyCommands.swift,
+				macOS/MirrorBuddyMacApp.swift,
+				macOS/Models/GoogleCalendarEvent.swift,
+				macOS/Models/MBGmailMessage.swift,
+				macOS/Services/macOSAudioPipelineManager.swift,
+				macOS/Services/macOSBackgroundTaskManager.swift,
+				macOS/Services/macOSCameraManager.swift,
+				macOS/Services/macOSGmailService.swift,
+				macOS/Services/macOSGoogleCalendarService.swift,
+				macOS/Services/macOSImageProcessor.swift,
+				macOS/Services/macOSPerformanceMonitor.swift,
+				macOS/Utilities/FeedbackManager.swift,
+				macOS/Utilities/WindowManager.swift,
+				macOS/Views/MacOSContentView.swift,
+				macOS/Views/MacOSMainView.swift,
+				macOS/Views/MacOSSidebarView.swift,
+				macOS/Views/MacOSToolbar.swift,
 			);
 			target = C2DDF28A2E9BA66800E76D0A /* MirrorBuddy */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A93A5F472EA8D72A00FCB2F2 /* MirrorBuddy macOS */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A93A5FD42EA8D8AD00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy" target */,
-				A93A5FD52EA8D8AD00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy macOS" target */,
-				A93A5F862EA8D78E00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy macOSTests" target */,
-				A93A5F872EA8D78E00FCB2F2 /* Exceptions for "MirrorBuddy macOS" folder in "MirrorBuddy macOSUITests" target */,
-			);
-			path = "MirrorBuddy macOS";
-			sourceTree = "<group>";
-		};
 		A93A5F572EA8D72B00FCB2F2 /* MirrorBuddy macOSTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "MirrorBuddy macOSTests";
@@ -253,9 +113,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				C2DDF2AE2E9BA66A00E76D0A /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy" target */,
-				A93A5FBE2EA8D83100FCB2F2 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOS" target */,
-				A93A5FBF2EA8D83100FCB2F2 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOSTests" target */,
-				A93A5FC02EA8D83100FCB2F2 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOSUITests" target */,
+				A9F8AE822EAAB2C7007B36F1 /* Exceptions for "MirrorBuddy" folder in "MirrorBuddy macOS" target */,
 			);
 			path = MirrorBuddy;
 			sourceTree = "<group>";
@@ -324,7 +182,6 @@
 				C2DDF28D2E9BA66800E76D0A /* MirrorBuddy */,
 				C2DDF29F2E9BA66A00E76D0A /* MirrorBuddyTests */,
 				C2DDF2A92E9BA66A00E76D0A /* MirrorBuddyUITests */,
-				A93A5F472EA8D72A00FCB2F2 /* MirrorBuddy macOS */,
 				A93A5F572EA8D72B00FCB2F2 /* MirrorBuddy macOSTests */,
 				A93A5F612EA8D72B00FCB2F2 /* MirrorBuddy macOSUITests */,
 				C2DDF28C2E9BA66800E76D0A /* Products */,
@@ -358,9 +215,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				A93A5F472EA8D72A00FCB2F2 /* MirrorBuddy macOS */,
 			);
 			name = "MirrorBuddy macOS";
 			packageProductDependencies = (
@@ -686,7 +540,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				AUTOMATION_APPLE_EVENTS = NO;
-				CODE_SIGN_ENTITLEMENTS = "MirrorBuddy macOS/MirrorBuddy macOS.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "MirrorBuddy/macOS/MirrorBuddy macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -742,7 +596,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				AUTOMATION_APPLE_EVENTS = NO;
-				CODE_SIGN_ENTITLEMENTS = "MirrorBuddy macOS/MirrorBuddy macOS.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "MirrorBuddy/macOS/MirrorBuddy macOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;

@@ -199,6 +199,7 @@ struct RetryExecutor: Sendable {
 
                 // Log retry attempt on the main actor for UI-safe diagnostics
                 await MainActor.run {
+                    #if os(iOS)
                     APIErrorLogger.shared.log(
                         UnifiedAPIError.network(error, context: [
                             "retryAttempt": attempt,
@@ -206,6 +207,9 @@ struct RetryExecutor: Sendable {
                             "elapsedTime": elapsed
                         ])
                     )
+                    #elseif os(macOS)
+                    print("🔄 Retry attempt \(attempt) after \(delay)s - Error: \(error.localizedDescription)")
+                    #endif
                 }
 
                 try await _Concurrency.Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))

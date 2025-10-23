@@ -241,6 +241,7 @@ enum UnifiedAPIError: @preconcurrency APIErrorProtocol {
 
 // MARK: - Error Conversion Extensions
 
+#if os(iOS)
 extension OpenAIError {
     /// Convert OpenAIError to UnifiedAPIError
     func toUnifiedError() -> UnifiedAPIError {
@@ -590,3 +591,4 @@ extension APIErrorProtocol {
         return message
     }
 }
+#endif

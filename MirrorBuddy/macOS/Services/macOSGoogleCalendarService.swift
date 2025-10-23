@@ -5,7 +5,7 @@ import SwiftData
 /// macOS-native Google Calendar API integration for assignment due dates
 /// Uses Timer-based scheduling instead of BGTaskScheduler
 @MainActor
-final class macOSGoogleCalendarService {
+final class macOSGoogleCalendarService: GoogleCalendarManaging {
     /// Shared singleton instance
     static let shared = macOSGoogleCalendarService()
 
@@ -91,7 +91,7 @@ final class macOSGoogleCalendarService {
     // MARK: - macOS Background Sync (Timer-based)
 
     /// Start automatic background sync
-    func startBackgroundSync(interval: TimeInterval? = nil) {
+    func startBackgroundSync(interval: TimeInterval?) {
         stopBackgroundSync()
 
         let syncInterval = interval ?? defaultSyncInterval
@@ -159,9 +159,9 @@ final class macOSGoogleCalendarService {
             }
         }
 
-        let response = try decoder.decode(CalendarListResponse.self, from: data)
+        let calendarListResponse = try decoder.decode(CalendarListResponse.self, from: data)
 
-        return response.items.map { item in
+        return calendarListResponse.items.map { item in
             GoogleCalendar(
                 id: item.id,
                 summary: item.summary,
@@ -327,7 +327,7 @@ final class macOSGoogleCalendarService {
         let allEvents = try fetchStoredEvents()
 
         return allEvents.filter { event in
-            let text = "\(event.summary) \(event.description ?? "")".lowercased()
+            let text = "\(event.summary) \(event.eventDescription ?? "")".lowercased()
             let keywords = ["compiti", "homework", "assignment", "esercizi", "verifica", "test", "consegna", "scadenza"]
             return keywords.contains(where: { text.contains($0) })
         }
@@ -367,34 +367,5 @@ struct GoogleCalendar {
     let isPrimary: Bool
 }
 
-@Model
-final class GCalendarEvent {
-    @Attribute(.unique) var id: String
-    var calendarID: String
-    var summary: String
-    var eventDescription: String?
-    var location: String?
-    var startDate: Date
-    var endDate: Date
-    var isAllDay: Bool
-
-    init(
-        id: String,
-        calendarID: String,
-        summary: String,
-        description: String?,
-        location: String?,
-        startDate: Date,
-        endDate: Date,
-        isAllDay: Bool
-    ) {
-        self.id = id
-        self.calendarID = calendarID
-        self.summary = summary
-        self.eventDescription = description
-        self.location = location
-        self.startDate = startDate
-        self.endDate = endDate
-        self.isAllDay = isAllDay
-    }
-}
+// MARK: - Google Calendar Event Model
+// Note: GCalendarEvent is now defined in MirrorBuddy/Core/Models/GCalendarEvent.swift

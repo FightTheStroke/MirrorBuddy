@@ -21,9 +21,10 @@ struct MacOSToolbar: ToolbarContent {
                 Label("Aggiornami", systemImage: "arrow.triangle.2.circlepath")
             }
             .buttonStyle(.borderedProminent)
-            .glassEffect(.clear)
+            // .glassEffect(.clear) // TODO: Add glass effect modifier
             .help("Sincronizza Drive, Gmail e Calendar")
-            .symbolEffect(.bounce, value: UpdateManager.shared.isSyncing)
+            // TODO: Add isSyncing published property to UpdateManager
+            // .symbolEffect(.bounce, value: UpdateManager.shared.isSyncing)
         }
 
         // MARK: - Center Items
@@ -60,7 +61,7 @@ struct MacOSToolbar: ToolbarContent {
                 Label("Voce", systemImage: "waveform")
             }
             .buttonStyle(.borderedProminent)
-            .glassEffect(.tinted(.blue.opacity(0.3)))
+            // .glassEffect(.tinted(.blue.opacity(0.3))) // TODO: Add glass effect modifier
             .help("Conversazione vocale (Cmd+Shift+V)")
             .keyboardShortcut("v", modifiers: [.command, .shift])
 
@@ -75,14 +76,16 @@ struct MacOSToolbar: ToolbarContent {
 
     // MARK: - Actions
     private func syncAll() {
-        Task { @MainActor in
-            await UpdateManager.shared.performFullUpdate()
-        }
+        // TODO: Add UpdateManager to macOS or create macOS version
+        // Task { @MainActor in
+        //     await UpdateManager.shared.performFullUpdate()
+        // }
+        print("📂 Sync requested (UpdateManager not yet in macOS target)")
     }
 
     private func startVoiceConversation() {
         // Navigate to voice or trigger voice overlay
-        NotificationCenter.default.post(name: .startVoiceConversation, object: nil)
+        NotificationCenter.default.post(name: Notification.Name("startVoiceConversation"), object: nil)
     }
 
     private func addMaterial() {

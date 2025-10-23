@@ -15,22 +15,46 @@ struct MacOSContentView: View {
         Group {
             switch section {
             case .materials:
-                DashboardView()
+                PlaceholderView(
+                    icon: "books.vertical",
+                    title: "Materiali",
+                    subtitle: "Coming soon for macOS"
+                )
 
             case .study:
-                StudyView()
+                PlaceholderView(
+                    icon: "brain.head.profile",
+                    title: "Studia",
+                    subtitle: "Coming soon for macOS"
+                )
 
             case .tasks:
-                TasksView()
+                PlaceholderView(
+                    icon: "checklist",
+                    title: "Compiti",
+                    subtitle: "Coming soon for macOS"
+                )
 
             case .voice:
-                VoiceView()
+                PlaceholderView(
+                    icon: "waveform",
+                    title: "Voce",
+                    subtitle: "Coming soon for macOS"
+                )
 
             case .statistics:
-                StudyStatisticsView()
+                PlaceholderView(
+                    icon: "chart.bar",
+                    title: "Statistiche",
+                    subtitle: "Coming soon for macOS"
+                )
 
             case .settings:
-                SettingsView()
+                PlaceholderView(
+                    icon: "gear",
+                    title: "Impostazioni",
+                    subtitle: "Coming soon for macOS"
+                )
 
             case .help:
                 HelpView()
@@ -169,6 +193,37 @@ struct KeyboardShortcutRow: View {
             Text(description)
                 .font(.openDyslexicBody)
         }
+    }
+}
+
+// MARK: - Placeholder View for Coming Soon Features
+struct PlaceholderView: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+
+    var body: some View {
+        VStack(spacing: 24) {
+            Image(systemName: icon)
+                .font(.system(size: 72))
+                .foregroundStyle(.secondary)
+
+            VStack(spacing: 8) {
+                Text(title)
+                    .font(.openDyslexicTitle)
+                    .foregroundStyle(.primary)
+
+                Text(subtitle)
+                    .font(.openDyslexicBody)
+                    .foregroundStyle(.secondary)
+            }
+
+            Text("Feature available on iOS")
+                .font(.openDyslexicCaption)
+                .foregroundStyle(.tertiary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(nsColor: .windowBackgroundColor))
     }
 }
 

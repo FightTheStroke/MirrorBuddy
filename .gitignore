@@ -83,3 +83,4 @@ MirrorBuddy/Resources/GoogleService-Info.plist
 *.orig
 *.rej
 .env.taskmaster
+MirrorBuddy/iOS/Resources/APIKeys-Info.plist

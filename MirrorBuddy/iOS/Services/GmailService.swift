@@ -5,7 +5,7 @@ import SwiftData
 
 /// Gmail API integration for assignment extraction (Task 43)
 @MainActor
-final class GmailService {
+final class GmailService: GmailManaging {
     /// Shared singleton instance
     static let shared = GmailService()
 
@@ -639,6 +639,61 @@ final class GmailService {
     /// Get last sync date
     func getLastSyncDate() -> Date? {
         lastSyncDate ?? UserDefaults.standard.object(forKey: "Gmail.LastSyncDate") as? Date
+    }
+
+    // MARK: - Protocol Conformance
+
+    /// Fetch stored messages from local database (protocol requirement)
+    func fetchStoredMessages() throws -> [MBGmailMessage] {
+        guard let context = modelContext else {
+            throw GmailError.notAuthenticated
+        }
+
+        let descriptor = FetchDescriptor<MBGmailMessageModel>(
+            sortBy: [SortDescriptor(\.receivedDate, order: .reverse)]
+        )
+        let models = try context.fetch(descriptor)
+
+        // Convert models to MBGmailMessage structs
+        return models.map { model in
+            MBGmailMessage(
+                id: model.id,
+                threadID: model.threadID,
+                from: model.from,
+                subject: model.subject,
+                body: model.body,
+                receivedDate: model.receivedDate,
+                isRead: model.isRead,
+                lastSyncedAt: model.lastSyncedAt
+            )
+        }
+    }
+
+    /// Extract assignments from stored messages (protocol requirement)
+    func extractAssignments() async throws -> [String] {
+        let messages = try fetchStoredMessages()
+        let assignments = extractAssignments(from: messages)
+        return assignments.map { $0.title }
+    }
+
+    /// Start automatic background synchronization (protocol requirement)
+    func startBackgroundSync(interval: TimeInterval?) async {
+        registerBackgroundTasks()
+        scheduleBackgroundSync()
+    }
+
+    /// Stop automatic background synchronization (protocol requirement)
+    func stopBackgroundSync() {
+        BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: "com.mirrorbuddy.gmail-sync")
+    }
+
+    /// Perform immediate background sync (protocol requirement)
+    func performBackgroundSync() async {
+        do {
+            try await performFullSync()
+        } catch {
+            logger.error("Background sync failed: \(error.localizedDescription)")
+        }
     }
 }
 

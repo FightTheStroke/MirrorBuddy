@@ -78,6 +78,24 @@ final class ServiceContainer {
         #endif
     }()
 
+    /// Gmail service (platform-specific)
+    lazy var gmailService: GmailManaging = {
+        #if os(iOS)
+        return GmailService.shared
+        #elseif os(macOS)
+        return macOSGmailService.shared
+        #endif
+    }()
+
+    /// Google Calendar service (platform-specific)
+    lazy var googleCalendarService: GoogleCalendarManaging = {
+        #if os(iOS)
+        return GoogleCalendarService.shared
+        #elseif os(macOS)
+        return macOSGoogleCalendarService.shared
+        #endif
+    }()
+
     // MARK: - Reset (for testing)
 
     /// Reset all lazy-loaded services (useful for testing)

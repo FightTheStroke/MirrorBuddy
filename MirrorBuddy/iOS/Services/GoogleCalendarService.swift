@@ -5,7 +5,7 @@ import SwiftData
 
 /// Google Calendar API integration for assignment due dates (Task 42)
 @MainActor
-final class GoogleCalendarService {
+final class GoogleCalendarService: GoogleCalendarManaging {
     /// Shared singleton instance
     static let shared = GoogleCalendarService()
 
@@ -421,6 +421,81 @@ final class GoogleCalendarService {
     /// Get last sync date
     func getLastSyncDate() -> Date? {
         lastSyncDate ?? UserDefaults.standard.object(forKey: "GoogleCalendar.LastSyncDate") as? Date
+    }
+
+    // MARK: - Protocol Conformance
+
+    /// Fetch all stored events from local database (protocol requirement)
+    func fetchStoredEvents() throws -> [GCalendarEvent] {
+        guard let context = modelContext else {
+            throw GoogleCalendarError.notAuthenticated
+        }
+
+        let descriptor = FetchDescriptor<GCalendarEventModel>(
+            sortBy: [SortDescriptor(\.startDate, order: .forward)]
+        )
+        let models = try context.fetch(descriptor)
+
+        return models.map { model in
+            GCalendarEvent(
+                id: model.id,
+                calendarID: model.calendarID,
+                summary: model.summary,
+                description: model.eventDescription,
+                startDate: model.startDate,
+                endDate: model.endDate,
+                isAllDay: model.isAllDay,
+                location: model.location,
+                htmlLink: model.htmlLink,
+                lastSyncedAt: model.lastSyncedAt
+            )
+        }
+    }
+
+    /// Fetch upcoming events (next 7 days) (protocol requirement)
+    func fetchUpcomingEvents() throws -> [GCalendarEvent] {
+        let allEvents = try fetchStoredEvents()
+        let now = Date()
+        let weekFromNow = Calendar.current.date(byAdding: .day, value: 7, to: now)!
+
+        return allEvents.filter { event in
+            event.startDate >= now && event.startDate <= weekFromNow
+        }
+    }
+
+    /// Extract assignment-related events (protocol requirement)
+    func extractAssignmentEvents() throws -> [GCalendarEvent] {
+        let allEvents = try fetchStoredEvents()
+
+        // Filter events that look like assignments (contain keywords)
+        let assignmentKeywords = ["assignment", "homework", "test", "exam", "quiz", "project", "due"]
+
+        return allEvents.filter { event in
+            let searchText = (event.summary + " " + (event.description ?? "")).lowercased()
+            return assignmentKeywords.contains { keyword in
+                searchText.contains(keyword)
+            }
+        }
+    }
+
+    /// Start automatic background synchronization (protocol requirement)
+    func startBackgroundSync(interval: TimeInterval?) {
+        registerBackgroundTasks()
+        scheduleBackgroundSync()
+    }
+
+    /// Stop automatic background synchronization (protocol requirement)
+    func stopBackgroundSync() {
+        BGTaskScheduler.shared.cancel(taskRequestWithIdentifier: "com.mirrorbuddy.calendar-sync")
+    }
+
+    /// Perform immediate background sync (protocol requirement)
+    func performBackgroundSync() async {
+        do {
+            try await performFullSync()
+        } catch {
+            logger.error("Background sync failed: \(error.localizedDescription)")
+        }
     }
 }
 

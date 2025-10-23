@@ -1,6 +1,9 @@
 import AuthenticationServices
 import Foundation
 import Security
+#if os(macOS)
+import AppKit
+#endif
 
 /// Google OAuth 2.0 authentication service for Google Drive access
 /// Configuration is hardcoded in GoogleOAuthConfig loaded from GoogleService-Info.plist
@@ -373,6 +376,7 @@ enum GoogleOAuthError: LocalizedError {
 
 extension GoogleOAuthService: ASWebAuthenticationPresentationContextProviding {
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        #if os(iOS)
         // Return the key window
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let window = windowScene.windows.first {
@@ -380,5 +384,9 @@ extension GoogleOAuthService: ASWebAuthenticationPresentationContextProviding {
         }
         // Fallback to main window (should not happen in modern iOS)
         return ASPresentationAnchor()
+        #elseif os(macOS)
+        // Return the main window for macOS
+        return NSApplication.shared.windows.first ?? NSWindow()
+        #endif
     }
 }

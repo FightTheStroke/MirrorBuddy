@@ -221,6 +221,7 @@ actor CircuitBreaker {
 
         // Log state transition
         _Concurrency.Task { @MainActor in
+            #if os(iOS)
             APIErrorLogger.shared.log(
                 UnifiedAPIError.unknown(
                     "Circuit breaker state changed",
@@ -233,6 +234,9 @@ actor CircuitBreaker {
                     ]
                 )
             )
+            #elseif os(macOS)
+            print("🔌 Circuit breaker: \(oldState) → \(newState)")
+            #endif
         }
     }
 
