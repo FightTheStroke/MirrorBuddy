@@ -21,11 +21,12 @@ final class ServiceContainer {
     }()
 
     /// Text-to-speech manager (platform-specific)
-    lazy var textToSpeech: TextToSpeechManaging = {
+    /// TODO: Add TextToSpeechService to macOS target or create macOS version
+    lazy var textToSpeech: TextToSpeechManaging? = {
         #if os(iOS)
         return TextToSpeechService.shared
         #elseif os(macOS)
-        return TextToSpeechService.shared // Same implementation works for both
+        return nil // TODO: Add TextToSpeechService.swift to macOS target
         #endif
     }()
 

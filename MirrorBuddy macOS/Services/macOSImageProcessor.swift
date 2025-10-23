@@ -126,7 +126,7 @@ final class macOSImageProcessor: ImageProcessing {
 
     func detectTextRegions(in image: NSImage) async throws -> [CGRect] {
         guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            throw ImageProcessorError.invalidImage
+            throw NSError(domain: "ImageProcessor", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid image"])
         }
 
         let request = VNRecognizeTextRequest()

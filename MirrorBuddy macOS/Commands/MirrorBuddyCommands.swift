@@ -58,7 +58,8 @@ struct MirrorBuddyCommands: Commands {
             .keyboardShortcut("f", modifiers: .command)
 
             Button("Voice Conversation") {
-                NotificationCenter.default.post(name: .startVoiceConversation, object: nil)
+                // TODO: Define .startVoiceConversation notification
+                NotificationCenter.default.post(name: Notification.Name("startVoiceConversation"), object: nil)
             }
             .keyboardShortcut("v", modifiers: [.command, .shift])
 
@@ -179,9 +180,11 @@ struct MirrorBuddyCommands: Commands {
     }
 
     private func importFromDrive() {
+        // TODO: Add DriveSyncService to macOS target
         // Trigger Drive sync
         Task { @MainActor in
-            await DriveSyncService.shared.performSync()
+            // await DriveSyncService.shared.performSync()
+            print("📂 Drive import requested (DriveSyncService not yet in macOS target)")
         }
     }
 

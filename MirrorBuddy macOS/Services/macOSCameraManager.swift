@@ -187,7 +187,7 @@ final class macOSCameraManager: NSObject, CameraManaging {
         device.focusMode = .autoFocus
         device.unlockForConfiguration()
 
-        logger.info("Focus set at point: \(point)")
+        logger.info("Focus set at point: (\(point.x), \(point.y))")
     }
 
     func setExposure(at point: CGPoint) throws {
@@ -204,7 +204,7 @@ final class macOSCameraManager: NSObject, CameraManaging {
         device.exposureMode = .autoExpose
         device.unlockForConfiguration()
 
-        logger.info("Exposure set at point: \(point)")
+        logger.info("Exposure set at point: (\(point.x), \(point.y))")
     }
 
     // MARK: - Private Helpers
@@ -251,7 +251,7 @@ private class PhotoCaptureDelegate: NSObject, AVCapturePhotoCaptureDelegate {
 
         let capturedPhoto = CapturedPhoto(
             imageData: imageData,
-            metadata: photo.metadata,
+            metadata: nil, // metadata is iOS-only in AVCapturePhoto
             timestamp: Date()
         )
 
