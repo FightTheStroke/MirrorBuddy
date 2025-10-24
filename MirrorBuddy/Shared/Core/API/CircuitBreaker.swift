@@ -326,8 +326,8 @@ extension RetryExecutor {
     /// Execute an operation with both retry logic and circuit breaker protection
     static func executeWithCircuitBreaker<Result: Sendable>(
         endpoint: String,
-        policy: RetryPolicy = .default,
-        circuitBreakerConfig: CircuitBreaker.Configuration = .default,
+        policy: RetryPolicy,
+        circuitBreakerConfig: CircuitBreaker.Configuration,
         _ operation: @escaping @Sendable () async throws -> Result
     ) async throws -> Result {
         let breaker = await CircuitBreakerRegistry.shared.breaker(
@@ -338,5 +338,19 @@ extension RetryExecutor {
         return try await breaker.execute {
             try await RetryExecutor.executeWithRetry(policy: policy, operation)
         }
+    }
+
+    /// Convenience method with default parameters accessed from MainActor context
+    @MainActor
+    static func executeWithCircuitBreaker<Result: Sendable>(
+        endpoint: String,
+        _ operation: @escaping @Sendable () async throws -> Result
+    ) async throws -> Result {
+        try await executeWithCircuitBreaker(
+            endpoint: endpoint,
+            policy: .default,
+            circuitBreakerConfig: .default,
+            operation
+        )
     }
 }

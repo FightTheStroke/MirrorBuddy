@@ -54,8 +54,8 @@ final class macOSBackgroundTaskManager: BackgroundTaskManaging {
 
         // Schedule timer
         let timer = Timer.scheduledTimer(withTimeInterval: timeInterval, repeats: false) { [weak self] _ in
-            guard let self = self, let handler = self.refreshHandler else { return }
-            _Concurrency.Task {
+            Task { @MainActor [weak self] in
+                guard let self = self, let handler = self.refreshHandler else { return }
                 await handler()
             }
         }

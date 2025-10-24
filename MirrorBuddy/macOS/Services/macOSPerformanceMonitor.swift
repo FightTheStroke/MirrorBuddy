@@ -47,7 +47,9 @@ final class macOSPerformanceMonitor: PerformanceMonitoring {
         updateMetrics()
 
         monitoringTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] _ in
-            self?.updateMetrics()
+            Task { @MainActor [weak self] in
+                self?.updateMetrics()
+            }
         }
 
         logger.info("Performance monitoring started (macOS)")

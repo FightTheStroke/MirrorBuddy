@@ -118,7 +118,9 @@ final class macOSAudioPipelineManager: NSObject, AudioManaging {
 
         // Start timer for duration tracking
         recordingTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-            self?.updateRecordingDuration()
+            Task { @MainActor [weak self] in
+                self?.updateRecordingDuration()
+            }
         }
 
         logger.info("Recording started (macOS)")

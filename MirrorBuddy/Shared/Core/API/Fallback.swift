@@ -208,8 +208,8 @@ struct ResilientAPICall {
     /// Execute an API call with full resilience (circuit breaker + retry + fallback)
     static func execute<T: Sendable>(
         endpoint: String,
-        retryPolicy: RetryPolicy = .default,
-        circuitBreakerConfig: CircuitBreaker.Configuration = .default,
+        retryPolicy: RetryPolicy,
+        circuitBreakerConfig: CircuitBreaker.Configuration,
         primary: @escaping @Sendable () async throws -> T,
         fallback: @escaping @Sendable (Error) async throws -> T
     ) async throws -> T {
@@ -228,11 +228,27 @@ struct ResilientAPICall {
         }
     }
 
+    /// Convenience method with default parameters (MainActor)
+    @MainActor
+    static func execute<T: Sendable>(
+        endpoint: String,
+        primary: @escaping @Sendable () async throws -> T,
+        fallback: @escaping @Sendable (Error) async throws -> T
+    ) async throws -> T {
+        try await execute(
+            endpoint: endpoint,
+            retryPolicy: .default,
+            circuitBreakerConfig: .default,
+            primary: primary,
+            fallback: fallback
+        )
+    }
+
     /// Execute with circuit breaker and retry, but no fallback
     static func execute<T: Sendable>(
         endpoint: String,
-        retryPolicy: RetryPolicy = .default,
-        circuitBreakerConfig: CircuitBreaker.Configuration = .default,
+        retryPolicy: RetryPolicy,
+        circuitBreakerConfig: CircuitBreaker.Configuration,
         operation: @escaping @Sendable () async throws -> T
     ) async throws -> T {
         try await RetryExecutor.executeWithCircuitBreaker(
@@ -240,6 +256,20 @@ struct ResilientAPICall {
             policy: retryPolicy,
             circuitBreakerConfig: circuitBreakerConfig,
             operation
+        )
+    }
+
+    /// Convenience method with default parameters (MainActor)
+    @MainActor
+    static func execute<T: Sendable>(
+        endpoint: String,
+        operation: @escaping @Sendable () async throws -> T
+    ) async throws -> T {
+        try await execute(
+            endpoint: endpoint,
+            retryPolicy: .default,
+            circuitBreakerConfig: .default,
+            operation: operation
         )
     }
 }

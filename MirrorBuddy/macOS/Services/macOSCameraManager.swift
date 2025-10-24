@@ -1,4 +1,4 @@
-import AVFoundation
+@preconcurrency import AVFoundation
 import AppKit
 import Combine
 import Foundation
@@ -119,7 +119,7 @@ final class macOSCameraManager: NSObject, CameraManaging {
         // Start session
         captureSession = session
 
-        DispatchQueue.global(qos: .userInitiated).async {
+        DispatchQueue.global(qos: .userInitiated).async { [session] in
             session.startRunning()
         }
 
@@ -150,7 +150,7 @@ final class macOSCameraManager: NSObject, CameraManaging {
         let settings = AVCapturePhotoSettings()
 
         // Use highest quality
-        if let format = photoOutput.availablePhotoCodecTypes.first {
+        if !photoOutput.availablePhotoCodecTypes.isEmpty {
             settings.photoQualityPrioritization = .quality
         }
 
@@ -211,7 +211,7 @@ final class macOSCameraManager: NSObject, CameraManaging {
 
     private func checkCameraAvailability() {
         let discoverySession = AVCaptureDevice.DiscoverySession(
-            deviceTypes: [.builtInWideAngleCamera, .externalUnknown],
+            deviceTypes: [.builtInWideAngleCamera, .external],
             mediaType: .video,
             position: .unspecified
         )
