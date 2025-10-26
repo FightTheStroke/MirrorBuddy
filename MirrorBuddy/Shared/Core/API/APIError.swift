@@ -181,7 +181,7 @@ enum UnifiedAPIError: APIErrorProtocol {
         }
     }
 
-    var errorDescription: String? {
+    nonisolated var errorDescription: String? {
         switch self {
         case let .configuration(message, _):
             return "Configuration error: \(message)"
@@ -211,7 +211,7 @@ enum UnifiedAPIError: APIErrorProtocol {
         }
     }
 
-    var recoverySuggestion: String? {
+    nonisolated var recoverySuggestion: String? {
         switch self {
         case .configuration:
             return "Check your API credentials and configuration in settings."

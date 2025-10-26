@@ -30,7 +30,8 @@ struct FallbackExecutor {
             // Log primary failure
             await MainActor.run {
                 #if os(iOS)
-                APIErrorLogger.shared.log(primaryError, additionalContext: [
+                let unifiedError = primaryError as? UnifiedAPIError ?? .unknown(primaryError.localizedDescription, context: ["originalError": String(describing: primaryError)])
+                APIErrorLogger.shared.log(unifiedError, additionalContext: [
                     "fallback": "attempting",
                     "primaryFailure": true
                 ])
@@ -47,7 +48,8 @@ struct FallbackExecutor {
                 // Log fallback failure
                 await MainActor.run {
                     #if os(iOS)
-                    APIErrorLogger.shared.log(fallbackError, additionalContext: [
+                    let unifiedFallbackError = fallbackError as? UnifiedAPIError ?? .unknown(fallbackError.localizedDescription, context: ["originalError": String(describing: fallbackError)])
+                    APIErrorLogger.shared.log(unifiedFallbackError, additionalContext: [
                         "fallback": "failed",
                         "primaryError": primaryError.localizedDescription
                     ])
