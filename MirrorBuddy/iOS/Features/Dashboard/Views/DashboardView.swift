@@ -22,6 +22,7 @@ struct DashboardView: View {
     @State private var selectedMaterial: Material?
     @State private var showingStreakHistory = false
     @State private var showingGoalSettings = false
+    @State private var showingDebug = false
 
     private var currentProgress: UserProgress {
         if let progress = userProgress.first {
@@ -59,6 +60,9 @@ struct DashboardView: View {
                 // Task 57: Offline mode banner
                 ConnectionStatusBanner()
                     .padding(.top, 8)
+
+                // Processing Status Banner - shows when materials are being processed
+                ProcessingStatusBanner()
 
                 ScrollView {
                     VStack(spacing: 20) {
@@ -102,6 +106,16 @@ struct DashboardView: View {
                     }
                 }
 
+                // DEBUG BUTTON - TEMPORARY
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        showingDebug = true
+                    } label: {
+                        Image(systemName: "ant.fill")
+                            .foregroundStyle(.red)
+                    }
+                }
+
                 ToolbarItem {
                     Button {
                         showingImport = true
@@ -124,6 +138,9 @@ struct DashboardView: View {
             }
             .sheet(isPresented: $showingGoalSettings) {
                 GoalSettingsView(userProgress: currentProgress)
+            }
+            .sheet(isPresented: $showingDebug) {
+                SimpleDebugImportView()
             }
             // Task 112: Voice command material detail navigation (enhanced with smart parsing)
             .onChange(of: voiceCommandHandler.selectedMaterialID) { _, materialQuery in

@@ -28,17 +28,15 @@ struct FallbackExecutor {
         } catch {
             let primaryError = error
             // Log primary failure
-            await MainActor.run {
-                #if os(iOS)
-                let unifiedError = primaryError as? UnifiedAPIError ?? .unknown(primaryError.localizedDescription, context: ["originalError": String(describing: primaryError)])
-                APIErrorLogger.shared.log(unifiedError, additionalContext: [
-                    "fallback": "attempting",
-                    "primaryFailure": true
-                ])
-                #elseif os(macOS)
-                print("⚠️ Primary API failed, attempting fallback: \(primaryError.localizedDescription)")
-                #endif
-            }
+            #if os(iOS)
+            let unifiedError = primaryError as? UnifiedAPIError ?? .unknown(primaryError.localizedDescription, context: ["originalError": String(describing: primaryError)])
+            await APIErrorLogger.shared.log(unifiedError, additionalContext: [
+                "fallback": "attempting",
+                "primaryFailure": true
+            ])
+            #elseif os(macOS)
+            print("⚠️ Primary API failed, attempting fallback: \(primaryError.localizedDescription)")
+            #endif
 
             do {
                 let fallbackResult = try await fallback(primaryError)
@@ -46,17 +44,15 @@ struct FallbackExecutor {
             } catch {
                 let fallbackError = error
                 // Log fallback failure
-                await MainActor.run {
-                    #if os(iOS)
-                    let unifiedFallbackError = fallbackError as? UnifiedAPIError ?? .unknown(fallbackError.localizedDescription, context: ["originalError": String(describing: fallbackError)])
-                    APIErrorLogger.shared.log(unifiedFallbackError, additionalContext: [
-                        "fallback": "failed",
-                        "primaryError": primaryError.localizedDescription
-                    ])
-                    #elseif os(macOS)
-                    print("❌ Fallback also failed: \(fallbackError.localizedDescription)")
-                    #endif
-                }
+                #if os(iOS)
+                let unifiedFallbackError = fallbackError as? UnifiedAPIError ?? .unknown(fallbackError.localizedDescription, context: ["originalError": String(describing: fallbackError)])
+                await APIErrorLogger.shared.log(unifiedFallbackError, additionalContext: [
+                    "fallback": "failed",
+                    "primaryError": primaryError.localizedDescription
+                ])
+                #elseif os(macOS)
+                print("❌ Fallback also failed: \(fallbackError.localizedDescription)")
+                #endif
 
                 return .failed(fallbackError)
             }

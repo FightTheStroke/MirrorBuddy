@@ -39,7 +39,8 @@ struct MainTabView: View {
             // Main tab view
             TabView(selection: $selectedTab) {
                 // MARK: - Dashboard Tab (Materiali)
-                DashboardView()
+                // SWITCHED TO SIMPLE DASHBOARD - User feedback: "UI fa ancora cagare"
+                SimpleDashboardView()
                     .tabItem {
                         Label {
                             Text("Materiali")

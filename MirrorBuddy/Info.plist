@@ -35,10 +35,10 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Fonts/OpenDyslexic-Regular.otf</string>
-		<string>Fonts/OpenDyslexic-Bold.otf</string>
-		<string>Fonts/OpenDyslexic-Italic.otf</string>
-		<string>Fonts/OpenDyslexic-Bold-Italic.otf</string>
+		<string>OpenDyslexic-Regular.otf</string>
+		<string>OpenDyslexic-Bold.otf</string>
+		<string>OpenDyslexic-Italic.otf</string>
+		<string>OpenDyslexic-Bold-Italic.otf</string>
 	</array>
 </dict>
 </plist>

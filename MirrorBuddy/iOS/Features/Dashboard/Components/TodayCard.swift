@@ -1,19 +1,14 @@
 import SwiftData
 import SwiftUI
 
-/// Today Card - Personalized daily priorities and quick actions (Task 137.2)
+/// Today Card - Personalized daily priorities and quick actions
 ///
-/// Addresses Pain Point #6: Missing "Today" Card from UX analysis
-/// Shows:
-/// - Top 3 priority materials for today
-/// - Study statistics (streak, completed today, deadlines)
-/// - Quick access to voice coach
-///
-/// Priority Algorithm:
-/// - Deadline proximity (highest weight)
-/// - Has study assets ready (mind maps, flashcards)
-/// - Recent activity
-/// - New materials never accessed
+/// Redesigned for clarity and visual hierarchy:
+/// - Clear SF Pro typography with proper weights
+/// - Improved spacing and breathing room
+/// - Vibrant gradient background
+/// - Smooth animations and transitions
+/// - Better accessibility support
 struct TodayCard: View {
     let todayPriorities: [Material]
     let studyStreak: Int
@@ -23,97 +18,191 @@ struct TodayCard: View {
     @State private var isAnimating = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Header
-            HStack {
-                Image(systemName: "sun.max.fill")
-                    .foregroundStyle(.orange)
-                    .font(.title2)
-                    .symbolEffect(.bounce, value: isAnimating)
+        VStack(alignment: .leading, spacing: 20) {
+            // MARK: - Header
+            header
 
-                Text("Oggi")
-                    .font(.title2)
-                    .fontWeight(.bold)
+            Divider()
+                .background(Color.white.opacity(0.3))
 
-                Spacer()
-
-                Text(Date().formatted(date: .abbreviated, time: .omitted))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            // Priority Materials (max 3)
+            // MARK: - Priority Materials
             if todayPriorities.isEmpty {
                 emptyState
             } else {
-                ForEach(Array(todayPriorities.enumerated()), id: \.element.id) { index, material in
-                    TodayMaterialRow(material: material, rank: index + 1)
-                        .transition(.scale.combined(with: .opacity))
+                VStack(spacing: 12) {
+                    ForEach(Array(todayPriorities.prefix(3).enumerated()), id: \.element.id) { index, material in
+                        TodayMaterialRow(material: material, rank: index + 1)
+                            .transition(.scale.combined(with: .opacity))
+                    }
                 }
             }
 
-            // Quick Stats
-            HStack(spacing: 20) {
-                StatBadge(
-                    icon: "flame.fill",
-                    value: "\(studyStreak)",
-                    label: "giorni",
-                    color: .orange
+            Divider()
+                .background(Color.white.opacity(0.3))
+
+            // MARK: - Quick Stats
+            statsRow
+        }
+        .padding(20)
+        .background {
+            ZStack {
+                // Vibrant gradient
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.4, green: 0.6, blue: 1.0),
+                        Color(red: 0.6, green: 0.4, blue: 1.0)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
                 )
 
-                StatBadge(
-                    icon: "checkmark.circle.fill",
-                    value: "\(completedToday)",
-                    label: "oggi",
-                    color: .green
-                )
-
-                StatBadge(
-                    icon: "calendar.badge.exclamationmark",
-                    value: "\(upcomingDeadlines)",
-                    label: "scadenze",
-                    color: .red
+                // Subtle pattern overlay
+                LinearGradient(
+                    colors: [
+                        Color.white.opacity(0.1),
+                        Color.clear
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
             }
         }
-        .padding()
-        .background(
-            LinearGradient(
-                colors: [
-                    Color.blue.opacity(0.1),
-                    Color.purple.opacity(0.1)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: Color.blue.opacity(0.3), radius: 15, y: 8)
         .onAppear {
-            withAnimation(.easeInOut(duration: 0.5)) {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
                 isAnimating = true
             }
+        }
+    }
+
+    // MARK: - Header
+
+    private var header: some View {
+        HStack(alignment: .center, spacing: 12) {
+            // Sun icon with animation
+            Image(systemName: "sun.max.fill")
+                .font(.system(size: 32, weight: .bold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [.yellow, .orange],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .symbolEffect(.bounce, value: isAnimating)
+                .shadow(color: .yellow.opacity(0.5), radius: 4, y: 2)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Oggi")
+                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+
+                Text(formattedDate)
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.8))
+            }
+
+            Spacer()
+
+            // Optional: Add streak flame if > 0
+            if studyStreak > 0 {
+                HStack(spacing: 4) {
+                    Image(systemName: "flame.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundStyle(.orange)
+                        .symbolEffect(.pulse, value: isAnimating)
+
+                    Text("\(studyStreak)")
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule()
+                        .fill(.white.opacity(0.2))
+                        .overlay(
+                            Capsule()
+                                .strokeBorder(.white.opacity(0.3), lineWidth: 1)
+                        )
+                )
+            }
+        }
+    }
+
+    // MARK: - Stats Row
+
+    private var statsRow: some View {
+        HStack(spacing: 0) {
+            StatBadge(
+                icon: "checkmark.circle.fill",
+                value: "\(completedToday)",
+                label: "Completati",
+                color: Color(red: 0.3, green: 0.9, blue: 0.5)
+            )
+
+            Divider()
+                .frame(height: 50)
+                .background(Color.white.opacity(0.3))
+
+            StatBadge(
+                icon: "calendar.badge.exclamationmark",
+                value: "\(upcomingDeadlines)",
+                label: "In Scadenza",
+                color: upcomingDeadlines > 0 ? Color(red: 1.0, green: 0.6, blue: 0.2) : .white.opacity(0.7)
+            )
+
+            Divider()
+                .frame(height: 50)
+                .background(Color.white.opacity(0.3))
+
+            StatBadge(
+                icon: "brain.fill",
+                value: "\(todayPriorities.count)",
+                label: "Da Studiare",
+                color: Color(red: 0.5, green: 0.8, blue: 1.0)
+            )
         }
     }
 
     // MARK: - Empty State
 
     private var emptyState: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 48))
-                .foregroundStyle(.green)
+        VStack(spacing: 16) {
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 56, weight: .bold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [Color(red: 0.3, green: 0.9, blue: 0.5), Color(red: 0.2, green: 0.7, blue: 0.9)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .symbolEffect(.bounce, value: isAnimating)
 
-            Text("Tutto fatto!")
-                .font(.headline)
+            VStack(spacing: 6) {
+                Text("Tutto Fatto!")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
 
-            Text("Nessun materiale in scadenza oggi")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
+                Text("Nessun materiale in scadenza oggi.\nBuon lavoro! 🎉")
+                    .font(.system(size: 15, weight: .medium, design: .rounded))
+                    .foregroundStyle(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
+        .padding(.vertical, 24)
+    }
+
+    // MARK: - Helpers
+
+    private var formattedDate: String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "it_IT")
+        formatter.dateFormat = "EEEE, d MMMM"
+        return formatter.string(from: Date()).capitalized
     }
 }
 
@@ -124,53 +213,65 @@ struct TodayMaterialRow: View {
     let material: Material
     let rank: Int
 
-    @Environment(\.colorScheme) private var colorScheme
-
     var body: some View {
-        HStack(spacing: 12) {
-            // Rank badge
+        HStack(spacing: 14) {
+            // Rank badge with gradient
             ZStack {
                 Circle()
-                    .fill(rankColor.opacity(0.2))
-                    .frame(width: 32, height: 32)
+                    .fill(
+                        LinearGradient(
+                            colors: [rankColor, rankColor.opacity(0.7)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 36, height: 36)
+                    .shadow(color: rankColor.opacity(0.3), radius: 4, y: 2)
 
                 Text("\(rank)")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundStyle(rankColor)
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
             }
 
             // Material info
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(material.title)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    .font(.system(size: 15, weight: .semibold, design: .default))
+                    .foregroundStyle(.white)
                     .lineLimit(1)
 
-                HStack(spacing: 8) {
+                HStack(spacing: 10) {
                     // Subject badge
                     if let subject = material.subject {
                         HStack(spacing: 4) {
                             Circle()
                                 .fill(subject.color)
-                                .frame(width: 6, height: 6)
+                                .frame(width: 8, height: 8)
 
                             Text(subject.displayName)
-                                .font(.caption2)
-                                .foregroundStyle(.secondary)
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.9))
                         }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule()
+                                .fill(.white.opacity(0.15))
+                        )
                     }
 
-                    // Assets available
-                    if material.mindMap != nil {
-                        Image(systemName: "brain.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.blue)
-                    }
-                    if !(material.flashcards?.isEmpty ?? true) {
-                        Image(systemName: "rectangle.portrait.on.rectangle.portrait.fill")
-                            .font(.caption2)
-                            .foregroundStyle(.purple)
+                    // Assets available icons
+                    HStack(spacing: 6) {
+                        if material.mindMap != nil {
+                            Image(systemName: "brain.fill")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.8))
+                        }
+                        if !(material.flashcards?.isEmpty ?? true) {
+                            Image(systemName: "rectangle.stack.fill")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundStyle(.white.opacity(0.8))
+                        }
                     }
                 }
             }
@@ -182,15 +283,14 @@ struct TodayMaterialRow: View {
                 deadlineIndicator(for: dueDate)
             }
         }
-        .padding(12)
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(uiColor: colorScheme == .dark ?
-                                .secondarySystemGroupedBackground : .systemBackground))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(rankColor.opacity(0.3), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(.white.opacity(0.15))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .strokeBorder(.white.opacity(0.2), lineWidth: 1)
+                )
         )
     }
 
@@ -198,10 +298,10 @@ struct TodayMaterialRow: View {
 
     private var rankColor: Color {
         switch rank {
-        case 1: return .red
-        case 2: return .orange
-        case 3: return .yellow
-        default: return .gray
+        case 1: return Color(red: 1.0, green: 0.3, blue: 0.3)  // Vivid red
+        case 2: return Color(red: 1.0, green: 0.6, blue: 0.2)  // Vivid orange
+        case 3: return Color(red: 1.0, green: 0.9, blue: 0.2)  // Vivid yellow
+        default: return .white.opacity(0.5)
         }
     }
 
@@ -210,26 +310,26 @@ struct TodayMaterialRow: View {
 
         let (text, color): (String, Color) = {
             if daysUntil < 0 {
-                return ("Scaduto", .red)
+                return ("SCADUTO", Color(red: 1.0, green: 0.2, blue: 0.2))
             } else if daysUntil == 0 {
-                return ("Oggi", .red)
+                return ("OGGI", Color(red: 1.0, green: 0.4, blue: 0.2))
             } else if daysUntil == 1 {
-                return ("Domani", .orange)
+                return ("DOMANI", Color(red: 1.0, green: 0.6, blue: 0.2))
             } else if daysUntil <= 7 {
-                return ("\(daysUntil)g", .yellow)
+                return ("\(daysUntil) GIORNI", Color(red: 1.0, green: 0.8, blue: 0.2))
             } else {
-                return ("\(daysUntil)g", .gray)
+                return ("\(daysUntil)g", .white.opacity(0.6))
             }
         }()
 
         return Text(text)
-            .font(.caption2)
-            .fontWeight(.semibold)
+            .font(.system(size: 11, weight: .bold, design: .rounded))
             .foregroundStyle(.white)
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
             .background(color)
             .clipShape(Capsule())
+            .shadow(color: color.opacity(0.3), radius: 3, y: 2)
     }
 }
 
@@ -243,18 +343,21 @@ struct StatBadge: View {
     let color: Color
 
     var body: some View {
-        VStack(spacing: 4) {
+        VStack(spacing: 6) {
             Image(systemName: icon)
-                .font(.title3)
+                .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(color)
+                .symbolRenderingMode(.hierarchical)
 
             Text(value)
-                .font(.headline)
-                .fontWeight(.bold)
+                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .foregroundStyle(.white)
 
             Text(label)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 11, weight: .medium, design: .rounded))
+                .foregroundStyle(.white.opacity(0.8))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
         .frame(maxWidth: .infinity)
     }
@@ -262,40 +365,49 @@ struct StatBadge: View {
 
 // MARK: - Preview
 
-#Preview {
+#Preview("With Priorities") {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     guard let container = try? ModelContainer(for: Material.self, configurations: config) else {
         return Text("Preview unavailable")
     }
 
     // Create sample materials
-    let material1 = Material(title: "Matematica - Equazioni", subject: nil)
-    let material2 = Material(title: "Storia - Rivoluzione Francese", subject: nil)
-    let material3 = Material(title: "Inglese - Present Perfect", subject: nil)
+    let material1 = Material(title: "Matematica - Equazioni di Secondo Grado", subject: nil)
+    let material2 = Material(title: "Storia - Rivoluzione Francese 1789", subject: nil)
+    let material3 = Material(title: "Inglese - Present Perfect Tense", subject: nil)
 
     container.mainContext.insert(material1)
     container.mainContext.insert(material2)
     container.mainContext.insert(material3)
 
     return ScrollView {
-        VStack(spacing: 20) {
-            // With priorities
-            TodayCard(
-                todayPriorities: [material1, material2, material3],
-                studyStreak: 7,
-                completedToday: 3,
-                upcomingDeadlines: 2
-            )
-
-            // Empty state
-            TodayCard(
-                todayPriorities: [],
-                studyStreak: 5,
-                completedToday: 0,
-                upcomingDeadlines: 0
-            )
-        }
+        TodayCard(
+            todayPriorities: [material1, material2, material3],
+            studyStreak: 12,
+            completedToday: 5,
+            upcomingDeadlines: 3
+        )
         .padding()
     }
+    .background(Color(.systemGroupedBackground))
+    .modelContainer(container)
+}
+
+#Preview("Empty State") {
+    let config = ModelConfiguration(isStoredInMemoryOnly: true)
+    guard let container = try? ModelContainer(for: Material.self, configurations: config) else {
+        return Text("Preview unavailable")
+    }
+
+    return ScrollView {
+        TodayCard(
+            todayPriorities: [],
+            studyStreak: 7,
+            completedToday: 2,
+            upcomingDeadlines: 0
+        )
+        .padding()
+    }
+    .background(Color(.systemGroupedBackground))
     .modelContainer(container)
 }

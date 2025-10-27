@@ -47,13 +47,14 @@ final class FlashcardGenerationService {
     // MARK: - Flashcard Generation (Subtask 23.2)
 
     /// Generate flashcards from study material text
+    /// Returns array of flashcard IDs (Sendable-compliant for Swift 6)
     func generateFlashcards(
         from text: String,
         materialID: UUID,
         subject: Subject? = nil,
         targetCount: Int? = nil,
         forceOffline: Bool = false
-    ) async throws -> [Flashcard] {
+    ) async throws -> [UUID] {
         logger.info("Generating flashcards for material \(materialID)")
 
         guard text.split(separator: " ").count >= minimumContentLength else {
@@ -115,8 +116,10 @@ final class FlashcardGenerationService {
         // Store in SwiftData (Subtask 23.3)
         try storeFlashcards(flashcards)
 
-        logger.info("Generated \(flashcards.count) flashcards")
-        return flashcards
+        // Return IDs instead of models (Sendable-compliant)
+        let flashcardIDs = flashcards.map { $0.id }
+        logger.info("Generated \(flashcards.count) flashcards with IDs: \(flashcardIDs)")
+        return flashcardIDs
     }
 
     // MARK: - Prompt Engineering
@@ -361,20 +364,20 @@ final class FlashcardGenerationService {
     func generateFlashcardsBatch(
         materials: [(text: String, materialID: UUID, subject: Subject?)],
         targetCountPerMaterial: Int? = nil
-    ) async throws -> [UUID: [Flashcard]] {
-        var results: [UUID: [Flashcard]] = [:]
+    ) async throws -> [UUID: [UUID]] {
+        var results: [UUID: [UUID]] = [:]
 
         for (index, material) in materials.enumerated() {
             logger.debug("Processing material \(index + 1) of \(materials.count)")
 
             do {
-                let flashcards = try await generateFlashcards(
+                let flashcardIDs = try await generateFlashcards(
                     from: material.text,
                     materialID: material.materialID,
                     subject: material.subject,
                     targetCount: targetCountPerMaterial
                 )
-                results[material.materialID] = flashcards
+                results[material.materialID] = flashcardIDs
 
                 // Add delay between requests
                 if index < materials.count - 1 {
@@ -419,7 +422,7 @@ final class FlashcardGenerationService {
         materialID: UUID,
         subject: Subject?,
         targetCount: Int?
-    ) async throws -> [Flashcard] {
+    ) async throws -> [UUID] {
         logger.info("Generating offline flashcards using rule-based approach")
 
         // Calculate target number of flashcards
@@ -459,8 +462,10 @@ final class FlashcardGenerationService {
         // Store in SwiftData
         try storeFlashcards(flashcards)
 
-        logger.info("Generated \(flashcards.count) offline flashcards")
-        return flashcards
+        // Return IDs instead of models (Sendable-compliant)
+        let flashcardIDs = flashcards.map { $0.id }
+        logger.info("Generated \(flashcards.count) offline flashcards with IDs: \(flashcardIDs)")
+        return flashcardIDs
     }
 
     /// Extract keyword-based flashcards (fill-in-the-blank style)

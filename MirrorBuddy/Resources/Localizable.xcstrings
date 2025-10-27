@@ -3998,6 +3998,9 @@
         }
       }
     },
+    "Debug Import" : {
+
+    },
     "Default subjects cannot be renamed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4515,6 +4518,9 @@
           }
         }
       }
+    },
+    "Elaborazione in corso" : {
+
     },
     "Elaborazione in corso..." : {
       "localizations" : {
@@ -8438,6 +8444,7 @@
       }
     },
     "Nessun materiale in scadenza oggi" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8452,6 +8459,9 @@
           }
         }
       }
+    },
+    "Nessun materiale in scadenza oggi.\nBuon lavoro! 🎉" : {
+
     },
     "Nessun traguardo sbloccato ancora" : {
       "localizations" : {
@@ -10805,6 +10815,9 @@
           }
         }
       }
+    },
+    "Pulisci Log" : {
+
     },
     "Pull to refresh or check your connection" : {
       "extractionState" : "manual",
@@ -14015,6 +14028,15 @@
         }
       }
     },
+    "TEST: Crea Materiale di Prova" : {
+
+    },
+    "TEST: Mostra Materiali Esistenti" : {
+
+    },
+    "TEST: Processa Primo Materiale" : {
+
+    },
     "Testing" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -14668,6 +14690,7 @@
       }
     },
     "Tutto fatto!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -14682,6 +14705,9 @@
           }
         }
       }
+    },
+    "Tutto Fatto!" : {
+
     },
     "Tutto Pronto!" : {
       "localizations" : {

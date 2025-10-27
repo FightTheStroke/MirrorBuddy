@@ -52,11 +52,30 @@ final class MaterialProcessingPipeline {
 
         logger.info("Starting pipeline for material: \(material.title)")
 
+        // Mark material as processing at start
+        await MainActor.run {
+            material.processingStatus = .processing
+        }
+
         do {
             try await executePipeline(execution)
-            logger.info("Pipeline completed for material: \(material.title)")
+            logger.info("✅ Pipeline completed successfully for material: \(material.title)")
+
+            // Mark material as completed
+            await MainActor.run {
+                material.processingStatus = .completed
+            }
         } catch {
-            logger.error("Pipeline failed for material: \(material.title) - \(error.localizedDescription)")
+            logger.error("❌ Pipeline FAILED for material: \(material.title)")
+            logger.error("   Error type: \(type(of: error))")
+            logger.error("   Error description: \(error.localizedDescription)")
+            logger.error("   Full error: \(String(describing: error))")
+
+            // Mark material as failed
+            await MainActor.run {
+                material.processingStatus = .failed
+            }
+
             throw error
         }
     }
@@ -180,21 +199,47 @@ final class MaterialProcessingPipeline {
             // Summary generation
             if options.enabledSteps.contains(.summary) {
                 let summaryService = self.summaryService
+                let logger = self.logger
                 group.addTask {
                     await reportProgress(.summary, status: .inProgress)
+                    logger.info("📝 Generating summary for material")
                     do {
-                        _ = try await summaryService.generateSummary(for: materialText)
+                        let summary = try await summaryService.generateSummary(for: materialText)
+                        logger.info("✅ Summary generated: \(summary.summaryText.prefix(100))...")
                         await reportProgress(.summary, status: .completed)
                     } catch {
+                        logger.error("❌ Summary generation FAILED")
+                        logger.error("   Error: \(error.localizedDescription)")
                         await reportProgress(.summary, status: .failed)
                         throw MaterialProcessingError.summaryFailed(error)
                     }
                 }
             }
 
-            // Note: Flashcard generation temporarily disabled in pipeline due to Swift 6 Sendable constraints
-            // Flashcards can be generated via the UI instead
-            // TODO: Refactor FlashcardGenerationService to return Sendable types (e.g., IDs instead of models)
+            // Flashcard generation (now Sendable-compliant)
+            if options.enabledSteps.contains(.flashcards) {
+                let flashcardService = self.flashcardService
+                let logger = self.logger
+                group.addTask {
+                    await reportProgress(.flashcards, status: .inProgress)
+                    logger.info("🃏 Generating flashcards for material")
+                    do {
+                        let flashcardIDs = try await flashcardService.generateFlashcards(
+                            from: materialText,
+                            materialID: materialID
+                        )
+                        logger.info("✅ Flashcards generated successfully: \(flashcardIDs.count) cards")
+                        await reportProgress(.flashcards, status: .completed)
+                    } catch {
+                        logger.error("❌ Flashcard generation FAILED")
+                        logger.error("   Error type: \(type(of: error))")
+                        logger.error("   Error description: \(error.localizedDescription)")
+                        logger.error("   Full error: \(String(describing: error))")
+                        await reportProgress(.flashcards, status: .failed)
+                        throw MaterialProcessingError.flashcardsFailed(error)
+                    }
+                }
+            }
 
             // Note: Explanation generation requires specific concepts,
             // so it's not included in automatic pipeline processing.
@@ -209,10 +254,16 @@ final class MaterialProcessingPipeline {
         // Mind map (depends on content understanding)
         if options.enabledSteps.contains(.mindMap) {
             await reportProgress(.mindMap, status: .inProgress)
+            logger.info("🧠 Generating mind map for material: \(materialTitle)")
             do {
-                _ = try await mindMapService.generateMindMap(from: materialTitle, materialID: materialID)
+                let mindMap = try await mindMapService.generateMindMap(from: materialTitle, materialID: materialID)
+                logger.info("✅ Mind map generated successfully with \(mindMap.nodes?.count ?? 0) nodes")
                 await reportProgress(.mindMap, status: .completed)
             } catch {
+                logger.error("❌ Mind map generation FAILED for material: \(materialTitle)")
+                logger.error("   Error type: \(type(of: error))")
+                logger.error("   Error description: \(error.localizedDescription)")
+                logger.error("   Full error: \(String(describing: error))")
                 await reportProgress(.mindMap, status: .failed)
                 if options.failFast {
                     throw MaterialProcessingError.mindMapFailed(error)
