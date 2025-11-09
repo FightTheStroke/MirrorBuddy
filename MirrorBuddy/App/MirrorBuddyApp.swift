@@ -9,11 +9,12 @@ import SwiftData
 import SwiftUI
 
 /// Wrapper view that applies localization dynamically
+/// MirrorBuddy 2.0: Now uses TodayView instead of 4-tab navigation
 private struct LocalizedContentView: View {
     @Environment(\.localizationManager) private var localizationManager
 
     var body: some View {
-        MainTabView()
+        TodayView()
             .environment(\.locale, localizationManager.currentLanguage.locale)
             .id(localizationManager.currentLanguage.rawValue) // Force refresh on language change
     }
@@ -204,6 +205,16 @@ struct MirrorBuddyApp: App {
                     // Task 57: Start offline network monitoring
                     _Concurrency.Task { @MainActor in
                         OfflineManager.shared.startMonitoring()
+                    }
+
+                    // MirrorBuddy 2.0: Initialize continuous voice engine
+                    _Concurrency.Task { @MainActor in
+                        do {
+                            try await ContinuousVoiceEngine.shared.requestPermission()
+                            print("✅ Voice engine permission granted")
+                        } catch {
+                            print("⚠️ Voice engine permission denied: \(error)")
+                        }
                     }
                 }
         }
