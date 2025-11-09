@@ -11,8 +11,10 @@ import SwiftUI
 
 /// Tasks view with email and calendar integration (Task 109)
 struct TasksView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query private var tasks: [Task]
     @State private var showingSyncSheet = false
+    @State private var showingTaskCreation = false
     @State private var isSyncing = false
     @State private var syncError: String?
     @State private var gmailMessages: [MBGmailMessage] = []
@@ -98,8 +100,7 @@ struct TasksView: View {
 
                 ToolbarItem {
                     Button {
-                        // Future Enhancement: Add task functionality
-                        // See Docs/FUTURE_ENHANCEMENTS.md - "TasksView - SwiftData Integration"
+                        showingTaskCreation = true
                     } label: {
                         Image(systemName: "plus")
                     }
@@ -113,6 +114,11 @@ struct TasksView: View {
                     await syncEmailsAndCalendar()
                 }
             }
+            .sheet(isPresented: $showingTaskCreation) {
+                TaskCreationView { taskData in
+                    createTask(from: taskData)
+                }
+            }
             .task {
                 // Load cached data on appear
                 loadCachedData()
@@ -124,8 +130,50 @@ struct TasksView: View {
     }
 
     private func loadCachedData() {
-        // Future Enhancement: Load persisted tasks from SwiftData
-        // See Docs/FUTURE_ENHANCEMENTS.md - "TasksView - SwiftData Integration"
+        // Tasks are automatically loaded via @Query
+        // Additional cached data can be loaded here if needed
+    }
+
+    private func createTask(from data: TaskCreationData) {
+        // Find or create subject if provided
+        var subjectEntity: SubjectEntity?
+        if let subjectName = data.subject {
+            // Try to find existing subject
+            let descriptor = FetchDescriptor<SubjectEntity>(
+                predicate: #Predicate { $0.name == subjectName }
+            )
+            subjectEntity = try? modelContext.fetch(descriptor).first
+
+            // Create if not found
+            if subjectEntity == nil {
+                subjectEntity = SubjectEntity(name: subjectName, color: .blue)
+                modelContext.insert(subjectEntity!)
+            }
+        }
+
+        // Map priority enum to int
+        let priorityInt = data.priority.toInt()
+
+        let newTask = Task(
+            title: data.title,
+            description: data.description,
+            subject: subjectEntity,
+            material: nil,
+            dueDate: data.dueDate,
+            source: .manual,
+            priority: priorityInt
+        )
+
+        modelContext.insert(newTask)
+
+        do {
+            try modelContext.save()
+            FeedbackManager.shared.playSuccess()
+            showingTaskCreation = false
+        } catch {
+            print("❌ Failed to save task: \(error)")
+            FeedbackManager.shared.playError()
+        }
     }
 
     private func syncEmailsAndCalendar() async {
