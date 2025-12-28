@@ -1,58 +1,58 @@
-# Contribuire a ConvergioEdu
+# Contributing to ConvergioEdu
 
-Grazie per il tuo interesse nel contribuire a ConvergioEdu!
+Thank you for your interest in contributing to ConvergioEdu!
 
-## Come Contribuire
+## How to Contribute
 
-### Segnalare Bug
-1. Apri una [Issue](https://github.com/Roberdan/ConvergioEdu/issues)
-2. Descrivi il problema in dettaglio
-3. Includi passi per riprodurre il bug
+### Reporting Bugs
+1. Open an [Issue](https://github.com/Roberdan/ConvergioEdu/issues)
+2. Describe the problem in detail
+3. Include steps to reproduce the bug
 
-### Proporre Funzionalita
-1. Apri una Issue con tag `enhancement`
-2. Descrivi la funzionalita e il suo valore
-3. Discuti con i maintainer prima di implementare
+### Proposing Features
+1. Open an Issue with the `enhancement` tag
+2. Describe the feature and its value
+3. Discuss with maintainers before implementing
 
-### Pull Request
-1. Forka il repository
-2. Crea un branch: `git checkout -b feature/nome-feature`
-3. Fai le tue modifiche
-4. Verifica: `npm run lint && npm run typecheck && npm run build`
-5. Committa: `git commit -m "feat: descrizione"`
-6. Pusha: `git push origin feature/nome-feature`
-7. Apri una Pull Request
+### Pull Requests
+1. Fork the repository
+2. Create a branch: `git checkout -b feature/feature-name`
+3. Make your changes
+4. Verify: `npm run lint && npm run typecheck && npm run build`
+5. Commit: `git commit -m "feat: description"`
+6. Push: `git push origin feature/feature-name`
+7. Open a Pull Request
 
-## Linee Guida
+## Guidelines
 
-### Codice
+### Code
 - TypeScript strict mode
-- ESLint senza warning
-- Test per nuove funzionalita
-- Commenti in inglese
+- ESLint with zero warnings
+- Tests for new features
+- Comments in English
 
-### Accessibilita
-Questo progetto e nato per l'inclusione. Ogni contributo DEVE:
-- Essere accessibile da tastiera
-- Avere contrasto sufficiente (WCAG AA)
-- Supportare screen reader
-- Non dipendere solo dal colore
+### Accessibility
+This project was born for inclusion. Every contribution MUST:
+- Be keyboard accessible
+- Have sufficient contrast (WCAG AA)
+- Support screen readers
+- Not rely on color alone
 
-### Commit
-Usiamo [Conventional Commits](https://www.conventionalcommits.org/):
-- `feat:` nuova funzionalita
+### Commits
+We use [Conventional Commits](https://www.conventionalcommits.org/):
+- `feat:` new feature
 - `fix:` bug fix
-- `docs:` documentazione
-- `style:` formattazione
+- `docs:` documentation
+- `style:` formatting
 - `refactor:` refactoring
-- `test:` aggiunta test
-- `chore:` manutenzione
+- `test:` adding tests
+- `chore:` maintenance
 
-## Contatti
+## Contact
 
 - **Email**: roberdan@fightthestroke.org
-- **Organizzazione**: [FightTheStroke](https://fightthestroke.org)
+- **Organization**: [FightTheStroke](https://fightthestroke.org)
 
-## Licenza
+## License
 
-Contribuendo, accetti che il tuo codice sia rilasciato sotto licenza MIT.
+By contributing, you agree that your code will be released under the MIT license.
