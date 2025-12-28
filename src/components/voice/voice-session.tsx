@@ -141,10 +141,18 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
     init();
   }, []);
 
+  // Track if we've already attempted connection to prevent retry loops
+  const hasAttemptedConnection = useRef(false);
+
   // Connect when connection info is available
   // Permission handling is done inside connect() to avoid duplicate getUserMedia calls
   useEffect(() => {
     const startConnection = async () => {
+      // Prevent retry loops - only attempt once per mount
+      if (hasAttemptedConnection.current) {
+        return;
+      }
+
       if (!connectionInfo || isConnected || connectionState !== 'idle' || permissionsLoading) {
         return;
       }
@@ -154,6 +162,9 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
         setPermissionError('Microphone access was denied. Please enable it in your browser settings.');
         return;
       }
+
+      // Mark that we've attempted connection
+      hasAttemptedConnection.current = true;
 
       // Clear any previous permission error and connect
       // The connect() function handles getUserMedia internally,
@@ -363,7 +374,8 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
                 <pre className="text-xs bg-slate-900 p-3 rounded-lg overflow-x-auto">
 {`AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview`}
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
                 </pre>
               </div>
 

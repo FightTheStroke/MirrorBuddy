@@ -50,6 +50,12 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
 
         if (mounted && videoRef.current) {
           videoRef.current.srcObject = mediaStream;
+          // Some browsers require explicit play call
+          try {
+            await videoRef.current.play();
+          } catch (playErr) {
+            logger.warn('Video autoplay blocked, user interaction may be needed', { error: String(playErr) });
+          }
           setStream(mediaStream);
           setIsLoading(false);
           if (timeoutId) clearTimeout(timeoutId);
@@ -142,6 +148,11 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
 
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
+        try {
+          await videoRef.current.play();
+        } catch (playErr) {
+          logger.warn('Video autoplay blocked', { error: String(playErr) });
+        }
         setStream(mediaStream);
         setIsLoading(false);
       }
@@ -163,7 +174,7 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
     >
       <Card className="w-full max-w-2xl bg-slate-900 border-slate-700 text-white overflow-hidden">
         {/* Header */}

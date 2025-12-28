@@ -1,6 +1,6 @@
 // ============================================================================
-// AZURE REALTIME WEBSOCKET PROXY SERVER
-// Proxies WebSocket connections to Azure OpenAI Realtime API
+// REALTIME WEBSOCKET PROXY SERVER
+// Proxies WebSocket connections to OpenAI or Azure OpenAI Realtime API
 // API Key stays server-side - NEVER exposed to client
 // ============================================================================
 
@@ -14,11 +14,45 @@ let wss: WebSocketServer | null = null;
 
 interface ProxyConnection {
   clientWs: WebSocket;
-  azureWs: WebSocket | null;
+  backendWs: WebSocket | null;
   maestroId: string;
 }
 
 const connections = new Map<string, ProxyConnection>();
+
+type Provider = 'openai' | 'azure';
+
+interface ProviderConfig {
+  provider: Provider;
+  wsUrl: string;
+  headers: Record<string, string>;
+}
+
+function getProviderConfig(): ProviderConfig | null {
+  // Priority 1: Azure OpenAI (GDPR compliant, configured for this project)
+  const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
+  const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
+  const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
+
+  if (azureEndpoint && azureApiKey && azureDeployment) {
+    const normalized = azureEndpoint
+      .replace(/^https:\/\//, 'wss://')
+      .replace(/^http:\/\//, 'ws://');
+    const url = new URL(normalized);
+    url.pathname = '/openai/v1/realtime';
+    url.searchParams.set('model', azureDeployment);
+    // Azure GA: api-key in URL query string (like Swift app does)
+    url.searchParams.set('api-key', azureApiKey);
+
+    return {
+      provider: 'azure',
+      wsUrl: url.toString(),
+      headers: {}, // No headers needed - api-key is in URL
+    };
+  }
+
+  return null;
+}
 
 export function startRealtimeProxy(): void {
   if (wss) {
@@ -26,17 +60,16 @@ export function startRealtimeProxy(): void {
     return;
   }
 
-  const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
-  const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
-  const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
-
-  if (!azureEndpoint || !azureApiKey || !azureDeployment) {
-    logger.warn('Azure OpenAI Realtime not configured - proxy disabled');
+  const config = getProviderConfig();
+  if (!config) {
+    logger.warn('Realtime API not configured - set OPENAI_API_KEY or AZURE_OPENAI_REALTIME_* vars');
     return;
   }
 
   wss = new WebSocketServer({ port: WS_PROXY_PORT });
-  logger.info(`WebSocket proxy started on port ${WS_PROXY_PORT}`);
+  const safeUrl = config.wsUrl.replace(/key=[^&]+/gi, 'key=***');
+  logger.info(`WebSocket proxy started on port ${WS_PROXY_PORT} (${config.provider.toUpperCase()})`);
+  logger.info(`Backend URL: ${safeUrl}`);
 
   wss.on('connection', (clientWs: WebSocket, req: IncomingMessage) => {
     const connectionId = crypto.randomUUID();
@@ -45,55 +78,70 @@ export function startRealtimeProxy(): void {
 
     logger.info(`Client connected: ${connectionId} for maestro: ${maestroId}`);
 
-    // Build Azure WebSocket URL with API key (server-side only!)
-    const azureWsUrl = azureEndpoint
-      .replace('https://', 'wss://')
-      .replace(/\/$/, '') +
-      `/openai/v1/realtime?model=${azureDeployment}&api-key=${azureApiKey}`;
-
-    // Connect to Azure
-    const azureWs = new WebSocket(azureWsUrl);
+    // Connect to backend (OpenAI or Azure)
+    const backendWs = new WebSocket(config.wsUrl, { headers: config.headers });
 
     connections.set(connectionId, {
       clientWs,
-      azureWs,
+      backendWs,
       maestroId,
     });
 
-    azureWs.on('open', () => {
-      logger.debug(`Azure connection established for ${connectionId}`);
-      // Signal client that proxy is ready
+    backendWs.on('open', () => {
+      logger.info(`Backend WebSocket OPEN for ${connectionId}`);
       clientWs.send(JSON.stringify({ type: 'proxy.ready' }));
     });
 
-    // Proxy messages from Azure to Client
-    azureWs.on('message', (data: Buffer) => {
+    // Proxy messages from Backend to Client
+    backendWs.on('message', (data: Buffer) => {
+      const msg = data.toString();
+      try {
+        const parsed = JSON.parse(msg);
+        logger.debug(`Backend -> Client [${parsed.type}]`);
+        if (parsed.type === 'error') {
+          logger.error(`Backend error: ${JSON.stringify(parsed.error)}`);
+        }
+      } catch {
+        logger.debug(`Backend -> Client [binary ${data.length} bytes]`);
+      }
       if (clientWs.readyState === WebSocket.OPEN) {
         clientWs.send(data);
       }
     });
 
-    // Proxy messages from Client to Azure
+    // Proxy messages from Client to Backend
     clientWs.on('message', (data: Buffer) => {
-      if (azureWs.readyState === WebSocket.OPEN) {
-        azureWs.send(data);
+      if (backendWs.readyState === WebSocket.OPEN) {
+        // Convert Buffer to string - Azure requires text messages, not binary
+        const msg = data.toString('utf-8');
+        try {
+          const parsed = JSON.parse(msg);
+          logger.info(`Client -> Backend [${parsed.type}]: ${msg.substring(0, 200)}...`);
+          // Send as TEXT string, not as Buffer (binary)
+          backendWs.send(msg);
+        } catch {
+          // For non-JSON (audio), send as binary
+          logger.info(`Client -> Backend [binary ${data.length} bytes]`);
+          backendWs.send(data);
+        }
       }
     });
 
-    // Handle Azure connection errors
-    azureWs.on('error', (error: Error) => {
-      logger.error(`Azure WebSocket error for ${connectionId}`, { error: error.message });
+    // Handle backend connection errors
+    backendWs.on('error', (error: Error) => {
+      logger.error(`Backend WebSocket error for ${connectionId}`, { error: error.message });
       clientWs.send(JSON.stringify({
         type: 'error',
-        error: { message: 'Azure connection error' },
+        error: { message: `${config.provider} connection error: ${error.message}` },
       }));
     });
 
-    // Handle Azure connection close
-    azureWs.on('close', (code: number, reason: Buffer) => {
-      logger.debug(`Azure connection closed for ${connectionId}`, { code, reason: reason.toString() });
+    // Handle backend connection close
+    backendWs.on('close', (code: number, reason: Buffer) => {
+      logger.debug(`Backend connection closed for ${connectionId}`, { code, reason: reason.toString() });
       if (clientWs.readyState === WebSocket.OPEN) {
-        clientWs.close(code, reason.toString());
+        const validCode = (code === 1000 || (code >= 3000 && code <= 4999)) ? code : 1000;
+        clientWs.close(validCode, reason.toString());
       }
       connections.delete(connectionId);
     });
@@ -101,8 +149,8 @@ export function startRealtimeProxy(): void {
     // Handle client disconnection
     clientWs.on('close', () => {
       logger.debug(`Client disconnected: ${connectionId}`);
-      if (azureWs.readyState === WebSocket.OPEN) {
-        azureWs.close();
+      if (backendWs.readyState === WebSocket.OPEN) {
+        backendWs.close();
       }
       connections.delete(connectionId);
     });
@@ -110,8 +158,8 @@ export function startRealtimeProxy(): void {
     // Handle client errors
     clientWs.on('error', (error: Error) => {
       logger.error(`Client WebSocket error for ${connectionId}`, { error: error.message });
-      if (azureWs.readyState === WebSocket.OPEN) {
-        azureWs.close();
+      if (backendWs.readyState === WebSocket.OPEN) {
+        backendWs.close();
       }
       connections.delete(connectionId);
     });
@@ -124,10 +172,9 @@ export function startRealtimeProxy(): void {
 
 export function stopRealtimeProxy(): void {
   if (wss) {
-    // Close all connections
     for (const [id, conn] of connections) {
       conn.clientWs.close();
-      conn.azureWs?.close();
+      conn.backendWs?.close();
       connections.delete(id);
     }
     wss.close();
