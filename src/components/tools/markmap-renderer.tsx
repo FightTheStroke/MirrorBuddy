@@ -1,0 +1,574 @@
+'use client';
+
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { Markmap } from 'markmap-view';
+import { Transformer } from 'markmap-lib';
+import { Printer, Download, ZoomIn, ZoomOut, Accessibility, RotateCcw } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
+import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+
+// Node structure for programmatic mindmap creation
+export interface MindmapNode {
+  id: string;
+  label: string;
+  children?: MindmapNode[];
+  icon?: string;
+  color?: string;
+}
+
+// Props can accept either markdown string OR structured nodes
+export interface MarkMapRendererProps {
+  title: string;
+  markdown?: string;
+  nodes?: MindmapNode[];
+  className?: string;
+}
+
+// Transformer instance for markdown parsing
+const transformer = new Transformer();
+
+// Convert structured nodes to markdown format
+function nodesToMarkdown(nodes: MindmapNode[], title: string): string {
+  const buildMarkdown = (node: MindmapNode, depth: number): string => {
+    const prefix = '#'.repeat(depth + 1);
+    let result = `${prefix} ${node.label}\n`;
+
+    if (node.children && node.children.length > 0) {
+      for (const child of node.children) {
+        result += buildMarkdown(child, depth + 1);
+      }
+    }
+
+    return result;
+  };
+
+  let markdown = `# ${title}\n`;
+  for (const node of nodes) {
+    markdown += buildMarkdown(node, 1);
+  }
+
+  return markdown;
+}
+
+export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRendererProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const markmapRef = useRef<Markmap | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [rendered, setRendered] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const [accessibilityMode, setAccessibilityMode] = useState(false);
+
+  const { settings } = useAccessibilityStore();
+
+  // Get the markdown content
+  const getMarkdownContent = useCallback((): string => {
+    if (markdown) {
+      return markdown;
+    }
+    if (nodes && nodes.length > 0) {
+      return nodesToMarkdown(nodes, title);
+    }
+    return `# ${title}\n## No content`;
+  }, [markdown, nodes, title]);
+
+  // Generate accessible description
+  const generateTextDescription = useCallback((): string => {
+    if (nodes && nodes.length > 0) {
+      const describeNode = (node: MindmapNode): string => {
+        let desc = node.label;
+        if (node.children && node.children.length > 0) {
+          desc += ': ' + node.children.map(c => describeNode(c)).join(', ');
+        }
+        return desc;
+      };
+      return `${title} con i seguenti rami: ${nodes.map(n => describeNode(n)).join('; ')}`;
+    }
+    return `Mappa mentale: ${title}`;
+  }, [nodes, title]);
+
+  // Render mindmap
+  useEffect(() => {
+    const renderMindmap = async () => {
+      if (!svgRef.current) return;
+
+      try {
+        setError(null);
+        setRendered(false);
+
+        // Clear previous content
+        svgRef.current.innerHTML = '';
+
+        // Get markdown and transform to markmap data
+        const content = getMarkdownContent();
+        const { root } = transformer.transform(content);
+
+        // Determine font family based on accessibility settings
+        const fontFamily = settings.dyslexiaFont || accessibilityMode
+          ? 'OpenDyslexic, Comic Sans MS, sans-serif'
+          : 'Arial, Helvetica, sans-serif';
+
+        // Determine colors based on accessibility settings
+        const isHighContrast = settings.highContrast || accessibilityMode;
+
+        // Create or update markmap
+        if (markmapRef.current) {
+          markmapRef.current.destroy();
+        }
+
+        markmapRef.current = Markmap.create(svgRef.current, {
+          autoFit: true,
+          duration: 300,
+          maxWidth: 300,
+          paddingX: 20,
+          spacingVertical: 10,
+          spacingHorizontal: 80,
+          color: (node) => {
+            if (isHighContrast) {
+              // High contrast colors
+              const colors = ['#ffff00', '#00ffff', '#ff00ff', '#00ff00', '#ff8000'];
+              return colors[node.state?.depth % colors.length] || '#ffffff';
+            }
+            // Normal theme colors
+            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+            return colors[node.state?.depth % colors.length] || '#64748b';
+          },
+        }, root);
+
+        // Apply custom styles after render
+        setTimeout(() => {
+          if (svgRef.current) {
+            // Apply font to all text elements
+            const textElements = svgRef.current.querySelectorAll('text, foreignObject');
+            textElements.forEach((el) => {
+              if (el instanceof SVGElement || el instanceof HTMLElement) {
+                el.style.fontFamily = fontFamily;
+                if (settings.largeText) {
+                  el.style.fontSize = '16px';
+                }
+              }
+            });
+
+            // High contrast background
+            if (isHighContrast) {
+              const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+              rect.setAttribute('width', '100%');
+              rect.setAttribute('height', '100%');
+              rect.setAttribute('fill', '#000000');
+              svgRef.current.insertBefore(rect, svgRef.current.firstChild);
+            }
+          }
+        }, 100);
+
+        // Add ARIA attributes
+        svgRef.current.setAttribute('role', 'img');
+        svgRef.current.setAttribute('aria-label', `Mappa mentale: ${title}`);
+
+        // Add title and desc for screen readers
+        const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        titleEl.textContent = `Mappa mentale: ${title}`;
+        svgRef.current.insertBefore(titleEl, svgRef.current.firstChild);
+
+        const descEl = document.createElementNS('http://www.w3.org/2000/svg', 'desc');
+        descEl.textContent = generateTextDescription();
+        svgRef.current.insertBefore(descEl, svgRef.current.firstChild?.nextSibling || null);
+
+        setRendered(true);
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        setError(errorMsg);
+        logger.error('MarkMap render error', { error: String(err) });
+      }
+    };
+
+    renderMindmap();
+  }, [markdown, nodes, title, settings.dyslexiaFont, settings.highContrast, settings.largeText, accessibilityMode, getMarkdownContent, generateTextDescription]);
+
+  // Zoom controls
+  const handleZoomIn = useCallback(() => {
+    if (markmapRef.current) {
+      markmapRef.current.rescale(1.25);
+    }
+    setZoom(z => Math.min(z * 1.25, 3));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    if (markmapRef.current) {
+      markmapRef.current.rescale(0.8);
+    }
+    setZoom(z => Math.max(z * 0.8, 0.5));
+  }, []);
+
+  const handleReset = useCallback(() => {
+    if (markmapRef.current) {
+      markmapRef.current.fit();
+    }
+    setZoom(1);
+  }, []);
+
+  // Print functionality
+  const handlePrint = useCallback(() => {
+    if (!svgRef.current) return;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+
+    const svgClone = svgRef.current.cloneNode(true) as SVGSVGElement;
+    const svgString = new XMLSerializer().serializeToString(svgClone);
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Mappa Mentale: ${title}</title>
+          <style>
+            @import url('https://fonts.cdnfonts.com/css/opendyslexic');
+            body {
+              margin: 0;
+              padding: 20mm;
+              font-family: ${settings.dyslexiaFont ? 'OpenDyslexic, ' : ''}Arial, sans-serif;
+              background: white;
+            }
+            h1 {
+              text-align: center;
+              font-size: ${settings.largeText ? '32pt' : '24pt'};
+              margin-bottom: 20mm;
+            }
+            .mindmap-container {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            .mindmap-container svg {
+              max-width: 100%;
+              height: auto;
+            }
+            @media print {
+              @page { size: A4 landscape; margin: 15mm; }
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          <div class="mindmap-container">${svgString}</div>
+          <script>
+            window.onload = function() {
+              setTimeout(function() { window.print(); window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }, [title, settings.dyslexiaFont, settings.largeText]);
+
+  // Download as PNG
+  const handleDownload = useCallback(async () => {
+    if (!svgRef.current) return;
+
+    try {
+      const svgClone = svgRef.current.cloneNode(true) as SVGSVGElement;
+
+      // Get dimensions
+      const bbox = svgRef.current.getBBox();
+      const width = Math.max(bbox.width + 100, 1600);
+      const height = Math.max(bbox.height + 100, 1200);
+
+      svgClone.setAttribute('width', String(width));
+      svgClone.setAttribute('height', String(height));
+      svgClone.setAttribute('viewBox', `${bbox.x - 50} ${bbox.y - 50} ${bbox.width + 100} ${bbox.height + 100}`);
+
+      // Inline styles
+      const allElements = svgClone.querySelectorAll('*');
+      allElements.forEach((el) => {
+        if (el instanceof SVGElement || el instanceof HTMLElement) {
+          const computed = window.getComputedStyle(el);
+          ['fill', 'stroke', 'stroke-width', 'font-family', 'font-size', 'font-weight'].forEach((prop) => {
+            const value = computed.getPropertyValue(prop);
+            if (value && value !== 'none' && value !== 'initial') {
+              (el as HTMLElement).style.setProperty(prop, value);
+            }
+          });
+        }
+      });
+
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // White background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+
+      // SVG to data URL
+      const serializer = new XMLSerializer();
+      let svgString = serializer.serializeToString(svgClone);
+      if (!svgString.includes('xmlns=')) {
+        svgString = svgString.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+      }
+
+      const base64 = btoa(unescape(encodeURIComponent(svgString)));
+      const dataUrl = `data:image/svg+xml;base64,${base64}`;
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `mappa-mentale-${title.toLowerCase().replace(/\s+/g, '-')}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 'image/png');
+      };
+
+      img.onerror = () => {
+        // Fallback: download SVG
+        const svgBlob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(svgBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `mappa-mentale-${title.toLowerCase().replace(/\s+/g, '-')}.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+
+      img.src = dataUrl;
+    } catch (err) {
+      logger.error('Export error', { error: String(err) });
+    }
+  }, [title]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={cn(
+        'rounded-xl border overflow-hidden',
+        settings.highContrast
+          ? 'border-white bg-black'
+          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800',
+        className
+      )}
+      role="region"
+      aria-label={`Mappa mentale: ${title}`}
+    >
+      {/* Toolbar */}
+      <div
+        className={cn(
+          'flex items-center justify-between px-4 py-2 border-b',
+          settings.highContrast
+            ? 'border-white bg-black'
+            : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50'
+        )}
+      >
+        <h3
+          className={cn(
+            'font-semibold',
+            settings.dyslexiaFont && 'tracking-wide',
+            settings.highContrast ? 'text-yellow-400' : 'text-slate-700 dark:text-slate-200'
+          )}
+          style={{ fontSize: `${14 * (settings.largeText ? 1.2 : 1)}px` }}
+        >
+          {title}
+        </h3>
+
+        <div className="flex items-center gap-2">
+          {/* Accessibility toggle */}
+          <button
+            onClick={() => setAccessibilityMode(!accessibilityMode)}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              accessibilityMode
+                ? 'bg-blue-500 text-white'
+                : settings.highContrast
+                  ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                  : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+            )}
+            title="Modalita accessibilita"
+            aria-label="Attiva/disattiva modalita accessibilita"
+          >
+            <Accessibility className="w-4 h-4" />
+          </button>
+
+          {/* Reset view */}
+          <button
+            onClick={handleReset}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              settings.highContrast
+                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+            )}
+            title="Ripristina vista"
+            aria-label="Ripristina vista"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+
+          {/* Zoom controls */}
+          <button
+            onClick={handleZoomOut}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              settings.highContrast
+                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+            )}
+            title="Riduci zoom"
+            aria-label="Riduci zoom"
+          >
+            <ZoomOut className="w-4 h-4" />
+          </button>
+
+          <span
+            className={cn(
+              'text-sm min-w-[4rem] text-center',
+              settings.highContrast ? 'text-white' : 'text-slate-600 dark:text-slate-400'
+            )}
+          >
+            {Math.round(zoom * 100)}%
+          </span>
+
+          <button
+            onClick={handleZoomIn}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              settings.highContrast
+                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+            )}
+            title="Aumenta zoom"
+            aria-label="Aumenta zoom"
+          >
+            <ZoomIn className="w-4 h-4" />
+          </button>
+
+          {/* Download */}
+          <button
+            onClick={handleDownload}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              settings.highContrast
+                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+            )}
+            title="Scarica PNG"
+            aria-label="Scarica mappa come PNG"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+
+          {/* Print */}
+          <button
+            onClick={handlePrint}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              settings.highContrast
+                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+            )}
+            title="Stampa"
+            aria-label="Stampa mappa mentale"
+          >
+            <Printer className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mindmap container */}
+      <div
+        className={cn(
+          'p-4 overflow-auto',
+          settings.highContrast ? 'bg-black' : 'bg-white dark:bg-slate-900'
+        )}
+        style={{ maxHeight: '600px', minHeight: '400px' }}
+      >
+        {error ? (
+          <div
+            className={cn(
+              'p-4 rounded-lg text-sm',
+              settings.highContrast
+                ? 'bg-red-900 border-2 border-red-500 text-white'
+                : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400'
+            )}
+            role="alert"
+          >
+            <strong>Errore:</strong> {error}
+          </div>
+        ) : (
+          <svg
+            ref={svgRef}
+            className={cn(
+              'w-full h-full min-h-[350px]',
+              !rendered && 'animate-pulse rounded-lg',
+              !rendered && (settings.highContrast ? 'bg-gray-800' : 'bg-slate-100 dark:bg-slate-700/50')
+            )}
+          />
+        )}
+      </div>
+
+      {/* Screen reader description */}
+      <div className="sr-only" aria-live="polite">
+        {rendered && `Mappa mentale "${title}" renderizzata con successo.`}
+      </div>
+    </motion.div>
+  );
+}
+
+// Helper to create mindmap from topics (same interface as before)
+export function createMindmapFromTopics(
+  title: string,
+  topics: Array<{ name: string; subtopics?: string[] }>
+): { title: string; nodes: MindmapNode[] } {
+  return {
+    title,
+    nodes: topics.map((topic, i) => ({
+      id: `topic-${i}`,
+      label: topic.name,
+      children: topic.subtopics?.map((sub, j) => ({
+        id: `topic-${i}-sub-${j}`,
+        label: sub,
+      })),
+    })),
+  };
+}
+
+// Helper to create mindmap from markdown
+export function createMindmapFromMarkdown(
+  title: string,
+  markdown: string
+): { title: string; markdown: string } {
+  return { title, markdown };
+}
+
+// Backward compatibility alias (old name was MindmapRenderer)
+export { MarkMapRenderer as MindmapRenderer };
+
+// Example mindmaps for testing
+export const exampleMindmaps = {
+  matematica: createMindmapFromTopics('Matematica', [
+    { name: 'Algebra', subtopics: ['Equazioni di primo grado', 'Equazioni di secondo grado', 'Polinomi e fattorizzazione'] },
+    { name: 'Geometria', subtopics: ['Triangoli e proprieta', 'Cerchi e circonferenze', 'Solidi geometrici'] },
+    { name: 'Analisi', subtopics: ['Limiti e continuita', 'Derivate e applicazioni', 'Integrali definiti'] },
+  ]),
+
+  storia: createMindmapFromTopics('Storia', [
+    { name: 'Antichita', subtopics: ['Civilta greca', 'Impero romano', 'Antico Egitto'] },
+    { name: 'Medioevo', subtopics: ['Sistema feudale', 'Le Crociate', 'Comuni italiani'] },
+    { name: 'Eta Moderna', subtopics: ['Rinascimento italiano', 'Scoperte geografiche', 'Riforma protestante'] },
+  ]),
+};

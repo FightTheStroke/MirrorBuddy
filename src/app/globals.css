@@ -1,0 +1,375 @@
+@import "tailwindcss";
+
+/* OpenDyslexic font for dyslexia support */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Italic.woff') format('woff');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.75rem;
+}
+
+/* Dark mode - supports both system preference and class-based theming (next-themes) */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+/* Class-based dark mode (for next-themes) */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 48%;
+}
+
+/* Accent color themes - Light mode */
+[data-accent="blue"] { --primary: 221.2 83.2% 53.3%; --ring: 221.2 83.2% 53.3%; --accent-color: #3b82f6; }
+[data-accent="green"] { --primary: 142.1 76.2% 36.3%; --ring: 142.1 76.2% 36.3%; --accent-color: #22c55e; }
+[data-accent="purple"] { --primary: 262.1 83.3% 57.8%; --ring: 262.1 83.3% 57.8%; --accent-color: #a855f7; }
+[data-accent="orange"] { --primary: 24.6 95% 53.1%; --ring: 24.6 95% 53.1%; --accent-color: #f97316; }
+[data-accent="pink"] { --primary: 330 81% 60%; --ring: 330 81% 60%; --accent-color: #ec4899; }
+
+/* Accent color themes - Dark mode (multiple selectors for maximum compatibility) */
+.dark[data-accent="blue"], [data-accent="blue"].dark, html.dark[data-accent="blue"] { --primary: 217.2 91.2% 59.8%; --ring: 224.3 76.3% 48%; --accent-color: #60a5fa; }
+.dark[data-accent="green"], [data-accent="green"].dark, html.dark[data-accent="green"] { --primary: 142.1 70.6% 45.3%; --ring: 142.1 70.6% 45.3%; --accent-color: #4ade80; }
+.dark[data-accent="purple"], [data-accent="purple"].dark, html.dark[data-accent="purple"] { --primary: 262.1 83.3% 67.8%; --ring: 262.1 83.3% 67.8%; --accent-color: #c084fc; }
+.dark[data-accent="orange"], [data-accent="orange"].dark, html.dark[data-accent="orange"] { --primary: 24.6 95% 63.1%; --ring: 24.6 95% 63.1%; --accent-color: #fb923c; }
+.dark[data-accent="pink"], [data-accent="pink"].dark, html.dark[data-accent="pink"] { --primary: 330 81% 70%; --ring: 330 81% 70%; --accent-color: #f472b6; }
+
+/* Utility class for accent color usage */
+.bg-accent-themed { background-color: var(--accent-color, hsl(var(--primary))); }
+.text-accent-themed { color: var(--accent-color, hsl(var(--primary))); }
+.border-accent-themed { border-color: var(--accent-color, hsl(var(--primary))); }
+.ring-accent-themed { --tw-ring-color: var(--accent-color, hsl(var(--ring))); }
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Selection */
+::selection {
+  background: hsl(var(--primary) / 0.3);
+}
+
+/* Focus visible */
+:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Animation utilities */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* === ACCESSIBILITY STYLES === */
+
+/* Dyslexia-friendly text */
+.dyslexia-font {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', 'Trebuchet MS', sans-serif !important;
+}
+
+.dyslexia-spacing {
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+}
+
+.dyslexia-line-height {
+  line-height: 1.8 !important;
+}
+
+/* High contrast mode */
+.high-contrast {
+  --background: 0 0% 0%;
+  --foreground: 60 100% 50%;
+  --primary: 60 100% 50%;
+  --primary-foreground: 0 0% 0%;
+  --card: 0 0% 0%;
+  --card-foreground: 0 0% 100%;
+  --border: 0 0% 100%;
+}
+
+.high-contrast body {
+  background-color: #000 !important;
+  color: #ffff00 !important;
+}
+
+.high-contrast a,
+.high-contrast button {
+  color: #ffff00 !important;
+  text-decoration: underline !important;
+}
+
+.high-contrast input,
+.high-contrast textarea,
+.high-contrast select {
+  background-color: #000 !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+}
+
+.high-contrast :focus-visible {
+  outline: 3px solid #ffff00 !important;
+  outline-offset: 3px !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Large text mode */
+.large-text {
+  font-size: 120% !important;
+}
+
+/* Color blind safe palette */
+.color-blind-mode {
+  --primary: 210 100% 50%;
+  --destructive: 30 100% 50%;
+}
+
+/* ADHD focus mode - hide distractions */
+.distraction-free .non-essential {
+  display: none !important;
+}
+
+.distraction-free .sidebar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.distraction-free:hover .sidebar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Keyboard navigation indicators */
+.keyboard-nav *:focus-visible {
+  outline: 3px solid hsl(var(--primary)) !important;
+  outline-offset: 4px !important;
+  border-radius: 4px;
+}
+
+/* Minimum touch target size (WCAG 2.1 AA) */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Skip to content link - only visible on focus for keyboard users */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  padding: 12px 24px;
+  z-index: 9999;
+  border-radius: 8px;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+}
+
+.skip-link:focus {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  width: auto;
+  height: auto;
+  opacity: 1;
+  pointer-events: auto;
+  clip: auto;
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* Print styles for mindmaps and educational content */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Ensure good print contrast */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Page breaks for educational content */
+  h1, h2, h3 {
+    page-break-after: avoid;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+}

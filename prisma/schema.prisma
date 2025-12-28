@@ -1,0 +1,260 @@
+// ============================================================================
+// CONVERGIO WEB - DATABASE SCHEMA
+// SQLite for local, PostgreSQL for cloud (same schema works for both)
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ============================================================================
+// USER & PROFILE
+// ============================================================================
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile       Profile?
+  settings      Settings?
+  progress      Progress?
+  sessions      StudySession[]
+  flashcards    FlashcardProgress[]
+  quizResults   QuizResult[]
+  conversations Conversation[]
+  learnings     Learning[]
+}
+
+model Profile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name          String?
+  age           Int?
+  schoolYear    Int?
+  schoolLevel   String   @default("superiore")
+  gradeLevel    String?
+  learningGoals String   @default("[]")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============================================================================
+// SETTINGS
+// ============================================================================
+
+model Settings {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Appearance
+  theme         String  @default("system")
+  language      String  @default("it")
+  accentColor   String  @default("blue")
+
+  // Accessibility
+  fontSize           String  @default("medium")
+  highContrast       Boolean @default(false)
+  dyslexiaFont       Boolean @default(false)
+  reducedMotion      Boolean @default(false)
+  voiceEnabled       Boolean @default(true)
+  simplifiedLanguage Boolean @default(false)
+  adhdMode           Boolean @default(false)
+
+  // AI Provider
+  provider      String  @default("azure")
+  model         String  @default("gpt-4o")
+  budgetLimit   Float   @default(50.0)
+  totalSpent    Float   @default(0.0)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// ============================================================================
+// PROGRESS & GAMIFICATION
+// ============================================================================
+
+model Progress {
+  id                String    @id @default(cuid())
+  userId            String    @unique
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  xp                Int       @default(0)
+  level             Int       @default(1)
+
+  // Streak
+  streakCurrent     Int       @default(0)
+  streakLongest     Int       @default(0)
+  lastStudyDate     DateTime?
+
+  // Aggregates
+  totalStudyMinutes Int       @default(0)
+  questionsAsked    Int       @default(0)
+  sessionsThisWeek  Int       @default(0)
+
+  // Complex data as JSON
+  achievements      String    @default("[]")
+  masteries         String    @default("[]")
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model StudySession {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  maestroId   String
+  subject     String
+  startedAt   DateTime  @default(now())
+  endedAt     DateTime?
+  duration    Int?
+  xpEarned    Int       @default(0)
+  questions   Int       @default(0)
+
+  @@index([userId])
+  @@index([startedAt])
+}
+
+// ============================================================================
+// EDUCATION: FLASHCARDS & QUIZZES
+// ============================================================================
+
+model FlashcardProgress {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cardId         String
+  deckId         String?
+
+  // FSRS Algorithm State
+  difficulty     Float     @default(0.0)
+  stability      Float     @default(0.0)
+  retrievability Float     @default(1.0)
+  state          String    @default("new")
+
+  // Review tracking
+  reps           Int       @default(0)
+  lapses         Int       @default(0)
+  lastReview     DateTime?
+  nextReview     DateTime?
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([userId, cardId])
+  @@index([userId])
+  @@index([nextReview])
+}
+
+model QuizResult {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  quizId         String
+  subject        String?
+  score          Int
+  totalQuestions Int
+  percentage     Float
+
+  // Detailed answers as JSON
+  answers        String   @default("[]")
+
+  completedAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([completedAt])
+}
+
+// ============================================================================
+// CONVERSATIONS & MEMORY
+// ============================================================================
+
+model Conversation {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  maestroId    String
+  title        String?
+
+  // Summary system
+  summary      String?
+  keyFacts     String?
+  topics       String    @default("[]")
+
+  // Message management
+  messageCount Int       @default(0)
+  messages     Message[]
+
+  // Status
+  isActive     Boolean   @default(true)
+  lastMessageAt DateTime?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([maestroId])
+  @@index([updatedAt])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  role           String
+  content        String
+
+  // Optional metadata
+  toolCalls      String?
+  tokenCount     Int?
+
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// LEARNINGS (Cross-session insights)
+// ============================================================================
+
+model Learning {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Context
+  maestroId   String?
+  subject     String?
+
+  // The learning itself
+  category    String
+  insight     String
+
+  // Confidence tracking
+  confidence  Float    @default(0.5)
+  occurrences Int      @default(1)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  lastSeen    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([category])
+  @@index([confidence])
+}

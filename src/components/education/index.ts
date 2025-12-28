@@ -1,0 +1,22 @@
+export { Quiz } from './quiz';
+export { QuizView } from './quiz-view';
+export { FlashcardStudy, FlashcardPreview } from './flashcard';
+export { FlashcardsView } from './flashcards-view';
+export { MindmapsView } from './mindmaps-view';
+export { HomeworkHelp } from './homework-help';
+export { HomeworkHelpView } from './homework-help-view';
+export { LibrettoView } from './libretto-view';
+export { CalendarView } from './calendar-view';
+export { HTMLPreview } from './html-preview';
+export { HTMLSnippetsView } from './html-snippets-view';
+
+// Lazy-loaded versions for performance
+export {
+  LazyQuizView,
+  LazyFlashcardsView,
+  LazyMindmapsView,
+  LazyHomeworkHelpView,
+  LazyLibrettoView,
+  LazyCalendarView,
+  LazyHTMLSnippetsView,
+} from './lazy';
