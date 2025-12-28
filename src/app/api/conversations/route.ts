@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import type { Conversation, Message } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(
-      conversations.map((c) => ({
+      conversations.map((c: Conversation & { messages: Message[] }) => ({
         ...c,
         topics: JSON.parse(c.topics || '[]'),
         keyFacts: c.keyFacts ? JSON.parse(c.keyFacts) : null,

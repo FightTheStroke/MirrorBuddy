@@ -8,6 +8,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { extractLearnings } from '@/lib/ai/summarize';
+import type { Message } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Format messages (reverse to chronological order)
-    const formattedMessages = conversation.messages.reverse().map((m) => ({
+    const formattedMessages = conversation.messages.reverse().map((m: Message) => ({
       role: m.role,
       content: m.content,
     }));

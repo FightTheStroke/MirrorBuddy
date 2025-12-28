@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import type { QuizResult } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     // Parse answers JSON
     return NextResponse.json(
-      results.map((r) => ({
+      results.map((r: QuizResult) => ({
         ...r,
         answers: JSON.parse(r.answers || '[]'),
       }))
