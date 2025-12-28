@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
+import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
@@ -50,6 +50,14 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     logger.error('Conversations GET error', { error: String(error) });
+
+    if (isDatabaseNotInitialized(error)) {
+      return NextResponse.json(
+        { error: 'Database not initialized', message: 'Run: npx prisma db push' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to get conversations' },
       { status: 500 }

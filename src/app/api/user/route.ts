@@ -5,7 +5,7 @@
 
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
+import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 export async function GET() {
@@ -69,6 +69,18 @@ export async function GET() {
     return NextResponse.json(user);
   } catch (error) {
     logger.error('User API error', { error: String(error) });
+
+    if (isDatabaseNotInitialized(error)) {
+      return NextResponse.json(
+        {
+          error: 'Database not initialized',
+          message: 'Run: npx prisma db push',
+          hint: 'See README.md for setup instructions'
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: 'Failed to get user' },
       { status: 500 }

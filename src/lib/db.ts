@@ -28,4 +28,24 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
+/**
+ * Check if an error is due to missing database tables (not initialized)
+ */
+export function isDatabaseNotInitialized(error: unknown): boolean {
+  const message = String(error);
+  return message.includes('no such table') ||
+         message.includes('SQLITE_ERROR') ||
+         message.includes('does not exist');
+}
+
+/**
+ * Get a user-friendly error message for database errors
+ */
+export function getDatabaseErrorMessage(error: unknown): string {
+  if (isDatabaseNotInitialized(error)) {
+    return 'Database not initialized. Run: npx prisma db push';
+  }
+  return 'Database error';
+}
+
 export default prisma;
