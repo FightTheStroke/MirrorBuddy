@@ -32,18 +32,20 @@ test.describe('Navigation', () => {
   });
 
   test('sidebar collapses and expands', async ({ page }) => {
-    // Find the collapse button
-    const collapseButton = page.locator('aside button[aria-label*="menu"]').or(page.locator('aside button').first());
+    // Find the collapse/expand button specifically
+    const collapseButton = page.locator('aside button[aria-label="Chiudi menu"]').or(
+      page.locator('aside button[aria-label="Apri menu"]')
+    );
 
     // Should start open
     await expect(page.locator('aside').locator('text=Convergio-Edu')).toBeVisible();
 
     // Click to collapse
-    await collapseButton.click();
+    await collapseButton.first().click();
     await page.waitForTimeout(300);
 
     // Click to expand again
-    await collapseButton.click();
+    await collapseButton.first().click();
     await page.waitForTimeout(300);
     await expect(page.locator('aside').locator('text=Convergio-Edu')).toBeVisible();
   });

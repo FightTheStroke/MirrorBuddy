@@ -670,10 +670,11 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         ];
 
         // Send session configuration
-        // FLAT FORMAT - VERIFIED WORKING WITH TEST PAGE
+        // AZURE GA FORMAT - session.type: 'realtime' IS REQUIRED!
         const sessionConfig = {
           type: 'session.update',
           session: {
+            type: 'realtime',  // REQUIRED by Azure GA!
             modalities: ['text', 'audio'],
             instructions: fullInstructions,
             voice: maestro.voice || 'alloy',
