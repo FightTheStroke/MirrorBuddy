@@ -1,0 +1,218 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# ISE Engineering Fundamentals: CI/CD
+# https://microsoft.github.io/code-with-engineering-playbook/CI-CD/
+
+jobs:
+  # Lane 1: Build Validation
+  build:
+    name: Build & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type Check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+  # Lane 2: Security Audit
+  security:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+      - name: Check for secrets
+        run: |
+          # Check for common secret patterns
+          if grep -rE "(sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16}|password\s*=\s*['\"][^'\"]+['\"])" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.json" .; then
+            echo "Potential secrets found in code!"
+            exit 1
+          fi
+          echo "No secrets detected"
+
+  # Lane 3: E2E Tests (runs only when Azure is configured)
+  test:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Setup test database
+        run: npx prisma db push
+
+      - name: Run E2E tests
+        run: npm run test
+        env:
+          # Use Ollama mock for CI (no Azure needed)
+          OLLAMA_URL: http://localhost:11434
+          OLLAMA_MODEL: llama3.2
+
+  # Lane 4: Accessibility Check
+  accessibility:
+    name: Accessibility Audit
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build
+        run: npm run build
+
+      - name: Start server and run Lighthouse
+        run: |
+          npm run start &
+          sleep 10
+          npx lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json --chrome-flags="--headless --no-sandbox" --only-categories=accessibility || true
+          # Check accessibility score
+          SCORE=$(cat lighthouse-report.json | jq '.categories.accessibility.score')
+          echo "Accessibility score: $SCORE"
+          if (( $(echo "$SCORE < 0.9" | bc -l) )); then
+            echo "Accessibility score below 90%!"
+            exit 1
+          fi
+        continue-on-error: true  # Don't fail build for now, but report
+
+  # Documentation Check
+  docs:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required docs exist
+        run: |
+          echo "Checking ISE required documentation..."
+
+          # README
+          if [ ! -f "README.md" ]; then
+            echo "ERROR: README.md missing"
+            exit 1
+          fi
+          echo "✓ README.md exists"
+
+          # CONTRIBUTING
+          if [ ! -f "CONTRIBUTING.md" ]; then
+            echo "ERROR: CONTRIBUTING.md missing"
+            exit 1
+          fi
+          echo "✓ CONTRIBUTING.md exists"
+
+          # CHANGELOG
+          if [ ! -f "CHANGELOG.md" ]; then
+            echo "ERROR: CHANGELOG.md missing"
+            exit 1
+          fi
+          echo "✓ CHANGELOG.md exists"
+
+          # LICENSE
+          if [ ! -f "LICENSE" ]; then
+            echo "ERROR: LICENSE missing"
+            exit 1
+          fi
+          echo "✓ LICENSE exists"
+
+          # .env.example
+          if [ ! -f ".env.example" ]; then
+            echo "ERROR: .env.example missing"
+            exit 1
+          fi
+          echo "✓ .env.example exists"
+
+          echo "All required documentation present!"
+
+  # Code Quality
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for TODO/FIXME in production code
+        run: |
+          # Allow in tests and docs, not in src
+          TODOS=$(grep -rn "TODO\|FIXME" src/ --include="*.ts" --include="*.tsx" || true)
+          if [ -n "$TODOS" ]; then
+            echo "WARNING: TODOs found in source code:"
+            echo "$TODOS"
+            # Don't fail, just warn for now
+          else
+            echo "✓ No TODOs in production code"
+          fi
+
+      - name: Check for console.log in production
+        run: |
+          # Exclude logger.ts which is allowed
+          CONSOLE_LOGS=$(grep -rn "console\\.log" src/ --include="*.ts" --include="*.tsx" | grep -v "logger" || true)
+          if [ -n "$CONSOLE_LOGS" ]; then
+            echo "WARNING: console.log found in source code:"
+            echo "$CONSOLE_LOGS"
+          else
+            echo "✓ No console.log in production code"
+          fi
