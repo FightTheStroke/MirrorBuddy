@@ -316,7 +316,8 @@ ConvergioEdu is part of a larger vision:
 | Styling | Tailwind CSS 4 |
 | State | Zustand |
 | Voice | Azure OpenAI Realtime API |
-| Diagrams | Mermaid.js + MarkMap |
+| Mind Maps | MarkMap |
+| Diagrams | Mermaid.js (flowchart, sequence, class, state, ER) |
 | Math | KaTeX |
 | Database | Prisma + SQLite/PostgreSQL |
 | Testing | Playwright E2E |

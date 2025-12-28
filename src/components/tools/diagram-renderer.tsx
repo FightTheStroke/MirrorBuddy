@@ -140,12 +140,7 @@ ${actors.map(a => `    participant ${a}`).join('\n')}
 ${messages.map(m => `    ${m.from}->>+${m.to}: ${m.text}`).join('\n')}
 `,
 
-  mindmap: (central: string, branches: Array<{ label: string; items: string[] }>) => `
-mindmap
-  root((${central}))
-${branches.map(b => `    ${b.label}
-${b.items.map(i => `      ${i}`).join('\n')}`).join('\n')}
-`,
+  // Mind maps use MarkMap - see markmap-renderer.tsx and ADR 0001
 
   classDiagram: (classes: Array<{ name: string; attributes: string[]; methods: string[] }>) => `
 classDiagram

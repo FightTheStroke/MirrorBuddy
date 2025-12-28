@@ -428,9 +428,9 @@ test.describe('Fix #1: Mindmap Labels', () => {
       await mindmapButton.first().click();
       await page.waitForTimeout(1000);
 
-      // Check that mindmap renderer is present
+      // Check that mindmap renderer is present (uses MarkMap, not Mermaid - see ADR 0001)
       const hasMindmap = await page
-        .locator('[class*="mindmap"], [class*="mermaid"], svg')
+        .locator('[class*="mindmap"], [class*="markmap"], svg')
         .first()
         .isVisible()
         .catch(() => false);

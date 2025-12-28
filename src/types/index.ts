@@ -351,8 +351,8 @@ export interface ChartRequest {
 }
 
 export interface DiagramRequest {
-  type: 'flowchart' | 'sequence' | 'class' | 'state' | 'er' | 'mindmap';
-  code: string; // Mermaid syntax
+  type: 'flowchart' | 'sequence' | 'class' | 'state' | 'er';
+  code: string; // Mermaid syntax (mind maps use MarkMap via create_mindmap tool)
   title?: string;
 }
 
