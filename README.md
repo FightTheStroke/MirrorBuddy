@@ -26,6 +26,10 @@
   <em>Following <a href="https://microsoft.github.io/code-with-engineering-playbook/">ISE Engineering Fundamentals</a> (personal project, no Microsoft affiliation)</em>
 </p>
 
+<p align="center">
+  <img src="public/screenshots/home.png" alt="ConvergioEdu Homepage" width="800">
+</p>
+
 ---
 
 ## The Manifesto
