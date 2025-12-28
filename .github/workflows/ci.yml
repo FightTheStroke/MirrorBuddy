@@ -61,86 +61,20 @@ jobs:
 
       - name: Check for secrets
         run: |
-          # Check for common secret patterns
-          if grep -rE "(sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16}|password\s*=\s*['\"][^'\"]+['\"])" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.json" .; then
+          # Check for common secret patterns in source code only (exclude node_modules)
+          if grep -rE "(sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16}|password\s*=\s*['\"][^'\"]+['\"])" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.json" --exclude-dir=node_modules --exclude-dir=.next src/ .; then
             echo "Potential secrets found in code!"
             exit 1
           fi
           echo "No secrets detected"
 
-  # Lane 3: E2E Tests (runs only when Azure is configured)
-  test:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # E2E Tests: Run locally with app-release-manager (not in CI)
+  # Real API integration tests require Azure/Ollama - run before release
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+  # Accessibility & E2E: Run locally with app-release-manager
+  # Lighthouse + Playwright require full environment - not suitable for CI
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Setup test database
-        run: npx prisma db push
-
-      - name: Run E2E tests
-        run: npm run test
-        env:
-          # Use Ollama mock for CI (no Azure needed)
-          OLLAMA_URL: http://localhost:11434
-          OLLAMA_MODEL: llama3.2
-
-  # Lane 4: Accessibility Check
-  accessibility:
-    name: Accessibility Audit
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Build
-        run: npm run build
-
-      - name: Start server and run Lighthouse
-        run: |
-          npm run start &
-          sleep 10
-          npx lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json --chrome-flags="--headless --no-sandbox" --only-categories=accessibility || true
-          # Check accessibility score
-          SCORE=$(cat lighthouse-report.json | jq '.categories.accessibility.score')
-          echo "Accessibility score: $SCORE"
-          if (( $(echo "$SCORE < 0.9" | bc -l) )); then
-            echo "Accessibility score below 90%!"
-            exit 1
-          fi
-        continue-on-error: true  # Don't fail build for now, but report
-
-  # Documentation Check
+  # Lane 3: Documentation Check
   docs:
     name: Documentation Check
     runs-on: ubuntu-latest
@@ -189,7 +123,7 @@ jobs:
 
           echo "All required documentation present!"
 
-  # Code Quality
+  # Lane 4: Code Quality
   quality:
     name: Code Quality
     runs-on: ubuntu-latest
