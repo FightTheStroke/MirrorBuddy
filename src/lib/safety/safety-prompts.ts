@@ -312,8 +312,10 @@ export function containsCrisisKeywords(text: string): boolean {
     'farmi del male',
     'suicidio',
     'ammazzarmi',
+    'voglio ammazzar', // catches "mi voglio ammazzare"
     'tagliarm',
     'nessuno mi vuole',
+    'nessuno mi ama',
     'sarebbe meglio se non esistessi',
     'mi odio',
     'mi faccio schifo',
