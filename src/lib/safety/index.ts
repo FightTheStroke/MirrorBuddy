@@ -19,3 +19,14 @@ export {
   CRISIS_RESPONSE,
   type SafetyInjectionOptions,
 } from './safety-prompts';
+
+export {
+  filterInput,
+  isInputBlocked,
+  getFilterResponse,
+  filterMessages,
+  hasBlockedMessage,
+  type FilterResult,
+  type FilterSeverity,
+  type FilterAction,
+} from './content-filter';
