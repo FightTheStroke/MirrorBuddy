@@ -767,9 +767,10 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       };
 
       // Use preferred microphone if set in settings
+      // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
       if (preferredMicrophoneId) {
-        audioConstraints.deviceId = { exact: preferredMicrophoneId };
-        console.log(`[VoiceSession] Using preferred microphone: ${preferredMicrophoneId}`);
+        audioConstraints.deviceId = { ideal: preferredMicrophoneId };
+        console.log(`[VoiceSession] Preferred microphone: ${preferredMicrophoneId} (will fallback if unavailable)`);
       }
 
       mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
