@@ -30,3 +30,12 @@ export {
   type FilterSeverity,
   type FilterAction,
 } from './content-filter';
+
+export {
+  sanitizeOutput,
+  needsSanitization,
+  validateOutput,
+  StreamingSanitizer,
+  type SanitizeResult,
+  type SanitizeCategory,
+} from './output-sanitizer';
