@@ -12,20 +12,20 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CharacterType, ExtendedStudentProfile, MaestroVoice } from '@/types';
+import type { CharacterType, ExtendedStudentProfile } from '@/types';
 import type { MaestroFull } from '@/data/maestri-full';
 import type { SupportTeacher } from '@/types';
 import type { BuddyProfile } from '@/types';
 import {
   routeToCharacter,
+  getCharacterGreeting,
+  getCharacterSystemPrompt,
   type RoutingResult,
 } from '@/lib/ai/character-router';
-import {
-  getDefaultSupportTeacher,
-  getSupportTeacherById,
-} from '@/data/support-teachers';
+import { getDefaultSupportTeacher, getSupportTeacherById } from '@/data/support-teachers';
+import { getBuddyForStudent } from '@/lib/ai/character-router';
+import { getBuddyById } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri-full';
-import { getBuddyById, getDefaultBuddy } from '@/data/buddy-profiles';
 
 // ============================================================================
 // TYPES
@@ -42,10 +42,9 @@ export interface ActiveCharacter {
   greeting: string;
   systemPrompt: string;
   color: string;
-  voice: MaestroVoice;
+  voice: string;
   voiceInstructions: string;
-  /** Display name for UI (e.g., subject for Maestro) */
-  subtitle?: string;
+  subtitle?: string; // Optional subtitle for character (e.g., "Peer Support", "Learning Coach")
 }
 
 /**
@@ -79,22 +78,6 @@ export interface HandoffSuggestion {
  * Conversation flow mode.
  */
 export type FlowMode = 'text' | 'voice' | 'idle';
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-/**
- * Default voice for Maestros (MaestroFull doesn't have voice property).
- */
-const DEFAULT_MAESTRO_VOICE: MaestroVoice = 'sage';
-
-/**
- * Default voice instructions for Maestros.
- */
-const DEFAULT_MAESTRO_VOICE_INSTRUCTIONS = `You are an educational character teaching your subject.
-Speak clearly and engagingly, adapting your pace to the student's needs.
-Be encouraging and patient. Use examples to illustrate concepts.`;
 
 // ============================================================================
 // STORE
@@ -158,31 +141,22 @@ function createActiveCharacter(
   let greeting: string;
   let systemPrompt: string;
   let voiceInstructions: string;
-  let voice: MaestroVoice;
-  let subtitle: string | undefined;
 
   if (type === 'buddy') {
     const buddy = character as BuddyProfile;
     greeting = buddy.getGreeting(profile);
     systemPrompt = buddy.getSystemPrompt(profile);
     voiceInstructions = buddy.voiceInstructions;
-    voice = buddy.voice;
-    subtitle = 'Peer Support';
   } else if (type === 'coach') {
     const coach = character as SupportTeacher;
     greeting = coach.greeting;
     systemPrompt = coach.systemPrompt;
     voiceInstructions = coach.voiceInstructions;
-    voice = coach.voice;
-    subtitle = 'Learning Coach';
   } else {
-    // Maestro - MaestroFull doesn't have voice properties
     const maestro = character as MaestroFull;
     greeting = maestro.greeting;
     systemPrompt = maestro.systemPrompt;
-    voiceInstructions = DEFAULT_MAESTRO_VOICE_INSTRUCTIONS;
-    voice = DEFAULT_MAESTRO_VOICE;
-    subtitle = maestro.subject;
+    voiceInstructions = ''; // MaestroFull uses systemPrompt for voice personality
   }
 
   return {
@@ -193,9 +167,8 @@ function createActiveCharacter(
     greeting,
     systemPrompt,
     color: character.color,
-    voice,
+    voice: 'voice' in character ? character.voice : 'alloy', // MaestroFull doesn't have voice
     voiceInstructions,
-    subtitle,
   };
 }
 
@@ -325,17 +298,17 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           maestro,
           'maestro',
           profile,
-          `${maestro.name} puo aiutarti con ${maestro.subject}`
+          `${maestro.name} può aiutarti con ${maestro.subject}`
         );
       },
 
       switchToBuddy: (profile) => {
-        const buddy = getDefaultBuddy();
+        const buddy = getBuddyForStudent(profile);
         get().switchToCharacter(
           buddy,
           'buddy',
           profile,
-          `${buddy.name} e qui per ascoltarti`
+          `${buddy.name} è qui per ascoltarti`
         );
       },
 
