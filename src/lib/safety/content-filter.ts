@@ -83,10 +83,10 @@ const PROFANITY_EN: RegExp[] = [
  */
 const JAILBREAK_PATTERNS: RegExp[] = [
   // Ignore/forget instructions
-  /ignora\s+(le\s+)?istruzioni/gi,
-  /ignore\s+(your\s+)?instructions/gi,
-  /dimentica\s+(le\s+)?regole/gi,
-  /forget\s+(your\s+)?rules/gi,
+  /ignora\s+.{0,20}istruzioni/gi,
+  /ignore\s+.{0,20}instructions/gi,
+  /dimentica\s+.{0,20}regole/gi,
+  /forget\s+.{0,20}rules/gi,
   /forget\s+everything/gi,
 
   // System prompt extraction
@@ -183,9 +183,13 @@ const SAFE_RESPONSES = {
 
 /**
  * Check text against a list of patterns
+ * Note: Resets lastIndex for global patterns to avoid stateful matching issues
  */
 function matchesPatterns(text: string, patterns: RegExp[]): boolean {
-  return patterns.some((pattern) => pattern.test(text));
+  return patterns.some((pattern) => {
+    pattern.lastIndex = 0; // Reset for global patterns
+    return pattern.test(text);
+  });
 }
 
 /**
