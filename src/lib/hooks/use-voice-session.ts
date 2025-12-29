@@ -8,6 +8,12 @@
 import { useCallback, useRef, useEffect, useState } from 'react';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores/app-store';
 import type { Maestro } from '@/types';
+import {
+  VOICE_TOOLS,
+  TOOL_USAGE_INSTRUCTIONS,
+  executeVoiceTool,
+  isToolCreationCommand,
+} from '@/lib/voice';
 
 // ============================================================================
 // TYPES
@@ -458,79 +464,10 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           .trim()
       : '';
 
-    const fullInstructions = languageInstruction + characterInstruction + memoryContext + truncatedSystemPrompt + voicePersonality;
+    // Add tool usage instructions for AI
+    const fullInstructions = languageInstruction + characterInstruction + memoryContext + truncatedSystemPrompt + voicePersonality + TOOL_USAGE_INSTRUCTIONS;
 
     console.log(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
-
-    // Define tools for voice session
-    const maestroTools = [
-      {
-        type: 'function',
-        name: 'create_mindmap',
-        description: 'Create an interactive mind map to visualize concepts',
-        parameters: {
-          type: 'object',
-          properties: {
-            title: { type: 'string' },
-            nodes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, label: { type: 'string' } } } },
-          },
-          required: ['title', 'nodes'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'create_quiz',
-        description: 'Create an interactive quiz',
-        parameters: {
-          type: 'object',
-          properties: {
-            title: { type: 'string' },
-            subject: { type: 'string' },
-            questions: { type: 'array', items: { type: 'object' } },
-          },
-          required: ['title', 'subject', 'questions'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'create_flashcard',
-        description: 'Create flashcards for study',
-        parameters: {
-          type: 'object',
-          properties: {
-            name: { type: 'string' },
-            subject: { type: 'string' },
-            cards: { type: 'array', items: { type: 'object', properties: { front: { type: 'string' }, back: { type: 'string' } } } },
-          },
-          required: ['name', 'subject', 'cards'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'web_search',
-        description: 'Search the web for educational information',
-        parameters: {
-          type: 'object',
-          properties: {
-            query: { type: 'string' },
-          },
-          required: ['query'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'capture_homework',
-        description: 'Request to see student homework via webcam',
-        parameters: {
-          type: 'object',
-          properties: {
-            purpose: { type: 'string' },
-            instructions: { type: 'string' },
-          },
-          required: ['purpose'],
-        },
-      },
-    ];
 
     // Send session configuration
     // Azure Preview API format (gpt-4o-realtime-preview)
@@ -551,7 +488,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           silence_duration_ms: voiceSilenceDuration,  // User configurable (300-800ms)
           create_response: true,
         },
-        tools: maestroTools,
+        tools: VOICE_TOOLS,
       },
     };
 
@@ -692,43 +629,80 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
       case 'response.function_call_arguments.done':
         if (event.name && typeof event.name === 'string' && event.arguments && typeof event.arguments === 'string') {
-          try {
-            const args = JSON.parse(event.arguments);
-            const callId = typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
-            const toolCall = {
-              id: callId,
-              type: event.name as import('@/types').ToolType,
-              name: event.name,
-              arguments: args,
-              status: 'pending' as const,
-            };
-            addToolCall(toolCall);
+          const toolName = event.name;
+          (async () => {
+            try {
+              const args = JSON.parse(event.arguments as string);
+              const callId = typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
+              const toolCall = {
+                id: callId,
+                type: toolName as import('@/types').ToolType,
+                name: toolName,
+                arguments: args,
+                status: 'pending' as const,
+              };
+              addToolCall(toolCall);
 
-            if (event.name === 'capture_homework') {
-              options.onWebcamRequest?.({
-                purpose: args.purpose || 'homework',
-                instructions: args.instructions,
-                callId: callId,
-              });
-              updateToolCall(toolCall.id, { status: 'pending' });
-              return;
-            }
+              // Handle webcam/homework capture request
+              if (toolName === 'capture_homework') {
+                options.onWebcamRequest?.({
+                  purpose: args.purpose || 'homework',
+                  instructions: args.instructions,
+                  callId: callId,
+                });
+                updateToolCall(toolCall.id, { status: 'pending' });
+                return;
+              }
 
-            updateToolCall(toolCall.id, { status: 'completed' });
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-              wsRef.current.send(JSON.stringify({
-                type: 'conversation.item.create',
-                item: {
-                  type: 'function_call_output',
-                  call_id: callId,
-                  output: JSON.stringify({ success: true, displayed: true }),
-                },
-              }));
-              wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+              // Handle tool creation commands (mindmap, quiz, flashcards, etc.)
+              if (isToolCreationCommand(toolName)) {
+                const sessionId = `voice-${maestroRef.current?.id || 'unknown'}-${Date.now()}`;
+                const maestroId = maestroRef.current?.id || 'unknown';
+
+                console.log(`[VoiceSession] Executing voice tool: ${toolName}`, args);
+
+                const result = await executeVoiceTool(sessionId, maestroId, toolName, args);
+
+                if (result.success) {
+                  console.log(`[VoiceSession] Tool created: ${result.toolId}`);
+                  updateToolCall(toolCall.id, { status: 'completed' });
+                } else {
+                  console.error(`[VoiceSession] Tool creation failed: ${result.error}`);
+                  updateToolCall(toolCall.id, { status: 'error' });
+                }
+
+                // Send function output back to Azure
+                if (wsRef.current?.readyState === WebSocket.OPEN) {
+                  wsRef.current.send(JSON.stringify({
+                    type: 'conversation.item.create',
+                    item: {
+                      type: 'function_call_output',
+                      call_id: callId,
+                      output: JSON.stringify(result),
+                    },
+                  }));
+                  wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+                }
+                return;
+              }
+
+              // Default handling for other tools (web_search, etc.)
+              updateToolCall(toolCall.id, { status: 'completed' });
+              if (wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({
+                  type: 'conversation.item.create',
+                  item: {
+                    type: 'function_call_output',
+                    call_id: callId,
+                    output: JSON.stringify({ success: true, displayed: true }),
+                  },
+                }));
+                wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+              }
+            } catch (error) {
+              console.error('[VoiceSession] Failed to parse/execute tool call:', error);
             }
-          } catch {
-            console.error('[VoiceSession] Failed to parse tool call');
-          }
+          })();
         }
         break;
 
