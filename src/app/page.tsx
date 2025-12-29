@@ -57,6 +57,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      {/* Version badge */}
+      <div className="fixed top-2 right-3 z-50">
+        <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+          v{process.env.APP_VERSION}
+        </span>
+      </div>
       {/* Sidebar */}
       <aside
         className={cn(
