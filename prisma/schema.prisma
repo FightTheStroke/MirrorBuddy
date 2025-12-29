@@ -258,3 +258,63 @@ model Learning {
   @@index([category])
   @@index([confidence])
 }
+
+// ============================================================================
+// STUDENT INSIGHT PROFILES (Multi-Maestro Learning Insights for Parents)
+// Related: Issue #31
+// ============================================================================
+
+model StudentInsightProfile {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  studentName  String
+
+  // Access control (GDPR)
+  visibleTo    String    @default("parents") // parents | teachers | both
+
+  // Consent tracking
+  parentConsent   Boolean  @default(false)
+  studentConsent  Boolean  @default(false)
+  consentDate     DateTime?
+  deletionRequested DateTime?
+
+  // Synthesized profile data as JSON
+  insights     String    @default("[]") // MaestroInsight[]
+  strengths    String    @default("[]") // StrengthArea[]
+  growthAreas  String    @default("[]") // GrowthArea[]
+  learningStyle String   @default("{}") // LearningStyle
+  strategies   String    @default("[]") // Strategy[]
+
+  // Historical snapshots
+  progressHistory String  @default("[]") // ProfileSnapshot[]
+
+  // Metadata
+  sessionCount  Int       @default(0)
+  lastSessionId String?
+  confidenceScore Float   @default(0.0)
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Access log for GDPR audit
+  accessLogs   ProfileAccessLog[]
+
+  @@index([userId])
+}
+
+model ProfileAccessLog {
+  id         String   @id @default(cuid())
+  profileId  String
+  profile    StudentInsightProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  userId     String
+  action     String   // view | download | share | edit | delete_request
+  details    String?
+  ipAddress  String?
+  userAgent  String?
+
+  timestamp  DateTime @default(now())
+
+  @@index([profileId])
+  @@index([timestamp])
+}
