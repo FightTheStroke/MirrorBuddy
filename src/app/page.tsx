@@ -15,6 +15,7 @@ import {
   Flame,
   Network,
   Calendar,
+  MessageCircle,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -27,22 +28,25 @@ import {
   LazyCalendarView,
   LazyHTMLSnippetsView,
 } from '@/components/education';
+import { ConversationFlow } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView, HomeProgressWidget } from '@/components/progress';
 import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
 import { cn } from '@/lib/utils';
 
-type View = 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'libretto' | 'calendar' | 'demos' | 'progress' | 'settings';
+type View = 'conversation' | 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'libretto' | 'calendar' | 'demos' | 'progress' | 'settings';
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState<View>('maestri');
+  // Conversation-first: start with conversation view
+  const [currentView, setCurrentView] = useState<View>('conversation');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const { xp, level, streak } = useProgressStore();
   const { studentProfile } = useSettingsStore();
 
   const navItems = [
+    { id: 'conversation' as const, label: 'Conversazione', icon: MessageCircle },
     { id: 'maestri' as const, label: 'Maestri', icon: GraduationCap },
     { id: 'quiz' as const, label: 'Quiz', icon: Brain },
     { id: 'flashcards' as const, label: 'Flashcards', icon: BookOpen },
@@ -73,7 +77,7 @@ export default function Home() {
         {/* Logo - clickable to return home */}
         <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
           <button
-            onClick={() => setCurrentView('maestri')}
+            onClick={() => setCurrentView('conversation')}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
             aria-label="Torna alla home"
           >
@@ -187,6 +191,8 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
+          {currentView === 'conversation' && <ConversationFlow />}
+
           {currentView === 'maestri' && (
             <>
               <HomeProgressWidget />
