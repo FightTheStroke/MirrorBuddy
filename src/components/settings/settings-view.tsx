@@ -31,6 +31,7 @@ import {
   Loader2,
   RefreshCw,
   Video,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1372,6 +1373,9 @@ function AudioSettings() {
         </CardContent>
       </Card>
 
+      {/* Voice Experience Settings */}
+      <VoiceExperienceSettings />
+
       {/* Info about Continuity */}
       <Card>
         <CardHeader>
@@ -1386,6 +1390,124 @@ function AudioSettings() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// Voice Experience Settings - VAD, silence, barge-in controls
+function VoiceExperienceSettings() {
+  const {
+    voiceVadThreshold,
+    voiceSilenceDuration,
+    voiceBargeInEnabled,
+    setVoiceVadThreshold,
+    setVoiceSilenceDuration,
+    setVoiceBargeInEnabled,
+  } = useSettingsStore();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="w-5 h-5 text-purple-500" />
+          Esperienza Vocale
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <p className="text-slate-600 dark:text-slate-400 text-sm">
+          Personalizza il comportamento delle conversazioni vocali con i Maestri.
+        </p>
+
+        {/* Barge-in Toggle */}
+        <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+          <div className="space-y-1">
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              Interruzione automatica (Barge-in)
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Permetti di interrompere il Maestro mentre parla iniziando a parlare tu.
+            </p>
+          </div>
+          <button
+            onClick={() => setVoiceBargeInEnabled(!voiceBargeInEnabled)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              voiceBargeInEnabled ? 'bg-purple-600' : 'bg-slate-300 dark:bg-slate-600'
+            }`}
+            role="switch"
+            aria-checked={voiceBargeInEnabled}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                voiceBargeInEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* VAD Threshold Slider */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              Sensibilità rilevamento voce
+            </div>
+            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
+              {voiceVadThreshold.toFixed(2)}
+            </span>
+          </div>
+          <input
+            type="range"
+            min="0.3"
+            max="0.7"
+            step="0.05"
+            value={voiceVadThreshold}
+            onChange={(e) => setVoiceVadThreshold(parseFloat(e.target.value))}
+            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
+          />
+          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Più sensibile (voce bassa)</span>
+            <span>Meno sensibile (rumore)</span>
+          </div>
+        </div>
+
+        {/* Silence Duration Slider */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              Attesa fine frase
+            </div>
+            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
+              {voiceSilenceDuration}ms
+            </span>
+          </div>
+          <input
+            type="range"
+            min="300"
+            max="800"
+            step="50"
+            value={voiceSilenceDuration}
+            onChange={(e) => setVoiceSilenceDuration(parseInt(e.target.value))}
+            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
+          />
+          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Più veloce (risposte rapide)</span>
+            <span>Più lento (frasi lunghe)</span>
+          </div>
+        </div>
+
+        {/* Reset to defaults */}
+        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+          <button
+            onClick={() => {
+              setVoiceVadThreshold(0.4);
+              setVoiceSilenceDuration(400);
+              setVoiceBargeInEnabled(true);
+            }}
+            className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+          >
+            Ripristina valori predefiniti
+          </button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

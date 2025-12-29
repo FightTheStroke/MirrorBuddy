@@ -1,6 +1,10 @@
 // ============================================================================
 // E2E TESTS: Voice Session Comprehensive
 // Tests for voice features, status messages, error handling, and UI states
+//
+// NOTE: Tests that require context.grantPermissions() for 'microphone'/'camera'
+// are skipped on Firefox and WebKit (not supported by Playwright).
+// See: https://playwright.dev/docs/api/class-browsercontext#browser-context-grant-permissions
 // ============================================================================
 
 import { test, expect, Page } from '@playwright/test';
@@ -102,6 +106,16 @@ test.describe('Voice Session Initialization', () => {
 });
 
 test.describe('Voice Session Status Messages', () => {
+  // Skip permission-dependent tests on Firefox/WebKit
+  test.beforeEach(async ({ browserName }, testInfo) => {
+    if (testInfo.title.includes('connecting state')) {
+      test.skip(
+        browserName === 'firefox' || browserName === 'webkit',
+        'Microphone permission grants not supported in Firefox/WebKit'
+      );
+    }
+  });
+
   test('status transitions are visible to user', async ({ page }) => {
     await setupAndClickMaestro(page);
 
@@ -156,6 +170,14 @@ test.describe('Voice Session Status Messages', () => {
 });
 
 test.describe('Voice Session Controls', () => {
+  // Skip all tests in this block on Firefox/WebKit - they all require permissions
+  test.beforeEach(async ({ browserName }) => {
+    test.skip(
+      browserName === 'firefox' || browserName === 'webkit',
+      'Microphone/camera permission grants not supported in Firefox/WebKit'
+    );
+  });
+
   test('mute button is accessible', async ({ page, context }) => {
     await context.grantPermissions(['microphone']);
     await setupAndClickMaestro(page);
@@ -203,6 +225,14 @@ test.describe('Voice Session Controls', () => {
 });
 
 test.describe('Voice Session Audio Feedback', () => {
+  // Skip all tests in this block on Firefox/WebKit - they all require permissions
+  test.beforeEach(async ({ browserName }) => {
+    test.skip(
+      browserName === 'firefox' || browserName === 'webkit',
+      'Microphone permission grants not supported in Firefox/WebKit'
+    );
+  });
+
   test('input level indicator is visible during session', async ({ page, context }) => {
     await context.grantPermissions(['microphone']);
     await setupAndClickMaestro(page);
@@ -353,6 +383,17 @@ test.describe('Voice Session Error Recovery', () => {
 });
 
 test.describe('Voice Session Performance', () => {
+  // Skip permission-dependent tests on Firefox/WebKit
+  test.beforeEach(async ({ browserName }, testInfo) => {
+    // 'closing session' test involves voice session which requires permissions internally
+    if (testInfo.title.includes('closing session')) {
+      test.skip(
+        browserName === 'firefox' || browserName === 'webkit',
+        'Voice session tests require microphone permissions not supported in Firefox/WebKit'
+      );
+    }
+  });
+
   test('session opens quickly (under 2 seconds)', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');

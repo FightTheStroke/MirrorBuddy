@@ -174,8 +174,13 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     reset,
   } = useVoiceSessionStore();
 
-  // Get preferred microphone from settings
-  const { preferredMicrophoneId } = useSettingsStore();
+  // Get preferred microphone and voice settings from settings
+  const {
+    preferredMicrophoneId,
+    voiceVadThreshold,
+    voiceSilenceDuration,
+    voiceBargeInEnabled,
+  } = useSettingsStore();
 
   // ============================================================================
   // REFS
@@ -540,9 +545,9 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         },
         turn_detection: {
           type: 'server_vad',
-          threshold: 0.4,            // ✅ Più sensibile a voce soft
+          threshold: voiceVadThreshold,            // User configurable (0.3-0.7)
           prefix_padding_ms: 300,
-          silence_duration_ms: 400,  // ✅ Turn-taking più veloce
+          silence_duration_ms: voiceSilenceDuration,  // User configurable (300-800ms)
           create_response: true,
         },
         // Temporarily disable tools for debugging - see if they cause issues
@@ -561,7 +566,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     setCurrentMaestro(maestro);
     setConnectionState('connected');
     options.onStateChange?.('connected');
-  }, [setConnected, setCurrentMaestro, setConnectionState, options]);
+  }, [setConnected, setCurrentMaestro, setConnectionState, options, voiceVadThreshold, voiceSilenceDuration]);
 
   const handleServerEvent = useCallback((event: Record<string, unknown>) => {
     const eventType = event.type as string;
@@ -595,7 +600,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         setListening(true);
 
         // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
-        if (isSpeaking && wsRef.current?.readyState === WebSocket.OPEN) {
+        // Only if barge-in is enabled in user settings
+        if (voiceBargeInEnabled && isSpeaking && wsRef.current?.readyState === WebSocket.OPEN) {
           console.log('[VoiceSession] Barge-in detected - interrupting assistant');
           wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
           audioQueueRef.current = [];
@@ -731,7 +737,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         console.log(`[VoiceSession] Event: ${eventType}`, JSON.stringify(event).slice(0, 200));
         break;
     }
-  }, [addTranscript, addToolCall, updateToolCall, options, setListening, isSpeaking, setSpeaking, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture]);
+  }, [addTranscript, addToolCall, updateToolCall, options, setListening, isSpeaking, setSpeaking, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture, voiceBargeInEnabled]);
 
   // Keep ref updated with latest handleServerEvent (fixes stale closure in ws.onmessage)
   useEffect(() => {
