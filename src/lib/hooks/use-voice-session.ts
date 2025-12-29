@@ -979,6 +979,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     inputLevel,
     outputLevel,
     connectionState,
+    // Expose analyser for waveform visualization
+    inputAnalyser: analyserRef.current,
     connect,
     disconnect,
     toggleMute,
