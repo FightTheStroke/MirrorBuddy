@@ -133,7 +133,7 @@ function getCoachForStudent(profile: ExtendedStudentProfile): SupportTeacher {
 /**
  * Gets the appropriate Buddy based on student preferences.
  */
-function getBuddyForStudent(profile: ExtendedStudentProfile): BuddyProfile {
+export function getBuddyForStudent(profile: ExtendedStudentProfile): BuddyProfile {
   if (profile.preferredBuddy) {
     const preferred = getBuddyById(profile.preferredBuddy);
     if (preferred) {
