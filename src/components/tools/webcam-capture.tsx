@@ -59,8 +59,9 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose, showT
         };
 
         // If user has a preferred camera, use it
+        // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
         if (preferredCameraId) {
-          videoConstraints.deviceId = { exact: preferredCameraId };
+          videoConstraints.deviceId = { ideal: preferredCameraId };
           // Remove facingMode when using specific device
           delete videoConstraints.facingMode;
         }
@@ -226,8 +227,9 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose, showT
         height: { ideal: 720 },
       };
 
+      // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
       if (preferredCameraId) {
-        videoConstraints.deviceId = { exact: preferredCameraId };
+        videoConstraints.deviceId = { ideal: preferredCameraId };
         delete videoConstraints.facingMode;
       }
 
