@@ -1,9 +1,21 @@
 // ============================================================================
 // E2E TESTS: Permissions (Microphone and Camera)
 // Comprehensive tests for permission handling, caching, and error states
+//
+// NOTE: context.grantPermissions() for 'microphone' and 'camera' is NOT
+// supported in Firefox and WebKit. These tests only run on Chromium.
+// See: https://playwright.dev/docs/api/class-browsercontext#browser-context-grant-permissions
 // ============================================================================
 
 import { test, expect } from '@playwright/test';
+
+// Skip all permission-dependent tests on Firefox and WebKit
+test.beforeEach(async ({ browserName }) => {
+  test.skip(
+    browserName === 'firefox' || browserName === 'webkit',
+    'Microphone/camera permission grants not supported in Firefox/WebKit'
+  );
+});
 
 test.describe('Microphone Permissions', () => {
   test.beforeEach(async ({ page }) => {

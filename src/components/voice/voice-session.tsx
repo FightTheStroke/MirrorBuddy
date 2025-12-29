@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, PhoneOff, VolumeX, Send, MessageSquare, Camera, Brain, BookOpen, Search, Network, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { SimpleLevelWaveform, CircularWaveform } from './waveform';
+import { CanvasWaveform, CircularWaveform } from './waveform';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { usePermissions } from '@/lib/hooks/use-permissions';
 import { ToolResultDisplay } from '@/components/tools';
@@ -67,6 +67,7 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
     inputLevel,
     outputLevel,
     connectionState,
+    inputAnalyser,
     connect,
     disconnect,
     toggleMute,
@@ -464,11 +465,11 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
 
             {/* Waveform visualization */}
             <div className="w-full">
-              <SimpleLevelWaveform
-                level={isListening ? inputLevel : isSpeaking ? outputLevel : 0}
+              <CanvasWaveform
+                analyser={inputAnalyser}
                 isActive={isListening || isSpeaking}
-                color={maestro.color}
-                height={48}
+                color={isListening ? '#22C55E' : maestro.color}
+                height={64}
               />
             </div>
           </div>

@@ -1,6 +1,10 @@
 // ============================================================================
 // E2E TESTS: Voice API and WebSocket Proxy
 // Tests the actual WebSocket connection, audio pipeline, and Azure integration
+//
+// NOTE: Tests that require context.grantPermissions() for 'microphone'/'camera'
+// are skipped on Firefox and WebKit (not supported by Playwright).
+// See: https://playwright.dev/docs/api/class-browsercontext#browser-context-grant-permissions
 // ============================================================================
 
 import { test, expect } from '@playwright/test';
@@ -225,6 +229,14 @@ test.describe('WebSocket Proxy', () => {
 });
 
 test.describe('Voice Session UI Integration', () => {
+  // Skip on Firefox/WebKit - permission grants not supported
+  test.beforeEach(async ({ browserName }) => {
+    test.skip(
+      browserName === 'firefox' || browserName === 'webkit',
+      'Microphone/camera permission grants not supported in Firefox/WebKit'
+    );
+  });
+
   test('clicking maestro shows voice session modal', async ({ page, context }) => {
     // Grant permissions
     await context.grantPermissions(['microphone', 'camera']);
@@ -351,6 +363,17 @@ test.describe('Voice Session UI Integration', () => {
 });
 
 test.describe('Test Voice Page', () => {
+  // Skip permission-dependent tests on Firefox/WebKit
+  test.beforeEach(async ({ browserName }, testInfo) => {
+    // Only skip the test that requires permissions
+    if (testInfo.title.includes('connect to WebSocket')) {
+      test.skip(
+        browserName === 'firefox' || browserName === 'webkit',
+        'Microphone permission grants not supported in Firefox/WebKit'
+      );
+    }
+  });
+
   test('test-voice page loads', async ({ page }) => {
     await page.goto('/test-voice');
     await page.waitForLoadState('networkidle');
