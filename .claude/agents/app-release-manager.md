@@ -101,10 +101,38 @@ npm run typecheck   # 0 errors
 npm run build       # Success
 ```
 
-### Phase 2: Tests (P0 - BLOCKING)
+### Phase 2: E2E Tests with REAL APIs (P0 - BLOCKING)
+
+**CRITICAL: All E2E tests MUST run with REAL AI providers, NO MOCKS.**
+
+Prerequisites:
+- Azure OpenAI configured in `.env.local` (for voice + chat)
+- OR Ollama running locally (`ollama serve` with llama3.2)
+- Database initialized (`npx prisma db push`)
+
 ```bash
-npm run test        # All Playwright E2E tests pass
+# Verify AI provider is working
+curl -X POST http://localhost:11434/api/generate -d '{"model":"llama3.2","prompt":"test"}'
+# OR verify Azure is configured
+grep AZURE_OPENAI .env.local
+
+# Run E2E tests with REAL API
+npm run test        # All Playwright E2E tests pass with real AI
+
+# Run specific test suites
+npx playwright test e2e/api-backend.spec.ts      # API CRUD
+npx playwright test e2e/maestri.spec.ts          # AI tutor responses
+npx playwright test e2e/voice-session.spec.ts   # Voice with Azure
+npx playwright test e2e/flashcards.spec.ts      # FSRS algorithm
+npx playwright test e2e/accessibility.spec.ts   # WCAG compliance
 ```
+
+**Test Coverage Requirements:**
+- [ ] All 17 maestri respond to at least one question
+- [ ] Voice session connects to Azure Realtime API
+- [ ] Flashcard FSRS calculations are correct
+- [ ] Quiz scoring works accurately
+- [ ] Mind map generation produces valid output
 
 ### Phase 3: Security (P0 - BLOCKING)
 - [ ] No secrets in codebase (grep for API keys, passwords)

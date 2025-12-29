@@ -205,6 +205,7 @@ AZURE_OPENAI_API_VERSION=2024-08-01-preview
 AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview
 ```
 
 **Note:** Voice features require the `gpt-4o-realtime-preview` model, currently available in select Azure regions.

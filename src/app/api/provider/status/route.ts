@@ -42,6 +42,7 @@ export async function GET() {
   const azureRealtimeEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
   const azureRealtimeApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
   const azureRealtimeDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
+  const azureRealtimeApiVersion = process.env.AZURE_OPENAI_REALTIME_API_VERSION;
 
   const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
   const ollamaModel = process.env.OLLAMA_MODEL || 'llama3.2';
@@ -104,6 +105,11 @@ export async function GET() {
           name: 'AZURE_OPENAI_REALTIME_DEPLOYMENT',
           configured: !!azureRealtimeDeployment,
           displayValue: azureRealtimeDeployment
+        },
+        {
+          name: 'AZURE_OPENAI_REALTIME_API_VERSION',
+          configured: !!azureRealtimeApiVersion,
+          displayValue: azureRealtimeApiVersion
         },
       ],
     },
