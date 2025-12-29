@@ -797,4 +797,116 @@ Utile per verificare:
 
 ---
 
+---
+
+## Compatibilità Browser e Sistema Operativo
+
+### Browser Supportati
+
+| Browser | Windows | macOS | Linux | Note |
+|---------|---------|-------|-------|------|
+| Chrome 110+ | ✅ | ✅ | ✅ | Pieno supporto, incluso setSinkId |
+| Edge 110+ | ✅ | ✅ | ✅ | Pieno supporto come Chrome |
+| Firefox | ⚠️ | ⚠️ | ⚠️ | Funziona, ma NO selezione speaker output |
+| Safari 14.1+ | ⚠️ | ⚠️ | N/A | Funziona, ma NO selezione speaker output |
+| Safari iOS | ⚠️ | N/A | N/A | Richiede user gesture per AudioContext |
+
+### Feature Support Matrix
+
+| Feature | Chrome/Edge | Firefox | Safari |
+|---------|-------------|---------|--------|
+| getUserMedia (mic) | ✅ | ✅ | ✅ |
+| enumerateDevices | ✅ | ✅ | ✅ |
+| AudioContext | ✅ | ✅ | ✅ (webkitAudioContext) |
+| **setSinkId** (output device) | ✅ | ❌ | ❌ |
+| WebSocket | ✅ | ✅ | ✅ |
+| ScriptProcessorNode | ✅ | ✅ | ✅ |
+
+### Fallback Implementati
+
+#### 1. webkitAudioContext (Safari)
+
+```typescript
+// File: src/lib/hooks/use-voice-session.ts
+const AudioContextClass = window.AudioContext ||
+  (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+```
+
+#### 2. setSinkId (Firefox, Safari)
+
+```typescript
+// File: src/components/settings/settings-view.tsx, src/app/test-voice/page.tsx
+if ('setSinkId' in audioContext) {
+  await audioContext.setSinkId(selectedOutputDevice);
+} else {
+  console.warn('Output device selection not supported, using system default');
+}
+```
+
+Se setSinkId non è supportato, l'audio va allo speaker di default del sistema.
+
+#### 3. Device Label Privacy (tutti i browser)
+
+I browser non mostrano i nomi dei dispositivi finché l'utente non concede il permesso:
+
+```typescript
+// Prima: devices hanno label vuoto
+// Dopo getUserMedia: devices hanno label completo
+await navigator.mediaDevices.getUserMedia({ audio: true });
+const devices = await navigator.mediaDevices.enumerateDevices();
+```
+
+### Limitazioni per OS
+
+#### macOS
+- ✅ Funziona al 100%
+- ✅ Tutti i dispositivi riconosciuti
+- ✅ Airpods e bluetooth supportati
+
+#### Windows
+- ✅ Funziona al 100%
+- ✅ Tutti i dispositivi riconosciuti
+- ⚠️ Alcuni driver audio possono richiedere permessi aggiuntivi
+
+#### Linux
+- ✅ Funziona con PulseAudio/PipeWire
+- ⚠️ setSinkId non funziona su Firefox Linux
+- ⚠️ Potrebbe richiedere configurazione ALSA per alcuni dispositivi
+
+### Mobile (iOS/Android)
+
+| Piattaforma | Supporto | Note |
+|-------------|----------|------|
+| iOS Safari | ⚠️ | Richiede user gesture, no background audio |
+| iOS Chrome | ⚠️ | Usa WebKit, stesse limitazioni Safari |
+| Android Chrome | ✅ | Pieno supporto |
+| Android Firefox | ⚠️ | No setSinkId |
+
+### Requisiti Minimi
+
+- **HTTPS obbligatorio**: getUserMedia richiede contesto sicuro
+- **Permessi browser**: Microfono e camera richiedono consenso utente
+- **WebSocket**: Deve essere supportato (tutti i browser moderni)
+
+### Come Testare Cross-Platform
+
+```bash
+# 1. Vai su /test-voice
+# 2. Verifica che i dispositivi siano elencati
+# 3. Prova la connessione WebSocket
+# 4. Parla e verifica che l'audio venga inviato
+# 5. Ascolta la risposta del maestro
+```
+
+### Problemi Noti per Piattaforma
+
+| Problema | Piattaforma | Workaround |
+|----------|-------------|------------|
+| AudioContext suspended | Safari iOS | User deve toccare schermo prima |
+| No device labels | Tutti | Richiedere permesso prima di enumerare |
+| setSinkId undefined | Firefox, Safari | Usa speaker di sistema |
+| Blob in WebSocket | Alcuni browser | Gestito con `instanceof Blob` |
+
+---
+
 *Documento creato dopo 2+ giorni di debug. NON RIPETERE I NOSTRI ERRORI!*
