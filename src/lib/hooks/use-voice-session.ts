@@ -540,9 +540,9 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         },
         turn_detection: {
           type: 'server_vad',
-          threshold: 0.5,
+          threshold: 0.4,            // ✅ Più sensibile a voce soft
           prefix_padding_ms: 300,
-          silence_duration_ms: 500,
+          silence_duration_ms: 400,  // ✅ Turn-taking più veloce
           create_response: true,
         },
         // Temporarily disable tools for debugging - see if they cause issues
@@ -593,6 +593,15 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       case 'input_audio_buffer.speech_started':
         console.log('[VoiceSession] User speech detected');
         setListening(true);
+
+        // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
+        if (isSpeaking && wsRef.current?.readyState === WebSocket.OPEN) {
+          console.log('[VoiceSession] Barge-in detected - interrupting assistant');
+          wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+          audioQueueRef.current = [];
+          isPlayingRef.current = false;
+          setSpeaking(false);
+        }
         break;
 
       case 'input_audio_buffer.speech_stopped':
@@ -722,7 +731,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         console.log(`[VoiceSession] Event: ${eventType}`, JSON.stringify(event).slice(0, 200));
         break;
     }
-  }, [addTranscript, addToolCall, updateToolCall, options, setListening, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture]);
+  }, [addTranscript, addToolCall, updateToolCall, options, setListening, isSpeaking, setSpeaking, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture]);
 
   // Keep ref updated with latest handleServerEvent (fixes stale closure in ws.onmessage)
   useEffect(() => {
@@ -979,8 +988,10 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     inputLevel,
     outputLevel,
     connectionState,
-    // Expose analyser for waveform visualization
-    inputAnalyser: analyserRef.current,
+    // Getter function to avoid accessing ref during render
+    get inputAnalyser() {
+      return analyserRef.current;
+    },
     connect,
     disconnect,
     toggleMute,
