@@ -45,30 +45,26 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose, showT
       // Set a timeout for camera initialization (10 seconds)
       timeoutId = setTimeout(() => {
         if (mounted && isLoading) {
+          logger.error('Camera timeout - getUserMedia did not respond in 10s');
           setError('Timeout fotocamera. Riprova.');
           setIsLoading(false);
         }
       }, 10000);
 
       try {
-        // Build video constraints with preferred camera if set
-        const videoConstraints: MediaTrackConstraints = {
-          facingMode: 'environment', // Prefer back camera on mobile
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        };
+        // Use simple constraints first (like settings page does)
+        // Complex constraints with width/height can cause issues on some browsers
+        const videoConstraints: MediaTrackConstraints | boolean = preferredCameraId
+          ? { deviceId: { ideal: preferredCameraId } }
+          : true;
 
-        // If user has a preferred camera, use it
-        // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
-        if (preferredCameraId) {
-          videoConstraints.deviceId = { ideal: preferredCameraId };
-          // Remove facingMode when using specific device
-          delete videoConstraints.facingMode;
-        }
+        logger.info('Requesting camera access', { preferredCameraId, constraints: videoConstraints });
 
         const mediaStream = await navigator.mediaDevices.getUserMedia({
           video: videoConstraints,
         });
+
+        logger.info('Camera access granted', { tracks: mediaStream.getVideoTracks().length });
 
         currentStream = mediaStream;
 
@@ -88,13 +84,14 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose, showT
           mediaStream.getTracks().forEach(track => track.stop());
         }
       } catch (err) {
-        logger.error('Camera error', { error: String(err) });
+        logger.error('Camera error', { error: String(err), preferredCameraId });
         if (mounted) {
-          // Try again without specific device ID
+          // Try again with simplest constraints (just true)
           if (preferredCameraId) {
+            logger.info('Retrying camera with simple constraints');
             try {
               const fallbackStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+                video: true,
               });
               if (mounted && videoRef.current) {
                 videoRef.current.srcObject = fallbackStream;
@@ -102,9 +99,11 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose, showT
                 setStream(fallbackStream);
                 setIsLoading(false);
                 if (timeoutId) clearTimeout(timeoutId);
+                logger.info('Camera fallback succeeded');
                 return;
               }
-            } catch {
+            } catch (fallbackErr) {
+              logger.error('Camera fallback also failed', { error: String(fallbackErr) });
               // Continue to error state
             }
           }
@@ -221,17 +220,10 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose, showT
     setIsLoading(true);
 
     try {
-      const videoConstraints: MediaTrackConstraints = {
-        facingMode: 'environment',
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      };
-
-      // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
-      if (preferredCameraId) {
-        videoConstraints.deviceId = { ideal: preferredCameraId };
-        delete videoConstraints.facingMode;
-      }
+      // Use simple constraints (like settings page does)
+      const videoConstraints: MediaTrackConstraints | boolean = preferredCameraId
+        ? { deviceId: { ideal: preferredCameraId } }
+        : true;
 
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: videoConstraints,
