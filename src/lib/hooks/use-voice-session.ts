@@ -542,6 +542,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         input_audio_format: 'pcm16',
         input_audio_transcription: {
           model: 'whisper-1',
+          language: language,  // Force transcription to use the language from settings
         },
         turn_detection: {
           type: 'server_vad',
