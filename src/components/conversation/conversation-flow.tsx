@@ -33,6 +33,7 @@ import {
 import type { ExtendedStudentProfile } from '@/types';
 import type { MaestroFull } from '@/data/maestri-full';
 import { routeToCharacter } from '@/lib/ai/character-router';
+import { analyzeHandoff } from '@/lib/ai/handoff-manager';
 
 // ============================================================================
 // SUB-COMPONENTS
@@ -304,6 +305,7 @@ export function ConversationFlow() {
     switchToMaestro,
     switchToBuddy,
     goBack,
+    suggestHandoff,
     acceptHandoff,
     dismissHandoff,
   } = useConversationFlowStore();
@@ -383,6 +385,25 @@ export function ConversationFlow() {
         role: 'assistant',
         content: assistantMessage,
       });
+
+      // Analyze for potential handoff
+      if (activeCharacter) {
+        const handoffAnalysis = analyzeHandoff({
+          message: userMessage,
+          aiResponse: assistantMessage,
+          activeCharacter,
+          studentProfile: extendedProfile,
+          recentMessages: messages.slice(-5).map(m => ({
+            role: m.role === 'system' ? 'assistant' : m.role as 'user' | 'assistant',
+            content: m.content,
+          })),
+        });
+
+        // Suggest handoff if analysis recommends it with sufficient confidence
+        if (handoffAnalysis.shouldHandoff && handoffAnalysis.suggestion && handoffAnalysis.confidence > 0.7) {
+          suggestHandoff(handoffAnalysis.suggestion);
+        }
+      }
     } catch (error) {
       console.error('Chat error:', error);
       addMessage({
@@ -393,7 +414,7 @@ export function ConversationFlow() {
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  }, [inputValue, isLoading, activeCharacter, messages, addMessage, extendedProfile]);
+  }, [inputValue, isLoading, activeCharacter, messages, addMessage, extendedProfile, suggestHandoff]);
 
   // Handle enter key
   const handleKeyDown = (e: React.KeyboardEvent) => {
