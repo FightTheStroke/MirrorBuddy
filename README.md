@@ -124,6 +124,8 @@ Talk to your Maestro like you would talk to a real teacher. Ask questions, discu
 - **Voice-to-voice** responses with natural intonation
 - **Interrupt anytime** — the Maestro listens and adapts
 - **Session recordings** saved for later review
+- **Device selection** — choose your preferred microphone and speaker
+- **Visual waveform** — see your voice levels in real-time
 
 ### Mind Maps
 
@@ -155,6 +157,16 @@ Test your knowledge with adaptive assessments.
 - **Generated from** your flashcards and conversations
 - **Mastery gates** — must pass to unlock new content
 
+### Homework Help
+
+Get help with your homework using AI-powered analysis.
+
+- **Photo capture** — take a picture of your homework with the webcam
+- **Countdown timer** — 0, 3, 5, or 10 second delay for positioning
+- **AI analysis** — Maestro analyzes your work and provides feedback
+- **Step-by-step guidance** — get help without getting the answer
+- **Works offline** — camera capture works without internet
+
 ### Gamification
 
 Learning should be rewarding.
@@ -178,6 +190,21 @@ Know exactly where you stand.
 ---
 
 ## Configuration
+
+### Settings Overview
+
+The Settings page provides comprehensive configuration:
+
+| Tab | Description |
+|-----|-------------|
+| **Profile** | Student name, age, learning style preferences |
+| **Accessibility** | Dyslexia font, ADHD mode, motion reduction, high contrast |
+| **Appearance** | Theme (light/dark/system), color schemes |
+| **AI Provider** | Azure OpenAI or Ollama configuration |
+| **Audio/Video** | Preferred microphone, speaker, and camera selection |
+| **Notifications** | Study reminders and progress alerts |
+| **Privacy** | Data export (GDPR), delete account |
+| **Diagnostics** | System checks, API connectivity, troubleshooting |
 
 ### AI Providers
 
@@ -322,6 +349,12 @@ ConvergioEdu is part of a larger vision:
 | Math | KaTeX |
 | Database | Prisma + SQLite/PostgreSQL |
 | Testing | Playwright E2E |
+
+### Developer Documentation
+
+For developers working on voice features, see:
+- [`docs/AZURE_REALTIME_API.md`](docs/AZURE_REALTIME_API.md) — Comprehensive guide to Azure Realtime API integration, including common bugs and solutions
+- [`CLAUDE.md`](CLAUDE.md) — Architecture overview and development commands
 
 ---
 
