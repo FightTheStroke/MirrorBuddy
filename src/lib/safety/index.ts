@@ -39,3 +39,14 @@ export {
   type SanitizeResult,
   type SanitizeCategory,
 } from './output-sanitizer';
+
+export {
+  detectJailbreak,
+  isObviousJailbreak,
+  getJailbreakResponse,
+  buildContext,
+  type JailbreakDetection,
+  type JailbreakCategory,
+  type ThreatLevel,
+  type ConversationContext,
+} from './jailbreak-detector';
