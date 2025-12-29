@@ -1058,9 +1058,10 @@ function AudioSettings() {
   // Start camera test
   const startCamTest = async () => {
     try {
+      // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
       const constraints: MediaStreamConstraints = {
         video: preferredCameraId
-          ? { deviceId: { exact: preferredCameraId } }
+          ? { deviceId: { ideal: preferredCameraId } }
           : true
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -2477,8 +2478,9 @@ function DiagnosticsTab() {
   // Start waveform visualization
   const startWaveform = async () => {
     try {
+      // Use 'ideal' for graceful fallback if device becomes unavailable
       const audioConstraints: boolean | MediaTrackConstraints = selectedMicId
-        ? { deviceId: { exact: selectedMicId } }
+        ? { deviceId: { ideal: selectedMicId } }
         : true;
       const stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
       waveformStreamRef.current = stream;
@@ -2597,8 +2599,9 @@ function DiagnosticsTab() {
   // Start webcam preview
   const startWebcam = async () => {
     try {
+      // Use 'ideal' for graceful fallback if device becomes unavailable
       const videoConstraints: boolean | MediaTrackConstraints = selectedCamId
-        ? { deviceId: { exact: selectedCamId } }
+        ? { deviceId: { ideal: selectedCamId } }
         : true;
       const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
       webcamStreamRef.current = stream;
