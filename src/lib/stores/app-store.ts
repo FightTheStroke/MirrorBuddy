@@ -29,6 +29,20 @@ interface AppearanceSettings {
 // Teaching style from super encouraging to brutal
 export type TeachingStyle = 'super_encouraging' | 'encouraging' | 'balanced' | 'strict' | 'brutal';
 
+/**
+ * Learning differences that the platform supports.
+ * Used for buddy matching and accessibility features.
+ */
+export type LearningDifference =
+  | 'dyslexia'
+  | 'dyscalculia'
+  | 'dysgraphia'
+  | 'adhd'
+  | 'autism'
+  | 'cerebralPalsy'
+  | 'visualImpairment'
+  | 'auditoryProcessing';
+
 interface ExtendedStudentProfile {
   name: string;
   age: number;
@@ -43,6 +57,10 @@ interface ExtendedStudentProfile {
   voiceEnabled: boolean;
   simplifiedLanguage: boolean;
   adhdMode: boolean;
+  // MirrorBuddy character preferences
+  learningDifferences: LearningDifference[];
+  preferredCoach?: 'melissa' | 'davide';
+  preferredBuddy?: 'mario' | 'maria';
 }
 
 // Provider preference for manual selection
@@ -110,6 +128,10 @@ export const useSettingsStore = create<SettingsState>()(
         voiceEnabled: true,
         simplifiedLanguage: false,
         adhdMode: false,
+        // MirrorBuddy defaults
+        learningDifferences: [],
+        preferredCoach: undefined,
+        preferredBuddy: undefined,
       },
       appearance: {
         theme: 'system',
