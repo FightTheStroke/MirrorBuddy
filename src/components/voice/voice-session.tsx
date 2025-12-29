@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, PhoneOff, VolumeX, Send, MessageSquare, Camera, Brain, BookOpen, Search, Network, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Waveform, CircularWaveform } from './waveform';
+import { SimpleLevelWaveform, CircularWaveform } from './waveform';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { usePermissions } from '@/lib/hooks/use-permissions';
 import { ToolResultDisplay } from '@/components/tools';
@@ -464,11 +464,11 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
 
             {/* Waveform visualization */}
             <div className="w-full">
-              <Waveform
+              <SimpleLevelWaveform
                 level={isListening ? inputLevel : isSpeaking ? outputLevel : 0}
                 isActive={isListening || isSpeaking}
                 color={maestro.color}
-                barCount={32}
+                height={48}
               />
             </div>
           </div>

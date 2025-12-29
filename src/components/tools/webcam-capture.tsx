@@ -2,25 +2,38 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, X, Check, RotateCcw, Loader2 } from 'lucide-react';
+import { Camera, X, Check, RotateCcw, Loader2, Timer, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
+import { useSettingsStore } from '@/lib/stores/app-store';
 
 interface WebcamCaptureProps {
   purpose: string;
   instructions?: string;
   onCapture: (imageData: string) => void;
   onClose: () => void;
+  showTimer?: boolean; // Enable timer mode for homework capture
 }
 
-export function WebcamCapture({ purpose, instructions, onCapture, onClose }: WebcamCaptureProps) {
+type TimerOption = 0 | 3 | 5 | 10;
+
+export function WebcamCapture({ purpose, instructions, onCapture, onClose, showTimer = false }: WebcamCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Timer state
+  const [selectedTimer, setSelectedTimer] = useState<TimerOption>(showTimer ? 3 : 0);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [showTimerMenu, setShowTimerMenu] = useState(false);
+  const [showFlash, setShowFlash] = useState(false);
+
+  // Get preferred camera from settings
+  const preferredCameraId = useSettingsStore((s) => s.preferredCameraId);
 
   // Start camera with timeout to prevent infinite loading
   useEffect(() => {
@@ -32,18 +45,28 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
       // Set a timeout for camera initialization (10 seconds)
       timeoutId = setTimeout(() => {
         if (mounted && isLoading) {
-          setError('Camera initialization timed out. Please try again.');
+          setError('Timeout fotocamera. Riprova.');
           setIsLoading(false);
         }
       }, 10000);
 
       try {
+        // Build video constraints with preferred camera if set
+        const videoConstraints: MediaTrackConstraints = {
+          facingMode: 'environment', // Prefer back camera on mobile
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+        };
+
+        // If user has a preferred camera, use it
+        if (preferredCameraId) {
+          videoConstraints.deviceId = { exact: preferredCameraId };
+          // Remove facingMode when using specific device
+          delete videoConstraints.facingMode;
+        }
+
         const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: 'environment', // Prefer back camera on mobile
-            width: { ideal: 1280 },
-            height: { ideal: 720 },
-          },
+          video: videoConstraints,
         });
 
         currentStream = mediaStream;
@@ -66,7 +89,25 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
       } catch (err) {
         logger.error('Camera error', { error: String(err) });
         if (mounted) {
-          setError('Unable to access camera. Please check permissions.');
+          // Try again without specific device ID
+          if (preferredCameraId) {
+            try {
+              const fallbackStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
+              });
+              if (mounted && videoRef.current) {
+                videoRef.current.srcObject = fallbackStream;
+                await videoRef.current.play();
+                setStream(fallbackStream);
+                setIsLoading(false);
+                if (timeoutId) clearTimeout(timeoutId);
+                return;
+              }
+            } catch {
+              // Continue to error state
+            }
+          }
+          setError('Impossibile accedere alla fotocamera. Controlla i permessi.');
           setIsLoading(false);
           if (timeoutId) clearTimeout(timeoutId);
         }
@@ -84,7 +125,7 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Intentionally empty - stream is captured in closure at mount time
+  }, [preferredCameraId]); // Re-run if preferred camera changes
 
   // Cleanup on unmount
   useEffect(() => {
@@ -106,8 +147,31 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  // Capture image
-  const handleCapture = useCallback(() => {
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown === null) return;
+
+    if (countdown === 0) {
+      // Flash and capture
+      setShowFlash(true);
+      setTimeout(() => {
+        setShowFlash(false);
+        doCapture();
+      }, 150);
+      setCountdown(null);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown]);
+
+  // Actual capture function
+  const doCapture = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
@@ -132,18 +196,43 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
     }
   }, [stream]);
 
+  // Handle capture button click
+  const handleCapture = useCallback(() => {
+    if (selectedTimer > 0) {
+      setCountdown(selectedTimer);
+    } else {
+      setShowFlash(true);
+      setTimeout(() => {
+        setShowFlash(false);
+        doCapture();
+      }, 150);
+    }
+  }, [selectedTimer, doCapture]);
+
+  // Cancel countdown
+  const handleCancelCountdown = useCallback(() => {
+    setCountdown(null);
+  }, []);
+
   // Retake photo
   const handleRetake = useCallback(async () => {
     setCapturedImage(null);
     setIsLoading(true);
 
     try {
+      const videoConstraints: MediaTrackConstraints = {
+        facingMode: 'environment',
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      };
+
+      if (preferredCameraId) {
+        videoConstraints.deviceId = { exact: preferredCameraId };
+        delete videoConstraints.facingMode;
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'environment',
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
+        video: videoConstraints,
       });
 
       if (videoRef.current) {
@@ -157,10 +246,10 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
         setIsLoading(false);
       }
     } catch (_err) {
-      setError('Unable to restart camera.');
+      setError('Impossibile riavviare la fotocamera.');
       setIsLoading(false);
     }
-  }, []);
+  }, [preferredCameraId]);
 
   // Confirm and send
   const handleConfirm = useCallback(() => {
@@ -168,6 +257,8 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
       onCapture(capturedImage);
     }
   }, [capturedImage, onCapture]);
+
+  const timerOptions: TimerOption[] = [0, 3, 5, 10];
 
   return (
     <motion.div
@@ -195,7 +286,7 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
             size="icon"
             onClick={onClose}
             className="text-slate-400 hover:text-white"
-            aria-label="Chiudi webcam"
+            aria-label="Chiudi fotocamera"
           >
             <X className="w-5 h-5" />
           </Button>
@@ -209,7 +300,7 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
                 <Camera className="w-16 h-16 mx-auto text-slate-600 mb-4" />
                 <p className="text-slate-400">{error}</p>
                 <Button variant="outline" className="mt-4" onClick={onClose}>
-                  Close
+                  Chiudi
                 </Button>
               </div>
             </div>
@@ -235,9 +326,55 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     src={capturedImage}
-                    alt="Captured homework"
+                    alt="Foto catturata"
                     className="w-full h-full object-contain"
                   />
+                )}
+              </AnimatePresence>
+
+              {/* Flash effect */}
+              <AnimatePresence>
+                {showFlash && (
+                  <motion.div
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: 0 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute inset-0 bg-white z-20"
+                  />
+                )}
+              </AnimatePresence>
+
+              {/* Countdown overlay */}
+              <AnimatePresence>
+                {countdown !== null && countdown > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 bg-black/50 flex items-center justify-center z-10"
+                  >
+                    <motion.div
+                      key={countdown}
+                      initial={{ scale: 1.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.5, opacity: 0 }}
+                      transition={{ type: 'spring', damping: 15, stiffness: 300 }}
+                      className="text-center"
+                    >
+                      <div className="text-8xl font-bold text-white drop-shadow-lg">
+                        {countdown}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleCancelCountdown}
+                        className="mt-6 border-white/50 text-white hover:bg-white/20"
+                      >
+                        Annulla
+                      </Button>
+                    </motion.div>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </>
@@ -247,11 +384,11 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
           <canvas ref={canvasRef} className="hidden" />
 
           {/* Capture guide overlay (when not captured) */}
-          {!capturedImage && !isLoading && !error && (
+          {!capturedImage && !isLoading && !error && countdown === null && (
             <div className="absolute inset-4 border-2 border-dashed border-white/30 rounded-lg pointer-events-none">
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full">
                 <p className="text-sm text-white/80">
-                  Position your homework in the frame
+                  Posiziona il contenuto nell&apos;inquadratura
                 </p>
               </div>
             </div>
@@ -261,15 +398,60 @@ export function WebcamCapture({ purpose, instructions, onCapture, onClose }: Web
         {/* Controls */}
         <div className="p-4 flex justify-center gap-4">
           {!capturedImage ? (
-            <Button
-              onClick={handleCapture}
-              disabled={isLoading || !!error}
-              size="lg"
-              className="bg-blue-600 hover:bg-blue-700 px-8"
-            >
-              <Camera className="w-5 h-5 mr-2" />
-              Scatta foto
-            </Button>
+            <>
+              {/* Timer selector (only if showTimer is true) */}
+              {showTimer && (
+                <div className="relative">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => setShowTimerMenu(!showTimerMenu)}
+                    className="border-slate-600 min-w-[100px]"
+                    disabled={countdown !== null}
+                  >
+                    <Timer className="w-4 h-4 mr-2" />
+                    {selectedTimer === 0 ? 'No timer' : `${selectedTimer}s`}
+                    <ChevronDown className="w-4 h-4 ml-2" />
+                  </Button>
+
+                  <AnimatePresence>
+                    {showTimerMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute bottom-full left-0 mb-2 bg-slate-800 border border-slate-700 rounded-lg shadow-lg overflow-hidden"
+                      >
+                        {timerOptions.map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => {
+                              setSelectedTimer(t);
+                              setShowTimerMenu(false);
+                            }}
+                            className={`w-full px-4 py-2 text-left hover:bg-slate-700 transition-colors ${
+                              selectedTimer === t ? 'bg-blue-600/30 text-blue-400' : 'text-slate-300'
+                            }`}
+                          >
+                            {t === 0 ? 'Immediato' : `${t} secondi`}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+
+              <Button
+                onClick={handleCapture}
+                disabled={isLoading || !!error || countdown !== null}
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 px-8"
+              >
+                <Camera className="w-5 h-5 mr-2" />
+                {countdown !== null ? 'In corso...' : 'Scatta foto'}
+              </Button>
+            </>
           ) : (
             <>
               <Button

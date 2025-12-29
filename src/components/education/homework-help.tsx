@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { WebcamCapture } from '@/components/tools/webcam-capture';
 import type { Homework, HomeworkStep } from '@/types';
 
 interface HomeworkHelpProps {
@@ -37,6 +38,7 @@ export function HomeworkHelp({
   const [expandedStep, setExpandedStep] = useState<string | null>(null);
   const [showHints, setShowHints] = useState<Record<string, number>>({});
   const [question, setQuestion] = useState('');
+  const [showWebcam, setShowWebcam] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,6 +49,25 @@ export function HomeworkHelp({
     const reader = new FileReader();
     reader.onload = (e) => setPhotoPreview(e.target?.result as string);
     reader.readAsDataURL(file);
+
+    // Upload and analyze
+    setIsUploading(true);
+    try {
+      await onSubmitPhoto(file);
+    } finally {
+      setIsUploading(false);
+    }
+  }, [onSubmitPhoto]);
+
+  // Handle webcam capture - convert base64 to File
+  const handleWebcamCapture = useCallback(async (imageData: string) => {
+    setShowWebcam(false);
+    setPhotoPreview(imageData);
+
+    // Convert base64 to File
+    const response = await fetch(imageData);
+    const blob = await response.blob();
+    const file = new File([blob], 'homework-photo.jpg', { type: 'image/jpeg' });
 
     // Upload and analyze
     setIsUploading(true);
@@ -108,20 +129,11 @@ export function HomeworkHelp({
             </div>
           )}
 
-          {/* Upload buttons - separate inputs for camera vs file picker */}
+          {/* Upload buttons */}
           <div className="grid grid-cols-2 gap-4">
-            {/* Camera input */}
+            {/* File picker input for gallery */}
             <input
               ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFileSelect}
-              className="hidden"
-              id="camera-input"
-            />
-            {/* File picker input (no capture) */}
-            <input
               type="file"
               accept="image/*"
               onChange={handleFileSelect}
@@ -131,13 +143,7 @@ export function HomeworkHelp({
             <Button
               variant="outline"
               className="h-auto py-6 flex-col"
-              onClick={() => {
-                const input = document.getElementById('camera-input') as HTMLInputElement;
-                if (input) {
-                  input.value = ''; // Reset to allow re-selection
-                  input.click();
-                }
-              }}
+              onClick={() => setShowWebcam(true)}
               disabled={isUploading}
             >
               <Camera className="w-6 h-6 mb-2" />
@@ -159,6 +165,19 @@ export function HomeworkHelp({
               <span>Carica immagine</span>
             </Button>
           </div>
+
+          {/* Webcam capture modal */}
+          <AnimatePresence>
+            {showWebcam && (
+              <WebcamCapture
+                purpose="Fotografa il compito"
+                instructions="Posiziona l'esercizio nell'inquadratura. Usa il timer per avere tempo di sistemare il libro."
+                onCapture={handleWebcamCapture}
+                onClose={() => setShowWebcam(false)}
+                showTimer={true}
+              />
+            )}
+          </AnimatePresence>
         </CardContent>
       </Card>
     );

@@ -57,6 +57,9 @@ interface SettingsState {
   studentProfile: ExtendedStudentProfile;
   appearance: AppearanceSettings;
   preferredProvider: ProviderPreference;
+  preferredMicrophoneId: string; // Empty string = system default
+  preferredOutputId: string; // Empty string = system default (speakers)
+  preferredCameraId: string; // Empty string = system default
   // Sync state
   lastSyncedAt: Date | null;
   pendingSync: boolean;
@@ -69,6 +72,9 @@ interface SettingsState {
   updateStudentProfile: (profile: Partial<ExtendedStudentProfile>) => void;
   updateAppearance: (appearance: Partial<AppearanceSettings>) => void;
   setPreferredProvider: (provider: ProviderPreference) => void;
+  setPreferredMicrophone: (microphoneId: string) => void;
+  setPreferredOutput: (outputId: string) => void;
+  setPreferredCamera: (cameraId: string) => void;
   // Sync actions
   syncToServer: () => Promise<void>;
   loadFromServer: () => Promise<void>;
@@ -103,6 +109,9 @@ export const useSettingsStore = create<SettingsState>()(
         language: 'it',
       },
       preferredProvider: 'auto',
+      preferredMicrophoneId: '', // Empty = system default
+      preferredOutputId: '', // Empty = system default (speakers)
+      preferredCameraId: '', // Empty = system default
       lastSyncedAt: null,
       pendingSync: false,
 
@@ -124,6 +133,12 @@ export const useSettingsStore = create<SettingsState>()(
         })),
       setPreferredProvider: (preferredProvider) =>
         set({ preferredProvider, pendingSync: true }),
+      setPreferredMicrophone: (preferredMicrophoneId) =>
+        set({ preferredMicrophoneId, pendingSync: true }),
+      setPreferredOutput: (preferredOutputId) =>
+        set({ preferredOutputId, pendingSync: true }),
+      setPreferredCamera: (preferredCameraId) =>
+        set({ preferredCameraId, pendingSync: true }),
 
       syncToServer: async () => {
         const state = get();

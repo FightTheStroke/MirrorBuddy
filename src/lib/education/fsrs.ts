@@ -131,7 +131,8 @@ function calculateNewStability(
 ): number {
   // Quality 1 (Again/Forgot) - significantly reduce stability
   if (quality === 1) {
-    return S * 0.3 * Math.pow(11.0, D - 1.0);
+    const newS = S * 0.3 * Math.pow(11.0, D - 1.0);
+    return Math.max(MIN_STABILITY_DAYS, Math.min(MAX_STABILITY_DAYS, newS));
   }
 
   // FSRS formula for successful recall

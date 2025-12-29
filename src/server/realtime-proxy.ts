@@ -39,10 +39,39 @@ function getProviderConfig(): ProviderConfig | null {
       .replace(/^https:\/\//, 'wss://')
       .replace(/^http:\/\//, 'ws://');
     const url = new URL(normalized);
-    url.pathname = '/openai/v1/realtime';
-    url.searchParams.set('model', azureDeployment);
-    // Azure GA: api-key in URL query string (like Swift app does)
-    url.searchParams.set('api-key', azureApiKey);
+
+    // =========================================================================
+    // AZURE REALTIME API: Preview vs GA
+    // =========================================================================
+    // CRITICAL: Azure has TWO different API formats that use different:
+    //   1. URL paths
+    //   2. Query parameters
+    //   3. Event names (response.audio.delta vs response.output_audio.delta)
+    //
+    // Preview API (gpt-4o-realtime-preview):
+    //   - Path: /openai/realtime
+    //   - Events: response.audio.delta, response.audio_transcript.delta
+    //
+    // GA API (gpt-realtime):
+    //   - Path: /openai/v1/realtime
+    //   - Events: response.output_audio.delta, response.output_audio_transcript.delta
+    //
+    // See: docs/AZURE_REALTIME_API.md for full documentation
+    // =========================================================================
+    const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.includes('preview');
+
+    if (isPreviewModel) {
+      // Preview API format: /openai/realtime with api-version and deployment
+      url.pathname = '/openai/realtime';
+      url.searchParams.set('api-version', '2025-04-01-preview');
+      url.searchParams.set('deployment', azureDeployment);
+      url.searchParams.set('api-key', azureApiKey);
+    } else {
+      // GA API format: /openai/v1/realtime with model
+      url.pathname = '/openai/v1/realtime';
+      url.searchParams.set('model', azureDeployment);
+      url.searchParams.set('api-key', azureApiKey);
+    }
 
     return {
       provider: 'azure',

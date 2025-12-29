@@ -200,6 +200,14 @@ async function azureChatCompletion(
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const url = `${config.endpoint}/openai/deployments/${config.model}/chat/completions?api-version=${apiVersion}`;
 
+  console.log(`[Azure Chat] Calling: ${url.replace(/api-key=[^&]+/gi, 'api-key=***')}`);
+  console.log(`[Azure Chat] Model: ${config.model}, Endpoint: ${config.endpoint}`);
+
+  // Build messages array - only include system message if systemPrompt is provided
+  const allMessages = systemPrompt
+    ? [{ role: 'system', content: systemPrompt }, ...messages]
+    : messages;
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -207,7 +215,7 @@ async function azureChatCompletion(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      messages: allMessages,
       temperature,
       max_tokens: maxTokens,
     }),
@@ -215,7 +223,8 @@ async function azureChatCompletion(
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`Azure OpenAI error: ${error}`);
+    console.error(`[Azure Chat] Error ${response.status}: ${error}`);
+    throw new Error(`Azure OpenAI error (${response.status}): ${error}`);
   }
 
   const data = await response.json();
@@ -234,6 +243,11 @@ async function ollamaChatCompletion(
   systemPrompt: string,
   temperature: number
 ): Promise<ChatCompletionResult> {
+  // Build messages array - only include system message if systemPrompt is provided
+  const allMessages = systemPrompt
+    ? [{ role: 'system', content: systemPrompt }, ...messages]
+    : messages;
+
   // Ollama supports OpenAI-compatible API at /v1/chat/completions
   const response = await fetch(`${config.endpoint}/v1/chat/completions`, {
     method: 'POST',
@@ -242,7 +256,7 @@ async function ollamaChatCompletion(
     },
     body: JSON.stringify({
       model: config.model,
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      messages: allMessages,
       temperature,
       stream: false,
     }),

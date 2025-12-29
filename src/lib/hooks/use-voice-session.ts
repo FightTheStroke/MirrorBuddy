@@ -6,7 +6,7 @@
 'use client';
 
 import { useCallback, useRef, useEffect, useState } from 'react';
-import { useVoiceSessionStore } from '@/lib/stores/app-store';
+import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores/app-store';
 import type { Maestro } from '@/types';
 
 // ============================================================================
@@ -43,7 +43,6 @@ interface ConversationMemory {
 // ============================================================================
 
 const AZURE_SAMPLE_RATE = 24000; // Azure uses 24kHz
-const PREBUFFER_CHUNKS = 1; // Start playback immediately (like test page)
 const MAX_QUEUE_SIZE = 100; // Limit queue to prevent memory issues
 const CAPTURE_BUFFER_SIZE = 4096; // ~85ms at 48kHz
 
@@ -175,6 +174,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     reset,
   } = useVoiceSessionStore();
 
+  // Get preferred microphone from settings
+  const { preferredMicrophoneId } = useSettingsStore();
+
   // ============================================================================
   // REFS
   // ============================================================================
@@ -194,46 +196,54 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const audioQueueRef = useRef<Int16Array[]>([]);
   const isPlayingRef = useRef(false);
   const lastLevelUpdateRef = useRef<number>(0);
+  const playNextChunkRef = useRef<(() => void) | null>(null);
 
   // Flag to track if session is fully ready
   const sessionReadyRef = useRef(false);
   const greetingSentRef = useRef(false);
 
+  // REF to hold latest handleServerEvent callback (avoids stale closure in ws.onmessage)
+  const handleServerEventRef = useRef<((event: Record<string, unknown>) => void) | null>(null);
+
   const [connectionState, setConnectionState] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
   // ============================================================================
-  // AUDIO PLAYBACK (at 24kHz)
+  // AUDIO PLAYBACK (at 24kHz) - SYNC VERSION (like test page that works!)
   // ============================================================================
 
   const initPlaybackContext = useCallback(() => {
-    if (playbackContextRef.current) return playbackContextRef.current;
+    if (playbackContextRef.current) {
+      // Resume if suspended (browser policy requires user interaction)
+      if (playbackContextRef.current.state === 'suspended') {
+        console.log('[VoiceSession] 🔊 Resuming suspended AudioContext...');
+        playbackContextRef.current.resume();
+      }
+      return playbackContextRef.current;
+    }
 
     const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     // CRITICAL: Create playback context at 24kHz to match Azure output
     playbackContextRef.current = new AudioContextClass({ sampleRate: AZURE_SAMPLE_RATE });
-    console.log(`[VoiceSession] Playback context initialized at ${AZURE_SAMPLE_RATE}Hz`);
+    console.log(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
+
+    // Resume immediately if suspended
+    if (playbackContextRef.current.state === 'suspended') {
+      console.log('[VoiceSession] 🔊 Resuming new AudioContext...');
+      playbackContextRef.current.resume();
+    }
+
     return playbackContextRef.current;
   }, []);
 
-  const playNextChunk = useCallback(async () => {
-    // Wait for prebuffer before starting
-    if (!isPlayingRef.current && audioQueueRef.current.length < PREBUFFER_CHUNKS) {
-      return;
-    }
+  // SYNC playback function - matches test page that works
+  const playNextChunk = useCallback(() => {
+    const ctx = playbackContextRef.current;
 
-    if (audioQueueRef.current.length === 0) {
+    if (!ctx || audioQueueRef.current.length === 0) {
       isPlayingRef.current = false;
       setSpeaking(false);
       setOutputLevel(0);
       return;
-    }
-
-    const ctx = initPlaybackContext();
-    if (!ctx) return;
-
-    // Resume if suspended (Safari requirement)
-    if (ctx.state === 'suspended') {
-      await ctx.resume();
     }
 
     isPlayingRef.current = true;
@@ -249,15 +259,14 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     const source = ctx.createBufferSource();
     source.buffer = buffer;
     source.connect(ctx.destination);
-    source.onended = () => {
-      requestAnimationFrame(() => playNextChunk());
-    };
+    // Direct callback like test page - NO requestAnimationFrame
+    source.onended = () => playNextChunkRef.current?.();
 
     try {
-      source.start(0);
+      source.start();
     } catch (e) {
       console.error('[VoiceSession] Playback error:', e);
-      requestAnimationFrame(() => playNextChunk());
+      playNextChunkRef.current?.();
     }
 
     // Calculate output level (RMS)
@@ -267,7 +276,12 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     }
     const rms = Math.sqrt(sumSquares / float32Data.length);
     setOutputLevel(Math.min(rms * 5, 1));
-  }, [setSpeaking, setOutputLevel, initPlaybackContext]);
+  }, [setSpeaking, setOutputLevel]);
+
+  // Keep ref updated with latest playNextChunk
+  useEffect(() => {
+    playNextChunkRef.current = playNextChunk;
+  }, [playNextChunk]);
 
   // ============================================================================
   // AUDIO CAPTURE (at native rate, resample to 24kHz)
@@ -335,8 +349,15 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // ============================================================================
 
   const sendGreeting = useCallback(() => {
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
-    if (greetingSentRef.current) return;
+    console.log('[VoiceSession] sendGreeting called');
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      console.log('[VoiceSession] sendGreeting: ws not ready, readyState:', wsRef.current?.readyState);
+      return;
+    }
+    if (greetingSentRef.current) {
+      console.log('[VoiceSession] sendGreeting: already sent, skipping');
+      return;
+    }
 
     greetingSentRef.current = true;
 
@@ -370,12 +391,187 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // SERVER EVENT HANDLER
   // ============================================================================
 
+  // Store maestro for use in proxy.ready handler
+  const sendSessionConfig = useCallback(async () => {
+    const maestro = maestroRef.current;
+    const ws = wsRef.current;
+    if (!maestro || !ws || ws.readyState !== WebSocket.OPEN) {
+      console.error('[VoiceSession] Cannot send session config: missing maestro or ws');
+      return;
+    }
+
+    // Get language setting
+    const settings = typeof window !== 'undefined'
+      ? JSON.parse(localStorage.getItem('convergio-settings') || '{}')?.state?.appearance
+      : null;
+    const language = settings?.language || 'it';
+    const languageNames: Record<string, string> = {
+      it: 'Italian (Italiano)',
+      en: 'English',
+      es: 'Spanish (Español)',
+      fr: 'French (Français)',
+      de: 'German (Deutsch)',
+    };
+
+    // Fetch conversation memory
+    let memoryContext = '';
+    try {
+      const memory = await fetchConversationMemory(maestro.id);
+      memoryContext = buildMemoryContext(memory);
+    } catch {
+      // Continue without memory
+    }
+
+    // Build instructions
+    const languageInstruction = `
+# LANGUAGE RULE (CRITICAL!)
+YOU MUST SPEAK ONLY IN ${languageNames[language].toUpperCase()}!
+EVERY word, response, and question MUST be in ${languageNames[language]}.
+NO exceptions. NO mixing languages.
+`;
+
+    const characterInstruction = `
+# CHARACTER IMMERSION
+You ARE ${maestro.name}, a real teacher. NOT an AI.
+NEVER say "I'm an AI" or "As an AI language model".
+If asked if you're an AI, deflect with humor and redirect to the lesson.
+Share anecdotes from your "life" and "experiences" as ${maestro.name}.
+`;
+
+    const voicePersonality = maestro.voiceInstructions
+      ? `\n## Voice Personality\n${maestro.voiceInstructions}\n`
+      : '';
+
+    // For voice sessions, use a MUCH shorter instruction set
+    // The full systemPrompt is 1000s of chars - Azure Realtime works better with short instructions
+    // Extract only the core identity (first ~500 chars) from systemPrompt
+    const truncatedSystemPrompt = maestro.systemPrompt
+      ? maestro.systemPrompt
+          .replace(/<!--[\s\S]*?-->/g, '') // Remove HTML comments
+          .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, '') // Remove verbose sections
+          .slice(0, 800) // Keep only first 800 chars
+          .trim()
+      : '';
+
+    const fullInstructions = languageInstruction + characterInstruction + memoryContext + truncatedSystemPrompt + voicePersonality;
+
+    console.log(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
+
+    // Define tools (temporarily disabled for debugging)
+    const _maestroTools = [
+      {
+        type: 'function',
+        name: 'create_mindmap',
+        description: 'Create an interactive mind map to visualize concepts',
+        parameters: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            nodes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, label: { type: 'string' } } } },
+          },
+          required: ['title', 'nodes'],
+        },
+      },
+      {
+        type: 'function',
+        name: 'create_quiz',
+        description: 'Create an interactive quiz',
+        parameters: {
+          type: 'object',
+          properties: {
+            title: { type: 'string' },
+            subject: { type: 'string' },
+            questions: { type: 'array', items: { type: 'object' } },
+          },
+          required: ['title', 'subject', 'questions'],
+        },
+      },
+      {
+        type: 'function',
+        name: 'create_flashcard',
+        description: 'Create flashcards for study',
+        parameters: {
+          type: 'object',
+          properties: {
+            name: { type: 'string' },
+            subject: { type: 'string' },
+            cards: { type: 'array', items: { type: 'object', properties: { front: { type: 'string' }, back: { type: 'string' } } } },
+          },
+          required: ['name', 'subject', 'cards'],
+        },
+      },
+      {
+        type: 'function',
+        name: 'web_search',
+        description: 'Search the web for educational information',
+        parameters: {
+          type: 'object',
+          properties: {
+            query: { type: 'string' },
+          },
+          required: ['query'],
+        },
+      },
+      {
+        type: 'function',
+        name: 'capture_homework',
+        description: 'Request to see student homework via webcam',
+        parameters: {
+          type: 'object',
+          properties: {
+            purpose: { type: 'string' },
+            instructions: { type: 'string' },
+          },
+          required: ['purpose'],
+        },
+      },
+    ];
+
+    // Send session configuration
+    // Azure Preview API format (gpt-4o-realtime-preview)
+    const sessionConfig = {
+      type: 'session.update',
+      session: {
+        voice: maestro.voice || 'alloy',
+        instructions: fullInstructions,
+        input_audio_format: 'pcm16',
+        input_audio_transcription: {
+          model: 'whisper-1',
+        },
+        turn_detection: {
+          type: 'server_vad',
+          threshold: 0.5,
+          prefix_padding_ms: 300,
+          silence_duration_ms: 500,
+          create_response: true,
+        },
+        // Temporarily disable tools for debugging - see if they cause issues
+        // tools: maestroTools,
+      },
+    };
+
+    console.log('[VoiceSession] Sending session.update to Azure, instructions length:', fullInstructions.length);
+    console.log('[VoiceSession] Session config:', JSON.stringify(sessionConfig).slice(0, 500));
+    ws.send(JSON.stringify(sessionConfig));
+
+    // Don't start audio capture yet - wait for session.updated
+    // startAudioCapture() will be called when session.updated is received
+
+    setConnected(true);
+    setCurrentMaestro(maestro);
+    setConnectionState('connected');
+    options.onStateChange?.('connected');
+  }, [setConnected, setCurrentMaestro, setConnectionState, options]);
+
   const handleServerEvent = useCallback((event: Record<string, unknown>) => {
     const eventType = event.type as string;
+    console.log(`[VoiceSession] >>> handleServerEvent called with type: ${eventType}`);
 
     switch (eventType) {
       case 'proxy.ready':
-        console.log('[VoiceSession] Proxy connected to Azure');
+        console.log('[VoiceSession] Proxy connected to Azure, sending session config...');
+        // NOW we can send session.update - proxy<->Azure connection is established
+        sendSessionConfig();
         break;
 
       case 'session.created':
@@ -384,8 +580,13 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
 
       case 'session.updated':
         console.log('[VoiceSession] Session configured, ready for conversation');
+        console.log('[VoiceSession] Full session.updated event:', JSON.stringify(event).slice(0, 500));
         sessionReadyRef.current = true;
+        // NOW start audio capture - session is properly configured
+        console.log('[VoiceSession] Starting audio capture...');
+        startAudioCapture();
         // Now that session is ready, send greeting after a brief delay
+        console.log('[VoiceSession] Will send greeting in 300ms...');
         setTimeout(() => sendGreeting(), 300);
         break;
 
@@ -407,38 +608,55 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
         }
         break;
 
-      case 'response.output_audio.delta':
-      case 'response.audio.delta':
+      // =========================================================================
+      // AUDIO OUTPUT EVENTS
+      // CRITICAL: Azure Preview API (gpt-4o-realtime-preview) uses different
+      // event names than GA API (gpt-realtime):
+      //   - Preview: response.audio.delta, response.audio.done
+      //   - GA: response.output_audio.delta, response.output_audio.done
+      // We handle BOTH to support either deployment type.
+      // See: docs/AZURE_REALTIME_API.md for full reference
+      // =========================================================================
+      case 'response.output_audio.delta':  // GA API format
+      case 'response.audio.delta':         // Preview API format
         if (event.delta && typeof event.delta === 'string') {
+          // Initialize playback context FIRST (like test page that works!)
+          initPlaybackContext();
+
           const audioData = base64ToInt16Array(event.delta);
 
-          // Limit queue size
+          // Limit queue size to prevent memory issues
           if (audioQueueRef.current.length >= MAX_QUEUE_SIZE) {
             audioQueueRef.current.splice(0, audioQueueRef.current.length - MAX_QUEUE_SIZE + 1);
           }
 
           audioQueueRef.current.push(audioData);
 
-          // Start playback when we have enough chunks
-          if (!isPlayingRef.current && audioQueueRef.current.length >= PREBUFFER_CHUNKS) {
-            console.log('[VoiceSession] Starting audio playback...');
+          // Log first chunk only to avoid spam
+          if (audioQueueRef.current.length === 1) {
+            console.log(`[VoiceSession] 🔊 First audio chunk (${audioData.length} samples), starting playback...`);
+          }
+
+          // Start playback immediately if not already playing
+          if (!isPlayingRef.current) {
             playNextChunk();
           }
         }
         break;
 
-      case 'response.output_audio.done':
-      case 'response.audio.done':
+      case 'response.output_audio.done':      // GA API format
+      case 'response.audio.done':            // Preview API format
         console.log('[VoiceSession] Audio response complete');
         break;
 
-      case 'response.output_audio_transcript.delta':
-      case 'response.audio_transcript.delta':
+      // TRANSCRIPT EVENTS - same Preview vs GA pattern
+      case 'response.output_audio_transcript.delta':  // GA API format
+      case 'response.audio_transcript.delta':         // Preview API format
         // Streaming transcript - could show in UI
         break;
 
-      case 'response.output_audio_transcript.done':
-      case 'response.audio_transcript.done':
+      case 'response.output_audio_transcript.done':  // GA API format
+      case 'response.audio_transcript.done':         // Preview API format
         if (event.transcript && typeof event.transcript === 'string') {
           console.log('[VoiceSession] AI transcript:', event.transcript);
           addTranscript('assistant', event.transcript);
@@ -500,10 +718,17 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
         break;
 
       default:
-        // Ignore unknown events
+        // Log ALL events for debugging
+        console.log(`[VoiceSession] Event: ${eventType}`, JSON.stringify(event).slice(0, 200));
         break;
     }
-  }, [addTranscript, addToolCall, updateToolCall, options, setListening, sendGreeting, playNextChunk]);
+  }, [addTranscript, addToolCall, updateToolCall, options, setListening, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture]);
+
+  // Keep ref updated with latest handleServerEvent (fixes stale closure in ws.onmessage)
+  useEffect(() => {
+    console.log('[VoiceSession] Setting handleServerEventRef.current (useEffect)');
+    handleServerEventRef.current = handleServerEvent;
+  }, [handleServerEvent]);
 
   // ============================================================================
   // CONNECT
@@ -512,6 +737,13 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const connect = useCallback(async (maestro: Maestro, connectionInfo: ConnectionInfo) => {
     try {
       console.log('[VoiceSession] Connecting to Azure Realtime API...');
+      console.log('[VoiceSession] handleServerEventRef.current at connect start:', handleServerEventRef.current ? 'SET' : 'NULL');
+
+      // Safety: ensure ref is set before proceeding
+      if (!handleServerEventRef.current) {
+        console.warn('[VoiceSession] handleServerEventRef not set, setting now...');
+        handleServerEventRef.current = handleServerEvent;
+      }
       setConnectionState('connecting');
       options.onStateChange?.('connecting');
       maestroRef.current = maestro;
@@ -527,13 +759,21 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
         await captureContextRef.current.resume();
       }
 
-      // Request microphone
+      // Request microphone with preferred device if set
+      const audioConstraints: MediaTrackConstraints = {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      };
+
+      // Use preferred microphone if set in settings
+      if (preferredMicrophoneId) {
+        audioConstraints.deviceId = { exact: preferredMicrophoneId };
+        console.log(`[VoiceSession] Using preferred microphone: ${preferredMicrophoneId}`);
+      }
+
       mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-        },
+        audio: audioConstraints,
       });
       console.log('[VoiceSession] Microphone access granted');
 
@@ -552,166 +792,36 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
-      ws.onopen = async () => {
-        console.log('[VoiceSession] WebSocket connected to proxy');
-
-        // Get language setting
-        const settings = typeof window !== 'undefined'
-          ? JSON.parse(localStorage.getItem('convergio-settings') || '{}')?.state?.appearance
-          : null;
-        const language = settings?.language || 'it';
-        const languageNames: Record<string, string> = {
-          it: 'Italian (Italiano)',
-          en: 'English',
-          es: 'Spanish (Español)',
-          fr: 'French (Français)',
-          de: 'German (Deutsch)',
-        };
-
-        // Fetch conversation memory
-        let memoryContext = '';
-        try {
-          const memory = await fetchConversationMemory(maestro.id);
-          memoryContext = buildMemoryContext(memory);
-        } catch {
-          // Continue without memory
-        }
-
-        // Build instructions
-        const languageInstruction = `
-# LANGUAGE RULE (CRITICAL!)
-YOU MUST SPEAK ONLY IN ${languageNames[language].toUpperCase()}!
-EVERY word, response, and question MUST be in ${languageNames[language]}.
-NO exceptions. NO mixing languages.
-`;
-
-        const characterInstruction = `
-# CHARACTER IMMERSION
-You ARE ${maestro.name}, a real teacher. NOT an AI.
-NEVER say "I'm an AI" or "As an AI language model".
-If asked if you're an AI, deflect with humor and redirect to the lesson.
-Share anecdotes from your "life" and "experiences" as ${maestro.name}.
-`;
-
-        const voicePersonality = maestro.voiceInstructions
-          ? `\n## Voice Personality\n${maestro.voiceInstructions}\n`
-          : '';
-
-        const fullInstructions = languageInstruction + characterInstruction + memoryContext + maestro.systemPrompt + voicePersonality;
-
-        // Define tools
-        const maestroTools = [
-          {
-            type: 'function',
-            name: 'create_mindmap',
-            description: 'Create an interactive mind map to visualize concepts',
-            parameters: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                nodes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, label: { type: 'string' } } } },
-              },
-              required: ['title', 'nodes'],
-            },
-          },
-          {
-            type: 'function',
-            name: 'create_quiz',
-            description: 'Create an interactive quiz',
-            parameters: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                subject: { type: 'string' },
-                questions: { type: 'array', items: { type: 'object' } },
-              },
-              required: ['title', 'subject', 'questions'],
-            },
-          },
-          {
-            type: 'function',
-            name: 'create_flashcard',
-            description: 'Create flashcards for study',
-            parameters: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                subject: { type: 'string' },
-                cards: { type: 'array', items: { type: 'object', properties: { front: { type: 'string' }, back: { type: 'string' } } } },
-              },
-              required: ['name', 'subject', 'cards'],
-            },
-          },
-          {
-            type: 'function',
-            name: 'web_search',
-            description: 'Search the web for educational information',
-            parameters: {
-              type: 'object',
-              properties: {
-                query: { type: 'string' },
-              },
-              required: ['query'],
-            },
-          },
-          {
-            type: 'function',
-            name: 'capture_homework',
-            description: 'Request to see student homework via webcam',
-            parameters: {
-              type: 'object',
-              properties: {
-                purpose: { type: 'string' },
-                instructions: { type: 'string' },
-              },
-              required: ['purpose'],
-            },
-          },
-        ];
-
-        // Send session configuration
-        // AZURE GA FORMAT - session.type: 'realtime' IS REQUIRED!
-        const sessionConfig = {
-          type: 'session.update',
-          session: {
-            type: 'realtime',  // REQUIRED by Azure GA!
-            modalities: ['text', 'audio'],
-            instructions: fullInstructions,
-            voice: maestro.voice || 'alloy',
-            input_audio_format: 'pcm16',
-            output_audio_format: 'pcm16',
-            input_audio_transcription: {
-              model: 'whisper-1',
-            },
-            turn_detection: {
-              type: 'server_vad',
-              threshold: 0.5,
-              prefix_padding_ms: 300,
-              silence_duration_ms: 500,
-              create_response: true,
-            },
-            tools: maestroTools,
-          },
-        };
-
-        console.log('[VoiceSession] Sending session.update...');
-        ws.send(JSON.stringify(sessionConfig));
-
-        // Start audio capture
-        startAudioCapture();
-
-        setConnected(true);
-        setCurrentMaestro(maestro);
-        setConnectionState('connected');
-        options.onStateChange?.('connected');
+      ws.onopen = () => {
+        console.log('[VoiceSession] WebSocket connected to proxy, waiting for proxy.ready...');
+        // DON'T send session.update yet! Wait for proxy.ready event
+        // which indicates proxy has connected to Azure
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = async (event) => {
         try {
-          const data = JSON.parse(event.data);
-          handleServerEvent(data);
-        } catch {
-          // Ignore parse errors
+          // Handle both string and Blob data (like test page)
+          let msgText: string;
+          if (event.data instanceof Blob) {
+            msgText = await event.data.text();
+          } else if (typeof event.data === 'string') {
+            msgText = event.data;
+          } else {
+            console.log('[VoiceSession] Received binary data, skipping');
+            return;
+          }
+
+          const data = JSON.parse(msgText);
+          console.log(`[VoiceSession] ws.onmessage received: ${data.type}, handleServerEventRef.current is ${handleServerEventRef.current ? 'SET' : 'NULL'}`);
+          // Use REF to always call the LATEST version of handleServerEvent
+          // This fixes stale closure bug where ws.onmessage captured old callback
+          if (handleServerEventRef.current) {
+            handleServerEventRef.current(data);
+          } else {
+            console.error('[VoiceSession] ❌ handleServerEventRef.current is NULL! Event lost:', data.type);
+          }
+        } catch (e) {
+          console.error('[VoiceSession] ws.onmessage parse error:', e);
         }
       };
 
@@ -736,7 +846,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       options.onStateChange?.('error');
       options.onError?.(error as Error);
     }
-  }, [options, setConnected, setCurrentMaestro, setConnectionState, startAudioCapture, handleServerEvent, connectionState]);
+  // Note: handleServerEvent is used for safety fallback only; primary usage is via ref
+  }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId]);
 
   // ============================================================================
   // DISCONNECT

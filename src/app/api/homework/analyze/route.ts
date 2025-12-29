@@ -7,6 +7,7 @@
 import { NextResponse } from 'next/server';
 import { getActiveProvider } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
+import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 
 interface HomeworkStep {
   id: string;
@@ -24,6 +25,15 @@ interface AnalysisResult {
 }
 
 export async function POST(request: Request) {
+  // Rate limiting: 10 requests per minute per IP (vision API is expensive)
+  const clientId = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(`homework:${clientId}`, RATE_LIMITS.HOMEWORK);
+
+  if (!rateLimit.success) {
+    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/homework/analyze' });
+    return rateLimitResponse(rateLimit);
+  }
+
   try {
     const { image, systemPrompt } = await request.json();
 

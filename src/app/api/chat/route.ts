@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
+import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -20,6 +21,15 @@ interface ChatRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting: 20 requests per minute per IP
+  const clientId = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(`chat:${clientId}`, RATE_LIMITS.CHAT);
+
+  if (!rateLimit.success) {
+    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/chat' });
+    return rateLimitResponse(rateLimit);
+  }
+
   try {
     const body: ChatRequest = await request.json();
     const { messages, systemPrompt, maestroId } = body;

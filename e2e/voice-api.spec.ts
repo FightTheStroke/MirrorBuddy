@@ -217,10 +217,10 @@ test.describe('WebSocket Proxy', () => {
     // We should get some kind of response
     expect(responses.length).toBeGreaterThan(2);
 
-    // If Azure is working, we should get audio delta or at least response.done
-    if (gotAudioDelta) {
-      expect(gotAudioDelta).toBe(true);
-    }
+    // Log whether Azure returned audio (not a failure if no audio - could be text-only response)
+    console.log('Got audio delta:', gotAudioDelta);
+    console.log('Got transcript:', gotTranscript);
+    console.log('Got response done:', gotResponseDone);
   });
 });
 
