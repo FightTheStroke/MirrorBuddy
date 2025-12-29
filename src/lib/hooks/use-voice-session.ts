@@ -462,8 +462,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
     console.log(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
 
-    // Define tools (temporarily disabled for debugging)
-    const _maestroTools = [
+    // Define tools for voice session
+    const maestroTools = [
       {
         type: 'function',
         name: 'create_mindmap',
@@ -550,8 +550,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           silence_duration_ms: voiceSilenceDuration,  // User configurable (300-800ms)
           create_response: true,
         },
-        // Temporarily disable tools for debugging - see if they cause issues
-        // tools: maestroTools,
+        tools: maestroTools,
       },
     };
 
