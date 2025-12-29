@@ -31,6 +31,7 @@ import {
   Loader2,
   RefreshCw,
   Video,
+  Settings,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -885,6 +886,8 @@ function AudioSettings() {
   const micStreamRef = useRef<MediaStream | null>(null);
   const micContextRef = useRef<AudioContext | null>(null);
   const micAnimationRef = useRef<number | null>(null);
+  const micAnalyserRef = useRef<AnalyserNode | null>(null);
+  const waveformCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Refs for video test
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -929,12 +932,12 @@ function AudioSettings() {
     };
   }, [refreshDevices]);
 
-  // Start microphone test
+  // Start microphone test with waveform visualization
   const startMicTest = async () => {
     try {
       const constraints: MediaStreamConstraints = {
         audio: preferredMicrophoneId
-          ? { deviceId: { exact: preferredMicrophoneId } }
+          ? { deviceId: { ideal: preferredMicrophoneId } }
           : true
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -945,21 +948,79 @@ function AudioSettings() {
       micContextRef.current = audioContext;
 
       const analyser = audioContext.createAnalyser();
-      analyser.fftSize = 256;
+      analyser.fftSize = 2048;
+      micAnalyserRef.current = analyser;
       const source = audioContext.createMediaStreamSource(stream);
       source.connect(analyser);
 
-      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const canvas = waveformCanvasRef.current;
+      if (!canvas) {
+        console.error('Waveform canvas not found');
+        return;
+      }
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-      const updateLevel = () => {
-        analyser.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-        setAudioLevel(Math.min(100, average * 1.5));
-        micAnimationRef.current = requestAnimationFrame(updateLevel);
+      const timeDataArray = new Uint8Array(analyser.fftSize);
+
+      const drawWaveform = () => {
+        if (!micAnalyserRef.current) return;
+        micAnimationRef.current = requestAnimationFrame(drawWaveform);
+
+        // Get time domain data for waveform
+        micAnalyserRef.current.getByteTimeDomainData(timeDataArray);
+
+        // Calculate audio level (RMS)
+        let sum = 0;
+        for (let i = 0; i < timeDataArray.length; i++) {
+          const value = (timeDataArray[i] - 128) / 128;
+          sum += value * value;
+        }
+        const rms = Math.sqrt(sum / timeDataArray.length);
+        const level = Math.min(100, rms * 400);
+        setAudioLevel(level);
+
+        // Draw waveform
+        const width = canvas.width;
+        const height = canvas.height;
+
+        ctx.fillStyle = 'rgb(15, 23, 42)'; // slate-900
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = level > 5 ? 'rgb(34, 197, 94)' : 'rgb(100, 116, 139)'; // green-500 or slate-500
+        ctx.beginPath();
+
+        const sliceWidth = width / timeDataArray.length;
+        let x = 0;
+
+        for (let i = 0; i < timeDataArray.length; i++) {
+          const v = timeDataArray[i] / 128.0;
+          const y = (v * height) / 2;
+
+          if (i === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+
+          x += sliceWidth;
+        }
+
+        ctx.lineTo(width, height / 2);
+        ctx.stroke();
+
+        // Draw level bar at the bottom
+        const gradient = ctx.createLinearGradient(0, 0, (width * level) / 100, 0);
+        gradient.addColorStop(0, 'rgb(34, 197, 94)');    // green
+        gradient.addColorStop(0.7, 'rgb(234, 179, 8)');  // yellow
+        gradient.addColorStop(1, 'rgb(239, 68, 68)');    // red
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, height - 4, (width * level) / 100, 4);
       };
 
       setMicTestActive(true);
-      updateLevel();
+      drawWaveform();
     } catch (error) {
       console.error('Mic test error:', error);
     }
@@ -979,8 +1040,19 @@ function AudioSettings() {
       micContextRef.current.close();
       micContextRef.current = null;
     }
+    micAnalyserRef.current = null;
     setMicTestActive(false);
     setAudioLevel(0);
+
+    // Clear canvas
+    const canvas = waveformCanvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = 'rgb(30, 41, 59)'; // slate-800
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+    }
   };
 
   // Start camera test
@@ -1132,23 +1204,33 @@ function AudioSettings() {
             </Button>
           </div>
 
-          {/* Mic level indicator */}
-          {micTestActive && (
-            <div className="space-y-2">
+          {/* Waveform visualization */}
+          <div className="space-y-2">
+            {micTestActive && (
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
                 <span className="text-sm text-slate-600 dark:text-slate-400">
                   Parla per testare il microfono
                 </span>
+                <span className="text-sm font-mono text-slate-500 dark:text-slate-400 ml-auto">
+                  {Math.round(audioLevel)}%
+                </span>
               </div>
-              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500 transition-all duration-75"
-                  style={{ width: `${audioLevel}%` }}
-                />
-              </div>
+            )}
+            <div className="relative">
+              <canvas
+                ref={waveformCanvasRef}
+                width={600}
+                height={80}
+                className="w-full h-[80px] rounded-lg bg-slate-800 dark:bg-slate-900"
+              />
+              {!micTestActive && (
+                <div className="absolute inset-0 flex items-center justify-center text-slate-500 dark:text-slate-400 text-sm">
+                  Clicca &quot;Testa Microfono&quot; per vedere la waveform
+                </div>
+              )}
             </div>
-          )}
+          </div>
 
           <div className="flex gap-3">
             {!micTestActive ? (
@@ -1291,6 +1373,9 @@ function AudioSettings() {
         </CardContent>
       </Card>
 
+      {/* Voice Experience Settings */}
+      <VoiceExperienceSettings />
+
       {/* Info about Continuity */}
       <Card>
         <CardHeader>
@@ -1305,6 +1390,124 @@ function AudioSettings() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// Voice Experience Settings - VAD, silence, barge-in controls
+function VoiceExperienceSettings() {
+  const {
+    voiceVadThreshold,
+    voiceSilenceDuration,
+    voiceBargeInEnabled,
+    setVoiceVadThreshold,
+    setVoiceSilenceDuration,
+    setVoiceBargeInEnabled,
+  } = useSettingsStore();
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="w-5 h-5 text-purple-500" />
+          Esperienza Vocale
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <p className="text-slate-600 dark:text-slate-400 text-sm">
+          Personalizza il comportamento delle conversazioni vocali con i Maestri.
+        </p>
+
+        {/* Barge-in Toggle */}
+        <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+          <div className="space-y-1">
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              Interruzione automatica (Barge-in)
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Permetti di interrompere il Maestro mentre parla iniziando a parlare tu.
+            </p>
+          </div>
+          <button
+            onClick={() => setVoiceBargeInEnabled(!voiceBargeInEnabled)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              voiceBargeInEnabled ? 'bg-purple-600' : 'bg-slate-300 dark:bg-slate-600'
+            }`}
+            role="switch"
+            aria-checked={voiceBargeInEnabled}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                voiceBargeInEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* VAD Threshold Slider */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              Sensibilità rilevamento voce
+            </div>
+            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
+              {voiceVadThreshold.toFixed(2)}
+            </span>
+          </div>
+          <input
+            type="range"
+            min="0.3"
+            max="0.7"
+            step="0.05"
+            value={voiceVadThreshold}
+            onChange={(e) => setVoiceVadThreshold(parseFloat(e.target.value))}
+            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
+          />
+          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Più sensibile (voce bassa)</span>
+            <span>Meno sensibile (rumore)</span>
+          </div>
+        </div>
+
+        {/* Silence Duration Slider */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="font-medium text-slate-900 dark:text-slate-100">
+              Attesa fine frase
+            </div>
+            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
+              {voiceSilenceDuration}ms
+            </span>
+          </div>
+          <input
+            type="range"
+            min="300"
+            max="800"
+            step="50"
+            value={voiceSilenceDuration}
+            onChange={(e) => setVoiceSilenceDuration(parseInt(e.target.value))}
+            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
+          />
+          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Più veloce (risposte rapide)</span>
+            <span>Più lento (frasi lunghe)</span>
+          </div>
+        </div>
+
+        {/* Reset to defaults */}
+        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
+          <button
+            onClick={() => {
+              setVoiceVadThreshold(0.4);
+              setVoiceSilenceDuration(400);
+              setVoiceBargeInEnabled(true);
+            }}
+            className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+          >
+            Ripristina valori predefiniti
+          </button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

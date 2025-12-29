@@ -60,6 +60,10 @@ interface SettingsState {
   preferredMicrophoneId: string; // Empty string = system default
   preferredOutputId: string; // Empty string = system default (speakers)
   preferredCameraId: string; // Empty string = system default
+  // Voice settings (Azure Realtime API)
+  voiceVadThreshold: number; // VAD sensitivity (0.3-0.7, default 0.4)
+  voiceSilenceDuration: number; // Silence before turn ends (300-800ms, default 400)
+  voiceBargeInEnabled: boolean; // Allow interrupting maestro (default true)
   // Sync state
   lastSyncedAt: Date | null;
   pendingSync: boolean;
@@ -75,6 +79,10 @@ interface SettingsState {
   setPreferredMicrophone: (microphoneId: string) => void;
   setPreferredOutput: (outputId: string) => void;
   setPreferredCamera: (cameraId: string) => void;
+  // Voice settings actions
+  setVoiceVadThreshold: (threshold: number) => void;
+  setVoiceSilenceDuration: (duration: number) => void;
+  setVoiceBargeInEnabled: (enabled: boolean) => void;
   // Sync actions
   syncToServer: () => Promise<void>;
   loadFromServer: () => Promise<void>;
@@ -112,6 +120,10 @@ export const useSettingsStore = create<SettingsState>()(
       preferredMicrophoneId: '', // Empty = system default
       preferredOutputId: '', // Empty = system default (speakers)
       preferredCameraId: '', // Empty = system default
+      // Voice settings defaults
+      voiceVadThreshold: 0.4, // Balanced sensitivity
+      voiceSilenceDuration: 400, // Fast turn-taking
+      voiceBargeInEnabled: true, // Allow interrupting maestro
       lastSyncedAt: null,
       pendingSync: false,
 
@@ -139,6 +151,13 @@ export const useSettingsStore = create<SettingsState>()(
         set({ preferredOutputId, pendingSync: true }),
       setPreferredCamera: (preferredCameraId) =>
         set({ preferredCameraId, pendingSync: true }),
+      // Voice settings setters with validation
+      setVoiceVadThreshold: (threshold) =>
+        set({ voiceVadThreshold: Math.max(0.3, Math.min(0.7, threshold)), pendingSync: true }),
+      setVoiceSilenceDuration: (duration) =>
+        set({ voiceSilenceDuration: Math.max(300, Math.min(800, duration)), pendingSync: true }),
+      setVoiceBargeInEnabled: (enabled) =>
+        set({ voiceBargeInEnabled: enabled, pendingSync: true }),
 
       syncToServer: async () => {
         const state = get();

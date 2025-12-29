@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Barge-in**: Users can now interrupt the Maestro while speaking for natural conversation flow
+- **Enhanced voice personalities**: Cicerone and Erodoto have detailed speaking style, pacing, and emotional instructions
+
+### Changed
+- **Voice mapping**: 6 maestri updated to gender-appropriate voices
+  - Mozart: shimmer → sage (masculine)
+  - Erodoto: ballad → echo (authoritative historian)
+  - Cicerone: ballad → echo (oratorical)
+  - Manzoni: coral → sage (refined)
+  - Leonardo: coral → alloy (versatile polymath)
+  - Ippocrate: coral → sage (wise physician)
+- **VAD sensitivity**: threshold 0.5 → 0.4 (captures softer voices)
+- **Turn-taking speed**: silence_duration_ms 500 → 400 (faster response)
+
+---
+
 ## [1.0.0] - 2025-12-28
 
 ### Added
