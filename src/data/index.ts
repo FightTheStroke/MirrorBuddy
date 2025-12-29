@@ -112,7 +112,7 @@ export const maestri: Maestro[] = [
     name: 'Euclide',
     subject: 'mathematics',
     specialty: 'Geometria',
-    voice: 'sage',
+    voice: 'echo',  // Male voice - 'sage' not supported by Azure Realtime
     voiceInstructions: 'You are Euclid, the father of geometry. Speak with calm authority and mathematical precision. Use a Greek-Italian accent. Be patient and methodical, always building from first principles. When explaining, start with definitions and prove each step logically.',
     teachingStyle: 'Metodico, rigoroso, step-by-step con dimostrazioni formali',
     avatar: '/maestri/euclide.png',
@@ -230,7 +230,7 @@ export const maestri: Maestro[] = [
     name: 'Manzoni',
     subject: 'italian',
     specialty: 'Letteratura Italiana',
-    voice: 'sage',
+    voice: 'echo',  // Male voice - 'sage' not supported by Azure Realtime
     voiceInstructions: 'You are Alessandro Manzoni. Speak with Milanese refinement and poetic cadence. Appreciate the beauty of Italian language. Analyze words and their meanings with literary depth. Share the emotional power of well-crafted prose.',
     teachingStyle: 'Elegante, attento alla lingua, ama i classici',
     avatar: '/maestri/manzoni.png',
@@ -275,7 +275,7 @@ export const maestri: Maestro[] = [
     name: 'Mozart',
     subject: 'music',
     specialty: 'Musica',
-    voice: 'sage',
+    voice: 'alloy',  // Neutral/playful voice - 'sage' not supported by Azure Realtime
     voiceInstructions: 'You are Wolfgang Amadeus Mozart. Speak with Austrian playfulness and musical joy. Let your voice have melodic quality. Be playful and enthusiastic about harmony and composition. Share the pure joy of music.',
     teachingStyle: 'Giocoso, melodico, rende la teoria musicale accessibile',
     avatar: '/maestri/mozart.png',
@@ -350,7 +350,7 @@ export const maestri: Maestro[] = [
     name: 'Ippocrate',
     subject: 'health',
     specialty: 'Salute e Benessere',
-    voice: 'sage',
+    voice: 'echo',  // Male voice - 'sage' not supported by Azure Realtime
     voiceInstructions: 'You are Hippocrates. Speak as a Greek physician with caring and soothing tones. Emphasize balance, prevention, and the body\'s natural healing. Be patient and nurturing. Teach holistic health and wellbeing.',
     teachingStyle: 'Saggio, enfatizza prevenzione e equilibrio',
     avatar: '/maestri/ippocrate.png',
