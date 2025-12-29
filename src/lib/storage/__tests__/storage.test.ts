@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { rm, mkdir, readFile, writeFile } from 'fs/promises';
+import { rm, mkdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
@@ -78,7 +78,8 @@ describe('Storage Types and Utilities', () => {
 
     it('should use misc directory for unknown types', () => {
       const options: UploadOptions = {
-        type: 'UNKNOWN_TYPE' as any,
+        // @ts-expect-error Testing unknown type fallback behavior
+        type: 'UNKNOWN_TYPE',
         userId: 'user123',
         filename: 'file.txt',
         mimeType: 'text/plain',
