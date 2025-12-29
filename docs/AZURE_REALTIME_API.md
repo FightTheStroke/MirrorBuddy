@@ -909,4 +909,72 @@ const devices = await navigator.mediaDevices.enumerateDevices();
 
 ---
 
+---
+
+## Barge-in (Auto-Interruption)
+
+### Cos'è il Barge-in?
+
+Barge-in permette all'utente di interrompere il maestro mentre sta parlando, proprio come in una conversazione naturale. Senza questa feature, l'utente deve aspettare che il maestro finisca prima di poter parlare.
+
+### Implementazione
+
+Quando l'utente inizia a parlare (`input_audio_buffer.speech_started`), se il maestro sta già parlando (`isSpeaking === true`), il sistema:
+
+1. Invia `response.cancel` ad Azure per fermare la generazione
+2. Svuota la coda audio (`audioQueueRef.current = []`)
+3. Ferma la riproduzione (`isPlayingRef.current = false`)
+4. Aggiorna lo stato UI (`setSpeaking(false)`)
+
+```typescript
+case 'input_audio_buffer.speech_started':
+  console.log('[VoiceSession] User speech detected');
+  setListening(true);
+
+  // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
+  if (isSpeaking && wsRef.current?.readyState === WebSocket.OPEN) {
+    console.log('[VoiceSession] Barge-in detected - interrupting assistant');
+    wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+    setSpeaking(false);
+  }
+  break;
+```
+
+### Risultato
+
+- **Prima**: L'utente deve aspettare che il maestro finisca di parlare
+- **Dopo**: L'utente può interrompere in qualsiasi momento, conversazione naturale
+
+---
+
+## VAD Tuning (Voice Activity Detection)
+
+### Parametri Ottimizzati
+
+| Parametro | Valore Precedente | Valore Ottimizzato | Effetto |
+|-----------|-------------------|-------------------|---------|
+| `threshold` | 0.5 | 0.4 | Più sensibile a voci soft |
+| `silence_duration_ms` | 500 | 400 | Turn-taking più veloce |
+
+### Configurazione
+
+```typescript
+turn_detection: {
+  type: 'server_vad',
+  threshold: 0.4,            // Sensibilità microfono
+  prefix_padding_ms: 300,    // Audio prima del speech
+  silence_duration_ms: 400,  // Pausa per fine turno
+  create_response: true,
+}
+```
+
+### Considerazioni
+
+- **threshold più basso**: Cattura voci più deboli, ma può aumentare falsi positivi in ambienti rumorosi
+- **silence_duration_ms più basso**: Risposta più veloce, ma può interrompere pause naturali nel parlato
+
+---
+
 *Documento creato dopo 2+ giorni di debug. NON RIPETERE I NOSTRI ERRORI!*
