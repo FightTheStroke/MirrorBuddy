@@ -24,7 +24,6 @@ import {
   LazyFlashcardsView,
   LazyMindmapsView,
   LazyHomeworkHelpView,
-  LazyLibrettoView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
 } from '@/components/education';
@@ -35,7 +34,7 @@ import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
 import { cn } from '@/lib/utils';
 
-type View = 'conversation' | 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'libretto' | 'calendar' | 'demos' | 'progress' | 'settings';
+type View = 'conversation' | 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'calendar' | 'demos' | 'progress' | 'settings';
 
 export default function Home() {
   // Conversation-first: start with conversation view
@@ -52,7 +51,6 @@ export default function Home() {
     { id: 'flashcards' as const, label: 'Flashcards', icon: BookOpen },
     { id: 'mindmaps' as const, label: 'Mappe Mentali', icon: Network },
     { id: 'homework' as const, label: 'Materiali', icon: Target },
-    { id: 'libretto' as const, label: 'Libretto', icon: BookOpen },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
@@ -196,8 +194,6 @@ export default function Home() {
           {currentView === 'mindmaps' && <LazyMindmapsView />}
 
           {currentView === 'homework' && <LazyHomeworkHelpView />}
-
-          {currentView === 'libretto' && <LazyLibrettoView />}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 
