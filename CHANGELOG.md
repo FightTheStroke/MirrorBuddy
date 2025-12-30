@@ -24,6 +24,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **VAD sensitivity**: threshold 0.5 → 0.4 (captures softer voices)
 - **Turn-taking speed**: silence_duration_ms 500 → 400 (faster response)
 
+### Fixed
+- **Theme switching** (#4): Light theme now correctly overrides OS dark mode preference by explicitly mapping theme classes in next-themes ThemeProvider
+- **Accent colors** (#5): CSS custom properties for accent colors now apply correctly in light mode with `.light[data-accent]` selectors
+- **Language buttons** (#6): Selected language state has clear visual feedback in settings
+- **AI Provider status** (#7): Fixed Ollama button closing tag (was `</div>`, now `</button>`) for proper semantic HTML
+
 ---
 
 ## [1.0.0] - 2025-12-28
