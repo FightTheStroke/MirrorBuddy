@@ -14,10 +14,12 @@ import {
   Minimize2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import { Button } from '@/components/ui/button';
 import { MaterialiConversation } from './materiali-conversation';
 import { CharacterSwitcher, type Character, SUPPORT_CHARACTERS } from './character-switcher';
+import { LazyVoiceSession } from '@/components/voice/lazy';
 import type { Maestro } from '@/types';
 
 // View modes for the workspace
@@ -44,6 +46,7 @@ export function StudyWorkspace({
   const [showCharacterSwitcher, setShowCharacterSwitcher] = useState(false);
   const [isToolActive, setIsToolActive] = useState(false);
   const [recentCharacterIds, setRecentCharacterIds] = useState<string[]>([]);
+  const [showVoiceSession, setShowVoiceSession] = useState(false);
 
   const { settings } = useAccessibilityStore();
 
@@ -71,12 +74,6 @@ export function StudyWorkspace({
     setIsToolActive(false);
   }, []);
 
-  // Handle voice mode switch
-  const handleSwitchToVoice = useCallback(() => {
-    // TODO: Integrate with voice session from RT-*
-    console.log('Switch to voice mode');
-  }, []);
-
   // Get Maestro if active character is a maestro
   const activeMaestro = useMemo(() => {
     if (activeCharacter.role === 'maestro') {
@@ -84,6 +81,18 @@ export function StudyWorkspace({
     }
     return undefined;
   }, [activeCharacter, maestri]);
+
+  // Handle voice mode switch
+  const handleSwitchToVoice = useCallback(() => {
+    // Voice is only supported for maestros (not coaches or buddies)
+    // Coaches/buddies don't have voice properties (voice, voiceInstructions, etc.)
+    if (activeMaestro) {
+      setShowVoiceSession(true);
+    } else {
+      // Could show a toast notification that voice is only for maestros
+      logger.warn('Voice sessions are only available when chatting with a Maestro');
+    }
+  }, [activeMaestro]);
 
   // Layout classes based on view mode
   const layoutClasses = useMemo(() => {
@@ -271,6 +280,18 @@ export function StudyWorkspace({
         maestri={maestri}
         recentCharacterIds={recentCharacterIds}
       />
+
+      {/* Voice Session Modal (only for maestros) */}
+      <AnimatePresence mode="wait">
+        {showVoiceSession && activeMaestro && (
+          <LazyVoiceSession
+            key={`voice-${activeMaestro.id}`}
+            maestro={activeMaestro}
+            onClose={() => setShowVoiceSession(false)}
+            onSwitchToChat={() => setShowVoiceSession(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

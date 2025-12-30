@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, Phone, PhoneOff, Mic, MicOff, Volume2 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import { getSupportTeacherById } from '@/data/support-teachers';
 import { getBuddyById } from '@/data/buddy-profiles';
 import type { ExtendedStudentProfile } from '@/types';
@@ -83,8 +84,6 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -147,7 +146,7 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
 
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      console.error('Chat error:', error);
+      logger.error('Chat error', { error });
       setMessages(prev => [...prev, {
         id: `error-${Date.now()}`,
         role: 'assistant',
@@ -164,11 +163,6 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
       e.preventDefault();
       handleSend();
     }
-  };
-
-  const handleVoiceCall = () => {
-    setIsVoiceActive(!isVoiceActive);
-    // TODO: Integrate with voice session - Issue #34
   };
 
   return (
@@ -198,64 +192,7 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
           <h2 className="text-xl font-bold">{character.name}</h2>
           <p className="text-sm text-white/80">{character.role}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-white hover:bg-white/20"
-            onClick={handleVoiceCall}
-            title={isVoiceActive ? 'Termina chiamata' : 'Inizia chiamata vocale'}
-          >
-            {isVoiceActive ? <PhoneOff className="h-5 w-5" /> : <Phone className="h-5 w-5" />}
-          </Button>
-        </div>
       </div>
-
-      {/* Voice Call Overlay */}
-      <AnimatePresence>
-        {isVoiceActive && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={cn(
-              'p-4 bg-gradient-to-r text-white flex items-center justify-between',
-              character.color
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
-              <span className="font-medium">Chiamata in corso con {character.name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-white hover:bg-white/20"
-                onClick={() => setIsMuted(!isMuted)}
-              >
-                {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                className="text-white hover:bg-white/20"
-              >
-                <Volume2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleVoiceCall}
-                className="bg-red-500 hover:bg-red-600"
-              >
-                <PhoneOff className="h-4 w-4 mr-1" />
-                Termina
-              </Button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50">
