@@ -95,6 +95,8 @@ Three stores in `src/lib/stores/app-store.ts`:
 | `src/components/conversation/conversation-flow.tsx` | Main conversation UI |
 | `src/lib/stores/conversation-flow-store.ts` | Conversation state management |
 | `src/lib/profile/profile-generator.ts` | Generates student profiles from Maestri insights |
+| `src/components/profile/parent-dashboard.tsx` | Parent dashboard UI showing student insights |
+| `src/app/parent-dashboard/page.tsx` | Parent dashboard route (`/parent-dashboard`) |
 | `src/lib/safety/` | Safety guardrails for all characters |
 
 #### Character Types
