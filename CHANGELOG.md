@@ -181,10 +181,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Roadmap
 
-### [1.0.0] - Planned
-- [ ] Parent/teacher dashboard
+### Completed in MirrorBuddy v2.0
+- [x] Parent/teacher dashboard (`/parent-dashboard`)
+- [x] Study companion feature (MirrorBuddy: Mario & Maria)
+
+### Future
 - [ ] Multi-language support
-- [ ] Study companion feature (from MirrorBuddy integration)
 - [ ] Mobile-optimized UI
 - [ ] Offline mode
 

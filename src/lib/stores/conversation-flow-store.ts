@@ -359,7 +359,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         });
       },
 
-      switchToCharacter: (character, type, profile, reason) => {
+      switchToCharacter: (character, type, profile, _reason) => {
         const state = get();
 
         // 1. Save current conversation to its bucket

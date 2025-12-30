@@ -1,7 +1,10 @@
 // ============================================================================
-// MIDDLEWARE: Provider Check & Landing Redirect
+// PROXY: Provider Check & Landing Redirect
 // Redirects to /landing if no AI provider is configured
 // Allows access to public routes (landing, showcase, api, static assets)
+//
+// Next.js 16: middleware.ts renamed to proxy.ts
+// See: https://nextjs.org/docs/messages/middleware-to-proxy
 // ============================================================================
 
 import { NextResponse } from 'next/server';
@@ -39,7 +42,7 @@ const STATIC_EXTENSIONS = [
 ];
 
 /**
- * Check if Azure OpenAI is configured (middleware-safe, uses env vars directly)
+ * Check if Azure OpenAI is configured (proxy-safe, uses env vars directly)
  */
 function hasAzureProvider(): boolean {
   return !!(
@@ -65,7 +68,7 @@ function hasAnyProvider(): boolean {
   return hasAzureProvider() || hasOllamaProvider();
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Skip static files

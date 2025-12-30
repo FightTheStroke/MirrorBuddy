@@ -73,7 +73,7 @@ test.describe('Autonomy API: Mind Maps Tracking', () => {
     // Get initial autonomy metrics
     const initialResponse = await request.get('/api/progress/autonomy');
     expect(initialResponse.ok()).toBeTruthy();
-    const initialData = await initialResponse.json();
+    const _initialData = await initialResponse.json();
 
     // Update method progress with mind maps
     const methodProgressResponse = await request.put('/api/progress/method', {
