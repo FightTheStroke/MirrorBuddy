@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch all relevant data in parallel
-    const [progress, sessions, flashcards, quizResults, _learnings] = await Promise.all([
+    const [progress, sessions, flashcards, quizResults, _learnings, methodProgress] = await Promise.all([
       prisma.progress.findUnique({ where: { userId } }),
       prisma.studySession.findMany({
         where: { userId, startedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
@@ -99,6 +99,7 @@ export async function GET(request: NextRequest) {
         orderBy: { completedAt: 'desc' },
       }),
       prisma.learning.findMany({ where: { userId } }),
+      prisma.methodProgress.findUnique({ where: { userId } }),
     ]);
 
     // Calculate data quality based on available data
@@ -113,6 +114,7 @@ export async function GET(request: NextRequest) {
     // Calculate tool usage
     const flashcardRetention = calculateFlashcardRetention(flashcards);
     const averageQuizScore = calculateAverageQuizScore(quizResults);
+    const mindMapsCreated = calculateMindMapsCreated(methodProgress);
 
     // Calculate learning patterns
     const avgSessionDuration = calculateAverageSessionDuration(sessions);
@@ -153,7 +155,7 @@ export async function GET(request: NextRequest) {
         flashcardRetention,
         quizParticipation: quizResults.length,
         averageQuizScore,
-        mindMapsCreated: 0, // TODO: Track mind map creation
+        mindMapsCreated,
       },
       learningPatterns: {
         averageSessionDuration: avgSessionDuration,
@@ -231,6 +233,20 @@ function calculateFlashcardRetention(flashcards: Array<{ retrievability: number 
 function calculateAverageQuizScore(quizResults: Array<{ percentage: number }>): number {
   if (quizResults.length === 0) return 0;
   return Math.round(quizResults.reduce((sum, q) => sum + q.percentage, 0) / quizResults.length);
+}
+
+function calculateMindMapsCreated(methodProgress: { mindMaps: string } | null): number {
+  if (!methodProgress) return 0;
+  try {
+    const mindMaps = JSON.parse(methodProgress.mindMaps) as {
+      createdAlone: number;
+      createdWithHints: number;
+      createdWithFullHelp: number;
+    };
+    return (mindMaps.createdAlone || 0) + (mindMaps.createdWithHints || 0) + (mindMaps.createdWithFullHelp || 0);
+  } catch {
+    return 0;
+  }
 }
 
 function calculateAverageSessionDuration(sessions: Array<{ duration: number | null }>): number {
