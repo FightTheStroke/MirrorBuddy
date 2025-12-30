@@ -191,7 +191,30 @@ WCAG 2.1 AA compliance is mandatory:
 - ADHD mode (focus helpers)
 - Motion reduction support
 
+### Accessibility Profiles (7 presets)
+Quick-select profiles in Settings → Accessibilità:
+| Profile | Key Features |
+|---------|--------------|
+| Dislessia | OpenDyslexic font, increased spacing, TTS |
+| ADHD | Focus mode, reduced animations, break timers |
+| Autismo | Reduced motion, distraction-free, calm UI |
+| Visivo | High contrast, large text, TTS enabled |
+| Uditivo | Visual-first communication, no audio dependencies |
+| Motorio | Keyboard navigation, no animations |
+| Paralisi Cerebrale | TTS, large text, keyboard nav, extra spacing |
+
 Accessibility store at `src/lib/accessibility/accessibility-store.ts`.
+
+## Notification System
+
+**STATUS: NOT_IMPLEMENTED**
+
+The notification feature is designed but not implemented. See `src/lib/notifications/notification-service.ts` for the stub and planned types. UI placeholders exist but no actual notification delivery occurs.
+
+Planned features (GitHub Issue #14):
+- In-app toast notifications
+- Browser push notifications
+- Study reminders, streak alerts, achievements
 
 ## Environment Configuration
 
