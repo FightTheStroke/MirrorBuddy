@@ -405,3 +405,36 @@ model MethodProgress {
   @@index([userId])
   @@index([autonomyScore])
 }
+
+// ============================================================================
+// CREATED TOOLS (Maestro-generated interactive tools - Issue #39)
+// ============================================================================
+
+model CreatedTool {
+  id              String   @id @default(cuid())
+
+  // Context
+  userId          String?
+  conversationId  String?
+  maestroId       String?
+
+  // Tool metadata
+  toolType        String   // mindmap | quiz | flashcard | demo | search
+  toolId          String   @unique // Client-side tool instance ID
+
+  // Tool data (JSON stored)
+  data            String   // Tool-specific data (MindmapData, QuizData, etc.)
+
+  // Status
+  status          String   @default("active") // active | archived | deleted
+
+  // Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+  @@index([conversationId])
+  @@index([maestroId])
+  @@index([toolType])
+  @@index([createdAt])
+}
