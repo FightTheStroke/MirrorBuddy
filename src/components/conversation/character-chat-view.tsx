@@ -18,15 +18,21 @@ interface Message {
 }
 
 interface CharacterChatViewProps {
-  characterId: 'melissa' | 'roberto' | 'mario' | 'faty';
+  characterId: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij' | 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
   characterType: 'coach' | 'buddy';
 }
 
 const CHARACTER_AVATARS: Record<string, string> = {
   mario: '/avatars/mario.jpg',
-  faty: '/avatars/faty.png',
+  noemi: '/avatars/noemi.png',
+  enea: '/avatars/enea.png',
+  bruno: '/avatars/bruno.png',
+  sofia: '/avatars/sofia.png',
   melissa: '/avatars/melissa.jpg',
   roberto: '/avatars/roberto.png',
+  chiara: '/avatars/chiara.png',
+  andrea: '/avatars/andrea.png',
+  favij: '/avatars/favij.jpg',
 };
 
 // Default student profile for buddy personalization
@@ -57,7 +63,7 @@ function getCharacterInfo(characterId: string, characterType: 'coach' | 'buddy')
       systemPrompt: teacher?.systemPrompt || '',
     };
   } else {
-    const buddy = getBuddyById(characterId as 'mario' | 'faty');
+    const buddy = getBuddyById(characterId as 'mario' | 'noemi');
     // BuddyProfile uses functions for dynamic content
     const greeting = buddy?.getGreeting?.(DEFAULT_STUDENT_PROFILE) || `Ehi! Piacere di conoscerti!`;
     const systemPrompt = buddy?.getSystemPrompt?.(DEFAULT_STUDENT_PROFILE) || '';

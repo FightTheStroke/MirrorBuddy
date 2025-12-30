@@ -52,10 +52,10 @@ export function MaestriGrid() {
       <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            I Tuoi Maestri
+            I Tuoi Professori
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Scegli un maestro per iniziare a studiare
+            Scegli un professore per iniziare a studiare
           </p>
         </div>
 
@@ -64,7 +64,7 @@ export function MaestriGrid() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Cerca maestro o materia..."
+            placeholder="Cerca professore o materia..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -138,7 +138,7 @@ export function MaestriGrid() {
         <div className="text-center py-12">
           <Filter className="h-12 w-12 mx-auto text-slate-400 mb-4" />
           <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">
-            Nessun maestro trovato
+            Nessun professore trovato
           </h3>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
             Prova a modificare i filtri di ricerca

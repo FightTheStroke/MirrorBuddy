@@ -684,9 +684,15 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         break;
 
       case 'error': {
-        const errorObj = event.error as { message?: string; code?: string } | undefined;
-        console.error('[VoiceSession] Server error:', errorObj);
-        options.onError?.(new Error(errorObj?.message || 'Server error'));
+        const errorObj = event.error as { message?: string; code?: string; type?: string } | undefined;
+        const errorMessage = errorObj?.message || errorObj?.code || errorObj?.type || 'Unknown server error';
+        const hasDetails = errorObj && Object.keys(errorObj).length > 0;
+        if (hasDetails) {
+          console.error('[VoiceSession] Server error:', { message: errorMessage, details: errorObj });
+        } else {
+          console.warn('[VoiceSession] Server error with no details (empty error object)');
+        }
+        options.onError?.(new Error(errorMessage));
         break;
       }
 
