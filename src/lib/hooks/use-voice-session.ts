@@ -458,7 +458,9 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     // Extract only the core identity (first ~500 chars) from systemPrompt
     const truncatedSystemPrompt = maestro.systemPrompt
       ? maestro.systemPrompt
-          .replace(/<!--[\s\S]*?-->/g, '') // Remove HTML comments
+          .replace(/<!--[\s\S]*?-->/g, '') // Remove complete HTML comments
+          .replace(/<!--/g, '') // Remove any remaining opening comment markers
+          .replace(/-->/g, '') // Remove any remaining closing comment markers
           .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, '') // Remove verbose sections
           .slice(0, 800) // Keep only first 800 chars
           .trim()

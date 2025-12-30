@@ -84,7 +84,7 @@ const HANDOFF_SIGNAL_PATTERNS = {
   maestro_suggestion: [
     /(?:ti consiglio|potresti parlare con|c'è|chiedi a|il (?:professor|maestro))\s+(\w+)/i,
     /per (?:questa materia|questo argomento).*?(?:meglio|ideale|perfetto)\s+(\w+)/i,
-    /(?:euclide|galileo|darwin|dante|leonardo|shakespeare|curie|socrate|turing|beethoven|erodoto|mercatore|ippocrate|smith|montessori|grozio)/i,
+    /(?:euclide|feynman|manzoni|leonardo|shakespeare|curie|socrate|mozart|erodoto|humboldt|smith)/i,
   ],
   // Coach or Maestro suggesting Buddy for emotional support
   buddy_suggestion: [
@@ -377,24 +377,19 @@ function createMaestroSuggestion(
   // Try to find a maestro by name
   const normalizedName = name.toLowerCase();
 
-  // Map common names to IDs
+  // Map common names to IDs (only maestros that actually exist)
   const nameToId: Record<string, string> = {
     euclide: 'euclide-matematica',
-    galileo: 'galileo-fisica',
-    darwin: 'darwin-biologia',
-    dante: 'dante-italiano',
+    feynman: 'feynman-fisica',
+    manzoni: 'manzoni-italiano',
     leonardo: 'leonardo-arte',
     shakespeare: 'shakespeare-inglese',
     curie: 'curie-chimica',
     socrate: 'socrate-filosofia',
-    turing: 'turing-informatica',
-    beethoven: 'beethoven-musica',
+    mozart: 'mozart-musica',
     erodoto: 'erodoto-storia',
-    mercatore: 'mercatore-geografia',
-    ippocrate: 'ippocrate-salute',
+    humboldt: 'humboldt-geografia',
     smith: 'smith-economia',
-    montessori: 'montessori-civica',
-    grozio: 'grozio-diritto',
   };
 
   const maestroId = nameToId[normalizedName];
