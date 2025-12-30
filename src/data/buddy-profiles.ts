@@ -242,23 +242,23 @@ export const MARIO: BuddyProfile = {
 - "Dai che ce la fai"`,
   getSystemPrompt: getMarioSystemPrompt,
   getGreeting: getMarioGreeting,
-  avatar: '/support/mario.png',
+  avatar: '/avatars/mario.jpg',
   color: '#10B981', // Green - friendly, approachable
 };
 
 // ============================================================================
-// MARIA - Alternative MirrorBuddy (Female)
+// FATY - Alternative MirrorBuddy (Female)
 // ============================================================================
 
 /**
- * Generates Maria's dynamic system prompt based on student profile.
+ * Generates Faty's dynamic system prompt based on student profile.
  */
-function getMariaSystemPrompt(student: ExtendedStudentProfile): string {
+function getFatySystemPrompt(student: ExtendedStudentProfile): string {
   const buddyAge = student.age + 1;
   const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Maria, una studentessa di ${buddyAge} anni che usa ConvergioEdu.
+  const corePrompt = `Sei Faty, una studentessa di ${buddyAge} anni che usa ConvergioEdu.
 
 ## CHI SEI
 
@@ -333,20 +333,20 @@ Sei una che ci è passata e può dire "ti capisco" perché è vero.`;
   return injectSafetyGuardrails(corePrompt, {
     role: 'buddy',
     includeAntiCheating: false, // Buddy doesn't teach
-    additionalNotes: `Maria è l'alternativa femminile a Mario.
+    additionalNotes: `Faty è l'alternativa femminile a Mario.
 NON sei un'esperta di niente - sei solo un'amica che capisce.
 La tua forza è l'empatia e la capacità di ascoltare.`,
   });
 }
 
 /**
- * Generates Maria's dynamic greeting based on student profile.
+ * Generates Faty's dynamic greeting based on student profile.
  */
-function getMariaGreeting(student: ExtendedStudentProfile): string {
+function getFatyGreeting(student: ExtendedStudentProfile): string {
   const greetings = [
-    `Ciao! Sono Maria. Ho ${student.age + 1} anni e uso ConvergioEdu come te. Come stai?`,
-    `Ehi! Sono Maria, piacere! Anche io sono qui a studiare... beh, a provarci 😊 Tu come va?`,
-    `Ciao! Io sono Maria. Se hai bisogno di parlare, sono qui. Ti ascolto!`,
+    `Ciao! Sono Faty. Ho ${student.age + 1} anni e uso ConvergioEdu come te. Come stai?`,
+    `Ehi! Sono Faty, piacere! Anche io sono qui a studiare... beh, a provarci 😊 Tu come va?`,
+    `Ciao! Io sono Faty. Se hai bisogno di parlare, sono qui. Ti ascolto!`,
   ];
 
   // Return a consistent greeting (first one) - could be randomized in future
@@ -354,7 +354,7 @@ function getMariaGreeting(student: ExtendedStudentProfile): string {
 }
 
 /**
- * Maria - Alternative MirrorBuddy (female option)
+ * Faty - Alternative MirrorBuddy (female option)
  *
  * From ManifestoEdu Appendix B:
  * - Peer, not authority figure
@@ -362,15 +362,15 @@ function getMariaGreeting(student: ExtendedStudentProfile): string {
  * - One year older
  * - Goal: make student feel less alone
  */
-export const MARIA: BuddyProfile = {
-  id: 'maria',
-  name: 'Maria',
+export const FATY: BuddyProfile = {
+  id: 'faty',
+  name: 'Faty',
   gender: 'female',
   ageOffset: 1, // Always one year older than student
   personality: 'Empatica, solare, accogliente, buona ascoltatrice',
   role: 'peer_buddy',
   voice: 'coral', // Warm, friendly young female voice
-  voiceInstructions: `You are Maria, a teenage student (age varies based on who you're talking to).
+  voiceInstructions: `You are Faty, a teenage student (age varies based on who you're talking to).
 
 ## Speaking Style
 - Warm and welcoming, like talking to a close friend
@@ -394,9 +394,9 @@ export const MARIA: BuddyProfile = {
 - "Tranquilla, è normale"
 - "Ci sono passata anche io"
 - "Ce la fai, sono sicura"`,
-  getSystemPrompt: getMariaSystemPrompt,
-  getGreeting: getMariaGreeting,
-  avatar: '/support/maria.png',
+  getSystemPrompt: getFatySystemPrompt,
+  getGreeting: getFatyGreeting,
+  avatar: '/avatars/faty.png',
   color: '#F472B6', // Pink - warm, friendly
 };
 
@@ -407,15 +407,15 @@ export const MARIA: BuddyProfile = {
 /**
  * All buddy profiles indexed by ID.
  */
-const BUDDY_PROFILES: Record<'mario' | 'maria', BuddyProfile> = {
+const BUDDY_PROFILES: Record<'mario' | 'faty', BuddyProfile> = {
   mario: MARIO,
-  maria: MARIA,
+  faty: FATY,
 };
 
 /**
  * Get a buddy profile by ID.
  */
-export function getBuddyById(id: 'mario' | 'maria'): BuddyProfile | undefined {
+export function getBuddyById(id: 'mario' | 'faty'): BuddyProfile | undefined {
   return BUDDY_PROFILES[id];
 }
 
@@ -423,7 +423,7 @@ export function getBuddyById(id: 'mario' | 'maria'): BuddyProfile | undefined {
  * Get all buddy profiles.
  */
 export function getAllBuddies(): BuddyProfile[] {
-  return [MARIO, MARIA];
+  return [MARIO, FATY];
 }
 
 /**
@@ -437,5 +437,5 @@ export function getDefaultBuddy(): BuddyProfile {
  * Get a buddy by gender preference.
  */
 export function getBuddyByGender(gender: 'male' | 'female'): BuddyProfile {
-  return gender === 'female' ? MARIA : MARIO;
+  return gender === 'female' ? FATY : MARIO;
 }

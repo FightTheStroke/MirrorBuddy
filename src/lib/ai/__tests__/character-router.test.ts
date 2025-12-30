@@ -258,7 +258,7 @@ describe('Character Router', () => {
     it('should respect preferred Coach', () => {
       const profileWithPreference: ExtendedStudentProfile = {
         ...defaultProfile,
-        preferredCoach: 'davide',
+        preferredCoach: 'roberto',
       };
 
       const context: RoutingContext = {
@@ -268,13 +268,13 @@ describe('Character Router', () => {
 
       const result = routeToCharacter(context);
       expect(result.characterType).toBe('coach');
-      expect((result.character as { id: string }).id).toBe('davide');
+      expect((result.character as { id: string }).id).toBe('roberto');
     });
 
     it('should respect preferred Buddy', () => {
       const profileWithPreference: ExtendedStudentProfile = {
         ...defaultProfile,
-        preferredBuddy: 'maria',
+        preferredBuddy: 'faty',
       };
 
       const context: RoutingContext = {
@@ -284,7 +284,7 @@ describe('Character Router', () => {
 
       const result = routeToCharacter(context);
       expect(result.characterType).toBe('buddy');
-      expect((result.character as { id: string }).id).toBe('maria');
+      expect((result.character as { id: string }).id).toBe('faty');
     });
 
     it('should use default Coach when no preference', () => {
@@ -360,13 +360,13 @@ describe('Character Router', () => {
       expect(buddy.id).toBe('mario');
     });
 
-    it('should return Maria when preferred', () => {
-      const profileWithMaria: ExtendedStudentProfile = {
+    it('should return Faty when preferred', () => {
+      const profileWithFaty: ExtendedStudentProfile = {
         ...defaultProfile,
-        preferredBuddy: 'maria',
+        preferredBuddy: 'faty',
       };
-      const buddy = getBuddyForStudent(profileWithMaria);
-      expect(buddy.id).toBe('maria');
+      const buddy = getBuddyForStudent(profileWithFaty);
+      expect(buddy.id).toBe('faty');
     });
   });
 

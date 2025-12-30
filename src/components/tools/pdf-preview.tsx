@@ -266,6 +266,7 @@ export function PDFPreview({
                     className="relative"
                     style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}
                   >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- Data URL from PDF rendering */}
                     <img
                       src={currentPageData.imageData}
                       alt={`Pagina ${currentPageData.pageNumber}`}
@@ -317,6 +318,7 @@ export function PDFPreview({
                           }
                         `}
                       >
+                        {/* eslint-disable-next-line @next/next/no-img-element -- Data URL from PDF rendering */}
                         <img
                           src={page.imageData}
                           alt={`Pagina ${page.pageNumber}`}

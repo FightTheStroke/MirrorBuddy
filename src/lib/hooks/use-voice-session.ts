@@ -13,7 +13,10 @@ import {
   TOOL_USAGE_INSTRUCTIONS,
   executeVoiceTool,
   isToolCreationCommand,
+  getToolTypeFromName,
 } from '@/lib/voice';
+import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
+import type { ToolType as MethodToolType, HelpLevel } from '@/lib/method-progress/types';
 
 // ============================================================================
 // TYPES
@@ -236,6 +239,10 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // Flag to track if session is fully ready
   const sessionReadyRef = useRef(false);
   const greetingSentRef = useRef(false);
+
+  // Track if Azure has an active response (for proper response.cancel handling)
+  // This prevents sending response.cancel when no response is active
+  const hasActiveResponseRef = useRef(false);
 
   // REF to hold latest handleServerEvent callback (avoids stale closure in ws.onmessage)
   const handleServerEventRef = useRef<((event: Record<string, unknown>) => void) | null>(null);
@@ -555,15 +562,29 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         setTimeout(() => sendGreeting(), 300);
         break;
 
+      case 'response.created':
+        // Azure has started generating a response - track this for proper cancellation
+        hasActiveResponseRef.current = true;
+        console.log('[VoiceSession] Response created - hasActiveResponse = true');
+        break;
+
       case 'input_audio_buffer.speech_started':
         console.log('[VoiceSession] User speech detected');
         setListening(true);
 
         // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
-        // Only if barge-in is enabled in user settings
-        if (voiceBargeInEnabled && isSpeaking && wsRef.current?.readyState === WebSocket.OPEN) {
-          console.log('[VoiceSession] Barge-in detected - interrupting assistant');
+        // Only if barge-in is enabled in user settings AND Azure actually has an active response
+        // Using hasActiveResponseRef instead of isSpeaking to prevent response_cancel_not_active errors
+        if (voiceBargeInEnabled && hasActiveResponseRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+          console.log('[VoiceSession] Barge-in detected - interrupting assistant (hasActiveResponse=true)');
           wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+          hasActiveResponseRef.current = false; // Mark as cancelled
+          audioQueueRef.current = [];
+          isPlayingRef.current = false;
+          setSpeaking(false);
+        } else if (voiceBargeInEnabled && isSpeaking) {
+          // Audio is still playing locally but Azure response is done - just clear local audio
+          console.log('[VoiceSession] Clearing local audio queue (response already done)');
           audioQueueRef.current = [];
           isPlayingRef.current = false;
           setSpeaking(false);
@@ -640,7 +661,15 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         break;
 
       case 'response.done':
-        console.log('[VoiceSession] Response complete');
+        // Azure has finished generating the response - clear the active flag
+        hasActiveResponseRef.current = false;
+        console.log('[VoiceSession] Response complete - hasActiveResponse = false');
+        break;
+
+      case 'response.cancelled':
+        // Azure confirms the response was cancelled
+        hasActiveResponseRef.current = false;
+        console.log('[VoiceSession] Response cancelled by client - hasActiveResponse = false');
         break;
 
       case 'error': {
@@ -689,6 +718,40 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
                 if (result.success) {
                   console.log(`[VoiceSession] Tool created: ${result.toolId}`);
                   updateToolCall(toolCall.id, { status: 'completed' });
+
+                  // Track tool creation for method progress (autonomy tracking)
+                  const voiceToolType = getToolTypeFromName(toolName);
+                  if (voiceToolType) {
+                    const methodTool = voiceToolType === 'mindmap' ? 'mind_map'
+                      : voiceToolType === 'flashcards' ? 'flashcard'
+                      : voiceToolType === 'quiz' ? 'quiz'
+                      : voiceToolType === 'summary' ? 'summary'
+                      : 'diagram';
+
+                    // Map subject string to MethodSubject type (Italian names)
+                    type MethodSubject = import('@/lib/method-progress/types').Subject;
+                    const subjectMap: Record<string, MethodSubject> = {
+                      mathematics: 'matematica', math: 'matematica', matematica: 'matematica',
+                      italian: 'italiano', italiano: 'italiano',
+                      history: 'storia', storia: 'storia',
+                      geography: 'geografia', geografia: 'geografia',
+                      science: 'scienze', scienze: 'scienze', physics: 'scienze', biology: 'scienze',
+                      english: 'inglese', inglese: 'inglese',
+                      art: 'arte', arte: 'arte',
+                      music: 'musica', musica: 'musica',
+                    };
+                    const mappedSubject = args.subject
+                      ? subjectMap[String(args.subject).toLowerCase()] ?? 'other'
+                      : undefined;
+
+                    // Voice-created tools are with AI hints (not alone, not full help)
+                    useMethodProgressStore.getState().recordToolCreation(
+                      methodTool as MethodToolType,
+                      'hints' as HelpLevel,
+                      mappedSubject
+                    );
+                    console.log(`[VoiceSession] Method progress tracked: ${methodTool} with hints`);
+                  }
                 } else {
                   console.error(`[VoiceSession] Tool creation failed: ${result.error}`);
                   updateToolCall(toolCall.id, { status: 'error' });
@@ -898,6 +961,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     isPlayingRef.current = false;
     sessionReadyRef.current = false;
     greetingSentRef.current = false;
+    hasActiveResponseRef.current = false;
     maestroRef.current = null;
 
     reset();
@@ -935,12 +999,16 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
   }, [addTranscript]);
 
   const cancelResponse = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
+    // Only send response.cancel if Azure actually has an active response
+    if (wsRef.current?.readyState === WebSocket.OPEN && hasActiveResponseRef.current) {
+      console.log('[VoiceSession] Cancelling active response');
       wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
-      audioQueueRef.current = [];
-      isPlayingRef.current = false;
-      setSpeaking(false);
+      hasActiveResponseRef.current = false;
     }
+    // Always clear local audio queue
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+    setSpeaking(false);
   }, [setSpeaking]);
 
   const sendWebcamResult = useCallback((callId: string, imageData: string | null) => {
