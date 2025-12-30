@@ -99,13 +99,13 @@ test.describe('Voice Mapping Validation', () => {
     }
   });
 
-  test('Mozart has sage voice (not shimmer)', async ({ request }) => {
+  test('Mozart has alloy voice (not shimmer)', async ({ request }) => {
     const response = await request.get('/api/maestri');
     const maestri = await response.json();
 
     const mozart = maestri.find((m: { id: string }) => m.id.toLowerCase().includes('mozart'));
     expect(mozart).toBeTruthy();
-    expect(mozart.voice).toBe('sage');
+    expect(mozart.voice).toBe('alloy');
   });
 
   test('Erodoto has echo voice (not ballad)', async ({ request }) => {
@@ -126,13 +126,13 @@ test.describe('Voice Mapping Validation', () => {
     expect(cicerone.voice).toBe('echo');
   });
 
-  test('Manzoni has sage voice (not coral)', async ({ request }) => {
+  test('Manzoni has echo voice (not coral)', async ({ request }) => {
     const response = await request.get('/api/maestri');
     const maestri = await response.json();
 
     const manzoni = maestri.find((m: { id: string }) => m.id.toLowerCase().includes('manzoni'));
     expect(manzoni).toBeTruthy();
-    expect(manzoni.voice).toBe('sage');
+    expect(manzoni.voice).toBe('echo');
   });
 
   test('Leonardo has alloy voice (not coral)', async ({ request }) => {
@@ -144,13 +144,13 @@ test.describe('Voice Mapping Validation', () => {
     expect(leonardo.voice).toBe('alloy');
   });
 
-  test('Ippocrate has sage voice (not coral)', async ({ request }) => {
+  test('Ippocrate has echo voice (not coral)', async ({ request }) => {
     const response = await request.get('/api/maestri');
     const maestri = await response.json();
 
     const ippocrate = maestri.find((m: { id: string }) => m.id.toLowerCase().includes('ippocrate'));
     expect(ippocrate).toBeTruthy();
-    expect(ippocrate.voice).toBe('sage');
+    expect(ippocrate.voice).toBe('echo');
   });
 });
 

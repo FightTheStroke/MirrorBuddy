@@ -99,7 +99,7 @@ test.describe('Voice Session and UI Integration', () => {
     await page.waitForTimeout(500);
 
     // Go back to home
-    await page.locator('button').filter({ hasText: 'Maestri' }).first().click();
+    await page.locator('button').filter({ hasText: 'Professori' }).first().click();
     await page.waitForTimeout(500);
 
     // Open voice session
@@ -123,7 +123,7 @@ test.describe('Navigation State Integration', () => {
       'Flashcards',
       'Progressi',
       'Impostazioni',
-      'Maestri',
+      'Professori',
     ];
 
     for (const view of views) {
@@ -275,7 +275,7 @@ test.describe('Error Handling Integration', () => {
     await expect(mainContent).toBeVisible();
 
     // Sidebar should still work
-    await page.locator('button').filter({ hasText: 'Maestri' }).first().click();
+    await page.locator('button').filter({ hasText: 'Professori' }).first().click();
     await page.waitForTimeout(500);
   });
 

@@ -15,8 +15,8 @@ test.describe('Archive View: Material Viewer', () => {
   });
 
   test('Archive page loads correctly', async ({ page }) => {
-    // Check the archive page is accessible
-    await expect(page).toHaveTitle(/ConvergioEdu|Archive|Archivio/i);
+    // Check the archive page is accessible (title may include hyphen: Convergio-Edu)
+    await expect(page).toHaveTitle(/Convergio[-]?Edu|Archive|Archivio/i);
 
     // Look for archive-related content
     const archiveHeading = page.getByRole('heading', { level: 1 });

@@ -174,8 +174,8 @@ test.describe('Permission Error UI', () => {
     await page.keyboard.press('Escape');
     await page.waitForTimeout(500);
 
-    // Verify we're back to main view
-    const canSeeMaestri = await page.locator('text=Maestri').first().isVisible().catch(() => false);
+    // Verify we're back to main view (look for Professori or any maestro name)
+    const canSeeMaestri = await page.locator('text=Professori').or(page.locator('text=Euclide')).first().isVisible().catch(() => false);
     expect(canSeeMaestri).toBeTruthy();
   });
 });

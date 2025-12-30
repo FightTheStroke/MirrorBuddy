@@ -28,13 +28,13 @@ test.describe('Flashcards View', () => {
 test.describe('Homework Help View', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Click the Compiti nav item
-    await page.locator('button').filter({ hasText: 'Compiti' }).click();
+    // Click the Materiali nav item (homework section)
+    await page.locator('button').filter({ hasText: 'Materiali' }).click();
   });
 
   test('homework help page loads', async ({ page }) => {
-    // Check for homework-related content in main area
-    await expect(page.locator('h1, h2').filter({ hasText: /Compiti|Aiuto|Homework/i }).first()).toBeVisible({ timeout: 5000 });
+    // Check for homework-related content in main area (label changed to Aiuto Compiti)
+    await expect(page.locator('h1, h2').filter({ hasText: /Materiali|Aiuto Compiti|Homework/i }).first()).toBeVisible({ timeout: 5000 });
   });
 });
 
