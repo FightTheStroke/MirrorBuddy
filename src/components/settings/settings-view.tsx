@@ -1553,7 +1553,7 @@ function AudioSettings() {
       setAvailableOutputs(outputs);
       setAvailableCameras(cams);
     } catch (error) {
-      console.error('Error fetching devices:', error);
+      logger.error('Error fetching devices', { error });
     }
   }, []);
 
@@ -1594,7 +1594,7 @@ function AudioSettings() {
 
       const canvas = waveformCanvasRef.current;
       if (!canvas) {
-        console.error('Waveform canvas not found');
+        logger.error('Waveform canvas not found');
         return;
       }
       const ctx = canvas.getContext('2d');
@@ -1661,7 +1661,7 @@ function AudioSettings() {
       setMicTestActive(true);
       drawWaveform();
     } catch (error) {
-      console.error('Mic test error:', error);
+      logger.error('Mic test error', { error });
     }
   };
 
@@ -1713,7 +1713,7 @@ function AudioSettings() {
 
       setCamTestActive(true);
     } catch (error) {
-      console.error('Camera test error:', error);
+      logger.error('Camera test error', { error });
     }
   };
 
@@ -1791,7 +1791,7 @@ function AudioSettings() {
           setSpeakerTestActive(false);
         }, 600);
       } catch (error) {
-        console.error('Fallback tone error:', error);
+        logger.error('Fallback tone error', { error });
         setSpeakerTestActive(false);
       }
     };
@@ -1820,7 +1820,7 @@ function AudioSettings() {
         };
 
         utterance.onerror = () => {
-          console.error('Speech synthesis error, falling back to tone');
+          logger.error('Speech synthesis error, falling back to tone');
           playFallbackTone();
         };
 
@@ -1835,7 +1835,7 @@ function AudioSettings() {
         playFallbackTone();
       }
     } catch (error) {
-      console.error('Speaker test error:', error);
+      logger.error('Speaker test error', { error });
       playFallbackTone();
     }
   };
@@ -2786,7 +2786,7 @@ function DiagnosticsTab() {
         setSelectedMicId(mics[0].deviceId);
       }
     } catch (error) {
-      console.error('Error fetching microphones:', error);
+      logger.error('Error fetching microphones', { error });
     }
   }, [selectedMicId]);
 
@@ -2806,7 +2806,7 @@ function DiagnosticsTab() {
         setSelectedCamId(cams[0].deviceId);
       }
     } catch (error) {
-      console.error('Error fetching cameras:', error);
+      logger.error('Error fetching cameras', { error });
     }
   }, [selectedCamId]);
 
@@ -3275,7 +3275,7 @@ function DiagnosticsTab() {
 
       draw();
     } catch (error) {
-      console.error('Waveform error:', error);
+      logger.error('Waveform error', { error });
       setWaveformActive(false);
     }
   };
@@ -3326,7 +3326,7 @@ function DiagnosticsTab() {
 
       setWebcamActive(true);
     } catch (error) {
-      console.error('Webcam error:', error);
+      logger.error('Webcam error', { error });
       setWebcamActive(false);
     }
   };

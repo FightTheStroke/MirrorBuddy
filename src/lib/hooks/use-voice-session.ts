@@ -6,6 +6,7 @@
 'use client';
 
 import { useCallback, useRef, useEffect, useState } from 'react';
+import { logger } from '@/lib/logger';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores/app-store';
 import type { Maestro } from '@/types';
 import {
@@ -258,7 +259,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     if (playbackContextRef.current) {
       // Resume if suspended (browser policy requires user interaction)
       if (playbackContextRef.current.state === 'suspended') {
-        console.log('[VoiceSession] 🔊 Resuming suspended AudioContext...');
+        logger.debug('[VoiceSession] 🔊 Resuming suspended AudioContext...');
         await playbackContextRef.current.resume();
       }
       return playbackContextRef.current;
@@ -267,21 +268,21 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     // CRITICAL: Create playback context at 24kHz to match Azure output
     playbackContextRef.current = new AudioContextClass({ sampleRate: AZURE_SAMPLE_RATE });
-    console.log(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
+    logger.debug(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
 
     // Set output device if specified (setSinkId API)
     if (preferredOutputId && 'setSinkId' in playbackContextRef.current) {
       try {
         await (playbackContextRef.current as AudioContext & { setSinkId: (id: string) => Promise<void> }).setSinkId(preferredOutputId);
-        console.log(`[VoiceSession] 🔊 Audio output set to device: ${preferredOutputId}`);
+        logger.debug(`[VoiceSession] 🔊 Audio output set to device: ${preferredOutputId}`);
       } catch (err) {
-        console.warn('[VoiceSession] ⚠️ Could not set output device, using default:', err);
+        logger.warn('[VoiceSession] ⚠️ Could not set output device, using default', { err });
       }
     }
 
     // Resume immediately if suspended
     if (playbackContextRef.current.state === 'suspended') {
-      console.log('[VoiceSession] 🔊 Resuming new AudioContext...');
+      logger.debug('[VoiceSession] 🔊 Resuming new AudioContext...');
       await playbackContextRef.current.resume();
     }
 
@@ -318,7 +319,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     try {
       source.start();
     } catch (e) {
-      console.error('[VoiceSession] Playback error:', e);
+      logger.error('[VoiceSession] Playback error', { error: e });
       playNextChunkRef.current?.();
     }
 
@@ -342,13 +343,13 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
 
   const startAudioCapture = useCallback(() => {
     if (!captureContextRef.current || !mediaStreamRef.current) {
-      console.warn('[VoiceSession] Cannot start capture: missing context or stream');
+      logger.warn('[VoiceSession] Cannot start capture: missing context or stream');
       return;
     }
 
     const context = captureContextRef.current;
     const nativeSampleRate = context.sampleRate;
-    console.log(`[VoiceSession] Starting audio capture at ${nativeSampleRate}Hz, resampling to ${AZURE_SAMPLE_RATE}Hz`);
+    logger.debug(`[VoiceSession] Starting audio capture at ${nativeSampleRate}Hz, resampling to ${AZURE_SAMPLE_RATE}Hz`);
 
     const source = context.createMediaStreamSource(mediaStreamRef.current);
     sourceNodeRef.current = source;
@@ -394,7 +395,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
 
     source.connect(processor);
     processor.connect(context.destination);
-    console.log('[VoiceSession] Audio capture started');
+    logger.debug('[VoiceSession] Audio capture started');
   }, [isMuted, setInputLevel]);
 
   // ============================================================================
@@ -402,13 +403,13 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // ============================================================================
 
   const sendGreeting = useCallback(() => {
-    console.log('[VoiceSession] sendGreeting called');
+    logger.debug('[VoiceSession] sendGreeting called');
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      console.log('[VoiceSession] sendGreeting: ws not ready, readyState:', wsRef.current?.readyState);
+      logger.debug('[VoiceSession] sendGreeting: ws not ready, readyState:', { readyState: wsRef.current?.readyState });
       return;
     }
     if (greetingSentRef.current) {
-      console.log('[VoiceSession] sendGreeting: already sent, skipping');
+      logger.debug('[VoiceSession] sendGreeting: already sent, skipping');
       return;
     }
 
@@ -425,7 +426,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     ];
     const greetingPrompt = greetingPrompts[Math.floor(Math.random() * greetingPrompts.length)];
 
-    console.log('[VoiceSession] Sending greeting request...');
+    logger.debug('[VoiceSession] Sending greeting request...');
 
     wsRef.current.send(JSON.stringify({
       type: 'conversation.item.create',
@@ -437,7 +438,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     }));
     wsRef.current.send(JSON.stringify({ type: 'response.create' }));
 
-    console.log('[VoiceSession] Greeting request sent, waiting for audio response...');
+    logger.debug('[VoiceSession] Greeting request sent, waiting for audio response...');
   }, []);
 
   // ============================================================================
@@ -449,7 +450,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     const maestro = maestroRef.current;
     const ws = wsRef.current;
     if (!maestro || !ws || ws.readyState !== WebSocket.OPEN) {
-      console.error('[VoiceSession] Cannot send session config: missing maestro or ws');
+      logger.error('[VoiceSession] Cannot send session config: missing maestro or ws');
       return;
     }
 
@@ -508,7 +509,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     // Add tool usage instructions for AI
     const fullInstructions = languageInstruction + characterInstruction + memoryContext + truncatedSystemPrompt + voicePersonality + TOOL_USAGE_INSTRUCTIONS;
 
-    console.log(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
+    logger.debug(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
 
     // Send session configuration
     // Azure Preview API format (gpt-4o-realtime-preview)
@@ -533,8 +534,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       },
     };
 
-    console.log('[VoiceSession] Sending session.update to Azure, instructions length:', fullInstructions.length);
-    console.log('[VoiceSession] Session config:', JSON.stringify(sessionConfig).slice(0, 500));
+    logger.debug('[VoiceSession] Sending session.update to Azure, instructions length:', { instructionsLength: fullInstructions.length });
+    logger.debug('[VoiceSession] Session config', { configPreview: JSON.stringify(sessionConfig).slice(0, 500) });
     ws.send(JSON.stringify(sessionConfig));
 
     // Don't start audio capture yet - wait for session.updated
@@ -548,46 +549,46 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
   const handleServerEvent = useCallback((event: Record<string, unknown>) => {
     const eventType = event.type as string;
-    console.log(`[VoiceSession] >>> handleServerEvent called with type: ${eventType}`);
+    logger.debug(`[VoiceSession] >>> handleServerEvent called with type: ${eventType}`);
 
     switch (eventType) {
       case 'proxy.ready':
-        console.log('[VoiceSession] Proxy connected to Azure, sending session config...');
+        logger.debug('[VoiceSession] Proxy connected to Azure, sending session config...');
         // NOW we can send session.update - proxy<->Azure connection is established
         sendSessionConfig();
         break;
 
       case 'session.created':
-        console.log('[VoiceSession] Session created');
+        logger.debug('[VoiceSession] Session created');
         break;
 
       case 'session.updated':
-        console.log('[VoiceSession] Session configured, ready for conversation');
-        console.log('[VoiceSession] Full session.updated event:', JSON.stringify(event).slice(0, 500));
+        logger.debug('[VoiceSession] Session configured, ready for conversation');
+        logger.debug('[VoiceSession] Full session.updated event', { eventPreview: JSON.stringify(event).slice(0, 500) });
         sessionReadyRef.current = true;
         // NOW start audio capture - session is properly configured
-        console.log('[VoiceSession] Starting audio capture...');
+        logger.debug('[VoiceSession] Starting audio capture...');
         startAudioCapture();
         // Now that session is ready, send greeting after a brief delay
-        console.log('[VoiceSession] Will send greeting in 300ms...');
+        logger.debug('[VoiceSession] Will send greeting in 300ms...');
         setTimeout(() => sendGreeting(), 300);
         break;
 
       case 'response.created':
         // Azure has started generating a response - track this for proper cancellation
         hasActiveResponseRef.current = true;
-        console.log('[VoiceSession] Response created - hasActiveResponse = true');
+        logger.debug('[VoiceSession] Response created - hasActiveResponse = true');
         break;
 
       case 'input_audio_buffer.speech_started':
-        console.log('[VoiceSession] User speech detected');
+        logger.debug('[VoiceSession] User speech detected');
         setListening(true);
 
         // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
         // Only if barge-in is enabled in user settings AND Azure actually has an active response
         // Using hasActiveResponseRef instead of isSpeaking to prevent response_cancel_not_active errors
         if (voiceBargeInEnabled && hasActiveResponseRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
-          console.log('[VoiceSession] Barge-in detected - interrupting assistant (hasActiveResponse=true)');
+          logger.debug('[VoiceSession] Barge-in detected - interrupting assistant (hasActiveResponse=true)');
           wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
           hasActiveResponseRef.current = false; // Mark as cancelled
           audioQueueRef.current = [];
@@ -595,7 +596,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           setSpeaking(false);
         } else if (voiceBargeInEnabled && isSpeaking) {
           // Audio is still playing locally but Azure response is done - just clear local audio
-          console.log('[VoiceSession] Clearing local audio queue (response already done)');
+          logger.debug('[VoiceSession] Clearing local audio queue (response already done)');
           audioQueueRef.current = [];
           isPlayingRef.current = false;
           setSpeaking(false);
@@ -603,13 +604,13 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         break;
 
       case 'input_audio_buffer.speech_stopped':
-        console.log('[VoiceSession] User speech ended');
+        logger.debug('[VoiceSession] User speech ended');
         setListening(false);
         break;
 
       case 'conversation.item.input_audio_transcription.completed':
         if (event.transcript && typeof event.transcript === 'string') {
-          console.log('[VoiceSession] User transcript:', event.transcript);
+          logger.debug('[VoiceSession] User transcript', { transcript: event.transcript });
           addTranscript('user', event.transcript);
           options.onTranscript?.('user', event.transcript);
         }
@@ -641,7 +642,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
           // Log first chunk only to avoid spam
           if (audioQueueRef.current.length === 1) {
-            console.log(`[VoiceSession] 🔊 First audio chunk (${audioData.length} samples), starting playback...`);
+            logger.debug(`[VoiceSession] 🔊 First audio chunk (${audioData.length} samples), starting playback...`);
           }
 
           // Start playback immediately if not already playing
@@ -653,7 +654,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
       case 'response.output_audio.done':      // GA API format
       case 'response.audio.done':            // Preview API format
-        console.log('[VoiceSession] Audio response complete');
+        logger.debug('[VoiceSession] Audio response complete');
         break;
 
       // TRANSCRIPT EVENTS - same Preview vs GA pattern
@@ -665,7 +666,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       case 'response.output_audio_transcript.done':  // GA API format
       case 'response.audio_transcript.done':         // Preview API format
         if (event.transcript && typeof event.transcript === 'string') {
-          console.log('[VoiceSession] AI transcript:', event.transcript);
+          logger.debug('[VoiceSession] AI transcript', { transcript: event.transcript });
           addTranscript('assistant', event.transcript);
           options.onTranscript?.('assistant', event.transcript);
         }
@@ -674,13 +675,13 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       case 'response.done':
         // Azure has finished generating the response - clear the active flag
         hasActiveResponseRef.current = false;
-        console.log('[VoiceSession] Response complete - hasActiveResponse = false');
+        logger.debug('[VoiceSession] Response complete - hasActiveResponse = false');
         break;
 
       case 'response.cancelled':
         // Azure confirms the response was cancelled
         hasActiveResponseRef.current = false;
-        console.log('[VoiceSession] Response cancelled by client - hasActiveResponse = false');
+        logger.debug('[VoiceSession] Response cancelled by client - hasActiveResponse = false');
         break;
 
       case 'error': {
@@ -688,9 +689,9 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         const errorMessage = errorObj?.message || errorObj?.code || errorObj?.type || 'Unknown server error';
         const hasDetails = errorObj && Object.keys(errorObj).length > 0;
         if (hasDetails) {
-          console.error('[VoiceSession] Server error:', { message: errorMessage, details: errorObj });
+          logger.error('[VoiceSession] Server error', { message: errorMessage, details: errorObj });
         } else {
-          console.warn('[VoiceSession] Server error with no details (empty error object)');
+          logger.warn('[VoiceSession] Server error with no details (empty error object)');
         }
         options.onError?.(new Error(errorMessage));
         break;
@@ -728,12 +729,12 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
                 const sessionId = `voice-${maestroRef.current?.id || 'unknown'}-${Date.now()}`;
                 const maestroId = maestroRef.current?.id || 'unknown';
 
-                console.log(`[VoiceSession] Executing voice tool: ${toolName}`, args);
+                logger.debug(`[VoiceSession] Executing voice tool: ${toolName}`, { args });
 
                 const result = await executeVoiceTool(sessionId, maestroId, toolName, args);
 
                 if (result.success) {
-                  console.log(`[VoiceSession] Tool created: ${result.toolId}`);
+                  logger.debug(`[VoiceSession] Tool created: ${result.toolId}`);
                   updateToolCall(toolCall.id, { status: 'completed' });
 
                   // Track tool creation for method progress (autonomy tracking)
@@ -767,10 +768,10 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
                       'hints' as HelpLevel,
                       mappedSubject
                     );
-                    console.log(`[VoiceSession] Method progress tracked: ${methodTool} with hints`);
+                    logger.debug(`[VoiceSession] Method progress tracked: ${methodTool} with hints`);
                   }
                 } else {
-                  console.error(`[VoiceSession] Tool creation failed: ${result.error}`);
+                  logger.error(`[VoiceSession] Tool creation failed: ${result.error}`);
                   updateToolCall(toolCall.id, { status: 'error' });
                 }
 
@@ -803,7 +804,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
                 wsRef.current.send(JSON.stringify({ type: 'response.create' }));
               }
             } catch (error) {
-              console.error('[VoiceSession] Failed to parse/execute tool call:', error);
+              logger.error('[VoiceSession] Failed to parse/execute tool call', { error });
             }
           })();
         }
@@ -811,14 +812,14 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
       default:
         // Log ALL events for debugging
-        console.log(`[VoiceSession] Event: ${eventType}`, JSON.stringify(event).slice(0, 200));
+        logger.debug(`[VoiceSession] Event: ${eventType}`, { eventPreview: JSON.stringify(event).slice(0, 200) });
         break;
     }
   }, [addTranscript, addToolCall, updateToolCall, options, setListening, isSpeaking, setSpeaking, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture, voiceBargeInEnabled]);
 
   // Keep ref updated with latest handleServerEvent (fixes stale closure in ws.onmessage)
   useEffect(() => {
-    console.log('[VoiceSession] Setting handleServerEventRef.current (useEffect)');
+    logger.debug('[VoiceSession] Setting handleServerEventRef.current (useEffect)');
     handleServerEventRef.current = handleServerEvent;
   }, [handleServerEvent]);
 
@@ -828,12 +829,12 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
   const connect = useCallback(async (maestro: Maestro, connectionInfo: ConnectionInfo) => {
     try {
-      console.log('[VoiceSession] Connecting to Azure Realtime API...');
-      console.log('[VoiceSession] handleServerEventRef.current at connect start:', handleServerEventRef.current ? 'SET' : 'NULL');
+      logger.debug('[VoiceSession] Connecting to Azure Realtime API...');
+      logger.debug('[VoiceSession] handleServerEventRef.current at connect start', { isSet: handleServerEventRef.current ? 'SET' : 'NULL' });
 
       // Safety: ensure ref is set before proceeding
       if (!handleServerEventRef.current) {
-        console.warn('[VoiceSession] handleServerEventRef not set, setting now...');
+        logger.warn('[VoiceSession] handleServerEventRef not set, setting now...');
         handleServerEventRef.current = handleServerEvent;
       }
       setConnectionState('connecting');
@@ -845,7 +846,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       // Initialize CAPTURE AudioContext (native sample rate)
       const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       captureContextRef.current = new AudioContextClass();
-      console.log(`[VoiceSession] Capture context initialized at ${captureContextRef.current.sampleRate}Hz`);
+      logger.debug(`[VoiceSession] Capture context initialized at ${captureContextRef.current.sampleRate}Hz`);
 
       if (captureContextRef.current.state === 'suspended') {
         await captureContextRef.current.resume();
@@ -854,7 +855,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       // Initialize PLAYBACK AudioContext with preferred output device (setSinkId)
       // Must be done BEFORE audio chunks arrive so the device is ready
       await initPlaybackContext();
-      console.log('[VoiceSession] Playback context initialized with preferred output device');
+      logger.debug('[VoiceSession] Playback context initialized with preferred output device');
 
       // Request microphone with preferred device if set
       const audioConstraints: MediaTrackConstraints = {
@@ -867,13 +868,13 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
       if (preferredMicrophoneId) {
         audioConstraints.deviceId = { ideal: preferredMicrophoneId };
-        console.log(`[VoiceSession] Preferred microphone: ${preferredMicrophoneId} (will fallback if unavailable)`);
+        logger.debug(`[VoiceSession] Preferred microphone: ${preferredMicrophoneId} (will fallback if unavailable)`);
       }
 
       mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
         audio: audioConstraints,
       });
-      console.log('[VoiceSession] Microphone access granted');
+      logger.debug('[VoiceSession] Microphone access granted');
 
       // Build WebSocket URL
       let wsUrl: string;
@@ -891,7 +892,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       wsRef.current = ws;
 
       ws.onopen = () => {
-        console.log('[VoiceSession] WebSocket connected to proxy, waiting for proxy.ready...');
+        logger.debug('[VoiceSession] WebSocket connected to proxy, waiting for proxy.ready...');
         // DON'T send session.update yet! Wait for proxy.ready event
         // which indicates proxy has connected to Azure
       };
@@ -905,33 +906,33 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           } else if (typeof event.data === 'string') {
             msgText = event.data;
           } else {
-            console.log('[VoiceSession] Received binary data, skipping');
+            logger.debug('[VoiceSession] Received binary data, skipping');
             return;
           }
 
           const data = JSON.parse(msgText);
-          console.log(`[VoiceSession] ws.onmessage received: ${data.type}, handleServerEventRef.current is ${handleServerEventRef.current ? 'SET' : 'NULL'}`);
+          logger.debug(`[VoiceSession] ws.onmessage received: ${data.type}, handleServerEventRef.current is ${handleServerEventRef.current ? 'SET' : 'NULL'}`);
           // Use REF to always call the LATEST version of handleServerEvent
           // This fixes stale closure bug where ws.onmessage captured old callback
           if (handleServerEventRef.current) {
             handleServerEventRef.current(data);
           } else {
-            console.error('[VoiceSession] ❌ handleServerEventRef.current is NULL! Event lost:', data.type);
+            logger.error('[VoiceSession] ❌ handleServerEventRef.current is NULL! Event lost', { eventType: data.type });
           }
         } catch (e) {
-          console.error('[VoiceSession] ws.onmessage parse error:', e);
+          logger.error('[VoiceSession] ws.onmessage parse error', { error: e });
         }
       };
 
       ws.onerror = (event) => {
-        console.error('[VoiceSession] WebSocket error:', event);
+        logger.error('[VoiceSession] WebSocket error', { event });
         setConnectionState('error');
         options.onStateChange?.('error');
         options.onError?.(new Error('WebSocket connection failed'));
       };
 
       ws.onclose = (event) => {
-        console.log('[VoiceSession] WebSocket closed:', event.code, event.reason);
+        logger.debug('[VoiceSession] WebSocket closed', { code: event.code, reason: event.reason });
         setConnected(false);
         if (connectionState !== 'error') {
           setConnectionState('idle');
@@ -939,7 +940,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       };
 
     } catch (error) {
-      console.error('[VoiceSession] Connection error:', error);
+      logger.error('[VoiceSession] Connection error', { error });
       setConnectionState('error');
       options.onStateChange?.('error');
       options.onError?.(error as Error);
@@ -952,7 +953,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
   // ============================================================================
 
   const disconnect = useCallback(() => {
-    console.log('[VoiceSession] Disconnecting...');
+    logger.debug('[VoiceSession] Disconnecting...');
 
     if (processorRef.current) {
       processorRef.current.disconnect();
@@ -1023,7 +1024,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
   const cancelResponse = useCallback(() => {
     // Only send response.cancel if Azure actually has an active response
     if (wsRef.current?.readyState === WebSocket.OPEN && hasActiveResponseRef.current) {
-      console.log('[VoiceSession] Cancelling active response');
+      logger.debug('[VoiceSession] Cancelling active response');
       wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
       hasActiveResponseRef.current = false;
     }
