@@ -43,6 +43,10 @@ import { analyzeHandoff } from '@/lib/ai/handoff-manager';
 // Voice session integration pending - Issue #34
 import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
 import type { ExtendedStudentProfile, CharacterType, Subject } from '@/types';
+// Tool integration - T-15
+import { ToolButtons } from './tool-buttons';
+import { ToolPanel } from '@/components/tools/tool-panel';
+import type { ToolType, ToolState } from '@/types/tools';
 
 // Character avatar mappings
 const CHARACTER_AVATARS: Record<string, string> = {
@@ -463,6 +467,8 @@ export function ConversationFlow() {
   const [isLoading, setIsLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
+  const [activeTool, setActiveTool] = useState<ToolState | null>(null);
+  const [isToolMinimized, setIsToolMinimized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sessionStartTimeRef = useRef<number>(Date.now());
@@ -498,6 +504,95 @@ export function ConversationFlow() {
     preferredCoach: studentProfile.preferredCoach,
     preferredBuddy: studentProfile.preferredBuddy,
   }), [studentProfile]);
+
+  // Handle tool request from ToolButtons
+  const handleToolRequest = useCallback(async (toolType: ToolType) => {
+    if (!activeCharacter || isLoading) return;
+
+    // Create tool prompts based on type
+    const toolPrompts: Record<ToolType, string> = {
+      mindmap: 'Crea una mappa mentale su questo argomento',
+      quiz: 'Crea un quiz per verificare la mia comprensione',
+      flashcard: 'Crea delle flashcard per memorizzare',
+      demo: 'Crea una demo interattiva per visualizzare',
+      search: 'Cerca risorse educative su questo argomento',
+      webcam: 'Voglio scattare una foto',
+      diagram: 'Crea un diagramma',
+      timeline: 'Crea una linea del tempo',
+      summary: 'Crea un riassunto',
+      formula: 'Mostra la formula',
+      chart: 'Crea un grafico',
+      pdf: 'Analizza il PDF',
+    };
+
+    const toolPrompt = toolPrompts[toolType] || `Crea ${toolType}`;
+    setInputValue('');
+    setIsLoading(true);
+
+    addMessage({ role: 'user', content: toolPrompt });
+
+    // Create initial tool state
+    const newTool: ToolState = {
+      id: `tool-${Date.now()}`,
+      type: toolType,
+      status: 'initializing',
+      progress: 0,
+      content: null,
+      createdAt: new Date(),
+    };
+    setActiveTool(newTool);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: activeCharacter.systemPrompt },
+            ...messages
+              .filter((m) => m.role !== 'system')
+              .map((m) => ({ role: m.role, content: m.content })),
+            { role: 'user', content: toolPrompt },
+          ],
+          maestroId: activeCharacter.id,
+          requestedTool: toolType,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get response');
+      const data = await response.json();
+
+      const assistantContent = data.content || data.message || '';
+      addMessage({ role: 'assistant', content: assistantContent });
+
+      // Update tool state based on response
+      if (data.toolCalls?.length > 0) {
+        const toolCall = data.toolCalls[0];
+        setActiveTool({
+          ...newTool,
+          status: 'completed',
+          progress: 1,
+          content: toolCall.result || toolCall.arguments,
+        });
+      } else {
+        // No tool was created, clear the state
+        setActiveTool(null);
+      }
+    } catch (error) {
+      console.error('Tool request error:', error);
+      addMessage({
+        role: 'assistant',
+        content: 'Mi dispiace, non sono riuscito a creare lo strumento. Riprova?',
+      });
+      setActiveTool({
+        ...newTool,
+        status: 'error',
+        error: 'Errore nella creazione dello strumento',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [activeCharacter, isLoading, messages, addMessage]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -831,6 +926,12 @@ export function ConversationFlow() {
       {/* Input area */}
       <div className="p-4 border-t border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-2">
+          {/* Tool buttons - quick access to educational tools */}
+          <ToolButtons
+            onToolRequest={handleToolRequest}
+            disabled={isLoading}
+            activeToolId={activeTool?.id}
+          />
           <input
             ref={inputRef}
             type="text"
@@ -880,6 +981,30 @@ export function ConversationFlow() {
           </Button>
         </div>
       </div>
+
+      {/* Floating tool panel - shows when a tool is being built */}
+      <AnimatePresence>
+        {activeTool && (
+          <motion.div
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 100 }}
+            className="fixed bottom-24 right-4 z-50 w-[480px] max-w-[calc(100vw-2rem)]"
+          >
+            <ToolPanel
+              tool={activeTool}
+              maestro={activeCharacter ? {
+                name: activeCharacter.name,
+                avatar: CHARACTER_AVATARS[activeCharacter.id] || '/avatars/default.jpg',
+                color: activeCharacter.color,
+              } : null}
+              onClose={() => setActiveTool(null)}
+              isMinimized={isToolMinimized}
+              onToggleMinimize={() => setIsToolMinimized(!isToolMinimized)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
