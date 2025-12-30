@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import type { ToolType } from '@/types/tools';
 
 // ============================================================================
 // DATABASE SCHEMA
@@ -342,3 +343,50 @@ async function generateThumbnail(blob: Blob, maxSize = 200): Promise<Blob> {
 
 export type MaterialMetadata = MaterialsDB['metadata']['value'];
 export type MaterialFile = MaterialsDB['files']['value'];
+
+// ============================================================================
+// UNIFIED MATERIAL RECORD (for Archive View)
+// Combines tool-based materials from API with file-based materials from IndexedDB
+// ============================================================================
+
+export interface MaterialRecord {
+  id: string;
+  toolId: string;
+  toolType: ToolType;
+  title?: string;
+  content: Record<string, unknown>;
+  maestroId?: string;
+  sessionId?: string;
+  subject?: string;
+  preview?: string;
+  status: 'active' | 'archived' | 'deleted';
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Get all active materials (tools + files) for the Archive View
+ * Fetches from the /api/materials endpoint which queries Prisma
+ */
+export async function getActiveMaterials(): Promise<MaterialRecord[]> {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+
+  try {
+    // Get userId from localStorage or session
+    const userId = localStorage.getItem('userId') || 'default-user';
+
+    const response = await fetch(`/api/materials?userId=${userId}&status=active`);
+    if (!response.ok) {
+      console.error('Failed to fetch materials:', response.status);
+      return [];
+    }
+
+    const data = await response.json();
+    return data.materials || [];
+  } catch (error) {
+    console.error('Error fetching active materials:', error);
+    return [];
+  }
+}
