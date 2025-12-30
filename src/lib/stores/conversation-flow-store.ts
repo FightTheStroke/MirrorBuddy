@@ -24,7 +24,7 @@ import {
 } from '@/lib/ai/character-router';
 import { getDefaultSupportTeacher, getSupportTeacherById } from '@/data/support-teachers';
 import { getBuddyForStudent } from '@/lib/ai/character-router';
-import { getBuddyById } from '@/data/buddy-profiles';
+import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri-full';
 
 // ============================================================================
@@ -332,7 +332,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
             character = getSupportTeacherById(previous.id as 'melissa' | 'roberto');
             break;
           case 'buddy':
-            character = getBuddyById(previous.id as 'mario' | 'faty');
+            character = getBuddyById(previous.id as BuddyId);
             break;
         }
 
