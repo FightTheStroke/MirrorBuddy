@@ -36,14 +36,6 @@ export const LazyHomeworkHelpView = dynamic(
   }
 );
 
-export const LazyLibrettoView = dynamic(
-  () => import('./libretto-view').then((mod) => ({ default: mod.LibrettoView })),
-  {
-    loading: () => <ViewSkeleton />,
-    ssr: false,
-  }
-);
-
 export const LazyCalendarView = dynamic(
   () => import('./calendar-view').then((mod) => ({ default: mod.CalendarView })),
   {

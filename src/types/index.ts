@@ -433,3 +433,181 @@ export interface Conversation {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// === SUPPORT CHARACTER TYPES (MirrorBuddy v2.0) ===
+
+/**
+ * Learning differences that the platform supports.
+ * Used for both student profiles and buddy matching.
+ */
+export type LearningDifference =
+  | 'dyslexia'
+  | 'dyscalculia'
+  | 'dysgraphia'
+  | 'adhd'
+  | 'autism'
+  | 'cerebralPalsy'
+  | 'visualImpairment'
+  | 'auditoryProcessing';
+
+/**
+ * Role of support characters in the Support Triangle.
+ */
+export type SupportRole = 'learning_coach' | 'peer_buddy';
+
+/**
+ * Gender option for support characters.
+ * Students can choose their preferred coach/buddy gender.
+ */
+export type CharacterGender = 'male' | 'female';
+
+/**
+ * Extended student profile with learning differences.
+ * Used by Mario/Noemi buddies to personalize their approach.
+ */
+export interface ExtendedStudentProfile extends StudentProfile {
+  learningDifferences: LearningDifference[];
+  preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+  preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+}
+
+/**
+ * Support Teacher (Melissa/Roberto) - Learning Coach role.
+ * Focus: develop autonomy and study method.
+ * Relationship: vertical (coach), but talks "alongside" not "from above".
+ */
+export interface SupportTeacher {
+  id: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+  name: string;
+  gender: CharacterGender;
+  age: number;
+  personality: string;
+  role: 'learning_coach';
+  voice: MaestroVoice;
+  voiceInstructions: string;
+  systemPrompt: string;
+  greeting: string;
+  avatar: string;
+  color: string;
+}
+
+/**
+ * MirrorBuddy (Mario/Noemi) - Peer Support role.
+ * Focus: make student feel less alone.
+ * Relationship: horizontal (friend), speaks as peer.
+ *
+ * System prompt is dynamic based on student profile:
+ * - Age is always student.age + 1
+ * - Learning differences mirror the student's
+ */
+export interface BuddyProfile {
+  id: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+  name: string;
+  gender: CharacterGender;
+  ageOffset: number; // Always 1 (one year older)
+  personality: string;
+  role: 'peer_buddy';
+  voice: MaestroVoice;
+  voiceInstructions: string;
+  /**
+   * Dynamic system prompt generator.
+   * Takes student profile to personalize Mario/Maria's background.
+   */
+  getSystemPrompt: (student: ExtendedStudentProfile) => string;
+  /**
+   * Dynamic greeting generator.
+   */
+  getGreeting: (student: ExtendedStudentProfile) => string;
+  avatar: string;
+  color: string;
+}
+
+/**
+ * Union type for any support character (coach or buddy).
+ */
+export type SupportCharacter = SupportTeacher | BuddyProfile;
+
+/**
+ * Character type identifier for routing.
+ */
+export type CharacterType = 'maestro' | 'coach' | 'buddy';
+
+// === PARENT DASHBOARD TYPES ===
+
+/**
+ * Observation category for what each Maestro observes.
+ * Maps to the Maestro's specialty and observation focus.
+ */
+export type ObservationCategory =
+  | 'logical_reasoning'       // Archimede
+  | 'creativity'              // Leonardo
+  | 'verbal_expression'       // Dante
+  | 'study_method'            // Montessori
+  | 'critical_thinking'       // Socrate
+  | 'artistic_sensitivity'    // Mozart
+  | 'scientific_curiosity'    // Darwin
+  | 'spatial_memory'          // Marco Polo
+  | 'historical_understanding' // Giulio Cesare
+  | 'mathematical_intuition'  // Pitagora
+  | 'linguistic_ability'      // Cicerone
+  | 'philosophical_depth'     // Aristotele
+  | 'physical_awareness'      // Ippocrate
+  | 'experimental_approach'   // Galileo
+  | 'environmental_awareness' // Plinio
+  | 'collaborative_spirit'    // Alessandro Magno
+  | 'narrative_skill';        // Omero
+
+/**
+ * Single observation from a Maestro about the student.
+ */
+export interface MaestroObservation {
+  id: string;
+  maestroId: string;
+  maestroName: string;
+  category: ObservationCategory;
+  observation: string;
+  isStrength: boolean; // true = punto di forza, false = area di crescita
+  confidence: number; // 0-1, how confident the Maestro is
+  createdAt: Date;
+  sessionId?: string;
+}
+
+/**
+ * Suggested strategy for the student.
+ */
+export interface LearningStrategy {
+  id: string;
+  title: string;
+  description: string;
+  suggestedBy: string[]; // Maestro IDs that suggested this
+  forAreas: ObservationCategory[];
+  priority: 'high' | 'medium' | 'low';
+}
+
+/**
+ * Learning style profile.
+ */
+export interface LearningStyleProfile {
+  preferredChannel: 'visual' | 'auditory' | 'kinesthetic' | 'reading_writing';
+  optimalSessionDuration: number; // minutes
+  preferredTimeOfDay: 'morning' | 'afternoon' | 'evening';
+  motivators: string[];
+  challengePreference: 'step_by_step' | 'big_picture' | 'mixed';
+}
+
+/**
+ * Complete student insights for parent dashboard.
+ * Aggregated from all Maestro interactions.
+ */
+export interface StudentInsights {
+  studentId: string;
+  studentName: string;
+  lastUpdated: Date;
+  strengths: MaestroObservation[];
+  growthAreas: MaestroObservation[];
+  strategies: LearningStrategy[];
+  learningStyle: LearningStyleProfile;
+  totalSessions: number;
+  totalMinutes: number;
+  maestriInteracted: string[];
+}

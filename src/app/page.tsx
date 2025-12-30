@@ -15,40 +15,68 @@ import {
   Flame,
   Network,
   Calendar,
+  Heart,
+  Sparkles,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import {
   LazyQuizView,
   LazyFlashcardsView,
   LazyMindmapsView,
   LazyHomeworkHelpView,
-  LazyLibrettoView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
 } from '@/components/education';
+import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView, HomeProgressWidget } from '@/components/progress';
 import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
 import { cn } from '@/lib/utils';
 
-type View = 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'libretto' | 'calendar' | 'demos' | 'progress' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'calendar' | 'demos' | 'progress' | 'settings';
+
+// Character info for sidebar display
+const COACH_INFO = {
+  melissa: { name: 'Melissa', avatar: '/avatars/melissa.jpg' },
+  roberto: { name: 'Roberto', avatar: '/avatars/roberto.png' },
+  chiara: { name: 'Chiara', avatar: '/avatars/chiara.png' },
+  andrea: { name: 'Andrea', avatar: '/avatars/andrea.png' },
+  favij: { name: 'Favij', avatar: '/avatars/favij.jpg' },
+} as const;
+
+const BUDDY_INFO = {
+  mario: { name: 'Mario', avatar: '/avatars/mario.jpg' },
+  noemi: { name: 'Noemi', avatar: '/avatars/noemi.png' },
+  enea: { name: 'Enea', avatar: '/avatars/enea.png' },
+  bruno: { name: 'Bruno', avatar: '/avatars/bruno.png' },
+  sofia: { name: 'Sofia', avatar: '/avatars/sofia.png' },
+} as const;
 
 export default function Home() {
+  // Start with Maestri as the first view
   const [currentView, setCurrentView] = useState<View>('maestri');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const { xp, level, streak } = useProgressStore();
   const { studentProfile } = useSettingsStore();
 
+  // Get selected coach and buddy from preferences (with defaults)
+  const selectedCoach = studentProfile?.preferredCoach || 'melissa';
+  const selectedBuddy = studentProfile?.preferredBuddy || 'mario';
+  const coachInfo = COACH_INFO[selectedCoach];
+  const buddyInfo = BUDDY_INFO[selectedBuddy];
+
   const navItems = [
-    { id: 'maestri' as const, label: 'Maestri', icon: GraduationCap },
+    { id: 'coach' as const, label: coachInfo.name, icon: Sparkles, isChat: true, avatar: coachInfo.avatar },
+    { id: 'buddy' as const, label: buddyInfo.name, icon: Heart, isChat: true, avatar: buddyInfo.avatar },
+    { id: 'maestri' as const, label: 'Professori', icon: GraduationCap },
     { id: 'quiz' as const, label: 'Quiz', icon: Brain },
     { id: 'flashcards' as const, label: 'Flashcards', icon: BookOpen },
     { id: 'mindmaps' as const, label: 'Mappe Mentali', icon: Network },
-    { id: 'homework' as const, label: 'Compiti', icon: Target },
-    { id: 'libretto' as const, label: 'Libretto', icon: BookOpen },
+    { id: 'homework' as const, label: 'Materiali', icon: Target },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
@@ -57,8 +85,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-      {/* Version badge */}
-      <div className="fixed top-2 right-3 z-50">
+      {/* Header with notifications and version */}
+      <div className="fixed top-2 right-3 z-50 flex items-center gap-3">
+        <NotificationBell />
         <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
           v{process.env.APP_VERSION}
         </span>
@@ -123,22 +152,41 @@ export default function Home() {
 
         {/* Navigation - with bottom padding for XP bar */}
         <nav className="p-4 space-y-2 overflow-y-auto pb-24" style={{ maxHeight: 'calc(100vh - 180px)' }}>
-          {navItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setCurrentView(item.id)}
-              className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
-                currentView === item.id
-                  ? 'bg-accent-themed text-white shadow-lg'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-              )}
-              style={currentView === item.id ? { boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40' } : undefined}
-            >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              {sidebarOpen && <span className="font-medium">{item.label}</span>}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const isChatItem = item.id === 'coach' || item.id === 'buddy';
+            const avatarSrc = 'avatar' in item ? item.avatar : null;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setCurrentView(item.id)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
+                  currentView === item.id
+                    ? 'bg-accent-themed text-white shadow-lg'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
+                  isChatItem && 'relative'
+                )}
+                style={currentView === item.id ? { boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40' } : undefined}
+              >
+                {avatarSrc ? (
+                  <div className="relative flex-shrink-0">
+                    <Image
+                      src={avatarSrc}
+                      alt={item.label}
+                      width={32}
+                      height={32}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-slate-900 rounded-full" />
+                  </div>
+                ) : (
+                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                )}
+                {sidebarOpen && <span className="font-medium">{item.label}</span>}
+              </button>
+            );
+          })}
         </nav>
 
         {/* XP Progress */}
@@ -168,17 +216,6 @@ export default function Home() {
           sidebarOpen ? 'ml-64' : 'ml-20'
         )}
       >
-        {/* Welcome header */}
-        {studentProfile.name && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Ciao, {studentProfile.name}! 👋
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400">
-              Pronto per una nuova sessione di studio?
-            </p>
-          </div>
-        )}
 
         {/* View content */}
         <motion.div
@@ -187,6 +224,14 @@ export default function Home() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
+          {currentView === 'coach' && (
+            <CharacterChatView characterId={selectedCoach} characterType="coach" />
+          )}
+
+          {currentView === 'buddy' && (
+            <CharacterChatView characterId={selectedBuddy} characterType="buddy" />
+          )}
+
           {currentView === 'maestri' && (
             <>
               <HomeProgressWidget />
@@ -201,8 +246,6 @@ export default function Home() {
           {currentView === 'mindmaps' && <LazyMindmapsView />}
 
           {currentView === 'homework' && <LazyHomeworkHelpView />}
-
-          {currentView === 'libretto' && <LazyLibrettoView />}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 

@@ -3,11 +3,13 @@
 import { useEffect, useRef } from 'react';
 import { ThemeProvider } from 'next-themes';
 import { AccessibilityProvider } from '@/components/accessibility';
+import { ToastContainer } from '@/components/ui/toast';
 import {
   useSettingsStore,
   initializeStores,
   setupAutoSync,
 } from '@/lib/stores/app-store';
+import { initializeTelemetry } from '@/lib/telemetry';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -46,6 +48,9 @@ function StoreInitializer() {
       // Silent fail - stores will use localStorage fallback
     });
 
+    // Initialize telemetry
+    const cleanupTelemetry = initializeTelemetry();
+
     // Setup auto-sync every 30 seconds
     const syncInterval = setupAutoSync(30000);
 
@@ -66,6 +71,7 @@ function StoreInitializer() {
 
     return () => {
       clearInterval(syncInterval);
+      cleanupTelemetry();
       window.removeEventListener('beforeunload', handleUnload);
     };
   }, []);
@@ -80,11 +86,14 @@ export function Providers({ children }: ProvidersProps) {
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      // Fix #4: Explicitly map themes to class names so .light class is added
+      value={{ light: 'light', dark: 'dark' }}
     >
       <AccessibilityProvider>
         <StoreInitializer />
         <AccentColorApplier />
         {children}
+        <ToastContainer />
       </AccessibilityProvider>
     </ThemeProvider>
   );
