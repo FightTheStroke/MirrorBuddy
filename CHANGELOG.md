@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - **Barge-in**: Users can now interrupt the Maestro while speaking for natural conversation flow
 - **Enhanced voice personalities**: Cicerone and Erodoto have detailed speaking style, pacing, and emotional instructions
+- **7 Accessibility Profiles**: Quick-select presets for Dislessia, ADHD, Autismo, Visivo, Uditivo, Motorio, Paralisi Cerebrale
+- **Notification Service Stub**: Placeholder for future notification system (NOT_IMPLEMENTED, see Issue #14)
 
 ### Changed
 - **Voice mapping**: 6 maestri updated to gender-appropriate voices
