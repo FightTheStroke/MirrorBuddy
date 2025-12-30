@@ -207,9 +207,10 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     reset,
   } = useVoiceSessionStore();
 
-  // Get preferred microphone and voice settings from settings
+  // Get preferred devices and voice settings from settings
   const {
     preferredMicrophoneId,
+    preferredOutputId,
     voiceVadThreshold,
     voiceSilenceDuration,
     voiceBargeInEnabled,
@@ -253,12 +254,12 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // AUDIO PLAYBACK (at 24kHz) - SYNC VERSION (like test page that works!)
   // ============================================================================
 
-  const initPlaybackContext = useCallback(() => {
+  const initPlaybackContext = useCallback(async () => {
     if (playbackContextRef.current) {
       // Resume if suspended (browser policy requires user interaction)
       if (playbackContextRef.current.state === 'suspended') {
         console.log('[VoiceSession] 🔊 Resuming suspended AudioContext...');
-        playbackContextRef.current.resume();
+        await playbackContextRef.current.resume();
       }
       return playbackContextRef.current;
     }
@@ -268,14 +269,24 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     playbackContextRef.current = new AudioContextClass({ sampleRate: AZURE_SAMPLE_RATE });
     console.log(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
 
+    // Set output device if specified (setSinkId API)
+    if (preferredOutputId && 'setSinkId' in playbackContextRef.current) {
+      try {
+        await (playbackContextRef.current as AudioContext & { setSinkId: (id: string) => Promise<void> }).setSinkId(preferredOutputId);
+        console.log(`[VoiceSession] 🔊 Audio output set to device: ${preferredOutputId}`);
+      } catch (err) {
+        console.warn('[VoiceSession] ⚠️ Could not set output device, using default:', err);
+      }
+    }
+
     // Resume immediately if suspended
     if (playbackContextRef.current.state === 'suspended') {
       console.log('[VoiceSession] 🔊 Resuming new AudioContext...');
-      playbackContextRef.current.resume();
+      await playbackContextRef.current.resume();
     }
 
     return playbackContextRef.current;
-  }, []);
+  }, [preferredOutputId]);
 
   // SYNC playback function - matches test page that works
   const playNextChunk = useCallback(() => {

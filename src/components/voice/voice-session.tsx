@@ -456,9 +456,9 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
               <p className="text-lg font-medium text-slate-200">{stateText}</p>
               {connectionState === 'connecting' && (
                 <div className="mt-2 flex items-center justify-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse delay-100" />
-                  <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse delay-200" />
+                  <div className="w-2 h-2 rounded-full bg-accent-themed animate-pulse" />
+                  <div className="w-2 h-2 rounded-full bg-accent-themed animate-pulse delay-100" />
+                  <div className="w-2 h-2 rounded-full bg-accent-themed animate-pulse delay-200" />
                 </div>
               )}
             </motion.div>
@@ -491,7 +491,7 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
                       className={cn(
                         'p-3 rounded-lg max-w-[85%]',
                         entry.role === 'user'
-                          ? 'bg-blue-600/30 ml-auto text-right'
+                          ? 'bg-accent-themed/30 ml-auto text-right'
                           : 'bg-slate-700/50 mr-auto'
                       )}
                     >
