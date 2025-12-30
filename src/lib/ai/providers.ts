@@ -13,6 +13,15 @@ export interface ProviderConfig {
   model: string;
 }
 
+export interface ToolCall {
+  id: string;
+  type: 'function';
+  function: {
+    name: string;
+    arguments: string; // JSON string
+  };
+}
+
 export interface ChatCompletionResult {
   content: string;
   provider: AIProvider;
@@ -22,6 +31,8 @@ export interface ChatCompletionResult {
     completion_tokens: number;
     total_tokens: number;
   };
+  tool_calls?: ToolCall[];
+  finish_reason?: 'stop' | 'tool_calls' | 'length' | 'content_filter';
 }
 
 /**
@@ -147,6 +158,18 @@ export async function isOllamaModelAvailable(model: string): Promise<boolean> {
 }
 
 /**
+ * OpenAI-compatible tool definition
+ */
+export interface ToolDefinition {
+  type: 'function';
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, unknown>;
+  };
+}
+
+/**
  * Perform chat completion using the active provider
  */
 export async function chatCompletion(
@@ -155,6 +178,8 @@ export async function chatCompletion(
   options?: {
     temperature?: number;
     maxTokens?: number;
+    tools?: ToolDefinition[];
+    tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } };
   }
 ): Promise<ChatCompletionResult> {
   const config = getActiveProvider();
@@ -166,7 +191,7 @@ export async function chatCompletion(
   const maxTokens = options?.maxTokens ?? 2048;
 
   if (config.provider === 'azure') {
-    return azureChatCompletion(config, messages, systemPrompt, temperature, maxTokens);
+    return azureChatCompletion(config, messages, systemPrompt, temperature, maxTokens, options?.tools, options?.tool_choice);
   }
 
   if (config.provider === 'ollama') {
@@ -184,7 +209,8 @@ export async function chatCompletion(
         `Ollama model "${config.model}" not found. Install it with: ollama pull ${config.model}`
       );
     }
-    return ollamaChatCompletion(config, messages, systemPrompt, temperature);
+    // Note: Ollama supports tools for some models (llama3.1+, mistral)
+    return ollamaChatCompletion(config, messages, systemPrompt, temperature, options?.tools, options?.tool_choice);
   }
 
   throw new Error(`Unknown provider: ${config.provider}`);
@@ -195,7 +221,9 @@ async function azureChatCompletion(
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
   temperature: number,
-  maxTokens: number
+  maxTokens: number,
+  tools?: ToolDefinition[],
+  tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } }
 ): Promise<ChatCompletionResult> {
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const url = `${config.endpoint}/openai/deployments/${config.model}/chat/completions?api-version=${apiVersion}`;
@@ -208,17 +236,26 @@ async function azureChatCompletion(
     ? [{ role: 'system', content: systemPrompt }, ...messages]
     : messages;
 
+  // Build request body
+  const requestBody: Record<string, unknown> = {
+    messages: allMessages,
+    temperature,
+    max_tokens: maxTokens,
+  };
+
+  // Add tools if provided
+  if (tools && tools.length > 0) {
+    requestBody.tools = tools;
+    requestBody.tool_choice = tool_choice ?? 'auto';
+  }
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'api-key': config.apiKey!,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      messages: allMessages,
-      temperature,
-      max_tokens: maxTokens,
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
@@ -228,12 +265,16 @@ async function azureChatCompletion(
   }
 
   const data = await response.json();
+  const choice = data.choices[0];
+  const message = choice?.message;
 
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || '',
     provider: 'azure',
     model: config.model,
     usage: data.usage,
+    tool_calls: message?.tool_calls,
+    finish_reason: choice?.finish_reason,
   };
 }
 
@@ -241,12 +282,28 @@ async function ollamaChatCompletion(
   config: ProviderConfig,
   messages: Array<{ role: string; content: string }>,
   systemPrompt: string,
-  temperature: number
+  temperature: number,
+  tools?: ToolDefinition[],
+  tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } }
 ): Promise<ChatCompletionResult> {
   // Build messages array - only include system message if systemPrompt is provided
   const allMessages = systemPrompt
     ? [{ role: 'system', content: systemPrompt }, ...messages]
     : messages;
+
+  // Build request body
+  const requestBody: Record<string, unknown> = {
+    model: config.model,
+    messages: allMessages,
+    temperature,
+    stream: false,
+  };
+
+  // Add tools if provided (Ollama supports tools for llama3.1+, mistral, etc.)
+  if (tools && tools.length > 0) {
+    requestBody.tools = tools;
+    requestBody.tool_choice = tool_choice ?? 'auto';
+  }
 
   // Ollama supports OpenAI-compatible API at /v1/chat/completions
   const response = await fetch(`${config.endpoint}/v1/chat/completions`, {
@@ -254,12 +311,7 @@ async function ollamaChatCompletion(
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      model: config.model,
-      messages: allMessages,
-      temperature,
-      stream: false,
-    }),
+    body: JSON.stringify(requestBody),
   });
 
   if (!response.ok) {
@@ -268,12 +320,16 @@ async function ollamaChatCompletion(
   }
 
   const data = await response.json();
+  const choice = data.choices[0];
+  const message = choice?.message;
 
   return {
-    content: data.choices[0]?.message?.content || '',
+    content: message?.content || '',
     provider: 'ollama',
     model: config.model,
     usage: data.usage,
+    tool_calls: message?.tool_calls,
+    finish_reason: choice?.finish_reason,
   };
 }
 
