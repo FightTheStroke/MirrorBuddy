@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+# Minimal permissions for security (ISE best practice)
+permissions:
+  contents: read
+
 # ISE Engineering Fundamentals: CI/CD
 # https://microsoft.github.io/code-with-engineering-playbook/CI-CD/
 

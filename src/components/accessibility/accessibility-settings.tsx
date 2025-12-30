@@ -13,6 +13,9 @@ import {
   Volume2,
   RotateCcw,
   ChevronRight,
+  Puzzle,
+  EarOff,
+  Accessibility,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
@@ -66,6 +69,9 @@ export function AccessibilitySettings({ isOpen, onClose }: AccessibilitySettings
     applyADHDProfile,
     applyVisualImpairmentProfile,
     applyMotorImpairmentProfile,
+    applyAutismProfile,
+    applyAuditoryImpairmentProfile,
+    applyCerebralPalsyProfile,
     shouldAnimate,
   } = useAccessibilityStore();
 
@@ -225,6 +231,9 @@ export function AccessibilitySettings({ isOpen, onClose }: AccessibilitySettings
                     onApplyADHD={applyADHDProfile}
                     onApplyVisual={applyVisualImpairmentProfile}
                     onApplyMotor={applyMotorImpairmentProfile}
+                    onApplyAutism={applyAutismProfile}
+                    onApplyAuditory={applyAuditoryImpairmentProfile}
+                    onApplyCerebralPalsy={applyCerebralPalsyProfile}
                     onReset={resetSettings}
                   />
                 )}
@@ -330,6 +339,28 @@ interface SliderProps {
 function Slider({ label, value, onChange, min, max, step, unit = '' }: SliderProps) {
   const { settings } = useAccessibilityStore();
 
+  // Calculate discrete steps for step buttons (Fix #12)
+  const stepValues: number[] = [];
+  for (let v = min; v <= max; v = Math.round((v + step) * 10) / 10) {
+    stepValues.push(v);
+  }
+
+  const currentIndex = stepValues.findIndex(v => Math.abs(v - value) < 0.01);
+  const canDecrease = currentIndex > 0;
+  const canIncrease = currentIndex < stepValues.length - 1;
+
+  const handleDecrease = () => {
+    if (canDecrease) {
+      onChange(stepValues[currentIndex - 1]);
+    }
+  };
+
+  const handleIncrease = () => {
+    if (canIncrease) {
+      onChange(stepValues[currentIndex + 1]);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -339,7 +370,7 @@ function Slider({ label, value, onChange, min, max, step, unit = '' }: SliderPro
           : 'bg-slate-50 dark:bg-slate-800/50'
       )}
     >
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-3">
         <span
           className={cn(
             'font-medium',
@@ -350,30 +381,67 @@ function Slider({ label, value, onChange, min, max, step, unit = '' }: SliderPro
         >
           {label}
         </span>
+      </div>
+
+      {/* Step buttons (Fix #12) */}
+      <div className="flex items-center justify-center gap-4">
+        <button
+          type="button"
+          onClick={handleDecrease}
+          disabled={!canDecrease}
+          className={cn(
+            'w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold transition-all',
+            settings.highContrast
+              ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30'
+              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30'
+          )}
+          aria-label="Diminuisci"
+        >
+          −
+        </button>
+
         <span
           className={cn(
-            'font-mono',
+            'font-mono text-2xl min-w-[80px] text-center',
             settings.highContrast ? 'text-yellow-400' : 'text-blue-500'
           )}
         >
           {value.toFixed(1)}{unit}
         </span>
+
+        <button
+          type="button"
+          onClick={handleIncrease}
+          disabled={!canIncrease}
+          className={cn(
+            'w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold transition-all',
+            settings.highContrast
+              ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30'
+              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30'
+          )}
+          aria-label="Aumenta"
+        >
+          +
+        </button>
       </div>
 
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(parseFloat(e.target.value))}
-        className={cn(
-          'w-full h-2 rounded-full appearance-none cursor-pointer',
-          settings.highContrast
-            ? 'bg-gray-700 accent-yellow-400'
-            : 'bg-slate-200 dark:bg-slate-700 accent-blue-500'
-        )}
-      />
+      {/* Step indicator dots */}
+      <div className="flex justify-center gap-1.5 mt-3">
+        {stepValues.map((v, i) => (
+          <button
+            key={v}
+            type="button"
+            onClick={() => onChange(v)}
+            className={cn(
+              'w-2 h-2 rounded-full transition-all',
+              i === currentIndex
+                ? settings.highContrast ? 'bg-yellow-400 w-3' : 'bg-blue-500 w-3'
+                : settings.highContrast ? 'bg-gray-600' : 'bg-slate-300 dark:bg-slate-600'
+            )}
+            aria-label={`${v}${unit}`}
+          />
+        ))}
+      </div>
     </div>
   );
 }
@@ -699,6 +767,9 @@ interface PresetsSettingsProps {
   onApplyADHD: () => void;
   onApplyVisual: () => void;
   onApplyMotor: () => void;
+  onApplyAutism: () => void;
+  onApplyAuditory: () => void;
+  onApplyCerebralPalsy: () => void;
   onReset: () => void;
 }
 
@@ -707,6 +778,9 @@ function PresetsSettings({
   onApplyADHD,
   onApplyVisual,
   onApplyMotor,
+  onApplyAutism,
+  onApplyAuditory,
+  onApplyCerebralPalsy,
   onReset,
 }: PresetsSettingsProps) {
   const { settings } = useAccessibilityStore();
@@ -727,6 +801,13 @@ function PresetsSettings({
       onClick: onApplyADHD,
     },
     {
+      title: 'Profilo Autismo',
+      description: 'Ambiente calmo, no distrazioni',
+      icon: <Puzzle className="w-6 h-6" />,
+      color: 'teal',
+      onClick: onApplyAutism,
+    },
+    {
       title: 'Profilo Visivo',
       description: 'Alto contrasto, testo grande, TTS',
       icon: <Eye className="w-6 h-6" />,
@@ -734,11 +815,25 @@ function PresetsSettings({
       onClick: onApplyVisual,
     },
     {
+      title: 'Profilo Uditivo',
+      description: 'Focus su comunicazione visiva',
+      icon: <EarOff className="w-6 h-6" />,
+      color: 'pink',
+      onClick: onApplyAuditory,
+    },
+    {
       title: 'Profilo Motorio',
       description: 'Navigazione tastiera, no animazioni',
       icon: <Hand className="w-6 h-6" />,
       color: 'green',
       onClick: onApplyMotor,
+    },
+    {
+      title: 'Paralisi Cerebrale',
+      description: 'TTS, testo grande, navigazione facilitata',
+      icon: <Accessibility className="w-6 h-6" />,
+      color: 'cyan',
+      onClick: onApplyCerebralPalsy,
     },
   ];
 

@@ -2,20 +2,27 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { Brain, HelpCircle, Play, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectIcons } from '@/data';
+import { Button } from '@/components/ui/button';
 import type { Maestro } from '@/types';
+import type { ToolType } from '@/types/tools';
 
 interface MaestroCardProps {
   maestro: Maestro;
   onSelect: (maestro: Maestro) => void;
+  onToolRequest?: (maestro: Maestro, tool: ToolType) => void;
   isSelected?: boolean;
+  showToolButtons?: boolean;
 }
 
 export function MaestroCard({
   maestro,
   onSelect,
+  onToolRequest,
   isSelected = false,
+  showToolButtons = false,
 }: MaestroCardProps) {
   return (
     <motion.button
@@ -101,6 +108,64 @@ export function MaestroCard({
       <p className="text-sm text-slate-500 dark:text-slate-400">
         {maestro.specialty}
       </p>
+
+      {/* Tool buttons - Issue #35 */}
+      {showToolButtons && onToolRequest && (
+        <div className="flex flex-wrap justify-center gap-1 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToolRequest(maestro, 'mindmap');
+            }}
+            aria-label={`Crea mappa mentale con ${maestro.name}`}
+          >
+            <Brain className="w-3 h-3 mr-1" />
+            Mappa
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToolRequest(maestro, 'quiz');
+            }}
+            aria-label={`Crea quiz con ${maestro.name}`}
+          >
+            <HelpCircle className="w-3 h-3 mr-1" />
+            Quiz
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToolRequest(maestro, 'demo');
+            }}
+            aria-label={`Crea demo con ${maestro.name}`}
+          >
+            <Play className="w-3 h-3 mr-1" />
+            Demo
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToolRequest(maestro, 'webcam');
+            }}
+            aria-label={`Scatta foto per ${maestro.name}`}
+          >
+            <Camera className="w-3 h-3 mr-1" />
+            Foto
+          </Button>
+        </div>
+      )}
     </motion.button>
   );
 }

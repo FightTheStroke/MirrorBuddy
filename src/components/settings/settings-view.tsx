@@ -32,12 +32,21 @@ import {
   RefreshCw,
   Video,
   Settings,
+  Undo2,
+  BarChart3,
+  Users,
+  Heart,
+  Sparkles,
 } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AccessibilitySettings } from '@/components/accessibility/accessibility-settings';
 import { useSettingsStore, type TeachingStyle } from '@/lib/stores/app-store';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { useNotificationStore, requestPushPermission, isPushSupported } from '@/lib/stores/notification-store';
+import { TelemetryDashboard } from '@/components/telemetry';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -86,15 +95,17 @@ const TEACHING_STYLES: Array<{
   },
 ];
 
-type SettingsTab = 'profile' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'notifications' | 'privacy' | 'diagnostics';
+type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'notifications' | 'telemetry' | 'privacy' | 'diagnostics';
 
 const tabs: Array<{ id: SettingsTab; label: string; icon: React.ReactNode }> = [
   { id: 'profile', label: 'Profilo', icon: <User className="w-5 h-5" /> },
+  { id: 'characters', label: 'Personaggi', icon: <Users className="w-5 h-5" /> },
   { id: 'accessibility', label: 'Accessibilita', icon: <Accessibility className="w-5 h-5" /> },
   { id: 'appearance', label: 'Aspetto', icon: <Palette className="w-5 h-5" /> },
   { id: 'ai', label: 'AI Provider', icon: <Bot className="w-5 h-5" /> },
   { id: 'audio', label: 'Audio/Video', icon: <Volume2 className="w-5 h-5" /> },
   { id: 'notifications', label: 'Notifiche', icon: <Bell className="w-5 h-5" /> },
+  { id: 'telemetry', label: 'Statistiche', icon: <BarChart3 className="w-5 h-5" /> },
   { id: 'privacy', label: 'Privacy', icon: <Shield className="w-5 h-5" /> },
   { id: 'diagnostics', label: 'Diagnostica', icon: <Wrench className="w-5 h-5" /> },
 ];
@@ -103,21 +114,64 @@ export function SettingsView() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [showAccessibilityModal, setShowAccessibilityModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const initialStateRef = useRef<{ settings: ReturnType<typeof useSettingsStore.getState>; accessibility: ReturnType<typeof useAccessibilityStore.getState>['settings'] } | null>(null);
 
   const { studentProfile, updateStudentProfile, appearance, updateAppearance } = useSettingsStore();
   const { settings: accessibilitySettings, updateSettings: updateAccessibilitySettings } = useAccessibilityStore();
+
+  // Store initial state on mount for undo capability
+  useEffect(() => {
+    if (!initialStateRef.current) {
+      initialStateRef.current = {
+        settings: useSettingsStore.getState(),
+        accessibility: useAccessibilityStore.getState().settings,
+      };
+    }
+  }, []);
+
+  // Track changes
+  useEffect(() => {
+    if (!initialStateRef.current) return;
+    const currentSettings = useSettingsStore.getState();
+    const currentAccessibility = useAccessibilityStore.getState().settings;
+    const changed = JSON.stringify({
+      profile: currentSettings.studentProfile,
+      appearance: currentSettings.appearance,
+      accessibility: currentAccessibility,
+    }) !== JSON.stringify({
+      profile: initialStateRef.current.settings.studentProfile,
+      appearance: initialStateRef.current.settings.appearance,
+      accessibility: initialStateRef.current.accessibility,
+    });
+    setHasChanges(changed);
+  }, [studentProfile, appearance, accessibilitySettings]);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
       // Actually sync settings to the server
       await useSettingsStore.getState().syncToServer();
+      // Update initial state after successful save
+      initialStateRef.current = {
+        settings: useSettingsStore.getState(),
+        accessibility: useAccessibilityStore.getState().settings,
+      };
+      setHasChanges(false);
     } catch (error) {
       logger.error('Failed to save settings', { error: String(error) });
     } finally {
       setIsSaving(false);
     }
   }, []);
+
+  const handleUndo = useCallback(() => {
+    if (!initialStateRef.current) return;
+    updateStudentProfile(initialStateRef.current.settings.studentProfile);
+    updateAppearance(initialStateRef.current.settings.appearance);
+    updateAccessibilitySettings(initialStateRef.current.accessibility);
+    setHasChanges(false);
+  }, [updateStudentProfile, updateAppearance, updateAccessibilitySettings]);
 
   return (
     <div className="space-y-6">
@@ -131,10 +185,27 @@ export function SettingsView() {
             Personalizza la tua esperienza di apprendimento
           </p>
         </div>
-        <Button onClick={handleSave} disabled={isSaving}>
-          <Save className="w-4 h-4 mr-2" />
-          {isSaving ? 'Salvando...' : 'Salva'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleUndo}
+            variant="outline"
+            disabled={!hasChanges || isSaving}
+            title="Annulla modifiche"
+          >
+            <Undo2 className="w-4 h-4 mr-2" />
+            Annulla
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className={cn(
+              hasChanges && !isSaving && 'bg-amber-500 hover:bg-amber-600 animate-pulse'
+            )}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? 'Salvando...' : hasChanges ? 'Salva Modifiche' : 'Salva'}
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -170,12 +241,18 @@ export function SettingsView() {
           />
         )}
 
+        {activeTab === 'characters' && (
+          <CharacterSettings
+            profile={studentProfile}
+            onUpdate={updateStudentProfile}
+          />
+        )}
+
         {activeTab === 'accessibility' && (
           <AccessibilityTab
             settings={accessibilitySettings}
             onOpenModal={() => setShowAccessibilityModal(true)}
-            onToggleDyslexia={() => updateAccessibilitySettings({ dyslexiaFont: !accessibilitySettings.dyslexiaFont })}
-            onToggleADHD={() => updateAccessibilitySettings({ adhdMode: !accessibilitySettings.adhdMode })}
+            onUpdateSettings={updateAccessibilitySettings}
           />
         )}
 
@@ -194,6 +271,7 @@ export function SettingsView() {
 
         {activeTab === 'privacy' && <PrivacySettings />}
 
+        {activeTab === 'telemetry' && <TelemetryDashboard />}
         {activeTab === 'diagnostics' && <DiagnosticsTab />}
       </motion.div>
 
@@ -226,24 +304,6 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
     { value: 'university', label: 'Universita' },
     { value: 'adult', label: 'Formazione Continua' },
   ];
-
-  const learningGoalOptions = [
-    'Migliorare in matematica',
-    'Imparare le lingue',
-    'Preparare esami',
-    'Sviluppare creativita',
-    'Approfondire scienze',
-    'Studiare storia e geografia',
-  ];
-
-  const toggleGoal = (goal: string) => {
-    const current = profile.learningGoals || [];
-    if (current.includes(goal)) {
-      onUpdate({ learningGoals: current.filter(g => g !== goal) });
-    } else {
-      onUpdate({ learningGoals: [...current, goal] });
-    }
-  };
 
   const currentStyle = TEACHING_STYLES.find(s => s.value === (profile.teachingStyle || 'balanced'));
 
@@ -290,54 +350,6 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-green-500" />
-              Obiettivi di Apprendimento
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-slate-500 mb-4">
-              Seleziona gli obiettivi che vuoi raggiungere
-            </p>
-            <div className="space-y-2">
-              {learningGoalOptions.map(goal => (
-                <label
-                  key={goal}
-                  className={cn(
-                    'flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors',
-                    (profile.learningGoals || []).includes(goal)
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500'
-                      : 'bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800'
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={(profile.learningGoals || []).includes(goal)}
-                    onChange={() => toggleGoal(goal)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={cn(
-                      'w-5 h-5 rounded border-2 flex items-center justify-center',
-                      (profile.learningGoals || []).includes(goal)
-                        ? 'bg-blue-500 border-blue-500 text-white'
-                        : 'border-slate-300 dark:border-slate-600'
-                    )}
-                  >
-                    {(profile.learningGoals || []).includes(goal) && (
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="text-sm font-medium">{goal}</span>
-                </label>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Teaching Style Card */}
@@ -345,12 +357,12 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <span className="text-2xl">{currentStyle?.emoji || '⚖️'}</span>
-            Stile dei Maestri
+            Stile dei Professori
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-slate-500">
-            Scegli come vuoi che i maestri ti parlino e ti correggano
+            Scegli come vuoi che i professori ti parlino e ti correggano
           </p>
 
           {/* Current style display */}
@@ -413,25 +425,538 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
   );
 }
 
+// Character Settings (Coach & Buddy Selection)
+interface CharacterSettingsProps {
+  profile: {
+    preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+    preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+    coachBorderColor?: string;
+    buddyBorderColor?: string;
+  };
+  onUpdate: (updates: Partial<CharacterSettingsProps['profile']>) => void;
+}
+
+// Available border colors for customization
+const BORDER_COLORS = [
+  { name: 'Rosa', value: '#EC4899' },
+  { name: 'Blu', value: '#3B82F6' },
+  { name: 'Verde', value: '#10B981' },
+  { name: 'Viola', value: '#8B5CF6' },
+  { name: 'Arancione', value: '#F97316' },
+  { name: 'Rosso', value: '#EF4444' },
+  { name: 'Ambra', value: '#F59E0B' },
+  { name: 'Indaco', value: '#6366F1' },
+  { name: 'Ciano', value: '#06B6D4' },
+  { name: 'Lime', value: '#84CC16' },
+];
+
+const COACHES = [
+  {
+    id: 'melissa' as const,
+    name: 'Melissa',
+    avatar: '/avatars/melissa.jpg',
+    description: 'Giovane, intelligente, allegra, paziente, entusiasta',
+    tagline: 'Entusiasta e positiva',
+    color: 'from-pink-500 to-rose-500',
+    bgColor: 'bg-pink-50 dark:bg-pink-900/20',
+    borderColor: 'border-pink-200 dark:border-pink-800',
+    activeBorder: 'border-pink-500 ring-2 ring-pink-500/50',
+  },
+  {
+    id: 'roberto' as const,
+    name: 'Roberto',
+    avatar: '/avatars/roberto.png',
+    description: 'Giovane, calmo, rassicurante, paziente, affidabile',
+    tagline: 'Calmo e rassicurante',
+    color: 'from-blue-500 to-indigo-500',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    borderColor: 'border-blue-200 dark:border-blue-800',
+    activeBorder: 'border-blue-500 ring-2 ring-blue-500/50',
+  },
+  {
+    id: 'chiara' as const,
+    name: 'Chiara',
+    avatar: '/avatars/chiara.png',
+    description: 'Organizzata, metodica, fresca di studi, empatica',
+    tagline: 'Appena laureata, ti capisce',
+    color: 'from-violet-500 to-purple-500',
+    bgColor: 'bg-violet-50 dark:bg-violet-900/20',
+    borderColor: 'border-violet-200 dark:border-violet-800',
+    activeBorder: 'border-violet-500 ring-2 ring-violet-500/50',
+  },
+  {
+    id: 'andrea' as const,
+    name: 'Andrea',
+    avatar: '/avatars/andrea.png',
+    description: 'Sportiva, energica, pratica, motivazionale',
+    tagline: 'Energia e pause attive',
+    color: 'from-orange-500 to-amber-500',
+    bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+    borderColor: 'border-orange-200 dark:border-orange-800',
+    activeBorder: 'border-orange-500 ring-2 ring-orange-500/50',
+  },
+  {
+    id: 'favij' as const,
+    name: 'Favij',
+    avatar: '/avatars/favij.jpg',
+    description: 'Gamer, rilassato, simpatico, creativo, tech-savvy',
+    tagline: 'Lo studio come un gioco',
+    color: 'from-red-500 to-rose-500',
+    bgColor: 'bg-red-50 dark:bg-red-900/20',
+    borderColor: 'border-red-200 dark:border-red-800',
+    activeBorder: 'border-red-500 ring-2 ring-red-500/50',
+  },
+];
+
+const BUDDIES = [
+  {
+    id: 'mario' as const,
+    name: 'Mario',
+    avatar: '/avatars/mario.jpg',
+    description: 'Amichevole, ironico, comprensivo, alla mano',
+    tagline: 'Il tuo amico che ti capisce',
+    color: 'from-emerald-500 to-teal-500',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+    borderColor: 'border-emerald-200 dark:border-emerald-800',
+    activeBorder: 'border-emerald-500 ring-2 ring-emerald-500/50',
+  },
+  {
+    id: 'noemi' as const,
+    name: 'Noemi',
+    avatar: '/avatars/noemi.png',
+    description: 'Empatica, solare, accogliente, buona ascoltatrice',
+    tagline: 'La tua amica che ti ascolta',
+    color: 'from-purple-500 to-violet-500',
+    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+    borderColor: 'border-purple-200 dark:border-purple-800',
+    activeBorder: 'border-purple-500 ring-2 ring-purple-500/50',
+  },
+  {
+    id: 'enea' as const,
+    name: 'Enea',
+    avatar: '/avatars/enea.png',
+    description: 'Allegro, positivo, spiritoso, energico',
+    tagline: 'Ti tira su il morale',
+    color: 'from-amber-500 to-yellow-500',
+    bgColor: 'bg-amber-50 dark:bg-amber-900/20',
+    borderColor: 'border-amber-200 dark:border-amber-800',
+    activeBorder: 'border-amber-500 ring-2 ring-amber-500/50',
+  },
+  {
+    id: 'bruno' as const,
+    name: 'Bruno',
+    avatar: '/avatars/bruno.png',
+    description: 'Riflessivo, calmo, profondo, buon ascoltatore',
+    tagline: 'Ti ascolta davvero',
+    color: 'from-indigo-500 to-blue-500',
+    bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+    borderColor: 'border-indigo-200 dark:border-indigo-800',
+    activeBorder: 'border-indigo-500 ring-2 ring-indigo-500/50',
+  },
+  {
+    id: 'sofia' as const,
+    name: 'Sofia',
+    avatar: '/avatars/sofia.png',
+    description: 'Creativa, sognatrice, profonda, artistica',
+    tagline: 'Vede le cose diversamente',
+    color: 'from-pink-500 to-fuchsia-500',
+    bgColor: 'bg-pink-50 dark:bg-pink-900/20',
+    borderColor: 'border-pink-200 dark:border-pink-800',
+    activeBorder: 'border-pink-500 ring-2 ring-pink-500/50',
+  },
+];
+
+function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
+  const selectedCoach = profile.preferredCoach || 'melissa';
+  const selectedBuddy = profile.preferredBuddy || 'mario';
+
+  return (
+    <div className="space-y-8">
+      {/* Coach Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            Il Tuo Coach di Apprendimento
+          </CardTitle>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Il coach ti aiuta a sviluppare il tuo metodo di studio e diventare autonomo
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {COACHES.map((coach) => (
+              <button
+                key={coach.id}
+                onClick={() => onUpdate({ preferredCoach: coach.id })}
+                className={cn(
+                  'relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left',
+                  coach.bgColor,
+                  selectedCoach === coach.id
+                    ? coach.activeBorder
+                    : `${coach.borderColor} hover:scale-[1.02]`
+                )}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className={cn(
+                    'w-16 h-16 rounded-full overflow-hidden border-2',
+                    selectedCoach === coach.id ? 'border-white shadow-lg' : 'border-slate-200 dark:border-slate-700'
+                  )}>
+                    <Image
+                      src={coach.avatar}
+                      alt={coach.name}
+                      width={64}
+                      height={64}
+                      className="object-cover w-full h-full"
+                      unoptimized
+                    />
+                  </div>
+                  {selectedCoach === coach.id && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+                    {coach.name}
+                  </h3>
+                  <p className={cn(
+                    'text-sm font-medium bg-gradient-to-r bg-clip-text text-transparent',
+                    coach.color
+                  )}>
+                    {coach.tagline}
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                    {coach.description}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Buddy Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="w-5 h-5 text-rose-500" />
+            Il Tuo MirrorBuddy
+          </CardTitle>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Il buddy e un amico della tua eta che capisce le tue difficolta e ti supporta
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {BUDDIES.map((buddy) => (
+              <button
+                key={buddy.id}
+                onClick={() => onUpdate({ preferredBuddy: buddy.id })}
+                className={cn(
+                  'relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left',
+                  buddy.bgColor,
+                  selectedBuddy === buddy.id
+                    ? buddy.activeBorder
+                    : `${buddy.borderColor} hover:scale-[1.02]`
+                )}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className={cn(
+                    'w-16 h-16 rounded-full overflow-hidden border-2',
+                    selectedBuddy === buddy.id ? 'border-white shadow-lg' : 'border-slate-200 dark:border-slate-700'
+                  )}>
+                    <Image
+                      src={buddy.avatar}
+                      alt={buddy.name}
+                      width={64}
+                      height={64}
+                      className="object-cover w-full h-full"
+                      unoptimized
+                    />
+                  </div>
+                  {selectedBuddy === buddy.id && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+                    {buddy.name}
+                  </h3>
+                  <p className={cn(
+                    'text-sm font-medium bg-gradient-to-r bg-clip-text text-transparent',
+                    buddy.color
+                  )}>
+                    {buddy.tagline}
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                    {buddy.description}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Color Customization */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="w-5 h-5 text-violet-500" />
+            Personalizza i Colori
+          </CardTitle>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Scegli i colori dei bordi per riconoscere coach e buddy negli avatar
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Coach Border Color */}
+          <div>
+            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+              Colore bordo Coach ({COACHES.find(c => c.id === selectedCoach)?.name})
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {BORDER_COLORS.map((color) => (
+                <button
+                  key={`coach-${color.value}`}
+                  onClick={() => onUpdate({ coachBorderColor: color.value })}
+                  className={cn(
+                    'w-10 h-10 rounded-full border-2 transition-all duration-200 hover:scale-110',
+                    profile.coachBorderColor === color.value
+                      ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                      : 'border-transparent'
+                  )}
+                  style={{ backgroundColor: color.value }}
+                  title={color.name}
+                >
+                  {profile.coachBorderColor === color.value && (
+                    <Check className="w-5 h-5 text-white mx-auto" />
+                  )}
+                </button>
+              ))}
+              <button
+                onClick={() => onUpdate({ coachBorderColor: undefined })}
+                className={cn(
+                  'w-10 h-10 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 transition-all duration-200 hover:scale-110 flex items-center justify-center',
+                  !profile.coachBorderColor && 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                )}
+                title="Predefinito"
+              >
+                <span className="text-xs text-slate-500">Auto</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Buddy Border Color */}
+          <div>
+            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+              Colore bordo Buddy ({BUDDIES.find(b => b.id === selectedBuddy)?.name})
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {BORDER_COLORS.map((color) => (
+                <button
+                  key={`buddy-${color.value}`}
+                  onClick={() => onUpdate({ buddyBorderColor: color.value })}
+                  className={cn(
+                    'w-10 h-10 rounded-full border-2 transition-all duration-200 hover:scale-110',
+                    profile.buddyBorderColor === color.value
+                      ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                      : 'border-transparent'
+                  )}
+                  style={{ backgroundColor: color.value }}
+                  title={color.name}
+                >
+                  {profile.buddyBorderColor === color.value && (
+                    <Check className="w-5 h-5 text-white mx-auto" />
+                  )}
+                </button>
+              ))}
+              <button
+                onClick={() => onUpdate({ buddyBorderColor: undefined })}
+                className={cn(
+                  'w-10 h-10 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 transition-all duration-200 hover:scale-110 flex items-center justify-center',
+                  !profile.buddyBorderColor && 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                )}
+                title="Predefinito"
+              >
+                <span className="text-xs text-slate-500">Auto</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+              Anteprima
+            </h4>
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <div
+                  className="w-16 h-16 rounded-full overflow-hidden border-4 mx-auto"
+                  style={{ borderColor: profile.coachBorderColor || '#3B82F6' }}
+                >
+                  <Image
+                    src={COACHES.find(c => c.id === selectedCoach)?.avatar || '/avatars/melissa.jpg'}
+                    alt="Coach"
+                    width={64}
+                    height={64}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+                <span className="text-xs text-slate-500 mt-1 block">Coach</span>
+              </div>
+              <div className="text-center">
+                <div
+                  className="w-16 h-16 rounded-full overflow-hidden border-4 mx-auto"
+                  style={{ borderColor: profile.buddyBorderColor || '#10B981' }}
+                >
+                  <Image
+                    src={BUDDIES.find(b => b.id === selectedBuddy)?.avatar || '/avatars/mario.jpg'}
+                    alt="Buddy"
+                    width={64}
+                    height={64}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+                <span className="text-xs text-slate-500 mt-1 block">Buddy</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Info Box */}
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 w-8 h-8 bg-amber-100 dark:bg-amber-800/50 rounded-full flex items-center justify-center">
+            <GraduationCap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <h4 className="font-medium text-amber-900 dark:text-amber-100">
+              Il Triangolo del Supporto
+            </h4>
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+              Il coach ti insegna il metodo, il buddy ti supporta emotivamente, e i Professori ti spiegano le materie.
+              Insieme formano il tuo team di apprendimento personalizzato!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Accessibility Tab
 interface AccessibilitySettings {
   dyslexiaFont?: boolean;
+  extraLetterSpacing?: boolean;
+  increasedLineHeight?: boolean;
   highContrast?: boolean;
   largeText?: boolean;
   ttsEnabled?: boolean;
+  ttsAutoRead?: boolean;
   adhdMode?: boolean;
+  distractionFreeMode?: boolean;
+  breakReminders?: boolean;
   reducedMotion?: boolean;
   keyboardNavigation?: boolean;
+  visualFirstMode?: boolean; // For auditory disabilities - visual-first communication
 }
 
 interface AccessibilityTabProps {
   settings: AccessibilitySettings;
   onOpenModal: () => void;
-  onToggleDyslexia: () => void;
-  onToggleADHD: () => void;
+  onUpdateSettings: (updates: Partial<AccessibilitySettings>) => void;
 }
 
-function AccessibilityTab({ settings, onOpenModal, onToggleDyslexia, onToggleADHD }: AccessibilityTabProps) {
+// Accessibility profile presets - Fix for #9
+const accessibilityProfiles = [
+  {
+    id: 'dyslexia',
+    label: 'Dislessia',
+    description: 'Font OpenDyslexic, spaziatura ottimizzata',
+    color: 'blue',
+    icon: '📖',
+    isActive: (s: AccessibilitySettings) => s.dyslexiaFont,
+    toggle: (s: AccessibilitySettings) => ({ dyslexiaFont: !s.dyslexiaFont, extraLetterSpacing: !s.dyslexiaFont, increasedLineHeight: !s.dyslexiaFont }),
+  },
+  {
+    id: 'adhd',
+    label: 'ADHD',
+    description: 'Timer Pomodoro, focus mode, promemoria',
+    color: 'purple',
+    icon: '🎯',
+    isActive: (s: AccessibilitySettings) => s.adhdMode,
+    toggle: (s: AccessibilitySettings) => ({ adhdMode: !s.adhdMode, distractionFreeMode: !s.adhdMode, breakReminders: !s.adhdMode }),
+  },
+  {
+    id: 'visual',
+    label: 'Visivo',
+    description: 'Alto contrasto, testo grande',
+    color: 'amber',
+    icon: '👁️',
+    isActive: (s: AccessibilitySettings) => s.highContrast || s.largeText,
+    toggle: (s: AccessibilitySettings) => ({ highContrast: !(s.highContrast && s.largeText), largeText: !(s.highContrast && s.largeText) }),
+  },
+  {
+    id: 'motor',
+    label: 'Motorio',
+    description: 'Navigazione tastiera, target grandi',
+    color: 'green',
+    icon: '🖐️',
+    isActive: (s: AccessibilitySettings) => s.keyboardNavigation,
+    toggle: (s: AccessibilitySettings) => ({ keyboardNavigation: !s.keyboardNavigation }),
+  },
+  {
+    id: 'autism',
+    label: 'Autismo',
+    description: 'Layout prevedibili, meno stimoli',
+    color: 'teal',
+    icon: '🧩',
+    isActive: (s: AccessibilitySettings) => s.reducedMotion && s.distractionFreeMode,
+    toggle: (s: AccessibilitySettings) => ({ reducedMotion: !(s.reducedMotion && s.distractionFreeMode), distractionFreeMode: !(s.reducedMotion && s.distractionFreeMode) }),
+  },
+  {
+    id: 'auditory',
+    label: 'Uditivo',
+    description: 'Comunicazione visiva, no dipendenza audio',
+    color: 'rose',
+    icon: '👂',
+    isActive: (s: AccessibilitySettings) => s.visualFirstMode,
+    toggle: (s: AccessibilitySettings) => ({ visualFirstMode: !s.visualFirstMode }),
+  },
+  {
+    id: 'cerebral-palsy',
+    label: 'Paralisi Cerebrale',
+    description: 'TTS, testo grande, tastiera, spaziatura extra',
+    color: 'blue',
+    icon: '♿',
+    isActive: (s: AccessibilitySettings) => s.ttsEnabled && s.largeText && s.keyboardNavigation,
+    toggle: (s: AccessibilitySettings) => ({
+      ttsEnabled: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+      largeText: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+      keyboardNavigation: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+      extraLetterSpacing: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+    }),
+  },
+] as const;
+
+const profileColors: Record<string, { bg: string; bgActive: string; border: string; borderActive: string; text: string; ring: string }> = {
+  blue: { bg: 'bg-blue-50 dark:bg-blue-900/20', bgActive: 'bg-blue-100 dark:bg-blue-900/40', border: 'border-blue-200 dark:border-blue-800 hover:border-blue-400', borderActive: 'border-blue-500', text: 'text-blue-700 dark:text-blue-300', ring: 'ring-blue-500/50' },
+  purple: { bg: 'bg-purple-50 dark:bg-purple-900/20', bgActive: 'bg-purple-100 dark:bg-purple-900/40', border: 'border-purple-200 dark:border-purple-800 hover:border-purple-400', borderActive: 'border-purple-500', text: 'text-purple-700 dark:text-purple-300', ring: 'ring-purple-500/50' },
+  amber: { bg: 'bg-amber-50 dark:bg-amber-900/20', bgActive: 'bg-amber-100 dark:bg-amber-900/40', border: 'border-amber-200 dark:border-amber-800 hover:border-amber-400', borderActive: 'border-amber-500', text: 'text-amber-700 dark:text-amber-300', ring: 'ring-amber-500/50' },
+  green: { bg: 'bg-green-50 dark:bg-green-900/20', bgActive: 'bg-green-100 dark:bg-green-900/40', border: 'border-green-200 dark:border-green-800 hover:border-green-400', borderActive: 'border-green-500', text: 'text-green-700 dark:text-green-300', ring: 'ring-green-500/50' },
+  teal: { bg: 'bg-teal-50 dark:bg-teal-900/20', bgActive: 'bg-teal-100 dark:bg-teal-900/40', border: 'border-teal-200 dark:border-teal-800 hover:border-teal-400', borderActive: 'border-teal-500', text: 'text-teal-700 dark:text-teal-300', ring: 'ring-teal-500/50' },
+  rose: { bg: 'bg-rose-50 dark:bg-rose-900/20', bgActive: 'bg-rose-100 dark:bg-rose-900/40', border: 'border-rose-200 dark:border-rose-800 hover:border-rose-400', borderActive: 'border-rose-500', text: 'text-rose-700 dark:text-rose-300', ring: 'ring-rose-500/50' },
+};
+
+function AccessibilityTab({ settings, onOpenModal, onUpdateSettings }: AccessibilityTabProps) {
   const activeFeatures = [
     settings.dyslexiaFont && 'Font dislessia',
     settings.highContrast && 'Alto contrasto',
@@ -448,25 +973,60 @@ function AccessibilityTab({ settings, onOpenModal, onToggleDyslexia, onToggleADH
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Accessibility className="w-5 h-5 text-purple-500" />
-            Impostazioni di Accessibilita
+            Profili di Accessibilita
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-slate-600 dark:text-slate-400">
-            Convergio e progettato per essere accessibile a tutti. Personalizza l&apos;esperienza
-            in base alle tue esigenze.
+            Seleziona uno o piu profili per personalizzare l&apos;esperienza in base alle tue esigenze.
           </p>
 
+          {/* All accessibility profiles - Fix for #9 */}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {accessibilityProfiles.map(profile => {
+              const colors = profileColors[profile.color];
+              const isActive = profile.isActive(settings);
+              return (
+                <button
+                  key={profile.id}
+                  onClick={() => onUpdateSettings(profile.toggle(settings))}
+                  className={cn(
+                    'text-left p-3 rounded-xl border-2 transition-all',
+                    isActive
+                      ? `${colors.bgActive} ${colors.borderActive} ring-2 ${colors.ring}`
+                      : `${colors.bg} ${colors.border}`
+                  )}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">{profile.icon}</span>
+                    <h4 className={cn('font-medium text-sm', colors.text)}>
+                      {profile.label}
+                    </h4>
+                    <div className={cn(
+                      'w-4 h-4 rounded-full border-2 flex items-center justify-center ml-auto',
+                      isActive ? `${colors.borderActive} bg-current` : 'border-slate-300'
+                    )}>
+                      {isActive && <Check className="w-2.5 h-2.5 text-white" />}
+                    </div>
+                  </div>
+                  <p className={cn('text-xs opacity-80', colors.text)}>
+                    {profile.description}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
           {activeFeatures.length > 0 && (
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
-              <h4 className="font-medium text-green-700 dark:text-green-400 mb-2">
+            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
+              <h4 className="font-medium text-green-700 dark:text-green-400 mb-2 text-sm">
                 Funzionalita attive:
               </h4>
               <div className="flex flex-wrap gap-2">
                 {activeFeatures.map((feature, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1 bg-green-100 dark:bg-green-800/50 text-green-700 dark:text-green-300 rounded-full text-sm"
+                    className="px-2 py-0.5 bg-green-100 dark:bg-green-800/50 text-green-700 dark:text-green-300 rounded-full text-xs"
                   >
                     {feature}
                   </span>
@@ -477,67 +1037,14 @@ function AccessibilityTab({ settings, onOpenModal, onToggleDyslexia, onToggleADH
 
           <Button
             onClick={onOpenModal}
-            className="w-full py-6 text-lg font-semibold bg-purple-600 hover:bg-purple-700 text-white"
-            size="lg"
+            variant="outline"
+            className="w-full"
           >
-            <Accessibility className="w-5 h-5 mr-2" />
-            Apri Pannello Accessibilita Completo
+            <Settings className="w-4 h-4 mr-2" />
+            Personalizza impostazioni avanzate
           </Button>
         </CardContent>
       </Card>
-
-      {/* Quick toggles - clickable cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <button
-          onClick={onToggleDyslexia}
-          className={cn(
-            "text-left p-4 rounded-xl border-2 transition-all",
-            settings.dyslexiaFont
-              ? "bg-blue-100 dark:bg-blue-900/40 border-blue-500 ring-2 ring-blue-500/50"
-              : "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 hover:border-blue-400"
-          )}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="font-medium text-blue-700 dark:text-blue-300">
-              Supporto Dislessia
-            </h4>
-            <div className={cn(
-              "w-5 h-5 rounded-full border-2 flex items-center justify-center",
-              settings.dyslexiaFont ? "bg-blue-500 border-blue-500" : "border-blue-300"
-            )}>
-              {settings.dyslexiaFont && <Check className="w-3 h-3 text-white" />}
-            </div>
-          </div>
-          <p className="text-sm text-blue-600 dark:text-blue-400">
-            Font OpenDyslexic, spaziatura ottimizzata
-          </p>
-        </button>
-
-        <button
-          onClick={onToggleADHD}
-          className={cn(
-            "text-left p-4 rounded-xl border-2 transition-all",
-            settings.adhdMode
-              ? "bg-purple-100 dark:bg-purple-900/40 border-purple-500 ring-2 ring-purple-500/50"
-              : "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800 hover:border-purple-400"
-          )}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="font-medium text-purple-700 dark:text-purple-300">
-              Supporto ADHD
-            </h4>
-            <div className={cn(
-              "w-5 h-5 rounded-full border-2 flex items-center justify-center",
-              settings.adhdMode ? "bg-purple-500 border-purple-500" : "border-purple-300"
-            )}>
-              {settings.adhdMode && <Check className="w-3 h-3 text-white" />}
-            </div>
-          </div>
-          <p className="text-sm text-purple-600 dark:text-purple-400">
-            Timer Pomodoro, focus mode e promemoria
-          </p>
-        </button>
-      </div>
     </div>
   );
 }
@@ -681,21 +1188,29 @@ function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsProps) {
               { value: 'es' as const, label: 'Español', flag: '🇪🇸' },
               { value: 'fr' as const, label: 'Français', flag: '🇫🇷' },
               { value: 'de' as const, label: 'Deutsch', flag: '🇩🇪' },
-            ].map(lang => (
-              <button
-                key={lang.value}
-                onClick={() => onUpdate({ language: lang.value })}
-                className={cn(
-                  'flex items-center gap-2 p-3 rounded-xl border-2 transition-all',
-                  (appearance.language || 'it') === lang.value
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
-                )}
-              >
-                <span className="text-xl">{lang.flag}</span>
-                <span className="text-sm font-medium">{lang.label}</span>
-              </button>
-            ))}
+            ].map(lang => {
+              const isSelected = (appearance.language || 'it') === lang.value;
+              return (
+                <button
+                  key={lang.value}
+                  onClick={() => onUpdate({ language: lang.value })}
+                  className={cn(
+                    'flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-medium',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900',
+                    isSelected
+                      ? 'bg-accent-themed text-white border-accent-themed shadow-lg focus:ring-accent-themed'
+                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:border-accent-themed hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm hover:shadow-md focus:ring-accent-themed'
+                  )}
+                  aria-pressed={isSelected}
+                >
+                  <span className="text-xl">{lang.flag}</span>
+                  <span className="text-sm">{lang.label}</span>
+                  {isSelected && (
+                    <Check className="w-4 h-4 ml-auto" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -703,64 +1218,188 @@ function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsProps) {
   );
 }
 
-// Notification Settings
+// Notification Settings - Uses global notification store
 function NotificationSettings() {
-  const [notifications, setNotifications] = useState({
-    studyReminders: true,
-    streakAlerts: true,
-    achievements: true,
-    weeklyReport: true,
-    sound: false,
-  });
+  const { preferences, pushPermission, updatePreferences, setPushPermission: _setPushPermission } = useNotificationStore();
+  const [isRequestingPush, setIsRequestingPush] = useState(false);
 
-  const toggleSetting = (key: keyof typeof notifications) => {
-    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleRequestPush = async () => {
+    setIsRequestingPush(true);
+    try {
+      const granted = await requestPushPermission();
+      if (granted) {
+        updatePreferences({ push: true });
+      }
+    } finally {
+      setIsRequestingPush(false);
+    }
+  };
+
+  const togglePreference = (key: keyof typeof preferences) => {
+    updatePreferences({ [key]: !preferences[key] });
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-amber-500" />
-          Notifiche
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {[
-          { key: 'studyReminders' as const, label: 'Promemoria studio', desc: 'Ricevi un promemoria per studiare' },
-          { key: 'streakAlerts' as const, label: 'Avvisi streak', desc: 'Notifica quando rischi di perdere la serie' },
-          { key: 'achievements' as const, label: 'Traguardi', desc: 'Notifica quando sblocchi un achievement' },
-          { key: 'weeklyReport' as const, label: 'Report settimanale', desc: 'Ricevi un riepilogo dei tuoi progressi' },
-          { key: 'sound' as const, label: 'Suoni', desc: 'Attiva effetti sonori' },
-        ].map(item => (
+    <div className="space-y-6">
+      {/* Master toggle */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-amber-500" />
+            Notifiche
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Master enable toggle */}
           <label
-            key={item.key}
             className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
           >
             <div>
               <span className="font-medium text-slate-900 dark:text-white block">
-                {item.label}
+                Abilita notifiche
               </span>
-              <span className="text-sm text-slate-500">{item.desc}</span>
+              <span className="text-sm text-slate-500">Attiva o disattiva tutte le notifiche</span>
             </div>
             <div
               className={cn(
                 'relative w-12 h-7 rounded-full transition-colors',
-                notifications[item.key] ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+                preferences.enabled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
               )}
-              onClick={() => toggleSetting(item.key)}
+              onClick={() => togglePreference('enabled')}
             >
               <span
                 className={cn(
                   'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
-                  notifications[item.key] ? 'translate-x-5' : 'translate-x-0'
+                  preferences.enabled ? 'translate-x-5' : 'translate-x-0'
                 )}
               />
             </div>
           </label>
-        ))}
-      </CardContent>
-    </Card>
+
+          {/* Push notifications */}
+          {isPushSupported() && (
+            <label
+              className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+            >
+              <div>
+                <span className="font-medium text-slate-900 dark:text-white block">
+                  Notifiche push
+                </span>
+                <span className="text-sm text-slate-500">
+                  {pushPermission === 'granted'
+                    ? 'Ricevi notifiche anche quando l\'app è chiusa'
+                    : pushPermission === 'denied'
+                    ? 'Permesso negato - controlla le impostazioni del browser'
+                    : 'Abilita le notifiche push del browser'}
+                </span>
+              </div>
+              {pushPermission !== 'granted' ? (
+                <Button
+                  size="sm"
+                  onClick={handleRequestPush}
+                  disabled={isRequestingPush || pushPermission === 'denied'}
+                >
+                  {isRequestingPush ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Abilita'
+                  )}
+                </Button>
+              ) : (
+                <div
+                  className={cn(
+                    'relative w-12 h-7 rounded-full transition-colors',
+                    preferences.push ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+                  )}
+                  onClick={() => togglePreference('push')}
+                >
+                  <span
+                    className={cn(
+                      'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
+                      preferences.push ? 'translate-x-5' : 'translate-x-0'
+                    )}
+                  />
+                </div>
+              )}
+            </label>
+          )}
+
+          {/* Sound */}
+          <label
+            className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+          >
+            <div>
+              <span className="font-medium text-slate-900 dark:text-white block">
+                Suoni
+              </span>
+              <span className="text-sm text-slate-500">Riproduci suoni per le notifiche</span>
+            </div>
+            <div
+              className={cn(
+                'relative w-12 h-7 rounded-full transition-colors',
+                preferences.sound ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+              )}
+              onClick={() => togglePreference('sound')}
+            >
+              <span
+                className={cn(
+                  'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
+                  preferences.sound ? 'translate-x-5' : 'translate-x-0'
+                )}
+              />
+            </div>
+          </label>
+        </CardContent>
+      </Card>
+
+      {/* Notification types */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Tipi di notifiche</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[
+            { key: 'reminders' as const, label: 'Promemoria studio', desc: 'Ricevi un promemoria per studiare' },
+            { key: 'streaks' as const, label: 'Avvisi streak', desc: 'Notifica quando rischi di perdere la serie' },
+            { key: 'achievements' as const, label: 'Traguardi', desc: 'Notifica quando sblocchi un achievement' },
+            { key: 'levelUp' as const, label: 'Livelli', desc: 'Notifica quando sali di livello' },
+            { key: 'breaks' as const, label: 'Pause', desc: 'Suggerimenti per fare pause (ADHD mode)' },
+            { key: 'sessionEnd' as const, label: 'Fine sessione', desc: 'Riepilogo a fine sessione di studio' },
+          ].map(item => (
+            <label
+              key={item.key}
+              className={cn(
+                'flex items-center justify-between p-4 rounded-lg cursor-pointer transition-opacity',
+                preferences.enabled
+                  ? 'bg-slate-50 dark:bg-slate-800/50'
+                  : 'bg-slate-50/50 dark:bg-slate-800/25 opacity-50'
+              )}
+            >
+              <div>
+                <span className="font-medium text-slate-900 dark:text-white block">
+                  {item.label}
+                </span>
+                <span className="text-sm text-slate-500">{item.desc}</span>
+              </div>
+              <div
+                className={cn(
+                  'relative w-12 h-7 rounded-full transition-colors',
+                  preferences[item.key] && preferences.enabled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+                )}
+                onClick={() => preferences.enabled && togglePreference(item.key)}
+              >
+                <span
+                  className={cn(
+                    'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
+                    preferences[item.key] ? 'translate-x-5' : 'translate-x-0'
+                  )}
+                />
+              </div>
+            </label>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -1124,96 +1763,145 @@ function AudioSettings() {
   // Test speaker output
   const testSpeaker = async () => {
     setSpeakerTestActive(true);
-    try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const audioContext = new AudioCtx();
 
-      // Try to set the output device if supported
-      if (preferredOutputId && 'setSinkId' in audioContext) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (audioContext as any).setSinkId(preferredOutputId);
-        } catch {
-          console.warn('Could not set output device, using default');
-        }
-      }
+    // Helper function to play fallback tone
+    const playFallbackTone = () => {
+      try {
+        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const audioContext = new AudioCtx();
 
-      // Create a pleasant test tone (440Hz with envelope)
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
 
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
 
-      // Envelope for pleasant sound
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
 
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
 
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.5);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
 
-      // Cleanup after sound finishes
-      setTimeout(() => {
-        audioContext.close();
+        setTimeout(() => {
+          audioContext.close();
+          setSpeakerTestActive(false);
+        }, 600);
+      } catch (error) {
+        console.error('Fallback tone error:', error);
         setSpeakerTestActive(false);
-      }, 600);
+      }
+    };
+
+    try {
+      // Use Web Speech API to speak a test phrase
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance('Ciao! Il test audio funziona correttamente.');
+        utterance.lang = 'it-IT';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // Try to find an Italian voice
+        const voices = window.speechSynthesis.getVoices();
+        const italianVoice = voices.find(v => v.lang.startsWith('it')) || voices[0];
+        if (italianVoice) {
+          utterance.voice = italianVoice;
+        }
+
+        utterance.onend = () => {
+          setSpeakerTestActive(false);
+        };
+
+        utterance.onerror = () => {
+          console.error('Speech synthesis error, falling back to tone');
+          playFallbackTone();
+        };
+
+        window.speechSynthesis.speak(utterance);
+
+        // Fallback timeout in case onend doesn't fire
+        setTimeout(() => {
+          setSpeakerTestActive(false);
+        }, 5000);
+      } else {
+        // Fallback to tone if speech synthesis not available
+        playFallbackTone();
+      }
     } catch (error) {
       console.error('Speaker test error:', error);
-      setSpeakerTestActive(false);
+      playFallbackTone();
     }
   };
 
   return (
     <div className="space-y-6">
-      {/* Microphone Settings */}
+      {/* Audio Devices - Compact 2-column layout (Fix #11) */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Mic className="w-5 h-5 text-red-500" />
-            Microfono
+            <Volume2 className="w-5 h-5 text-amber-500" />
+            Dispositivi Audio
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Seleziona il microfono da usare per le conversazioni vocali con i Maestri.
-          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Microphone */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <Mic className="w-4 h-4 text-red-500" />
+                Microfono
+              </label>
+              <select
+                value={preferredMicrophoneId}
+                onChange={(e) => handleMicChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+              >
+                <option value="">Predefinito di sistema</option>
+                {availableMics.map((mic) => (
+                  <option key={mic.deviceId} value={mic.deviceId}>
+                    {mic.label || `Microfono ${mic.deviceId.slice(0, 8)}...`}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex items-center gap-3">
-            <select
-              value={preferredMicrophoneId}
-              onChange={(e) => handleMicChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
-            >
-              <option value="">Predefinito di sistema</option>
-              {availableMics.map((mic) => (
-                <option key={mic.deviceId} value={mic.deviceId}>
-                  {mic.label || `Microfono ${mic.deviceId.slice(0, 8)}...`}
-                </option>
-              ))}
-            </select>
-            <Button
-              onClick={refreshDevices}
-              variant="outline"
-              size="sm"
-              title="Aggiorna lista dispositivi"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </Button>
+            {/* Output */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <Volume2 className="w-4 h-4 text-amber-500" />
+                Altoparlanti
+              </label>
+              <select
+                value={preferredOutputId}
+                onChange={(e) => handleOutputChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+              >
+                <option value="">Predefinito di sistema</option>
+                {availableOutputs.map((output) => (
+                  <option key={output.deviceId} value={output.deviceId}>
+                    {output.label || `Altoparlante ${output.deviceId.slice(0, 8)}...`}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Waveform visualization */}
+          {/* Mic waveform - compact */}
           <div className="space-y-2">
             {micTestActive && (
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Parla per testare il microfono
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-xs text-slate-600 dark:text-slate-400">
+                  Parla per testare
                 </span>
-                <span className="text-sm font-mono text-slate-500 dark:text-slate-400 ml-auto">
+                <span className="text-xs font-mono text-slate-500 ml-auto">
                   {Math.round(audioLevel)}%
                 </span>
               </div>
@@ -1222,97 +1910,84 @@ function AudioSettings() {
               <canvas
                 ref={waveformCanvasRef}
                 width={600}
-                height={80}
-                className="w-full h-[80px] rounded-lg bg-slate-800 dark:bg-slate-900"
+                height={60}
+                className="w-full h-[60px] rounded-lg bg-slate-800 dark:bg-slate-900"
               />
               {!micTestActive && (
-                <div className="absolute inset-0 flex items-center justify-center text-slate-500 dark:text-slate-400 text-sm">
-                  Clicca &quot;Testa Microfono&quot; per vedere la waveform
+                <div className="absolute inset-0 flex items-center justify-center text-slate-500 dark:text-slate-400 text-xs">
+                  Clicca &quot;Testa&quot; per vedere la waveform
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex gap-3">
-            {!micTestActive ? (
-              <Button onClick={startMicTest} variant="default" className="flex-1">
-                <Mic className="w-4 h-4 mr-2" />
-                Testa Microfono
-              </Button>
-            ) : (
-              <Button onClick={stopMicTest} variant="destructive" className="flex-1">
-                <XCircle className="w-4 h-4 mr-2" />
-                Ferma Test
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Output Device (Speakers) Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Volume2 className="w-5 h-5 text-amber-500" />
-            Altoparlanti / Cuffie
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Seleziona il dispositivo di output audio per sentire le risposte dei Maestri.
-          </p>
-
-          <div className="flex items-center gap-3">
-            <select
-              value={preferredOutputId}
-              onChange={(e) => handleOutputChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
-            >
-              <option value="">Predefinito di sistema</option>
-              {availableOutputs.map((output) => (
-                <option key={output.deviceId} value={output.deviceId}>
-                  {output.label || `Altoparlante ${output.deviceId.slice(0, 8)}...`}
-                </option>
-              ))}
-            </select>
+          {/* Test buttons - row */}
+          <div className="grid grid-cols-3 gap-2">
             <Button
               onClick={refreshDevices}
               variant="outline"
               size="sm"
-              title="Aggiorna lista dispositivi"
+              title="Aggiorna dispositivi"
             >
               <RefreshCw className="w-4 h-4" />
             </Button>
-          </div>
-
-          <div className="flex gap-3">
+            {!micTestActive ? (
+              <Button onClick={startMicTest} variant="default" size="sm">
+                <Mic className="w-4 h-4 mr-1" />
+                Testa Mic
+              </Button>
+            ) : (
+              <Button onClick={stopMicTest} variant="destructive" size="sm">
+                <XCircle className="w-4 h-4 mr-1" />
+                Stop
+              </Button>
+            )}
             <Button
               onClick={testSpeaker}
               variant="default"
-              className="flex-1"
+              size="sm"
               disabled={speakerTestActive}
             >
-              <Volume2 className="w-4 h-4 mr-2" />
-              {speakerTestActive ? 'Riproduzione...' : 'Testa Audio'}
+              <Volume2 className="w-4 h-4 mr-1" />
+              {speakerTestActive ? '...' : 'Testa'}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Camera Settings */}
+      {/* Webcam - Better layout with larger preview */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
             <Video className="w-5 h-5 text-blue-500" />
             Webcam
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Seleziona la webcam da usare (per future funzionalità video).
-          </p>
+          {/* Large video preview */}
+          <div className="relative aspect-video max-w-md mx-auto rounded-xl overflow-hidden bg-slate-900">
+            <video
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              muted
+              playsInline
+            />
+            {!camTestActive && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                <Video className="w-12 h-12 text-slate-600" />
+                <span className="text-sm text-slate-500">Clicca &quot;Testa&quot; per vedere l&apos;anteprima</span>
+              </div>
+            )}
+            {camTestActive && (
+              <div className="absolute top-2 right-2 flex items-center gap-2 px-2 py-1 bg-black/50 rounded-full">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-xs text-white">LIVE</span>
+              </div>
+            )}
+          </div>
 
-          <div className="flex items-center gap-3">
+          {/* Controls row */}
+          <div className="flex items-center gap-4">
             <select
               value={preferredCameraId}
               onChange={(e) => handleCamChange(e.target.value)}
@@ -1325,52 +2000,24 @@ function AudioSettings() {
                 </option>
               ))}
             </select>
-            <Button
-              onClick={refreshDevices}
-              variant="outline"
-              size="sm"
-              title="Aggiorna lista dispositivi"
-            >
+            <Button onClick={refreshDevices} variant="outline" size="sm" title="Aggiorna dispositivi">
               <RefreshCw className="w-4 h-4" />
             </Button>
-          </div>
-
-          {/* Video preview */}
-          <div className="relative rounded-lg overflow-hidden bg-slate-900 aspect-video">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              muted
-              playsInline
-            />
-            {!camTestActive && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Video className="w-12 h-12 text-slate-600" />
-              </div>
-            )}
-            {camTestActive && (
-              <div className="absolute top-2 right-2 flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-xs text-white bg-black/50 px-2 py-1 rounded">
-                  LIVE
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div className="flex gap-3">
             {!camTestActive ? (
-              <Button onClick={startCamTest} variant="default" className="flex-1">
-                <Video className="w-4 h-4 mr-2" />
-                Testa Webcam
+              <Button onClick={startCamTest} variant="default" size="sm">
+                <Video className="w-4 h-4 mr-1" />
+                Testa
               </Button>
             ) : (
-              <Button onClick={stopCamTest} variant="destructive" className="flex-1">
-                <XCircle className="w-4 h-4 mr-2" />
-                Ferma Test
+              <Button onClick={stopCamTest} variant="destructive" size="sm">
+                <XCircle className="w-4 h-4 mr-1" />
+                Stop
               </Button>
             )}
           </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
+            Per future funzionalità video
+          </p>
         </CardContent>
       </Card>
 
@@ -1415,7 +2062,7 @@ function VoiceExperienceSettings() {
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-slate-600 dark:text-slate-400 text-sm">
-          Personalizza il comportamento delle conversazioni vocali con i Maestri.
+          Personalizza il comportamento delle conversazioni vocali con i Professori.
         </p>
 
         {/* Barge-in Toggle */}
@@ -1425,7 +2072,7 @@ function VoiceExperienceSettings() {
               Interruzione automatica (Barge-in)
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Permetti di interrompere il Maestro mentre parla iniziando a parlare tu.
+              Permetti di interrompere il Professore mentre parla iniziando a parlare tu.
             </p>
           </div>
           <button
@@ -1444,53 +2091,59 @@ function VoiceExperienceSettings() {
           </button>
         </div>
 
-        {/* VAD Threshold Slider */}
+        {/* VAD Threshold - Discrete Steps */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="font-medium text-slate-900 dark:text-slate-100">
-              Sensibilità rilevamento voce
-            </div>
-            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
-              {voiceVadThreshold.toFixed(2)}
-            </span>
+          <div className="font-medium text-slate-900 dark:text-slate-100">
+            Sensibilità rilevamento voce
           </div>
-          <input
-            type="range"
-            min="0.3"
-            max="0.7"
-            step="0.05"
-            value={voiceVadThreshold}
-            onChange={(e) => setVoiceVadThreshold(parseFloat(e.target.value))}
-            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
-          />
-          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>Più sensibile (voce bassa)</span>
-            <span>Meno sensibile (rumore)</span>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { value: 0.35, label: 'Alta', desc: 'Per voce bassa' },
+              { value: 0.5, label: 'Media', desc: 'Bilanciata' },
+              { value: 0.65, label: 'Bassa', desc: 'Ignora rumore' },
+            ].map(({ value, label, desc }) => (
+              <button
+                key={value}
+                onClick={() => setVoiceVadThreshold(value)}
+                className={cn(
+                  'p-3 rounded-xl border-2 transition-all text-center',
+                  Math.abs(voiceVadThreshold - value) < 0.1
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-purple-300'
+                )}
+              >
+                <div className="font-medium text-slate-900 dark:text-slate-100">{label}</div>
+                <div className="text-xs text-slate-500">{desc}</div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Silence Duration Slider */}
+        {/* Silence Duration - Discrete Steps */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="font-medium text-slate-900 dark:text-slate-100">
-              Attesa fine frase
-            </div>
-            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
-              {voiceSilenceDuration}ms
-            </span>
+          <div className="font-medium text-slate-900 dark:text-slate-100">
+            Attesa fine frase
           </div>
-          <input
-            type="range"
-            min="300"
-            max="800"
-            step="50"
-            value={voiceSilenceDuration}
-            onChange={(e) => setVoiceSilenceDuration(parseInt(e.target.value))}
-            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
-          />
-          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>Più veloce (risposte rapide)</span>
-            <span>Più lento (frasi lunghe)</span>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { value: 350, label: 'Veloce', desc: 'Risposte rapide' },
+              { value: 500, label: 'Normale', desc: 'Bilanciata' },
+              { value: 700, label: 'Lento', desc: 'Frasi lunghe' },
+            ].map(({ value, label, desc }) => (
+              <button
+                key={value}
+                onClick={() => setVoiceSilenceDuration(value)}
+                className={cn(
+                  'p-3 rounded-xl border-2 transition-all text-center',
+                  Math.abs(voiceSilenceDuration - value) < 100
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-purple-300'
+                )}
+              >
+                <div className="font-medium text-slate-900 dark:text-slate-100">{label}</div>
+                <div className="text-xs text-slate-500">{desc}</div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -1498,8 +2151,8 @@ function VoiceExperienceSettings() {
         <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
           <button
             onClick={() => {
-              setVoiceVadThreshold(0.4);
-              setVoiceSilenceDuration(400);
+              setVoiceVadThreshold(0.5);
+              setVoiceSilenceDuration(500);
               setVoiceBargeInEnabled(true);
             }}
             className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
@@ -1660,22 +2313,59 @@ function AIProviderSettings() {
             <div className="animate-pulse h-20 bg-slate-100 dark:bg-slate-800 rounded-lg" />
           ) : (
             <>
+              {/* Clear Status Banner - Fix for #7 */}
+              <div className={cn(
+                'p-3 rounded-lg flex items-center gap-3',
+                providerStatus.activeProvider === 'azure'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
+                  : providerStatus.activeProvider === 'ollama'
+                    ? 'bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800'
+                    : 'bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800'
+              )}>
+                <div className={cn(
+                  'w-3 h-3 rounded-full animate-pulse',
+                  providerStatus.activeProvider === 'azure' ? 'bg-blue-500' :
+                  providerStatus.activeProvider === 'ollama' ? 'bg-green-500' : 'bg-amber-500'
+                )} />
+                <div className="flex-1">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                    {providerStatus.activeProvider === 'azure' ? 'Azure OpenAI' :
+                     providerStatus.activeProvider === 'ollama' ? 'Ollama (Locale)' :
+                     'Nessun provider attivo'}
+                  </span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400 ml-2">
+                    {providerStatus.activeProvider === 'azure'
+                      ? `Chat + Voice (${providerStatus.azure.model})`
+                      : providerStatus.activeProvider === 'ollama'
+                        ? `Solo Chat (${providerStatus.ollama.model})`
+                        : 'Configura un provider'}
+                  </span>
+                </div>
+                {providerStatus.activeProvider && (
+                  <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+                )}
+              </div>
+
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Clicca per selezionare il provider preferito:
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Azure Card */}
-                <div
-                  role="button"
-                  tabIndex={0}
+                {/* Azure Card - Fix #7: Clear button styling */}
+                <button
+                  type="button"
                   onClick={() => setPreferredProvider('azure')}
-                  onKeyDown={(e) => e.key === 'Enter' && setPreferredProvider('azure')}
                   className={cn(
-                    'p-4 rounded-xl border-2 transition-all cursor-pointer',
-                    preferredProvider === 'azure' && 'ring-2 ring-blue-500 ring-offset-2',
+                    'p-4 rounded-xl border-2 transition-all text-left',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-blue-500',
+                    'hover:shadow-md active:scale-[0.99]',
+                    preferredProvider === 'azure' && 'ring-2 ring-accent-themed ring-offset-2 dark:ring-offset-slate-900',
                     providerStatus.activeProvider === 'azure'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-md'
                       : providerStatus.azure.configured
-                        ? 'border-slate-300 dark:border-slate-600 hover:border-blue-300'
-                        : 'border-slate-200 dark:border-slate-700 opacity-60'
+                        ? 'border-slate-300 dark:border-slate-600 hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10'
+                        : 'border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed'
                   )}
+                  disabled={!providerStatus.azure.configured}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <Cloud className="w-6 h-6 text-blue-500" />
@@ -1706,23 +2396,24 @@ function AIProviderSettings() {
                       Voice: {providerStatus.azure.realtimeModel}
                     </div>
                   )}
-                </div>
+                </button>
 
-                {/* Ollama Card */}
-                <div
-                  role="button"
-                  tabIndex={0}
+                {/* Ollama Card - Fix #7: Clear button styling */}
+                <button
+                  type="button"
                   onClick={() => setPreferredProvider('ollama')}
-                  onKeyDown={(e) => e.key === 'Enter' && setPreferredProvider('ollama')}
                   className={cn(
-                    'p-4 rounded-xl border-2 transition-all cursor-pointer',
-                    preferredProvider === 'ollama' && 'ring-2 ring-green-500 ring-offset-2',
+                    'p-4 rounded-xl border-2 transition-all text-left',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-green-500',
+                    'hover:shadow-md active:scale-[0.99]',
+                    preferredProvider === 'ollama' && 'ring-2 ring-accent-themed ring-offset-2 dark:ring-offset-slate-900',
                     providerStatus.activeProvider === 'ollama'
-                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20 shadow-md'
                       : providerStatus.ollama.configured
-                        ? 'border-slate-300 dark:border-slate-600 hover:border-green-300'
-                        : 'border-slate-200 dark:border-slate-700 opacity-60'
+                        ? 'border-slate-300 dark:border-slate-600 hover:border-green-400 hover:bg-green-50/50 dark:hover:bg-green-900/10'
+                        : 'border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed'
                   )}
+                  disabled={!providerStatus.ollama.configured}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <Server className="w-6 h-6 text-green-500" />
@@ -1751,7 +2442,7 @@ function AIProviderSettings() {
                   <div className="mt-1 text-xs text-slate-500">
                     URL: {providerStatus.ollama.url}
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Selection Mode Indicator */}
@@ -2021,6 +2712,28 @@ function AIProviderSettings() {
               </p>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Showcase Mode */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-purple-500" />
+            Modalità Showcase
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            Esplora Convergio Edu senza configurare un provider AI. Demo interattive
+            con contenuti statici: maestri, quiz, flashcards, mappe mentali e altro.
+          </p>
+          <Link href="/showcase">
+            <Button variant="outline" className="w-full gap-2">
+              <Sparkles className="w-4 h-4" />
+              Apri Showcase
+            </Button>
+          </Link>
         </CardContent>
       </Card>
     </div>
@@ -2693,7 +3406,7 @@ function DiagnosticsTab() {
       <Button
         onClick={onRun}
         disabled={result.status === 'running'}
-        variant="outline"
+        variant="default"
         size="sm"
         className="mt-3 w-full"
       >

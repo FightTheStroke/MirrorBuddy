@@ -8,6 +8,15 @@
 import { useCallback, useRef, useEffect, useState } from 'react';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores/app-store';
 import type { Maestro } from '@/types';
+import {
+  VOICE_TOOLS,
+  TOOL_USAGE_INSTRUCTIONS,
+  executeVoiceTool,
+  isToolCreationCommand,
+  getToolTypeFromName,
+} from '@/lib/voice';
+import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
+import type { ToolType as MethodToolType, HelpLevel } from '@/lib/method-progress/types';
 
 // ============================================================================
 // TYPES
@@ -49,6 +58,30 @@ const CAPTURE_BUFFER_SIZE = 4096; // ~85ms at 48kHz
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
+
+/**
+ * Sanitize text by removing HTML comments completely.
+ * Uses a loop-based approach with combined regex to handle nested/overlapping
+ * patterns that could bypass single-pass sanitization.
+ * Per CodeQL docs: combines patterns in single regex with alternation.
+ * Note: This sanitizes TRUSTED internal strings (maestro definitions), not user input.
+ * @see https://codeql.github.com/codeql-query-help/javascript/js-incomplete-multi-character-sanitization/
+ */
+function sanitizeHtmlComments(text: string): string {
+  let result = text;
+  let previousResult: string;
+
+  // Loop until no more changes occur (handles nested patterns like <!---->)
+  // Uses combined regex with alternation as recommended by CodeQL docs
+  // Handles all standard HTML comment variations including --!> (browser quirk)
+  do {
+    previousResult = result;
+    // Remove complete HTML comments (including --!> variant), then orphaned markers
+    result = result.replace(/<!--[\s\S]*?(?:--|--!)>|<!--|(?:--|--!)>/g, '');
+  } while (result !== previousResult);
+
+  return result;
+}
 
 async function fetchConversationMemory(maestroId: string): Promise<ConversationMemory | null> {
   try {
@@ -174,9 +207,10 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     reset,
   } = useVoiceSessionStore();
 
-  // Get preferred microphone and voice settings from settings
+  // Get preferred devices and voice settings from settings
   const {
     preferredMicrophoneId,
+    preferredOutputId,
     voiceVadThreshold,
     voiceSilenceDuration,
     voiceBargeInEnabled,
@@ -207,6 +241,10 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const sessionReadyRef = useRef(false);
   const greetingSentRef = useRef(false);
 
+  // Track if Azure has an active response (for proper response.cancel handling)
+  // This prevents sending response.cancel when no response is active
+  const hasActiveResponseRef = useRef(false);
+
   // REF to hold latest handleServerEvent callback (avoids stale closure in ws.onmessage)
   const handleServerEventRef = useRef<((event: Record<string, unknown>) => void) | null>(null);
 
@@ -216,12 +254,12 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // AUDIO PLAYBACK (at 24kHz) - SYNC VERSION (like test page that works!)
   // ============================================================================
 
-  const initPlaybackContext = useCallback(() => {
+  const initPlaybackContext = useCallback(async () => {
     if (playbackContextRef.current) {
       // Resume if suspended (browser policy requires user interaction)
       if (playbackContextRef.current.state === 'suspended') {
         console.log('[VoiceSession] 🔊 Resuming suspended AudioContext...');
-        playbackContextRef.current.resume();
+        await playbackContextRef.current.resume();
       }
       return playbackContextRef.current;
     }
@@ -231,14 +269,24 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     playbackContextRef.current = new AudioContextClass({ sampleRate: AZURE_SAMPLE_RATE });
     console.log(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
 
+    // Set output device if specified (setSinkId API)
+    if (preferredOutputId && 'setSinkId' in playbackContextRef.current) {
+      try {
+        await (playbackContextRef.current as AudioContext & { setSinkId: (id: string) => Promise<void> }).setSinkId(preferredOutputId);
+        console.log(`[VoiceSession] 🔊 Audio output set to device: ${preferredOutputId}`);
+      } catch (err) {
+        console.warn('[VoiceSession] ⚠️ Could not set output device, using default:', err);
+      }
+    }
+
     // Resume immediately if suspended
     if (playbackContextRef.current.state === 'suspended') {
       console.log('[VoiceSession] 🔊 Resuming new AudioContext...');
-      playbackContextRef.current.resume();
+      await playbackContextRef.current.resume();
     }
 
     return playbackContextRef.current;
-  }, []);
+  }, [preferredOutputId]);
 
   // SYNC playback function - matches test page that works
   const playNextChunk = useCallback(() => {
@@ -444,93 +492,23 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 `;
 
     const voicePersonality = maestro.voiceInstructions
-      ? `\n## Voice Personality\n${maestro.voiceInstructions}\n`
+      ? `\n## Voice Personality\n${sanitizeHtmlComments(maestro.voiceInstructions)}\n`
       : '';
 
     // For voice sessions, use a MUCH shorter instruction set
     // The full systemPrompt is 1000s of chars - Azure Realtime works better with short instructions
     // Extract only the core identity (first ~500 chars) from systemPrompt
     const truncatedSystemPrompt = maestro.systemPrompt
-      ? maestro.systemPrompt
-          .replace(/<!--[\s\S]*?-->/g, '') // Remove HTML comments
+      ? sanitizeHtmlComments(maestro.systemPrompt)
           .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, '') // Remove verbose sections
           .slice(0, 800) // Keep only first 800 chars
           .trim()
       : '';
 
-    const fullInstructions = languageInstruction + characterInstruction + memoryContext + truncatedSystemPrompt + voicePersonality;
+    // Add tool usage instructions for AI
+    const fullInstructions = languageInstruction + characterInstruction + memoryContext + truncatedSystemPrompt + voicePersonality + TOOL_USAGE_INSTRUCTIONS;
 
     console.log(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
-
-    // Define tools for voice session
-    const maestroTools = [
-      {
-        type: 'function',
-        name: 'create_mindmap',
-        description: 'Create an interactive mind map to visualize concepts',
-        parameters: {
-          type: 'object',
-          properties: {
-            title: { type: 'string' },
-            nodes: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, label: { type: 'string' } } } },
-          },
-          required: ['title', 'nodes'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'create_quiz',
-        description: 'Create an interactive quiz',
-        parameters: {
-          type: 'object',
-          properties: {
-            title: { type: 'string' },
-            subject: { type: 'string' },
-            questions: { type: 'array', items: { type: 'object' } },
-          },
-          required: ['title', 'subject', 'questions'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'create_flashcard',
-        description: 'Create flashcards for study',
-        parameters: {
-          type: 'object',
-          properties: {
-            name: { type: 'string' },
-            subject: { type: 'string' },
-            cards: { type: 'array', items: { type: 'object', properties: { front: { type: 'string' }, back: { type: 'string' } } } },
-          },
-          required: ['name', 'subject', 'cards'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'web_search',
-        description: 'Search the web for educational information',
-        parameters: {
-          type: 'object',
-          properties: {
-            query: { type: 'string' },
-          },
-          required: ['query'],
-        },
-      },
-      {
-        type: 'function',
-        name: 'capture_homework',
-        description: 'Request to see student homework via webcam',
-        parameters: {
-          type: 'object',
-          properties: {
-            purpose: { type: 'string' },
-            instructions: { type: 'string' },
-          },
-          required: ['purpose'],
-        },
-      },
-    ];
 
     // Send session configuration
     // Azure Preview API format (gpt-4o-realtime-preview)
@@ -551,7 +529,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           silence_duration_ms: voiceSilenceDuration,  // User configurable (300-800ms)
           create_response: true,
         },
-        tools: maestroTools,
+        tools: VOICE_TOOLS,
       },
     };
 
@@ -595,15 +573,29 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         setTimeout(() => sendGreeting(), 300);
         break;
 
+      case 'response.created':
+        // Azure has started generating a response - track this for proper cancellation
+        hasActiveResponseRef.current = true;
+        console.log('[VoiceSession] Response created - hasActiveResponse = true');
+        break;
+
       case 'input_audio_buffer.speech_started':
         console.log('[VoiceSession] User speech detected');
         setListening(true);
 
         // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
-        // Only if barge-in is enabled in user settings
-        if (voiceBargeInEnabled && isSpeaking && wsRef.current?.readyState === WebSocket.OPEN) {
-          console.log('[VoiceSession] Barge-in detected - interrupting assistant');
+        // Only if barge-in is enabled in user settings AND Azure actually has an active response
+        // Using hasActiveResponseRef instead of isSpeaking to prevent response_cancel_not_active errors
+        if (voiceBargeInEnabled && hasActiveResponseRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+          console.log('[VoiceSession] Barge-in detected - interrupting assistant (hasActiveResponse=true)');
           wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+          hasActiveResponseRef.current = false; // Mark as cancelled
+          audioQueueRef.current = [];
+          isPlayingRef.current = false;
+          setSpeaking(false);
+        } else if (voiceBargeInEnabled && isSpeaking) {
+          // Audio is still playing locally but Azure response is done - just clear local audio
+          console.log('[VoiceSession] Clearing local audio queue (response already done)');
           audioQueueRef.current = [];
           isPlayingRef.current = false;
           setSpeaking(false);
@@ -680,55 +672,140 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         break;
 
       case 'response.done':
-        console.log('[VoiceSession] Response complete');
+        // Azure has finished generating the response - clear the active flag
+        hasActiveResponseRef.current = false;
+        console.log('[VoiceSession] Response complete - hasActiveResponse = false');
+        break;
+
+      case 'response.cancelled':
+        // Azure confirms the response was cancelled
+        hasActiveResponseRef.current = false;
+        console.log('[VoiceSession] Response cancelled by client - hasActiveResponse = false');
         break;
 
       case 'error': {
-        const errorObj = event.error as { message?: string; code?: string } | undefined;
-        console.error('[VoiceSession] Server error:', errorObj);
-        options.onError?.(new Error(errorObj?.message || 'Server error'));
+        const errorObj = event.error as { message?: string; code?: string; type?: string } | undefined;
+        const errorMessage = errorObj?.message || errorObj?.code || errorObj?.type || 'Unknown server error';
+        const hasDetails = errorObj && Object.keys(errorObj).length > 0;
+        if (hasDetails) {
+          console.error('[VoiceSession] Server error:', { message: errorMessage, details: errorObj });
+        } else {
+          console.warn('[VoiceSession] Server error with no details (empty error object)');
+        }
+        options.onError?.(new Error(errorMessage));
         break;
       }
 
       case 'response.function_call_arguments.done':
         if (event.name && typeof event.name === 'string' && event.arguments && typeof event.arguments === 'string') {
-          try {
-            const args = JSON.parse(event.arguments);
-            const callId = typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
-            const toolCall = {
-              id: callId,
-              type: event.name as import('@/types').ToolType,
-              name: event.name,
-              arguments: args,
-              status: 'pending' as const,
-            };
-            addToolCall(toolCall);
+          const toolName = event.name;
+          (async () => {
+            try {
+              const args = JSON.parse(event.arguments as string);
+              const callId = typeof event.call_id === 'string' ? event.call_id : `local-${crypto.randomUUID()}`;
+              const toolCall = {
+                id: callId,
+                type: toolName as import('@/types').ToolType,
+                name: toolName,
+                arguments: args,
+                status: 'pending' as const,
+              };
+              addToolCall(toolCall);
 
-            if (event.name === 'capture_homework') {
-              options.onWebcamRequest?.({
-                purpose: args.purpose || 'homework',
-                instructions: args.instructions,
-                callId: callId,
-              });
-              updateToolCall(toolCall.id, { status: 'pending' });
-              return;
-            }
+              // Handle webcam/homework capture request
+              if (toolName === 'capture_homework') {
+                options.onWebcamRequest?.({
+                  purpose: args.purpose || 'homework',
+                  instructions: args.instructions,
+                  callId: callId,
+                });
+                updateToolCall(toolCall.id, { status: 'pending' });
+                return;
+              }
 
-            updateToolCall(toolCall.id, { status: 'completed' });
-            if (wsRef.current?.readyState === WebSocket.OPEN) {
-              wsRef.current.send(JSON.stringify({
-                type: 'conversation.item.create',
-                item: {
-                  type: 'function_call_output',
-                  call_id: callId,
-                  output: JSON.stringify({ success: true, displayed: true }),
-                },
-              }));
-              wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+              // Handle tool creation commands (mindmap, quiz, flashcards, etc.)
+              if (isToolCreationCommand(toolName)) {
+                const sessionId = `voice-${maestroRef.current?.id || 'unknown'}-${Date.now()}`;
+                const maestroId = maestroRef.current?.id || 'unknown';
+
+                console.log(`[VoiceSession] Executing voice tool: ${toolName}`, args);
+
+                const result = await executeVoiceTool(sessionId, maestroId, toolName, args);
+
+                if (result.success) {
+                  console.log(`[VoiceSession] Tool created: ${result.toolId}`);
+                  updateToolCall(toolCall.id, { status: 'completed' });
+
+                  // Track tool creation for method progress (autonomy tracking)
+                  const voiceToolType = getToolTypeFromName(toolName);
+                  if (voiceToolType) {
+                    const methodTool = voiceToolType === 'mindmap' ? 'mind_map'
+                      : voiceToolType === 'flashcards' ? 'flashcard'
+                      : voiceToolType === 'quiz' ? 'quiz'
+                      : voiceToolType === 'summary' ? 'summary'
+                      : 'diagram';
+
+                    // Map subject string to MethodSubject type (Italian names)
+                    type MethodSubject = import('@/lib/method-progress/types').Subject;
+                    const subjectMap: Record<string, MethodSubject> = {
+                      mathematics: 'matematica', math: 'matematica', matematica: 'matematica',
+                      italian: 'italiano', italiano: 'italiano',
+                      history: 'storia', storia: 'storia',
+                      geography: 'geografia', geografia: 'geografia',
+                      science: 'scienze', scienze: 'scienze', physics: 'scienze', biology: 'scienze',
+                      english: 'inglese', inglese: 'inglese',
+                      art: 'arte', arte: 'arte',
+                      music: 'musica', musica: 'musica',
+                    };
+                    const mappedSubject = args.subject
+                      ? subjectMap[String(args.subject).toLowerCase()] ?? 'other'
+                      : undefined;
+
+                    // Voice-created tools are with AI hints (not alone, not full help)
+                    useMethodProgressStore.getState().recordToolCreation(
+                      methodTool as MethodToolType,
+                      'hints' as HelpLevel,
+                      mappedSubject
+                    );
+                    console.log(`[VoiceSession] Method progress tracked: ${methodTool} with hints`);
+                  }
+                } else {
+                  console.error(`[VoiceSession] Tool creation failed: ${result.error}`);
+                  updateToolCall(toolCall.id, { status: 'error' });
+                }
+
+                // Send function output back to Azure
+                if (wsRef.current?.readyState === WebSocket.OPEN) {
+                  wsRef.current.send(JSON.stringify({
+                    type: 'conversation.item.create',
+                    item: {
+                      type: 'function_call_output',
+                      call_id: callId,
+                      output: JSON.stringify(result),
+                    },
+                  }));
+                  wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+                }
+                return;
+              }
+
+              // Default handling for other tools (web_search, etc.)
+              updateToolCall(toolCall.id, { status: 'completed' });
+              if (wsRef.current?.readyState === WebSocket.OPEN) {
+                wsRef.current.send(JSON.stringify({
+                  type: 'conversation.item.create',
+                  item: {
+                    type: 'function_call_output',
+                    call_id: callId,
+                    output: JSON.stringify({ success: true, displayed: true }),
+                  },
+                }));
+                wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+              }
+            } catch (error) {
+              console.error('[VoiceSession] Failed to parse/execute tool call:', error);
             }
-          } catch {
-            console.error('[VoiceSession] Failed to parse tool call');
-          }
+          })();
         }
         break;
 
@@ -773,6 +850,11 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       if (captureContextRef.current.state === 'suspended') {
         await captureContextRef.current.resume();
       }
+
+      // Initialize PLAYBACK AudioContext with preferred output device (setSinkId)
+      // Must be done BEFORE audio chunks arrive so the device is ready
+      await initPlaybackContext();
+      console.log('[VoiceSession] Playback context initialized with preferred output device');
 
       // Request microphone with preferred device if set
       const audioConstraints: MediaTrackConstraints = {
@@ -863,7 +945,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       options.onError?.(error as Error);
     }
   // Note: handleServerEvent is used for safety fallback only; primary usage is via ref
-  }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId]);
+  }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId, initPlaybackContext]);
 
   // ============================================================================
   // DISCONNECT
@@ -901,6 +983,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     isPlayingRef.current = false;
     sessionReadyRef.current = false;
     greetingSentRef.current = false;
+    hasActiveResponseRef.current = false;
     maestroRef.current = null;
 
     reset();
@@ -938,12 +1021,16 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
   }, [addTranscript]);
 
   const cancelResponse = useCallback(() => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
+    // Only send response.cancel if Azure actually has an active response
+    if (wsRef.current?.readyState === WebSocket.OPEN && hasActiveResponseRef.current) {
+      console.log('[VoiceSession] Cancelling active response');
       wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
-      audioQueueRef.current = [];
-      isPlayingRef.current = false;
-      setSpeaking(false);
+      hasActiveResponseRef.current = false;
     }
+    // Always clear local audio queue
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+    setSpeaking(false);
   }, [setSpeaking]);
 
   const sendWebcamResult = useCallback((callId: string, imageData: string | null) => {

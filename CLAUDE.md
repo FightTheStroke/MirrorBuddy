@@ -58,6 +58,124 @@ Three stores in `src/lib/stores/app-store.ts`:
 - System prompt with pedagogical guidelines
 - Greeting message and avatar
 
+### MirrorBuddy v2.0 - Triangle of Support
+
+> **Architecture from ManifestoEdu.md** - Three layers of support for students with learning differences.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    TRIANGLE OF SUPPORT                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│                      MAESTRI (17)                           │
+│                    Subject Experts                          │
+│              "Vertical" - Content Teaching                  │
+│                                                             │
+│         ┌───────────────┬───────────────┐                   │
+│         │               │               │                   │
+│         ▼               ▼               ▼                   │
+│      COACH            COACH          BUDDY                  │
+│    (Melissa)         (Davide)    (Mario/Maria)              │
+│   Learning Method   Learning Method  Peer Support           │
+│   "Vertical"        "Vertical"      "Horizontal"            │
+│   Autonomy-focused  Calm/Reassuring  Emotional Connection   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/data/support-teachers.ts` | Melissa & Davide coach profiles |
+| `src/data/buddy-profiles.ts` | Mario & Maria buddy profiles |
+| `src/lib/ai/character-router.ts` | Routes students to appropriate character |
+| `src/lib/ai/handoff-manager.ts` | Manages transitions between characters |
+| `src/lib/ai/intent-detection.ts` | Detects student intent (academic, method, emotional) |
+| `src/components/conversation/conversation-flow.tsx` | Main conversation UI |
+| `src/lib/stores/conversation-flow-store.ts` | Conversation state management |
+| `src/lib/profile/profile-generator.ts` | Generates student profiles from Maestri insights |
+| `src/components/profile/parent-dashboard.tsx` | Parent dashboard UI showing student insights |
+| `src/app/parent-dashboard/page.tsx` | Parent dashboard route (`/parent-dashboard`) |
+| `src/lib/safety/` | Safety guardrails for all characters |
+
+#### Character Types
+
+```typescript
+type CharacterType = 'maestro' | 'coach' | 'buddy';
+```
+
+- **Maestro**: Subject expert (Archimede, Leonardo, Dante, etc.)
+- **Coach**: Learning method coach (Melissa or Davide)
+- **Buddy**: Peer support companion (Mario or Maria)
+
+#### Buddy Mirroring System
+
+Buddies dynamically mirror the student's profile:
+- **Age**: Always 1 year older than student (`ageOffset: 1`)
+- **Learning Differences**: Same as student (dyslexia, ADHD, autism, etc.)
+- **Gender**: Student can choose Mario (male) or Maria (female)
+
+```typescript
+// Example: Buddy system prompt is generated dynamically
+const prompt = getMarioSystemPrompt(studentProfile);
+// Mario says: "Ho la dislessia (le lettere a volte si confondono...)"
+// This mirrors the STUDENT'S learning differences
+```
+
+#### Character Routing
+
+Intent → Character routing logic in `character-router.ts`:
+
+| Student Intent | Routed To | Reason |
+|----------------|-----------|--------|
+| "Spiegami le frazioni" | Maestro (Archimede) | Academic content |
+| "Non riesco a concentrarmi" | Coach (Melissa) | Study method |
+| "Mi sento solo" | Buddy (Mario) | Emotional support |
+| "Ho paura di sbagliare" | Buddy (Mario) | Emotional support |
+
+#### Handoff Protocol
+
+Characters can suggest handoffs to each other:
+- Maestro → Coach: "Per organizzarti meglio, prova Melissa"
+- Coach → Buddy: "Vuoi parlare con Mario? Lui capisce"
+- Buddy → Maestro: "Per matematica, chiedi ad Archimede!"
+
+Handoffs are tracked in `handoff-manager.ts` to maintain conversation context.
+
+### Safety Guardrails
+
+All AI characters (Maestri, Coaches, Buddies) have safety guardrails injected into their system prompts.
+
+| File | Purpose |
+|------|---------|
+| `src/lib/safety/index.ts` | Main safety module exports |
+| `src/lib/safety/guardrails.ts` | `injectSafetyGuardrails()` function |
+| `src/lib/safety/content-filter.ts` | `filterInput()` and `sanitizeOutput()` |
+| `src/lib/safety/age-gating.ts` | Age-appropriate content validation |
+| `src/lib/safety/monitoring.ts` | Safety event logging |
+
+**Integration Points:**
+- `character-router.ts:390` - Injects guardrails into Maestro prompts
+- `/api/chat/route.ts` - Filters input before AI, sanitizes output after
+
+### Parent Dashboard (GDPR Compliant)
+
+Dashboard at `/parent-dashboard` shows aggregated insights from student's conversations with Maestri.
+
+**Consent Model:**
+- Requires explicit consent from BOTH parent and student
+- Data can be exported (JSON/PDF) for portability
+- Right to erasure: deletion requests are tracked and honored
+- All access is logged in `ProfileAccessLog` for audit
+
+**Data Flow:**
+```
+Conversations → Learning table → profile-generator.ts → StudentInsightProfile
+                                                               ↓
+                                                    Parent Dashboard UI
+```
+
 ### Key Type Definitions
 `src/types/index.ts` contains all shared types. Import as:
 ```typescript
@@ -71,15 +189,21 @@ Components organized by feature domain:
 - `components/education/` - Quiz, flashcard, mind map, homework
 - `components/voice/` - Voice session UI
 - `components/maestros/` - Maestro selection grid
+- `components/conversation/` - MirrorBuddy conversation flow (Triangle of Support)
 
 ### API Routes (Next.js App Router)
 All under `/src/app/api/`:
-- `/chat` - Chat completions (Azure/Ollama)
+- `/chat` - Chat completions (Azure/Ollama) with safety filtering
 - `/conversations/[id]` - Session management
 - `/realtime/token` - Azure voice token (CORS-safe)
-- `/progress` - XP, levels, gamification
+- `/progress` - XP, levels, gamification (triggers notifications)
 - `/flashcards/progress` - FSRS state updates
 - `/user/data` - GDPR export/delete
+- `/notifications` - Notification CRUD (GET, POST, PATCH, DELETE)
+- `/profile` - Student insight profiles (GDPR compliant)
+- `/profile/generate` - Trigger profile generation from learnings
+- `/profile/consent` - Manage GDPR consent for profiles
+- `/profile/export` - Export profile (JSON or PDF)
 
 ## Database Schema
 
@@ -89,6 +213,10 @@ Prisma schema at `prisma/schema.prisma`. Key models:
 - **FlashcardProgress** - FSRS-5 algorithm state per card
 - **Conversation** → has Messages - Chat history with summaries
 - **Learning** - Cross-session insights extracted from conversations
+- **StudentInsightProfile** - GDPR-compliant parent dashboard data with consent tracking
+- **ProfileAccessLog** - Audit log for GDPR compliance
+- **Notification** - Server-side notification persistence with scheduling
+- **TelemetryEvent** - Usage analytics for Grafana integration
 
 After schema changes:
 ```bash
@@ -105,7 +233,116 @@ WCAG 2.1 AA compliance is mandatory:
 - ADHD mode (focus helpers)
 - Motion reduction support
 
+### Accessibility Profiles (7 presets)
+Quick-select profiles in Settings → Accessibilità:
+| Profile | Key Features |
+|---------|--------------|
+| Dislessia | OpenDyslexic font, increased spacing, TTS |
+| ADHD | Focus mode, reduced animations, break timers |
+| Autismo | Reduced motion, distraction-free, calm UI |
+| Visivo | High contrast, large text, TTS enabled |
+| Uditivo | Visual-first communication, no audio dependencies |
+| Motorio | Keyboard navigation, no animations |
+| Paralisi Cerebrale | TTS, large text, keyboard nav, extra spacing |
+
 Accessibility store at `src/lib/accessibility/accessibility-store.ts`.
+
+## Notification System
+
+**STATUS: IMPLEMENTED**
+
+Server-side notification system with database persistence and automatic triggers.
+
+### Architecture
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Database | `prisma/schema.prisma` → Notification | Persistent storage with scheduling |
+| Server Triggers | `src/lib/notifications/server-triggers.ts` | Create notifications on events |
+| API | `src/app/api/notifications/route.ts` | CRUD operations |
+| Client Store | `src/lib/stores/notification-store.ts` | Zustand state + API sync |
+| UI | `src/components/notifications/` | Toast display |
+
+### Automatic Triggers
+
+Notifications are automatically created when:
+- **Level Up**: User reaches new XP level → `serverNotifications.levelUp()`
+- **Streak Milestone**: 3, 7, 14, 30, 50, 100, 365 days → `serverNotifications.streakMilestone()`
+- **Achievement Unlocked**: New achievement earned → `serverNotifications.achievement()`
+- **Session Complete**: Study session ends → `serverNotifications.sessionComplete()`
+- **Streak At Risk**: No study today with active streak → `serverNotifications.streakAtRisk()`
+
+### Adding New Triggers
+
+1. Add method to `server-triggers.ts`:
+```typescript
+serverNotifications.myNewTrigger = async (userId: string, data: MyData) => {
+  await createNotification({
+    userId,
+    type: 'my_type',
+    title: 'Notification Title',
+    message: 'Notification message...',
+  });
+};
+```
+
+2. Call from relevant API route or server action
+
+## Tool Execution System
+
+**STATUS: IMPLEMENTED**
+
+Maestri can create interactive educational tools during conversations using OpenAI function calling.
+
+### Available Tools
+
+| Tool | Function Name | Purpose |
+|------|---------------|---------|
+| Mind Map | `create_mindmap` | Visual concept organization (MarkMap rendering) |
+| Quiz | `create_quiz` | Multiple choice assessment |
+| Flashcards | `create_flashcards` | FSRS-compatible spaced repetition cards |
+| Demo | `create_demo` | Interactive HTML/JS simulations (sandboxed) |
+| Search | `web_search` | Educational web/YouTube search |
+
+### Architecture
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Types | `src/types/tools.ts` | Unified tool types + `CHAT_TOOL_DEFINITIONS` |
+| Executor | `src/lib/tools/tool-executor.ts` | Handler registry and execution |
+| Handlers | `src/lib/tools/handlers/*.ts` | Tool-specific logic |
+| Events | `src/lib/realtime/tool-events.ts` | SSE broadcasting |
+| Storage | `src/lib/storage/materials-db.ts` | IndexedDB for client-side materials |
+| Persistence | `prisma/schema.prisma` → `CreatedTool` | Server-side tool records |
+
+### Adding a New Tool
+
+1. Add type to `src/types/tools.ts`:
+```typescript
+export interface MyToolData {
+  // Tool-specific fields
+}
+```
+
+2. Add function definition to `CHAT_TOOL_DEFINITIONS` in same file
+
+3. Create handler in `src/lib/tools/handlers/`:
+```typescript
+import { registerToolHandler } from '../tool-executor';
+
+registerToolHandler('my_tool', async (args) => {
+  // Validate and process
+  return { success: true, toolId, toolType: 'my_tool', data };
+});
+```
+
+4. Import handler in `src/lib/tools/handlers/index.ts`
+
+### Security
+
+- **Demo Sandbox**: JavaScript validated against `DANGEROUS_JS_PATTERNS` blocklist
+- **HTML Sanitization**: Script tags and event handlers removed
+- **Iframe Isolation**: `sandbox="allow-scripts"` (no same-origin access)
 
 ## Environment Configuration
 

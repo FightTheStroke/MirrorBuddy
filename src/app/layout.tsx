@@ -6,9 +6,9 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Convergio-Edu - Learn with AI Maestros',
-  description: 'Educational platform with AI-powered voice tutors for personalized learning',
-  keywords: ['education', 'AI', 'tutoring', 'voice', 'learning', 'maestros'],
+  title: 'Convergio-Edu - Impara con i Professori AI',
+  description: 'Piattaforma educativa con tutor vocali AI per un apprendimento personalizzato',
+  keywords: ['education', 'AI', 'tutoring', 'voice', 'learning', 'professori'],
 };
 
 export default function RootLayout({
