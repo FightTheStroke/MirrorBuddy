@@ -79,7 +79,7 @@ test.describe('Language Affects Maestri', () => {
     await page.goto('/');
 
     // Default is Italian - check for Italian text in nav
-    await expect(page.locator('button').filter({ hasText: 'Maestri' })).toBeVisible();
+    await expect(page.locator('button').filter({ hasText: 'Professori' })).toBeVisible();
   });
 });
 

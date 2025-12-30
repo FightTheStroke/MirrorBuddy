@@ -29,7 +29,7 @@ test.describe('C2: Homework Analyze API', () => {
   test('homework analyze endpoint is accessible', async ({ page }) => {
     // Navigate to homework view
     await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Compiti' }).click();
+    await page.locator('button').filter({ hasText: 'Materiali' }).click();
     await page.waitForTimeout(1000);
 
     // Should show homework help UI
@@ -247,8 +247,8 @@ test.describe('Fix #33: Logo Returns Home', () => {
       await logo.click();
       await page.waitForTimeout(500);
 
-      // Should return to home (maestri view)
-      const hasMaestri = await page.locator('text=Maestri').first().isVisible().catch(() => false);
+      // Should return to home (professori view)
+      const hasMaestri = await page.locator('text=Professori').or(page.locator('text=Euclide')).first().isVisible().catch(() => false);
       expect(hasMaestri || true).toBeTruthy();
     }
   });
@@ -285,7 +285,7 @@ test.describe('Fix #37: Maestri Language', () => {
     await page.waitForTimeout(500);
 
     // Check for Italian text
-    const italianTexts = ['Maestri', 'Impostazioni', 'Quiz', 'Flashcards', 'Compiti', 'Progressi'];
+    const italianTexts = ['Professori', 'Impostazioni', 'Quiz', 'Flashcards', 'Materiali', 'Progressi'];
     let italianCount = 0;
 
     for (const text of italianTexts) {
@@ -304,7 +304,7 @@ test.describe('Fix #37: Maestri Language', () => {
 test.describe('Fix #38: Homework Camera/Upload Separation', () => {
   test('homework view has separate camera and upload options', async ({ page }) => {
     await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Compiti' }).click();
+    await page.locator('button').filter({ hasText: 'Materiali' }).click();
     await page.waitForTimeout(1000);
 
     // Look for both camera and upload buttons/inputs
@@ -491,7 +491,7 @@ test.describe('Fix #19-21: AI Provider UI', () => {
 test.describe('Fix #22-24: Homework Image Analysis', () => {
   test('homework help has image input', async ({ page }) => {
     await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Compiti' }).click();
+    await page.locator('button').filter({ hasText: 'Materiali' }).click();
     await page.waitForTimeout(1000);
 
     // Check for image input capability
@@ -573,7 +573,7 @@ test.describe('Performance: Fix Verification', () => {
     await page.goto('/');
 
     // Navigate through all views
-    const views = ['Quiz', 'Flashcards', 'Mappe Mentali', 'Compiti', 'Progressi', 'Impostazioni'];
+    const views = ['Quiz', 'Flashcards', 'Mappe Mentali', 'Materiali', 'Progressi', 'Impostazioni'];
 
     for (const view of views) {
       await page.locator('button').filter({ hasText: view }).click().catch(() => {});
@@ -581,7 +581,7 @@ test.describe('Performance: Fix Verification', () => {
     }
 
     // Return home
-    await page.locator('button').filter({ hasText: 'Maestri' }).click().catch(() => {});
+    await page.locator('button').filter({ hasText: 'Professori' }).click().catch(() => {});
     await page.waitForTimeout(500);
 
     // Page should still be responsive

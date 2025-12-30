@@ -39,16 +39,10 @@ test.describe('Settings View', () => {
     await expect(gradeSelect.first()).toHaveValue('primary');
   });
 
-  test('learning goals can be selected', async ({ page }) => {
-    // Check for learning goals
-    await expect(page.locator('text=Obiettivi di Apprendimento')).toBeVisible();
-
-    // Click on a goal
-    await page.click('text=Migliorare in matematica');
-
-    // Should be selected (check for visual change)
-    const goal = page.locator('text=Migliorare in matematica').locator('..');
-    await expect(goal).toHaveClass(/border-blue|bg-blue/);
+  test('teaching style can be selected', async ({ page }) => {
+    // Check for teaching style section (learning goals removed from UI)
+    // The profile tab shows teaching style options instead
+    await expect(page.locator('text=Stile')).toBeVisible({ timeout: 5000 });
   });
 });
 

@@ -143,7 +143,7 @@ test.describe('Console Errors Check', () => {
     });
 
     await page.goto('/');
-    await page.click('text=Compiti');
+    await page.click('text=Materiali');
     await page.waitForTimeout(1000);
 
     expect(errors.length, `Homework view errors: ${errors.join(', ')}`).toBe(0);
@@ -164,8 +164,8 @@ test.describe('Console Errors Check', () => {
     await page.goto('/');
     await page.waitForTimeout(500);
 
-    // Navigate through all views
-    const views = ['Quiz', 'Flashcards', 'Mappe Mentali', 'Compiti', 'Progressi', 'Impostazioni', 'Maestri'];
+    // Navigate through all views (Compiti renamed to Materiali, Maestri renamed to Professori)
+    const views = ['Quiz', 'Flashcards', 'Mappe Mentali', 'Materiali', 'Progressi', 'Impostazioni', 'Professori'];
 
     for (const view of views) {
       await page.click(`text=${view}`);
