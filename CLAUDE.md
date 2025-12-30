@@ -58,6 +58,89 @@ Three stores in `src/lib/stores/app-store.ts`:
 - System prompt with pedagogical guidelines
 - Greeting message and avatar
 
+### MirrorBuddy v2.0 - Triangle of Support
+
+> **Architecture from ManifestoEdu.md** - Three layers of support for students with learning differences.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    TRIANGLE OF SUPPORT                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│                      MAESTRI (17)                           │
+│                    Subject Experts                          │
+│              "Vertical" - Content Teaching                  │
+│                                                             │
+│         ┌───────────────┬───────────────┐                   │
+│         │               │               │                   │
+│         ▼               ▼               ▼                   │
+│      COACH            COACH          BUDDY                  │
+│    (Melissa)         (Davide)    (Mario/Maria)              │
+│   Learning Method   Learning Method  Peer Support           │
+│   "Vertical"        "Vertical"      "Horizontal"            │
+│   Autonomy-focused  Calm/Reassuring  Emotional Connection   │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/data/support-teachers.ts` | Melissa & Davide coach profiles |
+| `src/data/buddy-profiles.ts` | Mario & Maria buddy profiles |
+| `src/lib/ai/character-router.ts` | Routes students to appropriate character |
+| `src/lib/ai/handoff-manager.ts` | Manages transitions between characters |
+| `src/lib/ai/intent-detection.ts` | Detects student intent (academic, method, emotional) |
+| `src/components/conversation/conversation-flow.tsx` | Main conversation UI |
+| `src/lib/stores/conversation-flow-store.ts` | Conversation state management |
+| `src/lib/profile/profile-generator.ts` | Generates student profiles from Maestri insights |
+| `src/lib/safety/` | Safety guardrails for all characters |
+
+#### Character Types
+
+```typescript
+type CharacterType = 'maestro' | 'coach' | 'buddy';
+```
+
+- **Maestro**: Subject expert (Archimede, Leonardo, Dante, etc.)
+- **Coach**: Learning method coach (Melissa or Davide)
+- **Buddy**: Peer support companion (Mario or Maria)
+
+#### Buddy Mirroring System
+
+Buddies dynamically mirror the student's profile:
+- **Age**: Always 1 year older than student (`ageOffset: 1`)
+- **Learning Differences**: Same as student (dyslexia, ADHD, autism, etc.)
+- **Gender**: Student can choose Mario (male) or Maria (female)
+
+```typescript
+// Example: Buddy system prompt is generated dynamically
+const prompt = getMarioSystemPrompt(studentProfile);
+// Mario says: "Ho la dislessia (le lettere a volte si confondono...)"
+// This mirrors the STUDENT'S learning differences
+```
+
+#### Character Routing
+
+Intent → Character routing logic in `character-router.ts`:
+
+| Student Intent | Routed To | Reason |
+|----------------|-----------|--------|
+| "Spiegami le frazioni" | Maestro (Archimede) | Academic content |
+| "Non riesco a concentrarmi" | Coach (Melissa) | Study method |
+| "Mi sento solo" | Buddy (Mario) | Emotional support |
+| "Ho paura di sbagliare" | Buddy (Mario) | Emotional support |
+
+#### Handoff Protocol
+
+Characters can suggest handoffs to each other:
+- Maestro → Coach: "Per organizzarti meglio, prova Melissa"
+- Coach → Buddy: "Vuoi parlare con Mario? Lui capisce"
+- Buddy → Maestro: "Per matematica, chiedi ad Archimede!"
+
+Handoffs are tracked in `handoff-manager.ts` to maintain conversation context.
+
 ### Key Type Definitions
 `src/types/index.ts` contains all shared types. Import as:
 ```typescript
@@ -71,6 +154,7 @@ Components organized by feature domain:
 - `components/education/` - Quiz, flashcard, mind map, homework
 - `components/voice/` - Voice session UI
 - `components/maestros/` - Maestro selection grid
+- `components/conversation/` - MirrorBuddy conversation flow (Triangle of Support)
 
 ### API Routes (Next.js App Router)
 All under `/src/app/api/`:
