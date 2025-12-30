@@ -1224,51 +1224,66 @@ function AudioSettings() {
 
   return (
     <div className="space-y-6">
-      {/* Microphone Settings */}
+      {/* Audio Devices - Compact 2-column layout (Fix #11) */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Mic className="w-5 h-5 text-red-500" />
-            Microfono
+            <Volume2 className="w-5 h-5 text-amber-500" />
+            Dispositivi Audio
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Seleziona il microfono da usare per le conversazioni vocali con i Maestri.
-          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Microphone */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <Mic className="w-4 h-4 text-red-500" />
+                Microfono
+              </label>
+              <select
+                value={preferredMicrophoneId}
+                onChange={(e) => handleMicChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+              >
+                <option value="">Predefinito di sistema</option>
+                {availableMics.map((mic) => (
+                  <option key={mic.deviceId} value={mic.deviceId}>
+                    {mic.label || `Microfono ${mic.deviceId.slice(0, 8)}...`}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div className="flex items-center gap-3">
-            <select
-              value={preferredMicrophoneId}
-              onChange={(e) => handleMicChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
-            >
-              <option value="">Predefinito di sistema</option>
-              {availableMics.map((mic) => (
-                <option key={mic.deviceId} value={mic.deviceId}>
-                  {mic.label || `Microfono ${mic.deviceId.slice(0, 8)}...`}
-                </option>
-              ))}
-            </select>
-            <Button
-              onClick={refreshDevices}
-              variant="outline"
-              size="sm"
-              title="Aggiorna lista dispositivi"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </Button>
+            {/* Output */}
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <Volume2 className="w-4 h-4 text-amber-500" />
+                Altoparlanti
+              </label>
+              <select
+                value={preferredOutputId}
+                onChange={(e) => handleOutputChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+              >
+                <option value="">Predefinito di sistema</option>
+                {availableOutputs.map((output) => (
+                  <option key={output.deviceId} value={output.deviceId}>
+                    {output.label || `Altoparlante ${output.deviceId.slice(0, 8)}...`}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Waveform visualization */}
+          {/* Mic waveform - compact */}
           <div className="space-y-2">
             {micTestActive && (
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Parla per testare il microfono
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-xs text-slate-600 dark:text-slate-400">
+                  Parla per testare
                 </span>
-                <span className="text-sm font-mono text-slate-500 dark:text-slate-400 ml-auto">
+                <span className="text-xs font-mono text-slate-500 ml-auto">
                   {Math.round(audioLevel)}%
                 </span>
               </div>
@@ -1277,154 +1292,115 @@ function AudioSettings() {
               <canvas
                 ref={waveformCanvasRef}
                 width={600}
-                height={80}
-                className="w-full h-[80px] rounded-lg bg-slate-800 dark:bg-slate-900"
+                height={60}
+                className="w-full h-[60px] rounded-lg bg-slate-800 dark:bg-slate-900"
               />
               {!micTestActive && (
-                <div className="absolute inset-0 flex items-center justify-center text-slate-500 dark:text-slate-400 text-sm">
-                  Clicca &quot;Testa Microfono&quot; per vedere la waveform
+                <div className="absolute inset-0 flex items-center justify-center text-slate-500 dark:text-slate-400 text-xs">
+                  Clicca &quot;Testa&quot; per vedere la waveform
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex gap-3">
-            {!micTestActive ? (
-              <Button onClick={startMicTest} variant="default" className="flex-1">
-                <Mic className="w-4 h-4 mr-2" />
-                Testa Microfono
-              </Button>
-            ) : (
-              <Button onClick={stopMicTest} variant="destructive" className="flex-1">
-                <XCircle className="w-4 h-4 mr-2" />
-                Ferma Test
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Output Device (Speakers) Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Volume2 className="w-5 h-5 text-amber-500" />
-            Altoparlanti / Cuffie
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Seleziona il dispositivo di output audio per sentire le risposte dei Maestri.
-          </p>
-
-          <div className="flex items-center gap-3">
-            <select
-              value={preferredOutputId}
-              onChange={(e) => handleOutputChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
-            >
-              <option value="">Predefinito di sistema</option>
-              {availableOutputs.map((output) => (
-                <option key={output.deviceId} value={output.deviceId}>
-                  {output.label || `Altoparlante ${output.deviceId.slice(0, 8)}...`}
-                </option>
-              ))}
-            </select>
+          {/* Test buttons - row */}
+          <div className="grid grid-cols-3 gap-2">
             <Button
               onClick={refreshDevices}
               variant="outline"
               size="sm"
-              title="Aggiorna lista dispositivi"
+              title="Aggiorna dispositivi"
             >
               <RefreshCw className="w-4 h-4" />
             </Button>
-          </div>
-
-          <div className="flex gap-3">
+            {!micTestActive ? (
+              <Button onClick={startMicTest} variant="default" size="sm">
+                <Mic className="w-4 h-4 mr-1" />
+                Testa Mic
+              </Button>
+            ) : (
+              <Button onClick={stopMicTest} variant="destructive" size="sm">
+                <XCircle className="w-4 h-4 mr-1" />
+                Stop
+              </Button>
+            )}
             <Button
               onClick={testSpeaker}
               variant="default"
-              className="flex-1"
+              size="sm"
               disabled={speakerTestActive}
             >
-              <Volume2 className="w-4 h-4 mr-2" />
-              {speakerTestActive ? 'Riproduzione...' : 'Testa Audio'}
+              <Volume2 className="w-4 h-4 mr-1" />
+              {speakerTestActive ? '...' : 'Testa'}
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Camera Settings */}
+      {/* Webcam - Compact layout with smaller preview */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-base">
             <Video className="w-5 h-5 text-blue-500" />
             Webcam
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Seleziona la webcam da usare (per future funzionalità video).
-          </p>
-
-          <div className="flex items-center gap-3">
-            <select
-              value={preferredCameraId}
-              onChange={(e) => handleCamChange(e.target.value)}
-              className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
-            >
-              <option value="">Predefinito di sistema</option>
-              {availableCameras.map((cam) => (
-                <option key={cam.deviceId} value={cam.deviceId}>
-                  {cam.label || `Webcam ${cam.deviceId.slice(0, 8)}...`}
-                </option>
-              ))}
-            </select>
-            <Button
-              onClick={refreshDevices}
-              variant="outline"
-              size="sm"
-              title="Aggiorna lista dispositivi"
-            >
-              <RefreshCw className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Video preview */}
-          <div className="relative rounded-lg overflow-hidden bg-slate-900 aspect-video">
-            <video
-              ref={videoRef}
-              className="w-full h-full object-cover"
-              muted
-              playsInline
-            />
-            {!camTestActive && (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Video className="w-12 h-12 text-slate-600" />
+        <CardContent className="space-y-3">
+          <div className="flex items-center gap-4">
+            {/* Select + smaller preview side by side */}
+            <div className="flex-1 space-y-2">
+              <select
+                value={preferredCameraId}
+                onChange={(e) => handleCamChange(e.target.value)}
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+              >
+                <option value="">Predefinito di sistema</option>
+                {availableCameras.map((cam) => (
+                  <option key={cam.deviceId} value={cam.deviceId}>
+                    {cam.label || `Webcam ${cam.deviceId.slice(0, 8)}...`}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Per future funzionalita video
+              </p>
+              <div className="flex gap-2">
+                <Button onClick={refreshDevices} variant="outline" size="sm">
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+                {!camTestActive ? (
+                  <Button onClick={startCamTest} variant="default" size="sm">
+                    <Video className="w-4 h-4 mr-1" />
+                    Testa
+                  </Button>
+                ) : (
+                  <Button onClick={stopCamTest} variant="destructive" size="sm">
+                    <XCircle className="w-4 h-4 mr-1" />
+                    Stop
+                  </Button>
+                )}
               </div>
-            )}
-            {camTestActive && (
-              <div className="absolute top-2 right-2 flex items-center gap-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse" />
-                <span className="text-xs text-white bg-black/50 px-2 py-1 rounded">
-                  LIVE
-                </span>
-              </div>
-            )}
-          </div>
+            </div>
 
-          <div className="flex gap-3">
-            {!camTestActive ? (
-              <Button onClick={startCamTest} variant="default" className="flex-1">
-                <Video className="w-4 h-4 mr-2" />
-                Testa Webcam
-              </Button>
-            ) : (
-              <Button onClick={stopCamTest} variant="destructive" className="flex-1">
-                <XCircle className="w-4 h-4 mr-2" />
-                Ferma Test
-              </Button>
-            )}
+            {/* Smaller video preview */}
+            <div className="relative w-40 h-30 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0">
+              <video
+                ref={videoRef}
+                className="w-full h-full object-cover"
+                muted
+                playsInline
+              />
+              {!camTestActive && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Video className="w-8 h-8 text-slate-600" />
+                </div>
+              )}
+              {camTestActive && (
+                <div className="absolute top-1 right-1">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
