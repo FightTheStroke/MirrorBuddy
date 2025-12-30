@@ -27,6 +27,7 @@ import {
 import {
   getBuddyById,
   getDefaultBuddy,
+  type BuddyId,
 } from '@/data/buddy-profiles';
 import { detectIntent, type DetectedIntent } from './intent-detection';
 import { injectSafetyGuardrails } from '@/lib/safety';
@@ -284,7 +285,7 @@ function getCurrentCharacterResult(
       character = getSupportTeacherById(current.id as 'melissa' | 'roberto');
       break;
     case 'buddy':
-      character = getBuddyById(current.id as 'mario' | 'faty');
+      character = getBuddyById(current.id as BuddyId);
       break;
   }
 

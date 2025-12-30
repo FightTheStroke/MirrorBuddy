@@ -60,8 +60,11 @@ interface ExtendedStudentProfile {
   adhdMode: boolean;
   // MirrorBuddy character preferences
   learningDifferences: LearningDifference[];
-  preferredCoach?: 'melissa' | 'roberto';
-  preferredBuddy?: 'mario' | 'faty';
+  preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+  preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+  // Custom border colors for coach and buddy avatars
+  coachBorderColor?: string;
+  buddyBorderColor?: string;
 }
 
 // Provider preference for manual selection

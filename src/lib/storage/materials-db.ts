@@ -1,38 +1,44 @@
 // ============================================================================
 // MATERIALS DATABASE
-// IndexedDB storage for client-side tool materials (mindmaps, quizzes, etc.)
+// IndexedDB storage for uploaded files (webcam photos, PDFs)
 // Uses the idb library for a Promise-based IndexedDB API
+// Issue #22: Materials Archive - Storage (IndexedDB)
 // ============================================================================
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
-import type { ToolType, ToolExecutionResult } from '@/types/tools';
 
 // ============================================================================
 // DATABASE SCHEMA
 // ============================================================================
 
-interface MaterialRecord {
-  toolId: string;
-  toolType: ToolType;
-  data: unknown;
-  maestroId?: string;
-  conversationId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  syncedAt?: Date;
-  status: 'active' | 'archived' | 'deleted';
-}
-
-interface MaterialsDBSchema extends DBSchema {
-  materials: {
-    key: string; // toolId
-    value: MaterialRecord;
+interface MaterialsDB extends DBSchema {
+  files: {
+    key: string;
+    value: {
+      id: string;
+      blob: Blob;
+      thumbnail?: Blob;
+      createdAt: number;
+    };
+  };
+  metadata: {
+    key: string;
+    value: {
+      id: string;
+      filename: string;
+      format: 'image' | 'pdf';
+      mimeType: string;
+      subject?: string;
+      maestroId?: string;
+      size: number;
+      pageCount?: number;
+      createdAt: Date;
+      updatedAt: Date;
+    };
     indexes: {
-      'by-type': ToolType;
-      'by-maestro': string;
-      'by-conversation': string;
-      'by-created': Date;
-      'by-status': string;
+      'by-date': Date;
+      'by-subject': string;
+      'by-format': string;
     };
   };
 }
@@ -44,36 +50,33 @@ interface MaterialsDBSchema extends DBSchema {
 const DB_NAME = 'convergio-materials';
 const DB_VERSION = 1;
 
-let dbPromise: Promise<IDBPDatabase<MaterialsDBSchema>> | null = null;
+let dbInstance: IDBPDatabase<MaterialsDB> | null = null;
 
 /**
  * Get the IndexedDB database instance
  * Creates the database if it doesn't exist
  */
-async function getDB(): Promise<IDBPDatabase<MaterialsDBSchema>> {
+export async function getMaterialsDB(): Promise<IDBPDatabase<MaterialsDB>> {
   if (typeof window === 'undefined') {
     throw new Error('IndexedDB is only available in the browser');
   }
 
-  if (!dbPromise) {
-    dbPromise = openDB<MaterialsDBSchema>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        // Create materials object store
-        const store = db.createObjectStore('materials', {
-          keyPath: 'toolId',
-        });
+  if (dbInstance) return dbInstance;
 
-        // Create indexes for efficient queries
-        store.createIndex('by-type', 'toolType');
-        store.createIndex('by-maestro', 'maestroId');
-        store.createIndex('by-conversation', 'conversationId');
-        store.createIndex('by-created', 'createdAt');
-        store.createIndex('by-status', 'status');
-      },
-    });
-  }
+  dbInstance = await openDB<MaterialsDB>(DB_NAME, DB_VERSION, {
+    upgrade(db) {
+      // Files store (blobs)
+      db.createObjectStore('files', { keyPath: 'id' });
 
-  return dbPromise;
+      // Metadata store with indexes
+      const metaStore = db.createObjectStore('metadata', { keyPath: 'id' });
+      metaStore.createIndex('by-date', 'createdAt');
+      metaStore.createIndex('by-subject', 'subject');
+      metaStore.createIndex('by-format', 'format');
+    },
+  });
+
+  return dbInstance;
 }
 
 // ============================================================================
@@ -81,158 +84,156 @@ async function getDB(): Promise<IDBPDatabase<MaterialsDBSchema>> {
 // ============================================================================
 
 /**
- * Save a tool result to IndexedDB
+ * Save a file (webcam photo or PDF) to IndexedDB
  */
 export async function saveMaterial(
-  result: ToolExecutionResult,
-  context?: { maestroId?: string; conversationId?: string }
-): Promise<void> {
-  if (!result.success || !result.data) {
-    throw new Error('Cannot save failed or empty tool result');
-  }
-
-  const db = await getDB();
+  file: Blob,
+  metadata: Omit<MaterialsDB['metadata']['value'], 'id' | 'createdAt' | 'updatedAt'>
+): Promise<string> {
+  const db = await getMaterialsDB();
+  const id = crypto.randomUUID();
   const now = new Date();
 
-  const record: MaterialRecord = {
-    toolId: result.toolId,
-    toolType: result.toolType,
-    data: result.data,
-    maestroId: context?.maestroId,
-    conversationId: context?.conversationId,
+  // Generate thumbnail for images
+  let thumbnail: Blob | undefined;
+  if (metadata.format === 'image') {
+    thumbnail = await generateThumbnail(file);
+  }
+
+  // Save file blob
+  await db.put('files', {
+    id,
+    blob: file,
+    thumbnail,
+    createdAt: now.getTime(),
+  });
+
+  // Save metadata
+  await db.put('metadata', {
+    ...metadata,
+    id,
     createdAt: now,
     updatedAt: now,
-    status: 'active',
-  };
+  });
 
-  await db.put('materials', record);
+  return id;
 }
 
 /**
- * Get a material by toolId
+ * Get all materials with optional filtering
  */
-export async function getMaterial(toolId: string): Promise<MaterialRecord | undefined> {
-  const db = await getDB();
-  return db.get('materials', toolId);
-}
+export async function getMaterials(filter?: {
+  subject?: string;
+  format?: 'image' | 'pdf';
+  limit?: number;
+}): Promise<Array<MaterialsDB['metadata']['value']>> {
+  const db = await getMaterialsDB();
+  let results = await db.getAll('metadata');
 
-/**
- * Get all materials of a specific type
- */
-export async function getMaterialsByType(toolType: ToolType): Promise<MaterialRecord[]> {
-  const db = await getDB();
-  return db.getAllFromIndex('materials', 'by-type', toolType);
-}
-
-/**
- * Get all materials for a specific maestro
- */
-export async function getMaterialsByMaestro(maestroId: string): Promise<MaterialRecord[]> {
-  const db = await getDB();
-  return db.getAllFromIndex('materials', 'by-maestro', maestroId);
-}
-
-/**
- * Get all materials for a specific conversation
- */
-export async function getMaterialsByConversation(conversationId: string): Promise<MaterialRecord[]> {
-  const db = await getDB();
-  return db.getAllFromIndex('materials', 'by-conversation', conversationId);
-}
-
-/**
- * Get all active materials
- */
-export async function getActiveMaterials(): Promise<MaterialRecord[]> {
-  const db = await getDB();
-  return db.getAllFromIndex('materials', 'by-status', 'active');
-}
-
-/**
- * Get recent materials (last N)
- */
-export async function getRecentMaterials(limit: number = 10): Promise<MaterialRecord[]> {
-  const db = await getDB();
-  const tx = db.transaction('materials', 'readonly');
-  const index = tx.store.index('by-created');
-
-  const materials: MaterialRecord[] = [];
-  let cursor = await index.openCursor(null, 'prev'); // descending order
-
-  while (cursor && materials.length < limit) {
-    if (cursor.value.status === 'active') {
-      materials.push(cursor.value);
-    }
-    cursor = await cursor.continue();
+  // Apply filters
+  if (filter?.subject) {
+    results = results.filter((m) => m.subject === filter.subject);
+  }
+  if (filter?.format) {
+    results = results.filter((m) => m.format === filter.format);
   }
 
-  return materials;
+  // Sort by date descending (most recent first)
+  results.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+  // Apply limit
+  if (filter?.limit) {
+    results = results.slice(0, filter.limit);
+  }
+
+  return results;
 }
 
 /**
- * Update a material's data
+ * Get a material's file blob by ID
  */
-export async function updateMaterial(
-  toolId: string,
-  data: Partial<Pick<MaterialRecord, 'data' | 'status'>>
+export async function getMaterialFile(id: string): Promise<Blob | undefined> {
+  const db = await getMaterialsDB();
+  const file = await db.get('files', id);
+  return file?.blob;
+}
+
+/**
+ * Get a material's thumbnail by ID
+ */
+export async function getMaterialThumbnail(id: string): Promise<Blob | undefined> {
+  const db = await getMaterialsDB();
+  const file = await db.get('files', id);
+  return file?.thumbnail;
+}
+
+/**
+ * Get material metadata by ID
+ */
+export async function getMaterialMetadata(
+  id: string
+): Promise<MaterialsDB['metadata']['value'] | undefined> {
+  const db = await getMaterialsDB();
+  return db.get('metadata', id);
+}
+
+/**
+ * Update material metadata (e.g., after subject detection)
+ */
+export async function updateMaterialMetadata(
+  id: string,
+  updates: Partial<Pick<MaterialsDB['metadata']['value'], 'subject' | 'maestroId' | 'pageCount'>>
 ): Promise<void> {
-  const db = await getDB();
-  const existing = await db.get('materials', toolId);
+  const db = await getMaterialsDB();
+  const existing = await db.get('metadata', id);
 
   if (!existing) {
-    throw new Error(`Material not found: ${toolId}`);
+    throw new Error(`Material not found: ${id}`);
   }
 
-  const updated: MaterialRecord = {
+  await db.put('metadata', {
     ...existing,
-    ...data,
+    ...updates,
     updatedAt: new Date(),
-  };
-
-  await db.put('materials', updated);
+  });
 }
 
 /**
- * Archive a material (soft delete)
+ * Delete a material (both file and metadata)
  */
-export async function archiveMaterial(toolId: string): Promise<void> {
-  await updateMaterial(toolId, { status: 'archived' });
+export async function deleteMaterial(id: string): Promise<void> {
+  const db = await getMaterialsDB();
+  await db.delete('files', id);
+  await db.delete('metadata', id);
 }
 
 /**
- * Delete a material permanently
+ * Get materials by subject
  */
-export async function deleteMaterial(toolId: string): Promise<void> {
-  const db = await getDB();
-  await db.delete('materials', toolId);
+export async function getMaterialsBySubject(
+  subject: string
+): Promise<Array<MaterialsDB['metadata']['value']>> {
+  const db = await getMaterialsDB();
+  return db.getAllFromIndex('metadata', 'by-subject', subject);
 }
 
 /**
- * Mark a material as synced with server
+ * Get materials by format (image or pdf)
  */
-export async function markMaterialSynced(toolId: string): Promise<void> {
-  const db = await getDB();
-  const existing = await db.get('materials', toolId);
-
-  if (!existing) {
-    throw new Error(`Material not found: ${toolId}`);
-  }
-
-  const updated: MaterialRecord = {
-    ...existing,
-    syncedAt: new Date(),
-  };
-
-  await db.put('materials', updated);
+export async function getMaterialsByFormat(
+  format: 'image' | 'pdf'
+): Promise<Array<MaterialsDB['metadata']['value']>> {
+  const db = await getMaterialsDB();
+  return db.getAllFromIndex('metadata', 'by-format', format);
 }
 
 /**
- * Get materials that need to be synced with server
+ * Get recent materials
  */
-export async function getUnsyncedMaterials(): Promise<MaterialRecord[]> {
-  const db = await getDB();
-  const all = await db.getAll('materials');
-  return all.filter((m) => !m.syncedAt && m.status === 'active');
+export async function getRecentMaterials(
+  limit: number = 10
+): Promise<Array<MaterialsDB['metadata']['value']>> {
+  return getMaterials({ limit });
 }
 
 // ============================================================================
@@ -240,73 +241,104 @@ export async function getUnsyncedMaterials(): Promise<MaterialRecord[]> {
 // ============================================================================
 
 /**
- * Delete all archived materials older than specified days
- */
-export async function cleanupArchivedMaterials(olderThanDays: number = 30): Promise<number> {
-  const db = await getDB();
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
-
-  const tx = db.transaction('materials', 'readwrite');
-  const index = tx.store.index('by-status');
-
-  let deletedCount = 0;
-  let cursor = await index.openCursor('archived');
-
-  while (cursor) {
-    if (cursor.value.updatedAt < cutoffDate) {
-      await cursor.delete();
-      deletedCount++;
-    }
-    cursor = await cursor.continue();
-  }
-
-  await tx.done;
-  return deletedCount;
-}
-
-/**
- * Clear all materials (for testing or reset)
+ * Delete all materials
  */
 export async function clearAllMaterials(): Promise<void> {
-  const db = await getDB();
-  await db.clear('materials');
+  const db = await getMaterialsDB();
+  await db.clear('files');
+  await db.clear('metadata');
 }
 
 /**
- * Get database statistics
+ * Get storage statistics
  */
 export async function getMaterialsStats(): Promise<{
   total: number;
-  active: number;
-  archived: number;
-  byType: Record<string, number>;
+  images: number;
+  pdfs: number;
+  totalSize: number;
+  bySubject: Record<string, number>;
 }> {
-  const db = await getDB();
-  const all = await db.getAll('materials');
+  const db = await getMaterialsDB();
+  const all = await db.getAll('metadata');
 
   const stats = {
     total: all.length,
-    active: 0,
-    archived: 0,
-    byType: {} as Record<string, number>,
+    images: 0,
+    pdfs: 0,
+    totalSize: 0,
+    bySubject: {} as Record<string, number>,
   };
 
   for (const material of all) {
-    if (material.status === 'active') {
-      stats.active++;
-    } else if (material.status === 'archived') {
-      stats.archived++;
+    if (material.format === 'image') {
+      stats.images++;
+    } else if (material.format === 'pdf') {
+      stats.pdfs++;
     }
 
-    stats.byType[material.toolType] = (stats.byType[material.toolType] || 0) + 1;
+    stats.totalSize += material.size;
+
+    if (material.subject) {
+      stats.bySubject[material.subject] = (stats.bySubject[material.subject] || 0) + 1;
+    }
   }
 
   return stats;
 }
 
 // ============================================================================
-// EXPORT
+// THUMBNAIL GENERATION
 // ============================================================================
 
-export type { MaterialRecord };
+/**
+ * Generate a thumbnail for an image blob
+ */
+async function generateThumbnail(blob: Blob, maxSize = 200): Promise<Blob> {
+  // Server-side check
+  if (typeof window === 'undefined') {
+    return blob;
+  }
+
+  return new Promise((resolve) => {
+    const img = new Image();
+
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const scale = Math.min(maxSize / img.width, maxSize / img.height);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        resolve(blob);
+        return;
+      }
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(
+        (thumbBlob) => {
+          URL.revokeObjectURL(img.src);
+          resolve(thumbBlob || blob);
+        },
+        'image/jpeg',
+        0.7
+      );
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(img.src);
+      resolve(blob);
+    };
+
+    img.src = URL.createObjectURL(blob);
+  });
+}
+
+// ============================================================================
+// TYPES EXPORT
+// ============================================================================
+
+export type MaterialMetadata = MaterialsDB['metadata']['value'];
+export type MaterialFile = MaterialsDB['files']['value'];

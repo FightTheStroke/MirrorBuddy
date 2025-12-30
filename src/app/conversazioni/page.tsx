@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { useSettingsStore } from '@/lib/stores/app-store';
 
 type CharacterCategory = 'coach' | 'buddy' | 'maestri';
-type CharacterId = 'melissa' | 'roberto' | 'mario' | 'faty' | string;
+type CharacterId = 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij' | 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia' | string;
 
 interface CharacterInfo {
   id: CharacterId;
@@ -52,6 +52,33 @@ const COACHES: CharacterInfo[] = [
     category: 'coach',
     color: 'from-blue-500 to-cyan-600',
   },
+  {
+    id: 'chiara',
+    name: 'Chiara',
+    role: 'Coach Organizzativa',
+    description: 'Ti aiuto a organizzare lo studio e a creare routine efficaci per raggiungere i tuoi obiettivi.',
+    avatar: '/avatars/chiara.png',
+    category: 'coach',
+    color: 'from-emerald-500 to-teal-600',
+  },
+  {
+    id: 'andrea',
+    name: 'Andrea',
+    role: 'Coach di Concentrazione',
+    description: 'Insieme possiamo migliorare la tua concentrazione e gestire le distrazioni durante lo studio.',
+    avatar: '/avatars/andrea.png',
+    category: 'coach',
+    color: 'from-amber-500 to-orange-600',
+  },
+  {
+    id: 'favij',
+    name: 'Favij',
+    role: 'Coach Creativo',
+    description: 'Ti mostro come rendere lo studio più divertente e coinvolgente con tecniche creative!',
+    avatar: '/avatars/favij.jpg',
+    category: 'coach',
+    color: 'from-red-500 to-pink-600',
+  },
 ];
 
 const BUDDIES: CharacterInfo[] = [
@@ -65,20 +92,47 @@ const BUDDIES: CharacterInfo[] = [
     color: 'from-pink-500 to-rose-600',
   },
   {
-    id: 'faty',
-    name: 'Faty',
+    id: 'noemi',
+    name: 'Noemi',
     role: 'Compagna di Studio',
     description: 'Ciao! Studiare insieme è più bello. Ti capisco perché sono una studentessa come te.',
-    avatar: '/avatars/faty.png',
+    avatar: '/avatars/noemi.png',
     category: 'buddy',
     color: 'from-orange-500 to-amber-600',
+  },
+  {
+    id: 'enea',
+    name: 'Enea',
+    role: 'Compagno Sportivo',
+    description: 'Lo studio è come lo sport: serve allenamento! Ti aiuto a trovare il tuo ritmo.',
+    avatar: '/avatars/enea.png',
+    category: 'buddy',
+    color: 'from-sky-500 to-blue-600',
+  },
+  {
+    id: 'bruno',
+    name: 'Bruno',
+    role: 'Compagno Creativo',
+    description: 'Mi piace trovare modi creativi per studiare. Possiamo inventare trucchi insieme!',
+    avatar: '/avatars/bruno.png',
+    category: 'buddy',
+    color: 'from-violet-500 to-purple-600',
+  },
+  {
+    id: 'sofia',
+    name: 'Sofia',
+    role: 'Compagna di Lettura',
+    description: 'Adoro leggere e condividere storie. Ti aiuto a rendere i testi più interessanti!',
+    avatar: '/avatars/sofia.png',
+    category: 'buddy',
+    color: 'from-rose-500 to-red-600',
   },
 ];
 
 const CATEGORY_TABS = [
   { id: 'coach' as const, label: 'Coach', icon: Sparkles, description: 'Aiuto per il metodo di studio' },
   { id: 'buddy' as const, label: 'Buddy', icon: Heart, description: 'Supporto tra pari' },
-  { id: 'maestri' as const, label: 'Maestri', icon: GraduationCap, description: 'Tutor per materia' },
+  { id: 'maestri' as const, label: 'Professori', icon: GraduationCap, description: 'Tutor per materia' },
 ];
 
 export default function ConversazioniPage() {
@@ -172,7 +226,7 @@ export default function ConversazioniPage() {
                 Torna alla lista
               </Button>
               <CharacterChatView
-                characterId={selectedCharacter.id as 'melissa' | 'roberto' | 'mario' | 'faty'}
+                characterId={selectedCharacter.id as 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij' | 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia'}
                 characterType={selectedCharacter.category === 'buddy' ? 'buddy' : 'coach'}
               />
             </motion.div>
@@ -210,15 +264,15 @@ export default function ConversazioniPage() {
                 <div className="text-center py-12">
                   <GraduationCap className="w-16 h-16 mx-auto mb-4 text-slate-300 dark:text-slate-600" />
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                    Vai ai Maestri
+                    Vai ai Professori
                   </h2>
                   <p className="text-slate-500 dark:text-slate-400 mb-4">
-                    Scegli un Maestro dalla pagina principale per studiare una materia.
+                    Scegli un Professore dalla pagina principale per studiare una materia.
                   </p>
                   <Link href="/">
                     <Button>
                       <GraduationCap className="w-4 h-4 mr-2" />
-                      Vedi i Maestri
+                      Vedi i Professori
                     </Button>
                   </Link>
                 </div>
