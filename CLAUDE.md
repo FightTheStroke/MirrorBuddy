@@ -288,6 +288,62 @@ serverNotifications.myNewTrigger = async (userId: string, data: MyData) => {
 
 2. Call from relevant API route or server action
 
+## Tool Execution System
+
+**STATUS: IMPLEMENTED**
+
+Maestri can create interactive educational tools during conversations using OpenAI function calling.
+
+### Available Tools
+
+| Tool | Function Name | Purpose |
+|------|---------------|---------|
+| Mind Map | `create_mindmap` | Visual concept organization (MarkMap rendering) |
+| Quiz | `create_quiz` | Multiple choice assessment |
+| Flashcards | `create_flashcards` | FSRS-compatible spaced repetition cards |
+| Demo | `create_demo` | Interactive HTML/JS simulations (sandboxed) |
+| Search | `web_search` | Educational web/YouTube search |
+
+### Architecture
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Types | `src/types/tools.ts` | Unified tool types + `CHAT_TOOL_DEFINITIONS` |
+| Executor | `src/lib/tools/tool-executor.ts` | Handler registry and execution |
+| Handlers | `src/lib/tools/handlers/*.ts` | Tool-specific logic |
+| Events | `src/lib/realtime/tool-events.ts` | SSE broadcasting |
+| Storage | `src/lib/storage/materials-db.ts` | IndexedDB for client-side materials |
+| Persistence | `prisma/schema.prisma` → `CreatedTool` | Server-side tool records |
+
+### Adding a New Tool
+
+1. Add type to `src/types/tools.ts`:
+```typescript
+export interface MyToolData {
+  // Tool-specific fields
+}
+```
+
+2. Add function definition to `CHAT_TOOL_DEFINITIONS` in same file
+
+3. Create handler in `src/lib/tools/handlers/`:
+```typescript
+import { registerToolHandler } from '../tool-executor';
+
+registerToolHandler('my_tool', async (args) => {
+  // Validate and process
+  return { success: true, toolId, toolType: 'my_tool', data };
+});
+```
+
+4. Import handler in `src/lib/tools/handlers/index.ts`
+
+### Security
+
+- **Demo Sandbox**: JavaScript validated against `DANGEROUS_JS_PATTERNS` blocklist
+- **HTML Sanitization**: Script tags and event handlers removed
+- **Iframe Isolation**: `sandbox="allow-scripts"` (no same-origin access)
+
 ## Environment Configuration
 
 Copy `.env.example` to `.env.local`. Key variables:
