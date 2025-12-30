@@ -8,6 +8,7 @@ export { HomeworkHelpView } from './homework-help-view';
 export { CalendarView } from './calendar-view';
 export { HTMLPreview } from './html-preview';
 export { HTMLSnippetsView } from './html-snippets-view';
+export { ArchiveView } from './archive-view';
 
 // Lazy-loaded versions for performance
 export {
