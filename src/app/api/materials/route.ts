@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Parse JSON content for each material
-    const parsed = materials.map((m) => ({
+    const parsed = materials.map((m: { content: string; [key: string]: unknown }) => ({
       ...m,
       content: JSON.parse(m.content),
     }));
