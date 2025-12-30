@@ -318,3 +318,90 @@ model ProfileAccessLog {
   @@index([profileId])
   @@index([timestamp])
 }
+
+// ============================================================================
+// NOTIFICATIONS (Server-side persistence for cross-device sync)
+// ============================================================================
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+
+  type        String   // achievement | streak | reminder | break | session_end | level_up | calendar | system
+  title       String
+  message     String
+  actionUrl   String?
+  metadata    String?  // JSON for additional data
+
+  read        Boolean  @default(false)
+  dismissed   Boolean  @default(false)
+
+  // Scheduling for future notifications
+  scheduledFor DateTime?
+  sentAt       DateTime?
+
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime? // Auto-delete after expiry
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([scheduledFor])
+}
+
+// ============================================================================
+// TELEMETRY (Usage Analytics & Grafana Integration)
+// ============================================================================
+
+model TelemetryEvent {
+  id          String   @id @default(cuid())
+  eventId     String   @unique // Client-generated event ID for deduplication
+
+  // Event data
+  timestamp   DateTime
+  category    String   // navigation | education | conversation | maestro | tools | accessibility | error | performance
+  action      String   // Specific action (page_view, quiz_started, etc.)
+  label       String?  // Additional context (page name, maestro ID, etc.)
+  value       Float?   // Numeric value (duration, count, etc.)
+  metadata    String?  // JSON for additional key-value pairs
+
+  // Session & user tracking
+  sessionId   String
+  userId      String?  // Optional, only if authenticated
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([timestamp])
+  @@index([category])
+  @@index([action])
+}
+
+// ============================================================================
+// METHOD PROGRESS (Autonomy Tracking - Issue #28)
+// ============================================================================
+
+model MethodProgress {
+  id        String @id @default(cuid())
+  userId    String @unique
+
+  // Skill progress (JSON stored)
+  mindMaps       String @default("{}") // MindMapProgress JSON
+  flashcards     String @default("{}") // FlashcardProgress JSON
+  selfAssessment String @default("{}") // SelfAssessmentProgress JSON
+  helpBehavior   String @default("{}") // HelpBehavior JSON
+  methodTransfer String @default("{}") // MethodTransfer JSON
+
+  // Events history (JSON array)
+  events String @default("[]") // MethodEvent[] JSON
+
+  // Computed scores
+  autonomyScore Float @default(0) // 0-1
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([autonomyScore])
+}

@@ -18,8 +18,8 @@ import type { SupportTeacher } from '@/types';
 import type { BuddyProfile } from '@/types';
 import {
   routeToCharacter,
-  getCharacterGreeting,
-  getCharacterSystemPrompt,
+  getCharacterGreeting as _getCharacterGreeting,
+  getCharacterSystemPrompt as _getCharacterSystemPrompt,
   type RoutingResult,
 } from '@/lib/ai/character-router';
 import { getDefaultSupportTeacher, getSupportTeacherById } from '@/data/support-teachers';
@@ -185,7 +185,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
       characterHistory: [],
 
       startConversation: (profile) => {
-        // Start with Coach (Melissa/Davide based on preference)
+        // Start with Coach (Melissa/Roberto based on preference)
         const coach = getDefaultSupportTeacher();
         const activeCharacter = createActiveCharacter(coach, 'coach', profile);
 
@@ -329,10 +329,10 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
             character = getMaestroById(previous.id);
             break;
           case 'coach':
-            character = getSupportTeacherById(previous.id as 'melissa' | 'davide');
+            character = getSupportTeacherById(previous.id as 'melissa' | 'roberto');
             break;
           case 'buddy':
-            character = getBuddyById(previous.id as 'mario' | 'maria');
+            character = getBuddyById(previous.id as 'mario' | 'faty');
             break;
         }
 

@@ -5,3 +5,4 @@
  */
 
 export { ConversationFlow } from './conversation-flow';
+export { CharacterChatView } from './character-chat-view';

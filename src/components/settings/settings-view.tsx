@@ -33,12 +33,19 @@ import {
   Video,
   Settings,
   Undo2,
+  BarChart3,
+  Users,
+  Heart,
+  Sparkles,
 } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AccessibilitySettings } from '@/components/accessibility/accessibility-settings';
 import { useSettingsStore, type TeachingStyle } from '@/lib/stores/app-store';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { useNotificationStore, requestPushPermission, isPushSupported } from '@/lib/stores/notification-store';
+import { TelemetryDashboard } from '@/components/telemetry';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -87,15 +94,17 @@ const TEACHING_STYLES: Array<{
   },
 ];
 
-type SettingsTab = 'profile' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'notifications' | 'privacy' | 'diagnostics';
+type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'notifications' | 'telemetry' | 'privacy' | 'diagnostics';
 
 const tabs: Array<{ id: SettingsTab; label: string; icon: React.ReactNode }> = [
   { id: 'profile', label: 'Profilo', icon: <User className="w-5 h-5" /> },
+  { id: 'characters', label: 'Personaggi', icon: <Users className="w-5 h-5" /> },
   { id: 'accessibility', label: 'Accessibilita', icon: <Accessibility className="w-5 h-5" /> },
   { id: 'appearance', label: 'Aspetto', icon: <Palette className="w-5 h-5" /> },
   { id: 'ai', label: 'AI Provider', icon: <Bot className="w-5 h-5" /> },
   { id: 'audio', label: 'Audio/Video', icon: <Volume2 className="w-5 h-5" /> },
   { id: 'notifications', label: 'Notifiche', icon: <Bell className="w-5 h-5" /> },
+  { id: 'telemetry', label: 'Statistiche', icon: <BarChart3 className="w-5 h-5" /> },
   { id: 'privacy', label: 'Privacy', icon: <Shield className="w-5 h-5" /> },
   { id: 'diagnostics', label: 'Diagnostica', icon: <Wrench className="w-5 h-5" /> },
 ];
@@ -185,9 +194,15 @@ export function SettingsView() {
             <Undo2 className="w-4 h-4 mr-2" />
             Annulla
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+            className={cn(
+              hasChanges && !isSaving && 'bg-amber-500 hover:bg-amber-600 animate-pulse'
+            )}
+          >
             <Save className="w-4 h-4 mr-2" />
-            {isSaving ? 'Salvando...' : 'Salva'}
+            {isSaving ? 'Salvando...' : hasChanges ? 'Salva Modifiche' : 'Salva'}
           </Button>
         </div>
       </div>
@@ -225,6 +240,13 @@ export function SettingsView() {
           />
         )}
 
+        {activeTab === 'characters' && (
+          <CharacterSettings
+            profile={studentProfile}
+            onUpdate={updateStudentProfile}
+          />
+        )}
+
         {activeTab === 'accessibility' && (
           <AccessibilityTab
             settings={accessibilitySettings}
@@ -248,6 +270,7 @@ export function SettingsView() {
 
         {activeTab === 'privacy' && <PrivacySettings />}
 
+        {activeTab === 'telemetry' && <TelemetryDashboard />}
         {activeTab === 'diagnostics' && <DiagnosticsTab />}
       </motion.div>
 
@@ -280,24 +303,6 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
     { value: 'university', label: 'Universita' },
     { value: 'adult', label: 'Formazione Continua' },
   ];
-
-  const learningGoalOptions = [
-    'Migliorare in matematica',
-    'Imparare le lingue',
-    'Preparare esami',
-    'Sviluppare creativita',
-    'Approfondire scienze',
-    'Studiare storia e geografia',
-  ];
-
-  const toggleGoal = (goal: string) => {
-    const current = profile.learningGoals || [];
-    if (current.includes(goal)) {
-      onUpdate({ learningGoals: current.filter(g => g !== goal) });
-    } else {
-      onUpdate({ learningGoals: [...current, goal] });
-    }
-  };
 
   const currentStyle = TEACHING_STYLES.find(s => s.value === (profile.teachingStyle || 'balanced'));
 
@@ -344,54 +349,6 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <GraduationCap className="w-5 h-5 text-green-500" />
-              Obiettivi di Apprendimento
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-slate-500 mb-4">
-              Seleziona gli obiettivi che vuoi raggiungere
-            </p>
-            <div className="space-y-2">
-              {learningGoalOptions.map(goal => (
-                <label
-                  key={goal}
-                  className={cn(
-                    'flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors',
-                    (profile.learningGoals || []).includes(goal)
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500'
-                      : 'bg-slate-50 dark:bg-slate-800/50 border-2 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800'
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={(profile.learningGoals || []).includes(goal)}
-                    onChange={() => toggleGoal(goal)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={cn(
-                      'w-5 h-5 rounded border-2 flex items-center justify-center',
-                      (profile.learningGoals || []).includes(goal)
-                        ? 'bg-blue-500 border-blue-500 text-white'
-                        : 'border-slate-300 dark:border-slate-600'
-                    )}
-                  >
-                    {(profile.learningGoals || []).includes(goal) && (
-                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="text-sm font-medium">{goal}</span>
-                </label>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Teaching Style Card */}
@@ -467,6 +424,220 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
   );
 }
 
+// Character Settings (Coach & Buddy Selection)
+interface CharacterSettingsProps {
+  profile: {
+    preferredCoach?: 'melissa' | 'roberto';
+    preferredBuddy?: 'mario' | 'faty';
+  };
+  onUpdate: (updates: Partial<CharacterSettingsProps['profile']>) => void;
+}
+
+const COACHES = [
+  {
+    id: 'melissa' as const,
+    name: 'Melissa',
+    avatar: '/avatars/melissa.jpg',
+    description: 'Giovane, intelligente, allegra, paziente, entusiasta',
+    tagline: 'Entusiasta e positiva',
+    color: 'from-pink-500 to-rose-500',
+    bgColor: 'bg-pink-50 dark:bg-pink-900/20',
+    borderColor: 'border-pink-200 dark:border-pink-800',
+    activeBorder: 'border-pink-500 ring-2 ring-pink-500/50',
+  },
+  {
+    id: 'roberto' as const,
+    name: 'Roberto',
+    avatar: '/avatars/roberto.png',
+    description: 'Giovane, calmo, rassicurante, paziente, affidabile',
+    tagline: 'Calmo e rassicurante',
+    color: 'from-blue-500 to-indigo-500',
+    bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+    borderColor: 'border-blue-200 dark:border-blue-800',
+    activeBorder: 'border-blue-500 ring-2 ring-blue-500/50',
+  },
+];
+
+const BUDDIES = [
+  {
+    id: 'mario' as const,
+    name: 'Mario',
+    avatar: '/avatars/mario.jpg',
+    description: 'Amichevole, ironico, comprensivo, alla mano',
+    tagline: 'Il tuo amico che ti capisce',
+    color: 'from-emerald-500 to-teal-500',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-900/20',
+    borderColor: 'border-emerald-200 dark:border-emerald-800',
+    activeBorder: 'border-emerald-500 ring-2 ring-emerald-500/50',
+  },
+  {
+    id: 'faty' as const,
+    name: 'Faty',
+    avatar: '/avatars/faty.png',
+    description: 'Empatica, solare, accogliente, buona ascoltatrice',
+    tagline: 'La tua amica che ti ascolta',
+    color: 'from-purple-500 to-violet-500',
+    bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+    borderColor: 'border-purple-200 dark:border-purple-800',
+    activeBorder: 'border-purple-500 ring-2 ring-purple-500/50',
+  },
+];
+
+function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
+  const selectedCoach = profile.preferredCoach || 'melissa';
+  const selectedBuddy = profile.preferredBuddy || 'mario';
+
+  return (
+    <div className="space-y-8">
+      {/* Coach Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-amber-500" />
+            Il Tuo Coach di Apprendimento
+          </CardTitle>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Il coach ti aiuta a sviluppare il tuo metodo di studio e diventare autonomo
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {COACHES.map((coach) => (
+              <button
+                key={coach.id}
+                onClick={() => onUpdate({ preferredCoach: coach.id })}
+                className={cn(
+                  'relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left',
+                  coach.bgColor,
+                  selectedCoach === coach.id
+                    ? coach.activeBorder
+                    : `${coach.borderColor} hover:scale-[1.02]`
+                )}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className={cn(
+                    'w-16 h-16 rounded-full overflow-hidden border-2',
+                    selectedCoach === coach.id ? 'border-white shadow-lg' : 'border-slate-200 dark:border-slate-700'
+                  )}>
+                    <Image
+                      src={coach.avatar}
+                      alt={coach.name}
+                      width={64}
+                      height={64}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  {selectedCoach === coach.id && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+                    {coach.name}
+                  </h3>
+                  <p className={cn(
+                    'text-sm font-medium bg-gradient-to-r bg-clip-text text-transparent',
+                    coach.color
+                  )}>
+                    {coach.tagline}
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                    {coach.description}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Buddy Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="w-5 h-5 text-rose-500" />
+            Il Tuo MirrorBuddy
+          </CardTitle>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Il buddy e un amico della tua eta che capisce le tue difficolta e ti supporta
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {BUDDIES.map((buddy) => (
+              <button
+                key={buddy.id}
+                onClick={() => onUpdate({ preferredBuddy: buddy.id })}
+                className={cn(
+                  'relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left',
+                  buddy.bgColor,
+                  selectedBuddy === buddy.id
+                    ? buddy.activeBorder
+                    : `${buddy.borderColor} hover:scale-[1.02]`
+                )}
+              >
+                <div className="relative flex-shrink-0">
+                  <div className={cn(
+                    'w-16 h-16 rounded-full overflow-hidden border-2',
+                    selectedBuddy === buddy.id ? 'border-white shadow-lg' : 'border-slate-200 dark:border-slate-700'
+                  )}>
+                    <Image
+                      src={buddy.avatar}
+                      alt={buddy.name}
+                      width={64}
+                      height={64}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                  {selectedBuddy === buddy.id && (
+                    <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+                    {buddy.name}
+                  </h3>
+                  <p className={cn(
+                    'text-sm font-medium bg-gradient-to-r bg-clip-text text-transparent',
+                    buddy.color
+                  )}>
+                    {buddy.tagline}
+                  </p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                    {buddy.description}
+                  </p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Info Box */}
+      <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 w-8 h-8 bg-amber-100 dark:bg-amber-800/50 rounded-full flex items-center justify-center">
+            <GraduationCap className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <h4 className="font-medium text-amber-900 dark:text-amber-100">
+              Il Triangolo del Supporto
+            </h4>
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+              Il coach ti insegna il metodo, il buddy ti supporta emotivamente, e i Maestri ti spiegano le materie.
+              Insieme formano il tuo team di apprendimento personalizzato!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Accessibility Tab
 interface AccessibilitySettings {
   dyslexiaFont?: boolean;
@@ -481,6 +652,7 @@ interface AccessibilitySettings {
   breakReminders?: boolean;
   reducedMotion?: boolean;
   keyboardNavigation?: boolean;
+  visualFirstMode?: boolean; // For auditory disabilities - visual-first communication
 }
 
 interface AccessibilityTabProps {
@@ -537,13 +709,27 @@ const accessibilityProfiles = [
     toggle: (s: AccessibilitySettings) => ({ reducedMotion: !(s.reducedMotion && s.distractionFreeMode), distractionFreeMode: !(s.reducedMotion && s.distractionFreeMode) }),
   },
   {
-    id: 'cognitive',
-    label: 'Cognitivo',
-    description: 'Interfaccia semplificata, sintesi vocale',
+    id: 'auditory',
+    label: 'Uditivo',
+    description: 'Comunicazione visiva, no dipendenza audio',
     color: 'rose',
-    icon: '🧠',
-    isActive: (s: AccessibilitySettings) => s.ttsEnabled,
-    toggle: (s: AccessibilitySettings) => ({ ttsEnabled: !s.ttsEnabled, ttsAutoRead: !s.ttsEnabled }),
+    icon: '👂',
+    isActive: (s: AccessibilitySettings) => s.visualFirstMode,
+    toggle: (s: AccessibilitySettings) => ({ visualFirstMode: !s.visualFirstMode }),
+  },
+  {
+    id: 'cerebral-palsy',
+    label: 'Paralisi Cerebrale',
+    description: 'TTS, testo grande, tastiera, spaziatura extra',
+    color: 'blue',
+    icon: '♿',
+    isActive: (s: AccessibilitySettings) => s.ttsEnabled && s.largeText && s.keyboardNavigation,
+    toggle: (s: AccessibilitySettings) => ({
+      ttsEnabled: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+      largeText: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+      keyboardNavigation: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+      extraLetterSpacing: !(s.ttsEnabled && s.largeText && s.keyboardNavigation),
+    }),
   },
 ] as const;
 
@@ -818,64 +1004,188 @@ function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsProps) {
   );
 }
 
-// Notification Settings
+// Notification Settings - Uses global notification store
 function NotificationSettings() {
-  const [notifications, setNotifications] = useState({
-    studyReminders: true,
-    streakAlerts: true,
-    achievements: true,
-    weeklyReport: true,
-    sound: false,
-  });
+  const { preferences, pushPermission, updatePreferences, setPushPermission: _setPushPermission } = useNotificationStore();
+  const [isRequestingPush, setIsRequestingPush] = useState(false);
 
-  const toggleSetting = (key: keyof typeof notifications) => {
-    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleRequestPush = async () => {
+    setIsRequestingPush(true);
+    try {
+      const granted = await requestPushPermission();
+      if (granted) {
+        updatePreferences({ push: true });
+      }
+    } finally {
+      setIsRequestingPush(false);
+    }
+  };
+
+  const togglePreference = (key: keyof typeof preferences) => {
+    updatePreferences({ [key]: !preferences[key] });
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-amber-500" />
-          Notifiche
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {[
-          { key: 'studyReminders' as const, label: 'Promemoria studio', desc: 'Ricevi un promemoria per studiare' },
-          { key: 'streakAlerts' as const, label: 'Avvisi streak', desc: 'Notifica quando rischi di perdere la serie' },
-          { key: 'achievements' as const, label: 'Traguardi', desc: 'Notifica quando sblocchi un achievement' },
-          { key: 'weeklyReport' as const, label: 'Report settimanale', desc: 'Ricevi un riepilogo dei tuoi progressi' },
-          { key: 'sound' as const, label: 'Suoni', desc: 'Attiva effetti sonori' },
-        ].map(item => (
+    <div className="space-y-6">
+      {/* Master toggle */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Bell className="w-5 h-5 text-amber-500" />
+            Notifiche
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Master enable toggle */}
           <label
-            key={item.key}
             className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
           >
             <div>
               <span className="font-medium text-slate-900 dark:text-white block">
-                {item.label}
+                Abilita notifiche
               </span>
-              <span className="text-sm text-slate-500">{item.desc}</span>
+              <span className="text-sm text-slate-500">Attiva o disattiva tutte le notifiche</span>
             </div>
             <div
               className={cn(
                 'relative w-12 h-7 rounded-full transition-colors',
-                notifications[item.key] ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+                preferences.enabled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
               )}
-              onClick={() => toggleSetting(item.key)}
+              onClick={() => togglePreference('enabled')}
             >
               <span
                 className={cn(
                   'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
-                  notifications[item.key] ? 'translate-x-5' : 'translate-x-0'
+                  preferences.enabled ? 'translate-x-5' : 'translate-x-0'
                 )}
               />
             </div>
           </label>
-        ))}
-      </CardContent>
-    </Card>
+
+          {/* Push notifications */}
+          {isPushSupported() && (
+            <label
+              className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+            >
+              <div>
+                <span className="font-medium text-slate-900 dark:text-white block">
+                  Notifiche push
+                </span>
+                <span className="text-sm text-slate-500">
+                  {pushPermission === 'granted'
+                    ? 'Ricevi notifiche anche quando l\'app è chiusa'
+                    : pushPermission === 'denied'
+                    ? 'Permesso negato - controlla le impostazioni del browser'
+                    : 'Abilita le notifiche push del browser'}
+                </span>
+              </div>
+              {pushPermission !== 'granted' ? (
+                <Button
+                  size="sm"
+                  onClick={handleRequestPush}
+                  disabled={isRequestingPush || pushPermission === 'denied'}
+                >
+                  {isRequestingPush ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Abilita'
+                  )}
+                </Button>
+              ) : (
+                <div
+                  className={cn(
+                    'relative w-12 h-7 rounded-full transition-colors',
+                    preferences.push ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+                  )}
+                  onClick={() => togglePreference('push')}
+                >
+                  <span
+                    className={cn(
+                      'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
+                      preferences.push ? 'translate-x-5' : 'translate-x-0'
+                    )}
+                  />
+                </div>
+              )}
+            </label>
+          )}
+
+          {/* Sound */}
+          <label
+            className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+          >
+            <div>
+              <span className="font-medium text-slate-900 dark:text-white block">
+                Suoni
+              </span>
+              <span className="text-sm text-slate-500">Riproduci suoni per le notifiche</span>
+            </div>
+            <div
+              className={cn(
+                'relative w-12 h-7 rounded-full transition-colors',
+                preferences.sound ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+              )}
+              onClick={() => togglePreference('sound')}
+            >
+              <span
+                className={cn(
+                  'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
+                  preferences.sound ? 'translate-x-5' : 'translate-x-0'
+                )}
+              />
+            </div>
+          </label>
+        </CardContent>
+      </Card>
+
+      {/* Notification types */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Tipi di notifiche</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {[
+            { key: 'reminders' as const, label: 'Promemoria studio', desc: 'Ricevi un promemoria per studiare' },
+            { key: 'streaks' as const, label: 'Avvisi streak', desc: 'Notifica quando rischi di perdere la serie' },
+            { key: 'achievements' as const, label: 'Traguardi', desc: 'Notifica quando sblocchi un achievement' },
+            { key: 'levelUp' as const, label: 'Livelli', desc: 'Notifica quando sali di livello' },
+            { key: 'breaks' as const, label: 'Pause', desc: 'Suggerimenti per fare pause (ADHD mode)' },
+            { key: 'sessionEnd' as const, label: 'Fine sessione', desc: 'Riepilogo a fine sessione di studio' },
+          ].map(item => (
+            <label
+              key={item.key}
+              className={cn(
+                'flex items-center justify-between p-4 rounded-lg cursor-pointer transition-opacity',
+                preferences.enabled
+                  ? 'bg-slate-50 dark:bg-slate-800/50'
+                  : 'bg-slate-50/50 dark:bg-slate-800/25 opacity-50'
+              )}
+            >
+              <div>
+                <span className="font-medium text-slate-900 dark:text-white block">
+                  {item.label}
+                </span>
+                <span className="text-sm text-slate-500">{item.desc}</span>
+              </div>
+              <div
+                className={cn(
+                  'relative w-12 h-7 rounded-full transition-colors',
+                  preferences[item.key] && preferences.enabled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
+                )}
+                onClick={() => preferences.enabled && togglePreference(item.key)}
+              >
+                <span
+                  className={cn(
+                    'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
+                    preferences[item.key] ? 'translate-x-5' : 'translate-x-0'
+                  )}
+                />
+              </div>
+            </label>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -1239,46 +1549,80 @@ function AudioSettings() {
   // Test speaker output
   const testSpeaker = async () => {
     setSpeakerTestActive(true);
-    try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const audioContext = new AudioCtx();
 
-      // Try to set the output device if supported
-      if (preferredOutputId && 'setSinkId' in audioContext) {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await (audioContext as any).setSinkId(preferredOutputId);
-        } catch {
-          console.warn('Could not set output device, using default');
-        }
-      }
+    // Helper function to play fallback tone
+    const playFallbackTone = () => {
+      try {
+        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const audioContext = new AudioCtx();
 
-      // Create a pleasant test tone (440Hz with envelope)
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
 
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(440, audioContext.currentTime);
 
-      // Envelope for pleasant sound
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
-      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.1);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
 
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
 
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.5);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5);
 
-      // Cleanup after sound finishes
-      setTimeout(() => {
-        audioContext.close();
+        setTimeout(() => {
+          audioContext.close();
+          setSpeakerTestActive(false);
+        }, 600);
+      } catch (error) {
+        console.error('Fallback tone error:', error);
         setSpeakerTestActive(false);
-      }, 600);
+      }
+    };
+
+    try {
+      // Use Web Speech API to speak a test phrase
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance('Ciao! Il test audio funziona correttamente.');
+        utterance.lang = 'it-IT';
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+
+        // Try to find an Italian voice
+        const voices = window.speechSynthesis.getVoices();
+        const italianVoice = voices.find(v => v.lang.startsWith('it')) || voices[0];
+        if (italianVoice) {
+          utterance.voice = italianVoice;
+        }
+
+        utterance.onend = () => {
+          setSpeakerTestActive(false);
+        };
+
+        utterance.onerror = () => {
+          console.error('Speech synthesis error, falling back to tone');
+          playFallbackTone();
+        };
+
+        window.speechSynthesis.speak(utterance);
+
+        // Fallback timeout in case onend doesn't fire
+        setTimeout(() => {
+          setSpeakerTestActive(false);
+        }, 5000);
+      } else {
+        // Fallback to tone if speech synthesis not available
+        playFallbackTone();
+      }
     } catch (error) {
       console.error('Speaker test error:', error);
-      setSpeakerTestActive(false);
+      playFallbackTone();
     }
   };
 
@@ -1397,7 +1741,7 @@ function AudioSettings() {
         </CardContent>
       </Card>
 
-      {/* Webcam - Compact layout with smaller preview */}
+      {/* Webcam - Better layout with larger preview */}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-base">
@@ -1405,63 +1749,61 @@ function AudioSettings() {
             Webcam
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center gap-4">
-            {/* Select + smaller preview side by side */}
-            <div className="flex-1 space-y-2">
-              <select
-                value={preferredCameraId}
-                onChange={(e) => handleCamChange(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
-              >
-                <option value="">Predefinito di sistema</option>
-                {availableCameras.map((cam) => (
-                  <option key={cam.deviceId} value={cam.deviceId}>
-                    {cam.label || `Webcam ${cam.deviceId.slice(0, 8)}...`}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Per future funzionalita video
-              </p>
-              <div className="flex gap-2">
-                <Button onClick={refreshDevices} variant="outline" size="sm">
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
-                {!camTestActive ? (
-                  <Button onClick={startCamTest} variant="default" size="sm">
-                    <Video className="w-4 h-4 mr-1" />
-                    Testa
-                  </Button>
-                ) : (
-                  <Button onClick={stopCamTest} variant="destructive" size="sm">
-                    <XCircle className="w-4 h-4 mr-1" />
-                    Stop
-                  </Button>
-                )}
+        <CardContent className="space-y-4">
+          {/* Large video preview */}
+          <div className="relative aspect-video max-w-md mx-auto rounded-xl overflow-hidden bg-slate-900">
+            <video
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              muted
+              playsInline
+            />
+            {!camTestActive && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                <Video className="w-12 h-12 text-slate-600" />
+                <span className="text-sm text-slate-500">Clicca &quot;Testa&quot; per vedere l&apos;anteprima</span>
               </div>
-            </div>
-
-            {/* Smaller video preview */}
-            <div className="relative w-40 h-30 rounded-lg overflow-hidden bg-slate-900 flex-shrink-0">
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                muted
-                playsInline
-              />
-              {!camTestActive && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Video className="w-8 h-8 text-slate-600" />
-                </div>
-              )}
-              {camTestActive && (
-                <div className="absolute top-1 right-1">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                </div>
-              )}
-            </div>
+            )}
+            {camTestActive && (
+              <div className="absolute top-2 right-2 flex items-center gap-2 px-2 py-1 bg-black/50 rounded-full">
+                <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                <span className="text-xs text-white">LIVE</span>
+              </div>
+            )}
           </div>
+
+          {/* Controls row */}
+          <div className="flex items-center gap-4">
+            <select
+              value={preferredCameraId}
+              onChange={(e) => handleCamChange(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
+            >
+              <option value="">Predefinito di sistema</option>
+              {availableCameras.map((cam) => (
+                <option key={cam.deviceId} value={cam.deviceId}>
+                  {cam.label || `Webcam ${cam.deviceId.slice(0, 8)}...`}
+                </option>
+              ))}
+            </select>
+            <Button onClick={refreshDevices} variant="outline" size="sm" title="Aggiorna dispositivi">
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+            {!camTestActive ? (
+              <Button onClick={startCamTest} variant="default" size="sm">
+                <Video className="w-4 h-4 mr-1" />
+                Testa
+              </Button>
+            ) : (
+              <Button onClick={stopCamTest} variant="destructive" size="sm">
+                <XCircle className="w-4 h-4 mr-1" />
+                Stop
+              </Button>
+            )}
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
+            Per future funzionalità video
+          </p>
         </CardContent>
       </Card>
 

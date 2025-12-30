@@ -2,19 +2,20 @@
  * ConvergioEdu Conversation Flow Component
  *
  * The central conversation-first interface that:
- * 1. Starts with Coach (Melissa/Davide) greeting
+ * 1. Shows character selection with photos and introductions
  * 2. Routes student messages to appropriate characters
  * 3. Supports seamless handoffs between characters
- * 4. Offers both text and voice modes
+ * 4. Offers both text and voice modes for Coach and Buddy
  *
  * Part of I-01: Conversation-First Main Flow
- * Related: #24 MirrorBuddy Issue, ManifestoEdu.md
+ * Related: #24 MirrorBuddy Issue, #33 Conversation UX, ManifestoEdu.md
  */
 
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import Image from 'next/image';
 import {
   Send,
   Mic,
@@ -26,6 +27,8 @@ import {
   VolumeX,
   Users,
   MessageCircle,
+  Phone,
+  PhoneOff,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -35,16 +38,25 @@ import {
   type FlowMessage,
   type ActiveCharacter,
 } from '@/lib/stores/conversation-flow-store';
-import { routeToCharacter, type RoutingResult } from '@/lib/ai/character-router';
+// Note: routeMessage from store is used instead of direct routeToCharacter
 import { analyzeHandoff } from '@/lib/ai/handoff-manager';
-import type { ExtendedStudentProfile, CharacterType } from '@/types';
+// Voice session integration pending - Issue #34
+import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
+import type { ExtendedStudentProfile, CharacterType, Subject } from '@/types';
+
+// Character avatar mappings
+const CHARACTER_AVATARS: Record<string, string> = {
+  mario: '/avatars/mario.jpg',
+  melissa: '/avatars/melissa.jpg',
+  // Add more as needed
+};
 
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
 
 /**
- * Character avatar with status indicator.
+ * Character avatar with photo or fallback.
  */
 function CharacterAvatar({
   character,
@@ -53,7 +65,7 @@ function CharacterAvatar({
   isActive = false,
 }: {
   character: ActiveCharacter;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   showStatus?: boolean;
   isActive?: boolean;
 }) {
@@ -61,37 +73,116 @@ function CharacterAvatar({
     sm: 'w-8 h-8',
     md: 'w-12 h-12',
     lg: 'w-16 h-16',
+    xl: 'w-24 h-24',
   };
+
+  const sizePx = {
+    sm: 32,
+    md: 48,
+    lg: 64,
+    xl: 96,
+  };
+
+  const avatarPath = CHARACTER_AVATARS[character.id];
+  const hasPhoto = !!avatarPath;
 
   return (
     <div className="relative">
       <div
         className={cn(
-          'rounded-full overflow-hidden ring-2 ring-offset-2',
+          'rounded-full overflow-hidden ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-900',
           sizeClasses[size]
         )}
-        style={{
-          borderColor: character.color,
-          backgroundColor: character.color + '20',
-        }}
+        style={{ borderColor: character.color }}
       >
-        {/* Placeholder avatar with initial */}
-        <div
-          className="w-full h-full flex items-center justify-center text-white font-bold"
-          style={{ backgroundColor: character.color }}
-        >
-          {character.name.charAt(0)}
-        </div>
+        {hasPhoto ? (
+          <Image
+            src={avatarPath}
+            alt={`Avatar di ${character.name}`}
+            width={sizePx[size]}
+            height={sizePx[size]}
+            className="w-full h-full object-cover"
+            priority={size === 'xl' || size === 'lg'}
+          />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center text-white font-bold"
+            style={{ backgroundColor: character.color }}
+          >
+            {character.name.charAt(0)}
+          </div>
+        )}
       </div>
       {showStatus && (
         <div
           className={cn(
-            'absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white',
-            isActive ? 'bg-green-500' : 'bg-gray-400'
+            'absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-slate-900',
+            isActive ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
           )}
         />
       )}
     </div>
+  );
+}
+
+/**
+ * Character role badge.
+ */
+function CharacterRoleBadge({ type }: { type: CharacterType }) {
+  const roleLabels: Record<CharacterType, { label: string; color: string }> = {
+    coach: { label: 'Coach', color: 'bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300' },
+    buddy: { label: 'Amico', color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' },
+    maestro: { label: 'Maestro', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' },
+  };
+
+  const { label, color } = roleLabels[type];
+
+  return (
+    <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', color)}>
+      {label}
+    </span>
+  );
+}
+
+/**
+ * Character introduction card.
+ * Exported for potential future use in character selection screens.
+ */
+export function CharacterCard({
+  character,
+  isSelected,
+  onClick,
+  description,
+}: {
+  character: ActiveCharacter;
+  isSelected: boolean;
+  onClick: () => void;
+  description: string;
+}) {
+  return (
+    <motion.button
+      onClick={onClick}
+      className={cn(
+        'flex flex-col items-center p-4 rounded-2xl border-2 transition-all',
+        'hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2',
+        isSelected
+          ? 'border-accent-themed bg-accent-themed/5 shadow-md'
+          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+      )}
+      style={{
+        borderColor: isSelected ? character.color : undefined,
+        boxShadow: isSelected ? `0 4px 14px ${character.color}20` : undefined,
+      }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <CharacterAvatar character={character} size="xl" showStatus isActive={isSelected} />
+      <h3 className="mt-3 font-semibold text-lg">{character.name}</h3>
+      <CharacterRoleBadge type={character.type} />
+      <p className="mt-2 text-sm text-center text-slate-600 dark:text-slate-400 line-clamp-2">
+        {description}
+      </p>
+    </motion.button>
   );
 }
 
@@ -203,66 +294,163 @@ function HandoffBanner({
 }
 
 /**
- * Character switcher for manual navigation.
+ * Character descriptions for the intro cards.
  */
-function CharacterSwitcher({
+const CHARACTER_DESCRIPTIONS: Record<string, string> = {
+  melissa: 'Ti aiuto a trovare il TUO metodo di studio. Insieme troviamo il modo migliore per te.',
+  roberto: 'Ti guido con calma a organizzare lo studio. Niente fretta, lavoriamo insieme.',
+  mario: 'Sono qui per ascoltarti. Ci sono passato anch\'io, ti capisco!',
+  faty: 'Sono qui per te. Se hai bisogno di parlare, ti ascolto!',
+};
+
+/**
+ * Enhanced character header with clear identity.
+ */
+function ConversationHeader({
   currentCharacter,
   onSwitchToCoach,
   onSwitchToBuddy,
   onGoBack,
   canGoBack,
+  isVoiceActive,
+  onVoiceCall,
 }: {
   currentCharacter: ActiveCharacter | null;
   onSwitchToCoach: () => void;
   onSwitchToBuddy: () => void;
   onGoBack: () => void;
   canGoBack: boolean;
+  isVoiceActive: boolean;
+  onVoiceCall: () => void;
 }) {
+  if (!currentCharacter) return null;
+
   return (
-    <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-200 dark:border-slate-700">
+    <div
+      className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700"
+      style={{ backgroundColor: `${currentCharacter.color}10` }}
+    >
       {canGoBack && (
-        <Button variant="ghost" size="icon-sm" onClick={onGoBack}>
+        <Button variant="ghost" size="icon-sm" onClick={onGoBack} aria-label="Torna indietro">
           <ArrowLeft className="w-4 h-4" />
         </Button>
       )}
-      <div className="flex-1 flex items-center gap-2">
-        {currentCharacter && (
-          <>
-            <CharacterAvatar character={currentCharacter} size="sm" showStatus isActive />
-            <div>
-              <p className="font-medium text-sm">{currentCharacter.name}</p>
-              <p className="text-xs text-slate-500">
-                {currentCharacter.type === 'coach'
-                  ? 'Coach'
-                  : currentCharacter.type === 'buddy'
-                  ? 'Buddy'
-                  : 'Maestro'}
-              </p>
-            </div>
-          </>
-        )}
+
+      <CharacterAvatar character={currentCharacter} size="md" showStatus isActive />
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <h2 className="font-semibold text-base truncate">{currentCharacter.name}</h2>
+          <CharacterRoleBadge type={currentCharacter.type} />
+        </div>
+        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+          {CHARACTER_DESCRIPTIONS[currentCharacter.id] || 'Sono qui per aiutarti'}
+        </p>
       </div>
-      <div className="flex gap-1" role="group" aria-label="Cambia personaggio">
+
+      {/* Voice call button - only for coach and buddy */}
+      {(currentCharacter.type === 'coach' || currentCharacter.type === 'buddy') && (
+        <Button
+          variant={isVoiceActive ? 'destructive' : 'outline'}
+          size="icon"
+          onClick={onVoiceCall}
+          aria-label={isVoiceActive ? 'Termina chiamata' : 'Chiama a voce'}
+          className={cn(
+            'relative',
+            isVoiceActive && 'animate-pulse'
+          )}
+        >
+          {isVoiceActive ? (
+            <PhoneOff className="w-4 h-4" />
+          ) : (
+            <Phone className="w-4 h-4" />
+          )}
+        </Button>
+      )}
+
+      {/* Quick switch buttons */}
+      <div className="flex gap-1 ml-2 border-l border-slate-200 dark:border-slate-700 pl-2">
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={onSwitchToCoach}
-          aria-label="Torna al Coach"
-          disabled={currentCharacter?.type === 'coach'}
+          aria-label="Parla con il Coach"
+          disabled={currentCharacter.type === 'coach'}
+          className={cn(
+            currentCharacter.type === 'coach' && 'opacity-50'
+          )}
         >
-          <Users className="w-4 h-4" aria-hidden="true" />
+          <Users className="w-4 h-4" />
         </Button>
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={onSwitchToBuddy}
           aria-label="Parla con un amico"
-          disabled={currentCharacter?.type === 'buddy'}
+          disabled={currentCharacter.type === 'buddy'}
+          className={cn(
+            currentCharacter.type === 'buddy' && 'opacity-50'
+          )}
         >
-          <MessageCircle className="w-4 h-4" aria-hidden="true" />
+          <MessageCircle className="w-4 h-4" />
         </Button>
       </div>
     </div>
+  );
+}
+
+/**
+ * Voice call overlay.
+ */
+function VoiceCallOverlay({
+  character,
+  isConnecting,
+  isActive,
+  onEnd,
+}: {
+  character: ActiveCharacter;
+  isConnecting: boolean;
+  isActive: boolean;
+  onEnd: () => void;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-slate-900/95 to-slate-800/95 backdrop-blur-sm"
+    >
+      <motion.div
+        animate={{ scale: isActive ? [1, 1.05, 1] : 1 }}
+        transition={{ repeat: Infinity, duration: 2 }}
+      >
+        <CharacterAvatar character={character} size="xl" showStatus isActive={isActive} />
+      </motion.div>
+
+      <h3 className="mt-4 text-xl font-semibold text-white">{character.name}</h3>
+      <CharacterRoleBadge type={character.type} />
+
+      <p className="mt-2 text-sm text-slate-300">
+        {isConnecting ? 'Connessione in corso...' : 'Chiamata in corso'}
+      </p>
+
+      {isActive && (
+        <div className="mt-4 flex items-center gap-2">
+          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          <span className="text-xs text-green-400">In ascolto</span>
+        </div>
+      )}
+
+      <Button
+        variant="destructive"
+        size="lg"
+        onClick={onEnd}
+        className="mt-8"
+      >
+        <PhoneOff className="w-5 h-5 mr-2" />
+        Termina chiamata
+      </Button>
+    </motion.div>
   );
 }
 
@@ -274,9 +462,11 @@ export function ConversationFlow() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const prefersReducedMotion = useReducedMotion();
+  const sessionStartTimeRef = useRef<number>(Date.now());
+  const _prefersReducedMotion = useReducedMotion(); // For future accessibility features
 
   // Stores
   const { studentProfile } = useSettingsStore();
@@ -288,7 +478,7 @@ export function ConversationFlow() {
     pendingHandoff,
     characterHistory,
     startConversation,
-    endConversation,
+    endConversation: _endConversation, // Available for future explicit end
     addMessage,
     setMode,
     switchToCoach,
@@ -298,16 +488,16 @@ export function ConversationFlow() {
     dismissHandoff,
     suggestHandoff,
     routeMessage,
-    switchToCharacter,
+    switchToCharacter: _switchToCharacter, // Used internally via specific switch functions
   } = useConversationFlowStore();
 
-  // Extended profile for routing
-  const extendedProfile: ExtendedStudentProfile = {
+  // Extended profile for routing - memoized to avoid unnecessary re-renders
+  const extendedProfile: ExtendedStudentProfile = useMemo(() => ({
     ...studentProfile,
     learningDifferences: studentProfile.learningDifferences || [],
     preferredCoach: studentProfile.preferredCoach,
     preferredBuddy: studentProfile.preferredBuddy,
-  };
+  }), [studentProfile]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -345,13 +535,55 @@ export function ConversationFlow() {
       // Route the message to determine if we need to switch characters
       const routingResult = routeMessage(userMessage, extendedProfile);
 
+      // Track method progress based on intent (autonomy tracking - Issue #28)
+      const methodProgressStore = useMethodProgressStore.getState();
+
+      // Map main Subject type (English) to method-progress Subject type (Italian)
+      const mapToMethodSubject = (subject?: Subject): import('@/lib/method-progress/types').Subject | undefined => {
+        if (!subject) return undefined;
+        const subjectMap: Record<string, import('@/lib/method-progress/types').Subject> = {
+          mathematics: 'matematica',
+          physics: 'scienze',
+          chemistry: 'scienze',
+          biology: 'scienze',
+          history: 'storia',
+          geography: 'geografia',
+          italian: 'italiano',
+          english: 'inglese',
+          art: 'arte',
+          music: 'musica',
+        };
+        return subjectMap[subject] ?? 'other';
+      };
+
+      if (routingResult.intent.type === 'method_help' ||
+          routingResult.intent.type === 'emotional_support') {
+        // Student is seeking help - track as help request
+        const timeElapsed = Math.round((Date.now() - sessionStartTimeRef.current) / 1000);
+        methodProgressStore.recordHelpRequest(
+          routingResult.reason,
+          timeElapsed,
+          mapToMethodSubject(routingResult.intent.subject)
+        );
+      } else if (routingResult.intent.type === 'academic_help' &&
+                 activeCharacter?.type === 'maestro') {
+        // Student is working independently with a maestro
+        // Only track as "solved alone" if they've been working for a while
+        if (messages.length > 4) {
+          methodProgressStore.recordProblemSolvedAlone(
+            userMessage.slice(0, 100),
+            mapToMethodSubject(routingResult.intent.subject)
+          );
+        }
+      }
+
       // Check if we should suggest a handoff
       if (
         routingResult.characterType !== activeCharacter.type &&
         routingResult.intent.confidence >= 0.7
       ) {
         // High confidence different character needed - suggest handoff
-        const { getMaestroById } = await import('@/data/maestri-full');
+        const { getMaestroById: _getMaestroById } = await import('@/data/maestri-full');
         const { getSupportTeacherById } = await import('@/data/support-teachers');
         const { getBuddyById } = await import('@/data/buddy-profiles');
 
@@ -477,16 +709,32 @@ export function ConversationFlow() {
   };
 
   /**
-   * Handle voice mode toggle.
+   * Handle voice mode toggle (for input area).
    */
   const handleVoiceToggle = () => {
     if (mode === 'voice') {
       setMode('text');
     } else {
       setMode('voice');
-      // TODO: Start voice session with useVoiceSession hook
     }
   };
+
+  /**
+   * Handle voice call (full voice conversation).
+   */
+  const handleVoiceCall = useCallback(() => {
+    if (isVoiceActive) {
+      // End voice call
+      setIsVoiceActive(false);
+      setMode('text');
+    } else {
+      // Start voice call
+      setIsVoiceActive(true);
+      setMode('voice');
+      // Voice session will be started by VoiceCallOverlay
+      // This is a placeholder - Issue #34 tracks voice WebSocket issues
+    }
+  }, [isVoiceActive, setMode]);
 
   /**
    * Handle accepting handoff.
@@ -514,14 +762,28 @@ export function ConversationFlow() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden">
-      {/* Header with character switcher */}
-      <CharacterSwitcher
+    <div className="relative flex flex-col h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden">
+      {/* Voice call overlay */}
+      <AnimatePresence>
+        {isVoiceActive && activeCharacter && (
+          <VoiceCallOverlay
+            character={activeCharacter}
+            isConnecting={mode !== 'voice'}
+            isActive={mode === 'voice'}
+            onEnd={handleVoiceCall}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Header with character info and voice call button */}
+      <ConversationHeader
         currentCharacter={activeCharacter}
         onSwitchToCoach={handleSwitchToCoach}
         onSwitchToBuddy={handleSwitchToBuddy}
         onGoBack={handleGoBack}
         canGoBack={characterHistory.length > 1}
+        isVoiceActive={isVoiceActive}
+        onVoiceCall={handleVoiceCall}
       />
 
       {/* Handoff suggestion */}

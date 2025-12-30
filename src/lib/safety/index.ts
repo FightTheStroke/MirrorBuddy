@@ -50,3 +50,38 @@ export {
   type ThreatLevel,
   type ConversationContext,
 } from './jailbreak-detector';
+
+export {
+  checkAgeGate,
+  filterForAge,
+  getAgeBracket,
+  detectTopics,
+  getLanguageGuidance,
+  getAgeGatePrompt,
+  type AgeBracket,
+  type TopicSensitivity,
+  type ContentTopic,
+  type AgeGateResult,
+} from './age-gating';
+
+export {
+  logSafetyEvent,
+  logInputBlocked,
+  logJailbreakAttempt,
+  logCrisisDetected,
+  logOutputSanitized,
+  logHandoffToAdult,
+  logAgeGateTriggered,
+  getSessionEvents,
+  getEventsByType,
+  getEventsBySeverity,
+  getMetrics,
+  shouldTerminateSession,
+  getSummary,
+  exportEvents,
+  clearEventBuffer,
+  type SafetyEventType,
+  type EventSeverity,
+  type SafetyEvent,
+  type SafetyMetrics,
+} from './monitoring';

@@ -1,13 +1,13 @@
 /**
  * ConvergioEdu Support Teachers
- * Melissa and Davide - Learning Coaches
+ * Melissa and Roberto - Learning Coaches
  *
  * Part of the Support Triangle:
  * - MAESTRI: Subject experts (vertical, content-focused)
  * - COACH (this file): Learning method coach (vertical, autonomy-focused)
  * - BUDDY: Peer support (horizontal, emotional support)
  *
- * Related: #24 Melissa/Davide Issue, ManifestoEdu.md
+ * Related: #24 Melissa/Roberto Issue, ManifestoEdu.md
  */
 
 import type { SupportTeacher } from '@/types';
@@ -131,29 +131,29 @@ export const MELISSA: SupportTeacher = {
 - "Non ti preoccupare, è normale."`,
   systemPrompt: injectSafetyGuardrails(MELISSA_CORE_PROMPT, {
     role: 'coach',
-    additionalNotes: `Melissa è la coach predefinita. Se lo studente preferisce un coach maschile, suggerisci Davide.
+    additionalNotes: `Melissa è la coach predefinita. Se lo studente preferisce un coach maschile, suggerisci Roberto.
 Focus su: metodo di studio, organizzazione, autonomia.
 NON sei un'esperta di materia - per quello ci sono i Maestri.`,
   }),
   greeting:
     'Ciao! Sono Melissa. Come posso aiutarti a imparare qualcosa di nuovo oggi?',
-  avatar: '/support/melissa.png',
+  avatar: '/avatars/melissa.jpg',
   color: '#EC4899', // Pink - warm, approachable
 };
 
 // ============================================================================
-// DAVIDE - Alternative Learning Coach (Male)
+// ROBERTO - Alternative Learning Coach (Male)
 // ============================================================================
 
 /**
- * Davide's core system prompt (before safety injection).
+ * Roberto's core system prompt (before safety injection).
  *
  * Same principles as Melissa, but with calmer, more reassuring tone.
  * From ManifestoEdu Appendix B:
  * - Calm, reassuring
  * - Guides peacefully
  */
-const DAVIDE_CORE_PROMPT = `Sei Davide, docente di sostegno virtuale per ConvergioEdu.
+const ROBERTO_CORE_PROMPT = `Sei Roberto, docente di sostegno virtuale per ConvergioEdu.
 
 ## IL TUO OBIETTIVO PRIMARIO
 
@@ -216,7 +216,7 @@ Sei un COACH, non un servitore. Il tuo lavoro è rendere lo studente indipendent
 La tua calma aiuta lo studente a non sentirsi sotto pressione.`;
 
 /**
- * Davide - Alternative Learning Coach (male option)
+ * Roberto - Alternative Learning Coach (male option)
  *
  * From ManifestoEdu Appendix B:
  * - Young (25-30 years)
@@ -224,15 +224,15 @@ La tua calma aiuta lo studente a non sentirsi sotto pressione.`;
  * - Guides peacefully
  * - Goal: autonomy
  */
-export const DAVIDE: SupportTeacher = {
-  id: 'davide',
-  name: 'Davide',
+export const ROBERTO: SupportTeacher = {
+  id: 'roberto',
+  name: 'Roberto',
   gender: 'male',
   age: 28,
   personality: 'Giovane, calmo, rassicurante, paziente, affidabile',
   role: 'learning_coach',
   voice: 'echo', // Calm, reassuring male voice
-  voiceInstructions: `You are Davide, a young virtual support teacher (28 years old).
+  voiceInstructions: `You are Roberto, a young virtual support teacher (28 years old).
 
 ## Speaking Style
 - Calm and reassuring, like a supportive older brother
@@ -256,16 +256,16 @@ export const DAVIDE: SupportTeacher = {
 - "Prendiamoci il tempo che serve."
 - "Sei sulla strada giusta."
 - "Nessun problema, ci lavoriamo insieme."`,
-  systemPrompt: injectSafetyGuardrails(DAVIDE_CORE_PROMPT, {
+  systemPrompt: injectSafetyGuardrails(ROBERTO_CORE_PROMPT, {
     role: 'coach',
-    additionalNotes: `Davide è il coach alternativo (opzione maschile). Alcuni studenti potrebbero preferirlo a Melissa.
+    additionalNotes: `Roberto è il coach alternativo (opzione maschile). Alcuni studenti potrebbero preferirlo a Melissa.
 La sua calma è particolarmente utile per studenti ansiosi o sotto pressione.
 Focus su: metodo di studio, organizzazione, autonomia.
 NON sei un esperto di materia - per quello ci sono i Maestri.`,
   }),
   greeting:
-    'Ciao! Sono Davide. Dimmi pure cosa stai studiando, ci lavoriamo insieme.',
-  avatar: '/support/davide.png',
+    'Ciao! Sono Roberto. Dimmi pure cosa stai studiando, ci lavoriamo insieme.',
+  avatar: '/avatars/roberto.png',
   color: '#3B82F6', // Blue - calm, trustworthy
 };
 
@@ -274,18 +274,18 @@ NON sei un esperto di materia - per quello ci sono i Maestri.`,
 // ============================================================================
 
 /**
- * All support teachers indexed by ID.
+ * All support teachers (coaches) indexed by ID.
  */
-const SUPPORT_TEACHERS: Record<'melissa' | 'davide', SupportTeacher> = {
+const SUPPORT_TEACHERS: Record<'melissa' | 'roberto', SupportTeacher> = {
   melissa: MELISSA,
-  davide: DAVIDE,
+  roberto: ROBERTO,
 };
 
 /**
  * Get a support teacher by ID.
  */
 export function getSupportTeacherById(
-  id: 'melissa' | 'davide'
+  id: 'melissa' | 'roberto'
 ): SupportTeacher | undefined {
   return SUPPORT_TEACHERS[id];
 }
@@ -294,7 +294,7 @@ export function getSupportTeacherById(
  * Get all support teachers.
  */
 export function getAllSupportTeachers(): SupportTeacher[] {
-  return [MELISSA, DAVIDE];
+  return [MELISSA, ROBERTO];
 }
 
 /**
@@ -310,5 +310,5 @@ export function getDefaultSupportTeacher(): SupportTeacher {
 export function getSupportTeacherByGender(
   gender: 'male' | 'female'
 ): SupportTeacher {
-  return gender === 'male' ? DAVIDE : MELISSA;
+  return gender === 'male' ? ROBERTO : MELISSA;
 }

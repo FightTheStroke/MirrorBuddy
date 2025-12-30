@@ -59,8 +59,8 @@ interface ExtendedStudentProfile {
   adhdMode: boolean;
   // MirrorBuddy character preferences
   learningDifferences: LearningDifference[];
-  preferredCoach?: 'melissa' | 'davide';
-  preferredBuddy?: 'mario' | 'maria';
+  preferredCoach?: 'melissa' | 'roberto';
+  preferredBuddy?: 'mario' | 'faty';
 }
 
 // Provider preference for manual selection

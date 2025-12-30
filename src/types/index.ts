@@ -463,21 +463,21 @@ export type CharacterGender = 'male' | 'female';
 
 /**
  * Extended student profile with learning differences.
- * Used by Mario/Maria buddies to personalize their approach.
+ * Used by Mario/Faty buddies to personalize their approach.
  */
 export interface ExtendedStudentProfile extends StudentProfile {
   learningDifferences: LearningDifference[];
-  preferredCoach?: 'melissa' | 'davide';
-  preferredBuddy?: 'mario' | 'maria';
+  preferredCoach?: 'melissa' | 'roberto';
+  preferredBuddy?: 'mario' | 'faty';
 }
 
 /**
- * Support Teacher (Melissa/Davide) - Learning Coach role.
+ * Support Teacher (Melissa/Roberto) - Learning Coach role.
  * Focus: develop autonomy and study method.
  * Relationship: vertical (coach), but talks "alongside" not "from above".
  */
 export interface SupportTeacher {
-  id: 'melissa' | 'davide';
+  id: 'melissa' | 'roberto';
   name: string;
   gender: CharacterGender;
   age: number;
@@ -492,7 +492,7 @@ export interface SupportTeacher {
 }
 
 /**
- * MirrorBuddy (Mario/Maria) - Peer Support role.
+ * MirrorBuddy (Mario/Faty) - Peer Support role.
  * Focus: make student feel less alone.
  * Relationship: horizontal (friend), speaks as peer.
  *
@@ -501,7 +501,7 @@ export interface SupportTeacher {
  * - Learning differences mirror the student's
  */
 export interface BuddyProfile {
-  id: 'mario' | 'maria';
+  id: 'mario' | 'faty';
   name: string;
   gender: CharacterGender;
   ageOffset: number; // Always 1 (one year older)

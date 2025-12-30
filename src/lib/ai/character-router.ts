@@ -29,6 +29,7 @@ import {
   getDefaultBuddy,
 } from '@/data/buddy-profiles';
 import { detectIntent, type DetectedIntent } from './intent-detection';
+import { injectSafetyGuardrails } from '@/lib/safety';
 
 // ============================================================================
 // TYPES
@@ -280,10 +281,10 @@ function getCurrentCharacterResult(
       character = getMaestroById(current.id);
       break;
     case 'coach':
-      character = getSupportTeacherById(current.id as 'melissa' | 'davide');
+      character = getSupportTeacherById(current.id as 'melissa' | 'roberto');
       break;
     case 'buddy':
-      character = getBuddyById(current.id as 'mario' | 'maria');
+      character = getBuddyById(current.id as 'mario' | 'faty');
       break;
   }
 
@@ -378,6 +379,8 @@ export function getCharacterGreeting(
 
 /**
  * Gets the system prompt for the routed character.
+ * SECURITY: All characters now have safety guardrails injected.
+ * Fix for Issue #30 - Maestri were previously deployed without safety.
  */
 export function getCharacterSystemPrompt(
   result: RoutingResult,
@@ -387,10 +390,17 @@ export function getCharacterSystemPrompt(
 
   switch (characterType) {
     case 'maestro':
-      return (character as MaestroFull).systemPrompt;
+      // CRITICAL FIX: Inject safety guardrails into Maestri prompts
+      // Previously, maestri were deployed WITHOUT safety - this fixes Issue #30
+      return injectSafetyGuardrails((character as MaestroFull).systemPrompt, {
+        role: 'maestro',
+        additionalNotes: `Sei ${(character as MaestroFull).name}, parla nel tuo stile storico.`,
+      });
     case 'coach':
+      // Coach already has safety injected in support-teachers.ts
       return (character as SupportTeacher).systemPrompt;
     case 'buddy':
+      // Buddy already has safety injected in buddy-profiles.ts
       return (character as BuddyProfile).getSystemPrompt(studentProfile);
     default:
       return '';

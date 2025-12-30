@@ -2,12 +2,14 @@
 // API ROUTE: Chat completions
 // Supports: Azure OpenAI, Ollama (local)
 // NEVER: Direct OpenAI API, Anthropic
+// SECURITY: Input/output filtering for child safety (Issue #30)
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
 import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { filterInput, sanitizeOutput } from '@/lib/safety';
 
 interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
@@ -41,18 +43,49 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // SECURITY: Filter the last user message for safety (Issue #30)
+    const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+    if (lastUserMessage) {
+      const filterResult = filterInput(lastUserMessage.content);
+      if (!filterResult.safe && filterResult.action === 'block') {
+        logger.warn('Content blocked by safety filter', {
+          clientId,
+          category: filterResult.category,
+          severity: filterResult.severity,
+        });
+        return NextResponse.json({
+          content: filterResult.suggestedResponse,
+          provider: 'safety_filter',
+          model: 'content-filter',
+          blocked: true,
+          category: filterResult.category,
+        });
+      }
+    }
+
     // Get active provider info for response
     const providerConfig = getActiveProvider();
 
     try {
       const result = await chatCompletion(messages, systemPrompt);
 
+      // SECURITY: Sanitize AI output before returning (Issue #30)
+      const sanitized = sanitizeOutput(result.content);
+      if (sanitized.modified) {
+        logger.warn('Output sanitized', {
+          clientId,
+          issuesFound: sanitized.issuesFound,
+          categories: sanitized.categories,
+        });
+      }
+
       return NextResponse.json({
-        content: result.content,
+        content: sanitized.text,
         provider: result.provider,
         model: result.model,
         usage: result.usage,
         maestroId,
+        sanitized: sanitized.modified,
       });
     } catch (providerError) {
       // Provider-specific error handling

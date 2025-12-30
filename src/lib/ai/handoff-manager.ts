@@ -89,12 +89,12 @@ const HANDOFF_SIGNAL_PATTERNS = {
   // Coach or Maestro suggesting Buddy for emotional support
   buddy_suggestion: [
     /(?:capisco che|sembra che).*?(?:difficile|stressante|preoccupato|ansioso)/i,
-    /(?:mario|maria).*?(?:può aiutarti|ti capisce|può ascoltarti)/i,
+    /(?:mario|faty).*?(?:può aiutarti|ti capisce|può ascoltarti)/i,
     /(?:vuoi parlare con|potresti sentirti meglio parlando con).*?(?:un amico|qualcuno della tua età)/i,
   ],
   // Buddy suggesting Coach for method help
   coach_suggestion: [
-    /(?:melissa|davide).*?(?:può aiutarti|sa come|organizzare)/i,
+    /(?:melissa|roberto).*?(?:può aiutarti|sa come|organizzare)/i,
     /(?:per organizzarti|per il metodo|per pianificare).*?(?:chiedi a|parla con)/i,
   ],
   // Anyone detecting emotional crisis

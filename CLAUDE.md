@@ -143,6 +143,39 @@ Characters can suggest handoffs to each other:
 
 Handoffs are tracked in `handoff-manager.ts` to maintain conversation context.
 
+### Safety Guardrails
+
+All AI characters (Maestri, Coaches, Buddies) have safety guardrails injected into their system prompts.
+
+| File | Purpose |
+|------|---------|
+| `src/lib/safety/index.ts` | Main safety module exports |
+| `src/lib/safety/guardrails.ts` | `injectSafetyGuardrails()` function |
+| `src/lib/safety/content-filter.ts` | `filterInput()` and `sanitizeOutput()` |
+| `src/lib/safety/age-gating.ts` | Age-appropriate content validation |
+| `src/lib/safety/monitoring.ts` | Safety event logging |
+
+**Integration Points:**
+- `character-router.ts:390` - Injects guardrails into Maestro prompts
+- `/api/chat/route.ts` - Filters input before AI, sanitizes output after
+
+### Parent Dashboard (GDPR Compliant)
+
+Dashboard at `/parent-dashboard` shows aggregated insights from student's conversations with Maestri.
+
+**Consent Model:**
+- Requires explicit consent from BOTH parent and student
+- Data can be exported (JSON/PDF) for portability
+- Right to erasure: deletion requests are tracked and honored
+- All access is logged in `ProfileAccessLog` for audit
+
+**Data Flow:**
+```
+Conversations → Learning table → profile-generator.ts → StudentInsightProfile
+                                                               ↓
+                                                    Parent Dashboard UI
+```
+
 ### Key Type Definitions
 `src/types/index.ts` contains all shared types. Import as:
 ```typescript
@@ -160,12 +193,17 @@ Components organized by feature domain:
 
 ### API Routes (Next.js App Router)
 All under `/src/app/api/`:
-- `/chat` - Chat completions (Azure/Ollama)
+- `/chat` - Chat completions (Azure/Ollama) with safety filtering
 - `/conversations/[id]` - Session management
 - `/realtime/token` - Azure voice token (CORS-safe)
-- `/progress` - XP, levels, gamification
+- `/progress` - XP, levels, gamification (triggers notifications)
 - `/flashcards/progress` - FSRS state updates
 - `/user/data` - GDPR export/delete
+- `/notifications` - Notification CRUD (GET, POST, PATCH, DELETE)
+- `/profile` - Student insight profiles (GDPR compliant)
+- `/profile/generate` - Trigger profile generation from learnings
+- `/profile/consent` - Manage GDPR consent for profiles
+- `/profile/export` - Export profile (JSON or PDF)
 
 ## Database Schema
 
@@ -175,6 +213,10 @@ Prisma schema at `prisma/schema.prisma`. Key models:
 - **FlashcardProgress** - FSRS-5 algorithm state per card
 - **Conversation** → has Messages - Chat history with summaries
 - **Learning** - Cross-session insights extracted from conversations
+- **StudentInsightProfile** - GDPR-compliant parent dashboard data with consent tracking
+- **ProfileAccessLog** - Audit log for GDPR compliance
+- **Notification** - Server-side notification persistence with scheduling
+- **TelemetryEvent** - Usage analytics for Grafana integration
 
 After schema changes:
 ```bash
@@ -207,14 +249,44 @@ Accessibility store at `src/lib/accessibility/accessibility-store.ts`.
 
 ## Notification System
 
-**STATUS: NOT_IMPLEMENTED**
+**STATUS: IMPLEMENTED**
 
-The notification feature is designed but not implemented. See `src/lib/notifications/notification-service.ts` for the stub and planned types. UI placeholders exist but no actual notification delivery occurs.
+Server-side notification system with database persistence and automatic triggers.
 
-Planned features (GitHub Issue #14):
-- In-app toast notifications
-- Browser push notifications
-- Study reminders, streak alerts, achievements
+### Architecture
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Database | `prisma/schema.prisma` → Notification | Persistent storage with scheduling |
+| Server Triggers | `src/lib/notifications/server-triggers.ts` | Create notifications on events |
+| API | `src/app/api/notifications/route.ts` | CRUD operations |
+| Client Store | `src/lib/stores/notification-store.ts` | Zustand state + API sync |
+| UI | `src/components/notifications/` | Toast display |
+
+### Automatic Triggers
+
+Notifications are automatically created when:
+- **Level Up**: User reaches new XP level → `serverNotifications.levelUp()`
+- **Streak Milestone**: 3, 7, 14, 30, 50, 100, 365 days → `serverNotifications.streakMilestone()`
+- **Achievement Unlocked**: New achievement earned → `serverNotifications.achievement()`
+- **Session Complete**: Study session ends → `serverNotifications.sessionComplete()`
+- **Streak At Risk**: No study today with active streak → `serverNotifications.streakAtRisk()`
+
+### Adding New Triggers
+
+1. Add method to `server-triggers.ts`:
+```typescript
+serverNotifications.myNewTrigger = async (userId: string, data: MyData) => {
+  await createNotification({
+    userId,
+    type: 'my_type',
+    title: 'Notification Title',
+    message: 'Notification message...',
+  });
+};
+```
+
+2. Call from relevant API route or server action
 
 ## Environment Configuration
 
