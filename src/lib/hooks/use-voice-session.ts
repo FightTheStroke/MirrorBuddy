@@ -450,7 +450,10 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 `;
 
     const voicePersonality = maestro.voiceInstructions
-      ? `\n## Voice Personality\n${maestro.voiceInstructions}\n`
+      ? `\n## Voice Personality\n${maestro.voiceInstructions
+          .replace(/<!--[\s\S]*?-->/g, '') // Remove complete HTML comments
+          .replace(/<!--/g, '') // Remove any remaining opening comment markers
+          .replace(/-->/g, '')}\n` // Remove any remaining closing comment markers
       : '';
 
     // For voice sessions, use a MUCH shorter instruction set
