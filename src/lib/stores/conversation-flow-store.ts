@@ -3,11 +3,11 @@
  *
  * Manages the state of the conversation-first interface:
  * - Current active character (Coach, Maestro, Buddy)
+ * - SEPARATE conversations per character (#33)
  * - Character routing and handoffs
- * - Conversation continuity across character switches
  *
  * Part of I-01: Conversation-First Main Flow
- * Related: #24 MirrorBuddy Issue, ManifestoEdu.md
+ * Related: #24 MirrorBuddy Issue, #33 Separate Conversations, ManifestoEdu.md
  */
 
 import { create } from 'zustand';
@@ -44,7 +44,7 @@ export interface ActiveCharacter {
   color: string;
   voice: string;
   voiceInstructions: string;
-  subtitle?: string; // Optional subtitle for character (e.g., "Peer Support", "Learning Coach")
+  subtitle?: string;
 }
 
 /**
@@ -63,6 +63,18 @@ export interface FlowMessage {
     id: string;
     reason: string;
   };
+}
+
+/**
+ * Stored conversation for a character.
+ */
+export interface CharacterConversation {
+  characterId: string;
+  characterType: CharacterType;
+  characterName: string;
+  messages: FlowMessage[];
+  lastMessageAt: Date | null;
+  conversationId?: string; // DB conversation ID if synced
 }
 
 /**
@@ -88,8 +100,11 @@ interface ConversationFlowState {
   mode: FlowMode;
   isActive: boolean;
   activeCharacter: ActiveCharacter | null;
-  messages: FlowMessage[];
+  messages: FlowMessage[]; // Current character's messages (displayed)
   pendingHandoff: HandoffSuggestion | null;
+
+  // SEPARATE CONVERSATIONS PER CHARACTER (#33)
+  conversationsByCharacter: Record<string, CharacterConversation>;
 
   // Session tracking
   sessionId: string | null;
@@ -125,6 +140,10 @@ interface ConversationFlowState {
   acceptHandoff: (profile: ExtendedStudentProfile) => void;
   dismissHandoff: () => void;
 
+  // Conversation history
+  getConversationForCharacter: (characterId: string) => CharacterConversation | null;
+  getAllConversations: () => CharacterConversation[];
+
   // Reset
   reset: () => void;
 }
@@ -137,7 +156,6 @@ function createActiveCharacter(
   type: CharacterType,
   profile: ExtendedStudentProfile
 ): ActiveCharacter {
-  // Determine greeting and system prompt based on character type
   let greeting: string;
   let systemPrompt: string;
   let voiceInstructions: string;
@@ -156,7 +174,7 @@ function createActiveCharacter(
     const maestro = character as MaestroFull;
     greeting = maestro.greeting;
     systemPrompt = maestro.systemPrompt;
-    voiceInstructions = ''; // MaestroFull uses systemPrompt for voice personality
+    voiceInstructions = '';
   }
 
   return {
@@ -167,9 +185,46 @@ function createActiveCharacter(
     greeting,
     systemPrompt,
     color: character.color,
-    voice: 'voice' in character ? character.voice : 'alloy', // MaestroFull doesn't have voice
+    voice: 'voice' in character ? character.voice : 'alloy',
     voiceInstructions,
   };
+}
+
+/**
+ * Save current messages to character's conversation bucket.
+ */
+function saveCurrentConversation(
+  state: ConversationFlowState
+): Record<string, CharacterConversation> {
+  if (!state.activeCharacter || state.messages.length === 0) {
+    return state.conversationsByCharacter;
+  }
+
+  const characterId = state.activeCharacter.id;
+  const existingConvo = state.conversationsByCharacter[characterId];
+
+  return {
+    ...state.conversationsByCharacter,
+    [characterId]: {
+      characterId,
+      characterType: state.activeCharacter.type,
+      characterName: state.activeCharacter.name,
+      messages: state.messages,
+      lastMessageAt: new Date(),
+      conversationId: existingConvo?.conversationId,
+    },
+  };
+}
+
+/**
+ * Load messages for a character from their conversation bucket.
+ */
+function loadConversationMessages(
+  conversationsByCharacter: Record<string, CharacterConversation>,
+  characterId: string
+): FlowMessage[] {
+  const convo = conversationsByCharacter[characterId];
+  return convo?.messages || [];
 }
 
 export const useConversationFlowStore = create<ConversationFlowState>()(
@@ -180,29 +235,42 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
       activeCharacter: null,
       messages: [],
       pendingHandoff: null,
+      conversationsByCharacter: {},
       sessionId: null,
       sessionStartedAt: null,
       characterHistory: [],
 
       startConversation: (profile) => {
-        // Start with Coach (Melissa/Roberto based on preference)
         const coach = getDefaultSupportTeacher();
         const activeCharacter = createActiveCharacter(coach, 'coach', profile);
+
+        // Check if we have existing conversation with this coach
+        const state = get();
+        const existingMessages = loadConversationMessages(
+          state.conversationsByCharacter,
+          coach.id
+        );
+
+        // If no existing messages, start with greeting
+        const messages: FlowMessage[] =
+          existingMessages.length > 0
+            ? existingMessages
+            : [
+                {
+                  id: crypto.randomUUID(),
+                  role: 'assistant',
+                  content: activeCharacter.greeting,
+                  timestamp: new Date(),
+                  characterId: activeCharacter.id,
+                  characterType: 'coach',
+                },
+              ];
 
         set({
           isActive: true,
           mode: 'text',
           activeCharacter,
-          messages: [
-            {
-              id: crypto.randomUUID(),
-              role: 'assistant',
-              content: activeCharacter.greeting,
-              timestamp: new Date(),
-              characterId: activeCharacter.id,
-              characterType: 'coach',
-            },
-          ],
+          messages,
           sessionId: crypto.randomUUID(),
           sessionStartedAt: new Date(),
           characterHistory: [{ type: 'coach', id: coach.id, timestamp: new Date() }],
@@ -211,6 +279,10 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
       },
 
       endConversation: () => {
+        // Save current conversation before ending
+        const state = get();
+        const updatedConversations = saveCurrentConversation(state);
+
         set({
           isActive: false,
           mode: 'idle',
@@ -220,6 +292,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           sessionId: null,
           sessionStartedAt: null,
           characterHistory: [],
+          conversationsByCharacter: updatedConversations,
         });
       },
 
@@ -234,10 +307,45 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           characterId: message.role === 'assistant' ? state.activeCharacter?.id : undefined,
           characterType: message.role === 'assistant' ? state.activeCharacter?.type : undefined,
         };
-        set({ messages: [...state.messages, newMessage] });
+
+        const newMessages = [...state.messages, newMessage];
+
+        // Also update the conversation bucket
+        const characterId = state.activeCharacter?.id;
+        let updatedConversations = state.conversationsByCharacter;
+
+        if (characterId && state.activeCharacter) {
+          updatedConversations = {
+            ...state.conversationsByCharacter,
+            [characterId]: {
+              characterId,
+              characterType: state.activeCharacter.type,
+              characterName: state.activeCharacter.name,
+              messages: newMessages,
+              lastMessageAt: new Date(),
+              conversationId: state.conversationsByCharacter[characterId]?.conversationId,
+            },
+          };
+        }
+
+        set({
+          messages: newMessages,
+          conversationsByCharacter: updatedConversations,
+        });
       },
 
-      clearMessages: () => set({ messages: [] }),
+      clearMessages: () => {
+        const state = get();
+        const characterId = state.activeCharacter?.id;
+
+        // Also clear from conversation bucket
+        if (characterId) {
+          const { [characterId]: _, ...rest } = state.conversationsByCharacter;
+          set({ messages: [], conversationsByCharacter: rest });
+        } else {
+          set({ messages: [] });
+        }
+      },
 
       routeMessage: (message, profile) => {
         const state = get();
@@ -253,72 +361,68 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
 
       switchToCharacter: (character, type, profile, reason) => {
         const state = get();
+
+        // 1. Save current conversation to its bucket
+        const savedConversations = saveCurrentConversation(state);
+
+        // 2. Create new active character
         const activeCharacter = createActiveCharacter(character, type, profile);
 
-        // Add to history
+        // 3. Load existing messages for new character (or start fresh)
+        let messages = loadConversationMessages(savedConversations, character.id);
+
+        if (messages.length === 0) {
+          // No existing conversation - add greeting
+          messages = [
+            {
+              id: crypto.randomUUID(),
+              role: 'assistant',
+              content: activeCharacter.greeting,
+              timestamp: new Date(),
+              characterId: activeCharacter.id,
+              characterType: type,
+            },
+          ];
+        }
+
+        // 4. Update history
         const newHistory = [
           ...state.characterHistory,
           { type, id: character.id, timestamp: new Date() },
         ];
 
-        // Add system message about the switch
-        const switchMessage: FlowMessage = {
-          id: crypto.randomUUID(),
-          role: 'system',
-          content: reason || `Ora parli con ${activeCharacter.name}`,
-          timestamp: new Date(),
-          switchedTo: { type, id: character.id, reason: reason || 'Character switch' },
-        };
-
-        // Add greeting from new character
-        const greetingMessage: FlowMessage = {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: activeCharacter.greeting,
-          timestamp: new Date(),
-          characterId: activeCharacter.id,
-          characterType: type,
-        };
-
         set({
           activeCharacter,
-          messages: [...state.messages, switchMessage, greetingMessage],
+          messages,
           characterHistory: newHistory,
           pendingHandoff: null,
+          conversationsByCharacter: savedConversations,
         });
       },
 
       switchToCoach: (profile) => {
         const coach = getDefaultSupportTeacher();
-        get().switchToCharacter(coach, 'coach', profile, 'Torniamo a organizzarci insieme');
+        get().switchToCharacter(coach, 'coach', profile);
       },
 
       switchToMaestro: (maestro, profile) => {
-        get().switchToCharacter(
-          maestro,
-          'maestro',
-          profile,
-          `${maestro.name} può aiutarti con ${maestro.subject}`
-        );
+        get().switchToCharacter(maestro, 'maestro', profile);
       },
 
       switchToBuddy: (profile) => {
         const buddy = getBuddyForStudent(profile);
-        get().switchToCharacter(
-          buddy,
-          'buddy',
-          profile,
-          `${buddy.name} è qui per ascoltarti`
-        );
+        get().switchToCharacter(buddy, 'buddy', profile);
       },
 
       goBack: (profile) => {
         const state = get();
         if (state.characterHistory.length <= 1) {
-          return false; // Can't go back, only one character
+          return false;
         }
 
-        // Remove current character from history
+        // Save current before going back
+        const savedConversations = saveCurrentConversation(state);
+
         const newHistory = state.characterHistory.slice(0, -1);
         const previous = newHistory[newHistory.length - 1];
 
@@ -342,10 +446,24 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
 
         const activeCharacter = createActiveCharacter(character, previous.type, profile);
 
+        // Load that character's messages
+        const messages = loadConversationMessages(savedConversations, previous.id);
+
         set({
           activeCharacter,
+          messages: messages.length > 0 ? messages : [
+            {
+              id: crypto.randomUUID(),
+              role: 'assistant',
+              content: activeCharacter.greeting,
+              timestamp: new Date(),
+              characterId: activeCharacter.id,
+              characterType: previous.type,
+            },
+          ],
           characterHistory: newHistory,
           pendingHandoff: null,
+          conversationsByCharacter: savedConversations,
         });
 
         return true;
@@ -359,17 +477,26 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         const state = get();
         if (!state.pendingHandoff) return;
 
-        const { toCharacter, reason } = state.pendingHandoff;
-        get().switchToCharacter(
-          toCharacter.character,
-          toCharacter.type,
-          profile,
-          reason
-        );
+        const { toCharacter } = state.pendingHandoff;
+        get().switchToCharacter(toCharacter.character, toCharacter.type, profile);
       },
 
       dismissHandoff: () => {
         set({ pendingHandoff: null });
+      },
+
+      getConversationForCharacter: (characterId) => {
+        const state = get();
+        return state.conversationsByCharacter[characterId] || null;
+      },
+
+      getAllConversations: () => {
+        const state = get();
+        return Object.values(state.conversationsByCharacter).sort((a, b) => {
+          const aTime = a.lastMessageAt?.getTime() || 0;
+          const bTime = b.lastMessageAt?.getTime() || 0;
+          return bTime - aTime; // Most recent first
+        });
       },
 
       reset: () => {
@@ -379,6 +506,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           activeCharacter: null,
           messages: [],
           pendingHandoff: null,
+          conversationsByCharacter: {},
           sessionId: null,
           sessionStartedAt: null,
           characterHistory: [],
@@ -388,7 +516,8 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
     {
       name: 'convergio-conversation-flow',
       partialize: (state) => ({
-        // Only persist essential state, not messages
+        // Persist conversations per character
+        conversationsByCharacter: state.conversationsByCharacter,
         sessionId: state.sessionId,
         sessionStartedAt: state.sessionStartedAt,
       }),
