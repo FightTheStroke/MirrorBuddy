@@ -407,6 +407,36 @@ model MethodProgress {
 }
 
 // ============================================================================
+// MATERIALS (Persisted tool outputs - T-20)
+// ============================================================================
+
+model Material {
+  id          String   @id @default(cuid())
+  userId      String
+  toolId      String   @unique // Client-generated tool ID
+  toolType    String   // mindmap, quiz, flashcard, demo, etc.
+  title       String
+  content     String   // JSON string
+
+  // Context
+  maestroId   String?
+  sessionId   String?
+  subject     String?
+  preview     String?  // Preview text for lists
+
+  // Status
+  status      String   @default("active") // active, archived, deleted
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([toolType])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
 // CREATED TOOLS (Maestro-generated interactive tools - Issue #39, #37)
 // ============================================================================
 
