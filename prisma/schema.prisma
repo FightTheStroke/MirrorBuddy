@@ -470,29 +470,3 @@ model CreatedTool {
   @@index([isBookmarked])
 }
 
-// ============================================================================
-// MATERIALS (Archive view - persisted tool outputs for browsing)
-// Used by ArchiveView component via /api/materials endpoint
-// ============================================================================
-
-model Material {
-  id        String   @id @default(cuid())
-  userId    String
-  toolId    String   @unique // ID from tool creation
-  toolType  String   // mindmap, quiz, flashcard, demo, webcam, pdf, etc.
-  title     String
-  content   String   @default("{}") // JSON data
-  maestroId String?
-  sessionId String?
-  subject   String?
-  preview   String?  // Preview text/thumbnail URL
-  status    String   @default("active") // active, archived, deleted
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([toolType])
-  @@index([status])
-  @@index([createdAt])
-}
