@@ -42,11 +42,17 @@ type View = 'coach' | 'buddy' | 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' |
 const COACH_INFO = {
   melissa: { name: 'Melissa', avatar: '/avatars/melissa.jpg' },
   roberto: { name: 'Roberto', avatar: '/avatars/roberto.png' },
+  chiara: { name: 'Chiara', avatar: '/avatars/chiara.png' },
+  andrea: { name: 'Andrea', avatar: '/avatars/andrea.png' },
+  favij: { name: 'Favij', avatar: '/avatars/favij.jpg' },
 } as const;
 
 const BUDDY_INFO = {
   mario: { name: 'Mario', avatar: '/avatars/mario.jpg' },
-  faty: { name: 'Faty', avatar: '/avatars/faty.png' },
+  noemi: { name: 'Noemi', avatar: '/avatars/noemi.png' },
+  enea: { name: 'Enea', avatar: '/avatars/enea.png' },
+  bruno: { name: 'Bruno', avatar: '/avatars/bruno.png' },
+  sofia: { name: 'Sofia', avatar: '/avatars/sofia.png' },
 } as const;
 
 export default function Home() {
@@ -66,7 +72,7 @@ export default function Home() {
   const navItems = [
     { id: 'coach' as const, label: coachInfo.name, icon: Sparkles, isChat: true, avatar: coachInfo.avatar },
     { id: 'buddy' as const, label: buddyInfo.name, icon: Heart, isChat: true, avatar: buddyInfo.avatar },
-    { id: 'maestri' as const, label: 'Maestri', icon: GraduationCap },
+    { id: 'maestri' as const, label: 'Professori', icon: GraduationCap },
     { id: 'quiz' as const, label: 'Quiz', icon: Brain },
     { id: 'flashcards' as const, label: 'Flashcards', icon: BookOpen },
     { id: 'mindmaps' as const, label: 'Mappe Mentali', icon: Network },
