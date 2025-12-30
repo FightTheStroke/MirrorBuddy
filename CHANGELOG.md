@@ -5,15 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased] - MirrorBuddy v2.0
+
+> **Branch**: `MirrorBuddy` | **GitHub Issues**: #19-#31 closed
 
 ### Added
+
+#### Triangle of Support Architecture (ADR-0003)
+- **Melissa & Davide (Learning Coaches)**: New AI characters focused on building student autonomy
+  - Melissa: Young, energetic female coach (default)
+  - Davide: Calm, reassuring male coach (alternative)
+  - Focus on teaching study methods, not doing work for students
+- **Mario & Maria (Peer Buddies)**: MirrorBuddy system for emotional peer support
+  - Mario: Male peer (default), always 1 year older than student
+  - Maria: Female peer (alternative)
+  - "Mirroring" system: buddy has same learning differences as student
+  - Horizontal relationship (peer-to-peer, not teacher-student)
+- **Character Router** (`src/lib/ai/character-router.ts`): Intent-based routing to appropriate character
+- **Intent Detection** (`src/lib/ai/intent-detection.ts`): Classifies student messages (academic, method, emotional, crisis)
+- **Handoff Manager** (`src/lib/ai/handoff-manager.ts`): Manages transitions between characters
+
+#### Safety Guardrails for Child Protection (ADR-0004)
+- **Core Safety Prompts** (`src/lib/safety/safety-prompts.ts`): Injected into ALL character system prompts
+- **Content Filter** (`src/lib/safety/content-filter.ts`): Input filtering for profanity and inappropriate content
+- **Output Sanitizer** (`src/lib/safety/output-sanitizer.ts`): Response sanitization before delivery
+- **Jailbreak Detector** (`src/lib/safety/jailbreak-detector.ts`): Pattern matching for prompt injection attempts
+- **Adversarial Test Suite** (`src/lib/safety/__tests__/`): Automated safety testing
+- Italian-specific crisis keywords detection with helpline referrals (Telefono Azzurro: 19696)
+
+#### Real-time Tool Canvas (ADR-0005)
+- **SSE Streaming** (`src/app/api/tools/stream/route.ts`): Server-Sent Events for real-time updates
+- **Tool Events Manager** (`src/lib/realtime/tool-events.ts`): Client registry and event broadcasting
+- **Tool State Management** (`src/lib/realtime/tool-state.ts`): Track tool creation progress
+- 80/20 layout: 80% tool canvas, 20% Maestro picture-in-picture
+
+#### Student Profile System
+- **Profile Generator** (`src/lib/profile/profile-generator.ts`): Synthesizes insights from all Maestri
+- **Parent Dashboard** (`src/app/parent-dashboard/page.tsx`): View for parents to see student progress
+- Insight collection from Maestri conversations
+- Growth-focused language (strengths and "areas of growth", not deficits)
+
+#### Storage Architecture (ADR-0001)
+- **Provider-agnostic Storage Service**: Abstract interface for file storage
+- **Local Storage Provider**: Development mode using `./uploads/`
+- **Azure Blob Provider**: Production mode (deferred implementation)
+- Support for: homework photos, mind maps, PDFs, voice recordings
+
+#### Voice Improvements
 - **Barge-in**: Users can now interrupt the Maestro while speaking for natural conversation flow
 - **Enhanced voice personalities**: Cicerone and Erodoto have detailed speaking style, pacing, and emotional instructions
+
+#### Accessibility
 - **7 Accessibility Profiles**: Quick-select presets for Dislessia, ADHD, Autismo, Visivo, Uditivo, Motorio, Paralisi Cerebrale
+- **Cerebral Palsy profile**: TTS, large text, keyboard nav, extra spacing
+
+#### Other
 - **Notification Service Stub**: Placeholder for future notification system (NOT_IMPLEMENTED, see Issue #14)
 
 ### Changed
+- **Conversation Flow**: Now routes to appropriate character based on intent
+- **Settings UI**: Reorganized Audio/Video settings for better UX
+- **Theme System**: Fixed theme detection and added value prop to ThemeProvider
 - **Voice mapping**: 6 maestri updated to gender-appropriate voices
   - Mozart: shimmer → sage (masculine)
   - Erodoto: ballad → echo (authoritative historian)
@@ -25,10 +77,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Turn-taking speed**: silence_duration_ms 500 → 400 (faster response)
 
 ### Fixed
-- **Theme switching** (#4): Light theme now correctly overrides OS dark mode preference by explicitly mapping theme classes in next-themes ThemeProvider
-- **Accent colors** (#5): CSS custom properties for accent colors now apply correctly in light mode with `.light[data-accent]` selectors
-- **Language buttons** (#6): Selected language state has clear visual feedback in settings
-- **AI Provider status** (#7): Fixed Ollama button closing tag (was `</div>`, now `</button>`) for proper semantic HTML
+- WCAG 2.1 AA accessibility fixes for conversation-flow component
+- Motion animations respect `prefers-reduced-motion`
+- Aria-labels on buttons and interactive elements
+- Aria-live regions for dynamic content
+- **Theme switching** (#4): Light theme now correctly overrides OS dark mode preference
+- **Accent colors** (#5): CSS custom properties for accent colors now apply correctly in light mode
+- **Language buttons** (#6): Selected language state has clear visual feedback
+- **AI Provider status** (#7): Fixed Ollama button closing tag for proper semantic HTML
+- CodeQL security alerts resolved (HTML sanitization, voiceInstructions injection)
+- Removed unused imports and lint warnings
+
+### Security
+- All 17 Maestri now have safety guardrails injected automatically
+- Crisis keyword detection with Italian helpline numbers
+- Jailbreak/prompt injection detection and blocking
+- Privacy protection: AI will not request personal information
+- GDPR-compliant data handling for minors
+
+### Removed
+- Deprecated `libretto-view.tsx` component
+- Fake history data replaced with real sessionHistory
+
+### Documentation
+- **ADR 0001**: Materials Storage Strategy
+- **ADR 0002**: MarkMap for Mind Maps
+- **ADR 0003**: Triangle of Support Architecture
+- **ADR 0004**: Safety Guardrails for Child Protection
+- **ADR 0005**: Real-time SSE Architecture
+- Updated CLAUDE.md with MirrorBuddy architecture
+- Updated E2E tests for new features
 
 ---
 
