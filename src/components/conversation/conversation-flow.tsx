@@ -14,7 +14,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Send,
   Mic,
@@ -242,24 +242,24 @@ function CharacterSwitcher({
           </>
         )}
       </div>
-      <div className="flex gap-1">
+      <div className="flex gap-1" role="group" aria-label="Cambia personaggio">
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={onSwitchToCoach}
-          title="Torna al Coach"
+          aria-label="Torna al Coach"
           disabled={currentCharacter?.type === 'coach'}
         >
-          <Users className="w-4 h-4" />
+          <Users className="w-4 h-4" aria-hidden="true" />
         </Button>
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={onSwitchToBuddy}
-          title="Parla con un amico"
+          aria-label="Parla con un amico"
           disabled={currentCharacter?.type === 'buddy'}
         >
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="w-4 h-4" aria-hidden="true" />
         </Button>
       </div>
     </div>
@@ -276,6 +276,7 @@ export function ConversationFlow() {
   const [isMuted, setIsMuted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   // Stores
   const { studentProfile } = useSettingsStore();
@@ -534,8 +535,13 @@ export function ConversationFlow() {
         )}
       </AnimatePresence>
 
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4">
+      {/* Messages area - WCAG 4.1.3: aria-live for screen readers */}
+      <div
+        className="flex-1 overflow-y-auto p-4"
+        role="log"
+        aria-live="polite"
+        aria-label="Messaggi della conversazione"
+      >
         {messages.map((message) => (
           <MessageBubble
             key={message.id}
@@ -570,6 +576,7 @@ export function ConversationFlow() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder={`Scrivi a ${activeCharacter.name}...`}
+            aria-label={`Scrivi un messaggio a ${activeCharacter.name}`}
             className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl border-0 focus:ring-2 focus:ring-accent-themed outline-none text-slate-900 dark:text-white placeholder:text-slate-500"
             disabled={isLoading}
           />
@@ -577,7 +584,8 @@ export function ConversationFlow() {
             variant="ghost"
             size="icon"
             onClick={() => setIsMuted(!isMuted)}
-            title={isMuted ? 'Attiva audio' : 'Disattiva audio'}
+            aria-label={isMuted ? 'Attiva audio' : 'Disattiva audio'}
+            aria-pressed={isMuted}
           >
             {isMuted ? (
               <VolumeX className="w-5 h-5" />
@@ -589,7 +597,8 @@ export function ConversationFlow() {
             variant="ghost"
             size="icon"
             onClick={handleVoiceToggle}
-            title={mode === 'voice' ? 'Passa al testo' : 'Passa alla voce'}
+            aria-label={mode === 'voice' ? 'Passa al testo' : 'Passa alla voce'}
+            aria-pressed={mode === 'voice'}
             className={cn(mode === 'voice' && 'bg-red-100 text-red-600')}
           >
             {mode === 'voice' ? (
@@ -602,9 +611,10 @@ export function ConversationFlow() {
             size="icon"
             onClick={handleSend}
             disabled={!inputValue.trim() || isLoading}
+            aria-label="Invia messaggio"
             className="bg-accent-themed hover:bg-accent-themed/90"
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-5 h-5" aria-hidden="true" />
           </Button>
         </div>
       </div>
