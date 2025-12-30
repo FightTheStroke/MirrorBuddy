@@ -13,7 +13,8 @@ import {
   generateTransitionMessage,
   type HandoffContext,
 } from '../handoff-manager';
-import type { ExtendedStudentProfile } from '@/types';
+import type { ExtendedStudentProfile, SupportTeacher, BuddyProfile } from '@/types';
+import type { MaestroFull } from '@/data/maestri-full';
 import type { ActiveCharacter, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
 
 describe('Handoff Manager', () => {
@@ -42,7 +43,7 @@ describe('Handoff Manager', () => {
       id: 'melissa',
       name: 'Melissa',
       greeting: 'Ciao! Sono Melissa.',
-      character: {} as any,
+      character: {} as unknown as SupportTeacher,
       systemPrompt: 'Coach system prompt',
       color: '#4CAF50',
       voice: 'coral',
@@ -54,7 +55,7 @@ describe('Handoff Manager', () => {
       id: 'euclide-matematica',
       name: 'Euclide',
       greeting: 'Salve! Sono Euclide.',
-      character: {} as any,
+      character: {} as unknown as MaestroFull,
       systemPrompt: 'Maestro system prompt',
       color: '#2196F3',
       voice: 'sage',
@@ -66,7 +67,7 @@ describe('Handoff Manager', () => {
       id: 'mario',
       name: 'Mario',
       greeting: 'Ehi! Sono Mario.',
-      character: {} as any,
+      character: {} as unknown as BuddyProfile,
       systemPrompt: 'Buddy system prompt',
       color: '#FF9800',
       voice: 'breeze',
@@ -213,7 +214,7 @@ describe('Handoff Manager', () => {
           id: 'euclide-matematica',
           name: 'Euclide',
           greeting: 'Salve!',
-          character: {} as any,
+          character: {} as unknown as MaestroFull,
           systemPrompt: 'Math maestro prompt',
           color: '#2196F3',
           voice: 'sage',
