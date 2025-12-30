@@ -54,3 +54,4 @@ prisma/dev.db-journal
 
 # Logs
 *.log
+.claude/settings.local.json
