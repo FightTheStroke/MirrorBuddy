@@ -845,6 +845,11 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         await captureContextRef.current.resume();
       }
 
+      // Initialize PLAYBACK AudioContext with preferred output device (setSinkId)
+      // Must be done BEFORE audio chunks arrive so the device is ready
+      await initPlaybackContext();
+      console.log('[VoiceSession] Playback context initialized with preferred output device');
+
       // Request microphone with preferred device if set
       const audioConstraints: MediaTrackConstraints = {
         echoCancellation: true,
@@ -934,7 +939,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       options.onError?.(error as Error);
     }
   // Note: handleServerEvent is used for safety fallback only; primary usage is via ref
-  }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId]);
+  }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId, initPlaybackContext]);
 
   // ============================================================================
   // DISCONNECT
