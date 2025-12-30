@@ -21,7 +21,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCalendarStore, type SchoolEvent } from '@/lib/stores/app-store';
-import { MAESTRI } from '@/data/maestri-full';
+import { maestri as MAESTRI } from '@/data/maestri';
 import { cn } from '@/lib/utils';
 
 type EventType = SchoolEvent['type'];

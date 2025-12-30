@@ -15,7 +15,7 @@ import type {
   SupportTeacher,
   BuddyProfile,
 } from '@/types';
-import type { MaestroFull } from '@/data/maestri-full';
+import type { MaestroFull } from '@/data/maestri';
 import type { ActiveCharacter, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
 // Note: routeToCharacter, suggestCharacterSwitch, getCharacterGreeting available from character-router if needed
 import { detectIntent, type IntentType } from './intent-detection';
@@ -24,7 +24,7 @@ import {
   getDefaultSupportTeacher,
 } from '@/data/support-teachers';
 import { getBuddyById, getDefaultBuddy } from '@/data/buddy-profiles';
-import { getMaestroById, getMaestriBySubject } from '@/data/maestri-full';
+import { getMaestroById, getMaestriBySubject } from '@/data/maestri';
 
 // ============================================================================
 // TYPES

@@ -4,6 +4,8 @@
 // NEVER: Direct OpenAI API, Anthropic
 // ============================================================================
 
+import { logger } from '@/lib/logger';
+
 export type AIProvider = 'azure' | 'ollama';
 
 export interface ProviderConfig {
@@ -228,8 +230,8 @@ async function azureChatCompletion(
   const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
   const url = `${config.endpoint}/openai/deployments/${config.model}/chat/completions?api-version=${apiVersion}`;
 
-  console.log(`[Azure Chat] Calling: ${url.replace(/api-key=[^&]+/gi, 'api-key=***')}`);
-  console.log(`[Azure Chat] Model: ${config.model}, Endpoint: ${config.endpoint}`);
+  logger.debug(`[Azure Chat] Calling: ${url.replace(/api-key=[^&]+/gi, 'api-key=***')}`);
+  logger.debug(`[Azure Chat] Model: ${config.model}, Endpoint: ${config.endpoint}`);
 
   // Build messages array - only include system message if systemPrompt is provided
   const allMessages = systemPrompt
@@ -260,7 +262,7 @@ async function azureChatCompletion(
 
   if (!response.ok) {
     const error = await response.text();
-    console.error(`[Azure Chat] Error ${response.status}: ${error}`);
+    logger.error(`[Azure Chat] Error ${response.status}`, { error });
     throw new Error(`Azure OpenAI error (${response.status}): ${error}`);
   }
 

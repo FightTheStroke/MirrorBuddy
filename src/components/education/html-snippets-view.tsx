@@ -15,7 +15,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useHTMLSnippetsStore, type HTMLSnippet } from '@/lib/stores/app-store';
 import { HTMLPreview } from './html-preview';
-import { MAESTRI } from '@/data/maestri-full';
+import { maestri as MAESTRI } from '@/data/maestri';
 
 export function HTMLSnippetsView() {
   const [searchQuery, setSearchQuery] = useState('');

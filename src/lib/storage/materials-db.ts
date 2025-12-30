@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 
 // ============================================================================
@@ -379,14 +380,14 @@ export async function getActiveMaterials(): Promise<MaterialRecord[]> {
 
     const response = await fetch(`/api/materials?userId=${userId}&status=active`);
     if (!response.ok) {
-      console.error('Failed to fetch materials:', response.status);
+      logger.error('Failed to fetch materials', { status: response.status });
       return [];
     }
 
     const data = await response.json();
     return data.materials || [];
   } catch (error) {
-    console.error('Error fetching active materials:', error);
+    logger.error('Error fetching active materials', { error });
     return [];
   }
 }

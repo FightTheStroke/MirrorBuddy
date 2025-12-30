@@ -18,8 +18,8 @@ import type {
   ExtendedStudentProfile,
   SupportCharacter,
 } from '@/types';
-import type { MaestroFull } from '@/data/maestri-full';
-import { getMaestroById, getMaestriBySubject } from '@/data/maestri-full';
+import type { MaestroFull } from '@/data/maestri';
+import { getMaestroById, getMaestriBySubject } from '@/data/maestri';
 import {
   getSupportTeacherById,
   getDefaultSupportTeacher,

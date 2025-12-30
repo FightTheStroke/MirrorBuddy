@@ -6,6 +6,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logger } from '@/lib/logger';
 import type {
   MethodProgress,
   MethodEvent,
@@ -109,7 +110,7 @@ export const useMethodProgressStore = create<MethodProgressState>()(
             }
           }
         } catch (error) {
-          console.error('Failed to fetch method progress:', error);
+          logger.error('Failed to fetch method progress', { error });
         } finally {
           set({ isLoading: false });
         }
@@ -136,7 +137,7 @@ export const useMethodProgressStore = create<MethodProgressState>()(
           });
           set({ lastSyncedAt: new Date() });
         } catch (error) {
-          console.error('Failed to sync method progress:', error);
+          logger.error('Failed to sync method progress', { error });
         }
       },
 
