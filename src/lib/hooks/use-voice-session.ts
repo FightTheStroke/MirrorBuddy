@@ -58,22 +58,21 @@ const CAPTURE_BUFFER_SIZE = 4096; // ~85ms at 48kHz
 
 /**
  * Sanitize text by removing HTML comments completely.
- * Uses a loop-based approach to handle nested/overlapping patterns
- * that could bypass single-pass regex sanitization.
- * This satisfies CodeQL's js/incomplete-multi-character-sanitization check.
+ * Uses a loop-based approach with combined regex to handle nested/overlapping
+ * patterns that could bypass single-pass sanitization.
+ * Per CodeQL docs: combines patterns in single regex with alternation.
+ * @see https://codeql.github.com/codeql-query-help/javascript/js-incomplete-multi-character-sanitization/
  */
 function sanitizeHtmlComments(text: string): string {
   let result = text;
   let previousResult: string;
 
   // Loop until no more changes occur (handles nested patterns like <!---->)
+  // Uses combined regex with alternation as recommended by CodeQL docs
   do {
     previousResult = result;
-    // First pass: remove complete HTML comments
-    result = result.replace(/<!--[\s\S]*?-->/g, '');
-    // Second pass: remove any orphaned markers
-    result = result.replace(/<!--/g, '');
-    result = result.replace(/-->/g, '');
+    // Remove complete HTML comments first, then orphaned markers in single combined pattern
+    result = result.replace(/<!--[\s\S]*?-->|<!--|-->/g, '');
   } while (result !== previousResult);
 
   return result;
