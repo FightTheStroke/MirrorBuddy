@@ -686,14 +686,17 @@ function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsProps) {
                 key={lang.value}
                 onClick={() => onUpdate({ language: lang.value })}
                 className={cn(
-                  'flex items-center gap-2 p-3 rounded-xl border-2 transition-all',
+                  'flex items-center gap-2 p-3 rounded-xl border-2 transition-all shadow-sm',
                   (appearance.language || 'it') === lang.value
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    ? 'border-accent-themed bg-primary/10 ring-2 ring-accent-themed/30'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md'
                 )}
               >
                 <span className="text-xl">{lang.flag}</span>
                 <span className="text-sm font-medium">{lang.label}</span>
+                {(appearance.language || 'it') === lang.value && (
+                  <Check className="w-4 h-4 text-accent-themed ml-auto" />
+                )}
               </button>
             ))}
           </div>
@@ -1666,6 +1669,39 @@ function AIProviderSettings() {
             <div className="animate-pulse h-20 bg-slate-100 dark:bg-slate-800 rounded-lg" />
           ) : (
             <>
+              {/* Clear Status Banner - Fix for #7 */}
+              <div className={cn(
+                'p-3 rounded-lg flex items-center gap-3',
+                providerStatus.activeProvider === 'azure'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800'
+                  : providerStatus.activeProvider === 'ollama'
+                    ? 'bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800'
+                    : 'bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800'
+              )}>
+                <div className={cn(
+                  'w-3 h-3 rounded-full animate-pulse',
+                  providerStatus.activeProvider === 'azure' ? 'bg-blue-500' :
+                  providerStatus.activeProvider === 'ollama' ? 'bg-green-500' : 'bg-amber-500'
+                )} />
+                <div className="flex-1">
+                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                    {providerStatus.activeProvider === 'azure' ? 'Azure OpenAI' :
+                     providerStatus.activeProvider === 'ollama' ? 'Ollama (Locale)' :
+                     'Nessun provider attivo'}
+                  </span>
+                  <span className="text-sm text-slate-600 dark:text-slate-400 ml-2">
+                    {providerStatus.activeProvider === 'azure'
+                      ? `Chat + Voice (${providerStatus.azure.model})`
+                      : providerStatus.activeProvider === 'ollama'
+                        ? `Solo Chat (${providerStatus.ollama.model})`
+                        : 'Configura un provider'}
+                  </span>
+                </div>
+                {providerStatus.activeProvider && (
+                  <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Azure Card */}
                 <div
@@ -1675,7 +1711,7 @@ function AIProviderSettings() {
                   onKeyDown={(e) => e.key === 'Enter' && setPreferredProvider('azure')}
                   className={cn(
                     'p-4 rounded-xl border-2 transition-all cursor-pointer',
-                    preferredProvider === 'azure' && 'ring-2 ring-blue-500 ring-offset-2',
+                    preferredProvider === 'azure' && 'ring-2 ring-accent-themed ring-offset-2 dark:ring-offset-slate-900',
                     providerStatus.activeProvider === 'azure'
                       ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                       : providerStatus.azure.configured
@@ -1722,7 +1758,7 @@ function AIProviderSettings() {
                   onKeyDown={(e) => e.key === 'Enter' && setPreferredProvider('ollama')}
                   className={cn(
                     'p-4 rounded-xl border-2 transition-all cursor-pointer',
-                    preferredProvider === 'ollama' && 'ring-2 ring-green-500 ring-offset-2',
+                    preferredProvider === 'ollama' && 'ring-2 ring-accent-themed ring-offset-2 dark:ring-offset-slate-900',
                     providerStatus.activeProvider === 'ollama'
                       ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
                       : providerStatus.ollama.configured
