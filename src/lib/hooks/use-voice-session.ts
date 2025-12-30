@@ -61,6 +61,7 @@ const CAPTURE_BUFFER_SIZE = 4096; // ~85ms at 48kHz
  * Uses a loop-based approach with combined regex to handle nested/overlapping
  * patterns that could bypass single-pass sanitization.
  * Per CodeQL docs: combines patterns in single regex with alternation.
+ * Note: This sanitizes TRUSTED internal strings (maestro definitions), not user input.
  * @see https://codeql.github.com/codeql-query-help/javascript/js-incomplete-multi-character-sanitization/
  */
 function sanitizeHtmlComments(text: string): string {
@@ -69,10 +70,11 @@ function sanitizeHtmlComments(text: string): string {
 
   // Loop until no more changes occur (handles nested patterns like <!---->)
   // Uses combined regex with alternation as recommended by CodeQL docs
+  // Handles all standard HTML comment variations including --!> (browser quirk)
   do {
     previousResult = result;
-    // Remove complete HTML comments first, then orphaned markers in single combined pattern
-    result = result.replace(/<!--[\s\S]*?-->|<!--|-->/g, '');
+    // Remove complete HTML comments (including --!> variant), then orphaned markers
+    result = result.replace(/<!--[\s\S]*?(?:--|--!)>|<!--|(?:--|--!)>/g, '');
   } while (result !== previousResult);
 
   return result;
