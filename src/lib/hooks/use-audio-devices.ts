@@ -110,7 +110,7 @@ export function useAudioDevices(): UseAudioDevicesReturn {
       // Re-enumerate to get labels
       await enumerateDevices();
       return true;
-    } catch (err) {
+    } catch (_err) {
       // Try audio only if video fails
       try {
         const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -118,7 +118,7 @@ export function useAudioDevices(): UseAudioDevicesReturn {
         setHasPermission(true);
         await enumerateDevices();
         return true;
-      } catch (audioErr) {
+      } catch (_audioErr) {
         setError('Permesso negato. Abilita microfono/camera nelle impostazioni del browser.');
         return false;
       }
