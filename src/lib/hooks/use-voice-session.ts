@@ -56,6 +56,29 @@ const CAPTURE_BUFFER_SIZE = 4096; // ~85ms at 48kHz
 // HELPER FUNCTIONS
 // ============================================================================
 
+/**
+ * Sanitize text by removing HTML comments completely.
+ * Uses a loop-based approach to handle nested/overlapping patterns
+ * that could bypass single-pass regex sanitization.
+ * This satisfies CodeQL's js/incomplete-multi-character-sanitization check.
+ */
+function sanitizeHtmlComments(text: string): string {
+  let result = text;
+  let previousResult: string;
+
+  // Loop until no more changes occur (handles nested patterns like <!---->)
+  do {
+    previousResult = result;
+    // First pass: remove complete HTML comments
+    result = result.replace(/<!--[\s\S]*?-->/g, '');
+    // Second pass: remove any orphaned markers
+    result = result.replace(/<!--/g, '');
+    result = result.replace(/-->/g, '');
+  } while (result !== previousResult);
+
+  return result;
+}
+
 async function fetchConversationMemory(maestroId: string): Promise<ConversationMemory | null> {
   try {
     const response = await fetch(`/api/conversations?maestroId=${maestroId}&limit=1`);
@@ -450,20 +473,14 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 `;
 
     const voicePersonality = maestro.voiceInstructions
-      ? `\n## Voice Personality\n${maestro.voiceInstructions
-          .replace(/<!--[\s\S]*?-->/g, '') // Remove complete HTML comments
-          .replace(/<!--/g, '') // Remove any remaining opening comment markers
-          .replace(/-->/g, '')}\n` // Remove any remaining closing comment markers
+      ? `\n## Voice Personality\n${sanitizeHtmlComments(maestro.voiceInstructions)}\n`
       : '';
 
     // For voice sessions, use a MUCH shorter instruction set
     // The full systemPrompt is 1000s of chars - Azure Realtime works better with short instructions
     // Extract only the core identity (first ~500 chars) from systemPrompt
     const truncatedSystemPrompt = maestro.systemPrompt
-      ? maestro.systemPrompt
-          .replace(/<!--[\s\S]*?-->/g, '') // Remove complete HTML comments
-          .replace(/<!--/g, '') // Remove any remaining opening comment markers
-          .replace(/-->/g, '') // Remove any remaining closing comment markers
+      ? sanitizeHtmlComments(maestro.systemPrompt)
           .replace(/\*\*Core Implementation\*\*:[\s\S]*?(?=##|$)/g, '') // Remove verbose sections
           .slice(0, 800) // Keep only first 800 chars
           .trim()
