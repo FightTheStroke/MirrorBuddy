@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { logger } from '@/lib/logger';
+import { onLevelUp, onStreakMilestone, onAchievement } from '@/lib/notifications/triggers';
 import type {
   Maestro,
   Theme,
@@ -59,8 +60,11 @@ interface ExtendedStudentProfile {
   adhdMode: boolean;
   // MirrorBuddy character preferences
   learningDifferences: LearningDifference[];
-  preferredCoach?: 'melissa' | 'roberto';
-  preferredBuddy?: 'mario' | 'faty';
+  preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+  preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+  // Custom border colors for coach and buddy avatars
+  coachBorderColor?: string;
+  buddyBorderColor?: string;
 }
 
 // Provider preference for manual selection
@@ -367,6 +371,22 @@ export const useProgressStore = create<ProgressState>()(
           ) {
             newLevel++;
           }
+          // Trigger level up notification if level increased
+          if (newLevel > state.level) {
+            const levelTitles: Record<number, string> = {
+              1: 'Principiante',
+              2: 'Apprendista',
+              3: 'Studente',
+              4: 'Studioso',
+              5: 'Esperto',
+              6: 'Maestro',
+              7: 'Gran Maestro',
+              8: 'Saggio',
+              9: 'Illuminato',
+              10: 'Leggenda',
+            };
+            onLevelUp(newLevel, levelTitles[newLevel] || `Livello ${newLevel}`);
+          }
           // Update current session XP
           const updatedSession = state.currentSession
             ? { ...state.currentSession, xpEarned: state.currentSession.xpEarned + amount }
@@ -387,6 +407,11 @@ export const useProgressStore = create<ProgressState>()(
             } else if (!lastStudy || new Date(lastStudy).toDateString() !== yesterday) {
               newCurrent = 1;
             }
+          }
+
+          // Trigger streak milestone notification if applicable
+          if (newCurrent > state.streak.current) {
+            onStreakMilestone(newCurrent);
           }
 
           return {
@@ -418,6 +443,8 @@ export const useProgressStore = create<ProgressState>()(
             (a) => a.id === achievementId
           );
           if (achievement && !achievement.unlockedAt) {
+            // Trigger achievement notification
+            onAchievement(achievement.name, achievement.description);
             return {
               achievements: state.achievements.map((a) =>
                 a.id === achievementId ? { ...a, unlockedAt: new Date() } : a

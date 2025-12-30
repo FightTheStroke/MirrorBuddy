@@ -684,9 +684,15 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         break;
 
       case 'error': {
-        const errorObj = event.error as { message?: string; code?: string } | undefined;
-        console.error('[VoiceSession] Server error:', errorObj);
-        options.onError?.(new Error(errorObj?.message || 'Server error'));
+        const errorObj = event.error as { message?: string; code?: string; type?: string } | undefined;
+        const errorMessage = errorObj?.message || errorObj?.code || errorObj?.type || 'Unknown server error';
+        const hasDetails = errorObj && Object.keys(errorObj).length > 0;
+        if (hasDetails) {
+          console.error('[VoiceSession] Server error:', { message: errorMessage, details: errorObj });
+        } else {
+          console.warn('[VoiceSession] Server error with no details (empty error object)');
+        }
+        options.onError?.(new Error(errorMessage));
         break;
       }
 
@@ -845,6 +851,11 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         await captureContextRef.current.resume();
       }
 
+      // Initialize PLAYBACK AudioContext with preferred output device (setSinkId)
+      // Must be done BEFORE audio chunks arrive so the device is ready
+      await initPlaybackContext();
+      console.log('[VoiceSession] Playback context initialized with preferred output device');
+
       // Request microphone with preferred device if set
       const audioConstraints: MediaTrackConstraints = {
         echoCancellation: true,
@@ -934,7 +945,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       options.onError?.(error as Error);
     }
   // Note: handleServerEvent is used for safety fallback only; primary usage is via ref
-  }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId]);
+  }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId, initPlaybackContext]);
 
   // ============================================================================
   // DISCONNECT
