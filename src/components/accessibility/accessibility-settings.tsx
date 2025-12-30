@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Puzzle,
   EarOff,
+  Accessibility,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
@@ -70,6 +71,7 @@ export function AccessibilitySettings({ isOpen, onClose }: AccessibilitySettings
     applyMotorImpairmentProfile,
     applyAutismProfile,
     applyAuditoryImpairmentProfile,
+    applyCerebralPalsyProfile,
     shouldAnimate,
   } = useAccessibilityStore();
 
@@ -231,6 +233,7 @@ export function AccessibilitySettings({ isOpen, onClose }: AccessibilitySettings
                     onApplyMotor={applyMotorImpairmentProfile}
                     onApplyAutism={applyAutismProfile}
                     onApplyAuditory={applyAuditoryImpairmentProfile}
+                    onApplyCerebralPalsy={applyCerebralPalsyProfile}
                     onReset={resetSettings}
                   />
                 )}
@@ -766,6 +769,7 @@ interface PresetsSettingsProps {
   onApplyMotor: () => void;
   onApplyAutism: () => void;
   onApplyAuditory: () => void;
+  onApplyCerebralPalsy: () => void;
   onReset: () => void;
 }
 
@@ -776,6 +780,7 @@ function PresetsSettings({
   onApplyMotor,
   onApplyAutism,
   onApplyAuditory,
+  onApplyCerebralPalsy,
   onReset,
 }: PresetsSettingsProps) {
   const { settings } = useAccessibilityStore();
@@ -822,6 +827,13 @@ function PresetsSettings({
       icon: <Hand className="w-6 h-6" />,
       color: 'green',
       onClick: onApplyMotor,
+    },
+    {
+      title: 'Paralisi Cerebrale',
+      description: 'TTS, testo grande, navigazione facilitata',
+      icon: <Accessibility className="w-6 h-6" />,
+      color: 'cyan',
+      onClick: onApplyCerebralPalsy,
     },
   ];
 
