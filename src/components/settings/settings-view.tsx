@@ -356,12 +356,12 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <span className="text-2xl">{currentStyle?.emoji || '⚖️'}</span>
-            Stile dei Maestri
+            Stile dei Professori
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-slate-500">
-            Scegli come vuoi che i maestri ti parlino e ti correggano
+            Scegli come vuoi che i professori ti parlino e ti correggano
           </p>
 
           {/* Current style display */}
@@ -427,11 +427,27 @@ function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
 // Character Settings (Coach & Buddy Selection)
 interface CharacterSettingsProps {
   profile: {
-    preferredCoach?: 'melissa' | 'roberto';
-    preferredBuddy?: 'mario' | 'faty';
+    preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+    preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+    coachBorderColor?: string;
+    buddyBorderColor?: string;
   };
   onUpdate: (updates: Partial<CharacterSettingsProps['profile']>) => void;
 }
+
+// Available border colors for customization
+const BORDER_COLORS = [
+  { name: 'Rosa', value: '#EC4899' },
+  { name: 'Blu', value: '#3B82F6' },
+  { name: 'Verde', value: '#10B981' },
+  { name: 'Viola', value: '#8B5CF6' },
+  { name: 'Arancione', value: '#F97316' },
+  { name: 'Rosso', value: '#EF4444' },
+  { name: 'Ambra', value: '#F59E0B' },
+  { name: 'Indaco', value: '#6366F1' },
+  { name: 'Ciano', value: '#06B6D4' },
+  { name: 'Lime', value: '#84CC16' },
+];
 
 const COACHES = [
   {
@@ -456,6 +472,39 @@ const COACHES = [
     borderColor: 'border-blue-200 dark:border-blue-800',
     activeBorder: 'border-blue-500 ring-2 ring-blue-500/50',
   },
+  {
+    id: 'chiara' as const,
+    name: 'Chiara',
+    avatar: '/avatars/chiara.png',
+    description: 'Organizzata, metodica, fresca di studi, empatica',
+    tagline: 'Appena laureata, ti capisce',
+    color: 'from-violet-500 to-purple-500',
+    bgColor: 'bg-violet-50 dark:bg-violet-900/20',
+    borderColor: 'border-violet-200 dark:border-violet-800',
+    activeBorder: 'border-violet-500 ring-2 ring-violet-500/50',
+  },
+  {
+    id: 'andrea' as const,
+    name: 'Andrea',
+    avatar: '/avatars/andrea.png',
+    description: 'Sportiva, energica, pratica, motivazionale',
+    tagline: 'Energia e pause attive',
+    color: 'from-orange-500 to-amber-500',
+    bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+    borderColor: 'border-orange-200 dark:border-orange-800',
+    activeBorder: 'border-orange-500 ring-2 ring-orange-500/50',
+  },
+  {
+    id: 'favij' as const,
+    name: 'Favij',
+    avatar: '/avatars/favij.jpg',
+    description: 'Gamer, rilassato, simpatico, creativo, tech-savvy',
+    tagline: 'Lo studio come un gioco',
+    color: 'from-red-500 to-rose-500',
+    bgColor: 'bg-red-50 dark:bg-red-900/20',
+    borderColor: 'border-red-200 dark:border-red-800',
+    activeBorder: 'border-red-500 ring-2 ring-red-500/50',
+  },
 ];
 
 const BUDDIES = [
@@ -471,15 +520,48 @@ const BUDDIES = [
     activeBorder: 'border-emerald-500 ring-2 ring-emerald-500/50',
   },
   {
-    id: 'faty' as const,
-    name: 'Faty',
-    avatar: '/avatars/faty.png',
+    id: 'noemi' as const,
+    name: 'Noemi',
+    avatar: '/avatars/noemi.png',
     description: 'Empatica, solare, accogliente, buona ascoltatrice',
     tagline: 'La tua amica che ti ascolta',
     color: 'from-purple-500 to-violet-500',
     bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     borderColor: 'border-purple-200 dark:border-purple-800',
     activeBorder: 'border-purple-500 ring-2 ring-purple-500/50',
+  },
+  {
+    id: 'enea' as const,
+    name: 'Enea',
+    avatar: '/avatars/enea.png',
+    description: 'Allegro, positivo, spiritoso, energico',
+    tagline: 'Ti tira su il morale',
+    color: 'from-amber-500 to-yellow-500',
+    bgColor: 'bg-amber-50 dark:bg-amber-900/20',
+    borderColor: 'border-amber-200 dark:border-amber-800',
+    activeBorder: 'border-amber-500 ring-2 ring-amber-500/50',
+  },
+  {
+    id: 'bruno' as const,
+    name: 'Bruno',
+    avatar: '/avatars/bruno.png',
+    description: 'Riflessivo, calmo, profondo, buon ascoltatore',
+    tagline: 'Ti ascolta davvero',
+    color: 'from-indigo-500 to-blue-500',
+    bgColor: 'bg-indigo-50 dark:bg-indigo-900/20',
+    borderColor: 'border-indigo-200 dark:border-indigo-800',
+    activeBorder: 'border-indigo-500 ring-2 ring-indigo-500/50',
+  },
+  {
+    id: 'sofia' as const,
+    name: 'Sofia',
+    avatar: '/avatars/sofia.png',
+    description: 'Creativa, sognatrice, profonda, artistica',
+    tagline: 'Vede le cose diversamente',
+    color: 'from-pink-500 to-fuchsia-500',
+    bgColor: 'bg-pink-50 dark:bg-pink-900/20',
+    borderColor: 'border-pink-200 dark:border-pink-800',
+    activeBorder: 'border-pink-500 ring-2 ring-pink-500/50',
   },
 ];
 
@@ -501,7 +583,7 @@ function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
           </p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {COACHES.map((coach) => (
               <button
                 key={coach.id}
@@ -525,6 +607,7 @@ function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
                       width={64}
                       height={64}
                       className="object-cover w-full h-full"
+                      unoptimized
                     />
                   </div>
                   {selectedCoach === coach.id && (
@@ -565,7 +648,7 @@ function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
           </p>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {BUDDIES.map((buddy) => (
               <button
                 key={buddy.id}
@@ -589,6 +672,7 @@ function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
                       width={64}
                       height={64}
                       className="object-cover w-full h-full"
+                      unoptimized
                     />
                   </div>
                   {selectedBuddy === buddy.id && (
@@ -617,6 +701,135 @@ function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
         </CardContent>
       </Card>
 
+      {/* Color Customization */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Palette className="w-5 h-5 text-violet-500" />
+            Personalizza i Colori
+          </CardTitle>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Scegli i colori dei bordi per riconoscere coach e buddy negli avatar
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Coach Border Color */}
+          <div>
+            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+              Colore bordo Coach ({COACHES.find(c => c.id === selectedCoach)?.name})
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {BORDER_COLORS.map((color) => (
+                <button
+                  key={`coach-${color.value}`}
+                  onClick={() => onUpdate({ coachBorderColor: color.value })}
+                  className={cn(
+                    'w-10 h-10 rounded-full border-2 transition-all duration-200 hover:scale-110',
+                    profile.coachBorderColor === color.value
+                      ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                      : 'border-transparent'
+                  )}
+                  style={{ backgroundColor: color.value }}
+                  title={color.name}
+                >
+                  {profile.coachBorderColor === color.value && (
+                    <Check className="w-5 h-5 text-white mx-auto" />
+                  )}
+                </button>
+              ))}
+              <button
+                onClick={() => onUpdate({ coachBorderColor: undefined })}
+                className={cn(
+                  'w-10 h-10 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 transition-all duration-200 hover:scale-110 flex items-center justify-center',
+                  !profile.coachBorderColor && 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                )}
+                title="Predefinito"
+              >
+                <span className="text-xs text-slate-500">Auto</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Buddy Border Color */}
+          <div>
+            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+              Colore bordo Buddy ({BUDDIES.find(b => b.id === selectedBuddy)?.name})
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {BORDER_COLORS.map((color) => (
+                <button
+                  key={`buddy-${color.value}`}
+                  onClick={() => onUpdate({ buddyBorderColor: color.value })}
+                  className={cn(
+                    'w-10 h-10 rounded-full border-2 transition-all duration-200 hover:scale-110',
+                    profile.buddyBorderColor === color.value
+                      ? 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                      : 'border-transparent'
+                  )}
+                  style={{ backgroundColor: color.value }}
+                  title={color.name}
+                >
+                  {profile.buddyBorderColor === color.value && (
+                    <Check className="w-5 h-5 text-white mx-auto" />
+                  )}
+                </button>
+              ))}
+              <button
+                onClick={() => onUpdate({ buddyBorderColor: undefined })}
+                className={cn(
+                  'w-10 h-10 rounded-full border-2 border-dashed border-slate-300 dark:border-slate-600 transition-all duration-200 hover:scale-110 flex items-center justify-center',
+                  !profile.buddyBorderColor && 'ring-2 ring-offset-2 ring-slate-400 dark:ring-slate-600'
+                )}
+                title="Predefinito"
+              >
+                <span className="text-xs text-slate-500">Auto</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Preview */}
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+            <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+              Anteprima
+            </h4>
+            <div className="flex items-center gap-6">
+              <div className="text-center">
+                <div
+                  className="w-16 h-16 rounded-full overflow-hidden border-4 mx-auto"
+                  style={{ borderColor: profile.coachBorderColor || '#3B82F6' }}
+                >
+                  <Image
+                    src={COACHES.find(c => c.id === selectedCoach)?.avatar || '/avatars/melissa.jpg'}
+                    alt="Coach"
+                    width={64}
+                    height={64}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+                <span className="text-xs text-slate-500 mt-1 block">Coach</span>
+              </div>
+              <div className="text-center">
+                <div
+                  className="w-16 h-16 rounded-full overflow-hidden border-4 mx-auto"
+                  style={{ borderColor: profile.buddyBorderColor || '#10B981' }}
+                >
+                  <Image
+                    src={BUDDIES.find(b => b.id === selectedBuddy)?.avatar || '/avatars/mario.jpg'}
+                    alt="Buddy"
+                    width={64}
+                    height={64}
+                    className="object-cover w-full h-full"
+                    unoptimized
+                  />
+                </div>
+                <span className="text-xs text-slate-500 mt-1 block">Buddy</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Info Box */}
       <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4">
         <div className="flex items-start gap-3">
@@ -628,7 +841,7 @@ function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
               Il Triangolo del Supporto
             </h4>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              Il coach ti insegna il metodo, il buddy ti supporta emotivamente, e i Maestri ti spiegano le materie.
+              Il coach ti insegna il metodo, il buddy ti supporta emotivamente, e i Professori ti spiegano le materie.
               Insieme formano il tuo team di apprendimento personalizzato!
             </p>
           </div>
@@ -1848,7 +2061,7 @@ function VoiceExperienceSettings() {
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-slate-600 dark:text-slate-400 text-sm">
-          Personalizza il comportamento delle conversazioni vocali con i Maestri.
+          Personalizza il comportamento delle conversazioni vocali con i Professori.
         </p>
 
         {/* Barge-in Toggle */}
@@ -1858,7 +2071,7 @@ function VoiceExperienceSettings() {
               Interruzione automatica (Barge-in)
             </div>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Permetti di interrompere il Maestro mentre parla iniziando a parlare tu.
+              Permetti di interrompere il Professore mentre parla iniziando a parlare tu.
             </p>
           </div>
           <button

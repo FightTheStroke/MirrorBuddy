@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { ExternalLink, Youtube, Globe } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -48,10 +49,12 @@ export function SearchResults({ data }: SearchResultsProps) {
               >
                 {result.thumbnail && (
                   <div className="relative mb-2 rounded-lg overflow-hidden aspect-video bg-slate-100 dark:bg-slate-800">
-                    <img
+                    <Image
                       src={result.thumbnail}
                       alt=""
-                      className="w-full h-full object-cover"
+                      fill
+                      unoptimized
+                      className="object-cover"
                     />
                     {result.type === 'youtube' && result.duration && (
                       <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
