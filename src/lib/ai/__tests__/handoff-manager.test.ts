@@ -14,7 +14,7 @@ import {
   type HandoffContext,
 } from '../handoff-manager';
 import type { ExtendedStudentProfile, SupportTeacher, BuddyProfile } from '@/types';
-import type { MaestroFull } from '@/data/maestri-full';
+import type { MaestroFull } from '@/data/maestri';
 import type { ActiveCharacter, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
 
 describe('Handoff Manager', () => {

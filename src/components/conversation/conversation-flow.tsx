@@ -33,6 +33,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useSettingsStore } from '@/lib/stores/app-store';
+import { logger } from '@/lib/logger';
 import {
   useConversationFlowStore,
   type FlowMessage,
@@ -579,7 +580,7 @@ export function ConversationFlow() {
         setActiveTool(null);
       }
     } catch (error) {
-      console.error('Tool request error:', error);
+      logger.error('Tool request error', { error });
       addMessage({
         role: 'assistant',
         content: 'Mi dispiace, non sono riuscito a creare lo strumento. Riprova?',
@@ -678,7 +679,7 @@ export function ConversationFlow() {
         routingResult.intent.confidence >= 0.7
       ) {
         // High confidence different character needed - suggest handoff
-        const { getMaestroById: _getMaestroById } = await import('@/data/maestri-full');
+        const { getMaestroById: _getMaestroById } = await import('@/data/maestri');
         const { getSupportTeacherById } = await import('@/data/support-teachers');
         const { getBuddyById } = await import('@/data/buddy-profiles');
 
@@ -773,7 +774,7 @@ export function ConversationFlow() {
         }
       }
     } catch (error) {
-      console.error('Chat error:', error);
+      logger.error('Chat error', { error });
       addMessage({
         role: 'assistant',
         content: 'Mi dispiace, ho avuto un problema. Puoi riprovare?',

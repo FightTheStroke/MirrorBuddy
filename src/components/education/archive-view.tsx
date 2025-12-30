@@ -26,6 +26,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import {
   getActiveMaterials,
   deleteMaterial,
@@ -316,7 +317,7 @@ export function ArchiveView() {
         const records = await getActiveMaterials();
         setMaterials(records as ArchiveItem[]);
       } catch (error) {
-        console.error('Failed to load materials:', error);
+        logger.error('Failed to load materials', { error });
       } finally {
         setIsLoading(false);
       }
@@ -363,13 +364,13 @@ export function ArchiveView() {
       await deleteMaterial(toolId);
       setMaterials((prev) => prev.filter((m) => m.toolId !== toolId));
     } catch (error) {
-      console.error('Failed to delete material:', error);
+      logger.error('Failed to delete material', { error });
     }
   };
 
   const handleView = (item: ArchiveItem) => {
     // TODO: Open material viewer modal or navigate to detail page
-    console.log('View material:', item);
+    logger.debug('View material', { item });
   };
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {

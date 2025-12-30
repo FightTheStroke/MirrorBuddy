@@ -8,6 +8,7 @@
  * Related: #25 Voice-First Tool Creation
  */
 
+import { logger } from '@/lib/logger';
 import type { ToolType } from '@/lib/realtime/tool-events';
 import type { Subject } from '@/types';
 
@@ -493,7 +494,7 @@ export async function executeVoiceTool(
       displayed: true,
     };
   } catch (error) {
-    console.error('[VoiceToolCommands] Failed to execute tool:', error);
+    logger.error('[VoiceToolCommands] Failed to execute tool', { error });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

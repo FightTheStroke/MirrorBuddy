@@ -13,7 +13,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { CharacterType, ExtendedStudentProfile } from '@/types';
-import type { MaestroFull } from '@/data/maestri-full';
+import type { MaestroFull } from '@/data/maestri';
 import type { SupportTeacher } from '@/types';
 import type { BuddyProfile } from '@/types';
 import {
@@ -25,7 +25,7 @@ import {
 import { getDefaultSupportTeacher, getSupportTeacherById } from '@/data/support-teachers';
 import { getBuddyForStudent } from '@/lib/ai/character-router';
 import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
-import { getMaestroById } from '@/data/maestri-full';
+import { getMaestroById } from '@/data/maestri';
 
 // ============================================================================
 // TYPES

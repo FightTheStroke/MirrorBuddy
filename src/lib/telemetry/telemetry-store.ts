@@ -5,6 +5,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { logger } from '@/lib/logger';
 import type {
   TelemetryEvent,
   TelemetryCategory,
@@ -257,7 +258,7 @@ export const useTelemetryStore = create<TelemetryState>()(
           set((s) => ({
             eventQueue: [...eventsToSend, ...s.eventQueue].slice(-s.config.maxQueueSize),
           }));
-          console.error('Telemetry flush failed:', error);
+          logger.error('Telemetry flush failed', { error });
         }
       },
 
@@ -285,7 +286,7 @@ export const useTelemetryStore = create<TelemetryState>()(
             });
           }
         } catch (error) {
-          console.error('Failed to fetch usage stats:', error);
+          logger.error('Failed to fetch usage stats', { error });
         }
       },
 

@@ -9,6 +9,7 @@
  */
 
 import * as pdfjsLib from 'pdfjs-dist';
+import { logger } from '@/lib/logger';
 
 // Configure pdf.js worker
 // The worker is loaded from CDN for optimal bundle size
@@ -181,7 +182,7 @@ export async function processPDF(
           height: viewport.height,
         });
       } catch (renderError) {
-        console.error(`Failed to render page ${pageNum}:`, renderError);
+        logger.error(`Failed to render page ${pageNum}`, { error: renderError });
         // Continue with other pages
       }
     }
