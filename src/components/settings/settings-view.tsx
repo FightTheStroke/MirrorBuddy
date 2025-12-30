@@ -1444,53 +1444,59 @@ function VoiceExperienceSettings() {
           </button>
         </div>
 
-        {/* VAD Threshold Slider */}
+        {/* VAD Threshold - Discrete Steps */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="font-medium text-slate-900 dark:text-slate-100">
-              Sensibilità rilevamento voce
-            </div>
-            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
-              {voiceVadThreshold.toFixed(2)}
-            </span>
+          <div className="font-medium text-slate-900 dark:text-slate-100">
+            Sensibilità rilevamento voce
           </div>
-          <input
-            type="range"
-            min="0.3"
-            max="0.7"
-            step="0.05"
-            value={voiceVadThreshold}
-            onChange={(e) => setVoiceVadThreshold(parseFloat(e.target.value))}
-            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
-          />
-          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>Più sensibile (voce bassa)</span>
-            <span>Meno sensibile (rumore)</span>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { value: 0.35, label: 'Alta', desc: 'Per voce bassa' },
+              { value: 0.5, label: 'Media', desc: 'Bilanciata' },
+              { value: 0.65, label: 'Bassa', desc: 'Ignora rumore' },
+            ].map(({ value, label, desc }) => (
+              <button
+                key={value}
+                onClick={() => setVoiceVadThreshold(value)}
+                className={cn(
+                  'p-3 rounded-xl border-2 transition-all text-center',
+                  Math.abs(voiceVadThreshold - value) < 0.1
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-purple-300'
+                )}
+              >
+                <div className="font-medium text-slate-900 dark:text-slate-100">{label}</div>
+                <div className="text-xs text-slate-500">{desc}</div>
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Silence Duration Slider */}
+        {/* Silence Duration - Discrete Steps */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="font-medium text-slate-900 dark:text-slate-100">
-              Attesa fine frase
-            </div>
-            <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
-              {voiceSilenceDuration}ms
-            </span>
+          <div className="font-medium text-slate-900 dark:text-slate-100">
+            Attesa fine frase
           </div>
-          <input
-            type="range"
-            min="300"
-            max="800"
-            step="50"
-            value={voiceSilenceDuration}
-            onChange={(e) => setVoiceSilenceDuration(parseInt(e.target.value))}
-            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-600"
-          />
-          <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
-            <span>Più veloce (risposte rapide)</span>
-            <span>Più lento (frasi lunghe)</span>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { value: 350, label: 'Veloce', desc: 'Risposte rapide' },
+              { value: 500, label: 'Normale', desc: 'Bilanciata' },
+              { value: 700, label: 'Lento', desc: 'Frasi lunghe' },
+            ].map(({ value, label, desc }) => (
+              <button
+                key={value}
+                onClick={() => setVoiceSilenceDuration(value)}
+                className={cn(
+                  'p-3 rounded-xl border-2 transition-all text-center',
+                  Math.abs(voiceSilenceDuration - value) < 100
+                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-purple-300'
+                )}
+              >
+                <div className="font-medium text-slate-900 dark:text-slate-100">{label}</div>
+                <div className="text-xs text-slate-500">{desc}</div>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -1498,8 +1504,8 @@ function VoiceExperienceSettings() {
         <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
           <button
             onClick={() => {
-              setVoiceVadThreshold(0.4);
-              setVoiceSilenceDuration(400);
+              setVoiceVadThreshold(0.5);
+              setVoiceSilenceDuration(500);
               setVoiceBargeInEnabled(true);
             }}
             className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
@@ -2693,7 +2699,7 @@ function DiagnosticsTab() {
       <Button
         onClick={onRun}
         disabled={result.status === 'running'}
-        variant="outline"
+        variant="default"
         size="sm"
         className="mt-3 w-full"
       >

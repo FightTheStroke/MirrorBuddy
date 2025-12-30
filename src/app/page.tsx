@@ -51,7 +51,7 @@ export default function Home() {
     { id: 'quiz' as const, label: 'Quiz', icon: Brain },
     { id: 'flashcards' as const, label: 'Flashcards', icon: BookOpen },
     { id: 'mindmaps' as const, label: 'Mappe Mentali', icon: Network },
-    { id: 'homework' as const, label: 'Compiti', icon: Target },
+    { id: 'homework' as const, label: 'Materiali', icon: Target },
     { id: 'libretto' as const, label: 'Libretto', icon: BookOpen },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
@@ -172,8 +172,8 @@ export default function Home() {
           sidebarOpen ? 'ml-64' : 'ml-20'
         )}
       >
-        {/* Welcome header */}
-        {studentProfile.name && (
+        {/* Welcome header - only show on main views */}
+        {studentProfile.name && ['conversation', 'maestri'].includes(currentView) && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
               Ciao, {studentProfile.name}! 👋
