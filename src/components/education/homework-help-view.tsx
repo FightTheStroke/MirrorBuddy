@@ -10,13 +10,16 @@ import {
   Send,
   Loader2,
   CheckCircle,
+  GraduationCap,
 } from 'lucide-react';
 import { HomeworkHelp } from './homework-help';
+import { SubjectConfirmationDialog } from './subject-confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import type { Homework, Subject } from '@/types';
+import { useVoiceSessionStore } from '@/lib/stores/app-store';
+import type { Homework, Subject, Maestro } from '@/types';
 
 interface MaieuticMessage {
   role: 'user' | 'assistant';
@@ -56,6 +59,14 @@ export function HomeworkHelpView() {
   const [chatInput, setChatInput] = useState('');
   const [isLoadingChat, setIsLoadingChat] = useState(false);
 
+  // Subject confirmation dialog state
+  const [showSubjectDialog, setShowSubjectDialog] = useState(false);
+  const [detectedSubject, setDetectedSubject] = useState<Subject>('mathematics');
+  const [pendingHomework, setPendingHomework] = useState<Homework | null>(null);
+  const [connectedMaestro, setConnectedMaestro] = useState<Maestro | null>(null);
+
+  const { setCurrentMaestro } = useVoiceSessionStore();
+
   // Load homework history from localStorage
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
@@ -85,6 +96,28 @@ export function HomeworkHelpView() {
     setHomeworkHistory(history);
   }, []);
 
+  // Handle subject confirmation from dialog
+  const handleSubjectConfirm = useCallback((subject: Subject, maestro: Maestro | null) => {
+    if (!pendingHomework) return;
+
+    // Update homework with confirmed subject
+    const confirmedHomework: Homework = {
+      ...pendingHomework,
+      subject,
+    };
+
+    setCurrentHomework(confirmedHomework);
+    saveHistory([confirmedHomework, ...homeworkHistory]);
+    setShowSubjectDialog(false);
+    setPendingHomework(null);
+
+    // If a Maestro was selected, set them as the current Maestro
+    if (maestro) {
+      setConnectedMaestro(maestro);
+      setCurrentMaestro(maestro);
+    }
+  }, [pendingHomework, homeworkHistory, saveHistory, setCurrentMaestro]);
+
   // Analyze photo and create homework with maieutic approach
   const handleSubmitPhoto = useCallback(async (photo: File): Promise<Homework> => {
     // Convert to base64
@@ -105,7 +138,7 @@ export function HomeworkHelpView() {
       const mockHomework: Homework = {
         id: crypto.randomUUID(),
         title: 'Problema da analizzare',
-        subject: 'math' as Subject,
+        subject: 'mathematics' as Subject,
         problemType: 'Esercizio',
         photoUrl: base64,
         steps: [
@@ -157,8 +190,10 @@ export function HomeworkHelpView() {
         createdAt: new Date(),
       };
 
-      setCurrentHomework(mockHomework);
-      saveHistory([mockHomework, ...homeworkHistory]);
+      // Show subject confirmation dialog
+      setPendingHomework(mockHomework);
+      setDetectedSubject(mockHomework.subject);
+      setShowSubjectDialog(true);
       return mockHomework;
     }
 
@@ -166,15 +201,17 @@ export function HomeworkHelpView() {
     const homework: Homework = {
       id: crypto.randomUUID(),
       title: data.title || 'Problema da risolvere',
-      subject: data.subject || 'math',
+      subject: data.subject || 'mathematics',
       problemType: data.problemType || 'Esercizio',
       photoUrl: base64,
       steps: data.steps || [],
       createdAt: new Date(),
     };
 
-    setCurrentHomework(homework);
-    saveHistory([homework, ...homeworkHistory]);
+    // Show subject confirmation dialog
+    setPendingHomework(homework);
+    setDetectedSubject(homework.subject);
+    setShowSubjectDialog(true);
     return homework;
   }, [homeworkHistory, saveHistory]);
 
@@ -306,11 +343,26 @@ export function HomeworkHelpView() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Aiuto Compiti
+            Materiali di Studio
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
             Metodo maieutico: ti guido a trovare la soluzione da solo
           </p>
+          {/* Connected Maestro badge */}
+          {connectedMaestro && (
+            <div className="mt-2 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+              <div
+                className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                style={{ backgroundColor: connectedMaestro.color }}
+              >
+                {connectedMaestro.avatar}
+              </div>
+              <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                Con {connectedMaestro.name}
+              </span>
+              <GraduationCap className="w-4 h-4 text-blue-500" />
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
           {currentHomework && (

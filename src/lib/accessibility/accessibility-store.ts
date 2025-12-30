@@ -125,6 +125,8 @@ interface AccessibilityStore {
   applyADHDProfile: () => void;
   applyVisualImpairmentProfile: () => void;
   applyMotorImpairmentProfile: () => void;
+  applyAutismProfile: () => void;
+  applyAuditoryImpairmentProfile: () => void;
 
   // ADHD actions
   updateADHDConfig: (updates: Partial<ADHDSessionConfig>) => void;
@@ -209,6 +211,29 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
             ...state.settings,
             keyboardNavigation: true,
             reducedMotion: true,
+          },
+        })),
+
+      applyAutismProfile: () =>
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            reducedMotion: true,
+            distractionFreeMode: true,
+            highContrast: false, // Avoid sensory overload from harsh contrast
+            lineSpacing: 1.4,
+            fontSize: 1.1,
+          },
+        })),
+
+      applyAuditoryImpairmentProfile: () =>
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            ttsEnabled: false, // TTS not useful for hearing impairment
+            largeText: true, // Emphasize visual communication
+            lineSpacing: 1.3,
+            // Visual cues become primary - no audio-dependent features
           },
         })),
 
