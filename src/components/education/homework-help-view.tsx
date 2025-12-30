@@ -213,7 +213,7 @@ export function HomeworkHelpView() {
     setDetectedSubject(homework.subject);
     setShowSubjectDialog(true);
     return homework;
-  }, [homeworkHistory, saveHistory]);
+  }, []);
 
   // Complete a step
   const handleCompleteStep = useCallback((stepId: string) => {
@@ -550,6 +550,32 @@ export function HomeworkHelpView() {
           setPendingHomework(null);
         }}
       />
+
+      {/* Connected Maestro indicator */}
+      {connectedMaestro && currentHomework && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-4 right-4 z-40"
+        >
+          <div
+            className="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
+            style={{ borderLeftColor: connectedMaestro.color, borderLeftWidth: 4 }}
+          >
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
+              style={{ backgroundColor: connectedMaestro.color }}
+            >
+              {connectedMaestro.avatar}
+            </div>
+            <div>
+              <p className="font-medium text-sm">{connectedMaestro.name}</p>
+              <p className="text-xs text-slate-500">Ti assiste in questo problema</p>
+            </div>
+            <GraduationCap className="w-4 h-4 text-slate-400" />
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
