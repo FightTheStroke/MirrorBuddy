@@ -1,69 +1,103 @@
 // ============================================================================
 // SEARCH HANDLER
 // Searches web and YouTube for educational content
-// Note: Requires external search API integration
+// Uses Wikipedia API (free) and YouTube search links
 // ============================================================================
 
 import { registerToolHandler } from '../tool-executor';
 import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
 import type { SearchData, SearchResult, ToolExecutionResult } from '@/types/tools';
 
 /**
- * Mock search results for development
- * In production, integrate with:
- * - Bing Search API (Azure Cognitive Services)
- * - YouTube Data API
- * - Google Custom Search API
+ * Wikipedia API response types
  */
-async function performWebSearch(query: string): Promise<SearchResult[]> {
-  // TODO: Integrate with actual search API
-  // For now, return educational placeholder results
+interface WikipediaSearchResult {
+  title: string;
+  pageid: number;
+  snippet: string;
+}
 
-  const mockResults: SearchResult[] = [
-    {
-      type: 'web',
-      title: `${query} - Enciclopedia Treccani`,
-      url: `https://www.treccani.it/enciclopedia/${encodeURIComponent(query)}`,
-      description: `Approfondimento enciclopedico su ${query}`,
-    },
-    {
-      type: 'web',
-      title: `${query} - Wikipedia`,
-      url: `https://it.wikipedia.org/wiki/${encodeURIComponent(query)}`,
-      description: `Voce Wikipedia su ${query}`,
-    },
-  ];
-
-  return mockResults;
+interface WikipediaApiResponse {
+  query?: {
+    search: WikipediaSearchResult[];
+  };
 }
 
 /**
- * Mock YouTube search
+ * Search Italian Wikipedia for educational content.
+ * Uses the MediaWiki API which is free and requires no API key.
+ */
+async function performWebSearch(query: string): Promise<SearchResult[]> {
+  const results: SearchResult[] = [];
+
+  try {
+    // Search Italian Wikipedia
+    const wikiUrl = new URL('https://it.wikipedia.org/w/api.php');
+    wikiUrl.searchParams.set('action', 'query');
+    wikiUrl.searchParams.set('list', 'search');
+    wikiUrl.searchParams.set('srsearch', query);
+    wikiUrl.searchParams.set('srlimit', '3');
+    wikiUrl.searchParams.set('format', 'json');
+    wikiUrl.searchParams.set('origin', '*');
+
+    const response = await fetch(wikiUrl.toString());
+    if (response.ok) {
+      const data: WikipediaApiResponse = await response.json();
+      const searchResults = data.query?.search || [];
+
+      for (const item of searchResults) {
+        // Strip HTML tags from snippet
+        const cleanSnippet = item.snippet.replace(/<[^>]*>/g, '');
+        results.push({
+          type: 'web',
+          title: `${item.title} - Wikipedia`,
+          url: `https://it.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}`,
+          description: cleanSnippet,
+        });
+      }
+    }
+  } catch (error) {
+    logger.error('Wikipedia search failed', { error, query });
+  }
+
+  // Always add Treccani link as authoritative Italian source
+  results.push({
+    type: 'web',
+    title: `Cerca "${query}" su Treccani`,
+    url: `https://www.treccani.it/enciclopedia/ricerca/${encodeURIComponent(query)}/`,
+    description: 'Enciclopedia Italiana - fonte autorevole per approfondimenti',
+  });
+
+  return results;
+}
+
+/**
+ * Generate YouTube educational search links.
+ * Returns direct search URLs for educational content.
+ * Optimized for Italian educational videos.
  */
 async function performYouTubeSearch(query: string): Promise<SearchResult[]> {
-  // TODO: Integrate with YouTube Data API
-  // For now, return educational placeholder results
+  // Generate educational search queries
+  const educationalQuery = `${query} spiegazione lezione`;
+  const courseQuery = `${query} corso italiano`;
 
-  const mockResults: SearchResult[] = [
+  const results: SearchResult[] = [
     {
       type: 'youtube',
-      title: `${query} spiegato bene`,
-      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' lezione')}`,
-      description: `Video didattico su ${query}`,
-      thumbnail: 'https://via.placeholder.com/320x180?text=Video',
-      duration: '10:30',
+      title: `Video didattici: ${query}`,
+      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(educationalQuery)}`,
+      description: 'Cerca video spiegazioni e lezioni su questo argomento',
     },
     {
       type: 'youtube',
-      title: `${query} - Corso completo`,
-      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(query + ' corso')}`,
-      description: `Corso video su ${query}`,
-      thumbnail: 'https://via.placeholder.com/320x180?text=Corso',
-      duration: '45:00',
+      title: `Corsi e tutorial: ${query}`,
+      url: `https://www.youtube.com/results?search_query=${encodeURIComponent(courseQuery)}`,
+      description: 'Cerca corsi completi e tutorial approfonditi',
     },
   ];
 
-  return mockResults;
+  return results;
 }
 
 /**
