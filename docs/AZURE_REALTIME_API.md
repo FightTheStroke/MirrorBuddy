@@ -1,75 +1,80 @@
-# Azure OpenAI Realtime API - Documentazione Tecnica
+# Azure OpenAI Realtime API - Technical Documentation
 
-> **ATTENZIONE**: Questa documentazione riporta problemi reali che abbiamo risolto.
-> NON è documentazione teorica - sono fix verificati in produzione.
+> **IMPORTANT**: This documentation reflects REAL problems we solved in production.
+> NOT theoretical docs - these are VERIFIED fixes.
+>
+> **Last validated**: 2025-12-30
 
-## Indice
+## Table of Contents
 
-1. [Panoramica](#panoramica)
-2. [**CRITICO: Preview vs GA API**](#critico-preview-vs-ga-api)
-3. [Requisiti Azure GA (2025-08-28)](#requisiti-azure-ga-2025-08-28)
-4. [Architettura WebSocket Proxy](#architettura-websocket-proxy)
-5. [Formato Audio](#formato-audio)
-6. [Resampling 48kHz → 24kHz](#resampling-48khz--24khz)
-7. [Errori Comuni e Soluzioni](#errori-comuni-e-soluzioni)
-8. [Testing e Debug](#testing-e-debug)
-9. [**BUG CRITICO: Stale Closure in React Hook**](#bug-critico-stale-closure-in-react-hook)
-10. [**BUG CRITICO: WebSocket Blob vs String**](#bug-critico-websocket-blob-vs-string)
-11. [Device Selection (Microphone e Speaker)](#device-selection-microphone-e-speaker)
+1. [Overview](#overview)
+2. [**CRITICAL: Preview vs GA API**](#critical-preview-vs-ga-api)
+3. [WebSocket Proxy Architecture](#websocket-proxy-architecture)
+4. [Audio Format](#audio-format)
+5. [Resampling 48kHz → 24kHz](#resampling-48khz--24khz)
+6. [Common Errors and Solutions](#common-errors-and-solutions)
+7. [Testing and Debug](#testing-and-debug)
+8. [**CRITICAL BUG: Stale Closure in React Hook**](#critical-bug-stale-closure-in-react-hook)
+9. [**CRITICAL BUG: WebSocket Blob vs String**](#critical-bug-websocket-blob-vs-string)
+10. [Device Selection (Microphone and Speaker)](#device-selection-microphone-and-speaker)
+11. [Barge-in (Auto-Interruption)](#barge-in-auto-interruption)
+12. [VAD Tuning](#vad-tuning-voice-activity-detection)
+13. [Browser Compatibility](#browser-compatibility)
+14. [Z-Index Modal Hierarchy](#z-index-modal-hierarchy)
 
 ---
 
-## Panoramica
+## Overview
 
-L'app usa Azure OpenAI Realtime API per conversazioni vocali real-time con i maestri.
-L'architettura è:
+The app uses Azure OpenAI Realtime API for real-time voice conversations with maestros.
+Architecture:
 
 ```
 Browser (48kHz) → WebSocket Proxy (port 3001) → Azure OpenAI Realtime API
                        ↑
-                  API Key qui
-                  (mai esposta al client)
+                  API Key here
+                  (never exposed to client)
 ```
 
-**File chiave:**
-- `src/server/realtime-proxy.ts` - Proxy WebSocket
-- `src/lib/hooks/use-voice-session.ts` - Hook principale per voice
-- `src/app/test-voice/page.tsx` - Pagina di test/debug
+**Key files:**
+- `src/server/realtime-proxy.ts` - WebSocket proxy
+- `src/lib/hooks/use-voice-session.ts` - Main voice hook
+- `src/app/test-voice/page.tsx` - Test/debug page
 
 ---
 
-## CRITICO: Preview vs GA API
+## CRITICAL: Preview vs GA API
 
-> ⚠️ **QUESTO È IL BUG CHE CI HA FATTO PERDERE ORE DI DEBUG** ⚠️
+> ⚠️ **THIS BUG COST US HOURS OF DEBUGGING** ⚠️
 >
-> Azure ha DUE versioni dell'API Realtime con event names DIVERSI!
-> Se il tuo codice aspetta l'evento sbagliato, l'audio NON VIENE MAI RIPRODOTTO.
+> Azure has TWO versions of the Realtime API with DIFFERENT event names!
+> If your code expects the wrong event, audio WILL NEVER PLAY.
 
-### Le Due API
+### The Two APIs
 
-| Aspetto | Preview API | GA API |
-|---------|-------------|--------|
+| Aspect | Preview API | GA API |
+|--------|-------------|--------|
 | **Deployment** | `gpt-4o-realtime-preview` | `gpt-realtime` |
 | **URL Path** | `/openai/realtime` | `/openai/v1/realtime` |
 | **API Version param** | `api-version=2025-04-01-preview` | NO param |
 | **Model param** | `deployment=...` | `model=...` |
 
-### Event Names - LA DIFFERENZA CRITICA
+### Event Names - THE CRITICAL DIFFERENCE
 
-| Evento | Preview API | GA API |
-|--------|-------------|--------|
+| Event | Preview API | GA API |
+|-------|-------------|--------|
 | Audio chunk | `response.audio.delta` | `response.output_audio.delta` |
-| Audio completato | `response.audio.done` | `response.output_audio.done` |
+| Audio completed | `response.audio.done` | `response.output_audio.done` |
 | Transcript chunk | `response.audio_transcript.delta` | `response.output_audio_transcript.delta` |
-| Transcript completato | `response.audio_transcript.done` | `response.output_audio_transcript.done` |
+| Transcript completed | `response.audio_transcript.done` | `response.output_audio_transcript.done` |
 
-### Come Gestire Entrambi (SOLUZIONE)
+### How to Handle Both (SOLUTION)
 
-Nel tuo message handler, usa switch con ENTRAMBI i case:
+In your message handler, use switch with BOTH cases:
 
 ```typescript
 switch (event.type) {
-  // Gestisci ENTRAMBI i formati!
+  // Handle BOTH formats!
   case 'response.output_audio.delta':  // GA API
   case 'response.audio.delta':         // Preview API
     playAudio(event.delta);
@@ -77,7 +82,7 @@ switch (event.type) {
 
   case 'response.output_audio.done':   // GA API
   case 'response.audio.done':          // Preview API
-    console.log('Audio completato');
+    console.log('Audio complete');
     break;
 
   case 'response.output_audio_transcript.delta':  // GA API
@@ -87,102 +92,83 @@ switch (event.type) {
 }
 ```
 
-### Come Sapere Quale Stai Usando
+### How to Know Which You're Using
 
-Controlla il nome del tuo deployment Azure:
-- Contiene `4o` o `preview`? → **Preview API**
-- Altrimenti → **GA API**
+Check your Azure deployment name:
+- Contains `4o` or `preview`? → **Preview API**
+- Otherwise → **GA API**
 
-Il proxy (`realtime-proxy.ts` linea 61) fa questa detection automaticamente:
+The proxy (`realtime-proxy.ts` line 61) does this detection automatically:
 
 ```typescript
 const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.includes('preview');
 ```
 
-### Bug Tipico
+### Implementation References
 
-```typescript
-// ❌ SBAGLIATO - funziona solo con GA
-if (event.type === 'response.output_audio.delta') {
-  playAudio(event.delta);
-}
-// Con Preview API, l'audio arriva ma questo if non matcha MAI!
-
-// ✅ CORRETTO - funziona con entrambi
-if (event.type === 'response.output_audio.delta' ||
-    event.type === 'response.audio.delta') {
-  playAudio(event.delta);
-}
-```
+- **Proxy detection**: `src/server/realtime-proxy.ts:61-74`
+- **Event handling**: `src/lib/hooks/use-voice-session.ts:627-671`
 
 ---
 
-## Requisiti Azure GA (2025-08-28)
+## session.update Format
 
-### session.update - Formato VERIFICATO FUNZIONANTE
+> ⚠️ **UNCERTAINTY NOTE**: We're using Preview API (`gpt-4o-realtime-preview`).
+> The format below is what WORKS in our code. The exact requirements may differ for GA API.
+
+### What Works (Preview API - VERIFIED)
 
 ```typescript
 {
   type: 'session.update',
   session: {
-    modalities: ['text', 'audio'],   // ⚠️ OBBLIGATORIO per output audio
-    voice: 'alloy',                   // ⚠️ FLAT, direttamente in session
-    instructions: 'Sei un assistente...',
-    input_audio_format: 'pcm16',      // Formato audio input
-    output_audio_format: 'pcm16',     // Formato audio output
-    input_audio_transcription: {      // ⚠️ FLAT, non in audio.input!
-      model: 'whisper-1'
+    voice: 'alloy',                   // FLAT in session (not in audio.output)
+    instructions: 'You are...',
+    input_audio_format: 'pcm16',
+    input_audio_transcription: {
+      model: 'whisper-1',
+      language: 'it',                 // Force transcription language
     },
-    turn_detection: {                 // ⚠️ FLAT, non in audio.input!
+    turn_detection: {
       type: 'server_vad',
-      threshold: 0.5,
+      threshold: 0.4,
       prefix_padding_ms: 300,
-      silence_duration_ms: 500,       // 500ms funziona meglio
-      create_response: true
+      silence_duration_ms: 400,
+      create_response: true,
     },
-    tools: [...]                      // Tools per function calling
+    tools: [...],                     // Optional: function calling
   }
 }
 ```
 
-### Differenze rispetto a OpenAI diretto
+### What We DON'T Use (But Documentation Mentions)
 
-| Parametro | OpenAI Beta | Azure GA (verificato) |
-|-----------|-------------|----------|
-| `modalities` | `['text', 'audio']` | **OBBLIGATORIO**: `['text', 'audio']` |
-| `voice` | In `session.voice` | In `session.voice` (FLAT) |
-| `turn_detection` | In `audio.input.turn_detection` | In `session.turn_detection` (FLAT) |
-| `transcription` | In `audio.input.transcription` | In `session.input_audio_transcription` (FLAT) |
-| `turn_detection.type` | `semantic_vad` | `server_vad` |
-| API Key | Header `Authorization` | Query string `api-key=XXX` |
-| Audio format | Nested in `audio.input/output` | Flat: `input_audio_format`, `output_audio_format` |
+These fields appear in Azure docs but we DON'T include them and it works:
 
-**IMPORTANTE**: Azure GA usa struttura FLAT, NON nested!
+| Field | Status | Note |
+|-------|--------|------|
+| `session.type: 'realtime'` | Not used | Works without it for Preview API |
+| `modalities: ['text', 'audio']` | Not used | Azure may use default |
+| `output_audio_format` | Not used | Defaults to pcm16 |
 
-### URL WebSocket Azure
+> **HONESTY**: We're not 100% certain these are optional. They may be required for GA API.
+> Our code works with Preview API without them. If you switch to GA, verify.
 
-```typescript
-// Costruzione URL
-const url = new URL(azureEndpoint);
-url.pathname = '/openai/v1/realtime';
-url.searchParams.set('model', deployment);      // es: 'gpt-4o-realtime'
-url.searchParams.set('api-key', apiKey);        // API key in query string!
+### Implementation Reference
 
-// Risultato:
-// wss://YOUR-RESOURCE.openai.azure.com/openai/v1/realtime?model=gpt-4o-realtime&api-key=XXX
-```
+- **Session config**: `src/lib/hooks/use-voice-session.ts:515-538`
 
 ---
 
-## Architettura WebSocket Proxy
+## WebSocket Proxy Architecture
 
-### Perché un proxy?
+### Why a Proxy?
 
-1. **Sicurezza**: API key mai esposta al browser
-2. **CORS**: Azure non supporta WebSocket dal browser direttamente
-3. **Logging**: Debug server-side dei messaggi
+1. **Security**: API key never exposed to browser
+2. **CORS**: Azure doesn't support WebSocket from browser directly
+3. **Logging**: Server-side debug of messages
 
-### Flow dei messaggi
+### Message Flow
 
 ```
 Client                    Proxy                     Azure
@@ -194,56 +180,49 @@ Client                    Proxy                     Azure
   │←── session.created ─────│                         │
   │                         │                         │
   │─── session.update ─────→│                         │
-  │    (JSON come testo)    │─── session.update ────→│
-  │                         │    (DEVE essere testo) │
+  │    (JSON as text)       │─── session.update ────→│
+  │                         │    (MUST be text)      │
   │                         │←── session.updated ────│
   │←── session.updated ─────│                         │
-  │                         │                         │
-  │─── audio.append ───────→│                         │
-  │    (base64 PCM16)       │─── audio.append ──────→│
-  │                         │←── speech_started ─────│
-  │←── speech_started ──────│                         │
-  │                         │←── audio.delta ────────│
-  │←── audio.delta ─────────│    (base64 PCM16)      │
 ```
 
-### BUG CRITICO RISOLTO: Buffer vs String
+### CRITICAL BUG FIXED: Buffer vs String
 
-**Problema**: Il proxy riceveva messaggi come `Buffer` e li inoltrava come binario.
-Azure RIFIUTA messaggi JSON inviati come binario.
+**Problem**: Proxy received messages as `Buffer` and forwarded as binary.
+Azure REJECTS JSON sent as binary.
 
-**Sintomo**: session.update funzionava via websocat ma falliva via proxy.
+**Symptom**: session.update worked via websocat but failed via proxy.
 
-**Fix** (`src/server/realtime-proxy.ts` linee 113-128):
+**Fix** (`src/server/realtime-proxy.ts:142-157`):
 
 ```typescript
-// ❌ SBAGLIATO - invia come binario
+// ❌ WRONG - sends as binary
 backendWs.send(data);
 
-// ✅ CORRETTO - converti a stringa per JSON
+// ✅ CORRECT - convert to string for JSON
 clientWs.on('message', (data: Buffer) => {
   const msg = data.toString('utf-8');
   try {
-    JSON.parse(msg);  // È JSON?
-    backendWs.send(msg);  // Invia come TESTO
+    JSON.parse(msg);  // Is it JSON?
+    backendWs.send(msg);  // Send as TEXT
   } catch {
-    backendWs.send(data); // Non-JSON (audio raw) → binario OK
+    backendWs.send(data); // Non-JSON (raw audio) → binary OK
   }
 });
 ```
 
 ---
 
-## Formato Audio
+## Audio Format
 
-### Specifiche tecniche
+### Technical Specifications
 
-| Direzione | Sample Rate | Formato | Encoding |
-|-----------|-------------|---------|----------|
+| Direction | Sample Rate | Format | Encoding |
+|-----------|-------------|--------|----------|
 | Input (browser → Azure) | 24000 Hz | PCM16 signed | base64 |
 | Output (Azure → browser) | 24000 Hz | PCM16 signed | base64 |
 
-### Messaggio audio input
+### Audio Input Message
 
 ```typescript
 {
@@ -252,24 +231,19 @@ clientWs.on('message', (data: Buffer) => {
 }
 ```
 
-### Messaggio audio output
+### Audio Output Message
 
 ```typescript
-// Azure invia chunks incrementali
+// Azure sends incremental chunks
 {
-  type: 'response.output_audio.delta',
+  type: 'response.audio.delta',  // or response.output_audio.delta for GA
   delta: 'BASE64_ENCODED_PCM16_24KHZ'
 }
 
-// Trascrizione in parallelo
+// Parallel transcription
 {
-  type: 'response.output_audio_transcript.delta',
-  delta: 'testo parziale...'
-}
-
-// Fine risposta
-{
-  type: 'response.done'
+  type: 'response.audio_transcript.delta',
+  delta: 'partial text...'
 }
 ```
 
@@ -277,14 +251,14 @@ clientWs.on('message', (data: Buffer) => {
 
 ## Resampling 48kHz → 24kHz
 
-### Il problema
+### The Problem
 
-I browser usano `AudioContext` che di default opera a 48000 Hz.
-Azure richiede ESATTAMENTE 24000 Hz.
+Browsers use `AudioContext` which defaults to 48000 Hz.
+Azure requires EXACTLY 24000 Hz.
 
-**Se invii 48kHz**: Azure non capisce l'audio, non rileva speech.
+**If you send 48kHz**: Azure won't understand the audio, no speech detection.
 
-### Soluzione: Linear Interpolation
+### Solution: Linear Interpolation
 
 ```typescript
 function resample(inputData: Float32Array, fromRate: number, toRate: number): Float32Array {
@@ -295,13 +269,12 @@ function resample(inputData: Float32Array, fromRate: number, toRate: number): Fl
   const output = new Float32Array(outputLength);
 
   for (let i = 0; i < outputLength; i++) {
-    // Calcola posizione nel buffer sorgente
     const srcIndex = i * ratio;
     const srcIndexFloor = Math.floor(srcIndex);
     const srcIndexCeil = Math.min(srcIndexFloor + 1, inputData.length - 1);
     const fraction = srcIndex - srcIndexFloor;
 
-    // Interpolazione lineare tra due sample
+    // Linear interpolation between two samples
     output[i] = inputData[srcIndexFloor] * (1 - fraction) +
                 inputData[srcIndexCeil] * fraction;
   }
@@ -310,345 +283,227 @@ function resample(inputData: Float32Array, fromRate: number, toRate: number): Fl
 }
 ```
 
-### Conversione Float32 → PCM16
+### Implementation Reference
 
-```typescript
-function float32ToInt16(float32Array: Float32Array): Int16Array {
-  const int16Array = new Int16Array(float32Array.length);
-  for (let i = 0; i < float32Array.length; i++) {
-    // Clamp a [-1, 1] e scala a [-32768, 32767]
-    const sample = Math.max(-1, Math.min(1, float32Array[i]));
-    int16Array[i] = sample < 0
-      ? sample * 32768
-      : sample * 32767;
-  }
-  return int16Array;
-}
-```
-
-### Encode base64
-
-```typescript
-function int16ArrayToBase64(int16Array: Int16Array): string {
-  const bytes = new Uint8Array(int16Array.buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return btoa(binary);
-}
-```
+- **Resample function**: `src/lib/hooks/use-voice-session.ts:165-178`
+- **Capture context**: `src/lib/hooks/use-voice-session.ts:371-372`
 
 ---
 
 ## Playback Audio (Azure → Speaker)
 
-### Il problema
+### The Problem
 
-Azure invia audio come base64 PCM16 in chunks.
-Devi:
-1. Decodificare base64
-2. Convertire PCM16 → Float32
-3. Riprodurre con Web Audio API
+Azure sends audio as base64 PCM16 in chunks.
+You must:
+1. Decode base64
+2. Convert PCM16 → Float32
+3. Play with Web Audio API at 24kHz
 
-### Implementazione
+### Implementation
 
 ```typescript
-// Coda per gestire chunks asincroni
-const audioQueue: Float32Array[] = [];
-let isPlaying = false;
-const playbackContext = new AudioContext({ sampleRate: 24000 });
+const AZURE_SAMPLE_RATE = 24000;
 
-// Decodifica e accoda
-function queueAudio(base64Audio: string) {
-  // Base64 → bytes
-  const binaryString = atob(base64Audio);
-  const bytes = new Uint8Array(binaryString.length);
-  for (let i = 0; i < binaryString.length; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
-  }
+// Create playback context at 24kHz (CRITICAL!)
+const playbackContext = new AudioContext({ sampleRate: AZURE_SAMPLE_RATE });
 
-  // PCM16 → Float32
-  const pcm16 = new Int16Array(bytes.buffer);
-  const float32 = new Float32Array(pcm16.length);
-  for (let i = 0; i < pcm16.length; i++) {
-    float32[i] = pcm16[i] / 32768;
-  }
+// Decode and play
+function playAudioChunk(base64Audio: string) {
+  // Base64 → Int16Array
+  const audioData = base64ToInt16Array(base64Audio);
 
-  audioQueue.push(float32);
-  if (!isPlaying) playNext();
-}
+  // Int16 → Float32
+  const float32Data = int16ToFloat32(audioData);
 
-// Riproduci sequenzialmente
-function playNext() {
-  if (audioQueue.length === 0) {
-    isPlaying = false;
-    return;
-  }
-
-  isPlaying = true;
-  const samples = audioQueue.shift()!;
-
-  const buffer = playbackContext.createBuffer(1, samples.length, 24000);
-  buffer.getChannelData(0).set(samples);
+  // Create buffer at 24kHz
+  const buffer = playbackContext.createBuffer(1, float32Data.length, AZURE_SAMPLE_RATE);
+  buffer.getChannelData(0).set(float32Data);
 
   const source = playbackContext.createBufferSource();
   source.buffer = buffer;
   source.connect(playbackContext.destination);
-  source.onended = playNext;
   source.start();
 }
 ```
 
+### Implementation Reference
+
+- **Playback context**: `src/lib/hooks/use-voice-session.ts:269`
+- **playNextChunk**: `src/lib/hooks/use-voice-session.ts:292-332`
+
 ---
 
-## Errori Comuni e Soluzioni
+## Common Errors and Solutions
 
-### 1. "Missing required parameter: 'session.type'"
+### 1. Audio not playing but WebSocket works?
 
-**Causa**: Azure GA richiede `session.type: "realtime"`.
+**Check which API you're using (Preview vs GA)**
+- Verify you handle BOTH event types
+- File: `src/lib/hooks/use-voice-session.ts:627-671`
 
-**Fix**:
-```typescript
-// ❌ Sbagliato
-{ type: 'session.update', session: { instructions: '...' } }
+### 2. session.update fails?
 
-// ✅ Corretto
-{ type: 'session.update', session: { type: 'realtime', instructions: '...' } }
+**Check the format (Preview uses different structure than GA)**
+- For Preview: flat structure, no `type: 'realtime'` needed
+- File: `src/app/test-voice/page.tsx` for manual testing
+
+### 3. Proxy doesn't connect to Azure?
+
+**Check env vars:**
+```bash
+AZURE_OPENAI_REALTIME_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
+AZURE_OPENAI_REALTIME_API_KEY=your-key
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
 ```
+- File: `src/server/realtime-proxy.ts:31-84`
 
-### 2. "Unknown parameter: 'session.voice'"
+### 4. Audio distorted or too fast/slow?
 
-**Causa**: Voice deve essere in `audio.output.voice`, non top-level.
-
-**Fix**:
+**AudioContext playback MUST be 24kHz:**
 ```typescript
-// ❌ Sbagliato
-{ session: { voice: 'alloy' } }
-
-// ✅ Corretto
-{ session: { audio: { output: { voice: 'alloy' } } } }
-```
-
-### 3. session.update funziona via websocat ma fallisce via proxy
-
-**Causa**: Proxy invia JSON come Buffer (binario) invece che stringa.
-
-**Fix**: Vedi sezione "BUG CRITICO RISOLTO" sopra.
-
-### 4. Audio inviato ma Azure non risponde
-
-**Cause possibili**:
-1. Sample rate sbagliato (deve essere 24kHz)
-2. VAD threshold troppo alto
-3. Audio troppo silenzioso
-
-**Debug**:
-```typescript
-// Verifica sample rate del browser
-console.log(audioContext.sampleRate); // Se 48000, DEVI resample
-
-// Verifica che stai mandando dati
-processor.onaudioprocess = (e) => {
-  const data = e.inputBuffer.getChannelData(0);
-  const maxAmplitude = Math.max(...data.map(Math.abs));
-  console.log('Max amplitude:', maxAmplitude); // Deve essere > 0.01
-};
-```
-
-### 5. Sento l'audio ma è distorto/veloce/lento
-
-**Causa**: Mismatch sample rate nel playback.
-
-**Fix**: AudioContext di playback DEVE essere 24kHz:
-```typescript
-// ❌ Sbagliato - usa default del sistema
+// ❌ WRONG - uses system default
 const ctx = new AudioContext();
 
-// ✅ Corretto - forza 24kHz
+// ✅ CORRECT - force 24kHz
 const ctx = new AudioContext({ sampleRate: 24000 });
 ```
 
----
+### 5. Audio sent but Azure doesn't respond?
 
-## Testing e Debug
+**Possible causes:**
+1. Wrong sample rate (must be 24kHz)
+2. VAD threshold too high
+3. Audio too quiet
 
-### 1. Test diretto con websocat
-
-Bypassa completamente l'app per testare Azure direttamente:
-
-```bash
-# Installa websocat
-brew install websocat
-
-# Connetti direttamente ad Azure
-websocat "wss://YOUR-RESOURCE.openai.azure.com/openai/v1/realtime?model=gpt-4o-realtime&api-key=YOUR_KEY"
-
-# Invia session.update
-{"type":"session.update","session":{"type":"realtime","instructions":"Test","audio":{"output":{"voice":"alloy"}}}}
+**Debug:**
+```typescript
+console.log(audioContext.sampleRate); // Must be 24000 after resample
 ```
 
-Se funziona qui ma non nell'app → problema nel proxy o client.
+---
 
-### 2. Log del proxy
+## Testing and Debug
 
-I log sono in console quando fai `npm run dev`:
+### 1. Direct test with websocat
+
+Bypass the app to test Azure directly:
+
+```bash
+# Install websocat
+brew install websocat
+
+# Connect directly to Azure (replace with your values)
+websocat "wss://YOUR-RESOURCE.openai.azure.com/openai/realtime?api-version=2025-04-01-preview&deployment=gpt-4o-realtime-preview&api-key=YOUR_KEY"
+
+# Send session.update
+{"type":"session.update","session":{"voice":"alloy","instructions":"Test"}}
+```
+
+If it works here but not in app → problem in proxy or client.
+
+### 2. Proxy logs
+
+Logs appear in console when running `npm run dev`:
 
 ```
 [INFO] Client connected: UUID for maestro: test-debug
 [INFO] Backend WebSocket OPEN for UUID
 [DEBUG] Backend -> Client [session.created]
 [INFO] Client -> Backend [session.update]: {"type":"session.update"...
-[DEBUG] Backend -> Client [session.updated]   ← Se vedi questo, funziona!
-[DEBUG] Backend -> Client [error]             ← Se vedi questo, leggi il messaggio
+[DEBUG] Backend -> Client [session.updated]   ← If you see this, it works!
+[DEBUG] Backend -> Client [error]             ← If you see this, read the message
 ```
 
-### 3. Pagina di test
+### 3. Test page
 
-Vai a `/test-voice` per debug interattivo:
-- Test microfono isolato
-- Connessione WebSocket manuale
-- Log di tutti i messaggi
-- Visualizzazione audio waveform
-
-### 4. Verifica deployment Azure
-
-```bash
-# Verifica che il deployment esista
-az cognitiveservices account deployment show \
-  --name YOUR-RESOURCE \
-  --resource-group YOUR-RG \
-  --deployment-name gpt-4o-realtime
-
-# Output deve mostrare:
-# "model": { "name": "gpt-4o-realtime-preview", "version": "2025-08-28" }
-```
+Go to `/test-voice` for interactive debug:
+- Isolated microphone test
+- Manual WebSocket connection
+- All message logging
+- Audio waveform visualization
 
 ---
 
-## Variabili d'Ambiente
+## CRITICAL BUG: Stale Closure in React Hook
 
-```bash
-# .env.local
-
-# Azure OpenAI Realtime (per voice)
-AZURE_OPENAI_REALTIME_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
-AZURE_OPENAI_REALTIME_API_KEY=your-api-key-here
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime
-
-# Porta WebSocket proxy
-WS_PROXY_PORT=3001
-```
-
----
-
-## Checklist Pre-Deploy
-
-- [ ] `session.type: "realtime"` presente in session.update
-- [ ] Voice in `audio.output.voice`, non top-level
-- [ ] Proxy converte Buffer a stringa per JSON
-- [ ] Resampling 48kHz → 24kHz implementato
-- [ ] Playback context a 24kHz
-- [ ] API key in query string URL, non header
-- [ ] VAD type è `server_vad`
-
----
-
-## Cronologia Problemi Risolti
-
-| Data | Problema | Soluzione |
-|------|----------|-----------|
-| 2025-12-28 | session.update rifiutato | Aggiunto `type: "realtime"` |
-| 2025-12-28 | voice non riconosciuto | Spostato in `audio.output.voice` |
-| 2025-12-28 | Proxy invia binario | Conversione Buffer → string |
-| 2025-12-28 | Audio non rilevato | Resampling 48k→24k |
-| 2025-12-28 | Nessun suono output | Implementato playback 24kHz |
-| 2025-12-29 | **Audio ricevuto ma non riprodotto** | Preview API usa `response.audio.delta` invece di `response.output_audio.delta` - il codice aspettava l'evento GA! |
-| 2025-12-29 | **VoiceSession non funziona ma test page sì** | Stale closure bug - `handleServerEvent` catturato al momento della connessione. Fix: usare useRef |
-| 2025-12-29 | **ws.onmessage non riceve eventi** | WebSocket invia Blob ma il codice gestiva solo String. Fix: `event.data instanceof Blob` |
-
----
-
-## BUG CRITICO: Stale Closure in React Hook
-
-> ⚠️ **QUESTO BUG CI HA FATTO IMPAZZIRE** ⚠️
+> ⚠️ **THIS BUG DROVE US CRAZY** ⚠️
 >
-> Il componente VoiceSession non funzionava mentre la pagina test-voice funzionava perfettamente.
-> Stesso codice WebSocket, stessi eventi - ma uno funzionava e l'altro no!
+> VoiceSession component didn't work while test-voice page worked perfectly.
+> Same WebSocket code, same events - but one worked and one didn't!
 
-### Il Problema
+### The Problem
 
-In un React hook con `useCallback`, quando fai:
+In a React hook with `useCallback`, when you do:
 
 ```typescript
 const handleServerEvent = useCallback((event) => {
-  // usa stato come `messages`, `currentResponse`, etc.
+  // uses state like `messages`, `currentResponse`, etc.
 }, [messages, currentResponse, ...]);
 
 const connect = useCallback(() => {
   ws.onmessage = (event) => {
-    handleServerEvent(JSON.parse(event.data));  // ❌ CATTURA VECCHIA VERSIONE!
+    handleServerEvent(JSON.parse(event.data));  // ❌ CAPTURES OLD VERSION!
   };
 }, [handleServerEvent]);
 ```
 
-Il problema: `ws.onmessage` cattura la versione di `handleServerEvent` che esisteva AL MOMENTO DELLA CONNESSIONE.
-Quando le dipendenze cambiano, `handleServerEvent` viene ri-creato, ma `ws.onmessage` usa ancora la vecchia versione!
+The problem: `ws.onmessage` captures the version of `handleServerEvent` that existed AT CONNECTION TIME.
+When dependencies change, `handleServerEvent` is re-created, but `ws.onmessage` still uses the old version!
 
-### Sintomi
+### Symptoms
 
-- Test page funziona (usa callback inline)
-- VoiceSession non funziona (usa useCallback)
-- Eventi WebSocket arrivano (vedi nei log)
-- `handleServerEvent` non processa gli eventi (stato mai aggiornato)
+- Test page works (uses inline callback)
+- VoiceSession doesn't work (uses useCallback)
+- WebSocket events arrive (visible in logs)
+- `handleServerEvent` doesn't process events (state never updates)
 
-### La Soluzione: useRef Pattern
+### The Solution: useRef Pattern
 
 ```typescript
-// 1. Crea un ref per tenere l'ultima versione del callback
+// 1. Create a ref to hold the latest callback version
 const handleServerEventRef = useRef<((event: Record<string, unknown>) => void) | null>(null);
 
-// 2. Aggiorna il ref ogni volta che il callback cambia
+// 2. Update the ref every time the callback changes
 useEffect(() => {
   handleServerEventRef.current = handleServerEvent;
 }, [handleServerEvent]);
 
-// 3. In ws.onmessage, usa il ref invece del callback diretto
+// 3. In ws.onmessage, use the ref instead of the callback directly
 ws.onmessage = async (event) => {
   const data = JSON.parse(event.data);
   if (handleServerEventRef.current) {
-    handleServerEventRef.current(data);  // ✅ SEMPRE L'ULTIMA VERSIONE!
+    handleServerEventRef.current(data);  // ✅ ALWAYS THE LATEST VERSION!
   }
 };
 ```
 
-### File Modificato
+### Implementation Reference
 
-`src/lib/hooks/use-voice-session.ts`:
-- Linea 204: Dichiarazione `handleServerEventRef`
-- Linee 725-729: useEffect che aggiorna il ref
-- Linee 783-808: `ws.onmessage` che usa il ref
+- **Ref declaration**: `src/lib/hooks/use-voice-session.ts:249`
+- **Ref update effect**: `src/lib/hooks/use-voice-session.ts:819-823`
+- **Usage in ws.onmessage**: `src/lib/hooks/use-voice-session.ts:916-918`
 
 ---
 
-## BUG CRITICO: WebSocket Blob vs String
+## CRITICAL BUG: WebSocket Blob vs String
 
-### Il Problema
+### The Problem
 
-In alcuni browser/contesti, `ws.onmessage` riceve dati come `Blob` invece di `string`.
+In some browsers/contexts, `ws.onmessage` receives data as `Blob` instead of `string`.
 
 ```typescript
-// ❌ SBAGLIATO - funziona solo se data è string
+// ❌ WRONG - only works if data is string
 ws.onmessage = (event) => {
-  const data = JSON.parse(event.data);  // ERRORE se event.data è Blob!
+  const data = JSON.parse(event.data);  // ERROR if event.data is Blob!
 };
 
-// ✅ CORRETTO - gestisce entrambi i casi
+// ✅ CORRECT - handles both cases
 ws.onmessage = async (event) => {
   let msgText: string;
 
   if (event.data instanceof Blob) {
-    msgText = await event.data.text();  // Converti Blob → string
+    msgText = await event.data.text();  // Convert Blob → string
   } else if (typeof event.data === 'string') {
     msgText = event.data;
   } else {
@@ -657,65 +512,68 @@ ws.onmessage = async (event) => {
   }
 
   const data = JSON.parse(msgText);
-  // ... processa data
+  // ... process data
 };
 ```
 
-### Come Capire se è Questo il Problema
+### How to Know if This is Your Problem
 
 ```typescript
 ws.onmessage = (event) => {
   console.log('Data type:', typeof event.data);
   console.log('Is Blob:', event.data instanceof Blob);
-  // Se vedi "Is Blob: true" → devi gestirlo!
+  // If you see "Is Blob: true" → you need to handle it!
 };
 ```
 
+### Implementation Reference
+
+- **Blob handling**: `src/lib/hooks/use-voice-session.ts:899-912`
+
 ---
 
-## Device Selection (Microphone e Speaker)
+## Device Selection (Microphone and Speaker)
 
-### Selezionare Microfono Specifico
+### Select Specific Microphone
 
 ```typescript
-// Enumera dispositivi (richiede permesso)
-await navigator.mediaDevices.getUserMedia({ audio: true });  // Richiedi permesso
+// Enumerate devices (requires permission)
+await navigator.mediaDevices.getUserMedia({ audio: true });  // Request permission
 const devices = await navigator.mediaDevices.enumerateDevices();
 const microphones = devices.filter(d => d.kind === 'audioinput');
 
-// Usa dispositivo specifico
+// Use specific device
 const stream = await navigator.mediaDevices.getUserMedia({
   audio: {
-    deviceId: { exact: selectedMicrophoneId }  // ⚠️ `exact` è importante!
+    deviceId: { ideal: selectedMicrophoneId }  // 'ideal' falls back if unavailable
   }
 });
 ```
 
-### Selezionare Speaker Specifico (Chrome 110+)
+### Select Specific Speaker (Chrome 110+)
 
 ```typescript
-// Enumera output devices
+// Enumerate output devices
 const speakers = devices.filter(d => d.kind === 'audiooutput');
 
-// Opzione 1: AudioContext con sinkId (Chrome 110+)
+// Option 1: AudioContext with sinkId (Chrome 110+)
 const ctx = new AudioContext({
   sampleRate: 24000,
-  sinkId: selectedSpeakerId  // Potrebbe non essere supportato
+  sinkId: selectedSpeakerId  // May not be supported
 });
 
-// Opzione 2: setSinkId (più compatibile)
+// Option 2: setSinkId (more compatible)
 if ('setSinkId' in audioContext) {
   await audioContext.setSinkId(selectedSpeakerId);
 }
 ```
 
-### Ascoltare Cambi Dispositivo
+### Listen for Device Changes
 
 ```typescript
 useEffect(() => {
   const handleDeviceChange = () => {
-    // Re-enumerate devices quando utente collega/scollega
-    enumerateDevices();
+    enumerateDevices();  // Re-enumerate when user plugs/unplugs
   };
 
   navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
@@ -727,89 +585,83 @@ useEffect(() => {
 
 ---
 
-## File Critici e Cosa Fare se Non Funziona
+## Barge-in (Auto-Interruption)
 
-### Checklist Debug Voice
+### What is Barge-in?
 
-1. **Audio non si sente ma WebSocket funziona?**
-   - Controlla quale API usi (Preview vs GA)
-   - Verifica che gestisci ENTRAMBI gli event types
-   - File: `src/lib/hooks/use-voice-session.ts` linee 575-616
+Barge-in allows the user to interrupt the maestro while speaking, like in a natural conversation. Without this, the user must wait for the maestro to finish.
 
-2. **session.update fallisce?**
-   - Controlla il formato (Preview usa struttura diversa da GA)
-   - File: `src/app/test-voice/page.tsx` per test manuale
+### Implementation
 
-3. **Proxy non connette ad Azure?**
-   - Controlla env vars: `AZURE_OPENAI_REALTIME_*`
-   - File: `src/server/realtime-proxy.ts` linee 43-74
+When user starts speaking (`input_audio_buffer.speech_started`), if maestro is speaking (`isSpeaking === true`):
 
-4. **Audio distorto o veloce?**
-   - AudioContext playback DEVE essere a 24kHz
-   - File: `src/lib/hooks/use-voice-session.ts` linea 214
+1. Send `response.cancel` to Azure to stop generation
+2. Clear audio queue (`audioQueueRef.current = []`)
+3. Stop playback (`isPlayingRef.current = false`)
+4. Update UI state (`setSpeaking(false)`)
 
-5. **VoiceSession component non funziona ma test page sì?**
-   - Probabile stale closure bug
-   - Verifica che `handleServerEventRef` sia usato in `ws.onmessage`
-   - File: `src/lib/hooks/use-voice-session.ts` linee 204, 725-729, 783-808
+```typescript
+case 'input_audio_buffer.speech_started':
+  console.log('[VoiceSession] User speech detected');
+  setListening(true);
 
-6. **Eventi WebSocket arrivano come Blob?**
-   - Aggiungi gestione `event.data instanceof Blob`
-   - Usa `await event.data.text()` per convertire
-   - File: `src/lib/hooks/use-voice-session.ts` linee 785-795
+  // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
+  if (voiceBargeInEnabled && hasActiveResponseRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+    console.log('[VoiceSession] Barge-in detected - interrupting assistant');
+    wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+    hasActiveResponseRef.current = false;
+    audioQueueRef.current = [];
+    isPlayingRef.current = false;
+    setSpeaking(false);
+  }
+  break;
+```
 
-7. **Microfono sbagliato selezionato?**
-   - Usa `/test-voice` per selezionare dispositivo
-   - Verifica con waveform che il mic corretto sia attivo
-   - File: `src/app/test-voice/page.tsx` - sezione Device Selection
+### Implementation Reference
+
+- **Barge-in logic**: `src/lib/hooks/use-voice-session.ts:582-602`
 
 ---
 
-## Waveform Visualization per Debug
+## VAD Tuning (Voice Activity Detection)
 
-La pagina `/test-voice` include una waveform canvas per vedere l'audio in tempo reale:
+### Optimized Parameters
+
+| Parameter | Previous | Optimized | Effect |
+|-----------|----------|-----------|--------|
+| `threshold` | 0.5 | 0.4 | More sensitive to soft voices |
+| `silence_duration_ms` | 500 | 400 | Faster turn-taking |
+
+### Configuration
 
 ```typescript
-// Setup analyser
-analyser.fftSize = 2048;
-const timeDataArray = new Uint8Array(analyser.fftSize);
-
-// Draw loop
-function draw() {
-  requestAnimationFrame(draw);
-  analyser.getByteTimeDomainData(timeDataArray);
-
-  // Draw wave
-  ctx.beginPath();
-  for (let i = 0; i < timeDataArray.length; i++) {
-    const v = timeDataArray[i] / 128.0;
-    const y = (v * height) / 2;
-    i === 0 ? ctx.moveTo(0, y) : ctx.lineTo(x, y);
-  }
-  ctx.stroke();
+turn_detection: {
+  type: 'server_vad',
+  threshold: 0.4,            // Microphone sensitivity
+  prefix_padding_ms: 300,    // Audio before speech
+  silence_duration_ms: 400,  // Pause for end of turn
+  create_response: true,
 }
 ```
 
-Utile per verificare:
-- Microfono funziona (wave si muove)
-- Dispositivo corretto (confronta con altro software)
-- Livello audio (barra verde in basso)
+### Considerations
+
+- **Lower threshold**: Catches quieter voices, but may increase false positives in noisy environments
+- **Lower silence_duration_ms**: Faster response, but may interrupt natural speech pauses
 
 ---
 
----
+## Browser Compatibility
 
-## Compatibilità Browser e Sistema Operativo
-
-### Browser Supportati
+### Supported Browsers
 
 | Browser | Windows | macOS | Linux | Note |
 |---------|---------|-------|-------|------|
-| Chrome 110+ | ✅ | ✅ | ✅ | Pieno supporto, incluso setSinkId |
-| Edge 110+ | ✅ | ✅ | ✅ | Pieno supporto come Chrome |
-| Firefox | ⚠️ | ⚠️ | ⚠️ | Funziona, ma NO selezione speaker output |
-| Safari 14.1+ | ⚠️ | ⚠️ | N/A | Funziona, ma NO selezione speaker output |
-| Safari iOS | ⚠️ | N/A | N/A | Richiede user gesture per AudioContext |
+| Chrome 110+ | ✅ | ✅ | ✅ | Full support including setSinkId |
+| Edge 110+ | ✅ | ✅ | ✅ | Full support like Chrome |
+| Firefox | ⚠️ | ⚠️ | ⚠️ | Works, but NO speaker output selection |
+| Safari 14.1+ | ⚠️ | ⚠️ | N/A | Works, but NO speaker output selection |
+| Safari iOS | ⚠️ | N/A | N/A | Requires user gesture for AudioContext |
 
 ### Feature Support Matrix
 
@@ -822,12 +674,11 @@ Utile per verificare:
 | WebSocket | ✅ | ✅ | ✅ |
 | ScriptProcessorNode | ✅ | ✅ | ✅ |
 
-### Fallback Implementati
+### Fallbacks Implemented
 
 #### 1. webkitAudioContext (Safari)
 
 ```typescript
-// File: src/lib/hooks/use-voice-session.ts
 const AudioContextClass = window.AudioContext ||
   (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
 ```
@@ -835,7 +686,6 @@ const AudioContextClass = window.AudioContext ||
 #### 2. setSinkId (Firefox, Safari)
 
 ```typescript
-// File: src/components/settings/settings-view.tsx, src/app/test-voice/page.tsx
 if ('setSinkId' in audioContext) {
   await audioContext.setSinkId(selectedOutputDevice);
 } else {
@@ -843,138 +693,118 @@ if ('setSinkId' in audioContext) {
 }
 ```
 
-Se setSinkId non è supportato, l'audio va allo speaker di default del sistema.
+---
 
-#### 3. Device Label Privacy (tutti i browser)
+## Z-Index Modal Hierarchy
 
-I browser non mostrano i nomi dei dispositivi finché l'utente non concede il permesso:
+When voice session is active, other modals (webcam, tools) must appear ABOVE:
 
-```typescript
-// Prima: devices hanno label vuoto
-// Dopo getUserMedia: devices hanno label completo
-await navigator.mediaDevices.getUserMedia({ audio: true });
-const devices = await navigator.mediaDevices.enumerateDevices();
+```
+z-50: Voice Session Modal (main overlay)
+z-[60]: Webcam Capture Modal (above voice session)
+z-[70]: Tool Preview Modal (above everything)
 ```
 
-### Limitazioni per OS
+**Important**: If a modal appears BELOW voice session, increase its z-index.
 
-#### macOS
-- ✅ Funziona al 100%
-- ✅ Tutti i dispositivi riconosciuti
-- ✅ Airpods e bluetooth supportati
+---
 
-#### Windows
-- ✅ Funziona al 100%
-- ✅ Tutti i dispositivi riconosciuti
-- ⚠️ Alcuni driver audio possono richiedere permessi aggiuntivi
-
-#### Linux
-- ✅ Funziona con PulseAudio/PipeWire
-- ⚠️ setSinkId non funziona su Firefox Linux
-- ⚠️ Potrebbe richiedere configurazione ALSA per alcuni dispositivi
-
-### Mobile (iOS/Android)
-
-| Piattaforma | Supporto | Note |
-|-------------|----------|------|
-| iOS Safari | ⚠️ | Richiede user gesture, no background audio |
-| iOS Chrome | ⚠️ | Usa WebKit, stesse limitazioni Safari |
-| Android Chrome | ✅ | Pieno supporto |
-| Android Firefox | ⚠️ | No setSinkId |
-
-### Requisiti Minimi
-
-- **HTTPS obbligatorio**: getUserMedia richiede contesto sicuro
-- **Permessi browser**: Microfono e camera richiedono consenso utente
-- **WebSocket**: Deve essere supportato (tutti i browser moderni)
-
-### Come Testare Cross-Platform
+## Environment Variables
 
 ```bash
-# 1. Vai su /test-voice
-# 2. Verifica che i dispositivi siano elencati
-# 3. Prova la connessione WebSocket
-# 4. Parla e verifica che l'audio venga inviato
-# 5. Ascolta la risposta del maestro
+# .env.local
+
+# Azure OpenAI Realtime (for voice)
+AZURE_OPENAI_REALTIME_ENDPOINT=https://YOUR-RESOURCE.openai.azure.com
+AZURE_OPENAI_REALTIME_API_KEY=your-api-key-here
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+
+# WebSocket proxy port
+WS_PROXY_PORT=3001
 ```
 
-### Problemi Noti per Piattaforma
+---
 
-| Problema | Piattaforma | Workaround |
-|----------|-------------|------------|
-| AudioContext suspended | Safari iOS | User deve toccare schermo prima |
-| No device labels | Tutti | Richiedere permesso prima di enumerare |
-| setSinkId undefined | Firefox, Safari | Usa speaker di sistema |
-| Blob in WebSocket | Alcuni browser | Gestito con `instanceof Blob` |
+## Pre-Deploy Checklist
+
+- [ ] Voice in flat `session.voice` (Preview API)
+- [ ] Proxy converts Buffer to string for JSON
+- [ ] Resampling 48kHz → 24kHz implemented
+- [ ] Playback context at 24kHz
+- [ ] API key in query string URL, not header
+- [ ] VAD type is `server_vad`
+- [ ] Handle BOTH Preview and GA event types
+- [ ] Z-index modals correct
+- [ ] handleServerEventRef pattern for stale closure
+- [ ] Blob handling in ws.onmessage
 
 ---
 
----
+## Problem History
 
-## Barge-in (Auto-Interruption)
-
-### Cos'è il Barge-in?
-
-Barge-in permette all'utente di interrompere il maestro mentre sta parlando, proprio come in una conversazione naturale. Senza questa feature, l'utente deve aspettare che il maestro finisca prima di poter parlare.
-
-### Implementazione
-
-Quando l'utente inizia a parlare (`input_audio_buffer.speech_started`), se il maestro sta già parlando (`isSpeaking === true`), il sistema:
-
-1. Invia `response.cancel` ad Azure per fermare la generazione
-2. Svuota la coda audio (`audioQueueRef.current = []`)
-3. Ferma la riproduzione (`isPlayingRef.current = false`)
-4. Aggiorna lo stato UI (`setSpeaking(false)`)
-
-```typescript
-case 'input_audio_buffer.speech_started':
-  console.log('[VoiceSession] User speech detected');
-  setListening(true);
-
-  // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
-  if (isSpeaking && wsRef.current?.readyState === WebSocket.OPEN) {
-    console.log('[VoiceSession] Barge-in detected - interrupting assistant');
-    wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
-    audioQueueRef.current = [];
-    isPlayingRef.current = false;
-    setSpeaking(false);
-  }
-  break;
-```
-
-### Risultato
-
-- **Prima**: L'utente deve aspettare che il maestro finisca di parlare
-- **Dopo**: L'utente può interrompere in qualsiasi momento, conversazione naturale
+| Date | Problem | Solution |
+|------|---------|----------|
+| 2025-12-28 | session.update rejected | Added `type: 'realtime'` (GA API) |
+| 2025-12-28 | voice not recognized | Moved to `audio.output.voice` (GA API) |
+| 2025-12-28 | Proxy sends binary | Buffer → string conversion |
+| 2025-12-28 | Audio not detected | Resampling 48k→24k |
+| 2025-12-28 | No output sound | Implemented 24kHz playback |
+| 2025-12-29 | **Audio received but not played** | Preview API uses `response.audio.delta` not `response.output_audio.delta` |
+| 2025-12-29 | **VoiceSession doesn't work but test page does** | Stale closure bug - fixed with useRef pattern |
+| 2025-12-29 | **ws.onmessage doesn't receive events** | WebSocket sends Blob, code expected String |
+| 2025-12-30 | session.update format confusion | Clarified: current code uses Preview API flat format |
 
 ---
 
-## VAD Tuning (Voice Activity Detection)
+## Uncertainties and Known Gaps
 
-### Parametri Ottimizzati
+> **HONESTY SECTION**: These are things we're NOT 100% certain about.
 
-| Parametro | Valore Precedente | Valore Ottimizzato | Effetto |
-|-----------|-------------------|-------------------|---------|
-| `threshold` | 0.5 | 0.4 | Più sensibile a voci soft |
-| `silence_duration_ms` | 500 | 400 | Turn-taking più veloce |
+1. **GA API vs Preview API requirements**: We're using Preview API. If you switch to GA API (`gpt-realtime` without `4o`), you may need:
+   - `session.type: 'realtime'`
+   - `modalities: ['text', 'audio']`
+   - `voice` in `audio.output.voice` instead of flat
+   - **We have NOT tested GA API recently.**
 
-### Configurazione
+2. **ScriptProcessorNode deprecation**: We use ScriptProcessorNode which is deprecated. AudioWorklet would be better but requires more work. Current implementation works in all browsers.
 
-```typescript
-turn_detection: {
-  type: 'server_vad',
-  threshold: 0.4,            // Sensibilità microfono
-  prefix_padding_ms: 300,    // Audio prima del speech
-  silence_duration_ms: 400,  // Pausa per fine turno
-  create_response: true,
-}
-```
-
-### Considerazioni
-
-- **threshold più basso**: Cattura voci più deboli, ma può aumentare falsi positivi in ambienti rumorosi
-- **silence_duration_ms più basso**: Risposta più veloce, ma può interrompere pause naturali nel parlato
+3. **WebSocket binary mode**: Not fully tested. If Azure ever switches to binary WebSocket mode, our current text-based handling might need updates.
 
 ---
 
-*Documento creato dopo 2+ giorni di debug. NON RIPETERE I NOSTRI ERRORI!*
+## Debug Checklist
+
+1. **Audio not playing but WebSocket works?**
+   - Check Preview vs GA API event types
+   - Handle BOTH in switch statement
+   - File: `src/lib/hooks/use-voice-session.ts:627-671`
+
+2. **session.update fails?**
+   - Check format (Preview vs GA have different structures)
+   - File: `src/app/test-voice/page.tsx` for manual testing
+
+3. **Proxy doesn't connect to Azure?**
+   - Check env vars: `AZURE_OPENAI_REALTIME_*`
+   - File: `src/server/realtime-proxy.ts:31-84`
+
+4. **Audio distorted or too fast?**
+   - AudioContext playback MUST be 24kHz
+   - File: `src/lib/hooks/use-voice-session.ts:269`
+
+5. **VoiceSession component doesn't work but test page does?**
+   - Likely stale closure bug
+   - Verify `handleServerEventRef` is used in `ws.onmessage`
+   - File: `src/lib/hooks/use-voice-session.ts:249, 819-823, 916-918`
+
+6. **WebSocket events arrive as Blob?**
+   - Add `event.data instanceof Blob` handling
+   - Use `await event.data.text()` to convert
+   - File: `src/lib/hooks/use-voice-session.ts:899-912`
+
+7. **Wrong microphone selected?**
+   - Use `/test-voice` to select device
+   - Verify with waveform that correct mic is active
+
+---
+
+*Document created after 2+ days of debugging. DON'T REPEAT OUR MISTAKES!*

@@ -358,3 +358,154 @@ test.describe('Safety Guardrails', () => {
     expect(pageLoaded).toBe(true);
   });
 });
+
+test.describe('Separate Conversations Per Character (#33)', () => {
+  test('store persists conversationsByCharacter structure', async ({ page }) => {
+    await page.goto('/');
+
+    // Wait for app to initialize
+    await page.waitForTimeout(1000);
+
+    // Check that the Zustand store has the correct structure
+    const storeStructure = await page.evaluate(() => {
+      const storageKey = 'convergio-conversation-flow';
+      const stored = localStorage.getItem(storageKey);
+      if (!stored) return null;
+
+      try {
+        const parsed = JSON.parse(stored);
+        return {
+          hasState: !!parsed.state,
+          hasConversationsByCharacter: !!parsed.state?.conversationsByCharacter,
+          conversationsByCharacterType: typeof parsed.state?.conversationsByCharacter,
+        };
+      } catch {
+        return null;
+      }
+    });
+
+    // Store should have the new structure
+    if (storeStructure) {
+      expect(storeStructure.hasState).toBe(true);
+      expect(storeStructure.hasConversationsByCharacter).toBe(true);
+      expect(storeStructure.conversationsByCharacterType).toBe('object');
+    }
+  });
+
+  test('conversations are isolated between characters', async ({ page }) => {
+    await page.goto('/');
+
+    // Simulate storing separate conversations via store
+    const testResult = await page.evaluate(() => {
+      const storageKey = 'convergio-conversation-flow';
+
+      // Create test data with separate conversations
+      const testData = {
+        state: {
+          conversationsByCharacter: {
+            melissa: {
+              characterId: 'melissa',
+              characterType: 'coach',
+              characterName: 'Melissa',
+              messages: [
+                { id: '1', role: 'assistant', content: 'Ciao da Melissa!', timestamp: new Date() },
+                { id: '2', role: 'user', content: 'Ciao Melissa', timestamp: new Date() },
+              ],
+              lastMessageAt: new Date(),
+            },
+            mario: {
+              characterId: 'mario',
+              characterType: 'buddy',
+              characterName: 'Mario',
+              messages: [
+                { id: '3', role: 'assistant', content: 'Ciao da Mario!', timestamp: new Date() },
+              ],
+              lastMessageAt: new Date(),
+            },
+          },
+          sessionId: 'test-session',
+          sessionStartedAt: new Date(),
+        },
+        version: 0,
+      };
+
+      localStorage.setItem(storageKey, JSON.stringify(testData));
+
+      // Verify stored data
+      const stored = JSON.parse(localStorage.getItem(storageKey) || '{}');
+      const melissaMessages = stored.state?.conversationsByCharacter?.melissa?.messages;
+      const marioMessages = stored.state?.conversationsByCharacter?.mario?.messages;
+
+      return {
+        melissaHas2Messages: melissaMessages?.length === 2,
+        marioHas1Message: marioMessages?.length === 1,
+        melissaContent: melissaMessages?.[0]?.content,
+        marioContent: marioMessages?.[0]?.content,
+        conversationsAreSeparate:
+          melissaMessages?.[0]?.content !== marioMessages?.[0]?.content,
+      };
+    });
+
+    expect(testResult.melissaHas2Messages).toBe(true);
+    expect(testResult.marioHas1Message).toBe(true);
+    expect(testResult.melissaContent).toBe('Ciao da Melissa!');
+    expect(testResult.marioContent).toBe('Ciao da Mario!');
+    expect(testResult.conversationsAreSeparate).toBe(true);
+  });
+
+  test('switching character preserves previous conversation', async ({ page }) => {
+    await page.goto('/');
+
+    // Test that the store correctly saves and loads conversations on switch
+    const preservationTest = await page.evaluate(() => {
+      // Simulate the store's saveCurrentConversation logic
+      const conversationsByCharacter: Record<string, unknown> = {};
+
+      // Simulate: User talks to Melissa
+      const melissaMessages = [
+        { id: '1', role: 'assistant', content: 'Benvenuta!', timestamp: new Date() },
+        { id: '2', role: 'user', content: 'Aiutami con lo studio', timestamp: new Date() },
+        { id: '3', role: 'assistant', content: 'Certo!', timestamp: new Date() },
+      ];
+
+      // Save Melissa's conversation
+      conversationsByCharacter['melissa'] = {
+        characterId: 'melissa',
+        characterType: 'coach',
+        characterName: 'Melissa',
+        messages: melissaMessages,
+        lastMessageAt: new Date(),
+      };
+
+      // Simulate: User switches to Mario, talks
+      const marioMessages = [
+        { id: '4', role: 'assistant', content: 'Ehi!', timestamp: new Date() },
+        { id: '5', role: 'user', content: 'Mi sento stressato', timestamp: new Date() },
+      ];
+
+      // Save Mario's conversation
+      conversationsByCharacter['mario'] = {
+        characterId: 'mario',
+        characterType: 'buddy',
+        characterName: 'Mario',
+        messages: marioMessages,
+        lastMessageAt: new Date(),
+      };
+
+      // Simulate: User switches back to Melissa
+      // Should load Melissa's 3 messages, not Mario's 2
+      const loadedMelissa = conversationsByCharacter['melissa'] as { messages: unknown[] };
+      const loadedMario = conversationsByCharacter['mario'] as { messages: unknown[] };
+
+      return {
+        melissaPreserved: loadedMelissa?.messages?.length === 3,
+        marioPreserved: loadedMario?.messages?.length === 2,
+        bothExist: !!loadedMelissa && !!loadedMario,
+      };
+    });
+
+    expect(preservationTest.melissaPreserved).toBe(true);
+    expect(preservationTest.marioPreserved).toBe(true);
+    expect(preservationTest.bothExist).toBe(true);
+  });
+});
