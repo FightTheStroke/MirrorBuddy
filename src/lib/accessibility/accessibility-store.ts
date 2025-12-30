@@ -127,6 +127,7 @@ interface AccessibilityStore {
   applyMotorImpairmentProfile: () => void;
   applyAutismProfile: () => void;
   applyAuditoryImpairmentProfile: () => void;
+  applyCerebralPalsyProfile: () => void;
 
   // ADHD actions
   updateADHDConfig: (updates: Partial<ADHDSessionConfig>) => void;
@@ -234,6 +235,20 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
             largeText: true, // Emphasize visual communication
             lineSpacing: 1.3,
             // Visual cues become primary - no audio-dependent features
+          },
+        })),
+
+      applyCerebralPalsyProfile: () =>
+        set((state) => ({
+          settings: {
+            ...state.settings,
+            keyboardNavigation: true, // Essential for motor control challenges
+            reducedMotion: true, // Reduce visual fatigue
+            ttsEnabled: true, // Assist with reading if eye tracking is difficult
+            largeText: true, // Easier visual targeting
+            fontSize: 1.2,
+            lineSpacing: 1.4,
+            extraLetterSpacing: true, // Compensate for visual tracking difficulties
           },
         })),
 
