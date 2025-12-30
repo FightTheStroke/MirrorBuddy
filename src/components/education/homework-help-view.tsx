@@ -539,6 +539,17 @@ export function HomeworkHelpView() {
           )}
         </div>
       </div>
+
+      {/* Subject Confirmation Dialog */}
+      <SubjectConfirmationDialog
+        detectedSubject={detectedSubject}
+        isOpen={showSubjectDialog}
+        onConfirm={handleSubjectConfirm}
+        onClose={() => {
+          setShowSubjectDialog(false);
+          setPendingHomework(null);
+        }}
+      />
     </div>
   );
 }
