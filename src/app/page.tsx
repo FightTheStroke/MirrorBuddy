@@ -172,17 +172,6 @@ export default function Home() {
           sidebarOpen ? 'ml-64' : 'ml-20'
         )}
       >
-        {/* Welcome header - only show on main views */}
-        {studentProfile.name && ['conversation', 'maestri'].includes(currentView) && (
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Ciao, {studentProfile.name}! 👋
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400">
-              Pronto per una nuova sessione di studio?
-            </p>
-          </div>
-        )}
 
         {/* View content */}
         <motion.div

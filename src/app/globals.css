@@ -51,9 +51,10 @@
   --radius: 0.75rem;
 }
 
-/* Dark mode - supports both system preference and class-based theming (next-themes) */
+/* Dark mode via system preference ONLY when theme="system" (no class set) */
+/* next-themes adds .dark class for dark mode, so this only applies for system preference fallback */
 @media (prefers-color-scheme: dark) {
-  :root:not(.light) {
+  :root:not(.dark):not(.light):not([class*="dark"]):not([class*="light"]) {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -74,6 +75,31 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
   }
+}
+
+/* Explicit light mode class - ensures light theme overrides OS dark preference (fix #4) */
+.light,
+html.light,
+:root.light {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
 }
 
 /* Class-based dark mode (for next-themes) */
@@ -99,25 +125,55 @@
   --ring: 224.3 76.3% 48%;
 }
 
-/* Accent color themes - Light mode */
-[data-accent="blue"] { --primary: 221.2 83.2% 53.3%; --ring: 221.2 83.2% 53.3%; --accent-color: #3b82f6; }
-[data-accent="green"] { --primary: 142.1 76.2% 36.3%; --ring: 142.1 76.2% 36.3%; --accent-color: #22c55e; }
-[data-accent="purple"] { --primary: 262.1 83.3% 57.8%; --ring: 262.1 83.3% 57.8%; --accent-color: #a855f7; }
-[data-accent="orange"] { --primary: 24.6 95% 53.1%; --ring: 24.6 95% 53.1%; --accent-color: #f97316; }
-[data-accent="pink"] { --primary: 330 81% 60%; --ring: 330 81% 60%; --accent-color: #ec4899; }
+/* Accent color themes - Light mode (including explicit .light class) - Fix #5 */
+[data-accent="blue"], .light[data-accent="blue"], html.light[data-accent="blue"] { --primary: 221.2 83.2% 53.3%; --ring: 221.2 83.2% 53.3%; --accent-color: #3b82f6; }
+[data-accent="green"], .light[data-accent="green"], html.light[data-accent="green"] { --primary: 142.1 76.2% 36.3%; --ring: 142.1 76.2% 36.3%; --accent-color: #22c55e; }
+[data-accent="purple"], .light[data-accent="purple"], html.light[data-accent="purple"] { --primary: 262.1 83.3% 57.8%; --ring: 262.1 83.3% 57.8%; --accent-color: #a855f7; }
+[data-accent="orange"], .light[data-accent="orange"], html.light[data-accent="orange"] { --primary: 24.6 95% 53.1%; --ring: 24.6 95% 53.1%; --accent-color: #f97316; }
+[data-accent="pink"], .light[data-accent="pink"], html.light[data-accent="pink"] { --primary: 330 81% 60%; --ring: 330 81% 60%; --accent-color: #ec4899; }
 
-/* Accent color themes - Dark mode (multiple selectors for maximum compatibility) */
+/* Accent color themes - Dark mode (multiple selectors for maximum compatibility) - Fix #5 */
 .dark[data-accent="blue"], [data-accent="blue"].dark, html.dark[data-accent="blue"] { --primary: 217.2 91.2% 59.8%; --ring: 224.3 76.3% 48%; --accent-color: #60a5fa; }
 .dark[data-accent="green"], [data-accent="green"].dark, html.dark[data-accent="green"] { --primary: 142.1 70.6% 45.3%; --ring: 142.1 70.6% 45.3%; --accent-color: #4ade80; }
 .dark[data-accent="purple"], [data-accent="purple"].dark, html.dark[data-accent="purple"] { --primary: 262.1 83.3% 67.8%; --ring: 262.1 83.3% 67.8%; --accent-color: #c084fc; }
 .dark[data-accent="orange"], [data-accent="orange"].dark, html.dark[data-accent="orange"] { --primary: 24.6 95% 63.1%; --ring: 24.6 95% 63.1%; --accent-color: #fb923c; }
 .dark[data-accent="pink"], [data-accent="pink"].dark, html.dark[data-accent="pink"] { --primary: 330 81% 70%; --ring: 330 81% 70%; --accent-color: #f472b6; }
 
-/* Utility class for accent color usage */
+/* Utility classes for accent color usage - Fix #5 */
 .bg-accent-themed { background-color: var(--accent-color, hsl(var(--primary))); }
 .text-accent-themed { color: var(--accent-color, hsl(var(--primary))); }
 .border-accent-themed { border-color: var(--accent-color, hsl(var(--primary))); }
 .ring-accent-themed { --tw-ring-color: var(--accent-color, hsl(var(--ring))); }
+
+/* Hover and focus states for accent color */
+.hover\:bg-accent-themed:hover { background-color: var(--accent-color, hsl(var(--primary))); }
+.hover\:text-accent-themed:hover { color: var(--accent-color, hsl(var(--primary))); }
+.hover\:border-accent-themed:hover { border-color: var(--accent-color, hsl(var(--primary))); }
+.focus\:ring-accent-themed:focus { --tw-ring-color: var(--accent-color, hsl(var(--ring))); }
+
+/* Accent background with opacity variants */
+.bg-accent-themed\/10 { background-color: color-mix(in srgb, var(--accent-color, hsl(var(--primary))) 10%, transparent); }
+.bg-accent-themed\/20 { background-color: color-mix(in srgb, var(--accent-color, hsl(var(--primary))) 20%, transparent); }
+.bg-accent-themed\/30 { background-color: color-mix(in srgb, var(--accent-color, hsl(var(--primary))) 30%, transparent); }
+
+/* Accent color for shadows */
+.shadow-accent-themed { --tw-shadow-color: var(--accent-color, hsl(var(--primary))); }
+
+/* Button-like accent styling */
+.btn-accent-themed {
+  background-color: var(--accent-color, hsl(var(--primary)));
+  color: white;
+  border: 2px solid var(--accent-color, hsl(var(--primary)));
+  transition: all 0.15s ease;
+}
+.btn-accent-themed:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+.btn-accent-themed:active {
+  filter: brightness(0.95);
+  transform: translateY(0);
+}
 
 * {
   border-color: hsl(var(--border));

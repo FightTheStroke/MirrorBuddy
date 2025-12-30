@@ -32,6 +32,7 @@ import {
   RefreshCw,
   Video,
   Settings,
+  Undo2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -103,21 +104,64 @@ export function SettingsView() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [showAccessibilityModal, setShowAccessibilityModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+  const initialStateRef = useRef<{ settings: ReturnType<typeof useSettingsStore.getState>; accessibility: ReturnType<typeof useAccessibilityStore.getState>['settings'] } | null>(null);
 
   const { studentProfile, updateStudentProfile, appearance, updateAppearance } = useSettingsStore();
   const { settings: accessibilitySettings, updateSettings: updateAccessibilitySettings } = useAccessibilityStore();
+
+  // Store initial state on mount for undo capability
+  useEffect(() => {
+    if (!initialStateRef.current) {
+      initialStateRef.current = {
+        settings: useSettingsStore.getState(),
+        accessibility: useAccessibilityStore.getState().settings,
+      };
+    }
+  }, []);
+
+  // Track changes
+  useEffect(() => {
+    if (!initialStateRef.current) return;
+    const currentSettings = useSettingsStore.getState();
+    const currentAccessibility = useAccessibilityStore.getState().settings;
+    const changed = JSON.stringify({
+      profile: currentSettings.studentProfile,
+      appearance: currentSettings.appearance,
+      accessibility: currentAccessibility,
+    }) !== JSON.stringify({
+      profile: initialStateRef.current.settings.studentProfile,
+      appearance: initialStateRef.current.settings.appearance,
+      accessibility: initialStateRef.current.accessibility,
+    });
+    setHasChanges(changed);
+  }, [studentProfile, appearance, accessibilitySettings]);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
       // Actually sync settings to the server
       await useSettingsStore.getState().syncToServer();
+      // Update initial state after successful save
+      initialStateRef.current = {
+        settings: useSettingsStore.getState(),
+        accessibility: useAccessibilityStore.getState().settings,
+      };
+      setHasChanges(false);
     } catch (error) {
       logger.error('Failed to save settings', { error: String(error) });
     } finally {
       setIsSaving(false);
     }
   }, []);
+
+  const handleUndo = useCallback(() => {
+    if (!initialStateRef.current) return;
+    updateStudentProfile(initialStateRef.current.settings.studentProfile);
+    updateAppearance(initialStateRef.current.settings.appearance);
+    updateAccessibilitySettings(initialStateRef.current.accessibility);
+    setHasChanges(false);
+  }, [updateStudentProfile, updateAppearance, updateAccessibilitySettings]);
 
   return (
     <div className="space-y-6">
@@ -131,10 +175,21 @@ export function SettingsView() {
             Personalizza la tua esperienza di apprendimento
           </p>
         </div>
-        <Button onClick={handleSave} disabled={isSaving}>
-          <Save className="w-4 h-4 mr-2" />
-          {isSaving ? 'Salvando...' : 'Salva'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={handleUndo}
+            variant="outline"
+            disabled={!hasChanges || isSaving}
+            title="Annulla modifiche"
+          >
+            <Undo2 className="w-4 h-4 mr-2" />
+            Annulla
+          </Button>
+          <Button onClick={handleSave} disabled={isSaving}>
+            <Save className="w-4 h-4 mr-2" />
+            {isSaving ? 'Salvando...' : 'Salva'}
+          </Button>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -733,24 +788,29 @@ function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsProps) {
               { value: 'es' as const, label: 'Español', flag: '🇪🇸' },
               { value: 'fr' as const, label: 'Français', flag: '🇫🇷' },
               { value: 'de' as const, label: 'Deutsch', flag: '🇩🇪' },
-            ].map(lang => (
-              <button
-                key={lang.value}
-                onClick={() => onUpdate({ language: lang.value })}
-                className={cn(
-                  'flex items-center gap-2 p-3 rounded-xl border-2 transition-all shadow-sm',
-                  (appearance.language || 'it') === lang.value
-                    ? 'border-accent-themed bg-primary/10 ring-2 ring-accent-themed/30'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 hover:shadow-md'
-                )}
-              >
-                <span className="text-xl">{lang.flag}</span>
-                <span className="text-sm font-medium">{lang.label}</span>
-                {(appearance.language || 'it') === lang.value && (
-                  <Check className="w-4 h-4 text-accent-themed ml-auto" />
-                )}
-              </button>
-            ))}
+            ].map(lang => {
+              const isSelected = (appearance.language || 'it') === lang.value;
+              return (
+                <button
+                  key={lang.value}
+                  onClick={() => onUpdate({ language: lang.value })}
+                  className={cn(
+                    'flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-medium',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900',
+                    isSelected
+                      ? 'bg-accent-themed text-white border-accent-themed shadow-lg focus:ring-accent-themed'
+                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:border-accent-themed hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm hover:shadow-md focus:ring-accent-themed'
+                  )}
+                  aria-pressed={isSelected}
+                >
+                  <span className="text-xl">{lang.flag}</span>
+                  <span className="text-sm">{lang.label}</span>
+                  {isSelected && (
+                    <Check className="w-4 h-4 ml-auto" />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -1730,22 +1790,26 @@ function AIProviderSettings() {
                 )}
               </div>
 
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Clicca per selezionare il provider preferito:
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Azure Card */}
-                <div
-                  role="button"
-                  tabIndex={0}
+                {/* Azure Card - Fix #7: Clear button styling */}
+                <button
+                  type="button"
                   onClick={() => setPreferredProvider('azure')}
-                  onKeyDown={(e) => e.key === 'Enter' && setPreferredProvider('azure')}
                   className={cn(
-                    'p-4 rounded-xl border-2 transition-all cursor-pointer',
+                    'p-4 rounded-xl border-2 transition-all text-left',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-blue-500',
+                    'hover:shadow-md active:scale-[0.99]',
                     preferredProvider === 'azure' && 'ring-2 ring-accent-themed ring-offset-2 dark:ring-offset-slate-900',
                     providerStatus.activeProvider === 'azure'
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-md'
                       : providerStatus.azure.configured
-                        ? 'border-slate-300 dark:border-slate-600 hover:border-blue-300'
-                        : 'border-slate-200 dark:border-slate-700 opacity-60'
+                        ? 'border-slate-300 dark:border-slate-600 hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10'
+                        : 'border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed'
                   )}
+                  disabled={!providerStatus.azure.configured}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <Cloud className="w-6 h-6 text-blue-500" />
@@ -1776,23 +1840,24 @@ function AIProviderSettings() {
                       Voice: {providerStatus.azure.realtimeModel}
                     </div>
                   )}
-                </div>
+                </button>
 
-                {/* Ollama Card */}
-                <div
-                  role="button"
-                  tabIndex={0}
+                {/* Ollama Card - Fix #7: Clear button styling */}
+                <button
+                  type="button"
                   onClick={() => setPreferredProvider('ollama')}
-                  onKeyDown={(e) => e.key === 'Enter' && setPreferredProvider('ollama')}
                   className={cn(
-                    'p-4 rounded-xl border-2 transition-all cursor-pointer',
+                    'p-4 rounded-xl border-2 transition-all text-left',
+                    'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900 focus:ring-green-500',
+                    'hover:shadow-md active:scale-[0.99]',
                     preferredProvider === 'ollama' && 'ring-2 ring-accent-themed ring-offset-2 dark:ring-offset-slate-900',
                     providerStatus.activeProvider === 'ollama'
-                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20 shadow-md'
                       : providerStatus.ollama.configured
-                        ? 'border-slate-300 dark:border-slate-600 hover:border-green-300'
-                        : 'border-slate-200 dark:border-slate-700 opacity-60'
+                        ? 'border-slate-300 dark:border-slate-600 hover:border-green-400 hover:bg-green-50/50 dark:hover:bg-green-900/10'
+                        : 'border-slate-200 dark:border-slate-700 opacity-60 cursor-not-allowed'
                   )}
+                  disabled={!providerStatus.ollama.configured}
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <Server className="w-6 h-6 text-green-500" />
@@ -1821,7 +1886,7 @@ function AIProviderSettings() {
                   <div className="mt-1 text-xs text-slate-500">
                     URL: {providerStatus.ollama.url}
                   </div>
-                </div>
+                </button>
               </div>
 
               {/* Selection Mode Indicator */}
