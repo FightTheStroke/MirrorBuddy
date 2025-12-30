@@ -234,10 +234,11 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
       }
     };
 
-    // Handle errors - use function reference to avoid closure issue
+    // Handle errors - close current eventSource via ref to avoid stale closure
     eventSource.onerror = function handleError() {
       logger.warn('Tool stream error');
-      eventSource.close();
+      // Close via ref to ensure we close the current EventSource, not a stale one
+      eventSourceRef.current?.close();
       eventSourceRef.current = null;
 
       if (reconnectAttemptsRef.current < maxReconnectAttempts) {

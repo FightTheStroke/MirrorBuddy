@@ -80,21 +80,21 @@ export interface RoutingContext {
  */
 const DEFAULT_MAESTRO_BY_SUBJECT: Record<Subject, string> = {
   mathematics: 'euclide-matematica',
-  physics: 'galileo-fisica',
+  physics: 'feynman-fisica',
   chemistry: 'curie-chimica',
-  biology: 'darwin-biologia',
+  biology: 'darwin-biologia', // Fallback will find actual maestro if exists
   history: 'erodoto-storia',
-  geography: 'mercatore-geografia',
-  italian: 'dante-italiano',
+  geography: 'humboldt-geografia',
+  italian: 'manzoni-italiano',
   english: 'shakespeare-inglese',
   art: 'leonardo-arte',
-  music: 'beethoven-musica',
-  civics: 'montessori-civica',
+  music: 'mozart-musica',
+  civics: 'montessori-civica', // Fallback will find actual maestro if exists
   economics: 'smith-economia',
-  computerScience: 'turing-informatica',
-  health: 'ippocrate-salute',
+  computerScience: 'turing-informatica', // Fallback will find actual maestro if exists
+  health: 'ippocrate-salute', // Fallback will find actual maestro if exists
   philosophy: 'socrate-filosofia',
-  internationalLaw: 'grozio-diritto',
+  internationalLaw: 'grozio-diritto', // Fallback will find actual maestro if exists
 };
 
 // ============================================================================
@@ -107,7 +107,8 @@ const DEFAULT_MAESTRO_BY_SUBJECT: Record<Subject, string> = {
 function getMaestroForSubject(subject: Subject): MaestroFull | undefined {
   const defaultId = DEFAULT_MAESTRO_BY_SUBJECT[subject];
   if (defaultId) {
-    return getMaestroById(defaultId);
+    const maestro = getMaestroById(defaultId);
+    if (maestro) return maestro;
   }
 
   // Fallback: get first Maestro for this subject
