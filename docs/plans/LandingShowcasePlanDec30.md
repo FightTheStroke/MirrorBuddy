@@ -105,21 +105,21 @@ grep "GATE-1" /Users/roberdan/GitHub/ConvergioEdu-Demo/docs/plans/LandingShowcas
 | ✅ | T-03 | Creare layout showcase | **CLAUDE 2** | `src/app/showcase/layout.tsx` | Con banner "Showcase Mode" |
 | ✅ | T-04 | Creare landing page base | **CLAUDE 2** | `src/app/landing/page.tsx` | Hero + links |
 
-### Phase 1A: Landing Page — 0/2 (CLAUDE 2 continua dopo Phase 0)
+### Phase 1A: Landing Page — 2/2 ✅ COMPLETE
 
 | Status | ID | Task | Assignee | Files | Note |
 |:------:|-----|------|----------|-------|------|
-| ⬜ | T-05 | Wizard configurazione Azure | **CLAUDE 2** | `src/app/landing/page.tsx` | Form con istruzioni |
-| ⬜ | T-06 | Wizard configurazione Ollama | **CLAUDE 2** | `src/app/landing/page.tsx` | Form con istruzioni |
+| ✅ | T-05 | Wizard configurazione Azure | **CLAUDE 2** | `src/app/landing/page.tsx` | Incluso in T-04 |
+| ✅ | T-06 | Wizard configurazione Ollama | **CLAUDE 2** | `src/app/landing/page.tsx` | Incluso in T-04 |
 
-### Phase 1B: Static Showcase Content — 0/4 ⏸️ WAITING GATE-1
+### Phase 1B: Static Showcase Content — 4/4 ✅ COMPLETE
 
 | Status | ID | Task | Assignee | Files | Note |
 |:------:|-----|------|----------|-------|------|
-| ⬜ | T-07 | Showcase home page | **CLAUDE 3** | `src/app/showcase/page.tsx` | Menu navigazione |
-| ⬜ | T-08 | Galleria Maestri showcase | **CLAUDE 3** | `src/app/showcase/maestri/page.tsx` | 17 maestri, no interazione |
-| ⬜ | T-09 | Mappe mentali pre-costruite | **CLAUDE 3** | `src/app/showcase/mindmaps/page.tsx` | 2-3 mappe statiche belle |
-| ⬜ | T-10 | Quiz di esempio | **CLAUDE 3** | `src/app/showcase/quiz/page.tsx` | 10 domande statiche |
+| ✅ | T-07 | Showcase home page | **CLAUDE 3** | `src/app/showcase/page.tsx` | Menu navigazione |
+| ✅ | T-08 | Galleria Maestri showcase | **CLAUDE 3** | `src/app/showcase/maestri/page.tsx` | 17 maestri, no interazione |
+| ✅ | T-09 | Mappe mentali pre-costruite | **CLAUDE 3** | `src/app/showcase/mindmaps/page.tsx` | 2-3 mappe statiche belle |
+| ✅ | T-10 | Quiz di esempio | **CLAUDE 3** | `src/app/showcase/quiz/page.tsx` | 10 domande statiche |
 
 ### Phase 1C: Interactive Showcases — 4/4 ✅ COMPLETE
 
@@ -130,12 +130,12 @@ grep "GATE-1" /Users/roberdan/GitHub/ConvergioEdu-Demo/docs/plans/LandingShowcas
 | ✅ | T-13 | Chat simulata Coach/Buddy | **CLAUDE 4** | `src/app/showcase/chat/page.tsx` | Messaggi pre-scritti animati |
 | ✅ | T-14 | Componente ShowcaseBanner | **CLAUDE 4** | `src/components/showcase/banner.tsx` | Banner sticky top |
 
-### Phase 2: Integration — 0/2
+### Phase 2: Integration — 2/2 ✅ COMPLETE
 
 | Status | ID | Task | Assignee | Files | Note |
 |:------:|-----|------|----------|-------|------|
-| ⬜ | T-15 | Test e2e showcase | **CLAUDE 1** | `e2e/showcase.spec.ts` | Verifica navigazione |
-| ⬜ | T-16 | Final build & PR | **CLAUDE 1** | - | Merge e cleanup |
+| ✅ | T-15 | Test e2e showcase | **CLAUDE 1** | `e2e/showcase.spec.ts` | Verifica navigazione |
+| ✅ | T-16 | Final build & PR | **CLAUDE 1** | commit 881e7fb | Build verified, commit done |
 
 ---
 
@@ -493,11 +493,11 @@ Banner riutilizzabile che appare in tutte le pagine showcase.
 | Phase | Done | Total | Status |
 |-------|:----:|:-----:|--------|
 | Phase 0: Infrastructure | 4 | 4 | ✅ COMPLETE |
-| Phase 1A: Landing | 0 | 2 | ⏸️ |
-| Phase 1B: Static Content | 0 | 4 | ⏸️ |
+| Phase 1A: Landing | 2 | 2 | ✅ COMPLETE |
+| Phase 1B: Static Content | 4 | 4 | ✅ COMPLETE |
 | Phase 1C: Interactive | 4 | 4 | ✅ COMPLETE |
-| Phase 2: Integration | 0 | 2 | ⏸️ |
-| **TOTAL** | **8** | **16** | **50%** |
+| Phase 2: Integration | 2 | 2 | ✅ COMPLETE |
+| **TOTAL** | **16** | **16** | **100%** 🎉 |
 
 ---
 
