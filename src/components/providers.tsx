@@ -80,6 +80,8 @@ export function Providers({ children }: ProvidersProps) {
       defaultTheme="system"
       enableSystem
       disableTransitionOnChange
+      // Fix #4: Explicitly map themes to class names so .light class is added
+      value={{ light: 'light', dark: 'dark' }}
     >
       <AccessibilityProvider>
         <StoreInitializer />
