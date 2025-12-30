@@ -11,3 +11,6 @@ export type { MindMapLiveProps, UseMindMapLiveOptions } from './mind-map-live';
 export { QuizTool } from './quiz-tool';
 export { FlashcardTool } from './flashcard-tool';
 export { ToolResultDisplay, ToolResultsList } from './tool-result-display';
+export { ToolPanel } from './tool-panel';
+export { DemoSandbox } from './demo-sandbox';
+export { SearchResults } from './search-results';
