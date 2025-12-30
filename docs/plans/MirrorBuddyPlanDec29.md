@@ -18,7 +18,7 @@
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║                                                                              ║
 ║  OVERALL PROGRESS                                                            ║
-║  ████████████████████████████████████████████████░░  94% (33/35 tasks)       ║
+║  █████████████████████████████████████████████████░  97% (34/35 tasks)       ║
 ║                                                                              ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║  PHASE 0: SAFETY     ████████████████████  5/5   ✅ COMPLETE                 ║
@@ -40,8 +40,8 @@
 ### Quick Status
 | Metric | Value |
 |--------|-------|
-| **Tasks Completed** | 33 / 35 |
-| **GitHub Issues** | 30 closed, 0 open ✅ |
+| **Tasks Completed** | 34 / 35 (only P-04 merge pending) |
+| **GitHub Issues** | 31 closed, 0 open ✅ |
 | **Current Phase** | 🔄 Phase 4 Polish - awaiting PR merge |
 | **Build Status** | ✅ Passes (0 errors) |
 | **TypeCheck Status** | ✅ Passes (0 errors) |
@@ -197,13 +197,13 @@ MAPPING ISSUE → TASKS:
 | #23 | Epic: Conversation-First Architecture | I-01,I-04,I-05 | ███ 3/3 ✅ | C3,C4 | - | - | (PARTIAL - comment added) |
 | #24 | Melissa/Davide - Docente di Sostegno | AI-01,02,05,06,07 | █████ 5/5 ✅ | C4 | 2025-12-29 23:35 | 2025-12-30 | 25m |
 | #29 | MirrorBuddy - Mario/Maria Peer Support | AI-03,AI-04 | ██ 2/2 ✅ | C4 | 2025-12-29 23:35 | 2025-12-30 | 10m |
-| #31 | Collaborative Student Profile | F-01,02 | ██░░ 2/4 🔄 | C2,C3,C4 | 2025-12-30 01:15 | | (Backend done, UI pending) |
+| #31 | Collaborative Student Profile | F-01,02 | ████ 4/4 ✅ | C2,C3,C4 | 2025-12-30 01:15 | 2025-12-30 03:00 | CLOSED |
 | #22 | Storage Architecture Decision | ST-01,ST-02 | ██ 2/2 ✅ | C2 | 2025-12-29 23:32 | 2025-12-30 00:30 | 58m |
 | #20 | Webcam Module Improvements | ST-03 | █ 1/1 ✅ | C2 | 2025-12-30 00:30 | 2025-12-30 00:45 | 15m |
 | #21 | PDF Processing Support | ST-04 | █ 1/1 ✅ | C2 | 2025-12-30 00:45 | 2025-12-30 01:15 | 30m |
 | #26 | Real-time Tool Building | RT-01,02,03,I-06 | ████ 4/4 ✅ | C3 | | | |
 | #19 | Materiali Feature Redesign | I-03 | █ 1/1 ✅ | C3 | 12-30 00:15 | 12-30 00:45 | 0.5h |
-| #25 | Voice-First Tool Creation | I-02 | ░ 0/1 | C4 | | | |
+| #25 | Voice-First Tool Creation | I-02 | █ 1/1 ✅ | C4 | 2025-12-30 | 2025-12-30 | CLOSED |
 | #27 | Study Scheduler & Notifications | F-04 | █ 1/1 ✅ | C2 | 2025-12-30 01:30 | 2025-12-30 01:40 | 10m |
 | #28 | Method Progress Tracking | F-05 | █ 1/1 ✅ | C2 | 2025-12-30 01:40 | 2025-12-30 02:10 | 30m |
 
@@ -970,14 +970,14 @@ In produzione:
 
 | Phase | Tasks | Status | Dependencies |
 |-------|:-----:|--------|--------------|
-| Phase 0: Safety | 5 | ⬜ 0% | None (BLOCKS ALL) |
-| Phase 1A: Storage | 4 | ⬜ 0% | Phase 0 |
-| Phase 1B: Realtime | 3 | ⬜ 0% | Phase 0 |
-| Phase 1C: AI | 7 | ⬜ 0% | Phase 0 |
-| Phase 2: Integration | 6 | ⬜ 0% | Phase 1 |
-| Phase 3: Features | 6 | ⬜ 0% | Phase 2 |
-| Phase 4: Polish | 4 | ⬜ 0% | Phase 3 |
-| **TOTAL** | **35** | **0%** | |
+| Phase 0: Safety | 5 | ✅ 100% | None (BLOCKS ALL) |
+| Phase 1A: Storage | 4 | ✅ 100% | Phase 0 |
+| Phase 1B: Realtime | 3 | ✅ 100% | Phase 0 |
+| Phase 1C: AI | 7 | ✅ 100% | Phase 0 |
+| Phase 2: Integration | 6 | ✅ 100% | Phase 1 |
+| Phase 3: Features | 6 | ✅ 100% | Phase 2 |
+| Phase 4: Polish | 4 | 🔄 75% (P-04 pending) | Phase 3 |
+| **TOTAL** | **35** | **97%** | P-04 awaiting approval |
 
 ### Estimated Hours by Phase
 | Phase | Hours | Notes |
