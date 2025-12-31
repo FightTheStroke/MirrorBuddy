@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
 
 /**
  * Convergio-Edu E2E Test Configuration
@@ -12,11 +13,16 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
 
+  // Global setup: sets onboarding as completed
+  globalSetup: path.join(__dirname, 'e2e', 'global-setup.ts'),
+
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // Use storage state with onboarding completed
+    storageState: path.join(__dirname, 'e2e', '.auth', 'storage-state.json'),
   },
 
   projects: [
