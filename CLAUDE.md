@@ -89,9 +89,10 @@ Three stores in `src/lib/stores/app-store.ts`:
 |------|---------|
 | `src/data/support-teachers.ts` | 5 coach profiles (Melissa, Roberto, Chiara, Andrea, Favij) |
 | `src/data/buddy-profiles.ts` | Mario & Maria buddy profiles |
+| `src/data/app-knowledge-base.ts` | Platform documentation for coaches (Issue #16) |
 | `src/lib/ai/character-router.ts` | Routes students to appropriate character |
 | `src/lib/ai/handoff-manager.ts` | Manages transitions between characters |
-| `src/lib/ai/intent-detection.ts` | Detects student intent (academic, method, emotional) |
+| `src/lib/ai/intent-detection.ts` | Detects student intent (academic, method, emotional, tech_support) |
 | `src/components/conversation/conversation-flow.tsx` | Main conversation UI |
 | `src/components/conversation/character-chat-view.tsx` | Coach/Buddy chat with voice (side-by-side layout) |
 | `src/lib/stores/conversation-flow-store.ts` | Conversation state management |
@@ -134,6 +135,41 @@ Intent → Character routing logic in `character-router.ts`:
 | "Non riesco a concentrarmi" | Coach (Melissa) | Study method |
 | "Mi sento solo" | Buddy (Mario) | Emotional support |
 | "Ho paura di sbagliare" | Buddy (Mario) | Emotional support |
+| "Come funzionano le flashcard?" | Coach (preferred) | Platform support (Issue #16) |
+| "Non sento la voce" | Coach (preferred) | Tech troubleshooting |
+
+#### Platform Knowledge Base (Issue #16)
+
+Coaches can answer questions about ConvergioEdu features, configuration, and troubleshooting.
+
+**Key File**: `src/data/app-knowledge-base.ts`
+
+```
+app-knowledge-base.ts
+├── APP_VERSION           → Version and last update date
+├── MAESTRI_KNOWLEDGE     → 17 Maestri, voice calls
+├── TOOLS_KNOWLEDGE       → Flashcard, Mindmap, Quiz, Demo
+├── SUPPORT_KNOWLEDGE     → Coach, Buddy
+├── GAMIFICATION_KNOWLEDGE → XP, Streak, Pomodoro
+├── SCHEDULER_KNOWLEDGE   → Calendar, Notifications
+├── ACCESSIBILITY_KNOWLEDGE → Profiles, Font, ADHD, TTS
+├── ACCOUNT_KNOWLEDGE     → Profile, Parents, GDPR
+├── GENERAL_TROUBLESHOOTING → Common problems with solutions
+└── generateKnowledgeBasePrompt() → Generates prompt for coaches
+```
+
+**How it works**:
+1. `generateKnowledgeBasePrompt()` creates formatted documentation
+2. `PLATFORM_KNOWLEDGE` constant wraps it with instructions
+3. All 5 coaches include `PLATFORM_KNOWLEDGE` in their system prompts
+4. Intent detection routes `tech_support` queries to the student's preferred coach
+
+**IMPORTANT - Update on each release**:
+- Add new features to appropriate category
+- Update `APP_VERSION.lastUpdated`
+- Add troubleshooting for new known issues
+
+See ADR 0013 for architecture decision.
 
 #### Handoff Protocol
 
@@ -221,11 +257,13 @@ Melissa guides new students through onboarding with bidirectional voice conversa
 
 | File | Purpose |
 |------|---------|
-| `src/lib/voice/onboarding-tools.ts` | Tool definitions + handlers for voice data capture |
-| `src/lib/hooks/use-onboarding-voice.ts` | Specialized voice hook with Azure Realtime |
+| `src/lib/voice/onboarding-tools.ts` | Melissa prompts + executeOnboardingTool handler |
+| `src/lib/voice/voice-tool-commands.ts` | Unified VOICE_TOOLS with onboarding tools |
+| `src/lib/hooks/use-voice-session.ts` | Standard voice hook (used by all voice features) |
 | `src/components/onboarding/voice-onboarding-panel.tsx` | Voice call UI (Melissa's pink theme) |
-| `src/components/onboarding/onboarding-transcript.tsx` | Collapsible conversation history |
 | `src/lib/stores/onboarding-store.ts` | Voice session state management |
+
+**Architecture**: Onboarding uses the standard `useVoiceSession` hook with onboarding-specific tools integrated into the unified `VOICE_TOOLS` array. This ensures consistent behavior across all voice features.
 
 **Tool Calls**: When Melissa hears student info, she calls tools to update the store:
 - `set_student_name(name)` → Updates name field

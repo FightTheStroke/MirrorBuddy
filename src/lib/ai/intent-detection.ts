@@ -46,7 +46,8 @@ export type IntentType =
   | 'emotional_support' // Needs peer support/validation
   | 'crisis' // Urgent emotional distress
   | 'general_chat' // Casual conversation
-  | 'tool_request'; // Wants to create flashcards, mindmaps, etc.
+  | 'tool_request' // Wants to create flashcards, mindmaps, etc.
+  | 'tech_support'; // Needs help with app features/configuration (Issue #16)
 
 /**
  * Tool types that can be created via conversation.
@@ -200,6 +201,58 @@ const TOOL_PATTERNS: RegExp[] = [
 ];
 
 /**
+ * Technical support patterns (Italian).
+ * Detects when student needs help with app features/configuration.
+ * Issue #16: Tech support handled by student's preferred coach.
+ *
+ * IMPORTANT: Patterns must be specific to app/platform context.
+ * Generic patterns like "come posso" would match study method questions.
+ */
+const TECH_SUPPORT_PATTERNS: RegExp[] = [
+  // App-specific navigation (bidirectional - app context can appear before or after question)
+  /\b(app|applicazione|sito|convergio|piattaforma)\b/i,
+  /\b(come si usa|come (funziona|uso) (l'|la )?app)\b/i,
+
+  // Voice/audio features (bidirectional matching)
+  /\b(voce|microfono|audio|chiamat[ae] vocal[ei])\b/i,
+
+  // Settings and configuration (explicit settings words)
+  /\b(impostazion[ei]|settings?|config|preferenz[ae])\b/i,
+
+  // Theme/contrast settings
+  /\b(tema|scuro|chiaro|dark mode|light mode)\b.*\b(cambi|attiv|dove|come)\b/i,
+  /\b(cambi|attiv)\w*\b.*\b(tema|scuro|chiaro)\b/i,
+
+  // Font and accessibility features
+  /\b(font|carattere|opendyslexic)\b.*\b(cambiare|attivare|dove)\b/i,
+  /\b(modalit[àa])\b.*\b(dislessia|adhd|accessibilit[àa])\b/i,
+  /\b(dislessia|adhd)\b.*\b(attivare|funzionalit[àa]|opzioni|modalit[àa])\b/i,
+
+  // Timer Pomodoro (app feature)
+  /\b(timer|pomodoro)\b/i,
+
+  // Notifications
+  /\b(notific[ah]e?|promemoria|avvis[oi])\b.*\b(attivare|disattivare|non arrivano|dove)\b/i,
+  /\b(notific[ah]e?)\b.*\b(non|come|dove)\b/i,
+
+  // Account and data
+  /\b(account|profilo|login|accesso|password)\b.*\b(creare|cambiare|recuperare|dove)\b/i,
+  /\b(esport|scaric|download)\b.*\b(dati|progressi)\b/i,
+  /\b(cancell|elimin)\b.*\b(dati|account)\b/i,
+  /\b(genitor[ei]|parent|dashboard)\b.*\b(accesso|vedere|dove|come)\b/i,
+
+  // Gamification
+  /\b(xp|punti esperienza)\b/i,
+  /\b(streak)\b/i,
+  /\b(badge|traguard[oi]|achievement)\b/i,
+
+  // General tech issues (requires explicit problem words)
+  /\b(bug|errore|problema tecnico|bloccato)\b/i,
+  /\b(non (carica|funziona|si apre|risponde|va))\b/i,
+  /\b(lent[ao]|crash)\b/i,
+];
+
+/**
  * Tool type detection patterns (Italian).
  * Used to distinguish which specific tool is being requested.
  */
@@ -295,6 +348,14 @@ function isToolRequest(message: string): boolean {
 }
 
 /**
+ * Checks if message is requesting technical support with the app.
+ * Issue #16: Routes to student's preferred coach.
+ */
+function isTechSupport(message: string): boolean {
+  return TECH_SUPPORT_PATTERNS.some((pattern) => pattern.test(message));
+}
+
+/**
  * Detects the specific tool type being requested.
  *
  * @param message - The student's message to analyze
@@ -372,6 +433,19 @@ export function detectIntent(message: string): DetectedIntent {
   const emotions = detectEmotions(normalizedMessage);
   const wantsMethod = isMethodRequest(normalizedMessage);
   const wantsTool = isToolRequest(normalizedMessage);
+  const wantsTechSupport = isTechSupport(normalizedMessage);
+
+  // 2.5. Tech support → Coach (Issue #16)
+  // Check early because tech support patterns can overlap with other patterns
+  if (wantsTechSupport && !subject) {
+    return {
+      type: 'tech_support',
+      confidence: 0.85,
+      emotionalIndicators: emotions,
+      recommendedCharacter: 'coach',
+      reason: "Technical support with app features - coach will use knowledge base",
+    };
+  }
 
   // 3. Determine intent type and routing
   const hasStrongNegativeEmotion = emotions.some((e) =>
@@ -471,11 +545,9 @@ export function getCharacterTypeLabel(type: CharacterType): string {
     case 'maestro':
       return 'Professore';
     case 'coach':
-      return 'Coach (Melissa/Davide)';
+      return 'Il tuo Coach';
     case 'buddy':
-      return 'Buddy (Mario/Maria)';
-    case 'support_assistant':
-      return 'Assistente Tecnico (Guido)';
+      return 'Il tuo Buddy';
   }
 }
 
@@ -498,9 +570,8 @@ export function shouldSuggestRedirect(
 
   const suggestions: Record<CharacterType, string> = {
     maestro: `Per questa domanda di ${intent.subject || 'materia'}, un Professore potrebbe aiutarti meglio!`,
-    coach: 'Per organizzare meglio lo studio, Melissa o Davide possono aiutarti!',
-    buddy: 'Se vuoi parlare con qualcuno che ti capisce, Mario o Maria sono qui!',
-    support_assistant: 'Per problemi tecnici o di configurazione, Guido puo\' aiutarti!',
+    coach: 'Per organizzare meglio lo studio, il tuo Coach puo\' aiutarti!',
+    buddy: 'Se vuoi parlare con qualcuno che ti capisce, il tuo Buddy e\' qui!',
   };
 
   return {

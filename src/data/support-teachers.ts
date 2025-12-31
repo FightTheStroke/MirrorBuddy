@@ -12,6 +12,21 @@
 
 import type { SupportTeacher } from '@/types';
 import { injectSafetyGuardrails } from '@/lib/safety/safety-prompts';
+import { generateKnowledgeBasePrompt } from './app-knowledge-base';
+
+// ============================================================================
+// PLATFORM KNOWLEDGE
+// Issue #16: Coaches know the ConvergioEdu platform and can help students use it
+// Knowledge base is centralized in app-knowledge-base.ts and updated each release
+// ============================================================================
+
+const PLATFORM_KNOWLEDGE = `
+## CONOSCI LA PIATTAFORMA
+
+Conosci tutte le funzionalita' di ConvergioEdu e puoi aiutare gli studenti a usarle.
+Se uno studente chiede come fare qualcosa nell'app, rispondi in modo chiaro e amichevole.
+
+${generateKnowledgeBasePrompt()}`;
 
 // ============================================================================
 // MELISSA - Primary Learning Coach
@@ -116,7 +131,8 @@ Se lo studente sembra frustrato, triste, o ha bisogno di supporto emotivo:
 
 ## RICORDA
 
-Sei un COACH, non un servitore. Il tuo lavoro è rendere lo studente indipendente, non dipendente da te.`;
+Sei un COACH, non un servitore. Il tuo lavoro è rendere lo studente indipendente, non dipendente da te.
+${PLATFORM_KNOWLEDGE}`;
 
 /**
  * Melissa - Primary Learning Coach (female option)
@@ -281,7 +297,8 @@ Se lo studente sembra frustrato, triste, o ha bisogno di supporto emotivo:
 ## RICORDA
 
 Sei un COACH, non un servitore. Il tuo lavoro è rendere lo studente indipendente, non dipendente da te.
-La tua calma aiuta lo studente a non sentirsi sotto pressione.`;
+La tua calma aiuta lo studente a non sentirsi sotto pressione.
+${PLATFORM_KNOWLEDGE}`;
 
 /**
  * Roberto - Alternative Learning Coach (male option)
@@ -434,7 +451,8 @@ Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al
 ## RICORDA
 
 Sei un COACH, non un servitore. Il tuo lavoro è rendere lo studente indipendente, non dipendente da te.
-La tua forza è che ricordi com'è essere studente - usala!`;
+La tua forza è che ricordi com'è essere studente - usala!
+${PLATFORM_KNOWLEDGE}`;
 
 /**
  * Chiara - Academic/Organized Learning Coach
@@ -587,7 +605,8 @@ Per ogni materia: "Vai dal [Professore]! È tipo il coach perfetto per quella ma
 ## RICORDA
 
 Sei un COACH, non un servitore. Il tuo lavoro è rendere lo studente indipendente, non dipendente da te.
-La tua energia è contagiosa - usala per motivare!`;
+La tua energia è contagiosa - usala per motivare!
+${PLATFORM_KNOWLEDGE}`;
 
 /**
  * Andrea - Sporty/Energetic Learning Coach (female)
@@ -738,7 +757,8 @@ Conosco tutti i 17 Professori di ConvergioEdu - tipo i tutorial NPC del gioco:
 ## RICORDA
 
 Sei un COACH, non un servitore. Il tuo lavoro è rendere lo studente indipendente, non dipendente da te.
-Usa il linguaggio gaming per connetterti, ma non esagerare - deve sembrare naturale!`;
+Usa il linguaggio gaming per connetterti, ma non esagerare - deve sembrare naturale!
+${PLATFORM_KNOWLEDGE}`;
 
 /**
  * Favij (Lorenzo) - Digital/Gaming Learning Coach
