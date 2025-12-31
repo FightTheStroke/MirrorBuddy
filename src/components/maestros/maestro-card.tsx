@@ -24,11 +24,29 @@ export function MaestroCard({
   isSelected = false,
   showToolButtons = false,
 }: MaestroCardProps) {
+  // Handle card click (not on tool buttons)
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't trigger if clicking on tool buttons
+    if ((e.target as HTMLElement).closest('[data-tool-button]')) return;
+    onSelect(maestro);
+  };
+
+  // Keyboard accessibility
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect(maestro);
+    }
+  };
+
   return (
-    <motion.button
-      onClick={() => onSelect(maestro)}
+    <motion.div
+      role="button"
+      tabIndex={0}
+      onClick={handleCardClick}
+      onKeyDown={handleKeyDown}
       className={cn(
-        'relative w-full p-6 rounded-2xl text-center transition-all duration-300',
+        'relative w-full p-6 rounded-2xl text-center transition-all duration-300 cursor-pointer',
         'bg-white dark:bg-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/80',
         'border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-md',
         'hover:border-opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2',
@@ -111,15 +129,12 @@ export function MaestroCard({
 
       {/* Tool buttons - Issue #35 */}
       {showToolButtons && onToolRequest && (
-        <div className="flex flex-wrap justify-center gap-1 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50">
+        <div className="flex flex-wrap justify-center gap-1 mt-3 pt-3 border-t border-slate-100 dark:border-slate-700/50" data-tool-button>
           <Button
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToolRequest(maestro, 'mindmap');
-            }}
+            onClick={() => onToolRequest(maestro, 'mindmap')}
             aria-label={`Crea mappa mentale con ${maestro.name}`}
           >
             <Brain className="w-3 h-3 mr-1" />
@@ -129,10 +144,7 @@ export function MaestroCard({
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToolRequest(maestro, 'quiz');
-            }}
+            onClick={() => onToolRequest(maestro, 'quiz')}
             aria-label={`Crea quiz con ${maestro.name}`}
           >
             <HelpCircle className="w-3 h-3 mr-1" />
@@ -142,10 +154,7 @@ export function MaestroCard({
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToolRequest(maestro, 'demo');
-            }}
+            onClick={() => onToolRequest(maestro, 'demo')}
             aria-label={`Crea demo con ${maestro.name}`}
           >
             <Play className="w-3 h-3 mr-1" />
@@ -155,10 +164,7 @@ export function MaestroCard({
             variant="ghost"
             size="sm"
             className="h-7 px-2 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              onToolRequest(maestro, 'webcam');
-            }}
+            onClick={() => onToolRequest(maestro, 'webcam')}
             aria-label={`Scatta foto per ${maestro.name}`}
           >
             <Camera className="w-3 h-3 mr-1" />
@@ -166,6 +172,6 @@ export function MaestroCard({
           </Button>
         </div>
       )}
-    </motion.button>
+    </motion.div>
   );
 }
