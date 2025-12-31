@@ -461,8 +461,9 @@ function VoiceCallOverlay({
     toggleMute,
   } = useVoiceSession({
     onError: (error) => {
-      logger.error('Voice call error', { error: String(error) });
-      setConfigError('Errore di connessione vocale');
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error('Voice call error', { message });
+      setConfigError(message || 'Errore di connessione vocale');
     },
     onTranscript: (role, text) => {
       logger.debug('Voice transcript', { role, text: text.substring(0, 100) });

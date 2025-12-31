@@ -77,7 +77,10 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
     clearToolCalls,
     sendWebcamResult,
   } = useVoiceSession({
-    onError: (error) => logger.error('Voice error', { error: String(error) }),
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error('Voice error', { message });
+    },
     onTranscript: (role, text) => {
       logger.debug('Transcript', { role, text: text.substring(0, 100) });
       // Count user questions
