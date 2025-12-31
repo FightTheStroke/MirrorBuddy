@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, ArrowLeft, SkipForward, User, GraduationCap, Heart } from 'lucide-react';
+import { ArrowRight, ArrowLeft, SkipForward, User, GraduationCap, Heart, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { cn } from '@/lib/utils';
+import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
 
 const SCHOOL_LEVELS = [
   { id: 'elementare', label: 'Elementare', years: '6-10 anni' },
@@ -35,7 +36,7 @@ const LEARNING_DIFFERENCES = [
  * - Learning differences (optional, for accessibility presets)
  */
 export function InfoStep() {
-  const { data, updateData, nextStep, prevStep, isReplayMode } = useOnboardingStore();
+  const { data, updateData, nextStep, prevStep, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
 
   const [age, setAge] = useState<number | undefined>(data.age);
   const [schoolLevel, setSchoolLevel] = useState<'elementare' | 'media' | 'superiore' | undefined>(
@@ -45,7 +46,20 @@ export function InfoStep() {
     data.learningDifferences || []
   );
 
+  // Auto-speak Melissa's info message
+  const { isPlaying, stop } = useOnboardingTTS({
+    autoSpeak: !isVoiceMuted,
+    text: ONBOARDING_SCRIPTS.info,
+    delay: 500,
+  });
+
+  const toggleMute = () => {
+    if (isPlaying) stop();
+    setVoiceMuted(!isVoiceMuted);
+  };
+
   const handleContinue = () => {
+    stop();
     updateData({
       age,
       schoolLevel,
@@ -55,6 +69,7 @@ export function InfoStep() {
   };
 
   const handleSkip = () => {
+    stop();
     nextStep();
   };
 
@@ -78,7 +93,7 @@ export function InfoStep() {
               className="object-cover w-full h-full"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
               Raccontami un po&apos; di te, {data.name}!
             </h2>
@@ -86,6 +101,19 @@ export function InfoStep() {
               Questo mi aiuterà a personalizzare la tua esperienza
             </p>
           </div>
+          {/* Voice toggle */}
+          <button
+            onClick={toggleMute}
+            className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
+            aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+          >
+            {isVoiceMuted ? (
+              <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+            ) : (
+              <Volume2 className={cn('w-5 h-5 text-pink-600 dark:text-pink-400', isPlaying && 'animate-pulse')} />
+            )}
+          </button>
         </div>
 
         {/* Age input */}
@@ -194,7 +222,7 @@ export function InfoStep() {
           className="flex gap-3 pt-4"
         >
           <Button
-            onClick={prevStep}
+            onClick={() => { stop(); prevStep(); }}
             variant="outline"
             size="lg"
             className="flex-1"

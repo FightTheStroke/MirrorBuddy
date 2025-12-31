@@ -2,10 +2,11 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, ArrowLeft, Lightbulb, Users, Heart, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Lightbulb, Users, Heart, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
 
 const PRINCIPLES = [
   {
@@ -40,7 +41,29 @@ const PRINCIPLES = [
  * Brief, engaging overview of what makes the platform special.
  */
 export function PrinciplesStep() {
-  const { data, nextStep, prevStep } = useOnboardingStore();
+  const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
+
+  // Auto-speak Melissa's principles message
+  const { isPlaying, stop } = useOnboardingTTS({
+    autoSpeak: !isVoiceMuted,
+    text: ONBOARDING_SCRIPTS.principles,
+    delay: 500,
+  });
+
+  const toggleMute = () => {
+    if (isPlaying) stop();
+    setVoiceMuted(!isVoiceMuted);
+  };
+
+  const handleNext = () => {
+    stop();
+    nextStep();
+  };
+
+  const handlePrev = () => {
+    stop();
+    prevStep();
+  };
 
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl">
@@ -56,7 +79,7 @@ export function PrinciplesStep() {
               className="object-cover w-full h-full"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
               Benvenuto nella Scuola Che Vorrei, {data.name}!
             </h2>
@@ -64,6 +87,19 @@ export function PrinciplesStep() {
               Ecco cosa ci rende speciali
             </p>
           </div>
+          {/* Voice toggle */}
+          <button
+            onClick={toggleMute}
+            className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
+            aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+          >
+            {isVoiceMuted ? (
+              <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+            ) : (
+              <Volume2 className={`w-5 h-5 text-pink-600 dark:text-pink-400 ${isPlaying ? 'animate-pulse' : ''}`} />
+            )}
+          </button>
         </div>
 
         {/* Principles grid */}
@@ -113,7 +149,7 @@ export function PrinciplesStep() {
           className="flex gap-3 pt-2"
         >
           <Button
-            onClick={prevStep}
+            onClick={handlePrev}
             variant="outline"
             size="lg"
             className="flex-1"
@@ -122,7 +158,7 @@ export function PrinciplesStep() {
             Indietro
           </Button>
           <Button
-            onClick={nextStep}
+            onClick={handleNext}
             size="lg"
             className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
           >

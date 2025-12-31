@@ -31,6 +31,7 @@ interface OnboardingState {
   onboardingCompletedAt: string | null;
   currentStep: OnboardingStep;
   isReplayMode: boolean;
+  isVoiceMuted: boolean;
 
   // Collected data
   data: OnboardingData;
@@ -40,6 +41,7 @@ interface OnboardingState {
   nextStep: () => void;
   prevStep: () => void;
   updateData: (data: Partial<OnboardingData>) => void;
+  setVoiceMuted: (muted: boolean) => void;
   completeOnboarding: () => void;
   startReplay: () => void;
   resetOnboarding: () => void;
@@ -61,11 +63,14 @@ export const useOnboardingStore = create<OnboardingState>()(
       onboardingCompletedAt: null,
       currentStep: 'welcome',
       isReplayMode: false,
+      isVoiceMuted: false,
       data: {
         name: '',
       },
 
       setStep: (step) => set({ currentStep: step }),
+
+      setVoiceMuted: (muted) => set({ isVoiceMuted: muted }),
 
       nextStep: () => {
         const currentIndex = STEP_ORDER.indexOf(get().currentStep);
@@ -105,6 +110,7 @@ export const useOnboardingStore = create<OnboardingState>()(
           onboardingCompletedAt: null,
           currentStep: 'welcome',
           isReplayMode: false,
+          isVoiceMuted: false,
           data: { name: '' },
         }),
 
@@ -143,6 +149,7 @@ export const useOnboardingStore = create<OnboardingState>()(
           onboardingCompletedAt: null,
           currentStep: 'welcome',
           isReplayMode: false,
+          isVoiceMuted: false,
           data: { name: '' },
         });
 
