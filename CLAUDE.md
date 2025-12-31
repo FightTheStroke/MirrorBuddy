@@ -169,6 +169,38 @@ Voice profiles defined in:
 - `support-teachers.ts`: Coaches have `voice` and `voiceInstructions` fields
 - `buddy-profiles.ts`: Buddies have `voice` and `voiceInstructions` fields
 
+#### Voice Support for Maestri (MaestroSession)
+
+`MaestroSession` provides unified voice+chat experience for all 17 Maestri:
+
+```
+┌─────────────────────────────────┬────────────┐
+│         Chat Area               │   Voice    │
+│   (flex-1, scrollable)          │   Panel    │
+│                                 │  (w-64)    │
+│   💬 Text message               │  [Avatar]  │
+│   🔊 Voice transcript           │  [Status]  │
+│   📊 Evaluation card            │  [Mute]    │
+│                                 │  [Hangup]  │
+├─────────────────────────────────┤            │
+│   [Input] [Send] [Call]         │            │
+└─────────────────────────────────┴────────────┘
+```
+
+| File | Purpose |
+|------|---------|
+| `src/components/maestros/maestro-session.tsx` | Unified voice+chat component (835 lines) |
+| `src/components/maestros/lazy.tsx` | Code-split wrapper for performance |
+| `src/components/voice/voice-panel.tsx` | Shared voice controls (used by both Maestri and Coach/Buddy) |
+| `src/components/chat/evaluation-card.tsx` | Inline session evaluation display |
+
+**Session Evaluation**: Auto-generated when session ends (5+ messages or 2+ min):
+- Score based on: engagement, questions asked, duration
+- Grades: Insufficiente (1-3) → Sufficiente (4-5) → Buono (6-7) → Ottimo (8-9) → Eccellente (10)
+- Saved to parent diary with GDPR consent
+
+**XP Rewards**: `Math.min(100, sessionDuration * 5 + questionCount * 10)`
+
 ### Safety Guardrails
 
 All AI characters (Maestri, Coaches, Buddies) have safety guardrails injected into their system prompts.
