@@ -2,23 +2,22 @@
 
 import { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { MaestroCard } from './maestro-card';
-import { LazyVoiceSession } from '@/components/voice/lazy';
-import { LazyChatSession } from '@/components/chat/lazy';
 import { maestri, subjectNames, subjectIcons, subjectColors, getAllSubjects } from '@/data';
 import { cn } from '@/lib/utils';
 import type { Maestro, Subject } from '@/types';
 import type { ToolType } from '@/types/tools';
 
-type SessionMode = 'voice' | 'chat' | null;
+type SessionMode = 'voice' | 'chat';
 
-export function MaestriGrid() {
+interface MaestriGridProps {
+  onMaestroSelect?: (maestro: Maestro, mode: SessionMode) => void;
+}
+
+export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<Subject | 'all'>('all');
-  const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
-  const [sessionMode, setSessionMode] = useState<SessionMode>(null);
-  const [sessionKey, setSessionKey] = useState(0); // Key to force remount on session restart
 
   const subjects = getAllSubjects();
 
@@ -37,24 +36,18 @@ export function MaestriGrid() {
 
   // Click on maestro goes directly to voice
   const handleSelect = (maestro: Maestro) => {
-    setSessionKey(prev => prev + 1); // Force fresh component mount
-    setSelectedMaestro(maestro);
-    setSessionMode('voice');
-  };
-
-  const handleCloseSession = () => {
-    setSessionMode(null);
-    setSelectedMaestro(null);
+    if (onMaestroSelect) {
+      onMaestroSelect(maestro, 'voice');
+    }
   };
 
   // Handle tool request from maestro card - opens chat with tool request
   const handleToolRequest = (maestro: Maestro, tool: ToolType) => {
-    setSessionKey(prev => prev + 1);
-    setSelectedMaestro(maestro);
-    // For tools, we start in chat mode so the tool can be built
-    setSessionMode('chat');
     // Store tool request in sessionStorage for chat to pick up
     sessionStorage.setItem('pendingToolRequest', JSON.stringify({ tool, maestroId: maestro.id }));
+    if (onMaestroSelect) {
+      onMaestroSelect(maestro, 'chat');
+    }
   };
 
   return (
@@ -159,31 +152,6 @@ export function MaestriGrid() {
         </div>
       )}
 
-      {/* Voice session (lazy loaded) */}
-      <AnimatePresence mode="wait">
-        {sessionMode === 'voice' && selectedMaestro && (
-          <LazyVoiceSession
-            key={`voice-${selectedMaestro.id}-${sessionKey}`}
-            maestro={selectedMaestro}
-            onClose={handleCloseSession}
-            onSwitchToChat={() => setSessionMode('chat')}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Chat session (lazy loaded) */}
-      <AnimatePresence mode="wait">
-        {sessionMode === 'chat' && selectedMaestro && (
-          <LazyChatSession
-            key={`chat-${selectedMaestro.id}`}
-            maestro={selectedMaestro}
-            onClose={handleCloseSession}
-            onSwitchToVoice={() => {
-              setSessionMode('voice');
-            }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }

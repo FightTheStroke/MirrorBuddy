@@ -80,7 +80,7 @@ export function InfoStep() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              Raccontami un po' di te, {data.name}!
+              Raccontami un po&apos; di te, {data.name}!
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
               Questo mi aiuterà a personalizzare la tua esperienza
@@ -163,7 +163,7 @@ export function InfoStep() {
             Hai qualche difficoltà particolare? (opzionale)
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Questo ci aiuta a rendere l'app più accessibile per te
+            Questo ci aiuta a rendere l&apos;app più accessibile per te
           </p>
           <div className="grid grid-cols-2 gap-2">
             {LEARNING_DIFFERENCES.map((diff) => (

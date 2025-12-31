@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Loader2, Phone, PhoneOff, Mic, MicOff, Volume2 } from 'lucide-react';
+import { Send, Loader2, Phone, PhoneOff, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { getSupportTeacherById } from '@/data/support-teachers';
 import { getBuddyById } from '@/data/buddy-profiles';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
+import { VoicePanel } from '@/components/voice';
 import type { ExtendedStudentProfile, Subject, Maestro, MaestroVoice } from '@/types';
 
 interface Message {
@@ -109,159 +110,6 @@ function characterToMaestro(character: ReturnType<typeof getCharacterInfo>, char
   };
 }
 
-/**
- * Side panel for voice controls (shown when voice is active)
- */
-// Pre-computed random offsets for audio visualizer bars (avoid Math.random in render)
-const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
-
-function VoicePanel({
-  character,
-  isConnected,
-  isListening,
-  isSpeaking,
-  isMuted,
-  inputLevel,
-  connectionState,
-  configError,
-  onToggleMute,
-  onEndCall,
-}: {
-  character: ReturnType<typeof getCharacterInfo>;
-  isConnected: boolean;
-  isListening: boolean;
-  isSpeaking: boolean;
-  isMuted: boolean;
-  inputLevel: number;
-  connectionState: string;
-  configError: string | null;
-  onToggleMute: () => void;
-  onEndCall: () => void;
-}) {
-  const getStatusText = () => {
-    if (configError) return configError;
-    if (connectionState === 'connecting') return 'Connessione...';
-    if (isConnected && isSpeaking) return `${character.name} sta parlando...`;
-    if (isConnected && isListening) return 'In ascolto...';
-    if (isConnected) return 'Connesso';
-    return 'Avvio chiamata...';
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 20 }}
-      className={cn(
-        "w-80 lg:w-96 flex flex-col items-center justify-center gap-6 p-6 rounded-2xl",
-        "bg-gradient-to-b",
-        character.color
-      )}
-    >
-      {/* Avatar with status ring */}
-      <motion.div
-        animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-        className="relative"
-      >
-        {character.avatar ? (
-          <Image
-            src={character.avatar}
-            alt={character.name}
-            width={112}
-            height={112}
-            className={cn(
-              'rounded-full border-4 object-cover transition-colors duration-300 w-24 h-24 lg:w-28 lg:h-28',
-              isConnected ? 'border-white' : 'border-white/50',
-              isSpeaking && 'border-white shadow-lg shadow-white/30'
-            )}
-          />
-        ) : (
-          <div className="w-24 h-24 lg:w-28 lg:h-28 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-4xl font-bold">
-            {character.name.charAt(0)}
-          </div>
-        )}
-        {isConnected && (
-          <span className="absolute bottom-2 right-2 w-5 h-5 bg-green-400 border-2 border-white/50 rounded-full animate-pulse" />
-        )}
-      </motion.div>
-
-      {/* Name */}
-      <div className="text-center">
-        <h3 className="text-xl lg:text-2xl font-semibold text-white">{character.name}</h3>
-        <p className={cn(
-          "text-sm mt-1",
-          configError ? "text-red-200" : "text-white/70"
-        )}>
-          {getStatusText()}
-        </p>
-      </div>
-
-      {/* Audio visualizer */}
-      {isConnected && (
-        <div className="flex items-center gap-1.5 h-10">
-          {VISUALIZER_BAR_OFFSETS.map((offset, i) => (
-            <motion.div
-              key={i}
-              animate={{
-                height: isSpeaking
-                  ? [6, 28 + offset, 6]
-                  : isListening && !isMuted
-                    ? [6, 6 + inputLevel * 50, 6]
-                    : 6
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 0.5 + i * 0.1,
-                ease: 'easeInOut'
-              }}
-              className={cn(
-                "w-2 rounded-full",
-                isSpeaking ? "bg-white" : isListening && !isMuted ? "bg-white/80" : "bg-white/30"
-              )}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Controls */}
-      <div className="flex items-center gap-4 mt-4">
-        {isConnected && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggleMute}
-            aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
-            className={cn(
-              'rounded-full w-14 h-14 transition-colors',
-              isMuted
-                ? 'bg-white/20 text-white hover:bg-white/30'
-                : 'bg-white/30 text-white hover:bg-white/40'
-            )}
-          >
-            {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-          </Button>
-        )}
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onEndCall}
-          className="rounded-full w-14 h-14 bg-red-500 text-white hover:bg-red-600"
-        >
-          <PhoneOff className="w-6 h-6" />
-        </Button>
-      </div>
-
-      {/* Mute status text */}
-      {isConnected && (
-        <p className="text-sm text-white/70">
-          {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
-        </p>
-      )}
-    </motion.div>
-  );
-}
 
 export function CharacterChatView({ characterId, characterType }: CharacterChatViewProps) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -451,9 +299,9 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
   };
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-8rem)] max-w-7xl mx-auto">
+    <div className="flex gap-4 h-[calc(100vh-8rem)]">
       {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0 max-w-4xl">
+      <div className="flex-1 flex flex-col min-w-0">
         {/* Chat Header */}
         <div className={cn(
           'flex items-center gap-4 p-4 rounded-t-2xl bg-gradient-to-r text-white',
@@ -618,7 +466,12 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
       <AnimatePresence>
         {isVoiceActive && (
           <VoicePanel
-            character={character}
+            character={{
+              name: character.name,
+              avatar: character.avatar,
+              specialty: character.role,
+              color: character.color,
+            }}
             isConnected={isConnected}
             isListening={isListening}
             isSpeaking={isSpeaking}

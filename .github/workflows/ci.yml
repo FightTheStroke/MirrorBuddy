@@ -7,6 +7,7 @@ on:
     branches: [main]
 
 # Minimal permissions for security (ISE best practice)
+# Triggered on PRs to main and pushes to main
 permissions:
   contents: read
 

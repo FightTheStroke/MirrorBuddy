@@ -143,7 +143,7 @@ export function OnboardingSettings() {
                 )}
                 {resetConfirmStep === 3 && (
                   <span className="text-red-600 font-medium">
-                    Questo e l'ultimo avviso. Clicca "Elimina tutto" per procedere.
+                    Questo è l&apos;ultimo avviso. Clicca &ldquo;Elimina tutto&rdquo; per procedere.
                     NON potrai tornare indietro!
                   </span>
                 )}
