@@ -122,6 +122,17 @@ export interface CreateTimelineArgs {
 }
 
 /**
+ * Arguments for create_demo tool.
+ */
+export interface CreateDemoArgs {
+  title: string;
+  description?: string;
+  html: string;
+  css?: string;
+  js?: string;
+}
+
+/**
  * Arguments for web_search tool.
  */
 export interface WebSearchArgs {
@@ -184,6 +195,7 @@ export type VoiceToolArgs =
   | { name: 'create_summary'; args: CreateSummaryArgs }
   | { name: 'create_diagram'; args: CreateDiagramArgs }
   | { name: 'create_timeline'; args: CreateTimelineArgs }
+  | { name: 'create_demo'; args: CreateDemoArgs }
   | { name: 'web_search'; args: WebSearchArgs }
   | { name: 'capture_homework'; args: CaptureHomeworkArgs }
   // Mindmap modification commands
@@ -421,6 +433,38 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
   },
   {
     type: 'function',
+    name: 'create_demo',
+    description:
+      'Crea una simulazione interattiva HTML/JS per visualizzare concetti. Usalo per dimostrazioni visive come il sistema solare, moto dei proiettili, circuiti elettrici, animazioni matematiche.',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'Titolo della simulazione',
+        },
+        description: {
+          type: 'string',
+          description: 'Breve descrizione di cosa mostra la demo',
+        },
+        html: {
+          type: 'string',
+          description: 'Codice HTML per la struttura',
+        },
+        css: {
+          type: 'string',
+          description: 'Codice CSS per lo stile (opzionale)',
+        },
+        js: {
+          type: 'string',
+          description: 'Codice JavaScript per l\'interattività (opzionale)',
+        },
+      },
+      required: ['title', 'html'],
+    },
+  },
+  {
+    type: 'function',
     name: 'web_search',
     description:
       'Cerca informazioni educative sul web. Usalo per trovare risorse aggiuntive, approfondimenti, o verificare informazioni.',
@@ -617,6 +661,8 @@ export function getToolTypeFromName(name: string): ToolType | null {
       return 'diagram';
     case 'create_timeline':
       return 'timeline';
+    case 'create_demo':
+      return 'demo';
     default:
       return null;
   }

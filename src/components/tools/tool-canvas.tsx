@@ -22,6 +22,7 @@ import {
   X,
   Maximize2,
   Minimize2,
+  Sparkles,
 } from 'lucide-react';
 import { useToolStream, type ActiveToolState } from '@/lib/hooks/use-tool-stream';
 import { MindmapRenderer } from './markmap-renderer';
@@ -41,6 +42,7 @@ const toolIcons: Record<ToolType, React.ReactNode> = {
   summary: <FileText className="w-5 h-5" />,
   timeline: <Clock className="w-5 h-5" />,
   diagram: <GitBranch className="w-5 h-5" />,
+  demo: <Sparkles className="w-5 h-5" />,
 };
 
 // Tool display names
@@ -51,6 +53,7 @@ const toolNames: Record<ToolType, string> = {
   summary: 'Riassunto',
   timeline: 'Linea del Tempo',
   diagram: 'Diagramma',
+  demo: 'Demo Interattiva',
 };
 
 interface ToolCanvasProps {
