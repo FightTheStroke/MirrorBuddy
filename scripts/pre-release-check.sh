@@ -1,119 +1,175 @@
 #!/usr/bin/env bash
 # =============================================================================
-# PRE-RELEASE CHECK SCRIPT
+# PRE-RELEASE CHECK SCRIPT - PARALLELIZED FOR M3 MAX
 # Runs all automated quality gates before release.
-# Exit on first failure (fail-fast).
+# Optimized for Apple Silicon with parallel execution.
 #
 # Usage: npm run pre-release
 # =============================================================================
 
-set -e  # Exit on first error
-
-# Colors for output
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Temp directory for parallel job results
+TEMP_DIR=$(mktemp -d)
+trap "rm -rf $TEMP_DIR" EXIT
 
 echo ""
 echo "=========================================="
 echo " CONVERGIO EDU - PRE-RELEASE CHECKS"
+echo " Parallelized for M3 Max (14 cores)"
 echo "=========================================="
 echo ""
 
-# Track timing
 START_TIME=$(date +%s)
 
-# Phase 1: Static Analysis
-echo -e "${YELLOW}[1/6] Running ESLint...${NC}"
-npm run lint
-LINT_EXIT=$?
-if [ $LINT_EXIT -ne 0 ]; then
-    echo -e "${RED}FAILED: ESLint found errors${NC}"
-    exit 1
-fi
-echo -e "${GREEN}PASSED: ESLint (0 errors, 0 warnings)${NC}"
-echo ""
+# =============================================================================
+# PHASE 1: INSTANT CHECKS (< 1 second)
+# =============================================================================
+echo -e "${BLUE}[PHASE 1] Instant checks...${NC}"
 
-echo -e "${YELLOW}[2/6] Running TypeScript check...${NC}"
-npm run typecheck
-TYPE_EXIT=$?
-if [ $TYPE_EXIT -ne 0 ]; then
-    echo -e "${RED}FAILED: TypeScript found errors${NC}"
-    exit 1
-fi
-echo -e "${GREEN}PASSED: TypeScript (0 errors)${NC}"
-echo ""
-
-# Phase 2: Security
-echo -e "${YELLOW}[3/6] Running security audit...${NC}"
-npm audit --audit-level=high
-AUDIT_EXIT=$?
-if [ $AUDIT_EXIT -ne 0 ]; then
-    echo -e "${RED}FAILED: Security vulnerabilities found${NC}"
-    exit 1
-fi
-echo -e "${GREEN}PASSED: Security audit (0 high/critical vulnerabilities)${NC}"
-echo ""
-
-# Phase 3: Documentation
-echo -e "${YELLOW}[4/6] Checking required documentation...${NC}"
+# Documentation check (instant)
 MISSING_DOCS=""
 for doc in "README.md" "CHANGELOG.md" "CONTRIBUTING.md" "CLAUDE.md"; do
-    if [ ! -f "$doc" ]; then
-        MISSING_DOCS="$MISSING_DOCS $doc"
-    fi
+    [ ! -f "$doc" ] && MISSING_DOCS="$MISSING_DOCS $doc"
 done
 if [ -n "$MISSING_DOCS" ]; then
-    echo -e "${RED}FAILED: Missing documentation:$MISSING_DOCS${NC}"
+    echo -e "${RED}✗ Missing docs:$MISSING_DOCS${NC}"
     exit 1
 fi
-echo -e "${GREEN}PASSED: All required documentation exists${NC}"
-echo ""
+echo -e "${GREEN}✓ Documentation exists${NC}"
 
-# Phase 4: Code Hygiene
-echo -e "${YELLOW}[5/6] Checking code hygiene...${NC}"
-# Check for TODO/FIXME in source code (excluding tests and docs)
-TODO_COUNT=$(grep -rE "(TODO|FIXME|HACK|XXX):" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v "node_modules" | wc -l | tr -d ' ')
+# Code hygiene with ripgrep (much faster than grep)
+if command -v rg &> /dev/null; then
+    TODO_COUNT=$(rg -c "(TODO|FIXME|HACK|XXX):" src/ -t ts -t tsx 2>/dev/null | awk -F: '{sum+=$2} END {print sum+0}')
+    CONSOLE_COUNT=$(rg -c "console\.(log|warn|error|debug|info)\(" src/ -t ts -t tsx 2>/dev/null | rg -v "logger\.ts" | awk -F: '{sum+=$2} END {print sum+0}')
+else
+    TODO_COUNT=$(grep -rE "(TODO|FIXME|HACK|XXX):" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | wc -l | tr -d ' ')
+    CONSOLE_COUNT=$(grep -rE "console\.(log|warn|error|debug|info)\(" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v "logger.ts" | wc -l | tr -d ' ')
+fi
+
 if [ "$TODO_COUNT" -gt 0 ]; then
-    echo -e "${RED}FAILED: Found $TODO_COUNT TODO/FIXME markers in src/${NC}"
-    grep -rE "(TODO|FIXME|HACK|XXX):" src/ --include="*.ts" --include="*.tsx" | head -10
+    echo -e "${RED}✗ Found $TODO_COUNT TODO/FIXME markers${NC}"
+    rg "(TODO|FIXME|HACK|XXX):" src/ -t ts -t tsx 2>/dev/null | head -5
     exit 1
 fi
-
-# Check for console.log in production code (excluding logger.ts and tests)
-CONSOLE_COUNT=$(grep -rE "console\.(log|warn|error|debug|info)\(" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v "logger.ts" | grep -v ".spec.ts" | grep -v ".test.ts" | grep -v "node_modules" | wc -l | tr -d ' ')
 if [ "$CONSOLE_COUNT" -gt 0 ]; then
-    echo -e "${RED}FAILED: Found $CONSOLE_COUNT console.* calls in src/ (use logger instead)${NC}"
-    grep -rE "console\.(log|warn|error|debug|info)\(" src/ --include="*.ts" --include="*.tsx" | grep -v "logger.ts" | grep -v ".spec.ts" | head -10
+    echo -e "${RED}✗ Found $CONSOLE_COUNT console.* calls (use logger)${NC}"
     exit 1
 fi
-echo -e "${GREEN}PASSED: Code hygiene (0 TODO/FIXME, 0 console.*)${NC}"
+echo -e "${GREEN}✓ Code hygiene passed${NC}"
+
+PHASE1_TIME=$(date +%s)
+echo -e "${BLUE}   Phase 1: $((PHASE1_TIME - START_TIME))s${NC}"
 echo ""
 
-# Phase 5: Build
-echo -e "${YELLOW}[6/6] Running production build...${NC}"
-npm run build > /dev/null 2>&1
-BUILD_EXIT=$?
-if [ $BUILD_EXIT -ne 0 ]; then
-    echo -e "${RED}FAILED: Production build failed${NC}"
-    npm run build
+# =============================================================================
+# PHASE 2: PARALLEL STATIC ANALYSIS
+# =============================================================================
+echo -e "${BLUE}[PHASE 2] Parallel static analysis (lint + typecheck + audit)...${NC}"
+
+# Run all three in parallel
+(
+    npm run lint > "$TEMP_DIR/lint.log" 2>&1
+    echo $? > "$TEMP_DIR/lint.exit"
+) &
+LINT_PID=$!
+
+(
+    npm run typecheck > "$TEMP_DIR/typecheck.log" 2>&1
+    echo $? > "$TEMP_DIR/typecheck.exit"
+) &
+TYPE_PID=$!
+
+(
+    npm audit --audit-level=high > "$TEMP_DIR/audit.log" 2>&1
+    echo $? > "$TEMP_DIR/audit.exit"
+) &
+AUDIT_PID=$!
+
+# Wait for all with progress indicator
+echo -n "   Running: "
+while kill -0 $LINT_PID 2>/dev/null || kill -0 $TYPE_PID 2>/dev/null || kill -0 $AUDIT_PID 2>/dev/null; do
+    echo -n "."
+    sleep 0.5
+done
+echo " done"
+
+# Check results
+LINT_EXIT=$(cat "$TEMP_DIR/lint.exit" 2>/dev/null || echo 1)
+TYPE_EXIT=$(cat "$TEMP_DIR/typecheck.exit" 2>/dev/null || echo 1)
+AUDIT_EXIT=$(cat "$TEMP_DIR/audit.exit" 2>/dev/null || echo 1)
+
+FAILED=0
+
+if [ "$LINT_EXIT" -ne 0 ]; then
+    echo -e "${RED}✗ ESLint failed${NC}"
+    cat "$TEMP_DIR/lint.log"
+    FAILED=1
+else
+    echo -e "${GREEN}✓ ESLint passed${NC}"
+fi
+
+if [ "$TYPE_EXIT" -ne 0 ]; then
+    echo -e "${RED}✗ TypeScript failed${NC}"
+    cat "$TEMP_DIR/typecheck.log"
+    FAILED=1
+else
+    echo -e "${GREEN}✓ TypeScript passed${NC}"
+fi
+
+if [ "$AUDIT_EXIT" -ne 0 ]; then
+    echo -e "${RED}✗ Security audit failed${NC}"
+    cat "$TEMP_DIR/audit.log"
+    FAILED=1
+else
+    echo -e "${GREEN}✓ Security audit passed${NC}"
+fi
+
+[ $FAILED -ne 0 ] && exit 1
+
+PHASE2_TIME=$(date +%s)
+echo -e "${BLUE}   Phase 2: $((PHASE2_TIME - PHASE1_TIME))s${NC}"
+echo ""
+
+# =============================================================================
+# PHASE 3: PRODUCTION BUILD (uses all cores via Next.js)
+# =============================================================================
+echo -e "${BLUE}[PHASE 3] Production build...${NC}"
+
+# Next.js automatically uses available cores
+if ! npm run build > "$TEMP_DIR/build.log" 2>&1; then
+    echo -e "${RED}✗ Build failed${NC}"
+    cat "$TEMP_DIR/build.log"
     exit 1
 fi
-echo -e "${GREEN}PASSED: Production build successful${NC}"
+echo -e "${GREEN}✓ Build successful${NC}"
+
+PHASE3_TIME=$(date +%s)
+echo -e "${BLUE}   Phase 3: $((PHASE3_TIME - PHASE2_TIME))s${NC}"
 echo ""
 
-# Summary
+# =============================================================================
+# SUMMARY
+# =============================================================================
 END_TIME=$(date +%s)
-DURATION=$((END_TIME - START_TIME))
+TOTAL=$((END_TIME - START_TIME))
 
 echo "=========================================="
-echo -e "${GREEN} ALL PRE-RELEASE CHECKS PASSED${NC}"
-echo " Duration: ${DURATION}s"
+echo -e "${GREEN} ✓ ALL PRE-RELEASE CHECKS PASSED${NC}"
+echo ""
+echo " Phase 1 (instant):   $((PHASE1_TIME - START_TIME))s"
+echo " Phase 2 (parallel):  $((PHASE2_TIME - PHASE1_TIME))s"
+echo " Phase 3 (build):     $((PHASE3_TIME - PHASE2_TIME))s"
+echo " ─────────────────────────"
+echo " Total:               ${TOTAL}s"
 echo "=========================================="
 echo ""
 echo "Next steps:"
 echo "  1. Run E2E tests: npm run test"
-echo "  2. Manual testing of critical flows"
-echo "  3. Create release: npm run version:patch"
+echo "  2. Create release: npm run version:patch"
 echo ""
