@@ -26,7 +26,47 @@ interface ChatRequest {
   systemPrompt: string;
   maestroId: string;
   enableTools?: boolean; // Optional: enable tool calling (default: true)
+  requestedTool?: 'mindmap' | 'quiz' | 'flashcard' | 'demo'; // Tool context injection
 }
+
+// Tool context to inject into system prompt (Phase 5: Chat API Enhancement)
+const TOOL_CONTEXT: Record<string, string> = {
+  mindmap: `
+STAI CREANDO UNA MAPPA MENTALE con lo studente.
+Linee guida:
+- Fai domande maieutiche per esplorare l'argomento
+- Parti dal concetto centrale e espandi in modo organico
+- Usa create_mindmap per costruire la mappa incrementalmente
+- Ogni risposta dello studente può aggiungere nodi alla mappa
+- Mantieni la struttura chiara e gerarchica`,
+
+  quiz: `
+STAI CREANDO UN QUIZ con lo studente.
+Linee guida:
+- Chiedi prima di che argomento vuole essere interrogato
+- Crea domande a scelta multipla chiare e formative
+- Usa create_quiz per generare il quiz
+- Includi feedback educativo per ogni risposta
+- Adatta la difficoltà al livello dello studente`,
+
+  flashcard: `
+STAI CREANDO FLASHCARD per lo studente.
+Linee guida:
+- Identifica i concetti chiave da memorizzare
+- Crea carte con domanda/risposta brevi e incisive
+- Usa create_flashcards per generare le carte
+- Organizza le carte per argomento o difficoltà
+- Le flashcard verranno usate con ripetizione spaziata FSRS`,
+
+  demo: `
+STAI CREANDO UNA DEMO INTERATTIVA per lo studente.
+Linee guida:
+- Capisce cosa lo studente vuole visualizzare
+- Crea simulazioni semplici ma efficaci
+- Usa create_demo per generare la demo HTML/JS
+- Mantieni l'interattività intuitiva e accessibile
+- Spiega cosa la demo sta mostrando`,
+};
 
 export async function POST(request: NextRequest) {
   // Rate limiting: 20 requests per minute per IP
@@ -40,13 +80,20 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: ChatRequest = await request.json();
-    const { messages, systemPrompt, maestroId, enableTools = true } = body;
+    const { messages, systemPrompt, maestroId, enableTools = true, requestedTool } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
         { error: 'Messages array is required' },
         { status: 400 }
       );
+    }
+
+    // Inject tool context into system prompt if tool is requested (Phase 5)
+    let enhancedSystemPrompt = systemPrompt;
+    if (requestedTool && TOOL_CONTEXT[requestedTool]) {
+      enhancedSystemPrompt = `${systemPrompt}\n\n${TOOL_CONTEXT[requestedTool]}`;
+      logger.debug('Tool context injected', { requestedTool, maestroId });
     }
 
     // SECURITY: Filter the last user message for safety (Issue #30)
@@ -75,7 +122,7 @@ export async function POST(request: NextRequest) {
     try {
       // Call AI with optional tool definitions
       // Cast to mutable array since chatCompletion expects ToolDefinition[]
-      const result = await chatCompletion(messages, systemPrompt, {
+      const result = await chatCompletion(messages, enhancedSystemPrompt, {
         tools: enableTools ? ([...CHAT_TOOL_DEFINITIONS] as typeof CHAT_TOOL_DEFINITIONS[number][]) : undefined,
         tool_choice: enableTools ? 'auto' : 'none',
       });

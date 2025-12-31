@@ -632,6 +632,7 @@ export function ConversationFlow() {
     messages,
     pendingHandoff,
     characterHistory,
+    sessionId,
     startConversation,
     endConversation: _endConversation, // Available for future explicit end
     addMessage,
@@ -761,6 +762,94 @@ export function ConversationFlow() {
       startConversation(extendedProfile);
     }
   }, [isActive, startConversation, extendedProfile]);
+
+  // SSE listener for real-time tool events (Phase 4: Fullscreen Layout)
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const eventSource = new EventSource(`/api/tools/sse?sessionId=${sessionId}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+
+        switch (data.type) {
+          case 'connected':
+            logger.debug('SSE connected', { sessionId, clientId: data.clientId });
+            break;
+
+          case 'tool:created':
+            // Tool creation started - show in panel
+            setActiveTool({
+              id: data.toolId,
+              type: data.toolType,
+              status: 'initializing',
+              progress: 0,
+              content: data.data,
+              createdAt: new Date(),
+            });
+            break;
+
+          case 'tool:update':
+            // Incremental update during building
+            setActiveTool((prev) => {
+              if (!prev || prev.id !== data.toolId) return prev;
+              return {
+                ...prev,
+                status: 'building',
+                progress: data.progress ?? prev.progress,
+                content: data.data ?? prev.content,
+              };
+            });
+            break;
+
+          case 'tool:complete':
+            // Tool finished building
+            setActiveTool((prev) => {
+              if (!prev || prev.id !== data.toolId) return prev;
+              return {
+                ...prev,
+                status: 'completed',
+                progress: 1,
+                content: data.data ?? prev.content,
+              };
+            });
+            break;
+
+          case 'tool:error':
+            // Tool build failed
+            setActiveTool((prev) => {
+              if (!prev || prev.id !== data.toolId) return prev;
+              return {
+                ...prev,
+                status: 'error',
+                error: data.error || 'Errore durante la creazione',
+              };
+            });
+            break;
+
+          case 'heartbeat':
+            // Keep-alive, no action needed
+            break;
+
+          default:
+            logger.debug('Unknown SSE event type', { type: data.type });
+        }
+      } catch (error) {
+        logger.error('SSE message parse error', { error: String(error) });
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      logger.error('SSE connection error', { error: String(error) });
+      // EventSource will automatically try to reconnect
+    };
+
+    return () => {
+      eventSource.close();
+      logger.debug('SSE connection closed', { sessionId });
+    };
+  }, [sessionId]);
 
   /**
    * Handle sending a message.

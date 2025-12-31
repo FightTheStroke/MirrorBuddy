@@ -47,6 +47,7 @@ import { useSettingsStore, type TeachingStyle } from '@/lib/stores/app-store';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import { useNotificationStore, requestPushPermission, isPushSupported } from '@/lib/stores/notification-store';
 import { TelemetryDashboard } from '@/components/telemetry';
+import { OnboardingSettings } from '@/components/settings/onboarding-settings';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -269,7 +270,12 @@ export function SettingsView() {
 
         {activeTab === 'notifications' && <NotificationSettings />}
 
-        {activeTab === 'privacy' && <PrivacySettings />}
+        {activeTab === 'privacy' && (
+          <>
+            <OnboardingSettings />
+            <PrivacySettings />
+          </>
+        )}
 
         {activeTab === 'telemetry' && <TelemetryDashboard />}
         {activeTab === 'diagnostics' && <DiagnosticsTab />}

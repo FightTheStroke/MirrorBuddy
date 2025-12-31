@@ -33,6 +33,8 @@ export interface DetectedIntent {
   recommendedCharacter: CharacterType;
   /** Reason for recommendation */
   reason: string;
+  /** Tool type if tool_request intent */
+  toolType?: ToolType;
 }
 
 /**
@@ -45,6 +47,11 @@ export type IntentType =
   | 'crisis' // Urgent emotional distress
   | 'general_chat' // Casual conversation
   | 'tool_request'; // Wants to create flashcards, mindmaps, etc.
+
+/**
+ * Tool types that can be created via conversation.
+ */
+export type ToolType = 'mindmap' | 'quiz' | 'flashcard' | 'demo';
 
 /**
  * Emotional indicators detected in message.
@@ -193,6 +200,33 @@ const TOOL_PATTERNS: RegExp[] = [
 ];
 
 /**
+ * Tool type detection patterns (Italian).
+ * Used to distinguish which specific tool is being requested.
+ */
+const TOOL_TYPE_PATTERNS: Record<ToolType, RegExp[]> = {
+  mindmap: [
+    /\b(mappa\s*(mentale|concettuale)?)\b/i,
+    /\b(schema|diagramma)\b/i,
+    /\b(organizza\s*(le\s+)?idee)\b/i,
+  ],
+  quiz: [
+    /\b(quiz|test|verifica|interrogazione)\b/i,
+    /\b(domande|esercizi)\b/i,
+    /\b(mi\s+interroghi?)\b/i,
+  ],
+  flashcard: [
+    /\b(flashcard|flash\s*card)\b/i,
+    /\b(carte\s+(per\s+)?ripass(o|are))\b/i,
+    /\b(schede\s+di\s+studio)\b/i,
+  ],
+  demo: [
+    /\b(demo|simulazione|animazione)\b/i,
+    /\b(mostra(mi)?\s+(come|cosa))\b/i,
+    /\b(interattiv[ao])\b/i,
+  ],
+};
+
+/**
  * Crisis patterns (Italian) - require immediate adult referral.
  * These are imported from safety-prompts.ts to maintain single source of truth.
  */
@@ -258,6 +292,33 @@ function isMethodRequest(message: string): boolean {
  */
 function isToolRequest(message: string): boolean {
   return TOOL_PATTERNS.some((pattern) => pattern.test(message));
+}
+
+/**
+ * Detects the specific tool type being requested.
+ *
+ * @param message - The student's message to analyze
+ * @returns The detected tool type, or null if no specific tool detected
+ *
+ * @example
+ * detectToolType("Fammi una mappa mentale sulla Liguria")
+ * // Returns: 'mindmap'
+ *
+ * detectToolType("Crea delle flashcard per ripassare storia")
+ * // Returns: 'flashcard'
+ */
+export function detectToolType(message: string): ToolType | null {
+  const normalizedMessage = message.toLowerCase().trim();
+
+  for (const [toolType, patterns] of Object.entries(TOOL_TYPE_PATTERNS)) {
+    for (const pattern of patterns) {
+      if (pattern.test(normalizedMessage)) {
+        return toolType as ToolType;
+      }
+    }
+  }
+
+  return null;
 }
 
 /**
@@ -330,13 +391,28 @@ export function detectIntent(message: string): DetectedIntent {
 
   // Tool request with subject → Maestro (they can create the tool)
   if (wantsTool && subject) {
+    const toolType = detectToolType(normalizedMessage);
     return {
       type: 'tool_request',
       confidence: 0.8,
       subject,
+      toolType: toolType ?? undefined,
       emotionalIndicators: emotions,
       recommendedCharacter: 'maestro',
-      reason: 'Tool creation request for specific subject',
+      reason: `Tool creation request (${toolType || 'unspecified'}) for specific subject`,
+    };
+  }
+
+  // Tool request without subject → Coach can help guide
+  if (wantsTool) {
+    const toolType = detectToolType(normalizedMessage);
+    return {
+      type: 'tool_request',
+      confidence: 0.7,
+      toolType: toolType ?? undefined,
+      emotionalIndicators: emotions,
+      recommendedCharacter: 'coach',
+      reason: `Tool creation request (${toolType || 'unspecified'}) - coach can help identify subject`,
     };
   }
 

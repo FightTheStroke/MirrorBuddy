@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Brain, Play, Trophy, Target, Sparkles } from 'lucide-react';
+import { Brain, Play, Trophy, Target, Sparkles, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Quiz } from './quiz';
@@ -137,6 +138,7 @@ const sampleQuizzes: QuizType[] = [
 ];
 
 export function QuizView() {
+  const router = useRouter();
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const { addXP } = useProgressStore();
@@ -171,6 +173,11 @@ export function QuizView() {
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm">
+          {/* PRIMARY: Conversation-first approach (Phase 6) */}
+          <Button onClick={() => router.push('/conversation?tool=quiz')}>
+            <MessageSquare className="h-4 w-4 mr-2" />
+            Crea Quiz con un Maestro
+          </Button>
           <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
             <Trophy className="h-4 w-4 text-purple-600" />
             <span className="font-medium text-purple-700 dark:text-purple-300">

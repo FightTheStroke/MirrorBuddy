@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -10,6 +11,7 @@ import {
   X,
   Save,
   Layers,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,6 +101,8 @@ interface FlashcardsViewProps {
 }
 
 export function FlashcardsView({ className }: FlashcardsViewProps) {
+  const router = useRouter();
+
   // Load decks from localStorage
   const [decks, setDecks] = useState<FlashcardDeck[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -206,10 +210,18 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
             Sistema di ripetizione spaziata FSRS-5
           </p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Nuovo Mazzo
-        </Button>
+        <div className="flex gap-2">
+          {/* PRIMARY: Conversation-first approach (Phase 6) */}
+          <Button onClick={() => router.push('/conversation?tool=flashcard')}>
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Crea con un Maestro
+          </Button>
+          {/* SECONDARY: Manual form fallback */}
+          <Button variant="outline" onClick={() => setShowCreateModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Modalità Manuale
+          </Button>
+        </div>
       </div>
 
       {/* Decks grid */}
