@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     debugLog.clientError(entry);
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to log' }, { status: 500 });
   }
 }
@@ -59,7 +59,7 @@ export async function GET() {
     return new NextResponse(content, {
       headers: { 'Content-Type': 'text/plain' },
     });
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ error: 'Failed to read log' }, { status: 500 });
   }
 }

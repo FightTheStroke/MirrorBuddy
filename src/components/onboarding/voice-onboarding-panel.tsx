@@ -109,7 +109,7 @@ export function VoiceOnboardingPanel({
     },
     onTranscript: (role, text) => {
       // Add voice transcripts to the onboarding store
-      const transcriptId = `${role}-${Date.now()}`;
+      const _transcriptId = `${role}-${Date.now()}`;
 
       // Avoid duplicate transcripts
       if (lastTranscriptIdRef.current === text.substring(0, 50)) {

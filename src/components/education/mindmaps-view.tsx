@@ -15,7 +15,7 @@ import {
   Upload,
   FileJson,
   FileText,
-  Image,
+  Image as ImageIcon,
   FileType,
   MessageSquare,
   Loader2,
@@ -88,7 +88,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
   const router = useRouter();
 
   // Load saved mindmaps from database API
-  const { mindmaps, loading, saveMindmap, deleteMindmap: apiDeleteMindmap, reload } = useMindmaps();
+  const { mindmaps, loading, saveMindmap, deleteMindmap: apiDeleteMindmap, reload: _reload } = useMindmaps();
 
   const [selectedMindmap, setSelectedMindmap] = useState<SavedMindmap | null>(null);
   const [showExamples, setShowExamples] = useState(false);
@@ -501,11 +501,11 @@ export function MindmapsView({ className }: MindmapsViewProps) {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'svg')}>
-                        <Image className="w-4 h-4 mr-2" />
+                        <ImageIcon className="w-4 h-4 mr-2" />
                         SVG
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'png')}>
-                        <Image className="w-4 h-4 mr-2" />
+                        <ImageIcon className="w-4 h-4 mr-2" />
                         PNG
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'pdf')}>
