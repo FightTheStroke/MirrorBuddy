@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles, ArrowRight, Volume2, VolumeX, Mic } from 'lucide-react';
+import { Sparkles, ArrowRight, Volume2, VolumeX, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { VoiceOnboardingPanel } from '@/components/onboarding/voice-onboarding-panel';
 import {
   useOnboardingTTS,
   ONBOARDING_SCRIPTS,
@@ -15,17 +16,19 @@ import {
 
 interface WelcomeStepProps {
   useWebSpeechFallback?: boolean;
+  onAzureUnavailable?: () => void;
 }
 
 /**
  * Step 1: Melissa intro + asks for student name
  *
- * Melissa is the default coach, but the student can change coach later in settings.
- * She warmly welcomes the student and asks for their name.
+ * TWO MODES:
+ * 1. Voice mode (voiceSessionActive): Full-screen voice experience with Melissa
+ * 2. Form mode: Traditional form with option to call Melissa
  *
  * Voice Integration (#61):
- * - Syncs with voice-captured name from onboarding store
- * - Shows feedback when voice captures data
+ * - When voice is active, shows unified voice panel
+ * - When voice is not active, shows form + "Call Melissa" button
  * - Falls back to Web Speech TTS when Azure unavailable
  */
 export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) {
@@ -38,9 +41,9 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
     setVoiceMuted,
     voiceSessionActive,
   } = useOnboardingStore();
+
   const [name, setName] = useState(data.name || '');
   const [error, setError] = useState('');
-  const [voiceCapturedName, setVoiceCapturedName] = useState(false);
 
   // Track previous store value to detect voice-captured changes
   const prevNameRef = useRef(data.name);
@@ -49,21 +52,17 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
   useEffect(() => {
     if (data.name && data.name !== prevNameRef.current) {
       prevNameRef.current = data.name;
-      // Use microtask to avoid synchronous setState in effect
       queueMicrotask(() => {
         setName(data.name);
-        setVoiceCapturedName(true);
-        setTimeout(() => setVoiceCapturedName(false), 3000);
       });
     }
   }, [data.name]);
 
-  // Auto-speak Melissa's welcome message (only when using Web Speech fallback)
-  // When Azure voice is active, Melissa speaks through the realtime API
+  // Auto-speak Melissa's welcome message (only when using Web Speech fallback and not in voice mode)
   const { isPlaying, stop } = useOnboardingTTS({
     autoSpeak: useWebSpeechFallback && !isVoiceMuted && !voiceSessionActive,
     text: ONBOARDING_SCRIPTS.welcome,
-    delay: 800, // Wait for animation
+    delay: 800,
   });
 
   const toggleMute = () => {
@@ -83,7 +82,7 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
       setError('Il nome deve avere almeno 2 caratteri');
       return;
     }
-    stop(); // Stop voice before navigating
+    stop();
     updateData({ name: trimmedName });
     nextStep();
   };
@@ -94,6 +93,50 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
     }
   };
 
+  // ========== VOICE MODE: Full-screen voice experience ==========
+  if (voiceSessionActive) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md mx-auto"
+      >
+        <VoiceOnboardingPanel step="welcome" className="w-full" />
+
+        {/* Show captured name if we have it */}
+        <AnimatePresence>
+          {data.name && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-4 p-4 bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-lg"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                  <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Nome catturato</p>
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">{data.name}</p>
+                </div>
+              </div>
+
+              <Button
+                onClick={handleContinue}
+                className="w-full mt-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+              >
+                Continua
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  }
+
+  // ========== FORM MODE: Traditional form with call option ==========
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl overflow-hidden">
       <CardContent className="p-0">
@@ -133,22 +176,24 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
               </p>
             </div>
 
-            {/* Voice toggle button */}
-            <motion.button
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              onClick={toggleMute}
-              className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-              aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-              title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-            >
-              {isVoiceMuted ? (
-                <VolumeX className="w-5 h-5 text-white" />
-              ) : (
-                <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
-              )}
-            </motion.button>
+            {/* Voice toggle button (for Web Speech) */}
+            {useWebSpeechFallback && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                onClick={toggleMute}
+                className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+                title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+              >
+                {isVoiceMuted ? (
+                  <VolumeX className="w-5 h-5 text-white" />
+                ) : (
+                  <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
+                )}
+              </motion.button>
+            )}
           </motion.div>
         </div>
 
@@ -166,11 +211,30 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
             </p>
             <p className="text-gray-600 dark:text-gray-400">
               Non preoccuparti se qualcosa ti sembra difficile - insieme troveremo
-              sempre un modo per capirlo! E se preferisci un altro coach, potrai
-              cambiarmi dalle impostazioni.
+              sempre un modo per capirlo!
             </p>
           </motion.div>
 
+          {/* Call Melissa button - prominent placement */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <VoiceOnboardingPanel step="welcome" />
+          </motion.div>
+
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">oppure scrivi</span>
+            </div>
+          </div>
+
+          {/* Manual input */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -183,44 +247,23 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
             >
               Come ti chiami?
             </label>
-            <div className="relative">
-              <Input
-                id="student-name"
-                type="text"
-                value={name}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setName(e.target.value);
-                  setError('');
-                  setVoiceCapturedName(false);
-                }}
-                onKeyDown={handleKeyDown}
-                placeholder="Scrivi il tuo nome..."
-                className={`text-lg py-6 px-4 border-2 focus:border-pink-500 focus:ring-pink-500 ${
-                  voiceCapturedName ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''
-                }`}
-                aria-describedby={error ? 'name-error' : undefined}
-                autoFocus={!voiceSessionActive}
-              />
-              {voiceCapturedName && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-green-600 dark:text-green-400"
-                >
-                  <Mic className="w-4 h-4" />
-                  <span className="text-xs font-medium">Melissa ha capito!</span>
-                </motion.div>
-              )}
-            </div>
+            <Input
+              id="student-name"
+              type="text"
+              value={name}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setName(e.target.value);
+                setError('');
+              }}
+              onKeyDown={handleKeyDown}
+              placeholder="Scrivi il tuo nome..."
+              className="text-lg py-6 px-4 border-2 focus:border-pink-500 focus:ring-pink-500"
+              aria-describedby={error ? 'name-error' : undefined}
+              autoFocus
+            />
             {error && (
               <p id="name-error" className="text-red-500 text-sm" role="alert">
                 {error}
-              </p>
-            )}
-            {voiceSessionActive && !name && (
-              <p className="text-sm text-pink-600 dark:text-pink-400 flex items-center gap-1">
-                <Mic className="w-3 h-3" />
-                Parla con Melissa per dirle il tuo nome...
               </p>
             )}
           </motion.div>
