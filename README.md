@@ -148,7 +148,9 @@ Visual learners rejoice. Every concept can become a mind map.
 
 - **Auto-generated** from conversations with your Maestro
 - **Interactive** — expand, collapse, zoom, pan
-- **Export to PNG** for studying offline
+- **Voice commands** — "aggiungi un nodo", "espandi questo concetto", "collega A a B"
+- **Multi-format export** — PNG, SVG, Markdown, FreeMind, XMind, JSON
+- **Import support** — load existing mind maps from other tools
 - **Powered by MarkMap** for beautiful, responsive visualizations
 - **Hierarchical structure** that mirrors how concepts connect
 
@@ -210,7 +212,7 @@ Know exactly where you stand.
 - **Session history** — what you learned and when
 - **Time tracking** — minutes spent learning
 - **Weak areas** — automatically identified for review
-- **Parent/teacher dashboard** (coming soon)
+- **Parent dashboard** — GDPR-compliant insights for parents (requires dual consent)
 
 ---
 
