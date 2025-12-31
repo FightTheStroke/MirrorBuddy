@@ -188,6 +188,8 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
   const sessionStartTime = useRef(Date.now());
   const questionCount = useRef(0);
   const lastTranscriptIdRef = useRef<string | null>(null);
+  const previousMessageCount = useRef(0);
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -224,7 +226,8 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
       }
       lastTranscriptIdRef.current = text.substring(0, 50);
 
-      if (role === 'user') {
+      // Only count as question if it contains a question mark
+      if (role === 'user' && text.includes('?')) {
         questionCount.current += 1;
       }
 
@@ -238,7 +241,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     },
   });
 
-  // Add greeting message on mount
+  // Add greeting message on mount and check for pending tool request
   useEffect(() => {
     setMessages([{
       id: 'greeting',
@@ -246,7 +249,38 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
       content: maestro.greeting,
       timestamp: new Date(),
     }]);
-  }, [maestro.greeting]);
+
+    // Check for pending tool request from maestri-grid
+    const pendingRequest = sessionStorage.getItem('pendingToolRequest');
+    if (pendingRequest) {
+      try {
+        const { tool, maestroId } = JSON.parse(pendingRequest);
+        if (maestroId === maestro.id) {
+          // Trigger the tool request
+          const toolPrompts: Record<string, string> = {
+            mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
+            quiz: `Crea un quiz per verificare la mia comprensione`,
+            flashcards: `Crea delle flashcard per aiutarmi a memorizzare`,
+            demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
+          };
+          if (toolPrompts[tool]) {
+            setInput(toolPrompts[tool]);
+          }
+          sessionStorage.removeItem('pendingToolRequest');
+        }
+      } catch {
+        sessionStorage.removeItem('pendingToolRequest');
+      }
+    }
+
+    // Cleanup timeouts on unmount
+    const timeoutRef = closeTimeoutRef.current;
+    return () => {
+      if (timeoutRef) {
+        clearTimeout(timeoutRef);
+      }
+    };
+  }, [maestro.greeting, maestro.id]);
 
   // Fetch voice connection info on mount (like CharacterChatView pattern)
   useEffect(() => {
@@ -290,10 +324,14 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     startVoice();
   }, [isVoiceActive, connectionInfo, connectionState, maestro, connect]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom only when new messages are added
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, toolCalls]);
+    const currentCount = messages.length + toolCalls.length;
+    if (currentCount > previousMessageCount.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+    previousMessageCount.current = currentCount;
+  }, [messages.length, toolCalls.length]);
 
   // Focus input when not in voice mode
   useEffect(() => {
@@ -356,22 +394,26 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     endSession();
   }, [isVoiceActive, disconnect, maestro.id, messages, addXP, endSession]);
 
-  // Handle text submit
-  const handleSubmit = async (e?: React.FormEvent) => {
+  // Handle text submit - wrapped in useCallback for performance
+  const handleSubmit = useCallback(async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (!input.trim() || isLoading) return;
 
+    const userContent = input.trim();
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: 'user',
-      content: input.trim(),
+      content: userContent,
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
-    questionCount.current += 1;
+    // Only count as question if it contains a question mark
+    if (userContent.includes('?')) {
+      questionCount.current += 1;
+    }
 
     try {
       const response = await fetch('/api/chat', {
@@ -381,7 +423,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
           messages: [
             { role: 'system', content: maestro.systemPrompt },
             ...messages.map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: input.trim() },
+            { role: 'user', content: userContent },
           ],
           maestroId: maestro.id,
         }),
@@ -414,7 +456,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
       setIsLoading(false);
       inputRef.current?.focus();
     }
-  };
+  }, [input, isLoading, messages, maestro.systemPrompt, maestro.id]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
