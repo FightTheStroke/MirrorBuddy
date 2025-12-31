@@ -23,15 +23,14 @@ interface WelcomeStepProps {
  * Step 1: Melissa intro + asks for student name
  *
  * TWO MODES:
- * 1. Voice mode (voiceSessionActive): Full-screen voice experience with Melissa
- * 2. Form mode: Traditional form with option to call Melissa
+ * 1. Voice mode (default): Melissa auto-starts and asks for name via voice
+ * 2. Form mode (fallback): Traditional form when Azure unavailable
  *
  * Voice Integration (#61):
- * - When voice is active, shows unified voice panel
- * - When voice is not active, shows form + "Call Melissa" button
- * - Falls back to Web Speech TTS when Azure unavailable
+ * - Melissa auto-connects when page loads (no button click needed)
+ * - Falls back to form + Web Speech TTS when Azure unavailable
  */
-export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) {
+export function WelcomeStep({ useWebSpeechFallback = false, onAzureUnavailable }: WelcomeStepProps) {
   const {
     data,
     updateData,
@@ -39,7 +38,6 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
     isReplayMode,
     isVoiceMuted,
     setVoiceMuted,
-    voiceSessionActive,
   } = useOnboardingStore();
 
   const [name, setName] = useState(data.name || '');
@@ -58,9 +56,9 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
     }
   }, [data.name]);
 
-  // Auto-speak Melissa's welcome message (only when using Web Speech fallback and not in voice mode)
+  // Auto-speak Melissa's welcome message (only when using Web Speech fallback)
   const { isPlaying, stop } = useOnboardingTTS({
-    autoSpeak: useWebSpeechFallback && !isVoiceMuted && !voiceSessionActive,
+    autoSpeak: useWebSpeechFallback && !isVoiceMuted,
     text: ONBOARDING_SCRIPTS.welcome,
     delay: 800,
   });
@@ -93,17 +91,18 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
     }
   };
 
-  // ========== VOICE MODE: Full-screen voice experience ==========
-  if (voiceSessionActive) {
+  // ========== VOICE MODE: Melissa auto-starts (default when Azure available) ==========
+  if (!useWebSpeechFallback) {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md mx-auto"
       >
-        <VoiceOnboardingPanel step="welcome" className="w-full" />
+        {/* Melissa voice panel - user clicks to start call */}
+        <VoiceOnboardingPanel step="welcome" onFallbackToWebSpeech={onAzureUnavailable} className="w-full" />
 
-        {/* Show captured name if we have it */}
+        {/* Show captured name with continue button */}
         <AnimatePresence>
           {data.name && (
             <motion.div
@@ -132,11 +131,17 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
             </motion.div>
           )}
         </AnimatePresence>
+
+        {isReplayMode && (
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
+            Stai rivedendo il tutorial. I tuoi dati esistenti non verranno modificati.
+          </p>
+        )}
       </motion.div>
     );
   }
 
-  // ========== FORM MODE: Traditional form with call option ==========
+  // ========== FORM MODE: Fallback when Azure unavailable ==========
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl overflow-hidden">
       <CardContent className="p-0">
@@ -176,24 +181,22 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
               </p>
             </div>
 
-            {/* Voice toggle button (for Web Speech) */}
-            {useWebSpeechFallback && (
-              <motion.button
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                onClick={toggleMute}
-                className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-                aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-                title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-              >
-                {isVoiceMuted ? (
-                  <VolumeX className="w-5 h-5 text-white" />
-                ) : (
-                  <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
-                )}
-              </motion.button>
-            )}
+            {/* Voice toggle button (Web Speech) */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              onClick={toggleMute}
+              className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+              aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+              title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            >
+              {isVoiceMuted ? (
+                <VolumeX className="w-5 h-5 text-white" />
+              ) : (
+                <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
+              )}
+            </motion.button>
           </motion.div>
         </div>
 
@@ -215,30 +218,11 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
             </p>
           </motion.div>
 
-          {/* Call Melissa button - prominent placement */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <VoiceOnboardingPanel step="welcome" />
-          </motion.div>
-
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">oppure scrivi</span>
-            </div>
-          </div>
-
           {/* Manual input */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+            transition={{ delay: 0.5 }}
             className="space-y-3"
           >
             <label
@@ -271,7 +255,7 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 0.6 }}
             className="pt-4"
           >
             <Button

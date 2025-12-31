@@ -14,6 +14,7 @@ import {
   type NotificationPreferences,
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from '@/lib/scheduler/types';
+import { sendPushToUser, isPushConfigured } from '@/lib/push/send';
 
 // Helper to get userId from cookies (consistent with other APIs)
 async function getUserId(): Promise<string | null> {
@@ -133,12 +134,15 @@ export async function POST(request: Request) {
       if (!recentFlashcardNotif) {
         const melissaVoice = getMelissaVoice('flashcard_due', { count: dueFlashcards.length });
 
+        const flashcardTitle = 'Flashcard pronte!';
+        const flashcardMessage = `Hai ${dueFlashcards.length} flashcard da ripassare.`;
+
         await prisma.notification.create({
           data: {
             userId,
             type: 'flashcard_due',
-            title: 'Flashcard pronte!',
-            message: `Hai ${dueFlashcards.length} flashcard da ripassare.`,
+            title: flashcardTitle,
+            message: flashcardMessage,
             actionUrl: '/flashcards',
             priority: 'medium',
             melissaVoice,
@@ -146,6 +150,16 @@ export async function POST(request: Request) {
             expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000), // Expires in 24h
           },
         });
+
+        // Send push notification (ADR-0014)
+        if (isPushConfigured()) {
+          await sendPushToUser(userId, {
+            title: flashcardTitle,
+            body: flashcardMessage,
+            url: '/flashcards',
+            tag: 'flashcard_due',
+          });
+        }
 
         notificationsCreated.push('flashcard_due');
         logger.info('Created flashcard due notification', { userId, count: dueFlashcards.length });
@@ -184,13 +198,17 @@ export async function POST(request: Request) {
               subject: session.subject,
             });
 
+            const sessionTitle = `Studio: ${session.subject}`;
+            const sessionMessage = `Tra ${minutesUntil} minuti e' ora di studiare ${session.subject}!`;
+            const sessionUrl = session.maestroId ? `/maestro/${session.maestroId}` : '/maestri';
+
             await prisma.notification.create({
               data: {
                 userId,
                 type: 'scheduled_session',
-                title: `Studio: ${session.subject}`,
-                message: `Tra ${minutesUntil} minuti e' ora di studiare ${session.subject}!`,
-                actionUrl: session.maestroId ? `/maestro/${session.maestroId}` : '/maestri',
+                title: sessionTitle,
+                message: sessionMessage,
+                actionUrl: sessionUrl,
                 priority: 'high',
                 relatedId: session.id,
                 melissaVoice,
@@ -198,6 +216,17 @@ export async function POST(request: Request) {
                 expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000), // Expires in 2h
               },
             });
+
+            // Send push notification (ADR-0014)
+            if (isPushConfigured()) {
+              await sendPushToUser(userId, {
+                title: sessionTitle,
+                body: sessionMessage,
+                url: sessionUrl,
+                tag: `session_${session.id}`,
+                requireInteraction: true, // High priority - keep visible
+              });
+            }
 
             notificationsCreated.push('scheduled_session');
             logger.info('Created session reminder', { userId, sessionId: session.id, subject: session.subject });
@@ -225,19 +254,32 @@ export async function POST(request: Request) {
           });
 
           if (!recentReminderNotif) {
+            const reminderTitle = 'Promemoria';
+            const reminderUrl = reminder.maestroId ? `/maestro/${reminder.maestroId}` : '/';
+
             await prisma.notification.create({
               data: {
                 userId,
                 type: 'reminder',
-                title: 'Promemoria',
+                title: reminderTitle,
                 message: reminder.message,
-                actionUrl: reminder.maestroId ? `/maestro/${reminder.maestroId}` : undefined,
+                actionUrl: reminderUrl,
                 priority: 'medium',
                 relatedId: reminder.id,
                 sentAt: now,
                 expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
               },
             });
+
+            // Send push notification (ADR-0014)
+            if (isPushConfigured()) {
+              await sendPushToUser(userId, {
+                title: reminderTitle,
+                body: reminder.message,
+                url: reminderUrl,
+                tag: `reminder_${reminder.id}`,
+              });
+            }
 
             notificationsCreated.push('custom_reminder');
 
@@ -288,12 +330,15 @@ export async function POST(request: Request) {
           if (!recentStreakNotif) {
             const melissaVoice = getMelissaVoice('streak_warning', { days: progress.streakCurrent });
 
+            const streakTitle = 'Streak a rischio!';
+            const streakMessage = `La tua streak di ${progress.streakCurrent} giorni sta per finire!`;
+
             await prisma.notification.create({
               data: {
                 userId,
                 type: 'streak',
-                title: 'Streak a rischio!',
-                message: `La tua streak di ${progress.streakCurrent} giorni sta per finire!`,
+                title: streakTitle,
+                message: streakMessage,
                 actionUrl: '/maestri',
                 priority: 'high',
                 melissaVoice,
@@ -301,6 +346,17 @@ export async function POST(request: Request) {
                 expiresAt: new Date(now.getTime() + 3 * 60 * 60 * 1000), // Expires in 3h
               },
             });
+
+            // Send push notification (ADR-0014)
+            if (isPushConfigured()) {
+              await sendPushToUser(userId, {
+                title: streakTitle,
+                body: streakMessage,
+                url: '/maestri',
+                tag: 'streak_warning',
+                requireInteraction: true, // High priority - keep visible
+              });
+            }
 
             notificationsCreated.push('streak_warning');
             logger.info('Created streak warning', { userId, streak: progress.streakCurrent });

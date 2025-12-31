@@ -30,21 +30,22 @@ const LEARNING_DIFFERENCES = [
 
 interface InfoStepProps {
   useWebSpeechFallback?: boolean;
+  onAzureUnavailable?: () => void;
 }
 
 /**
  * Step 2: Optional info collection (skippable)
  *
  * TWO MODES:
- * 1. Voice mode (voiceSessionActive): Full-screen voice experience
- * 2. Form mode: Traditional form with option to call Melissa
+ * 1. Voice mode (default): Melissa continues conversation from step 1
+ * 2. Form mode (fallback): Traditional form when Azure unavailable
  *
  * Collects:
  * - Age (optional)
  * - School level (optional)
  * - Learning differences (optional, for accessibility presets)
  */
-export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
+export function InfoStep({ useWebSpeechFallback = false, onAzureUnavailable }: InfoStepProps) {
   const {
     data,
     updateData,
@@ -53,7 +54,6 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
     isReplayMode,
     isVoiceMuted,
     setVoiceMuted,
-    voiceSessionActive,
   } = useOnboardingStore();
 
   const [age, setAge] = useState<number | undefined>(data.age);
@@ -97,7 +97,7 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
 
   // Auto-speak Melissa's info message (only when using Web Speech fallback)
   const { isPlaying, stop } = useOnboardingTTS({
-    autoSpeak: useWebSpeechFallback && !isVoiceMuted && !voiceSessionActive,
+    autoSpeak: useWebSpeechFallback && !isVoiceMuted,
     text: ONBOARDING_SCRIPTS.info,
     delay: 500,
   });
@@ -133,20 +133,21 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
     );
   };
 
-  // Check if we have enough data to continue
+  // Check if we have enough data to show continue button in voice mode
   const hasData = data.age || data.schoolLevel || (data.learningDifferences && data.learningDifferences.length > 0);
 
-  // ========== VOICE MODE: Full-screen voice experience ==========
-  if (voiceSessionActive) {
+  // ========== VOICE MODE: Melissa continues conversation ==========
+  if (!useWebSpeechFallback) {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="w-full max-w-md mx-auto"
       >
-        <VoiceOnboardingPanel step="info" className="w-full" />
+        {/* Melissa continues conversation (already connected from step 1) */}
+        <VoiceOnboardingPanel step="info" onFallbackToWebSpeech={onAzureUnavailable} className="w-full" />
 
-        {/* Show captured data summary */}
+        {/* Show collected data summary with navigation */}
         <AnimatePresence>
           {hasData && (
             <motion.div
@@ -220,11 +221,31 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Navigation when no data captured yet */}
+        {!hasData && (
+          <div className="mt-4 flex gap-2">
+            <Button onClick={handleBack} variant="outline" className="flex-1">
+              <ArrowLeft className="mr-2 w-4 h-4" />
+              Indietro
+            </Button>
+            <Button onClick={handleSkip} variant="ghost" className="text-gray-500">
+              <SkipForward className="mr-2 w-4 h-4" />
+              Salta
+            </Button>
+          </div>
+        )}
+
+        {isReplayMode && (
+          <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
+            Modalità anteprima - le modifiche non saranno salvate
+          </p>
+        )}
       </motion.div>
     );
   }
 
-  // ========== FORM MODE: Traditional form with call option ==========
+  // ========== FORM MODE: Fallback when Azure unavailable ==========
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl">
       <CardContent className="p-8 space-y-6">
@@ -247,46 +268,25 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
               Questo mi aiuterà a personalizzare la tua esperienza
             </p>
           </div>
-          {/* Voice toggle (for Web Speech) */}
-          {useWebSpeechFallback && (
-            <button
-              onClick={toggleMute}
-              className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
-              aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-            >
-              {isVoiceMuted ? (
-                <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-              ) : (
-                <Volume2 className={cn('w-5 h-5 text-pink-600 dark:text-pink-400', isPlaying && 'animate-pulse')} />
-              )}
-            </button>
-          )}
-        </div>
-
-        {/* Call Melissa button */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-        >
-          <VoiceOnboardingPanel step="info" />
-        </motion.div>
-
-        {/* Divider */}
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">oppure compila</span>
-          </div>
+          {/* Voice toggle (Web Speech) */}
+          <button
+            onClick={toggleMute}
+            className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
+            aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+          >
+            {isVoiceMuted ? (
+              <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+            ) : (
+              <Volume2 className={cn('w-5 h-5 text-pink-600 dark:text-pink-400', isPlaying && 'animate-pulse')} />
+            )}
+          </button>
         </div>
 
         {/* Age input */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.1 }}
           className="space-y-2"
         >
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -315,7 +315,7 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2 }}
           className="space-y-2"
         >
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -349,7 +349,7 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.3 }}
           className="space-y-2"
         >
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -384,7 +384,7 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.4 }}
           className="flex gap-3 pt-4"
         >
           <Button onClick={handleBack} variant="outline" size="lg" className="flex-1">

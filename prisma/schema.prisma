@@ -23,11 +23,12 @@ model User {
   profile       Profile?
   settings      Settings?
   progress      Progress?
-  sessions      StudySession[]
-  flashcards    FlashcardProgress[]
-  quizResults   QuizResult[]
-  conversations Conversation[]
-  learnings     Learning[]
+  sessions          StudySession[]
+  flashcards        FlashcardProgress[]
+  quizResults       QuizResult[]
+  conversations     Conversation[]
+  learnings         Learning[]
+  pushSubscriptions PushSubscription[]
 }
 
 model Profile {
@@ -552,5 +553,25 @@ model CustomReminder {
   @@index([scheduleId])
   @@index([datetime])
   @@index([active])
+}
+
+// ============================================================================
+// PWA PUSH NOTIFICATIONS (ADR-0014)
+// Push subscription storage for background notifications
+// ============================================================================
+
+model PushSubscription {
+  id        String    @id @default(cuid())
+  userId    String
+  endpoint  String    @unique // Push service endpoint URL
+  p256dh    String    // Public key for encryption
+  auth      String    // Auth secret for encryption
+  userAgent String?   // Browser/device info for debugging
+  createdAt DateTime  @default(now())
+  expiresAt DateTime? // Optional expiration
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 

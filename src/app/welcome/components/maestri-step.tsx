@@ -14,13 +14,18 @@ import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding
 // Featured maestri to highlight (first shown in carousel)
 const FEATURED_IDS = ['euclide', 'leonardo', 'curie', 'shakespeare', 'feynman', 'darwin'];
 
+interface MaestriStepProps {
+  useWebSpeechFallback?: boolean;
+  onAzureUnavailable?: () => void;
+}
+
 /**
  * Step 4: Carousel of Maestri
  *
  * Shows the 16 historical figure tutors available in the platform.
  * Highlights a few featured ones and allows scrolling through all.
  */
-export function MaestriStep() {
+export function MaestriStep(_props: MaestriStepProps) {
   const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);

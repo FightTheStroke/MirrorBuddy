@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { ThemeProvider } from 'next-themes';
 import { AccessibilityProvider } from '@/components/accessibility';
 import { ToastContainer } from '@/components/ui/toast';
+import { IOSInstallBanner } from '@/components/pwa';
 import {
   useSettingsStore,
   initializeStores,
@@ -97,6 +98,7 @@ export function Providers({ children }: ProvidersProps) {
         <AccentColorApplier />
         {children}
         <ToastContainer />
+        <IOSInstallBanner />
       </AccessibilityProvider>
     </ThemeProvider>
   );

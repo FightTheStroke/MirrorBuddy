@@ -179,11 +179,39 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
               <TrendingUp className="h-5 w-5 text-blue-500" />
               Aree di Crescita
             </CardTitle>
+            {insights.growthAreas.length > 0 && (
+              <p className="text-sm text-slate-500 mt-1">
+                Aree dove {insights.studentName.split(' ')[0]} puo migliorare con il giusto supporto
+              </p>
+            )}
           </CardHeader>
           <CardContent>
+            {/* Priority Summary */}
+            {insights.growthAreas.length > 0 && (
+              <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center gap-2 text-sm">
+                  <Lightbulb className="h-4 w-4 text-blue-500" />
+                  <span className="font-medium text-blue-900 dark:text-blue-100">
+                    Focus consigliato:
+                  </span>
+                  <span className="text-blue-700 dark:text-blue-300">
+                    {insights.growthAreas.length === 1
+                      ? CATEGORY_LABELS[insights.growthAreas[0].category]
+                      : `${CATEGORY_LABELS[insights.growthAreas[0].category]} e ${CATEGORY_LABELS[insights.growthAreas[1]?.category] || 'altro'}`
+                    }
+                  </span>
+                </div>
+              </div>
+            )}
             <div className="space-y-3">
-              {insights.growthAreas.slice(0, expandedGrowth ? undefined : 3).map((obs) => (
-                <ObservationCard key={obs.id} observation={obs} isStrength={false} />
+              {insights.growthAreas.slice(0, expandedGrowth ? undefined : 3).map((obs, idx) => (
+                <ObservationCard
+                  key={obs.id}
+                  observation={obs}
+                  isStrength={false}
+                  showPriority={idx < 2}
+                  priorityLevel={idx === 0 ? 'high' : 'medium'}
+                />
               ))}
               {insights.growthAreas.length > 3 && (
                 <Button
@@ -304,10 +332,29 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
 function ObservationCard({
   observation,
   isStrength,
+  showPriority = false,
+  priorityLevel = 'medium',
 }: {
   observation: MaestroObservation;
   isStrength: boolean;
+  showPriority?: boolean;
+  priorityLevel?: 'high' | 'medium' | 'low';
 }) {
+  const priorityConfig = {
+    high: {
+      label: 'Priorita Alta',
+      className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
+    },
+    medium: {
+      label: 'Priorita Media',
+      className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
+    },
+    low: {
+      label: 'Priorita Bassa',
+      className: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
+    },
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -316,19 +363,30 @@ function ObservationCard({
         'p-3 rounded-lg border',
         isStrength
           ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800'
-          : 'bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800'
+          : 'bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800',
+        showPriority && priorityLevel === 'high' && 'ring-2 ring-red-300 dark:ring-red-700'
       )}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
-          <span className={cn(
-            'text-xs font-medium px-2 py-0.5 rounded-full',
-            isStrength
-              ? 'bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200'
-              : 'bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200'
-          )}>
-            {CATEGORY_LABELS[observation.category]}
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={cn(
+              'text-xs font-medium px-2 py-0.5 rounded-full',
+              isStrength
+                ? 'bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200'
+                : 'bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200'
+            )}>
+              {CATEGORY_LABELS[observation.category]}
+            </span>
+            {showPriority && !isStrength && (
+              <span className={cn(
+                'text-xs font-medium px-2 py-0.5 rounded-full border',
+                priorityConfig[priorityLevel].className
+              )}>
+                {priorityConfig[priorityLevel].label}
+              </span>
+            )}
+          </div>
           <p className="text-sm mt-2 text-slate-700 dark:text-slate-300">
             {observation.observation}
           </p>

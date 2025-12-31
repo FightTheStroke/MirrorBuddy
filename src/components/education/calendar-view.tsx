@@ -17,12 +17,19 @@ import {
   Edit2,
   X,
   Lightbulb,
+  Bell,
+  CalendarDays,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useCalendarStore, type SchoolEvent } from '@/lib/stores/app-store';
 import { maestri as MAESTRI } from '@/data/maestri';
 import { cn } from '@/lib/utils';
+import { useScheduler } from '@/lib/hooks/use-scheduler';
+import { WeeklySchedule, NotificationPreferences } from '@/components/scheduler';
+import { DEFAULT_NOTIFICATION_PREFERENCES } from '@/lib/scheduler/types';
+
+type ViewTab = 'calendar' | 'schedule' | 'notifications';
 
 type EventType = SchoolEvent['type'];
 type Priority = SchoolEvent['priority'];
@@ -68,8 +75,19 @@ export function CalendarView() {
     description: '',
     priority: 'medium',
   });
+  const [activeTab, setActiveTab] = useState<ViewTab>('calendar');
 
   const { events, addEvent, updateEvent, deleteEvent, toggleCompleted, getSuggestedMaestri } = useCalendarStore();
+
+  // Scheduler integration
+  const {
+    schedule,
+    isLoading: schedulerLoading,
+    createSession,
+    updateSession,
+    deleteSession,
+    updatePreferences,
+  } = useScheduler();
 
   // Get calendar days for current month
   const calendarDays = useMemo(() => {
@@ -216,13 +234,56 @@ export function CalendarView() {
             Pianifica verifiche, compiti e progetti
           </p>
         </div>
-        <Button onClick={() => setShowAddForm(true)} className="gap-2">
+        <Button onClick={() => setShowAddForm(true)} className="gap-2" disabled={activeTab !== 'calendar'}>
           <Plus className="w-4 h-4" />
           Nuovo Evento
         </Button>
       </div>
 
-      {/* Maestri Suggestions */}
+      {/* Tab Navigation */}
+      <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700">
+        <button
+          onClick={() => setActiveTab('calendar')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+            activeTab === 'calendar'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          )}
+        >
+          <Calendar className="w-4 h-4" />
+          Eventi
+        </button>
+        <button
+          onClick={() => setActiveTab('schedule')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+            activeTab === 'schedule'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          )}
+        >
+          <CalendarDays className="w-4 h-4" />
+          Piano Settimanale
+        </button>
+        <button
+          onClick={() => setActiveTab('notifications')}
+          className={cn(
+            'flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px',
+            activeTab === 'notifications'
+              ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+              : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+          )}
+        >
+          <Bell className="w-4 h-4" />
+          Notifiche
+        </button>
+      </div>
+
+      {/* Calendar Tab Content */}
+      {activeTab === 'calendar' && (
+        <>
+          {/* Maestri Suggestions */}
       {suggestions.length > 0 && (
         <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
           <CardHeader className="pb-2">
@@ -442,6 +503,28 @@ export function CalendarView() {
           </CardContent>
         </Card>
       </div>
+        </>
+      )}
+
+      {/* Schedule Tab */}
+      {activeTab === 'schedule' && (
+        <WeeklySchedule
+          sessions={schedule?.weeklyPlan || []}
+          onCreateSession={createSession}
+          onUpdateSession={updateSession}
+          onDeleteSession={deleteSession}
+          isLoading={schedulerLoading}
+        />
+      )}
+
+      {/* Notifications Tab */}
+      {activeTab === 'notifications' && (
+        <NotificationPreferences
+          preferences={schedule?.preferences || DEFAULT_NOTIFICATION_PREFERENCES}
+          onUpdate={updatePreferences}
+          isLoading={schedulerLoading}
+        />
+      )}
 
       {/* Add/Edit Event Modal */}
       <AnimatePresence>

@@ -35,12 +35,17 @@ const PRINCIPLES = [
   },
 ];
 
+interface PrinciplesStepProps {
+  useWebSpeechFallback?: boolean;
+  onAzureUnavailable?: () => void;
+}
+
 /**
  * Step 3: Principles of ConvergioEdu
  *
  * Brief, engaging overview of what makes the platform special.
  */
-export function PrinciplesStep() {
+export function PrinciplesStep(_props: PrinciplesStepProps) {
   const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
 
   // Auto-speak Melissa's principles message

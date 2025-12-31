@@ -20,6 +20,7 @@ import {
   Sparkles,
   Clock,
   Star,
+  Users,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -40,9 +41,10 @@ import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
+import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'calendar' | 'demos' | 'progress' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -84,6 +86,7 @@ export default function Home() {
 
   const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
   const { studentProfile } = useSettingsStore();
+  const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
 
   // Don't render main app until onboarding check is done
   if (!hasCompletedOnboarding) {
@@ -120,6 +123,7 @@ export default function Home() {
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
+    { id: 'genitori' as const, label: 'Genitori', icon: Users },
     { id: 'settings' as const, label: 'Impostazioni', icon: Settings },
   ];
 
@@ -245,7 +249,14 @@ export default function Home() {
             return (
               <button
                 key={item.id}
-                onClick={() => setCurrentView(item.id)}
+                onClick={() => {
+                  if (item.id === 'genitori') {
+                    markAsViewed();
+                    router.push('/parent-dashboard');
+                  } else {
+                    setCurrentView(item.id);
+                  }
+                }}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
                   currentView === item.id
@@ -267,7 +278,12 @@ export default function Home() {
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-slate-900 rounded-full" />
                   </div>
                 ) : (
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  <div className="relative flex-shrink-0">
+                    <item.icon className="h-5 w-5" />
+                    {item.id === 'genitori' && hasNewInsights && (
+                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
+                    )}
+                  </div>
                 )}
                 {sidebarOpen && <span className="font-medium">{item.label}</span>}
               </button>
