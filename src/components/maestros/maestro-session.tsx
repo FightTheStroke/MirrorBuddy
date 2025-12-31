@@ -60,7 +60,7 @@ function generateAutoEvaluation(
     5 +
     Math.min(2, questionsAsked * 0.5) +
     Math.min(2, sessionDuration * 0.1) +
-    (Math.random() * 0.5)
+    Math.min(0.5, xpEarned * 0.005) // Deterministic bonus based on XP
   ));
   const score = Math.round(baseScore);
 
@@ -437,15 +437,24 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
 
   // Handle webcam capture
   const handleWebcamCapture = useCallback((imageData: string) => {
-    // TODO: Send image to AI for analysis
     setShowWebcam(false);
     setWebcamRequest(null);
-    setMessages(prev => [...prev, {
-      id: `webcam-${Date.now()}`,
-      role: 'user',
-      content: '[Foto catturata]',
-      timestamp: new Date(),
-    }]);
+    // Add user message showing photo was captured
+    setMessages(prev => [
+      ...prev,
+      {
+        id: `webcam-${Date.now()}`,
+        role: 'user',
+        content: '[Foto catturata]',
+        timestamp: new Date(),
+      },
+      {
+        id: `webcam-info-${Date.now()}`,
+        role: 'assistant',
+        content: 'Ho ricevuto la tua foto! Per ora non posso analizzarla automaticamente, ma puoi descrivermi cosa vedi o cosa vorresti che ti spiegassi.',
+        timestamp: new Date(),
+      },
+    ]);
     logger.debug('Webcam captured', { imageDataLength: imageData.length });
   }, []);
 
@@ -517,9 +526,10 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
           <Button
             variant="ghost"
             size="icon"
-            onClick={stopTTS}
+            onClick={ttsEnabled ? stopTTS : undefined}
+            disabled={!ttsEnabled}
             className="text-white hover:bg-white/20"
-            aria-label={ttsEnabled ? 'TTS attivo' : 'TTS disattivo'}
+            aria-label={ttsEnabled ? 'Disattiva lettura vocale' : 'Lettura vocale disattivata'}
           >
             {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </Button>
@@ -705,7 +715,13 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isVoiceActive ? 'Parla o scrivi...' : `Scrivi un messaggio a ${maestro.name}...`}
+              placeholder={
+                sessionEnded
+                  ? 'Sessione terminata - Clicca "Nuova conversazione" per ricominciare'
+                  : isVoiceActive
+                    ? 'Parla o scrivi...'
+                    : `Scrivi un messaggio a ${maestro.name}...`
+              }
               className="flex-1 resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm focus:outline-none focus:ring-2"
               style={{ '--tw-ring-color': maestro.color } as React.CSSProperties}
               rows={1}

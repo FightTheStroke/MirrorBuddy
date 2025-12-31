@@ -35,7 +35,9 @@ export function EvaluationCard({
   maestroColor,
   className,
 }: EvaluationCardProps) {
-  const gradeInfo = GRADE_LABELS[evaluation.score] || GRADE_LABELS[5];
+  // Clamp score to valid range 1-10
+  const clampedScore = Math.min(10, Math.max(1, evaluation.score));
+  const gradeInfo = GRADE_LABELS[clampedScore] || GRADE_LABELS[5];
 
   return (
     <motion.div
@@ -68,7 +70,7 @@ export function EvaluationCard({
               gradeInfo.colorClass
             )}
           >
-            <span className="text-2xl font-bold">{evaluation.score}</span>
+            <span className="text-2xl font-bold">{clampedScore}</span>
             <span className="text-xs opacity-80">/10</span>
           </motion.div>
         </div>
