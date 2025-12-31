@@ -113,17 +113,32 @@ WCAG 2.1 AA compliant. Because accessibility isn't a feature—it's the foundati
 
 ---
 
+## Getting Started
+
+New users are guided through a friendly **onboarding experience**:
+
+1. **Welcome** — Meet the platform and its mission
+2. **Core Principles** — Learn about our educational philosophy
+3. **Meet the Maestri** — Browse your AI tutors with carousel preview
+4. **Ready to Learn** — Jump into your first session
+
+The onboarding only appears once and can be reset from Settings.
+
+---
+
 ## Features in Detail
 
 ### Voice Sessions
 
 Talk to your Maestro like you would talk to a real teacher. Ask questions, discuss concepts, explore ideas—all through natural voice conversation.
 
+- **Unified voice+chat** — side-by-side layout lets you type while talking
 - **Real-time voice interaction** powered by Azure OpenAI Realtime API
-- **Automatic transcription** so you can review what was said
+- **Automatic transcription** — voice messages appear in chat with 🔊 indicator
 - **Voice-to-voice** responses with natural intonation
 - **Interrupt anytime** — the Maestro listens and adapts
-- **Session recordings** saved for later review
+- **Session evaluation** — automatic feedback at session end with grades and XP
+- **Parent diary integration** — session insights saved for parents (GDPR compliant)
 - **Device selection** — choose your preferred microphone and speaker
 - **Visual waveform** — see your voice levels in real-time
 
@@ -176,6 +191,16 @@ Learning should be rewarding.
 - **Badges** — achievements for milestones
 - **Streaks** — daily consistency rewards
 - **Leaderboards** (optional) — friendly competition
+
+### Pomodoro Timer
+
+ADHD-friendly focus sessions with built-in breaks.
+
+- **Configurable intervals** — 25/5/15 min default (fully customizable)
+- **Visual countdown** — see time remaining at a glance
+- **Break reminders** — notifications when it's time to rest
+- **XP rewards** — earn points for completed focus sessions
+- **Header widget** — always visible, never intrusive
 
 ### Progress Tracking
 
