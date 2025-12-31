@@ -67,7 +67,8 @@ export function HomeworkHelp({
     canvas.width = viewport.width;
     canvas.height = viewport.height;
 
-    await page.render({ canvasContext: context, viewport, canvas }).promise;
+    // canvas property required for pdfjs-dist v5
+    await page.render({ canvasContext: context, viewport, canvas } as Parameters<typeof page.render>[0]).promise;
     return canvas.toDataURL('image/png');
   }, []);
 

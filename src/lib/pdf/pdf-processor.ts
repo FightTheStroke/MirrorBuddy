@@ -165,12 +165,12 @@ export async function processPDF(
           throw new Error('Failed to get canvas context');
         }
 
-        // Render page to canvas
+        // Render page to canvas (canvas property required for pdfjs-dist v5)
         await page.render({
           canvasContext: context,
           viewport,
           canvas,
-        }).promise;
+        } as Parameters<typeof page.render>[0]).promise;
 
         // Convert to image
         const imageData = canvas.toDataURL(format, quality);
