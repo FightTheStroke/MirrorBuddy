@@ -964,10 +964,14 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       };
 
     } catch (error) {
-      logger.error('[VoiceSession] Connection error', { error });
+      // Ensure we always have a meaningful error message
+      const errorMessage = error instanceof Error
+        ? error.message
+        : (typeof error === 'string' ? error : 'Errore di connessione sconosciuto');
+      logger.error('[VoiceSession] Connection error', { message: errorMessage });
       setConnectionState('error');
       options.onStateChange?.('error');
-      options.onError?.(error as Error);
+      options.onError?.(new Error(errorMessage));
     }
   // Note: handleServerEvent is used for safety fallback only; primary usage is via ref
   }, [options, setConnected, setConnectionState, connectionState, handleServerEvent, preferredMicrophoneId, initPlaybackContext]);
