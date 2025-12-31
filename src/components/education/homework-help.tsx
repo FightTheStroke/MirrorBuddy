@@ -67,7 +67,7 @@ export function HomeworkHelp({
     canvas.width = viewport.width;
     canvas.height = viewport.height;
 
-    await page.render({ canvasContext: context, viewport }).promise;
+    await page.render({ canvasContext: context, viewport, canvas }).promise;
     return canvas.toDataURL('image/png');
   }, []);
 
