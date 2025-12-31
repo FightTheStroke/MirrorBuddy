@@ -41,18 +41,36 @@ function log(level: LogLevel, message: string, context?: Record<string, unknown>
 
   const formatted = formatLog(entry);
 
+  // Use explicit %s format to prevent format string interpretation of user messages
+  // This fixes CodeQL's "use of externally-controlled format string" warning
   switch (level) {
     case 'error':
-      console.error(formatted, context || '');
+      if (context) {
+        console.error('%s %o', formatted, context);
+      } else {
+        console.error('%s', formatted);
+      }
       break;
     case 'warn':
-      console.warn(formatted, context || '');
+      if (context) {
+        console.warn('%s %o', formatted, context);
+      } else {
+        console.warn('%s', formatted);
+      }
       break;
     case 'info':
-      console.info(formatted, context || '');
+      if (context) {
+        console.info('%s %o', formatted, context);
+      } else {
+        console.info('%s', formatted);
+      }
       break;
     case 'debug':
-      console.debug(formatted, context || '');
+      if (context) {
+        console.debug('%s %o', formatted, context);
+      } else {
+        console.debug('%s', formatted);
+      }
       break;
   }
 }

@@ -47,8 +47,21 @@ async function performWebSearch(query: string): Promise<SearchResult[]> {
       const searchResults = data.query?.search || [];
 
       for (const item of searchResults) {
-        // Strip HTML tags from snippet
-        const cleanSnippet = item.snippet.replace(/<[^>]*>/g, '');
+        // Strip HTML tags from snippet (comprehensive: loop until no more tags)
+        let cleanSnippet = item.snippet;
+        let previousLength: number;
+        do {
+          previousLength = cleanSnippet.length;
+          // Remove complete tags
+          cleanSnippet = cleanSnippet.replace(/<[^>]*>/g, '');
+          // Remove any orphaned < that could indicate malformed tags
+          cleanSnippet = cleanSnippet.replace(/<[^<]*/g, (match) =>
+            match.includes('>') ? match : ''
+          );
+        } while (cleanSnippet.length !== previousLength);
+        // Final cleanup: remove any remaining < or > characters
+        cleanSnippet = cleanSnippet.replace(/[<>]/g, '');
+
         results.push({
           type: 'web',
           title: `${item.title} - Wikipedia`,
