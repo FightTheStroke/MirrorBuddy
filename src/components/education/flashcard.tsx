@@ -54,8 +54,8 @@ export function FlashcardStudy({ deck, onRating, onComplete }: FlashcardProps) {
 
   if (!currentCard) {
     return (
-      <Card className="max-w-xl mx-auto">
-        <CardContent className="p-8 text-center">
+      <Card className="w-full">
+        <CardContent className="p-6 sm:p-8 text-center">
           <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-6">
             <Check className="w-10 h-10 text-green-600" />
           </div>
@@ -71,7 +71,7 @@ export function FlashcardStudy({ deck, onRating, onComplete }: FlashcardProps) {
   }
 
   return (
-    <div className="max-w-xl mx-auto">
+    <div className="w-full">
       {/* Progress */}
       <div className="flex items-center justify-between mb-4 text-sm text-slate-500">
         <span>Carta {currentIndex + 1} di {cardsToReview.length}</span>

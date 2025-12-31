@@ -29,6 +29,13 @@ function getQuizHandler(): ((args: Record<string, unknown>) => Promise<ToolExecu
   return (globalThis as any).__quizHandler ?? null;
 }
 
+// Helper that throws if handler not registered (avoids TS null checks)
+function requireQuizHandler(): (args: Record<string, unknown>) => Promise<ToolExecutionResult> {
+  const handler = getQuizHandler();
+  if (!handler) throw new Error('Handler not registered');
+  return handler;
+}
+
 describe('Quiz Handler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -256,10 +263,6 @@ describe('Quiz Handler', () => {
 
   describe('Quiz Creation', () => {
     it('should create a valid quiz successfully', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Mathematics',
         questions: [
@@ -272,7 +275,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       expect(result.toolId).toBe('test-quiz-id-123');
@@ -289,10 +292,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should normalize whitespace in topic and questions', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: '  Mathematics  ',
         questions: [
@@ -305,7 +304,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -316,10 +315,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should handle questions without explanation', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Science',
         questions: [
@@ -331,7 +326,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -339,10 +334,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should handle multiple questions', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'General Knowledge',
         questions: [
@@ -365,7 +356,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -378,10 +369,6 @@ describe('Quiz Handler', () => {
 
   describe('Quiz Validation Errors', () => {
     it('should return error when topic is missing', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         questions: [
           {
@@ -392,7 +379,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.toolId).toBe('test-quiz-id-123');
@@ -401,10 +388,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should return error when topic is not a string', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 123,
         questions: [
@@ -416,17 +399,13 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Topic is required and must be a string');
     });
 
     it('should return error when topic is empty string', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: '',
         questions: [
@@ -438,33 +417,25 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Topic is required and must be a string');
     });
 
     it('should return error when questions array is empty', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Test Topic',
         questions: [],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('At least one question is required');
     });
 
     it('should return error when question text is missing', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Test Topic',
         questions: [
@@ -475,17 +446,13 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Question 1: question text is required');
     });
 
     it('should return error when options are insufficient', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Test Topic',
         questions: [
@@ -497,17 +464,13 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Question 1: at least 2 options are required');
     });
 
     it('should return error when correctIndex is invalid', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Test Topic',
         questions: [
@@ -519,17 +482,13 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Question 1: correctIndex must be a valid index');
     });
 
     it('should return error when correctIndex is negative', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Test Topic',
         questions: [
@@ -541,7 +500,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('Question 1: correctIndex must be a valid index');
@@ -550,10 +509,6 @@ describe('Quiz Handler', () => {
 
   describe('Multiple Choice Handling', () => {
     it('should accept exactly 2 options', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'True/False',
         questions: [
@@ -565,7 +520,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -573,10 +528,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should accept 4 options (standard multiple choice)', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Standard Quiz',
         questions: [
@@ -588,7 +539,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -596,10 +547,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should accept more than 4 options', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Extended Quiz',
         questions: [
@@ -611,7 +558,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -619,10 +566,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should validate correctIndex is within options bounds', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Bounds Test',
         questions: [
@@ -634,7 +577,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -642,10 +585,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should handle correctIndex at zero', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Index Zero Test',
         questions: [
@@ -657,7 +596,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -667,10 +606,6 @@ describe('Quiz Handler', () => {
 
   describe('Edge Cases', () => {
     it('should handle very long question text', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const longQuestion = 'A'.repeat(1000);
       const args = {
         topic: 'Long Text Test',
@@ -683,7 +618,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -691,10 +626,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should handle special characters in topic', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Tëst Tópïc with 中文 & émojis 🎓',
         questions: [
@@ -706,7 +637,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -714,10 +645,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should handle special characters in questions and options', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Special Characters',
         questions: [
@@ -729,7 +656,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -738,10 +665,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should handle undefined explanation gracefully', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'No Explanation',
         questions: [
@@ -754,7 +677,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
@@ -762,10 +685,6 @@ describe('Quiz Handler', () => {
     });
 
     it('should trim whitespace-only explanation', async () => {
-      if (!getQuizHandler()) {
-        throw new Error('Handler not registered');
-      }
-
       const args = {
         topic: 'Whitespace Test',
         questions: [
@@ -778,7 +697,7 @@ describe('Quiz Handler', () => {
         ],
       };
 
-      const result = await getQuizHandler()(args);
+      const result = await requireQuizHandler()(args);
 
       expect(result.success).toBe(true);
       const data = result.data as any;
