@@ -1217,7 +1217,7 @@ function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsProps) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-slate-500 mb-4">
-            Seleziona la lingua in cui i maestri ti parleranno
+            Seleziona la lingua in cui i professori ti parleranno
           </p>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
             {[

@@ -179,7 +179,7 @@ export function ReadyStep() {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30">
                 <span className="text-2xl">📚</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Scegli un Maestro</strong> - per ogni materia c&apos;è l&apos;esperto giusto
+                  <strong>Scegli un Professore</strong> - per ogni materia c&apos;è l&apos;esperto giusto
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/30">

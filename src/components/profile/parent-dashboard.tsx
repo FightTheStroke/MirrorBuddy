@@ -165,7 +165,7 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
               )}
               {insights.strengths.length === 0 && (
                 <p className="text-sm text-slate-500 text-center py-4">
-                  I Maestri stanno ancora osservando. Torna presto!
+                  I Professori stanno ancora osservando. Torna presto!
                 </p>
               )}
             </div>

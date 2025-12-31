@@ -203,13 +203,13 @@ export const defaultAchievements: Achievement[] = [
   { id: 'streak_100', name: 'Leggenda!', description: 'Mantieni una serie di 100 giorni', icon: '🔥', category: 'streak', requirement: 100, xpReward: 1000 },
 
   // Mastery achievements
-  { id: 'master_1', name: 'Primo Maestro', description: 'Raggiungi la padronanza in una materia', icon: '⭐', category: 'mastery', requirement: 1, xpReward: 200 },
+  { id: 'master_1', name: 'Primo Professore', description: 'Raggiungi la padronanza in una materia', icon: '⭐', category: 'mastery', requirement: 1, xpReward: 200 },
   { id: 'master_5', name: 'Multidisciplinare', description: 'Raggiungi la padronanza in 5 materie', icon: '⭐', category: 'mastery', requirement: 5, xpReward: 500 },
   { id: 'perfect_quiz', name: 'Perfezionista', description: 'Completa un quiz con il 100%', icon: '💯', category: 'mastery', requirement: 1, xpReward: 100 },
 
   // Exploration achievements
-  { id: 'all_maestros', name: 'Collezionista', description: 'Studia con tutti i 17 maestri', icon: '🧭', category: 'exploration', requirement: 17, xpReward: 300 },
-  { id: 'curious', name: 'Curioso', description: 'Fai 50 domande ai maestri', icon: '❓', category: 'exploration', requirement: 50, xpReward: 150 },
+  { id: 'all_maestros', name: 'Collezionista', description: 'Studia con tutti i 17 professori', icon: '🧭', category: 'exploration', requirement: 17, xpReward: 300 },
+  { id: 'curious', name: 'Curioso', description: 'Fai 50 domande ai professori', icon: '❓', category: 'exploration', requirement: 50, xpReward: 150 },
 
   // XP achievements
   { id: 'xp_1000', name: 'Mille Punti', description: 'Accumula 1000 XP', icon: '⚡', category: 'xp', requirement: 1000, xpReward: 100 },

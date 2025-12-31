@@ -88,7 +88,7 @@ const ROLE_INFO: Record<
     color: 'text-blue-500',
   },
   maestro: {
-    label: 'Maestro',
+    label: 'Professore',
     icon: <GraduationCap className="w-4 h-4" />,
     color: 'text-purple-500',
   },

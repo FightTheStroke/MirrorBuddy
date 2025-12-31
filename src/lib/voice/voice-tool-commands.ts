@@ -557,7 +557,7 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
         suggestions: {
           type: 'array',
           items: { type: 'string' },
-          description: 'Suggerimenti per i sotto-nodi (opzionale, il Maestro può proporre)',
+          description: 'Suggerimenti per i sotto-nodi (opzionale, il Professore può proporre)',
         },
       },
       required: ['node'],

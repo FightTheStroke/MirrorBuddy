@@ -232,7 +232,7 @@ const MARIO_CONVERSATION: ConversationNode = {
         {
           id: 'x3',
           role: 'assistant',
-          content: 'Hai provato a parlare con Archimede? E uno dei Maestri qui - spiega la matematica in modo che ha senso anche per me. E non ti giudica mai se non capisci al primo colpo!',
+          content: 'Hai provato a parlare con Archimede? E uno dei Professori qui - spiega la matematica in modo che ha senso anche per me. E non ti giudica mai se non capisci al primo colpo!',
         },
       ],
       nextOptions: [

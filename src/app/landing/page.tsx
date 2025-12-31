@@ -17,7 +17,7 @@ import {
 const features = [
   {
     icon: GraduationCap,
-    title: '17 Maestri AI',
+    title: '17 Professori AI',
     description:
       'Impara da figure storiche: Archimede, Leonardo, Galileo, Marie Curie e tanti altri',
   },

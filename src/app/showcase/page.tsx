@@ -17,11 +17,11 @@ import {
 const showcaseSections = [
   {
     href: '/showcase/maestri',
-    title: 'Incontra i Maestri',
-    description: '17 AI tutors ispirati a grandi figure storiche. Da Euclide a Marie Curie, ogni maestro ha il suo stile unico.',
+    title: 'Incontra i Professori',
+    description: '17 AI tutors ispirati a grandi figure storiche. Da Euclide a Marie Curie, ogni professore ha il suo stile unico.',
     icon: GraduationCap,
     color: 'from-purple-500 to-indigo-600',
-    stats: '17 Maestri',
+    stats: '17 Professori',
   },
   {
     href: '/showcase/mindmaps',

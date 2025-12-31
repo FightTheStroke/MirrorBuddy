@@ -88,7 +88,7 @@ export const notificationService = {
     useNotificationStore.getState().addNotification({
       type: 'reminder',
       title,
-      message: 'I tuoi Maestri ti aspettano. Anche solo 15 minuti fanno la differenza!',
+      message: 'I tuoi Professori ti aspettano. Anche solo 15 minuti fanno la differenza!',
       actionUrl: '/maestri',
     });
   },

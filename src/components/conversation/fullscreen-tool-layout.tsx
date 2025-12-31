@@ -113,7 +113,7 @@ function ChatDrawer({
             <div className="h-full overflow-y-auto p-4 space-y-3">
               {messages.length === 0 ? (
                 <p className="text-center text-slate-400 dark:text-slate-500 text-sm py-8">
-                  Inizia una conversazione col Maestro...
+                  Inizia una conversazione col Professore...
                 </p>
               ) : (
                 messages.map((msg) => (
@@ -157,7 +157,7 @@ function InputBar({
   onVoiceToggle,
   isVoiceActive,
   maestroColor,
-  placeholder = 'Chiedi al Maestro...',
+  placeholder = 'Chiedi al Professore...',
 }: InputBarProps) {
   const [inputValue, setInputValue] = useState('');
 

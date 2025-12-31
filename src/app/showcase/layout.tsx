@@ -23,7 +23,7 @@ const showcaseNavItems = [
   },
   {
     href: '/showcase/maestri',
-    label: 'Maestri',
+    label: 'Professori',
     icon: GraduationCap,
   },
   {

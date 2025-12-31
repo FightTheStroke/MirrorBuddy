@@ -17,7 +17,7 @@ const tierNames: Record<MasteryTier, string> = {
   intermediate: 'Intermedio',
   advanced: 'Avanzato',
   expert: 'Esperto',
-  master: 'Maestro',
+  master: 'Professore',
 };
 
 const tierColors: Record<MasteryTier, string> = {

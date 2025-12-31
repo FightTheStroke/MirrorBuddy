@@ -293,7 +293,7 @@ function generateStrengths(questions: number, duration: number): string[] {
     strengths.push('Buona concentrazione durante la sessione');
   }
   if (questions >= 3 && duration >= 5) {
-    strengths.push('Interazione attiva con il maestro');
+    strengths.push('Interazione attiva con il professore');
   }
   if (strengths.length === 0) {
     strengths.push('Hai iniziato il percorso di apprendimento');

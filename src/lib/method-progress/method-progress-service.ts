@@ -430,7 +430,7 @@ function getMindMapMessage(progress: MindMapProgress): string {
 function getFlashcardMessage(progress: FlashcardProgress): string {
   switch (progress.level) {
     case 'expert':
-      return 'Maestro delle flashcard!';
+      return 'Esperto delle flashcard!';
     case 'competent':
       return 'Crei flashcard efficaci!';
     case 'learning':

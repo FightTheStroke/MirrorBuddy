@@ -75,7 +75,7 @@ export function OnboardingSettings() {
                 Rivedi il tutorial
               </h4>
               <p className="text-sm text-blue-600 dark:text-blue-400">
-                Guarda di nuovo la presentazione di Melissa e i Maestri.
+                Guarda di nuovo la presentazione di Melissa e i Professori.
                 I tuoi dati non verranno modificati.
               </p>
             </div>
@@ -131,7 +131,7 @@ export function OnboardingSettings() {
                     <ul className="list-disc list-inside mt-2 space-y-1">
                       <li>Progressi e XP</li>
                       <li>Flashcard e materiali salvati</li>
-                      <li>Conversazioni con i Maestri</li>
+                      <li>Conversazioni con i Professori</li>
                       <li>Impostazioni e preferenze</li>
                     </ul>
                   </span>

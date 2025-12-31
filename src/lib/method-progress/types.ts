@@ -301,9 +301,9 @@ export const METHOD_MILESTONES: MethodMilestone[] = [
   {
     id: 'flashcard_expert',
     type: 'flashcard',
-    title: 'Maestro delle Flashcard',
+    title: 'Esperto delle Flashcard',
     description: 'Hai creato 20 flashcard efficaci!',
-    badgeName: 'Maestro delle Flashcard',
+    badgeName: 'Esperto delle Flashcard',
     requirements: { metric: 'flashcards.createdAlone', threshold: 20 },
     xpReward: 150,
   },

@@ -425,7 +425,7 @@ export function suggestCharacterSwitch(
     case 'maestro':
       // This would need a subject - defaulting to math for now
       character = getMaestroForSubject('mathematics')!;
-      message = `${reason} Vuoi parlare con un Maestro?`;
+      message = `${reason} Vuoi parlare con un Professore?`;
       break;
     case 'coach':
       character = getCoachForStudent(profile);

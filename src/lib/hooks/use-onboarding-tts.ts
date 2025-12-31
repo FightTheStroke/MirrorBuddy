@@ -270,9 +270,9 @@ Se hai qualche difficoltà particolare nello studio, non vergognarti a dirmelo: 
 
   principles: `Ecco cosa rende speciale la nostra scuola!
 Qui impariamo insieme divertendoci, con pazienza e rispetto per i tuoi tempi.
-Ogni maestro che incontrerai è un esperto che ti guiderà con passione.`,
+Ogni professore che incontrerai è un esperto che ti guiderà con passione.`,
 
-  maestri: `Lascia che ti presenti i nostri Maestri!
+  maestri: `Lascia che ti presenti i nostri Professori!
 Sono personaggi storici incredibili, ognuno esperto nella sua materia.
 Puoi scegliere chi vuoi in base a cosa stai studiando. Ti aiuteranno a capire tutto in modo semplice e divertente!`,
 
