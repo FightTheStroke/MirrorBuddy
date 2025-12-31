@@ -19,6 +19,8 @@ interface ToolPanelProps {
   onClose: () => void;
   isMinimized?: boolean;
   onToggleMinimize?: () => void;
+  /** When true, panel fills container instead of fixed height (for video conference layout) */
+  embedded?: boolean;
 }
 
 export function ToolPanel({
@@ -27,6 +29,7 @@ export function ToolPanel({
   onClose,
   isMinimized = false,
   onToggleMinimize,
+  embedded = false,
 }: ToolPanelProps) {
   if (!tool) return null;
 
@@ -93,10 +96,10 @@ export function ToolPanel({
         exit={{ opacity: 0, y: 20 }}
         transition={{ duration: 0.2 }}
         className={cn(
-          'bg-white dark:bg-slate-900 rounded-xl shadow-xl',
-          'border border-slate-200 dark:border-slate-700',
+          'bg-white dark:bg-slate-900',
+          !embedded && 'rounded-xl shadow-xl border border-slate-200 dark:border-slate-700',
           'flex flex-col overflow-hidden',
-          isMinimized ? 'h-16' : 'h-[70vh]'
+          embedded ? 'h-full' : (isMinimized ? 'h-16' : 'h-[70vh]')
         )}
       >
         {/* Header */}

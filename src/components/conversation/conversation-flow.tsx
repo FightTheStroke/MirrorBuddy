@@ -41,9 +41,9 @@ import {
 } from '@/lib/stores/conversation-flow-store';
 // Note: routeMessage from store is used instead of direct routeToCharacter
 import { analyzeHandoff } from '@/lib/ai/handoff-manager';
-// Voice session integration pending - Issue #34
+import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
-import type { ExtendedStudentProfile, CharacterType, Subject } from '@/types';
+import type { ExtendedStudentProfile, CharacterType, Subject, Maestro, MaestroVoice } from '@/types';
 // Tool integration - T-15
 import { ToolButtons } from './tool-buttons';
 import { ToolPanel } from '@/components/tools/tool-panel';
@@ -309,6 +309,35 @@ const CHARACTER_DESCRIPTIONS: Record<string, string> = {
 };
 
 /**
+ * Voice connection info from /api/realtime/token
+ */
+interface VoiceConnectionInfo {
+  provider: 'azure';
+  proxyPort: number;
+  configured: boolean;
+}
+
+/**
+ * Convert ActiveCharacter to Maestro-compatible interface for voice session.
+ * Coach and Buddy have all the required voice fields.
+ */
+function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
+  return {
+    id: character.id,
+    name: character.name,
+    subject: 'methodology' as Subject, // Coaches/buddies aren't subject-specific
+    specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
+    voice: (character.voice || 'alloy') as MaestroVoice,
+    voiceInstructions: character.voiceInstructions || '',
+    teachingStyle: character.type === 'coach' ? 'scaffolding' : 'peer-support',
+    avatar: CHARACTER_AVATARS[character.id] || '/avatars/default.jpg',
+    color: character.color,
+    systemPrompt: character.systemPrompt,
+    greeting: character.greeting,
+  };
+}
+
+/**
  * Enhanced character header with clear identity.
  */
 function ConversationHeader({
@@ -405,19 +434,102 @@ function ConversationHeader({
 }
 
 /**
- * Voice call overlay.
+ * Voice call overlay with actual Azure Realtime voice session.
+ * Issue #34: Now integrates with useVoiceSession hook.
  */
 function VoiceCallOverlay({
   character,
-  isConnecting,
-  isActive,
   onEnd,
 }: {
   character: ActiveCharacter;
-  isConnecting: boolean;
-  isActive: boolean;
   onEnd: () => void;
 }) {
+  const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
+  const hasAttemptedConnection = useRef(false);
+
+  const {
+    isConnected,
+    isListening,
+    isSpeaking,
+    isMuted,
+    transcript,
+    inputLevel,
+    connectionState,
+    connect,
+    disconnect,
+    toggleMute,
+  } = useVoiceSession({
+    onError: (error) => {
+      logger.error('Voice call error', { error: String(error) });
+      setConfigError('Errore di connessione vocale');
+    },
+    onTranscript: (role, text) => {
+      logger.debug('Voice transcript', { role, text: text.substring(0, 100) });
+    },
+  });
+
+  // Fetch connection info on mount
+  useEffect(() => {
+    async function fetchConnectionInfo() {
+      try {
+        const response = await fetch('/api/realtime/token');
+        const data = await response.json();
+        if (data.error) {
+          logger.error('Voice API error', { error: data.error });
+          setConfigError(data.message || 'Servizio vocale non configurato');
+          return;
+        }
+        setConnectionInfo(data as VoiceConnectionInfo);
+      } catch (error) {
+        logger.error('Failed to get voice connection info', { error: String(error) });
+        setConfigError('Impossibile connettersi al servizio vocale');
+      }
+    }
+    fetchConnectionInfo();
+  }, []);
+
+  // Connect when connection info is available
+  useEffect(() => {
+    const startConnection = async () => {
+      if (hasAttemptedConnection.current) return;
+      if (!connectionInfo || isConnected || connectionState !== 'idle') return;
+
+      hasAttemptedConnection.current = true;
+
+      try {
+        // Convert character to Maestro-compatible interface
+        const maestroLike = activeCharacterToMaestro(character);
+        await connect(maestroLike, connectionInfo);
+      } catch (error) {
+        logger.error('Voice connection failed', { error: String(error) });
+        if (error instanceof DOMException && error.name === 'NotAllowedError') {
+          setConfigError('Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.');
+        } else {
+          setConfigError('Errore di connessione vocale');
+        }
+      }
+    };
+
+    startConnection();
+  }, [connectionInfo, isConnected, connectionState, character, connect]);
+
+  // Handle end call
+  const handleEndCall = useCallback(() => {
+    disconnect();
+    onEnd();
+  }, [disconnect, onEnd]);
+
+  // Status text
+  const getStatusText = () => {
+    if (configError) return configError;
+    if (connectionState === 'connecting') return 'Connessione in corso...';
+    if (isConnected && isSpeaking) return `${character.name} sta parlando...`;
+    if (isConnected && isListening) return 'In ascolto...';
+    if (isConnected) return 'Connesso';
+    return 'Avvio chiamata...';
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -426,35 +538,70 @@ function VoiceCallOverlay({
       className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-slate-900/95 to-slate-800/95 backdrop-blur-sm"
     >
       <motion.div
-        animate={{ scale: isActive ? [1, 1.05, 1] : 1 }}
+        animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
         transition={{ repeat: Infinity, duration: 2 }}
       >
-        <CharacterAvatar character={character} size="xl" showStatus isActive={isActive} />
+        <CharacterAvatar character={character} size="xl" showStatus isActive={isConnected} />
       </motion.div>
 
       <h3 className="mt-4 text-xl font-semibold text-white">{character.name}</h3>
       <CharacterRoleBadge type={character.type} />
 
-      <p className="mt-2 text-sm text-slate-300">
-        {isConnecting ? 'Connessione in corso...' : 'Chiamata in corso'}
+      <p className={cn(
+        "mt-2 text-sm",
+        configError ? "text-red-400" : "text-slate-300"
+      )}>
+        {getStatusText()}
       </p>
 
-      {isActive && (
+      {/* Input level indicator */}
+      {isConnected && isListening && (
         <div className="mt-4 flex items-center gap-2">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-xs text-green-400">In ascolto</span>
+          <span
+            className="w-2 h-2 rounded-full animate-pulse"
+            style={{
+              backgroundColor: inputLevel > 0.1 ? '#22c55e' : '#64748b',
+              transform: `scale(${1 + inputLevel * 2})`
+            }}
+          />
+          <span className="text-xs text-green-400">
+            {isMuted ? 'Microfono disattivato' : 'In ascolto'}
+          </span>
         </div>
       )}
 
-      <Button
-        variant="destructive"
-        size="lg"
-        onClick={onEnd}
-        className="mt-8"
-      >
-        <PhoneOff className="w-5 h-5 mr-2" />
-        Termina chiamata
-      </Button>
+      {/* Transcript preview */}
+      {transcript.length > 0 && (
+        <div className="mt-4 max-w-md px-4 py-2 bg-slate-800/50 rounded-lg max-h-32 overflow-y-auto">
+          <p className="text-xs text-slate-400">
+            {transcript[transcript.length - 1]?.content.substring(0, 150)}
+            {(transcript[transcript.length - 1]?.content.length || 0) > 150 && '...'}
+          </p>
+        </div>
+      )}
+
+      {/* Controls */}
+      <div className="mt-8 flex items-center gap-4">
+        {isConnected && (
+          <Button
+            variant={isMuted ? 'destructive' : 'outline'}
+            size="lg"
+            onClick={toggleMute}
+            aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+          >
+            {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+          </Button>
+        )}
+
+        <Button
+          variant="destructive"
+          size="lg"
+          onClick={handleEndCall}
+        >
+          <PhoneOff className="w-5 h-5 mr-2" />
+          Termina chiamata
+        </Button>
+      </div>
     </motion.div>
   );
 }
@@ -857,6 +1004,9 @@ export function ConversationFlow() {
     );
   }
 
+  // Video conference layout when tool is active (Issue #36)
+  const hasActiveTool = activeTool && activeTool.status !== 'error';
+
   return (
     <div className="relative flex flex-col h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden">
       {/* Voice call overlay */}
@@ -864,14 +1014,12 @@ export function ConversationFlow() {
         {isVoiceActive && activeCharacter && (
           <VoiceCallOverlay
             character={activeCharacter}
-            isConnecting={mode !== 'voice'}
-            isActive={mode === 'voice'}
             onEnd={handleVoiceCall}
           />
         )}
       </AnimatePresence>
 
-      {/* Header with character info and voice call button */}
+      {/* Header with character info and voice call button - 10% */}
       <ConversationHeader
         currentCharacter={activeCharacter}
         onSwitchToCoach={handleSwitchToCoach}
@@ -893,38 +1041,93 @@ export function ConversationFlow() {
         )}
       </AnimatePresence>
 
-      {/* Messages area - WCAG 4.1.3: aria-live for screen readers */}
-      <div
-        className="flex-1 overflow-y-auto p-4"
-        role="log"
-        aria-live="polite"
-        aria-label="Messaggi della conversazione"
-      >
-        {messages.map((message) => (
-          <MessageBubble
-            key={message.id}
-            message={message}
-            activeCharacter={
-              message.role === 'assistant' ? activeCharacter : null
-            }
-          />
-        ))}
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex gap-3 mb-4"
-          >
-            <CharacterAvatar character={activeCharacter} size="sm" />
-            <div className="px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-md">
-              <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
-            </div>
-          </motion.div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+      {/* Main content area - switches between chat-first and tool-first layouts */}
+      {hasActiveTool ? (
+        /* VIDEO CONFERENCE LAYOUT: Tool takes center stage (Issue #36) */
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Tool panel - 70% of remaining space */}
+          <div className="flex-[7] overflow-auto border-b border-slate-200 dark:border-slate-700">
+            <ToolPanel
+              tool={activeTool}
+              maestro={activeCharacter ? {
+                name: activeCharacter.name,
+                avatar: CHARACTER_AVATARS[activeCharacter.id] || '/avatars/default.jpg',
+                color: activeCharacter.color,
+              } : null}
+              onClose={() => setActiveTool(null)}
+              isMinimized={isToolMinimized}
+              onToggleMinimize={() => setIsToolMinimized(!isToolMinimized)}
+              embedded={true}
+            />
+          </div>
 
-      {/* Input area */}
+          {/* Mini chat - 15% of remaining space */}
+          <div
+            className="flex-[1.5] overflow-y-auto p-2 bg-slate-50 dark:bg-slate-800/50"
+            role="log"
+            aria-live="polite"
+            aria-label="Messaggi recenti"
+          >
+            {/* Show only last 3 messages in mini view */}
+            {messages.slice(-3).map((message) => (
+              <div
+                key={message.id}
+                className={cn(
+                  'text-xs py-1 px-2 rounded mb-1',
+                  message.role === 'user'
+                    ? 'bg-accent-themed/10 text-right'
+                    : 'bg-slate-200 dark:bg-slate-700'
+                )}
+              >
+                <span className="font-medium">
+                  {message.role === 'user' ? 'Tu' : activeCharacter?.name}:
+                </span>{' '}
+                {message.content.substring(0, 80)}
+                {message.content.length > 80 && '...'}
+              </div>
+            ))}
+            {isLoading && (
+              <div className="text-xs py-1 px-2 flex items-center gap-1">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                <span>{activeCharacter?.name} sta pensando...</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* NORMAL LAYOUT: Chat takes full space */
+        <div
+          className="flex-1 overflow-y-auto p-4"
+          role="log"
+          aria-live="polite"
+          aria-label="Messaggi della conversazione"
+        >
+          {messages.map((message) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              activeCharacter={
+                message.role === 'assistant' ? activeCharacter : null
+              }
+            />
+          ))}
+          {isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex gap-3 mb-4"
+            >
+              <CharacterAvatar character={activeCharacter} size="sm" />
+              <div className="px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-md">
+                <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
+              </div>
+            </motion.div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      )}
+
+      {/* Input area - 5% */}
       <div className="p-4 border-t border-slate-200 dark:border-slate-700">
         <div className="flex items-center gap-2">
           {/* Tool buttons - quick access to educational tools */}
@@ -982,30 +1185,6 @@ export function ConversationFlow() {
           </Button>
         </div>
       </div>
-
-      {/* Floating tool panel - shows when a tool is being built */}
-      <AnimatePresence>
-        {activeTool && (
-          <motion.div
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 100 }}
-            className="fixed bottom-24 right-4 z-50 w-[480px] max-w-[calc(100vw-2rem)]"
-          >
-            <ToolPanel
-              tool={activeTool}
-              maestro={activeCharacter ? {
-                name: activeCharacter.name,
-                avatar: CHARACTER_AVATARS[activeCharacter.id] || '/avatars/default.jpg',
-                color: activeCharacter.color,
-              } : null}
-              onClose={() => setActiveTool(null)}
-              isMinimized={isToolMinimized}
-              onToggleMinimize={() => setIsToolMinimized(!isToolMinimized)}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

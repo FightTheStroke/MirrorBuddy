@@ -9,6 +9,7 @@ import { LazyChatSession } from '@/components/chat/lazy';
 import { maestri, subjectNames, subjectIcons, subjectColors, getAllSubjects } from '@/data';
 import { cn } from '@/lib/utils';
 import type { Maestro, Subject } from '@/types';
+import type { ToolType } from '@/types/tools';
 
 type SessionMode = 'voice' | 'chat' | null;
 
@@ -44,6 +45,16 @@ export function MaestriGrid() {
   const handleCloseSession = () => {
     setSessionMode(null);
     setSelectedMaestro(null);
+  };
+
+  // Handle tool request from maestro card - opens chat with tool request
+  const handleToolRequest = (maestro: Maestro, tool: ToolType) => {
+    setSessionKey(prev => prev + 1);
+    setSelectedMaestro(maestro);
+    // For tools, we start in chat mode so the tool can be built
+    setSessionMode('chat');
+    // Store tool request in sessionStorage for chat to pick up
+    sessionStorage.setItem('pendingToolRequest', JSON.stringify({ tool, maestroId: maestro.id }));
   };
 
   return (
@@ -128,6 +139,8 @@ export function MaestriGrid() {
             <MaestroCard
               maestro={maestro}
               onSelect={handleSelect}
+              showToolButtons={true}
+              onToolRequest={handleToolRequest}
             />
           </motion.div>
         ))}
