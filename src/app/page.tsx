@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
+import { MaestroSession } from '@/components/maestros/maestro-session';
+import type { Maestro } from '@/types';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { PomodoroHeaderWidget } from '@/components/pomodoro';
 import {
@@ -40,7 +42,8 @@ import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
 import { cn } from '@/lib/utils';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'calendar' | 'demos' | 'progress' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'calendar' | 'demos' | 'progress' | 'settings';
+type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
 const COACH_INFO = {
@@ -73,6 +76,11 @@ export default function Home() {
   // Start with Maestri as the first view
   const [currentView, setCurrentView] = useState<View>('maestri');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Maestro session state
+  const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
+  const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
+  const [maestroSessionKey, setMaestroSessionKey] = useState(0);
 
   const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
 
@@ -310,7 +318,25 @@ export default function Home() {
             <CharacterChatView characterId={selectedBuddy} characterType="buddy" />
           )}
 
-          {currentView === 'maestri' && <MaestriGrid />}
+          {currentView === 'maestri' && (
+            <MaestriGrid
+              onMaestroSelect={(maestro, mode) => {
+                setSelectedMaestro(maestro);
+                setMaestroSessionMode(mode);
+                setMaestroSessionKey(prev => prev + 1);
+                setCurrentView('maestro-session');
+              }}
+            />
+          )}
+
+          {currentView === 'maestro-session' && selectedMaestro && (
+            <MaestroSession
+              key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
+              maestro={selectedMaestro}
+              onClose={() => setCurrentView('maestri')}
+              initialMode={maestroSessionMode}
+            />
+          )}
 
           {currentView === 'quiz' && <LazyQuizView />}
 
