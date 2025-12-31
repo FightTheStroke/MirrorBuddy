@@ -469,7 +469,7 @@ export function detectIntent(message: string): DetectedIntent {
 export function getCharacterTypeLabel(type: CharacterType): string {
   switch (type) {
     case 'maestro':
-      return 'Maestro';
+      return 'Professore';
     case 'coach':
       return 'Coach (Melissa/Davide)';
     case 'buddy':
@@ -495,7 +495,7 @@ export function shouldSuggestRedirect(
   }
 
   const suggestions: Record<CharacterType, string> = {
-    maestro: `Per questa domanda di ${intent.subject || 'materia'}, un Maestro potrebbe aiutarti meglio!`,
+    maestro: `Per questa domanda di ${intent.subject || 'materia'}, un Professore potrebbe aiutarti meglio!`,
     coach: 'Per organizzare meglio lo studio, Melissa o Davide possono aiutarti!',
     buddy: 'Se vuoi parlare con qualcuno che ti capisce, Mario o Maria sono qui!',
   };

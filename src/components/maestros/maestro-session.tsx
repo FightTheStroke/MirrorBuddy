@@ -90,7 +90,7 @@ function generateAutoEvaluation(
   const strengths: string[] = [];
   if (questionsAsked >= 5) strengths.push('Curiosità e voglia di approfondire');
   if (sessionDuration >= 10) strengths.push('Buona concentrazione durante la sessione');
-  if (questionsAsked >= 3 && sessionDuration >= 5) strengths.push('Interazione attiva con il maestro');
+  if (questionsAsked >= 3 && sessionDuration >= 5) strengths.push('Interazione attiva con il professore');
   if (strengths.length === 0) strengths.push('Hai iniziato il percorso di apprendimento');
 
   const areasToImprove: string[] = [];

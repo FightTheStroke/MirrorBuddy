@@ -116,7 +116,7 @@ function EmptyState({ filter }: { filter: FilterType }) {
       </h3>
       <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md">
         I materiali creati durante le tue sessioni di studio appariranno qui.
-        Inizia una conversazione con un Maestro per creare nuovi contenuti!
+        Inizia una conversazione con un Professore per creare nuovi contenuti!
       </p>
     </motion.div>
   );

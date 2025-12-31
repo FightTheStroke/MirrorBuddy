@@ -172,8 +172,8 @@ export default function MindmapsShowcasePage() {
           Come funzionano le Mappe Mentali?
         </h3>
         <p className="text-white/70 text-sm leading-relaxed">
-          Durante le lezioni con i Maestri, puoi chiedere di creare mappe mentali su qualsiasi argomento.
-          Il Maestro generer&agrave; una mappa visuale che ti aiuter&agrave; a comprendere e memorizzare i concetti.
+          Durante le lezioni con i Professori, puoi chiedere di creare mappe mentali su qualsiasi argomento.
+          Il Professore generer&agrave; una mappa visuale che ti aiuter&agrave; a comprendere e memorizzare i concetti.
           Potrai stamparle, scaricarle e usarle per studiare offline.
         </p>
       </motion.div>

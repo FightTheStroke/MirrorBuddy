@@ -104,6 +104,6 @@ function getLevelTitle(level: number): string {
   if (level < 10) return 'Apprendista';
   if (level < 20) return 'Studioso';
   if (level < 30) return 'Esperto';
-  if (level < 50) return 'Maestro';
+  if (level < 50) return 'Professore';
   return 'Genio';
 }

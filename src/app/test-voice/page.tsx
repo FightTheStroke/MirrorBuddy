@@ -1013,15 +1013,15 @@ export default function TestVoicePage() {
 
       {/* MAESTRO TESTING SECTION */}
       <div className="mb-4 p-4 bg-gradient-to-r from-purple-900 to-indigo-900 rounded border-2 border-purple-500">
-        <h2 className="font-bold mb-3 text-xl">🎭 MAESTRO TEST (Confronto Diretto)</h2>
+        <h2 className="font-bold mb-3 text-xl">🎭 PROFESSORE TEST (Confronto Diretto)</h2>
         <p className="text-sm text-purple-200 mb-4">
-          Testa la connessione voice con un maestro reale per confrontare con la pagina principale.
+          Testa la connessione voice con un professore reale per confrontare con la pagina principale.
         </p>
 
         {/* Maestro selector */}
         <div className="flex flex-wrap gap-4 mb-4">
           <div className="flex-1 min-w-64">
-            <label className="block text-sm text-purple-300 mb-1">Seleziona Maestro:</label>
+            <label className="block text-sm text-purple-300 mb-1">Seleziona Professore:</label>
             <select
               value={selectedMaestro?.id || ''}
               onChange={(e) => {
@@ -1031,7 +1031,7 @@ export default function TestVoicePage() {
               }}
               className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-purple-500"
             >
-              <option value="">-- Scegli un Maestro --</option>
+              <option value="">-- Scegli un Professore --</option>
               {maestri.map(m => (
                 <option key={m.id} value={m.id}>
                   {m.name} - {m.specialty} ({m.subject})
@@ -1084,7 +1084,7 @@ export default function TestVoicePage() {
                 disabled={!selectedMaestro || status === 'connecting'}
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded disabled:opacity-50"
               >
-                🔌 Connect con {selectedMaestro?.name || 'Maestro'}
+                🔌 Connect con {selectedMaestro?.name || 'Professore'}
               </button>
               <button
                 onClick={() => {
@@ -1134,15 +1134,15 @@ export default function TestVoicePage() {
               disabled={!selectedMaestro}
               className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded disabled:opacity-50"
             >
-              🎙️ Apri VoiceSession con {selectedMaestro?.name || 'Maestro'}
+              🎙️ Apri VoiceSession con {selectedMaestro?.name || 'Professore'}
             </button>
           )}
         </div>
 
         {testMode === 'component' && (
           <p className="mt-3 text-xs text-purple-300">
-            ⚠️ Questo aprira il componente VoiceSession reale - quello usato nella pagina maestri.
-            Se funziona qui ma non nella pagina maestri, il problema e nel routing/lazy loading.
+            ⚠️ Questo aprira il componente VoiceSession reale - quello usato nella pagina professori.
+            Se funziona qui ma non nella pagina professori, il problema e nel routing/lazy loading.
           </p>
         )}
       </div>

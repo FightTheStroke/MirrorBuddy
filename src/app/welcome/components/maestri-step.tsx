@@ -103,7 +103,7 @@ export function MaestriStep() {
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              I tuoi Maestri, {data.name}!
+              I tuoi Professori, {data.name}!
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
               {maestri.length} grandi geni pronti ad aiutarti
@@ -222,9 +222,9 @@ export function MaestriStep() {
           className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50"
         >
           <p className="text-gray-700 dark:text-gray-300 text-sm">
-            <strong>Come funziona?</strong> Ogni Maestro è esperto nella sua materia.
+            <strong>Come funziona?</strong> Ogni Professore è esperto nella sua materia.
             Quando hai bisogno di aiuto con matematica, chiedi a Euclide. Per l&apos;inglese, c&apos;è Shakespeare!
-            Io ti aiuterò a scegliere il Maestro giusto per ogni situazione.
+            Io ti aiuterò a scegliere il Professore giusto per ogni situazione.
           </p>
         </motion.div>
 

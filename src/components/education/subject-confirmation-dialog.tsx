@@ -129,7 +129,7 @@ export function SubjectConfirmationDialog({
             {showMaestroSelection ? (
               <>
                 <GraduationCap className="h-5 w-5 text-blue-500" />
-                Scegli un Maestro
+                Scegli un Professore
               </>
             ) : (
               <>
@@ -188,7 +188,7 @@ export function SubjectConfirmationDialog({
           ) : (
             <>
               <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                Vuoi studiare <span className="font-semibold text-blue-600">{getSubjectLabel(selectedSubject)}</span> con un Maestro?
+                Vuoi studiare <span className="font-semibold text-blue-600">{getSubjectLabel(selectedSubject)}</span> con un Professore?
                 Ti guiderà passo dopo passo.
               </p>
 

@@ -443,7 +443,7 @@ function MasteryTab({ masteries }: MasteryTabProps) {
     intermediate: 'Intermedio',
     advanced: 'Avanzato',
     expert: 'Esperto',
-    master: 'Maestro',
+    master: 'Professore',
   };
 
   const subjects: Subject[] = ['mathematics', 'physics', 'chemistry', 'biology', 'history', 'geography', 'italian', 'english', 'art', 'music'];
@@ -598,7 +598,7 @@ function HistoryTab() {
                         {subjectNames[session.subject as Subject] || session.subject || 'Studio'}
                       </h4>
                       <p className="text-sm text-slate-500">
-                        {session.maestroId ? `Maestro ${session.maestroId}` : 'Sessione di studio'}
+                        {session.maestroId ? `Professore ${session.maestroId}` : 'Sessione di studio'}
                       </p>
                     </div>
                     <div className="text-right">

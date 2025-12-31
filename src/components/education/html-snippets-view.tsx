@@ -84,7 +84,7 @@ export function HTMLSnippetsView() {
             Demo Interattive
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Esempi HTML creati dai Maestri
+            Esempi HTML creati dai Professori
           </p>
         </div>
       </div>
@@ -135,7 +135,7 @@ export function HTMLSnippetsView() {
             </h3>
             <p className="text-sm text-slate-500 mt-2">
               {snippets.length === 0
-                ? 'Chiedi a un Maestro di creare una demo interattiva!'
+                ? 'Chiedi a un Professore di creare una demo interattiva!'
                 : 'Prova a modificare i filtri di ricerca'}
             </p>
           </CardContent>

@@ -66,7 +66,7 @@ export function PomodoroHeaderWidget() {
     reset,
   } = usePomodoroStore();
 
-  const { addXP } = useProgressStore();
+  const { addXP, updateStreak } = useProgressStore();
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Request notification permission on mount
@@ -115,8 +115,9 @@ export function PomodoroHeaderWidget() {
             bonuses.push(`+${POMODORO_XP.CYCLE_BONUS} ciclo completo`);
           }
 
-          // Award XP
+          // Award XP and update streak
           addXP(xpEarned);
+          updateStreak();
 
           const nextPhase = isLongBreak ? 'longBreak' : 'shortBreak';
           const nextTime = isLongBreak ? settings.longBreakMinutes * 60 : settings.shortBreakMinutes * 60;
@@ -151,7 +152,7 @@ export function PomodoroHeaderWidget() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, settings, setPhase, setTimeRemaining, setIsRunning, incrementPomodoros, addXP]);
+  }, [isRunning, settings, setPhase, setTimeRemaining, setIsRunning, incrementPomodoros, addXP, updateStreak]);
 
   const handleStart = useCallback(() => {
     setPhase('focus');

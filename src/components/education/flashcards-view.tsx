@@ -214,7 +214,7 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
           <Button onClick={() => router.push('/conversation?tool=flashcard')}>
             <MessageSquare className="w-4 h-4 mr-2" />
-            Crea con un Maestro
+            Crea con un Professore
           </Button>
           {/* SECONDARY: Manual form fallback */}
           <Button variant="outline" onClick={() => setShowCreateModal(true)}>

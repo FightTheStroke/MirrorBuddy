@@ -286,12 +286,12 @@ export default function ParentDashboardPage() {
                 Nessun Profilo Disponibile
               </CardTitle>
               <CardDescription>
-                Per creare il profilo dello studente, e necessario prima interagire con i Maestri durante le sessioni di studio.
+                Per creare il profilo dello studente, e necessario prima interagire con i Professori durante le sessioni di studio.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-slate-600 dark:text-slate-400">
-                Il profilo viene generato automaticamente analizzando le conversazioni con i Maestri,
+                Il profilo viene generato automaticamente analizzando le conversazioni con i Professori,
                 identificando punti di forza, aree di crescita e suggerendo strategie personalizzate.
               </p>
               <div className="flex gap-3">
@@ -332,7 +332,7 @@ export default function ParentDashboardPage() {
               <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 text-sm">
                 <h4 className="font-medium mb-2">Cosa verra visualizzato:</h4>
                 <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
-                  <li>Punti di forza osservati dai Maestri</li>
+                  <li>Punti di forza osservati dai Professori</li>
                   <li>Aree dove lo studente puo crescere</li>
                   <li>Strategie di apprendimento personalizzate</li>
                   <li>Stile di apprendimento preferito</li>
@@ -430,7 +430,7 @@ export default function ParentDashboardPage() {
               <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
                 <p className="text-sm text-amber-700 dark:text-amber-300">
                   <strong>Nota:</strong> Il profilo ha una affidabilita del {Math.round(meta.confidenceScore * 100)}%.
-                  Piu sessioni di studio con i Maestri miglioreranno la precisione delle osservazioni.
+                  Piu sessioni di studio con i Professori miglioreranno la precisione delle osservazioni.
                 </p>
               </div>
             )}

@@ -497,7 +497,7 @@ export default function ShowcaseSolarSystemPage() {
 
                   <div className="mt-6 pt-4 border-t border-white/10">
                     <p className="text-xs text-purple-300">
-                      In modalita completa, i Maestri potrebbero spiegarti molto di piu su ogni pianeta!
+                      In modalita completa, i Professori potrebbero spiegarti molto di piu su ogni pianeta!
                     </p>
                   </div>
                 </CardContent>

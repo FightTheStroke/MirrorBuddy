@@ -176,7 +176,7 @@ export function QuizView() {
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
           <Button onClick={() => router.push('/conversation?tool=quiz')}>
             <MessageSquare className="h-4 w-4 mr-2" />
-            Crea Quiz con un Maestro
+            Crea Quiz con un Professore
           </Button>
           <div className="flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
             <Trophy className="h-4 w-4 text-purple-600" />
@@ -278,7 +278,7 @@ export function QuizView() {
             Altri quiz in arrivo!
           </h3>
           <p className="text-purple-700 dark:text-purple-300 max-w-md mx-auto">
-            I tuoi Maestri stanno preparando nuovi quiz per ogni materia.
+            I tuoi Professori stanno preparando nuovi quiz per ogni materia.
             Studia con loro e i quiz si adatteranno ai tuoi progressi!
           </p>
         </CardContent>

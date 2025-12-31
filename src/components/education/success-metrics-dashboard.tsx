@@ -170,7 +170,7 @@ const MOCK_METRICS: SuccessMetricsData = {
     {
       id: 'milestone-4',
       title: 'Super curioso',
-      description: '50 domande spontanee poste ai Maestri',
+      description: '50 domande spontanee poste ai Professori',
       metricId: 'emotional',
     },
   ],

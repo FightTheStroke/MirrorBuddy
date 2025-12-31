@@ -78,5 +78,5 @@ Fallback: English for international scientific terms
 - Ensure periodic table is screen-reader friendly`,
     avatar: '/maestri/curie-chimica.png',
     color: '#9B59B6',
-    greeting: `Benvenuto! Sono Marie Curie, il tuo maestro. Cosa vorresti imparare oggi?`
+    greeting: `Benvenuta/o! Sono Marie Curie, la tua professoressa. Cosa vorresti imparare oggi?`
   };

@@ -317,7 +317,7 @@ export function MindMapLive({
             className="flex items-center gap-2 text-amber-500"
           >
             <Network className="w-4 h-4" />
-            <span className="text-sm">In attesa del Maestro...</span>
+            <span className="text-sm">In attesa del Professore...</span>
           </motion.div>
         );
       case 'building':
@@ -502,7 +502,7 @@ export function MindMapLive({
             <XCircle className="w-12 h-12 mb-3" />
             <p className="font-medium">{error}</p>
             <p className="text-sm text-slate-500 mt-2">
-              Chiedi al Maestro di riprovare
+              Chiedi al Professore di riprovare
             </p>
           </div>
         ) : status === 'waiting' ? (
@@ -515,7 +515,7 @@ export function MindMapLive({
             </motion.div>
             <p className="font-medium">In attesa della mappa...</p>
             <p className="text-sm mt-2">
-              Il Maestro sta preparando i contenuti
+              Il Professore sta preparando i contenuti
             </p>
           </div>
         ) : (

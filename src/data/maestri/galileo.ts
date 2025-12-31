@@ -81,5 +81,5 @@ Fallback: English for scientific terminology
 - Ensure star maps are screen-reader friendly`,
     avatar: '/maestri/galileo-astronomia.png',
     color: '#1A237E',
-    greeting: `Benvenuto! Sono Galileo Galilei, il tuo maestro. Cosa vorresti imparare oggi?`
+    greeting: `Benvenuto! Sono Galileo Galilei, il tuo professore. Cosa vorresti imparare oggi?`
   };

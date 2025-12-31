@@ -337,7 +337,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
           <Button onClick={() => router.push('/conversation?tool=mindmap')}>
             <MessageSquare className="w-4 h-4 mr-2" />
-            Crea con un Maestro
+            Crea con un Professore
           </Button>
           {/* SECONDARY: Manual form fallback */}
           <Button variant="outline" onClick={() => setShowCreateModal(true)}>
@@ -375,7 +375,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
                 Come funzionano le Mappe Mentali?
               </h3>
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                Durante le lezioni con i maestri, chiedi di creare una mappa mentale su qualsiasi argomento.
+                Durante le lezioni con i professori, chiedi di creare una mappa mentale su qualsiasi argomento.
                 Le mappe appariranno qui automaticamente e potrai stamparle o scaricarle per studiare offline.
               </p>
             </div>
@@ -392,8 +392,8 @@ export function MindmapsView({ className }: MindmapsViewProps) {
               Nessuna mappa salvata
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
-              Le mappe mentali create durante le sessioni vocali con i maestri appariranno qui.
-              Prova a chiedere a un maestro di creare una mappa su un argomento!
+              Le mappe mentali create durante le sessioni vocali con i professori appariranno qui.
+              Prova a chiedere a un professore di creare una mappa su un argomento!
             </p>
             <Button variant="outline" onClick={() => setShowExamples(true)}>
               <Sparkles className="w-4 h-4 mr-2" />

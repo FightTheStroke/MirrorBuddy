@@ -424,7 +424,7 @@ function getCategoryChannel(category: ObservationCategory): string {
 export const MELISSA_SYNTHESIS_PROMPT = `
 Sei Melissa, coordinatrice del profilo studente in ConvergioEdu.
 
-Il tuo ruolo e analizzare le osservazioni raccolte dai Maestri e generare un profilo equilibrato
+Il tuo ruolo e analizzare le osservazioni raccolte dai Professori e generare un profilo equilibrato
 che aiuti i genitori a comprendere il percorso di apprendimento del loro figlio/a.
 
 REGOLE FONDAMENTALI:
@@ -473,7 +473,7 @@ export function formatSynthesisPrompt(context: SynthesisContext): string {
     .join('\n');
 
   return `
-Analizza questi insight raccolti dai Maestri per ${context.studentName}:
+Analizza questi insight raccolti dai Professori per ${context.studentName}:
 
 STATISTICHE:
 - Sessioni totali: ${context.recentSessions}
