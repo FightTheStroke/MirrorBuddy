@@ -255,6 +255,29 @@ export function HomeworkHelpView() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- sendMaieuticMessage defined after
   }, []);
 
+  // Build system prompt for maieutic chat - use Maestro if connected
+  const getMaieuticSystemPrompt = useCallback(() => {
+    const basePrompt = connectedMaestro
+      ? `Sei ${connectedMaestro.name}, ${connectedMaestro.specialty}. ${connectedMaestro.teachingStyle}
+
+${MAIEUTIC_SYSTEM_PROMPT}`
+      : MAIEUTIC_SYSTEM_PROMPT;
+
+    // Add homework context to system prompt
+    if (currentHomework) {
+      return `${basePrompt}
+
+CONTESTO DEL PROBLEMA:
+- Titolo: ${currentHomework.title}
+- Tipo: ${currentHomework.problemType}
+- Passaggi: ${currentHomework.steps.map((s, i) => `${i + 1}. ${s.description} (${s.completed ? 'completato' : 'da fare'})`).join('\n')}
+
+Guida lo studente attraverso questi passaggi usando domande maieutiche. Non dare risposte dirette.`;
+    }
+
+    return basePrompt;
+  }, [connectedMaestro, currentHomework]);
+
   // Send message to maieutic API
   const sendMaieuticMessage = useCallback(async (message: string) => {
     setIsLoadingChat(true);
@@ -265,42 +288,38 @@ export function HomeworkHelpView() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            { role: 'system', content: MAIEUTIC_SYSTEM_PROMPT },
             ...maieuticChat.map(m => ({ role: m.role, content: m.content })),
             { role: 'user', content: message },
           ],
-          context: currentHomework ? {
-            problemTitle: currentHomework.title,
-            problemType: currentHomework.problemType,
-            steps: currentHomework.steps.map(s => ({
-              description: s.description,
-              completed: s.completed,
-            })),
-          } : undefined,
+          systemPrompt: getMaieuticSystemPrompt(),
+          maestroId: connectedMaestro?.id || 'maieutic',
+          enableTools: false, // No tools for maieutic chat
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to get response');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to get response');
       }
 
       const data = await response.json();
 
       setMaieuticChat(prev => [...prev, {
         role: 'assistant',
-        content: data.response || data.message || 'Prova a pensare: cosa sai già su questo argomento?',
+        content: data.content || 'Mi dispiace, non ho capito. Puoi riformulare la domanda?',
         timestamp: new Date(),
       }]);
-    } catch {
+    } catch (err) {
+      logger.error('Maieutic chat error', { error: String(err) });
       setMaieuticChat(prev => [...prev, {
         role: 'assistant',
-        content: 'Scusa, c\'è stato un problema. Prova a riformulare la domanda: cosa esattamente non ti è chiaro?',
+        content: 'Scusa, c\'è stato un problema. Prova a riformulare la domanda.',
         timestamp: new Date(),
       }]);
     } finally {
       setIsLoadingChat(false);
     }
-  }, [currentHomework, maieuticChat]);
+  }, [maieuticChat, getMaieuticSystemPrompt, connectedMaestro]);
 
   // Handle chat submit
   const handleChatSubmit = useCallback(() => {
@@ -384,12 +403,27 @@ export function HomeworkHelpView() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main content */}
         <div className={cn('lg:col-span-2', showHistory && 'lg:col-span-2')}>
-          <HomeworkHelp
-            homework={currentHomework || undefined}
-            onSubmitPhoto={handleSubmitPhoto}
-            onCompleteStep={handleCompleteStep}
-            onAskQuestion={handleAskQuestion}
-          />
+          {/* Subject Confirmation - shown inline after photo capture */}
+          {showSubjectDialog ? (
+            <SubjectConfirmationDialog
+              key={pendingHomework?.id || detectedSubject}
+              detectedSubject={detectedSubject}
+              isOpen={showSubjectDialog}
+              photoPreview={pendingHomework?.photoUrl}
+              onConfirm={handleSubjectConfirm}
+              onClose={() => {
+                setShowSubjectDialog(false);
+                setPendingHomework(null);
+              }}
+            />
+          ) : (
+            <HomeworkHelp
+              homework={currentHomework || undefined}
+              onSubmitPhoto={handleSubmitPhoto}
+              onCompleteStep={handleCompleteStep}
+              onAskQuestion={handleAskQuestion}
+            />
+          )}
         </div>
 
         {/* Sidebar: History or Chat */}
@@ -499,7 +533,7 @@ export function HomeworkHelpView() {
                         className={cn(
                           'p-3 rounded-lg text-sm',
                           msg.role === 'user'
-                            ? 'bg-blue-500 text-white ml-8'
+                            ? 'bg-accent-themed text-white ml-8'
                             : 'bg-slate-100 dark:bg-slate-800 mr-8'
                         )}
                       >
@@ -540,42 +574,6 @@ export function HomeworkHelpView() {
         </div>
       </div>
 
-      {/* Subject Confirmation Dialog */}
-      <SubjectConfirmationDialog
-        detectedSubject={detectedSubject}
-        isOpen={showSubjectDialog}
-        onConfirm={handleSubjectConfirm}
-        onClose={() => {
-          setShowSubjectDialog(false);
-          setPendingHomework(null);
-        }}
-      />
-
-      {/* Connected Maestro indicator */}
-      {connectedMaestro && currentHomework && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-4 right-4 z-40"
-        >
-          <div
-            className="flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
-            style={{ borderLeftColor: connectedMaestro.color, borderLeftWidth: 4 }}
-          >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold"
-              style={{ backgroundColor: connectedMaestro.color }}
-            >
-              {connectedMaestro.avatar}
-            </div>
-            <div>
-              <p className="font-medium text-sm">{connectedMaestro.name}</p>
-              <p className="text-xs text-slate-500">Ti assiste in questo problema</p>
-            </div>
-            <GraduationCap className="w-4 h-4 text-slate-400" />
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }
