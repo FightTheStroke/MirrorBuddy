@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowRight, ArrowLeft, SkipForward, User, GraduationCap, Heart, Volume2, VolumeX, Mic } from 'lucide-react';
@@ -68,34 +68,50 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
   const [voiceCapturedSchool, setVoiceCapturedSchool] = useState(false);
   const [voiceCapturedDiffs, setVoiceCapturedDiffs] = useState(false);
 
+  // Track previous store values to detect voice-captured changes
+  const prevAgeRef = useRef(data.age);
+  const prevSchoolRef = useRef(data.schoolLevel);
+  const prevDiffsRef = useRef(data.learningDifferences);
+
   // Sync local state with store (when voice captures data)
   useEffect(() => {
-    if (data.age !== undefined && data.age !== age) {
-      setAge(data.age);
-      setVoiceCapturedAge(true);
-      setTimeout(() => setVoiceCapturedAge(false), 3000);
+    if (data.age !== undefined && data.age !== prevAgeRef.current) {
+      prevAgeRef.current = data.age;
+      // Use microtask to avoid synchronous setState in effect
+      queueMicrotask(() => {
+        setAge(data.age);
+        setVoiceCapturedAge(true);
+        setTimeout(() => setVoiceCapturedAge(false), 3000);
+      });
     }
-  }, [data.age, age]);
+  }, [data.age]);
 
   useEffect(() => {
-    if (data.schoolLevel && data.schoolLevel !== schoolLevel) {
-      setSchoolLevel(data.schoolLevel);
-      setVoiceCapturedSchool(true);
-      setTimeout(() => setVoiceCapturedSchool(false), 3000);
+    if (data.schoolLevel && data.schoolLevel !== prevSchoolRef.current) {
+      prevSchoolRef.current = data.schoolLevel;
+      queueMicrotask(() => {
+        setSchoolLevel(data.schoolLevel);
+        setVoiceCapturedSchool(true);
+        setTimeout(() => setVoiceCapturedSchool(false), 3000);
+      });
     }
-  }, [data.schoolLevel, schoolLevel]);
+  }, [data.schoolLevel]);
 
   useEffect(() => {
     if (data.learningDifferences && data.learningDifferences.length > 0) {
-      const currentSet = new Set(selectedDifferences);
+      const prevSet = new Set(prevDiffsRef.current || []);
       const newSet = new Set(data.learningDifferences);
-      if (![...currentSet].every(d => newSet.has(d)) || ![...newSet].every(d => currentSet.has(d))) {
-        setSelectedDifferences(data.learningDifferences);
-        setVoiceCapturedDiffs(true);
-        setTimeout(() => setVoiceCapturedDiffs(false), 3000);
+      const hasChanged = ![...prevSet].every(d => newSet.has(d)) || ![...newSet].every(d => prevSet.has(d));
+      if (hasChanged) {
+        prevDiffsRef.current = data.learningDifferences;
+        queueMicrotask(() => {
+          setSelectedDifferences(data.learningDifferences || []);
+          setVoiceCapturedDiffs(true);
+          setTimeout(() => setVoiceCapturedDiffs(false), 3000);
+        });
       }
     }
-  }, [data.learningDifferences, selectedDifferences]);
+  }, [data.learningDifferences]);
 
   // Auto-speak Melissa's info message (only when using Web Speech fallback)
   const { isPlaying, stop } = useOnboardingTTS({

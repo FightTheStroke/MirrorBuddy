@@ -23,7 +23,6 @@ function WelcomeContent() {
     currentStep,
     isReplayMode,
     startReplay,
-    voiceSessionActive,
   } = useOnboardingStore();
 
   // Track if we should use Web Speech fallback

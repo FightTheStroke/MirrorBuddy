@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Sparkles, ArrowRight, Volume2, VolumeX, Mic } from 'lucide-react';
@@ -42,15 +42,21 @@ export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) 
   const [error, setError] = useState('');
   const [voiceCapturedName, setVoiceCapturedName] = useState(false);
 
+  // Track previous store value to detect voice-captured changes
+  const prevNameRef = useRef(data.name);
+
   // Sync local name state with store (when voice captures name)
   useEffect(() => {
-    if (data.name && data.name !== name) {
-      setName(data.name);
-      setVoiceCapturedName(true);
-      // Clear the voice captured indicator after a moment
-      setTimeout(() => setVoiceCapturedName(false), 3000);
+    if (data.name && data.name !== prevNameRef.current) {
+      prevNameRef.current = data.name;
+      // Use microtask to avoid synchronous setState in effect
+      queueMicrotask(() => {
+        setName(data.name);
+        setVoiceCapturedName(true);
+        setTimeout(() => setVoiceCapturedName(false), 3000);
+      });
     }
-  }, [data.name, name]);
+  }, [data.name]);
 
   // Auto-speak Melissa's welcome message (only when using Web Speech fallback)
   // When Azure voice is active, Melissa speaks through the realtime API
