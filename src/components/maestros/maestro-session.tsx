@@ -42,6 +42,14 @@ import { VoicePanel } from '@/components/voice';
 import { logger } from '@/lib/logger';
 import type { Maestro, ChatMessage, ToolCall, SessionEvaluation } from '@/types';
 
+// Constants for score/XP calculations (extracted for clarity)
+const SCORE_QUESTIONS_WEIGHT = 0.5; // Points per question (max 2 points)
+const SCORE_DURATION_WEIGHT = 0.1;  // Points per minute (max 2 points)
+const SCORE_XP_WEIGHT = 0.005;      // Points per XP (max 0.5 points)
+const XP_PER_MINUTE = 5;            // XP earned per minute of session
+const XP_PER_QUESTION = 10;         // XP earned per question asked
+const MAX_XP_PER_SESSION = 100;     // Maximum XP per session
+
 interface MaestroSessionProps {
   maestro: Maestro;
   onClose: () => void;
@@ -58,9 +66,9 @@ function generateAutoEvaluation(
 ): SessionEvaluation {
   const baseScore = Math.min(10, Math.max(1,
     5 +
-    Math.min(2, questionsAsked * 0.5) +
-    Math.min(2, sessionDuration * 0.1) +
-    Math.min(0.5, xpEarned * 0.005) // Deterministic bonus based on XP
+    Math.min(2, questionsAsked * SCORE_QUESTIONS_WEIGHT) +
+    Math.min(2, sessionDuration * SCORE_DURATION_WEIGHT) +
+    Math.min(0.5, xpEarned * SCORE_XP_WEIGHT)
   ));
   const score = Math.round(baseScore);
 
@@ -149,7 +157,6 @@ function MessageBubble({
         )}
         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
         <div className="flex items-center justify-between mt-1 gap-2">
-          {isVoice && !isUser && <Volume2 className="w-3 h-3 opacity-60" />}
           <span className="text-xs opacity-60">
             {new Date(message.timestamp).toLocaleTimeString('it-IT', {
               hour: '2-digit',
@@ -357,11 +364,12 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     setSessionEnded(true);
 
     const sessionDuration = Math.round((Date.now() - sessionStartTime.current) / 60000);
-    const xpEarned = Math.min(100, sessionDuration * 5 + questionCount.current * 10);
+    const xpEarned = Math.min(MAX_XP_PER_SESSION, sessionDuration * XP_PER_MINUTE + questionCount.current * XP_PER_QUESTION);
 
     const evaluation = generateAutoEvaluation(questionCount.current, sessionDuration, xpEarned);
 
-    // Try to save to diary
+    // Try to save to diary - silent failure is intentional to not distract from evaluation
+    // The savedToDiary flag controls whether the success indicator is shown
     try {
       const response = await fetch('/api/learnings/extract', {
         method: 'POST',
@@ -372,11 +380,12 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
           messages: messages.map(m => ({ role: m.role, content: m.content })),
         }),
       });
-      if (response.ok) {
-        evaluation.savedToDiary = true;
-      }
+      evaluation.savedToDiary = response.ok;
     } catch (error) {
-      logger.error('Failed to extract learnings', { error });
+      // Silent failure - diary save is non-critical functionality
+      // We don't want to distract from the evaluation experience
+      logger.warn('Failed to save to diary (non-critical)', { error });
+      evaluation.savedToDiary = false;
     }
 
     // Add evaluation message to chat

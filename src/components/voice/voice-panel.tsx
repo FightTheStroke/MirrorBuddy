@@ -182,9 +182,13 @@ export function VoicePanel({
         </Button>
       </div>
 
-      {/* Mute status text */}
+      {/* Mute status text with accessibility */}
       {isConnected && (
-        <p className="text-xs text-white/60">
+        <p
+          className="text-xs text-white/60"
+          aria-live="polite"
+          role="status"
+        >
           {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
         </p>
       )}
