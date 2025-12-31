@@ -25,6 +25,12 @@ interface OnboardingData {
   gender?: 'male' | 'female' | 'other';
 }
 
+interface VoiceTranscriptEntry {
+  role: 'user' | 'assistant';
+  text: string;
+  timestamp: number;
+}
+
 interface OnboardingState {
   // Flow state
   hasCompletedOnboarding: boolean;
@@ -32,6 +38,12 @@ interface OnboardingState {
   currentStep: OnboardingStep;
   isReplayMode: boolean;
   isVoiceMuted: boolean;
+
+  // Voice session state
+  voiceSessionActive: boolean;
+  voiceSessionConnecting: boolean;
+  voiceTranscript: VoiceTranscriptEntry[];
+  azureAvailable: boolean | null; // null = not checked yet
 
   // Collected data
   data: OnboardingData;
@@ -42,6 +54,11 @@ interface OnboardingState {
   prevStep: () => void;
   updateData: (data: Partial<OnboardingData>) => void;
   setVoiceMuted: (muted: boolean) => void;
+  setVoiceSessionActive: (active: boolean) => void;
+  setVoiceSessionConnecting: (connecting: boolean) => void;
+  addVoiceTranscript: (role: 'user' | 'assistant', text: string) => void;
+  clearVoiceTranscript: () => void;
+  setAzureAvailable: (available: boolean) => void;
   completeOnboarding: () => void;
   startReplay: () => void;
   resetOnboarding: () => void;
@@ -64,6 +81,13 @@ export const useOnboardingStore = create<OnboardingState>()(
       currentStep: 'welcome',
       isReplayMode: false,
       isVoiceMuted: false,
+
+      // Voice session state
+      voiceSessionActive: false,
+      voiceSessionConnecting: false,
+      voiceTranscript: [],
+      azureAvailable: null,
+
       data: {
         name: '',
       },
@@ -71,6 +95,23 @@ export const useOnboardingStore = create<OnboardingState>()(
       setStep: (step) => set({ currentStep: step }),
 
       setVoiceMuted: (muted) => set({ isVoiceMuted: muted }),
+
+      setVoiceSessionActive: (active) => set({ voiceSessionActive: active }),
+
+      setVoiceSessionConnecting: (connecting) =>
+        set({ voiceSessionConnecting: connecting }),
+
+      addVoiceTranscript: (role, text) =>
+        set((state) => ({
+          voiceTranscript: [
+            ...state.voiceTranscript,
+            { role, text, timestamp: Date.now() },
+          ],
+        })),
+
+      clearVoiceTranscript: () => set({ voiceTranscript: [] }),
+
+      setAzureAvailable: (available) => set({ azureAvailable: available }),
 
       nextStep: () => {
         const currentIndex = STEP_ORDER.indexOf(get().currentStep);
@@ -111,6 +152,10 @@ export const useOnboardingStore = create<OnboardingState>()(
           currentStep: 'welcome',
           isReplayMode: false,
           isVoiceMuted: false,
+          voiceSessionActive: false,
+          voiceSessionConnecting: false,
+          voiceTranscript: [],
+          azureAvailable: null,
           data: { name: '' },
         }),
 
@@ -150,6 +195,10 @@ export const useOnboardingStore = create<OnboardingState>()(
           currentStep: 'welcome',
           isReplayMode: false,
           isVoiceMuted: false,
+          voiceSessionActive: false,
+          voiceSessionConnecting: false,
+          voiceTranscript: [],
+          azureAvailable: null,
           data: { name: '' },
         });
 

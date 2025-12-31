@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles, ArrowRight, Volume2, VolumeX } from 'lucide-react';
+import { Sparkles, ArrowRight, Volume2, VolumeX, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,20 +13,49 @@ import {
   ONBOARDING_SCRIPTS,
 } from '@/lib/hooks/use-onboarding-tts';
 
+interface WelcomeStepProps {
+  useWebSpeechFallback?: boolean;
+}
+
 /**
  * Step 1: Melissa intro + asks for student name
  *
  * Melissa is the default coach, but the student can change coach later in settings.
  * She warmly welcomes the student and asks for their name.
+ *
+ * Voice Integration (#61):
+ * - Syncs with voice-captured name from onboarding store
+ * - Shows feedback when voice captures data
+ * - Falls back to Web Speech TTS when Azure unavailable
  */
-export function WelcomeStep() {
-  const { data, updateData, nextStep, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
+export function WelcomeStep({ useWebSpeechFallback = false }: WelcomeStepProps) {
+  const {
+    data,
+    updateData,
+    nextStep,
+    isReplayMode,
+    isVoiceMuted,
+    setVoiceMuted,
+    voiceSessionActive,
+  } = useOnboardingStore();
   const [name, setName] = useState(data.name || '');
   const [error, setError] = useState('');
+  const [voiceCapturedName, setVoiceCapturedName] = useState(false);
 
-  // Auto-speak Melissa's welcome message
+  // Sync local name state with store (when voice captures name)
+  useEffect(() => {
+    if (data.name && data.name !== name) {
+      setName(data.name);
+      setVoiceCapturedName(true);
+      // Clear the voice captured indicator after a moment
+      setTimeout(() => setVoiceCapturedName(false), 3000);
+    }
+  }, [data.name, name]);
+
+  // Auto-speak Melissa's welcome message (only when using Web Speech fallback)
+  // When Azure voice is active, Melissa speaks through the realtime API
   const { isPlaying, stop } = useOnboardingTTS({
-    autoSpeak: !isVoiceMuted,
+    autoSpeak: useWebSpeechFallback && !isVoiceMuted && !voiceSessionActive,
     text: ONBOARDING_SCRIPTS.welcome,
     delay: 800, // Wait for animation
   });
@@ -148,23 +177,44 @@ export function WelcomeStep() {
             >
               Come ti chiami?
             </label>
-            <Input
-              id="student-name"
-              type="text"
-              value={name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                setName(e.target.value);
-                setError('');
-              }}
-              onKeyDown={handleKeyDown}
-              placeholder="Scrivi il tuo nome..."
-              className="text-lg py-6 px-4 border-2 focus:border-pink-500 focus:ring-pink-500"
-              aria-describedby={error ? 'name-error' : undefined}
-              autoFocus
-            />
+            <div className="relative">
+              <Input
+                id="student-name"
+                type="text"
+                value={name}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setName(e.target.value);
+                  setError('');
+                  setVoiceCapturedName(false);
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder="Scrivi il tuo nome..."
+                className={`text-lg py-6 px-4 border-2 focus:border-pink-500 focus:ring-pink-500 ${
+                  voiceCapturedName ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : ''
+                }`}
+                aria-describedby={error ? 'name-error' : undefined}
+                autoFocus={!voiceSessionActive}
+              />
+              {voiceCapturedName && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-green-600 dark:text-green-400"
+                >
+                  <Mic className="w-4 h-4" />
+                  <span className="text-xs font-medium">Melissa ha capito!</span>
+                </motion.div>
+              )}
+            </div>
             {error && (
               <p id="name-error" className="text-red-500 text-sm" role="alert">
                 {error}
+              </p>
+            )}
+            {voiceSessionActive && !name && (
+              <p className="text-sm text-pink-600 dark:text-pink-400 flex items-center gap-1">
+                <Mic className="w-3 h-3" />
+                Parla con Melissa per dirle il tuo nome...
               </p>
             )}
           </motion.div>
