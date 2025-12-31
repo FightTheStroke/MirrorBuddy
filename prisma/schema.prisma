@@ -204,12 +204,17 @@ model Conversation {
   isActive     Boolean   @default(true)
   lastMessageAt DateTime?
 
+  // Parent Mode (Issue #63)
+  isParentMode Boolean   @default(false)
+  studentId    String?   // The student being discussed (for parent conversations)
+
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
   @@index([userId])
   @@index([maestroId])
   @@index([updatedAt])
+  @@index([isParentMode])
 }
 
 model Message {
