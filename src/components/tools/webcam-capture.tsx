@@ -134,7 +134,8 @@ export function WebcamCapture({
         }
 
         const constraints: MediaStreamConstraints = {
-          video: deviceId ? { deviceId: { exact: deviceId } } : true,
+          // Use 'ideal' instead of 'exact' for graceful fallback if device unavailable
+          video: deviceId ? { deviceId: { ideal: deviceId } } : true,
         };
 
         logger.info('Requesting camera access', { deviceId, constraints });
@@ -503,20 +504,23 @@ export function WebcamCapture({
                 </div>
               </div>
             </div>
-          ) : isLoading ? (
-            <div className="absolute inset-0 flex items-center justify-center flex-col gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-              <p className="text-slate-400 text-sm">Avvio fotocamera...</p>
-            </div>
           ) : (
             <>
-              {/* Live video feed */}
+              {/* Loading overlay - shown over video while initializing */}
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center flex-col gap-3 z-10 bg-black">
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+                  <p className="text-slate-400 text-sm">Avvio fotocamera...</p>
+                </div>
+              )}
+
+              {/* Live video feed - ALWAYS in DOM to ensure videoRef is available */}
               <video
                 ref={videoRef}
                 autoPlay
                 playsInline
                 muted
-                className={capturedImage ? 'hidden' : 'w-full h-full object-cover'}
+                className={capturedImage || isLoading ? 'invisible' : 'w-full h-full object-cover'}
               />
 
               {/* Captured image preview */}
