@@ -49,32 +49,87 @@ function validateCode(code: string): { safe: boolean; violations: string[] } {
 }
 
 /**
+ * Remove script elements using character-by-character state machine
+ * This avoids regex-based multi-character bypass vulnerabilities
+ */
+function removeScriptElements(html: string): string {
+  let result = '';
+  let i = 0;
+  const lowerHtml = html.toLowerCase();
+
+  while (i < html.length) {
+    // Check for opening script tag
+    if (lowerHtml.substring(i, i + 7) === '<script') {
+      // Find the end of this script element
+      const closingTag = lowerHtml.indexOf('</script', i);
+      if (closingTag !== -1) {
+        // Skip to after the closing tag
+        const endOfClosing = lowerHtml.indexOf('>', closingTag);
+        i = endOfClosing !== -1 ? endOfClosing + 1 : html.length;
+      } else {
+        // No closing tag, skip to end
+        i = html.length;
+      }
+    } else {
+      result += html[i];
+      i++;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Sanitize HTML to prevent XSS
  * Note: Multi-layer sanitization, the iframe sandbox provides main security
  */
 function sanitizeHtml(html: string): string {
-  let sanitized = html;
+  // First pass: remove script elements entirely (state machine approach)
+  let sanitized = removeScriptElements(html);
 
-  // Remove script tags (comprehensive: handles variations, attributes, whitespace)
-  // Loop to handle nested or malformed tags
-  let previousLength: number;
-  do {
-    previousLength = sanitized.length;
-    // Handle all script tag variations including self-closing and malformed
-    sanitized = sanitized.replace(/<\s*script[^>]*>/gi, '');
-    sanitized = sanitized.replace(/<\s*\/\s*script\s*>/gi, '');
-  } while (sanitized.length !== previousLength);
+  // Remove event handlers by finding on* attributes
+  // Use state machine to properly handle attribute context
+  let result = '';
+  let inTag = false;
+  let i = 0;
 
-  // Remove event handlers (comprehensive: handles all on* attributes)
-  sanitized = sanitized.replace(/\s+on[a-z]+\s*=/gi, ' data-removed-handler=');
+  while (i < sanitized.length) {
+    const char = sanitized[i];
 
-  // Remove javascript:, vbscript:, data: URLs (comprehensive: handles encoding and whitespace)
-  // First decode HTML entities that could be used for bypass
-  sanitized = sanitized.replace(/&#x?[0-9a-f]+;?/gi, '');
-  // Check for dangerous protocols with optional whitespace/newlines
-  sanitized = sanitized.replace(/\b(javascript|vbscript|data)\s*:/gi, 'removed:');
-  // Also remove variations with whitespace between characters
-  sanitized = sanitized.replace(/j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:');
+    if (char === '<') {
+      inTag = true;
+      result += char;
+      i++;
+    } else if (char === '>') {
+      inTag = false;
+      result += char;
+      i++;
+    } else if (inTag && sanitized.substring(i).match(/^on[a-z]+\s*=/i)) {
+      // Found event handler, replace with data attribute
+      const match = sanitized.substring(i).match(/^on[a-z]+/i);
+      if (match) {
+        result += 'data-removed-' + match[0].substring(2);
+        i += match[0].length;
+      }
+    } else {
+      result += char;
+      i++;
+    }
+  }
+
+  sanitized = result;
+
+  // Remove dangerous URL schemes (normalize and check)
+  // Decode any HTML entities first
+  const decoded = sanitized
+    .replace(/&#x([0-9a-f]+);?/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#(\d+);?/g, (_, dec) => String.fromCharCode(parseInt(dec, 10)));
+
+  // Remove dangerous protocols
+  sanitized = decoded
+    .replace(/javascript\s*:/gi, 'removed:')
+    .replace(/vbscript\s*:/gi, 'removed:')
+    .replace(/data\s*:/gi, 'removed:');
 
   return sanitized;
 }
