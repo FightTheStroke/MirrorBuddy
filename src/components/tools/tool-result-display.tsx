@@ -9,7 +9,7 @@ import { DiagramRenderer } from './diagram-renderer';
 import { FormulaRenderer } from './formula-renderer';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
-import { MindmapRenderer } from './markmap-renderer';
+import { LiveMindmap } from './live-mindmap';
 import { cn } from '@/lib/utils';
 import type { ToolCall, CodeExecutionRequest, ChartRequest, DiagramRequest, FormulaRequest, QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
@@ -30,6 +30,8 @@ function autoSaveFlashcards(request: FlashcardDeckRequest): void {
 interface ToolResultDisplayProps {
   toolCall: ToolCall;
   className?: string;
+  /** Session ID for real-time mindmap modifications (Maestro+Student collaboration) */
+  sessionId?: string | null;
 }
 
 const toolIcons: Record<string, React.ReactNode> = {
@@ -54,7 +56,7 @@ const toolNames: Record<string, string> = {
   create_mindmap: 'Mind Map',
 };
 
-export function ToolResultDisplay({ toolCall, className }: ToolResultDisplayProps) {
+export function ToolResultDisplay({ toolCall, className, sessionId }: ToolResultDisplayProps) {
   const icon = toolIcons[toolCall.type] || <Code className="w-4 h-4" />;
   const name = toolNames[toolCall.type] || toolCall.name;
 
@@ -107,7 +109,7 @@ export function ToolResultDisplay({ toolCall, className }: ToolResultDisplayProp
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
           >
-            <ToolContent toolCall={toolCall} />
+            <ToolContent toolCall={toolCall} sessionId={sessionId} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -147,7 +149,7 @@ function StatusBadge({ status }: { status: ToolCall['status'] }) {
   }
 }
 
-function ToolContent({ toolCall }: { toolCall: ToolCall }) {
+function ToolContent({ toolCall, sessionId }: { toolCall: ToolCall; sessionId?: string | null }) {
   switch (toolCall.type) {
     case 'run_code':
       return (
@@ -190,7 +192,10 @@ function ToolContent({ toolCall }: { toolCall: ToolCall }) {
 
     case 'create_mindmap':
       return (
-        <AutoSaveMindmap request={toolCall.arguments as unknown as MindmapRequest} />
+        <AutoSaveMindmap
+          request={toolCall.arguments as unknown as MindmapRequest}
+          sessionId={sessionId}
+        />
       );
 
     default:
@@ -227,7 +232,7 @@ function AutoSaveFlashcard({ request }: { request: FlashcardDeckRequest }) {
   return <FlashcardTool request={request} />;
 }
 
-function AutoSaveMindmap({ request }: { request: MindmapRequest }) {
+function AutoSaveMindmap({ request, sessionId }: { request: MindmapRequest; sessionId?: string | null }) {
   const savedRef = useRef(false);
   useEffect(() => {
     if (!savedRef.current) {
@@ -235,23 +240,32 @@ function AutoSaveMindmap({ request }: { request: MindmapRequest }) {
       autoSaveMindmap(request);
     }
   }, [request]);
-  return <MindmapRenderer title={request.title} nodes={request.nodes} />;
+  // Use LiveMindmap for real-time Maestro+Student collaboration on mindmaps
+  return (
+    <LiveMindmap
+      sessionId={sessionId ?? null}
+      title={request.title}
+      initialNodes={request.nodes}
+    />
+  );
 }
 
 // Multiple tools display
 interface ToolResultsListProps {
   toolCalls: ToolCall[];
   className?: string;
+  /** Session ID for real-time mindmap modifications (Maestro+Student collaboration) */
+  sessionId?: string | null;
 }
 
-export function ToolResultsList({ toolCalls, className }: ToolResultsListProps) {
+export function ToolResultsList({ toolCalls, className, sessionId }: ToolResultsListProps) {
   if (toolCalls.length === 0) return null;
 
   return (
     <div className={cn('space-y-4', className)} role="list" aria-label="Tool results">
       <AnimatePresence>
         {toolCalls.map((toolCall) => (
-          <ToolResultDisplay key={toolCall.id} toolCall={toolCall} />
+          <ToolResultDisplay key={toolCall.id} toolCall={toolCall} sessionId={sessionId} />
         ))}
       </AnimatePresence>
     </div>
