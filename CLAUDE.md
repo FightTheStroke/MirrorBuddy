@@ -221,6 +221,8 @@ All AI characters (Maestri, Coaches, Buddies) have safety guardrails injected in
 
 Dashboard at `/parent-dashboard` shows aggregated insights from student's conversations with Maestri.
 
+**Access:** Settings → Genitori → Apri Dashboard Genitori
+
 **Consent Model:**
 - Requires explicit consent from BOTH parent and student
 - Data can be exported (JSON/PDF) for portability
