@@ -87,7 +87,7 @@ Three stores in `src/lib/stores/app-store.ts`:
 
 | File | Purpose |
 |------|---------|
-| `src/data/support-teachers.ts` | Melissa & Davide coach profiles |
+| `src/data/support-teachers.ts` | 5 coach profiles (Melissa, Roberto, Chiara, Andrea, Favij) |
 | `src/data/buddy-profiles.ts` | Mario & Maria buddy profiles |
 | `src/lib/ai/character-router.ts` | Routes students to appropriate character |
 | `src/lib/ai/handoff-manager.ts` | Manages transitions between characters |
@@ -430,6 +430,28 @@ registerToolHandler('my_tool', async (args) => {
 - **Demo Sandbox**: JavaScript validated against `DANGEROUS_JS_PATTERNS` blocklist
 - **HTML Sanitization**: Script tags and event handlers removed
 - **Iframe Isolation**: `sandbox="allow-scripts"` (no same-origin access)
+
+### Voice Commands for Mindmaps (ADR-0011)
+
+Real-time voice modification of mindmaps during Maestro conversations.
+
+| Command | Function | Example Voice Input |
+|---------|----------|---------------------|
+| `mindmap_add_node` | Add concept as child | "Aggiungi Roma sotto Italia" |
+| `mindmap_connect_nodes` | Link two nodes | "Collega storia con geografia" |
+| `mindmap_expand_node` | Add multiple children | "Espandi il nodo Liguria" |
+| `mindmap_delete_node` | Remove node | "Cancella il nodo sbagliato" |
+| `mindmap_focus_node` | Center view on node | "Zoom su Roma" |
+| `mindmap_set_color` | Change node color | "Colora Roma di rosso" |
+
+**Key Files:**
+
+| File | Purpose |
+|------|---------|
+| `src/lib/hooks/use-mindmap-modifications.ts` | SSE hook for modification events |
+| `src/components/tools/interactive-markmap-renderer.tsx` | Imperative modification API |
+| `src/components/tools/live-mindmap.tsx` | Combined renderer + SSE |
+| `src/app/api/tools/stream/modify/route.ts` | Modification broadcast endpoint |
 
 ## Environment Configuration
 

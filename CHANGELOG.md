@@ -7,9 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - MirrorBuddy v2.0
 
-> **Branch**: `MirrorBuddy` | **GitHub Issues**: #19-#31 closed
+> **Branch**: `MirrorBuddy` | **GitHub Issues**: #19-#31, #44 closed
 
 ### Added
+
+#### Voice Commands for Mindmaps (ADR-0011, Issue #44)
+- **useMindmapModifications Hook** (`src/lib/hooks/use-mindmap-modifications.ts`): SSE subscription for real-time mindmap modification events
+- **InteractiveMarkMapRenderer** (`src/components/tools/interactive-markmap-renderer.tsx`): Extended renderer with imperative modification API
+  - `addNode(concept, parentNode?)` - Add new concept as child
+  - `expandNode(node, suggestions?)` - Add multiple children
+  - `deleteNode(node)` - Remove node and descendants
+  - `focusNode(node)` - Center view with highlight animation
+  - `setNodeColor(node, color)` - Change node styling
+  - `connectNodes(nodeA, nodeB)` - Create conceptual link
+  - `undo()` - Revert last modification
+- **LiveMindmap** (`src/components/tools/live-mindmap.tsx`): Wrapper combining renderer + SSE for voice-controlled mindmaps
+- Fuzzy node matching for voice command targeting
+- D3 animations for smooth visual feedback
 
 #### Triangle of Support Architecture (ADR-0003)
 - **Melissa & Davide (Learning Coaches)**: New AI characters focused on building student autonomy
