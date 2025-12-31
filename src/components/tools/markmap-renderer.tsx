@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Markmap } from 'markmap-view';
 import { Transformer } from 'markmap-lib';
-import { Printer, Download, ZoomIn, ZoomOut, Accessibility, RotateCcw } from 'lucide-react';
+import { Printer, Download, ZoomIn, ZoomOut, Accessibility, RotateCcw, Maximize, Minimize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
@@ -54,11 +54,13 @@ function nodesToMarkdown(nodes: MindmapNode[], title: string): string {
 
 export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRendererProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const markmapRef = useRef<Markmap | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
   const [zoom, setZoom] = useState(1);
   const [accessibilityMode, setAccessibilityMode] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const { settings } = useAccessibilityStore();
 
@@ -207,7 +209,38 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
     setZoom(1);
   }, []);
 
-  // Print functionality
+  // Fullscreen toggle
+  const handleFullscreen = useCallback(async () => {
+    if (!containerRef.current) return;
+
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (err) {
+      logger.error('Fullscreen error', { error: String(err) });
+    }
+  }, []);
+
+  // Listen for fullscreen changes (user may exit with Escape)
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+      // Re-fit the mindmap when entering/exiting fullscreen
+      if (markmapRef.current) {
+        setTimeout(() => markmapRef.current?.fit(), 100);
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // Print functionality - expands labels to prevent truncation
   const handlePrint = useCallback(() => {
     if (!svgRef.current) return;
 
@@ -215,6 +248,32 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
     if (!printWindow) return;
 
     const svgClone = svgRef.current.cloneNode(true) as SVGSVGElement;
+
+    // Fix truncated labels: expand all foreignObject elements to fit their content
+    const foreignObjects = svgClone.querySelectorAll('foreignObject');
+    foreignObjects.forEach((fo) => {
+      // Remove width constraint to let text flow naturally
+      fo.setAttribute('width', '600'); // Expanded width for printing
+      // Also update any nested div with max-width
+      const divs = fo.querySelectorAll('div');
+      divs.forEach((div) => {
+        if (div instanceof HTMLElement) {
+          div.style.maxWidth = 'none';
+          div.style.width = 'auto';
+          div.style.whiteSpace = 'nowrap';
+          div.style.overflow = 'visible';
+        }
+      });
+    });
+
+    // Expand the SVG viewBox to accommodate wider labels
+    const bbox = svgRef.current.getBBox();
+    const expandedWidth = Math.max(bbox.width * 1.5, 1600);
+    const expandedHeight = Math.max(bbox.height + 200, 1000);
+    svgClone.setAttribute('width', String(expandedWidth));
+    svgClone.setAttribute('height', String(expandedHeight));
+    svgClone.setAttribute('viewBox', `${bbox.x - 100} ${bbox.y - 50} ${expandedWidth} ${expandedHeight}`);
+
     const svgString = new XMLSerializer().serializeToString(svgClone);
 
     printWindow.document.write(`
@@ -239,13 +298,22 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
               display: flex;
               justify-content: center;
               align-items: center;
+              overflow: visible;
             }
             .mindmap-container svg {
               max-width: 100%;
               height: auto;
+              overflow: visible;
+            }
+            /* Ensure all text is visible */
+            foreignObject { overflow: visible !important; }
+            foreignObject div {
+              max-width: none !important;
+              white-space: nowrap !important;
+              overflow: visible !important;
             }
             @media print {
-              @page { size: A4 landscape; margin: 15mm; }
+              @page { size: A4 landscape; margin: 10mm; }
               body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             }
           </style>
@@ -264,21 +332,36 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
     printWindow.document.close();
   }, [title, settings.dyslexiaFont, settings.largeText]);
 
-  // Download as PNG
+  // Download as PNG - expands labels to prevent truncation
   const handleDownload = useCallback(async () => {
     if (!svgRef.current) return;
 
     try {
       const svgClone = svgRef.current.cloneNode(true) as SVGSVGElement;
 
-      // Get dimensions
+      // Fix truncated labels: expand all foreignObject elements to fit their content
+      const foreignObjects = svgClone.querySelectorAll('foreignObject');
+      foreignObjects.forEach((fo) => {
+        fo.setAttribute('width', '600'); // Expanded width for download
+        const divs = fo.querySelectorAll('div');
+        divs.forEach((div) => {
+          if (div instanceof HTMLElement) {
+            div.style.maxWidth = 'none';
+            div.style.width = 'auto';
+            div.style.whiteSpace = 'nowrap';
+            div.style.overflow = 'visible';
+          }
+        });
+      });
+
+      // Get dimensions with extra space for expanded labels
       const bbox = svgRef.current.getBBox();
-      const width = Math.max(bbox.width + 100, 1600);
-      const height = Math.max(bbox.height + 100, 1200);
+      const width = Math.max(bbox.width * 1.5, 2000);
+      const height = Math.max(bbox.height + 200, 1200);
 
       svgClone.setAttribute('width', String(width));
       svgClone.setAttribute('height', String(height));
-      svgClone.setAttribute('viewBox', `${bbox.x - 50} ${bbox.y - 50} ${bbox.width + 100} ${bbox.height + 100}`);
+      svgClone.setAttribute('viewBox', `${bbox.x - 100} ${bbox.y - 50} ${width} ${height}`);
 
       // Inline styles
       const allElements = svgClone.querySelectorAll('*');
@@ -354,6 +437,7 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
 
   return (
     <motion.div
+      ref={containerRef}
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
@@ -361,6 +445,7 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
         settings.highContrast
           ? 'border-white bg-black'
           : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800',
+        isFullscreen && 'fixed inset-0 z-50 rounded-none',
         className
       )}
       role="region"
@@ -457,6 +542,23 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
             <ZoomIn className="w-4 h-4" />
           </button>
 
+          {/* Fullscreen toggle */}
+          <button
+            onClick={handleFullscreen}
+            className={cn(
+              'p-2 rounded-lg transition-colors',
+              isFullscreen
+                ? 'bg-green-500 text-white hover:bg-green-600'
+                : settings.highContrast
+                  ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                  : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+            )}
+            title={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
+            aria-label={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
+          >
+            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+          </button>
+
           {/* Download */}
           <button
             onClick={handleDownload}
@@ -493,9 +595,13 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
       <div
         className={cn(
           'p-4 overflow-auto',
-          settings.highContrast ? 'bg-black' : 'bg-white dark:bg-slate-900'
+          settings.highContrast ? 'bg-black' : 'bg-white dark:bg-slate-900',
+          isFullscreen && 'flex-1'
         )}
-        style={{ maxHeight: '600px', minHeight: '400px' }}
+        style={{
+          maxHeight: isFullscreen ? 'calc(100vh - 60px)' : '600px',
+          minHeight: isFullscreen ? 'calc(100vh - 60px)' : '400px'
+        }}
       >
         {error ? (
           <div

@@ -685,13 +685,37 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         break;
 
       case 'error': {
-        const errorObj = event.error as { message?: string; code?: string; type?: string } | undefined;
-        const errorMessage = errorObj?.message || errorObj?.code || errorObj?.type || 'Unknown server error';
-        const hasDetails = errorObj && Object.keys(errorObj).length > 0;
+        // Handle various error object formats from Azure Realtime API
+        const errorObj = event.error as { message?: string; code?: string; type?: string; error?: string } | string | undefined;
+
+        let errorMessage: string;
+        if (typeof errorObj === 'string') {
+          errorMessage = errorObj;
+        } else if (errorObj && typeof errorObj === 'object') {
+          // Try multiple fields that Azure might use
+          errorMessage = errorObj.message || errorObj.error || errorObj.code || errorObj.type || '';
+          if (!errorMessage && Object.keys(errorObj).length > 0) {
+            // If we have an object but couldn't extract a message, stringify it
+            try {
+              errorMessage = `Server error: ${JSON.stringify(errorObj)}`;
+            } catch {
+              errorMessage = 'Unknown server error (unparseable)';
+            }
+          }
+        } else {
+          errorMessage = '';
+        }
+
+        // Ensure we never have empty message
+        if (!errorMessage) {
+          errorMessage = 'Errore di connessione al server vocale';
+        }
+
+        const hasDetails = errorObj && typeof errorObj === 'object' && Object.keys(errorObj).length > 0;
         if (hasDetails) {
           logger.error('[VoiceSession] Server error', { message: errorMessage, details: errorObj });
         } else {
-          logger.warn('[VoiceSession] Server error with no details (empty error object)');
+          logger.warn('[VoiceSession] Server error with no details', { originalError: event.error });
         }
         options.onError?.(new Error(errorMessage));
         break;

@@ -8,6 +8,8 @@ import {
   Network,
   X,
   Sparkles,
+  PlusCircle,
+  Save,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -82,6 +84,12 @@ export function MindmapsView({ className }: MindmapsViewProps) {
   const [selectedMindmap, setSelectedMindmap] = useState<SavedMindmap | null>(null);
   const [showExamples, setShowExamples] = useState(false);
   const [selectedExample, setSelectedExample] = useState<{ title: string; nodes: MindmapNode[]; subject: string } | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newMapTitle, setNewMapTitle] = useState('');
+  const [newMapSubject, setNewMapSubject] = useState<Subject>('mathematics');
+  const [newMapTopics, setNewMapTopics] = useState<{ name: string; subtopics: string[] }[]>([
+    { name: '', subtopics: [''] },
+  ]);
 
   // Save mindmaps to localStorage
   const saveMindmaps = (newMindmaps: SavedMindmap[]) => {
@@ -111,6 +119,78 @@ export function MindmapsView({ className }: MindmapsViewProps) {
     setShowExamples(false);
   };
 
+  // Create new mindmap from form
+  const handleCreateMindmap = () => {
+    if (!newMapTitle.trim()) return;
+
+    const validTopics = newMapTopics.filter(t => t.name.trim());
+    if (validTopics.length === 0) return;
+
+    const { nodes } = createMindmapFromTopics(
+      newMapTitle,
+      validTopics.map(t => ({
+        name: t.name,
+        subtopics: t.subtopics.filter(s => s.trim()),
+      }))
+    );
+
+    const newMindmap: SavedMindmap = {
+      id: crypto.randomUUID(),
+      title: newMapTitle,
+      nodes,
+      subject: newMapSubject,
+      createdAt: new Date(),
+    };
+
+    saveMindmaps([...mindmaps, newMindmap]);
+    setShowCreateModal(false);
+    setNewMapTitle('');
+    setNewMapSubject('mathematics');
+    setNewMapTopics([{ name: '', subtopics: [''] }]);
+  };
+
+  // Add topic to creation form
+  const addTopic = () => {
+    setNewMapTopics([...newMapTopics, { name: '', subtopics: [''] }]);
+  };
+
+  // Update topic name
+  const updateTopicName = (index: number, name: string) => {
+    const updated = [...newMapTopics];
+    updated[index].name = name;
+    setNewMapTopics(updated);
+  };
+
+  // Add subtopic
+  const addSubtopic = (topicIndex: number) => {
+    const updated = [...newMapTopics];
+    updated[topicIndex].subtopics.push('');
+    setNewMapTopics(updated);
+  };
+
+  // Update subtopic
+  const updateSubtopic = (topicIndex: number, subtopicIndex: number, value: string) => {
+    const updated = [...newMapTopics];
+    updated[topicIndex].subtopics[subtopicIndex] = value;
+    setNewMapTopics(updated);
+  };
+
+  // Remove topic
+  const removeTopic = (index: number) => {
+    if (newMapTopics.length > 1) {
+      setNewMapTopics(newMapTopics.filter((_, i) => i !== index));
+    }
+  };
+
+  // Remove subtopic
+  const removeSubtopic = (topicIndex: number, subtopicIndex: number) => {
+    const updated = [...newMapTopics];
+    if (updated[topicIndex].subtopics.length > 1) {
+      updated[topicIndex].subtopics = updated[topicIndex].subtopics.filter((_, i) => i !== subtopicIndex);
+      setNewMapTopics(updated);
+    }
+  };
+
   // Group mindmaps by subject
   const mindmapsBySubject = useMemo(() => {
     const grouped: Record<string, SavedMindmap[]> = {};
@@ -126,11 +206,12 @@ export function MindmapsView({ className }: MindmapsViewProps) {
     setSelectedMindmap(null);
     setShowExamples(false);
     setSelectedExample(null);
+    setShowCreateModal(false);
   }, []);
 
   // Handle Escape key to close modals
   useEffect(() => {
-    const hasOpenModal = selectedMindmap || showExamples || selectedExample;
+    const hasOpenModal = selectedMindmap || showExamples || selectedExample || showCreateModal;
     if (!hasOpenModal) return;
 
     const handleEscape = (e: KeyboardEvent) => {
@@ -140,7 +221,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
     };
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [selectedMindmap, showExamples, selectedExample, closeModals]);
+  }, [selectedMindmap, showExamples, selectedExample, showCreateModal, closeModals]);
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -154,10 +235,16 @@ export function MindmapsView({ className }: MindmapsViewProps) {
             Visualizza e stampa le tue mappe create durante le lezioni
           </p>
         </div>
-        <Button variant="outline" onClick={() => setShowExamples(true)}>
-          <Sparkles className="w-4 h-4 mr-2" />
-          Esempi
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowCreateModal(true)}>
+            <PlusCircle className="w-4 h-4 mr-2" />
+            Crea Nuova
+          </Button>
+          <Button variant="outline" onClick={() => setShowExamples(true)}>
+            <Sparkles className="w-4 h-4 mr-2" />
+            Esempi
+          </Button>
+        </div>
       </div>
 
       {/* Info card */}
@@ -394,6 +481,146 @@ export function MindmapsView({ className }: MindmapsViewProps) {
                     ))}
                   </div>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Create mindmap modal */}
+      <AnimatePresence>
+        {showCreateModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setShowCreateModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+                <h3 className="text-xl font-bold">Crea Nuova Mappa Mentale</h3>
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-auto p-4 space-y-4">
+                {/* Title input */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Titolo della mappa</label>
+                  <input
+                    type="text"
+                    value={newMapTitle}
+                    onChange={(e) => setNewMapTitle(e.target.value)}
+                    placeholder="Es: Rivoluzione Francese, Teorema di Pitagora..."
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* Subject selector */}
+                <div>
+                  <label className="block text-sm font-medium mb-1">Materia</label>
+                  <select
+                    value={newMapSubject}
+                    onChange={(e) => setNewMapSubject(e.target.value as Subject)}
+                    className="w-full px-3 py-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    {Object.entries(subjectNames).map(([key, name]) => (
+                      <option key={key} value={key}>
+                        {subjectIcons[key as Subject]} {name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Topics */}
+                <div>
+                  <label className="block text-sm font-medium mb-2">Argomenti principali</label>
+                  <div className="space-y-4">
+                    {newMapTopics.map((topic, topicIndex) => (
+                      <div key={topicIndex} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                        <div className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={topic.name}
+                            onChange={(e) => updateTopicName(topicIndex, e.target.value)}
+                            placeholder={`Argomento ${topicIndex + 1}`}
+                            className="flex-1 px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          />
+                          {newMapTopics.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeTopic(topicIndex)}
+                              className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                        <div className="ml-4 space-y-2">
+                          {topic.subtopics.map((subtopic, subtopicIndex) => (
+                            <div key={subtopicIndex} className="flex gap-2">
+                              <input
+                                type="text"
+                                value={subtopic}
+                                onChange={(e) => updateSubtopic(topicIndex, subtopicIndex, e.target.value)}
+                                placeholder={`Sotto-argomento ${subtopicIndex + 1}`}
+                                className="flex-1 px-3 py-1.5 text-sm border rounded-lg dark:bg-slate-700 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              />
+                              {topic.subtopics.length > 1 && (
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  onClick={() => removeSubtopic(topicIndex, subtopicIndex)}
+                                  className="text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20"
+                                >
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => addSubtopic(topicIndex)}
+                            className="text-slate-600 dark:text-slate-400"
+                          >
+                            <Plus className="w-3 h-3 mr-1" />
+                            Aggiungi sotto-argomento
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={addTopic}
+                    className="mt-2"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Aggiungi argomento
+                  </Button>
+                </div>
+              </div>
+              <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowCreateModal(false)}>
+                  Annulla
+                </Button>
+                <Button onClick={handleCreateMindmap} disabled={!newMapTitle.trim() || !newMapTopics.some(t => t.name.trim())}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Crea Mappa
+                </Button>
               </div>
             </motion.div>
           </motion.div>
