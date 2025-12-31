@@ -18,6 +18,7 @@ import {
   Sparkles,
   Target,
   BookOpen,
+  AlertTriangle,
 } from 'lucide-react';
 import * as pdfjs from 'pdfjs-dist';
 
@@ -29,6 +30,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { WebcamCapture } from '@/components/tools/webcam-capture';
 import type { Homework, HomeworkStep } from '@/types';
+
+// Maximum pages to process from PDF (performance + cost limit)
+const MAX_PDF_PAGES = 5;
 
 interface HomeworkHelpProps {
   homework?: Homework;
@@ -56,6 +60,8 @@ export function HomeworkHelp({
   const [pdfPages, setPdfPages] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pdfTotalPages, setPdfTotalPages] = useState(0);
+  const [pdfError, setPdfError] = useState<string | null>(null);
+  const [analyzedPage, setAnalyzedPage] = useState<number | null>(null); // Track which page was analyzed
 
   // Render a PDF page to image data URL
   const renderPdfPage = useCallback(async (pdfDoc: pdfjs.PDFDocumentProxy, pageNum: number): Promise<string> => {
@@ -72,24 +78,65 @@ export function HomeworkHelp({
     return canvas.toDataURL('image/png');
   }, []);
 
+  // Analyze a specific PDF page
+  const analyzePdfPage = useCallback(async (pageIndex: number) => {
+    if (!pdfPages[pageIndex]) return;
+
+    setIsUploading(true);
+    try {
+      const response = await fetch(pdfPages[pageIndex]);
+      const blob = await response.blob();
+      const imageFile = new File([blob], `pdf-page-${pageIndex + 1}.png`, { type: 'image/png' });
+      await onSubmitPhoto(imageFile);
+      setAnalyzedPage(pageIndex);
+    } finally {
+      setIsUploading(false);
+    }
+  }, [pdfPages, onSubmitPhoto]);
+
   const handleFileSelect = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Reset error state
+    setPdfError(null);
 
     // Check if PDF
     if (file.type === 'application/pdf') {
       setIsPdf(true);
       setIsUploading(true);
+      setAnalyzedPage(null);
 
       try {
         const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
-        const totalPages = pdf.numPages;
-        setPdfTotalPages(totalPages);
 
-        // Render all pages as images
+        // Try to load PDF - this will fail for encrypted/corrupt files
+        let pdf: pdfjs.PDFDocumentProxy;
+        try {
+          pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+        } catch (pdfLoadError) {
+          const errorMsg = pdfLoadError instanceof Error ? pdfLoadError.message : 'Errore sconosciuto';
+          if (errorMsg.includes('password') || errorMsg.includes('encrypted')) {
+            setPdfError('Questo PDF è protetto da password. Rimuovi la protezione e riprova.');
+          } else {
+            setPdfError('Impossibile leggere il PDF. Il file potrebbe essere corrotto.');
+          }
+          setIsUploading(false);
+          return;
+        }
+
+        const totalPages = pdf.numPages;
+        const pagesToRender = Math.min(totalPages, MAX_PDF_PAGES);
+        setPdfTotalPages(pagesToRender);
+
+        // Show warning if PDF has more pages than limit
+        if (totalPages > MAX_PDF_PAGES) {
+          setPdfError(`Il PDF ha ${totalPages} pagine. Verranno caricate solo le prime ${MAX_PDF_PAGES}.`);
+        }
+
+        // Render pages up to limit
         const pageImages: string[] = [];
-        for (let i = 1; i <= totalPages; i++) {
+        for (let i = 1; i <= pagesToRender; i++) {
           const imageData = await renderPdfPage(pdf, i);
           pageImages.push(imageData);
         }
@@ -97,11 +144,15 @@ export function HomeworkHelp({
         setCurrentPage(0);
         setPhotoPreview(pageImages[0]);
 
-        // Convert first page to File for analysis
+        // Auto-analyze first page
         const response = await fetch(pageImages[0]);
         const blob = await response.blob();
         const imageFile = new File([blob], 'pdf-page-1.png', { type: 'image/png' });
         await onSubmitPhoto(imageFile);
+        setAnalyzedPage(0);
+      } catch (error) {
+        console.error('PDF processing error:', error);
+        setPdfError('Errore durante l\'elaborazione del PDF. Riprova.');
       } finally {
         setIsUploading(false);
       }
@@ -177,6 +228,39 @@ export function HomeworkHelp({
           </p>
         </div>
 
+        {/* PDF error (blocking - no preview available) */}
+        {pdfError && !photoPreview && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Card className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-red-800 dark:text-red-200 mb-1">
+                      Errore nel caricamento PDF
+                    </h3>
+                    <p className="text-red-700 dark:text-red-300 text-sm">
+                      {pdfError}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setPdfError(null)}
+                    className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-500"
+                    aria-label="Chiudi messaggio"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Photo/PDF preview */}
         {photoPreview && (
           <motion.div
@@ -185,6 +269,20 @@ export function HomeworkHelp({
           >
             <Card>
               <CardContent className="p-6">
+                {/* PDF warning banner (non-blocking - preview available) */}
+                {pdfError && (
+                  <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                    <p className="text-sm text-amber-800 dark:text-amber-200 flex-1">{pdfError}</p>
+                    <button
+                      onClick={() => setPdfError(null)}
+                      className="p-1 rounded hover:bg-amber-100 dark:hover:bg-amber-900/30 text-amber-500"
+                      aria-label="Chiudi avviso"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
                 <div className="relative rounded-xl overflow-hidden">
                   {isPdf && (
                     <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500 text-white text-sm font-medium shadow-lg">
@@ -202,35 +300,55 @@ export function HomeworkHelp({
                       </div>
                     </div>
                   )}
+                  {/* PDF page navigation */}
                   {isPdf && pdfTotalPages > 1 && !isUploading && (
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 rounded-full bg-black/80 text-white text-sm shadow-lg">
-                      <button
-                        onClick={() => {
-                          const newPage = Math.max(0, currentPage - 1);
-                          setCurrentPage(newPage);
-                          setPhotoPreview(pdfPages[newPage]);
-                        }}
-                        disabled={currentPage === 0}
-                        className="p-1.5 hover:bg-white/20 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Pagina precedente"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <span className="min-w-[80px] text-center font-medium">
-                        Pagina {currentPage + 1} di {pdfTotalPages}
-                      </span>
-                      <button
-                        onClick={() => {
-                          const newPage = Math.min(pdfTotalPages - 1, currentPage + 1);
-                          setCurrentPage(newPage);
-                          setPhotoPreview(pdfPages[newPage]);
-                        }}
-                        disabled={currentPage === pdfTotalPages - 1}
-                        className="p-1.5 hover:bg-white/20 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
-                        aria-label="Pagina successiva"
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                      {/* Analyze different page button */}
+                      {analyzedPage !== null && currentPage !== analyzedPage && (
+                        <button
+                          onClick={() => analyzePdfPage(currentPage)}
+                          className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium shadow-lg flex items-center gap-2"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          Analizza questa pagina
+                        </button>
+                      )}
+                      {/* Page indicator showing which page is analyzed */}
+                      {analyzedPage !== null && currentPage !== analyzedPage && (
+                        <span className="text-xs text-amber-400 bg-black/60 px-2 py-1 rounded">
+                          Analisi attuale: pagina {analyzedPage + 1}
+                        </span>
+                      )}
+                      {/* Navigation controls */}
+                      <div className="flex items-center gap-3 px-4 py-2 rounded-full bg-black/80 text-white text-sm shadow-lg">
+                        <button
+                          onClick={() => {
+                            const newPage = Math.max(0, currentPage - 1);
+                            setCurrentPage(newPage);
+                            setPhotoPreview(pdfPages[newPage]);
+                          }}
+                          disabled={currentPage === 0}
+                          className="p-1.5 hover:bg-white/20 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Pagina precedente"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <span className="min-w-[80px] text-center font-medium">
+                          Pagina {currentPage + 1} di {pdfTotalPages}
+                        </span>
+                        <button
+                          onClick={() => {
+                            const newPage = Math.min(pdfTotalPages - 1, currentPage + 1);
+                            setCurrentPage(newPage);
+                            setPhotoPreview(pdfPages[newPage]);
+                          }}
+                          disabled={currentPage === pdfTotalPages - 1}
+                          className="p-1.5 hover:bg-white/20 rounded-full disabled:opacity-50 disabled:cursor-not-allowed"
+                          aria-label="Pagina successiva"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
                   )}
                   <button
@@ -240,6 +358,8 @@ export function HomeworkHelp({
                       setPdfPages([]);
                       setCurrentPage(0);
                       setPdfTotalPages(0);
+                      setPdfError(null);
+                      setAnalyzedPage(null);
                     }}
                     className="absolute top-3 right-3 p-2 rounded-full bg-black/60 text-white hover:bg-black/80"
                     aria-label="Rimuovi file"
