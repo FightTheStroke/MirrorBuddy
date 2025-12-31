@@ -40,7 +40,7 @@ export function ReadyStep(_props: ReadyStepProps) {
     setVoiceMuted(!isVoiceMuted);
   };
 
-  const handlePrev = () => {
+  const _handlePrev = () => {
     stop();
     prevStep();
   };
