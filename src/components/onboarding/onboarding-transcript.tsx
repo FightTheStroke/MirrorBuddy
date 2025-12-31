@@ -38,7 +38,7 @@ export function OnboardingTranscript({
   // Auto-expand when voice session starts and there are messages
   useEffect(() => {
     if (voiceSessionActive && voiceTranscript.length > 0 && !isExpanded) {
-      setIsExpanded(true);
+      queueMicrotask(() => setIsExpanded(true));
     }
   }, [voiceSessionActive, voiceTranscript.length, isExpanded]);
 

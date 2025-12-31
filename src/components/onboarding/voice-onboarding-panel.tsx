@@ -13,7 +13,7 @@
 
 import { useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useOnboardingVoice } from '@/lib/hooks/use-onboarding-voice';
@@ -54,7 +54,7 @@ export function VoiceOnboardingPanel({
     },
   });
 
-  const { isVoiceMuted } = useOnboardingStore();
+  // Voice muted state is managed by useOnboardingVoice hook
   const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
 
   // Check Azure availability on mount
