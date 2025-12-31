@@ -715,7 +715,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         if (hasDetails) {
           logger.error('[VoiceSession] Server error', { message: errorMessage, details: errorObj });
         } else {
-          logger.warn('[VoiceSession] Server error with no details', { originalError: event.error });
+          // Don't log empty objects - just log the message
+          logger.warn('[VoiceSession] Server error', { message: errorMessage });
         }
         options.onError?.(new Error(errorMessage));
         break;
