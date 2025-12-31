@@ -889,7 +889,7 @@ const accessibilityProfiles = [
   {
     id: 'adhd',
     label: 'ADHD',
-    description: 'Timer Pomodoro, focus mode, promemoria',
+    description: 'Timer Pomodoro (25/5 min), focus mode, notifiche pause',
     color: 'purple',
     icon: '🎯',
     isActive: (s: AccessibilitySettings) => s.adhdMode,

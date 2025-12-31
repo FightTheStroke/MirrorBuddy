@@ -22,6 +22,7 @@ import {
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
 import { NotificationBell } from '@/components/notifications/notification-bell';
+import { PomodoroHeaderWidget } from '@/components/pomodoro';
 import {
   LazyQuizView,
   LazyFlashcardsView,
@@ -160,8 +161,9 @@ export default function Home() {
           )}
         </div>
 
-        {/* Right section: notifications + version */}
+        {/* Right section: pomodoro + notifications + version */}
         <div className="flex items-center gap-3">
+          <PomodoroHeaderWidget />
           <NotificationBell />
           <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
             v{process.env.APP_VERSION}

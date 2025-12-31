@@ -8,7 +8,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
 import type { MindmapData, MindmapNode } from '@/lib/tools/mindmap-export';
 import type { RoomParticipant } from '@/lib/collab/mindmap-room';
-import { broadcastCollabEvent, type CollabSSEEvent } from '@/app/api/collab/sse/route';
+import type { CollabSSEEvent } from '@/app/api/collab/sse/route';
 
 // ============================================================================
 // TYPES
@@ -68,6 +68,18 @@ export function useCollaboration(options: UseCollaborationOptions): [Collaborati
   const cursorThrottleRef = useRef<NodeJS.Timeout | null>(null);
   const lastCursorRef = useRef<{ x: number; y: number } | null>(null);
 
+  // Refs for callbacks to avoid stale closures
+  const onMindmapUpdateRef = useRef(onMindmapUpdate);
+  const onParticipantJoinRef = useRef(onParticipantJoin);
+  const onParticipantLeaveRef = useRef(onParticipantLeave);
+
+  // Keep refs updated
+  useEffect(() => {
+    onMindmapUpdateRef.current = onMindmapUpdate;
+    onParticipantJoinRef.current = onParticipantJoin;
+    onParticipantLeaveRef.current = onParticipantLeave;
+  }, [onMindmapUpdate, onParticipantJoin, onParticipantLeave]);
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
@@ -80,132 +92,23 @@ export function useCollaboration(options: UseCollaborationOptions): [Collaborati
     };
   }, []);
 
-  // Create room
-  const createRoom = useCallback(async (mindmap: MindmapData): Promise<string | null> => {
-    setState((prev) => ({ ...prev, isConnecting: true, error: null }));
-
+  // Refresh mindmap from server
+  const refreshMindmap = useCallback(async (roomId: string) => {
     try {
-      const response = await fetch('/api/collab/rooms', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mindmap,
-          user: { id: userId, name: userName, avatar: userAvatar },
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create room');
+      const response = await fetch(`/api/collab/rooms/${roomId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.mindmap) {
+          onMindmapUpdateRef.current?.(data.mindmap);
+        }
       }
-
-      const data = await response.json();
-      const roomId = data.room.roomId;
-
-      // Connect to SSE
-      await connectToRoom(roomId);
-
-      return roomId;
     } catch (error) {
-      logger.error('Failed to create collaboration room', { error });
-      setState((prev) => ({
-        ...prev,
-        isConnecting: false,
-        error: error instanceof Error ? error.message : 'Failed to create room',
-      }));
-      return null;
+      logger.warn('Failed to refresh mindmap', { error, roomId });
     }
-  }, [userId, userName, userAvatar]);
-
-  // Join room
-  const joinRoom = useCallback(async (roomId: string): Promise<boolean> => {
-    setState((prev) => ({ ...prev, isConnecting: true, error: null }));
-
-    try {
-      const response = await fetch(`/api/collab/rooms/${roomId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'join',
-          user: { id: userId, name: userName, avatar: userAvatar },
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to join room');
-      }
-
-      const data = await response.json();
-
-      // Update state with room data
-      setState((prev) => ({
-        ...prev,
-        participants: data.participants || [],
-        version: data.version || 0,
-      }));
-
-      // Notify about mindmap
-      if (onMindmapUpdate && data.mindmap) {
-        onMindmapUpdate(data.mindmap);
-      }
-
-      // Connect to SSE
-      await connectToRoom(roomId);
-
-      return true;
-    } catch (error) {
-      logger.error('Failed to join collaboration room', { error, roomId });
-      setState((prev) => ({
-        ...prev,
-        isConnecting: false,
-        error: error instanceof Error ? error.message : 'Failed to join room',
-      }));
-      return false;
-    }
-  }, [userId, userName, userAvatar, onMindmapUpdate]);
-
-  // Connect to SSE
-  const connectToRoom = useCallback(async (roomId: string) => {
-    // Close existing connection
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-    }
-
-    const es = new EventSource(`/api/collab/sse?roomId=${roomId}&userId=${userId}`);
-    eventSourceRef.current = es;
-
-    es.onopen = () => {
-      setState((prev) => ({
-        ...prev,
-        isConnected: true,
-        isConnecting: false,
-        roomId,
-      }));
-      logger.info('Connected to collaboration room', { roomId });
-    };
-
-    es.onerror = (error) => {
-      logger.error('Collaboration SSE error', { error, roomId });
-      setState((prev) => ({
-        ...prev,
-        isConnected: false,
-        error: 'Connection lost',
-      }));
-    };
-
-    es.onmessage = (event) => {
-      try {
-        const data: CollabSSEEvent = JSON.parse(event.data);
-        handleCollabEvent(data);
-      } catch (error) {
-        logger.warn('Failed to parse collab event', { error });
-      }
-    };
-  }, [userId]);
+  }, []);
 
   // Handle collaboration events
-  const handleCollabEvent = useCallback((event: CollabSSEEvent) => {
+  const handleCollabEvent = useCallback((event: CollabSSEEvent, roomId: string, _participantsSnapshot: RoomParticipant[]) => {
     switch (event.type) {
       case 'user:online':
       case 'user:join': {
@@ -215,7 +118,7 @@ export function useCollaboration(options: UseCollaborationOptions): [Collaborati
             ...prev,
             participants: [...prev.participants.filter((p) => p.id !== participant.id), participant],
           }));
-          onParticipantJoin?.(participant);
+          onParticipantJoinRef.current?.(participant);
         }
         break;
       }
@@ -230,16 +133,17 @@ export function useCollaboration(options: UseCollaborationOptions): [Collaborati
             cursors: new Map([...prev.cursors].filter(([id]) => id !== leftUserId)),
             selections: new Map([...prev.selections].filter(([id]) => id !== leftUserId)),
           }));
-          onParticipantLeave?.(leftUserId);
+          onParticipantLeaveRef.current?.(leftUserId);
         }
         break;
       }
 
       case 'user:cursor': {
         const cursor = event.data.cursor as { x: number; y: number } | undefined;
-        const participant = state.participants.find((p) => p.id === event.userId);
-        if (cursor && event.userId !== userId && participant) {
+        if (cursor && event.userId !== userId) {
           setState((prev) => {
+            const participant = prev.participants.find((p) => p.id === event.userId);
+            if (!participant) return prev;
             const newCursors = new Map(prev.cursors);
             newCursors.set(event.userId, {
               x: cursor.x,
@@ -278,8 +182,8 @@ export function useCollaboration(options: UseCollaborationOptions): [Collaborati
           setState((prev) => ({ ...prev, version: event.version! }));
         }
         // Trigger refresh via callback
-        if (state.roomId) {
-          refreshMindmap(state.roomId);
+        if (roomId) {
+          refreshMindmap(roomId);
         }
         break;
       }
@@ -288,7 +192,7 @@ export function useCollaboration(options: UseCollaborationOptions): [Collaborati
         const mindmap = event.data.mindmap as MindmapData | undefined;
         const participants = event.data.participants as RoomParticipant[] | undefined;
         if (mindmap) {
-          onMindmapUpdate?.(mindmap);
+          onMindmapUpdateRef.current?.(mindmap);
         }
         if (participants) {
           setState((prev) => ({
@@ -300,22 +204,135 @@ export function useCollaboration(options: UseCollaborationOptions): [Collaborati
         break;
       }
     }
-  }, [userId, state.roomId, state.participants, onMindmapUpdate, onParticipantJoin, onParticipantLeave]);
+  }, [userId, refreshMindmap]);
 
-  // Refresh mindmap from server
-  const refreshMindmap = useCallback(async (roomId: string) => {
-    try {
-      const response = await fetch(`/api/collab/rooms/${roomId}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.mindmap) {
-          onMindmapUpdate?.(data.mindmap);
-        }
-      }
-    } catch (error) {
-      logger.warn('Failed to refresh mindmap', { error, roomId });
+  // Connect to SSE
+  const connectToRoom = useCallback(async (roomId: string) => {
+    // Close existing connection
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
     }
-  }, [onMindmapUpdate]);
+
+    const es = new EventSource(`/api/collab/sse?roomId=${roomId}&userId=${userId}`);
+    eventSourceRef.current = es;
+
+    es.onopen = () => {
+      setState((prev) => ({
+        ...prev,
+        isConnected: true,
+        isConnecting: false,
+        roomId,
+      }));
+      logger.info('Connected to collaboration room', { roomId });
+    };
+
+    es.onerror = (error) => {
+      logger.error('Collaboration SSE error', { error, roomId });
+      setState((prev) => ({
+        ...prev,
+        isConnected: false,
+        error: 'Connection lost',
+      }));
+    };
+
+    es.onmessage = (event) => {
+      try {
+        const data: CollabSSEEvent = JSON.parse(event.data);
+        // Get current state for participants snapshot
+        setState((prev) => {
+          handleCollabEvent(data, roomId, prev.participants);
+          return prev; // No state change here, handleCollabEvent does it
+        });
+      } catch (error) {
+        logger.warn('Failed to parse collab event', { error });
+      }
+    };
+  }, [userId, handleCollabEvent]);
+
+  // Create room
+  const createRoom = useCallback(async (mindmap: MindmapData): Promise<string | null> => {
+    setState((prev) => ({ ...prev, isConnecting: true, error: null }));
+
+    try {
+      const response = await fetch('/api/collab/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mindmap,
+          user: { id: userId, name: userName, avatar: userAvatar },
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to create room');
+      }
+
+      const data = await response.json();
+      const roomId = data.room.roomId;
+
+      // Connect to SSE
+      await connectToRoom(roomId);
+
+      return roomId;
+    } catch (error) {
+      logger.error('Failed to create collaboration room', { error });
+      setState((prev) => ({
+        ...prev,
+        isConnecting: false,
+        error: error instanceof Error ? error.message : 'Failed to create room',
+      }));
+      return null;
+    }
+  }, [userId, userName, userAvatar, connectToRoom]);
+
+  // Join room
+  const joinRoom = useCallback(async (roomId: string): Promise<boolean> => {
+    setState((prev) => ({ ...prev, isConnecting: true, error: null }));
+
+    try {
+      const response = await fetch(`/api/collab/rooms/${roomId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'join',
+          user: { id: userId, name: userName, avatar: userAvatar },
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to join room');
+      }
+
+      const data = await response.json();
+
+      // Update state with room data
+      setState((prev) => ({
+        ...prev,
+        participants: data.participants || [],
+        version: data.version || 0,
+      }));
+
+      // Notify about mindmap
+      if (data.mindmap) {
+        onMindmapUpdateRef.current?.(data.mindmap);
+      }
+
+      // Connect to SSE
+      await connectToRoom(roomId);
+
+      return true;
+    } catch (error) {
+      logger.error('Failed to join collaboration room', { error, roomId });
+      setState((prev) => ({
+        ...prev,
+        isConnecting: false,
+        error: error instanceof Error ? error.message : 'Failed to join room',
+      }));
+      return false;
+    }
+  }, [userId, userName, userAvatar, connectToRoom]);
 
   // Leave room
   const leaveRoom = useCallback(async () => {
