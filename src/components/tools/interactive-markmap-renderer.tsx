@@ -630,10 +630,13 @@ export const InteractiveMarkMapRenderer = forwardRef<
           {
             autoFit: true,
             duration: 300,
-            maxWidth: 300,
-            paddingX: 20,
-            spacingVertical: 10,
-            spacingHorizontal: 80,
+            maxWidth: 280,
+            paddingX: 16,
+            spacingVertical: 8,
+            spacingHorizontal: 100,
+            initialExpandLevel: 3, // Start with first 3 levels expanded, rest collapsed
+            zoom: true, // Enable zoom/pan
+            pan: true,  // Enable panning
             color: (node) => {
               if (isHighContrast) {
                 const colors = ['#ffff00', '#00ffff', '#ff00ff', '#00ff00', '#ff8000'];
@@ -897,15 +900,15 @@ export const InteractiveMarkMapRenderer = forwardRef<
         </div>
       </div>
 
-      {/* Mindmap container */}
+      {/* Mindmap container - centered with pan/zoom support */}
       <div
         className={cn(
-          'p-4 overflow-auto',
+          'flex items-center justify-center overflow-hidden relative',
           settings.highContrast ? 'bg-black' : 'bg-white dark:bg-slate-900',
           isFullscreen && 'flex-1'
         )}
         style={{
-          maxHeight: isFullscreen ? 'calc(100vh - 60px)' : '600px',
+          height: isFullscreen ? 'calc(100vh - 60px)' : '500px',
           minHeight: isFullscreen ? 'calc(100vh - 60px)' : '400px',
         }}
       >
@@ -922,15 +925,23 @@ export const InteractiveMarkMapRenderer = forwardRef<
             <strong>Errore:</strong> {error}
           </div>
         ) : (
-          <svg
-            ref={svgRef}
-            className={cn(
-              'w-full h-full min-h-[350px]',
-              !rendered && 'animate-pulse rounded-lg',
-              !rendered &&
-                (settings.highContrast ? 'bg-gray-800' : 'bg-slate-100 dark:bg-slate-700/50')
+          <>
+            <svg
+              ref={svgRef}
+              className={cn(
+                'absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing',
+                !rendered && 'animate-pulse rounded-lg',
+                !rendered &&
+                  (settings.highContrast ? 'bg-gray-800' : 'bg-slate-100 dark:bg-slate-700/50')
+              )}
+              style={{ touchAction: 'none' }}
+            />
+            {rendered && (
+              <div className="absolute bottom-2 left-2 text-xs text-slate-400 dark:text-slate-500 pointer-events-none select-none">
+                Trascina per spostare • Scroll/pinch per zoom • Click sui nodi per espandere/comprimere
+              </div>
             )}
-          />
+          </>
         )}
       </div>
 

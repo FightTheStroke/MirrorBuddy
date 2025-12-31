@@ -122,10 +122,13 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
         markmapRef.current = Markmap.create(svgRef.current, {
           autoFit: true,
           duration: 300,
-          maxWidth: 300,
-          paddingX: 20,
-          spacingVertical: 10,
-          spacingHorizontal: 80,
+          maxWidth: 280,
+          paddingX: 16,
+          spacingVertical: 8,
+          spacingHorizontal: 100,
+          initialExpandLevel: 3, // Start with first 3 levels expanded, rest collapsed
+          zoom: true, // Enable zoom/pan
+          pan: true,  // Enable panning
           color: (node) => {
             if (isHighContrast) {
               // High contrast colors
@@ -283,28 +286,54 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
           <title>Mappa Mentale: ${title}</title>
           <style>
             @import url('https://fonts.cdnfonts.com/css/opendyslexic');
-            body {
+
+            * {
+              box-sizing: border-box;
               margin: 0;
-              padding: 20mm;
+              padding: 0;
+            }
+
+            html, body {
+              width: 100%;
+              height: 100%;
+              margin: 0;
+              padding: 0;
               font-family: ${settings.dyslexiaFont ? 'OpenDyslexic, ' : ''}Arial, sans-serif;
               background: white;
             }
+
+            .print-page {
+              width: 100%;
+              height: 100vh;
+              display: flex;
+              flex-direction: column;
+              padding: 10mm;
+            }
+
             h1 {
               text-align: center;
-              font-size: ${settings.largeText ? '32pt' : '24pt'};
-              margin-bottom: 20mm;
+              font-size: ${settings.largeText ? '24pt' : '18pt'};
+              margin-bottom: 8mm;
+              flex-shrink: 0;
             }
+
             .mindmap-container {
+              flex: 1;
               display: flex;
               justify-content: center;
               align-items: center;
               overflow: visible;
+              min-height: 0;
             }
+
             .mindmap-container svg {
               max-width: 100%;
+              max-height: 100%;
+              width: auto;
               height: auto;
               overflow: visible;
             }
+
             /* Ensure all text is visible */
             foreignObject { overflow: visible !important; }
             foreignObject div {
@@ -312,15 +341,36 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
               white-space: nowrap !important;
               overflow: visible !important;
             }
+
             @media print {
-              @page { size: A4 landscape; margin: 10mm; }
-              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              @page {
+                size: A4 landscape;
+                margin: 5mm;
+              }
+
+              html, body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+              }
+
+              .print-page {
+                height: 100%;
+                page-break-after: avoid;
+                padding: 5mm;
+              }
+
+              h1 {
+                font-size: ${settings.largeText ? '20pt' : '16pt'};
+                margin-bottom: 5mm;
+              }
             }
           </style>
         </head>
         <body>
-          <h1>${title}</h1>
-          <div class="mindmap-container">${svgString}</div>
+          <div class="print-page">
+            <h1>${title}</h1>
+            <div class="mindmap-container">${svgString}</div>
+          </div>
           <script>
             window.onload = function() {
               setTimeout(function() { window.print(); window.close(); }, 500);
@@ -591,15 +641,15 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
         </div>
       </div>
 
-      {/* Mindmap container */}
+      {/* Mindmap container - centered with pan/zoom support */}
       <div
         className={cn(
-          'p-4 overflow-auto',
+          'flex items-center justify-center overflow-hidden relative',
           settings.highContrast ? 'bg-black' : 'bg-white dark:bg-slate-900',
           isFullscreen && 'flex-1'
         )}
         style={{
-          maxHeight: isFullscreen ? 'calc(100vh - 60px)' : '600px',
+          height: isFullscreen ? 'calc(100vh - 60px)' : '500px',
           minHeight: isFullscreen ? 'calc(100vh - 60px)' : '400px'
         }}
       >
@@ -616,14 +666,22 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
             <strong>Errore:</strong> {error}
           </div>
         ) : (
-          <svg
-            ref={svgRef}
-            className={cn(
-              'w-full h-full min-h-[350px]',
-              !rendered && 'animate-pulse rounded-lg',
-              !rendered && (settings.highContrast ? 'bg-gray-800' : 'bg-slate-100 dark:bg-slate-700/50')
+          <>
+            <svg
+              ref={svgRef}
+              className={cn(
+                'absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing',
+                !rendered && 'animate-pulse rounded-lg',
+                !rendered && (settings.highContrast ? 'bg-gray-800' : 'bg-slate-100 dark:bg-slate-700/50')
+              )}
+              style={{ touchAction: 'none' }}
+            />
+            {rendered && (
+              <div className="absolute bottom-2 left-2 text-xs text-slate-400 dark:text-slate-500 pointer-events-none select-none">
+                Trascina per spostare • Scroll/pinch per zoom • Click sui nodi per espandere/comprimere
+              </div>
             )}
-          />
+          </>
         )}
       </div>
 

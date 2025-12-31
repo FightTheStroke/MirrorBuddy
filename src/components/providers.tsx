@@ -11,6 +11,9 @@ import {
 } from '@/lib/stores/app-store';
 import { initializeTelemetry } from '@/lib/telemetry';
 
+// Debug logger - captures all browser errors to file (dev only)
+import '@/lib/client-error-logger';
+
 interface ProvidersProps {
   children: React.ReactNode;
 }

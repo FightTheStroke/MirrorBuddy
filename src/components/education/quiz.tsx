@@ -90,8 +90,8 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
     const passed = score >= quiz.masteryThreshold;
 
     return (
-      <Card className="max-w-2xl mx-auto">
-        <CardContent className="p-8 text-center">
+      <Card className="w-full">
+        <CardContent className="p-6 sm:p-8 text-center">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -131,8 +131,8 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
   }
 
   return (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
+    <Card className="w-full">
+      <CardHeader className="px-4 sm:px-6">
         <div className="flex items-center justify-between mb-4">
           <span className="text-sm text-slate-500">
             Domanda {currentIndex + 1} di {quiz.questions.length}
@@ -144,7 +144,7 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
         <Progress value={progress} className="h-2" />
       </CardHeader>
 
-      <CardContent className="p-6">
+      <CardContent className="p-4 sm:p-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
