@@ -215,12 +215,12 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     reset,
   } = useVoiceSessionStore();
 
-  // Get preferred devices and voice settings from settings
+  // Get preferred devices from settings
+  // Note: Voice VAD settings are now hardcoded to optimal values in session config
+  // and can be adjusted in /test-voice for debugging
   const {
     preferredMicrophoneId,
     preferredOutputId,
-    voiceVadThreshold,
-    voiceSilenceDuration,
     voiceBargeInEnabled,
   } = useSettingsStore();
 
@@ -260,6 +260,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
 
   // REF to hold latest handleServerEvent callback (avoids stale closure in ws.onmessage)
   const handleServerEventRef = useRef<((event: Record<string, unknown>) => void) | null>(null);
+
+  // Stable session ID for the entire voice conversation (used for tool SSE subscriptions)
+  const sessionIdRef = useRef<string | null>(null);
 
   const [connectionState, setConnectionState] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
@@ -581,25 +584,34 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     logger.debug(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
 
     // Send session configuration
-    // Azure Preview API format (gpt-4o-realtime-preview)
+    // Azure Realtime API format - works with both Preview (gpt-4o-realtime-preview) and GA (gpt-realtime) models
+    // See: https://learn.microsoft.com/en-us/azure/ai-services/openai/realtime-audio-reference
     const sessionConfig = {
       type: 'session.update',
       session: {
         voice: maestro.voice || 'alloy',
         instructions: fullInstructions,
         input_audio_format: 'pcm16',
+        output_audio_format: 'pcm16',
+        // Noise reduction to prevent echo (new feature Dec 2025)
+        // 'near_field' for headphones/close mic, 'far_field' for laptop/conference
+        input_audio_noise_reduction: {
+          type: 'near_field',
+        },
         input_audio_transcription: {
           model: 'whisper-1',
           language: language,  // Force transcription to use the language from settings
         },
         turn_detection: {
           type: 'server_vad',
-          threshold: voiceVadThreshold,            // User configurable (0.3-0.7)
-          prefix_padding_ms: 300,
-          silence_duration_ms: voiceSilenceDuration,  // User configurable (300-800ms)
-          create_response: true,
+          threshold: 0.5,                // Balanced sensitivity (0.0-1.0)
+          prefix_padding_ms: 300,        // Audio before detected speech
+          silence_duration_ms: 500,      // Silence before turn ends (balanced)
+          create_response: true,         // Auto-respond when speech stops
+          interrupt_response: !options.disableBargeIn,  // Control barge-in at Azure level
         },
         tools: VOICE_TOOLS,
+        temperature: 0.8,                // Natural conversation temperature
       },
     };
 
@@ -614,7 +626,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     setCurrentMaestro(maestro);
     setConnectionState('connected');
     options.onStateChange?.('connected');
-  }, [setConnected, setCurrentMaestro, setConnectionState, options, voiceVadThreshold, voiceSilenceDuration]);
+  }, [setConnected, setCurrentMaestro, setConnectionState, options]);
 
   const handleServerEvent = useCallback((event: Record<string, unknown>) => {
     const eventType = event.type as string;
@@ -846,7 +858,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
               // Handle tool creation commands (mindmap, quiz, flashcards, etc.)
               if (isToolCreationCommand(toolName)) {
-                const sessionId = `voice-${maestroRef.current?.id || 'unknown'}-${Date.now()}`;
+                // Use stable session ID from connect() - ensures all tools in same conversation share sessionId
+                const sessionId = sessionIdRef.current || `voice-${maestroRef.current?.id || 'unknown'}-${Date.now()}`;
                 const maestroId = maestroRef.current?.id || 'unknown';
 
                 logger.debug(`[VoiceSession] Executing voice tool: ${toolName}`, { args });
@@ -962,6 +975,11 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       maestroRef.current = maestro;
       sessionReadyRef.current = false;
       greetingSentRef.current = false;
+
+      // Generate stable session ID for this voice conversation
+      // Used for SSE subscriptions so tool modifications target the right mindmap
+      sessionIdRef.current = `voice-${maestro.id}-${Date.now()}`;
+      logger.debug('[VoiceSession] Session ID generated', { sessionId: sessionIdRef.current });
 
       // Initialize CAPTURE AudioContext (native sample rate)
       const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -1230,6 +1248,10 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
     // Getter function to avoid accessing ref during render
     get inputAnalyser() {
       return analyserRef.current;
+    },
+    // Stable session ID for SSE subscriptions (mindmap real-time updates)
+    get sessionId() {
+      return sessionIdRef.current;
     },
     connect,
     disconnect,

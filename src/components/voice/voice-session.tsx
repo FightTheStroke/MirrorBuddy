@@ -76,6 +76,7 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
     clearTranscript: _clearTranscript,
     clearToolCalls,
     sendWebcamResult,
+    sessionId: voiceSessionId,
   } = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
@@ -527,7 +528,7 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                     >
-                      <ToolResultDisplay toolCall={toolCall} />
+                      <ToolResultDisplay toolCall={toolCall} sessionId={voiceSessionId} />
                     </motion.div>
                   ))}
                 </AnimatePresence>

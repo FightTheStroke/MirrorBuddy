@@ -221,6 +221,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     connect,
     disconnect,
     toggleMute,
+    sessionId: voiceSessionId,
   } = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
@@ -664,7 +665,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
             )
           ))}
 
-          {/* Tool results inline */}
+          {/* Tool results inline - pass sessionId for real-time mindmap collaboration */}
           {toolCalls.map((tool) => (
             <motion.div
               key={tool.id}
@@ -672,7 +673,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
               animate={{ opacity: 1, scale: 1 }}
               className="mb-4"
             >
-              <ToolResultDisplay toolCall={tool} />
+              <ToolResultDisplay toolCall={tool} sessionId={voiceSessionId} />
             </motion.div>
           ))}
 
