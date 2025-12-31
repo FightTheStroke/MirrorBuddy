@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOnboardingStore, getStepIndex, getTotalSteps } from '@/lib/stores/onboarding-store';
@@ -9,8 +9,6 @@ import { InfoStep } from './components/info-step';
 import { PrinciplesStep } from './components/principles-step';
 import { MaestriStep } from './components/maestri-step';
 import { ReadyStep } from './components/ready-step';
-import { VoiceOnboardingPanel } from '@/components/onboarding/voice-onboarding-panel';
-import { OnboardingTranscript } from '@/components/onboarding/onboarding-transcript';
 import { cn } from '@/lib/utils';
 
 function WelcomeContent() {
@@ -25,16 +23,8 @@ function WelcomeContent() {
     startReplay,
   } = useOnboardingStore();
 
-  // Track if we should use Web Speech fallback
-  const [useWebSpeechFallback, setUseWebSpeechFallback] = useState(false);
-
-  // Callback when Azure is unavailable
-  const handleAzureUnavailable = useCallback(() => {
-    setUseWebSpeechFallback(true);
-  }, []);
-
-  // Show voice panel only on steps that collect data (welcome, info)
-  const showVoicePanel = currentStep === 'welcome' || currentStep === 'info';
+  // Track if we should use Web Speech fallback (when Azure unavailable)
+  const [useWebSpeechFallback] = useState(false);
 
   // Handle replay mode
   useEffect(() => {
@@ -95,51 +85,22 @@ function WelcomeContent() {
         </div>
       </div>
 
-      {/* Main content - Side-by-side layout on larger screens */}
+      {/* Main content - centered single column */}
       <div className="pt-20 pb-8 px-4 min-h-screen flex items-center justify-center">
-        <div className={cn(
-          "w-full flex flex-col lg:flex-row gap-6 items-start justify-center",
-          showVoicePanel ? "max-w-5xl" : "max-w-2xl"
-        )}>
-          {/* Form content area */}
-          <div className="flex-1 w-full lg:max-w-2xl">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentStep}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <CurrentStepComponent useWebSpeechFallback={useWebSpeechFallback} />
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Transcript - below form on mobile, shown when voice is active */}
-            {showVoicePanel && (
-              <div className="mt-4 lg:hidden">
-                <OnboardingTranscript />
-              </div>
-            )}
-          </div>
-
-          {/* Voice panel - side on desktop, hidden on mobile (transcript shows instead) */}
-          {showVoicePanel && (
-            <div className="hidden lg:flex flex-col gap-4 w-72 sticky top-24">
-              <VoiceOnboardingPanel onFallbackToWebSpeech={handleAzureUnavailable} />
-              <OnboardingTranscript defaultExpanded />
-            </div>
-          )}
-
-          {/* Mobile voice panel - floating at bottom */}
-          {showVoicePanel && (
-            <div className="lg:hidden fixed bottom-4 right-4 z-50">
-              <VoiceOnboardingPanel
-                className="shadow-xl"
-                onFallbackToWebSpeech={handleAzureUnavailable}
+        <div className="w-full max-w-md">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+            >
+              <CurrentStepComponent
+                useWebSpeechFallback={useWebSpeechFallback}
               />
-            </div>
-          )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </div>

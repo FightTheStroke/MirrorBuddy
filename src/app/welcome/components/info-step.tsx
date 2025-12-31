@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, ArrowLeft, SkipForward, User, GraduationCap, Heart, Volume2, VolumeX, Mic } from 'lucide-react';
+import { ArrowRight, ArrowLeft, SkipForward, User, GraduationCap, Heart, Volume2, VolumeX, Check, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { VoiceOnboardingPanel } from '@/components/onboarding/voice-onboarding-panel';
 import { cn } from '@/lib/utils';
 import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
 
@@ -34,14 +35,14 @@ interface InfoStepProps {
 /**
  * Step 2: Optional info collection (skippable)
  *
+ * TWO MODES:
+ * 1. Voice mode (voiceSessionActive): Full-screen voice experience
+ * 2. Form mode: Traditional form with option to call Melissa
+ *
  * Collects:
  * - Age (optional)
  * - School level (optional)
  * - Learning differences (optional, for accessibility presets)
- *
- * Voice Integration (#61):
- * - Syncs with voice-captured data from onboarding store
- * - Shows feedback when voice captures data
  */
 export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
   const {
@@ -63,37 +64,22 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
     data.learningDifferences || []
   );
 
-  // Track voice-captured data
-  const [voiceCapturedAge, setVoiceCapturedAge] = useState(false);
-  const [voiceCapturedSchool, setVoiceCapturedSchool] = useState(false);
-  const [voiceCapturedDiffs, setVoiceCapturedDiffs] = useState(false);
-
-  // Track previous store values to detect voice-captured changes
+  // Sync local state with store (when voice captures data)
   const prevAgeRef = useRef(data.age);
   const prevSchoolRef = useRef(data.schoolLevel);
   const prevDiffsRef = useRef(data.learningDifferences);
 
-  // Sync local state with store (when voice captures data)
   useEffect(() => {
     if (data.age !== undefined && data.age !== prevAgeRef.current) {
       prevAgeRef.current = data.age;
-      // Use microtask to avoid synchronous setState in effect
-      queueMicrotask(() => {
-        setAge(data.age);
-        setVoiceCapturedAge(true);
-        setTimeout(() => setVoiceCapturedAge(false), 3000);
-      });
+      queueMicrotask(() => setAge(data.age));
     }
   }, [data.age]);
 
   useEffect(() => {
     if (data.schoolLevel && data.schoolLevel !== prevSchoolRef.current) {
       prevSchoolRef.current = data.schoolLevel;
-      queueMicrotask(() => {
-        setSchoolLevel(data.schoolLevel);
-        setVoiceCapturedSchool(true);
-        setTimeout(() => setVoiceCapturedSchool(false), 3000);
-      });
+      queueMicrotask(() => setSchoolLevel(data.schoolLevel));
     }
   }, [data.schoolLevel]);
 
@@ -104,11 +90,7 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
       const hasChanged = ![...prevSet].every(d => newSet.has(d)) || ![...newSet].every(d => prevSet.has(d));
       if (hasChanged) {
         prevDiffsRef.current = data.learningDifferences;
-        queueMicrotask(() => {
-          setSelectedDifferences(data.learningDifferences || []);
-          setVoiceCapturedDiffs(true);
-          setTimeout(() => setVoiceCapturedDiffs(false), 3000);
-        });
+        queueMicrotask(() => setSelectedDifferences(data.learningDifferences || []));
       }
     }
   }, [data.learningDifferences]);
@@ -140,12 +122,109 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
     nextStep();
   };
 
+  const handleBack = () => {
+    stop();
+    prevStep();
+  };
+
   const toggleDifference = (id: string) => {
     setSelectedDifferences((prev) =>
       prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]
     );
   };
 
+  // Check if we have enough data to continue
+  const hasData = data.age || data.schoolLevel || (data.learningDifferences && data.learningDifferences.length > 0);
+
+  // ========== VOICE MODE: Full-screen voice experience ==========
+  if (voiceSessionActive) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-md mx-auto"
+      >
+        <VoiceOnboardingPanel step="info" className="w-full" />
+
+        {/* Show captured data summary */}
+        <AnimatePresence>
+          {hasData && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-4 p-4 bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-lg space-y-3"
+            >
+              <h3 className="font-semibold text-gray-800 dark:text-gray-200">Dati raccolti</h3>
+
+              <div className="space-y-2">
+                {/* Age */}
+                <div className="flex items-center gap-2 text-sm">
+                  {data.age ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-gray-300" />
+                  )}
+                  <span className={data.age ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'}>
+                    Età: {data.age ? `${data.age} anni` : '...'}
+                  </span>
+                </div>
+
+                {/* School */}
+                <div className="flex items-center gap-2 text-sm">
+                  {data.schoolLevel ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-gray-300" />
+                  )}
+                  <span className={data.schoolLevel ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'}>
+                    Scuola: {data.schoolLevel ?
+                      (data.schoolLevel === 'elementare' ? 'Elementare' :
+                       data.schoolLevel === 'media' ? 'Media' : 'Superiore') : '...'}
+                  </span>
+                </div>
+
+                {/* Differences */}
+                <div className="flex items-center gap-2 text-sm">
+                  {data.learningDifferences && data.learningDifferences.length > 0 ? (
+                    <Check className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-gray-300" />
+                  )}
+                  <span className={data.learningDifferences?.length ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'}>
+                    Difficoltà: {data.learningDifferences?.length ?
+                      data.learningDifferences.map(d =>
+                        LEARNING_DIFFERENCES.find(ld => ld.id === d)?.label
+                      ).join(', ') : '(opzionale)'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <Button
+                  onClick={handleBack}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <ArrowLeft className="mr-2 w-4 h-4" />
+                  Indietro
+                </Button>
+                <Button
+                  onClick={handleContinue}
+                  className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
+                >
+                  Continua
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    );
+  }
+
+  // ========== FORM MODE: Traditional form with call option ==========
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl">
       <CardContent className="p-8 space-y-6">
@@ -168,49 +247,61 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
               Questo mi aiuterà a personalizzare la tua esperienza
             </p>
           </div>
-          {/* Voice toggle */}
-          <button
-            onClick={toggleMute}
-            className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
-            aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-            title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-          >
-            {isVoiceMuted ? (
-              <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
-            ) : (
-              <Volume2 className={cn('w-5 h-5 text-pink-600 dark:text-pink-400', isPlaying && 'animate-pulse')} />
-            )}
-          </button>
+          {/* Voice toggle (for Web Speech) */}
+          {useWebSpeechFallback && (
+            <button
+              onClick={toggleMute}
+              className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
+              aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            >
+              {isVoiceMuted ? (
+                <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+              ) : (
+                <Volume2 className={cn('w-5 h-5 text-pink-600 dark:text-pink-400', isPlaying && 'animate-pulse')} />
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Call Melissa button */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <VoiceOnboardingPanel step="info" />
+        </motion.div>
+
+        {/* Divider */}
+        <div className="relative">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+          </div>
+          <div className="relative flex justify-center text-sm">
+            <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">oppure compila</span>
+          </div>
         </div>
 
         {/* Age input */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2 }}
           className="space-y-2"
         >
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <User className="w-4 h-4" />
             Quanti anni hai?
-            {voiceCapturedAge && (
-              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
-                <Mic className="w-3 h-3" />
-                Melissa ha capito!
-              </span>
-            )}
           </label>
           <div className="flex gap-2 flex-wrap">
             {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((a) => (
               <button
                 key={a}
-                onClick={() => { setAge(a); setVoiceCapturedAge(false); }}
+                onClick={() => setAge(a)}
                 className={cn(
                   'w-10 h-10 rounded-lg font-medium transition-all',
                   age === a
-                    ? voiceCapturedAge
-                      ? 'bg-green-500 text-white shadow-lg scale-110 ring-2 ring-green-300'
-                      : 'bg-pink-500 text-white shadow-lg scale-110'
+                    ? 'bg-pink-500 text-white shadow-lg scale-110'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 )}
               >
@@ -224,30 +315,22 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.3 }}
           className="space-y-2"
         >
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <GraduationCap className="w-4 h-4" />
             Che scuola fai?
-            {voiceCapturedSchool && (
-              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
-                <Mic className="w-3 h-3" />
-                Melissa ha capito!
-              </span>
-            )}
           </label>
           <div className="grid grid-cols-3 gap-3">
             {SCHOOL_LEVELS.map((level) => (
               <button
                 key={level.id}
-                onClick={() => { setSchoolLevel(level.id); setVoiceCapturedSchool(false); }}
+                onClick={() => setSchoolLevel(level.id)}
                 className={cn(
                   'p-3 rounded-xl border-2 transition-all text-center',
                   schoolLevel === level.id
-                    ? voiceCapturedSchool
-                      ? 'border-green-500 bg-green-50 dark:bg-green-950 ring-2 ring-green-300'
-                      : 'border-pink-500 bg-pink-50 dark:bg-pink-950'
+                    ? 'border-pink-500 bg-pink-50 dark:bg-pink-950'
                     : 'border-gray-200 dark:border-gray-700 hover:border-pink-300'
                 )}
               >
@@ -266,18 +349,12 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
           className="space-y-2"
         >
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <Heart className="w-4 h-4" />
             Hai qualche difficoltà particolare? (opzionale)
-            {voiceCapturedDiffs && (
-              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
-                <Mic className="w-3 h-3" />
-                Melissa ha capito!
-              </span>
-            )}
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
             Questo ci aiuta a rendere l&apos;app più accessibile per te
@@ -286,13 +363,11 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
             {LEARNING_DIFFERENCES.map((diff) => (
               <button
                 key={diff.id}
-                onClick={() => { toggleDifference(diff.id); setVoiceCapturedDiffs(false); }}
+                onClick={() => toggleDifference(diff.id)}
                 className={cn(
                   'p-3 rounded-xl border-2 transition-all text-left flex items-center gap-2',
                   selectedDifferences.includes(diff.id)
-                    ? voiceCapturedDiffs
-                      ? 'border-green-500 bg-green-50 dark:bg-green-950 ring-2 ring-green-300'
-                      : 'border-pink-500 bg-pink-50 dark:bg-pink-950'
+                    ? 'border-pink-500 bg-pink-50 dark:bg-pink-950'
                     : 'border-gray-200 dark:border-gray-700 hover:border-pink-300'
                 )}
               >
@@ -309,24 +384,14 @@ export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.5 }}
           className="flex gap-3 pt-4"
         >
-          <Button
-            onClick={() => { stop(); prevStep(); }}
-            variant="outline"
-            size="lg"
-            className="flex-1"
-          >
+          <Button onClick={handleBack} variant="outline" size="lg" className="flex-1">
             <ArrowLeft className="mr-2 w-4 h-4" />
             Indietro
           </Button>
-          <Button
-            onClick={handleSkip}
-            variant="ghost"
-            size="lg"
-            className="text-gray-500"
-          >
+          <Button onClick={handleSkip} variant="ghost" size="lg" className="text-gray-500">
             <SkipForward className="mr-2 w-4 h-4" />
             Salta
           </Button>

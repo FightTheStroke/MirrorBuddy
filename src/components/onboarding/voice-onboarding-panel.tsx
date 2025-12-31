@@ -1,27 +1,28 @@
 'use client';
 
 /**
- * VoiceOnboardingPanel - Voice panel for Melissa during onboarding
+ * VoiceOnboardingPanel - Unified voice experience with Melissa
  *
- * Provides:
- * - Voice call controls with Melissa's avatar and styling
- * - Connection status and audio visualizer
- * - Fallback message when Azure is unavailable
+ * When voice is active:
+ * - Shows large Melissa avatar with speaking animation
+ * - Integrated transcript (last messages)
+ * - Checklist of captured data
+ * - Mute/Hangup controls
+ *
+ * When voice is not active:
+ * - Compact "Call Melissa" button
  *
  * Related: #61 Onboarding Voice Integration
  */
 
 import { useEffect, useCallback, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Phone, PhoneOff, Mic, MicOff, VolumeX } from 'lucide-react';
+import Image from 'next/image';
+import { Phone, PhoneOff, Mic, MicOff, VolumeX, Check, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useOnboardingVoice } from '@/lib/hooks/use-onboarding-voice';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import { MELISSA } from '@/data/support-teachers';
-
-// Pre-computed random offsets for audio visualizer bars
-const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
 // Melissa's pink theme color
 const MELISSA_COLOR = '#EC4899';
@@ -29,11 +30,17 @@ const MELISSA_COLOR = '#EC4899';
 export interface VoiceOnboardingPanelProps {
   className?: string;
   onFallbackToWebSpeech?: () => void;
+  /** Which step we're on - affects what data we show */
+  step?: 'welcome' | 'info';
+  /** Auto-connect on mount (Melissa starts speaking automatically) */
+  autoConnect?: boolean;
 }
 
 export function VoiceOnboardingPanel({
   className,
   onFallbackToWebSpeech,
+  step = 'welcome',
+  autoConnect = false,
 }: VoiceOnboardingPanelProps) {
   const {
     isConnected,
@@ -54,21 +61,23 @@ export function VoiceOnboardingPanel({
     },
   });
 
-  // Voice muted state is managed by useOnboardingVoice hook
+  const { data, voiceTranscript } = useOnboardingStore();
   const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
 
-  // Check Azure availability on mount
+  // Check Azure availability on mount and auto-connect if enabled
   useEffect(() => {
     if (!hasCheckedAzure) {
       checkAzureAvailability().then((available) => {
         setHasCheckedAzure(true);
-        // If Azure not available, trigger fallback
         if (!available) {
           onFallbackToWebSpeech?.();
+        } else if (autoConnect && !isConnected && !isConnecting) {
+          // Auto-connect: Melissa starts speaking automatically
+          connect();
         }
       });
     }
-  }, [checkAzureAvailability, hasCheckedAzure, onFallbackToWebSpeech]);
+  }, [checkAzureAvailability, hasCheckedAzure, onFallbackToWebSpeech, autoConnect, connect, isConnected, isConnecting]);
 
   const handleStartCall = useCallback(() => {
     connect();
@@ -78,179 +87,250 @@ export function VoiceOnboardingPanel({
     disconnect();
   }, [disconnect]);
 
-  const getStatusText = () => {
-    if (isConnecting) return 'Connessione...';
-    if (isConnected && isSpeaking) return 'Melissa sta parlando...';
-    if (isConnected) return 'In ascolto...';
-    if (azureAvailable === false) return 'Voce non disponibile';
-    return 'Premi per chiamare';
+  // Get last 4 transcript entries
+  const recentTranscript = voiceTranscript.slice(-4);
+
+  // Data checklist based on step
+  const getChecklist = () => {
+    if (step === 'welcome') {
+      return [
+        { key: 'name', label: 'Nome', value: data.name, required: true },
+      ];
+    }
+    return [
+      { key: 'name', label: 'Nome', value: data.name, required: true },
+      { key: 'age', label: 'Età', value: data.age ? `${data.age} anni` : null, required: false },
+      { key: 'school', label: 'Scuola', value: data.schoolLevel ?
+        (data.schoolLevel === 'elementare' ? 'Elementare' :
+         data.schoolLevel === 'media' ? 'Media' : 'Superiore') : null, required: false },
+      { key: 'differences', label: 'Difficoltà', value: data.learningDifferences?.length ?
+        `${data.learningDifferences.length} indicate` : null, required: false },
+    ];
   };
 
-  // If Azure is not available, show fallback UI
+  const checklist = getChecklist();
+
+  // If Azure is not available, show nothing (form mode will be used)
   if (azureAvailable === false) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className={cn(
-          'flex flex-col items-center justify-center gap-3 p-6 rounded-2xl bg-gray-100 dark:bg-gray-800',
-          className
-        )}
-      >
-        <VolumeX className="w-10 h-10 text-gray-400" />
-        <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
-          La voce interattiva non è disponibile.
-          <br />
-          Compila i campi manualmente.
-        </p>
-      </motion.div>
-    );
+    return null;
   }
 
   // Loading state while checking Azure
   if (!hasCheckedAzure) {
     return (
+      <div className={cn('flex items-center justify-center p-4', className)}>
+        <div className="w-8 h-8 rounded-full border-4 border-pink-300 border-t-pink-500 animate-spin" />
+      </div>
+    );
+  }
+
+  // ========== NOT CONNECTED - Show call button ==========
+  if (!isConnected && !isConnecting) {
+    return (
+      <motion.button
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        onClick={handleStartCall}
+        className={cn(
+          'flex items-center gap-3 px-6 py-4 rounded-2xl',
+          'bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700',
+          'text-white font-medium shadow-lg hover:shadow-xl transition-all',
+          className
+        )}
+      >
+        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/30">
+          <Image
+            src="/avatars/melissa.jpg"
+            alt="Melissa"
+            width={48}
+            height={48}
+            className="object-cover w-full h-full"
+          />
+        </div>
+        <div className="text-left">
+          <div className="font-semibold">Chiama Melissa</div>
+          <div className="text-sm text-pink-100">Completa con la voce</div>
+        </div>
+        <Phone className="w-6 h-6 ml-2" />
+      </motion.button>
+    );
+  }
+
+  // ========== CONNECTING ==========
+  if (isConnecting) {
+    return (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className={cn(
-          'flex flex-col items-center justify-center gap-3 p-6 rounded-2xl',
+          'flex flex-col items-center justify-center gap-4 p-8 rounded-2xl',
+          'bg-gradient-to-br from-pink-500 to-pink-600',
           className
         )}
-        style={{ background: `linear-gradient(to bottom, ${MELISSA_COLOR}40, ${MELISSA_COLOR}20)` }}
       >
-        <div className="w-12 h-12 rounded-full border-4 border-pink-300 border-t-pink-500 animate-spin" />
-        <p className="text-sm text-gray-600 dark:text-gray-300">Verifica connessione...</p>
+        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/30 animate-pulse">
+          <Image
+            src="/avatars/melissa.jpg"
+            alt="Melissa"
+            width={80}
+            height={80}
+            className="object-cover w-full h-full"
+          />
+        </div>
+        <p className="text-white font-medium">Connessione in corso...</p>
       </motion.div>
     );
   }
 
+  // ========== CONNECTED - Full voice experience ==========
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'flex flex-col items-center justify-center gap-4 p-6 rounded-2xl',
+        'flex flex-col rounded-2xl overflow-hidden shadow-2xl',
+        'bg-gradient-to-br from-pink-500 via-pink-600 to-pink-700',
         className
       )}
-      style={{ background: `linear-gradient(to bottom, ${MELISSA_COLOR}, ${MELISSA_COLOR}dd)` }}
     >
-      {/* Avatar with status ring */}
-      <motion.div
-        animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
-        transition={{ repeat: Infinity, duration: 1.5 }}
-        className="relative"
-      >
-        <div
-          className={cn(
-            'w-20 h-20 rounded-full flex items-center justify-center text-white text-3xl font-bold border-4 transition-all duration-300',
-            'bg-gradient-to-br from-pink-400 to-pink-600',
-            isConnected ? 'border-white shadow-lg' : 'border-white/50',
-            isSpeaking && 'shadow-xl shadow-white/30'
-          )}
+      {/* Header with avatar and status */}
+      <div className="flex items-center gap-4 p-6 pb-4">
+        <motion.div
+          animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          className="relative"
         >
-          M
-        </div>
-        {isConnected && (
-          <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-400 border-2 border-white/50 rounded-full animate-pulse" />
-        )}
-      </motion.div>
+          <div className={cn(
+            'w-20 h-20 rounded-full overflow-hidden border-4 transition-all',
+            isSpeaking ? 'border-white shadow-lg shadow-white/30' : 'border-white/50'
+          )}>
+            <Image
+              src="/avatars/melissa.jpg"
+              alt="Melissa"
+              width={80}
+              height={80}
+              className="object-cover w-full h-full"
+            />
+          </div>
+          <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-400 border-2 border-white rounded-full animate-pulse" />
+        </motion.div>
 
-      {/* Name and status */}
-      <div className="text-center">
-        <h3 className="text-lg font-semibold text-white">{MELISSA.name}</h3>
-        <p className="text-xs text-white/70">Coach di sostegno</p>
-        <p className="text-xs text-white/60 mt-1">{getStatusText()}</p>
+        <div className="flex-1">
+          <h3 className="text-xl font-bold text-white">Melissa</h3>
+          <p className="text-sm text-pink-100">
+            {isSpeaking ? 'Sta parlando...' : isMuted ? 'Microfono spento' : 'In ascolto...'}
+          </p>
+        </div>
+
+        {/* Audio visualizer */}
+        <div className="flex items-center gap-1 h-8">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <motion.div
+              key={i}
+              animate={{
+                height: isSpeaking ? [4, 20 + i * 3, 4] : !isMuted ? [4, 8, 4] : 4,
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: 0.5 + i * 0.1,
+                ease: 'easeInOut',
+              }}
+              className={cn(
+                'w-1.5 rounded-full',
+                isSpeaking ? 'bg-white' : !isMuted ? 'bg-white/60' : 'bg-white/30'
+              )}
+            />
+          ))}
+        </div>
       </div>
 
-      {/* Audio visualizer - only when connected */}
-      <AnimatePresence>
-        {isConnected && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 32 }}
-            exit={{ opacity: 0, height: 0 }}
-            className="flex items-center gap-1"
-          >
-            {VISUALIZER_BAR_OFFSETS.map((offset, i) => (
+      {/* Transcript area */}
+      <div className="flex-1 px-6 py-4 bg-white/10 backdrop-blur-sm min-h-[120px] max-h-[200px] overflow-y-auto">
+        <AnimatePresence mode="popLayout">
+          {recentTranscript.length === 0 ? (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-pink-100 text-sm italic text-center py-4"
+            >
+              Parla con Melissa...
+            </motion.p>
+          ) : (
+            recentTranscript.map((entry, i) => (
               <motion.div
-                key={i}
-                animate={{
-                  height: isSpeaking
-                    ? [4, 20 + offset, 4]
-                    : !isMuted
-                      ? [4, 8, 4]
-                      : 4,
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 0.5 + i * 0.1,
-                  ease: 'easeInOut',
-                }}
+                key={entry.timestamp}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
                 className={cn(
-                  'w-1.5 rounded-full',
-                  isSpeaking ? 'bg-white' : !isMuted ? 'bg-white/80' : 'bg-white/30'
+                  'mb-2 p-2 rounded-lg text-sm',
+                  entry.role === 'assistant'
+                    ? 'bg-white/20 text-white'
+                    : 'bg-pink-800/30 text-pink-100 ml-4'
                 )}
-              />
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+              >
+                <span className="font-medium">
+                  {entry.role === 'assistant' ? 'Melissa: ' : 'Tu: '}
+                </span>
+                {entry.text}
+              </motion.div>
+            ))
+          )}
+        </AnimatePresence>
+      </div>
 
-      {/* Controls */}
-      <div className="flex items-center gap-3 mt-2">
-        {!isConnected ? (
-          <Button
-            onClick={handleStartCall}
-            disabled={isConnecting}
-            className="rounded-full w-14 h-14 bg-white text-pink-500 hover:bg-white/90 shadow-lg"
-            aria-label="Inizia chiamata con Melissa"
-          >
-            <Phone className="w-6 h-6" />
-          </Button>
-        ) : (
-          <>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleMute}
-              aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+      {/* Data checklist */}
+      <div className="px-6 py-3 bg-white/5">
+        <div className="flex flex-wrap gap-2">
+          {checklist.map((item) => (
+            <div
+              key={item.key}
               className={cn(
-                'rounded-full w-12 h-12 transition-colors',
-                isMuted
-                  ? 'bg-white/20 text-white hover:bg-white/30'
-                  : 'bg-white/30 text-white hover:bg-white/40'
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm',
+                item.value
+                  ? 'bg-green-500/20 text-green-100'
+                  : 'bg-white/10 text-white/60'
               )}
             >
-              {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleEndCall}
-              className="rounded-full w-12 h-12 bg-red-500 text-white hover:bg-red-600"
-              aria-label="Termina chiamata"
-            >
-              <PhoneOff className="w-5 h-5" />
-            </Button>
-          </>
-        )}
+              {item.value ? (
+                <Check className="w-3.5 h-3.5" />
+              ) : (
+                <Circle className="w-3.5 h-3.5" />
+              )}
+              <span>{item.label}</span>
+              {item.value && <span className="font-medium">: {item.value}</span>}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Mute status text */}
-      {isConnected && (
-        <p className="text-xs text-white/60" aria-live="polite" role="status">
-          {isMuted ? 'Microfono disattivato' : 'Parla con Melissa...'}
-        </p>
-      )}
+      {/* Controls */}
+      <div className="flex items-center justify-center gap-4 p-4 bg-pink-800/30">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleMute}
+          aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+          className={cn(
+            'rounded-full w-14 h-14 transition-colors',
+            isMuted
+              ? 'bg-red-500/20 text-red-200 hover:bg-red-500/30'
+              : 'bg-white/20 text-white hover:bg-white/30'
+          )}
+        >
+          {isMuted ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+        </Button>
 
-      {/* Hint text when not connected */}
-      {!isConnected && !isConnecting && (
-        <p className="text-xs text-white/60 text-center max-w-[180px]">
-          Parla con Melissa per completare l&apos;onboarding
-        </p>
-      )}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleEndCall}
+          className="rounded-full w-14 h-14 bg-red-500 text-white hover:bg-red-600"
+          aria-label="Termina chiamata"
+        >
+          <PhoneOff className="w-6 h-6" />
+        </Button>
+      </div>
     </motion.div>
   );
 }
