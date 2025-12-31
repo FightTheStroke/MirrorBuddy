@@ -1,7 +1,7 @@
 /**
  * Text-to-Speech hook for onboarding
  *
- * Uses Azure OpenAI TTS when available, falls back to Web Speech API.
+ * Uses Azure/OpenAI TTS when available, falls back to Web Speech API.
  * Designed for Melissa's onboarding narration.
  *
  * @module hooks/use-onboarding-tts
@@ -25,12 +25,12 @@ interface UseOnboardingTTSOptions {
 interface TTSState {
   isPlaying: boolean;
   isLoading: boolean;
-  hasAzure: boolean | null; // null = checking
+  hasOpenAI: boolean | null; // null = checking
   error: string | null;
 }
 
 /**
- * Hook for onboarding TTS with Azure fallback to Web Speech
+ * Hook for onboarding TTS with OpenAI TTS, fallback to Web Speech API
  */
 export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
   const { voice = 'shimmer', autoSpeak = false, text, delay = 500 } = options;
@@ -38,37 +38,44 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
   const [state, setState] = useState<TTSState>({
     isPlaying: false,
     isLoading: false,
-    hasAzure: null,
+    hasOpenAI: null,
     error: null,
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
   const hasAutoSpokenRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  // Check if Azure TTS is available
+  // Check if OpenAI TTS is available
   useEffect(() => {
-    const checkAzure = async () => {
+    const checkOpenAI = async () => {
       try {
         const response = await fetch('/api/tts');
         const data = await response.json();
-        setState((prev) => ({ ...prev, hasAzure: data.available }));
+        setState((prev) => ({ ...prev, hasOpenAI: data.available }));
       } catch {
-        setState((prev) => ({ ...prev, hasAzure: false }));
+        setState((prev) => ({ ...prev, hasOpenAI: false }));
       }
     };
-    checkAzure();
+    checkOpenAI();
   }, []);
 
   /**
    * Stop any ongoing playback
    */
   const stop = useCallback(() => {
-    // Stop Azure audio
+    // Stop OpenAI audio
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
       audioRef.current = null;
+    }
+
+    // Stop Web Speech synthesis
+    if (speechRef.current) {
+      window.speechSynthesis?.cancel();
+      speechRef.current = null;
     }
 
     // Cancel fetch request
@@ -81,9 +88,9 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
   }, []);
 
   /**
-   * Speak text using Azure TTS
+   * Speak text using OpenAI TTS
    */
-  const speakAzure = useCallback(
+  const speakOpenAI = useCallback(
     async (textToSpeak: string): Promise<boolean> => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -146,7 +153,7 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
         if ((error as Error).name === 'AbortError') {
           return true; // Intentionally stopped
         }
-        console.error('[OnboardingTTS] Azure error:', error);
+        console.error('[OnboardingTTS] OpenAI error:', error);
         setState((prev) => ({ ...prev, isLoading: false }));
         return false; // Fallback to Web Speech
       }
@@ -154,9 +161,61 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
     [voice]
   );
 
+  /**
+   * Speak text using Web Speech API (fallback)
+   */
+  const speakWebSpeech = useCallback((textToSpeak: string) => {
+    if (!window.speechSynthesis) {
+      setState((prev) => ({
+        ...prev,
+        error: 'Speech synthesis not supported',
+      }));
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = 'it-IT';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.1; // Slightly higher for a younger voice
+    utterance.volume = 1.0;
+
+    // Try to find a female Italian voice
+    const voices = window.speechSynthesis.getVoices();
+    const italianFemale = voices.find(
+      (v) => v.lang.startsWith('it') && v.name.toLowerCase().includes('female')
+    );
+    const italian = voices.find((v) => v.lang.startsWith('it'));
+    if (italianFemale) {
+      utterance.voice = italianFemale;
+    } else if (italian) {
+      utterance.voice = italian;
+    }
+
+    utterance.onstart = () => {
+      setState((prev) => ({ ...prev, isPlaying: true, isLoading: false }));
+    };
+
+    utterance.onend = () => {
+      setState((prev) => ({ ...prev, isPlaying: false }));
+      speechRef.current = null;
+    };
+
+    utterance.onerror = () => {
+      setState((prev) => ({
+        ...prev,
+        isPlaying: false,
+        error: 'Web Speech error',
+      }));
+      speechRef.current = null;
+    };
+
+    speechRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
 
   /**
-   * Main speak function - uses OpenAI TTS only (no browser fallback)
+   * Main speak function - OpenAI TTS preferred, Web Speech as fallback
    */
   const speak = useCallback(
     async (textToSpeak: string) => {
@@ -165,31 +224,29 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
       stop(); // Stop any existing playback
 
       // Wait for TTS check if still pending
-      if (state.hasAzure === null) {
+      if (state.hasOpenAI === null) {
         setState((prev) => ({ ...prev, isLoading: true }));
         // Give it a moment to check
         await new Promise((r) => setTimeout(r, 100));
       }
 
-      // Only use OpenAI TTS (no browser fallback)
-      if (state.hasAzure) {
-        await speakAzure(textToSpeak);
-      } else {
-        // TTS not available - set error state
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: 'TTS not configured. Set OPENAI_API_KEY in .env.local',
-        }));
+      // Try OpenAI TTS first (preferred - Melissa's real voice)
+      if (state.hasOpenAI) {
+        const success = await speakOpenAI(textToSpeak);
+        if (success) return;
+        // If OpenAI failed, fallback to Web Speech
       }
+
+      // Fallback to Web Speech API (browser voice)
+      speakWebSpeech(textToSpeak);
     },
-    [state.hasAzure, speakAzure, stop]
+    [state.hasOpenAI, speakOpenAI, speakWebSpeech, stop]
   );
 
   // Auto-speak on mount/text change
   useEffect(() => {
     if (!autoSpeak || !text || hasAutoSpokenRef.current) return;
-    if (state.hasAzure === null) return; // Wait for Azure check
+    if (state.hasOpenAI === null) return; // Wait for TTS check
 
     hasAutoSpokenRef.current = true;
 
@@ -198,7 +255,7 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [autoSpeak, text, delay, speak, state.hasAzure]);
+  }, [autoSpeak, text, delay, speak, state.hasOpenAI]);
 
   // Reset auto-spoken flag when text changes
   useEffect(() => {
@@ -217,7 +274,7 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
     stop,
     isPlaying: state.isPlaying,
     isLoading: state.isLoading,
-    hasAzure: state.hasAzure,
+    hasOpenAI: state.hasOpenAI,
     error: state.error,
   };
 }
