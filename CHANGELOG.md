@@ -70,6 +70,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Coach/Buddy Voice**: Separate voice layout for Coach and Buddy characters
 - Dual panel design for conversation + character display
 
+#### Unified Maestri Voice Experience (PR #43)
+- **MaestroSession** (`src/components/maestros/maestro-session.tsx`): 835-line unified component combining voice and chat
+  - Side-by-side layout: chat on left (flex-1), voice panel on right (w-64)
+  - Seamless voice/chat switching within same session
+  - Voice transcripts appear in chat stream with 🔊 indicator
+  - Real-time Azure Realtime API integration
+- **VoicePanel** (`src/components/voice/voice-panel.tsx`): Shared voice controls component
+  - Extracted from CharacterChatView for reuse
+  - Avatar with speaking animation
+  - Audio visualizer with input levels
+  - Mute/unmute and end call controls
+  - Supports both hex colors and Tailwind gradients
+- **EvaluationCard** (`src/components/chat/evaluation-card.tsx`): Inline session evaluation
+  - Auto-generated at session end (5+ messages or 2+ minutes)
+  - Score calculation: engagement, questions asked, duration
+  - Grade display (Insufficiente → Eccellente)
+  - Parent diary integration with GDPR consent
+- **Session Metrics**: XP rewards, question counting, duration tracking
+- **LazyMaestroSession**: Code-split wrapper for performance
+
 #### Separate Conversations per Character (ADR-0010)
 - Each Maestro/Coach/Buddy maintains independent conversation history
 - Context preserved across sessions per character
