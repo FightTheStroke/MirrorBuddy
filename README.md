@@ -11,6 +11,8 @@
 
 <p align="center">
   <a href="https://github.com/Roberdan/ConvergioEdu/actions/workflows/ci.yml"><img src="https://github.com/Roberdan/ConvergioEdu/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/tests-874%20passed-brightgreen" alt="Tests: 874 passed">
+  <img src="https://img.shields.io/badge/coverage-63%25-yellow" alt="Coverage: 63%">
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://github.com/Roberdan/ConvergioEdu/releases"><img src="https://img.shields.io/github/v/release/Roberdan/ConvergioEdu?include_prereleases&label=version" alt="Version"></a>
 </p>
