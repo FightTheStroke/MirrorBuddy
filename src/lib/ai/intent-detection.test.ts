@@ -18,8 +18,6 @@ import {
   getCharacterTypeLabel,
   shouldSuggestRedirect,
   type DetectedIntent,
-  type IntentType,
-  type ToolType,
 } from './intent-detection';
 
 describe('Intent Detection System', () => {
