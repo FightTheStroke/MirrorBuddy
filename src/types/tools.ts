@@ -180,6 +180,105 @@ export const CHAT_TOOL_DEFINITIONS = [
       },
     },
   },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'create_summary',
+      description: 'Crea un riassunto strutturato di un argomento. Usa quando lo studente chiede una sintesi, un ripasso, o vuole i punti chiave.',
+      parameters: {
+        type: 'object',
+        properties: {
+          topic: {
+            type: 'string',
+            description: 'Argomento da riassumere',
+          },
+          sections: {
+            type: 'array',
+            description: 'Sezioni del riassunto',
+            items: {
+              type: 'object',
+              properties: {
+                title: { type: 'string', description: 'Titolo della sezione' },
+                content: { type: 'string', description: 'Contenuto della sezione' },
+                keyPoints: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Punti chiave della sezione',
+                },
+              },
+              required: ['title', 'content'],
+            },
+          },
+          length: {
+            type: 'string',
+            enum: ['short', 'medium', 'long'],
+            description: 'Lunghezza del riassunto',
+          },
+        },
+        required: ['topic', 'sections'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'create_diagram',
+      description: 'Crea un diagramma Mermaid (flowchart, sequence, class, ER). Usa per visualizzare processi, algoritmi, o relazioni tra entità.',
+      parameters: {
+        type: 'object',
+        properties: {
+          topic: {
+            type: 'string',
+            description: 'Argomento del diagramma',
+          },
+          diagramType: {
+            type: 'string',
+            enum: ['flowchart', 'sequence', 'class', 'er'],
+            description: 'Tipo di diagramma',
+          },
+          mermaidCode: {
+            type: 'string',
+            description: 'Codice Mermaid per il diagramma',
+          },
+        },
+        required: ['topic', 'diagramType', 'mermaidCode'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'create_timeline',
+      description: 'Crea una linea del tempo per eventi storici o sequenze temporali. Ideale per storia e cronologie.',
+      parameters: {
+        type: 'object',
+        properties: {
+          topic: {
+            type: 'string',
+            description: 'Argomento della timeline (es. "Seconda Guerra Mondiale")',
+          },
+          period: {
+            type: 'string',
+            description: 'Periodo coperto (es. "1939-1945")',
+          },
+          events: {
+            type: 'array',
+            description: 'Eventi della timeline',
+            items: {
+              type: 'object',
+              properties: {
+                date: { type: 'string', description: 'Data dell\'evento' },
+                title: { type: 'string', description: 'Titolo dell\'evento' },
+                description: { type: 'string', description: 'Descrizione dell\'evento' },
+              },
+              required: ['date', 'title'],
+            },
+          },
+        },
+        required: ['topic', 'events'],
+      },
+    },
+  },
 ] as const;
 
 /**
@@ -302,4 +401,46 @@ export interface FlashcardItem {
 export interface FlashcardData {
   topic: string;
   cards: FlashcardItem[];
+}
+
+// ============================================================================
+// Summary specific types
+// ============================================================================
+
+export interface SummarySection {
+  title: string;
+  content: string;
+  keyPoints?: string[];
+}
+
+export interface SummaryData {
+  topic: string;
+  sections: SummarySection[];
+  length?: 'short' | 'medium' | 'long';
+}
+
+// ============================================================================
+// Diagram specific types
+// ============================================================================
+
+export interface DiagramData {
+  topic: string;
+  diagramType: 'flowchart' | 'sequence' | 'class' | 'er';
+  mermaidCode: string;
+}
+
+// ============================================================================
+// Timeline specific types
+// ============================================================================
+
+export interface TimelineEvent {
+  date: string;
+  title: string;
+  description?: string;
+}
+
+export interface TimelineData {
+  topic: string;
+  period?: string;
+  events: TimelineEvent[];
 }

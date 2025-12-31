@@ -22,7 +22,8 @@ export type ToolType =
   | 'quiz'
   | 'summary'
   | 'timeline'
-  | 'diagram';
+  | 'diagram'
+  | 'demo';
 
 // Event payload structure
 export interface ToolEvent {

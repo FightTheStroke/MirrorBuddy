@@ -26,9 +26,13 @@ import {
   Camera,
   Brain,
   BookOpen,
+  Layers,
   Search,
   RotateCcw,
   Sparkles,
+  FileText,
+  GitBranch,
+  Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -510,12 +514,16 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
   }, []);
 
   // Request tool from input
-  const requestTool = (tool: 'mindmap' | 'quiz' | 'flashcards' | 'demo') => {
+  const requestTool = (tool: 'mindmap' | 'quiz' | 'flashcards' | 'demo' | 'search' | 'summary' | 'diagram' | 'timeline') => {
     const toolPrompts: Record<string, string> = {
       mindmap: `Crea una mappa mentale sull'argomento di cui stiamo parlando`,
       quiz: `Crea un quiz per verificare la mia comprensione`,
       flashcards: `Crea delle flashcard per aiutarmi a memorizzare`,
       demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
+      search: `Cerca informazioni utili sull'argomento`,
+      summary: `Fammi un riassunto strutturato dell'argomento`,
+      diagram: `Crea un diagramma per visualizzare il concetto`,
+      timeline: `Crea una linea temporale degli eventi`,
     };
     setInput(toolPrompts[tool]);
     inputRef.current?.focus();
@@ -751,12 +759,57 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => requestTool('flashcards')}
               disabled={isLoading || sessionEnded}
               className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-              title="Cerca"
+              title="Crea flashcard"
+            >
+              <Layers className="w-4 h-4 mr-1" />
+              <span className="text-xs">Flashcard</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => requestTool('search')}
+              disabled={isLoading || sessionEnded}
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              title="Cerca su web"
             >
               <Search className="w-4 h-4 mr-1" />
               <span className="text-xs">Cerca</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => requestTool('summary')}
+              disabled={isLoading || sessionEnded}
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              title="Crea riassunto"
+            >
+              <FileText className="w-4 h-4 mr-1" />
+              <span className="text-xs">Riassunto</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => requestTool('diagram')}
+              disabled={isLoading || sessionEnded}
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              title="Crea diagramma"
+            >
+              <GitBranch className="w-4 h-4 mr-1" />
+              <span className="text-xs">Diagramma</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => requestTool('timeline')}
+              disabled={isLoading || sessionEnded}
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              title="Crea linea temporale"
+            >
+              <Clock className="w-4 h-4 mr-1" />
+              <span className="text-xs">Timeline</span>
             </Button>
           </div>
 
