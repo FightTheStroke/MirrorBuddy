@@ -496,12 +496,31 @@ Azure ha DUE versioni dell'API Realtime con **event names DIVERSI**:
 | `src/app/test-voice/page.tsx` | Pagina debug - test manuale WebSocket |
 | `docs/AZURE_REALTIME_API.md` | **DOCUMENTAZIONE COMPLETA** - leggi prima di debuggare |
 
+### Requisito HTTPS per Microfono
+
+`navigator.mediaDevices.getUserMedia()` richiede un **secure context**:
+
+| Contesto | Funziona? | Note |
+|----------|-----------|------|
+| `localhost:3000` | ✅ | Sempre ok |
+| `127.0.0.1:3000` | ✅ | Sempre ok |
+| `https://example.com` | ✅ | HTTPS = ok |
+| `http://192.168.x.x:3000` | ❌ | **NON FUNZIONA** |
+| `http://example.com` | ❌ | HTTP senza localhost = no |
+
+**Errore tipico**: `undefined is not an object (evaluating 'navigator.mediaDevices.getUserMedia')`
+
+**Soluzione per test su device mobile**:
+1. Usa tunnel HTTPS (ngrok, cloudflared)
+2. Oppure configura certificato SSL locale
+
 ### Debug Voice Checklist
 
 1. Audio non si sente? → Controlla event types Preview vs GA
 2. session.update fallisce? → Formato diverso tra Preview e GA
 3. Proxy non connette? → Verifica env vars `AZURE_OPENAI_REALTIME_*`
 4. Audio distorto? → AudioContext playback DEVE essere 24kHz
+5. `mediaDevices undefined`? → Stai usando HTTP su IP invece di localhost/HTTPS
 
 ### Env Vars Voice
 
