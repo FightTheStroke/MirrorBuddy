@@ -83,6 +83,7 @@ export default function Home() {
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
 
   const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
+  const { studentProfile } = useSettingsStore();
 
   // Don't render main app until onboarding check is done
   if (!hasCompletedOnboarding) {
@@ -101,7 +102,6 @@ export default function Home() {
   const hours = Math.floor(totalStudyMinutes / 60);
   const minutes = totalStudyMinutes % 60;
   const studyTimeStr = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
-  const { studentProfile } = useSettingsStore();
 
   // Get selected coach and buddy from preferences (with defaults)
   const selectedCoach = studentProfile?.preferredCoach || 'melissa';
