@@ -49,6 +49,7 @@ import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import { useNotificationStore, requestPushPermission, isPushSupported } from '@/lib/stores/notification-store';
 import { TelemetryDashboard } from '@/components/telemetry';
 import { OnboardingSettings } from '@/components/settings/onboarding-settings';
+import { SupportChat } from '@/components/support';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 
@@ -2812,6 +2813,9 @@ function DiagnosticsTab() {
   const videoPreviewRef = useRef<HTMLVideoElement>(null);
   const webcamStreamRef = useRef<MediaStream | null>(null);
 
+  // Support chat state (Issue #16)
+  const [supportChatOpen, setSupportChatOpen] = useState(false);
+
   // Fetch available microphones
   const refreshMicrophones = useCallback(async () => {
     try {
@@ -3687,6 +3691,43 @@ function DiagnosticsTab() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Support Assistant (Issue #16) */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-indigo-500" />
+            Assistenza Tecnica
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-slate-600 dark:text-slate-400">
+            Hai bisogno di aiuto con la configurazione o hai problemi tecnici?
+            Chiedi a Guido, il nostro assistente tecnico.
+          </p>
+
+          <div className="flex flex-wrap gap-2 text-xs text-slate-500">
+            <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">Azure OpenAI</span>
+            <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">Voce e Audio</span>
+            <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">Flashcard e Quiz</span>
+            <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded">Accessibilita</span>
+          </div>
+
+          <Button
+            onClick={() => setSupportChatOpen(true)}
+            className="w-full bg-indigo-500 hover:bg-indigo-600"
+          >
+            <Bot className="w-4 h-4 mr-2" />
+            Chiedi a Guido
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Support Chat Modal */}
+      <SupportChat
+        isOpen={supportChatOpen}
+        onClose={() => setSupportChatOpen(false)}
+      />
 
       {/* Troubleshooting hints */}
       <Card>

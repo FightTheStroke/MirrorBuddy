@@ -553,7 +553,7 @@ export type SupportCharacter = SupportTeacher | BuddyProfile;
 /**
  * Character type identifier for routing.
  */
-export type CharacterType = 'maestro' | 'coach' | 'buddy';
+export type CharacterType = 'maestro' | 'coach' | 'buddy' | 'support_assistant';
 
 // === PARENT DASHBOARD TYPES ===
 
