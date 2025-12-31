@@ -139,19 +139,32 @@ export async function POST(request: NextRequest) {
               args,
               { maestroId, conversationId: undefined }
             );
+            // Transform to ToolCall interface format expected by ToolResultDisplay
+            // Note: type uses function name (e.g., 'create_mindmap') to match ToolType in types/index.ts
             toolResults.push({
-              toolCallId: toolCall.id,
-              functionName: toolCall.function.name,
-              result: toolResult,
+              id: toolResult.toolId || toolCall.id,
+              type: toolCall.function.name,
+              name: toolCall.function.name,
+              arguments: args,
+              status: toolResult.success ? 'completed' : 'error',
+              result: {
+                success: toolResult.success,
+                data: toolResult.data,
+                error: toolResult.error,
+              },
             });
           } catch (toolError) {
             logger.error('Tool execution failed', {
               toolCall: toolCall.function.name,
               error: String(toolError),
             });
+            const args = JSON.parse(toolCall.function.arguments || '{}');
             toolResults.push({
-              toolCallId: toolCall.id,
-              functionName: toolCall.function.name,
+              id: toolCall.id,
+              type: toolCall.function.name,
+              name: toolCall.function.name,
+              arguments: args,
+              status: 'error',
               result: {
                 success: false,
                 error: toolError instanceof Error ? toolError.message : 'Tool execution failed',

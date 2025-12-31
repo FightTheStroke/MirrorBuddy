@@ -122,7 +122,7 @@ export function ToolResultDisplay({ toolCall, className }: ToolResultDisplayProp
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className={cn('space-y-2', className)}
+      className={cn('space-y-2 w-full', className)}
       role="region"
       aria-label={`Tool result: ${name}`}
     >
