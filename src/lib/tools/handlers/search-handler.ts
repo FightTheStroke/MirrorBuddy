@@ -25,6 +25,29 @@ interface WikipediaApiResponse {
 }
 
 /**
+ * Strip HTML tags using character-by-character state machine
+ * This avoids regex-based multi-character bypass vulnerabilities
+ */
+function stripHtmlTags(html: string): string {
+  let result = '';
+  let inTag = false;
+
+  for (let i = 0; i < html.length; i++) {
+    const char = html[i];
+
+    if (char === '<') {
+      inTag = true;
+    } else if (char === '>') {
+      inTag = false;
+    } else if (!inTag) {
+      result += char;
+    }
+  }
+
+  return result;
+}
+
+/**
  * Search Italian Wikipedia for educational content.
  * Uses the MediaWiki API which is free and requires no API key.
  */
@@ -47,20 +70,9 @@ async function performWebSearch(query: string): Promise<SearchResult[]> {
       const searchResults = data.query?.search || [];
 
       for (const item of searchResults) {
-        // Strip HTML tags from snippet (comprehensive: loop until no more tags)
-        let cleanSnippet = item.snippet;
-        let previousLength: number;
-        do {
-          previousLength = cleanSnippet.length;
-          // Remove complete tags
-          cleanSnippet = cleanSnippet.replace(/<[^>]*>/g, '');
-          // Remove any orphaned < that could indicate malformed tags
-          cleanSnippet = cleanSnippet.replace(/<[^<]*/g, (match) =>
-            match.includes('>') ? match : ''
-          );
-        } while (cleanSnippet.length !== previousLength);
-        // Final cleanup: remove any remaining < or > characters
-        cleanSnippet = cleanSnippet.replace(/[<>]/g, '');
+        // Strip HTML tags using character-by-character parsing (avoids regex bypass attacks)
+        // This handles all tag formats correctly without multi-character regex issues
+        const cleanSnippet = stripHtmlTags(item.snippet);
 
         results.push({
           type: 'web',
