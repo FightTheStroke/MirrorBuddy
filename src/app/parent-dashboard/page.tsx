@@ -2,8 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { ParentDashboard } from '@/components/profile/parent-dashboard';
+import { TeacherDiary, type DiaryEntry } from '@/components/profile/teacher-diary';
+import { ProgressTimeline } from '@/components/profile/progress-timeline';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Loader2,
   AlertCircle,
@@ -13,8 +16,11 @@ import {
   Shield,
   UserCheck,
   Trash2,
+  BookOpen,
+  User,
+  TrendingUp,
 } from 'lucide-react';
-import type { StudentInsights } from '@/types';
+import type { StudentInsights, ObservationCategory } from '@/types';
 
 // Demo user ID - in production this would come from authentication
 const DEMO_USER_ID = 'demo-student-1';
@@ -33,16 +39,31 @@ interface ProfileMeta {
   sessionCount: number;
 }
 
-type PageState = 'loading' | 'no-profile' | 'needs-consent' | 'ready' | 'error' | 'deletion-pending';
+interface LearningEntry {
+  id: string;
+  maestroId: string;
+  subject: string;
+  category: string;
+  insight: string;
+  confidence: number;
+  occurrences: number;
+  createdAt: string;
+  lastSeen: string;
+}
+
+type PageState = 'loading' | 'no-profile' | 'needs-consent' | 'needs-student-consent' | 'ready' | 'error' | 'deletion-pending';
 
 export default function ParentDashboardPage() {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [insights, setInsights] = useState<StudentInsights | null>(null);
+  const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
   const [meta, setMeta] = useState<ProfileMeta | null>(null);
   const [_consentStatus, setConsentStatus] = useState<ConsentStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isDiaryLoading, setIsDiaryLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'diary' | 'profile' | 'progress'>('diary');
 
   // Fetch consent status
   const fetchConsentStatus = useCallback(async () => {
@@ -58,6 +79,63 @@ export default function ParentDashboardPage() {
       return null;
     }
   }, []);
+
+  // Fetch learning entries for diary
+  const fetchDiaryEntries = useCallback(async () => {
+    setIsDiaryLoading(true);
+    try {
+      const response = await fetch(`/api/learnings?userId=${DEMO_USER_ID}`);
+      const data = await response.json();
+
+      if (response.ok && data.learnings) {
+        // Convert to DiaryEntry format
+        const entries: DiaryEntry[] = data.learnings.map((l: LearningEntry) => ({
+          id: l.id,
+          maestroId: l.maestroId || 'unknown',
+          maestroName: getMaestroDisplayName(l.maestroId),
+          subject: l.subject || '',
+          category: l.category as ObservationCategory,
+          observation: l.insight,
+          isStrength: l.confidence >= 0.7,
+          confidence: l.confidence,
+          occurrences: l.occurrences,
+          createdAt: new Date(l.createdAt),
+          lastSeen: new Date(l.lastSeen),
+        }));
+
+        setDiaryEntries(entries);
+      }
+    } catch (err) {
+      console.error('Failed to fetch diary entries:', err);
+    } finally {
+      setIsDiaryLoading(false);
+    }
+  }, []);
+
+  // Helper to get Maestro display name
+  const getMaestroDisplayName = (maestroId: string | null): string => {
+    if (!maestroId) return 'Professore';
+    const names: Record<string, string> = {
+      leonardo: 'Leonardo',
+      galileo: 'Galileo',
+      curie: 'Marie Curie',
+      cicerone: 'Cicerone',
+      lovelace: 'Ada Lovelace',
+      smith: 'Adam Smith',
+      shakespeare: 'Shakespeare',
+      humboldt: 'Humboldt',
+      erodoto: 'Erodoto',
+      manzoni: 'Manzoni',
+      euclide: 'Euclide',
+      mozart: 'Mozart',
+      socrate: 'Socrate',
+      ippocrate: 'Ippocrate',
+      feynman: 'Feynman',
+      darwin: 'Darwin',
+      chris: 'Chris',
+    };
+    return names[maestroId.toLowerCase()] || maestroId;
+  };
 
   // Fetch profile data
   const fetchProfile = useCallback(async () => {
@@ -122,8 +200,18 @@ export default function ParentDashboardPage() {
           return;
         }
 
-        // Fetch profile
-        const result = await fetchProfile();
+        // Parent consented but student hasn't
+        if (consent?.parentConsent && !consent?.studentConsent) {
+          setPageState('needs-student-consent');
+          // Still load data - parent can view but with reminder
+        }
+
+        // Fetch profile and diary entries in parallel
+        const [result] = await Promise.all([
+          fetchProfile(),
+          fetchDiaryEntries(),
+        ]);
+
         if (result === 'needs-consent') {
           setPageState('needs-consent');
         } else if (result === 'no-profile') {
@@ -138,7 +226,7 @@ export default function ParentDashboardPage() {
     };
 
     load();
-  }, [fetchConsentStatus, fetchProfile]);
+  }, [fetchConsentStatus, fetchProfile, fetchDiaryEntries]);
 
   // Generate profile from learning data
   const handleGenerateProfile = async () => {
@@ -158,8 +246,8 @@ export default function ParentDashboardPage() {
         throw new Error(data.message || data.error || 'Failed to generate profile');
       }
 
-      // Refetch profile after generation
-      await fetchProfile();
+      // Refetch profile and diary after generation
+      await Promise.all([fetchProfile(), fetchDiaryEntries()]);
       setPageState('ready');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate profile');
@@ -186,7 +274,10 @@ export default function ParentDashboardPage() {
         // Refetch everything
         const consent = await fetchConsentStatus();
         if (consent?.parentConsent) {
-          const result = await fetchProfile();
+          const [result] = await Promise.all([
+            fetchProfile(),
+            fetchDiaryEntries(),
+          ]);
           if (result === true) {
             setPageState('ready');
           }
@@ -318,42 +409,285 @@ export default function ParentDashboardPage() {
 
       case 'needs-consent':
         return (
-          <Card className="max-w-lg mx-auto">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-indigo-500" />
-                Consenso Richiesto
-              </CardTitle>
-              <CardDescription>
-                Per visualizzare il profilo dello studente e necessario il consenso del genitore.
+          <Card className="max-w-2xl mx-auto">
+            <CardHeader className="text-center pb-2">
+              <div className="mx-auto w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4">
+                <Shield className="h-8 w-8 text-indigo-500" />
+              </div>
+              <CardTitle className="text-2xl">Consenso per il Dashboard Genitori</CardTitle>
+              <CardDescription className="text-base mt-2">
+                Per visualizzare le osservazioni dei Professori su tuo/a figlio/a, abbiamo bisogno del tuo consenso esplicito.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 text-sm">
-                <h4 className="font-medium mb-2">Cosa verra visualizzato:</h4>
-                <ul className="list-disc list-inside space-y-1 text-slate-600 dark:text-slate-400">
-                  <li>Punti di forza osservati dai Professori</li>
-                  <li>Aree dove lo studente puo crescere</li>
-                  <li>Strategie di apprendimento personalizzate</li>
-                  <li>Stile di apprendimento preferito</li>
-                  <li>Statistiche delle sessioni di studio</li>
+            <CardContent className="space-y-6">
+              {/* Why we collect this data */}
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
+                <h4 className="font-semibold text-indigo-900 dark:text-indigo-100 mb-3 flex items-center gap-2">
+                  <BookOpen className="h-5 w-5" />
+                  Perche raccogliamo questi dati?
+                </h4>
+                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                  Durante le conversazioni con i Professori virtuali, il sistema osserva come tuo/a figlio/a
+                  apprende e interagisce. Queste osservazioni ci permettono di costruire un profilo educativo
+                  che ti aiuta a <strong>supportare meglio il suo percorso di apprendimento a casa</strong>.
+                </p>
+              </div>
+
+              {/* What you will see */}
+              <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-5">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <User className="h-5 w-5 text-slate-600 dark:text-slate-400" />
+                  Cosa potrai vedere:
+                </h4>
+                <div className="grid sm:grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">&#10003;</span>
+                    <span className="text-slate-600 dark:text-slate-400">Punti di forza osservati dai Professori</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">&#10003;</span>
+                    <span className="text-slate-600 dark:text-slate-400">Aree dove puo crescere con supporto</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">&#10003;</span>
+                    <span className="text-slate-600 dark:text-slate-400">Strategie personalizzate per studiare a casa</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">&#10003;</span>
+                    <span className="text-slate-600 dark:text-slate-400">Stile di apprendimento preferito</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">&#10003;</span>
+                    <span className="text-slate-600 dark:text-slate-400">Diario con osservazioni cronologiche</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-green-500 mt-0.5">&#10003;</span>
+                    <span className="text-slate-600 dark:text-slate-400">Suggerimenti pratici per ogni materia</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Benefits for parents */}
+              <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-5 border border-amber-100 dark:border-amber-800">
+                <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-3 flex items-center gap-2">
+                  <UserCheck className="h-5 w-5" />
+                  Come ti aiuta questo strumento:
+                </h4>
+                <ul className="space-y-2 text-sm text-amber-800 dark:text-amber-200">
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">1.</span>
+                    <span>Capisci meglio come tuo/a figlio/a affronta lo studio</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">2.</span>
+                    <span>Ricevi suggerimenti concreti su come supportarlo/a a casa</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">3.</span>
+                    <span>Segui i progressi nel tempo con osservazioni datate</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="font-bold">4.</span>
+                    <span>Scopri i suoi punti di forza per valorizzarli</span>
+                  </li>
                 </ul>
               </div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 text-sm">
-                <h4 className="font-medium mb-2 text-blue-700 dark:text-blue-300">Privacy e GDPR:</h4>
-                <ul className="list-disc list-inside space-y-1 text-blue-600 dark:text-blue-400">
-                  <li>I dati sono trattati in conformita al GDPR</li>
-                  <li>Puoi esportare i dati in qualsiasi momento</li>
-                  <li>Puoi richiedere la cancellazione quando vuoi</li>
-                  <li>I dati non vengono condivisi con terze parti</li>
-                </ul>
+
+              {/* GDPR and Privacy */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-5 border border-blue-100 dark:border-blue-800">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Privacy e i tuoi diritti (GDPR):
+                </h4>
+                <div className="grid sm:grid-cols-2 gap-3 text-sm text-blue-700 dark:text-blue-300">
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-0.5">&#128274;</span>
+                    <span>Dati trattati in conformita al GDPR</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-0.5">&#128190;</span>
+                    <span>Esporta i dati in qualsiasi momento</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-0.5">&#128465;</span>
+                    <span>Richiedi la cancellazione quando vuoi</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-500 mt-0.5">&#128683;</span>
+                    <span>Nessuna condivisione con terze parti</span>
+                  </div>
+                </div>
               </div>
-              <Button onClick={handleGiveConsent} className="w-full">
-                <Shield className="h-4 w-4 mr-2" />
-                Acconsento alla Visualizzazione
-              </Button>
+
+              {/* AI Disclaimer */}
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  <strong className="text-slate-700 dark:text-slate-300">Nota importante:</strong> Tutte le osservazioni e i suggerimenti
+                  sono generati da un sistema di Intelligenza Artificiale. L&apos;AI puo commettere errori e le osservazioni
+                  non sostituiscono la valutazione di insegnanti o professionisti qualificati. Usa queste informazioni
+                  come spunto di riflessione, non come diagnosi o valutazione definitiva.
+                </p>
+              </div>
+
+              {/* Consent button */}
+              <div className="pt-2">
+                <Button onClick={handleGiveConsent} className="w-full py-6 text-lg">
+                  <Shield className="h-5 w-5 mr-2" />
+                  Acconsento alla Visualizzazione del Profilo
+                </Button>
+                <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-3">
+                  Cliccando, confermi di essere il genitore/tutore legale e di acconsentire al trattamento dei dati educativi.
+                </p>
+              </div>
             </CardContent>
           </Card>
+        );
+
+      case 'needs-student-consent':
+        return (
+          <>
+            {/* Student consent reminder banner */}
+            <div className="max-w-4xl mx-auto mb-6">
+              <Card className="border-amber-300 dark:border-amber-700 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
+                <CardContent className="py-4">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div className="p-3 rounded-full bg-amber-100 dark:bg-amber-800/50">
+                      <AlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-amber-900 dark:text-amber-100">
+                        Consenso dello studente mancante
+                      </h3>
+                      <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                        Per una maggiore trasparenza, chiedi a tuo/a figlio/a di confermare che e d&apos;accordo
+                        con la visualizzazione del suo profilo di apprendimento. Puoi comunque visualizzare i dati.
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="border-amber-400 text-amber-700 hover:bg-amber-100 dark:border-amber-600 dark:text-amber-300"
+                      onClick={async () => {
+                        // Record only student consent (parent already consented)
+                        try {
+                          await fetch('/api/profile/consent', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              userId: DEMO_USER_ID,
+                              studentConsent: true,
+                            }),
+                          });
+                          await fetchConsentStatus();
+                          setPageState('ready');
+                        } catch {
+                          // Ignore error
+                        }
+                      }}
+                    >
+                      <UserCheck className="h-4 w-4 mr-2" />
+                      Studente Acconsente
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Still show the content */}
+            <div className="max-w-4xl mx-auto">
+              {/* Action Bar */}
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleExport('json')}
+                    disabled={isExporting}
+                  >
+                    <FileJson className="h-4 w-4 mr-2" />
+                    Esporta JSON
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleExport('pdf')}
+                    disabled={isExporting}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Esporta Report
+                  </Button>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGenerateProfile}
+                  disabled={isGenerating}
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                  )}
+                  Aggiorna Profilo
+                </Button>
+              </div>
+
+              {/* Tabbed Content */}
+              <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'diary' | 'profile' | 'progress')} className="w-full">
+                <TabsList className="grid w-full max-w-lg grid-cols-3 mb-6">
+                  <TabsTrigger value="diary" className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4" />
+                    Diario
+                  </TabsTrigger>
+                  <TabsTrigger value="profile" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Profilo
+                  </TabsTrigger>
+                  <TabsTrigger value="progress" className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4" />
+                    Progressi
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="diary">
+                  <TeacherDiary
+                    entries={diaryEntries}
+                    studentName={insights?.studentName || 'lo studente'}
+                    isLoading={isDiaryLoading}
+                  />
+                </TabsContent>
+
+                <TabsContent value="profile">
+                  {insights && <ParentDashboard insights={insights} />}
+                </TabsContent>
+
+                <TabsContent value="progress">
+                  <ProgressTimeline
+                    entries={diaryEntries}
+                    studentName={insights?.studentName || 'lo studente'}
+                  />
+                </TabsContent>
+              </Tabs>
+
+              {/* AI Disclaimer Footer */}
+              <div className="mt-8 p-4 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                <div className="flex items-start gap-3">
+                  <div className="p-1.5 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 mt-0.5">
+                    <AlertCircle className="h-4 w-4 text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      <strong className="text-slate-700 dark:text-slate-300">Disclaimer AI:</strong> Tutte le osservazioni,
+                      i profili e i suggerimenti presenti in questa pagina sono generati automaticamente da un sistema
+                      di Intelligenza Artificiale. L&apos;AI puo commettere errori e le informazioni fornite non sostituiscono
+                      la valutazione di insegnanti, psicologi o altri professionisti qualificati. Usa queste informazioni
+                      come spunto di riflessione e dialogo, non come diagnosi o valutazione definitiva delle capacita
+                      di tuo/a figlio/a.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
         );
 
       case 'deletion-pending':
@@ -435,15 +769,68 @@ export default function ParentDashboardPage() {
               </div>
             )}
 
-            {/* Dashboard */}
-            {insights && <ParentDashboard insights={insights} />}
+            {/* Tabbed Content */}
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'diary' | 'profile' | 'progress')} className="w-full">
+              <TabsList className="grid w-full max-w-lg grid-cols-3 mb-6">
+                <TabsTrigger value="diary" className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4" />
+                  Diario
+                </TabsTrigger>
+                <TabsTrigger value="profile" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Profilo
+                </TabsTrigger>
+                <TabsTrigger value="progress" className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4" />
+                  Progressi
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="diary">
+                <TeacherDiary
+                  entries={diaryEntries}
+                  studentName={insights?.studentName || 'lo studente'}
+                  isLoading={isDiaryLoading}
+                />
+              </TabsContent>
+
+              <TabsContent value="profile">
+                {insights && <ParentDashboard insights={insights} />}
+              </TabsContent>
+
+              <TabsContent value="progress">
+                <ProgressTimeline
+                  entries={diaryEntries}
+                  studentName={insights?.studentName || 'lo studente'}
+                />
+              </TabsContent>
+            </Tabs>
+
+            {/* AI Disclaimer Footer */}
+            <div className="mt-8 p-4 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+              <div className="flex items-start gap-3">
+                <div className="p-1.5 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 mt-0.5">
+                  <AlertCircle className="h-4 w-4 text-slate-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    <strong className="text-slate-700 dark:text-slate-300">Disclaimer AI:</strong> Tutte le osservazioni,
+                    i profili e i suggerimenti presenti in questa pagina sono generati automaticamente da un sistema
+                    di Intelligenza Artificiale. L&apos;AI puo commettere errori e le informazioni fornite non sostituiscono
+                    la valutazione di insegnanti, psicologi o altri professionisti qualificati. Usa queste informazioni
+                    come spunto di riflessione e dialogo, non come diagnosi o valutazione definitiva delle capacita
+                    di tuo/a figlio/a.
+                  </p>
+                </div>
+              </div>
+            </div>
           </>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 p-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 p-4 md:p-8">
       {renderContent()}
     </div>
   );

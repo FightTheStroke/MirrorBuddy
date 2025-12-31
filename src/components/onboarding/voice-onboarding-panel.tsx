@@ -3,6 +3,10 @@
 /**
  * VoiceOnboardingPanel - Unified voice experience with Melissa
  *
+ * Uses the standard useVoiceSession hook with onboarding-specific tools.
+ * The onboarding tools (set_student_name, set_student_age, etc.) are now
+ * part of the unified VOICE_TOOLS and handled by executeVoiceTool.
+ *
  * When voice is active:
  * - Shows large Melissa avatar with speaking animation
  * - Integrated transcript (last messages)
@@ -15,75 +19,166 @@
  * Related: #61 Onboarding Voice Integration
  */
 
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { Phone, PhoneOff, Mic, MicOff, VolumeX, Check, Circle } from 'lucide-react';
+import { Phone, PhoneOff, Mic, MicOff, Check, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useOnboardingVoice } from '@/lib/hooks/use-onboarding-voice';
+import { logger } from '@/lib/logger';
+import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-
-// Melissa's pink theme color
-const MELISSA_COLOR = '#EC4899';
+import {
+  MELISSA_ONBOARDING_PROMPT,
+  MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
+} from '@/lib/voice/onboarding-tools';
+import type { Maestro, Subject, MaestroVoice } from '@/types';
 
 export interface VoiceOnboardingPanelProps {
   className?: string;
   onFallbackToWebSpeech?: () => void;
   /** Which step we're on - affects what data we show */
   step?: 'welcome' | 'info';
-  /** Auto-connect on mount (Melissa starts speaking automatically) */
-  autoConnect?: boolean;
+}
+
+interface VoiceConnectionInfo {
+  provider: 'azure';
+  proxyPort: number;
+  configured: boolean;
+}
+
+/**
+ * Create a Maestro-like object for Melissa with onboarding-specific prompts.
+ */
+function createOnboardingMelissa(): Maestro {
+  return {
+    id: 'melissa-onboarding',
+    name: 'Melissa',
+    subject: 'methodology' as Subject,
+    specialty: 'Learning Coach - Onboarding',
+    voice: 'shimmer' as MaestroVoice,
+    voiceInstructions: MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
+    teachingStyle: 'scaffolding',
+    avatar: '/avatars/melissa.jpg',
+    color: '#EC4899',
+    systemPrompt: MELISSA_ONBOARDING_PROMPT,
+    greeting: 'Ciao! Sono Melissa, piacere di conoscerti! Come ti chiami?',
+  };
 }
 
 export function VoiceOnboardingPanel({
   className,
   onFallbackToWebSpeech,
   step = 'welcome',
-  autoConnect = false,
 }: VoiceOnboardingPanelProps) {
+  const { data, addVoiceTranscript, voiceTranscript, clearVoiceTranscript } = useOnboardingStore();
+  const hasInitializedRef = useRef(false);
+
+  // Clear transcript on mount (fresh start for onboarding)
+  useEffect(() => {
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
+      clearVoiceTranscript();
+    }
+  }, [clearVoiceTranscript]);
+  const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
+  const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
+  const hasAttemptedConnection = useRef(false);
+  const lastTranscriptIdRef = useRef<string | null>(null);
+
+  // Use the standard voice session hook
   const {
     isConnected,
-    isConnecting,
+    isListening,
     isSpeaking,
     isMuted,
-    azureAvailable,
+    connectionState,
     connect,
     disconnect,
     toggleMute,
-    checkAzureAvailability,
-  } = useOnboardingVoice({
-    onAzureUnavailable: () => {
-      onFallbackToWebSpeech?.();
-    },
+  } = useVoiceSession({
     onError: (error) => {
-      console.error('[VoiceOnboardingPanel] Error:', error);
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error('[VoiceOnboardingPanel] Voice error', { message });
+      setConfigError(message || 'Errore di connessione vocale');
+    },
+    onTranscript: (role, text) => {
+      // Add voice transcripts to the onboarding store
+      const transcriptId = `${role}-${Date.now()}`;
+
+      // Avoid duplicate transcripts
+      if (lastTranscriptIdRef.current === text.substring(0, 50)) {
+        return;
+      }
+      lastTranscriptIdRef.current = text.substring(0, 50);
+
+      addVoiceTranscript(role as 'user' | 'assistant', text);
     },
   });
 
-  const { data, voiceTranscript } = useOnboardingStore();
-  const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
-
-  // Check Azure availability on mount and auto-connect if enabled
+  // Fetch voice connection info on mount
   useEffect(() => {
-    if (!hasCheckedAzure) {
-      checkAzureAvailability().then((available) => {
-        setHasCheckedAzure(true);
-        if (!available) {
+    async function fetchConnectionInfo() {
+      try {
+        const response = await fetch('/api/realtime/token');
+        const data = await response.json();
+        if (data.error) {
+          logger.error('[VoiceOnboardingPanel] Voice API error', { error: data.error });
+          setHasCheckedAzure(true);
           onFallbackToWebSpeech?.();
-        } else if (autoConnect && !isConnected && !isConnecting) {
-          // Auto-connect: Melissa starts speaking automatically
-          connect();
+          return;
         }
-      });
+        setConnectionInfo(data as VoiceConnectionInfo);
+        setHasCheckedAzure(true);
+      } catch (error) {
+        logger.error('[VoiceOnboardingPanel] Failed to get voice config', { error: String(error) });
+        setHasCheckedAzure(true);
+        onFallbackToWebSpeech?.();
+      }
     }
-  }, [checkAzureAvailability, hasCheckedAzure, onFallbackToWebSpeech, autoConnect, connect, isConnected, isConnecting]);
+    fetchConnectionInfo();
+  }, [onFallbackToWebSpeech]);
+
+  // Connect when voice is activated
+  useEffect(() => {
+    const startConnection = async () => {
+      if (!isVoiceActive || hasAttemptedConnection.current) return;
+      if (!connectionInfo || isConnected || connectionState !== 'idle') return;
+
+      hasAttemptedConnection.current = true;
+      setConfigError(null);
+
+      try {
+        const onboardingMelissa = createOnboardingMelissa();
+        await connect(onboardingMelissa, connectionInfo);
+      } catch (error) {
+        logger.error('[VoiceOnboardingPanel] Connection failed', { error: String(error) });
+        if (error instanceof DOMException && error.name === 'NotAllowedError') {
+          setConfigError('Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.');
+        } else {
+          setConfigError('Errore di connessione vocale');
+        }
+      }
+    };
+
+    startConnection();
+  }, [isVoiceActive, connectionInfo, isConnected, connectionState, connect]);
+
+  // Reset connection attempt flag when voice is deactivated
+  useEffect(() => {
+    if (!isVoiceActive) {
+      hasAttemptedConnection.current = false;
+    }
+  }, [isVoiceActive]);
 
   const handleStartCall = useCallback(() => {
-    connect();
-  }, [connect]);
+    setIsVoiceActive(true);
+  }, []);
 
   const handleEndCall = useCallback(() => {
+    setIsVoiceActive(false);
     disconnect();
   }, [disconnect]);
 
@@ -111,7 +206,7 @@ export function VoiceOnboardingPanel({
   const checklist = getChecklist();
 
   // If Azure is not available, show nothing (form mode will be used)
-  if (azureAvailable === false) {
+  if (hasCheckedAzure && !connectionInfo) {
     return null;
   }
 
@@ -125,7 +220,7 @@ export function VoiceOnboardingPanel({
   }
 
   // ========== NOT CONNECTED - Show call button ==========
-  if (!isConnected && !isConnecting) {
+  if (!isVoiceActive && !isConnected) {
     return (
       <motion.button
         initial={{ opacity: 0, scale: 0.9 }}
@@ -157,7 +252,7 @@ export function VoiceOnboardingPanel({
   }
 
   // ========== CONNECTING ==========
-  if (isConnecting) {
+  if (isVoiceActive && !isConnected) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -177,7 +272,22 @@ export function VoiceOnboardingPanel({
             className="object-cover w-full h-full"
           />
         </div>
-        <p className="text-white font-medium">Connessione in corso...</p>
+        <p className="text-white font-medium">
+          {configError || 'Connessione in corso...'}
+        </p>
+        {configError && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setIsVoiceActive(false);
+              setConfigError(null);
+            }}
+            className="text-white/80 hover:text-white"
+          >
+            Annulla
+          </Button>
+        )}
       </motion.div>
     );
   }
@@ -218,7 +328,7 @@ export function VoiceOnboardingPanel({
         <div className="flex-1">
           <h3 className="text-xl font-bold text-white">Melissa</h3>
           <p className="text-sm text-pink-100">
-            {isSpeaking ? 'Sta parlando...' : isMuted ? 'Microfono spento' : 'In ascolto...'}
+            {isSpeaking ? 'Sta parlando...' : isMuted ? 'Microfono spento' : isListening ? 'In ascolto...' : 'Connessa'}
           </p>
         </div>
 
@@ -228,7 +338,7 @@ export function VoiceOnboardingPanel({
             <motion.div
               key={i}
               animate={{
-                height: isSpeaking ? [4, 20 + i * 3, 4] : !isMuted ? [4, 8, 4] : 4,
+                height: isSpeaking ? [4, 20 + i * 3, 4] : isListening && !isMuted ? [4, 8, 4] : 4,
               }}
               transition={{
                 repeat: Infinity,
@@ -237,7 +347,7 @@ export function VoiceOnboardingPanel({
               }}
               className={cn(
                 'w-1.5 rounded-full',
-                isSpeaking ? 'bg-white' : !isMuted ? 'bg-white/60' : 'bg-white/30'
+                isSpeaking ? 'bg-white' : isListening && !isMuted ? 'bg-white/60' : 'bg-white/30'
               )}
             />
           ))}
@@ -256,7 +366,7 @@ export function VoiceOnboardingPanel({
               Parla con Melissa...
             </motion.p>
           ) : (
-            recentTranscript.map((entry, i) => (
+            recentTranscript.map((entry) => (
               <motion.div
                 key={entry.timestamp}
                 initial={{ opacity: 0, y: 10 }}

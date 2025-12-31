@@ -11,6 +11,7 @@
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/lib/realtime/tool-events';
 import type { Subject } from '@/types';
+import { executeOnboardingTool } from './onboarding-tools';
 
 // ============================================================================
 // TYPES
@@ -185,6 +186,35 @@ export interface MindmapSetColorArgs {
   color: string;
 }
 
+// ============================================================================
+// ONBOARDING TOOL TYPES (#61 Onboarding Voice Integration)
+// ============================================================================
+
+/** Arguments for set_student_name tool. */
+export interface SetStudentNameArgs {
+  name: string;
+}
+
+/** Arguments for set_student_age tool. */
+export interface SetStudentAgeArgs {
+  age: number;
+}
+
+/** Arguments for set_school_level tool. */
+export interface SetSchoolLevelArgs {
+  level: 'elementare' | 'media' | 'superiore';
+}
+
+/** Arguments for set_learning_differences tool. */
+export interface SetLearningDifferencesArgs {
+  differences: string[];
+}
+
+/** Arguments for set_student_gender tool. */
+export interface SetStudentGenderArgs {
+  gender: 'male' | 'female' | 'other';
+}
+
 /**
  * Union of all tool arguments.
  */
@@ -204,7 +234,16 @@ export type VoiceToolArgs =
   | { name: 'mindmap_expand_node'; args: MindmapExpandNodeArgs }
   | { name: 'mindmap_delete_node'; args: MindmapDeleteNodeArgs }
   | { name: 'mindmap_focus_node'; args: MindmapFocusNodeArgs }
-  | { name: 'mindmap_set_color'; args: MindmapSetColorArgs };
+  | { name: 'mindmap_set_color'; args: MindmapSetColorArgs }
+  // Onboarding tools
+  | { name: 'set_student_name'; args: SetStudentNameArgs }
+  | { name: 'set_student_age'; args: SetStudentAgeArgs }
+  | { name: 'set_school_level'; args: SetSchoolLevelArgs }
+  | { name: 'set_learning_differences'; args: SetLearningDifferencesArgs }
+  | { name: 'set_student_gender'; args: SetStudentGenderArgs }
+  | { name: 'confirm_step_data'; args: Record<string, never> }
+  | { name: 'next_onboarding_step'; args: Record<string, never> }
+  | { name: 'prev_onboarding_step'; args: Record<string, never> };
 
 // ============================================================================
 // TOOL DEFINITIONS
@@ -615,6 +654,137 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
       required: ['node', 'color'],
     },
   },
+  // ============================================================================
+  // ONBOARDING TOOLS (#61 Onboarding Voice Integration)
+  // ============================================================================
+  {
+    type: 'function',
+    name: 'set_student_name',
+    description:
+      'Imposta il nome dello studente. Usa quando lo studente dice il suo nome.',
+    parameters: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          description: 'Il nome dello studente',
+        },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'set_student_age',
+    description:
+      "Imposta l'età dello studente. Usa quando lo studente dice quanti anni ha.",
+    parameters: {
+      type: 'object',
+      properties: {
+        age: {
+          type: 'number',
+          description: 'Età dello studente (6-19)',
+        },
+      },
+      required: ['age'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'set_school_level',
+    description:
+      'Imposta il livello scolastico. Usa quando lo studente dice che scuola frequenta.',
+    parameters: {
+      type: 'object',
+      properties: {
+        level: {
+          type: 'string',
+          enum: ['elementare', 'media', 'superiore'],
+          description: 'Livello scolastico: elementare, media, o superiore',
+        },
+      },
+      required: ['level'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'set_learning_differences',
+    description:
+      'Imposta le difficoltà di apprendimento. Usa quando lo studente menziona dislessia, ADHD, autismo, etc.',
+    parameters: {
+      type: 'object',
+      properties: {
+        differences: {
+          type: 'array',
+          items: {
+            type: 'string',
+            enum: [
+              'dyslexia',
+              'dyscalculia',
+              'dysgraphia',
+              'adhd',
+              'autism',
+              'cerebralPalsy',
+              'visualImpairment',
+              'auditoryProcessing',
+            ],
+          },
+          description: 'Lista delle difficoltà di apprendimento',
+        },
+      },
+      required: ['differences'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'set_student_gender',
+    description:
+      'Imposta il genere dello studente per personalizzare il buddy. Usa quando lo studente indica la preferenza.',
+    parameters: {
+      type: 'object',
+      properties: {
+        gender: {
+          type: 'string',
+          enum: ['male', 'female', 'other'],
+          description: 'Genere dello studente',
+        },
+      },
+      required: ['gender'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'confirm_step_data',
+    description:
+      'Conferma i dati raccolti e chiedi allo studente se sono corretti. Usa dopo aver raccolto le informazioni principali.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
+  {
+    type: 'function',
+    name: 'next_onboarding_step',
+    description:
+      "Avanza al prossimo step dell'onboarding. Usa quando lo studente è pronto a continuare.",
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
+  {
+    type: 'function',
+    name: 'prev_onboarding_step',
+    description:
+      'Torna allo step precedente. Usa quando lo studente vuole modificare qualcosa.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
 ];
 
 // ============================================================================
@@ -638,6 +808,31 @@ const MINDMAP_MODIFICATION_COMMANDS = [
  */
 export function isMindmapModificationCommand(name: string): boolean {
   return MINDMAP_MODIFICATION_COMMANDS.includes(name as typeof MINDMAP_MODIFICATION_COMMANDS[number]);
+}
+
+// ============================================================================
+// ONBOARDING COMMAND HELPERS (#61 Onboarding Voice Integration)
+// ============================================================================
+
+/**
+ * List of onboarding command names.
+ */
+const ONBOARDING_COMMANDS = [
+  'set_student_name',
+  'set_student_age',
+  'set_school_level',
+  'set_learning_differences',
+  'set_student_gender',
+  'confirm_step_data',
+  'next_onboarding_step',
+  'prev_onboarding_step',
+] as const;
+
+/**
+ * Check if a tool name is an onboarding command.
+ */
+export function isOnboardingCommand(name: string): boolean {
+  return ONBOARDING_COMMANDS.includes(name as typeof ONBOARDING_COMMANDS[number]);
 }
 
 // ============================================================================
@@ -692,6 +887,11 @@ export async function executeVoiceTool(
   // Check for mindmap modification commands first
   if (isMindmapModificationCommand(toolName)) {
     return executeMindmapModification(sessionId, toolName, args);
+  }
+
+  // Check for onboarding commands (#61 Onboarding Voice Integration)
+  if (isOnboardingCommand(toolName)) {
+    return executeOnboardingTool(toolName, args);
   }
 
   const toolType = getToolTypeFromName(toolName);

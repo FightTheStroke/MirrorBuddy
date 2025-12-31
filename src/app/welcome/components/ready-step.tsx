@@ -13,12 +13,17 @@ import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding
 // Pre-defined sparkle offsets (avoids Math.random during render)
 const SPARKLE_OFFSETS = [5, -12, 18, -8, 15, -5];
 
+interface ReadyStepProps {
+  useWebSpeechFallback?: boolean;
+  onAzureUnavailable?: () => void;
+}
+
 /**
  * Step 5: Ready to start CTA
  *
  * Final step - saves data and redirects to main app.
  */
-export function ReadyStep() {
+export function ReadyStep(_props: ReadyStepProps) {
   const router = useRouter();
   const { data, prevStep, completeOnboarding, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
   const { updateStudentProfile } = useSettingsStore();

@@ -421,6 +421,59 @@ serverNotifications.myNewTrigger = async (userId: string, data: MyData) => {
 
 2. Call from relevant API route or server action
 
+### PWA Push Notifications (ADR-0014)
+
+**STATUS: IMPLEMENTED**
+
+Background push notifications via Web Push API for PWA installations.
+
+#### Two Notification Layers
+
+| Layer | When Active | Mechanism |
+|-------|-------------|-----------|
+| **In-App** | User has app open | Toast UI + optional Melissa voice |
+| **Push** | App closed/background | Service Worker + browser notification |
+
+#### Platform Support
+
+| Platform | In-App | Push | Notes |
+|----------|--------|------|-------|
+| iOS Safari | ✅ | ⚠️ | PWA install required for push |
+| macOS Safari 16+ | ✅ | ✅ | Full support |
+| Chrome/Edge/Firefox | ✅ | ✅ | Full support |
+| Android Chrome | ✅ | ✅ | No PWA install needed |
+
+#### Key Files
+
+| File | Purpose |
+|------|---------|
+| `docs/adr/0014-pwa-push-notifications.md` | Architecture decision |
+| `prisma/schema.prisma` → `PushSubscription` | Subscription storage |
+| `public/sw.js` | Service Worker for push handling |
+| `src/lib/push/vapid.ts` | VAPID keys + platform detection |
+| `src/lib/push/subscription.ts` | Client-side subscription lifecycle |
+| `src/lib/push/send.ts` | Server-side push sending |
+| `src/app/api/push/subscribe/route.ts` | Subscription CRUD |
+| `src/components/pwa/ios-install-banner.tsx` | iOS PWA install prompt |
+| `src/components/scheduler/notification-preferences.tsx` | Conditional push toggle |
+
+#### Environment Variables
+
+```bash
+# VAPID keys for Web Push (generate via: npx web-push generate-vapid-keys)
+NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-public-key
+VAPID_PRIVATE_KEY=your-private-key
+VAPID_SUBJECT=mailto:support@convergioedu.com
+```
+
+#### Conditional UI Logic
+
+Push toggle in settings is conditionally displayed:
+- **Hidden**: Browser doesn't support Push API
+- **Disabled + banner**: iOS Safari not installed as PWA
+- **Disabled + message**: User denied notification permission
+- **Enabled**: All conditions met
+
 ## Pomodoro Timer System
 
 **STATUS: IMPLEMENTED**
