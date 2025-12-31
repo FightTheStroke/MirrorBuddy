@@ -93,6 +93,7 @@ Three stores in `src/lib/stores/app-store.ts`:
 | `src/lib/ai/handoff-manager.ts` | Manages transitions between characters |
 | `src/lib/ai/intent-detection.ts` | Detects student intent (academic, method, emotional) |
 | `src/components/conversation/conversation-flow.tsx` | Main conversation UI |
+| `src/components/conversation/character-chat-view.tsx` | Coach/Buddy chat with voice (side-by-side layout) |
 | `src/lib/stores/conversation-flow-store.ts` | Conversation state management |
 | `src/lib/profile/profile-generator.ts` | Generates student profiles from Maestri insights |
 | `src/components/profile/parent-dashboard.tsx` | Parent dashboard UI showing student insights |
@@ -142,6 +143,31 @@ Characters can suggest handoffs to each other:
 - Buddy → Maestro: "Per matematica, chiedi ad Archimede!"
 
 Handoffs are tracked in `handoff-manager.ts` to maintain conversation context.
+
+#### Voice Support for Coach & Buddy
+
+`CharacterChatView` provides voice calling for Coach (Melissa) and Buddy (Mario) characters:
+
+```
+┌─────────────────────────────────┬────────────┐
+│         Chat Area               │   Voice    │
+│   (unified message stream)      │   Panel    │
+│                                 │            │
+│   🔊 Voice transcript here      │  [Avatar]  │
+│   💬 Text message here          │  [Status]  │
+│   🔊 Voice transcript here      │  [Mute]    │
+│                                 │  [Hangup]  │
+└─────────────────────────────────┴────────────┘
+```
+
+- **Side-by-side layout**: Voice panel on right, chat on left
+- **Unified conversation**: Voice transcripts appear in chat with 🔊 icon
+- **Theme integration**: Panel uses character's gradient color
+- **Azure Realtime API**: Same voice infrastructure as Maestri
+
+Voice profiles defined in:
+- `support-teachers.ts`: Coaches have `voice` and `voiceInstructions` fields
+- `buddy-profiles.ts`: Buddies have `voice` and `voiceInstructions` fields
 
 ### Safety Guardrails
 
