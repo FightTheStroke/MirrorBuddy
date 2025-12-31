@@ -8,7 +8,6 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 export type OnboardingStep =
   | 'welcome' // Step 1: Melissa intro + chiede nome
@@ -74,8 +73,7 @@ const STEP_ORDER: OnboardingStep[] = [
 ];
 
 export const useOnboardingStore = create<OnboardingState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       hasCompletedOnboarding: false,
       onboardingCompletedAt: null,
       currentStep: 'welcome',
@@ -160,7 +158,14 @@ export const useOnboardingStore = create<OnboardingState>()(
         }),
 
       resetAllData: async () => {
-        // Clear all localStorage stores
+        // Delete all user data from database (primary data source)
+        try {
+          await fetch('/api/user/data', { method: 'DELETE' });
+        } catch {
+          // Continue with local cleanup even if API fails
+        }
+
+        // Clear any remaining localStorage (legacy/session data)
         const storeKeys = [
           'convergio-settings',
           'convergio-progress',
@@ -172,13 +177,17 @@ export const useOnboardingStore = create<OnboardingState>()(
           'convergio-accessibility',
           'convergio-notifications',
           'convergio-pomodoro',
+          'convergio-user-id',
         ];
 
         storeKeys.forEach((key) => {
           localStorage.removeItem(key);
         });
 
-        // Clear IndexedDB (materials, flashcards, etc.)
+        // Clear sessionStorage (temporary user ID)
+        sessionStorage.removeItem('convergio-user-id');
+
+        // Clear IndexedDB (legacy materials storage)
         const databases = ['convergio-materials', 'convergio-flashcards'];
         for (const dbName of databases) {
           try {
@@ -205,9 +214,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         // Reload the page to reinitialize everything
         window.location.href = '/welcome';
       },
-    }),
-    { name: 'convergio-onboarding' }
-  )
+    })
 );
 
 /**

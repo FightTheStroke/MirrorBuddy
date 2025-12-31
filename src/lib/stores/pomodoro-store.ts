@@ -1,7 +1,6 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 export type PomodoroPhase = 'idle' | 'focus' | 'shortBreak' | 'longBreak';
 
@@ -51,8 +50,7 @@ const DEFAULT_SETTINGS: PomodoroSettings = {
 const getToday = () => new Date().toISOString().split('T')[0];
 
 export const usePomodoroStore = create<PomodoroStore>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       // Initial state
       phase: 'idle',
       timeRemaining: DEFAULT_SETTINGS.focusMinutes * 60,
@@ -119,17 +117,5 @@ export const usePomodoroStore = create<PomodoroStore>()(
           lastActiveDate: today,
         });
       },
-    }),
-    {
-      name: 'pomodoro-storage',
-      partialize: (state) => ({
-        settings: state.settings,
-        completedPomodoros: state.completedPomodoros,
-        totalFocusTime: state.totalFocusTime,
-        todayPomodoros: state.todayPomodoros,
-        todayFocusMinutes: state.todayFocusMinutes,
-        lastActiveDate: state.lastActiveDate,
-      }),
-    }
-  )
+    })
 );

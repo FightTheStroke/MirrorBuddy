@@ -18,6 +18,7 @@ import {
   Image,
   FileType,
   MessageSquare,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +36,7 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { logger } from '@/lib/logger';
+import { useMindmaps, type SavedMindmap } from '@/lib/hooks/use-saved-materials';
 
 interface MindmapNode {
   id: string;
@@ -42,15 +44,6 @@ interface MindmapNode {
   children?: MindmapNode[];
   icon?: string;
   color?: string;
-}
-
-interface SavedMindmap {
-  id: string;
-  title: string;
-  nodes: MindmapNode[];
-  subject: Subject;
-  createdAt: Date;
-  maestroId?: string;
 }
 
 interface MindmapsViewProps {
@@ -94,12 +87,8 @@ const exampleMindmapsBySubject: Record<string, { title: string; nodes: MindmapNo
 export function MindmapsView({ className }: MindmapsViewProps) {
   const router = useRouter();
 
-  // Load saved mindmaps from localStorage
-  const [mindmaps, setMindmaps] = useState<SavedMindmap[]>(() => {
-    if (typeof window === 'undefined') return [];
-    const saved = localStorage.getItem('convergio-mindmaps');
-    return saved ? JSON.parse(saved) : [];
-  });
+  // Load saved mindmaps from database API
+  const { mindmaps, loading, saveMindmap, deleteMindmap: apiDeleteMindmap, reload } = useMindmaps();
 
   const [selectedMindmap, setSelectedMindmap] = useState<SavedMindmap | null>(null);
   const [showExamples, setShowExamples] = useState(false);
@@ -111,36 +100,27 @@ export function MindmapsView({ className }: MindmapsViewProps) {
     { name: '', subtopics: [''] },
   ]);
 
-  // Save mindmaps to localStorage
-  const saveMindmaps = (newMindmaps: SavedMindmap[]) => {
-    setMindmaps(newMindmaps);
-    localStorage.setItem('convergio-mindmaps', JSON.stringify(newMindmaps));
-  };
-
-  // Delete mindmap
-  const deleteMindmap = (id: string) => {
-    saveMindmaps(mindmaps.filter(m => m.id !== id));
+  // Delete mindmap via API
+  const handleDeleteMindmap = async (id: string) => {
+    await apiDeleteMindmap(id);
     if (selectedMindmap?.id === id) {
       setSelectedMindmap(null);
     }
   };
 
   // Save example as personal mindmap
-  const saveExampleAsMindmap = (example: { title: string; nodes: MindmapNode[] }, subject: string) => {
-    const newMindmap: SavedMindmap = {
-      id: crypto.randomUUID(),
+  const saveExampleAsMindmap = async (example: { title: string; nodes: MindmapNode[] }, subject: string) => {
+    await saveMindmap({
       title: example.title,
       nodes: example.nodes,
       subject: subject as Subject,
-      createdAt: new Date(),
-    };
-    saveMindmaps([...mindmaps, newMindmap]);
+    });
     setSelectedExample(null);
     setShowExamples(false);
   };
 
   // Create new mindmap from form
-  const handleCreateMindmap = () => {
+  const handleCreateMindmap = async () => {
     if (!newMapTitle.trim()) return;
 
     const validTopics = newMapTopics.filter(t => t.name.trim());
@@ -154,15 +134,12 @@ export function MindmapsView({ className }: MindmapsViewProps) {
       }))
     );
 
-    const newMindmap: SavedMindmap = {
-      id: crypto.randomUUID(),
+    await saveMindmap({
       title: newMapTitle,
       nodes,
       subject: newMapSubject,
-      createdAt: new Date(),
-    };
+    });
 
-    saveMindmaps([...mindmaps, newMindmap]);
     setShowCreateModal(false);
     setNewMapTitle('');
     setNewMapSubject('mathematics');
@@ -283,15 +260,14 @@ export function MindmapsView({ className }: MindmapsViewProps) {
         children: node.children?.map((child) => convertNode(child as { id: string; text: string; color?: string; children?: unknown[] })),
       });
 
-      const newMindmap: SavedMindmap = {
-        id: crypto.randomUUID(),
-        title: result.mindmap.title,
-        nodes: result.mindmap.root.children?.map((child) => convertNode(child as { id: string; text: string; color?: string; children?: unknown[] })) || [],
-        subject: (result.mindmap.topic as Subject) || 'mathematics',
-        createdAt: new Date(),
-      };
+      const nodes = result.mindmap.root.children?.map((child) => convertNode(child as { id: string; text: string; color?: string; children?: unknown[] })) || [];
+      const subject = (result.mindmap.topic as Subject) || 'mathematics';
 
-      saveMindmaps([...mindmaps, newMindmap]);
+      await saveMindmap({
+        title: result.mindmap.title,
+        nodes,
+        subject,
+      });
 
       if (result.warnings?.length) {
         alert(`Importazione completata con avvisi:\n${result.warnings.join('\n')}`);
@@ -305,7 +281,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
 
     // Reset input
     event.target.value = '';
-  }, [mindmaps, saveMindmaps]);
+  }, [saveMindmap]);
 
   // Handle Escape key to close modals
   useEffect(() => {
@@ -384,7 +360,16 @@ export function MindmapsView({ className }: MindmapsViewProps) {
       </Card>
 
       {/* Mindmaps grid */}
-      {mindmaps.length === 0 ? (
+      {loading ? (
+        <Card className="p-12">
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 mx-auto text-slate-400 mb-4 animate-spin" />
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+              Caricamento...
+            </h3>
+          </div>
+        </Card>
+      ) : mindmaps.length === 0 ? (
         <Card className="p-12">
           <div className="text-center">
             <Network className="w-16 h-16 mx-auto text-slate-400 mb-4" />
@@ -441,7 +426,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            deleteMindmap(mindmap.id);
+                            handleDeleteMindmap(mindmap.id);
                           }}
                           className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity"
                         >

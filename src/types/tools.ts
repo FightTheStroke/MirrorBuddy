@@ -18,7 +18,8 @@ export type ToolType =
   | 'formula'      // Formula matematica (KaTeX)
   | 'chart'        // Grafico (Chart.js)
   | 'webcam'       // Foto da webcam
-  | 'pdf';         // PDF caricato
+  | 'pdf'          // PDF caricato
+  | 'homework';    // Compiti con metodo maieutico
 
 /**
  * OpenAI function definitions for chat API

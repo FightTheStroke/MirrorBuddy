@@ -379,8 +379,8 @@ export async function getActiveMaterials(): Promise<MaterialRecord[]> {
   }
 
   try {
-    // Get userId from localStorage or session
-    const userId = localStorage.getItem('userId') || 'default-user';
+    // Get userId from sessionStorage (temporary until auth is implemented)
+    const userId = sessionStorage.getItem('convergio-user-id') || 'default-user';
 
     const response = await fetch(`/api/materials?userId=${userId}&status=active`);
     if (!response.ok) {

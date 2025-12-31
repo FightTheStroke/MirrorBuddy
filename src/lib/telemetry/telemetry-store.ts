@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+// Issue #64: Removed persist() - telemetry uses server API
 import { nanoid } from 'nanoid';
 import { logger } from '@/lib/logger';
 import type {
@@ -87,7 +87,7 @@ function generateSessionId(): string {
 
 function isSameDay(date1: Date | string | null, date2: Date): boolean {
   if (!date1) return false;
-  // Handle string dates from localStorage (JSON serialization)
+  // Handle string dates from JSON serialization
   const d1 = typeof date1 === 'string' ? new Date(date1) : date1;
   if (isNaN(d1.getTime())) return false;
   return (
@@ -102,7 +102,6 @@ function isSameDay(date1: Date | string | null, date2: Date): boolean {
 // ============================================================================
 
 export const useTelemetryStore = create<TelemetryState>()(
-  persist(
     (set, get) => ({
       // Initial state
       config: DEFAULT_CONFIG,
@@ -307,17 +306,7 @@ export const useTelemetryStore = create<TelemetryState>()(
           lastFetchedAt: null,
         });
       },
-    }),
-    {
-      name: 'convergio-telemetry',
-      partialize: (state) => ({
-        config: state.config,
-        sessionId: state.sessionId,
-        localStats: state.localStats,
-        // Don't persist event queue (flush on unload instead)
-      }),
-    }
-  )
+    })
 );
 
 // ============================================================================

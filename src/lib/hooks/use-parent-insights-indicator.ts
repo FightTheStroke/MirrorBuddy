@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-const LAST_VIEWED_KEY = 'parent-dashboard-last-viewed';
 const CHECK_INTERVAL_MS = 60000; // Check every minute
 
 /**
  * Hook to track if there are new insights since the parent dashboard was last viewed.
- * Used to show a badge on the Genitori navigation item.
+ * Uses database for persistence via /api/profile/last-viewed endpoint.
+ * Shows a badge on the Genitori navigation item.
  */
 export function useParentInsightsIndicator() {
   const [hasNewInsights, setHasNewInsights] = useState(false);
@@ -15,8 +15,15 @@ export function useParentInsightsIndicator() {
 
   const checkForNewInsights = useCallback(async () => {
     try {
-      const lastViewed = localStorage.getItem(LAST_VIEWED_KEY);
-      const lastViewedDate = lastViewed ? new Date(lastViewed) : new Date(0);
+      // Get last viewed timestamp from database
+      const lastViewedResponse = await fetch('/api/profile/last-viewed');
+      let lastViewedDate = new Date(0);
+      if (lastViewedResponse.ok) {
+        const lastViewedData = await lastViewedResponse.json();
+        if (lastViewedData.lastViewed) {
+          lastViewedDate = new Date(lastViewedData.lastViewed);
+        }
+      }
 
       // Fetch latest learning entries
       const response = await fetch('/api/learnings?limit=1');
@@ -41,9 +48,17 @@ export function useParentInsightsIndicator() {
   }, []);
 
   // Mark as viewed - call this when user visits parent dashboard
-  const markAsViewed = useCallback(() => {
-    localStorage.setItem(LAST_VIEWED_KEY, new Date().toISOString());
-    setHasNewInsights(false);
+  const markAsViewed = useCallback(async () => {
+    try {
+      await fetch('/api/profile/last-viewed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timestamp: new Date().toISOString() }),
+      });
+      setHasNewInsights(false);
+    } catch {
+      // Silently fail - not critical
+    }
   }, []);
 
   // Check on mount and periodically

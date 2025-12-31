@@ -102,6 +102,7 @@ const TOOL_ICONS: Record<ToolType, typeof Brain> = {
   chart: FileText,
   webcam: Camera,
   pdf: FileText,
+  homework: FileText,
 };
 
 const TOOL_LABELS: Record<ToolType, string> = {
@@ -117,6 +118,7 @@ const TOOL_LABELS: Record<ToolType, string> = {
   chart: 'Grafici',
   webcam: 'Foto',
   pdf: 'PDF',
+  homework: 'Compiti',
 };
 
 const FILTER_TABS: { value: FilterType; label: string; icon?: typeof Bookmark }[] = [

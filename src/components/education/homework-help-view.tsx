@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   History,
@@ -25,6 +25,7 @@ import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { useVoiceSessionStore } from '@/lib/stores/app-store';
+import { useHomeworkSessions, type SavedHomework } from '@/lib/hooks/use-saved-materials';
 import type { Homework, Subject, Maestro } from '@/types';
 
 interface MaieuticMessage {
@@ -32,13 +33,6 @@ interface MaieuticMessage {
   content: string;
   timestamp: Date;
 }
-
-interface StoredHomework extends Omit<Homework, 'createdAt' | 'completedAt'> {
-  createdAt: string;
-  completedAt?: string;
-}
-
-const STORAGE_KEY = 'convergio_homework_sessions';
 
 // Maieutic system prompt for homework help
 const MAIEUTIC_SYSTEM_PROMPT = `Sei un tutor educativo che usa il metodo maieutico (socratico).
@@ -57,9 +51,22 @@ Quando lo studente fa domande:
 
 Rispondi SEMPRE in italiano.`;
 
+// Convert SavedHomework to Homework type
+function toHomework(saved: SavedHomework): Homework {
+  return {
+    id: saved.id,
+    title: saved.title,
+    subject: saved.subject,
+    problemType: saved.problemType,
+    photoUrl: saved.photoUrl,
+    steps: saved.steps,
+    createdAt: saved.createdAt,
+    completedAt: saved.completedAt,
+  };
+}
+
 export function HomeworkHelpView() {
   const [currentHomework, setCurrentHomework] = useState<Homework | null>(null);
-  const [homeworkHistory, setHomeworkHistory] = useState<Homework[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [maieuticChat, setMaieuticChat] = useState<MaieuticMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
@@ -73,37 +80,20 @@ export function HomeworkHelpView() {
 
   const { setCurrentMaestro } = useVoiceSessionStore();
 
-  // Load homework history from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      try {
-        const parsed: StoredHomework[] = JSON.parse(stored);
-        const homework = parsed.map(h => ({
-          ...h,
-          createdAt: new Date(h.createdAt),
-          completedAt: h.completedAt ? new Date(h.completedAt) : undefined,
-        }));
-        setHomeworkHistory(homework);
-      } catch (e) {
-        logger.error('Failed to parse homework history', { error: String(e) });
-      }
-    }
-  }, []);
+  // Load homework sessions from database API
+  const {
+    sessions: homeworkHistory,
+    loading: historyLoading,
+    saveSession,
+    updateSession,
+    deleteSession,
+  } = useHomeworkSessions();
 
-  // Save homework history to localStorage
-  const saveHistory = useCallback((history: Homework[]) => {
-    const toStore: StoredHomework[] = history.map(h => ({
-      ...h,
-      createdAt: h.createdAt.toISOString(),
-      completedAt: h.completedAt?.toISOString(),
-    }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toStore));
-    setHomeworkHistory(history);
-  }, []);
+  // Convert SavedHomework[] to Homework[] for display
+  const displayHistory = homeworkHistory.map(toHomework);
 
   // Handle subject confirmation from dialog
-  const handleSubjectConfirm = useCallback((subject: Subject, maestro: Maestro | null) => {
+  const handleSubjectConfirm = useCallback(async (subject: Subject, maestro: Maestro | null) => {
     if (!pendingHomework) return;
 
     // Update homework with confirmed subject
@@ -113,7 +103,17 @@ export function HomeworkHelpView() {
     };
 
     setCurrentHomework(confirmedHomework);
-    saveHistory([confirmedHomework, ...homeworkHistory]);
+
+    // Save to database API
+    await saveSession({
+      title: confirmedHomework.title,
+      subject: confirmedHomework.subject,
+      problemType: confirmedHomework.problemType,
+      photoUrl: confirmedHomework.photoUrl,
+      steps: confirmedHomework.steps,
+      completedAt: confirmedHomework.completedAt,
+    });
+
     setShowSubjectDialog(false);
     setPendingHomework(null);
 
@@ -122,7 +122,7 @@ export function HomeworkHelpView() {
       setConnectedMaestro(maestro);
       setCurrentMaestro(maestro);
     }
-  }, [pendingHomework, homeworkHistory, saveHistory, setCurrentMaestro]);
+  }, [pendingHomework, saveSession, setCurrentMaestro]);
 
   // Analyze photo and create homework with maieutic approach
   const handleSubmitPhoto = useCallback(async (photo: File): Promise<Homework> => {
@@ -222,10 +222,10 @@ export function HomeworkHelpView() {
   }, []);
 
   // Complete a step
-  const handleCompleteStep = useCallback((stepId: string) => {
+  const handleCompleteStep = useCallback(async (stepId: string) => {
     if (!currentHomework) return;
 
-    const updatedHomework = {
+    const updatedHomework: Homework = {
       ...currentHomework,
       steps: currentHomework.steps.map(step =>
         step.id === stepId ? { ...step, completed: true } : step
@@ -240,12 +240,18 @@ export function HomeworkHelpView() {
 
     setCurrentHomework(updatedHomework);
 
-    // Update in history
-    const updatedHistory = homeworkHistory.map(h =>
-      h.id === updatedHomework.id ? updatedHomework : h
-    );
-    saveHistory(updatedHistory);
-  }, [currentHomework, homeworkHistory, saveHistory]);
+    // Update in database API
+    await updateSession({
+      id: updatedHomework.id,
+      title: updatedHomework.title,
+      subject: updatedHomework.subject,
+      problemType: updatedHomework.problemType,
+      photoUrl: updatedHomework.photoUrl,
+      steps: updatedHomework.steps,
+      createdAt: updatedHomework.createdAt,
+      completedAt: updatedHomework.completedAt,
+    });
+  }, [currentHomework, updateSession]);
 
   // Ask maieutic question
   const handleAskQuestion = useCallback((question: string) => {
@@ -348,13 +354,12 @@ Guida lo studente attraverso questi passaggi usando domande maieutiche. Non dare
   }, []);
 
   // Delete homework from history
-  const deleteHomework = useCallback((id: string) => {
-    const updated = homeworkHistory.filter(h => h.id !== id);
-    saveHistory(updated);
+  const deleteHomework = useCallback(async (id: string) => {
+    await deleteSession(id);
     if (currentHomework?.id === id) {
       setCurrentHomework(null);
     }
-  }, [currentHomework, homeworkHistory, saveHistory]);
+  }, [currentHomework, deleteSession]);
 
   // Start new homework
   const startNew = useCallback(() => {
@@ -401,7 +406,7 @@ Guida lo studente attraverso questi passaggi usando domande maieutiche. Non dare
             className={cn(showHistory && 'bg-slate-100 dark:bg-slate-800')}
           >
             <History className="w-4 h-4 mr-2" />
-            Cronologia ({homeworkHistory.length})
+            Cronologia ({displayHistory.length})
           </Button>
         </div>
       </div>
@@ -457,12 +462,16 @@ Guida lo studente attraverso questi passaggi usando domande maieutiche. Non dare
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2 max-h-96 overflow-y-auto">
-                    {homeworkHistory.length === 0 ? (
+                    {historyLoading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+                      </div>
+                    ) : displayHistory.length === 0 ? (
                       <p className="text-sm text-slate-500 text-center py-4">
                         Nessun problema salvato
                       </p>
                     ) : (
-                      homeworkHistory.map(hw => (
+                      displayHistory.map(hw => (
                         <div
                           key={hw.id}
                           className={cn(

@@ -12,78 +12,19 @@ import { FlashcardTool } from './flashcard-tool';
 import { MindmapRenderer } from './markmap-renderer';
 import { cn } from '@/lib/utils';
 import type { ToolCall, CodeExecutionRequest, ChartRequest, DiagramRequest, FormulaRequest, QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
+import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 
-// Auto-save utilities for tool results
+// Auto-save utilities for tool results - now use database API
 function autoSaveMindmap(request: MindmapRequest): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const saved = localStorage.getItem('convergio-mindmaps');
-    const mindmaps = saved ? JSON.parse(saved) : [];
-
-    // Check if already saved (by title)
-    if (mindmaps.some((m: { title: string }) => m.title === request.title)) return;
-
-    mindmaps.unshift({
-      id: crypto.randomUUID(),
-      title: request.title,
-      nodes: request.nodes,
-      subject: 'general', // Mindmaps don't have subject in request
-      createdAt: new Date().toISOString(),
-    });
-
-    // Keep only last 50 mindmaps
-    localStorage.setItem('convergio-mindmaps', JSON.stringify(mindmaps.slice(0, 50)));
-  } catch {
-    // Silent failure - localStorage might be full
-  }
+  autoSaveMaterial('mindmap', request.title, { nodes: request.nodes }, { subject: 'general' });
 }
 
 function autoSaveQuiz(request: QuizRequest): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const saved = localStorage.getItem('convergio-quizzes');
-    const quizzes = saved ? JSON.parse(saved) : [];
-
-    // Check if already saved (by title)
-    if (quizzes.some((q: { title: string }) => q.title === request.title)) return;
-
-    quizzes.unshift({
-      id: crypto.randomUUID(),
-      title: request.title,
-      subject: request.subject,
-      questions: request.questions,
-      createdAt: new Date().toISOString(),
-    });
-
-    // Keep only last 50 quizzes
-    localStorage.setItem('convergio-quizzes', JSON.stringify(quizzes.slice(0, 50)));
-  } catch {
-    // Silent failure
-  }
+  autoSaveMaterial('quiz', request.title, { questions: request.questions }, { subject: request.subject });
 }
 
 function autoSaveFlashcards(request: FlashcardDeckRequest): void {
-  if (typeof window === 'undefined') return;
-  try {
-    const saved = localStorage.getItem('convergio-flashcard-decks');
-    const decks = saved ? JSON.parse(saved) : [];
-
-    // Check if already saved (by name)
-    if (decks.some((d: { name: string }) => d.name === request.name)) return;
-
-    decks.unshift({
-      id: crypto.randomUUID(),
-      name: request.name,
-      subject: request.subject,
-      cards: request.cards,
-      createdAt: new Date().toISOString(),
-    });
-
-    // Keep only last 50 decks
-    localStorage.setItem('convergio-flashcard-decks', JSON.stringify(decks.slice(0, 50)));
-  } catch {
-    // Silent failure
-  }
+  autoSaveMaterial('flashcard', request.name, { cards: request.cards }, { subject: request.subject });
 }
 
 interface ToolResultDisplayProps {

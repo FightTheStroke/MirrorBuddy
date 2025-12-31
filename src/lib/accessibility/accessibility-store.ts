@@ -1,7 +1,6 @@
 'use client';
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 // Accessibility settings interface
 export interface AccessibilitySettings {
@@ -151,8 +150,7 @@ interface AccessibilityStore {
 }
 
 export const useAccessibilityStore = create<AccessibilityStore>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       settings: defaultAccessibilitySettings,
       adhdConfig: defaultADHDConfig,
       adhdStats: defaultADHDStats,
@@ -404,16 +402,7 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         if (adhdStats.totalSessions === 0) return 0;
         return adhdStats.completedSessions / adhdStats.totalSessions;
       },
-    }),
-    {
-      name: 'convergio-accessibility',
-      partialize: (state) => ({
-        settings: state.settings,
-        adhdConfig: state.adhdConfig,
-        adhdStats: state.adhdStats,
-      }),
-    }
-  )
+    })
 );
 
 // Export default settings for SSR

@@ -43,7 +43,37 @@ Three stores in `src/lib/stores/app-store.ts`:
 - **SettingsStore**: Theme, provider config, student profile, accessibility
 - **ProgressStore**: XP, levels, streaks, achievements, subject masteries
 - **ChatStore**: Active conversation, messages, tool calls
-- Stores persist to localStorage and sync with server via API
+
+**IMPORTANT - Database First Architecture (Issue #64)**:
+- All stores sync with database via REST APIs - NO localStorage persistence
+- Database is the single source of truth for all user data
+- UI state is hydrated from database on page load
+- Changes are persisted to database immediately (fire-and-forget for responsiveness)
+- See ADR 0015 for full architecture decision
+
+### Data Persistence Rules
+
+**NEVER use localStorage for user data.** Use these patterns instead:
+
+| Data Type | Storage | Example |
+|-----------|---------|---------|
+| User settings | `/api/user/settings` | Theme, language, accessibility |
+| Progress data | `/api/progress` | XP, levels, masteries |
+| Materials | `/api/materials` | Mindmaps, quizzes, flashcards |
+| Conversations | `/api/conversations` | Chat history |
+| Temporary session ID | `sessionStorage` | `convergio-user-id` |
+| Device-specific cache | `localStorage` (OK) | Permissions cache, PWA banner |
+
+**Acceptable localStorage uses:**
+- Cleanup operations during data deletion
+- Device-specific ephemeral caches (browser permissions, PWA install banner)
+- Test files checking for localStorage as security pattern
+
+**Never use localStorage for:**
+- User preferences (theme, language, accessibility)
+- Educational content (mindmaps, quizzes, flashcards, homework)
+- Progress data (XP, levels, streaks, masteries)
+- Any data that should sync across devices
 
 ### FSRS Flashcard Algorithm
 `src/lib/education/fsrs.ts` implements Free Spaced Repetition Scheduler (FSRS-5):

@@ -487,9 +487,8 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
 
     greetingSentRef.current = true;
 
-    const studentName = typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('convergio-settings') || '{}')?.state?.studentProfile?.name
-      : null;
+    // Get student name from settings store
+    const studentName = useSettingsStore.getState().studentProfile?.name || null;
 
     const greetingPrompts = [
       `Saluta lo studente${studentName ? ` chiamandolo ${studentName}` : ''} con calore e presentati. Sii coinvolgente ed entusiasta. Poi chiedi cosa vorrebbe imparare oggi.`,
@@ -526,11 +525,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
       return;
     }
 
-    // Get language setting
-    const settings = typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('convergio-settings') || '{}')?.state?.appearance
-      : null;
-    const language = settings?.language || 'it';
+    // Get language setting from settings store
+    const appearance = useSettingsStore.getState().appearance;
+    const language = appearance?.language || 'it';
     const languageNames: Record<string, string> = {
       it: 'Italian (Italiano)',
       en: 'English',

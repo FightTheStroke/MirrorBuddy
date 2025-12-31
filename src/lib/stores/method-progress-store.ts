@@ -5,7 +5,6 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { logger } from '@/lib/logger';
 import type {
   MethodProgress,
@@ -75,8 +74,7 @@ function calculateAutonomyScore(state: {
 }
 
 export const useMethodProgressStore = create<MethodProgressState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       ...DEFAULT_METHOD_PROGRESS,
       userId: null,
       isLoading: false,
@@ -325,18 +323,5 @@ export const useMethodProgressStore = create<MethodProgressState>()(
           lastSyncedAt: null,
         });
       },
-    }),
-    {
-      name: 'convergio-method-progress',
-      partialize: (state) => ({
-        mindMaps: state.mindMaps,
-        flashcards: state.flashcards,
-        selfAssessment: state.selfAssessment,
-        helpBehavior: state.helpBehavior,
-        methodTransfer: state.methodTransfer,
-        events: state.events.slice(-50), // Persist only last 50 events
-        autonomyScore: state.autonomyScore,
-      }),
-    }
-  )
+    })
 );

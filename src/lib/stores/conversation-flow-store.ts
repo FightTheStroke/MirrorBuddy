@@ -11,7 +11,6 @@
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type { CharacterType, ExtendedStudentProfile } from '@/types';
 import type { MaestroFull } from '@/data/maestri';
 import type { SupportTeacher } from '@/types';
@@ -228,8 +227,7 @@ function loadConversationMessages(
 }
 
 export const useConversationFlowStore = create<ConversationFlowState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       mode: 'idle',
       isActive: false,
       activeCharacter: null,
@@ -512,15 +510,5 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           characterHistory: [],
         });
       },
-    }),
-    {
-      name: 'convergio-conversation-flow',
-      partialize: (state) => ({
-        // Persist conversations per character
-        conversationsByCharacter: state.conversationsByCharacter,
-        sessionId: state.sessionId,
-        sessionStartedAt: state.sessionStartedAt,
-      }),
-    }
-  )
+    })
 );

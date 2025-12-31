@@ -418,3 +418,44 @@ test.describe('Backend API: Data Persistence', () => {
     expect(progress.xp).toBe(1000);
   });
 });
+
+test.describe('Backend API: Parent Dashboard Last Viewed (Issue #64)', () => {
+  test('GET /api/profile/last-viewed - returns null initially', async ({ request }) => {
+    await request.get('/api/user');
+
+    const response = await request.get('/api/profile/last-viewed');
+    expect(response.ok()).toBeTruthy();
+
+    const data = await response.json();
+    expect(data.lastViewed).toBeNull();
+  });
+
+  test('POST /api/profile/last-viewed - sets timestamp', async ({ request }) => {
+    await request.get('/api/user');
+
+    const timestamp = new Date().toISOString();
+    const response = await request.post('/api/profile/last-viewed', {
+      data: { timestamp },
+    });
+    expect(response.ok()).toBeTruthy();
+
+    const data = await response.json();
+    expect(data.success).toBe(true);
+  });
+
+  test('GET /api/profile/last-viewed - returns saved timestamp', async ({ request }) => {
+    await request.get('/api/user');
+
+    // Set timestamp
+    const timestamp = new Date().toISOString();
+    await request.post('/api/profile/last-viewed', {
+      data: { timestamp },
+    });
+
+    // Retrieve and verify
+    const response = await request.get('/api/profile/last-viewed');
+    const data = await response.json();
+    expect(data.lastViewed).toBeDefined();
+    expect(new Date(data.lastViewed).getTime()).toBeGreaterThan(0);
+  });
+});

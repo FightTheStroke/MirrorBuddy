@@ -12,6 +12,7 @@ import {
   Save,
   Layers,
   MessageSquare,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -100,26 +101,87 @@ interface FlashcardsViewProps {
   className?: string;
 }
 
+// Get user ID for API calls
+function getUserId(): string {
+  if (typeof window === 'undefined') return 'default-user';
+  let userId = sessionStorage.getItem('convergio-user-id');
+  if (!userId) {
+    userId = `user-${crypto.randomUUID()}`;
+    sessionStorage.setItem('convergio-user-id', userId);
+  }
+  return userId;
+}
+
 export function FlashcardsView({ className }: FlashcardsViewProps) {
   const router = useRouter();
 
-  // Load decks from localStorage
-  const [decks, setDecks] = useState<FlashcardDeck[]>(() => {
-    if (typeof window === 'undefined') return [];
-    const saved = localStorage.getItem('convergio-flashcard-decks');
-    return saved ? JSON.parse(saved) : [];
-  });
-
+  // Load decks from database API
+  const [decks, setDecks] = useState<FlashcardDeck[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedDeck, setSelectedDeck] = useState<FlashcardDeck | null>(null);
   const [isStudying, setIsStudying] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingDeck, setEditingDeck] = useState<FlashcardDeck | null>(null);
 
-  // Save decks to localStorage
-  const saveDecks = (newDecks: FlashcardDeck[]) => {
+  // Fetch decks from API
+  const loadDecks = useCallback(async () => {
+    setLoading(true);
+    try {
+      const userId = getUserId();
+      const response = await fetch(`/api/materials?userId=${userId}&toolType=flashcard&status=active`);
+      if (response.ok) {
+        const data = await response.json();
+        const loadedDecks: FlashcardDeck[] = (data.materials || []).map((m: { toolId: string; title: string; subject?: string; content: { cards?: Flashcard[] }; createdAt: string }) => ({
+          id: m.toolId,
+          name: m.title,
+          subject: (m.subject || 'mathematics') as Subject,
+          cards: (m.content?.cards || []).map((c: Flashcard) => ({
+            ...c,
+            nextReview: new Date(c.nextReview),
+            lastReview: c.lastReview ? new Date(c.lastReview) : undefined,
+          })),
+          createdAt: new Date(m.createdAt),
+        }));
+        setDecks(loadedDecks);
+      }
+    } catch {
+      // Silent failure
+    }
+    setLoading(false);
+  }, []);
+
+  // Load decks on mount - setState in effect is intentional for data fetching
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    loadDecks();
+  }, [loadDecks]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  // Save deck to API
+  const saveDeckToAPI = useCallback(async (deck: FlashcardDeck) => {
+    const userId = getUserId();
+    await fetch('/api/materials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        toolId: deck.id,
+        toolType: 'flashcard',
+        title: deck.name,
+        content: { cards: deck.cards },
+        subject: deck.subject,
+      }),
+    });
+  }, []);
+
+  // Save all decks
+  const saveDecks = useCallback(async (newDecks: FlashcardDeck[]) => {
     setDecks(newDecks);
-    localStorage.setItem('convergio-flashcard-decks', JSON.stringify(newDecks));
-  };
+    // Find changed deck and save it
+    for (const deck of newDecks) {
+      await saveDeckToAPI(deck);
+    }
+  }, [saveDeckToAPI]);
 
   // Get cards due for review
   const getDueCards = (deck: FlashcardDeck) => {
@@ -155,11 +217,16 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
     setIsStudying(false);
   };
 
-  // Delete deck
-  const deleteDeck = (deckId: string) => {
-    saveDecks(decks.filter(d => d.id !== deckId));
-    if (selectedDeck?.id === deckId) {
-      setSelectedDeck(null);
+  // Delete deck via API
+  const deleteDeck = async (deckId: string) => {
+    try {
+      await fetch(`/api/materials?toolId=${deckId}`, { method: 'DELETE' });
+      setDecks(decks.filter(d => d.id !== deckId));
+      if (selectedDeck?.id === deckId) {
+        setSelectedDeck(null);
+      }
+    } catch {
+      // Silent failure
     }
   };
 
@@ -225,7 +292,16 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
       </div>
 
       {/* Decks grid */}
-      {decks.length === 0 ? (
+      {loading ? (
+        <Card className="p-12">
+          <div className="text-center">
+            <Loader2 className="w-16 h-16 mx-auto text-slate-400 mb-4 animate-spin" />
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+              Caricamento...
+            </h3>
+          </div>
+        </Card>
+      ) : decks.length === 0 ? (
         <Card className="p-12">
           <div className="text-center">
             <Layers className="w-16 h-16 mx-auto text-slate-400 mb-4" />

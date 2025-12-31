@@ -673,6 +673,7 @@ export function ConversationFlow() {
       formula: 'Mostra la formula',
       chart: 'Crea un grafico',
       pdf: 'Analizza il PDF',
+      homework: 'Aiutami con i compiti',
     };
 
     const toolPrompt = toolPrompts[toolType] || `Crea ${toolType}`;
