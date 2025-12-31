@@ -697,29 +697,62 @@ DATABASE_URL=file:./prisma/dev.db  # SQLite local, PostgreSQL in prod
 
 > **LEGGI QUESTO PRIMA DI TOCCARE IL CODICE VOICE**
 
-### Preview vs GA API - IL BUG CHE FA PERDERE ORE
+### Modelli Disponibili (Dicembre 2025)
 
-Azure ha DUE versioni dell'API Realtime con **event names DIVERSI**:
+| Modello | Versione | Stato | Note |
+|---------|----------|-------|------|
+| `gpt-realtime` | 2025-08-28 | **GA** ✅ | Raccomandato, qualità massima (ATTUALE) |
+| `gpt-realtime-mini` | 2025-12-15 | GA | Più veloce, costo minore (FUTURO cost-optimization) |
+| `gpt-4o-realtime-preview` | 2025-06-03 | **Deprecated** | NON usare |
 
-| Evento | Preview API (`gpt-4o-realtime-preview`) | GA API (`gpt-realtime`) |
-|--------|----------------------------------------|-------------------------|
-| Audio chunk | `response.audio.delta` | `response.output_audio.delta` |
+**Deployment attuale**: `gpt-4o-realtime` → modello `gpt-realtime` (GA)
+
+**Ottimizzazione costi futura**: Quando necessario, potremo passare a `gpt-realtime-mini` per ridurre i costi mantenendo funzionalità voice.
+
+### Session Config Ottimale (Issue #61)
+
+Impostazioni hardcoded in `use-voice-session.ts` - NON modificabili dall'utente:
+
+```typescript
+{
+  input_audio_noise_reduction: { type: 'near_field' },  // Riduce eco
+  turn_detection: {
+    type: 'server_vad',
+    threshold: 0.5,
+    prefix_padding_ms: 300,
+    silence_duration_ms: 500,
+    create_response: true,
+    interrupt_response: true,  // Barge-in (false per onboarding)
+  },
+  temperature: 0.8,
+}
+```
+
+**Debug settings** disponibili solo su `/test-voice` (non in Settings utente).
+
+### Preview vs GA API - ATTENZIONE
+
+Azure ha DUE formati con **event names DIVERSI**. Il codice gestisce ENTRAMBI:
+
+| Evento | Preview API | GA API |
+|--------|-------------|--------|
+| Audio | `response.audio.delta` | `response.output_audio.delta` |
 | Transcript | `response.audio_transcript.delta` | `response.output_audio_transcript.delta` |
 
-**Se il codice aspetta l'evento sbagliato, l'audio arriva ma NON viene riprodotto!**
+**Il codice in `use-voice-session.ts` ascolta ENTRAMBI i formati** (linee 575-616).
 
 ### File Critici Voice
 
 | File | Responsabilità |
 |------|----------------|
-| `src/lib/hooks/use-voice-session.ts` | Hook principale - gestisce ENTRAMBI i formati (linee 575-616) |
-| `src/server/realtime-proxy.ts` | WebSocket proxy - detection Preview/GA (linee 43-74) |
-| `src/app/test-voice/page.tsx` | Pagina debug - test manuale WebSocket |
-| `docs/AZURE_REALTIME_API.md` | **DOCUMENTAZIONE COMPLETA** - leggi prima di debuggare |
+| `src/lib/hooks/use-voice-session.ts` | Hook principale - session config, audio, VAD |
+| `src/server/realtime-proxy.ts` | WebSocket proxy verso Azure |
+| `src/app/test-voice/page.tsx` | Pagina debug con controlli VAD/noise |
+| `docs/AZURE_REALTIME_API.md` | Documentazione dettagliata API |
 
 ### Requisito HTTPS per Microfono
 
-`navigator.mediaDevices.getUserMedia()` richiede un **secure context**:
+`navigator.mediaDevices.getUserMedia()` richiede **secure context**:
 
 | Contesto | Funziona? | Note |
 |----------|-----------|------|
@@ -727,28 +760,37 @@ Azure ha DUE versioni dell'API Realtime con **event names DIVERSI**:
 | `127.0.0.1:3000` | ✅ | Sempre ok |
 | `https://example.com` | ✅ | HTTPS = ok |
 | `http://192.168.x.x:3000` | ❌ | **NON FUNZIONA** |
-| `http://example.com` | ❌ | HTTP senza localhost = no |
 
-**Errore tipico**: `undefined is not an object (evaluating 'navigator.mediaDevices.getUserMedia')`
-
-**Soluzione per test su device mobile**:
-1. Usa tunnel HTTPS (ngrok, cloudflared)
-2. Oppure configura certificato SSL locale
+**Soluzione mobile**: Usa tunnel HTTPS (ngrok, cloudflared).
 
 ### Debug Voice Checklist
 
-1. Audio non si sente? → Controlla event types Preview vs GA
-2. session.update fallisce? → Formato diverso tra Preview e GA
-3. Proxy non connette? → Verifica env vars `AZURE_OPENAI_REALTIME_*`
-4. Audio distorto? → AudioContext playback DEVE essere 24kHz
-5. `mediaDevices undefined`? → Stai usando HTTP su IP invece di localhost/HTTPS
+1. Audio non si sente? → Controlla event types (Preview vs GA)
+2. Echo loop su onboarding? → `disableBargeIn: true` in VoiceOnboardingPanel
+3. session.update fallisce? → Verifica formato per modello GA
+4. Audio distorto? → AudioContext DEVE essere 24kHz
+5. `mediaDevices undefined`? → HTTP su IP invece di localhost/HTTPS
+6. VAD troppo sensibile? → Vai su `/test-voice` per debug
 
 ### Env Vars Voice
 
 ```bash
 AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview  # Preview API!
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime  # Deployment name (uses gpt-realtime GA model)
+```
+
+### Creare nuovo deployment (Azure CLI)
+
+```bash
+az cognitiveservices account deployment create \
+  --name aoai-virtualbpm-prod \
+  --resource-group rg-virtualbpm-prod \
+  --deployment-name gpt-realtime-mini \
+  --model-name gpt-realtime-mini \
+  --model-version 2025-12-15 \
+  --sku-name GlobalStandard \
+  --sku-capacity 1
 ```
 
 ## CI/CD Pipeline

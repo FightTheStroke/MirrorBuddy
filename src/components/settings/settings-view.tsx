@@ -2062,8 +2062,8 @@ function AudioSettings() {
         </CardContent>
       </Card>
 
-      {/* Voice Experience Settings */}
-      <VoiceExperienceSettings />
+      {/* Voice Experience Settings - REMOVED: moved to /test-voice debug page */}
+      {/* Optimal settings now hardcoded in use-voice-session.ts */}
 
       {/* Info about Continuity */}
       <Card>
@@ -2082,129 +2082,9 @@ function AudioSettings() {
   );
 }
 
-// Voice Experience Settings - VAD, silence, barge-in controls
-function VoiceExperienceSettings() {
-  const {
-    voiceVadThreshold,
-    voiceSilenceDuration,
-    voiceBargeInEnabled,
-    setVoiceVadThreshold,
-    setVoiceSilenceDuration,
-    setVoiceBargeInEnabled,
-  } = useSettingsStore();
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Settings className="w-5 h-5 text-purple-500" />
-          Esperienza Vocale
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <p className="text-slate-600 dark:text-slate-400 text-sm">
-          Personalizza il comportamento delle conversazioni vocali con i Professori.
-        </p>
-
-        {/* Barge-in Toggle */}
-        <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-          <div className="space-y-1">
-            <div className="font-medium text-slate-900 dark:text-slate-100">
-              Interruzione automatica (Barge-in)
-            </div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Permetti di interrompere il Professore mentre parla iniziando a parlare tu.
-            </p>
-          </div>
-          <button
-            onClick={() => setVoiceBargeInEnabled(!voiceBargeInEnabled)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              voiceBargeInEnabled ? 'bg-purple-600' : 'bg-slate-300 dark:bg-slate-600'
-            }`}
-            role="switch"
-            aria-checked={voiceBargeInEnabled}
-          >
-            <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                voiceBargeInEnabled ? 'translate-x-6' : 'translate-x-1'
-              }`}
-            />
-          </button>
-        </div>
-
-        {/* VAD Threshold - Discrete Steps */}
-        <div className="space-y-3">
-          <div className="font-medium text-slate-900 dark:text-slate-100">
-            Sensibilità rilevamento voce
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { value: 0.35, label: 'Alta', desc: 'Per voce bassa' },
-              { value: 0.5, label: 'Media', desc: 'Bilanciata' },
-              { value: 0.65, label: 'Bassa', desc: 'Ignora rumore' },
-            ].map(({ value, label, desc }) => (
-              <button
-                key={value}
-                onClick={() => setVoiceVadThreshold(value)}
-                className={cn(
-                  'p-3 rounded-xl border-2 transition-all text-center',
-                  Math.abs(voiceVadThreshold - value) < 0.1
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-purple-300'
-                )}
-              >
-                <div className="font-medium text-slate-900 dark:text-slate-100">{label}</div>
-                <div className="text-xs text-slate-500">{desc}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Silence Duration - Discrete Steps */}
-        <div className="space-y-3">
-          <div className="font-medium text-slate-900 dark:text-slate-100">
-            Attesa fine frase
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { value: 350, label: 'Veloce', desc: 'Risposte rapide' },
-              { value: 500, label: 'Normale', desc: 'Bilanciata' },
-              { value: 700, label: 'Lento', desc: 'Frasi lunghe' },
-            ].map(({ value, label, desc }) => (
-              <button
-                key={value}
-                onClick={() => setVoiceSilenceDuration(value)}
-                className={cn(
-                  'p-3 rounded-xl border-2 transition-all text-center',
-                  Math.abs(voiceSilenceDuration - value) < 100
-                    ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-purple-300'
-                )}
-              >
-                <div className="font-medium text-slate-900 dark:text-slate-100">{label}</div>
-                <div className="text-xs text-slate-500">{desc}</div>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Reset to defaults */}
-        <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
-          <button
-            onClick={() => {
-              setVoiceVadThreshold(0.5);
-              setVoiceSilenceDuration(500);
-              setVoiceBargeInEnabled(true);
-            }}
-            className="text-sm text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
-          >
-            Ripristina valori predefiniti
-          </button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+// VoiceExperienceSettings REMOVED - Issue #61
+// Voice settings are now hardcoded to optimal values in use-voice-session.ts
+// Debug controls available at /test-voice page
 
 // AI Provider Settings with Cost Management
 interface CostSummary {

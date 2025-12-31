@@ -35,6 +35,14 @@ export default function TestVoicePage() {
   const [selectedInputDevice, setSelectedInputDevice] = useState<string>('');
   const [selectedOutputDevice, setSelectedOutputDevice] = useState<string>('');
 
+  // Voice debug settings (moved from Settings page - Issue #61)
+  const [vadThreshold, setVadThreshold] = useState(0.5);
+  const [silenceDuration, setSilenceDuration] = useState(500);
+  const [prefixPadding, setPrefixPadding] = useState(300);
+  const [bargeInEnabled, setBargeInEnabled] = useState(true);
+  const [noiseReduction, setNoiseReduction] = useState<'none' | 'near_field' | 'far_field'>('near_field');
+  const [voiceTemperature, setVoiceTemperature] = useState(0.8);
+
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -515,6 +523,39 @@ export default function TestVoicePage() {
     wsRef.current.send(JSON.stringify(config));
   };
 
+  // Send session.update using debug settings from UI (Issue #61)
+  const sendDebugSessionUpdate = () => {
+    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      addLog('error', '❌ WebSocket not connected');
+      return;
+    }
+
+    const config = {
+      type: 'session.update',
+      session: {
+        voice: 'alloy',
+        instructions: 'You are a helpful assistant. Respond in Italian.',
+        input_audio_format: 'pcm16',
+        input_audio_transcription: { model: 'whisper-1' },
+        temperature: voiceTemperature,
+        ...(noiseReduction !== 'none' && {
+          input_audio_noise_reduction: { type: noiseReduction }
+        }),
+        turn_detection: {
+          type: 'server_vad',
+          threshold: vadThreshold,
+          prefix_padding_ms: prefixPadding,
+          silence_duration_ms: silenceDuration,
+          create_response: true,
+          interrupt_response: bargeInEnabled,
+        }
+      }
+    };
+
+    addLog('send', `Sending DEBUG session.update with custom settings: ${JSON.stringify(config).substring(0, 400)}...`);
+    wsRef.current.send(JSON.stringify(config));
+  };
+
   // Debug: Show full configuration status
   const debugConfig = async () => {
     addLog('info', 'Fetching debug configuration...');
@@ -950,6 +991,161 @@ export default function TestVoicePage() {
           <span className="text-xs text-gray-400 self-center">
             {audioInputDevices.length} mics, {audioOutputDevices.length} speakers
           </span>
+        </div>
+      </div>
+
+      {/* Voice Debug Settings (Issue #61 - moved from Settings page) */}
+      <div className="mb-4 p-4 bg-gradient-to-r from-amber-900 to-orange-900 rounded border-2 border-amber-500">
+        <h2 className="font-bold mb-3 text-xl">🎛️ Voice Session Debug Settings</h2>
+        <p className="text-sm text-amber-200 mb-4">
+          Questi controlli sono solo per debug. In produzione, i valori sono hardcoded in use-voice-session.ts
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* VAD Threshold */}
+          <div className="bg-black/30 rounded p-3">
+            <label className="block text-sm text-amber-300 mb-1">
+              VAD Threshold: {vadThreshold.toFixed(2)}
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={vadThreshold}
+              onChange={(e) => setVadThreshold(parseFloat(e.target.value))}
+              className="w-full accent-amber-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>Sensibile</span>
+              <span>Ignora rumore</span>
+            </div>
+          </div>
+
+          {/* Silence Duration */}
+          <div className="bg-black/30 rounded p-3">
+            <label className="block text-sm text-amber-300 mb-1">
+              Silence Duration: {silenceDuration}ms
+            </label>
+            <input
+              type="range"
+              min="100"
+              max="1000"
+              step="50"
+              value={silenceDuration}
+              onChange={(e) => setSilenceDuration(parseInt(e.target.value))}
+              className="w-full accent-amber-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>Veloce</span>
+              <span>Lento</span>
+            </div>
+          </div>
+
+          {/* Prefix Padding */}
+          <div className="bg-black/30 rounded p-3">
+            <label className="block text-sm text-amber-300 mb-1">
+              Prefix Padding: {prefixPadding}ms
+            </label>
+            <input
+              type="range"
+              min="100"
+              max="500"
+              step="50"
+              value={prefixPadding}
+              onChange={(e) => setPrefixPadding(parseInt(e.target.value))}
+              className="w-full accent-amber-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>100ms</span>
+              <span>500ms</span>
+            </div>
+          </div>
+
+          {/* Temperature */}
+          <div className="bg-black/30 rounded p-3">
+            <label className="block text-sm text-amber-300 mb-1">
+              Temperature: {voiceTemperature.toFixed(1)}
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.1"
+              value={voiceTemperature}
+              onChange={(e) => setVoiceTemperature(parseFloat(e.target.value))}
+              className="w-full accent-amber-500"
+            />
+            <div className="flex justify-between text-xs text-gray-400 mt-1">
+              <span>Deterministico</span>
+              <span>Creativo</span>
+            </div>
+          </div>
+
+          {/* Noise Reduction */}
+          <div className="bg-black/30 rounded p-3">
+            <label className="block text-sm text-amber-300 mb-1">
+              Noise Reduction
+            </label>
+            <select
+              value={noiseReduction}
+              onChange={(e) => setNoiseReduction(e.target.value as 'none' | 'near_field' | 'far_field')}
+              className="w-full px-2 py-1 rounded bg-gray-800 text-white border border-amber-500"
+            >
+              <option value="none">None</option>
+              <option value="near_field">Near Field (headphones/close mic)</option>
+              <option value="far_field">Far Field (laptop/conference)</option>
+            </select>
+          </div>
+
+          {/* Barge-in Toggle */}
+          <div className="bg-black/30 rounded p-3">
+            <label className="block text-sm text-amber-300 mb-1">
+              Barge-in (Interruption)
+            </label>
+            <button
+              onClick={() => setBargeInEnabled(!bargeInEnabled)}
+              className={`w-full px-3 py-2 rounded font-medium ${
+                bargeInEnabled
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-red-600 hover:bg-red-700'
+              }`}
+            >
+              {bargeInEnabled ? '✅ Enabled' : '❌ Disabled'}
+            </button>
+            <p className="text-xs text-gray-400 mt-1">
+              {bargeInEnabled ? 'User can interrupt AI' : 'AI speaks without interruption'}
+            </p>
+          </div>
+        </div>
+
+        {/* Current Config Summary */}
+        <div className="mt-4 p-3 bg-black/50 rounded font-mono text-xs text-amber-200">
+          <strong>Session Config Preview:</strong>
+          <pre className="mt-2 overflow-x-auto">
+{JSON.stringify({
+  input_audio_noise_reduction: noiseReduction === 'none' ? undefined : { type: noiseReduction },
+  turn_detection: {
+    type: 'server_vad',
+    threshold: vadThreshold,
+    prefix_padding_ms: prefixPadding,
+    silence_duration_ms: silenceDuration,
+    create_response: true,
+    interrupt_response: bargeInEnabled,
+  },
+  temperature: voiceTemperature,
+}, null, 2)}
+          </pre>
+          <button
+            onClick={sendDebugSessionUpdate}
+            disabled={status !== 'connected'}
+            className="mt-3 w-full px-4 py-2 bg-amber-600 hover:bg-amber-700 rounded font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            🔧 Apply Debug Settings to Session
+          </button>
+          <p className="text-xs text-gray-400 mt-1">
+            Connect first, then click to send session.update with these settings
+          </p>
         </div>
       </div>
 
