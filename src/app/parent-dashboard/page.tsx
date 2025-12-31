@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { ParentDashboard } from '@/components/profile/parent-dashboard';
 import { TeacherDiary, type DiaryEntry } from '@/components/profile/teacher-diary';
 import { ProgressTimeline } from '@/components/profile/progress-timeline';
+import { ParentProfessorChat } from '@/components/profile/parent-professor-chat';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -64,6 +65,14 @@ export default function ParentDashboardPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isDiaryLoading, setIsDiaryLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'diary' | 'profile' | 'progress'>('diary');
+
+  // Chat with Maestro state (Issue #63)
+  const [chatMaestro, setChatMaestro] = useState<{ id: string; name: string } | null>(null);
+
+  // Handler for "Parla con Professore" button
+  const handleTalkToMaestro = useCallback((maestroId: string, maestroName: string) => {
+    setChatMaestro({ id: maestroId, name: maestroName });
+  }, []);
 
   // Fetch consent status
   const fetchConsentStatus = useCallback(async () => {
@@ -653,6 +662,7 @@ export default function ParentDashboardPage() {
                     entries={diaryEntries}
                     studentName={insights?.studentName || 'lo studente'}
                     isLoading={isDiaryLoading}
+                    onTalkToMaestro={handleTalkToMaestro}
                   />
                 </TabsContent>
 
@@ -791,6 +801,7 @@ export default function ParentDashboardPage() {
                   entries={diaryEntries}
                   studentName={insights?.studentName || 'lo studente'}
                   isLoading={isDiaryLoading}
+                  onTalkToMaestro={handleTalkToMaestro}
                 />
               </TabsContent>
 
@@ -831,7 +842,20 @@ export default function ParentDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 p-4 md:p-8">
-      {renderContent()}
+      <div className="max-w-4xl mx-auto">
+        {renderContent()}
+      </div>
+
+      {/* Parent-Professor Chat Modal (Issue #63) */}
+      {chatMaestro && (
+        <ParentProfessorChat
+          maestroId={chatMaestro.id}
+          maestroName={chatMaestro.name}
+          studentId={DEMO_USER_ID}
+          studentName={insights?.studentName || 'lo studente'}
+          onClose={() => setChatMaestro(null)}
+        />
+      )}
     </div>
   );
 }

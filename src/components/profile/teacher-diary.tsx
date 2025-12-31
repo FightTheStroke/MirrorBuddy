@@ -15,8 +15,10 @@ import {
   MessageCircle,
   Search,
   X,
+  Phone,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -50,6 +52,7 @@ interface TeacherDiaryProps {
   entries: DiaryEntry[];
   studentName: string;
   isLoading?: boolean;
+  onTalkToMaestro?: (maestroId: string, maestroName: string) => void;
 }
 
 // Italian labels for observation categories
@@ -79,7 +82,7 @@ const CATEGORY_LABELS: Record<ObservationCategory, string> = {
  * Shows chronological observations from Maestri with suggestions for parents.
  * Part of Issue #57: Parent Dashboard improvements.
  */
-export function TeacherDiary({ entries, studentName, isLoading }: TeacherDiaryProps) {
+export function TeacherDiary({ entries, studentName, isLoading, onTalkToMaestro }: TeacherDiaryProps) {
   const [selectedMaestro, setSelectedMaestro] = useState<string>('all');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
@@ -296,6 +299,7 @@ export function TeacherDiary({ entries, studentName, isLoading }: TeacherDiaryPr
                       onToggle={() => setExpandedEntry(
                         expandedEntry === entry.id ? null : entry.id
                       )}
+                      onTalkToMaestro={onTalkToMaestro}
                       delay={idx * 0.05}
                     />
                   ))}
@@ -316,11 +320,13 @@ function DiaryEntryCard({
   entry,
   isExpanded,
   onToggle,
+  onTalkToMaestro,
   delay = 0,
 }: {
   entry: DiaryEntry;
   isExpanded: boolean;
   onToggle: () => void;
+  onTalkToMaestro?: (maestroId: string, maestroName: string) => void;
   delay?: number;
 }) {
   const maestro = getMaestroById(entry.maestroId);
@@ -466,6 +472,25 @@ function DiaryEntryCard({
                           </p>
                         </div>
                       </div>
+
+                      {/* Talk to Maestro button - Issue #63 */}
+                      {onTalkToMaestro && (
+                        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onTalkToMaestro(entry.maestroId, maestro?.displayName || entry.maestroName);
+                            }}
+                            className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
+                          >
+                            <Phone className="w-4 h-4 mr-2" />
+                            Parla con {maestro?.displayName || entry.maestroName}
+                          </Button>
+                          <p className="text-xs text-slate-500 mt-2">
+                            Avvia una conversazione diretta con il Professore per discutere dei progressi.
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

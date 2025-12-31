@@ -309,6 +309,34 @@ Conversations → Learning table → profile-generator.ts → StudentInsightProf
                                                     Parent Dashboard UI
 ```
 
+### Parent-Professor Chat (Issue #63)
+
+Parents can have direct conversations with Maestri about their child's progress.
+
+**Access:** Parent Dashboard → Diario → Click "Parla con Professore" on any entry
+
+**Key Files:**
+
+| File | Purpose |
+|------|---------|
+| `src/components/profile/parent-professor-chat.tsx` | Chat UI with consent modal |
+| `src/lib/ai/parent-mode.ts` | Formal communication prompts |
+| `src/app/api/parent-professor/route.ts` | Chat API (POST/GET) |
+| `src/app/api/parent-professor/[id]/route.ts` | Single conversation (GET/DELETE) |
+| `src/app/api/parent-professor/consent/route.ts` | Consent management |
+
+**Database Fields:**
+- `Conversation.isParentMode` - Flags parent conversations
+- `Conversation.studentId` - Links to student being discussed
+- `Settings.parentChatConsentAt` - When parent consented to chat
+
+**Features:**
+- Consent modal with AI disclaimer before first message
+- All messages persisted to database (zero localStorage)
+- Maestri use formal language ("Lei") with parents
+- Learning entries injected as context for personalized responses
+- Conversation history loads on reopen
+
 ### Key Type Definitions
 `src/types/index.ts` contains all shared types. Import as:
 ```typescript
@@ -337,6 +365,9 @@ All under `/src/app/api/`:
 - `/profile/generate` - Trigger profile generation from learnings
 - `/profile/consent` - Manage GDPR consent for profiles
 - `/profile/export` - Export profile (JSON or PDF)
+- `/parent-professor` - Parent-Maestro chat (POST: send, GET: list)
+- `/parent-professor/[id]` - Single conversation (GET, DELETE)
+- `/parent-professor/consent` - Parent chat consent (GET, POST)
 
 ## Database Schema
 

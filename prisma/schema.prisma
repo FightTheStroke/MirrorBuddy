@@ -29,6 +29,14 @@ model User {
   conversations     Conversation[]
   learnings         Learning[]
   pushSubscriptions PushSubscription[]
+
+  // Issue #64: Consolidated localStorage data
+  accessibility     AccessibilitySettings?
+  onboarding        OnboardingState?
+  pomodoroStats     PomodoroStats?
+  calendarEvents    CalendarEvent[]
+  htmlSnippets      HtmlSnippet[]
+  homeworkSessions  HomeworkSession[]
 }
 
 model Profile {
@@ -75,6 +83,9 @@ model Settings {
   model         String  @default("gpt-4o")
   budgetLimit   Float   @default(50.0)
   totalSpent    Float   @default(0.0)
+
+  // Parent Mode Consent (Issue #63)
+  parentChatConsentAt DateTime?  // When parent consented to chat with professors
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -578,5 +589,200 @@ model PushSubscription {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ============================================================================
+// ACCESSIBILITY SETTINGS (Issue #64 - localStorage consolidation)
+// Migrated from: accessibility-store.ts
+// ============================================================================
+
+model AccessibilitySettings {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Dyslexia support
+  dyslexiaFont        Boolean @default(false)
+  extraLetterSpacing  Boolean @default(false)
+  increasedLineHeight Boolean @default(false)
+
+  // Visual support
+  highContrast   Boolean @default(false)
+  largeText      Boolean @default(false)
+  reducedMotion  Boolean @default(false)
+
+  // Text-to-Speech
+  ttsEnabled  Boolean @default(false)
+  ttsSpeed    Float   @default(1.0) // 0.5 to 2.0
+  ttsAutoRead Boolean @default(false)
+
+  // ADHD support
+  adhdMode           Boolean @default(false)
+  distractionFreeMode Boolean @default(false)
+  breakReminders     Boolean @default(false)
+
+  // General accessibility
+  lineSpacing        Float   @default(1.0) // 1.0 to 2.0
+  fontSize           Float   @default(1.0) // 0.8 to 1.5
+  colorBlindMode     Boolean @default(false)
+  keyboardNavigation Boolean @default(true)
+
+  // Custom colors
+  customBackgroundColor String @default("#ffffff")
+  customTextColor       String @default("#000000")
+
+  // ADHD Session Config (JSON)
+  adhdConfig String @default("{}") // ADHDSessionConfig JSON
+  adhdStats  String @default("{}") // ADHDSessionStats JSON
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ============================================================================
+// ONBOARDING STATE (Issue #64 - localStorage consolidation)
+// Migrated from: onboarding-store.ts
+// ============================================================================
+
+model OnboardingState {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Flow state
+  hasCompletedOnboarding Boolean  @default(false)
+  onboardingCompletedAt  DateTime?
+  currentStep            String   @default("welcome") // OnboardingStep
+  isReplayMode           Boolean  @default(false)
+  isVoiceMuted           Boolean  @default(false)
+
+  // Collected data (JSON)
+  data String @default("{}") // OnboardingData JSON
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ============================================================================
+// POMODORO STATS (Issue #64 - localStorage consolidation)
+// Migrated from: pomodoro-store.ts
+// ============================================================================
+
+model PomodoroStats {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Persistent stats
+  completedPomodoros Int @default(0)
+  totalFocusTime     Int @default(0) // in seconds
+  todayPomodoros     Int @default(0)
+  todayFocusMinutes  Int @default(0)
+  lastActiveDate     String @default("")
+
+  // Settings (JSON)
+  settings String @default("{}") // PomodoroSettings JSON
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ============================================================================
+// CALENDAR EVENTS (Issue #64 - localStorage consolidation)
+// Migrated from: calendar-store.ts
+// ============================================================================
+
+model CalendarEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  subject     String?
+  maestroId   String?
+
+  // Timing
+  date        DateTime
+  startTime   String?  // "16:00" format
+  endTime     String?
+  duration    Int?     // in minutes
+  allDay      Boolean  @default(false)
+
+  // Recurrence
+  recurring   Boolean  @default(false)
+  recurrence  String?  // daily | weekly | monthly | none
+
+  // Status
+  completed   Boolean  @default(false)
+  reminded    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([date])
+}
+
+// ============================================================================
+// HTML SNIPPETS (Issue #64 - localStorage consolidation)
+// Migrated from: app-store.ts HTMLSnippetsStore
+// ============================================================================
+
+model HtmlSnippet {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  snippetId String   @unique // Client-generated ID
+  html      String
+  css       String?
+  js        String?
+  title     String?
+  subject   String?
+  maestroId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([snippetId])
+}
+
+// ============================================================================
+// HOMEWORK SESSIONS (Issue #64 - localStorage consolidation)
+// Migrated from: homework-help-view.tsx session storage
+// ============================================================================
+
+model HomeworkSession {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Session data
+  subject     String?
+  topic       String?
+  problemType String?
+  status      String   @default("active") // active | completed | abandoned
+
+  // Messages and steps (JSON arrays)
+  messages String @default("[]")
+  steps    String @default("[]")
+
+  // Timing
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
 }
 
