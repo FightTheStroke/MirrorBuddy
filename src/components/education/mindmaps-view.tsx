@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -16,6 +17,7 @@ import {
   FileText,
   Image,
   FileType,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -90,6 +92,8 @@ const exampleMindmapsBySubject: Record<string, { title: string; nodes: MindmapNo
 };
 
 export function MindmapsView({ className }: MindmapsViewProps) {
+  const router = useRouter();
+
   // Load saved mindmaps from localStorage
   const [mindmaps, setMindmaps] = useState<SavedMindmap[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -330,9 +334,15 @@ export function MindmapsView({ className }: MindmapsViewProps) {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={() => setShowCreateModal(true)}>
+          {/* PRIMARY: Conversation-first approach (Phase 6) */}
+          <Button onClick={() => router.push('/conversation?tool=mindmap')}>
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Crea con un Maestro
+          </Button>
+          {/* SECONDARY: Manual form fallback */}
+          <Button variant="outline" onClick={() => setShowCreateModal(true)}>
             <PlusCircle className="w-4 h-4 mr-2" />
-            Crea Nuova
+            Modalità Manuale
           </Button>
           <Button variant="outline" onClick={() => setShowExamples(true)}>
             <Sparkles className="w-4 h-4 mr-2" />
