@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, ArrowLeft, SkipForward, User, GraduationCap, Heart, Volume2, VolumeX } from 'lucide-react';
+import { ArrowRight, ArrowLeft, SkipForward, User, GraduationCap, Heart, Volume2, VolumeX, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
@@ -27,6 +27,10 @@ const LEARNING_DIFFERENCES = [
   { id: 'auditoryProcessing', label: 'Difficoltà Uditive', icon: '👂' },
 ] as const;
 
+interface InfoStepProps {
+  useWebSpeechFallback?: boolean;
+}
+
 /**
  * Step 2: Optional info collection (skippable)
  *
@@ -34,9 +38,22 @@ const LEARNING_DIFFERENCES = [
  * - Age (optional)
  * - School level (optional)
  * - Learning differences (optional, for accessibility presets)
+ *
+ * Voice Integration (#61):
+ * - Syncs with voice-captured data from onboarding store
+ * - Shows feedback when voice captures data
  */
-export function InfoStep() {
-  const { data, updateData, nextStep, prevStep, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
+export function InfoStep({ useWebSpeechFallback = false }: InfoStepProps) {
+  const {
+    data,
+    updateData,
+    nextStep,
+    prevStep,
+    isReplayMode,
+    isVoiceMuted,
+    setVoiceMuted,
+    voiceSessionActive,
+  } = useOnboardingStore();
 
   const [age, setAge] = useState<number | undefined>(data.age);
   const [schoolLevel, setSchoolLevel] = useState<'elementare' | 'media' | 'superiore' | undefined>(
@@ -46,9 +63,43 @@ export function InfoStep() {
     data.learningDifferences || []
   );
 
-  // Auto-speak Melissa's info message
+  // Track voice-captured data
+  const [voiceCapturedAge, setVoiceCapturedAge] = useState(false);
+  const [voiceCapturedSchool, setVoiceCapturedSchool] = useState(false);
+  const [voiceCapturedDiffs, setVoiceCapturedDiffs] = useState(false);
+
+  // Sync local state with store (when voice captures data)
+  useEffect(() => {
+    if (data.age !== undefined && data.age !== age) {
+      setAge(data.age);
+      setVoiceCapturedAge(true);
+      setTimeout(() => setVoiceCapturedAge(false), 3000);
+    }
+  }, [data.age, age]);
+
+  useEffect(() => {
+    if (data.schoolLevel && data.schoolLevel !== schoolLevel) {
+      setSchoolLevel(data.schoolLevel);
+      setVoiceCapturedSchool(true);
+      setTimeout(() => setVoiceCapturedSchool(false), 3000);
+    }
+  }, [data.schoolLevel, schoolLevel]);
+
+  useEffect(() => {
+    if (data.learningDifferences && data.learningDifferences.length > 0) {
+      const currentSet = new Set(selectedDifferences);
+      const newSet = new Set(data.learningDifferences);
+      if (![...currentSet].every(d => newSet.has(d)) || ![...newSet].every(d => currentSet.has(d))) {
+        setSelectedDifferences(data.learningDifferences);
+        setVoiceCapturedDiffs(true);
+        setTimeout(() => setVoiceCapturedDiffs(false), 3000);
+      }
+    }
+  }, [data.learningDifferences, selectedDifferences]);
+
+  // Auto-speak Melissa's info message (only when using Web Speech fallback)
   const { isPlaying, stop } = useOnboardingTTS({
-    autoSpeak: !isVoiceMuted,
+    autoSpeak: useWebSpeechFallback && !isVoiceMuted && !voiceSessionActive,
     text: ONBOARDING_SCRIPTS.info,
     delay: 500,
   });
@@ -126,16 +177,24 @@ export function InfoStep() {
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <User className="w-4 h-4" />
             Quanti anni hai?
+            {voiceCapturedAge && (
+              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
+                <Mic className="w-3 h-3" />
+                Melissa ha capito!
+              </span>
+            )}
           </label>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((a) => (
               <button
                 key={a}
-                onClick={() => setAge(a)}
+                onClick={() => { setAge(a); setVoiceCapturedAge(false); }}
                 className={cn(
                   'w-10 h-10 rounded-lg font-medium transition-all',
                   age === a
-                    ? 'bg-pink-500 text-white shadow-lg scale-110'
+                    ? voiceCapturedAge
+                      ? 'bg-green-500 text-white shadow-lg scale-110 ring-2 ring-green-300'
+                      : 'bg-pink-500 text-white shadow-lg scale-110'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                 )}
               >
@@ -155,16 +214,24 @@ export function InfoStep() {
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <GraduationCap className="w-4 h-4" />
             Che scuola fai?
+            {voiceCapturedSchool && (
+              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
+                <Mic className="w-3 h-3" />
+                Melissa ha capito!
+              </span>
+            )}
           </label>
           <div className="grid grid-cols-3 gap-3">
             {SCHOOL_LEVELS.map((level) => (
               <button
                 key={level.id}
-                onClick={() => setSchoolLevel(level.id)}
+                onClick={() => { setSchoolLevel(level.id); setVoiceCapturedSchool(false); }}
                 className={cn(
                   'p-3 rounded-xl border-2 transition-all text-center',
                   schoolLevel === level.id
-                    ? 'border-pink-500 bg-pink-50 dark:bg-pink-950'
+                    ? voiceCapturedSchool
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950 ring-2 ring-green-300'
+                      : 'border-pink-500 bg-pink-50 dark:bg-pink-950'
                     : 'border-gray-200 dark:border-gray-700 hover:border-pink-300'
                 )}
               >
@@ -189,6 +256,12 @@ export function InfoStep() {
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <Heart className="w-4 h-4" />
             Hai qualche difficoltà particolare? (opzionale)
+            {voiceCapturedDiffs && (
+              <span className="flex items-center gap-1 text-green-600 dark:text-green-400 text-xs">
+                <Mic className="w-3 h-3" />
+                Melissa ha capito!
+              </span>
+            )}
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
             Questo ci aiuta a rendere l&apos;app più accessibile per te
@@ -197,11 +270,13 @@ export function InfoStep() {
             {LEARNING_DIFFERENCES.map((diff) => (
               <button
                 key={diff.id}
-                onClick={() => toggleDifference(diff.id)}
+                onClick={() => { toggleDifference(diff.id); setVoiceCapturedDiffs(false); }}
                 className={cn(
                   'p-3 rounded-xl border-2 transition-all text-left flex items-center gap-2',
                   selectedDifferences.includes(diff.id)
-                    ? 'border-pink-500 bg-pink-50 dark:bg-pink-950'
+                    ? voiceCapturedDiffs
+                      ? 'border-green-500 bg-green-50 dark:bg-green-950 ring-2 ring-green-300'
+                      : 'border-pink-500 bg-pink-50 dark:bg-pink-950'
                     : 'border-gray-200 dark:border-gray-700 hover:border-pink-300'
                 )}
               >
