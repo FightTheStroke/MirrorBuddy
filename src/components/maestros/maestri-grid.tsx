@@ -4,8 +4,7 @@ import { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MaestroCard } from './maestro-card';
-import { LazyVoiceSession } from '@/components/voice/lazy';
-import { LazyChatSession } from '@/components/chat/lazy';
+import { LazyMaestroSession } from './lazy';
 import { maestri, subjectNames, subjectIcons, subjectColors, getAllSubjects } from '@/data';
 import { cn } from '@/lib/utils';
 import type { Maestro, Subject } from '@/types';
@@ -159,28 +158,14 @@ export function MaestriGrid() {
         </div>
       )}
 
-      {/* Voice session (lazy loaded) */}
+      {/* Unified Maestro session (lazy loaded) */}
       <AnimatePresence mode="wait">
-        {sessionMode === 'voice' && selectedMaestro && (
-          <LazyVoiceSession
-            key={`voice-${selectedMaestro.id}-${sessionKey}`}
+        {sessionMode && selectedMaestro && (
+          <LazyMaestroSession
+            key={`session-${selectedMaestro.id}-${sessionKey}`}
             maestro={selectedMaestro}
             onClose={handleCloseSession}
-            onSwitchToChat={() => setSessionMode('chat')}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Chat session (lazy loaded) */}
-      <AnimatePresence mode="wait">
-        {sessionMode === 'chat' && selectedMaestro && (
-          <LazyChatSession
-            key={`chat-${selectedMaestro.id}`}
-            maestro={selectedMaestro}
-            onClose={handleCloseSession}
-            onSwitchToVoice={() => {
-              setSessionMode('voice');
-            }}
+            initialMode={sessionMode}
           />
         )}
       </AnimatePresence>
