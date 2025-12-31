@@ -474,6 +474,8 @@ export function getCharacterTypeLabel(type: CharacterType): string {
       return 'Coach (Melissa/Davide)';
     case 'buddy':
       return 'Buddy (Mario/Maria)';
+    case 'support_assistant':
+      return 'Assistente Tecnico (Guido)';
   }
 }
 
@@ -498,6 +500,7 @@ export function shouldSuggestRedirect(
     maestro: `Per questa domanda di ${intent.subject || 'materia'}, un Professore potrebbe aiutarti meglio!`,
     coach: 'Per organizzare meglio lo studio, Melissa o Davide possono aiutarti!',
     buddy: 'Se vuoi parlare con qualcuno che ti capisce, Mario o Maria sono qui!',
+    support_assistant: 'Per problemi tecnici o di configurazione, Guido puo\' aiutarti!',
   };
 
   return {
