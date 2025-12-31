@@ -201,6 +201,41 @@ Voice profiles defined in:
 
 **XP Rewards**: `Math.min(100, sessionDuration * 5 + questionCount * 10)`
 
+### Onboarding Voice Integration (#61)
+
+Melissa guides new students through onboarding with bidirectional voice conversation via Azure Realtime API.
+
+```
+┌────────────────────────────────────┬──────────────────────┐
+│        FORM INPUT AREA             │    VOICE PANEL       │
+│   (WelcomeStep / InfoStep)         │   (Melissa)          │
+│                                    │                      │
+│   - Name input    <──── synced ────│   [Avatar + Status]  │
+│   - Age selector  <──── synced ────│   [Audio Visualizer] │
+│   - School level  <──── synced ────│   [Call Controls]    │
+│   - Learning diffs <─── synced ────│                      │
+├────────────────────────────────────┴──────────────────────┤
+│              TRANSCRIPT (collapsible)                      │
+└────────────────────────────────────────────────────────────┘
+```
+
+| File | Purpose |
+|------|---------|
+| `src/lib/voice/onboarding-tools.ts` | Tool definitions + handlers for voice data capture |
+| `src/lib/hooks/use-onboarding-voice.ts` | Specialized voice hook with Azure Realtime |
+| `src/components/onboarding/voice-onboarding-panel.tsx` | Voice call UI (Melissa's pink theme) |
+| `src/components/onboarding/onboarding-transcript.tsx` | Collapsible conversation history |
+| `src/lib/stores/onboarding-store.ts` | Voice session state management |
+
+**Tool Calls**: When Melissa hears student info, she calls tools to update the store:
+- `set_student_name(name)` → Updates name field
+- `set_student_age(age)` → Updates age selector
+- `set_school_level(level)` → Updates school level
+- `set_learning_differences(diffs)` → Updates learning differences
+- `next_onboarding_step()` / `prev_onboarding_step()` → Navigate flow
+
+**Fallback**: When Azure is unavailable, falls back to Web Speech API TTS (`use-onboarding-tts.ts`) with manual form input only.
+
 ### Safety Guardrails
 
 All AI characters (Maestri, Coaches, Buddies) have safety guardrails injected into their system prompts.
