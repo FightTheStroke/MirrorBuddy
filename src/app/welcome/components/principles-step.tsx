@@ -97,8 +97,8 @@ export function PrinciplesStep() {
           className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-950/30 dark:to-purple-950/30 p-4 rounded-xl border border-pink-100 dark:border-pink-900/50"
         >
           <p className="text-gray-700 dark:text-gray-300 italic">
-            "Ricorda, {data.name}: non esiste un modo sbagliato di imparare.
-            Io sono qui per aiutarti a trovare il tuo!"
+            &ldquo;Ricorda, {data.name}: non esiste un modo sbagliato di imparare.
+            Io sono qui per aiutarti a trovare il tuo!&rdquo;
           </p>
           <p className="text-right text-sm text-pink-600 dark:text-pink-400 mt-2 font-medium">
             — Melissa

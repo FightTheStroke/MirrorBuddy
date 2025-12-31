@@ -9,6 +9,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useSettingsStore } from '@/lib/stores/app-store';
 
+// Pre-defined sparkle offsets (avoids Math.random during render)
+const SPARKLE_OFFSETS = [5, -12, 18, -8, 15, -5];
+
 /**
  * Step 5: Ready to start CTA
  *
@@ -103,7 +106,7 @@ export function ReadyStep() {
               animate={{
                 opacity: [0, 1, 0],
                 y: [-20, -60],
-                x: Math.random() * 40 - 20,
+                x: SPARKLE_OFFSETS[i],
               }}
               transition={{
                 duration: 2,
@@ -143,7 +146,7 @@ export function ReadyStep() {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30">
                 <span className="text-2xl">📚</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Scegli un Maestro</strong> - per ogni materia c'è l'esperto giusto
+                  <strong>Scegli un Maestro</strong> - per ogni materia c&apos;è l&apos;esperto giusto
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/30">
@@ -183,7 +186,7 @@ export function ReadyStep() {
 
           {isReplayMode && (
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-              Fine del tutorial. Clicca "Iniziamo!" per tornare all'app.
+              Fine del tutorial. Clicca &ldquo;Iniziamo!&rdquo; per tornare all&apos;app.
             </p>
           )}
         </div>

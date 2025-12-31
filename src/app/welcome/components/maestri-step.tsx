@@ -185,7 +185,7 @@ export function MaestriStep() {
         >
           <p className="text-gray-700 dark:text-gray-300 text-sm">
             <strong>Come funziona?</strong> Ogni Maestro è esperto nella sua materia.
-            Quando hai bisogno di aiuto con matematica, chiedi a Euclide. Per l'inglese, c'è Shakespeare!
+            Quando hai bisogno di aiuto con matematica, chiedi a Euclide. Per l&apos;inglese, c&apos;è Shakespeare!
             Io ti aiuterò a scegliere il Maestro giusto per ogni situazione.
           </p>
         </motion.div>
