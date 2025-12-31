@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import {
   GraduationCap,
   BookOpen,
@@ -58,11 +60,26 @@ const BUDDY_INFO = {
 } as const;
 
 export default function Home() {
+  const router = useRouter();
+  const { hasCompletedOnboarding } = useOnboardingStore();
+
+  // Redirect to welcome if onboarding not completed
+  useEffect(() => {
+    if (!hasCompletedOnboarding) {
+      router.push('/welcome');
+    }
+  }, [hasCompletedOnboarding, router]);
+
   // Start with Maestri as the first view
   const [currentView, setCurrentView] = useState<View>('maestri');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
+
+  // Don't render main app until onboarding check is done
+  if (!hasCompletedOnboarding) {
+    return null;
+  }
 
   // XP calculations
   const XP_PER_LEVEL = [0, 100, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000];

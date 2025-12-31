@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Conversation-First Tool Creation (Issue #23)
+- **Fullscreen Tool Layout** (`src/components/conversation/fullscreen-tool-layout.tsx`): 82/18 split with Maestro overlay
+- **Maestro Overlay** (`src/components/tools/maestro-overlay.tsx`): Floating Maestro during tool building
+- **Intent Detection** with tool type recognition (mindmap, quiz, flashcard)
+- Tools created through natural conversation, not forms
+
 #### Voice Commands for Mindmaps (ADR-0011, Issue #44)
 - **useMindmapModifications Hook** (`src/lib/hooks/use-mindmap-modifications.ts`): SSE subscription for real-time mindmap modification events
 - **InteractiveMarkMapRenderer** (`src/components/tools/interactive-markmap-renderer.tsx`): Extended renderer with imperative modification API
@@ -24,6 +30,80 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **LiveMindmap** (`src/components/tools/live-mindmap.tsx`): Wrapper combining renderer + SSE for voice-controlled mindmaps
 - Fuzzy node matching for voice command targeting
 - D3 animations for smooth visual feedback
+
+#### Multi-User Collaboration (Issue #44)
+- **Mindmap Room** (`src/lib/collab/mindmap-room.ts`): Real-time room state with CRDT-like versioning
+- **Collab WebSocket** (`src/lib/collab/collab-websocket.ts`): WebSocket connection management
+- **Room API** (`src/app/api/collab/rooms/`): Create, join, leave rooms
+- Participant cursors and presence indicators
+- Conflict resolution via version numbers
+
+#### Import/Export Multi-Format (Issue #44)
+- **Mindmap Export** (`src/lib/tools/mindmap-export.ts`): PNG, SVG, Markdown, FreeMind (.mm), XMind, JSON
+- **Mindmap Import** (`src/lib/tools/mindmap-import.ts`): Auto-detect format, parse Markdown/FreeMind/XMind/JSON
+- Download helper for browser blob saving
+
+#### Tool Execution System (ADR-0009)
+- **OpenAI Function Calling**: Maestri can create tools via structured function calls
+- **Tool Executor** (`src/lib/tools/tool-executor.ts`): Handler registry pattern
+- **Tool Handlers**: mindmap, quiz, demo, search, flashcard
+- **Tool Panel** (`src/components/tools/tool-panel.tsx`): UI for tool visualization
+- **Tool Persistence**: IndexedDB for binaries, Prisma for metadata
+
+#### Showcase Mode
+- **Offline Demo** (`src/app/showcase/`): Full app demo without LLM connection
+- **Showcase Button**: Added to AI Provider settings for easy access
+- Pre-recorded responses for all features demonstration
+
+#### Pomodoro Timer (Issue #45)
+- **PomodoroTimer** (`src/components/education/pomodoro-timer.tsx`): ADHD-friendly focus sessions
+- Configurable work/break intervals
+- Visual and audio notifications
+- Integration with unified header
+
+#### Video Conference Layout
+- **Voice Session Layout**: Video-conference style with Maestro fullscreen
+- **Fullscreen Mindmaps**: Tool takes 100% during creation
+- **Picture-in-Picture**: Maestro avatar overlay during tool building
+
+#### Side-by-Side Voice UI
+- **Coach/Buddy Voice**: Separate voice layout for Coach and Buddy characters
+- Dual panel design for conversation + character display
+
+#### Separate Conversations per Character (ADR-0010)
+- Each Maestro/Coach/Buddy maintains independent conversation history
+- Context preserved across sessions per character
+- Clean handoffs between characters
+
+#### Telemetry System (ADR-0006)
+- **TelemetryEvent** model in Prisma schema
+- Usage analytics for Grafana integration
+- Privacy-respecting event tracking
+
+#### Notification Persistence (ADR-0007)
+- **Notification** model with scheduling support
+- Server-side triggers for level-up, streak, achievements
+- API endpoints for CRUD operations
+
+#### Parent Dashboard GDPR (ADR-0008)
+- **Dual Consent**: Parent AND student must approve
+- **Data Export**: JSON/PDF portability
+- **Right to Erasure**: Deletion request tracking
+- **Access Logging**: Audit trail for GDPR compliance
+
+#### Materiali Redesign
+- **50/50 Responsive Grid**: Better layout for materials view
+- Improved visual hierarchy
+
+#### Audio Device Selection
+- **setSinkId Integration**: Choose output audio device
+- Device picker in voice settings
+
+#### Onboarding Flow
+- **Welcome Page** (`src/app/welcome/`): Multi-step onboarding
+- **Onboarding Store**: Track completion state
+- Redirect to welcome if not completed
+- Meet the Maestri carousel
 
 #### Triangle of Support Architecture (ADR-0003)
 - **Melissa & Davide (Learning Coaches)**: New AI characters focused on building student autonomy
@@ -80,6 +160,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Conversation Flow**: Now routes to appropriate character based on intent
 - **Settings UI**: Reorganized Audio/Video settings for better UX
 - **Theme System**: Fixed theme detection and added value prop to ThemeProvider
+- **Maestri Data**: Split `maestri-full.ts` into per-maestro modules for maintainability
+- **Logging**: All `console.*` calls replaced with structured `logger` utility
+- **Voice Panel**: Improved layout balance and proportions
 - **Voice mapping**: 6 maestri updated to gender-appropriate voices
   - Mozart: shimmer → sage (masculine)
   - Erodoto: ballad → echo (authoritative historian)
@@ -99,6 +182,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Accent colors** (#5): CSS custom properties for accent colors now apply correctly in light mode
 - **Language buttons** (#6): Selected language state has clear visual feedback
 - **AI Provider status** (#7): Fixed Ollama button closing tag for proper semantic HTML
+- **E2E Tests**: Fixed 28 failing Playwright tests
+- **Voice Session**: Eliminated empty error objects `{}` in logs
+- **Button Nesting**: Resolved hydration error in MaestroCard
+- **Homework Camera**: Fixed camera capture and inline subject dialog
+- **Showcase Navigation**: Added exit navigation back to main app
 - CodeQL security alerts resolved (HTML sanitization, voiceInstructions injection)
 - Removed unused imports and lint warnings
 
@@ -119,8 +207,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ADR 0003**: Triangle of Support Architecture
 - **ADR 0004**: Safety Guardrails for Child Protection
 - **ADR 0005**: Real-time SSE Architecture
-- Updated CLAUDE.md with MirrorBuddy architecture
+- **ADR 0006**: Telemetry System
+- **ADR 0007**: Notification Persistence
+- **ADR 0008**: Parent Dashboard GDPR Compliance
+- **ADR 0009**: Tool Execution Architecture
+- **ADR 0010**: Separate Conversations per Character
+- **ADR 0011**: Voice Commands for Mindmap Modifications
+- Updated CLAUDE.md with MirrorBuddy architecture, Tool Execution, Voice Commands
 - Updated E2E tests for new features
+- Added voice support documentation for Coach & Buddy
 
 ---
 
