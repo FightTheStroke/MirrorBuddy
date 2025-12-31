@@ -56,6 +56,11 @@ const AZURE_SAMPLE_RATE = 24000; // Azure uses 24kHz
 const MAX_QUEUE_SIZE = 100; // Limit queue to prevent memory issues
 const CAPTURE_BUFFER_SIZE = 4096; // ~85ms at 48kHz
 
+// Audio playback tuning parameters
+const MIN_BUFFER_CHUNKS = 3; // Wait for N chunks before starting playback (~300ms buffer)
+const SCHEDULE_AHEAD_TIME = 0.1; // Schedule chunks 100ms ahead
+const CHUNK_GAP_TOLERANCE = 0.02; // 20ms tolerance for scheduling gaps
+
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
@@ -238,6 +243,11 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const lastLevelUpdateRef = useRef<number>(0);
   const playNextChunkRef = useRef<(() => void) | null>(null);
 
+  // Time-based scheduling for smooth audio playback
+  const nextPlayTimeRef = useRef<number>(0);
+  const scheduledSourcesRef = useRef<AudioBufferSourceNode[]>([]);
+  const isBufferingRef = useRef(true); // Start in buffering mode
+
   // Flag to track if session is fully ready
   const sessionReadyRef = useRef(false);
   const greetingSentRef = useRef(false);
@@ -289,48 +299,108 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     return playbackContextRef.current;
   }, [preferredOutputId]);
 
-  // SYNC playback function - matches test page that works
+  // =========================================================================
+  // TIME-BASED SCHEDULED PLAYBACK
+  // Uses AudioContext.currentTime for precise scheduling to prevent stuttering
+  // =========================================================================
+
+  // Schedule all queued chunks for playback
+  const scheduleQueuedChunks = useCallback(() => {
+    const ctx = playbackContextRef.current;
+    if (!ctx || audioQueueRef.current.length === 0) return;
+
+    const currentTime = ctx.currentTime;
+
+    // Schedule chunks from queue
+    while (audioQueueRef.current.length > 0) {
+      const audioData = audioQueueRef.current.shift()!;
+      const float32Data = int16ToFloat32(audioData);
+
+      // Create buffer at 24kHz
+      const buffer = ctx.createBuffer(1, float32Data.length, AZURE_SAMPLE_RATE);
+      buffer.getChannelData(0).set(float32Data);
+
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+
+      // Calculate chunk duration
+      const chunkDuration = float32Data.length / AZURE_SAMPLE_RATE;
+
+      // Determine when to play this chunk
+      // If we're behind schedule, catch up; otherwise schedule ahead
+      if (nextPlayTimeRef.current < currentTime + CHUNK_GAP_TOLERANCE) {
+        nextPlayTimeRef.current = currentTime + SCHEDULE_AHEAD_TIME;
+      }
+
+      try {
+        source.start(nextPlayTimeRef.current);
+        scheduledSourcesRef.current.push(source);
+
+        // Clean up finished sources to prevent memory leak
+        source.onended = () => {
+          const idx = scheduledSourcesRef.current.indexOf(source);
+          if (idx > -1) scheduledSourcesRef.current.splice(idx, 1);
+
+          // Check if all playback is done
+          if (scheduledSourcesRef.current.length === 0 && audioQueueRef.current.length === 0) {
+            isPlayingRef.current = false;
+            isBufferingRef.current = true; // Reset to buffering for next response
+            setSpeaking(false);
+            setOutputLevel(0);
+          }
+        };
+
+        // Update next play time
+        nextPlayTimeRef.current += chunkDuration;
+
+      } catch (e) {
+        logger.error('[VoiceSession] Playback scheduling error', { error: e });
+      }
+
+      // Calculate and update output level (RMS)
+      let sumSquares = 0;
+      for (let i = 0; i < float32Data.length; i++) {
+        sumSquares += float32Data[i] * float32Data[i];
+      }
+      const rms = Math.sqrt(sumSquares / float32Data.length);
+      setOutputLevel(Math.min(rms * 5, 1));
+    }
+  }, [setSpeaking, setOutputLevel]);
+
+  // Legacy playNextChunk - now triggers scheduled playback
   const playNextChunk = useCallback(() => {
     const ctx = playbackContextRef.current;
 
     if (!ctx || audioQueueRef.current.length === 0) {
-      isPlayingRef.current = false;
-      setSpeaking(false);
-      setOutputLevel(0);
+      // Check if there are still scheduled sources playing
+      if (scheduledSourcesRef.current.length === 0) {
+        isPlayingRef.current = false;
+        setSpeaking(false);
+        setOutputLevel(0);
+      }
       return;
+    }
+
+    // If we're in buffering mode, wait for enough chunks
+    if (isBufferingRef.current && audioQueueRef.current.length < MIN_BUFFER_CHUNKS) {
+      logger.debug(`[VoiceSession] Buffering... ${audioQueueRef.current.length}/${MIN_BUFFER_CHUNKS} chunks`);
+      return;
+    }
+
+    // Exit buffering mode and start scheduled playback
+    if (isBufferingRef.current) {
+      isBufferingRef.current = false;
+      nextPlayTimeRef.current = ctx.currentTime + SCHEDULE_AHEAD_TIME;
+      logger.debug(`[VoiceSession] Buffer ready, starting scheduled playback at ${nextPlayTimeRef.current.toFixed(3)}`);
     }
 
     isPlayingRef.current = true;
     setSpeaking(true);
 
-    const audioData = audioQueueRef.current.shift()!;
-    const float32Data = int16ToFloat32(audioData);
-
-    // Create buffer at 24kHz (matching context sample rate)
-    const buffer = ctx.createBuffer(1, float32Data.length, AZURE_SAMPLE_RATE);
-    buffer.getChannelData(0).set(float32Data);
-
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(ctx.destination);
-    // Direct callback like test page - NO requestAnimationFrame
-    source.onended = () => playNextChunkRef.current?.();
-
-    try {
-      source.start();
-    } catch (e) {
-      logger.error('[VoiceSession] Playback error', { error: e });
-      playNextChunkRef.current?.();
-    }
-
-    // Calculate output level (RMS)
-    let sumSquares = 0;
-    for (let i = 0; i < float32Data.length; i++) {
-      sumSquares += float32Data[i] * float32Data[i];
-    }
-    const rms = Math.sqrt(sumSquares / float32Data.length);
-    setOutputLevel(Math.min(rms * 5, 1));
-  }, [setSpeaking, setOutputLevel]);
+    // Schedule all queued chunks
+    scheduleQueuedChunks();
+  }, [setSpeaking, setOutputLevel, scheduleQueuedChunks]);
 
   // Keep ref updated with latest playNextChunk
   useEffect(() => {
@@ -593,12 +663,24 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           hasActiveResponseRef.current = false; // Mark as cancelled
           audioQueueRef.current = [];
           isPlayingRef.current = false;
+          isBufferingRef.current = true;
+          // Stop all scheduled audio sources immediately
+          scheduledSourcesRef.current.forEach(source => {
+            try { source.stop(); } catch { /* already stopped */ }
+          });
+          scheduledSourcesRef.current = [];
           setSpeaking(false);
         } else if (voiceBargeInEnabled && isSpeaking) {
           // Audio is still playing locally but Azure response is done - just clear local audio
           logger.debug('[VoiceSession] Clearing local audio queue (response already done)');
           audioQueueRef.current = [];
           isPlayingRef.current = false;
+          isBufferingRef.current = true;
+          // Stop all scheduled audio sources immediately
+          scheduledSourcesRef.current.forEach(source => {
+            try { source.stop(); } catch { /* already stopped */ }
+          });
+          scheduledSourcesRef.current = [];
           setSpeaking(false);
         }
         break;
@@ -1018,6 +1100,15 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
 
     audioQueueRef.current = [];
     isPlayingRef.current = false;
+    isBufferingRef.current = true;
+    nextPlayTimeRef.current = 0;
+
+    // Stop all scheduled audio sources
+    scheduledSourcesRef.current.forEach(source => {
+      try { source.stop(); } catch { /* already stopped */ }
+    });
+    scheduledSourcesRef.current = [];
+
     sessionReadyRef.current = false;
     greetingSentRef.current = false;
     hasActiveResponseRef.current = false;
@@ -1064,9 +1155,14 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
       hasActiveResponseRef.current = false;
     }
-    // Always clear local audio queue
+    // Always clear local audio queue and stop scheduled sources
     audioQueueRef.current = [];
     isPlayingRef.current = false;
+    isBufferingRef.current = true;
+    scheduledSourcesRef.current.forEach(source => {
+      try { source.stop(); } catch { /* already stopped */ }
+    });
+    scheduledSourcesRef.current = [];
     setSpeaking(false);
   }, [setSpeaking]);
 
