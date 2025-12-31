@@ -7,16 +7,35 @@ export default defineConfig({
     environment: 'node',
     include: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
     exclude: ['node_modules', 'e2e/**'],
+    setupFiles: ['./src/test/setup.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      reportsDirectory: './coverage',
+      include: [
+        'src/lib/education/**/*.ts',
+        'src/lib/ai/**/*.ts',
+        'src/lib/safety/**/*.ts',
+        'src/lib/tools/**/*.ts',
+        'src/lib/profile/**/*.ts',
+      ],
       exclude: [
         'node_modules/',
         'e2e/',
         '**/*.config.*',
         '**/*.d.ts',
         'src/types/**',
+        '**/*.test.ts',
+        '**/*.spec.ts',
       ],
+      thresholds: {
+        global: {
+          branches: 80,
+          functions: 80,
+          lines: 80,
+          statements: 80,
+        },
+      },
     },
   },
   resolve: {

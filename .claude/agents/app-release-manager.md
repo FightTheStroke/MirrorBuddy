@@ -37,6 +37,31 @@ This script verifies (no agent tokens needed):
 
 ---
 
+## PHASE 1.5: UNIT TESTS & COVERAGE (P0 - BLOCKING)
+
+Run unit tests with coverage verification:
+
+```bash
+npm run test:coverage
+```
+
+**Minimum thresholds (80% required):**
+- [ ] Lines: >= 80%
+- [ ] Branches: >= 80%
+- [ ] Functions: >= 80%
+- [ ] Statements: >= 80%
+
+Coverage includes:
+- `src/lib/education/**/*.ts` - FSRS, mastery learning
+- `src/lib/ai/**/*.ts` - Intent detection, character routing
+- `src/lib/safety/**/*.ts` - Content filter, guardrails
+- `src/lib/tools/**/*.ts` - Tool handlers (quiz, mindmap, demo)
+- `src/lib/profile/**/*.ts` - Student profiles
+
+**If coverage < 80%: ADD TESTS FIRST, then continue.**
+
+---
+
 ## PHASE 2: E2E TESTS (P0 - BLOCKING)
 
 After pre-release passes, run E2E tests with REAL AI:

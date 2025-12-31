@@ -12,10 +12,21 @@ vi.mock('@/lib/realtime/tool-events', () => ({
   broadcastToolEvent: vi.fn(),
 }));
 
+// Mock nanoid with a function that generates unique IDs
+const mockNanoid = vi.fn();
+vi.mock('nanoid', () => ({
+  nanoid: () => mockNanoid(),
+}));
+
 describe('tool-executor', () => {
+  let idCounter = 0;
+
   beforeEach(() => {
     clearHandlers();
     vi.clearAllMocks();
+    // Reset and configure nanoid mock to return unique IDs
+    idCounter = 0;
+    mockNanoid.mockImplementation(() => `test-id-${++idCounter}`);
   });
 
   afterEach(() => {
@@ -113,21 +124,36 @@ describe('tool-executor', () => {
       expect(result.error).toContain('Handler error');
     });
 
-    it('should generate unique toolId for each execution', async () => {
+    it('should generate toolId when handler returns empty toolId', async () => {
       const mockHandler = vi.fn().mockResolvedValue({
         success: true,
-        toolId: '', // Will be overwritten
+        toolId: '', // Empty - should be filled by executor
         toolType: 'quiz',
         data: {},
       });
       registerToolHandler('create_quiz', mockHandler);
 
-      const result1 = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
-      const result2 = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
+      const result = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
 
-      expect(result1.toolId).toBeTruthy();
-      expect(result2.toolId).toBeTruthy();
-      expect(result1.toolId).not.toBe(result2.toolId);
+      // Executor should fill in a toolId when handler returns empty
+      expect(result.toolId).toBeTruthy();
+      expect(typeof result.toolId).toBe('string');
+      expect(result.toolId.length).toBeGreaterThan(0);
+    });
+
+    it('should preserve toolId when handler returns one', async () => {
+      const mockHandler = vi.fn().mockResolvedValue({
+        success: true,
+        toolId: 'handler-provided-id',
+        toolType: 'quiz',
+        data: {},
+      });
+      registerToolHandler('create_quiz', mockHandler);
+
+      const result = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
+
+      // Handler's toolId should be preserved
+      expect(result.toolId).toBe('handler-provided-id');
     });
   });
 
