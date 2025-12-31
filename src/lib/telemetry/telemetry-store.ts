@@ -5,6 +5,7 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { nanoid } from 'nanoid';
 import { logger } from '@/lib/logger';
 import type {
   TelemetryEvent,
@@ -80,7 +81,8 @@ const DEFAULT_CONFIG: TelemetryConfig = {
 // ============================================================================
 
 function generateSessionId(): string {
-  return `sess_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  // Use nanoid for cryptographically secure random strings
+  return `sess_${Date.now()}_${nanoid(7)}`;
 }
 
 function isSameDay(date1: Date | string | null, date2: Date): boolean {
@@ -131,7 +133,7 @@ export const useTelemetryStore = create<TelemetryState>()(
         if (Math.random() > state.config.sampleRate) return;
 
         const event: TelemetryEvent = {
-          id: `evt_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          id: `evt_${Date.now()}_${nanoid(7)}`,
           timestamp: new Date(),
           category,
           action,

@@ -50,17 +50,31 @@ function validateCode(code: string): { safe: boolean; violations: string[] } {
 
 /**
  * Sanitize HTML to prevent XSS
- * Note: Basic sanitization, the iframe sandbox provides main security
+ * Note: Multi-layer sanitization, the iframe sandbox provides main security
  */
 function sanitizeHtml(html: string): string {
-  // Remove script tags (JS should be in the js field)
-  let sanitized = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+  let sanitized = html;
 
-  // Remove event handlers
-  sanitized = sanitized.replace(/\s+on\w+\s*=/gi, ' data-removed-handler=');
+  // Remove script tags (comprehensive: handles variations, attributes, whitespace)
+  // Loop to handle nested or malformed tags
+  let previousLength: number;
+  do {
+    previousLength = sanitized.length;
+    // Handle all script tag variations including self-closing and malformed
+    sanitized = sanitized.replace(/<\s*script[^>]*>/gi, '');
+    sanitized = sanitized.replace(/<\s*\/\s*script\s*>/gi, '');
+  } while (sanitized.length !== previousLength);
 
-  // Remove javascript: URLs
-  sanitized = sanitized.replace(/javascript:/gi, 'removed:');
+  // Remove event handlers (comprehensive: handles all on* attributes)
+  sanitized = sanitized.replace(/\s+on[a-z]+\s*=/gi, ' data-removed-handler=');
+
+  // Remove javascript:, vbscript:, data: URLs (comprehensive: handles encoding and whitespace)
+  // First decode HTML entities that could be used for bypass
+  sanitized = sanitized.replace(/&#x?[0-9a-f]+;?/gi, '');
+  // Check for dangerous protocols with optional whitespace/newlines
+  sanitized = sanitized.replace(/\b(javascript|vbscript|data)\s*:/gi, 'removed:');
+  // Also remove variations with whitespace between characters
+  sanitized = sanitized.replace(/j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:');
 
   return sanitized;
 }
