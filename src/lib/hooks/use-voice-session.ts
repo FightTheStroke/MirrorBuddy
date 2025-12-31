@@ -28,6 +28,8 @@ interface UseVoiceSessionOptions {
   onError?: (error: Error) => void;
   onStateChange?: (state: 'idle' | 'connecting' | 'connected' | 'error') => void;
   onWebcamRequest?: (request: { purpose: string; instructions?: string; callId: string }) => void;
+  /** Disable barge-in to prevent echo loop (speaker→mic→VAD→cancel) */
+  disableBargeIn?: boolean;
 }
 
 interface ConnectionInfo {
@@ -655,9 +657,11 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         setListening(true);
 
         // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
-        // Only if barge-in is enabled in user settings AND Azure actually has an active response
-        // Using hasActiveResponseRef instead of isSpeaking to prevent response_cancel_not_active errors
-        if (voiceBargeInEnabled && hasActiveResponseRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+        // Check disableBargeIn option FIRST (prevents echo loop in onboarding)
+        // Then check user settings AND Azure response state
+        if (options.disableBargeIn) {
+          logger.debug('[VoiceSession] Barge-in disabled (onboarding mode) - ignoring speech');
+        } else if (voiceBargeInEnabled && hasActiveResponseRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
           logger.debug('[VoiceSession] Barge-in detected - interrupting assistant (hasActiveResponse=true)');
           wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
           hasActiveResponseRef.current = false; // Mark as cancelled
