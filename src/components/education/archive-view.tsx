@@ -27,6 +27,8 @@ import {
   BookmarkCheck,
   Star,
   Eye,
+  BookOpen,
+  Filter,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,6 +52,30 @@ type ViewMode = 'grid' | 'list';
 interface ArchiveItem extends MaterialRecord {
   title?: string;
 }
+
+// Italian subject labels
+const SUBJECT_LABELS: Record<string, string> = {
+  matematica: 'Matematica',
+  italiano: 'Italiano',
+  storia: 'Storia',
+  geografia: 'Geografia',
+  scienze: 'Scienze',
+  fisica: 'Fisica',
+  chimica: 'Chimica',
+  arte: 'Arte',
+  musica: 'Musica',
+  filosofia: 'Filosofia',
+  latino: 'Latino',
+  greco: 'Greco',
+  inglese: 'Inglese',
+  francese: 'Francese',
+  spagnolo: 'Spagnolo',
+  tedesco: 'Tedesco',
+  educazione_fisica: 'Educazione Fisica',
+  informatica: 'Informatica',
+  economia: 'Economia',
+  diritto: 'Diritto',
+};
 
 // Sort options for dropdown
 const SORT_OPTIONS: { value: SortBy; label: string }[] = [
@@ -620,6 +646,11 @@ export function ArchiveView() {
   const [materials, setMaterials] = useState<ArchiveItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState<ArchiveItem | null>(null);
+  // Subject filter (Issue #37)
+  const [subjectFilter, setSubjectFilter] = useState<string>('all');
+  // Date range filter (Issue #37)
+  const [dateFrom, setDateFrom] = useState<string>('');
+  const [dateTo, setDateTo] = useState<string>('');
 
   // Load materials from IndexedDB
   useEffect(() => {
@@ -637,6 +668,17 @@ export function ArchiveView() {
     loadMaterials();
   }, []);
 
+  // Extract unique subjects from materials
+  const availableSubjects = useMemo(() => {
+    const subjects = new Set<string>();
+    for (const item of materials) {
+      if (item.subject) {
+        subjects.add(item.subject);
+      }
+    }
+    return Array.from(subjects).sort();
+  }, [materials]);
+
   // Filter and sort materials
   const filtered = useMemo(() => {
     let result = [...materials];
@@ -648,6 +690,23 @@ export function ArchiveView() {
       result = result.filter((item) => item.toolType === filter);
     }
 
+    // Filter by subject (Issue #37)
+    if (subjectFilter !== 'all') {
+      result = result.filter((item) => item.subject === subjectFilter);
+    }
+
+    // Filter by date range (Issue #37)
+    if (dateFrom) {
+      const fromDate = new Date(dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+      result = result.filter((item) => new Date(item.createdAt) >= fromDate);
+    }
+    if (dateTo) {
+      const toDate = new Date(dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      result = result.filter((item) => new Date(item.createdAt) <= toDate);
+    }
+
     // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -655,7 +714,8 @@ export function ArchiveView() {
         (item) =>
           item.title?.toLowerCase().includes(query) ||
           item.maestroId?.toLowerCase().includes(query) ||
-          item.toolType.toLowerCase().includes(query)
+          item.toolType.toLowerCase().includes(query) ||
+          item.subject?.toLowerCase().includes(query)
       );
     }
 
@@ -676,7 +736,7 @@ export function ArchiveView() {
     });
 
     return result;
-  }, [materials, filter, searchQuery, sortBy]);
+  }, [materials, filter, searchQuery, sortBy, subjectFilter, dateFrom, dateTo]);
 
   // Handlers
   const handleDelete = async (toolId: string) => {
@@ -836,6 +896,74 @@ export function ArchiveView() {
             )}
           </Button>
         ))}
+      </div>
+
+      {/* Advanced Filters (Issue #37) */}
+      <div className="flex flex-wrap items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+          <Filter className="w-4 h-4" />
+          <span className="font-medium">Filtri:</span>
+        </div>
+
+        {/* Subject Filter */}
+        <div className="relative">
+          <select
+            value={subjectFilter}
+            onChange={(e) => setSubjectFilter(e.target.value)}
+            className="appearance-none pl-8 pr-8 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+            aria-label="Filtra per materia"
+          >
+            <option value="all">Tutte le materie</option>
+            {availableSubjects.map((subject) => (
+              <option key={subject} value={subject}>
+                {SUBJECT_LABELS[subject] || subject}
+              </option>
+            ))}
+          </select>
+          <BookOpen className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+        </div>
+
+        {/* Date Range Filter */}
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => setDateFrom(e.target.value)}
+              className="pl-8 pr-3 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Data da"
+            />
+            <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
+          <span className="text-slate-400">-</span>
+          <div className="relative">
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => setDateTo(e.target.value)}
+              className="pl-8 pr-3 h-8 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              aria-label="Data a"
+            />
+            <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
+        </div>
+
+        {/* Clear Filters Button */}
+        {(subjectFilter !== 'all' || dateFrom || dateTo) && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setSubjectFilter('all');
+              setDateFrom('');
+              setDateTo('');
+            }}
+            className="text-xs gap-1"
+          >
+            <X className="w-3 h-3" />
+            Pulisci filtri
+          </Button>
+        )}
       </div>
 
       {/* Content */}
