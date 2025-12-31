@@ -3,7 +3,7 @@
 // ============================================================================
 // ARCHIVE VIEW
 // Unified view for browsing all saved materials (tools, PDFs, photos)
-// T-18: Unified Archive page
+// Issue #37: Unified Archive page with bookmark, rating, filters
 // ============================================================================
 
 import { useState, useEffect, useMemo, useCallback, type ChangeEvent } from 'react';
@@ -23,6 +23,10 @@ import {
   Trash2,
   ExternalLink,
   X,
+  Bookmark,
+  BookmarkCheck,
+  Star,
+  Eye,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,13 +43,21 @@ import type { ToolType } from '@/types/tools';
 // Types
 // ============================================================================
 
-type FilterType = 'all' | ToolType;
-type SortBy = 'date' | 'type';
+type FilterType = 'all' | 'bookmarked' | ToolType;
+type SortBy = 'date' | 'type' | 'rating' | 'views';
 type ViewMode = 'grid' | 'list';
 
 interface ArchiveItem extends MaterialRecord {
   title?: string;
 }
+
+// Sort options for dropdown
+const SORT_OPTIONS: { value: SortBy; label: string }[] = [
+  { value: 'date', label: 'Data' },
+  { value: 'type', label: 'Tipo' },
+  { value: 'rating', label: 'Valutazione' },
+  { value: 'views', label: 'Visualizzazioni' },
+];
 
 // ============================================================================
 // Constants
@@ -81,8 +93,9 @@ const TOOL_LABELS: Record<ToolType, string> = {
   pdf: 'PDF',
 };
 
-const FILTER_TABS: { value: FilterType; label: string }[] = [
+const FILTER_TABS: { value: FilterType; label: string; icon?: typeof Bookmark }[] = [
   { value: 'all', label: 'Tutti' },
+  { value: 'bookmarked', label: 'Preferiti', icon: BookmarkCheck },
   { value: 'mindmap', label: 'Mappe' },
   { value: 'quiz', label: 'Quiz' },
   { value: 'flashcard', label: 'Flashcard' },
@@ -92,15 +105,101 @@ const FILTER_TABS: { value: FilterType; label: string }[] = [
 ];
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Update a material's bookmark or rating via API
+ */
+async function updateMaterialInteraction(
+  toolId: string,
+  updates: { isBookmarked?: boolean; userRating?: number }
+): Promise<boolean> {
+  try {
+    const response = await fetch('/api/materials', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ toolId, ...updates }),
+    });
+    return response.ok;
+  } catch (error) {
+    logger.error('Failed to update material interaction', { error, toolId });
+    return false;
+  }
+}
+
+// ============================================================================
 // Sub-components
 // ============================================================================
+
+/**
+ * Star rating component (1-5 stars)
+ */
+function StarRating({
+  rating,
+  onRate,
+  readonly = false,
+  size = 'sm',
+}: {
+  rating: number | undefined;
+  onRate?: (rating: number) => void;
+  readonly?: boolean;
+  size?: 'sm' | 'md';
+}) {
+  const [hoverRating, setHoverRating] = useState(0);
+  const currentRating = hoverRating || rating || 0;
+  const starSize = size === 'sm' ? 'w-3.5 h-3.5' : 'w-5 h-5';
+
+  return (
+    <div
+      className="flex items-center gap-0.5"
+      onMouseLeave={() => setHoverRating(0)}
+    >
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          disabled={readonly}
+          onClick={(e) => {
+            e.stopPropagation();
+            onRate?.(star);
+          }}
+          onMouseEnter={() => !readonly && setHoverRating(star)}
+          className={cn(
+            'transition-colors',
+            !readonly && 'cursor-pointer hover:scale-110',
+            readonly && 'cursor-default'
+          )}
+          aria-label={`${star} stelle`}
+        >
+          <Star
+            className={cn(
+              starSize,
+              star <= currentRating
+                ? 'fill-yellow-400 text-yellow-400'
+                : 'text-slate-300 dark:text-slate-600'
+            )}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
 
 /**
  * Empty state when no materials match the filter
  */
 function EmptyState({ filter }: { filter: FilterType }) {
-  const Icon = filter === 'all' ? FileText : TOOL_ICONS[filter];
-  const label = filter === 'all' ? 'materiali' : TOOL_LABELS[filter].toLowerCase();
+  const Icon = filter === 'all'
+    ? FileText
+    : filter === 'bookmarked'
+      ? BookmarkCheck
+      : TOOL_ICONS[filter];
+  const label = filter === 'all'
+    ? 'materiali'
+    : filter === 'bookmarked'
+      ? 'preferiti'
+      : TOOL_LABELS[filter].toLowerCase();
 
   return (
     <motion.div
@@ -129,10 +228,14 @@ function GridView({
   items,
   onDelete,
   onView,
+  onBookmark,
+  onRate,
 }: {
   items: ArchiveItem[];
   onDelete: (id: string) => void;
   onView: (item: ArchiveItem) => void;
+  onBookmark: (id: string, bookmarked: boolean) => void;
+  onRate: (id: string, rating: number) => void;
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -163,24 +266,54 @@ function GridView({
                         {label}
                       </span>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                        onDelete(item.toolId);
-                      }}
-                      aria-label="Elimina"
-                    >
-                      <Trash2 className="w-4 h-4 text-destructive" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          onBookmark(item.toolId, !item.isBookmarked);
+                        }}
+                        aria-label={item.isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+                      >
+                        {item.isBookmarked ? (
+                          <BookmarkCheck className="w-4 h-4 text-primary" />
+                        ) : (
+                          <Bookmark className="w-4 h-4 text-slate-400 hover:text-primary" />
+                        )}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                          onDelete(item.toolId);
+                        }}
+                        aria-label="Elimina"
+                      >
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <CardTitle className="text-base line-clamp-2 mb-2">
                     {item.title || `${label} del ${formatDate(item.createdAt)}`}
                   </CardTitle>
+                  <div className="flex items-center justify-between mb-2">
+                    <StarRating
+                      rating={item.userRating}
+                      onRate={(rating) => onRate(item.toolId, rating)}
+                    />
+                    {item.viewCount > 0 && (
+                      <div className="flex items-center gap-1 text-xs text-slate-400">
+                        <Eye className="w-3 h-3" />
+                        <span>{item.viewCount}</span>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                     <Calendar className="w-3 h-3" />
                     <span>{formatDate(item.createdAt)}</span>
@@ -346,10 +479,14 @@ function ListView({
   items,
   onDelete,
   onView,
+  onBookmark,
+  onRate,
 }: {
   items: ArchiveItem[];
   onDelete: (id: string) => void;
   onView: (item: ArchiveItem) => void;
+  onBookmark: (id: string, bookmarked: boolean) => void;
+  onRate: (id: string, rating: number) => void;
 }) {
   return (
     <div className="space-y-2">
@@ -373,24 +510,59 @@ function ListView({
               </div>
 
               <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-slate-900 dark:text-white truncate">
-                  {item.title || `${label} del ${formatDate(item.createdAt)}`}
-                </h3>
-                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <span className="font-medium">{label}</span>
-                  <span className="text-slate-300 dark:text-slate-600">|</span>
-                  <Calendar className="w-3 h-3" />
-                  <span>{formatDate(item.createdAt)}</span>
-                  {item.maestroId && (
-                    <>
-                      <span className="text-slate-300 dark:text-slate-600">|</span>
-                      <span className="capitalize">{item.maestroId}</span>
-                    </>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-medium text-slate-900 dark:text-white truncate">
+                    {item.title || `${label} del ${formatDate(item.createdAt)}`}
+                  </h3>
+                  {item.isBookmarked && (
+                    <BookmarkCheck className="w-4 h-4 text-primary shrink-0" />
                   )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <StarRating
+                    rating={item.userRating}
+                    onRate={(rating) => onRate(item.toolId, rating)}
+                    size="sm"
+                  />
+                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <span className="font-medium">{label}</span>
+                    <span className="text-slate-300 dark:text-slate-600">|</span>
+                    <Calendar className="w-3 h-3" />
+                    <span>{formatDate(item.createdAt)}</span>
+                    {item.maestroId && (
+                      <>
+                        <span className="text-slate-300 dark:text-slate-600">|</span>
+                        <span className="capitalize">{item.maestroId}</span>
+                      </>
+                    )}
+                    {item.viewCount > 0 && (
+                      <>
+                        <span className="text-slate-300 dark:text-slate-600">|</span>
+                        <Eye className="w-3 h-3" />
+                        <span>{item.viewCount}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 shrink-0">
+              <div className="flex items-center gap-1 shrink-0">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={(e: React.MouseEvent) => {
+                    e.stopPropagation();
+                    onBookmark(item.toolId, !item.isBookmarked);
+                  }}
+                  aria-label={item.isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+                >
+                  {item.isBookmarked ? (
+                    <BookmarkCheck className="w-4 h-4 text-primary" />
+                  ) : (
+                    <Bookmark className="w-4 h-4 text-slate-400 hover:text-primary" />
+                  )}
+                </Button>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -469,8 +641,10 @@ export function ArchiveView() {
   const filtered = useMemo(() => {
     let result = [...materials];
 
-    // Filter by type
-    if (filter !== 'all') {
+    // Filter by type or bookmarked
+    if (filter === 'bookmarked') {
+      result = result.filter((item) => item.isBookmarked);
+    } else if (filter !== 'all') {
       result = result.filter((item) => item.toolType === filter);
     }
 
@@ -487,10 +661,18 @@ export function ArchiveView() {
 
     // Sort
     result.sort((a, b) => {
-      if (sortBy === 'date') {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      switch (sortBy) {
+        case 'date':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'type':
+          return a.toolType.localeCompare(b.toolType);
+        case 'rating':
+          return (b.userRating || 0) - (a.userRating || 0);
+        case 'views':
+          return (b.viewCount || 0) - (a.viewCount || 0);
+        default:
+          return 0;
       }
-      return a.toolType.localeCompare(b.toolType);
     });
 
     return result;
@@ -521,9 +703,32 @@ export function ArchiveView() {
     setSearchQuery(e.target.value);
   };
 
+  // Bookmark handler
+  const handleBookmark = useCallback(async (toolId: string, isBookmarked: boolean) => {
+    const success = await updateMaterialInteraction(toolId, { isBookmarked });
+    if (success) {
+      setMaterials((prev) =>
+        prev.map((m) => (m.toolId === toolId ? { ...m, isBookmarked } : m))
+      );
+    }
+  }, []);
+
+  // Rating handler
+  const handleRate = useCallback(async (toolId: string, userRating: number) => {
+    const success = await updateMaterialInteraction(toolId, { userRating });
+    if (success) {
+      setMaterials((prev) =>
+        prev.map((m) => (m.toolId === toolId ? { ...m, userRating } : m))
+      );
+    }
+  }, []);
+
   // Count by type for tab badges
   const countByType = useMemo(() => {
-    const counts: Record<string, number> = { all: materials.length };
+    const counts: Record<string, number> = {
+      all: materials.length,
+      bookmarked: materials.filter((m) => m.isBookmarked).length,
+    };
     for (const item of materials) {
       counts[item.toolType] = (counts[item.toolType] || 0) + 1;
     }
@@ -557,19 +762,22 @@ export function ArchiveView() {
             />
           </div>
 
-          {/* Sort toggle */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSortBy(sortBy === 'date' ? 'type' : 'date')}
-            className="gap-1"
-            aria-label={`Ordina per ${sortBy === 'date' ? 'tipo' : 'data'}`}
-          >
-            <ArrowUpDown className="w-4 h-4" />
-            <span className="hidden sm:inline">
-              {sortBy === 'date' ? 'Data' : 'Tipo'}
-            </span>
-          </Button>
+          {/* Sort dropdown */}
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortBy)}
+              className="appearance-none pl-8 pr-8 h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+              aria-label="Ordina per"
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <ArrowUpDown className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
 
           {/* View toggle */}
           <div className="flex border rounded-lg dark:border-slate-700">
@@ -631,7 +839,7 @@ export function ArchiveView() {
       </div>
 
       {/* Content */}
-      <div role="tabpanel" aria-label={`Materiali ${filter === 'all' ? 'tutti' : TOOL_LABELS[filter]}`}>
+      <div role="tabpanel" aria-label={`Materiali ${filter === 'all' ? 'tutti' : filter === 'bookmarked' ? 'preferiti' : TOOL_LABELS[filter]}`}>
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
@@ -639,9 +847,21 @@ export function ArchiveView() {
         ) : filtered.length === 0 ? (
           <EmptyState filter={filter} />
         ) : viewMode === 'grid' ? (
-          <GridView items={filtered} onDelete={handleDelete} onView={handleView} />
+          <GridView
+            items={filtered}
+            onDelete={handleDelete}
+            onView={handleView}
+            onBookmark={handleBookmark}
+            onRate={handleRate}
+          />
         ) : (
-          <ListView items={filtered} onDelete={handleDelete} onView={handleView} />
+          <ListView
+            items={filtered}
+            onDelete={handleDelete}
+            onView={handleView}
+            onBookmark={handleBookmark}
+            onRate={handleRate}
+          />
         )}
       </div>
 

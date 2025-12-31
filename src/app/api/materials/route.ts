@@ -55,6 +55,9 @@ interface UpdateMaterialRequest {
   title?: string;
   content?: Record<string, unknown>;
   status?: 'active' | 'archived' | 'deleted';
+  // User interaction (Issue #37 - Archive features)
+  userRating?: number;
+  isBookmarked?: boolean;
 }
 
 /**
@@ -214,7 +217,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body: UpdateMaterialRequest & { toolId: string } = await request.json();
-    const { toolId, title, content, status } = body;
+    const { toolId, title, content, status, userRating, isBookmarked } = body;
 
     if (!toolId) {
       return NextResponse.json(
@@ -238,6 +241,13 @@ export async function PATCH(request: NextRequest) {
     if (title) updateData.title = title;
     if (content) updateData.content = JSON.stringify(content);
     if (status) updateData.status = status;
+    // User interaction fields (Issue #37)
+    if (typeof userRating === 'number' && userRating >= 1 && userRating <= 5) {
+      updateData.userRating = userRating;
+    }
+    if (typeof isBookmarked === 'boolean') {
+      updateData.isBookmarked = isBookmarked;
+    }
 
     const updated = await prisma.material.update({
       where: { toolId },

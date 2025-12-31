@@ -327,11 +327,16 @@ model Notification {
   id          String   @id @default(cuid())
   userId      String
 
-  type        String   // achievement | streak | reminder | break | session_end | level_up | calendar | system
+  type        String   // achievement | streak | reminder | break | session_end | level_up | calendar | system | flashcard_due | scheduled_session | suggestion
   title       String
   message     String
   actionUrl   String?
   metadata    String?  // JSON for additional data
+
+  // Scheduler-specific fields (Issue #27)
+  priority     String?  // high | medium | low
+  relatedId    String?  // Reference to flashcard deck, session, etc.
+  melissaVoice String?  // Voice script for Melissa TTS
 
   read        Boolean  @default(false)
   dismissed   Boolean  @default(false)
@@ -427,6 +432,11 @@ model Material {
   // Status
   status      String   @default("active") // active, archived, deleted
 
+  // User interaction (Issue #37 - Archive features)
+  userRating   Int?     // 1-5 stars
+  isBookmarked Boolean  @default(false)
+  viewCount    Int      @default(0)
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -434,6 +444,7 @@ model Material {
   @@index([toolType])
   @@index([status])
   @@index([createdAt])
+  @@index([isBookmarked])
 }
 
 // ============================================================================

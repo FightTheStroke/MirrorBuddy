@@ -361,6 +361,10 @@ export interface MaterialRecord {
   subject?: string;
   preview?: string;
   status: 'active' | 'archived' | 'deleted';
+  // User interaction (Issue #37 - Archive features)
+  userRating?: number; // 1-5 stars
+  isBookmarked: boolean;
+  viewCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
