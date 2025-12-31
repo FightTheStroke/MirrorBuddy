@@ -710,5 +710,5 @@ Immagina una scuola dove:
 ---
 
 *Documento vivente | Living document*
-*Ultima modifica | Last updated: December 2024*
+*Ultima modifica | Last updated: December 2025*
 *Versione | Version: 2.1.0*
