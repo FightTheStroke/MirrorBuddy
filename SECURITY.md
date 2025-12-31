@@ -132,4 +132,4 @@ We appreciate security researchers who help keep ConvergioEdu safe. With your pe
 
 ---
 
-*Last updated: December 2024*
+*Last updated: December 2025*
