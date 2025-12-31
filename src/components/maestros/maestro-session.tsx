@@ -567,6 +567,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
           >
             <div className="w-full max-w-lg">
               <WebcamCapture
+                purpose={webcamRequest.purpose}
                 onCapture={handleWebcamCapture}
                 onClose={() => { setShowWebcam(false); setWebcamRequest(null); }}
                 instructions={webcamRequest.instructions}
@@ -697,8 +698,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
             className="mb-4"
           >
             <ToolResultDisplay
-              tool={tool}
-              onClose={() => setToolCalls(prev => prev.filter(t => t.id !== tool.id))}
+              toolCall={tool}
             />
           </motion.div>
         ))}
