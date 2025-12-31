@@ -11,6 +11,7 @@ import {
   MessageCircle,
   Sparkles,
   ArrowRight,
+  Accessibility,
 } from 'lucide-react';
 
 const showcaseSections = [
@@ -53,6 +54,14 @@ const showcaseSections = [
     icon: Globe,
     color: 'from-violet-500 to-purple-600',
     stats: 'Interattivo',
+  },
+  {
+    href: '/showcase/accessibility',
+    title: 'Accessibilita',
+    description: 'Prova i 7 profili di accessibilita: dislessia, ADHD, autismo, visivo e altro. Testa le impostazioni in tempo reale.',
+    icon: Accessibility,
+    color: 'from-cyan-500 to-blue-600',
+    stats: '7 Profili',
   },
   {
     href: '/showcase/chat',
