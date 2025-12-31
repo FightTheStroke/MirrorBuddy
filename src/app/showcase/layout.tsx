@@ -12,6 +12,7 @@ import {
   Home,
   Settings,
   Sparkles,
+  ExternalLink,
 } from 'lucide-react';
 
 const showcaseNavItems = [
@@ -70,13 +71,22 @@ export default function ShowcaseLayout({
               Modalita Showcase - Configura un LLM per le funzionalita complete
             </span>
           </div>
-          <Link
-            href="/landing"
-            className="flex items-center gap-1 px-3 py-1 bg-amber-700 hover:bg-amber-800 text-white text-sm font-medium rounded-md transition-colors"
-          >
-            <Settings className="w-4 h-4" />
-            Configura ora
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/"
+              className="flex items-center gap-1 px-3 py-1 bg-white/90 hover:bg-white text-amber-900 text-sm font-medium rounded-md transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Vai all&apos;App
+            </Link>
+            <Link
+              href="/landing"
+              className="flex items-center gap-1 px-3 py-1 bg-amber-700 hover:bg-amber-800 text-white text-sm font-medium rounded-md transition-colors"
+            >
+              <Settings className="w-4 h-4" />
+              Configura LLM
+            </Link>
+          </div>
         </div>
       </div>
 
