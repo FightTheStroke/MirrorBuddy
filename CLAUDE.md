@@ -314,6 +314,67 @@ serverNotifications.myNewTrigger = async (userId: string, data: MyData) => {
 
 2. Call from relevant API route or server action
 
+## Pomodoro Timer System
+
+**STATUS: IMPLEMENTED**
+
+Timer Pomodoro per supporto ADHD con XP rewards e notifiche browser.
+
+### Architecture
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Hook | `src/lib/hooks/use-pomodoro-timer.ts` | Timer logic, state machine |
+| Store | `src/lib/stores/pomodoro-store.ts` | Zustand store, persistence |
+| Component | `src/components/pomodoro/pomodoro-timer.tsx` | Full UI component |
+| Header Widget | `src/components/pomodoro/pomodoro-header-widget.tsx` | Compact widget for header |
+| Exports | `src/components/pomodoro/index.ts` | Public exports |
+
+### Timer Phases
+
+```
+idle → focus (25 min) → shortBreak (5 min) → focus → ... → longBreak (15 min)
+         ↑                                                        |
+         └────────────────────────────────────────────────────────┘
+```
+
+- **Focus**: 25 min default (configurable 5-60 min)
+- **Short Break**: 5 min default (configurable 1-15 min)
+- **Long Break**: 15 min after 4 pomodoros (configurable 10-30 min)
+
+### XP Rewards
+
+| Event | XP |
+|-------|-----|
+| Complete 1 pomodoro | +15 XP |
+| First pomodoro of day | +10 XP bonus |
+| Complete 4 pomodoros (cycle) | +15 XP bonus |
+
+### Integration Points
+
+- **Header**: `PomodoroHeaderWidget` in `src/app/page.tsx` line 166
+- **Notifications**: Uses `breakReminders` flag from accessibility settings
+- **XP**: Calls `addXP()` from `useProgressStore`
+
+### Usage
+
+```typescript
+import { PomodoroTimer, PomodoroHeaderWidget } from '@/components/pomodoro';
+
+// Full component (settings page, sidebar)
+<PomodoroTimer onPomodoroComplete={(count, time) => console.log(count, time)} />
+
+// Compact widget (header)
+<PomodoroHeaderWidget />
+```
+
+### Settings Connection
+
+The timer respects `breakReminders` flag from accessibility settings:
+- `Settings → Accessibilità → ADHD → Promemoria pause`
+- When disabled, browser notifications are suppressed
+- Timer still works, just silent
+
 ## Tool Execution System
 
 **STATUS: IMPLEMENTED**
