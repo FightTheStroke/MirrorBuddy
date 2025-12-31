@@ -110,6 +110,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Data Export**: JSON/PDF portability
 - **Right to Erasure**: Deletion request tracking
 - **Access Logging**: Audit trail for GDPR compliance
+- **Settings Integration**: "Genitori" tab in Settings links to `/parent-dashboard`
 
 #### Materiali Redesign
 - **50/50 Responsive Grid**: Better layout for materials view
