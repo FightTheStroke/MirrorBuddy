@@ -319,9 +319,9 @@ describe('Intent Detection System', () => {
 
   describe('getCharacterTypeLabel', () => {
     it('should return correct Italian labels', () => {
-      expect(getCharacterTypeLabel('maestro')).toBe('Maestro');
-      expect(getCharacterTypeLabel('coach')).toBe('Coach (Melissa/Davide)');
-      expect(getCharacterTypeLabel('buddy')).toBe('Buddy (Mario/Maria)');
+      expect(getCharacterTypeLabel('maestro')).toBe('Professore');
+      expect(getCharacterTypeLabel('coach')).toBe('Il tuo Coach');
+      expect(getCharacterTypeLabel('buddy')).toBe('Il tuo Buddy');
     });
   });
 
@@ -350,7 +350,7 @@ describe('Intent Detection System', () => {
 
       const result = shouldSuggestRedirect(intent, 'coach');
       expect(result.should).toBe(true);
-      expect(result.suggestion).toContain('Maestro');
+      expect(result.suggestion).toContain('Professore');
     });
 
     it('should not suggest redirect for low confidence intents', () => {
@@ -373,7 +373,7 @@ describe('Intent Detection System', () => {
         reason: 'test',
       };
       const coachResult = shouldSuggestRedirect(coachIntent, 'maestro');
-      expect(coachResult.suggestion).toContain('Melissa');
+      expect(coachResult.suggestion).toContain('Coach');
 
       const buddyIntent: DetectedIntent = {
         type: 'emotional_support',
@@ -382,7 +382,7 @@ describe('Intent Detection System', () => {
         reason: 'test',
       };
       const buddyResult = shouldSuggestRedirect(buddyIntent, 'maestro');
-      expect(buddyResult.suggestion).toContain('Mario');
+      expect(buddyResult.suggestion).toContain('Buddy');
     });
   });
 

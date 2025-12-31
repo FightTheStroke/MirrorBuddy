@@ -275,6 +275,110 @@ describe('Intent Detection', () => {
   });
 
   // =========================================================================
+  // TECH SUPPORT DETECTION (Issue #16)
+  // =========================================================================
+
+  describe('Tech Support Detection', () => {
+    it('should detect app navigation questions', () => {
+      const messages = [
+        'Come funziona la voce nell\'app?',
+        'Dove trovo le impostazioni?',
+        'Non si sente la voce',
+        'Come si usa l\'app?',
+        'Come funziona il microfono?',
+      ];
+
+      for (const msg of messages) {
+        const intent = detectIntent(msg);
+        expect(intent.type).toBe('tech_support');
+        expect(intent.recommendedCharacter).toBe('coach');
+      }
+    });
+
+    it('should detect feature-specific questions', () => {
+      const messages = [
+        'Le notifiche non arrivano',
+        'Come attivo il timer pomodoro?',
+        'Dove attivo il pomodoro?',
+        'Come avviare il timer?',
+      ];
+
+      for (const msg of messages) {
+        const intent = detectIntent(msg);
+        expect(intent.type).toBe('tech_support');
+        expect(intent.recommendedCharacter).toBe('coach');
+      }
+    });
+
+    it('should detect settings and configuration questions', () => {
+      const messages = [
+        'Come cambio le impostazioni?',
+        'Dove trovo le preferenze?',
+        'Dove trovo i settings?',
+        'Come configuro l\'app?',
+      ];
+
+      for (const msg of messages) {
+        const intent = detectIntent(msg);
+        expect(intent.type).toBe('tech_support');
+        expect(intent.recommendedCharacter).toBe('coach');
+      }
+    });
+
+    it('should detect gamification questions', () => {
+      const messages = [
+        'Come sbloccare i badge?',
+        'Come guadagno punti esperienza?',
+        'Ho perso la streak, come funziona?',
+      ];
+
+      for (const msg of messages) {
+        const intent = detectIntent(msg);
+        expect(intent.type).toBe('tech_support');
+        expect(intent.recommendedCharacter).toBe('coach');
+      }
+    });
+
+    it('should NOT detect generic questions as tech support', () => {
+      // These should NOT be tech support - they're about study methods
+      const messages = [
+        'Come posso studiare meglio?',
+        'Come faccio a memorizzare le formule?',
+        'Come gestisco il tempo?',
+      ];
+
+      for (const msg of messages) {
+        const intent = detectIntent(msg);
+        expect(intent.type).not.toBe('tech_support');
+      }
+    });
+
+    it('should prioritize academic over tech support when subject detected', () => {
+      // "Come funziona la matematica?" has both tech pattern and subject
+      // Subject should win because student wants academic help
+      const intent = detectIntent('Come funziona la matematica?');
+      expect(intent.type).toBe('academic_help');
+      expect(intent.subject).toBe('mathematics');
+      expect(intent.recommendedCharacter).toBe('maestro');
+    });
+
+    it('should detect technical problems', () => {
+      const messages = [
+        'L\'app non carica',
+        'C\'è un bug nella pagina',
+        'Il sito è lento',
+        'L\'app non funziona',
+      ];
+
+      for (const msg of messages) {
+        const intent = detectIntent(msg);
+        expect(intent.type).toBe('tech_support');
+        expect(intent.recommendedCharacter).toBe('coach');
+      }
+    });
+  });
+
+  // =========================================================================
   // CHARACTER ROUTING
   // =========================================================================
 
@@ -339,9 +443,9 @@ describe('Intent Detection', () => {
 
   describe('getCharacterTypeLabel', () => {
     it('should return correct Italian labels', () => {
-      expect(getCharacterTypeLabel('maestro')).toBe('Maestro');
-      expect(getCharacterTypeLabel('coach')).toBe('Coach (Melissa/Davide)');
-      expect(getCharacterTypeLabel('buddy')).toBe('Buddy (Mario/Maria)');
+      expect(getCharacterTypeLabel('maestro')).toBe('Professore');
+      expect(getCharacterTypeLabel('coach')).toBe('Il tuo Coach');
+      expect(getCharacterTypeLabel('buddy')).toBe('Il tuo Buddy');
     });
   });
 
@@ -370,7 +474,7 @@ describe('Intent Detection', () => {
 
       const result = shouldSuggestRedirect(intent, 'maestro');
       expect(result.should).toBe(true);
-      expect(result.suggestion).toContain('Mario');
+      expect(result.suggestion).toContain('Buddy');
     });
 
     it('should not suggest redirect for low-confidence mismatch', () => {

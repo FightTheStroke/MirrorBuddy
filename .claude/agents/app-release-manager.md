@@ -104,6 +104,18 @@ Manual verification required:
 - [ ] Progress tracking updates XP/levels
 - [ ] Mind maps render properly
 
+### Platform Knowledge Base (Issue #16)
+- [ ] `src/data/app-knowledge-base.ts` updated with new features
+- [ ] `APP_VERSION.lastUpdated` matches release date (YYYY-MM)
+- [ ] New troubleshooting entries for known issues
+- [ ] Coach can answer "Come funziona [new feature]?" correctly
+
+**Verification command:**
+```bash
+grep "lastUpdated" src/data/app-knowledge-base.ts
+# Should show current month: '2025-12' or later
+```
+
 ---
 
 ## PHASE 4: RELEASE

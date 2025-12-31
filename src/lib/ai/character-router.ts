@@ -255,6 +255,16 @@ export function routeToCharacter(context: RoutingContext): RoutingResult {
         }],
       };
 
+    case 'tech_support':
+      // Tech support: Coach with knowledge base (Issue #16)
+      // Uses student's preferred coach, NOT a separate character
+      return {
+        characterType: 'coach',
+        character: getCoachForStudent(studentProfile),
+        intent,
+        reason: "Technical support with app - coach uses knowledge base",
+      };
+
     case 'general_chat':
     default:
       // General: Coach as neutral starting point

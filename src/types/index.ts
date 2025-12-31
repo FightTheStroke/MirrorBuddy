@@ -552,8 +552,9 @@ export type SupportCharacter = SupportTeacher | BuddyProfile;
 
 /**
  * Character type identifier for routing.
+ * Note: 'support_assistant' was removed in Issue #16 - coaches handle platform support directly.
  */
-export type CharacterType = 'maestro' | 'coach' | 'buddy' | 'support_assistant';
+export type CharacterType = 'maestro' | 'coach' | 'buddy';
 
 // === PARENT DASHBOARD TYPES ===
 

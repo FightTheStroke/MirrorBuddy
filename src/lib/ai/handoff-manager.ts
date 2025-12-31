@@ -116,6 +116,7 @@ const INTENT_HANDOFF_MAP: Record<IntentType, CharacterType | null> = {
   crisis: 'buddy',
   tool_request: null, // Stay with current
   general_chat: null, // Stay with current
+  tech_support: 'coach', // Issue #16: Coach handles platform questions
 };
 
 // ============================================================================
