@@ -788,6 +788,18 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
           errorMessage = '';
         }
 
+        // Suppress benign race condition errors - these happen when we try to cancel
+        // a response that already finished (timing issue, not a real problem)
+        const isCancelRaceCondition = errorMessage.toLowerCase().includes('cancel') &&
+          (errorMessage.toLowerCase().includes('no active response') ||
+           errorMessage.toLowerCase().includes('not found'));
+
+        if (isCancelRaceCondition) {
+          // Just log as debug - this is expected behavior during barge-in
+          logger.debug('[VoiceSession] Cancel race condition (benign)', { message: errorMessage });
+          break;
+        }
+
         // Ensure we never have empty message
         if (!errorMessage) {
           errorMessage = 'Errore di connessione al server vocale';
