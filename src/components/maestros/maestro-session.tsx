@@ -225,21 +225,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     }
   }, [voiceToolCalls, clearVoiceToolCalls]);
 
-  // Handle Escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isToolFullscreen) {
-          setIsToolFullscreen(false);
-        } else {
-          handleClose();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isToolFullscreen, handleClose]);
-
   // Handle webcam capture
   const handleWebcamCapture = useCallback((imageData: string) => {
     if (webcamRequest) {
@@ -330,6 +315,21 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
       onClose();
     }
   }, [voiceActive, sessionEnded, handleEndSession, onClose]);
+
+  // Handle Escape key (must be after handleClose is defined)
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isToolFullscreen) {
+          setIsToolFullscreen(false);
+        } else {
+          handleClose();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isToolFullscreen, handleClose]);
 
   // Handle text submit
   const handleSubmit = async (e: React.FormEvent) => {
