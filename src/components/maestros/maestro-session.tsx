@@ -1,13 +1,14 @@
 'use client';
 
 /**
- * MaestroSession - Unified side-by-side layout for Maestri
+ * MaestroSession - Embedded conversation layout matching Coach/Buddy pattern
  *
- * Consistent with Coach/Buddy pattern from character-chat-view.tsx:
- * - Chat on left with messages + tools inline
- * - Voice panel on right (always visible when voice active)
- * - Evaluation appears inline in chat when session ends
- * - Learning extraction triggered on session end for parent diary
+ * Layout identical to ConversationFlow:
+ * - Header with avatar, name, specialty, voice call button
+ * - Messages area with inline tools
+ * - Input area at bottom
+ * - VoiceCallOverlay when voice active (covers the component)
+ * - Evaluation inline in chat when session ends
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
@@ -18,29 +19,22 @@ import {
   X,
   Mic,
   MicOff,
+  Phone,
   PhoneOff,
   Loader2,
-  User,
-  Copy,
-  Check,
-  RotateCcw,
   Volume2,
   VolumeX,
   Camera,
-  Network,
   Brain,
   BookOpen,
   Search,
-  Maximize2,
-  Minimize2,
+  RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import { useTTS } from '@/components/accessibility';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { useProgressStore } from '@/lib/stores/app-store';
-import { CircularWaveform, CanvasWaveform } from '@/components/voice/waveform';
 import { ToolResultDisplay } from '@/components/tools';
 import { WebcamCapture } from '@/components/tools/webcam-capture';
 import { EvaluationCard } from '@/components/chat/evaluation-card';
@@ -52,9 +46,6 @@ interface MaestroSessionProps {
   onClose: () => void;
   initialMode?: 'voice' | 'chat';
 }
-
-// Pre-computed bar offsets for audio visualizer (used in styling)
-const _VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
 /**
  * Generates evaluation based on session metrics.
@@ -68,30 +59,30 @@ function generateAutoEvaluation(
     5 +
     Math.min(2, questionsAsked * 0.5) +
     Math.min(2, sessionDuration * 0.1) +
-    (Math.random() * 0.5) // Reduced randomness
+    (Math.random() * 0.5)
   ));
   const score = Math.round(baseScore);
 
   let feedback: string;
   if (score >= 9) {
-    feedback = 'Sessione eccezionale! Hai dimostrato grande impegno e curiosita. Continua cosi!';
+    feedback = 'Sessione eccezionale! Hai dimostrato grande impegno e curiosità. Continua così!';
   } else if (score >= 7) {
     feedback = 'Ottima sessione di studio. Hai fatto buoni progressi e posto domande interessanti.';
   } else if (score >= 5) {
-    feedback = 'Buona sessione. C\'e ancora margine di miglioramento, ma stai andando nella direzione giusta.';
+    feedback = 'Buona sessione. C\'è ancora margine di miglioramento, ma stai andando nella direzione giusta.';
   } else {
-    feedback = 'La sessione e stata breve. Prova a dedicare piu tempo allo studio per risultati migliori.';
+    feedback = 'La sessione è stata breve. Prova a dedicare più tempo allo studio per risultati migliori.';
   }
 
   const strengths: string[] = [];
-  if (questionsAsked >= 5) strengths.push('Curiosita e voglia di approfondire');
+  if (questionsAsked >= 5) strengths.push('Curiosità e voglia di approfondire');
   if (sessionDuration >= 10) strengths.push('Buona concentrazione durante la sessione');
   if (questionsAsked >= 3 && sessionDuration >= 5) strengths.push('Interazione attiva con il maestro');
   if (strengths.length === 0) strengths.push('Hai iniziato il percorso di apprendimento');
 
   const areasToImprove: string[] = [];
-  if (questionsAsked < 3) areasToImprove.push('Fai piu domande per chiarire i dubbi');
-  if (sessionDuration < 10) areasToImprove.push('Prova sessioni piu lunghe per approfondire meglio');
+  if (questionsAsked < 3) areasToImprove.push('Fai più domande per chiarire i dubbi');
+  if (sessionDuration < 10) areasToImprove.push('Prova sessioni più lunghe per approfondire meglio');
   if (areasToImprove.length === 0) areasToImprove.push('Continua a esercitarti regolarmente');
 
   return {
@@ -106,230 +97,359 @@ function generateAutoEvaluation(
   };
 }
 
+/**
+ * Voice call overlay - appears over the component when voice is active.
+ * Matches VoiceCallOverlay from conversation-flow.tsx
+ */
+function VoiceCallOverlay({
+  maestro,
+  onEnd,
+  onTranscriptUpdate,
+}: {
+  maestro: Maestro;
+  onEnd: () => void;
+  onTranscriptUpdate: (role: 'user' | 'assistant', text: string) => void;
+}) {
+  const [configError, setConfigError] = useState<string | null>(null);
+  const hasAttemptedConnection = useRef(false);
+
+  const {
+    isConnected,
+    isListening,
+    isSpeaking,
+    isMuted,
+    transcript,
+    inputLevel,
+    connectionState,
+    connect,
+    disconnect,
+    toggleMute,
+  } = useVoiceSession({
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error('Voice call error', { message });
+      setConfigError(message || 'Errore di connessione vocale');
+    },
+    onTranscript: (role, text) => {
+      logger.debug('Voice transcript', { role, text: text.substring(0, 100) });
+      onTranscriptUpdate(role, text);
+    },
+  });
+
+  // Connect on mount
+  useEffect(() => {
+    const startConnection = async () => {
+      if (hasAttemptedConnection.current) return;
+      if (isConnected || connectionState !== 'idle') return;
+
+      hasAttemptedConnection.current = true;
+
+      try {
+        // Get connection info first
+        const response = await fetch('/api/realtime/token');
+        const data = await response.json();
+        if (data.error) {
+          setConfigError(data.message || 'Servizio vocale non configurato');
+          return;
+        }
+        await connect(maestro, data);
+      } catch (error) {
+        logger.error('Voice connection failed', { error: String(error) });
+        if (error instanceof DOMException && error.name === 'NotAllowedError') {
+          setConfigError('Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.');
+        } else {
+          setConfigError('Errore di connessione vocale');
+        }
+      }
+    };
+
+    startConnection();
+  }, [isConnected, connectionState, maestro, connect]);
+
+  const handleEndCall = useCallback(() => {
+    disconnect();
+    onEnd();
+  }, [disconnect, onEnd]);
+
+  const getStatusText = () => {
+    if (configError) return configError;
+    if (connectionState === 'connecting') return 'Connessione in corso...';
+    if (isConnected && isSpeaking) return `${maestro.name} sta parlando...`;
+    if (isConnected && isListening) return 'In ascolto...';
+    if (isConnected) return 'Connesso';
+    return 'Avvio chiamata...';
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-slate-900/95 to-slate-800/95 backdrop-blur-sm rounded-2xl"
+    >
+      <motion.div
+        animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
+        transition={{ repeat: Infinity, duration: 2 }}
+        className="relative"
+      >
+        <div
+          className="w-24 h-24 rounded-full overflow-hidden ring-4 ring-offset-4 ring-offset-slate-900"
+          style={{ borderColor: maestro.color }}
+        >
+          <Image
+            src={maestro.avatar}
+            alt={maestro.name}
+            width={96}
+            height={96}
+            className="w-full h-full object-cover"
+            priority
+          />
+        </div>
+        {isConnected && (
+          <div className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-green-500 border-2 border-slate-900 animate-pulse" />
+        )}
+      </motion.div>
+
+      <h3 className="mt-4 text-xl font-semibold text-white">{maestro.name}</h3>
+      <span
+        className="text-xs px-2 py-0.5 rounded-full font-medium mt-1"
+        style={{ backgroundColor: `${maestro.color}30`, color: maestro.color }}
+      >
+        {maestro.specialty}
+      </span>
+
+      <p className={cn(
+        "mt-3 text-sm",
+        configError ? "text-red-400" : "text-slate-300"
+      )}>
+        {getStatusText()}
+      </p>
+
+      {/* Input level indicator */}
+      {isConnected && isListening && (
+        <div className="mt-4 flex items-center gap-2">
+          <span
+            className="w-2 h-2 rounded-full animate-pulse"
+            style={{
+              backgroundColor: inputLevel > 0.1 ? '#22c55e' : '#64748b',
+              transform: `scale(${1 + inputLevel * 2})`
+            }}
+          />
+          <span className="text-xs text-green-400">
+            {isMuted ? 'Microfono disattivato' : 'In ascolto'}
+          </span>
+        </div>
+      )}
+
+      {/* Transcript preview */}
+      {transcript.length > 0 && (
+        <div className="mt-4 max-w-md px-4 py-2 bg-slate-800/50 rounded-lg max-h-32 overflow-y-auto">
+          <p className="text-xs text-slate-400">
+            {transcript[transcript.length - 1]?.content.substring(0, 150)}
+            {(transcript[transcript.length - 1]?.content.length || 0) > 150 && '...'}
+          </p>
+        </div>
+      )}
+
+      {/* Controls */}
+      <div className="mt-8 flex items-center gap-4">
+        {isConnected && (
+          <Button
+            variant={isMuted ? 'destructive' : 'outline'}
+            size="lg"
+            onClick={toggleMute}
+            aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+            className="border-slate-600"
+          >
+            {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+          </Button>
+        )}
+
+        <Button
+          variant="destructive"
+          size="lg"
+          onClick={handleEndCall}
+        >
+          <PhoneOff className="w-5 h-5 mr-2" />
+          Termina chiamata
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
+/**
+ * Message bubble component matching ConversationFlow style.
+ */
+function MessageBubble({
+  message,
+  maestro,
+  ttsEnabled,
+  speak,
+}: {
+  message: ChatMessage;
+  maestro: Maestro;
+  ttsEnabled: boolean;
+  speak: (text: string) => void;
+}) {
+  const isUser = message.role === 'user';
+  const isVoice = message.isVoice;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn('flex gap-3 mb-4', isUser ? 'justify-end' : 'justify-start')}
+    >
+      {!isUser && (
+        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+          <Image
+            src={maestro.avatar}
+            alt={maestro.name}
+            width={32}
+            height={32}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+      <div
+        className={cn(
+          'max-w-[80%] px-4 py-3 rounded-2xl',
+          isUser
+            ? 'bg-blue-500 text-white rounded-br-md'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-bl-md'
+        )}
+        style={isUser ? { backgroundColor: maestro.color } : undefined}
+      >
+        {isVoice && (
+          <span className="text-xs opacity-60 mb-1 flex items-center gap-1">
+            <Volume2 className="w-3 h-3" /> Trascrizione vocale
+          </span>
+        )}
+        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+        <div className="flex items-center justify-between mt-1">
+          <span className="text-xs opacity-60">
+            {new Date(message.timestamp).toLocaleTimeString('it-IT', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </span>
+          {!isUser && ttsEnabled && (
+            <button
+              onClick={() => speak(message.content)}
+              className="text-xs opacity-60 hover:opacity-100"
+              title="Leggi ad alta voce"
+            >
+              <Volume2 className="w-3 h-3" />
+            </button>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: MaestroSessionProps) {
   // Chat state
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-
-  // Voice state
-  const [voiceActive, setVoiceActive] = useState(initialMode === 'voice');
+  const [isVoiceActive, setIsVoiceActive] = useState(initialMode === 'voice');
   const [showWebcam, setShowWebcam] = useState(false);
   const [webcamRequest, setWebcamRequest] = useState<{ purpose: string; instructions?: string; callId: string } | null>(null);
-  const [isToolFullscreen, setIsToolFullscreen] = useState(false);
 
   // Session tracking
-  const sessionStartTime = useRef<Date>(new Date());
-  const questionCount = useRef<number>(0);
   const [sessionEnded, setSessionEnded] = useState(false);
+  const sessionStartTime = useRef(Date.now());
+  const questionCount = useRef(0);
 
+  // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const { settings } = useAccessibilityStore();
+  // Stores
+  const { addXP, endSession } = useProgressStore();
   const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
-  const { currentSession, startSession, endSession } = useProgressStore();
-
-  // Voice session hook
-  const {
-    isConnected,
-    isListening,
-    isSpeaking,
-    isMuted,
-    inputLevel,
-    outputLevel,
-    connectionState,
-    inputAnalyser,
-    connect,
-    disconnect,
-    toggleMute,
-    sendText: sendVoiceText,
-    cancelResponse,
-    sendWebcamResult,
-    toolCalls: voiceToolCalls,
-    clearToolCalls: clearVoiceToolCalls,
-  } = useVoiceSession({
-    onError: (error) => {
-      const message = error instanceof Error ? error.message : String(error);
-      logger.error('Voice error', { message });
-    },
-    onTranscript: (role, text) => {
-      // Add voice transcript to chat messages
-      const voiceMessage: ChatMessage = {
-        id: `voice-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-        role: role as 'user' | 'assistant',
-        content: text,
-        timestamp: new Date(),
-        isVoice: true,
-      };
-      setMessages(prev => [...prev, voiceMessage]);
-
-      // Count user questions
-      if (role === 'user' && text.includes('?')) {
-        questionCount.current++;
-      }
-    },
-    onWebcamRequest: (request) => {
-      logger.debug('Webcam requested', { purpose: request.purpose });
-      setWebcamRequest(request);
-      setShowWebcam(true);
-    },
-  });
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: settings.reducedMotion ? 'auto' : 'smooth' });
-  }, [messages, settings.reducedMotion]);
 
   // Add greeting message on mount
   useEffect(() => {
-    const greetingMessage: ChatMessage = {
+    setMessages([{
       id: 'greeting',
       role: 'assistant',
       content: maestro.greeting,
       timestamp: new Date(),
-    };
-    setMessages([greetingMessage]);
+    }]);
+  }, [maestro.greeting]);
 
-    if (settings.ttsAutoRead && !voiceActive) {
-      speak(maestro.greeting);
-    }
-  }, [maestro.greeting, settings.ttsAutoRead, speak, voiceActive]);
-
-  // Start voice session when voice is active
+  // Auto-scroll to bottom
   useEffect(() => {
-    if (voiceActive && connectionState === 'idle') {
-      const startVoice = async () => {
-        try {
-          await connect(maestro, { provider: 'azure', proxyPort: 3001, configured: true });
-          if (!currentSession) {
-            sessionStartTime.current = new Date();
-            startSession(maestro.id, maestro.specialty);
-          }
-        } catch (error) {
-          logger.error('Failed to start voice', { error: String(error) });
-          setVoiceActive(false);
-        }
-      };
-      startVoice();
-    }
-  }, [voiceActive, connectionState, connect, maestro, currentSession, startSession]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, toolCalls]);
 
-  // Merge voice tool calls into main tool calls
+  // Focus input when not in voice mode
   useEffect(() => {
-    if (voiceToolCalls.length > 0) {
-      setToolCalls(prev => [...prev, ...voiceToolCalls]);
-      clearVoiceToolCalls();
+    if (!isVoiceActive) {
+      inputRef.current?.focus();
     }
-  }, [voiceToolCalls, clearVoiceToolCalls]);
+  }, [isVoiceActive]);
 
-  // Handle webcam capture
-  const handleWebcamCapture = useCallback((imageData: string) => {
-    if (webcamRequest) {
-      sendWebcamResult(webcamRequest.callId, imageData);
-      setShowWebcam(false);
-      setWebcamRequest(null);
+  // Handle voice transcript updates
+  const handleVoiceTranscript = useCallback((role: 'user' | 'assistant', text: string) => {
+    if (role === 'user') {
+      questionCount.current += 1;
     }
-  }, [webcamRequest, sendWebcamResult]);
+    setMessages(prev => [...prev, {
+      id: `voice-${Date.now()}`,
+      role,
+      content: text,
+      timestamp: new Date(),
+      isVoice: true,
+    }]);
+  }, []);
 
-  const handleWebcamClose = useCallback(() => {
-    if (webcamRequest) {
-      sendWebcamResult(webcamRequest.callId, null);
-    }
-    setShowWebcam(false);
-    setWebcamRequest(null);
-  }, [webcamRequest, sendWebcamResult]);
-
-  // End session and generate evaluation
-  const handleEndSession = useCallback(async () => {
-    if (sessionEnded) return;
-
-    disconnect();
-    setVoiceActive(false);
+  // End voice and generate evaluation
+  const handleEndVoice = useCallback(async () => {
+    setIsVoiceActive(false);
     setSessionEnded(true);
 
-    // Calculate metrics
-    const durationMinutes = Math.round(
-      (Date.now() - sessionStartTime.current.getTime()) / 60000
-    );
-    const xpEarned = currentSession?.xpEarned || Math.max(5, messages.length * 2);
+    const sessionDuration = Math.round((Date.now() - sessionStartTime.current) / 60000);
+    const xpEarned = Math.min(100, sessionDuration * 5 + questionCount.current * 10);
 
-    // Generate evaluation
-    const evaluation = generateAutoEvaluation(
-      questionCount.current,
-      durationMinutes,
-      xpEarned
-    );
+    const eval_ = generateAutoEvaluation(questionCount.current, sessionDuration, xpEarned);
 
-    // Try to save to diary (learning extraction)
+    // Try to save to diary
     try {
-      // Get conversation ID from last message or create one
       const response = await fetch('/api/learnings/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          conversationId: `session-${sessionStartTime.current.getTime()}`,
-          subject: maestro.specialty,
-          // Include evaluation data for extraction
-          evaluationData: {
-            score: evaluation.score,
-            feedback: evaluation.feedback,
-            strengths: evaluation.strengths,
-            areasToImprove: evaluation.areasToImprove,
-          },
+          conversationId: `maestro-${maestro.id}-${Date.now()}`,
+          maestroId: maestro.id,
+          messages: messages.map(m => ({ role: m.role, content: m.content })),
         }),
       });
-
       if (response.ok) {
-        evaluation.savedToDiary = true;
-        logger.info('Learning saved to diary', { maestroId: maestro.id });
+        eval_.savedToDiary = true;
       }
     } catch (error) {
-      logger.error('Failed to save to diary', { error: String(error) });
+      logger.error('Failed to extract learnings', { error });
     }
 
-    // Add evaluation as chat message
-    const evaluationMessage: ChatMessage = {
-      id: `evaluation-${Date.now()}`,
+    // Add evaluation message to chat
+    setMessages(prev => [...prev, {
+      id: `eval-${Date.now()}`,
       role: 'assistant',
-      content: '', // Not used for display
+      content: '',
       timestamp: new Date(),
       type: 'evaluation',
-      evaluation,
-    };
-    setMessages(prev => [...prev, evaluationMessage]);
+      evaluation: eval_,
+    }]);
 
-    // End session in store
+    // Update progress
+    addXP(xpEarned);
     endSession();
-  }, [sessionEnded, disconnect, currentSession, messages.length, maestro, endSession]);
-
-  // Handle close
-  const handleClose = useCallback(() => {
-    if (voiceActive && !sessionEnded) {
-      handleEndSession();
-      // Delay close to show evaluation
-      setTimeout(onClose, 500);
-    } else {
-      onClose();
-    }
-  }, [voiceActive, sessionEnded, handleEndSession, onClose]);
-
-  // Handle Escape key (must be after handleClose is defined)
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (isToolFullscreen) {
-          setIsToolFullscreen(false);
-        } else {
-          handleClose();
-        }
-      }
-    };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isToolFullscreen, handleClose]);
+  }, [maestro.id, messages, addXP, endSession]);
 
   // Handle text submit
   const handleSubmit = async (e: React.FormEvent) => {
@@ -343,59 +463,48 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
       timestamp: new Date(),
     };
 
-    // Count questions
-    if (input.includes('?')) {
-      questionCount.current++;
-    }
-
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    questionCount.current += 1;
 
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content,
-          })),
-          systemPrompt: maestro.systemPrompt,
+          messages: [
+            { role: 'system', content: maestro.systemPrompt },
+            ...messages.map(m => ({ role: m.role, content: m.content })),
+            { role: 'user', content: input.trim() },
+          ],
           maestroId: maestro.id,
         }),
       });
 
-      if (!response.ok) throw new Error('Chat request failed');
-
+      if (!response.ok) throw new Error('Failed to get response');
       const data = await response.json();
 
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: data.content,
+        content: data.content || data.message || '',
         timestamp: new Date(),
-        tokens: data.usage?.total_tokens,
       };
-
       setMessages(prev => [...prev, assistantMessage]);
 
-      if (data.toolCalls) {
+      // Handle tool calls
+      if (data.toolCalls?.length > 0) {
         setToolCalls(prev => [...prev, ...data.toolCalls]);
       }
-
-      if (settings.ttsAutoRead && !voiceActive) {
-        speak(data.content);
-      }
     } catch (error) {
-      logger.error('Chat error', { error: String(error) });
-      const errorMessage: ChatMessage = {
+      logger.error('Chat error', { error });
+      setMessages(prev => [...prev, {
         id: `error-${Date.now()}`,
         role: 'assistant',
-        content: 'Mi scuso, si è verificato un errore. Riprova.',
+        content: 'Mi dispiace, ho avuto un problema. Puoi riprovare?',
         timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, errorMessage]);
+      }]);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
@@ -409,12 +518,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     }
   };
 
-  const copyMessage = async (content: string, id: string) => {
-    await navigator.clipboard.writeText(content);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
   const clearChat = () => {
     setMessages([{
       id: 'greeting',
@@ -424,541 +527,274 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     }]);
     setToolCalls([]);
     questionCount.current = 0;
+    setSessionEnded(false);
   };
 
-  // Manual tool trigger
-  const triggerManualTool = useCallback((toolName: string) => {
-    if (toolName === 'capture_homework') {
-      setWebcamRequest({ purpose: 'homework', instructions: 'Mostra il tuo compito o libro', callId: `manual-${Date.now()}` });
-      setShowWebcam(true);
-    } else if (voiceActive && isConnected) {
-      const toolPrompts: Record<string, string> = {
-        mindmap: 'Usa lo strumento create_mindmap per creare ORA una mappa mentale visiva sull\'argomento che stiamo discutendo.',
-        quiz: 'Usa lo strumento create_quiz per creare ORA un quiz interattivo con domande a scelta multipla.',
-        flashcard: 'Usa lo strumento create_flashcards per creare ORA delle flashcard interattive.',
-        search: 'Usa lo strumento web_search per cercare ORA informazioni aggiornate.',
-      };
-      if (toolPrompts[toolName]) {
-        sendVoiceText(toolPrompts[toolName]);
-      }
-    }
-  }, [voiceActive, isConnected, sendVoiceText]);
-
-  // Voice state text
-  const stateText = connectionState === 'connecting'
-    ? 'Connessione in corso...'
-    : isListening
-    ? 'Ti sto ascoltando...'
-    : isSpeaking
-    ? `${maestro.name} sta parlando...`
-    : isConnected
-    ? 'Pronto - parla ora'
-    : 'Disconnesso';
+  // Handle webcam capture
+  const handleWebcamCapture = useCallback((_imageData: string) => {
+    // TODO: Send image to AI for analysis
+    setShowWebcam(false);
+    setWebcamRequest(null);
+    setMessages(prev => [...prev, {
+      id: `webcam-${Date.now()}`,
+      role: 'user',
+      content: '[Foto catturata]',
+      timestamp: new Date(),
+    }]);
+  }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex bg-black/50"
-    >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className={cn(
-          'flex-1 flex m-4 rounded-2xl shadow-2xl overflow-hidden',
-          settings.highContrast
-            ? 'bg-black border-2 border-yellow-400'
-            : 'bg-white dark:bg-slate-900'
+    <div className="relative flex flex-col h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden">
+      {/* Voice call overlay */}
+      <AnimatePresence>
+        {isVoiceActive && (
+          <VoiceCallOverlay
+            maestro={maestro}
+            onEnd={handleEndVoice}
+            onTranscriptUpdate={handleVoiceTranscript}
+          />
         )}
-      >
-        {/* Left: Chat Area */}
-        <div className={cn(
-          'flex flex-col',
-          voiceActive ? 'flex-1' : 'w-full',
-          isToolFullscreen && 'hidden'
-        )}>
-          {/* Header */}
-          <header
-            className={cn(
-              'flex items-center justify-between px-4 py-3 border-b',
-              settings.highContrast
-                ? 'border-yellow-400 bg-black'
-                : 'border-slate-200 dark:border-slate-700'
-            )}
-            style={{ backgroundColor: `${maestro.color}10` }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-full overflow-hidden"
-                style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
-              >
-                <Image
-                  src={maestro.avatar}
-                  alt={maestro.name}
-                  width={40}
-                  height={40}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <h2 className={cn(
-                  'font-semibold',
-                  settings.highContrast ? 'text-yellow-400' : 'text-slate-900 dark:text-white'
-                )}>
-                  {maestro.name}
-                </h2>
-                <p className={cn(
-                  'text-xs',
-                  settings.highContrast ? 'text-gray-400' : 'text-slate-500'
-                )}>
-                  {maestro.specialty}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* TTS toggle */}
-              <button
-                onClick={() => (ttsEnabled ? stopTTS() : null)}
-                className={cn(
-                  'p-2 rounded-lg transition-colors',
-                  settings.highContrast
-                    ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                    : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700'
-                )}
-                title={ttsEnabled ? 'TTS attivo' : 'TTS disattivo'}
-              >
-                {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-              </button>
-
-              {/* Voice toggle */}
-              <button
-                onClick={() => {
-                  if (voiceActive) {
-                    disconnect();
-                    setVoiceActive(false);
-                  } else {
-                    setVoiceActive(true);
-                  }
-                }}
-                className={cn(
-                  'p-2 rounded-lg transition-colors',
-                  voiceActive
-                    ? 'bg-green-500 text-white hover:bg-green-600'
-                    : settings.highContrast
-                    ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                )}
-                title={voiceActive ? 'Voce attiva' : 'Attiva voce'}
-              >
-                <Mic className="w-4 h-4" />
-              </button>
-
-              {/* Fullscreen toggle */}
-              {toolCalls.length > 0 && (
-                <button
-                  onClick={() => setIsToolFullscreen(!isToolFullscreen)}
-                  className={cn(
-                    'p-2 rounded-lg transition-colors',
-                    settings.highContrast
-                      ? 'text-yellow-400 hover:bg-yellow-400/20'
-                      : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-                  )}
-                  title={isToolFullscreen ? 'Esci fullscreen' : 'Fullscreen'}
-                >
-                  {isToolFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                </button>
-              )}
-
-              {/* Clear chat */}
-              <button
-                onClick={clearChat}
-                className={cn(
-                  'p-2 rounded-lg transition-colors',
-                  settings.highContrast
-                    ? 'text-yellow-400 hover:bg-yellow-400/20'
-                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-                )}
-                title="Nuova conversazione"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-
-              {/* Close */}
-              <button
-                onClick={handleClose}
-                className={cn(
-                  'p-2 rounded-lg transition-colors',
-                  settings.highContrast
-                    ? 'text-yellow-400 hover:bg-yellow-400/20'
-                    : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-                )}
-                title="Chiudi"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </header>
-
-          {/* Messages */}
-          <main className={cn(
-            'flex-1 overflow-y-auto p-4 space-y-4',
-            settings.highContrast ? 'bg-black' : ''
-          )}>
-            <AnimatePresence mode="popLayout">
-              {messages.map((message) => {
-                // Render evaluation card
-                if (message.type === 'evaluation' && message.evaluation) {
-                  return (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="max-w-md mx-auto"
-                    >
-                      <EvaluationCard
-                        evaluation={message.evaluation}
-                        maestroName={maestro.name}
-                        maestroColor={maestro.color}
-                      />
-                    </motion.div>
-                  );
-                }
-
-                // Regular message
-                return (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className={cn(
-                      'flex gap-3',
-                      message.role === 'user' ? 'justify-end' : 'justify-start'
-                    )}
-                  >
-                    {message.role === 'assistant' && (
-                      <div
-                        className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
-                        style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
-                      >
-                        <Image
-                          src={maestro.avatar}
-                          alt={maestro.name}
-                          width={32}
-                          height={32}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    )}
-
-                    <div
-                      className={cn(
-                        'max-w-[80%] rounded-2xl px-4 py-3 relative group',
-                        message.role === 'user'
-                          ? settings.highContrast
-                            ? 'bg-yellow-400 text-black'
-                            : 'bg-blue-500 text-white'
-                          : settings.highContrast
-                            ? 'bg-gray-900 text-white border border-gray-700'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                      )}
-                    >
-                      {/* Voice indicator */}
-                      {message.isVoice && (
-                        <span className="text-xs opacity-60 mr-2">&#128266;</span>
-                      )}
-                      <p className="whitespace-pre-wrap inline">{message.content}</p>
-
-                      <button
-                        onClick={() => copyMessage(message.content, message.id)}
-                        className={cn(
-                          'absolute -right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded-full transition-opacity',
-                          settings.highContrast
-                            ? 'bg-yellow-400 text-black'
-                            : 'bg-white dark:bg-slate-700 shadow-md'
-                        )}
-                        title="Copia messaggio"
-                      >
-                        {copiedId === message.id ? (
-                          <Check className="w-3 h-3 text-green-500" />
-                        ) : (
-                          <Copy className="w-3 h-3" />
-                        )}
-                      </button>
-                    </div>
-
-                    {message.role === 'user' && (
-                      <div className={cn(
-                        'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
-                        settings.highContrast
-                          ? 'bg-yellow-400 text-black'
-                          : 'bg-blue-500 text-white'
-                      )}>
-                        <User className="w-4 h-4" />
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-
-            {/* Tool calls inline */}
-            {toolCalls.length > 0 && (
-              <div className="space-y-3">
-                {toolCalls.map((toolCall) => (
-                  <ToolResultDisplay key={toolCall.id} toolCall={toolCall} />
-                ))}
-              </div>
-            )}
-
-            {/* Loading indicator */}
-            {isLoading && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex gap-3"
-              >
-                <div
-                  className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
-                  style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
-                >
-                  <Image
-                    src={maestro.avatar}
-                    alt={maestro.name}
-                    width={32}
-                    height={32}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className={cn(
-                  'rounded-2xl px-4 py-3 flex items-center gap-2',
-                  settings.highContrast
-                    ? 'bg-gray-900 border border-gray-700'
-                    : 'bg-slate-100 dark:bg-slate-800'
-                )}>
-                  <Loader2 className={cn(
-                    'w-4 h-4 animate-spin',
-                    settings.highContrast ? 'text-yellow-400' : 'text-blue-500'
-                  )} />
-                  <span className={cn(
-                    'text-sm',
-                    settings.highContrast ? 'text-gray-400' : 'text-slate-500'
-                  )}>
-                    {maestro.name} sta pensando...
-                  </span>
-                </div>
-              </motion.div>
-            )}
-
-            <div ref={messagesEndRef} />
-          </main>
-
-          {/* Input */}
-          <footer className={cn(
-            'border-t p-4',
-            settings.highContrast
-              ? 'border-yellow-400 bg-black'
-              : 'border-slate-200 dark:border-slate-700'
-          )}>
-            <form onSubmit={handleSubmit} className="flex gap-3">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder={voiceActive ? "Puoi anche scrivere..." : "Scrivi un messaggio..."}
-                rows={1}
-                className={cn(
-                  'flex-1 resize-none rounded-xl px-4 py-3 focus:outline-none focus:ring-2',
-                  settings.highContrast
-                    ? 'bg-gray-900 text-white border-2 border-yellow-400 focus:ring-yellow-400'
-                    : 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-blue-500'
-                )}
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className={cn(
-                  'px-4 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
-                  settings.highContrast
-                    ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
-                )}
-                style={{ backgroundColor: input.trim() ? maestro.color : undefined }}
-              >
-                <Send className="w-5 h-5" />
-              </button>
-            </form>
-          </footer>
-        </div>
-
-        {/* Right: Voice Panel */}
-        {voiceActive && (
-          <motion.div
-            initial={{ x: 20, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 20, opacity: 0 }}
-            className={cn(
-              'w-80 flex flex-col border-l',
-              settings.highContrast
-                ? 'border-yellow-400 bg-black'
-                : 'border-slate-200 dark:border-slate-700'
-            )}
-            style={{ background: `linear-gradient(to bottom, ${maestro.color}22, ${maestro.color}11)` }}
-          >
-            {/* Voice Header */}
-            <div className="p-4 border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-white/90">Sessione Voce</h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleEndSession}
-                  className="text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <PhoneOff className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            {/* Avatar + Waveform */}
-            <div className="flex-1 flex flex-col items-center justify-center p-6 gap-4">
-              <CircularWaveform
-                level={isSpeaking ? outputLevel : inputLevel}
-                isActive={isListening || isSpeaking}
-                color={maestro.color}
-                size={120}
-                image={maestro.avatar}
-              />
-
-              <motion.p
-                key={stateText}
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-sm text-white/80 text-center"
-              >
-                {stateText}
-              </motion.p>
-
-              {/* Mini waveform */}
-              <div className="w-full">
-                <CanvasWaveform
-                  analyser={inputAnalyser}
-                  isActive={isListening || isSpeaking}
-                  color={isListening ? '#22C55E' : maestro.color}
-                  height={48}
-                />
-              </div>
-            </div>
-
-            {/* Tool buttons */}
-            <div className="p-4 border-t border-white/10">
-              <div className="grid grid-cols-3 gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => triggerManualTool('capture_homework')}
-                  className="flex-col h-auto py-2 text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <Camera className="h-4 w-4 mb-1" />
-                  <span className="text-xs">Webcam</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => triggerManualTool('mindmap')}
-                  className="flex-col h-auto py-2 text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <Network className="h-4 w-4 mb-1" />
-                  <span className="text-xs">Mappa</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => triggerManualTool('quiz')}
-                  className="flex-col h-auto py-2 text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <Brain className="h-4 w-4 mb-1" />
-                  <span className="text-xs">Quiz</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => triggerManualTool('flashcard')}
-                  className="flex-col h-auto py-2 text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <BookOpen className="h-4 w-4 mb-1" />
-                  <span className="text-xs">Flashcard</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => triggerManualTool('search')}
-                  className="flex-col h-auto py-2 text-white/70 hover:text-white hover:bg-white/10"
-                >
-                  <Search className="h-4 w-4 mb-1" />
-                  <span className="text-xs">Cerca</span>
-                </Button>
-              </div>
-            </div>
-
-            {/* Voice controls */}
-            <div className="p-4 border-t border-white/10">
-              <div className="flex items-center justify-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleMute}
-                  className={cn(
-                    'rounded-full',
-                    isMuted
-                      ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
-                      : 'bg-white/10 text-white hover:bg-white/20'
-                  )}
-                >
-                  {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                </Button>
-
-                {isSpeaking && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={cancelResponse}
-                    className="rounded-full bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
-                  >
-                    <VolumeX className="h-5 w-5" />
-                  </Button>
-                )}
-
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  onClick={handleEndSession}
-                  className="rounded-full"
-                >
-                  <PhoneOff className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </motion.div>
+      </AnimatePresence>
 
       {/* Webcam overlay */}
       <AnimatePresence>
         {showWebcam && webcamRequest && (
-          <WebcamCapture
-            purpose={webcamRequest.purpose}
-            instructions={webcamRequest.instructions}
-            onCapture={handleWebcamCapture}
-            onClose={handleWebcamClose}
-          />
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-40 bg-black/90 flex items-center justify-center"
+          >
+            <div className="w-full max-w-lg">
+              <WebcamCapture
+                onCapture={handleWebcamCapture}
+                onClose={() => { setShowWebcam(false); setWebcamRequest(null); }}
+                instructions={webcamRequest.instructions}
+              />
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+
+      {/* Header - matches ConversationFlow header */}
+      <div
+        className="flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700"
+        style={{ backgroundColor: `${maestro.color}15` }}
+      >
+        <div
+          className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-offset-2"
+          style={{ borderColor: maestro.color }}
+        >
+          <Image
+            src={maestro.avatar}
+            alt={maestro.name}
+            width={48}
+            height={48}
+            className="w-full h-full object-cover"
+            priority
+          />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-base truncate text-slate-900 dark:text-white">
+              {maestro.name}
+            </h2>
+            <span
+              className="text-xs px-2 py-0.5 rounded-full font-medium"
+              style={{ backgroundColor: `${maestro.color}20`, color: maestro.color }}
+            >
+              Maestro
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+            {maestro.specialty}
+          </p>
+        </div>
+
+        {/* Voice call button */}
+        <Button
+          variant={isVoiceActive ? 'destructive' : 'outline'}
+          size="icon"
+          onClick={() => setIsVoiceActive(!isVoiceActive)}
+          aria-label={isVoiceActive ? 'Termina chiamata' : 'Chiama a voce'}
+          className={cn(
+            'relative',
+            isVoiceActive && 'animate-pulse'
+          )}
+        >
+          {isVoiceActive ? (
+            <PhoneOff className="w-4 h-4" />
+          ) : (
+            <Phone className="w-4 h-4" />
+          )}
+        </Button>
+
+        {/* TTS toggle */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={stopTTS}
+          aria-label={ttsEnabled ? 'TTS attivo' : 'TTS disattivo'}
+        >
+          {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+        </Button>
+
+        {/* Clear chat */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={clearChat}
+          aria-label="Nuova conversazione"
+        >
+          <RotateCcw className="w-4 h-4" />
+        </Button>
+
+        {/* Close */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          aria-label="Chiudi"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      </div>
+
+      {/* Messages area */}
+      <div
+        className="flex-1 overflow-y-auto p-4"
+        role="log"
+        aria-live="polite"
+        aria-label="Messaggi della conversazione"
+      >
+        {messages.map((message) => (
+          message.type === 'evaluation' && message.evaluation ? (
+            <EvaluationCard
+              key={message.id}
+              evaluation={message.evaluation}
+              maestroName={maestro.name}
+              maestroColor={maestro.color}
+              className="mb-4"
+            />
+          ) : (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              maestro={maestro}
+              ttsEnabled={ttsEnabled}
+              speak={speak}
+            />
+          )
+        ))}
+
+        {/* Tool results inline */}
+        {toolCalls.map((tool) => (
+          <motion.div
+            key={tool.id}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-4"
+          >
+            <ToolResultDisplay
+              tool={tool}
+              onClose={() => setToolCalls(prev => prev.filter(t => t.id !== tool.id))}
+            />
+          </motion.div>
+        ))}
+
+        {/* Loading indicator */}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex gap-3 mb-4"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+              <Image
+                src={maestro.avatar}
+                alt={maestro.name}
+                width={32}
+                height={32}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-md">
+              <Loader2 className="w-5 h-5 animate-spin text-slate-500" />
+            </div>
+          </motion.div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input area */}
+      <div className="p-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex items-center gap-2">
+          {/* Tool buttons */}
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={() => {
+                setWebcamRequest({ purpose: 'homework', instructions: 'Mostra il tuo compito', callId: `cam-${Date.now()}` });
+                setShowWebcam(true);
+              }}
+              disabled={isLoading}
+              title="Scatta foto"
+            >
+              <Camera className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={isLoading}
+              title="Mappa mentale"
+            >
+              <Brain className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={isLoading}
+              title="Quiz"
+            >
+              <BookOpen className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              disabled={isLoading}
+              title="Cerca"
+            >
+              <Search className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={`Scrivi un messaggio a ${maestro.name}...`}
+            aria-label={`Scrivi un messaggio a ${maestro.name}`}
+            className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl border-0 focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 dark:text-white placeholder:text-slate-500"
+            disabled={isLoading || sessionEnded}
+          />
+
+          <Button
+            size="icon"
+            onClick={handleSubmit}
+            disabled={!input.trim() || isLoading || sessionEnded}
+            aria-label="Invia messaggio"
+            style={{ backgroundColor: maestro.color }}
+            className="hover:opacity-90"
+          >
+            <Send className="w-5 h-5" aria-hidden="true" />
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
