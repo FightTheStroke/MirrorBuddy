@@ -239,6 +239,23 @@ ConvergioEdu supports multiple AI providers. Choose based on your needs:
 |----------|--------------|----------|------|
 | **Azure OpenAI** | Full voice | Production, schools | Pay-per-use |
 | **Ollama** | Text only | Local dev, privacy | Free |
+| **Showcase Mode** | Simulated | Demo, no API needed | Free |
+
+### Try Without an API Key (Showcase Mode)
+
+Want to explore the app without setting up Azure or Ollama? Use **Showcase Mode**:
+
+1. Go to **Settings → AI Provider**
+2. Click **"Modalità Showcase"** button
+3. Navigate to `/showcase` to explore all features with pre-recorded responses
+
+Showcase includes:
+- All 17 Maestri with simulated conversations
+- Mind maps, flashcards, quizzes demo
+- Voice UI preview (without actual voice)
+- Full accessibility features
+
+Perfect for demos, presentations, or trying the app before committing to an API.
 
 ### Option 1: Azure OpenAI (Recommended)
 
