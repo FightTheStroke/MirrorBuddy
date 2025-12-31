@@ -3,12 +3,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, GraduationCap } from 'lucide-react';
+import { ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, GraduationCap, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { maestri } from '@/data';
 import { cn } from '@/lib/utils';
+import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
 
 // Featured maestri to highlight (first shown in carousel)
 const FEATURED_IDS = ['euclide', 'leonardo', 'curie', 'shakespeare', 'feynman', 'darwin'];
@@ -20,10 +21,32 @@ const FEATURED_IDS = ['euclide', 'leonardo', 'curie', 'shakespeare', 'feynman', 
  * Highlights a few featured ones and allows scrolling through all.
  */
 export function MaestriStep() {
-  const { data, nextStep, prevStep } = useOnboardingStore();
+  const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+
+  // Auto-speak Melissa's maestri message
+  const { isPlaying, stop } = useOnboardingTTS({
+    autoSpeak: !isVoiceMuted,
+    text: ONBOARDING_SCRIPTS.maestri,
+    delay: 500,
+  });
+
+  const toggleMute = () => {
+    if (isPlaying) stop();
+    setVoiceMuted(!isVoiceMuted);
+  };
+
+  const handleNext = () => {
+    stop();
+    nextStep();
+  };
+
+  const handlePrev = () => {
+    stop();
+    prevStep();
+  };
 
   // Sort maestri: featured first, then alphabetically
   const sortedMaestri = [...maestri].sort((a, b) => {
@@ -78,7 +101,7 @@ export function MaestriStep() {
               className="object-cover w-full h-full"
             />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
               I tuoi Maestri, {data.name}!
             </h2>
@@ -86,6 +109,21 @@ export function MaestriStep() {
               {maestri.length} grandi geni pronti ad aiutarti
             </p>
           </div>
+          {/* Voice toggle */}
+          <button
+            onClick={toggleMute}
+            className={cn(
+              'p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors'
+            )}
+            aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+          >
+            {isVoiceMuted ? (
+              <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+            ) : (
+              <Volume2 className={cn('w-5 h-5 text-pink-600 dark:text-pink-400', isPlaying && 'animate-pulse')} />
+            )}
+          </button>
         </div>
 
         {/* Carousel */}
@@ -198,7 +236,7 @@ export function MaestriStep() {
           className="flex gap-3 pt-2"
         >
           <Button
-            onClick={prevStep}
+            onClick={handlePrev}
             variant="outline"
             size="lg"
             className="flex-1"
@@ -207,7 +245,7 @@ export function MaestriStep() {
             Indietro
           </Button>
           <Button
-            onClick={nextStep}
+            onClick={handleNext}
             size="lg"
             className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
           >

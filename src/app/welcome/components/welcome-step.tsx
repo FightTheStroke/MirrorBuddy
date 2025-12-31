@@ -3,11 +3,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles, ArrowRight } from 'lucide-react';
+import { Sparkles, ArrowRight, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import {
+  useOnboardingTTS,
+  ONBOARDING_SCRIPTS,
+} from '@/lib/hooks/use-onboarding-tts';
 
 /**
  * Step 1: Melissa intro + asks for student name
@@ -16,9 +20,23 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store';
  * She warmly welcomes the student and asks for their name.
  */
 export function WelcomeStep() {
-  const { data, updateData, nextStep, isReplayMode } = useOnboardingStore();
+  const { data, updateData, nextStep, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
   const [name, setName] = useState(data.name || '');
   const [error, setError] = useState('');
+
+  // Auto-speak Melissa's welcome message
+  const { isPlaying, stop } = useOnboardingTTS({
+    autoSpeak: !isVoiceMuted,
+    text: ONBOARDING_SCRIPTS.welcome,
+    delay: 800, // Wait for animation
+  });
+
+  const toggleMute = () => {
+    if (isPlaying) {
+      stop();
+    }
+    setVoiceMuted(!isVoiceMuted);
+  };
 
   const handleContinue = () => {
     const trimmedName = name.trim();
@@ -30,6 +48,7 @@ export function WelcomeStep() {
       setError('Il nome deve avere almeno 2 caratteri');
       return;
     }
+    stop(); // Stop voice before navigating
     updateData({ name: trimmedName });
     nextStep();
   };
@@ -72,12 +91,29 @@ export function WelcomeStep() {
               </motion.div>
             </div>
 
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl font-bold mb-1">Ciao! Sono Melissa</h1>
               <p className="text-pink-100 text-sm">
                 La tua insegnante di sostegno
               </p>
             </div>
+
+            {/* Voice toggle button */}
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              onClick={toggleMute}
+              className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+              aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+              title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            >
+              {isVoiceMuted ? (
+                <VolumeX className="w-5 h-5 text-white" />
+              ) : (
+                <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
+              )}
+            </motion.button>
           </motion.div>
         </div>
 

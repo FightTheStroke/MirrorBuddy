@@ -3,11 +3,12 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Rocket, ArrowLeft, PartyPopper, Sparkles } from 'lucide-react';
+import { Rocket, ArrowLeft, PartyPopper, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useSettingsStore } from '@/lib/stores/app-store';
+import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
 
 // Pre-defined sparkle offsets (avoids Math.random during render)
 const SPARKLE_OFFSETS = [5, -12, 18, -8, 15, -5];
@@ -19,10 +20,28 @@ const SPARKLE_OFFSETS = [5, -12, 18, -8, 15, -5];
  */
 export function ReadyStep() {
   const router = useRouter();
-  const { data, prevStep, completeOnboarding, isReplayMode } = useOnboardingStore();
+  const { data, prevStep, completeOnboarding, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
   const { updateStudentProfile } = useSettingsStore();
 
+  // Auto-speak Melissa's ready message (personalized with name)
+  const { isPlaying, stop } = useOnboardingTTS({
+    autoSpeak: !isVoiceMuted,
+    text: ONBOARDING_SCRIPTS.ready(data.name),
+    delay: 500,
+  });
+
+  const toggleMute = () => {
+    if (isPlaying) stop();
+    setVoiceMuted(!isVoiceMuted);
+  };
+
+  const handlePrev = () => {
+    stop();
+    prevStep();
+  };
+
   const handleStart = () => {
+    stop();
     // Save collected data to settings store (only if not replay mode)
     if (!isReplayMode) {
       updateStudentProfile({
@@ -54,6 +73,20 @@ export function ReadyStep() {
       <CardContent className="p-0">
         {/* Celebratory header */}
         <div className="relative bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 p-8 text-white text-center">
+          {/* Voice toggle */}
+          <button
+            onClick={toggleMute}
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+            aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+          >
+            {isVoiceMuted ? (
+              <VolumeX className="w-5 h-5 text-white" />
+            ) : (
+              <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
+            )}
+          </button>
+
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
