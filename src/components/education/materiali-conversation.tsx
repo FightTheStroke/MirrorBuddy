@@ -395,7 +395,7 @@ export function MaterialiConversation({
             size="sm"
             onClick={toggleVoiceMode}
             className={cn(
-              isVoiceMode && 'bg-blue-500 text-white hover:bg-blue-600'
+              isVoiceMode && 'bg-accent-themed text-white hover:opacity-90'
             )}
             aria-label={isVoiceMode ? 'Disattiva voce' : 'Attiva voce'}
           >
@@ -488,7 +488,7 @@ export function MaterialiConversation({
                       message.role === 'user'
                         ? settings.highContrast
                           ? 'bg-yellow-400 text-black'
-                          : 'bg-blue-500 text-white'
+                          : 'bg-accent-themed text-white'
                         : settings.highContrast
                           ? 'bg-gray-900 text-white border border-gray-700'
                           : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white',

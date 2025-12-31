@@ -12,7 +12,8 @@ export type ToolEventType =
   | 'tool:update'       // Incremental update (content chunk)
   | 'tool:complete'     // Tool finished building
   | 'tool:error'        // Error during creation
-  | 'tool:cancelled';   // User cancelled
+  | 'tool:cancelled'    // User cancelled
+  | 'mindmap:modify';   // Mindmap modification command (Phase 7)
 
 // Tool types supported by the platform
 export type ToolType =
@@ -48,7 +49,20 @@ export interface ToolEventData {
 
   // For 'tool:error'
   error?: string;
+
+  // For 'mindmap:modify' (Phase 7: Voice Commands)
+  command?: MindmapModifyCommand;
+  args?: Record<string, unknown>;
 }
+
+// Mindmap modification commands (Phase 7: Voice Commands)
+export type MindmapModifyCommand =
+  | 'mindmap_add_node'
+  | 'mindmap_connect_nodes'
+  | 'mindmap_expand_node'
+  | 'mindmap_delete_node'
+  | 'mindmap_focus_node'
+  | 'mindmap_set_color';
 
 // Connected SSE client
 interface SSEClient {

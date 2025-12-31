@@ -10,13 +10,14 @@ import {
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
-  TrendingUp,
   Target,
   Flame,
   Network,
   Calendar,
   Heart,
   Sparkles,
+  Clock,
+  Star,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -31,7 +32,7 @@ import {
 } from '@/components/education';
 import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
-import { LazyProgressView, HomeProgressWidget } from '@/components/progress';
+import { LazyProgressView } from '@/components/progress';
 import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
 import { cn } from '@/lib/utils';
@@ -60,7 +61,20 @@ export default function Home() {
   const [currentView, setCurrentView] = useState<View>('maestri');
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const { xp, level, streak } = useProgressStore();
+  const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
+
+  // XP calculations
+  const XP_PER_LEVEL = [0, 100, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000];
+  const currentLevelXP = XP_PER_LEVEL[level - 1] || 0;
+  const nextLevelXP = XP_PER_LEVEL[level] || XP_PER_LEVEL[XP_PER_LEVEL.length - 1];
+  const xpInLevel = xp - currentLevelXP;
+  const xpNeeded = nextLevelXP - currentLevelXP;
+  const progressPercent = Math.min(100, (xpInLevel / xpNeeded) * 100);
+
+  // Format study time
+  const hours = Math.floor(totalStudyMinutes / 60);
+  const minutes = totalStudyMinutes % 60;
+  const studyTimeStr = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
   const { studentProfile } = useSettingsStore();
 
   // Get selected coach and buddy from preferences (with defaults)
@@ -85,13 +99,76 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-      {/* Header with notifications and version */}
-      <div className="fixed top-2 right-3 z-50 flex items-center gap-3">
-        <NotificationBell />
-        <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
-          v{process.env.APP_VERSION}
-        </span>
-      </div>
+      {/* Unified Header Bar */}
+      <header
+        className={cn(
+          'fixed top-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300',
+          sidebarOpen ? 'left-64' : 'left-20'
+        )}
+      >
+        {/* Level + XP Progress */}
+        <div className="flex items-center gap-3 min-w-[200px]">
+          <div className="w-8 h-8 rounded-full bg-accent-themed flex items-center justify-center flex-shrink-0">
+            <Trophy className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-baseline gap-2 text-sm">
+              <span className="font-bold text-slate-900 dark:text-white">Lv.{level}</span>
+              <span className="text-xs text-slate-500">{xpInLevel}/{xpNeeded} XP</span>
+            </div>
+            <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-32">
+              <motion.div
+                className="h-full bg-accent-themed rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercent}%` }}
+                transition={{ duration: 0.5 }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-1.5" title="Streak">
+            <Flame className={cn("w-4 h-4", streak.current > 0 ? "text-orange-500" : "text-slate-400")} />
+            <span className={cn("font-semibold", streak.current > 0 ? "text-orange-500" : "text-slate-500")}>
+              {streak.current}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5" title="Sessioni questa settimana">
+            <BookOpen className="w-4 h-4 text-accent-themed" />
+            <span className="font-semibold text-slate-700 dark:text-slate-300">{sessionsThisWeek}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5" title="Tempo di studio">
+            <Clock className="w-4 h-4 text-green-500" />
+            <span className="font-semibold text-slate-700 dark:text-slate-300">{studyTimeStr}</span>
+          </div>
+
+          <div className="flex items-center gap-1.5" title="Domande fatte">
+            <Star className="w-4 h-4 text-purple-500" />
+            <span className="font-semibold text-slate-700 dark:text-slate-300">{questionsAsked}</span>
+          </div>
+
+          {/* Streak bonus badge */}
+          {streak.current >= 3 && (
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium">
+              <Flame className="w-3 h-3" />
+              +{Math.min(streak.current * 10, 50)}% XP
+            </div>
+          )}
+        </div>
+
+        {/* Right section: notifications + version */}
+        <div className="flex items-center gap-3">
+          <NotificationBell />
+          <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+            v{process.env.APP_VERSION}
+          </span>
+        </div>
+      </header>
+
       {/* Sidebar */}
       <aside
         className={cn(
@@ -100,24 +177,24 @@ export default function Home() {
         )}
       >
         {/* Logo - clickable to return home */}
-        <div className="h-16 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
+        <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
           <button
             onClick={() => setCurrentView('maestri')}
             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
             aria-label="Torna alla home"
           >
-            <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
               <Image
                 src="/icon.png"
                 alt="Convergio"
-                width={40}
-                height={40}
+                width={36}
+                height={36}
                 className="w-full h-full object-cover"
               />
             </div>
             {sidebarOpen && (
               <span className="font-bold text-lg text-slate-900 dark:text-white">
-                Convergio-Edu
+                Convergio
               </span>
             )}
           </button>
@@ -132,26 +209,8 @@ export default function Home() {
           </Button>
         </div>
 
-        {/* Quick stats */}
-        {sidebarOpen && (
-          <div className="p-4 border-b border-slate-200 dark:border-slate-800">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20">
-                <Flame className="h-5 w-5 text-orange-500 mb-1" />
-                <p className="text-2xl font-bold text-orange-600">{streak.current}</p>
-                <p className="text-xs text-orange-600/80">Streak</p>
-              </div>
-              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
-                <TrendingUp className="h-5 w-5 text-blue-500 mb-1" />
-                <p className="text-2xl font-bold text-blue-600">{level}</p>
-                <p className="text-xs text-blue-600/80">Level</p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Navigation - with bottom padding for XP bar */}
-        <nav className="p-4 space-y-2 overflow-y-auto pb-24" style={{ maxHeight: 'calc(100vh - 180px)' }}>
+        <nav className="p-4 space-y-2 overflow-y-auto pb-24" style={{ maxHeight: 'calc(100vh - 120px)' }}>
           {navItems.map((item) => {
             const isChatItem = item.id === 'coach' || item.id === 'buddy';
             const avatarSrc = 'avatar' in item ? item.avatar : null;
@@ -212,7 +271,7 @@ export default function Home() {
       {/* Main content */}
       <main
         className={cn(
-          'min-h-screen transition-all duration-300 p-8',
+          'min-h-screen transition-all duration-300 p-8 pt-20',
           sidebarOpen ? 'ml-64' : 'ml-20'
         )}
       >
@@ -232,12 +291,7 @@ export default function Home() {
             <CharacterChatView characterId={selectedBuddy} characterType="buddy" />
           )}
 
-          {currentView === 'maestri' && (
-            <>
-              <HomeProgressWidget />
-              <MaestriGrid />
-            </>
-          )}
+          {currentView === 'maestri' && <MaestriGrid />}
 
           {currentView === 'quiz' && <LazyQuizView />}
 

@@ -10,6 +10,12 @@ import {
   Sparkles,
   PlusCircle,
   Save,
+  Download,
+  Upload,
+  FileJson,
+  FileText,
+  Image,
+  FileType,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +23,16 @@ import { MindmapRenderer, createMindmapFromTopics } from '@/components/tools/mar
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import type { Subject } from '@/types';
+import { exportMindmap, downloadExport, type ExportFormat } from '@/lib/tools/mindmap-export';
+import { importMindmapFromFile } from '@/lib/tools/mindmap-import';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import { logger } from '@/lib/logger';
 
 interface MindmapNode {
   id: string;
@@ -209,6 +225,84 @@ export function MindmapsView({ className }: MindmapsViewProps) {
     setShowCreateModal(false);
   }, []);
 
+  // Handle export mindmap
+  const handleExport = useCallback(async (mindmap: SavedMindmap, format: ExportFormat) => {
+    try {
+      // Convert SavedMindmap to MindmapData format
+      const mindmapData = {
+        title: mindmap.title,
+        topic: mindmap.subject,
+        root: {
+          id: 'root',
+          text: mindmap.title,
+          children: mindmap.nodes.map((node) => ({
+            id: node.id,
+            text: node.label,
+            color: node.color,
+            children: node.children?.map((child) => ({
+              id: child.id,
+              text: child.label,
+              color: child.color,
+            })),
+          })),
+        },
+        createdAt: mindmap.createdAt.toString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      const result = await exportMindmap(mindmapData, { format });
+      downloadExport(result);
+      logger.info('Mindmap exported', { format, title: mindmap.title });
+    } catch (error) {
+      logger.error('Export failed', { error });
+      alert(`Errore durante l'esportazione: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`);
+    }
+  }, []);
+
+  // Handle import mindmap
+  const handleImport = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const result = await importMindmapFromFile(file);
+
+      if (!result.success || !result.mindmap) {
+        throw new Error(result.error || 'Import failed');
+      }
+
+      // Convert MindmapData to SavedMindmap format
+      const convertNode = (node: { id: string; text: string; color?: string; children?: unknown[] }): MindmapNode => ({
+        id: node.id,
+        label: node.text,
+        color: node.color,
+        children: node.children?.map((child) => convertNode(child as { id: string; text: string; color?: string; children?: unknown[] })),
+      });
+
+      const newMindmap: SavedMindmap = {
+        id: crypto.randomUUID(),
+        title: result.mindmap.title,
+        nodes: result.mindmap.root.children?.map((child) => convertNode(child as { id: string; text: string; color?: string; children?: unknown[] })) || [],
+        subject: (result.mindmap.topic as Subject) || 'mathematics',
+        createdAt: new Date(),
+      };
+
+      saveMindmaps([...mindmaps, newMindmap]);
+
+      if (result.warnings?.length) {
+        alert(`Importazione completata con avvisi:\n${result.warnings.join('\n')}`);
+      }
+
+      logger.info('Mindmap imported', { title: result.mindmap.title, file: file.name });
+    } catch (error) {
+      logger.error('Import failed', { error, file: file.name });
+      alert(`Errore durante l'importazione: ${error instanceof Error ? error.message : 'Errore sconosciuto'}`);
+    }
+
+    // Reset input
+    event.target.value = '';
+  }, [mindmaps, saveMindmaps]);
+
   // Handle Escape key to close modals
   useEffect(() => {
     const hasOpenModal = selectedMindmap || showExamples || selectedExample || showCreateModal;
@@ -244,6 +338,18 @@ export function MindmapsView({ className }: MindmapsViewProps) {
             <Sparkles className="w-4 h-4 mr-2" />
             Esempi
           </Button>
+          <Button variant="outline" asChild>
+            <label className="cursor-pointer">
+              <Upload className="w-4 h-4 mr-2" />
+              Importa
+              <input
+                type="file"
+                accept=".json,.md,.markdown,.mm,.xmind,.txt"
+                onChange={handleImport}
+                className="hidden"
+              />
+            </label>
+          </Button>
         </div>
       </div>
 
@@ -251,8 +357,8 @@ export function MindmapsView({ className }: MindmapsViewProps) {
       <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
         <CardContent className="p-4">
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-xl bg-blue-500/10">
-              <Network className="w-6 h-6 text-blue-500" />
+            <div className="p-3 rounded-xl bg-accent-themed/10">
+              <Network className="w-6 h-6 text-accent-themed" />
             </div>
             <div>
               <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
@@ -380,12 +486,55 @@ export function MindmapsView({ className }: MindmapsViewProps) {
                   <span className="text-xl">{subjectIcons[selectedMindmap.subject]}</span>
                   <h3 className="text-xl font-bold">{selectedMindmap.title}</h3>
                 </div>
-                <button
-                  onClick={() => setSelectedMindmap(null)}
-                  className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Export dropdown */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Download className="w-4 h-4 mr-2" />
+                        Esporta
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'json')}>
+                        <FileJson className="w-4 h-4 mr-2" />
+                        JSON
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'markdown')}>
+                        <FileText className="w-4 h-4 mr-2" />
+                        Markdown
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'svg')}>
+                        <Image className="w-4 h-4 mr-2" />
+                        SVG
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'png')}>
+                        <Image className="w-4 h-4 mr-2" />
+                        PNG
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'pdf')}>
+                        <FileType className="w-4 h-4 mr-2" />
+                        PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'freemind')}>
+                        <Network className="w-4 h-4 mr-2" />
+                        FreeMind (.mm)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport(selectedMindmap, 'xmind')}>
+                        <Network className="w-4 h-4 mr-2" />
+                        XMind
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <button
+                    onClick={() => setSelectedMindmap(null)}
+                    className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
               <div className="flex-1 overflow-auto p-4">
                 <MindmapRenderer

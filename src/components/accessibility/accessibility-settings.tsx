@@ -156,7 +156,7 @@ export function AccessibilitySettings({ isOpen, onClose }: AccessibilitySettings
                         selectedCategory === cat.id
                           ? settings.highContrast
                             ? 'bg-yellow-400 text-black'
-                            : 'bg-blue-500 text-white'
+                            : 'bg-accent-themed text-white'
                           : settings.highContrast
                             ? 'text-white hover:bg-yellow-400/20'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700',
@@ -301,7 +301,7 @@ function Toggle({ label, description, checked, onChange, icon }: ToggleProps) {
           checked
             ? settings.highContrast
               ? 'bg-yellow-400'
-              : 'bg-blue-500'
+              : 'bg-accent-themed'
             : settings.highContrast
               ? 'bg-gray-700'
               : 'bg-slate-300 dark:bg-slate-600'
@@ -435,7 +435,7 @@ function Slider({ label, value, onChange, min, max, step, unit = '' }: SliderPro
             className={cn(
               'w-2 h-2 rounded-full transition-all',
               i === currentIndex
-                ? settings.highContrast ? 'bg-yellow-400 w-3' : 'bg-blue-500 w-3'
+                ? settings.highContrast ? 'bg-yellow-400 w-3' : 'bg-accent-themed w-3'
                 : settings.highContrast ? 'bg-gray-600' : 'bg-slate-300 dark:bg-slate-600'
             )}
             aria-label={`${v}${unit}`}

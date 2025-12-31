@@ -136,6 +136,44 @@ export interface CaptureHomeworkArgs {
   instructions?: string;
 }
 
+// ============================================================================
+// MINDMAP MODIFICATION COMMAND TYPES (Phase 7: Voice Commands)
+// ============================================================================
+
+/** Arguments for mindmap_add_node tool. */
+export interface MindmapAddNodeArgs {
+  concept: string;
+  parentNode?: string;
+}
+
+/** Arguments for mindmap_connect_nodes tool. */
+export interface MindmapConnectNodesArgs {
+  nodeA: string;
+  nodeB: string;
+}
+
+/** Arguments for mindmap_expand_node tool. */
+export interface MindmapExpandNodeArgs {
+  node: string;
+  suggestions?: string[];
+}
+
+/** Arguments for mindmap_delete_node tool. */
+export interface MindmapDeleteNodeArgs {
+  node: string;
+}
+
+/** Arguments for mindmap_focus_node tool. */
+export interface MindmapFocusNodeArgs {
+  node: string;
+}
+
+/** Arguments for mindmap_set_color tool. */
+export interface MindmapSetColorArgs {
+  node: string;
+  color: string;
+}
+
 /**
  * Union of all tool arguments.
  */
@@ -147,7 +185,14 @@ export type VoiceToolArgs =
   | { name: 'create_diagram'; args: CreateDiagramArgs }
   | { name: 'create_timeline'; args: CreateTimelineArgs }
   | { name: 'web_search'; args: WebSearchArgs }
-  | { name: 'capture_homework'; args: CaptureHomeworkArgs };
+  | { name: 'capture_homework'; args: CaptureHomeworkArgs }
+  // Mindmap modification commands
+  | { name: 'mindmap_add_node'; args: MindmapAddNodeArgs }
+  | { name: 'mindmap_connect_nodes'; args: MindmapConnectNodesArgs }
+  | { name: 'mindmap_expand_node'; args: MindmapExpandNodeArgs }
+  | { name: 'mindmap_delete_node'; args: MindmapDeleteNodeArgs }
+  | { name: 'mindmap_focus_node'; args: MindmapFocusNodeArgs }
+  | { name: 'mindmap_set_color'; args: MindmapSetColorArgs };
 
 // ============================================================================
 // TOOL DEFINITIONS
@@ -410,7 +455,146 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
       required: ['purpose'],
     },
   },
+  // ============================================================================
+  // MINDMAP MODIFICATION COMMANDS (Phase 7: Voice Commands)
+  // ============================================================================
+  {
+    type: 'function',
+    name: 'mindmap_add_node',
+    description:
+      'Aggiungi un nodo alla mappa mentale corrente. Usalo quando lo studente dice "aggiungi", "metti", "inserisci" un concetto.',
+    parameters: {
+      type: 'object',
+      properties: {
+        concept: {
+          type: 'string',
+          description: 'Il concetto o testo da aggiungere come nuovo nodo',
+        },
+        parentNode: {
+          type: 'string',
+          description: 'Il nodo padre a cui collegare (opzionale, usa il nodo selezionato o centrale)',
+        },
+      },
+      required: ['concept'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'mindmap_connect_nodes',
+    description:
+      'Collega due nodi della mappa. Usalo quando lo studente dice "collega X con Y", "unisci", "fai un collegamento".',
+    parameters: {
+      type: 'object',
+      properties: {
+        nodeA: {
+          type: 'string',
+          description: 'Primo nodo da collegare',
+        },
+        nodeB: {
+          type: 'string',
+          description: 'Secondo nodo da collegare',
+        },
+      },
+      required: ['nodeA', 'nodeB'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'mindmap_expand_node',
+    description:
+      'Espandi un nodo con sotto-nodi. Usalo quando lo studente dice "espandi", "aggiungi dettagli", "approfondisci" un nodo.',
+    parameters: {
+      type: 'object',
+      properties: {
+        node: {
+          type: 'string',
+          description: 'Il nodo da espandere',
+        },
+        suggestions: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Suggerimenti per i sotto-nodi (opzionale, il Maestro può proporre)',
+        },
+      },
+      required: ['node'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'mindmap_delete_node',
+    description:
+      'Elimina un nodo dalla mappa. Usalo quando lo studente dice "cancella", "rimuovi", "togli" un nodo.',
+    parameters: {
+      type: 'object',
+      properties: {
+        node: {
+          type: 'string',
+          description: 'Il nodo da eliminare',
+        },
+      },
+      required: ['node'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'mindmap_focus_node',
+    description:
+      'Centra la vista su un nodo specifico. Usalo quando lo studente dice "vai a", "mostrami", "zoom su" un nodo.',
+    parameters: {
+      type: 'object',
+      properties: {
+        node: {
+          type: 'string',
+          description: 'Il nodo su cui fare focus',
+        },
+      },
+      required: ['node'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'mindmap_set_color',
+    description:
+      'Cambia il colore di un nodo. Usalo quando lo studente dice "colora", "cambia colore", "fai rosso/blu/verde".',
+    parameters: {
+      type: 'object',
+      properties: {
+        node: {
+          type: 'string',
+          description: 'Il nodo da colorare',
+        },
+        color: {
+          type: 'string',
+          description: 'Il colore (rosso, blu, verde, giallo, arancione, viola, rosa)',
+        },
+      },
+      required: ['node', 'color'],
+    },
+  },
 ];
+
+// ============================================================================
+// MINDMAP MODIFICATION COMMAND HELPERS
+// ============================================================================
+
+/**
+ * List of mindmap modification command names.
+ */
+const MINDMAP_MODIFICATION_COMMANDS = [
+  'mindmap_add_node',
+  'mindmap_connect_nodes',
+  'mindmap_expand_node',
+  'mindmap_delete_node',
+  'mindmap_focus_node',
+  'mindmap_set_color',
+] as const;
+
+/**
+ * Check if a tool name is a mindmap modification command.
+ */
+export function isMindmapModificationCommand(name: string): boolean {
+  return MINDMAP_MODIFICATION_COMMANDS.includes(name as typeof MINDMAP_MODIFICATION_COMMANDS[number]);
+}
 
 // ============================================================================
 // TOOL NAME TO TYPE MAPPING
@@ -459,6 +643,11 @@ export async function executeVoiceTool(
   toolName: string,
   args: Record<string, unknown>
 ): Promise<VoiceToolCallResult> {
+  // Check for mindmap modification commands first
+  if (isMindmapModificationCommand(toolName)) {
+    return executeMindmapModification(sessionId, toolName, args);
+  }
+
   const toolType = getToolTypeFromName(toolName);
 
   // Non-tool commands (web_search, capture_homework) are handled differently
@@ -495,6 +684,50 @@ export async function executeVoiceTool(
     };
   } catch (error) {
     logger.error('[VoiceToolCommands] Failed to execute tool', { error });
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Execute a mindmap modification command via SSE broadcast.
+ * These commands modify an existing mindmap in real-time.
+ */
+export async function executeMindmapModification(
+  sessionId: string,
+  commandName: string,
+  args: Record<string, unknown>
+): Promise<VoiceToolCallResult> {
+  try {
+    // Send modification event to SSE endpoint
+    const response = await fetch('/api/tools/stream/modify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        command: commandName,
+        args,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return {
+        success: false,
+        error: error.message || 'Failed to modify mindmap',
+      };
+    }
+
+    logger.info('[VoiceToolCommands] Mindmap modification sent', { commandName, args });
+    return {
+      success: true,
+      toolType: 'mindmap',
+      displayed: true,
+    };
+  } catch (error) {
+    logger.error('[VoiceToolCommands] Failed to modify mindmap', { error });
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -556,6 +789,35 @@ Hai accesso a strumenti per creare materiali didattici. USA questi strumenti qua
 - Lo studente ha un esercizio scritto e ha bisogno di aiuto
 - Dice "ti faccio vedere", "guarda questo problema"
 - Ha difficoltà con un compito specifico
+
+## COMANDI VOCALI PER MODIFICARE MAPPE MENTALI
+
+Quando c'è una mappa mentale attiva, lo studente può modificarla vocalmente:
+
+### mindmap_add_node
+- "Aggiungi [concetto]" - aggiunge un nuovo nodo
+- "Metti anche [concetto]" - aggiunge un nodo collegato
+- "Inserisci [concetto] sotto [nodo]" - aggiunge figlio specifico
+
+### mindmap_connect_nodes
+- "Collega [A] con [B]" - crea connessione tra due nodi
+- "Unisci [A] e [B]" - collega i nodi
+
+### mindmap_expand_node
+- "Espandi [nodo]" - genera sotto-nodi automaticamente
+- "Approfondisci [nodo]" - aggiunge dettagli
+
+### mindmap_delete_node
+- "Cancella [nodo]" - rimuove il nodo
+- "Togli [nodo]" - elimina dalla mappa
+
+### mindmap_focus_node
+- "Vai a [nodo]" - centra la vista su quel nodo
+- "Mostrami [nodo]" - zoom su nodo specifico
+
+### mindmap_set_color
+- "Colora [nodo] di rosso/blu/verde" - cambia colore
+- "Fai [nodo] giallo" - imposta colore
 
 NOTA: Quando crei uno strumento, ANNUNCIALO prima vocalmente (es. "Ti preparo un quiz su questo argomento...") e poi invoca la funzione.
 `;

@@ -118,7 +118,7 @@ export function ProgressView() {
             className={cn(
               'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all',
               activeTab === tab.id
-                ? 'bg-blue-500 text-white'
+                ? 'bg-accent-themed text-white'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             )}
           >
@@ -297,7 +297,7 @@ function OverviewTab({ xp, level, levelProgress, streak, masteries }: OverviewTa
             {weeklyData.map((day, i) => (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
                 <motion.div
-                  className="w-full bg-blue-500 rounded-t"
+                  className="w-full bg-accent-themed rounded-t"
                   initial={{ height: 0 }}
                   animate={{ height: `${(day.minutes / maxMinutes) * 100}%` }}
                   transition={{ duration: 0.5, delay: i * 0.05 }}

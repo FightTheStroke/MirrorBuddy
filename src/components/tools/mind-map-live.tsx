@@ -389,13 +389,13 @@ export function MindMapLive({
             className={cn(
               'p-2 rounded-lg',
               status === 'building' && 'animate-pulse',
-              settings.highContrast ? 'bg-yellow-400' : 'bg-blue-500/10'
+              settings.highContrast ? 'bg-yellow-400' : 'bg-accent-themed/10'
             )}
           >
             <Network
               className={cn(
                 'w-5 h-5',
-                settings.highContrast ? 'text-black' : 'text-blue-500'
+                settings.highContrast ? 'text-black' : 'text-accent-themed'
               )}
             />
           </div>

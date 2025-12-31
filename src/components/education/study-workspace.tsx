@@ -344,7 +344,7 @@ function ToolCanvasPlaceholder({
               }}
               className={cn(
                 'w-8 h-8 rounded-lg',
-                settings.highContrast ? 'bg-yellow-400' : 'bg-blue-500'
+                settings.highContrast ? 'bg-yellow-400' : 'bg-accent-themed'
               )}
             />
           ) : (
