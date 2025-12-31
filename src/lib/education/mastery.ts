@@ -8,7 +8,7 @@
  * - Skill mastery: 80%+ correct = mastered
  * - Skill tree: Prerequisites must be mastered before advancing
  * - Adaptive difficulty: Adjusts based on performance
- * - Persistent state: Saves to localStorage
+ * - Persistent state: Saves to database via /api/progress
  *
  * Copyright (c) 2025 Convergio.io
  * Licensed under MIT License
@@ -83,56 +83,80 @@ export interface MasteryStats {
 }
 
 // ============================================================================
-// PERSISTENCE
+// PERSISTENCE - Uses database via /api/progress endpoint
+// Issue #64: Consolidate localStorage to Database
 // ============================================================================
 
-const STORAGE_KEY = "convergio_mastery_state";
+/**
+ * Serialize mastery state for API storage
+ */
+function serializeMasteryState(state: MasteryState): unknown[] {
+  return Array.from(state.topics.entries()).map(([id, progress]) => ({
+    id,
+    ...progress,
+    lastAttempt: progress.lastAttempt.toISOString(),
+    masteredAt: progress.masteredAt?.toISOString(),
+  }));
+}
 
 /**
- * Save mastery state to localStorage
+ * Deserialize mastery state from API response
  */
-export function saveMasteryState(state: MasteryState): void {
-  try {
-    const serialized = {
-      studentId: state.studentId,
-      topics: Array.from(state.topics.entries()).map(([id, progress]) => ({
-        id,
-        ...progress,
-        lastAttempt: progress.lastAttempt.toISOString(),
-        masteredAt: progress.masteredAt?.toISOString(),
-      })),
+function deserializeMasteryState(data: unknown[]): MasteryState {
+  const topics = new Map<string, TopicProgress>();
+
+  for (const item of data || []) {
+    const typedItem = item as {
+      id: string;
+      topicId: string;
+      totalQuestions: number;
+      correctAnswers: number;
+      masteryLevel: number;
+      isMastered: boolean;
+      attempts: number;
+      lastAttempt: string;
+      currentDifficulty: number;
+      status: SkillStatus;
+      masteredAt?: string;
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(serialized));
+    topics.set(typedItem.id, {
+      ...typedItem,
+      lastAttempt: new Date(typedItem.lastAttempt),
+      masteredAt: typedItem.masteredAt ? new Date(typedItem.masteredAt) : undefined,
+    });
+  }
+
+  return { topics };
+}
+
+/**
+ * Save mastery state to database via API
+ */
+export async function saveMasteryState(state: MasteryState): Promise<void> {
+  try {
+    const serialized = serializeMasteryState(state);
+    await fetch('/api/progress', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ masteries: serialized }),
+    });
   } catch (error) {
     logger.error('[Mastery] Failed to save state', { error: String(error) });
   }
 }
 
 /**
- * Load mastery state from localStorage
+ * Load mastery state from database via API
  */
-export function loadMasteryState(): MasteryState {
+export async function loadMasteryState(): Promise<MasteryState> {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
+    const response = await fetch('/api/progress');
+    if (!response.ok) {
       return { topics: new Map() };
     }
 
-    const parsed = JSON.parse(stored);
-    const topics = new Map<string, TopicProgress>();
-
-    for (const item of parsed.topics || []) {
-      topics.set(item.id, {
-        ...item,
-        lastAttempt: new Date(item.lastAttempt),
-        masteredAt: item.masteredAt ? new Date(item.masteredAt) : undefined,
-      });
-    }
-
-    return {
-      studentId: parsed.studentId,
-      topics,
-    };
+    const data = await response.json();
+    return deserializeMasteryState(data.masteries || []);
   } catch (error) {
     logger.error('[Mastery] Failed to load state', { error: String(error) });
     return { topics: new Map() };
@@ -142,8 +166,16 @@ export function loadMasteryState(): MasteryState {
 /**
  * Clear all mastery data
  */
-export function clearMasteryState(): void {
-  localStorage.removeItem(STORAGE_KEY);
+export async function clearMasteryState(): Promise<void> {
+  try {
+    await fetch('/api/progress', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ masteries: [] }),
+    });
+  } catch (error) {
+    logger.error('[Mastery] Failed to clear state', { error: String(error) });
+  }
 }
 
 // ============================================================================
@@ -271,8 +303,8 @@ export function recordAnswer(
 
   newState.topics = topics;
 
-  // Auto-save to localStorage
-  saveMasteryState(newState);
+  // Auto-save to database (fire and forget)
+  void saveMasteryState(newState);
 
   return newState;
 }
@@ -423,8 +455,8 @@ export function resetTopic(state: MasteryState, topicId: string): MasteryState {
   topics.delete(topicId);
   newState.topics = topics;
 
-  // Auto-save to localStorage
-  saveMasteryState(newState);
+  // Auto-save to database (fire and forget)
+  void saveMasteryState(newState);
 
   return newState;
 }
@@ -438,8 +470,8 @@ export function resetAllProgress(state: MasteryState): MasteryState {
     topics: new Map<string, TopicProgress>(),
   };
 
-  // Auto-save to localStorage
-  saveMasteryState(newState);
+  // Auto-save to database (fire and forget)
+  void saveMasteryState(newState);
 
   return newState;
 }

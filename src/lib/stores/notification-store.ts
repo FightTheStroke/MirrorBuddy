@@ -1,10 +1,9 @@
 /**
  * Notification Store - Zustand store for notification state management
- * Persists to localStorage and syncs notification preferences
+ * In-memory only - server sync via /api/notifications
  */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 export type NotificationType =
   | 'achievement'
@@ -76,8 +75,7 @@ const generateId = (): string => {
 };
 
 export const useNotificationStore = create<NotificationState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       notifications: [],
       preferences: DEFAULT_PREFERENCES,
       pushPermission: typeof window !== 'undefined' && 'Notification' in window
@@ -164,15 +162,7 @@ export const useNotificationStore = create<NotificationState>()(
       setPushPermission: (permission) => {
         set({ pushPermission: permission });
       },
-    }),
-    {
-      name: 'convergio-notifications',
-      partialize: (state) => ({
-        notifications: state.notifications,
-        preferences: state.preferences,
-      }),
-    }
-  )
+    })
 );
 
 // Helper: Check if notification type is enabled

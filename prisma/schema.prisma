@@ -87,6 +87,12 @@ model Settings {
   // Parent Mode Consent (Issue #63)
   parentChatConsentAt DateTime?  // When parent consented to chat with professors
 
+  // Parent Dashboard (Issue #64)
+  parentDashboardLastViewed DateTime?  // When parent last viewed the dashboard
+
+  // Azure Cost Configuration
+  azureCostConfig String?  // JSON: {token_cost, audio_cost, etc.}
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

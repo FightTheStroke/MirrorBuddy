@@ -4,7 +4,6 @@
 // ============================================================================
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { logger } from '@/lib/logger';
 import { onLevelUp, onStreakMilestone, onAchievement } from '@/lib/notifications/triggers';
 import type {
@@ -111,8 +110,7 @@ interface SettingsState {
 }
 
 export const useSettingsStore = create<SettingsState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       theme: 'system',
       provider: 'openai',
       model: 'gpt-4o',
@@ -283,9 +281,7 @@ export const useSettingsStore = create<SettingsState>()(
           logger.error('Settings load failed', { error: String(error) });
         }
       },
-    }),
-    { name: 'convergio-settings' }
-  )
+    })
 );
 
 // === PROGRESS STORE (Gamification) ===
@@ -346,8 +342,7 @@ const XP_PER_LEVEL = [
 ];
 
 export const useProgressStore = create<ProgressState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       xp: 0,
       level: 1,
       streak: { current: 0, longest: 0 },
@@ -633,9 +628,7 @@ export const useProgressStore = create<ProgressState>()(
           logger.error('Progress load failed', { error: String(error) });
         }
       },
-    }),
-    { name: 'convergio-progress' }
-  )
+    })
 );
 
 // === VOICE SESSION STORE ===
@@ -734,8 +727,7 @@ interface ConversationState {
 }
 
 export const useConversationStore = create<ConversationState>()(
-  persist(
-    (set) => ({
+  (set) => ({
       conversations: [],
       currentConversationId: null,
       lastSyncedAt: null,
@@ -883,9 +875,7 @@ export const useConversationStore = create<ConversationState>()(
           logger.error('Conversations load failed', { error: String(error) });
         }
       },
-    }),
-    { name: 'convergio-conversations' }
-  )
+    })
 );
 
 // === LEARNINGS STORE ===
@@ -914,8 +904,7 @@ interface LearningsState {
 }
 
 export const useLearningsStore = create<LearningsState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       learnings: [],
       lastSyncedAt: null,
 
@@ -992,9 +981,7 @@ export const useLearningsStore = create<LearningsState>()(
           logger.error('Learnings load failed', { error: String(error) });
         }
       },
-    }),
-    { name: 'convergio-learnings' }
-  )
+    })
 );
 
 // === HTML SNIPPETS STORE ===
@@ -1022,8 +1009,7 @@ interface HTMLSnippetsState {
 }
 
 export const useHTMLSnippetsStore = create<HTMLSnippetsState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       snippets: [],
 
       addSnippet: (snippet) => {
@@ -1064,9 +1050,7 @@ export const useHTMLSnippetsStore = create<HTMLSnippetsState>()(
       getSnippetsByMaestro: (maestroId) => {
         return get().snippets.filter((s) => s.maestroId === maestroId);
       },
-    }),
-    { name: 'convergio-html-snippets' }
-  )
+    })
 );
 
 // === SCHOOL CALENDAR STORE ===
@@ -1131,8 +1115,7 @@ const SUBJECT_TO_MAESTRO: Record<string, string> = {
 };
 
 export const useCalendarStore = create<CalendarState>()(
-  persist(
-    (set, get) => ({
+  (set, get) => ({
       events: [],
 
       addEvent: (event) =>
@@ -1242,9 +1225,7 @@ export const useCalendarStore = create<CalendarState>()(
             return priorityOrder[a.priority] - priorityOrder[b.priority];
           });
       },
-    }),
-    { name: 'convergio-calendar' }
-  )
+    })
 );
 
 // === UI STORE ===

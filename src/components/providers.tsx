@@ -49,7 +49,7 @@ function StoreInitializer() {
 
     // Initialize stores from database
     initializeStores().catch(() => {
-      // Silent fail - stores will use localStorage fallback
+      // Silent fail - stores will use in-memory defaults
     });
 
     // Initialize telemetry

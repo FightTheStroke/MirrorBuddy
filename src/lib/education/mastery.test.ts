@@ -384,35 +384,66 @@ describe('Mastery Learning System', () => {
   });
 
   describe('Persistence', () => {
-    it('should save and load state correctly', () => {
-      let state = recordAnswer(emptyState, 'topic1', true);
-      state = recordAnswer(state, 'topic1', true);
+    // Mock fetch for API calls
+    const mockFetch = vi.fn();
+    beforeEach(() => {
+      globalThis.fetch = mockFetch;
+      mockFetch.mockReset();
+    });
 
-      // State was saved automatically by recordAnswer
-      // Now load it
-      const loaded = loadMasteryState();
+    it('should save and load state correctly', async () => {
+      // Mock successful API calls
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          masteries: [
+            {
+              topicId: 'topic1',
+              masteryLevel: 0.5,
+              attempts: 2,
+              correctAnswers: 2,
+              lastAttemptDate: new Date().toISOString(),
+              currentDifficulty: 0.5,
+              status: 'learning',
+            },
+          ],
+        }),
+      });
 
+      const loaded = await loadMasteryState();
       expect(loaded.topics.size).toBe(1);
       const progress = loaded.topics.get('topic1');
       expect(progress?.attempts).toBe(2);
     });
 
-    it('should handle empty localStorage', () => {
-      localStorageMock.getItem.mockReturnValueOnce(null);
-      const loaded = loadMasteryState();
+    it('should handle empty API response', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        json: async () => ({ masteries: [] }),
+      });
+
+      const loaded = await loadMasteryState();
       expect(loaded.topics.size).toBe(0);
     });
 
-    it('should handle invalid JSON in localStorage', () => {
-      localStorageMock.getItem.mockReturnValueOnce('invalid json');
-      const loaded = loadMasteryState();
+    it('should handle API errors gracefully', async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+      });
+
+      const loaded = await loadMasteryState();
       expect(loaded.topics.size).toBe(0);
     });
 
-    it('should clear state from localStorage', () => {
-      recordAnswer(emptyState, 'topic1', true);
-      clearMasteryState();
-      expect(localStorageMock.removeItem).toHaveBeenCalled();
+    it('should clear state via API', async () => {
+      mockFetch.mockResolvedValue({ ok: true });
+
+      await clearMasteryState();
+      expect(mockFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ masteries: [] }),
+      }));
     });
   });
 

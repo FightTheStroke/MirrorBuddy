@@ -1505,12 +1505,15 @@ function PrivacySettings() {
                 localStorage.removeItem('voice-session');
                 localStorage.removeItem('accessibility-settings');
 
-                // Call API to delete server-side data
+                // Delete all data from database (primary data source)
                 try {
                   await fetch('/api/user/data', { method: 'DELETE' });
                 } catch {
-                  // Server deletion optional - local is primary
+                  // Continue even if API fails - user will be logged out anyway
                 }
+
+                // Clear sessionStorage (temporary user ID)
+                sessionStorage.removeItem('convergio-user-id');
 
                 // Reload to reset state
                 window.location.reload();
@@ -2260,25 +2263,35 @@ function AIProviderSettings() {
   const [savingCostConfig, setSavingCostConfig] = useState(false);
   const [costConfigSaved, setCostConfigSaved] = useState(false);
 
-  // Load existing config from localStorage
+  // Load existing config from database
   useEffect(() => {
-    const saved = localStorage.getItem('azure_cost_config');
-    if (saved) {
+    const loadConfig = async () => {
       try {
-        const parsed = JSON.parse(saved);
-        setAzureCostConfig(parsed);
-        setCostConfigSaved(true);
+        const res = await fetch('/api/user/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data.azureCostConfig) {
+            const parsed = JSON.parse(data.azureCostConfig);
+            setAzureCostConfig(parsed);
+            setCostConfigSaved(true);
+          }
+        }
       } catch {
-        // Invalid JSON, ignore
+        // Failed to load, ignore
       }
-    }
+    };
+    loadConfig();
   }, []);
 
-  // Save cost config to localStorage
+  // Save cost config to database
   const saveCostConfig = async () => {
     setSavingCostConfig(true);
     try {
-      localStorage.setItem('azure_cost_config', JSON.stringify(azureCostConfig));
+      await fetch('/api/user/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ azureCostConfig: JSON.stringify(azureCostConfig) }),
+      });
       setCostConfigSaved(true);
       // Note: Server still needs env vars - this is for future API enhancement
       // For now, show success and inform user to also set env vars
