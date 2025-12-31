@@ -481,3 +481,76 @@ model CreatedTool {
   @@index([isBookmarked])
 }
 
+// ============================================================================
+// STUDY SCHEDULER (Smart Notifications & Scheduling - Issue #27)
+// ============================================================================
+
+model StudySchedule {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+
+  // Notification preferences (JSON)
+  preferences String   @default("{}") // NotificationPreferences JSON
+
+  sessions    ScheduledSession[]
+  reminders   CustomReminder[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model ScheduledSession {
+  id            String   @id @default(cuid())
+  userId        String
+  scheduleId    String
+  schedule      StudySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  // Session details
+  dayOfWeek     Int      // 0-6 (Sunday-Saturday)
+  time          String   // "16:00" format
+  duration      Int      @default(30) // minutes
+  subject       String
+  maestroId     String?
+  topic         String?
+
+  // Scheduling options
+  active        Boolean  @default(true)
+  reminderOffset Int     @default(5) // minutes before notification
+  repeat        String   @default("weekly") // daily | weekly | weekdays | none
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([scheduleId])
+  @@index([dayOfWeek])
+  @@index([active])
+}
+
+model CustomReminder {
+  id            String   @id @default(cuid())
+  userId        String
+  scheduleId    String
+  schedule      StudySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  // Reminder details
+  datetime      DateTime
+  message       String
+  subject       String?
+  maestroId     String?
+
+  // Scheduling options
+  repeat        String   @default("none") // daily | weekly | none
+  active        Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([scheduleId])
+  @@index([datetime])
+  @@index([active])
+}
+

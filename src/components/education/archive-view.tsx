@@ -248,6 +248,98 @@ function EmptyState({ filter }: { filter: FilterType }) {
 }
 
 /**
+ * Thumbnail preview for materials (Issue #37)
+ */
+function ThumbnailPreview({ item }: { item: ArchiveItem }) {
+  const Icon = TOOL_ICONS[item.toolType];
+  const content = item.content;
+
+  // Webcam photos - show actual image
+  if (item.toolType === 'webcam' && typeof content === 'object' && 'imageData' in content) {
+    return (
+      <div className="w-full h-24 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
+        {/* eslint-disable-next-line @next/next/no-img-element -- User-captured data URL */}
+        <img
+          src={(content as { imageData: string }).imageData}
+          alt="Anteprima foto"
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+  }
+
+  // Mindmaps - show structured preview
+  if (item.toolType === 'mindmap' && typeof content === 'object' && 'markdown' in content) {
+    const markdown = (content as { markdown: string }).markdown;
+    // Extract first few lines for preview
+    const lines = markdown.split('\n').filter(l => l.trim()).slice(0, 4);
+    return (
+      <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-2">
+        <div className="text-[10px] font-mono text-slate-600 dark:text-slate-400 space-y-0.5 overflow-hidden">
+          {lines.map((line, i) => (
+            <div key={i} className="truncate">{line}</div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Quiz - show question count
+  if (item.toolType === 'quiz' && typeof content === 'object' && 'questions' in content) {
+    const questions = (content as { questions: unknown[] }).questions;
+    return (
+      <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400">{questions.length}</div>
+          <div className="text-xs text-green-600/70 dark:text-green-400/70">domande</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Flashcards - show card count
+  if (item.toolType === 'flashcard' && typeof content === 'object' && 'cards' in content) {
+    const cards = (content as { cards: unknown[] }).cards;
+    return (
+      <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/30 dark:to-violet-900/30 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{cards.length}</div>
+          <div className="text-xs text-purple-600/70 dark:text-purple-400/70">flashcard</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Demo - show interactive badge
+  if (item.toolType === 'demo') {
+    return (
+      <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-orange-50 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 flex items-center justify-center">
+        <div className="text-center">
+          <Play className="w-8 h-8 text-orange-500 mx-auto mb-1" />
+          <div className="text-xs text-orange-600/70 dark:text-orange-400/70">Demo Interattiva</div>
+        </div>
+      </div>
+    );
+  }
+
+  // PDF - show document icon
+  if (item.toolType === 'pdf') {
+    return (
+      <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-red-50 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 flex items-center justify-center">
+        <FileText className="w-10 h-10 text-red-400" />
+      </div>
+    );
+  }
+
+  // Default - show type icon
+  return (
+    <div className="w-full h-24 rounded-lg overflow-hidden bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center">
+      <Icon className="w-10 h-10 text-slate-400" />
+    </div>
+  );
+}
+
+/**
  * Grid view for materials
  */
 function GridView({
@@ -279,56 +371,54 @@ function GridView({
               transition={{ delay: index * 0.05 }}
             >
               <Card
-                className="group cursor-pointer hover:shadow-lg transition-shadow"
+                className="group cursor-pointer hover:shadow-lg transition-shadow overflow-hidden"
                 onClick={() => onView(item)}
               >
-                <CardHeader className="pb-2">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-lg bg-primary/10">
-                        <Icon className="w-4 h-4 text-primary" />
-                      </div>
-                      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                        {label}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={(e: React.MouseEvent) => {
-                          e.stopPropagation();
-                          onBookmark(item.toolId, !item.isBookmarked);
-                        }}
-                        aria-label={item.isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
-                      >
-                        {item.isBookmarked ? (
-                          <BookmarkCheck className="w-4 h-4 text-primary" />
-                        ) : (
-                          <Bookmark className="w-4 h-4 text-slate-400 hover:text-primary" />
-                        )}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={(e: React.MouseEvent) => {
-                          e.stopPropagation();
-                          onDelete(item.toolId);
-                        }}
-                        aria-label="Elimina"
-                      >
-                        <Trash2 className="w-4 h-4 text-destructive" />
-                      </Button>
-                    </div>
+                {/* Thumbnail Preview (Issue #37) */}
+                <div className="relative">
+                  <ThumbnailPreview item={item} />
+                  {/* Overlay actions */}
+                  <div className="absolute top-2 right-2 flex gap-1">
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-7 w-7 bg-white/90 dark:bg-slate-900/90 shadow-sm"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        onBookmark(item.toolId, !item.isBookmarked);
+                      }}
+                      aria-label={item.isBookmarked ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}
+                    >
+                      {item.isBookmarked ? (
+                        <BookmarkCheck className="w-3.5 h-3.5 text-primary" />
+                      ) : (
+                        <Bookmark className="w-3.5 h-3.5 text-slate-500" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="h-7 w-7 bg-white/90 dark:bg-slate-900/90 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        onDelete(item.toolId);
+                      }}
+                      aria-label="Elimina"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-destructive" />
+                    </Button>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <CardTitle className="text-base line-clamp-2 mb-2">
+                  {/* Type badge */}
+                  <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-white/90 dark:bg-slate-900/90 shadow-sm">
+                    <Icon className="w-3 h-3 text-primary" />
+                    <span className="text-[10px] font-medium text-slate-600 dark:text-slate-400">{label}</span>
+                  </div>
+                </div>
+                <CardContent className="pt-3 pb-3">
+                  <CardTitle className="text-sm line-clamp-2 mb-2">
                     {item.title || `${label} del ${formatDate(item.createdAt)}`}
                   </CardTitle>
-                  <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center justify-between mb-1">
                     <StarRating
                       rating={item.userRating}
                       onRate={(rating) => onRate(item.toolId, rating)}
