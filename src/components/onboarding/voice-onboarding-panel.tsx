@@ -99,6 +99,9 @@ export function VoiceOnboardingPanel({
     disconnect,
     toggleMute,
   } = useVoiceSession({
+    // CRITICAL: Disable barge-in for onboarding to prevent echo loop
+    // Speaker audio → mic → VAD → speech_started → response.cancel → audio stops after "Ciao"
+    disableBargeIn: true,
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
       logger.error('[VoiceOnboardingPanel] Voice error', { message });
