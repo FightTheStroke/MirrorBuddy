@@ -267,7 +267,7 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
                   'p-2 rounded-lg transition-colors',
                   settings.highContrast
                     ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                    : 'bg-accent-themed text-white hover:brightness-110'
                 )}
                 title="Passa alla modalità voce"
               >
@@ -348,7 +348,7 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
                     message.role === 'user'
                       ? settings.highContrast
                         ? 'bg-yellow-400 text-black'
-                        : 'bg-blue-500 text-white'
+                        : 'bg-accent-themed text-white'
                       : settings.highContrast
                         ? 'bg-gray-900 text-white border border-gray-700'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white',
@@ -386,7 +386,7 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
                       'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
                       settings.highContrast
                         ? 'bg-yellow-400 text-black'
-                        : 'bg-blue-500 text-white'
+                        : 'bg-accent-themed text-white'
                     )}
                   >
                     <User className="w-4 h-4" />
@@ -491,7 +491,7 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
                 'px-4 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
                 settings.highContrast
                   ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
+                  : 'bg-accent-themed text-white hover:brightness-110'
               )}
               style={{ backgroundColor: input.trim() ? maestro.color : undefined }}
               aria-label="Invia messaggio"

@@ -49,9 +49,9 @@ export function SessionSkeleton() {
         </div>
         <div className="flex justify-center">
           <div className="flex items-center gap-2 text-slate-500">
-            <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="h-2 w-2 rounded-full bg-blue-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+            <div className="h-2 w-2 rounded-full bg-accent-themed animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="h-2 w-2 rounded-full bg-accent-themed animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="h-2 w-2 rounded-full bg-accent-themed animate-bounce" style={{ animationDelay: '300ms' }} />
             <span className="ml-2 text-sm">Caricamento sessione...</span>
           </div>
         </div>

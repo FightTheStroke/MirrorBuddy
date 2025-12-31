@@ -169,7 +169,6 @@ export async function processPDF(
         await page.render({
           canvasContext: context,
           viewport,
-          canvas,
         }).promise;
 
         // Convert to image

@@ -478,7 +478,7 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
             className={cn(
               'p-2 rounded-lg transition-colors',
               accessibilityMode
-                ? 'bg-blue-500 text-white'
+                ? 'bg-accent-themed text-white'
                 : settings.highContrast
                   ? 'bg-yellow-400 text-black hover:bg-yellow-300'
                   : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
@@ -581,7 +581,7 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
               'p-2 rounded-lg transition-colors',
               settings.highContrast
                 ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                : 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-accent-themed text-white hover:brightness-110'
             )}
             title="Stampa"
             aria-label="Stampa mappa mentale"

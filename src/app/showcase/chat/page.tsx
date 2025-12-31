@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { MessageCircle, User, Sparkles, RotateCcw, Heart, Brain, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { MessageCircle, Sparkles, RotateCcw, Heart, Brain, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -319,12 +320,12 @@ function ChatView({
   conversation,
   characterName,
   characterColor,
-  characterIcon,
+  characterAvatar,
 }: {
   conversation: ConversationNode;
   characterName: string;
   characterColor: string;
-  characterIcon: React.ReactNode;
+  characterAvatar: string;
 }) {
   const [messages, setMessages] = useState<Message[]>(conversation.initialMessages);
   const [currentOptions, setCurrentOptions] = useState<ConversationOption[]>(conversation.options);
@@ -391,10 +392,15 @@ function ChatView({
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         <div className="flex items-center gap-3">
           <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: `${characterColor}30` }}
+            className="relative w-10 h-10 rounded-full overflow-hidden ring-2 ring-white/30"
           >
-            {characterIcon}
+            <Image
+              src={characterAvatar}
+              alt={characterName}
+              fill
+              className="object-cover"
+              unoptimized
+            />
           </div>
           <div>
             <h3 className="font-semibold text-white">{characterName}</h3>
@@ -514,7 +520,7 @@ export default function ShowcaseChatPage() {
               conversation={MELISSA_CONVERSATION}
               characterName="Coach Melissa"
               characterColor="#F59E0B"
-              characterIcon={<Brain className="w-5 h-5 text-amber-400" />}
+              characterAvatar="/avatars/melissa.jpg"
             />
           </TabsContent>
 
@@ -523,7 +529,7 @@ export default function ShowcaseChatPage() {
               conversation={MARIO_CONVERSATION}
               characterName="Buddy Mario"
               characterColor="#22C55E"
-              characterIcon={<User className="w-5 h-5 text-green-400" />}
+              characterAvatar="/avatars/mario.jpg"
             />
           </TabsContent>
         </Card>
