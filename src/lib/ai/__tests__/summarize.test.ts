@@ -38,16 +38,17 @@ describe('Summarize Module', () => {
 
   describe('generateConversationSummary', () => {
     it('should generate summary when provider is available', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: 'Lo studente ha chiesto aiuto con le frazioni e ha mostrato buona comprensione.',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
       const messages = [
-        { role: 'user', content: 'Come si sommano le frazioni?' },
-        { role: 'assistant', content: 'Per sommare le frazioni con lo stesso denominatore...' },
-        { role: 'user', content: 'Ah capisco! E se i denominatori sono diversi?' },
+        { role: 'user' as const, content: 'Come si sommano le frazioni?' },
+        { role: 'assistant' as const, content: 'Per sommare le frazioni con lo stesso denominatore...' },
+        { role: 'user' as const, content: 'Ah capisco! E se i denominatori sono diversi?' },
       ];
 
       const result = await generateConversationSummary(messages);
@@ -59,7 +60,7 @@ describe('Summarize Module', () => {
     it('should throw error when no provider available', async () => {
       mockGetActiveProvider.mockReturnValue(null);
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
 
       await expect(generateConversationSummary(messages)).rejects.toThrow(
         'No AI provider available for summarization'
@@ -67,15 +68,16 @@ describe('Summarize Module', () => {
     });
 
     it('should format messages with STUDENTE/MAESTRO labels', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: 'Riassunto della conversazione',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
       const messages = [
-        { role: 'user', content: 'Domanda' },
-        { role: 'assistant', content: 'Risposta' },
+        { role: 'user' as const, content: 'Domanda' },
+        { role: 'assistant' as const, content: 'Risposta' },
       ];
 
       await generateConversationSummary(messages);
@@ -89,19 +91,20 @@ describe('Summarize Module', () => {
 
   describe('extractKeyFacts', () => {
     it('should extract key facts when provider is available', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify({
           decisions: ['vuole approfondire geometria'],
           preferences: ['preferisce esempi pratici'],
           learned: ['comprende il teorema di Pitagora'],
         }),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
       const messages = [
-        { role: 'user', content: 'Mi piacciono gli esempi pratici' },
-        { role: 'assistant', content: 'Ecco un esempio pratico...' },
+        { role: 'user' as const, content: 'Mi piacciono gli esempi pratici' },
+        { role: 'assistant' as const, content: 'Ecco un esempio pratico...' },
       ];
 
       const result = await extractKeyFacts(messages);
@@ -114,7 +117,7 @@ describe('Summarize Module', () => {
     it('should return empty arrays when no provider', async () => {
       mockGetActiveProvider.mockReturnValue(null);
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractKeyFacts(messages);
 
       expect(result).toEqual({
@@ -125,13 +128,14 @@ describe('Summarize Module', () => {
     });
 
     it('should return empty arrays on parse error', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: 'invalid json response',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractKeyFacts(messages);
 
       expect(result).toEqual({
@@ -142,23 +146,24 @@ describe('Summarize Module', () => {
     });
 
     it('should extract JSON from mixed response', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: 'Ecco i fatti: {"decisions": ["test"], "preferences": [], "learned": []}',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractKeyFacts(messages);
 
       expect(result.decisions).toContain('test');
     });
 
     it('should handle API errors gracefully', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockRejectedValue(new Error('API error'));
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractKeyFacts(messages);
 
       expect(result).toEqual({
@@ -171,15 +176,16 @@ describe('Summarize Module', () => {
 
   describe('extractTopics', () => {
     it('should extract topics array', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: '["Matematica - Frazioni", "Geometria", "Esercizi"]',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
       const messages = [
-        { role: 'user', content: 'Parlami delle frazioni' },
-        { role: 'assistant', content: 'Le frazioni sono...' },
+        { role: 'user' as const, content: 'Parlami delle frazioni' },
+        { role: 'assistant' as const, content: 'Le frazioni sono...' },
       ];
 
       const result = await extractTopics(messages);
@@ -192,33 +198,35 @@ describe('Summarize Module', () => {
     it('should return empty array when no provider', async () => {
       mockGetActiveProvider.mockReturnValue(null);
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractTopics(messages);
 
       expect(result).toEqual([]);
     });
 
     it('should return empty array on parse error', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: 'not a valid array',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractTopics(messages);
 
       expect(result).toEqual([]);
     });
 
     it('should extract array from mixed response', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: 'Gli argomenti sono: ["Storia", "Geografia"]',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractTopics(messages);
 
       expect(result).toContain('Storia');
@@ -226,10 +234,10 @@ describe('Summarize Module', () => {
     });
 
     it('should handle API errors gracefully', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockRejectedValue(new Error('Network error'));
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractTopics(messages);
 
       expect(result).toEqual([]);
@@ -238,13 +246,14 @@ describe('Summarize Module', () => {
 
   describe('extractLearnings', () => {
     it('should extract valid learnings', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify([
           { category: 'preference', insight: 'Preferisce esempi visivi', confidence: 0.8 },
           { category: 'weakness', insight: 'Difficoltà con le frazioni', confidence: 0.7 },
         ]),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
       const messages = [{ role: 'user', content: 'Non capisco le frazioni' }];
@@ -258,23 +267,24 @@ describe('Summarize Module', () => {
     it('should return empty array when no provider', async () => {
       mockGetActiveProvider.mockReturnValue(null);
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toEqual([]);
     });
 
     it('should filter invalid categories', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify([
           { category: 'invalid', insight: 'Test', confidence: 0.8 },
           { category: 'preference', insight: 'Valid', confidence: 0.7 },
         ]),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toHaveLength(1);
@@ -282,16 +292,17 @@ describe('Summarize Module', () => {
     });
 
     it('should filter learnings with low confidence', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify([
           { category: 'preference', insight: 'Too low', confidence: 0.2 },
           { category: 'strength', insight: 'Valid', confidence: 0.5 },
         ]),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toHaveLength(1);
@@ -299,16 +310,17 @@ describe('Summarize Module', () => {
     });
 
     it('should filter learnings with confidence above 1', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify([
           { category: 'preference', insight: 'Too high', confidence: 1.5 },
           { category: 'strength', insight: 'Valid', confidence: 0.9 },
         ]),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toHaveLength(1);
@@ -316,7 +328,7 @@ describe('Summarize Module', () => {
     });
 
     it('should limit to 3 learnings', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify([
           { category: 'preference', insight: 'One', confidence: 0.8 },
@@ -325,26 +337,28 @@ describe('Summarize Module', () => {
           { category: 'interest', insight: 'Four', confidence: 0.5 },
           { category: 'style', insight: 'Five', confidence: 0.4 },
         ]),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toHaveLength(3);
     });
 
     it('should filter learnings without insight', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify([
           { category: 'preference', insight: '', confidence: 0.8 },
           { category: 'strength', insight: 'Valid', confidence: 0.7 },
         ]),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toHaveLength(1);
@@ -352,23 +366,24 @@ describe('Summarize Module', () => {
     });
 
     it('should handle API errors gracefully', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockRejectedValue(new Error('API error'));
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toEqual([]);
     });
 
     it('should handle invalid JSON response', async () => {
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: 'not valid json',
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       expect(result).toEqual([]);
@@ -377,7 +392,7 @@ describe('Summarize Module', () => {
     it('should accept all valid categories', async () => {
       const categories = ['preference', 'strength', 'weakness', 'interest', 'style'];
 
-      mockGetActiveProvider.mockReturnValue({ type: 'azure', model: 'gpt-4' });
+      mockGetActiveProvider.mockReturnValue({ provider: 'azure', endpoint: 'https://test.openai.azure.com', model: 'gpt-4' });
       mockChatCompletion.mockResolvedValue({
         content: JSON.stringify(
           categories.map((cat, i) => ({
@@ -386,10 +401,11 @@ describe('Summarize Module', () => {
             confidence: 0.5,
           }))
         ),
-        role: 'assistant',
+        provider: 'azure',
+        model: 'gpt-4',
       });
 
-      const messages = [{ role: 'user', content: 'Test' }];
+      const messages = [{ role: 'user' as const, content: 'Test' }];
       const result = await extractLearnings(messages, 'archimede');
 
       // Should have 3 (max limit)
@@ -409,8 +425,8 @@ describe('Summarize Module', () => {
 
     it('should use first user message as title', async () => {
       const messages = [
-        { role: 'assistant', content: 'Ciao!' },
-        { role: 'user', content: 'Come funzionano le frazioni?' },
+        { role: 'assistant' as const, content: 'Ciao!' },
+        { role: 'user' as const, content: 'Come funzionano le frazioni?' },
       ];
 
       const result = await generateConversationTitle(messages);
@@ -419,7 +435,7 @@ describe('Summarize Module', () => {
 
     it('should truncate long messages to 50 chars with ellipsis', async () => {
       const longMessage = 'Questa è una domanda molto lunga che supera il limite di cinquanta caratteri imposto dal sistema';
-      const messages = [{ role: 'user', content: longMessage }];
+      const messages = [{ role: 'user' as const, content: longMessage }];
 
       const result = await generateConversationTitle(messages);
 
@@ -428,7 +444,7 @@ describe('Summarize Module', () => {
     });
 
     it('should not add ellipsis for short messages', async () => {
-      const messages = [{ role: 'user', content: 'Ciao!' }];
+      const messages = [{ role: 'user' as const, content: 'Ciao!' }];
 
       const result = await generateConversationTitle(messages);
 
@@ -438,8 +454,8 @@ describe('Summarize Module', () => {
 
     it('should return default if no user message', async () => {
       const messages = [
-        { role: 'assistant', content: 'Ciao!' },
-        { role: 'assistant', content: 'Come posso aiutarti?' },
+        { role: 'assistant' as const, content: 'Ciao!' },
+        { role: 'assistant' as const, content: 'Come posso aiutarti?' },
       ];
 
       const result = await generateConversationTitle(messages);
@@ -448,9 +464,9 @@ describe('Summarize Module', () => {
 
     it('should use first user message even if not first overall', async () => {
       const messages = [
-        { role: 'assistant', content: 'Benvenuto!' },
-        { role: 'assistant', content: 'Sono qui per aiutarti.' },
-        { role: 'user', content: 'Grazie, parliamo di storia' },
+        { role: 'assistant' as const, content: 'Benvenuto!' },
+        { role: 'assistant' as const, content: 'Sono qui per aiutarti.' },
+        { role: 'user' as const, content: 'Grazie, parliamo di storia' },
       ];
 
       const result = await generateConversationTitle(messages);
@@ -459,7 +475,7 @@ describe('Summarize Module', () => {
 
     it('should handle exactly 50 character message', async () => {
       const exactMessage = '12345678901234567890123456789012345678901234567890';
-      const messages = [{ role: 'user', content: exactMessage }];
+      const messages = [{ role: 'user' as const, content: exactMessage }];
 
       const result = await generateConversationTitle(messages);
 
