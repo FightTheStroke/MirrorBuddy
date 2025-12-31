@@ -12,7 +12,13 @@ import {
   CheckCircle,
   GraduationCap,
 } from 'lucide-react';
-import { HomeworkHelp } from './homework-help';
+import dynamic from 'next/dynamic';
+
+// Dynamic import to avoid SSR issues with pdfjs (uses DOMMatrix)
+const HomeworkHelp = dynamic(
+  () => import('./homework-help').then((mod) => mod.HomeworkHelp),
+  { ssr: false }
+);
 import { SubjectConfirmationDialog } from './subject-confirmation-dialog';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
