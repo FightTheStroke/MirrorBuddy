@@ -37,6 +37,7 @@ import {
   Users,
   Heart,
   Sparkles,
+  UserCircle,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -96,7 +97,7 @@ const TEACHING_STYLES: Array<{
   },
 ];
 
-type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'notifications' | 'telemetry' | 'privacy' | 'diagnostics';
+type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'notifications' | 'telemetry' | 'privacy' | 'genitori' | 'diagnostics';
 
 const tabs: Array<{ id: SettingsTab; label: string; icon: React.ReactNode }> = [
   { id: 'profile', label: 'Profilo', icon: <User className="w-5 h-5" /> },
@@ -108,6 +109,7 @@ const tabs: Array<{ id: SettingsTab; label: string; icon: React.ReactNode }> = [
   { id: 'notifications', label: 'Notifiche', icon: <Bell className="w-5 h-5" /> },
   { id: 'telemetry', label: 'Statistiche', icon: <BarChart3 className="w-5 h-5" /> },
   { id: 'privacy', label: 'Privacy', icon: <Shield className="w-5 h-5" /> },
+  { id: 'genitori', label: 'Genitori', icon: <UserCircle className="w-5 h-5" /> },
   { id: 'diagnostics', label: 'Diagnostica', icon: <Wrench className="w-5 h-5" /> },
 ];
 
@@ -275,6 +277,36 @@ export function SettingsView() {
             <OnboardingSettings />
             <PrivacySettings />
           </>
+        )}
+
+        {activeTab === 'genitori' && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <UserCircle className="w-5 h-5" />
+                Area Genitori
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Accedi alla dashboard dedicata ai genitori per monitorare i progressi
+                e le attivita del tuo bambino in modo sicuro e rispettoso della privacy (GDPR).
+              </p>
+              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  <strong>Consenso richiesto:</strong> La dashboard genitori richiede il consenso
+                  sia del genitore che dello studente per rispettare la normativa GDPR sulla
+                  protezione dei dati dei minori.
+                </p>
+              </div>
+              <Link href="/parent-dashboard">
+                <Button className="w-full mt-4" size="lg">
+                  <UserCircle className="w-5 h-5 mr-2" />
+                  Apri Dashboard Genitori
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
         )}
 
         {activeTab === 'telemetry' && <TelemetryDashboard />}
