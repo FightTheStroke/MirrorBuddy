@@ -38,7 +38,7 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
   const [state, setState] = useState<TTSState>({
     isPlaying: false,
     isLoading: false,
-    hasOpenAI: null,
+    hasOpenAI: true, // Assume true, will fallback if not
     error: null,
   });
 
@@ -46,20 +46,6 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
   const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
   const hasAutoSpokenRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-
-  // Check if OpenAI TTS is available
-  useEffect(() => {
-    const checkOpenAI = async () => {
-      try {
-        const response = await fetch('/api/tts');
-        const data = await response.json();
-        setState((prev) => ({ ...prev, hasOpenAI: data.available }));
-      } catch {
-        setState((prev) => ({ ...prev, hasOpenAI: false }));
-      }
-    };
-    checkOpenAI();
-  }, []);
 
   /**
    * Stop any ongoing playback
@@ -223,30 +209,20 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
 
       stop(); // Stop any existing playback
 
-      // Wait for TTS check if still pending
-      if (state.hasOpenAI === null) {
-        setState((prev) => ({ ...prev, isLoading: true }));
-        // Give it a moment to check
-        await new Promise((r) => setTimeout(r, 100));
-      }
+      // Always try OpenAI TTS first (Melissa's real voice)
+      const success = await speakOpenAI(textToSpeak);
+      if (success) return;
 
-      // Try OpenAI TTS first (preferred - Melissa's real voice)
-      if (state.hasOpenAI) {
-        const success = await speakOpenAI(textToSpeak);
-        if (success) return;
-        // If OpenAI failed, fallback to Web Speech
-      }
-
-      // Fallback to Web Speech API (browser voice)
+      // If OpenAI failed (not configured or error), fallback to Web Speech
+      console.log('[OnboardingTTS] OpenAI failed, using Web Speech fallback');
       speakWebSpeech(textToSpeak);
     },
-    [state.hasOpenAI, speakOpenAI, speakWebSpeech, stop]
+    [speakOpenAI, speakWebSpeech, stop]
   );
 
   // Auto-speak on mount/text change
   useEffect(() => {
     if (!autoSpeak || !text || hasAutoSpokenRef.current) return;
-    if (state.hasOpenAI === null) return; // Wait for TTS check
 
     hasAutoSpokenRef.current = true;
 
@@ -255,7 +231,7 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
     }, delay);
 
     return () => clearTimeout(timer);
-  }, [autoSpeak, text, delay, speak, state.hasOpenAI]);
+  }, [autoSpeak, text, delay, speak]);
 
   // Reset auto-spoken flag when text changes
   useEffect(() => {
