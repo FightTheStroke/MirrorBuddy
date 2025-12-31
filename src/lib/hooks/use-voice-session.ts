@@ -882,6 +882,13 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
       await initPlaybackContext();
       logger.debug('[VoiceSession] Playback context initialized with preferred output device');
 
+      // Check if mediaDevices is available (requires HTTPS or localhost)
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error(
+          'Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.'
+        );
+      }
+
       // Request microphone with preferred device if set
       const audioConstraints: MediaTrackConstraints = {
         echoCancellation: true,
