@@ -30,31 +30,17 @@ import {
   getStatusEmoji,
   getStatusColor,
   createExampleCurriculum,
-  saveMasteryState,
   loadMasteryState,
   clearMasteryState,
   type MasteryState,
   type Topic,
 } from './mastery';
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-  };
-})();
+// Mock fetch for API calls (used by auto-save in recordAnswer)
+const mockFetch = vi.fn();
 
-Object.defineProperty(global, 'localStorage', { value: localStorageMock });
+// Set up global fetch mock
+Object.defineProperty(globalThis, 'fetch', { value: mockFetch, writable: true });
 
 describe('Mastery Learning System', () => {
   let emptyState: MasteryState;
@@ -62,7 +48,9 @@ describe('Mastery Learning System', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    localStorageMock.clear();
+    mockFetch.mockReset();
+    // Default mock: successful API responses
+    mockFetch.mockResolvedValue({ ok: true });
     emptyState = { topics: new Map() };
     sampleTopics = createExampleCurriculum();
   });
@@ -125,9 +113,12 @@ describe('Mastery Learning System', () => {
       expect(isMastered(state, 'topic1')).toBe(true);
     });
 
-    it('should auto-save to localStorage', () => {
+    it('should auto-save to API', () => {
       recordAnswer(emptyState, 'topic1', true);
-      expect(localStorageMock.setItem).toHaveBeenCalled();
+      // recordAnswer calls saveMasteryState which uses fetch
+      expect(mockFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
+        method: 'PUT',
+      }));
     });
   });
 
@@ -384,13 +375,6 @@ describe('Mastery Learning System', () => {
   });
 
   describe('Persistence', () => {
-    // Mock fetch for API calls
-    const mockFetch = vi.fn();
-    beforeEach(() => {
-      globalThis.fetch = mockFetch;
-      mockFetch.mockReset();
-    });
-
     it('should save and load state correctly', async () => {
       // Mock successful API calls
       mockFetch.mockResolvedValue({
@@ -398,13 +382,16 @@ describe('Mastery Learning System', () => {
         json: async () => ({
           masteries: [
             {
+              id: 'topic1', // Key field used by deserializer
               topicId: 'topic1',
-              masteryLevel: 0.5,
+              masteryLevel: 50,
+              isMastered: false,
+              totalQuestions: 2,
               attempts: 2,
               correctAnswers: 2,
-              lastAttemptDate: new Date().toISOString(),
-              currentDifficulty: 0.5,
-              status: 'learning',
+              lastAttempt: new Date().toISOString(),
+              currentDifficulty: 1.0,
+              status: 'attempted',
             },
           ],
         }),

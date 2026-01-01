@@ -23,7 +23,7 @@ vi.mock('@/lib/tools/tool-executor', () => {
 });
 
 // Import after mocking
-import { registerToolHandler, getRegisteredHandlers } from '@/lib/tools/tool-executor';
+import { getRegisteredHandlers } from '@/lib/tools/tool-executor';
 
 describe('Mindmap Handler', () => {
   let mindmapHandler: Function;
