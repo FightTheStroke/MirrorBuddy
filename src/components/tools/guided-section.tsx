@@ -5,7 +5,7 @@
  * Part of Issue #70: Collaborative summary writing
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import { Lightbulb, ChevronDown, ChevronUp, Eye, Edit3, MessageCircle } from 'lucide-react';
