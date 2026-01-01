@@ -103,12 +103,12 @@ Le fondamenta. Schema e tipi devono essere corretti.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 1.01 | Fix types in tools.ts (MindmapData.title) | `src/types/tools.ts` | | |
-| 1.02 | Add searchableText field to Material model | `prisma/schema.prisma` | | |
-| 1.03 | Add Collection model | `prisma/schema.prisma` | | |
-| 1.04 | Add Tag and MaterialTag models | `prisma/schema.prisma` | | |
-| 1.05 | Run Prisma migration | - | | |
-| 1.06 | Verify all types compile | `npm run typecheck` | | |
+| 1.01 | Fix types in tools.ts (MindmapData.title) | `src/types/tools.ts` | ✅ (already correct) | ✅ |
+| 1.02 | Add searchableText field to Material model | `prisma/schema.prisma` | ✅ | ✅ |
+| 1.03 | Add Collection model | `prisma/schema.prisma` | ✅ | ✅ |
+| 1.04 | Add Tag and MaterialTag models | `prisma/schema.prisma` | ✅ | ✅ |
+| 1.05 | Run Prisma migration | - | ✅ (db push) | ✅ |
+| 1.06 | Verify all types compile | `npm run typecheck` | ✅ | ✅ |
 
 ---
 

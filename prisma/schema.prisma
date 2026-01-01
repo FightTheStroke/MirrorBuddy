@@ -487,6 +487,14 @@ model Material {
   isBookmarked Boolean  @default(false)
   viewCount    Int      @default(0)
 
+  // Full-text search (ADR 0022 - Knowledge Hub)
+  searchableText String?  // Pre-computed searchable content for Fuse.js
+
+  // Organization (ADR 0022 - Knowledge Hub)
+  collectionId String?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+  tags         MaterialTag[]
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -496,6 +504,63 @@ model Material {
   @@index([sessionId])
   @@index([createdAt])
   @@index([isBookmarked])
+  @@index([collectionId])
+}
+
+// ============================================================================
+// COLLECTIONS (ADR 0022 - Knowledge Hub)
+// Folders for organizing materials
+// ============================================================================
+
+model Collection {
+  id          String       @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  color       String?      // Hex color for folder icon
+  icon        String?      // Optional icon name
+  parentId    String?      // Nested folders support
+  parent      Collection?  @relation("CollectionTree", fields: [parentId], references: [id])
+  children    Collection[] @relation("CollectionTree")
+  materials   Material[]
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([userId, name, parentId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+// ============================================================================
+// TAGS (ADR 0022 - Knowledge Hub)
+// User-defined tags for materials
+// ============================================================================
+
+model Tag {
+  id        String        @id @default(cuid())
+  userId    String
+  name      String
+  color     String?       // Hex color for tag badge
+  materials MaterialTag[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model MaterialTag {
+  id         String   @id @default(cuid())
+  materialId String
+  tagId      String
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([materialId, tagId])
+  @@index([materialId])
+  @@index([tagId])
 }
 
 // ============================================================================
