@@ -1,4 +1,4 @@
-# ADR 0020: Knowledge Hub Architecture
+# ADR 0022: Knowledge Hub Architecture
 
 ## Status
 Proposed
