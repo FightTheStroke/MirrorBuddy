@@ -11,6 +11,8 @@ Maestri can create interactive educational tools during conversations.
 | Flashcards | `create_flashcards` | FSRS-compatible spaced repetition |
 | Demo | `create_demo` | Interactive HTML/JS simulations |
 | Search | `web_search` | Educational web/YouTube search |
+| Student Summary | `open_student_summary` | Student writes summary with maieutic guidance |
+| Summary (AI) | `create_summary` | AI-generated summary (legacy) |
 
 ## Architecture
 
@@ -45,3 +47,24 @@ Maestri can create interactive educational tools during conversations.
 | `mindmap_delete_node` | Remove | "Cancella il nodo" |
 | `mindmap_focus_node` | Center view | "Zoom su Roma" |
 | `mindmap_set_color` | Change color | "Colora Roma di rosso" |
+
+## Voice Commands for Student Summary (#70)
+
+Maieutic method: Student writes, Maestro guides with questions.
+
+| Command | Function | When to Use |
+|---------|----------|-------------|
+| `open_student_summary` | Open editor | "Devo fare un riassunto" |
+| `student_summary_add_comment` | Add inline feedback | Highlight and comment on student text |
+
+### Maieutic Guidance
+
+The Maestro should:
+1. Ask guiding questions, not write the content
+2. Use inline comments to highlight areas for improvement
+3. Encourage the student to express their understanding
+
+Example prompts:
+- "Di cosa parla questo argomento?"
+- "Quali sono i punti chiave?"
+- "Cosa è importante ricordare?"

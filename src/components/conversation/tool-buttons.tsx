@@ -20,7 +20,7 @@ const TOOL_BUTTONS: Array<{
   { type: 'quiz', icon: HelpCircle, label: 'Quiz', tooltip: 'Crea quiz' },
   { type: 'demo', icon: Play, label: 'Demo', tooltip: 'Crea simulazione interattiva' },
   { type: 'flashcard', icon: Layers, label: 'Flashcard', tooltip: 'Crea flashcard' },
-  { type: 'summary', icon: FileText, label: 'Riassunto', tooltip: 'Crea riassunto strutturato' },
+  { type: 'summary', icon: FileText, label: 'Riassunto', tooltip: 'Scrivi un riassunto guidato' },
   { type: 'search', icon: Search, label: 'Cerca', tooltip: 'Cerca su web/YouTube' },
   { type: 'webcam', icon: Camera, label: 'Foto', tooltip: 'Scatta foto' },
 ];
