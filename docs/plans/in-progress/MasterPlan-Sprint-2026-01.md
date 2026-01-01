@@ -206,7 +206,7 @@ Componenti riutilizzabili con ACCESSIBILITY.
 | 5.13 | ImageRenderer | `src/components/education/knowledge-hub/renderers/image-renderer.tsx` | ✅ | |
 | 5.14 | PdfRenderer | `src/components/education/knowledge-hub/renderers/pdf-renderer.tsx` | ✅ | |
 | 5.15 | HomeworkRenderer | `src/components/education/knowledge-hub/renderers/homework-renderer.tsx` | ✅ | |
-| 5.16 | Unit tests for all renderers | `src/components/education/knowledge-hub/renderers/__tests__/` | | |
+| 5.16 | Unit tests for all renderers | `src/components/education/knowledge-hub/renderers/__tests__/` | ✅ | |
 
 ### 5C: Knowledge Hub Components (ACCESSIBLE)
 

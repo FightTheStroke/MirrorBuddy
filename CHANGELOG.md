@@ -30,10 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `PdfRenderer`: PDF viewer with download option
   - `ImageRenderer`: Accessible image with alt text
   - `HomeworkRenderer`: Task list with completion tracking
-- **29 Unit Tests** (`src/components/education/knowledge-hub/renderers/__tests__/index.test.tsx`):
-  - Registry function tests for all 12 types
-  - Lazy import resolution tests
-  - FallbackRenderer behavior tests
+- **126 Unit Tests** (`src/components/education/knowledge-hub/renderers/__tests__/`):
+  - `index.test.tsx`: 29 tests for registry functions (hasRenderer, getRendererImport, getSupportedRenderers)
+  - `validation.test.ts`: 43 tests for all type guards and validation utilities
+  - `renderers.test.tsx`: 44 tests for all 12 renderer components (rendering, empty states, interactions)
+  - `error-boundary.test.tsx`: 10 tests for RendererErrorBoundary and withErrorBoundary HOC
 
 #### Knowledge Hub Material Dialog (Phase 5, Tasks 5.01-5.02)
 - **Material Dialog** (`src/components/education/knowledge-hub/material-dialog.tsx`):
