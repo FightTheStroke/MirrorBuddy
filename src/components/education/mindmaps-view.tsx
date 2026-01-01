@@ -545,6 +545,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
               <div className="flex-1 overflow-auto p-4">
                 <MindmapRenderer
                   title={selectedMindmap.title}
+                  markdown={selectedMindmap.markdown}
                   nodes={selectedMindmap.nodes}
                 />
               </div>

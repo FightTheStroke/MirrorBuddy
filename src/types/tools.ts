@@ -423,7 +423,8 @@ export interface MindmapNode {
 }
 
 export interface MindmapData {
-  topic: string;
+  title: string; // ADR 0020: Standardized on 'title' (was 'topic')
+  topic?: string; // Deprecated: for backward compatibility
   nodes: MindmapNode[];
   markdown?: string;
 }
