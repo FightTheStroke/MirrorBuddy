@@ -34,21 +34,72 @@ Tutto quello fatto finora potrebbe essere un casino. Ogni task va:
 
 ## OBIETTIVI FINALI
 
-Queste sono le 5 cose che l'utente vuole. TUTTO il lavoro serve a questi obiettivi:
-
 | # | Obiettivo | Cosa significa |
 |---|-----------|----------------|
 | A | **Mindmaps funzionano** | title field, hierarchy, AI prompts corretti |
 | B | **Maestri hanno memoria** | Ricordano conversazioni precedenti |
 | C | **Tool creation ha UX corretta** | Dialog per scegliere maestro/modalita prima di creare |
 | D | **Materiali organizzati** | Knowledge Hub con search, collections, views |
-| E | **Codebase documentata** | ARCHITECTURE.md, ADRs aggiornati |
+| E | **Codebase documentata** | ARCHITECTURE.md, ADRs corretti e numerati |
+
+---
+
+## STANDARDS DI RIFERIMENTO
+
+Ogni task DEVE rispettare:
+
+### ISE Engineering Fundamentals
+- https://microsoft.github.io/code-with-engineering-playbook/
+- Code Reviews (Thor)
+- Testing (80% coverage)
+- Documentation
+
+### Security (OWASP Top 10)
+- Input validation su tutti gli API
+- Parameterized queries (Prisma)
+- XSS prevention (sanitize output)
+- CSRF protection
+- Auth check su ogni endpoint
+
+### Accessibility (WCAG 2.1 AA)
+- Keyboard navigation
+- Screen reader support
+- Color contrast 4.5:1
+- Focus indicators
+- Aria labels
+
+### GDPR (Minori)
+- Consenso genitori per dati sensibili
+- Right to erasure
+- Data minimization
+- Audit logging
+
+### Safety (ADR 0004)
+- 5-layer defense attivo su tutte le nuove features
+- Tutti i nuovi AI prompt usano `injectSafetyGuardrails()`
+- Crisis keywords detection
+- Age-appropriate content
+
+---
+
+## FASE 0: CLEANUP & PREREQUISITES
+
+Prima di iniziare: pulire il casino esistente.
+
+| ID | Task | File | Status | Thor |
+|----|------|------|--------|------|
+| 0.01 | Fix ADR numbering: rename 0020-mindmap to 0020 | `docs/adr/` | | |
+| 0.02 | Fix ADR numbering: rename memory to 0021 | `docs/adr/` | | |
+| 0.03 | Fix ADR numbering: rename knowledge-hub to 0022 | `docs/adr/` | | |
+| 0.04 | Verify existing safety tests pass | `src/lib/safety/__tests__/` | | |
+| 0.05 | Verify existing E2E tests pass | `e2e/` | | |
+| 0.06 | Run full build to establish baseline | - | | |
 
 ---
 
 ## FASE 1: DATABASE & TYPES
 
-Prima di tutto: le fondamenta. Schema e tipi devono essere corretti.
+Le fondamenta. Schema e tipi devono essere corretti.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
@@ -69,7 +120,7 @@ Utility functions e business logic. Nessuna dipendenza da UI.
 |----|------|------|--------|------|
 | 2.01 | Create mindmap-utils.ts (markdown conversion) | `src/lib/tools/mindmap-utils.ts` | | |
 | 2.02 | Create memory-loader.ts | `src/lib/conversation/memory-loader.ts` | | |
-| 2.03 | Create prompt-enhancer.ts | `src/lib/conversation/prompt-enhancer.ts` | | |
+| 2.03 | Create prompt-enhancer.ts (MUST use injectSafetyGuardrails) | `src/lib/conversation/prompt-enhancer.ts` | | |
 | 2.04 | Create knowledge-base-v2.ts (lazy retrieval) | `src/lib/ai/app-knowledge-base-v2.ts` | | |
 | 2.05 | Create searchable-text.ts (Fuse.js) | `src/lib/search/searchable-text.ts` | | |
 | 2.06 | Create material-export.ts | `src/lib/export/material-export.ts` | | |
@@ -98,30 +149,45 @@ State management updates. Altri componenti dipendono da questi.
 
 ## FASE 4: API ROUTES
 
-Backend endpoints. Tutti gli API necessari.
+Backend endpoints con SECURITY CHECKS.
+
+**OGNI API DEVE:**
+- Verificare `convergio-user-id` cookie
+- Validare input con Zod
+- Usare Prisma (parameterized queries)
+- Rate limiting se appropriato
+- Logging per audit
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 4.01 | Create /api/conversations/memory | `src/app/api/conversations/memory/route.ts` | | |
-| 4.02 | Create /api/collections | `src/app/api/collections/route.ts` | | |
-| 4.03 | Create /api/tags | `src/app/api/tags/route.ts` | | |
+| 4.01 | Create /api/conversations/memory (auth + validation) | `src/app/api/conversations/memory/route.ts` | | |
+| 4.02 | Create /api/collections (auth + validation) | `src/app/api/collections/route.ts` | | |
+| 4.03 | Create /api/tags (auth + validation) | `src/app/api/tags/route.ts` | | |
 | 4.04 | Update /api/materials for searchableText | `src/app/api/materials/route.ts` | | |
 | 4.05 | Update /api/materials for collection/tag filters | `src/app/api/materials/route.ts` | | |
-| 4.06 | Create /api/materials/bulk | `src/app/api/materials/bulk/route.ts` | | |
+| 4.06 | Create /api/materials/bulk (auth + validation) | `src/app/api/materials/bulk/route.ts` | | |
 | 4.07 | Update /api/chat for content with tool calls | `src/app/api/chat/route.ts` | | |
+| 4.08 | Security review: OWASP check all new endpoints | - | | |
 
 ---
 
 ## FASE 5: BASE COMPONENTS
 
-Componenti riutilizzabili. Le views dipendono da questi.
+Componenti riutilizzabili con ACCESSIBILITY.
+
+**OGNI COMPONENTE UI DEVE:**
+- Keyboard navigable (Tab, Enter, Escape)
+- Aria labels appropriati
+- Focus visible
+- Color contrast 4.5:1
+- Screen reader friendly
 
 ### 5A: Tool Selection Dialog
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.01 | Create ToolMaestroSelectionDialog | `src/components/education/tool-maestro-selection-dialog.tsx` | | |
-| 5.02 | Unit tests for dialog | `src/components/education/__tests__/tool-maestro-selection-dialog.test.tsx` | | |
+| 5.01 | Create ToolMaestroSelectionDialog (accessible) | `src/components/education/tool-maestro-selection-dialog.tsx` | | |
+| 5.02 | Unit tests + accessibility tests for dialog | `src/components/education/__tests__/tool-maestro-selection-dialog.test.tsx` | | |
 
 ### 5B: Knowledge Hub Renderers
 
@@ -142,16 +208,16 @@ Componenti riutilizzabili. Le views dipendono da questi.
 | 5.15 | HomeworkRenderer | `src/components/education/knowledge-hub/renderers/homework-renderer.tsx` | | |
 | 5.16 | Unit tests for all renderers | `src/components/education/knowledge-hub/renderers/__tests__/` | | |
 
-### 5C: Knowledge Hub Components
+### 5C: Knowledge Hub Components (ACCESSIBLE)
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.17 | SearchBar component | `src/components/education/knowledge-hub/components/search-bar.tsx` | | |
-| 5.18 | SidebarNavigation component | `src/components/education/knowledge-hub/components/sidebar-navigation.tsx` | | |
+| 5.17 | SearchBar component (keyboard, aria) | `src/components/education/knowledge-hub/components/search-bar.tsx` | | |
+| 5.18 | SidebarNavigation (keyboard nav) | `src/components/education/knowledge-hub/components/sidebar-navigation.tsx` | | |
 | 5.19 | QuickActions component | `src/components/education/knowledge-hub/components/quick-actions.tsx` | | |
 | 5.20 | BulkToolbar component | `src/components/education/knowledge-hub/components/bulk-toolbar.tsx` | | |
 | 5.21 | StatsPanel component | `src/components/education/knowledge-hub/components/stats-panel.tsx` | | |
-| 5.22 | MaterialCard with drag & drop | `src/components/education/knowledge-hub/components/material-card.tsx` | | |
+| 5.22 | MaterialCard with drag & drop (keyboard alternative) | `src/components/education/knowledge-hub/components/material-card.tsx` | | |
 
 ### 5D: Knowledge Hub Hooks
 
@@ -168,7 +234,12 @@ Componenti riutilizzabili. Le views dipendono da questi.
 
 ## FASE 6: HANDLERS & CORE FIXES
 
-Fix ai handlers e core rendering logic.
+Fix AI handlers e core rendering. SAFETY INTEGRATION.
+
+**OGNI AI PROMPT DEVE:**
+- Usare `injectSafetyGuardrails()` da `@/lib/safety`
+- Passare per content filter
+- Output sanitizzato
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
@@ -179,6 +250,7 @@ Fix ai handlers e core rendering logic.
 | 6.05 | Update support-teachers.ts (use v2 knowledge base) | `src/lib/ai/support-teachers.ts` | | |
 | 6.06 | Update MaterialViewer (use renderer registry) | `src/components/education/archive/material-viewer.tsx` | | |
 | 6.07 | Unit tests for mindmap-handler | `src/lib/tools/handlers/__tests__/mindmap-handler.test.ts` | | |
+| 6.08 | Verify safety integration in memory-loader | - | | |
 
 ---
 
@@ -236,48 +308,119 @@ Scripts one-time e data migrations.
 
 ---
 
-## FASE 9: E2E & INTEGRATION TESTS
+## FASE 9: TESTING & VERIFICATION
 
-Tests che attraversano tutto il sistema.
+Tutti i test. Nessuna eccezione.
+
+### 9A: E2E Tests
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
 | 9.01 | E2E test mindmap-hierarchy.spec.ts | `e2e/mindmap-hierarchy.spec.ts` | | |
 | 9.02 | E2E test knowledge-hub.spec.ts | `e2e/knowledge-hub.spec.ts` | | |
 | 9.03 | Integration test memory flow | `src/lib/conversation/__tests__/memory-integration.test.ts` | | |
-| 9.04 | Manual test: all 5 tool flows | - | | |
-| 9.05 | Manual test: voice mode | - | | |
-| 9.06 | Manual test: knowledge hub search | - | | |
+
+### 9B: Safety Tests
+
+| ID | Task | File | Status | Thor |
+|----|------|------|--------|------|
+| 9.04 | Test safety layer with memory feature | `src/lib/safety/__tests__/memory-safety.test.ts` | | |
+| 9.05 | Test safety layer with Knowledge Hub | `src/lib/safety/__tests__/knowledge-hub-safety.test.ts` | | |
+| 9.06 | Adversarial test: jailbreak via memory | - | | |
+
+### 9C: Accessibility Tests
+
+| ID | Task | File | Status | Thor |
+|----|------|------|--------|------|
+| 9.07 | Axe accessibility audit Knowledge Hub | `e2e/accessibility-knowledge-hub.spec.ts` | | |
+| 9.08 | Keyboard navigation test all new UI | - | | |
+| 9.09 | Screen reader test (manual) | - | | |
+
+### 9D: Performance Tests
+
+| ID | Task | File | Status | Thor |
+|----|------|------|--------|------|
+| 9.10 | Search performance with 1000+ materials | - | | |
+| 9.11 | Knowledge Hub load time < 2s | - | | |
+
+### 9E: Manual Tests
+
+| ID | Task | File | Status | Thor |
+|----|------|------|--------|------|
+| 9.12 | Manual test: all 5 tool flows | - | | |
+| 9.13 | Manual test: voice mode | - | | |
+| 9.14 | Manual test: knowledge hub search | - | | |
+| 9.15 | Manual test: memory context in conversation | - | | |
 
 ---
 
 ## FASE 10: DOCUMENTATION
 
-Tutta la documentazione.
+Tutta la documentazione. Formati specifici.
+
+### ADR Format (da ADR esistenti):
+```markdown
+# ADR XXXX: Title
+
+## Status
+Proposed | Accepted | Deprecated | Superseded
+
+## Date
+YYYY-MM-DD
+
+## Context
+[Problem description, options considered]
+
+## Decision
+[What we decided and why]
+
+## Consequences
+### Positive
+### Negative
+### Risks
+### Mitigations
+
+## Key Files
+| File | Purpose |
+
+## References
+```
+
+### CHANGELOG Format (Keep a Changelog):
+```markdown
+## [Unreleased] - Feature Name
+> **Branch**: `branch-name` | **Plan**: `docs/plans/...`
+
+### Added
+### Changed
+### Fixed
+### Security
+### Deprecated
+### Removed
+### Documentation
+```
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 10.01 | Create ARCHITECTURE.md | `docs/ARCHITECTURE.md` | | |
-| 10.02 | - Document 17 Maestri | `docs/ARCHITECTURE.md` | | |
-| 10.03 | - Document Triangle of Support | `docs/ARCHITECTURE.md` | | |
-| 10.04 | - Document all tools | `docs/ARCHITECTURE.md` | | |
-| 10.05 | - Document gamification | `docs/ARCHITECTURE.md` | | |
-| 10.06 | - Document accessibility | `docs/ARCHITECTURE.md` | | |
-| 10.07 | - Document audio system | `docs/ARCHITECTURE.md` | | |
-| 10.08 | - Document GDPR/parent dashboard | `docs/ARCHITECTURE.md` | | |
-| 10.09 | - Document state management | `docs/ARCHITECTURE.md` | | |
-| 10.10 | - Document AI providers | `docs/ARCHITECTURE.md` | | |
-| 10.11 | Create ADR 0021 memory injection | `docs/adr/0021-conversational-memory-injection.md` | | |
-| 10.12 | Create ADR 0022 knowledge hub | `docs/adr/0022-knowledge-hub-architecture.md` | | |
-| 10.13 | Create conversation-memory.md | `docs/claude/conversation-memory.md` | | |
-| 10.14 | Create knowledge-hub.md | `docs/claude/knowledge-hub.md` | | |
-| 10.15 | Update CHANGELOG | `CHANGELOG.md` | | |
+| 10.01 | Update ARCHITECTURE.md with new features | `docs/ARCHITECTURE.md` | | |
+| 10.02 | - Document Memory Injection | `docs/ARCHITECTURE.md` | | |
+| 10.03 | - Document Knowledge Hub | `docs/ARCHITECTURE.md` | | |
+| 10.04 | - Document Tool Focus Selection | `docs/ARCHITECTURE.md` | | |
+| 10.05 | - Update ADR count and list | `docs/ARCHITECTURE.md` | | |
+| 10.06 | Finalize ADR 0020 (mindmap fix) | `docs/adr/0020-mindmap-data-structure-fix.md` | | |
+| 10.07 | Finalize ADR 0021 (memory injection) | `docs/adr/0021-conversational-memory-injection.md` | | |
+| 10.08 | Finalize ADR 0022 (knowledge hub) | `docs/adr/0022-knowledge-hub-architecture.md` | | |
+| 10.09 | Create conversation-memory.md | `docs/claude/conversation-memory.md` | | |
+| 10.10 | Create knowledge-hub.md | `docs/claude/knowledge-hub.md` | | |
+| 10.11 | Update CHANGELOG with all changes | `CHANGELOG.md` | | |
 
 ---
 
-## FASE 11: RELEASE MANAGER
+## FASE 11: COMPLIANCE VERIFICATION
 
-Updates al release manager per ConvergioEdu.
+Verifica compliance con tutti gli standard.
+
+### 11A: Release Manager Updates
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
@@ -286,20 +429,41 @@ Updates al release manager per ConvergioEdu.
 | 11.03 | Add AI safety guardrails validation | `.claude/agents/app-release-manager.md` | | |
 | 11.04 | Add E2E educational flows | `.claude/agents/app-release-manager.md` | | |
 
+### 11B: GDPR Verification
+
+| ID | Task | File | Status | Thor |
+|----|------|------|--------|------|
+| 11.05 | Verify Knowledge Hub data can be exported | - | | |
+| 11.06 | Verify Knowledge Hub data can be deleted | - | | |
+| 11.07 | Verify Memory data respects consent | - | | |
+| 11.08 | Audit logging for new endpoints | - | | |
+
+### 11C: Security Audit
+
+| ID | Task | File | Status | Thor |
+|----|------|------|--------|------|
+| 11.09 | OWASP check: all new API endpoints | - | | |
+| 11.10 | XSS check: all new UI components | - | | |
+| 11.11 | Auth check: all endpoints verify user | - | | |
+
 ---
 
 ## FASE 12: FINAL VERIFICATION
 
-Verifica finale completa.
+Verifica finale completa. BLOCCA SE FALLISCE.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 12.01 | Full lint check | - | | |
-| 12.02 | Full typecheck | - | | |
-| 12.03 | Full build | - | | |
-| 12.04 | Full test suite | - | | |
-| 12.05 | Verify all objectives met | - | | |
-| 12.06 | Final Thor review | - | | |
+| 12.01 | Full lint check (0 errors, 0 warnings) | - | | |
+| 12.02 | Full typecheck (0 errors) | - | | |
+| 12.03 | Full build (passes) | - | | |
+| 12.04 | Full test suite (all pass) | - | | |
+| 12.05 | Verify Objective A: Mindmaps work | - | | |
+| 12.06 | Verify Objective B: Memory works | - | | |
+| 12.07 | Verify Objective C: Tool UX works | - | | |
+| 12.08 | Verify Objective D: Knowledge Hub works | - | | |
+| 12.09 | Verify Objective E: Docs complete | - | | |
+| 12.10 | Final Thor review: EVERYTHING | - | | |
 
 ---
 
@@ -324,15 +488,32 @@ npm run test
 ```
 
 ### Checklist Thor per ogni task:
+
+**Code Quality:**
 - [ ] Nessun console.log
 - [ ] Nessun TODO dimenticato
 - [ ] Nessun codice commentato
 - [ ] Types corretti e completi
-- [ ] Nessun any
+- [ ] Nessun `any`
 - [ ] Error handling presente
 - [ ] Test coverage >= 80%
-- [ ] Nessuna vulnerabilita security
-- [ ] Accessibilita rispettata (se UI)
+
+**Security (OWASP):**
+- [ ] Input validation presente
+- [ ] Nessuna SQL injection possibile
+- [ ] Nessuna XSS possibile
+- [ ] Auth check su endpoint
+
+**Accessibility (WCAG):**
+- [ ] Keyboard navigable (se UI)
+- [ ] Aria labels (se UI)
+- [ ] Focus visible (se UI)
+- [ ] Contrast OK (se UI)
+
+**Safety (ADR 0004):**
+- [ ] AI prompts usano `injectSafetyGuardrails()` (se AI)
+- [ ] Content filter attivo (se AI)
+- [ ] Output sanitizzato (se AI)
 
 ---
 
@@ -345,7 +526,7 @@ npm run test
 
 Task: <ID> (es. 1.01)
 
-Generated with Claude Code
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
@@ -358,19 +539,20 @@ Tipi: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
 
 | Fase | Completati | Totale | % |
 |------|:----------:|:------:|:-:|
+| 0. Cleanup | 0 | 6 | 0% |
 | 1. Database & Types | 0 | 6 | 0% |
 | 2. Core Libraries | 0 | 12 | 0% |
 | 3. Stores | 0 | 5 | 0% |
-| 4. API Routes | 0 | 7 | 0% |
+| 4. API Routes | 0 | 8 | 0% |
 | 5. Base Components | 0 | 28 | 0% |
-| 6. Handlers & Fixes | 0 | 7 | 0% |
+| 6. Handlers & Fixes | 0 | 8 | 0% |
 | 7. Views | 0 | 17 | 0% |
 | 8. Scripts | 0 | 2 | 0% |
-| 9. E2E Tests | 0 | 6 | 0% |
-| 10. Documentation | 0 | 15 | 0% |
-| 11. Release Manager | 0 | 4 | 0% |
-| 12. Final Verification | 0 | 6 | 0% |
-| **TOTALE** | **0** | **115** | **0%** |
+| 9. Testing | 0 | 15 | 0% |
+| 10. Documentation | 0 | 11 | 0% |
+| 11. Compliance | 0 | 11 | 0% |
+| 12. Final Verification | 0 | 10 | 0% |
+| **TOTALE** | **0** | **129** | **0%** |
 
 ---
 
@@ -387,7 +569,7 @@ I vecchi piani dettagliati sono in `docs/plans/reference/` per consultazione:
 
 ## COME USARE QUESTO PIANO
 
-1. **Inizia dal task 1.01** - Mai saltare
+1. **Inizia dal task 0.01** - Mai saltare
 2. **Segui l'ordine delle fasi** - Le dipendenze sono gia calcolate
 3. **Consulta i reference** per dettagli implementativi specifici
 4. **Esegui verifiche** dopo ogni task
@@ -396,10 +578,12 @@ I vecchi piani dettagliati sono in `docs/plans/reference/` per consultazione:
 7. **Aggiorna questo file** marcando il task completato
 8. **Passa al task successivo**
 
+**SE UN TASK FALLISCE:** Non andare avanti. Fix prima.
+
 ---
 
-**Versione**: 2.0
+**Versione**: 3.0
 **Creato**: 2026-01-01
-**Riorganizzato**: 2026-01-01
+**Ultimo aggiornamento**: 2026-01-01
 **Autore**: Claude Opus 4.5
 **Branch**: development
