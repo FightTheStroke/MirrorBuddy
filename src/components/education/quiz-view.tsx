@@ -9,9 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Quiz } from './quiz';
 import { useProgressStore, useUIStore } from '@/lib/stores/app-store';
 import { useQuizzes } from '@/lib/hooks/use-saved-materials';
-import type { Quiz as QuizType, QuizResult, Subject } from '@/types';
+import type { Quiz as QuizType, QuizResult, Subject, Maestro } from '@/types';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import { cn } from '@/lib/utils';
+import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 
 // Sample quizzes for demonstration
 const sampleQuizzes: QuizType[] = [
@@ -145,6 +146,13 @@ export function QuizView() {
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const { addXP } = useProgressStore();
   const { quizzes: savedQuizzes, loading, deleteQuiz } = useQuizzes();
+  const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+
+  // Handle maestro selection and enter focus mode
+  const handleMaestroConfirm = (maestro: Maestro, mode: 'voice' | 'chat') => {
+    setShowMaestroDialog(false);
+    enterFocusMode('quiz', maestro.id, mode);
+  };
 
   // Convert SavedQuiz to QuizType for the Quiz component
   const convertToQuizType = (saved: typeof savedQuizzes[0]): QuizType => ({
@@ -198,7 +206,7 @@ export function QuizView() {
         </div>
         <div className="flex items-center gap-4 text-sm">
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
-          <Button onClick={() => enterFocusMode('quiz')}>
+          <Button onClick={() => setShowMaestroDialog(true)}>
             <MessageSquare className="h-4 w-4 mr-2" />
             Crea Quiz con un Professore
           </Button>
@@ -424,6 +432,14 @@ export function QuizView() {
           </p>
         </CardContent>
       </Card>
+
+      {/* Maestro selection dialog */}
+      <ToolMaestroSelectionDialog
+        isOpen={showMaestroDialog}
+        toolType="quiz"
+        onConfirm={handleMaestroConfirm}
+        onClose={() => setShowMaestroDialog(false)}
+      />
     </div>
   );
 }

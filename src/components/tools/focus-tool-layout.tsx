@@ -12,16 +12,17 @@
 
 import { useEffect, useCallback, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, Send, Mic, MicOff } from 'lucide-react';
+import { X, Loader2, Send, Mic, MicOff, Phone, PhoneOff, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToolPanel } from './tool-panel';
 import { useUIStore, useSettingsStore } from '@/lib/stores/app-store';
 import { getMaestroById } from '@/data/maestri';
 import { getSupportTeacherById } from '@/data/support-teachers';
+import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 import type { MaestroFull } from '@/data/maestri';
-import type { SupportTeacher } from '@/types';
+import type { SupportTeacher, Subject } from '@/types';
 import { cn } from '@/lib/utils';
 
 // Map tool types to suggested maestros (for future use)
@@ -99,16 +100,18 @@ const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
 };
 
 export function FocusToolLayout() {
-  const { focusMode, focusToolType, focusMaestroId, focusTool, setFocusTool, exitFocusMode } = useUIStore();
+  const { focusMode, focusToolType, focusMaestroId, focusInteractionMode, focusTool, setFocusTool, exitFocusMode } = useUIStore();
   const { studentProfile } = useSettingsStore();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const [voiceSessionId, _setVoiceSessionId] = useState<string | null>(null);
+  const [connectionInfo, setConnectionInfo] = useState<{ provider: 'azure'; proxyPort: number; configured: boolean } | null>(null);
+  const [configError, setConfigError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const lastTranscriptIdRef = useRef<string | null>(null);
 
   // Determine which maestro/coach to use
   const getMaestroOrCoach = useCallback((): MaestroFull | SupportTeacher | null => {
@@ -147,6 +150,120 @@ export function FocusToolLayout() {
   };
 
   const characterProps = getCharacterProps(character);
+
+  // Voice session hook - must be after character is defined
+  const {
+    isConnected: voiceConnected,
+    isListening,
+    isSpeaking,
+    isMuted,
+    inputLevel,
+    connectionState,
+    connect: voiceConnect,
+    disconnect: voiceDisconnect,
+    toggleMute,
+    sessionId: voiceSessionId,
+  } = useVoiceSession({
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error('Voice session error in focus mode', { message });
+      setConfigError(message || 'Errore di connessione vocale');
+    },
+    onTranscript: (role, text) => {
+      // Add voice transcripts to messages
+      const transcriptId = `voice-${role}-${Date.now()}`;
+
+      // Avoid duplicate transcripts
+      if (lastTranscriptIdRef.current === text.substring(0, 50)) {
+        return;
+      }
+      lastTranscriptIdRef.current = text.substring(0, 50);
+
+      setMessages(prev => [...prev, {
+        id: transcriptId,
+        role,
+        content: text,
+        timestamp: new Date(),
+      }]);
+    },
+  });
+
+  // Fetch voice connection info on mount
+  useEffect(() => {
+    async function fetchConnectionInfo() {
+      try {
+        const response = await fetch('/api/realtime/token');
+        const data = await response.json();
+        if (data.error) {
+          logger.error('Voice API error', { error: data.error });
+          setConfigError(data.message || 'Servizio vocale non configurato');
+          return;
+        }
+        setConnectionInfo(data);
+      } catch (error) {
+        logger.error('Failed to get voice connection info', { error: String(error) });
+        setConfigError('Impossibile connettersi al servizio vocale');
+      }
+    }
+    if (focusMode) {
+      fetchConnectionInfo();
+    }
+  }, [focusMode]);
+
+  // Auto-start voice if interaction mode is 'voice'
+  useEffect(() => {
+    if (focusMode && focusInteractionMode === 'voice' && connectionInfo && !isVoiceActive) {
+      setIsVoiceActive(true);
+    }
+  }, [focusMode, focusInteractionMode, connectionInfo, isVoiceActive]);
+
+  // Connect to voice when activated
+  useEffect(() => {
+    if (!isVoiceActive || !connectionInfo || connectionState !== 'idle' || !character) return;
+
+    const startVoice = async () => {
+      setConfigError(null);
+      try {
+        // Check if character is a SupportTeacher (has voice property directly)
+        const isSupportTeacher = 'voice' in character && 'voiceInstructions' in character;
+        // Create a maestro-compatible object for the voice session
+        const maestroForVoice = {
+          id: character.id,
+          name: characterProps?.name || 'Coach',
+          subject: ('subject' in character ? character.subject : 'general') as Subject,
+          specialty: '',
+          voice: isSupportTeacher ? (character as SupportTeacher).voice : 'alloy' as const,
+          voiceInstructions: isSupportTeacher ? (character as SupportTeacher).voiceInstructions : 'Parla in modo chiaro e amichevole.',
+          teachingStyle: 'Interattivo e coinvolgente',
+          avatar: characterProps?.avatar || '/avatars/default.jpg',
+          color: characterProps?.color || '#3b82f6',
+          systemPrompt: characterProps?.systemPrompt || '',
+          greeting: characterProps?.greeting || '',
+        };
+        await voiceConnect(maestroForVoice, connectionInfo);
+      } catch (error) {
+        logger.error('Voice connection failed', { error: String(error) });
+        if (error instanceof DOMException && error.name === 'NotAllowedError') {
+          setConfigError('Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.');
+        } else {
+          setConfigError('Errore di connessione vocale');
+        }
+        setIsVoiceActive(false);
+      }
+    };
+
+    startVoice();
+  }, [isVoiceActive, connectionInfo, connectionState, character, characterProps, voiceConnect]);
+
+  // Handle voice toggle
+  const handleVoiceToggle = useCallback(() => {
+    if (isVoiceActive) {
+      voiceDisconnect();
+      setIsVoiceActive(false);
+    } else {
+      setIsVoiceActive(true);
+    }
+  }, [isVoiceActive, voiceDisconnect]);
 
   // ESC key handler
   useEffect(() => {
@@ -314,6 +431,33 @@ export function FocusToolLayout() {
             )}
           </div>
           <div className="flex items-center gap-2">
+            {/* Voice status indicator */}
+            {focusInteractionMode === 'voice' && (
+              <div className={cn(
+                'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
+                voiceConnected && !isMuted && 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+                voiceConnected && isMuted && 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+                !voiceConnected && isVoiceActive && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+                configError && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+              )}>
+                {configError ? (
+                  <>
+                    <MicOff className="h-3 w-3" />
+                    <span>Voce non disponibile</span>
+                  </>
+                ) : voiceConnected ? (
+                  <>
+                    {isMuted ? <MicOff className="h-3 w-3" /> : isSpeaking ? <Volume2 className="h-3 w-3" /> : <Mic className="h-3 w-3" />}
+                    <span>{isMuted ? 'Muted' : isSpeaking ? 'Parlando' : 'Voce attiva'}</span>
+                  </>
+                ) : isVoiceActive ? (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Connessione...</span>
+                  </>
+                ) : null}
+              </div>
+            )}
             <span className="text-xs text-slate-400">ESC per uscire</span>
             <Button
               variant="ghost"
@@ -375,15 +519,70 @@ export function FocusToolLayout() {
                   className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl border-0 focus:ring-2 focus:ring-accent-themed outline-none text-sm"
                   disabled={isLoading}
                 />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsVoiceActive(!isVoiceActive)}
-                  aria-label={isVoiceActive ? 'Disattiva voce' : 'Attiva voce'}
-                  className={cn(isVoiceActive && 'bg-red-100 text-red-600')}
-                >
-                  {isVoiceActive ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                </Button>
+                {/* Voice button with status */}
+                <div className="relative">
+                  {/* Input level indicator */}
+                  {voiceConnected && !isMuted && (
+                    <div
+                      className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"
+                    >
+                      <div
+                        className="h-full bg-green-500 transition-all duration-75"
+                        style={{ width: `${Math.min(inputLevel * 100, 100)}%` }}
+                      />
+                    </div>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleVoiceToggle}
+                    disabled={!!configError && !isVoiceActive}
+                    aria-label={isVoiceActive ? 'Disattiva voce' : 'Attiva voce'}
+                    className={cn(
+                      'relative',
+                      voiceConnected && isSpeaking && 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+                      voiceConnected && isListening && !isSpeaking && 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+                      voiceConnected && isMuted && 'bg-slate-200 text-slate-500 dark:bg-slate-700',
+                      !voiceConnected && isVoiceActive && 'bg-blue-100 text-blue-600 animate-pulse',
+                      configError && 'bg-red-100 text-red-600'
+                    )}
+                    title={configError || (voiceConnected ? (isMuted ? 'Muted' : isSpeaking ? 'Parlando...' : isListening ? 'Ascoltando...' : 'Connesso') : 'Attiva voce')}
+                  >
+                    {voiceConnected ? (
+                      isMuted ? <MicOff className="h-4 w-4" /> : isSpeaking ? <Volume2 className="h-4 w-4" /> : <Phone className="h-4 w-4" />
+                    ) : isVoiceActive ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Mic className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+                {/* Mute button when voice is connected */}
+                {voiceConnected && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleMute}
+                    aria-label={isMuted ? 'Attiva microfono' : 'Silenzia microfono'}
+                    className={cn(
+                      isMuted && 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
+                    )}
+                  >
+                    {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                  </Button>
+                )}
+                {/* End call button when connected */}
+                {voiceConnected && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleVoiceToggle}
+                    aria-label="Termina chiamata"
+                    className="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
+                  >
+                    <PhoneOff className="h-4 w-4" />
+                  </Button>
+                )}
                 <Button
                   size="icon"
                   onClick={handleSend}
