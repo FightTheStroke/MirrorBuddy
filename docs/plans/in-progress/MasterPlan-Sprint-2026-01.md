@@ -118,18 +118,18 @@ Utility functions e business logic. Nessuna dipendenza da UI.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 2.01 | Create mindmap-utils.ts (markdown conversion) | `src/lib/tools/mindmap-utils.ts` | ✅ (already exists) | |
-| 2.02 | Create memory-loader.ts | `src/lib/conversation/memory-loader.ts` | ✅ | |
-| 2.03 | Create prompt-enhancer.ts (MUST use injectSafetyGuardrails) | `src/lib/conversation/prompt-enhancer.ts` | ✅ | |
-| 2.04 | Create knowledge-base-v2.ts (lazy retrieval) | `src/data/app-knowledge-base-v2.ts` | ✅ (already exists) | |
-| 2.05 | Create searchable-text.ts (Fuse.js) | `src/lib/search/searchable-text.ts` | ✅ | |
-| 2.06 | Create material-export.ts | `src/lib/export/material-export.ts` | ✅ | |
-| 2.07 | Install fuse.js | `package.json` | ✅ | |
-| 2.08 | Unit tests for mindmap-utils | `src/lib/tools/__tests__/mindmap-utils.test.ts` | ✅ (already exists) | |
-| 2.09 | Unit tests for memory-loader | `src/lib/conversation/__tests__/memory-loader.test.ts` | ✅ (16 tests) | |
-| 2.10 | Unit tests for prompt-enhancer | `src/lib/conversation/__tests__/prompt-enhancer.test.ts` | ✅ (12 tests) | |
-| 2.11 | Unit tests for knowledge-base-v2 | `src/data/__tests__/app-knowledge-base-v2.test.ts` | ✅ (16 tests) | |
-| 2.12 | Unit tests for searchable-text | `src/lib/search/__tests__/searchable-text.test.ts` | ✅ (26 tests) | |
+| 2.01 | Create mindmap-utils.ts (markdown conversion) | `src/lib/tools/mindmap-utils.ts` | ✅ (already exists) | ✅ |
+| 2.02 | Create memory-loader.ts | `src/lib/conversation/memory-loader.ts` | ✅ | ✅ |
+| 2.03 | Create prompt-enhancer.ts (MUST use injectSafetyGuardrails) | `src/lib/conversation/prompt-enhancer.ts` | ✅ | ✅ |
+| 2.04 | Create knowledge-base-v2.ts (lazy retrieval) | `src/data/app-knowledge-base-v2.ts` | ✅ (already exists) | ✅ |
+| 2.05 | Create searchable-text.ts (Fuse.js) | `src/lib/search/searchable-text.ts` | ✅ | ✅ |
+| 2.06 | Create material-export.ts | `src/lib/export/material-export.ts` | ✅ | ✅ |
+| 2.07 | Install fuse.js | `package.json` | ✅ | ✅ |
+| 2.08 | Unit tests for mindmap-utils | `src/lib/tools/__tests__/mindmap-utils.test.ts` | ✅ (already exists) | ✅ |
+| 2.09 | Unit tests for memory-loader | `src/lib/conversation/__tests__/memory-loader.test.ts` | ✅ (16 tests) | ✅ |
+| 2.10 | Unit tests for prompt-enhancer | `src/lib/conversation/__tests__/prompt-enhancer.test.ts` | ✅ (12 tests) | ✅ |
+| 2.11 | Unit tests for knowledge-base-v2 | `src/data/__tests__/app-knowledge-base-v2.test.ts` | ✅ (16 tests) | ✅ |
+| 2.12 | Unit tests for searchable-text | `src/lib/search/__tests__/searchable-text.test.ts` | ✅ (26 tests) | ✅ |
 
 ---
 
@@ -139,11 +139,11 @@ State management updates. Altri componenti dipendono da questi.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 3.01 | Add focusInteractionMode to app-store | `src/lib/stores/app-store.ts` | | |
-| 3.02 | Update enterFocusMode signature | `src/lib/stores/app-store.ts` | | |
-| 3.03 | Update exitFocusMode to reset mode | `src/lib/stores/app-store.ts` | | |
-| 3.04 | Modify conversation-flow-store for memory | `src/lib/stores/conversation-flow-store.ts` | | |
-| 3.05 | Unit tests for store changes | `src/lib/stores/__tests__/app-store.test.ts` | | |
+| 3.01 | Add focusInteractionMode to app-store | `src/lib/stores/app-store.ts` | ✅ (already exists) | ✅ |
+| 3.02 | Update enterFocusMode signature | `src/lib/stores/app-store.ts` | ✅ (already exists) | ✅ |
+| 3.03 | Update exitFocusMode to reset mode | `src/lib/stores/app-store.ts` | ✅ (already exists) | ✅ |
+| 3.04 | Modify conversation-flow-store for memory | `src/lib/stores/conversation-flow-store.ts` | ✅ (memory fields exist) | ✅ |
+| 3.05 | Unit tests for store changes | `src/lib/stores/__tests__/app-store.test.ts` | ✅ (21 tests) | ✅ |
 
 ---
 
@@ -545,7 +545,7 @@ Tipi: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
 | 0. Cleanup | 6 | 6 | 100% |
 | 1. Database & Types | 6 | 6 | 100% |
 | 2. Core Libraries | 12 | 12 | 100% |
-| 3. Stores | 0 | 5 | 0% |
+| 3. Stores | 5 | 5 | 100% |
 | 4. API Routes | 0 | 8 | 0% |
 | 5. Base Components | 0 | 28 | 0% |
 | 6. Handlers & Fixes | 0 | 8 | 0% |
@@ -555,7 +555,7 @@ Tipi: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`
 | 10. Documentation | 0 | 11 | 0% |
 | 11. Compliance | 0 | 11 | 0% |
 | 12. Final Verification | 0 | 10 | 0% |
-| **TOTALE** | **24** | **129** | **19%** |
+| **TOTALE** | **29** | **129** | **22%** |
 
 ---
 
