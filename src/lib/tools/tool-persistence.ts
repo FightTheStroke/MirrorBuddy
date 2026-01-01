@@ -2,10 +2,14 @@
 // TOOL PERSISTENCE
 // Database operations for saving and retrieving created tools
 // Issue #22: Materials Archive - Tool Storage
+//
+// UPDATED: Now uses unified Material table instead of deprecated CreatedTool.
+// Part of Session Summary & Unified Archive feature.
 // ============================================================================
 
 import { prisma } from '@/lib/db';
 import type { ToolType } from '@/types/tools';
+import { randomUUID } from 'crypto';
 
 // ============================================================================
 // TYPES
@@ -24,6 +28,7 @@ export interface SaveToolParams {
 
 export interface SavedTool {
   id: string;
+  toolId: string;
   userId: string;
   type: string;
   title: string;
@@ -48,30 +53,74 @@ export interface GetToolsFilter {
 }
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+/**
+ * Convert Material record to SavedTool interface
+ */
+function materialToSavedTool(material: {
+  id: string;
+  toolId: string;
+  userId: string;
+  toolType: string;
+  title: string;
+  topic: string | null;
+  content: string;
+  maestroId: string | null;
+  conversationId: string | null;
+  sessionId: string | null;
+  userRating: number | null;
+  isBookmarked: boolean;
+  viewCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}): SavedTool {
+  return {
+    id: material.id,
+    toolId: material.toolId,
+    userId: material.userId,
+    type: material.toolType,
+    title: material.title,
+    topic: material.topic,
+    content: JSON.parse(material.content) as Record<string, unknown>,
+    maestroId: material.maestroId,
+    conversationId: material.conversationId,
+    sessionId: material.sessionId,
+    userRating: material.userRating,
+    isBookmarked: material.isBookmarked,
+    viewCount: material.viewCount,
+    createdAt: material.createdAt,
+    updatedAt: material.updatedAt,
+  };
+}
+
+// ============================================================================
 // CRUD OPERATIONS
 // ============================================================================
 
 /**
- * Save a tool to the database
+ * Save a tool to the database (using Material table)
  */
 export async function saveTool(params: SaveToolParams): Promise<SavedTool> {
-  const tool = await prisma.createdTool.create({
+  const toolId = `tool-${randomUUID()}`;
+
+  const material = await prisma.material.create({
     data: {
       userId: params.userId,
-      type: params.type,
+      toolId,
+      toolType: params.type,
       title: params.title,
       topic: params.topic ?? null,
       content: JSON.stringify(params.content),
       maestroId: params.maestroId ?? null,
       conversationId: params.conversationId ?? null,
       sessionId: params.sessionId ?? null,
+      status: 'active',
     },
   });
 
-  return {
-    ...tool,
-    content: JSON.parse(tool.content) as Record<string, unknown>,
-  };
+  return materialToSavedTool(material);
 }
 
 /**
@@ -81,10 +130,13 @@ export async function getUserTools(
   userId: string,
   filter?: GetToolsFilter
 ): Promise<SavedTool[]> {
-  const where: Record<string, unknown> = { userId };
+  const where: Record<string, unknown> = {
+    userId,
+    status: 'active', // Only return active materials
+  };
 
   if (filter?.type) {
-    where.type = filter.type;
+    where.toolType = filter.type;
   }
   if (filter?.maestroId) {
     where.maestroId = filter.maestroId;
@@ -93,53 +145,63 @@ export async function getUserTools(
     where.isBookmarked = filter.isBookmarked;
   }
 
-  const tools = await prisma.createdTool.findMany({
+  const materials = await prisma.material.findMany({
     where,
     orderBy: { createdAt: 'desc' },
     take: filter?.limit ?? 50,
     skip: filter?.offset ?? 0,
   });
 
-  return tools.map((tool) => ({
-    ...tool,
-    content: JSON.parse(tool.content) as Record<string, unknown>,
-  }));
+  return materials.map(materialToSavedTool);
 }
 
 /**
- * Get a single tool by ID
+ * Get a single tool by ID (supports both id and toolId)
  */
 export async function getToolById(
-  toolId: string,
+  idOrToolId: string,
   userId: string
 ): Promise<SavedTool | null> {
-  const tool = await prisma.createdTool.findFirst({
-    where: { id: toolId, userId },
+  // Try to find by toolId first, then by id
+  const material = await prisma.material.findFirst({
+    where: {
+      userId,
+      status: 'active',
+      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
+    },
   });
 
-  if (!tool) return null;
+  if (!material) return null;
 
-  return {
-    ...tool,
-    content: JSON.parse(tool.content) as Record<string, unknown>,
-  };
+  return materialToSavedTool(material);
 }
 
 /**
- * Delete a tool
+ * Delete a tool (soft delete by setting status to 'deleted')
  */
-export async function deleteTool(toolId: string, userId: string): Promise<boolean> {
-  const result = await prisma.createdTool.deleteMany({
-    where: { id: toolId, userId },
+export async function deleteTool(idOrToolId: string, userId: string): Promise<boolean> {
+  const material = await prisma.material.findFirst({
+    where: {
+      userId,
+      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
+    },
   });
-  return result.count > 0;
+
+  if (!material) return false;
+
+  await prisma.material.update({
+    where: { id: material.id },
+    data: { status: 'deleted' },
+  });
+
+  return true;
 }
 
 /**
  * Update a tool's rating (1-5 stars)
  */
 export async function updateToolRating(
-  toolId: string,
+  idOrToolId: string,
   userId: string,
   rating: number
 ): Promise<SavedTool | null> {
@@ -147,48 +209,67 @@ export async function updateToolRating(
     throw new Error('Rating must be between 1 and 5');
   }
 
-  const tool = await prisma.createdTool.updateMany({
-    where: { id: toolId, userId },
+  const material = await prisma.material.findFirst({
+    where: {
+      userId,
+      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
+    },
+  });
+
+  if (!material) return null;
+
+  await prisma.material.update({
+    where: { id: material.id },
     data: { userRating: rating },
   });
 
-  if (tool.count === 0) return null;
-
-  return getToolById(toolId, userId);
+  return getToolById(idOrToolId, userId);
 }
 
 /**
  * Toggle bookmark status
  */
 export async function toggleBookmark(
-  toolId: string,
+  idOrToolId: string,
   userId: string
 ): Promise<SavedTool | null> {
-  const existing = await prisma.createdTool.findFirst({
-    where: { id: toolId, userId },
+  const material = await prisma.material.findFirst({
+    where: {
+      userId,
+      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
+    },
   });
 
-  if (!existing) return null;
+  if (!material) return null;
 
-  await prisma.createdTool.update({
-    where: { id: toolId },
-    data: { isBookmarked: !existing.isBookmarked },
+  await prisma.material.update({
+    where: { id: material.id },
+    data: { isBookmarked: !material.isBookmarked },
   });
 
-  return getToolById(toolId, userId);
+  return getToolById(idOrToolId, userId);
 }
 
 /**
  * Increment view count
  */
 export async function incrementViewCount(
-  toolId: string,
+  idOrToolId: string,
   userId: string
 ): Promise<void> {
-  await prisma.createdTool.updateMany({
-    where: { id: toolId, userId },
-    data: { viewCount: { increment: 1 } },
+  const material = await prisma.material.findFirst({
+    where: {
+      userId,
+      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
+    },
   });
+
+  if (material) {
+    await prisma.material.update({
+      where: { id: material.id },
+      data: { viewCount: { increment: 1 } },
+    });
+  }
 }
 
 /**
@@ -200,10 +281,10 @@ export async function getToolStats(userId: string): Promise<{
   bookmarked: number;
   avgRating: number | null;
 }> {
-  const tools = await prisma.createdTool.findMany({
-    where: { userId },
+  const materials = await prisma.material.findMany({
+    where: { userId, status: 'active' },
     select: {
-      type: true,
+      toolType: true,
       isBookmarked: true,
       userRating: true,
     },
@@ -214,17 +295,17 @@ export async function getToolStats(userId: string): Promise<{
   let ratingSum = 0;
   let ratingCount = 0;
 
-  for (const tool of tools) {
-    byType[tool.type] = (byType[tool.type] || 0) + 1;
-    if (tool.isBookmarked) bookmarked++;
-    if (tool.userRating !== null) {
-      ratingSum += tool.userRating;
+  for (const material of materials) {
+    byType[material.toolType] = (byType[material.toolType] || 0) + 1;
+    if (material.isBookmarked) bookmarked++;
+    if (material.userRating !== null) {
+      ratingSum += material.userRating;
       ratingCount++;
     }
   }
 
   return {
-    total: tools.length,
+    total: materials.length,
     byType,
     bookmarked,
     avgRating: ratingCount > 0 ? ratingSum / ratingCount : null,
@@ -246,4 +327,48 @@ export async function getRecentTools(
  */
 export async function getBookmarkedTools(userId: string): Promise<SavedTool[]> {
   return getUserTools(userId, { isBookmarked: true });
+}
+
+/**
+ * Get tools by session ID
+ */
+export async function getToolsBySession(
+  userId: string,
+  sessionId: string
+): Promise<SavedTool[]> {
+  const materials = await prisma.material.findMany({
+    where: {
+      userId,
+      sessionId,
+      status: 'active',
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return materials.map(materialToSavedTool);
+}
+
+/**
+ * Link a tool to a session
+ */
+export async function linkToolToSession(
+  idOrToolId: string,
+  userId: string,
+  sessionId: string
+): Promise<SavedTool | null> {
+  const material = await prisma.material.findFirst({
+    where: {
+      userId,
+      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
+    },
+  });
+
+  if (!material) return null;
+
+  const updated = await prisma.material.update({
+    where: { id: material.id },
+    data: { sessionId },
+  });
+
+  return materialToSavedTool(updated);
 }

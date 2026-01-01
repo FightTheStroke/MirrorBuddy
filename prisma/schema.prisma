@@ -144,8 +144,26 @@ model StudySession {
   xpEarned    Int       @default(0)
   questions   Int       @default(0)
 
+  // Student self-evaluation (1-5 stars)
+  studentRating    Int?
+  studentFeedback  String?
+
+  // AI Maestro evaluation (1-10 score)
+  maestroScore     Int?
+  maestroFeedback  String?
+  strengths        String?   // JSON array
+  areasToImprove   String?   // JSON array
+
+  // Session context
+  topics           String    @default("[]") // JSON array of topics covered
+  conversationId   String?   // Link to Conversation
+
+  // Tools created during session
+  materials        Material[]
+
   @@index([userId])
   @@index([startedAt])
+  @@index([conversationId])
 }
 
 // ============================================================================
@@ -453,8 +471,13 @@ model Material {
   // Context
   maestroId   String?
   sessionId   String?
+  session     StudySession? @relation(fields: [sessionId], references: [id])
   subject     String?
   preview     String?  // Preview text for lists
+
+  // Migrated from CreatedTool
+  topic          String?
+  conversationId String?
 
   // Status
   status      String   @default("active") // active, archived, deleted
@@ -470,12 +493,41 @@ model Material {
   @@index([userId])
   @@index([toolType])
   @@index([status])
+  @@index([sessionId])
   @@index([createdAt])
   @@index([isBookmarked])
 }
 
 // ============================================================================
+// PARENT NOTES (Auto-generated session summaries for parents)
+// ============================================================================
+
+model ParentNote {
+  id          String    @id @default(cuid())
+  userId      String
+  sessionId   String
+  maestroId   String
+  subject     String
+  duration    Int       // minutes
+
+  // Content
+  summary     String    // Brief summary for parents
+  highlights  String    // JSON array of achievements
+  concerns    String?   // JSON array of concerns (can be empty)
+  suggestions String?   // JSON array of suggestions
+
+  // Timestamps
+  generatedAt DateTime  @default(now())
+  viewedAt    DateTime?
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([generatedAt])
+}
+
+// ============================================================================
 // CREATED TOOLS (Maestro-generated interactive tools - Issue #39, #37)
+// DEPRECATED: Use Material table instead. Kept for migration buffer.
 // ============================================================================
 
 model CreatedTool {

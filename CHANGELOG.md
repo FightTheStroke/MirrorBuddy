@@ -5,6 +5,85 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Session Summaries & Unified Archive
+
+> **Branch**: `feature/conversation-summaries-unified-archive` | **Plan**: `docs/plans/SessionSummaryUnifiedArchive-2026-01-01.md`
+
+### Added
+
+#### Conversation Summaries
+- **Summary Generator** (`src/lib/conversation/summary-generator.ts`): Auto-generate summaries at session end
+  - Triggered by explicit close or 15-min inactivity timeout
+  - Extracts topics, key facts, and student learnings
+  - Saves to Conversation table
+- **Inactivity Monitor** (`src/lib/conversation/inactivity-monitor.ts`): Track conversation activity
+  - 15-minute timeout per conversation
+  - Automatic summary trigger on timeout
+  - Singleton pattern for global tracking
+
+#### Contextual Greetings
+- **Greeting Generator** (`src/lib/conversation/contextual-greeting.ts`): Personalized welcome messages
+  - References previous conversation summary
+  - Time-aware greetings ("ieri", "la settimana scorsa")
+  - Fallback to default greeting if no history
+
+#### Dual Rating System
+- **Maestro Evaluation** (`src/lib/session/maestro-evaluation.ts`): AI evaluation of sessions
+  - Score 1-10 with constructive feedback
+  - Identifies strengths and areas to improve
+  - Encouraging tone focused on progress
+- **Rating Modal** (`src/components/session/session-rating-modal.tsx`): Student self-evaluation
+  - 5-star rating with optional feedback
+  - Session info display (duration, topics)
+  - Skip option for quick exit
+
+#### Parent Notes
+- **Parent Note Generator** (`src/lib/session/parent-note-generator.ts`): Auto-generated parent summaries
+  - Parent-friendly language (non-technical)
+  - Highlights achievements
+  - Constructive framing of concerns
+  - Practical home activity suggestions
+- **Parent Notes API** (`src/app/api/parent-notes/route.ts`): CRUD operations
+  - List notes with unread count
+  - Mark as viewed tracking
+  - Delete functionality
+
+#### API Endpoints
+- `POST /api/conversations/[id]/end`: End conversation with summary
+- `GET /api/conversations/[id]/end`: Get conversation summary
+- `GET/PATCH/DELETE /api/parent-notes`: Parent notes CRUD
+
+### Changed
+
+#### Unified Tool Archive
+- **Material table extended**: Now includes sessionId relation, topic, conversationId
+- **tool-persistence.ts**: Migrated from CreatedTool to Material table
+  - All CRUD operations now use Material
+  - Soft delete via status field
+  - Session linking support
+
+#### StudySession Schema
+- Added rating fields: studentRating, studentFeedback, maestroScore, maestroFeedback
+- Added session context: topics, conversationId, strengths, areasToImprove
+- Added materials relation for session-tool linking
+
+#### Conversation Flow Store
+- `endConversationWithSummary()`: New action for summary-aware session end
+- `loadContextualGreeting()`: Fetch personalized greeting
+- `showRatingModal` / `sessionSummary`: State for rating flow
+- Integration with inactivity monitor
+
+### Deprecated
+- **CreatedTool table**: Marked deprecated, use Material instead
+  - Migration script: `scripts/migrate-created-tools.ts`
+  - 30-day buffer before removal
+
+### Documentation
+- ADR 0019: Session Summaries & Unified Archive
+- Claude docs: `docs/claude/session-summaries.md`
+
+---
+
 ## [Unreleased] - Tool Architecture Improvements
 
 > **Branch**: `main` | **GitHub Issues**: #64, Plan
@@ -46,7 +125,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed dependency on `useHTMLSnippetsStore` Zustand store for demos
 
 ---
-
 ## [Unreleased] - Ambient Audio Feature
 
 > **Branch**: `feature/71-ambient-audio-enhanced` | **GitHub Issue**: #71
