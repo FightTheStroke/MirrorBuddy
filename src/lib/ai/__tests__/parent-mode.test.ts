@@ -19,14 +19,15 @@ import {
 function createMockLearning(overrides: Partial<Learning> = {}): Learning {
   return {
     id: 'learning-1',
-    visitorId: 'visitor-1',
+    userId: 'user-1',
+    maestroId: null,
+    subject: null,
     category: 'learning_preference',
     insight: 'Test insight',
     confidence: 0.8,
     occurrences: 1,
-    metadata: null,
     createdAt: new Date('2026-01-01'),
-    updatedAt: new Date('2026-01-01'),
+    lastSeen: new Date('2026-01-01'),
     ...overrides,
   };
 }

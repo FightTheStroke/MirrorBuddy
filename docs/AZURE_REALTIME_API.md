@@ -753,6 +753,63 @@ WS_PROXY_PORT=3001
 | 2025-12-29 | **VoiceSession doesn't work but test page does** | Stale closure bug - fixed with useRef pattern |
 | 2025-12-29 | **ws.onmessage doesn't receive events** | WebSocket sends Blob, code expected String |
 | 2025-12-30 | session.update format confusion | Clarified: current code uses Preview API flat format |
+| 2026-01-01 | **Only first word plays in onboarding** | Chunk scheduling bug - chunks 4+ never scheduled (see below) |
+
+---
+
+## CRITICAL BUG: Audio Chunk Scheduling (2026-01-01)
+
+> ⚠️ **THIS BUG CAUSED "ONLY FIRST WORD PLAYS"** ⚠️
+>
+> Audio chunks arrived correctly from Azure but only ~3 chunks played.
+> Root cause: after initial buffer, new chunks were queued but never scheduled.
+
+### The Problem
+
+The audio playback uses a buffering system:
+1. Wait for MIN_BUFFER_CHUNKS (3) before starting playback
+2. Once buffer ready, schedule all chunks with `scheduleQueuedChunks()`
+3. New chunks arrive and get pushed to queue...
+4. **BUG**: New chunks sat in queue forever because `playNextChunk()` was skipped!
+
+```typescript
+// ❌ WRONG - chunks 4+ never played
+if (!isPlayingRef.current) {
+  playNextChunk();  // Only called when NOT playing
+}
+// After buffer fills, isPlayingRef = true, so this never runs!
+```
+
+### The Solution
+
+Schedule new chunks immediately when already playing:
+
+```typescript
+// ✅ CORRECT - schedule new chunks as they arrive
+if (!isPlayingRef.current) {
+  // Not yet playing - go through buffering/startup logic
+  playNextChunk();
+} else if (!isBufferingRef.current) {
+  // Already playing - schedule new chunks immediately
+  scheduleQueuedChunks();
+}
+```
+
+### How to Identify This Bug
+
+**Symptoms:**
+- First word/syllable plays, then silence
+- Server logs show ALL `response.audio.delta` events received
+- Client receives audio but doesn't play it all
+
+**Debug steps:**
+1. Check server logs for `response.audio.delta` events - if all arrive, it's client-side
+2. Add logging in `scheduleQueuedChunks()` to see if chunks are processed
+3. Check if `audioQueueRef.current.length` grows but never decreases
+
+### Implementation Reference
+
+- **Fix location**: `src/lib/hooks/use-voice-session.ts:743-751`
 
 ---
 
