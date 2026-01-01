@@ -113,6 +113,7 @@ export const FILTER_TABS: { value: FilterType; label: string; icon?: typeof Book
   { value: 'mindmap', label: 'Mappe' },
   { value: 'quiz', label: 'Quiz' },
   { value: 'flashcard', label: 'Flashcard' },
+  { value: 'summary', label: 'Riassunti' },
   { value: 'demo', label: 'Demo' },
   { value: 'webcam', label: 'Foto' },
   { value: 'pdf', label: 'PDF' },

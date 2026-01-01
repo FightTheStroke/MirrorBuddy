@@ -9,8 +9,9 @@ import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
 import { DemoSandbox } from './demo-sandbox';
 import { SearchResults } from './search-results';
+import { SummaryTool } from './summary-tool';
 import { cn } from '@/lib/utils';
-import type { ToolState } from '@/types/tools';
+import type { ToolState, SummaryData } from '@/types/tools';
 import type { QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
 
 interface ToolPanelProps {
@@ -59,6 +60,10 @@ export function ToolPanel({
       case 'search': {
         const searchData = tool.content as { query: string; results: Array<{ type: 'web' | 'youtube'; title: string; url: string; description?: string; thumbnail?: string; duration?: string }> };
         return <SearchResults data={searchData} />;
+      }
+      case 'summary': {
+        const summaryData = tool.content as SummaryData;
+        return <SummaryTool data={summaryData} />;
       }
       default:
         return (
