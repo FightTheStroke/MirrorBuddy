@@ -8,16 +8,23 @@ import type { AudioMode } from '@/types';
 
 /**
  * Generate white noise (equal energy across frequencies)
+ * 
+ * TODO: Implement proper AudioWorkletProcessor for modern browsers
+ * Currently uses deprecated ScriptProcessorNode as fallback since AudioWorklet
+ * requires registering a worklet module. ScriptProcessorNode is deprecated but
+ * still widely supported and will continue working until browsers remove it
+ * (no concrete timeline as of 2026). Future implementation should register
+ * a worklet processor via audioContext.audioWorklet.addModule().
  */
 export function createWhiteNoiseNode(audioContext: AudioContext): AudioWorkletNode | ScriptProcessorNode {
   // Try to use AudioWorklet if available (better performance)
-  // Fall back to ScriptProcessor for compatibility
+  // Falls through silently if worklet not registered - this is intentional
   if (audioContext.audioWorklet) {
     try {
       const workletNode = new AudioWorkletNode(audioContext, 'white-noise-processor');
       return workletNode;
     } catch {
-      // Fall through to ScriptProcessor
+      // Worklet not registered, fall through to ScriptProcessor
     }
   }
 

@@ -18,6 +18,8 @@ export function useAmbientAudio() {
   const engine = useMemo(() => getAudioEngine(), []);
 
   // Initialize audio engine on mount
+  // Note: engine is a singleton from useMemo, and store methods are stable
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const initEngine = async () => {
       try {
@@ -35,7 +37,7 @@ export function useAmbientAudio() {
     return () => {
       engine.stopAll();
     };
-  }, [engine, store]);
+  }, []);
 
   // Sync store state with engine
   useEffect(() => {
