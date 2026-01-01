@@ -223,7 +223,8 @@ function WelcomeContent() {
               </motion.div>
             </motion.div>
 
-            {/* Welcome Text */}
+            {/* Welcome Text - aria-live for screen readers */}
+            <div aria-live="polite" aria-atomic="true">
             {isReturningUser ? (
               <>
                 <motion.h1
@@ -267,6 +268,7 @@ function WelcomeContent() {
                 </motion.p>
               </>
             )}
+            </div>
 
             {/* Features Grid */}
             <motion.div
@@ -468,6 +470,7 @@ function WelcomeContent() {
               <CurrentStepComponent
                 useWebSpeechFallback={useWebSpeechFallback}
                 onAzureUnavailable={handleAzureUnavailable}
+                existingUserData={existingUserData}
               />
             </motion.div>
           </AnimatePresence>

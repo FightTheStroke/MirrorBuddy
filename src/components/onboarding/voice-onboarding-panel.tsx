@@ -29,8 +29,9 @@ import { logger } from '@/lib/logger';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import {
-  MELISSA_ONBOARDING_PROMPT,
+  generateMelissaOnboardingPrompt,
   MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
+  type ExistingUserDataForPrompt,
 } from '@/lib/voice/onboarding-tools';
 import type { Maestro, Subject, MaestroVoice } from '@/types';
 
@@ -39,6 +40,8 @@ export interface VoiceOnboardingPanelProps {
   onFallbackToWebSpeech?: () => void;
   /** Which step we're on - affects what data we show */
   step?: 'welcome' | 'info';
+  /** Existing user data for returning users - Melissa will acknowledge them */
+  existingUserData?: ExistingUserDataForPrompt | null;
 }
 
 interface VoiceConnectionInfo {
@@ -49,8 +52,11 @@ interface VoiceConnectionInfo {
 
 /**
  * Create a Maestro-like object for Melissa with onboarding-specific prompts.
+ * If existingUserData is provided, Melissa will greet them by name and ask if they want to update.
  */
-function createOnboardingMelissa(): Maestro {
+function createOnboardingMelissa(existingUserData?: ExistingUserDataForPrompt | null): Maestro {
+  const isReturningUser = Boolean(existingUserData?.name);
+
   return {
     id: 'melissa-onboarding',
     name: 'Melissa',
@@ -61,8 +67,11 @@ function createOnboardingMelissa(): Maestro {
     teachingStyle: 'scaffolding',
     avatar: '/avatars/melissa.jpg',
     color: '#EC4899',
-    systemPrompt: MELISSA_ONBOARDING_PROMPT,
-    greeting: 'Ciao! Sono Melissa, piacere di conoscerti! Come ti chiami?',
+    // Use dynamic prompt that adapts for returning users
+    systemPrompt: generateMelissaOnboardingPrompt(existingUserData),
+    greeting: isReturningUser
+      ? `Ciao ${existingUserData?.name}! È bello rivederti! Ho già le tue informazioni. Vuoi cambiare qualcosa o andiamo avanti?`
+      : 'Ciao! Sono Melissa, piacere di conoscerti! Come ti chiami?',
   };
 }
 
@@ -70,6 +79,7 @@ export function VoiceOnboardingPanel({
   className,
   onFallbackToWebSpeech,
   step = 'welcome',
+  existingUserData,
 }: VoiceOnboardingPanelProps) {
   const { data, addVoiceTranscript, voiceTranscript, clearVoiceTranscript } = useOnboardingStore();
   const hasInitializedRef = useRef(false);
@@ -154,7 +164,7 @@ export function VoiceOnboardingPanel({
       setConfigError(null);
 
       try {
-        const onboardingMelissa = createOnboardingMelissa();
+        const onboardingMelissa = createOnboardingMelissa(existingUserData);
         await connect(onboardingMelissa, connectionInfo);
       } catch (error) {
         logger.error('[VoiceOnboardingPanel] Connection failed', { error: String(error) });
