@@ -157,7 +157,7 @@ export function useStudentSummarySync({
     eventSource.onmessage = handleEvent;
     eventSource.onerror = () => {
       setIsConnected(false);
-      reconnectTimeoutRef.current && clearTimeout(reconnectTimeoutRef.current);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       reconnectTimeoutRef.current = setTimeout(connectRef.current, 3000);
     };
   }, [sessionId, summaryId, enabled, handleEvent]);
@@ -165,7 +165,7 @@ export function useStudentSummarySync({
   useEffect(() => { connectRef.current = connect; }, [connect]);
 
   const reconnect = useCallback(() => {
-    reconnectTimeoutRef.current && clearTimeout(reconnectTimeoutRef.current);
+    if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
     connect();
   }, [connect]);
 
@@ -208,7 +208,7 @@ export function useStudentSummarySync({
     return () => {
       eventSourceRef.current?.close();
       eventSourceRef.current = null;
-      reconnectTimeoutRef.current && clearTimeout(reconnectTimeoutRef.current);
+      if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
       setIsConnected(false);
     };
   }, [sessionId, enabled, connect]);

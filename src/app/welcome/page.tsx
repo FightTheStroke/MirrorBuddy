@@ -72,7 +72,7 @@ function WelcomeContent() {
     hasCompletedOnboarding,
     currentStep,
     isReplayMode,
-    azureAvailable,
+    azureAvailable: _azureAvailable,
     startReplay,
     resetOnboarding,
     updateData,

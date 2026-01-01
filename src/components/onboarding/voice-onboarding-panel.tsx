@@ -52,12 +52,12 @@ export interface VoiceOnboardingPanelProps {
 
 export function VoiceOnboardingPanel({
   className,
-  onFallbackToWebSpeech,
+  onFallbackToWebSpeech: _onFallbackToWebSpeech,
   step = 'welcome',
   voiceSession,
   connectionInfo,
   onboardingMelissa,
-  existingUserData,
+  existingUserData: _existingUserData,
 }: VoiceOnboardingPanelProps) {
   const { data, voiceTranscript, clearVoiceTranscript } = useOnboardingStore();
   const hasInitializedRef = useRef(false);
