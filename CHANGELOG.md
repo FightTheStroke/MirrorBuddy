@@ -53,6 +53,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `GET /api/conversations/[id]/end`: Get conversation summary
 - `GET/PATCH/DELETE /api/parent-notes`: Parent notes CRUD
 
+#### Knowledge Hub API Routes (ADR 0022, MasterPlan Phase 4)
+- `GET /api/conversations/memory`: Load conversation context for memory injection (ADR 0021)
+- `GET/POST /api/collections`: List and create material folders (nested support)
+- `GET/PUT/DELETE /api/collections/[id]`: Single collection operations
+- `GET/POST /api/tags`: List and create user tags with material counts
+- `GET/PUT/DELETE /api/tags/[id]`: Single tag operations
+- `POST /api/materials/bulk`: Bulk operations (move, archive, delete, restore, addTags, removeTags, setTags)
+- Updated `/api/materials`: Added searchableText generation, collection/tag filters
+- Updated `/api/chat`: Added conversation memory injection (ADR 0021)
+- **Security**: All endpoints use cookie auth, Zod validation, Prisma parameterized queries, ownership verification
+
 ### Changed
 
 #### Unified Tool Archive
