@@ -10,6 +10,7 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { VoiceOnboardingPanel } from '@/components/onboarding/voice-onboarding-panel';
 import { cn } from '@/lib/utils';
 import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
+import type { Maestro, VoiceSessionHandle } from '@/types';
 
 const SCHOOL_LEVELS = [
   { id: 'elementare', label: 'Elementare', years: '6-10 anni' },
@@ -28,9 +29,21 @@ const LEARNING_DIFFERENCES = [
   { id: 'auditoryProcessing', label: 'Difficoltà Uditive', icon: '👂' },
 ] as const;
 
+interface VoiceConnectionInfo {
+  provider: 'azure';
+  proxyPort: number;
+  configured: boolean;
+}
+
 interface InfoStepProps {
   useWebSpeechFallback?: boolean;
   onAzureUnavailable?: () => void;
+  /** Voice session handle from parent */
+  voiceSession?: VoiceSessionHandle;
+  /** Connection info from parent */
+  connectionInfo?: VoiceConnectionInfo | null;
+  /** Melissa maestro from parent */
+  onboardingMelissa?: Maestro;
 }
 
 /**
@@ -45,7 +58,13 @@ interface InfoStepProps {
  * - School level (optional)
  * - Learning differences (optional, for accessibility presets)
  */
-export function InfoStep({ useWebSpeechFallback = false, onAzureUnavailable }: InfoStepProps) {
+export function InfoStep({
+  useWebSpeechFallback = false,
+  onAzureUnavailable,
+  voiceSession,
+  connectionInfo,
+  onboardingMelissa,
+}: InfoStepProps) {
   const {
     data,
     updateData,
@@ -145,7 +164,16 @@ export function InfoStep({ useWebSpeechFallback = false, onAzureUnavailable }: I
         className="w-full max-w-md mx-auto"
       >
         {/* Melissa continues conversation (already connected from step 1) */}
-        <VoiceOnboardingPanel step="info" onFallbackToWebSpeech={onAzureUnavailable} className="w-full" />
+        {voiceSession && onboardingMelissa && (
+          <VoiceOnboardingPanel
+            step="info"
+            onFallbackToWebSpeech={onAzureUnavailable}
+            className="w-full"
+            voiceSession={voiceSession}
+            connectionInfo={connectionInfo ?? null}
+            onboardingMelissa={onboardingMelissa}
+          />
+        )}
 
         {/* Show collected data summary with navigation */}
         <AnimatePresence>

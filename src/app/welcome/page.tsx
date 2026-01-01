@@ -1,10 +1,11 @@
 'use client';
 
-import { Suspense, useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCcw, Wifi, WifiOff, Cloud, Volume2 } from 'lucide-react';
 import { useOnboardingStore, getStepIndex, getTotalSteps } from '@/lib/stores/onboarding-store';
+import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { WelcomeStep } from './components/welcome-step';
 import { InfoStep } from './components/info-step';
 import { PrinciplesStep } from './components/principles-step';
@@ -12,6 +13,38 @@ import { MaestriStep } from './components/maestri-step';
 import { ReadyStep } from './components/ready-step';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
+import type { VoiceSessionHandle } from '@/types';
+import type { Maestro, Subject, MaestroVoice } from '@/types';
+import {
+  MELISSA_ONBOARDING_PROMPT,
+  MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
+} from '@/lib/voice/onboarding-tools';
+
+interface VoiceConnectionInfo {
+  provider: 'azure';
+  proxyPort: number;
+  configured: boolean;
+}
+
+/**
+ * Create Melissa maestro for onboarding with specialized prompts.
+ */
+function createOnboardingMelissa(): Maestro {
+  return {
+    id: 'melissa-onboarding',
+    name: 'Melissa',
+    subject: 'methodology' as Subject,
+    specialty: 'Learning Coach - Onboarding',
+    voice: 'shimmer' as MaestroVoice,
+    voiceInstructions: MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
+    teachingStyle: 'scaffolding',
+    avatar: '/avatars/melissa.jpg',
+    color: '#EC4899',
+    systemPrompt: MELISSA_ONBOARDING_PROMPT,
+    greeting: 'Ciao! Sono Melissa, piacere di conoscerti! Come ti chiami?',
+  };
+}
 
 function WelcomeContent() {
   const router = useRouter();
@@ -25,10 +58,65 @@ function WelcomeContent() {
     azureAvailable,
     startReplay,
     resetOnboarding,
+    addVoiceTranscript,
   } = useOnboardingStore();
 
   // Track if we should use Web Speech fallback (when Azure unavailable)
   const [useWebSpeechFallback, setUseWebSpeechFallback] = useState(false);
+  const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
+  const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
+  const lastTranscriptRef = useRef<string | null>(null);
+
+  // ========== SINGLE VOICE SESSION FOR ALL ONBOARDING STEPS ==========
+  const voiceSession = useVoiceSession({
+    noiseReductionType: 'far_field',
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error('[WelcomePage] Voice error', { message });
+      setUseWebSpeechFallback(true);
+    },
+    onTranscript: (role, text) => {
+      // Deduplicate transcripts
+      if (lastTranscriptRef.current === text.substring(0, 50)) return;
+      lastTranscriptRef.current = text.substring(0, 50);
+      addVoiceTranscript(role as 'user' | 'assistant', text);
+    },
+  });
+
+  // Fetch voice connection info on mount
+  useEffect(() => {
+    async function fetchConnectionInfo() {
+      try {
+        const response = await fetch('/api/realtime/token');
+        const data = await response.json();
+        if (data.error) {
+          logger.error('[WelcomePage] Voice API error', { error: data.error });
+          setHasCheckedAzure(true);
+          setUseWebSpeechFallback(true);
+          return;
+        }
+        setConnectionInfo(data as VoiceConnectionInfo);
+        setHasCheckedAzure(true);
+      } catch (error) {
+        logger.error('[WelcomePage] Failed to get voice config', { error: String(error) });
+        setHasCheckedAzure(true);
+        setUseWebSpeechFallback(true);
+      }
+    }
+    fetchConnectionInfo();
+  }, []);
+
+  // Create voice session handle to pass to children
+  const voiceSessionHandle: VoiceSessionHandle = {
+    isConnected: voiceSession.isConnected,
+    isListening: voiceSession.isListening,
+    isSpeaking: voiceSession.isSpeaking,
+    isMuted: voiceSession.isMuted,
+    connectionState: voiceSession.connectionState,
+    connect: voiceSession.connect,
+    disconnect: voiceSession.disconnect,
+    toggleMute: voiceSession.toggleMute,
+  };
 
   // Callback when Azure is unavailable - fallback to Web Speech TTS
   const handleAzureUnavailable = useCallback(() => {
@@ -77,6 +165,7 @@ function WelcomeContent() {
   // Handle reset - clears all data and restarts onboarding
   const handleReset = () => {
     if (confirm('Vuoi ricominciare da capo? Tutti i dati inseriti verranno cancellati.')) {
+      voiceSession.disconnect(); // Disconnect voice before resetting
       resetOnboarding();
       setUseWebSpeechFallback(false);
       // Force page reload to reset all states
@@ -86,10 +175,10 @@ function WelcomeContent() {
 
   // Determine voice mode status
   const getVoiceModeInfo = () => {
-    if (azureAvailable === null) {
+    if (!hasCheckedAzure) {
       return { label: 'Verifica...', icon: Wifi, color: 'text-gray-400', bg: 'bg-gray-100 dark:bg-gray-800' };
     }
-    if (useWebSpeechFallback || azureAvailable === false) {
+    if (useWebSpeechFallback || !connectionInfo) {
       return {
         label: 'Web Speech',
         icon: Volume2,
@@ -204,6 +293,9 @@ function WelcomeContent() {
               <CurrentStepComponent
                 useWebSpeechFallback={useWebSpeechFallback}
                 onAzureUnavailable={handleAzureUnavailable}
+                voiceSession={voiceSessionHandle}
+                connectionInfo={connectionInfo}
+                onboardingMelissa={createOnboardingMelissa()}
               />
             </motion.div>
           </AnimatePresence>

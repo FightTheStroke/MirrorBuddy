@@ -3,9 +3,8 @@
 /**
  * VoiceOnboardingPanel - Unified voice experience with Melissa
  *
- * Uses the standard useVoiceSession hook with onboarding-specific tools.
- * The onboarding tools (set_student_name, set_student_age, etc.) are now
- * part of the unified VOICE_TOOLS and handled by executeVoiceTool.
+ * REFACTORED: Now receives voice session from parent (welcome/page.tsx) to maintain
+ * a single persistent connection across all onboarding steps.
  *
  * When voice is active:
  * - Shows large Melissa avatar with speaking animation
@@ -26,20 +25,8 @@ import { Phone, PhoneOff, Mic, MicOff, Check, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
-import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import {
-  MELISSA_ONBOARDING_PROMPT,
-  MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
-} from '@/lib/voice/onboarding-tools';
-import type { Maestro, Subject, MaestroVoice } from '@/types';
-
-export interface VoiceOnboardingPanelProps {
-  className?: string;
-  onFallbackToWebSpeech?: () => void;
-  /** Which step we're on - affects what data we show */
-  step?: 'welcome' | 'info';
-}
+import type { Maestro, VoiceSessionHandle } from '@/types';
 
 interface VoiceConnectionInfo {
   provider: 'azure';
@@ -47,48 +34,35 @@ interface VoiceConnectionInfo {
   configured: boolean;
 }
 
-/**
- * Create a Maestro-like object for Melissa with onboarding-specific prompts.
- */
-function createOnboardingMelissa(): Maestro {
-  return {
-    id: 'melissa-onboarding',
-    name: 'Melissa',
-    subject: 'methodology' as Subject,
-    specialty: 'Learning Coach - Onboarding',
-    voice: 'shimmer' as MaestroVoice,
-    voiceInstructions: MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
-    teachingStyle: 'scaffolding',
-    avatar: '/avatars/melissa.jpg',
-    color: '#EC4899',
-    systemPrompt: MELISSA_ONBOARDING_PROMPT,
-    greeting: 'Ciao! Sono Melissa, piacere di conoscerti! Come ti chiami?',
-  };
+export interface VoiceOnboardingPanelProps {
+  className?: string;
+  onFallbackToWebSpeech?: () => void;
+  /** Which step we're on - affects what data we show */
+  step?: 'welcome' | 'info';
+  /** Voice session handle from parent - maintains single connection */
+  voiceSession: VoiceSessionHandle;
+  /** Connection info from parent */
+  connectionInfo: VoiceConnectionInfo | null;
+  /** Melissa maestro config from parent */
+  onboardingMelissa: Maestro;
 }
 
 export function VoiceOnboardingPanel({
   className,
   onFallbackToWebSpeech,
   step = 'welcome',
+  voiceSession,
+  connectionInfo,
+  onboardingMelissa,
 }: VoiceOnboardingPanelProps) {
-  const { data, addVoiceTranscript, voiceTranscript, clearVoiceTranscript } = useOnboardingStore();
+  const { data, voiceTranscript, clearVoiceTranscript } = useOnboardingStore();
   const hasInitializedRef = useRef(false);
+  const hasAttemptedConnectionRef = useRef(false);
 
-  // Clear transcript on mount (fresh start for onboarding)
-  useEffect(() => {
-    if (!hasInitializedRef.current) {
-      hasInitializedRef.current = true;
-      clearVoiceTranscript();
-    }
-  }, [clearVoiceTranscript]);
-  const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
-  const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
   const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const hasAttemptedConnection = useRef(false);
-  const lastTranscriptIdRef = useRef<string | null>(null);
 
-  // Use the standard voice session hook
+  // Destructure voice session
   const {
     isConnected,
     isListening,
@@ -98,63 +72,31 @@ export function VoiceOnboardingPanel({
     connect,
     disconnect,
     toggleMute,
-  } = useVoiceSession({
-    // Use far_field noise reduction for laptop speakers - handles echo suppression
-    // This allows barge-in (user can interrupt) while preventing echo loop
-    noiseReductionType: 'far_field',
-    onError: (error) => {
-      const message = error instanceof Error ? error.message : String(error);
-      logger.error('[VoiceOnboardingPanel] Voice error', { message });
-      setConfigError(message || 'Errore di connessione vocale');
-    },
-    onTranscript: (role, text) => {
-      // Add voice transcripts to the onboarding store
-      const _transcriptId = `${role}-${Date.now()}`;
+  } = voiceSession;
 
-      // Avoid duplicate transcripts
-      if (lastTranscriptIdRef.current === text.substring(0, 50)) {
-        return;
-      }
-      lastTranscriptIdRef.current = text.substring(0, 50);
-
-      addVoiceTranscript(role as 'user' | 'assistant', text);
-    },
-  });
-
-  // Fetch voice connection info on mount
+  // Clear transcript only on first mount of welcome step
   useEffect(() => {
-    async function fetchConnectionInfo() {
-      try {
-        const response = await fetch('/api/realtime/token');
-        const data = await response.json();
-        if (data.error) {
-          logger.error('[VoiceOnboardingPanel] Voice API error', { error: data.error });
-          setHasCheckedAzure(true);
-          onFallbackToWebSpeech?.();
-          return;
-        }
-        setConnectionInfo(data as VoiceConnectionInfo);
-        setHasCheckedAzure(true);
-      } catch (error) {
-        logger.error('[VoiceOnboardingPanel] Failed to get voice config', { error: String(error) });
-        setHasCheckedAzure(true);
-        onFallbackToWebSpeech?.();
-      }
+    if (!hasInitializedRef.current && step === 'welcome') {
+      hasInitializedRef.current = true;
+      clearVoiceTranscript();
     }
-    fetchConnectionInfo();
-  }, [onFallbackToWebSpeech]);
+  }, [clearVoiceTranscript, step]);
 
-  // Connect when voice is activated
+  // Connect when voice is activated (only if not already connected)
   useEffect(() => {
     const startConnection = async () => {
-      if (!isVoiceActive || hasAttemptedConnection.current) return;
-      if (!connectionInfo || isConnected || connectionState !== 'idle') return;
+      // Skip if already connected or already attempted
+      if (isConnected) return;
+      if (!isVoiceActive) return;
+      if (hasAttemptedConnectionRef.current) return;
+      if (!connectionInfo) return;
+      if (connectionState !== 'idle') return;
 
-      hasAttemptedConnection.current = true;
+      hasAttemptedConnectionRef.current = true;
       setConfigError(null);
 
       try {
-        const onboardingMelissa = createOnboardingMelissa();
+        logger.debug('[VoiceOnboardingPanel] Connecting to voice session...');
         await connect(onboardingMelissa, connectionInfo);
       } catch (error) {
         logger.error('[VoiceOnboardingPanel] Connection failed', { error: String(error) });
@@ -163,26 +105,22 @@ export function VoiceOnboardingPanel({
         } else {
           setConfigError('Errore di connessione vocale');
         }
+        hasAttemptedConnectionRef.current = false;
       }
     };
 
     startConnection();
-  }, [isVoiceActive, connectionInfo, isConnected, connectionState, connect]);
-
-  // Reset connection attempt flag when voice is deactivated
-  useEffect(() => {
-    if (!isVoiceActive) {
-      hasAttemptedConnection.current = false;
-    }
-  }, [isVoiceActive]);
+  }, [isVoiceActive, connectionInfo, isConnected, connectionState, connect, onboardingMelissa]);
 
   const handleStartCall = useCallback(() => {
     setIsVoiceActive(true);
+    hasAttemptedConnectionRef.current = false;
   }, []);
 
   const handleEndCall = useCallback(() => {
     setIsVoiceActive(false);
     disconnect();
+    hasAttemptedConnectionRef.current = false;
   }, [disconnect]);
 
   // Get last 4 transcript entries
@@ -209,21 +147,13 @@ export function VoiceOnboardingPanel({
   const checklist = getChecklist();
 
   // If Azure is not available, show nothing (form mode will be used)
-  if (hasCheckedAzure && !connectionInfo) {
+  if (!connectionInfo) {
     return null;
   }
 
-  // Loading state while checking Azure
-  if (!hasCheckedAzure) {
-    return (
-      <div className={cn('flex items-center justify-center p-4', className)}>
-        <div className="w-8 h-8 rounded-full border-4 border-pink-300 border-t-pink-500 animate-spin" />
-      </div>
-    );
-  }
-
   // ========== NOT CONNECTED - Show call button ==========
-  if (!isVoiceActive && !isConnected) {
+  // Show call button if not connected AND (not active OR in idle state)
+  if (!isConnected && (!isVoiceActive || connectionState === 'idle')) {
     return (
       <motion.button
         initial={{ opacity: 0, scale: 0.9 }}
@@ -255,7 +185,7 @@ export function VoiceOnboardingPanel({
   }
 
   // ========== CONNECTING ==========
-  if (isVoiceActive && !isConnected) {
+  if (isVoiceActive && !isConnected && connectionState === 'connecting') {
     return (
       <motion.div
         initial={{ opacity: 0 }}
