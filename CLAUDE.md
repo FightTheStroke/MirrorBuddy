@@ -1,833 +1,157 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code when working with this repository.
 
 ## Project Overview
 
-**ConvergioEdu** ("La Scuola Che Vorrei") is an AI-powered educational platform for students with learning differences (dyslexia, ADHD, autism, cerebral palsy). Features 17 AI "Maestros" (historical figures as tutors), voice conversations, FSRS flashcards, mind maps, quizzes, and gamification.
+**ConvergioEdu** ("La Scuola Che Vorrei") - AI-powered educational platform for students with learning differences (dyslexia, ADHD, autism, cerebral palsy). Features 17 AI "Maestros" (historical figures as tutors), voice conversations, FSRS flashcards, mind maps, quizzes, and gamification.
 
 ## Commands
 
 ```bash
-# Development
-npm run dev              # Start dev server at localhost:3000
+npm run dev              # Dev server localhost:3000
 npm run build            # Production build
 npm run lint             # ESLint
-npm run typecheck        # TypeScript check (tsc --noEmit)
-
-# Testing (Playwright E2E)
-npm run test             # Run all E2E tests
-npm run test:ui          # Playwright UI mode
-npm run test:headed      # Run with visible browser
-npm run test:debug       # Debug mode
-npx playwright test e2e/accessibility.spec.ts  # Run single test file
-
-# Database (Prisma with libSQL adapter)
-npx prisma generate      # Generate Prisma client (required after schema changes)
+npm run typecheck        # TypeScript (tsc --noEmit)
+npm run test             # Playwright E2E tests
+npx prisma generate      # Generate client after schema changes
 npx prisma db push       # Sync schema with database
-npx prisma studio        # Database GUI
-npx prisma migrate dev   # Create migration
 ```
 
 ## Architecture
 
-### Dual AI Provider Pattern
-The app abstracts AI providers in `src/lib/ai/providers.ts`:
-- **Azure OpenAI**: Primary provider, supports voice (Realtime API)
-- **Ollama**: Fallback for local/offline text-only mode
-- Provider selection: user preference → Azure if configured → Ollama fallback
-- Voice features require Azure (Ollama doesn't support realtime audio)
+### AI Providers
+`src/lib/ai/providers.ts` abstracts providers:
+- **Azure OpenAI**: Primary, supports voice (Realtime API)
+- **Ollama**: Fallback for local/offline text-only
+- Voice requires Azure
 
 ### State Management (Zustand)
-Three stores in `src/lib/stores/app-store.ts`:
-- **SettingsStore**: Theme, provider config, student profile, accessibility
-- **ProgressStore**: XP, levels, streaks, achievements, subject masteries
-- **ChatStore**: Active conversation, messages, tool calls
-
-**IMPORTANT - Database First Architecture (Issue #64)**:
-- All stores sync with database via REST APIs - NO localStorage persistence
-- Database is the single source of truth for all user data
-- UI state is hydrated from database on page load
-- Changes are persisted to database immediately (fire-and-forget for responsiveness)
-- See ADR 0015 for full architecture decision
-
-### Data Persistence Rules
-
-**NEVER use localStorage for user data.** Use these patterns instead:
-
-| Data Type | Storage | Example |
-|-----------|---------|---------|
-| User settings | `/api/user/settings` | Theme, language, accessibility |
-| Progress data | `/api/progress` | XP, levels, masteries |
-| Materials | `/api/materials` | Mindmaps, quizzes, flashcards |
-| Conversations | `/api/conversations` | Chat history |
-| Temporary session ID | `sessionStorage` | `convergio-user-id` |
-| Device-specific cache | `localStorage` (OK) | Permissions cache, PWA banner |
-
-**Acceptable localStorage uses:**
-- Cleanup operations during data deletion
-- Device-specific ephemeral caches (browser permissions, PWA install banner)
-- Test files checking for localStorage as security pattern
-
-**Never use localStorage for:**
-- User preferences (theme, language, accessibility)
-- Educational content (mindmaps, quizzes, flashcards, homework)
-- Progress data (XP, levels, streaks, masteries)
-- Any data that should sync across devices
-
-### FSRS Flashcard Algorithm
-`src/lib/education/fsrs.ts` implements Free Spaced Repetition Scheduler (FSRS-5):
-- Card states: `new` → `learning` → `review` → `relearning`
-- Tracks difficulty, stability, retrievability per card
-- Calculates optimal review intervals for retention
-
-### 17 Maestros (AI Tutors)
-`src/data/maestri-full.ts` (4700+ lines) defines each historical figure with:
-- Voice personality (`voiceInstructions`) for Azure Realtime
-- Teaching style and subject specialization
-- System prompt with pedagogical guidelines
-- Greeting message and avatar
-
-### MirrorBuddy v2.0 - Triangle of Support
-
-> **Architecture from ManifestoEdu.md** - Three layers of support for students with learning differences.
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    TRIANGLE OF SUPPORT                       │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│                      MAESTRI (17)                           │
-│                    Subject Experts                          │
-│              "Vertical" - Content Teaching                  │
-│                                                             │
-│         ┌───────────────┬───────────────┐                   │
-│         │               │               │                   │
-│         ▼               ▼               ▼                   │
-│      COACH            COACH          BUDDY                  │
-│    (Melissa)         (Davide)    (Mario/Maria)              │
-│   Learning Method   Learning Method  Peer Support           │
-│   "Vertical"        "Vertical"      "Horizontal"            │
-│   Autonomy-focused  Calm/Reassuring  Emotional Connection   │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-#### Key Files
-
-| File | Purpose |
-|------|---------|
-| `src/data/support-teachers.ts` | 5 coach profiles (Melissa, Roberto, Chiara, Andrea, Favij) |
-| `src/data/buddy-profiles.ts` | Mario & Maria buddy profiles |
-| `src/data/app-knowledge-base.ts` | Platform documentation for coaches (Issue #16) |
-| `src/lib/ai/character-router.ts` | Routes students to appropriate character |
-| `src/lib/ai/handoff-manager.ts` | Manages transitions between characters |
-| `src/lib/ai/intent-detection.ts` | Detects student intent (academic, method, emotional, tech_support) |
-| `src/components/conversation/conversation-flow.tsx` | Main conversation UI |
-| `src/components/conversation/character-chat-view.tsx` | Coach/Buddy chat with voice (side-by-side layout) |
-| `src/lib/stores/conversation-flow-store.ts` | Conversation state management |
-| `src/lib/profile/profile-generator.ts` | Generates student profiles from Maestri insights |
-| `src/components/profile/parent-dashboard.tsx` | Parent dashboard UI showing student insights |
-| `src/app/parent-dashboard/page.tsx` | Parent dashboard route (`/parent-dashboard`) |
-| `src/lib/safety/` | Safety guardrails for all characters |
-
-#### Character Types
-
-```typescript
-type CharacterType = 'maestro' | 'coach' | 'buddy';
-```
-
-- **Maestro**: Subject expert (Archimede, Leonardo, Dante, etc.)
-- **Coach**: Learning method coach (Melissa or Davide)
-- **Buddy**: Peer support companion (Mario or Maria)
-
-#### Buddy Mirroring System
-
-Buddies dynamically mirror the student's profile:
-- **Age**: Always 1 year older than student (`ageOffset: 1`)
-- **Learning Differences**: Same as student (dyslexia, ADHD, autism, etc.)
-- **Gender**: Student can choose Mario (male) or Maria (female)
-
-```typescript
-// Example: Buddy system prompt is generated dynamically
-const prompt = getMarioSystemPrompt(studentProfile);
-// Mario says: "Ho la dislessia (le lettere a volte si confondono...)"
-// This mirrors the STUDENT'S learning differences
-```
-
-#### Character Routing
-
-Intent → Character routing logic in `character-router.ts`:
-
-| Student Intent | Routed To | Reason |
-|----------------|-----------|--------|
-| "Spiegami le frazioni" | Maestro (Archimede) | Academic content |
-| "Non riesco a concentrarmi" | Coach (Melissa) | Study method |
-| "Mi sento solo" | Buddy (Mario) | Emotional support |
-| "Ho paura di sbagliare" | Buddy (Mario) | Emotional support |
-| "Come funzionano le flashcard?" | Coach (preferred) | Platform support (Issue #16) |
-| "Non sento la voce" | Coach (preferred) | Tech troubleshooting |
-
-#### Platform Knowledge Base (Issue #16)
-
-Coaches can answer questions about ConvergioEdu features, configuration, and troubleshooting.
-
-**Key File**: `src/data/app-knowledge-base.ts`
-
-```
-app-knowledge-base.ts
-├── APP_VERSION           → Version and last update date
-├── MAESTRI_KNOWLEDGE     → 17 Maestri, voice calls
-├── TOOLS_KNOWLEDGE       → Flashcard, Mindmap, Quiz, Demo
-├── SUPPORT_KNOWLEDGE     → Coach, Buddy
-├── GAMIFICATION_KNOWLEDGE → XP, Streak, Pomodoro
-├── SCHEDULER_KNOWLEDGE   → Calendar, Notifications
-├── ACCESSIBILITY_KNOWLEDGE → Profiles, Font, ADHD, TTS
-├── ACCOUNT_KNOWLEDGE     → Profile, Parents, GDPR
-├── GENERAL_TROUBLESHOOTING → Common problems with solutions
-└── generateKnowledgeBasePrompt() → Generates prompt for coaches
-```
-
-**How it works**:
-1. `generateKnowledgeBasePrompt()` creates formatted documentation
-2. `PLATFORM_KNOWLEDGE` constant wraps it with instructions
-3. All 5 coaches include `PLATFORM_KNOWLEDGE` in their system prompts
-4. Intent detection routes `tech_support` queries to the student's preferred coach
-
-**IMPORTANT - Update on each release**:
-- Add new features to appropriate category
-- Update `APP_VERSION.lastUpdated`
-- Add troubleshooting for new known issues
-
-See ADR 0013 for architecture decision.
-
-#### Handoff Protocol
-
-Characters can suggest handoffs to each other:
-- Maestro → Coach: "Per organizzarti meglio, prova Melissa"
-- Coach → Buddy: "Vuoi parlare con Mario? Lui capisce"
-- Buddy → Maestro: "Per matematica, chiedi ad Archimede!"
-
-Handoffs are tracked in `handoff-manager.ts` to maintain conversation context.
-
-#### Voice Support for Coach & Buddy
-
-`CharacterChatView` provides voice calling for Coach (Melissa) and Buddy (Mario) characters:
-
-```
-┌─────────────────────────────────┬────────────┐
-│         Chat Area               │   Voice    │
-│   (unified message stream)      │   Panel    │
-│                                 │            │
-│   🔊 Voice transcript here      │  [Avatar]  │
-│   💬 Text message here          │  [Status]  │
-│   🔊 Voice transcript here      │  [Mute]    │
-│                                 │  [Hangup]  │
-└─────────────────────────────────┴────────────┘
-```
-
-- **Side-by-side layout**: Voice panel on right, chat on left
-- **Unified conversation**: Voice transcripts appear in chat with 🔊 icon
-- **Theme integration**: Panel uses character's gradient color
-- **Azure Realtime API**: Same voice infrastructure as Maestri
-
-Voice profiles defined in:
-- `support-teachers.ts`: Coaches have `voice` and `voiceInstructions` fields
-- `buddy-profiles.ts`: Buddies have `voice` and `voiceInstructions` fields
-
-#### Voice Support for Maestri (MaestroSession)
-
-`MaestroSession` provides unified voice+chat experience for all 17 Maestri:
-
-```
-┌─────────────────────────────────┬────────────┐
-│         Chat Area               │   Voice    │
-│   (flex-1, scrollable)          │   Panel    │
-│                                 │  (w-64)    │
-│   💬 Text message               │  [Avatar]  │
-│   🔊 Voice transcript           │  [Status]  │
-│   📊 Evaluation card            │  [Mute]    │
-│                                 │  [Hangup]  │
-├─────────────────────────────────┤            │
-│   [Input] [Send] [Call]         │            │
-└─────────────────────────────────┴────────────┘
-```
-
-| File | Purpose |
-|------|---------|
-| `src/components/maestros/maestro-session.tsx` | Unified voice+chat component (835 lines) |
-| `src/components/maestros/lazy.tsx` | Code-split wrapper for performance |
-| `src/components/voice/voice-panel.tsx` | Shared voice controls (used by both Maestri and Coach/Buddy) |
-| `src/components/chat/evaluation-card.tsx` | Inline session evaluation display |
-
-**Session Evaluation**: Auto-generated when session ends (5+ messages or 2+ min):
-- Score based on: engagement, questions asked, duration
-- Grades: Insufficiente (1-3) → Sufficiente (4-5) → Buono (6-7) → Ottimo (8-9) → Eccellente (10)
-- Saved to parent diary with GDPR consent
-
-**XP Rewards**: `Math.min(100, sessionDuration * 5 + questionCount * 10)`
-
-### Onboarding Voice Integration (#61)
-
-Melissa guides new students through onboarding with bidirectional voice conversation via Azure Realtime API.
-
-```
-┌────────────────────────────────────┬──────────────────────┐
-│        FORM INPUT AREA             │    VOICE PANEL       │
-│   (WelcomeStep / InfoStep)         │   (Melissa)          │
-│                                    │                      │
-│   - Name input    <──── synced ────│   [Avatar + Status]  │
-│   - Age selector  <──── synced ────│   [Audio Visualizer] │
-│   - School level  <──── synced ────│   [Call Controls]    │
-│   - Learning diffs <─── synced ────│                      │
-├────────────────────────────────────┴──────────────────────┤
-│              TRANSCRIPT (collapsible)                      │
-└────────────────────────────────────────────────────────────┘
-```
-
-| File | Purpose |
-|------|---------|
-| `src/lib/voice/onboarding-tools.ts` | Melissa prompts + executeOnboardingTool handler |
-| `src/lib/voice/voice-tool-commands.ts` | Unified VOICE_TOOLS with onboarding tools |
-| `src/lib/hooks/use-voice-session.ts` | Standard voice hook (used by all voice features) |
-| `src/components/onboarding/voice-onboarding-panel.tsx` | Voice call UI (Melissa's pink theme) |
-| `src/lib/stores/onboarding-store.ts` | Voice session state management |
-
-**Architecture**: Onboarding uses the standard `useVoiceSession` hook with onboarding-specific tools integrated into the unified `VOICE_TOOLS` array. This ensures consistent behavior across all voice features.
-
-**Tool Calls**: When Melissa hears student info, she calls tools to update the store:
-- `set_student_name(name)` → Updates name field
-- `set_student_age(age)` → Updates age selector
-- `set_school_level(level)` → Updates school level
-- `set_learning_differences(diffs)` → Updates learning differences
-- `next_onboarding_step()` / `prev_onboarding_step()` → Navigate flow
-
-**Fallback**: When Azure is unavailable, falls back to Web Speech API TTS (`use-onboarding-tts.ts`) with manual form input only.
-
-### Safety Guardrails
-
-All AI characters (Maestri, Coaches, Buddies) have safety guardrails injected into their system prompts.
-
-| File | Purpose |
-|------|---------|
-| `src/lib/safety/index.ts` | Main safety module exports |
-| `src/lib/safety/guardrails.ts` | `injectSafetyGuardrails()` function |
-| `src/lib/safety/content-filter.ts` | `filterInput()` and `sanitizeOutput()` |
-| `src/lib/safety/age-gating.ts` | Age-appropriate content validation |
-| `src/lib/safety/monitoring.ts` | Safety event logging |
-
-**Integration Points:**
-- `character-router.ts:390` - Injects guardrails into Maestro prompts
-- `/api/chat/route.ts` - Filters input before AI, sanitizes output after
-
-### Parent Dashboard (GDPR Compliant)
-
-Dashboard at `/parent-dashboard` shows aggregated insights from student's conversations with Maestri.
-
-**Access:** Settings → Genitori → Apri Dashboard Genitori
-
-**Consent Model:**
-- Requires explicit consent from BOTH parent and student
-- Data can be exported (JSON/PDF) for portability
-- Right to erasure: deletion requests are tracked and honored
-- All access is logged in `ProfileAccessLog` for audit
-
-**Data Flow:**
-```
-Conversations → Learning table → profile-generator.ts → StudentInsightProfile
-                                                               ↓
-                                                    Parent Dashboard UI
-```
-
-### Parent-Professor Chat (Issue #63)
-
-Parents can have direct conversations with Maestri about their child's progress.
-
-**Access:** Parent Dashboard → Diario → Click "Parla con Professore" on any entry
-
-**Key Files:**
-
-| File | Purpose |
-|------|---------|
-| `src/components/profile/parent-professor-chat.tsx` | Chat UI with consent modal |
-| `src/lib/ai/parent-mode.ts` | Formal communication prompts |
-| `src/app/api/parent-professor/route.ts` | Chat API (POST/GET) |
-| `src/app/api/parent-professor/[id]/route.ts` | Single conversation (GET/DELETE) |
-| `src/app/api/parent-professor/consent/route.ts` | Consent management |
-
-**Database Fields:**
-- `Conversation.isParentMode` - Flags parent conversations
-- `Conversation.studentId` - Links to student being discussed
-- `Settings.parentChatConsentAt` - When parent consented to chat
-
-**Features:**
-- Consent modal with AI disclaimer before first message
-- All messages persisted to database (zero localStorage)
-- Maestri use formal language ("Lei") with parents
-- Learning entries injected as context for personalized responses
-- Conversation history loads on reopen
-
-### Key Type Definitions
-`src/types/index.ts` contains all shared types. Import as:
-```typescript
-import type { Maestro, UserProfile, StudySession } from '@/types';
-```
-
-### Component Organization
-Components organized by feature domain:
-- `components/ui/` - Headless primitives (button, card, dialog)
-- `components/accessibility/` - A11y settings and controls
-- `components/education/` - Quiz, flashcard, mind map, homework
+`src/lib/stores/app-store.ts`:
+- **SettingsStore**: Theme, provider config, profile, accessibility
+- **ProgressStore**: XP, levels, streaks, achievements
+- **ChatStore**: Conversations, messages, tool calls
+
+**Database First (ADR 0015)**: All stores sync via REST APIs - NO localStorage for user data.
+
+### Data Persistence
+
+| Data Type | Storage |
+|-----------|---------|
+| User settings | `/api/user/settings` |
+| Progress | `/api/progress` |
+| Materials | `/api/materials` |
+| Conversations | `/api/conversations` |
+| Session ID | `sessionStorage` |
+| Device cache | `localStorage` (OK) |
+
+### FSRS Flashcards
+`src/lib/education/fsrs.ts` - Free Spaced Repetition Scheduler (FSRS-5).
+
+### 17 Maestros
+`src/data/maestri-full.ts` defines each historical figure with voice personality, teaching style, and subject specialization.
+
+## On-Demand Documentation
+
+Load detailed docs with `@docs/claude/filename.md`:
+
+| Doc | Contents |
+|-----|----------|
+| `@docs/claude/mirrorbuddy.md` | Triangle of Support, Coach/Buddy system, character routing |
+| `@docs/claude/voice-api.md` | Azure Realtime API, models, session config, debug checklist |
+| `@docs/claude/tools.md` | Tool execution, mindmap/quiz/flashcard creation |
+| `@docs/claude/notifications.md` | Server-side notifications, PWA push |
+| `@docs/claude/parent-dashboard.md` | GDPR consent, parent-professor chat |
+| `@docs/claude/pomodoro.md` | Timer phases, XP rewards |
+| `@docs/claude/onboarding.md` | Voice onboarding with Melissa |
+
+## Key Files
+
+### Types
+`src/types/index.ts` - All shared types. Import as `import type { Maestro } from '@/types'`.
+
+### Components
+- `components/ui/` - Headless primitives
+- `components/accessibility/` - A11y controls
+- `components/education/` - Quiz, flashcard, mindmap
 - `components/voice/` - Voice session UI
-- `components/maestros/` - Maestro selection grid
-- `components/conversation/` - MirrorBuddy conversation flow (Triangle of Support)
+- `components/maestros/` - Maestro selection
+- `components/conversation/` - MirrorBuddy flow
 
-### API Routes (Next.js App Router)
+### API Routes
 All under `/src/app/api/`:
-- `/chat` - Chat completions (Azure/Ollama) with safety filtering
+- `/chat` - Chat completions with safety filtering
 - `/conversations/[id]` - Session management
-- `/realtime/token` - Azure voice token (CORS-safe)
-- `/progress` - XP, levels, gamification (triggers notifications)
-- `/flashcards/progress` - FSRS state updates
-- `/user/data` - GDPR export/delete
-- `/notifications` - Notification CRUD (GET, POST, PATCH, DELETE)
-- `/profile` - Student insight profiles (GDPR compliant)
-- `/profile/generate` - Trigger profile generation from learnings
-- `/profile/consent` - Manage GDPR consent for profiles
-- `/profile/export` - Export profile (JSON or PDF)
-- `/parent-professor` - Parent-Maestro chat (POST: send, GET: list)
-- `/parent-professor/[id]` - Single conversation (GET, DELETE)
-- `/parent-professor/consent` - Parent chat consent (GET, POST)
+- `/realtime/token` - Azure voice token
+- `/progress` - XP, levels, gamification
+- `/flashcards/progress` - FSRS updates
+- `/notifications` - CRUD
+- `/profile` - Student insights (GDPR)
+- `/parent-professor` - Parent chat
 
-## Database Schema
+## Database
 
-Prisma schema at `prisma/schema.prisma`. Key models:
-- **User** → has Profile, Settings, Progress (1:1)
-- **StudySession** - Learning activity with XP tracking
-- **FlashcardProgress** - FSRS-5 algorithm state per card
-- **Conversation** → has Messages - Chat history with summaries
-- **Learning** - Cross-session insights extracted from conversations
-- **StudentInsightProfile** - GDPR-compliant parent dashboard data with consent tracking
-- **ProfileAccessLog** - Audit log for GDPR compliance
-- **Notification** - Server-side notification persistence with scheduling
-- **TelemetryEvent** - Usage analytics for Grafana integration
+Prisma at `prisma/schema.prisma`. Key models:
+- **User** → Profile, Settings, Progress (1:1)
+- **StudySession** - Learning with XP
+- **FlashcardProgress** - FSRS state
+- **Conversation** → Messages
+- **Learning** - Cross-session insights
+- **Notification** - Server persistence
 
-After schema changes:
 ```bash
 npx prisma generate && npx prisma db push
 ```
 
-## Accessibility Requirements
+## Accessibility
 
-WCAG 2.1 AA compliance is mandatory:
-- Full keyboard navigation
-- Minimum 4.5:1 color contrast
-- Screen reader compatible
-- Dyslexia font option (OpenDyslexic)
-- ADHD mode (focus helpers)
-- Motion reduction support
+WCAG 2.1 AA mandatory. 7 profiles in Settings:
+- Dislessia, ADHD, Autismo, Visivo, Uditivo, Motorio, Paralisi Cerebrale
 
-### Accessibility Profiles (7 presets)
-Quick-select profiles in Settings → Accessibilità:
-| Profile | Key Features |
-|---------|--------------|
-| Dislessia | OpenDyslexic font, increased spacing, TTS |
-| ADHD | Focus mode, reduced animations, break timers |
-| Autismo | Reduced motion, distraction-free, calm UI |
-| Visivo | High contrast, large text, TTS enabled |
-| Uditivo | Visual-first communication, no audio dependencies |
-| Motorio | Keyboard navigation, no animations |
-| Paralisi Cerebrale | TTS, large text, keyboard nav, extra spacing |
+Store: `src/lib/accessibility/accessibility-store.ts`
 
-Accessibility store at `src/lib/accessibility/accessibility-store.ts`.
+## Safety
 
-## Notification System
+`src/lib/safety/`:
+- `guardrails.ts` - Injects safety into prompts
+- `content-filter.ts` - Filters input/output
+- `age-gating.ts` - Age-appropriate validation
 
-**STATUS: IMPLEMENTED**
+## Environment
 
-Server-side notification system with database persistence and automatic triggers.
-
-### Architecture
-
-| Layer | File | Purpose |
-|-------|------|---------|
-| Database | `prisma/schema.prisma` → Notification | Persistent storage with scheduling |
-| Server Triggers | `src/lib/notifications/server-triggers.ts` | Create notifications on events |
-| API | `src/app/api/notifications/route.ts` | CRUD operations |
-| Client Store | `src/lib/stores/notification-store.ts` | Zustand state + API sync |
-| UI | `src/components/notifications/` | Toast display |
-
-### Automatic Triggers
-
-Notifications are automatically created when:
-- **Level Up**: User reaches new XP level → `serverNotifications.levelUp()`
-- **Streak Milestone**: 3, 7, 14, 30, 50, 100, 365 days → `serverNotifications.streakMilestone()`
-- **Achievement Unlocked**: New achievement earned → `serverNotifications.achievement()`
-- **Session Complete**: Study session ends → `serverNotifications.sessionComplete()`
-- **Streak At Risk**: No study today with active streak → `serverNotifications.streakAtRisk()`
-
-### Adding New Triggers
-
-1. Add method to `server-triggers.ts`:
-```typescript
-serverNotifications.myNewTrigger = async (userId: string, data: MyData) => {
-  await createNotification({
-    userId,
-    type: 'my_type',
-    title: 'Notification Title',
-    message: 'Notification message...',
-  });
-};
-```
-
-2. Call from relevant API route or server action
-
-### PWA Push Notifications (ADR-0014)
-
-**STATUS: IMPLEMENTED**
-
-Background push notifications via Web Push API for PWA installations.
-
-#### Two Notification Layers
-
-| Layer | When Active | Mechanism |
-|-------|-------------|-----------|
-| **In-App** | User has app open | Toast UI + optional Melissa voice |
-| **Push** | App closed/background | Service Worker + browser notification |
-
-#### Platform Support
-
-| Platform | In-App | Push | Notes |
-|----------|--------|------|-------|
-| iOS Safari | ✅ | ⚠️ | PWA install required for push |
-| macOS Safari 16+ | ✅ | ✅ | Full support |
-| Chrome/Edge/Firefox | ✅ | ✅ | Full support |
-| Android Chrome | ✅ | ✅ | No PWA install needed |
-
-#### Key Files
-
-| File | Purpose |
-|------|---------|
-| `docs/adr/0014-pwa-push-notifications.md` | Architecture decision |
-| `prisma/schema.prisma` → `PushSubscription` | Subscription storage |
-| `public/sw.js` | Service Worker for push handling |
-| `src/lib/push/vapid.ts` | VAPID keys + platform detection |
-| `src/lib/push/subscription.ts` | Client-side subscription lifecycle |
-| `src/lib/push/send.ts` | Server-side push sending |
-| `src/app/api/push/subscribe/route.ts` | Subscription CRUD |
-| `src/components/pwa/ios-install-banner.tsx` | iOS PWA install prompt |
-| `src/components/scheduler/notification-preferences.tsx` | Conditional push toggle |
-
-#### Environment Variables
-
-```bash
-# VAPID keys for Web Push (generate via: npx web-push generate-vapid-keys)
-NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-public-key
-VAPID_PRIVATE_KEY=your-private-key
-VAPID_SUBJECT=mailto:support@convergioedu.com
-```
-
-#### Conditional UI Logic
-
-Push toggle in settings is conditionally displayed:
-- **Hidden**: Browser doesn't support Push API
-- **Disabled + banner**: iOS Safari not installed as PWA
-- **Disabled + message**: User denied notification permission
-- **Enabled**: All conditions met
-
-## Pomodoro Timer System
-
-**STATUS: IMPLEMENTED**
-
-Timer Pomodoro per supporto ADHD con XP rewards e notifiche browser.
-
-### Architecture
-
-| Layer | File | Purpose |
-|-------|------|---------|
-| Hook | `src/lib/hooks/use-pomodoro-timer.ts` | Timer logic, state machine |
-| Store | `src/lib/stores/pomodoro-store.ts` | Zustand store, persistence |
-| Component | `src/components/pomodoro/pomodoro-timer.tsx` | Full UI component |
-| Header Widget | `src/components/pomodoro/pomodoro-header-widget.tsx` | Compact widget for header |
-| Exports | `src/components/pomodoro/index.ts` | Public exports |
-
-### Timer Phases
-
-```
-idle → focus (25 min) → shortBreak (5 min) → focus → ... → longBreak (15 min)
-         ↑                                                        |
-         └────────────────────────────────────────────────────────┘
-```
-
-- **Focus**: 25 min default (configurable 5-60 min)
-- **Short Break**: 5 min default (configurable 1-15 min)
-- **Long Break**: 15 min after 4 pomodoros (configurable 10-30 min)
-
-### XP Rewards
-
-| Event | XP |
-|-------|-----|
-| Complete 1 pomodoro | +15 XP |
-| First pomodoro of day | +10 XP bonus |
-| Complete 4 pomodoros (cycle) | +15 XP bonus |
-
-### Integration Points
-
-- **Header**: `PomodoroHeaderWidget` in `src/app/page.tsx` line 166
-- **Notifications**: Uses `breakReminders` flag from accessibility settings
-- **XP**: Calls `addXP()` from `useProgressStore`
-
-### Usage
-
-```typescript
-import { PomodoroTimer, PomodoroHeaderWidget } from '@/components/pomodoro';
-
-// Full component (settings page, sidebar)
-<PomodoroTimer onPomodoroComplete={(count, time) => console.log(count, time)} />
-
-// Compact widget (header)
-<PomodoroHeaderWidget />
-```
-
-### Settings Connection
-
-The timer respects `breakReminders` flag from accessibility settings:
-- `Settings → Accessibilità → ADHD → Promemoria pause`
-- When disabled, browser notifications are suppressed
-- Timer still works, just silent
-
-## Tool Execution System
-
-**STATUS: IMPLEMENTED**
-
-Maestri can create interactive educational tools during conversations using OpenAI function calling.
-
-### Available Tools
-
-| Tool | Function Name | Purpose |
-|------|---------------|---------|
-| Mind Map | `create_mindmap` | Visual concept organization (MarkMap rendering) |
-| Quiz | `create_quiz` | Multiple choice assessment |
-| Flashcards | `create_flashcards` | FSRS-compatible spaced repetition cards |
-| Demo | `create_demo` | Interactive HTML/JS simulations (sandboxed) |
-| Search | `web_search` | Educational web/YouTube search |
-
-### Architecture
-
-| Layer | File | Purpose |
-|-------|------|---------|
-| Types | `src/types/tools.ts` | Unified tool types + `CHAT_TOOL_DEFINITIONS` |
-| Executor | `src/lib/tools/tool-executor.ts` | Handler registry and execution |
-| Handlers | `src/lib/tools/handlers/*.ts` | Tool-specific logic |
-| Events | `src/lib/realtime/tool-events.ts` | SSE broadcasting |
-| Storage | `src/lib/storage/materials-db.ts` | IndexedDB for client-side materials |
-| Persistence | `prisma/schema.prisma` → `CreatedTool` | Server-side tool records |
-
-### Adding a New Tool
-
-1. Add type to `src/types/tools.ts`:
-```typescript
-export interface MyToolData {
-  // Tool-specific fields
-}
-```
-
-2. Add function definition to `CHAT_TOOL_DEFINITIONS` in same file
-
-3. Create handler in `src/lib/tools/handlers/`:
-```typescript
-import { registerToolHandler } from '../tool-executor';
-
-registerToolHandler('my_tool', async (args) => {
-  // Validate and process
-  return { success: true, toolId, toolType: 'my_tool', data };
-});
-```
-
-4. Import handler in `src/lib/tools/handlers/index.ts`
-
-### Security
-
-- **Demo Sandbox**: JavaScript validated against `DANGEROUS_JS_PATTERNS` blocklist
-- **HTML Sanitization**: Script tags and event handlers removed
-- **Iframe Isolation**: `sandbox="allow-scripts"` (no same-origin access)
-
-### Voice Commands for Mindmaps (ADR-0011)
-
-Real-time voice modification of mindmaps during Maestro conversations.
-
-| Command | Function | Example Voice Input |
-|---------|----------|---------------------|
-| `mindmap_add_node` | Add concept as child | "Aggiungi Roma sotto Italia" |
-| `mindmap_connect_nodes` | Link two nodes | "Collega storia con geografia" |
-| `mindmap_expand_node` | Add multiple children | "Espandi il nodo Liguria" |
-| `mindmap_delete_node` | Remove node | "Cancella il nodo sbagliato" |
-| `mindmap_focus_node` | Center view on node | "Zoom su Roma" |
-| `mindmap_set_color` | Change node color | "Colora Roma di rosso" |
-
-**Key Files:**
-
-| File | Purpose |
-|------|---------|
-| `src/lib/hooks/use-mindmap-modifications.ts` | SSE hook for modification events |
-| `src/components/tools/interactive-markmap-renderer.tsx` | Imperative modification API |
-| `src/components/tools/live-mindmap.tsx` | Combined renderer + SSE |
-| `src/app/api/tools/stream/modify/route.ts` | Modification broadcast endpoint |
-
-## Environment Configuration
-
-Copy `.env.example` to `.env.local`. Key variables:
 ```bash
 # Azure OpenAI (required for voice)
 AZURE_OPENAI_ENDPOINT=
 AZURE_OPENAI_API_KEY=
 AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
-AZURE_OPENAI_REALTIME_ENDPOINT=    # Voice features
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_ENDPOINT=
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime
 
-# OR Ollama (local, text-only)
+# Ollama (local text-only)
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2
 
 # Database
-DATABASE_URL=file:./prisma/dev.db  # SQLite local, PostgreSQL in prod
+DATABASE_URL=file:./prisma/dev.db
 ```
 
-## Voice API (Azure Realtime) - CRITICAL
+## CI/CD
 
-> **LEGGI QUESTO PRIMA DI TOCCARE IL CODICE VOICE**
+`.github/workflows/ci.yml`:
+1. Build & Lint
+2. Security Audit
+3. Documentation Check
+4. Code Quality
 
-### Modelli Disponibili (Dicembre 2025)
-
-| Modello | Versione | Stato | Note |
-|---------|----------|-------|------|
-| `gpt-realtime` | 2025-08-28 | **GA** ✅ | Raccomandato, qualità massima (ATTUALE) |
-| `gpt-realtime-mini` | 2025-12-15 | GA | Più veloce, costo minore (FUTURO cost-optimization) |
-| `gpt-4o-realtime-preview` | 2025-06-03 | **Deprecated** | NON usare |
-
-**Deployment attuale**: `gpt-4o-realtime` → modello `gpt-realtime` (GA)
-
-**Ottimizzazione costi futura**: Quando necessario, potremo passare a `gpt-realtime-mini` per ridurre i costi mantenendo funzionalità voice.
-
-### Session Config Ottimale (Issue #61)
-
-Impostazioni hardcoded in `use-voice-session.ts` - NON modificabili dall'utente:
-
-```typescript
-{
-  input_audio_noise_reduction: { type: 'near_field' },  // Riduce eco
-  turn_detection: {
-    type: 'server_vad',
-    threshold: 0.5,
-    prefix_padding_ms: 300,
-    silence_duration_ms: 500,
-    create_response: true,
-    interrupt_response: true,  // Barge-in (false per onboarding)
-  },
-  temperature: 0.8,
-}
-```
-
-**Debug settings** disponibili solo su `/test-voice` (non in Settings utente).
-
-### Preview vs GA API - ATTENZIONE
-
-Azure ha DUE formati con **event names DIVERSI**. Il codice gestisce ENTRAMBI:
-
-| Evento | Preview API | GA API |
-|--------|-------------|--------|
-| Audio | `response.audio.delta` | `response.output_audio.delta` |
-| Transcript | `response.audio_transcript.delta` | `response.output_audio_transcript.delta` |
-
-**Il codice in `use-voice-session.ts` ascolta ENTRAMBI i formati** (linee 575-616).
-
-### File Critici Voice
-
-| File | Responsabilità |
-|------|----------------|
-| `src/lib/hooks/use-voice-session.ts` | Hook principale - session config, audio, VAD |
-| `src/server/realtime-proxy.ts` | WebSocket proxy verso Azure |
-| `src/app/test-voice/page.tsx` | Pagina debug con controlli VAD/noise |
-| `docs/AZURE_REALTIME_API.md` | Documentazione dettagliata API |
-
-### Requisito HTTPS per Microfono
-
-`navigator.mediaDevices.getUserMedia()` richiede **secure context**:
-
-| Contesto | Funziona? | Note |
-|----------|-----------|------|
-| `localhost:3000` | ✅ | Sempre ok |
-| `127.0.0.1:3000` | ✅ | Sempre ok |
-| `https://example.com` | ✅ | HTTPS = ok |
-| `http://192.168.x.x:3000` | ❌ | **NON FUNZIONA** |
-
-**Soluzione mobile**: Usa tunnel HTTPS (ngrok, cloudflared).
-
-### Debug Voice Checklist
-
-1. Audio non si sente? → Controlla event types (Preview vs GA)
-2. Echo loop su onboarding? → `disableBargeIn: true` in VoiceOnboardingPanel
-3. session.update fallisce? → Verifica formato per modello GA
-4. Audio distorto? → AudioContext DEVE essere 24kHz
-5. `mediaDevices undefined`? → HTTP su IP invece di localhost/HTTPS
-6. VAD troppo sensibile? → Vai su `/test-voice` per debug
-
-### Env Vars Voice
-
-```bash
-AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_REALTIME_API_KEY=your-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime  # Deployment name (uses gpt-realtime GA model)
-```
-
-### Creare nuovo deployment (Azure CLI)
-
-```bash
-az cognitiveservices account deployment create \
-  --name aoai-virtualbpm-prod \
-  --resource-group rg-virtualbpm-prod \
-  --deployment-name gpt-realtime-mini \
-  --model-name gpt-realtime-mini \
-  --model-version 2025-12-15 \
-  --sku-name GlobalStandard \
-  --sku-capacity 1
-```
-
-## CI/CD Pipeline
-
-`.github/workflows/ci.yml` runs fast checks on every PR:
-1. **Build & Lint**: ESLint + TypeScript + Next.js build
-2. **Security Audit**: npm audit + secret detection
-3. **Documentation Check**: Required files exist
-4. **Code Quality**: TODO/FIXME and console.log detection
-
-E2E tests are NOT run in CI - they require real AI providers.
-
-## Testing Strategy
-
-**CI (GitHub Actions)**: Fast validation (~2 min)
-- Build, lint, typecheck, security scan
-- No E2E tests (require AI providers)
-
-**Release (app-release-manager)**: Full E2E with REAL APIs
-- Requires Azure OpenAI or Ollama running locally
-- Tests all 17 maestri with actual AI responses
-- Voice session tests with Azure Realtime API
-- FSRS flashcard algorithm verification
-- Accessibility audit with Lighthouse
-
-```bash
-# Before release, run locally with real AI:
-ollama serve                     # Start Ollama locally
-npm run test                     # Full E2E suite
-npx playwright test --headed     # Visual debugging
-```
+E2E tests require real AI providers - run locally before release.
 
 ## Path Aliases
 
-Use `@/` for imports:
 ```typescript
 import { cn } from '@/lib/utils';
 import { useSettingsStore } from '@/lib/stores/app-store';
-import { Maestro } from '@/types';
 ```
+
+## Summary Instructions
+
+When compacting, focus on: code changes, test output, architectural decisions, and open tasks. Discard verbose file listings and intermediate debug output.

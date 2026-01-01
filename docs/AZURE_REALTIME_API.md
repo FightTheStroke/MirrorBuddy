@@ -621,6 +621,32 @@ case 'input_audio_buffer.speech_started':
 
 - **Barge-in logic**: `src/lib/hooks/use-voice-session.ts:582-602`
 
+### Echo Prevention with `far_field` Noise Reduction
+
+**Problem (2026-01-01)**: Onboarding originally disabled barge-in (`disableBargeIn: true`) to prevent echo loops where speaker audio would trigger the VAD, cancelling Melissa's response after just one word.
+
+**Wrong approach**: Disable barge-in completely → User can't interrupt → Not bidirectional
+
+**Correct approach**: Use `far_field` noise reduction + keep barge-in enabled:
+
+```typescript
+// In voice-onboarding-panel.tsx
+} = useVoiceSession({
+  // Use far_field noise reduction for laptop speakers - handles echo suppression
+  // This allows barge-in (user can interrupt) while preventing echo loop
+  noiseReductionType: 'far_field',
+  onError: (error) => { ... },
+});
+```
+
+**Noise reduction types**:
+| Type | Use Case |
+|------|----------|
+| `near_field` | Headphones, close microphone (default) |
+| `far_field` | Laptop speakers, conference room (echo suppression) |
+
+The `far_field` mode tells Azure to apply acoustic echo cancellation algorithms, filtering out speaker audio from the mic input.
+
 ---
 
 ## VAD Tuning (Voice Activity Detection)
