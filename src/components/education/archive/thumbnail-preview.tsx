@@ -31,6 +31,30 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
     );
   }
 
+  // Homework - show photo thumbnail with overlay
+  if (item.toolType === 'homework' && typeof content === 'object' && 'photoUrl' in content) {
+    const homeworkContent = content as { photoUrl: string; steps?: Array<{ completed: boolean }> };
+    const completedSteps = homeworkContent.steps?.filter(s => s.completed).length ?? 0;
+    const totalSteps = homeworkContent.steps?.length ?? 0;
+    return (
+      <div className="relative w-full h-24 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
+        {/* eslint-disable-next-line @next/next/no-img-element -- User-uploaded base64 */}
+        <img
+          src={homeworkContent.photoUrl}
+          alt="Anteprima compito"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute bottom-1 left-2 right-2 flex items-center justify-between">
+          <span className="text-[10px] text-white font-medium">Compito</span>
+          {totalSteps > 0 && (
+            <span className="text-[10px] text-white/80">{completedSteps}/{totalSteps}</span>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // Mindmaps - show structured preview
   if (item.toolType === 'mindmap' && typeof content === 'object' && 'markdown' in content) {
     const markdown = (content as { markdown: string }).markdown;

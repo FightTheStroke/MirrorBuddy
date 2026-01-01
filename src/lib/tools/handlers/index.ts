@@ -12,6 +12,7 @@ import './flashcard-handler';
 import './summary-handler';
 import './diagram-handler';
 import './timeline-handler';
+import './archive-handler';
 
 // Re-export utilities for testing
 export { generateMarkdownFromNodes } from './mindmap-handler';

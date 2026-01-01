@@ -9,6 +9,7 @@ import {
   ArrowRight,
   ArrowLeft,
 } from 'lucide-react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -200,11 +201,14 @@ export function SubjectConfirmationDialog({
                     onClick={() => handleMaestroSelect(maestro)}
                     className="w-full p-4 flex items-center gap-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-left"
                   >
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-md"
-                      style={{ backgroundColor: maestro.color }}
-                    >
-                      {maestro.avatar}
+                    <div className="w-12 h-12 rounded-full overflow-hidden shadow-md flex-shrink-0">
+                      <Image
+                        src={maestro.avatar}
+                        alt={maestro.name}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold">{maestro.name}</p>

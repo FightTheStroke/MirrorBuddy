@@ -924,6 +924,34 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
       required: [],
     },
   },
+  // ============================================================================
+  // ARCHIVE SEARCH TOOL (Issue #37: Unified Archive Access for Maestri)
+  // ============================================================================
+  {
+    type: 'function',
+    name: 'search_archive',
+    description:
+      'Cerca materiali salvati nell\'archivio dello studente (mappe mentali, quiz, flashcard, riassunti, demo, compiti). Usa quando lo studente chiede "hai salvato...", "mostrami quella mappa...", "rivediamo il quiz di...".',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: {
+          type: 'string',
+          description: 'Testo da cercare nei titoli e contenuti',
+        },
+        toolType: {
+          type: 'string',
+          enum: ['mindmap', 'quiz', 'flashcard', 'summary', 'demo', 'homework', 'diagram', 'timeline'],
+          description: 'Tipo di materiale da cercare (opzionale)',
+        },
+        subject: {
+          type: 'string',
+          description: 'Materia dei materiali (opzionale)',
+        },
+      },
+      required: [],
+    },
+  },
 ];
 
 // ============================================================================
@@ -1289,6 +1317,12 @@ Quando c'è un riassunto attivo, lo studente può modificarlo vocalmente:
 - Lo studente ha un esercizio scritto e ha bisogno di aiuto
 - Dice "ti faccio vedere", "guarda questo problema"
 - Ha difficoltà con un compito specifico
+
+### Quando usare search_archive:
+- Lo studente chiede di materiali creati in precedenza
+- Dice "hai salvato quella mappa?", "rivediamo il quiz di storia"
+- Vuole recuperare contenuti già creati (mappe, quiz, flashcard, riassunti, demo, compiti)
+- Usa per trovare materiali per argomento, materia, o tipo
 
 ## COMANDI VOCALI PER MODIFICARE MAPPE MENTALI
 
