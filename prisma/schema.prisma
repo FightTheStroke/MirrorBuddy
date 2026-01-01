@@ -479,7 +479,7 @@ model CreatedTool {
   userId         String
 
   // Tool metadata
-  type           String   // mindmap, quiz, demo, flashcard, search
+  type           String   // mindmap, quiz, demo, flashcard, search, summary, diagram, timeline
   title          String
   topic          String?
   content        String   @default("{}") // JSON data

@@ -6,6 +6,7 @@
 import { registerToolHandler } from '../tool-executor';
 import { nanoid } from 'nanoid';
 import type { SummaryData, SummarySection, ToolExecutionResult } from '@/types/tools';
+import { createEmptyStudentSummary } from '@/types/tools';
 
 /**
  * Validate summary sections structure
@@ -98,6 +99,76 @@ registerToolHandler('create_summary', async (args): Promise<ToolExecutionResult>
     toolId: nanoid(),
     toolType: 'summary',
     data,
+  };
+});
+
+/**
+ * Handler for opening the student summary editor (maieutic method)
+ * Student writes their own summary with guidance
+ */
+registerToolHandler('open_student_summary', async (args, context): Promise<ToolExecutionResult> => {
+  const { topic } = args as { topic: string };
+
+  if (!topic || typeof topic !== 'string') {
+    return {
+      success: false,
+      toolId: nanoid(),
+      toolType: 'summary',
+      error: 'Topic is required',
+    };
+  }
+
+  // Create empty student summary structure
+  const studentSummary = createEmptyStudentSummary(
+    topic.trim(),
+    context?.maestroId,
+    context?.sessionId
+  );
+
+  return {
+    success: true,
+    toolId: studentSummary.id,
+    toolType: 'summary',
+    data: {
+      type: 'student_summary',
+      ...studentSummary,
+    },
+  };
+});
+
+/**
+ * Handler for adding inline comments to student summary
+ */
+registerToolHandler('student_summary_add_comment', async (args, context): Promise<ToolExecutionResult> => {
+  const { sectionId, startOffset, endOffset, text } = args as {
+    sectionId: string;
+    startOffset: number;
+    endOffset: number;
+    text: string;
+  };
+
+  if (!sectionId || !text) {
+    return {
+      success: false,
+      toolId: nanoid(),
+      toolType: 'summary',
+      error: 'sectionId and text are required',
+    };
+  }
+
+  // This emits an SSE event to update the client
+  return {
+    success: true,
+    toolId: nanoid(),
+    toolType: 'summary',
+    data: {
+      type: 'student_summary_comment',
+      sectionId,
+      startOffset,
+      endOffset,
+      text,
+      maestroId: context?.maestroId,
+    },
   };
 });
 
