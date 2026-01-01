@@ -5,7 +5,7 @@
  * Shows subject selection, then maestro selection for that subject
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   GraduationCap,
@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { getMaestriBySubject, getAllSubjects, maestri as allMaestri } from '@/data';
 import type { Subject, Maestro } from '@/types';
@@ -89,8 +88,54 @@ export function ToolMaestroSelectionDialog({
   const [step, setStep] = useState<Step>('subject');
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   const allSubjects = getAllSubjects();
+
+  // Focus trap and keyboard handling
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Store previous focus
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    // Focus the dialog
+    dialogRef.current?.focus();
+
+    // Handle Escape key
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+
+      // Focus trap - keep focus within dialog
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        } else if (!e.shiftKey && document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      // Restore focus when dialog closes
+      previousFocusRef.current?.focus();
+    };
+  }, [isOpen, onClose]);
   const availableMaestri = selectedSubject ? getMaestriBySubject(selectedSubject) : [];
 
   const toolLabel = TOOL_LABELS[toolType] || toolType;
@@ -161,11 +206,16 @@ export function ToolMaestroSelectionDialog({
         onClick={handleClose}
       >
         <motion.div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="dialog-title"
+          tabIndex={-1}
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-xl"
+          className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col shadow-xl focus:outline-none"
         >
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
@@ -173,7 +223,7 @@ export function ToolMaestroSelectionDialog({
               {step === 'subject' && <BookOpen className="h-5 w-5 text-accent-themed" />}
               {step === 'maestro' && <GraduationCap className="h-5 w-5 text-accent-themed" />}
               {step === 'mode' && <Mic className="h-5 w-5 text-accent-themed" />}
-              <h2 className="text-lg font-semibold">
+              <h2 id="dialog-title" className="text-lg font-semibold">
                 {step === 'subject' && `Crea ${toolLabel} - Scegli Materia`}
                 {step === 'maestro' && `Crea ${toolLabel} - Scegli Professore`}
                 {step === 'mode' && `Crea ${toolLabel} - Scegli Modalità`}
