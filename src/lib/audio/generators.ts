@@ -25,7 +25,6 @@ export function createWhiteNoiseNode(audioContext: AudioContext): AudioWorkletNo
   const bufferSize = 4096;
   const whiteNoise = audioContext.createScriptProcessor(bufferSize, 1, 1);
   
-  whiteNoise.onerror = null;
   whiteNoise.addEventListener('audioprocess', (e) => {
     const output = e.outputBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
@@ -46,7 +45,6 @@ export function createPinkNoiseNode(audioContext: AudioContext): ScriptProcessor
   // Pink noise requires filtering - use Paul Kellett algorithm
   let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
   
-  pinkNoise.onerror = null;
   pinkNoise.addEventListener('audioprocess', (e) => {
     const output = e.outputBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
@@ -74,7 +72,6 @@ export function createBrownNoiseNode(audioContext: AudioContext): ScriptProcesso
   
   let lastOut = 0.0;
   
-  brownNoise.onerror = null;
   brownNoise.addEventListener('audioprocess', (e) => {
     const output = e.outputBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {

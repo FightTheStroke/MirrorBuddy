@@ -5,7 +5,7 @@
 
 import { logger } from '@/lib/logger';
 import type { AudioMode, AudioLayer } from '@/types';
-import { createAudioNodeForMode, getBinauralConfig } from './generators';
+import { createAudioNodeForMode } from './generators';
 
 /**
  * Represents an active audio layer with its Web Audio nodes
