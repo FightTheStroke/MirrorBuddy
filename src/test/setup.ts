@@ -4,6 +4,7 @@
  */
 
 import { vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 // Mock console methods for cleaner test output
 global.console = {
