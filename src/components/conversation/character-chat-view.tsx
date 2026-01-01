@@ -341,10 +341,31 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
 
       const data = await response.json();
 
+      // ADR 0020: Generate contextual fallback if AI made tool calls but no content
+      let responseContent = data.content || data.message;
+      if (!responseContent || responseContent.trim() === '') {
+        if (data.toolCalls && data.toolCalls.length > 0) {
+          const toolNames = data.toolCalls.map((tc: { type?: string }) => tc.type);
+          if (toolNames.includes('create_mindmap')) {
+            responseContent = 'Ti sto creando la mappa mentale...';
+          } else if (toolNames.includes('create_quiz')) {
+            responseContent = 'Ti sto preparando il quiz...';
+          } else if (toolNames.includes('create_flashcards')) {
+            responseContent = 'Ti sto creando le flashcard...';
+          } else if (toolNames.includes('create_summary')) {
+            responseContent = 'Ti sto preparando il riassunto...';
+          } else {
+            responseContent = 'Sto elaborando la tua richiesta...';
+          }
+        } else {
+          responseContent = 'Mi dispiace, non ho capito. Puoi ripetere?';
+        }
+      }
+
       const assistantMessage: Message = {
         id: `assistant-${Date.now()}`,
         role: 'assistant',
-        content: data.content || data.message || 'Mi dispiace, non ho capito.',
+        content: responseContent,
         timestamp: new Date(),
       };
 

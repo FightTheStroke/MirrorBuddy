@@ -67,7 +67,7 @@ describe('Mindmap Handler', () => {
       expect(result.data).toBeDefined();
 
       const data = result.data as any;
-      expect(data.topic).toBe('Solar System');
+      expect(data.title).toBe('Solar System'); // ADR 0020: Changed from 'topic' to 'title'
       expect(data.nodes).toHaveLength(1);
       expect(data.nodes[0]).toEqual({
         id: '1',
@@ -447,7 +447,7 @@ describe('Mindmap Handler', () => {
 
       expect(result.success).toBe(true);
       const data = result.data as any;
-      expect(data.topic).toBe('La "Divina Commedia" di Dante');
+      expect(data.title).toBe('La "Divina Commedia" di Dante'); // ADR 0020
       expect(data.markdown).toContain('# La "Divina Commedia" di Dante');
     });
 
@@ -462,7 +462,7 @@ describe('Mindmap Handler', () => {
 
       expect(result.success).toBe(true);
       const data = result.data as any;
-      expect(data.topic).toBe(longTopic);
+      expect(data.title).toBe(longTopic); // ADR 0020
       expect(data.markdown).toContain(`# ${longTopic}`);
     });
 
@@ -476,7 +476,7 @@ describe('Mindmap Handler', () => {
 
       expect(result.success).toBe(true);
       const data = result.data as any;
-      expect(data.topic).toBe('数学 (Mathematics) 🔢');
+      expect(data.title).toBe('数学 (Mathematics) 🔢'); // ADR 0020
       expect(data.markdown).toContain('# 数学 (Mathematics) 🔢');
       expect(data.markdown).toContain('## Algebra 代数');
     });
