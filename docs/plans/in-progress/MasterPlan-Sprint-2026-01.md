@@ -187,7 +187,7 @@ Componenti riutilizzabili con ACCESSIBILITY.
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
 | 5.01 | Create ToolMaestroSelectionDialog (accessible) | `src/components/education/tool-maestro-selection-dialog.tsx` | ✅ | |
-| 5.02 | Unit tests + accessibility tests for dialog | `src/components/education/__tests__/tool-maestro-selection-dialog.test.tsx` | | |
+| 5.02 | Unit tests + accessibility tests for dialog | `src/components/education/__tests__/tool-maestro-selection-dialog.test.tsx` | ✅ | |
 
 ### 5B: Knowledge Hub Renderers
 
