@@ -17,6 +17,7 @@ Reference files with `@docs/claude/filename.md` in conversation.
 | `parent-dashboard.md` | GDPR consent, parent-professor chat |
 | `pomodoro.md` | Timer phases, XP rewards |
 | `onboarding.md` | Voice onboarding with Melissa |
+| `ambient-audio.md` | Procedural audio, presets, Pomodoro integration |
 
 ## Context Optimization (Jan 2026)
 

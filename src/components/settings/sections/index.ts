@@ -5,5 +5,6 @@ export { AppearanceSettings } from './appearance-settings';
 export { NotificationSettings } from './notification-settings';
 export { PrivacySettings } from './privacy-settings';
 export { AudioSettings } from './audio-settings';
+export { AmbientAudioSettings } from './ambient-audio-settings';
 export { AIProviderSettings } from './ai-provider-settings';
 export { DiagnosticsTab } from './diagnostics-tab';

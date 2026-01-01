@@ -13,6 +13,7 @@ import { ToolResultDisplay } from '@/components/tools';
 import { WebcamCapture } from '@/components/tools/webcam-capture';
 import { SessionGradeDisplay } from './session-grade';
 import { useProgressStore } from '@/lib/stores/app-store';
+import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { Maestro } from '@/types';
@@ -103,6 +104,30 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
       startSession(maestro.id, maestro.specialty);
     }
   }, [isConnected, currentSession, maestro.id, maestro.specialty, startSession]);
+
+  // Auto-pause ambient audio during voice session (ADR-0018)
+  const ambientPlaybackState = useAmbientAudioStore((s) => s.playbackState);
+  const pauseAmbient = useAmbientAudioStore((s) => s.pause);
+  const playAmbient = useAmbientAudioStore((s) => s.play);
+  const wasPlayingRef = useRef(false);
+
+  useEffect(() => {
+    if (isConnected) {
+      // Voice session started - pause ambient if playing
+      if (ambientPlaybackState === 'playing') {
+        wasPlayingRef.current = true;
+        pauseAmbient();
+        logger.debug('[VoiceSession] Paused ambient audio for voice session');
+      }
+    } else {
+      // Voice session ended - resume ambient if it was playing before
+      if (wasPlayingRef.current) {
+        wasPlayingRef.current = false;
+        playAmbient();
+        logger.debug('[VoiceSession] Resumed ambient audio after voice session');
+      }
+    }
+  }, [isConnected, ambientPlaybackState, pauseAmbient, playAmbient]);
 
   // Handle webcam capture completion
   const handleWebcamCapture = useCallback((imageData: string) => {

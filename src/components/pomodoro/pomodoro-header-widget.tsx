@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { usePomodoroStore, PomodoroPhase } from '@/lib/stores/pomodoro-store';
 import { useProgressStore } from '@/lib/stores/app-store';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
 import { cn } from '@/lib/utils';
 
 // XP rewards for Pomodoro
@@ -73,6 +74,25 @@ export function PomodoroHeaderWidget() {
   useEffect(() => {
     requestNotificationPermission();
   }, []);
+
+  // Ambient audio integration (ADR-0018)
+  useEffect(() => {
+    const ambientStore = useAmbientAudioStore.getState();
+    const { autoStartWithPomodoro, pauseDuringBreak, pomodoroPreset } = ambientStore;
+
+    if (phase === 'focus' && isRunning && autoStartWithPomodoro) {
+      // Start ambient audio when focus phase begins
+      if (ambientStore.playbackState !== 'playing') {
+        ambientStore.applyPreset(pomodoroPreset);
+        ambientStore.play();
+      }
+    } else if ((phase === 'shortBreak' || phase === 'longBreak') && pauseDuringBreak) {
+      // Pause during breaks if setting enabled
+      if (ambientStore.playbackState === 'playing') {
+        ambientStore.pause();
+      }
+    }
+  }, [phase, isRunning]);
 
   // Timer tick
   useEffect(() => {
