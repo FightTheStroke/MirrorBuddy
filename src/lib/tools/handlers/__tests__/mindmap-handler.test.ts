@@ -195,7 +195,7 @@ describe('Mindmap Handler', () => {
       const result = await mindmapHandler(args, {}) as ToolExecutionResult;
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Topic is required and must be a string');
+      expect(result.error).toBe('Title is required and must be a string');
       expect(result.toolType).toBe('mindmap');
     });
 
@@ -208,7 +208,7 @@ describe('Mindmap Handler', () => {
       const result = await mindmapHandler(args, {}) as ToolExecutionResult;
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Topic is required and must be a string');
+      expect(result.error).toBe('Title is required and must be a string');
     });
 
     it('should reject non-string topic', async () => {
@@ -220,7 +220,7 @@ describe('Mindmap Handler', () => {
       const result = await mindmapHandler(args, {}) as ToolExecutionResult;
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Topic is required and must be a string');
+      expect(result.error).toBe('Title is required and must be a string');
     });
 
     it('should reject missing nodes array', async () => {
@@ -513,7 +513,7 @@ describe('Mindmap Handler', () => {
       const result = await mindmapHandler(args, {}) as ToolExecutionResult;
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('Topic is required');
+      expect(result.error).toContain('Title is required');
     });
 
     it('should handle undefined nodes', async () => {
