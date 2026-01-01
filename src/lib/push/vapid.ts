@@ -3,6 +3,8 @@
 // Handles VAPID keys for Web Push authentication
 // ============================================================================
 
+import { logger } from '@/lib/logger';
+
 /**
  * Get the VAPID public key for client-side subscription.
  * This is safe to expose - it's a public key.
@@ -10,7 +12,7 @@
 export function getVapidPublicKey(): string | null {
   const key = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   if (!key) {
-    console.warn('[VAPID] NEXT_PUBLIC_VAPID_PUBLIC_KEY not configured');
+    logger.warn('[VAPID] NEXT_PUBLIC_VAPID_PUBLIC_KEY not configured');
     return null;
   }
   return key;

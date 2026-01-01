@@ -5,6 +5,12 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from '@/lib/rate-limit';
 
 // Blocked domains that are inappropriate for educational context
 const BLOCKED_DOMAINS = [
@@ -63,6 +69,13 @@ interface SafeSearchResponse {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit check
+  const clientId = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(`search:${clientId}`, RATE_LIMITS.SEARCH);
+  if (!rateLimit.success) {
+    return rateLimitResponse(rateLimit);
+  }
+
   try {
     const body = await request.json();
     const { query, subject, maxResults = 5 } = body;

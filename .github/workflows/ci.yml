@@ -73,13 +73,34 @@ jobs:
           fi
           echo "No secrets detected"
 
-  # E2E Tests: Run locally with app-release-manager (not in CI)
-  # Real API integration tests require Azure/Ollama - run before release
+  # Lane 3: Unit Tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  # Accessibility & E2E: Run locally with app-release-manager
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+  # Lane 4: E2E Tests - Run locally with app-release-manager (skipped in CI)
+  # Real API integration tests require Azure/Ollama - run before release
   # Lighthouse + Playwright require full environment - not suitable for CI
 
-  # Lane 3: Documentation Check
+  # Lane 5: Documentation Check
   docs:
     name: Documentation Check
     runs-on: ubuntu-latest
@@ -128,7 +149,7 @@ jobs:
 
           echo "All required documentation present!"
 
-  # Lane 4: Code Quality
+  # Lane 6: Code Quality
   quality:
     name: Code Quality
     runs-on: ubuntu-latest

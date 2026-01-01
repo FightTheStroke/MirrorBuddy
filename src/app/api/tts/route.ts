@@ -9,6 +9,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 // OpenAI TTS voices
 type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
@@ -67,7 +74,7 @@ async function generateAzureTTS(text: string, voice: TTSVoice): Promise<ArrayBuf
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('[TTS] Azure API error:', response.status, errorText);
+    logger.error('[TTS] Azure API error', { status: response.status, error: errorText });
     throw new Error(`Azure TTS failed: ${response.status}`);
   }
 
@@ -97,7 +104,7 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error('[TTS] OpenAI API error:', response.status, errorText);
+    logger.error('[TTS] OpenAI API error', { status: response.status, error: errorText });
     throw new Error(`OpenAI TTS failed: ${response.status}`);
   }
 
@@ -111,6 +118,13 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
  * Returns audio/mpeg stream.
  */
 export async function POST(request: NextRequest) {
+  // Rate limit check
+  const clientId = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(`tts:${clientId}`, RATE_LIMITS.TTS);
+  if (!rateLimit.success) {
+    return rateLimitResponse(rateLimit);
+  }
+
   try {
     const provider = getTTSProvider();
 
@@ -156,7 +170,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[TTS] Error:', error);
+    logger.error('[TTS] Error', { error });
     return NextResponse.json(
       { error: 'Internal server error', fallback: true },
       { status: 500 }

@@ -8,6 +8,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { logger } from '@/lib/logger';
 
 type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
 
@@ -139,7 +140,7 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
         if ((error as Error).name === 'AbortError') {
           return true; // Intentionally stopped
         }
-        console.error('[OnboardingTTS] OpenAI error:', error);
+        logger.error('[OnboardingTTS] OpenAI error', { error });
         setState((prev) => ({ ...prev, isLoading: false }));
         return false; // Fallback to Web Speech
       }
@@ -214,7 +215,7 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
       if (success) return;
 
       // If OpenAI failed (not configured or error), fallback to Web Speech
-      console.log('[OnboardingTTS] OpenAI failed, using Web Speech fallback');
+      logger.debug('[OnboardingTTS] OpenAI failed, using Web Speech fallback');
       speakWebSpeech(textToSpeak);
     },
     [speakOpenAI, speakWebSpeech, stop]

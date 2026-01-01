@@ -141,6 +141,11 @@ export const RATE_LIMITS = {
     maxRequests: 30,
     windowMs: 60 * 1000,
   },
+  /** TTS API: 15 requests per minute (audio generation, expensive) */
+  TTS: {
+    maxRequests: 15,
+    windowMs: 60 * 1000,
+  },
   /** General API: 60 requests per minute */
   GENERAL: {
     maxRequests: 60,
