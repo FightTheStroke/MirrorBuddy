@@ -29,6 +29,7 @@ import { MaestroSession } from '@/components/maestros/maestro-session';
 import type { Maestro } from '@/types';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { PomodoroHeaderWidget } from '@/components/pomodoro';
+import { AmbientAudioHeaderWidget } from '@/components/ambient-audio';
 import {
   LazyQuizView,
   LazyFlashcardsView,
@@ -193,8 +194,9 @@ export default function Home() {
           )}
         </div>
 
-        {/* Right section: pomodoro + notifications + version */}
+        {/* Right section: ambient audio + pomodoro + notifications + version */}
         <div className="flex items-center gap-3">
+          <AmbientAudioHeaderWidget />
           <PomodoroHeaderWidget />
           <NotificationBell />
           <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
