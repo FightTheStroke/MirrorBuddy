@@ -15,6 +15,7 @@ import {
   UserCircle,
   Bot,
   Volume2,
+  Music,
   Wrench,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -37,11 +38,12 @@ import {
   NotificationSettings,
   PrivacySettings,
   AudioSettings,
+  AmbientAudioSettings,
   AIProviderSettings,
   DiagnosticsTab,
 } from './sections';
 
-type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'notifications' | 'telemetry' | 'privacy' | 'genitori' | 'diagnostics';
+type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'ambient-audio' | 'notifications' | 'telemetry' | 'privacy' | 'genitori' | 'diagnostics';
 
 const tabs: Array<{ id: SettingsTab; label: string; icon: React.ReactNode }> = [
   { id: 'profile', label: 'Profilo', icon: <User className="w-5 h-5" /> },
@@ -50,6 +52,7 @@ const tabs: Array<{ id: SettingsTab; label: string; icon: React.ReactNode }> = [
   { id: 'appearance', label: 'Aspetto', icon: <Palette className="w-5 h-5" /> },
   { id: 'ai', label: 'AI Provider', icon: <Bot className="w-5 h-5" /> },
   { id: 'audio', label: 'Audio/Video', icon: <Volume2 className="w-5 h-5" /> },
+  { id: 'ambient-audio', label: 'Audio Ambientale', icon: <Music className="w-5 h-5" /> },
   { id: 'notifications', label: 'Notifiche', icon: <Bell className="w-5 h-5" /> },
   { id: 'telemetry', label: 'Statistiche', icon: <BarChart3 className="w-5 h-5" /> },
   { id: 'privacy', label: 'Privacy', icon: <Shield className="w-5 h-5" /> },
@@ -213,6 +216,8 @@ export function SettingsView() {
         {activeTab === 'ai' && <AIProviderSettings />}
 
         {activeTab === 'audio' && <AudioSettings />}
+
+        {activeTab === 'ambient-audio' && <AmbientAudioSettings />}
 
         {activeTab === 'notifications' && <NotificationSettings />}
 
