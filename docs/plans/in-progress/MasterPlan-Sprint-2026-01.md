@@ -160,7 +160,7 @@ Backend endpoints con SECURITY CHECKS.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 4.01 | Create /api/conversations/memory (auth + validation) | `src/app/api/conversations/memory/route.ts` | | |
+| 4.01 | Create /api/conversations/memory (auth + validation) | `src/app/api/conversations/memory/route.ts` | ✅ | |
 | 4.02 | Create /api/collections (auth + validation) | `src/app/api/collections/route.ts` | | |
 | 4.03 | Create /api/tags (auth + validation) | `src/app/api/tags/route.ts` | | |
 | 4.04 | Update /api/materials for searchableText | `src/app/api/materials/route.ts` | | |
