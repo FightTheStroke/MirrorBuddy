@@ -165,7 +165,7 @@ Backend endpoints con SECURITY CHECKS.
 | 4.03 | Create /api/tags (auth + validation) | `src/app/api/tags/route.ts` | ✅ | |
 | 4.04 | Update /api/materials for searchableText | `src/app/api/materials/route.ts` | ✅ | |
 | 4.05 | Update /api/materials for collection/tag filters | `src/app/api/materials/route.ts` | ✅ | |
-| 4.06 | Create /api/materials/bulk (auth + validation) | `src/app/api/materials/bulk/route.ts` | | |
+| 4.06 | Create /api/materials/bulk (auth + validation) | `src/app/api/materials/bulk/route.ts` | ✅ | |
 | 4.07 | Update /api/chat for content with tool calls | `src/app/api/chat/route.ts` | | |
 | 4.08 | Security review: OWASP check all new endpoints | - | | |
 
