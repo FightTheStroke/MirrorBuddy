@@ -26,6 +26,9 @@ import { getBuddyForStudent } from '@/lib/ai/character-router';
 import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
+import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
+import { endConversationWithSummary as generateSummary } from '@/lib/conversation/summary-generator';
+import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
 
 // ============================================================================
 // PERSISTENCE HELPERS
@@ -244,10 +247,20 @@ interface ConversationFlowState {
   // Character history (for back navigation)
   characterHistory: Array<{ type: CharacterType; id: string; timestamp: Date }>;
 
+  // Session summary state
+  showRatingModal: boolean;
+  sessionSummary: {
+    topics: string[];
+    summary: string;
+    duration: number;
+  } | null;
+
   // Actions
   startConversation: (profile: ExtendedStudentProfile) => void;
   endConversation: () => void;
+  endConversationWithSummary: (conversationId: string, userId: string) => Promise<void>;
   setMode: (mode: FlowMode) => void;
+  setShowRatingModal: (show: boolean) => void;
 
   // Message actions
   addMessage: (message: Omit<FlowMessage, 'id' | 'timestamp'>) => Promise<void>;
@@ -274,6 +287,14 @@ interface ConversationFlowState {
   // Conversation history
   getConversationForCharacter: (characterId: string) => CharacterConversation | null;
   getAllConversations: () => CharacterConversation[];
+
+  // Contextual greetings
+  loadContextualGreeting: (
+    userId: string,
+    characterId: string,
+    studentName: string,
+    maestroName: string
+  ) => Promise<string | null>;
 
   // Reset
   reset: () => void;
@@ -372,6 +393,8 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
       sessionId: null,
       sessionStartedAt: null,
       characterHistory: [],
+      showRatingModal: false,
+      sessionSummary: null,
 
       startConversation: (profile) => {
         const coach = getDefaultSupportTeacher();
@@ -416,6 +439,11 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         const state = get();
         const updatedConversations = saveCurrentConversation(state);
 
+        // Stop inactivity monitoring
+        if (state.sessionId) {
+          inactivityMonitor.stopTracking(state.sessionId);
+        }
+
         set({
           isActive: false,
           mode: 'idle',
@@ -426,10 +454,53 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           sessionStartedAt: null,
           characterHistory: [],
           conversationsByCharacter: updatedConversations,
+          showRatingModal: false,
+          sessionSummary: null,
+        });
+      },
+
+      endConversationWithSummary: async (conversationId: string, _userId: string) => {
+        const state = get();
+
+        // Stop inactivity monitoring
+        inactivityMonitor.stopTracking(conversationId);
+
+        // Calculate session duration
+        const duration = state.sessionStartedAt
+          ? Math.round((Date.now() - state.sessionStartedAt.getTime()) / 60000)
+          : 0;
+
+        try {
+          // Generate summary
+          const result = await generateSummary(conversationId);
+
+          if (result) {
+            set({
+              sessionSummary: {
+                topics: result.topics,
+                summary: result.summary,
+                duration,
+              },
+              showRatingModal: true,
+            });
+          }
+        } catch (error) {
+          console.error('Failed to generate summary:', error);
+        }
+
+        // Save conversation
+        const updatedConversations = saveCurrentConversation(state);
+
+        set({
+          isActive: false,
+          mode: 'idle',
+          conversationsByCharacter: updatedConversations,
         });
       },
 
       setMode: (mode) => set({ mode }),
+
+      setShowRatingModal: (show: boolean) => set({ showRatingModal: show }),
 
       addMessage: async (message) => {
         const state = get();
@@ -647,7 +718,30 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         });
       },
 
+      loadContextualGreeting: async (
+        userId: string,
+        characterId: string,
+        studentName: string,
+        maestroName: string
+      ): Promise<string | null> => {
+        try {
+          const result = await getGreetingForCharacter(
+            userId,
+            characterId,
+            studentName,
+            maestroName
+          );
+          return result?.greeting || null;
+        } catch (error) {
+          console.error('Failed to load contextual greeting:', error);
+          return null;
+        }
+      },
+
       reset: () => {
+        // Stop all inactivity monitoring
+        inactivityMonitor.stopAll();
+
         set({
           mode: 'idle',
           isActive: false,
@@ -658,6 +752,8 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           sessionId: null,
           sessionStartedAt: null,
           characterHistory: [],
+          showRatingModal: false,
+          sessionSummary: null,
         });
       },
 
