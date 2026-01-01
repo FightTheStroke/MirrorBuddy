@@ -35,6 +35,22 @@ When Melissa hears student info:
 - `set_learning_differences(diffs)` → Updates diffs
 - `next_onboarding_step()` / `prev_onboarding_step()` → Navigate
 
+## Voice Session Config
+
+Onboarding uses `far_field` noise reduction for echo suppression while keeping barge-in enabled:
+
+```typescript
+useVoiceSession({
+  noiseReductionType: 'far_field',  // Echo cancellation for laptop speakers
+  // Barge-in enabled by default - user can interrupt Melissa
+});
+```
+
+| Option | Value | Purpose |
+|--------|-------|---------|
+| `noiseReductionType` | `'far_field'` | Filters speaker audio from mic input |
+| `disableBargeIn` | `false` (default) | Allows interrupting Melissa |
+
 ## Fallback
 
 When Azure unavailable: Web Speech API TTS (`use-onboarding-tts.ts`) with manual form input.
