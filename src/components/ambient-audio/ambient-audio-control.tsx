@@ -58,7 +58,6 @@ export function AmbientAudioControl() {
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const isPlaying = playbackState === 'playing';
-  const isPaused = playbackState === 'paused';
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -88,11 +87,6 @@ export function AmbientAudioControl() {
   const noiseModesData = AUDIO_MODES.filter(m => m.category === 'noise');
   const binauralModesData = AUDIO_MODES.filter(m => m.category === 'binaural');
   const ambientModesData = AUDIO_MODES.filter(m => m.category === 'ambient');
-
-  // Check if ambient sounds are implemented
-  const isAmbientImplemented = (mode: AudioMode) => {
-    return ['rain', 'thunderstorm', 'fireplace', 'cafe', 'library', 'forest', 'ocean', 'night'].includes(mode) === false;
-  };
 
   return (
     <div className="space-y-6">

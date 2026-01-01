@@ -3,7 +3,7 @@
 // React hook for controlling ambient audio engine
 // ============================================================================
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
 import { getAudioEngine } from '@/lib/audio/engine';
 import { logger } from '@/lib/logger';
@@ -15,7 +15,7 @@ import type { AudioMode, AudioPreset } from '@/types';
  */
 export function useAmbientAudio() {
   const store = useAmbientAudioStore();
-  const engine = getAudioEngine();
+  const engine = useMemo(() => getAudioEngine(), []);
 
   // Initialize audio engine on mount
   useEffect(() => {
@@ -35,7 +35,7 @@ export function useAmbientAudio() {
     return () => {
       engine.stopAll();
     };
-  }, []);
+  }, [engine, store]);
 
   // Sync store state with engine
   useEffect(() => {
@@ -44,10 +44,6 @@ export function useAmbientAudio() {
     // Apply layers to engine
     const syncLayers = async () => {
       try {
-        // Remove layers that are not in store
-        const engineState = engine.getState();
-        // (Note: Would need to track layer IDs in engine for proper sync)
-        
         // Add/update layers from store
         for (const layer of store.layers) {
           if (layer.enabled) {
@@ -62,12 +58,12 @@ export function useAmbientAudio() {
     };
 
     syncLayers();
-  }, [store.layers, store.playbackState]);
+  }, [engine, store, store.layers, store.playbackState]);
 
   // Sync master volume
   useEffect(() => {
     engine.setMasterVolume(store.masterVolume);
-  }, [store.masterVolume]);
+  }, [engine, store.masterVolume]);
 
   // Handle play/pause/stop
   const play = useCallback(async () => {
@@ -78,7 +74,7 @@ export function useAmbientAudio() {
       logger.error('Failed to play audio', { error });
       store.setError('Failed to start audio playback');
     }
-  }, [store]);
+  }, [engine, store]);
 
   const pause = useCallback(() => {
     store.pause();
@@ -87,7 +83,7 @@ export function useAmbientAudio() {
   const stop = useCallback(() => {
     engine.stopAll();
     store.stop();
-  }, [store]);
+  }, [engine, store]);
 
   // Layer management
   const addLayer = useCallback((mode: AudioMode, volume = 0.7) => {
@@ -97,23 +93,23 @@ export function useAmbientAudio() {
   const removeLayer = useCallback((layerId: string) => {
     engine.removeLayer(layerId);
     store.removeLayer(layerId);
-  }, [store]);
+  }, [engine, store]);
 
   const setLayerVolume = useCallback((layerId: string, volume: number) => {
     engine.setLayerVolume(layerId, volume);
     store.setLayerVolume(layerId, volume);
-  }, [store]);
+  }, [engine, store]);
 
   const toggleLayer = useCallback((layerId: string, enabled: boolean) => {
     engine.toggleLayer(layerId, enabled);
     store.toggleLayer(layerId, enabled);
-  }, [store]);
+  }, [engine, store]);
 
   // Preset management
   const applyPreset = useCallback((preset: AudioPreset) => {
     engine.stopAll();
     store.applyPreset(preset);
-  }, [store]);
+  }, [engine, store]);
 
   // Master volume control
   const setMasterVolume = useCallback((volume: number) => {
@@ -124,12 +120,12 @@ export function useAmbientAudio() {
   const duck = useCallback(() => {
     engine.duck(store.duckedVolume);
     store.duck();
-  }, [store]);
+  }, [engine, store]);
 
   const unduck = useCallback(() => {
     engine.unduck();
     store.unduck();
-  }, [store]);
+  }, [engine, store]);
 
   return {
     // State
