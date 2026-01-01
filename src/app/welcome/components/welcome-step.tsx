@@ -13,6 +13,13 @@ import {
   useOnboardingTTS,
   ONBOARDING_SCRIPTS,
 } from '@/lib/hooks/use-onboarding-tts';
+import type { Maestro, VoiceSessionHandle } from '@/types';
+
+interface VoiceConnectionInfo {
+  provider: 'azure';
+  proxyPort: number;
+  configured: boolean;
+}
 
 interface ExistingUserData {
   name: string;
@@ -25,6 +32,12 @@ interface WelcomeStepProps {
   useWebSpeechFallback?: boolean;
   onAzureUnavailable?: () => void;
   existingUserData?: ExistingUserData | null;
+  /** Voice session handle from parent */
+  voiceSession?: VoiceSessionHandle;
+  /** Connection info from parent */
+  connectionInfo?: VoiceConnectionInfo | null;
+  /** Melissa maestro from parent */
+  onboardingMelissa?: Maestro;
 }
 
 /**
@@ -38,7 +51,14 @@ interface WelcomeStepProps {
  * - Melissa auto-connects when page loads (no button click needed)
  * - Falls back to form + Web Speech TTS when Azure unavailable
  */
-export function WelcomeStep({ useWebSpeechFallback = false, onAzureUnavailable, existingUserData }: WelcomeStepProps) {
+export function WelcomeStep({
+  useWebSpeechFallback = false,
+  onAzureUnavailable,
+  existingUserData,
+  voiceSession,
+  connectionInfo,
+  onboardingMelissa,
+}: WelcomeStepProps) {
   const {
     data,
     updateData,
@@ -108,7 +128,17 @@ export function WelcomeStep({ useWebSpeechFallback = false, onAzureUnavailable, 
         className="w-full max-w-md mx-auto"
       >
         {/* Melissa voice panel - user clicks to start call */}
-        <VoiceOnboardingPanel step="welcome" onFallbackToWebSpeech={onAzureUnavailable} existingUserData={existingUserData} className="w-full" />
+        {voiceSession && onboardingMelissa && (
+          <VoiceOnboardingPanel
+            step="welcome"
+            onFallbackToWebSpeech={onAzureUnavailable}
+            className="w-full"
+            voiceSession={voiceSession}
+            connectionInfo={connectionInfo ?? null}
+            onboardingMelissa={onboardingMelissa}
+            existingUserData={existingUserData}
+          />
+        )}
 
         {/* Show captured name with continue button */}
         <AnimatePresence>
