@@ -311,6 +311,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Turn-taking speed**: silence_duration_ms 500 → 400 (faster response)
 
 ### Fixed
+- **Onboarding Voice Session** (#61): Voice session now persists across onboarding steps, preventing disconnect/reconnect and fallback to Web Speech API
+- **Parent Dashboard Navigation**: Added sticky header with "Torna all'app" back button
 - WCAG 2.1 AA accessibility fixes for conversation-flow component
 - Motion animations respect `prefers-reduced-motion`
 - Aria-labels on buttons and interactive elements
