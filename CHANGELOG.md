@@ -166,6 +166,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tool Panel** (`src/components/tools/tool-panel.tsx`): UI for tool visualization
 - **Tool Persistence**: IndexedDB for binaries, Prisma for metadata
 
+#### Student Summary Editor with Maieutic Method (Issue #70)
+- **StudentSummaryEditor** (`src/components/tools/student-summary-editor.tsx`): Student writes their own summary with Coach guidance
+  - Guided 3-section structure: Introduzione, Sviluppo, Conclusione
+  - Each section has a guiding question to prompt student thinking
+  - Markdown support for formatting
+  - Real-time word count
+- **Maieutic Method**: Coach guides with questions, never writes for the student
+- **Inline Comments** (`InlineComment` type): Coach can highlight text and add feedback
+- **Voice Commands**: `open_student_summary`, `student_summary_add_comment`
+- **SSE Sync Hook** (`src/lib/hooks/use-student-summary-sync.ts`): Real-time collaboration
+- **Archive Integration**: Summaries appear in Archivio under "Riassunti" filter
+
 #### Showcase Mode
 - **Offline Demo** (`src/app/showcase/`): Full app demo without LLM connection
 - **Showcase Button**: Added to AI Provider settings for easy access
