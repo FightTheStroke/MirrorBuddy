@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { X, Minimize2, Maximize2, Loader2 } from 'lucide-react';
@@ -12,8 +13,20 @@ import { SearchResults } from './search-results';
 import { SummaryTool } from './summary-tool';
 import { StudentSummaryEditor } from './student-summary-editor';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import type { ToolState, SummaryData, StudentSummaryData } from '@/types/tools';
 import type { QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
+
+// Get user ID from session storage (matches use-saved-materials.ts pattern)
+function getUserId(): string {
+  if (typeof window === 'undefined') return 'default-user';
+  let userId = sessionStorage.getItem('convergio-user-id');
+  if (!userId) {
+    userId = `user-${crypto.randomUUID()}`;
+    sessionStorage.setItem('convergio-user-id', userId);
+  }
+  return userId;
+}
 
 interface ToolPanelProps {
   tool: ToolState | null;
@@ -33,6 +46,33 @@ export function ToolPanel({
   onToggleMinimize,
   embedded = false,
 }: ToolPanelProps) {
+  // Save student summary to materials archive
+  const handleSaveStudentSummary = useCallback(async (data: StudentSummaryData) => {
+    try {
+      const userId = getUserId();
+      const response = await fetch('/api/tools/saved', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          type: 'summary',
+          title: data.title,
+          topic: data.topic,
+          content: data,
+          maestroId: data.maestroId,
+          sessionId: data.sessionId,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Save failed: ${response.status}`);
+      }
+      logger.info('Student summary saved', { title: data.title });
+    } catch (error) {
+      logger.error('Failed to save student summary', { error: String(error) });
+      throw error;
+    }
+  }, []);
+
   if (!tool) return null;
 
   const renderToolContent = () => {
@@ -73,6 +113,7 @@ export function ToolPanel({
               topic={studentData.topic}
               maestroId={studentData.maestroId}
               sessionId={studentData.sessionId}
+              onSave={handleSaveStudentSummary}
             />
           );
         }
