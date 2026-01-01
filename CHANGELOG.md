@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Knowledge Hub Components
+
+> **Branch**: `development` | **Plan**: `docs/plans/in-progress/MasterPlan-Sprint-2026-01.md`
+
+### Added
+
+#### Knowledge Hub Renderer Registry (Phase 5, Tasks 5.03-5.15)
+- **Renderer Registry** (`src/components/education/knowledge-hub/renderers/index.tsx`):
+  - Lazy loading with dynamic imports for code splitting
+  - Utility functions: `getRendererImport`, `hasRenderer`, `getSupportedRenderers`
+  - `FallbackRenderer` for unknown material types
+  - Display labels and icons for all 12 material types
+- **Type-Safe Renderers** for all material types:
+  - `MindmapRenderer`: Wrapper around MarkMapRenderer
+  - `QuizRenderer`: Interactive quiz with show/hide answers toggle
+  - `FlashcardRenderer`: Flip animation cards with navigation
+  - `SummaryRenderer`: Wrapper around SummaryRenderer with expandAll
+  - `DemoRenderer`: HTML/CSS/JS interactive demos with iframe sandbox
+  - `DiagramRenderer`: Mermaid diagram wrapper
+  - `TimelineRenderer`: Vertical timeline with motion animations
+  - `FormulaRenderer`: KaTeX formula wrapper
+  - `ChartRenderer`: Chart.js wrapper (line, bar, pie, scatter, area)
+  - `PdfRenderer`: PDF viewer with download option
+  - `ImageRenderer`: Accessible image with alt text
+  - `HomeworkRenderer`: Task list with completion tracking
+- **29 Unit Tests** (`src/components/education/knowledge-hub/renderers/__tests__/index.test.tsx`):
+  - Registry function tests for all 12 types
+  - Lazy import resolution tests
+  - FallbackRenderer behavior tests
+
+#### Knowledge Hub Material Dialog (Phase 5, Tasks 5.01-5.02)
+- **Material Dialog** (`src/components/education/knowledge-hub/material-dialog.tsx`):
+  - WCAG 2.1 AA accessible modal with focus trap
+  - Dynamic renderer loading via React.lazy
+  - Edit/Delete actions with confirmation
+  - Loading states and error handling
+  - Keyboard navigation (Escape to close)
+- **Dialog Tests** (`src/components/education/knowledge-hub/__tests__/material-dialog.test.tsx`)
+
+---
+
 ## [Unreleased] - Session Summaries & Unified Archive
 
 > **Branch**: `feature/conversation-summaries-unified-archive` | **Plan**: `docs/plans/SessionSummaryUnifiedArchive-2026-01-01.md`

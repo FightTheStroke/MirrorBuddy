@@ -21,6 +21,27 @@ export { ChartRenderer } from '@/components/tools/chart-renderer';
 export { DiagramRenderer } from '@/components/tools/diagram-renderer';
 export { MarkMapRenderer } from '@/components/tools/markmap-renderer';
 
+// Re-export validation utilities
+export {
+  validateRendererData,
+  getValidator,
+  isValidMindmapData,
+  isValidQuizData,
+  isValidFlashcardData,
+  isValidSummaryData,
+  isValidChartData,
+  isValidDiagramData,
+  isValidTimelineData,
+  isValidFormulaData,
+  isValidHomeworkData,
+  isValidDemoData,
+  isValidImageData,
+  isValidPdfData,
+} from './validation';
+
+// Re-export error boundary
+export { RendererErrorBoundary, withErrorBoundary } from './renderer-error-boundary';
+
 // Base props that all renderers should accept
 export interface BaseRendererProps {
   /** The material content data */
