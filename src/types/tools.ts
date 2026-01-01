@@ -30,29 +30,41 @@ export const CHAT_TOOL_DEFINITIONS = [
     type: 'function' as const,
     function: {
       name: 'create_mindmap',
-      description: 'Crea una mappa mentale interattiva su un argomento. Usa questo strumento quando lo studente chiede di visualizzare concetti, creare schemi, o organizzare informazioni.',
+      description: `Crea una mappa mentale interattiva ben strutturata su un argomento. Usa questo strumento quando lo studente chiede di visualizzare concetti, creare schemi, o organizzare informazioni.
+
+IMPORTANTE - Struttura della mappa:
+- Il "title" è il nodo centrale/principale della mappa
+- I nodi senza parentId sono i RAMI PRINCIPALI che partono dal centro
+- Ogni ramo principale deve avere 2-4 sotto-nodi (con parentId = id del ramo)
+- Crea almeno 3-5 rami principali per una mappa utile
+- Usa 2-3 livelli di profondità (rami → sotto-rami → dettagli)
+
+Esempio di struttura per "Fotosintesi":
+- title: "La Fotosintesi"
+- Rami principali (parentId omesso): "Fase Luminosa", "Fase Oscura", "Fattori Limitanti", "Importanza"
+- Sotto-rami di "Fase Luminosa": "Clorofilla", "Acqua", "ATP e NADPH"`,
       parameters: {
         type: 'object',
         properties: {
-          topic: {
+          title: {
             type: 'string',
-            description: 'Argomento principale della mappa mentale',
+            description: 'Titolo/argomento principale che appare al CENTRO della mappa mentale',
           },
           nodes: {
             type: 'array',
-            description: 'Nodi della mappa mentale',
+            description: 'Nodi della mappa organizzati gerarchicamente. I nodi senza parentId sono i rami principali dal centro. I sotto-nodi hanno parentId = id del loro nodo padre.',
             items: {
               type: 'object',
               properties: {
-                id: { type: 'string', description: 'ID univoco del nodo' },
-                label: { type: 'string', description: 'Testo del nodo' },
-                parentId: { type: 'string', description: 'ID del nodo padre (null per root)' },
+                id: { type: 'string', description: 'ID univoco del nodo (es: "1", "2", "2a", "2b")' },
+                label: { type: 'string', description: 'Testo breve del nodo (max 5-7 parole)' },
+                parentId: { type: 'string', description: 'ID del nodo padre. OMETTI per i rami principali (che partono dal centro). INCLUDI per i sotto-nodi.' },
               },
               required: ['id', 'label'],
             },
           },
         },
-        required: ['topic', 'nodes'],
+        required: ['title', 'nodes'],
       },
     },
   },

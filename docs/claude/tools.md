@@ -22,7 +22,8 @@ Maestri can create interactive educational tools during conversations.
 | Executor | `src/lib/tools/tool-executor.ts` | Handler registry |
 | Handlers | `src/lib/tools/handlers/*.ts` | Tool-specific logic |
 | Events | `src/lib/realtime/tool-events.ts` | SSE broadcasting |
-| Storage | `src/lib/storage/materials-db.ts` | IndexedDB materials |
+| Storage | `src/lib/hooks/use-saved-materials.ts` | Database API (ADR 0015) |
+| API | `/api/materials` | REST endpoint for all tools |
 
 ## Adding a New Tool
 

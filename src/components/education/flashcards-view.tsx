@@ -20,6 +20,7 @@ import { FlashcardStudy } from './flashcard';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import type { FlashcardDeck, Flashcard, Subject, Rating, CardState } from '@/types';
+import { useUIStore } from '@/lib/stores/app-store';
 
 // FSRS-5 Parameters (optimized defaults)
 const FSRS_PARAMS = {
@@ -113,7 +114,8 @@ function getUserId(): string {
 }
 
 export function FlashcardsView({ className }: FlashcardsViewProps) {
-  const router = useRouter();
+  const _router = useRouter();
+  const { enterFocusMode } = useUIStore();
 
   // Load decks from database API
   const [decks, setDecks] = useState<FlashcardDeck[]>([]);
@@ -279,7 +281,7 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
         </div>
         <div className="flex gap-2">
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
-          <Button onClick={() => router.push('/conversation?tool=flashcard')}>
+          <Button onClick={() => enterFocusMode('flashcard')}>
             <MessageSquare className="w-4 h-4 mr-2" />
             Crea con un Professore
           </Button>

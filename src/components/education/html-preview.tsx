@@ -15,7 +15,7 @@ import {
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useHTMLSnippetsStore } from '@/lib/stores/app-store';
+import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import { cn } from '@/lib/utils';
 
 interface HTMLPreviewProps {
@@ -33,7 +33,7 @@ export function HTMLPreview({
   title = 'Interactive Demo',
   description,
   subject,
-  maestroId,
+  maestroId: _maestroId, // Reserved for future use with autoSaveMaterial
   onClose,
   allowSave = true,
 }: HTMLPreviewProps) {
@@ -41,9 +41,8 @@ export function HTMLPreview({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const { addSnippet } = useHTMLSnippetsStore();
 
   // Sanitize HTML to prevent XSS attacks
   // Allow safe interactive styling but block scripts and dangerous handlers
@@ -78,17 +77,21 @@ export function HTMLPreview({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSave = () => {
-    addSnippet({
-      title,
-      description,
-      code,
-      subject,
-      maestroId,
-      tags: subject ? [subject] : [],
-    });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await autoSaveMaterial(
+        'demo',
+        title,
+        { code, description, tags: subject ? [subject] : [] },
+        { subject }
+      );
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleOpenInNewTab = () => {

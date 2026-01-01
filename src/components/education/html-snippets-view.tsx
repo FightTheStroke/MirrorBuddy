@@ -13,36 +13,36 @@ import {
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useHTMLSnippetsStore, type HTMLSnippet } from '@/lib/stores/app-store';
+import { useDemos, type SavedDemo } from '@/lib/hooks/use-saved-materials';
 import { HTMLPreview } from './html-preview';
 import { maestri as MAESTRI } from '@/data/maestri';
 
 export function HTMLSnippetsView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [previewSnippet, setPreviewSnippet] = useState<HTMLSnippet | null>(null);
+  const [previewSnippet, setPreviewSnippet] = useState<SavedDemo | null>(null);
 
-  const { snippets, deleteSnippet } = useHTMLSnippetsStore();
+  const { demos, loading, deleteDemo } = useDemos();
 
-  // Get unique subjects from snippets
+  // Get unique subjects from demos
   const subjects = useMemo(() => {
-    const subjectSet = new Set(snippets.map(s => s.subject).filter(Boolean));
+    const subjectSet = new Set(demos.map(s => s.subject).filter(Boolean));
     return Array.from(subjectSet);
-  }, [snippets]);
+  }, [demos]);
 
-  // Filter snippets
-  const filteredSnippets = useMemo(() => {
-    return snippets.filter(snippet => {
+  // Filter demos
+  const filteredDemos = useMemo(() => {
+    return demos.filter(demo => {
       const matchesSearch = !searchQuery ||
-        snippet.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        snippet.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        snippet.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+        demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        demo.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        demo.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
 
-      const matchesSubject = !selectedSubject || snippet.subject === selectedSubject;
+      const matchesSubject = !selectedSubject || demo.subject === selectedSubject;
 
       return matchesSearch && matchesSubject;
     });
-  }, [snippets, searchQuery, selectedSubject]);
+  }, [demos, searchQuery, selectedSubject]);
 
   const getMaestroName = (maestroId?: string) => {
     if (!maestroId) return null;
@@ -67,8 +67,8 @@ export function HTMLSnippetsView() {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [previewSnippet, closePreview]);
 
-  const handleOpenInNewTab = (snippet: HTMLSnippet) => {
-    const blob = new Blob([snippet.code], { type: 'text/html' });
+  const handleOpenInNewTab = (demo: SavedDemo) => {
+    const blob = new Blob([demo.code], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
     window.open(url, '_blank');
     setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -125,16 +125,25 @@ export function HTMLSnippetsView() {
         </div>
       </div>
 
-      {/* Snippets Grid */}
-      {filteredSnippets.length === 0 ? (
+      {/* Demos Grid */}
+      {loading ? (
+        <Card>
+          <CardContent className="p-12 text-center">
+            <Code className="w-16 h-16 text-slate-300 mx-auto mb-4 animate-pulse" />
+            <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
+              Caricamento demo...
+            </h3>
+          </CardContent>
+        </Card>
+      ) : filteredDemos.length === 0 ? (
         <Card>
           <CardContent className="p-12 text-center">
             <Code className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
-              {snippets.length === 0 ? 'Nessuna demo salvata' : 'Nessun risultato'}
+              {demos.length === 0 ? 'Nessuna demo salvata' : 'Nessun risultato'}
             </h3>
             <p className="text-sm text-slate-500 mt-2">
-              {snippets.length === 0
+              {demos.length === 0
                 ? 'Chiedi a un Professore di creare una demo interattiva!'
                 : 'Prova a modificare i filtri di ricerca'}
             </p>
@@ -143,12 +152,12 @@ export function HTMLSnippetsView() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <AnimatePresence>
-            {filteredSnippets.map((snippet) => {
-              const maestroName = getMaestroName(snippet.maestroId);
+            {filteredDemos.map((demo) => {
+              const maestroName = getMaestroName(demo.maestroId);
 
               return (
                 <motion.div
-                  key={snippet.id}
+                  key={demo.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.9 }}
@@ -165,7 +174,7 @@ export function HTMLSnippetsView() {
                         <Button
                           size="sm"
                           variant="secondary"
-                          onClick={() => setPreviewSnippet(snippet)}
+                          onClick={() => setPreviewSnippet(demo)}
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           Anteprima
@@ -173,7 +182,7 @@ export function HTMLSnippetsView() {
                         <Button
                           size="sm"
                           variant="secondary"
-                          onClick={() => handleOpenInNewTab(snippet)}
+                          onClick={() => handleOpenInNewTab(demo)}
                         >
                           <ExternalLink className="w-4 h-4" />
                         </Button>
@@ -183,27 +192,27 @@ export function HTMLSnippetsView() {
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-slate-900 dark:text-white line-clamp-1">
-                          {snippet.title}
+                          {demo.title}
                         </h3>
                         <button
-                          onClick={() => deleteSnippet(snippet.id)}
+                          onClick={() => deleteDemo(demo.id)}
                           className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900/30 text-slate-400 hover:text-red-500 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
 
-                      {snippet.description && (
+                      {demo.description && (
                         <p className="text-sm text-slate-500 line-clamp-2 mb-3">
-                          {snippet.description}
+                          {demo.description}
                         </p>
                       )}
 
                       <div className="flex items-center gap-3 text-xs text-slate-400">
-                        {snippet.subject && (
+                        {demo.subject && (
                           <span className="flex items-center gap-1">
                             <Tag className="w-3 h-3" />
-                            {snippet.subject}
+                            {demo.subject}
                           </span>
                         )}
                         {maestroName && (
@@ -213,7 +222,7 @@ export function HTMLSnippetsView() {
 
                       <div className="flex items-center gap-1 text-xs text-slate-400 mt-2">
                         <Calendar className="w-3 h-3" />
-                        {new Date(snippet.createdAt).toLocaleDateString('it-IT')}
+                        {new Date(demo.createdAt).toLocaleDateString('it-IT')}
                       </div>
                     </CardContent>
                   </Card>

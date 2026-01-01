@@ -29,6 +29,7 @@ import {
   generateFlashcardsFromSummary,
 } from '@/lib/tools/summary-export';
 import type { SummaryData } from '@/types/tools';
+import { useUIStore } from '@/lib/stores/app-store';
 
 interface SummariesViewProps {
   className?: string;
@@ -36,6 +37,7 @@ interface SummariesViewProps {
 
 export function SummariesView({ className }: SummariesViewProps) {
   const { tools, loading, deleteTool } = useSavedTools('summary');
+  const { enterFocusMode } = useUIStore();
   const [selectedSummary, setSelectedSummary] = useState<{
     id: string;
     title: string;
@@ -84,7 +86,7 @@ export function SummariesView({ className }: SummariesViewProps) {
             I tuoi riassunti creati durante le sessioni con Coach e Maestri
           </p>
         </div>
-        <Button onClick={() => window.location.href = '/conversation?tool=summary'}>
+        <Button onClick={() => enterFocusMode('summary')}>
           <MessageSquare className="w-4 h-4 mr-2" />
           Crea con un Professore
         </Button>

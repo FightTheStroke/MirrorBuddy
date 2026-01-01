@@ -11,6 +11,7 @@ import type { Maestro, MaestroVoice, Subject } from '@/types';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { CharacterAvatar } from './character-avatar';
 import { CharacterRoleBadge } from './character-role-badge';
+import { AudioDeviceSelector } from './audio-device-selector';
 import { CHARACTER_AVATARS } from './constants';
 
 /**
@@ -45,6 +46,8 @@ function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
 interface VoiceCallOverlayProps {
   character: ActiveCharacter;
   onEnd: () => void;
+  /** Callback to expose session ID for real-time tool modifications */
+  onSessionIdChange?: (sessionId: string | null) => void;
 }
 
 /**
@@ -54,11 +57,24 @@ interface VoiceCallOverlayProps {
 export function VoiceCallOverlay({
   character,
   onEnd,
+  onSessionIdChange,
 }: VoiceCallOverlayProps) {
   const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const hasAttemptedConnection = useRef(false);
 
+  const voiceSession = useVoiceSession({
+    onError: (error) => {
+      const message = error instanceof Error ? error.message : String(error);
+      logger.error('Voice call error', { message });
+      setConfigError(message || 'Errore di connessione vocale');
+    },
+    onTranscript: (role, text) => {
+      logger.debug('Voice transcript', { role, text: text.substring(0, 100) });
+    },
+  });
+
+  // Destructure voice session
   const {
     isConnected,
     isListening,
@@ -70,16 +86,13 @@ export function VoiceCallOverlay({
     connect,
     disconnect,
     toggleMute,
-  } = useVoiceSession({
-    onError: (error) => {
-      const message = error instanceof Error ? error.message : String(error);
-      logger.error('Voice call error', { message });
-      setConfigError(message || 'Errore di connessione vocale');
-    },
-    onTranscript: (role, text) => {
-      logger.debug('Voice transcript', { role, text: text.substring(0, 100) });
-    },
-  });
+    sessionId,
+  } = voiceSession;
+
+  // Notify parent when sessionId changes (for tool panel SSE subscription)
+  useEffect(() => {
+    onSessionIdChange?.(sessionId);
+  }, [sessionId, onSessionIdChange]);
 
   // Fetch connection info on mount
   useEffect(() => {
@@ -182,18 +195,36 @@ export function VoiceCallOverlay({
         </div>
       )}
 
-      {/* Transcript preview */}
+      {/* Transcript preview - show only AI responses (more accurate than user transcripts) */}
       {transcript.length > 0 && (
-        <div className="mt-4 max-w-md px-4 py-2 bg-slate-800/50 rounded-lg max-h-32 overflow-y-auto">
-          <p className="text-xs text-slate-400">
-            {transcript[transcript.length - 1]?.content.substring(0, 150)}
-            {(transcript[transcript.length - 1]?.content.length || 0) > 150 && '...'}
+        <div className="mt-4 max-w-md px-4 py-2 bg-slate-800/50 rounded-lg max-h-40 overflow-y-auto">
+          <div className="space-y-2">
+            {transcript.slice(-3).map((entry, i) => (
+              <div key={i} className={cn(
+                "text-xs px-2 py-1 rounded",
+                entry.role === 'assistant'
+                  ? "bg-slate-700/50 text-slate-200"
+                  : "text-slate-500 italic"
+              )}>
+                {entry.role === 'assistant' && (
+                  <span className="font-medium text-slate-400 mr-1">{character.name}:</span>
+                )}
+                {entry.content.substring(0, 120)}
+                {entry.content.length > 120 && '...'}
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-slate-600 mt-2 text-center">
+            Trascrizione approssimativa
           </p>
         </div>
       )}
 
       {/* Controls */}
       <div className="mt-8 flex items-center gap-4">
+        {/* Audio device selector */}
+        <AudioDeviceSelector compact />
+
         {isConnected && (
           <Button
             variant={isMuted ? 'destructive' : 'outline'}

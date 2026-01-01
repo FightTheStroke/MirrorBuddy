@@ -329,7 +329,9 @@ export type ToolType =
   | 'show_formula'
   | 'create_quiz'
   | 'create_flashcard'
-  | 'create_mindmap';
+  | 'create_mindmap'
+  | 'create_summary'
+  | 'create_demo';
 
 export interface ToolCall {
   id: string;

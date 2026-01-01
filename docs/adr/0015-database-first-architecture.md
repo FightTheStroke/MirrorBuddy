@@ -37,6 +37,8 @@ Issue #64 was created to consolidate all localStorage to database as single sour
 | Flashcard decks | localStorage | `/api/materials?toolType=flashcard` |
 | Quizzes | localStorage | `/api/materials?toolType=quiz` |
 | Homework sessions | localStorage | `/api/materials?toolType=homework` |
+| **Demos/HTML snippets** | Zustand in-memory | `/api/materials?toolType=demo` |
+| **Summaries** | Zustand in-memory | `/api/materials?toolType=summary` |
 | Conversations | localStorage | `/api/conversations` |
 | Calendar events | localStorage | `/api/scheduler` |
 | Accessibility settings | localStorage | `/api/user/settings` |
@@ -125,6 +127,8 @@ Dedicated hooks for each material type in `use-saved-materials.ts`:
 - `useQuizzes()` - CRUD for quizzes
 - `useFlashcardDecks()` - CRUD for flashcard decks
 - `useHomeworkSessions()` - CRUD for homework sessions
+- `useDemos()` - CRUD for interactive demos/HTML snippets
+- `useSavedTools(toolType)` - Generic hook for summaries and other tools
 
 All use `/api/materials` endpoint with `toolType` parameter.
 
@@ -179,6 +183,8 @@ All use `/api/materials` endpoint with `toolType` parameter.
 - `src/components/education/flashcards-view.tsx`
 - `src/components/education/homework-help-view.tsx`
 - `src/components/education/archive-view.tsx`
+- `src/components/education/html-snippets-view.tsx` (migrated to useDemos)
+- `src/components/education/html-preview.tsx` (migrated to autoSaveMaterial)
 - `src/components/tools/tool-result-display.tsx`
 - `src/components/settings/settings-view.tsx`
 

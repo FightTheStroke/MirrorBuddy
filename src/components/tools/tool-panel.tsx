@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { X, Minimize2, Maximize2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MarkMapRenderer } from './markmap-renderer';
+import { LiveMindmap } from './live-mindmap';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
 import { DemoSandbox } from './demo-sandbox';
@@ -36,6 +37,8 @@ interface ToolPanelProps {
   onToggleMinimize?: () => void;
   /** When true, panel fills container instead of fixed height (for video conference layout) */
   embedded?: boolean;
+  /** Session ID for real-time tool modifications (voice commands) */
+  sessionId?: string | null;
 }
 
 export function ToolPanel({
@@ -45,6 +48,7 @@ export function ToolPanel({
   isMinimized = false,
   onToggleMinimize,
   embedded = false,
+  sessionId = null,
 }: ToolPanelProps) {
   // Save student summary to materials archive
   const handleSaveStudentSummary = useCallback(async (data: StudentSummaryData) => {
@@ -79,6 +83,18 @@ export function ToolPanel({
     switch (tool.type) {
       case 'mindmap': {
         const mindmapData = tool.content as MindmapRequest;
+        // Use LiveMindmap for real-time voice commands when sessionId available
+        if (sessionId) {
+          return (
+            <LiveMindmap
+              sessionId={sessionId}
+              title={mindmapData.title}
+              initialNodes={mindmapData.nodes}
+              listenForEvents={true}
+            />
+          );
+        }
+        // Fallback to static renderer when no session
         return (
           <MarkMapRenderer
             title={mindmapData.title}

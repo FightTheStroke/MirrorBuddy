@@ -59,18 +59,18 @@ function generateMarkdownFromNodes(
  * Register the mindmap handler
  */
 registerToolHandler('create_mindmap', async (args): Promise<ToolExecutionResult> => {
-  const { topic, nodes } = args as {
-    topic: string;
+  const { title, nodes } = args as {
+    title: string;
     nodes: Array<{ id: string; label: string; parentId?: string }>;
   };
 
   // Validate input
-  if (!topic || typeof topic !== 'string') {
+  if (!title || typeof title !== 'string') {
     return {
       success: false,
       toolId: nanoid(),
       toolType: 'mindmap',
-      error: 'Topic is required and must be a string',
+      error: 'Title is required and must be a string',
     };
   }
 
@@ -84,10 +84,10 @@ registerToolHandler('create_mindmap', async (args): Promise<ToolExecutionResult>
   }
 
   // Generate markdown content
-  const markdown = generateMarkdownFromNodes(topic, nodes);
+  const markdown = generateMarkdownFromNodes(title, nodes);
 
   const data: MindmapData = {
-    topic,
+    topic: title, // MindmapData uses 'topic' internally
     nodes: nodes.map((n) => ({
       id: n.id,
       label: n.label,

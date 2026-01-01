@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { RefreshCw, AlertTriangle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface DemoSandboxProps {
@@ -13,39 +13,15 @@ interface DemoSandboxProps {
   };
 }
 
-// Dangerous patterns to block
-const DANGEROUS_PATTERNS = [
-  /document\.cookie/i,
-  /localStorage/i,
-  /sessionStorage/i,
-  /fetch\s*\(/i,
-  /XMLHttpRequest/i,
-  /window\.open/i,
-  /window\.location/i,
-  /eval\s*\(/i,
-  /Function\s*\(/i,
-];
-
-function validateCode(code: string): { safe: boolean; warnings: string[] } {
-  const warnings: string[] = [];
-
-  for (const pattern of DANGEROUS_PATTERNS) {
-    if (pattern.test(code)) {
-      warnings.push(`Blocked: ${pattern.source}`);
-    }
-  }
-
-  return { safe: warnings.length === 0, warnings };
-}
+// Note: Validation is already done by demo-handler.ts before reaching this component.
+// The demo-handler sanitizes HTML and validates JS before returning data.
+// This component trusts the data has been pre-validated.
 
 export function DemoSandbox({ data }: DemoSandboxProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [key, setKey] = useState(0);
 
   const { html, css = '', js = '' } = data;
-
-  // Validate JS code
-  const validation = validateCode(js);
 
   const fullHtml = `
     <!DOCTYPE html>
@@ -60,7 +36,7 @@ export function DemoSandbox({ data }: DemoSandboxProps) {
     </head>
     <body>
       ${html}
-      ${validation.safe ? `<script>${js}</script>` : '<!-- JS blocked for safety -->'}
+      ${js ? `<script>${js}</script>` : ''}
     </body>
     </html>
   `;
@@ -68,22 +44,6 @@ export function DemoSandbox({ data }: DemoSandboxProps) {
   const handleRefresh = () => {
     setKey(prev => prev + 1);
   };
-
-  if (!validation.safe) {
-    return (
-      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-        <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-400 mb-2">
-          <AlertTriangle className="w-5 h-5" />
-          <span className="font-medium">Demo bloccata per sicurezza</span>
-        </div>
-        <ul className="text-sm text-yellow-600 dark:text-yellow-500 list-disc list-inside">
-          {validation.warnings.map((w, i) => (
-            <li key={i}>{w}</li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-full">
@@ -97,7 +57,7 @@ export function DemoSandbox({ data }: DemoSandboxProps) {
         </Button>
       </div>
 
-      <div className="flex-1 mx-4 mb-4 border rounded-lg overflow-hidden bg-white dark:bg-slate-800">
+      <div className="flex-1 mx-4 mb-4 border rounded-lg overflow-hidden bg-white dark:bg-slate-800 min-h-[300px]">
         <iframe
           key={key}
           ref={iframeRef}

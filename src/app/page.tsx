@@ -43,7 +43,8 @@ import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { Button } from '@/components/ui/button';
-import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
+import { useProgressStore, useSettingsStore, useUIStore } from '@/lib/stores/app-store';
+import { FocusToolLayout } from '@/components/tools/focus-tool-layout';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
 
@@ -69,14 +70,19 @@ const BUDDY_INFO = {
 
 export default function Home() {
   const router = useRouter();
-  const { hasCompletedOnboarding } = useOnboardingStore();
+  const { hasCompletedOnboarding, isHydrated, hydrateFromApi } = useOnboardingStore();
 
-  // Redirect to welcome if onboarding not completed
+  // Hydrate onboarding state from DB on mount
   useEffect(() => {
-    if (!hasCompletedOnboarding) {
+    hydrateFromApi();
+  }, [hydrateFromApi]);
+
+  // Redirect to welcome if onboarding not completed (only after hydration)
+  useEffect(() => {
+    if (isHydrated && !hasCompletedOnboarding) {
       router.push('/welcome');
     }
-  }, [hasCompletedOnboarding, router]);
+  }, [isHydrated, hasCompletedOnboarding, router]);
 
   // Start with Maestri as the first view
   const [currentView, setCurrentView] = useState<View>('maestri');
@@ -90,9 +96,10 @@ export default function Home() {
   const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
+  const { focusMode } = useUIStore();
 
-  // Don't render main app until onboarding check is done
-  if (!hasCompletedOnboarding) {
+  // Don't render main app until hydration is done and onboarding is completed
+  if (!isHydrated || !hasCompletedOnboarding) {
     return null;
   }
 
@@ -378,6 +385,9 @@ export default function Home() {
           {currentView === 'settings' && <LazySettingsView />}
         </motion.div>
       </main>
+
+      {/* Focus Mode Overlay - renders above everything when active */}
+      {focusMode && <FocusToolLayout />}
     </div>
   );
 }

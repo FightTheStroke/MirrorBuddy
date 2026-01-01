@@ -37,6 +37,7 @@ interface OnboardingState {
   currentStep: OnboardingStep;
   isReplayMode: boolean;
   isVoiceMuted: boolean;
+  isHydrated: boolean; // True after we've checked the DB
 
   // Voice session state
   voiceSessionActive: boolean;
@@ -62,6 +63,7 @@ interface OnboardingState {
   startReplay: () => void;
   resetOnboarding: () => void;
   resetAllData: () => Promise<void>;
+  hydrateFromApi: () => Promise<void>;
 }
 
 const STEP_ORDER: OnboardingStep[] = [
@@ -79,6 +81,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       currentStep: 'welcome',
       isReplayMode: false,
       isVoiceMuted: false,
+      isHydrated: false,
 
       // Voice session state
       voiceSessionActive: false,
@@ -150,6 +153,7 @@ export const useOnboardingStore = create<OnboardingState>()(
           currentStep: 'welcome',
           isReplayMode: false,
           isVoiceMuted: false,
+          isHydrated: false,
           voiceSessionActive: false,
           voiceSessionConnecting: false,
           voiceTranscript: [],
@@ -204,6 +208,7 @@ export const useOnboardingStore = create<OnboardingState>()(
           currentStep: 'welcome',
           isReplayMode: false,
           isVoiceMuted: false,
+          isHydrated: false,
           voiceSessionActive: false,
           voiceSessionConnecting: false,
           voiceTranscript: [],
@@ -213,6 +218,47 @@ export const useOnboardingStore = create<OnboardingState>()(
 
         // Reload the page to reinitialize everything
         window.location.href = '/welcome';
+      },
+
+      hydrateFromApi: async () => {
+        // Skip if already hydrated
+        if (get().isHydrated) return;
+
+        try {
+          const response = await fetch('/api/onboarding');
+          if (!response.ok) {
+            // API error - mark as hydrated but don't update state
+            set({ isHydrated: true });
+            return;
+          }
+
+          const data = await response.json();
+
+          // If user has existing data (profile with name), consider them as onboarded
+          // This handles the case where OnboardingState record is missing but user exists
+          const isCompleted = data.onboardingState?.hasCompletedOnboarding ?? data.hasExistingData ?? false;
+
+          // Update store with DB state
+          set({
+            isHydrated: true,
+            hasCompletedOnboarding: isCompleted,
+            onboardingCompletedAt: data.onboardingState?.onboardingCompletedAt ?? null,
+            currentStep: (data.onboardingState?.currentStep as OnboardingStep) ?? (isCompleted ? 'ready' : 'welcome'),
+            isReplayMode: data.onboardingState?.isReplayMode ?? false,
+            ...(data.data && {
+              data: {
+                name: data.data.name ?? '',
+                age: data.data.age,
+                schoolLevel: data.data.schoolLevel,
+                learningDifferences: data.data.learningDifferences,
+                gender: data.data.gender,
+              },
+            }),
+          });
+        } catch {
+          // Network error - mark as hydrated to avoid infinite loop
+          set({ isHydrated: true });
+        }
       },
     })
 );

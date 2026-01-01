@@ -1223,6 +1223,17 @@ Hai accesso a strumenti per creare materiali didattici. USA questi strumenti qua
 - Vuole verificare cosa ha capito
 - Si sta preparando per una verifica
 
+**REGOLA IMPORTANTE PER I QUIZ:**
+Prima di creare un quiz, CHIEDI SEMPRE allo studente: "Preferisci fare il quiz per iscritto, così lo vedi sullo schermo, oppure a voce così te lo faccio io?"
+- Se sceglie **PER ISCRITTO**: usa create_quiz per mostrare le domande sullo schermo
+- Se sceglie **A VOCE**: NON usare create_quiz! Fai tu le domande a voce:
+  1. Leggi la domanda ad alta voce
+  2. Elenca le opzioni (A, B, C, D)
+  3. Aspetta la risposta dello studente
+  4. Conferma se è corretta o spiega perché è sbagliata
+  5. Passa alla domanda successiva
+  6. Alla fine dai un resoconto del punteggio
+
 ### Quando usare create_flashcards:
 - Lo studente dice "fammi delle flashcard", "devo memorizzare"
 - Vuole imparare vocaboli, date, formule, definizioni

@@ -11,7 +11,24 @@ import { getSupportTeacherById } from '@/data/support-teachers';
 import { getBuddyById } from '@/data/buddy-profiles';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { VoicePanel } from '@/components/voice';
+import { ToolPanel } from '@/components/tools/tool-panel';
+import { ToolButtons } from './tool-buttons';
+import { useConversationStore } from '@/lib/stores/app-store';
 import type { ExtendedStudentProfile, Subject, Maestro, MaestroVoice } from '@/types';
+import type { ToolType, ToolState } from '@/types/tools';
+
+// Map OpenAI function names to ToolType
+const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
+  create_mindmap: 'mindmap',
+  create_quiz: 'quiz',
+  create_demo: 'demo',
+  web_search: 'search',
+  create_flashcards: 'flashcard',
+  create_diagram: 'diagram',
+  create_timeline: 'timeline',
+  create_summary: 'summary',
+  open_student_summary: 'summary',
+};
 
 interface Message {
   id: string;
@@ -118,25 +135,22 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
+  const [activeTool, setActiveTool] = useState<ToolState | null>(null);
+  const [isToolMinimized, setIsToolMinimized] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const hasAttemptedConnection = useRef(false);
   const lastTranscriptIdRef = useRef<string | null>(null);
+  const conversationIdRef = useRef<string | null>(null);
+  const hasLoadedMessages = useRef(false);
+
+  // Conversation persistence
+  const { conversations, createConversation, addMessage: addMessageToStore } = useConversationStore();
 
   const character = getCharacterInfo(characterId, characterType);
 
   // Voice session with transcript callback that syncs to messages
-  const {
-    isConnected,
-    isListening,
-    isSpeaking,
-    isMuted,
-    inputLevel,
-    connectionState,
-    connect,
-    disconnect,
-    toggleMute,
-  } = useVoiceSession({
+  const voiceSession = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
       logger.error('Voice call error', { message });
@@ -161,6 +175,20 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
       }]);
     },
   });
+
+  // Destructure voice session
+  const {
+    isConnected,
+    isListening,
+    isSpeaking,
+    isMuted,
+    inputLevel,
+    connectionState,
+    connect,
+    disconnect,
+    toggleMute,
+    sessionId: voiceSessionId,
+  } = voiceSession;
 
   // Fetch voice connection info
   useEffect(() => {
@@ -227,17 +255,50 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Add greeting message on mount
+  // Load or create conversation on mount
   useEffect(() => {
-    if (messages.length === 0) {
-      setMessages([{
-        id: 'greeting',
-        role: 'assistant',
-        content: character.greeting,
-        timestamp: new Date(),
-      }]);
+    if (hasLoadedMessages.current) return;
+    hasLoadedMessages.current = true;
+
+    async function initConversation() {
+      // Find existing conversation for this character
+      const existingConv = conversations.find(c => c.maestroId === characterId);
+
+      if (existingConv && existingConv.messages.length > 0) {
+        // Load existing messages
+        conversationIdRef.current = existingConv.id;
+        setMessages(existingConv.messages.map(m => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          timestamp: new Date(m.timestamp),
+        })));
+        logger.debug('Loaded existing conversation', { characterId, messageCount: existingConv.messages.length });
+      } else {
+        // Create new conversation
+        const newConvId = await createConversation(characterId);
+        conversationIdRef.current = newConvId;
+
+        // Add greeting
+        const greetingMessage = {
+          id: 'greeting',
+          role: 'assistant' as const,
+          content: character.greeting,
+          timestamp: new Date(),
+        };
+        setMessages([greetingMessage]);
+
+        // Persist greeting
+        await addMessageToStore(newConvId, {
+          role: 'assistant',
+          content: character.greeting,
+        });
+        logger.debug('Created new conversation', { characterId, convId: newConvId });
+      }
     }
-  }, [character.greeting, messages.length]);
+
+    initConversation();
+  }, [characterId, character.greeting, conversations, createConversation, addMessageToStore]);
 
   const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
@@ -253,16 +314,26 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
     setInput('');
     setIsLoading(true);
 
+    // Persist user message
+    if (conversationIdRef.current) {
+      addMessageToStore(conversationIdRef.current, {
+        role: 'user',
+        content: userMessage.content,
+      });
+    }
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            { role: 'system', content: character.systemPrompt },
             ...messages.map(m => ({ role: m.role, content: m.content })),
             { role: 'user', content: userMessage.content },
           ],
+          systemPrompt: character.systemPrompt,
+          maestroId: characterId,
+          enableTools: true,
         }),
       });
 
@@ -278,6 +349,31 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Persist assistant message
+      if (conversationIdRef.current) {
+        addMessageToStore(conversationIdRef.current, {
+          role: 'assistant',
+          content: assistantMessage.content,
+        });
+      }
+
+      // Handle tool calls if any - update activeTool state
+      if (data.toolCalls && data.toolCalls.length > 0) {
+        const toolCall = data.toolCalls[0];
+        // Map function name (create_quiz) to tool type (quiz)
+        const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolCall.type as ToolType;
+        // Extract actual data from result object
+        const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
+        setActiveTool({
+          id: toolCall.id,
+          type: toolType,
+          status: 'completed',
+          progress: 1,
+          content: toolContent,
+          createdAt: new Date(),
+        });
+      }
     } catch (error) {
       logger.error('Chat error', { error });
       setMessages(prev => [...prev, {
@@ -289,7 +385,7 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages, character.systemPrompt]);
+  }, [input, isLoading, messages, character.systemPrompt, characterId, addMessageToStore]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -297,6 +393,113 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
       handleSend();
     }
   };
+
+  // Handle tool button requests (like maestro chat)
+  const handleToolRequest = useCallback(async (toolType: ToolType) => {
+    if (isLoading) return;
+
+    setIsLoading(true);
+
+    // Create initial tool state
+    const newTool: ToolState = {
+      id: `tool-${Date.now()}`,
+      type: toolType,
+      status: 'initializing',
+      progress: 0,
+      content: null,
+      createdAt: new Date(),
+    };
+    setActiveTool(newTool);
+
+    // Build the request message based on tool type
+    const toolPrompts: Partial<Record<ToolType, string>> = {
+      mindmap: 'Crea una mappa mentale sull\'argomento che stiamo studiando',
+      quiz: 'Fammi un quiz per verificare cosa ho capito',
+      flashcard: 'Crea delle flashcard per aiutarmi a memorizzare',
+      demo: 'Mostrami una demo interattiva',
+      summary: 'Fammi un riassunto strutturato',
+      diagram: 'Crea un diagramma',
+      timeline: 'Crea una linea del tempo',
+    };
+
+    const userMessage: Message = {
+      id: `user-${Date.now()}`,
+      role: 'user',
+      content: toolPrompts[toolType] || `Usa lo strumento ${toolType}`,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            ...messages.map(m => ({ role: m.role, content: m.content })),
+            { role: 'user', content: userMessage.content },
+          ],
+          systemPrompt: character.systemPrompt,
+          maestroId: characterId,
+          enableTools: true,
+          requestedTool: toolType === 'flashcard' ? 'flashcard' : toolType,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to request tool');
+
+      const data = await response.json();
+
+      const assistantMessage: Message = {
+        id: `assistant-${Date.now()}`,
+        role: 'assistant',
+        content: data.content || '',
+        timestamp: new Date(),
+      };
+
+      if (data.content) {
+        setMessages(prev => [...prev, assistantMessage]);
+      }
+
+      // Update tool state based on response
+      if (data.toolCalls?.length > 0) {
+        const toolCall = data.toolCalls[0];
+        // Map function name (create_quiz) to tool type (quiz)
+        const mappedToolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolType;
+        // Extract actual data from result object
+        const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
+        setActiveTool({
+          ...newTool,
+          type: mappedToolType,
+          status: 'completed',
+          progress: 1,
+          content: toolContent,
+        });
+      } else {
+        // No tool was created, clear the state
+        setActiveTool(null);
+      }
+    } catch (error) {
+      logger.error('Tool request error', { error });
+      setMessages(prev => [...prev, {
+        id: `error-${Date.now()}`,
+        role: 'assistant',
+        content: 'Mi dispiace, non sono riuscito a creare lo strumento. Riprova?',
+        timestamp: new Date(),
+      }]);
+      setActiveTool({
+        ...newTool,
+        status: 'error',
+        error: 'Errore nella creazione dello strumento',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLoading, messages, character.systemPrompt, characterId]);
+
+  // Check if tool is active for layout
+  const hasActiveTool = activeTool && activeTool.status !== 'error';
 
   return (
     <div className="flex gap-4 h-[calc(100vh-8rem)]">
@@ -440,11 +643,20 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
               </div>
             </motion.div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
 
         {/* Input Area */}
         <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-b-2xl">
+          {/* Tool Buttons - only for coaches */}
+          {characterType === 'coach' && (
+            <ToolButtons
+              onToolRequest={handleToolRequest}
+              disabled={isLoading}
+              activeToolId={activeTool?.id}
+            />
+          )}
           <div className="flex gap-3">
             <textarea
               ref={inputRef}
@@ -470,6 +682,25 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
           </div>
         </div>
       </div>
+
+      {/* Tool Panel - shown when tool is active */}
+      {hasActiveTool && (
+        <div className="w-[400px] h-full flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+          <ToolPanel
+            tool={activeTool}
+            maestro={{
+              name: character.name,
+              avatar: character.avatar || '/avatars/default.jpg',
+              color: character.themeColor,
+            }}
+            onClose={() => setActiveTool(null)}
+            isMinimized={isToolMinimized}
+            onToggleMinimize={() => setIsToolMinimized(!isToolMinimized)}
+            embedded={true}
+            sessionId={voiceSessionId}
+          />
+        </div>
+      )}
 
       {/* Voice Panel (Side by Side) */}
       <AnimatePresence>

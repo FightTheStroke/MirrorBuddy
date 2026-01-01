@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Brain, Play, Trophy, Target, Sparkles, MessageSquare } from 'lucide-react';
+import { Brain, Play, Trophy, Target, Sparkles, MessageSquare, Loader2, Trash2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Quiz } from './quiz';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore, useUIStore } from '@/lib/stores/app-store';
+import { useQuizzes } from '@/lib/hooks/use-saved-materials';
 import type { Quiz as QuizType, QuizResult, Subject } from '@/types';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import { cn } from '@/lib/utils';
@@ -138,10 +139,33 @@ const sampleQuizzes: QuizType[] = [
 ];
 
 export function QuizView() {
-  const router = useRouter();
+  const _router = useRouter();
+  const { enterFocusMode } = useUIStore();
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const { addXP } = useProgressStore();
+  const { quizzes: savedQuizzes, loading, deleteQuiz } = useQuizzes();
+
+  // Convert SavedQuiz to QuizType for the Quiz component
+  const convertToQuizType = (saved: typeof savedQuizzes[0]): QuizType => ({
+    id: saved.id,
+    title: saved.title,
+    subject: (saved.subject || 'mathematics') as Subject,
+    questions: saved.questions.map((q, idx) => ({
+      id: String(idx),
+      text: q.question,
+      type: 'multiple_choice' as const,
+      options: q.options,
+      correctAnswer: q.correctIndex ?? 0,
+      hints: [],
+      explanation: q.explanation || '',
+      difficulty: 2,
+      subject: (saved.subject || 'mathematics') as Subject,
+      topic: saved.title,
+    })),
+    masteryThreshold: 70,
+    xpReward: Math.max(20, saved.questions.length * 10),
+  });
 
   const handleQuizComplete = (result: QuizResult) => {
     addXP(result.xpEarned);
@@ -174,7 +198,7 @@ export function QuizView() {
         </div>
         <div className="flex items-center gap-4 text-sm">
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
-          <Button onClick={() => router.push('/conversation?tool=quiz')}>
+          <Button onClick={() => enterFocusMode('quiz')}>
             <MessageSquare className="h-4 w-4 mr-2" />
             Crea Quiz con un Professore
           </Button>
@@ -187,9 +211,125 @@ export function QuizView() {
         </div>
       </div>
 
-      {/* Quiz Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {sampleQuizzes.map((quiz) => {
+      {/* I tuoi Quiz - Saved quizzes from database */}
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+          <span className="ml-2 text-slate-500">Caricamento quiz salvati...</span>
+        </div>
+      ) : savedQuizzes.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+            <Clock className="h-5 w-5 text-purple-500" />
+            I tuoi Quiz
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {savedQuizzes.map((saved) => {
+              const quiz = convertToQuizType(saved);
+              const isCompleted = completedQuizzes.includes(quiz.id);
+              const subjectColor = subjectColors[quiz.subject] || '#6366f1';
+              const icon = subjectIcons[quiz.subject] || '📚';
+              const name = subjectNames[quiz.subject] || quiz.subject;
+
+              return (
+                <motion.div
+                  key={quiz.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Card
+                    className={cn(
+                      'cursor-pointer transition-all border-2 hover:shadow-lg relative group',
+                      isCompleted
+                        ? 'border-green-500/50 bg-green-50/50 dark:bg-green-900/10'
+                        : 'border-purple-200 dark:border-purple-800 hover:border-purple-400'
+                    )}
+                    onClick={() => !isCompleted && setSelectedQuiz(quiz)}
+                  >
+                    {/* Delete button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Sei sicuro di voler eliminare questo quiz?')) {
+                          deleteQuiz(quiz.id);
+                        }
+                      }}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200"
+                      title="Elimina quiz"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div
+                          className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
+                          style={{ backgroundColor: `${subjectColor}20` }}
+                        >
+                          {icon}
+                        </div>
+                        {isCompleted && (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
+                            <Trophy className="h-3 w-3 text-green-600" />
+                            <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                              Completato
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <CardTitle className="text-lg mt-3">{quiz.title}</CardTitle>
+                      <p className="text-sm text-slate-500" style={{ color: subjectColor }}>
+                        {name}
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        Creato il {saved.createdAt.toLocaleDateString('it-IT')}
+                      </p>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400 mb-4">
+                        <div className="flex items-center gap-1">
+                          <Target className="h-4 w-4" />
+                          <span>{quiz.questions.length} domande</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Sparkles className="h-4 w-4 text-amber-500" />
+                          <span>{quiz.xpReward} XP</span>
+                        </div>
+                      </div>
+
+                      <Button
+                        className="w-full"
+                        variant={isCompleted ? 'outline' : 'default'}
+                        disabled={isCompleted}
+                      >
+                        {isCompleted ? (
+                          <>
+                            <Trophy className="h-4 w-4 mr-2" />
+                            Completato
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-4 w-4 mr-2" />
+                            Inizia Quiz
+                          </>
+                        )}
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Quiz di Esempio - Sample quizzes */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+          <Sparkles className="h-5 w-5 text-amber-500" />
+          Quiz di Esempio
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {sampleQuizzes.map((quiz) => {
           const isCompleted = completedQuizzes.includes(quiz.id);
           const subjectColor = subjectColors[quiz.subject] || '#6366f1';
           const icon = subjectIcons[quiz.subject] || '📚';
@@ -266,6 +406,7 @@ export function QuizView() {
             </motion.div>
           );
         })}
+        </div>
       </div>
 
       {/* Empty state / Coming soon */}

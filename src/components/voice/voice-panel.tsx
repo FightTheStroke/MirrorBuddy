@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Mic, MicOff, PhoneOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { cn } from '@/lib/utils';
 
 // Pre-computed random offsets for audio visualizer bars
@@ -155,6 +156,9 @@ export function VoicePanel({
 
       {/* Controls */}
       <div className="flex items-center gap-3 mt-2">
+        {/* Audio device selector */}
+        <AudioDeviceSelector compact />
+
         {isConnected && (
           <Button
             variant="ghost"

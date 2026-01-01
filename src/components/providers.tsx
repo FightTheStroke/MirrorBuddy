@@ -10,6 +10,7 @@ import {
   initializeStores,
   setupAutoSync,
 } from '@/lib/stores/app-store';
+import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { initializeTelemetry } from '@/lib/telemetry';
 
 // Debug logger - captures all browser errors to file (dev only)
@@ -50,6 +51,11 @@ function StoreInitializer() {
     // Initialize stores from database
     initializeStores().catch(() => {
       // Silent fail - stores will use in-memory defaults
+    });
+
+    // Load conversation summaries for context
+    useConversationFlowStore.getState().loadFromServer().catch(() => {
+      // Silent fail - conversations will start fresh
     });
 
     // Initialize telemetry

@@ -42,12 +42,25 @@ Linee guida:
 
   quiz: `
 STAI CREANDO UN QUIZ con lo studente.
-Linee guida:
+
+**REGOLA IMPORTANTE:** Prima di creare il quiz, CHIEDI allo studente:
+"Preferisci fare il quiz per iscritto (lo vedi sullo schermo) oppure a voce (te lo faccio io)?"
+
+Se sceglie PER ISCRITTO:
 - Chiedi prima di che argomento vuole essere interrogato
 - Crea domande a scelta multipla chiare e formative
 - Usa create_quiz per generare il quiz
 - Includi feedback educativo per ogni risposta
-- Adatta la difficoltà al livello dello studente`,
+- Adatta la difficoltà al livello dello studente
+
+Se sceglie A VOCE (o se siete in una sessione vocale):
+- NON usare create_quiz!
+- Fai tu le domande una alla volta nella chat
+- Elenca le opzioni (A, B, C, D)
+- Aspetta la risposta dello studente
+- Conferma se è corretta o spiega perché è sbagliata
+- Passa alla domanda successiva
+- Alla fine dai un resoconto del punteggio`,
 
   flashcard: `
 STAI CREANDO FLASHCARD per lo studente.

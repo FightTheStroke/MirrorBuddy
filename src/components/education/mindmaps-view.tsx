@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { logger } from '@/lib/logger';
 import { useMindmaps, type SavedMindmap } from '@/lib/hooks/use-saved-materials';
+import { useUIStore } from '@/lib/stores/app-store';
 
 interface MindmapNode {
   id: string;
@@ -85,7 +86,8 @@ const exampleMindmapsBySubject: Record<string, { title: string; nodes: MindmapNo
 };
 
 export function MindmapsView({ className }: MindmapsViewProps) {
-  const router = useRouter();
+  const _router = useRouter();
+  const { enterFocusMode } = useUIStore();
 
   // Load saved mindmaps from database API
   const { mindmaps, loading, saveMindmap, deleteMindmap: apiDeleteMindmap, reload: _reload } = useMindmaps();
@@ -311,7 +313,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
         </div>
         <div className="flex gap-2">
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
-          <Button onClick={() => router.push('/conversation?tool=mindmap')}>
+          <Button onClick={() => enterFocusMode('mindmap')}>
             <MessageSquare className="w-4 h-4 mr-2" />
             Crea con un Professore
           </Button>
