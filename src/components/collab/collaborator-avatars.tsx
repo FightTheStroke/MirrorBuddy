@@ -7,6 +7,7 @@
 // ============================================================================
 
 import React, { memo } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users } from 'lucide-react';
 import type { RoomParticipant } from '@/lib/collab/mindmap-room';
@@ -130,10 +131,13 @@ const CollaboratorAvatar = memo(function CollaboratorAvatar({
             style={{ boxShadow: isEditing ? `0 0 0 2px ${participant.color}` : undefined }}
           >
             {participant.avatar ? (
-              <img
+              <Image
                 src={participant.avatar}
                 alt={participant.name}
+                width={32}
+                height={32}
                 className="h-full w-full object-cover"
+                unoptimized
               />
             ) : (
               <div

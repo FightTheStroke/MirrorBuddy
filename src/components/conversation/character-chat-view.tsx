@@ -338,10 +338,19 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
             variant={isVoiceActive ? 'destructive' : 'ghost'}
             size="icon"
             onClick={handleVoiceCall}
-            aria-label={isVoiceActive ? 'Termina chiamata' : 'Avvia chiamata vocale'}
+            disabled={!!configError && !isVoiceActive}
+            aria-label={
+              configError && !isVoiceActive
+                ? `Voce non disponibile: ${configError}`
+                : isVoiceActive
+                  ? 'Termina chiamata'
+                  : 'Avvia chiamata vocale'
+            }
+            title={configError && !isVoiceActive ? configError : undefined}
             className={cn(
               'text-white hover:bg-white/20 transition-all',
-              isVoiceActive && 'bg-red-500 hover:bg-red-600 animate-pulse'
+              isVoiceActive && 'bg-red-500 hover:bg-red-600 animate-pulse',
+              configError && !isVoiceActive && 'opacity-50 cursor-not-allowed'
             )}
           >
             {isVoiceActive ? (

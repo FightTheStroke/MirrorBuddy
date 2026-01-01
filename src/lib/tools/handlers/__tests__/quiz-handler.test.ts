@@ -20,7 +20,6 @@ vi.mock('../../tool-executor', () => ({
 
 // Import the handler after mocks are set up
 import { validateQuestions } from '../quiz-handler';
-import { registerToolHandler } from '../../tool-executor';
 // This import triggers the handler registration via side effects
 import '../quiz-handler';
 

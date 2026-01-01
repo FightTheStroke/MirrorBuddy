@@ -19,9 +19,6 @@ import {
   getFilterResponse,
   filterMessages,
   hasBlockedMessage,
-  type FilterResult,
-  type FilterSeverity,
-  type FilterAction,
 } from './content-filter';
 
 describe('Content Filter', () => {
