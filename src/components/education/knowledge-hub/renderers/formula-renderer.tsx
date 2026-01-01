@@ -1,14 +1,33 @@
 'use client';
 
+/**
+ * Knowledge Hub Formula Renderer
+ *
+ * Wrapper around the main FormulaRenderer for use in Knowledge Hub.
+ * Adapts BaseRendererProps to FormulaRendererProps.
+ *
+ * Expected data format:
+ * {
+ *   latex: string;
+ *   description?: string;
+ * }
+ */
+
+import { FormulaRenderer as BaseFormulaRenderer } from '@/components/tools/formula-renderer';
+import type { FormulaRequest } from '@/types';
 import type { BaseRendererProps } from './index';
 
-export function FormulaRenderer({ data, className, readOnly }: BaseRendererProps) {
-  // TODO: Task 5.11 - Implement formula renderer
-  return (
-    <div className={className} data-readonly={readOnly}>
-      <pre className="p-4 text-sm bg-slate-100 dark:bg-slate-800 rounded-lg">
-        {JSON.stringify(data, null, 2)}
-      </pre>
-    </div>
-  );
+/**
+ * Render a LaTeX formula from stored material data.
+ */
+export function FormulaRenderer({ data, className }: BaseRendererProps) {
+  const formulaData = data as unknown as Partial<FormulaRequest>;
+
+  // Build the request object for the base renderer
+  const request: FormulaRequest = {
+    latex: formulaData.latex || '',
+    description: formulaData.description,
+  };
+
+  return <BaseFormulaRenderer request={request} className={className} />;
 }

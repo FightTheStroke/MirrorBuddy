@@ -195,17 +195,17 @@ Componenti riutilizzabili con ACCESSIBILITY.
 |----|------|------|--------|------|
 | 5.03 | Create renderer registry | `src/components/education/knowledge-hub/renderers/index.tsx` | ✅ | |
 | 5.04 | MindmapRenderer | `src/components/education/knowledge-hub/renderers/mindmap-renderer.tsx` | ✅ | |
-| 5.05 | QuizRenderer | `src/components/education/knowledge-hub/renderers/quiz-renderer.tsx` | | |
-| 5.06 | FlashcardRenderer | `src/components/education/knowledge-hub/renderers/flashcard-renderer.tsx` | | |
-| 5.07 | SummaryRenderer | `src/components/education/knowledge-hub/renderers/summary-renderer.tsx` | | |
-| 5.08 | DemoRenderer | `src/components/education/knowledge-hub/renderers/demo-renderer.tsx` | | |
-| 5.09 | DiagramRenderer (Mermaid) | `src/components/education/knowledge-hub/renderers/diagram-renderer.tsx` | | |
-| 5.10 | TimelineRenderer | `src/components/education/knowledge-hub/renderers/timeline-renderer.tsx` | | |
-| 5.11 | FormulaRenderer (KaTeX) | `src/components/education/knowledge-hub/renderers/formula-renderer.tsx` | | |
-| 5.12 | ChartRenderer | `src/components/education/knowledge-hub/renderers/chart-renderer.tsx` | | |
-| 5.13 | ImageRenderer | `src/components/education/knowledge-hub/renderers/image-renderer.tsx` | | |
-| 5.14 | PdfRenderer | `src/components/education/knowledge-hub/renderers/pdf-renderer.tsx` | | |
-| 5.15 | HomeworkRenderer | `src/components/education/knowledge-hub/renderers/homework-renderer.tsx` | | |
+| 5.05 | QuizRenderer | `src/components/education/knowledge-hub/renderers/quiz-renderer.tsx` | ✅ | |
+| 5.06 | FlashcardRenderer | `src/components/education/knowledge-hub/renderers/flashcard-renderer.tsx` | ✅ | |
+| 5.07 | SummaryRenderer | `src/components/education/knowledge-hub/renderers/summary-renderer.tsx` | ✅ | |
+| 5.08 | DemoRenderer | `src/components/education/knowledge-hub/renderers/demo-renderer.tsx` | ✅ | |
+| 5.09 | DiagramRenderer (Mermaid) | `src/components/education/knowledge-hub/renderers/diagram-renderer.tsx` | ✅ | |
+| 5.10 | TimelineRenderer | `src/components/education/knowledge-hub/renderers/timeline-renderer.tsx` | ✅ | |
+| 5.11 | FormulaRenderer (KaTeX) | `src/components/education/knowledge-hub/renderers/formula-renderer.tsx` | ✅ | |
+| 5.12 | ChartRenderer | `src/components/education/knowledge-hub/renderers/chart-renderer.tsx` | ✅ | |
+| 5.13 | ImageRenderer | `src/components/education/knowledge-hub/renderers/image-renderer.tsx` | ✅ | |
+| 5.14 | PdfRenderer | `src/components/education/knowledge-hub/renderers/pdf-renderer.tsx` | ✅ | |
+| 5.15 | HomeworkRenderer | `src/components/education/knowledge-hub/renderers/homework-renderer.tsx` | ✅ | |
 | 5.16 | Unit tests for all renderers | `src/components/education/knowledge-hub/renderers/__tests__/` | | |
 
 ### 5C: Knowledge Hub Components (ACCESSIBLE)

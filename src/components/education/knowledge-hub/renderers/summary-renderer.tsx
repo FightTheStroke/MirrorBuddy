@@ -1,14 +1,45 @@
 'use client';
 
+/**
+ * Knowledge Hub Summary Renderer
+ *
+ * Wrapper around the main SummaryRenderer for use in Knowledge Hub.
+ * Adapts BaseRendererProps to SummaryRendererProps.
+ *
+ * Expected data format:
+ * {
+ *   title: string;
+ *   sections: SummarySection[];
+ *   length?: 'short' | 'medium' | 'long';
+ * }
+ */
+
+import { SummaryRenderer as BaseSummaryRenderer } from '@/components/tools/summary-renderer';
+import type { SummarySection } from '@/types/tools';
 import type { BaseRendererProps } from './index';
 
-export function SummaryRenderer({ data, className, readOnly }: BaseRendererProps) {
-  // TODO: Task 5.07 - Implement summary renderer
+interface SummaryData {
+  title?: string;
+  sections: SummarySection[];
+  length?: 'short' | 'medium' | 'long';
+}
+
+/**
+ * Render a summary from stored material data.
+ */
+export function SummaryRenderer({ data, className }: BaseRendererProps) {
+  const summaryData = data as unknown as SummaryData;
+
+  const title = summaryData.title || 'Riassunto';
+  const sections = summaryData.sections || [];
+
   return (
-    <div className={className} data-readonly={readOnly}>
-      <pre className="p-4 text-sm bg-slate-100 dark:bg-slate-800 rounded-lg">
-        {JSON.stringify(data, null, 2)}
-      </pre>
-    </div>
+    <BaseSummaryRenderer
+      title={title}
+      sections={sections}
+      length={summaryData.length}
+      expandAll={true}
+      className={className}
+    />
   );
 }
