@@ -3,7 +3,7 @@
 **Data**: 2026-01-01
 **Branch**: `feature/tool-focus-mode-selection`
 **Worktree**: `/Users/roberdan/GitHub/ConvergioEdu-tool-focus`
-**Status**: ✅ IMPLEMENTATO - In attesa di review
+**Status**: Pending
 
 ---
 
