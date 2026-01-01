@@ -985,7 +985,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         logger.debug(`[VoiceSession] Event: ${eventType}`, { eventPreview: JSON.stringify(event).slice(0, 200) });
         break;
     }
-  }, [addTranscript, addToolCall, updateToolCall, options, setListening, isSpeaking, setSpeaking, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture, voiceBargeInEnabled]);
+  }, [addTranscript, addToolCall, updateToolCall, options, setListening, isSpeaking, setSpeaking, sendGreeting, playNextChunk, sendSessionConfig, initPlaybackContext, startAudioCapture, voiceBargeInEnabled, scheduleQueuedChunks]);
 
   // Keep ref updated with latest handleServerEvent (fixes stale closure in ws.onmessage)
   useEffect(() => {
