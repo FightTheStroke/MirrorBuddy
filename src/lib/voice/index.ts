@@ -26,6 +26,7 @@ export {
   // Utilities
   getToolTypeFromName,
   isToolCreationCommand,
+  isOnboardingCommand,
   executeVoiceTool,
   generateToolId,
   // Prompts

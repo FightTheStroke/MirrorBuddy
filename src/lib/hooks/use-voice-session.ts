@@ -14,6 +14,7 @@ import {
   TOOL_USAGE_INSTRUCTIONS,
   executeVoiceTool,
   isToolCreationCommand,
+  isOnboardingCommand,
   getToolTypeFromName,
 } from '@/lib/voice';
 import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
@@ -860,6 +861,35 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
                   callId: callId,
                 });
                 updateToolCall(toolCall.id, { status: 'pending' });
+                return;
+              }
+
+              // Handle onboarding commands (set_student_name, set_student_age, etc.)
+              if (isOnboardingCommand(toolName)) {
+                logger.debug(`[VoiceSession] Executing onboarding tool: ${toolName}`, { args });
+
+                const result = await executeVoiceTool('onboarding', 'melissa', toolName, args);
+
+                if (result.success) {
+                  logger.info(`[VoiceSession] Onboarding tool executed: ${toolName}`);
+                  updateToolCall(toolCall.id, { status: 'completed' });
+                } else {
+                  logger.error(`[VoiceSession] Onboarding tool failed: ${result.error}`);
+                  updateToolCall(toolCall.id, { status: 'error' });
+                }
+
+                // Send function output back to Azure so it can continue the conversation
+                if (wsRef.current?.readyState === WebSocket.OPEN) {
+                  wsRef.current.send(JSON.stringify({
+                    type: 'conversation.item.create',
+                    item: {
+                      type: 'function_call_output',
+                      call_id: callId,
+                      output: JSON.stringify(result),
+                    },
+                  }));
+                  wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+                }
                 return;
               }
 
