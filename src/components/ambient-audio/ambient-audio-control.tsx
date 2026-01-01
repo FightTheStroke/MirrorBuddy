@@ -48,7 +48,7 @@ export function AmbientAudioControl() {
     addLayer,
     removeLayer,
     setLayerVolume,
-    toggleLayer,
+    toggleLayer: _toggleLayer,
     applyPreset,
     setMasterVolume,
     clearLayers,
