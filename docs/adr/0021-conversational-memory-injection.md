@@ -1,4 +1,4 @@
-# ADR 0020: Conversational Memory Injection
+# ADR 0021: Conversational Memory Injection
 
 ## Status
 Proposed
