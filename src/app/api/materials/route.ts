@@ -6,8 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { generateSearchableText } from '@/lib/search/searchable-text';
+import type { ToolType } from '@/types/tools';
 
 // Material types for storage (maps from ToolType actions to stored types)
 type MaterialType =
@@ -66,8 +69,14 @@ interface UpdateMaterialRequest {
  */
 export async function GET(request: NextRequest) {
   try {
+    // Auth check - prefer cookie, fallback to query param for backwards compatibility
+    const cookieStore = await cookies();
+    const cookieUserId = cookieStore.get('convergio-user-id')?.value;
+
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const queryUserId = searchParams.get('userId');
+    const userId = cookieUserId || queryUserId;
+
     const toolType = searchParams.get('toolType');
     const status = searchParams.get('status') || 'active';
     const limit = parseInt(searchParams.get('limit') || '50', 10);
@@ -75,8 +84,8 @@ export async function GET(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'Missing userId parameter' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       );
     }
 
@@ -122,8 +131,13 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body: CreateMaterialRequest & { userId: string } = await request.json();
-    const { userId, toolId, toolType, title, content, maestroId, sessionId, subject, preview } = body;
+    // Auth check - prefer cookie, fallback to body for backwards compatibility
+    const cookieStore = await cookies();
+    const cookieUserId = cookieStore.get('convergio-user-id')?.value;
+
+    const body: CreateMaterialRequest & { userId?: string } = await request.json();
+    const userId = cookieUserId || body.userId;
+    const { toolId, toolType, title, content, maestroId, sessionId, subject, preview } = body;
 
     // Validate required fields
     if (!userId || !toolId || !toolType || !title || !content) {
@@ -152,6 +166,9 @@ export async function POST(request: NextRequest) {
       where: { toolId },
     });
 
+    // Generate searchable text for full-text search
+    const searchableText = generateSearchableText(toolType as ToolType, content);
+
     if (existing) {
       // Update existing material
       const updated = await prisma.material.update({
@@ -159,6 +176,7 @@ export async function POST(request: NextRequest) {
         data: {
           title,
           content: JSON.stringify(content),
+          searchableText,
           preview,
           updatedAt: new Date(),
         },
@@ -184,6 +202,7 @@ export async function POST(request: NextRequest) {
         toolType,
         title,
         content: JSON.stringify(content),
+        searchableText,
         maestroId,
         sessionId,
         subject,
@@ -239,7 +258,14 @@ export async function PATCH(request: NextRequest) {
 
     const updateData: Record<string, unknown> = {};
     if (title) updateData.title = title;
-    if (content) updateData.content = JSON.stringify(content);
+    if (content) {
+      updateData.content = JSON.stringify(content);
+      // Regenerate searchable text when content changes
+      updateData.searchableText = generateSearchableText(
+        existing.toolType as ToolType,
+        content
+      );
+    }
     if (status) updateData.status = status;
     // User interaction fields (Issue #37)
     if (typeof userRating === 'number' && userRating >= 1 && userRating <= 5) {
