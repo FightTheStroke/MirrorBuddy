@@ -14,9 +14,17 @@ import {
   ONBOARDING_SCRIPTS,
 } from '@/lib/hooks/use-onboarding-tts';
 
+interface ExistingUserData {
+  name: string;
+  age?: number;
+  schoolLevel?: 'elementare' | 'media' | 'superiore';
+  learningDifferences?: string[];
+}
+
 interface WelcomeStepProps {
   useWebSpeechFallback?: boolean;
   onAzureUnavailable?: () => void;
+  existingUserData?: ExistingUserData | null;
 }
 
 /**
@@ -30,7 +38,7 @@ interface WelcomeStepProps {
  * - Melissa auto-connects when page loads (no button click needed)
  * - Falls back to form + Web Speech TTS when Azure unavailable
  */
-export function WelcomeStep({ useWebSpeechFallback = false, onAzureUnavailable }: WelcomeStepProps) {
+export function WelcomeStep({ useWebSpeechFallback = false, onAzureUnavailable, existingUserData }: WelcomeStepProps) {
   const {
     data,
     updateData,
@@ -100,7 +108,7 @@ export function WelcomeStep({ useWebSpeechFallback = false, onAzureUnavailable }
         className="w-full max-w-md mx-auto"
       >
         {/* Melissa voice panel - user clicks to start call */}
-        <VoiceOnboardingPanel step="welcome" onFallbackToWebSpeech={onAzureUnavailable} className="w-full" />
+        <VoiceOnboardingPanel step="welcome" onFallbackToWebSpeech={onAzureUnavailable} existingUserData={existingUserData} className="w-full" />
 
         {/* Show captured name with continue button */}
         <AnimatePresence>

@@ -11,6 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Landing Page & Returning User Support (Issues #73, #74)
+- **Beautiful Landing Page** (`src/app/welcome/page.tsx`): Gradient hero with Melissa avatar, feature grid
+- **Returning User Detection**: API endpoint `/api/onboarding` fetches existing user data from database
+- **Dynamic Melissa Prompt**: `generateMelissaOnboardingPrompt(existingData)` adapts greeting for returning users
+- **Personalized Greeting**: "Ciao [Nome]! È bello rivederti! Vuoi cambiare qualcosa?"
+- **Skip Option**: Returning users can skip onboarding and go directly to app
+- **Zod Validation**: POST endpoint validates input with proper error responses
+- **Accessibility**: `aria-live="polite"` for screen reader announcements
+- **Unit Tests**: 27 new tests for onboarding tools
+
 #### Conversation-First Tool Creation (Issue #23)
 - **Fullscreen Tool Layout** (`src/components/conversation/fullscreen-tool-layout.tsx`): 82/18 split with Maestro overlay
 - **Maestro Overlay** (`src/components/tools/maestro-overlay.tsx`): Floating Maestro during tool building
