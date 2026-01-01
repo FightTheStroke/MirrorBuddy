@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - Ambient Audio Feature
 
-> **Branch**: `copilot/add-ambient-audio-feature` | **GitHub Issue**: Ambient Audio Feature Request
+> **Branch**: `feature/71-ambient-audio-enhanced` | **GitHub Issue**: #71
 
 ### Added
 
@@ -74,8 +74,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Alpha (8-14 Hz): Relaxed focus, ideal for studying
   - Beta (14-30 Hz): Active concentration, problem-solving
   - Theta (4-8 Hz): Creative thinking, meditation
-- **Ambient Soundscapes** (prepared for future implementation):
-  - Rain, Thunderstorm, Fireplace, Café, Library, Forest, Ocean, Night
+- **Ambient Soundscapes** (procedural audio generation):
+  - Rain: Filtered noise with randomized rain drops
+  - Thunderstorm: Rain with deep thunder rumbles
+  - Fireplace: Crackling fire sounds
+  - Café: Murmur with subtle clinks
+  - Library: Quiet ambience with page turns
+  - Forest: Wind with bird chirps
+  - Ocean: Wave patterns with rhythm
 
 #### Presets
 - **Focus**: Binaural alpha for concentration
@@ -99,14 +105,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript strict mode compliance
 
 ### Future Enhancements
-- Ambient soundscape audio files (rain, fireplace, café, etc.)
 - Pomodoro timer integration
 - Study session auto-start
-- Spotify OAuth integration for personalized playlists
 - Settings persistence across sessions
 - User-created preset saving
 - Visualization spectrum analyzer
-- Mobile app support
 
 ## [Unreleased] - MirrorBuddy v2.0
 
