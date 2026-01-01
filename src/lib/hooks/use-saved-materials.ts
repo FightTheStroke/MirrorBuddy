@@ -29,11 +29,12 @@ export interface SavedMaterial {
   updatedAt: string;
 }
 
-// Mindmap-specific type
+// Mindmap-specific type - ADR 0020
 export interface SavedMindmap {
   id: string;
   title: string;
   nodes: MindmapNode[];
+  markdown?: string; // Pre-generated markdown for rendering
   subject: Subject;
   createdAt: Date;
   maestroId?: string;
@@ -216,18 +217,28 @@ export function useMindmaps() {
   const [loading, setLoading] = useState(true);
   const userId = getUserId();
 
-  // Load mindmaps from API
+  // Load mindmaps from API - ADR 0020: Extract markdown and handle topic->title compat
   const loadMindmaps = useCallback(async () => {
     setLoading(true);
     const materials = await fetchMaterials('mindmap', userId);
-    const mapped: SavedMindmap[] = materials.map((m) => ({
-      id: m.toolId,
-      title: m.title,
-      nodes: (m.content as { nodes?: MindmapNode[] }).nodes || [],
-      subject: (m.subject || 'general') as Subject,
-      createdAt: new Date(m.createdAt),
-      maestroId: m.maestroId,
-    }));
+    const mapped: SavedMindmap[] = materials.map((m) => {
+      const content = m.content as {
+        nodes?: MindmapNode[];
+        markdown?: string;
+        title?: string;
+        topic?: string;
+      };
+      return {
+        id: m.toolId,
+        // Prefer title from content, fallback to topic for backward compat
+        title: m.title || content.title || content.topic || 'Untitled',
+        nodes: content.nodes || [],
+        markdown: content.markdown,
+        subject: (m.subject || 'general') as Subject,
+        createdAt: new Date(m.createdAt),
+        maestroId: m.maestroId,
+      };
+    });
     setMindmaps(mapped);
     setLoading(false);
   }, [userId]);
@@ -238,14 +249,18 @@ export function useMindmaps() {
   }, [loadMindmaps]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  // Save mindmap
+  // Save mindmap - ADR 0020: Include markdown in content
   const saveMindmap = useCallback(
     async (mindmap: Omit<SavedMindmap, 'id' | 'createdAt'>) => {
       const saved = await saveMaterialToAPI(
         userId,
         'mindmap',
         mindmap.title,
-        { nodes: mindmap.nodes },
+        {
+          nodes: mindmap.nodes,
+          markdown: mindmap.markdown,
+          title: mindmap.title, // Store title in content for redundancy
+        },
         { subject: mindmap.subject, maestroId: mindmap.maestroId }
       );
       if (saved) {

@@ -87,7 +87,7 @@ registerToolHandler('create_mindmap', async (args): Promise<ToolExecutionResult>
   const markdown = generateMarkdownFromNodes(title, nodes);
 
   const data: MindmapData = {
-    topic: title, // MindmapData uses 'topic' internally
+    title, // ADR 0020: Standardize on 'title' field
     nodes: nodes.map((n) => ({
       id: n.id,
       label: n.label,

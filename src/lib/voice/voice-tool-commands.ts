@@ -276,37 +276,59 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
   {
     type: 'function',
     name: 'create_mindmap',
-    description:
-      'Crea una mappa mentale interattiva per visualizzare concetti. Usala quando lo studente chiede di organizzare un argomento, creare uno schema, o vuole vedere le connessioni tra concetti.',
+    description: `Crea una mappa mentale interattiva per visualizzare concetti.
+
+STRUTTURA RICHIESTA (ADR 0020):
+- title: Il soggetto principale della mappa (es. "La Liguria", "La Cellula")
+- nodes: Array di nodi CON GERARCHIA usando parentId
+
+ESEMPIO DI STRUTTURA CORRETTA:
+{
+  "title": "La Liguria",
+  "nodes": [
+    { "id": "1", "label": "Geografia", "parentId": null },
+    { "id": "2", "label": "Posizione", "parentId": "1" },
+    { "id": "3", "label": "Nord-Ovest Italia", "parentId": "2" },
+    { "id": "4", "label": "Caratteristiche", "parentId": "1" },
+    { "id": "5", "label": "Costa frastagliata", "parentId": "4" }
+  ]
+}
+
+IMPORTANTE:
+- parentId: null = nodo di primo livello (topic principale)
+- parentId: "1" = figlio del nodo con id "1" (subtopic)
+- Crea SEMPRE almeno 2-3 livelli di gerarchia
+- RISPONDI SEMPRE con un messaggio testuale PRIMA di chiamare il tool`,
     parameters: {
       type: 'object',
       properties: {
         title: {
           type: 'string',
-          description: 'Titolo della mappa mentale',
+          description: 'Titolo/soggetto principale della mappa mentale (es. "La Liguria")',
         },
         topic: {
           type: 'string',
-          description: 'Argomento principale da mappare',
+          description: 'Argomento principale da mappare (deprecated: usa title)',
         },
         subject: {
           type: 'string',
-          description: 'Materia (mathematics, physics, history, etc.)',
+          description: 'Materia (mathematics, physics, history, geography, etc.)',
         },
         nodes: {
           type: 'array',
-          description: 'Nodi della mappa (opzionale, possono essere generati)',
+          description: 'Nodi della mappa con struttura gerarchica tramite parentId',
           items: {
             type: 'object',
             properties: {
-              id: { type: 'string' },
-              label: { type: 'string' },
-              parentId: { type: 'string' },
+              id: { type: 'string', description: 'ID univoco del nodo' },
+              label: { type: 'string', description: 'Testo del nodo' },
+              parentId: { type: 'string', description: 'ID del nodo padre (null per root)' },
             },
+            required: ['id', 'label'],
           },
         },
       },
-      required: ['title', 'topic'],
+      required: ['title', 'nodes'],
     },
   },
   {
@@ -1245,6 +1267,29 @@ Hai accesso a strumenti per creare materiali didattici. USA questi strumenti qua
 - Lo studente dice "fammi una mappa", "crea uno schema", "organizza questo argomento"
 - Vuole vedere le connessioni tra concetti
 - Chiede di visualizzare un argomento
+
+**REGOLA CRITICA PER MAPPE MENTALI (ADR 0020):**
+1. USA SEMPRE il campo "title" per il soggetto principale (es. "La Liguria")
+2. CREA GERARCHIA con parentId:
+   - parentId: null = argomento principale (primo livello)
+   - parentId: "1" = sottoargomento del nodo con id "1"
+3. RISPONDI SEMPRE con un messaggio testuale PRIMA di chiamare create_mindmap
+
+ESEMPIO CORRETTO:
+Studente: "Crea una mappa sulla Liguria, concentrati sulla geografia"
+Tu PRIMA dici: "Perfetto! Ti creo una mappa mentale sulla Liguria con focus sulla geografia."
+POI chiami create_mindmap con:
+{
+  "title": "La Liguria",
+  "nodes": [
+    { "id": "1", "label": "Geografia", "parentId": null },
+    { "id": "2", "label": "Posizione", "parentId": "1" },
+    { "id": "3", "label": "Nord-Ovest Italia", "parentId": "2" },
+    { "id": "4", "label": "Confini", "parentId": "1" },
+    { "id": "5", "label": "Francia", "parentId": "4" },
+    { "id": "6", "label": "Piemonte", "parentId": "4" }
+  ]
+}
 
 ### Quando usare create_quiz:
 - Lo studente dice "interrogami", "fammi delle domande", "voglio fare un test"
