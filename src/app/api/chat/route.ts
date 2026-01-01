@@ -7,12 +7,15 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { filterInput, sanitizeOutput } from '@/lib/safety';
 import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
 import { executeToolCall } from '@/lib/tools/tool-executor';
+import { loadPreviousContext } from '@/lib/conversation/memory-loader';
+import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
@@ -26,6 +29,7 @@ interface ChatRequest {
   systemPrompt: string;
   maestroId: string;
   enableTools?: boolean; // Optional: enable tool calling (default: true)
+  enableMemory?: boolean; // Optional: enable conversation memory (default: true)
   requestedTool?: 'mindmap' | 'quiz' | 'flashcard' | 'demo' | 'summary'; // Tool context injection
 }
 
@@ -103,7 +107,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: ChatRequest = await request.json();
-    const { messages, systemPrompt, maestroId, enableTools = true, requestedTool } = body;
+    const { messages, systemPrompt, maestroId, enableTools = true, enableMemory = true, requestedTool } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -112,11 +116,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Inject tool context into system prompt if tool is requested (Phase 5)
+    // Get userId from cookie for memory injection
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('convergio-user-id')?.value;
+
+    // Build enhanced system prompt with tool context
     let enhancedSystemPrompt = systemPrompt;
     if (requestedTool && TOOL_CONTEXT[requestedTool]) {
       enhancedSystemPrompt = `${systemPrompt}\n\n${TOOL_CONTEXT[requestedTool]}`;
       logger.debug('Tool context injected', { requestedTool, maestroId });
+    }
+
+    // Inject conversation memory if enabled and user is authenticated (ADR 0021)
+    let hasMemory = false;
+    if (enableMemory && userId && maestroId) {
+      try {
+        const memory = await loadPreviousContext(userId, maestroId);
+        if (memory.recentSummary || memory.keyFacts.length > 0) {
+          enhancedSystemPrompt = enhanceSystemPrompt({
+            basePrompt: enhancedSystemPrompt,
+            memory,
+            safetyOptions: {
+              role: 'maestro',
+            },
+          });
+          hasMemory = true;
+          logger.debug('Conversation memory injected', {
+            maestroId,
+            keyFactCount: memory.keyFacts.length,
+            hasSummary: !!memory.recentSummary,
+          });
+        }
+      } catch (memoryError) {
+        // Memory loading failure should not block the chat
+        logger.warn('Failed to load conversation memory', {
+          userId,
+          maestroId,
+          error: String(memoryError),
+        });
+      }
     }
 
     // SECURITY: Filter the last user message for safety (Issue #30)
@@ -160,7 +198,7 @@ export async function POST(request: NextRequest) {
             const toolResult = await executeToolCall(
               toolCall.function.name,
               args,
-              { maestroId, conversationId: undefined }
+              { maestroId, conversationId: undefined, userId }
             );
             // Transform to ToolCall interface format expected by ToolResultDisplay
             // Note: type uses function name (e.g., 'create_mindmap') to match ToolType in types/index.ts
@@ -205,6 +243,7 @@ export async function POST(request: NextRequest) {
           maestroId,
           toolCalls: toolResults,
           hasTools: true,
+          hasMemory,
         });
       }
 
@@ -223,6 +262,7 @@ export async function POST(request: NextRequest) {
         provider: result.provider,
         model: result.model,
         usage: result.usage,
+        hasMemory,
         maestroId,
         sanitized: sanitized.modified,
       });
