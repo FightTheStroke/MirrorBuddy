@@ -53,7 +53,7 @@ describe('Mindmap Handler', () => {
   describe('Successful mindmap creation', () => {
     it('should create a mindmap with single root node', async () => {
       const args = {
-        topic: 'Solar System',
+        title: 'Solar System',
         nodes: [
           { id: '1', label: 'The Sun', parentId: null },
         ],
@@ -80,7 +80,7 @@ describe('Mindmap Handler', () => {
 
     it('should create a mindmap with multiple root nodes', async () => {
       const args = {
-        topic: 'Photosynthesis',
+        title: 'Photosynthesis',
         nodes: [
           { id: '1', label: 'Inputs', parentId: null },
           { id: '2', label: 'Outputs', parentId: null },
@@ -101,7 +101,7 @@ describe('Mindmap Handler', () => {
 
     it('should create a hierarchical mindmap with parent-child relationships', async () => {
       const args = {
-        topic: 'Italian Renaissance',
+        title: 'Italian Renaissance',
         nodes: [
           { id: '1', label: 'Art', parentId: null },
           { id: '2', label: 'Leonardo da Vinci', parentId: '1' },
@@ -123,7 +123,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle nodes with empty string parentId as root nodes', async () => {
       const args = {
-        topic: 'Test Topic',
+        title: 'Test Topic',
         nodes: [
           { id: '1', label: 'Root with empty string', parentId: '' },
           { id: '2', label: 'Root with null literal', parentId: 'null' },
@@ -140,7 +140,7 @@ describe('Mindmap Handler', () => {
 
     it('should normalize parentId to null when undefined or empty', async () => {
       const args = {
-        topic: 'Normalization Test',
+        title: 'Normalization Test',
         nodes: [
           { id: '1', label: 'No parentId' },
           { id: '2', label: 'Empty parentId', parentId: '' },
@@ -159,7 +159,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle deeply nested hierarchies', async () => {
       const args = {
-        topic: 'Biological Classification',
+        title: 'Biological Classification',
         nodes: [
           { id: '1', label: 'Kingdom', parentId: null },
           { id: '2', label: 'Phylum', parentId: '1' },
@@ -201,7 +201,7 @@ describe('Mindmap Handler', () => {
 
     it('should reject empty string topic', async () => {
       const args = {
-        topic: '',
+        title: '',
         nodes: [{ id: '1', label: 'Node', parentId: null }],
       };
 
@@ -213,7 +213,7 @@ describe('Mindmap Handler', () => {
 
     it('should reject non-string topic', async () => {
       const args = {
-        topic: 123,
+        title: 123,
         nodes: [{ id: '1', label: 'Node', parentId: null }],
       };
 
@@ -225,7 +225,7 @@ describe('Mindmap Handler', () => {
 
     it('should reject missing nodes array', async () => {
       const args = {
-        topic: 'Test Topic',
+        title: 'Test Topic',
       };
 
       const result = await mindmapHandler(args, {}) as ToolExecutionResult;
@@ -236,7 +236,7 @@ describe('Mindmap Handler', () => {
 
     it('should reject empty nodes array', async () => {
       const args = {
-        topic: 'Test Topic',
+        title: 'Test Topic',
         nodes: [],
       };
 
@@ -248,7 +248,7 @@ describe('Mindmap Handler', () => {
 
     it('should reject non-array nodes', async () => {
       const args = {
-        topic: 'Test Topic',
+        title: 'Test Topic',
         nodes: 'not-an-array',
       };
 
@@ -266,7 +266,7 @@ describe('Mindmap Handler', () => {
   describe('Node structure validation', () => {
     it('should accept nodes with only required fields (id, label)', async () => {
       const args = {
-        topic: 'Minimal Nodes',
+        title: 'Minimal Nodes',
         nodes: [
           { id: '1', label: 'Node 1' },
           { id: '2', label: 'Node 2' },
@@ -284,7 +284,7 @@ describe('Mindmap Handler', () => {
 
     it('should preserve node ids and labels', async () => {
       const args = {
-        topic: 'ID Preservation',
+        title: 'ID Preservation',
         nodes: [
           { id: 'custom-id-1', label: 'Custom Label 1', parentId: null },
           { id: 'custom-id-2', label: 'Custom Label 2', parentId: 'custom-id-1' },
@@ -303,7 +303,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle nodes with special characters in labels', async () => {
       const args = {
-        topic: 'Special Characters',
+        title: 'Special Characters',
         nodes: [
           { id: '1', label: 'Node with "quotes"', parentId: null },
           { id: '2', label: 'Node with <angle> brackets', parentId: null },
@@ -439,7 +439,7 @@ describe('Mindmap Handler', () => {
   describe('Topic handling', () => {
     it('should preserve topic with special characters', async () => {
       const args = {
-        topic: 'La "Divina Commedia" di Dante',
+        title: 'La "Divina Commedia" di Dante',
         nodes: [{ id: '1', label: 'Inferno', parentId: null }],
       };
 
@@ -454,7 +454,7 @@ describe('Mindmap Handler', () => {
     it('should handle very long topic names', async () => {
       const longTopic = 'A'.repeat(500);
       const args = {
-        topic: longTopic,
+        title: longTopic,
         nodes: [{ id: '1', label: 'Node', parentId: null }],
       };
 
@@ -468,7 +468,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle topic with unicode characters', async () => {
       const args = {
-        topic: '数学 (Mathematics) 🔢',
+        title: '数学 (Mathematics) 🔢',
         nodes: [{ id: '1', label: 'Algebra 代数', parentId: null }],
       };
 
@@ -489,7 +489,7 @@ describe('Mindmap Handler', () => {
   describe('Error handling', () => {
     it('should return consistent error structure', async () => {
       const args = {
-        topic: '',
+        title: '',
         nodes: [],
       };
 
@@ -506,7 +506,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle null topic', async () => {
       const args = {
-        topic: null,
+        title: null,
         nodes: [{ id: '1', label: 'Node', parentId: null }],
       };
 
@@ -518,7 +518,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle undefined nodes', async () => {
       const args = {
-        topic: 'Test',
+        title: 'Test',
         nodes: undefined,
       };
 
@@ -535,7 +535,7 @@ describe('Mindmap Handler', () => {
       vi.mocked(nanoid).mockImplementation(() => `tool-${++callCount}`);
 
       const args = {
-        topic: 'Test',
+        title: 'Test',
         nodes: [{ id: '1', label: 'Node', parentId: null }],
       };
 
@@ -555,7 +555,7 @@ describe('Mindmap Handler', () => {
   describe('Edge cases', () => {
     it('should handle single node mindmap', async () => {
       const args = {
-        topic: 'Single Node',
+        title: 'Single Node',
         nodes: [{ id: '1', label: 'Only Node', parentId: null }],
       };
 
@@ -576,7 +576,7 @@ describe('Mindmap Handler', () => {
       }));
 
       const args = {
-        topic: 'Large Mindmap',
+        title: 'Large Mindmap',
         nodes,
       };
 
@@ -590,7 +590,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle orphaned nodes (parentId references non-existent node)', async () => {
       const args = {
-        topic: 'Orphaned Nodes',
+        title: 'Orphaned Nodes',
         nodes: [
           { id: '1', label: 'Root', parentId: null },
           { id: '2', label: 'Orphan', parentId: 'non-existent' },
@@ -607,7 +607,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle circular references gracefully', async () => {
       const args = {
-        topic: 'Circular Reference',
+        title: 'Circular Reference',
         nodes: [
           { id: '1', label: 'Node A', parentId: '2' },
           { id: '2', label: 'Node B', parentId: '1' },
@@ -624,7 +624,7 @@ describe('Mindmap Handler', () => {
 
     it('should handle nodes with whitespace-only labels', async () => {
       const args = {
-        topic: 'Whitespace Labels',
+        title: 'Whitespace Labels',
         nodes: [
           { id: '1', label: '   ', parentId: null },
           { id: '2', label: '\t\n', parentId: null },
@@ -658,7 +658,7 @@ describe('Mindmap Handler', () => {
 
     it('should accept context parameter without errors', async () => {
       const args = {
-        topic: 'Context Test',
+        title: 'Context Test',
         nodes: [{ id: '1', label: 'Node', parentId: null }],
       };
 

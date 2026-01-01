@@ -2,16 +2,19 @@
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, CheckCircle, XCircle, Code, BarChart2, GitBranch, Calculator, HelpCircle, Layers, Network } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Code, BarChart2, GitBranch, Calculator, HelpCircle, Layers, Network, FileText, Play } from 'lucide-react';
 import { CodeRunner } from './code-runner';
 import { ChartRenderer } from './chart-renderer';
 import { DiagramRenderer } from './diagram-renderer';
 import { FormulaRenderer } from './formula-renderer';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
+import { SummaryTool } from './summary-tool';
+import { DemoSandbox } from './demo-sandbox';
 import { LiveMindmap } from './live-mindmap';
 import { cn } from '@/lib/utils';
 import type { ToolCall, CodeExecutionRequest, ChartRequest, DiagramRequest, FormulaRequest, QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
+import type { SummaryData, DemoData } from '@/types/tools';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 
 // Auto-save utilities for tool results - now use database API
@@ -25,6 +28,14 @@ function autoSaveQuiz(request: QuizRequest): void {
 
 function autoSaveFlashcards(request: FlashcardDeckRequest): void {
   autoSaveMaterial('flashcard', request.name, { cards: request.cards }, { subject: request.subject });
+}
+
+function autoSaveSummary(request: SummaryData): void {
+  autoSaveMaterial('summary', request.topic, { sections: request.sections, length: request.length }, { subject: 'general' });
+}
+
+function autoSaveDemo(request: DemoData): void {
+  autoSaveMaterial('demo', request.title, { html: request.html, css: request.css, js: request.js, description: request.description }, { subject: 'general' });
 }
 
 interface ToolResultDisplayProps {
@@ -43,6 +54,8 @@ const toolIcons: Record<string, React.ReactNode> = {
   create_quiz: <HelpCircle className="w-4 h-4" />,
   create_flashcard: <Layers className="w-4 h-4" />,
   create_mindmap: <Network className="w-4 h-4" />,
+  create_summary: <FileText className="w-4 h-4" />,
+  create_demo: <Play className="w-4 h-4" />,
 };
 
 const toolNames: Record<string, string> = {
@@ -54,6 +67,8 @@ const toolNames: Record<string, string> = {
   create_quiz: 'Quiz',
   create_flashcard: 'Flashcard',
   create_mindmap: 'Mind Map',
+  create_summary: 'Summary',
+  create_demo: 'Demo',
 };
 
 export function ToolResultDisplay({ toolCall, className, sessionId }: ToolResultDisplayProps) {
@@ -198,6 +213,16 @@ function ToolContent({ toolCall, sessionId }: { toolCall: ToolCall; sessionId?: 
         />
       );
 
+    case 'create_summary':
+      return (
+        <AutoSaveSummary request={toolCall.arguments as unknown as SummaryData} />
+      );
+
+    case 'create_demo':
+      return (
+        <AutoSaveDemo request={toolCall.arguments as unknown as DemoData} />
+      );
+
     default:
       return (
         <div className="p-4 rounded-xl bg-slate-800 border border-slate-700">
@@ -248,6 +273,28 @@ function AutoSaveMindmap({ request, sessionId }: { request: MindmapRequest; sess
       initialNodes={request.nodes}
     />
   );
+}
+
+function AutoSaveSummary({ request }: { request: SummaryData }) {
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (!savedRef.current) {
+      savedRef.current = true;
+      autoSaveSummary(request);
+    }
+  }, [request]);
+  return <SummaryTool data={request} />;
+}
+
+function AutoSaveDemo({ request }: { request: DemoData }) {
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (!savedRef.current) {
+      savedRef.current = true;
+      autoSaveDemo(request);
+    }
+  }, [request]);
+  return <DemoSandbox data={request} />;
 }
 
 // Multiple tools display

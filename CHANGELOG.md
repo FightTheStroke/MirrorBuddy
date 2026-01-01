@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Tool Architecture Improvements
+
+> **Branch**: `main` | **GitHub Issues**: #64, Plan
+
+### Changed
+
+#### Demo/HTML Snippets Migration to Database
+- **Migrated Demo storage** from Zustand in-memory store to database API (ADR 0015 compliance)
+  - Added `useDemos()` hook in `src/lib/hooks/use-saved-materials.ts`
+  - Updated `html-snippets-view.tsx` to use database-backed `useDemos()` instead of `useHTMLSnippetsStore`
+  - Updated `html-preview.tsx` to save via `autoSaveMaterial()` API
+  - Supports both legacy `code` format and new `html/css/js` component format
+- **Unified tool auto-save** in `tool-result-display.tsx`:
+  - Added `AutoSaveDemo` component for automatic demo archiving
+  - Added `AutoSaveSummary` component for automatic summary archiving
+  - All tools now consistently auto-save to database on creation
+
+#### Mindmap Improvements
+- **Fixed "undefined" central node** bug: AI prompt now uses `title` parameter consistently
+- **Improved mindmap structure**: Enhanced AI prompt with detailed instructions for hierarchical structure
+  - Clear guidance on main branches (3-5) and sub-nodes (2-4 per branch)
+  - Example structure provided for better AI understanding
+  - 2-3 depth levels specification
+
+#### Uniform Focus Mode
+- **Standardized "Crea con Professore"** across all tool views:
+  - `mindmaps-view.tsx`: Uses `enterFocusMode('mindmap')`
+  - `quiz-view.tsx`: Uses `enterFocusMode('quiz')`
+  - `flashcards-view.tsx`: Uses `enterFocusMode('flashcard')`
+  - `summaries-view.tsx`: Uses `enterFocusMode('summary')`
+
+### Added
+- `'create_demo'` and `'create_summary'` to ToolType union in `types/index.ts`
+- `SavedDemo` interface for typed demo data
+- Loading state in `html-snippets-view.tsx` for better UX
+
+### Technical
+- All educational tools now follow ADR 0015 Database-First Architecture
+- Removed dependency on `useHTMLSnippetsStore` Zustand store for demos
+
+---
+
 ## [Unreleased] - Ambient Audio Feature
 
 > **Branch**: `feature/71-ambient-audio-enhanced` | **GitHub Issue**: #71

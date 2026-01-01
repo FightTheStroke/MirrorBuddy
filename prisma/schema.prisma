@@ -51,6 +51,10 @@ model Profile {
   gradeLevel    String?
   learningGoals String   @default("[]")
 
+  // Character preferences (coach and buddy selection)
+  preferredCoach String?  // melissa, roberto, chiara, andrea, favij
+  preferredBuddy String?  // mario, noemi, enea, bruno, sofia
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

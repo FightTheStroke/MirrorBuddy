@@ -21,10 +21,138 @@ import {
   getCharacterSystemPrompt as _getCharacterSystemPrompt,
   type RoutingResult,
 } from '@/lib/ai/character-router';
-import { getDefaultSupportTeacher, getSupportTeacherById } from '@/data/support-teachers';
+import { getDefaultSupportTeacher, getSupportTeacherById, type CoachId } from '@/data/support-teachers';
 import { getBuddyForStudent } from '@/lib/ai/character-router';
 import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
+import { logger } from '@/lib/logger';
+
+// ============================================================================
+// PERSISTENCE HELPERS
+// ============================================================================
+
+/**
+ * Create a new conversation in the database.
+ */
+async function createConversationInDB(
+  characterId: string,
+  characterType: CharacterType,
+  characterName: string
+): Promise<string | null> {
+  try {
+    const response = await fetch('/api/conversations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        maestroId: characterId,
+        title: `Conversazione con ${characterName}`,
+      }),
+    });
+    if (!response.ok) {
+      logger.error('Failed to create conversation', { status: response.status });
+      return null;
+    }
+    const data = await response.json();
+    logger.debug('Created conversation', { id: data.id, characterId });
+    return data.id;
+  } catch (error) {
+    logger.error('Error creating conversation', { error: String(error) });
+    return null;
+  }
+}
+
+/**
+ * Save a message to the database.
+ */
+async function saveMessageToDB(
+  conversationId: string,
+  role: string,
+  content: string
+): Promise<void> {
+  try {
+    const response = await fetch(`/api/conversations/${conversationId}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role, content }),
+    });
+    if (!response.ok) {
+      logger.error('Failed to save message', { status: response.status });
+    }
+  } catch (error) {
+    logger.error('Error saving message', { error: String(error) });
+  }
+}
+
+/**
+ * Conversation summary from DB (used for context, not full message restoration).
+ */
+interface ConversationSummary {
+  id: string;
+  maestroId: string;
+  title: string;
+  summary: string | null;
+  keyFacts: string[] | null;
+  topics: string[];
+  messageCount: number;
+  lastMessageAt: string | null;
+}
+
+/**
+ * Load conversation summaries from the database (not full messages).
+ * We use summaries for context instead of restoring entire conversations.
+ */
+async function loadConversationSummariesFromDB(): Promise<ConversationSummary[]> {
+  try {
+    const response = await fetch('/api/conversations?limit=20&active=true');
+
+    // 401 = no user cookie yet (first visit), not an error
+    if (response.status === 401) {
+      return [];
+    }
+
+    if (!response.ok) {
+      logger.warn('Conversations API returned error', { status: response.status });
+      return [];
+    }
+
+    const data = await response.json();
+
+    // API might return error object instead of array
+    if (!Array.isArray(data)) {
+      if (data.error) {
+        logger.warn('Conversations API error', { error: data.error });
+      }
+      return [];
+    }
+
+    return data;
+  } catch (error) {
+    // Network error or JSON parse error
+    logger.warn('Error loading conversation summaries', { error: String(error) });
+    return [];
+  }
+}
+
+/**
+ * Update conversation summary in DB.
+ * TODO: Call this when ending a conversation to save summary for future context.
+ */
+async function _updateConversationSummary(
+  conversationId: string,
+  summary: string,
+  keyFacts: string[],
+  topics: string[]
+): Promise<void> {
+  try {
+    await fetch(`/api/conversations/${conversationId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ summary, keyFacts: JSON.stringify(keyFacts), topics }),
+    });
+  } catch (error) {
+    logger.error('Error updating conversation summary', { error: String(error) });
+  }
+}
 
 // ============================================================================
 // TYPES
@@ -74,6 +202,10 @@ export interface CharacterConversation {
   messages: FlowMessage[];
   lastMessageAt: Date | null;
   conversationId?: string; // DB conversation ID if synced
+  // Summary for context (loaded from DB, not full messages)
+  previousSummary?: string;
+  previousKeyFacts?: string[];
+  previousTopics?: string[];
 }
 
 /**
@@ -118,7 +250,7 @@ interface ConversationFlowState {
   setMode: (mode: FlowMode) => void;
 
   // Message actions
-  addMessage: (message: Omit<FlowMessage, 'id' | 'timestamp'>) => void;
+  addMessage: (message: Omit<FlowMessage, 'id' | 'timestamp'>) => Promise<void>;
   clearMessages: () => void;
 
   // Character routing
@@ -145,6 +277,9 @@ interface ConversationFlowState {
 
   // Reset
   reset: () => void;
+
+  // Persistence
+  loadFromServer: () => Promise<void>;
 }
 
 /**
@@ -296,7 +431,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
 
       setMode: (mode) => set({ mode }),
 
-      addMessage: (message) => {
+      addMessage: async (message) => {
         const state = get();
         const newMessage: FlowMessage = {
           ...message,
@@ -311,8 +446,18 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         // Also update the conversation bucket
         const characterId = state.activeCharacter?.id;
         let updatedConversations = state.conversationsByCharacter;
+        let conversationId = state.conversationsByCharacter[characterId || '']?.conversationId;
 
         if (characterId && state.activeCharacter) {
+          // Create conversation in DB if not exists
+          if (!conversationId) {
+            conversationId = await createConversationInDB(
+              characterId,
+              state.activeCharacter.type,
+              state.activeCharacter.name
+            ) || undefined;
+          }
+
           updatedConversations = {
             ...state.conversationsByCharacter,
             [characterId]: {
@@ -321,9 +466,14 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
               characterName: state.activeCharacter.name,
               messages: newMessages,
               lastMessageAt: new Date(),
-              conversationId: state.conversationsByCharacter[characterId]?.conversationId,
+              conversationId,
             },
           };
+
+          // Persist message to DB (fire and forget)
+          if (conversationId) {
+            saveMessageToDB(conversationId, newMessage.role, newMessage.content);
+          }
         }
 
         set({
@@ -509,6 +659,63 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           sessionStartedAt: null,
           characterHistory: [],
         });
+      },
+
+      loadFromServer: async () => {
+        try {
+          // Load summaries, not full messages
+          const summaries = await loadConversationSummariesFromDB();
+          if (summaries.length === 0) return;
+
+          // Convert DB summaries to store format
+          const conversationsByCharacter: Record<string, CharacterConversation> = {};
+
+          for (const conv of summaries) {
+            const characterId = conv.maestroId;
+
+            // Determine character type from ID prefix
+            let characterType: CharacterType = 'maestro';
+            let characterName = conv.title.replace('Conversazione con ', '');
+
+            if (characterId.startsWith('coach-')) {
+              characterType = 'coach';
+              // Extract coach name from ID (e.g., 'coach-melissa' -> 'melissa')
+              const coachName = characterId.replace('coach-', '') as CoachId;
+              const coach = getSupportTeacherById(coachName);
+              if (coach) characterName = coach.name;
+            } else if (characterId.startsWith('buddy-')) {
+              characterType = 'buddy';
+              const buddy = getBuddyById(characterId as BuddyId);
+              if (buddy) characterName = buddy.name;
+            } else {
+              const maestro = getMaestroById(characterId);
+              if (maestro) characterName = maestro.name;
+            }
+
+            // Store summary for context, not full messages
+            conversationsByCharacter[characterId] = {
+              characterId,
+              characterType,
+              characterName,
+              messages: [], // Start fresh, use summary for context
+              lastMessageAt: conv.lastMessageAt ? new Date(conv.lastMessageAt) : null,
+              conversationId: conv.id,
+              previousSummary: conv.summary || undefined,
+              previousKeyFacts: conv.keyFacts || undefined,
+              previousTopics: conv.topics || undefined,
+            };
+          }
+
+          set({ conversationsByCharacter });
+          logger.info('Loaded conversation summaries from server', {
+            count: Object.keys(conversationsByCharacter).length,
+          });
+        } catch (error) {
+          // Non-critical: app works fine without previous conversation context
+          logger.warn('Failed to load conversation summaries', {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
       },
     })
 );

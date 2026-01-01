@@ -36,6 +36,19 @@ import type { ExtendedStudentProfile, Subject } from '@/types';
 import { ToolButtons } from './tool-buttons';
 import { ToolPanel } from '@/components/tools/tool-panel';
 import type { ToolType, ToolState } from '@/types/tools';
+
+// Map OpenAI function names to ToolType
+const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
+  create_mindmap: 'mindmap',
+  create_quiz: 'quiz',
+  create_demo: 'demo',
+  web_search: 'search',
+  create_flashcards: 'flashcard',
+  create_diagram: 'diagram',
+  create_timeline: 'timeline',
+  create_summary: 'summary',
+  open_student_summary: 'summary',
+};
 // Sub-components
 import {
   CharacterAvatar,
@@ -60,6 +73,7 @@ export function ConversationFlow() {
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
+  const [voiceSessionId, setVoiceSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sessionStartTimeRef = useRef<number>(Date.now());
@@ -161,11 +175,16 @@ export function ConversationFlow() {
       // Update tool state based on response
       if (data.toolCalls?.length > 0) {
         const toolCall = data.toolCalls[0];
+        // Map function name (create_quiz) to tool type (quiz)
+        const mappedToolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolType;
+        // Extract actual data from result object
+        const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
         setActiveTool({
           ...newTool,
+          type: mappedToolType,
           status: 'completed',
           progress: 1,
-          content: toolCall.result || toolCall.arguments,
+          content: toolContent,
         });
       } else {
         // No tool was created, clear the state
@@ -548,6 +567,7 @@ export function ConversationFlow() {
           <VoiceCallOverlay
             character={activeCharacter}
             onEnd={handleVoiceCall}
+            onSessionIdChange={setVoiceSessionId}
           />
         )}
       </AnimatePresence>
@@ -591,6 +611,7 @@ export function ConversationFlow() {
               isMinimized={isToolMinimized}
               onToggleMinimize={() => setIsToolMinimized(!isToolMinimized)}
               embedded={true}
+              sessionId={voiceSessionId}
             />
           </div>
 

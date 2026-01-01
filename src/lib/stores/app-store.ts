@@ -17,6 +17,7 @@ import type {
   ChatMessage,
   ToolCall,
 } from '@/types';
+import type { ToolState, ToolType } from '@/types/tools';
 
 // === SETTINGS STORE ===
 
@@ -213,6 +214,9 @@ export const useSettingsStore = create<SettingsState>()(
               schoolLevel: state.studentProfile.schoolLevel,
               gradeLevel: state.studentProfile.gradeLevel,
               learningGoals: state.studentProfile.learningGoals,
+              // Character preferences
+              preferredCoach: state.studentProfile.preferredCoach,
+              preferredBuddy: state.studentProfile.preferredBuddy,
               accessibility: {
                 fontSize: state.studentProfile.fontSize,
                 highContrast: state.studentProfile.highContrast,
@@ -265,6 +269,9 @@ export const useSettingsStore = create<SettingsState>()(
                   schoolLevel: profile.schoolLevel ?? state.studentProfile.schoolLevel,
                   gradeLevel: profile.gradeLevel ?? state.studentProfile.gradeLevel,
                   learningGoals: profile.learningGoals ?? state.studentProfile.learningGoals,
+                  // Character preferences
+                  preferredCoach: profile.preferredCoach ?? state.studentProfile.preferredCoach,
+                  preferredBuddy: profile.preferredBuddy ?? state.studentProfile.preferredBuddy,
                   fontSize: accessibility.fontSize ?? state.studentProfile.fontSize,
                   highContrast: accessibility.highContrast ?? state.studentProfile.highContrast,
                   dyslexiaFont: accessibility.dyslexiaFont ?? state.studentProfile.dyslexiaFont,
@@ -1234,21 +1241,47 @@ interface UIState {
   sidebarOpen: boolean;
   settingsOpen: boolean;
   currentView: 'maestri' | 'chat' | 'voice' | 'quiz' | 'flashcards' | 'homework' | 'progress';
+  // Focus Mode - fullscreen tool view
+  focusMode: boolean;
+  focusTool: ToolState | null;
+  focusToolType: ToolType | null;
+  focusMaestroId: string | null;
   // Actions
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
   toggleSettings: () => void;
   setCurrentView: (view: UIState['currentView']) => void;
+  // Focus Mode Actions
+  enterFocusMode: (toolType: ToolType, maestroId?: string) => void;
+  setFocusTool: (tool: ToolState | null) => void;
+  exitFocusMode: () => void;
 }
 
 export const useUIStore = create<UIState>((set) => ({
   sidebarOpen: true,
   settingsOpen: false,
   currentView: 'maestri',
+  focusMode: false,
+  focusTool: null,
+  focusToolType: null,
+  focusMaestroId: null,
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
   setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
   toggleSettings: () => set((state) => ({ settingsOpen: !state.settingsOpen })),
   setCurrentView: (currentView) => set({ currentView }),
+  enterFocusMode: (toolType, maestroId) => set({
+    focusMode: true,
+    focusToolType: toolType,
+    focusMaestroId: maestroId || null,
+    focusTool: null, // Will be set when tool is created
+  }),
+  setFocusTool: (tool) => set({ focusTool: tool }),
+  exitFocusMode: () => set({
+    focusMode: false,
+    focusTool: null,
+    focusToolType: null,
+    focusMaestroId: null,
+  }),
 }));
 
 // === SYNC HOOK ===
