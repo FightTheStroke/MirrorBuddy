@@ -10,8 +10,9 @@ import { FlashcardTool } from './flashcard-tool';
 import { DemoSandbox } from './demo-sandbox';
 import { SearchResults } from './search-results';
 import { SummaryTool } from './summary-tool';
+import { StudentSummaryEditor } from './student-summary-editor';
 import { cn } from '@/lib/utils';
-import type { ToolState, SummaryData } from '@/types/tools';
+import type { ToolState, SummaryData, StudentSummaryData } from '@/types/tools';
 import type { QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
 
 interface ToolPanelProps {
@@ -62,8 +63,21 @@ export function ToolPanel({
         return <SearchResults data={searchData} />;
       }
       case 'summary': {
-        const summaryData = tool.content as SummaryData;
-        return <SummaryTool data={summaryData} />;
+        const summaryContent = tool.content as Record<string, unknown>;
+        // Check if this is a student-written summary (maieutic method)
+        if (summaryContent.type === 'student_summary') {
+          const studentData = summaryContent as unknown as StudentSummaryData;
+          return (
+            <StudentSummaryEditor
+              initialData={studentData}
+              topic={studentData.topic}
+              maestroId={studentData.maestroId}
+              sessionId={studentData.sessionId}
+            />
+          );
+        }
+        // AI-generated summary (legacy)
+        return <SummaryTool data={summaryContent as unknown as SummaryData} />;
       }
       default:
         return (

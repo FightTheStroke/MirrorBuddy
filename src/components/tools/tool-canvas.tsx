@@ -30,7 +30,8 @@ import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
 import { DiagramRenderer } from './diagram-renderer';
 import { SummaryTool } from './summary-tool';
-import type { SummaryData } from '@/types/tools';
+import { StudentSummaryEditor } from './student-summary-editor';
+import type { SummaryData, StudentSummaryData } from '@/types/tools';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { ToolType } from '@/lib/realtime/tool-events';
@@ -442,12 +443,23 @@ function ToolRenderer({ tool }: { tool: ActiveToolState }) {
         />
       );
 
-    case 'summary':
-      return (
-        <SummaryTool
-          data={tool.content as SummaryData}
-        />
-      );
+    case 'summary': {
+      const summaryContent = tool.content as Record<string, unknown>;
+      // Check if this is a student-written summary (maieutic method)
+      if (summaryContent.type === 'student_summary') {
+        const studentData = summaryContent as unknown as StudentSummaryData;
+        return (
+          <StudentSummaryEditor
+            initialData={studentData}
+            topic={studentData.topic}
+            maestroId={studentData.maestroId}
+            sessionId={studentData.sessionId}
+          />
+        );
+      }
+      // AI-generated summary (legacy)
+      return <SummaryTool data={summaryContent as unknown as SummaryData} />;
+    }
 
     case 'timeline':
     default:
