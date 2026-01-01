@@ -30,6 +30,8 @@ interface UseVoiceSessionOptions {
   onWebcamRequest?: (request: { purpose: string; instructions?: string; callId: string }) => void;
   /** Disable barge-in to prevent echo loop (speaker→mic→VAD→cancel) */
   disableBargeIn?: boolean;
+  /** Noise reduction type: 'near_field' for headphones, 'far_field' for laptop speakers with echo */
+  noiseReductionType?: 'near_field' | 'far_field';
 }
 
 interface ConnectionInfo {
@@ -596,7 +598,7 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         // Noise reduction to prevent echo (new feature Dec 2025)
         // 'near_field' for headphones/close mic, 'far_field' for laptop/conference
         input_audio_noise_reduction: {
-          type: 'near_field',
+          type: options.noiseReductionType || 'near_field',
         },
         input_audio_transcription: {
           model: 'whisper-1',
