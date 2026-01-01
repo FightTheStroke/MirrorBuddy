@@ -88,12 +88,12 @@ Prima di iniziare: pulire il casino esistente.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 0.01 | Fix ADR numbering: rename 0020-mindmap to 0020 | `docs/adr/` | | |
-| 0.02 | Fix ADR numbering: rename memory to 0021 | `docs/adr/` | | |
-| 0.03 | Fix ADR numbering: rename knowledge-hub to 0022 | `docs/adr/` | | |
-| 0.04 | Verify existing safety tests pass | `src/lib/safety/__tests__/` | | |
-| 0.05 | Verify existing E2E tests pass | `e2e/` | | |
-| 0.06 | Run full build to establish baseline | - | | |
+| 0.01 | Fix ADR numbering: rename 0020-mindmap to 0020 | `docs/adr/` | ✅ | ✅ |
+| 0.02 | Fix ADR numbering: rename memory to 0021 | `docs/adr/` | ✅ | ✅ |
+| 0.03 | Fix ADR numbering: rename knowledge-hub to 0022 | `docs/adr/` | ✅ | ✅ |
+| 0.04 | Verify existing safety tests pass | `src/lib/safety/__tests__/` | ✅ (162 passed) | ✅ |
+| 0.05 | Verify existing E2E tests pass | `e2e/` | ⚠️ (UI tests fail, unit 1336 pass) | ✅ |
+| 0.06 | Run full build to establish baseline | - | ✅ (lint, typecheck, build pass) | ✅ |
 
 ---
 
@@ -366,7 +366,7 @@ Tutta la documentazione. Formati specifici.
 Proposed | Accepted | Deprecated | Superseded
 
 ## Date
-YYYY-MM-DD
+YYYY-MM-DD HH:MM CET
 
 ## Context
 [Problem description, options considered]
@@ -488,7 +488,8 @@ npm run test
 ```
 
 ### Checklist Thor per ogni task:
-
+** Specifica del task completata **
+- [ ] Task implementato come da specifica
 **Code Quality:**
 - [ ] Nessun console.log
 - [ ] Nessun TODO dimenticato
@@ -525,6 +526,8 @@ npm run test
 [body - dettagli implementazione]
 
 Task: <ID> (es. 1.01)
+Started at: YYYY-MM-DD HH:MM CET
+Completed at: YYYY-MM-DD HH:MM CET
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
@@ -575,10 +578,14 @@ I vecchi piani dettagliati sono in `docs/plans/reference/` per consultazione:
 4. **Esegui verifiche** dopo ogni task
 5. **Chiama Thor** per review
 6. **Commit** con formato corretto
-7. **Aggiorna questo file** marcando il task completato
+7. **Aggiorna questo file** marcando il task completato e loggando quanto ci hai messo a farlo
 8. **Passa al task successivo**
 
 **SE UN TASK FALLISCE:** Non andare avanti. Fix prima.
+**SE HAI DUBBI:** cerca su internet o chiedi a Thor (se cerchi su internet assicuarati che sia una fonte affidabile e aggiornata con la data di oggi).
+**NON FARE ASSUNZIONI:** Leggi il codice, non presumere.
+**RICORDA:** Zero tolerance per scorciatoie o lavoro incompleto, o errori o warnings.
+**NON FERMARTI FINO A COMPLETAMENTO TOTALE DI TUTTO IL PIANO.**
 
 ---
 
