@@ -12,21 +12,18 @@
 
 import type { SupportTeacher } from '@/types';
 import { injectSafetyGuardrails } from '@/lib/safety/safety-prompts';
-import { generateKnowledgeBasePrompt } from './app-knowledge-base';
+import { generateCompactIndexPrompt } from './app-knowledge-base-v2';
 
 // ============================================================================
 // PLATFORM KNOWLEDGE
 // Issue #16: Coaches know the ConvergioEdu platform and can help students use it
-// Knowledge base is centralized in app-knowledge-base.ts and updated each release
+// Knowledge base is in app-knowledge-base-v2.ts (optimized with lazy retrieval)
 // ============================================================================
 
+// Optimized: Use compact index (~200 tokens) instead of full dump (~4k tokens)
+// Full knowledge loaded on-demand via getRelevantKnowledge() in chat handler
 const PLATFORM_KNOWLEDGE = `
-## CONOSCI LA PIATTAFORMA
-
-Conosci tutte le funzionalita' di ConvergioEdu e puoi aiutare gli studenti a usarle.
-Se uno studente chiede come fare qualcosa nell'app, rispondi in modo chiaro e amichevole.
-
-${generateKnowledgeBasePrompt()}`;
+${generateCompactIndexPrompt()}`;
 
 // ============================================================================
 // MELISSA - Primary Learning Coach
