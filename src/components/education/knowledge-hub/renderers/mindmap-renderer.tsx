@@ -1,14 +1,48 @@
 'use client';
 
+/**
+ * Knowledge Hub Mindmap Renderer
+ *
+ * Wrapper around the main MarkMapRenderer for use in Knowledge Hub.
+ * Adapts BaseRendererProps to MarkMapRendererProps.
+ *
+ * Expected data format:
+ * {
+ *   title: string;
+ *   markdown?: string;
+ *   nodes?: MindmapNode[];
+ * }
+ */
+
+import { MarkMapRenderer, type MindmapNode } from '@/components/tools/markmap-renderer';
 import type { BaseRendererProps } from './index';
 
-export function MindmapRenderer({ data, className, readOnly }: BaseRendererProps) {
-  // TODO: Task 5.04 - Implement mindmap renderer wrapping MarkMapRenderer
+interface MindmapData {
+  title?: string;
+  markdown?: string;
+  nodes?: MindmapNode[];
+}
+
+/**
+ * Render a mindmap from stored material data.
+ *
+ * @param data - Material content containing title, markdown, or nodes
+ * @param className - Additional CSS classes
+ * @param readOnly - Whether the renderer is in read-only mode (unused for mindmaps)
+ */
+export function MindmapRenderer({ data, className }: BaseRendererProps) {
+  const mindmapData = data as MindmapData;
+
+  const title = mindmapData.title || 'Mappa Mentale';
+  const markdown = mindmapData.markdown;
+  const nodes = mindmapData.nodes;
+
   return (
-    <div className={className} data-readonly={readOnly}>
-      <pre className="p-4 text-sm bg-slate-100 dark:bg-slate-800 rounded-lg">
-        {JSON.stringify(data, null, 2)}
-      </pre>
-    </div>
+    <MarkMapRenderer
+      title={title}
+      markdown={markdown}
+      nodes={nodes}
+      className={className}
+    />
   );
 }
