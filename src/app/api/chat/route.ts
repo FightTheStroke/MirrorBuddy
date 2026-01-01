@@ -26,7 +26,7 @@ interface ChatRequest {
   systemPrompt: string;
   maestroId: string;
   enableTools?: boolean; // Optional: enable tool calling (default: true)
-  requestedTool?: 'mindmap' | 'quiz' | 'flashcard' | 'demo'; // Tool context injection
+  requestedTool?: 'mindmap' | 'quiz' | 'flashcard' | 'demo' | 'summary'; // Tool context injection
 }
 
 // Tool context to inject into system prompt (Phase 5: Chat API Enhancement)
@@ -66,6 +66,16 @@ Linee guida:
 - Usa create_demo per generare la demo HTML/JS
 - Mantieni l'interattività intuitiva e accessibile
 - Spiega cosa la demo sta mostrando`,
+
+  summary: `
+STAI CREANDO UN RIASSUNTO STRUTTURATO con lo studente.
+Linee guida:
+- Chiedi prima quale argomento vuole riassumere
+- Organizza il contenuto in sezioni chiare e logiche
+- Usa create_summary per costruire il riassunto
+- Includi punti chiave per ogni sezione
+- Adatta la lunghezza alle esigenze dello studente (breve/medio/lungo)
+- Fai domande per approfondire i punti importanti`,
 };
 
 export async function POST(request: NextRequest) {

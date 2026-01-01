@@ -29,6 +29,8 @@ import { MindmapRenderer } from './markmap-renderer';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
 import { DiagramRenderer } from './diagram-renderer';
+import { SummaryTool } from './summary-tool';
+import type { SummaryData } from '@/types/tools';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { ToolType } from '@/lib/realtime/tool-events';
@@ -441,6 +443,12 @@ function ToolRenderer({ tool }: { tool: ActiveToolState }) {
       );
 
     case 'summary':
+      return (
+        <SummaryTool
+          data={tool.content as SummaryData}
+        />
+      );
+
     case 'timeline':
     default:
       // Fallback for unsupported types

@@ -655,6 +655,81 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
     },
   },
   // ============================================================================
+  // SUMMARY MODIFICATION COMMANDS (#70 Real-time Summary Tool)
+  // ============================================================================
+  {
+    type: 'function',
+    name: 'summary_set_title',
+    description:
+      'Imposta o modifica il titolo del riassunto. Usalo quando lo studente dice il titolo o l\'argomento.',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'Il titolo del riassunto',
+        },
+      },
+      required: ['title'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'summary_add_section',
+    description:
+      'Aggiungi una nuova sezione al riassunto. Usalo quando lo studente menziona un nuovo aspetto o argomento.',
+    parameters: {
+      type: 'object',
+      properties: {
+        title: {
+          type: 'string',
+          description: 'Titolo della sezione',
+        },
+        content: {
+          type: 'string',
+          description: 'Contenuto della sezione (opzionale)',
+        },
+        keyPoints: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Punti chiave della sezione (opzionale)',
+        },
+      },
+      required: ['title'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'summary_add_point',
+    description:
+      'Aggiungi un punto chiave a una sezione. Usalo quando lo studente aggiunge dettagli o informazioni.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sectionIndex: {
+          type: 'number',
+          description: 'Indice della sezione (0-based, usa l\'ultima se non specificato)',
+        },
+        point: {
+          type: 'string',
+          description: 'Il punto chiave da aggiungere',
+        },
+      },
+      required: ['point'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'summary_finalize',
+    description:
+      'Salva e finalizza il riassunto. Usalo quando lo studente dice "salva", "ho finito", "basta".',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+  },
+  // ============================================================================
   // ONBOARDING TOOLS (#61 Onboarding Voice Integration)
   // ============================================================================
   {
@@ -811,6 +886,27 @@ export function isMindmapModificationCommand(name: string): boolean {
 }
 
 // ============================================================================
+// SUMMARY MODIFICATION COMMAND HELPERS (#70 Real-time Summary Tool)
+// ============================================================================
+
+/**
+ * List of summary modification command names.
+ */
+const SUMMARY_MODIFICATION_COMMANDS = [
+  'summary_set_title',
+  'summary_add_section',
+  'summary_add_point',
+  'summary_finalize',
+] as const;
+
+/**
+ * Check if a tool name is a summary modification command.
+ */
+export function isSummaryModificationCommand(name: string): boolean {
+  return SUMMARY_MODIFICATION_COMMANDS.includes(name as typeof SUMMARY_MODIFICATION_COMMANDS[number]);
+}
+
+// ============================================================================
 // ONBOARDING COMMAND HELPERS (#61 Onboarding Voice Integration)
 // ============================================================================
 
@@ -887,6 +983,11 @@ export async function executeVoiceTool(
   // Check for mindmap modification commands first
   if (isMindmapModificationCommand(toolName)) {
     return executeMindmapModification(sessionId, toolName, args);
+  }
+
+  // Check for summary modification commands (#70 Real-time Summary Tool)
+  if (isSummaryModificationCommand(toolName)) {
+    return executeSummaryModification(sessionId, toolName, args);
   }
 
   // Check for onboarding commands (#61 Onboarding Voice Integration)
@@ -982,6 +1083,51 @@ export async function executeMindmapModification(
 }
 
 /**
+ * Execute a summary modification command via SSE broadcast.
+ * These commands modify an existing summary in real-time.
+ */
+export async function executeSummaryModification(
+  sessionId: string,
+  commandName: string,
+  args: Record<string, unknown>
+): Promise<VoiceToolCallResult> {
+  try {
+    // Send modification event to SSE endpoint
+    const response = await fetch('/api/tools/stream/modify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        toolType: 'summary',
+        command: commandName,
+        args,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return {
+        success: false,
+        error: error.message || 'Failed to modify summary',
+      };
+    }
+
+    logger.info('[VoiceToolCommands] Summary modification sent', { commandName, args });
+    return {
+      success: true,
+      toolType: 'summary',
+      displayed: true,
+    };
+  } catch (error) {
+    logger.error('[VoiceToolCommands] Failed to modify summary', { error });
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
  * Generate a tool ID for a voice command.
  */
 export function generateToolId(): string {
@@ -1017,9 +1163,28 @@ Hai accesso a strumenti per creare materiali didattici. USA questi strumenti qua
 - Chiede aiuto per memorizzare
 
 ### Quando usare create_summary:
-- Lo studente dice "riassumimi", "fai una sintesi"
+- Lo studente dice "riassumimi", "fai una sintesi", "devo fare un riassunto"
 - Ha bisogno di un ripasso veloce
 - Vuole i punti chiave di un argomento
+
+## COMANDI VOCALI PER MODIFICARE RIASSUNTI
+
+Quando c'è un riassunto attivo, lo studente può modificarlo vocalmente:
+
+### summary_set_title
+- Imposta il titolo quando lo studente dice l'argomento
+
+### summary_add_section
+- "Parliamo di [argomento]" - crea una nuova sezione
+- "Aggiungi una sezione su [tema]" - nuova sezione
+
+### summary_add_point
+- "Ricorda che..." - aggiunge un punto alla sezione corrente
+- "Un altro punto importante è..." - aggiunge punto
+
+### summary_finalize
+- "Ho finito" - salva e chiude il riassunto
+- "Salva il riassunto" - finalizza
 
 ### Quando usare create_diagram:
 - Lo studente chiede un flowchart, un diagramma di flusso

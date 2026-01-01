@@ -1,6 +1,6 @@
 'use client';
 
-import { Brain, HelpCircle, Play, Layers, Search, Camera } from 'lucide-react';
+import { Brain, HelpCircle, Play, Layers, Search, Camera, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { ToolType } from '@/types/tools';
 
@@ -20,6 +20,7 @@ const TOOL_BUTTONS: Array<{
   { type: 'quiz', icon: HelpCircle, label: 'Quiz', tooltip: 'Crea quiz' },
   { type: 'demo', icon: Play, label: 'Demo', tooltip: 'Crea simulazione interattiva' },
   { type: 'flashcard', icon: Layers, label: 'Flashcard', tooltip: 'Crea flashcard' },
+  { type: 'summary', icon: FileText, label: 'Riassunto', tooltip: 'Crea riassunto strutturato' },
   { type: 'search', icon: Search, label: 'Cerca', tooltip: 'Cerca su web/YouTube' },
   { type: 'webcam', icon: Camera, label: 'Foto', tooltip: 'Scatta foto' },
 ];
