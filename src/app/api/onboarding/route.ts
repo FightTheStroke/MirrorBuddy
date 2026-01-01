@@ -9,8 +9,25 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
+
+// Zod schema for input validation
+const OnboardingDataSchema = z.object({
+  name: z.string().min(2).max(50),
+  age: z.number().int().min(6).max(19).optional(),
+  schoolLevel: z.enum(['elementare', 'media', 'superiore']).optional(),
+  learningDifferences: z.array(z.string()).optional(),
+  gender: z.enum(['male', 'female', 'other']).optional(),
+});
+
+const PostBodySchema = z.object({
+  data: OnboardingDataSchema.optional(),
+  hasCompletedOnboarding: z.boolean().optional(),
+  currentStep: z.string().optional(),
+  isReplayMode: z.boolean().optional(),
+});
 
 interface OnboardingData {
   name: string;
@@ -123,17 +140,23 @@ export async function POST(request: NextRequest) {
     let userId = cookieStore.get('convergio-user-id')?.value;
 
     const body = await request.json();
+
+    // Validate input with Zod
+    const parseResult = PostBodySchema.safeParse(body);
+    if (!parseResult.success) {
+      logger.warn('Onboarding API validation failed', { issues: parseResult.error.issues });
+      return NextResponse.json(
+        { error: 'Invalid request data', details: parseResult.error.issues },
+        { status: 400 }
+      );
+    }
+
     const {
       data,
       hasCompletedOnboarding,
       currentStep,
       isReplayMode,
-    } = body as {
-      data?: OnboardingData;
-      hasCompletedOnboarding?: boolean;
-      currentStep?: string;
-      isReplayMode?: boolean;
-    };
+    } = parseResult.data;
 
     // Create user if doesn't exist
     if (!userId) {
