@@ -5,6 +5,109 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Ambient Audio Feature
+
+> **Branch**: `copilot/add-ambient-audio-feature` | **GitHub Issue**: Ambient Audio Feature Request
+
+### Added
+
+#### Ambient Audio System for Focus & Study
+- **Audio Engine** (`src/lib/audio/engine.ts`): Web Audio API-based engine for real-time audio generation and mixing
+  - Singleton pattern for global audio management
+  - Multi-layer audio mixing with individual volume controls
+  - Smooth audio ducking for voice/TTS integration
+  - Master gain control with fade transitions
+- **Audio Generators** (`src/lib/audio/generators.ts`): Procedural audio generation
+  - White noise (equal energy across frequencies)
+  - Pink noise (1/f spectrum, natural sound)
+  - Brown noise (1/f² spectrum, deeper rumbling)
+  - Binaural beats (Alpha 8-14Hz, Beta 14-30Hz, Theta 4-8Hz)
+  - Stereo oscillator setup for binaural effect
+- **Ambient Audio Store** (`src/lib/stores/ambient-audio-store.ts`): Zustand store for state management
+  - Playback state tracking (idle, playing, paused, loading, error)
+  - Multi-layer management with individual controls
+  - 7 preset configurations (focus, deep work, creative, library, starbucks, rainy day, nature)
+  - Auto-duck settings for voice integration
+  - Study session integration settings
+- **React Hook** (`src/lib/hooks/use-ambient-audio.ts`): Integration hook for components
+  - Synchronizes Zustand store with Web Audio engine
+  - Provides play/pause/stop controls
+  - Layer management (add, remove, volume, toggle)
+  - Preset application
+  - Master volume control
+  - Ducking controls for voice integration
+- **UI Components**:
+  - **AmbientAudioControl** (`src/components/ambient-audio/ambient-audio-control.tsx`): Full-featured audio control panel
+    - Master volume slider with percentage display
+    - Play/Pause/Stop controls
+    - 7 quick preset buttons with descriptions
+    - Advanced mixer with layer management
+    - Real-time volume control per layer
+    - Visual feedback for active layers
+    - Coming soon indicator for ambient soundscapes
+  - **AmbientAudioSettings** (`src/components/settings/sections/ambient-audio-settings.tsx`): Settings section wrapper
+- **Test Page** (`src/app/test-audio/page.tsx`): Dedicated demo page
+  - Feature showcase with descriptions
+  - Usage tips and best practices
+  - Scientific research references
+  - Integration roadmap information
+- **Settings Integration**: New "Audio Ambientale" tab in settings page
+  - Distinct from Audio/Video device settings
+  - Full access to ambient audio controls
+  - Persistent across sessions (prepared)
+- **E2E Tests** (`e2e/ambient-audio.spec.ts`): Comprehensive test coverage
+  - Test page component visibility
+  - Preset button functionality
+  - Play/pause/stop controls
+  - Volume slider interaction
+  - Advanced mixer toggle
+  - Settings tab integration
+  - Keyboard navigation accessibility
+  - Screen reader compatibility
+
+#### Audio Modes Available
+- **Noise Types**:
+  - White Noise: Equal energy masking
+  - Pink Noise: Natural 1/f spectrum
+  - Brown Noise: Deep 1/f² rumbling
+- **Binaural Beats** (requires stereo headphones):
+  - Alpha (8-14 Hz): Relaxed focus, ideal for studying
+  - Beta (14-30 Hz): Active concentration, problem-solving
+  - Theta (4-8 Hz): Creative thinking, meditation
+- **Ambient Soundscapes** (prepared for future implementation):
+  - Rain, Thunderstorm, Fireplace, Café, Library, Forest, Ocean, Night
+
+#### Presets
+- **Focus**: Binaural alpha for concentration
+- **Deep Work**: Beta waves + brown noise
+- **Creative**: Theta waves + nature sounds
+- **Library**: Quiet ambience + white noise
+- **Starbucks**: Café atmosphere
+- **Rainy Day**: Rain + fireplace + thunder
+- **Nature**: Forest + ocean sounds
+
+### Technical Details
+- Web Audio API for cross-browser compatibility
+- Procedural generation eliminates need for large audio files
+- Singleton audio engine pattern for resource efficiency
+- ScriptProcessorNode fallback for compatibility
+- Support for AudioWorklet (performance optimization)
+- Multi-layer architecture allows custom combinations
+- Smooth volume transitions (200ms ramps)
+- Auto-ducking capability for voice/TTS integration
+- Zustand store for React state management
+- TypeScript strict mode compliance
+
+### Future Enhancements
+- Ambient soundscape audio files (rain, fireplace, café, etc.)
+- Pomodoro timer integration
+- Study session auto-start
+- Spotify OAuth integration for personalized playlists
+- Settings persistence across sessions
+- User-created preset saving
+- Visualization spectrum analyzer
+- Mobile app support
+
 ## [Unreleased] - MirrorBuddy v2.0
 
 > **Branch**: `MirrorBuddy` | **GitHub Issues**: #19-#31, #44 closed
