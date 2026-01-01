@@ -89,13 +89,32 @@ export interface CreateFlashcardsArgs {
 }
 
 /**
- * Arguments for create_summary tool.
+ * Arguments for create_summary tool (legacy AI-generated).
  */
 export interface CreateSummaryArgs {
   title: string;
   subject?: Subject;
   topic: string;
   length?: 'short' | 'medium' | 'long';
+}
+
+/**
+ * Arguments for open_student_summary tool (maieutic method).
+ * Student writes their own summary with AI guidance.
+ */
+export interface OpenStudentSummaryArgs {
+  topic: string;
+}
+
+/**
+ * Arguments for student_summary_add_comment tool.
+ * Maestro adds inline feedback to student's text.
+ */
+export interface StudentSummaryAddCommentArgs {
+  sectionId: 'intro' | 'main' | 'conclusion';
+  startOffset: number;
+  endOffset: number;
+  text: string;
 }
 
 /**
@@ -403,6 +422,51 @@ export const VOICE_TOOLS: VoiceToolDefinition[] = [
         },
       },
       required: ['title', 'topic'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'open_student_summary',
+    description:
+      'Apre l\'editor per far SCRIVERE un riassunto allo studente. NON genera contenuto. Usa quando lo studente dice "devo fare un riassunto" o vuole scrivere lui stesso. Guida con il metodo maieutico.',
+    parameters: {
+      type: 'object',
+      properties: {
+        topic: {
+          type: 'string',
+          description: 'Argomento del riassunto che lo studente scriverà',
+        },
+      },
+      required: ['topic'],
+    },
+  },
+  {
+    type: 'function',
+    name: 'student_summary_add_comment',
+    description:
+      'Aggiunge un commento inline al riassunto dello studente. Usa per dare feedback su parti specifiche del testo.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sectionId: {
+          type: 'string',
+          enum: ['intro', 'main', 'conclusion'],
+          description: 'Sezione del riassunto',
+        },
+        startOffset: {
+          type: 'number',
+          description: 'Posizione iniziale del testo da commentare',
+        },
+        endOffset: {
+          type: 'number',
+          description: 'Posizione finale del testo da commentare',
+        },
+        text: {
+          type: 'string',
+          description: 'Il commento/feedback per lo studente',
+        },
+      },
+      required: ['sectionId', 'startOffset', 'endOffset', 'text'],
     },
   },
   {
@@ -897,6 +961,7 @@ const SUMMARY_MODIFICATION_COMMANDS = [
   'summary_add_section',
   'summary_add_point',
   'summary_finalize',
+  'student_summary_add_comment', // #70 maieutic method
 ] as const;
 
 /**
@@ -947,6 +1012,7 @@ export function getToolTypeFromName(name: string): ToolType | null {
     case 'create_flashcards':
       return 'flashcards';
     case 'create_summary':
+    case 'open_student_summary': // #70 maieutic method
       return 'summary';
     case 'create_diagram':
       return 'diagram';
@@ -1162,12 +1228,24 @@ Hai accesso a strumenti per creare materiali didattici. USA questi strumenti qua
 - Vuole imparare vocaboli, date, formule, definizioni
 - Chiede aiuto per memorizzare
 
-### Quando usare create_summary:
-- Lo studente dice "riassumimi", "fai una sintesi", "devo fare un riassunto"
-- Ha bisogno di un ripasso veloce
-- Vuole i punti chiave di un argomento
+### Quando usare open_student_summary (PREFERITO - metodo maieutico):
+- Lo studente dice "devo fare un riassunto", "devo scrivere un riassunto"
+- Vuole scrivere LUI STESSO il riassunto (compito, esercizio)
+- Apre l'editor vuoto, lo studente scrive, tu guidi con domande
 
-## COMANDI VOCALI PER MODIFICARE RIASSUNTI
+### Quando usare create_summary (solo se lo studente vuole che tu generi):
+- Lo studente dice "riassumimi TU", "fai TU una sintesi"
+- Ha bisogno di un ripasso veloce generato dall'AI
+- Vuole i punti chiave senza scrivere lui stesso
+
+## COMANDI VOCALI PER RIASSUNTI DELLO STUDENTE (metodo maieutico)
+
+### student_summary_add_comment
+- Usa per dare feedback sul testo scritto dallo studente
+- Evidenzia parti specifiche e aggiungi commenti costruttivi
+- Es: "Questo punto potrebbe essere più chiaro" oppure "Ottima osservazione!"
+
+## COMANDI VOCALI PER MODIFICARE RIASSUNTI (legacy)
 
 Quando c'è un riassunto attivo, lo studente può modificarlo vocalmente:
 
