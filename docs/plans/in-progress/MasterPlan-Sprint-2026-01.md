@@ -194,7 +194,7 @@ Componenti riutilizzabili con ACCESSIBILITY.
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
 | 5.03 | Create renderer registry | `src/components/education/knowledge-hub/renderers/index.tsx` | ✅ | |
-| 5.04 | MindmapRenderer | `src/components/education/knowledge-hub/renderers/mindmap-renderer.tsx` | | |
+| 5.04 | MindmapRenderer | `src/components/education/knowledge-hub/renderers/mindmap-renderer.tsx` | ✅ | |
 | 5.05 | QuizRenderer | `src/components/education/knowledge-hub/renderers/quiz-renderer.tsx` | | |
 | 5.06 | FlashcardRenderer | `src/components/education/knowledge-hub/renderers/flashcard-renderer.tsx` | | |
 | 5.07 | SummaryRenderer | `src/components/education/knowledge-hub/renderers/summary-renderer.tsx` | | |
