@@ -19,8 +19,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FlashcardStudy } from './flashcard';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
-import type { FlashcardDeck, Flashcard, Subject, Rating, CardState } from '@/types';
+import type { FlashcardDeck, Flashcard, Subject, Rating, CardState, Maestro } from '@/types';
 import { useUIStore } from '@/lib/stores/app-store';
+import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 
 // FSRS-5 Parameters (optimized defaults)
 const FSRS_PARAMS = {
@@ -124,6 +125,13 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
   const [isStudying, setIsStudying] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingDeck, setEditingDeck] = useState<FlashcardDeck | null>(null);
+  const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+
+  // Handle maestro selection and enter focus mode
+  const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
+    setShowMaestroDialog(false);
+    enterFocusMode('flashcard', maestro.id, mode);
+  }, [enterFocusMode]);
 
   // Fetch decks from API
   const loadDecks = useCallback(async () => {
@@ -281,7 +289,7 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
         </div>
         <div className="flex gap-2">
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
-          <Button onClick={() => enterFocusMode('flashcard')}>
+          <Button onClick={() => setShowMaestroDialog(true)}>
             <MessageSquare className="w-4 h-4 mr-2" />
             Crea con un Professore
           </Button>
@@ -465,6 +473,14 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
           />
         )}
       </AnimatePresence>
+
+      {/* Maestro selection dialog */}
+      <ToolMaestroSelectionDialog
+        isOpen={showMaestroDialog}
+        toolType="flashcard"
+        onConfirm={handleMaestroConfirm}
+        onClose={() => setShowMaestroDialog(false)}
+      />
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SummaryRenderer } from '@/components/tools/summary-renderer';
+import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 import { cn } from '@/lib/utils';
 import { useSavedTools } from '@/lib/hooks/use-saved-materials';
 import {
@@ -29,6 +30,7 @@ import {
   generateFlashcardsFromSummary,
 } from '@/lib/tools/summary-export';
 import type { SummaryData } from '@/types/tools';
+import type { Maestro } from '@/types';
 import { useUIStore } from '@/lib/stores/app-store';
 
 interface SummariesViewProps {
@@ -44,6 +46,13 @@ export function SummariesView({ className }: SummariesViewProps) {
     data: SummaryData;
     createdAt: Date;
   } | null>(null);
+  const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+
+  // Handle maestro selection and enter focus mode
+  const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
+    setShowMaestroDialog(false);
+    enterFocusMode('summary', maestro.id, mode);
+  }, [enterFocusMode]);
 
   // Handle delete
   const handleDelete = useCallback(async (id: string) => {
@@ -86,7 +95,7 @@ export function SummariesView({ className }: SummariesViewProps) {
             I tuoi riassunti creati durante le sessioni con Coach e Maestri
           </p>
         </div>
-        <Button onClick={() => enterFocusMode('summary')}>
+        <Button onClick={() => setShowMaestroDialog(true)}>
           <MessageSquare className="w-4 h-4 mr-2" />
           Crea con un Professore
         </Button>
@@ -265,6 +274,14 @@ export function SummariesView({ className }: SummariesViewProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Maestro selection dialog */}
+      <ToolMaestroSelectionDialog
+        isOpen={showMaestroDialog}
+        toolType="summary"
+        onConfirm={handleMaestroConfirm}
+        onClose={() => setShowMaestroDialog(false)}
+      />
     </div>
   );
 }
