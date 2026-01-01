@@ -21,6 +21,7 @@ import {
   Clock,
   Star,
   Users,
+  FileText,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -32,6 +33,7 @@ import {
   LazyQuizView,
   LazyFlashcardsView,
   LazyMindmapsView,
+  LazySummariesView,
   LazyHomeworkHelpView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
@@ -44,7 +46,7 @@ import { useProgressStore, useSettingsStore } from '@/lib/stores/app-store';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'homework' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -119,6 +121,7 @@ export default function Home() {
     { id: 'quiz' as const, label: 'Quiz', icon: Brain },
     { id: 'flashcards' as const, label: 'Flashcards', icon: BookOpen },
     { id: 'mindmaps' as const, label: 'Mappe Mentali', icon: Network },
+    { id: 'summaries' as const, label: 'Riassunti', icon: FileText },
     { id: 'homework' as const, label: 'Materiali', icon: Target },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
@@ -359,6 +362,8 @@ export default function Home() {
           {currentView === 'flashcards' && <LazyFlashcardsView />}
 
           {currentView === 'mindmaps' && <LazyMindmapsView />}
+
+          {currentView === 'summaries' && <LazySummariesView />}
 
           {currentView === 'homework' && <LazyHomeworkHelpView />}
 

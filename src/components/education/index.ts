@@ -3,6 +3,7 @@ export { QuizView } from './quiz-view';
 export { FlashcardStudy, FlashcardPreview } from './flashcard';
 export { FlashcardsView } from './flashcards-view';
 export { MindmapsView } from './mindmaps-view';
+export { SummariesView } from './summaries-view';
 // HomeworkHelp uses pdfjs which requires DOMMatrix (browser-only)
 // Use LazyHomeworkHelpView instead for SSR compatibility
 export { HomeworkHelpView } from './homework-help-view';
@@ -16,6 +17,7 @@ export {
   LazyQuizView,
   LazyFlashcardsView,
   LazyMindmapsView,
+  LazySummariesView,
   LazyHomeworkHelpView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
