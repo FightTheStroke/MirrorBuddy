@@ -740,9 +740,14 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
             logger.debug(`[VoiceSession] 🔊 First audio chunk (${audioData.length} samples), starting playback...`);
           }
 
-          // Start playback immediately if not already playing
+          // Start playback or schedule new chunks
           if (!isPlayingRef.current) {
+            // Not yet playing - go through buffering/startup logic
             playNextChunk();
+          } else if (!isBufferingRef.current) {
+            // Already playing - schedule new chunks immediately
+            // This fixes the bug where chunks 4+ were queued but never scheduled
+            scheduleQueuedChunks();
           }
         }
         break;
