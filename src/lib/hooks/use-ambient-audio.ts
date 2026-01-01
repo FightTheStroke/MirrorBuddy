@@ -160,7 +160,15 @@ export function useAmbientAudio() {
     // Study integration
     setAutoStartWithStudy: store.setAutoStartWithStudy,
     setStudySessionAudioMode: store.setStudySessionAudioMode,
-    
+
+    // Pomodoro integration (ADR-0018)
+    autoStartWithPomodoro: store.autoStartWithPomodoro,
+    pauseDuringBreak: store.pauseDuringBreak,
+    pomodoroPreset: store.pomodoroPreset,
+    setAutoStartWithPomodoro: store.setAutoStartWithPomodoro,
+    setPauseDuringBreak: store.setPauseDuringBreak,
+    setPomodoroPreset: store.setPomodoroPreset,
+
     // Engine state
     engineState: engine.getState(),
   };

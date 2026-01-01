@@ -485,6 +485,39 @@ export function useHomeworkSessions() {
 }
 
 /**
+ * Generic hook for saved tools (summaries, etc.)
+ * Works with any ToolType and returns raw SavedMaterial objects
+ */
+export function useSavedTools(toolType: ToolType) {
+  const [tools, setTools] = useState<SavedMaterial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const userId = getUserId();
+
+  const loadTools = useCallback(async () => {
+    setLoading(true);
+    const materials = await fetchMaterials(toolType, userId);
+    setTools(materials);
+    setLoading(false);
+  }, [userId, toolType]);
+
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    loadTools();
+  }, [loadTools]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const deleteTool = useCallback(async (id: string) => {
+    const success = await deleteMaterialFromAPI(id);
+    if (success) {
+      setTools((prev) => prev.filter((t) => t.toolId !== id));
+    }
+    return success;
+  }, []);
+
+  return { tools, loading, deleteTool, reload: loadTools };
+}
+
+/**
  * Auto-save utility for tool results (used by tool-result-display.tsx)
  * Checks for duplicates by title before saving
  */

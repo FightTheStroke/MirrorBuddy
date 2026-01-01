@@ -29,7 +29,11 @@ interface AmbientAudioStore {
   autoStartWithStudy: boolean;
   studySessionAudioMode: AudioMode | null;
   error: string | null;
-  
+  // Pomodoro integration (ADR-0018)
+  autoStartWithPomodoro: boolean;
+  pauseDuringBreak: boolean;
+  pomodoroPreset: AudioPreset;
+
   // Actions
   play: () => void;
   pause: () => void;
@@ -49,18 +53,26 @@ interface AmbientAudioStore {
   setStudySessionAudioMode: (mode: AudioMode | null) => void;
   setError: (error: string | null) => void;
   reset: () => void;
+  // Pomodoro integration (ADR-0018)
+  setAutoStartWithPomodoro: (enabled: boolean) => void;
+  setPauseDuringBreak: (enabled: boolean) => void;
+  setPomodoroPreset: (preset: AudioPreset) => void;
 }
 
 const initialState = {
   playbackState: 'idle' as AudioPlaybackState,
   masterVolume: 0.5,
-  currentPreset: null,
+  currentPreset: null as AudioPreset | null,
   layers: [] as AudioLayer[],
   autoDuckEnabled: true,
   duckedVolume: 0.2,
   autoStartWithStudy: false,
-  studySessionAudioMode: null,
-  error: null,
+  studySessionAudioMode: null as AudioMode | null,
+  error: null as string | null,
+  // Pomodoro integration (ADR-0018)
+  autoStartWithPomodoro: false,
+  pauseDuringBreak: true,
+  pomodoroPreset: 'focus' as AudioPreset,
 };
 
 export const useAmbientAudioStore = create<AmbientAudioStore>((set, get) => ({
@@ -186,5 +198,21 @@ export const useAmbientAudioStore = create<AmbientAudioStore>((set, get) => ({
   reset: () => {
     logger.info('Ambient audio: reset to initial state');
     set(initialState);
+  },
+
+  // Pomodoro integration (ADR-0018)
+  setAutoStartWithPomodoro: (enabled: boolean) => {
+    logger.info('Ambient audio: set auto-start with pomodoro', { enabled });
+    set({ autoStartWithPomodoro: enabled });
+  },
+
+  setPauseDuringBreak: (enabled: boolean) => {
+    logger.info('Ambient audio: set pause during break', { enabled });
+    set({ pauseDuringBreak: enabled });
+  },
+
+  setPomodoroPreset: (preset: AudioPreset) => {
+    logger.info('Ambient audio: set pomodoro preset', { preset });
+    set({ pomodoroPreset: preset });
   },
 }));
