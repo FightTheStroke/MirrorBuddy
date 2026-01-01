@@ -3,7 +3,8 @@
 import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCcw, Wifi, WifiOff, Cloud, Volume2 } from 'lucide-react';
+import Image from 'next/image';
+import { RotateCcw, Wifi, WifiOff, Cloud, Volume2, ArrowRight, Settings, Sparkles } from 'lucide-react';
 import { useOnboardingStore, getStepIndex, getTotalSteps } from '@/lib/stores/onboarding-store';
 import { WelcomeStep } from './components/welcome-step';
 import { InfoStep } from './components/info-step';
@@ -12,6 +13,16 @@ import { MaestriStep } from './components/maestri-step';
 import { ReadyStep } from './components/ready-step';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
+
+// Data returned from /api/onboarding
+interface ExistingUserData {
+  name: string;
+  age?: number;
+  schoolLevel?: 'elementare' | 'media' | 'superiore';
+  learningDifferences?: string[];
+  gender?: 'male' | 'female' | 'other';
+}
 
 function WelcomeContent() {
   const router = useRouter();
@@ -25,10 +36,40 @@ function WelcomeContent() {
     azureAvailable,
     startReplay,
     resetOnboarding,
+    updateData,
   } = useOnboardingStore();
+
+  // Track existing user data for returning users
+  const [existingUserData, setExistingUserData] = useState<ExistingUserData | null>(null);
+  const [hasCheckedExistingData, setHasCheckedExistingData] = useState(false);
+  const [showLandingPage, setShowLandingPage] = useState(true);
 
   // Track if we should use Web Speech fallback (when Azure unavailable)
   const [useWebSpeechFallback, setUseWebSpeechFallback] = useState(false);
+
+  // Fetch existing user data for returning users
+  useEffect(() => {
+    async function fetchExistingData() {
+      try {
+        const response = await fetch('/api/onboarding');
+        const data = await response.json();
+
+        if (data.hasExistingData && data.data) {
+          setExistingUserData(data.data);
+          // Pre-populate store with existing data
+          if (data.data.name) {
+            updateData({ name: data.data.name });
+          }
+        }
+
+        setHasCheckedExistingData(true);
+      } catch (error) {
+        logger.error('[WelcomePage] Failed to fetch existing data', { error: String(error) });
+        setHasCheckedExistingData(true);
+      }
+    }
+    fetchExistingData();
+  }, [updateData]);
 
   // Callback when Azure is unavailable - fallback to Web Speech TTS
   const handleAzureUnavailable = useCallback(() => {
@@ -84,6 +125,16 @@ function WelcomeContent() {
     }
   };
 
+  // Skip to app - for returning users who don't want to update anything
+  const handleSkipToApp = useCallback(() => {
+    router.push('/');
+  }, [router]);
+
+  // Start onboarding - transition from landing page to actual onboarding
+  const handleStartOnboarding = useCallback(() => {
+    setShowLandingPage(false);
+  }, []);
+
   // Determine voice mode status
   const getVoiceModeInfo = () => {
     if (azureAvailable === null) {
@@ -110,6 +161,208 @@ function WelcomeContent() {
   const voiceMode = getVoiceModeInfo();
   const VoiceModeIcon = voiceMode.icon;
 
+  // Show loading state while checking for existing data
+  if (!hasCheckedExistingData) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-950 dark:to-blue-950 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center"
+        >
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center animate-pulse">
+            <Sparkles className="w-8 h-8 text-white" />
+          </div>
+          <p className="text-gray-600 dark:text-gray-400">Caricamento...</p>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // ========== LANDING PAGE (shown first) ==========
+  if (showLandingPage) {
+    const isReturningUser = Boolean(existingUserData?.name);
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-950 dark:to-blue-950 relative overflow-hidden">
+        {/* Hero Section */}
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-2xl mx-auto"
+          >
+            {/* Logo / Avatar */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
+              className="relative w-32 h-32 mx-auto mb-8"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-pink-400 to-purple-600 rounded-full blur-xl opacity-50" />
+              <div className="relative w-full h-full rounded-full bg-gradient-to-br from-pink-400 to-purple-600 p-1">
+                <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
+                  <Image
+                    src="/avatars/melissa.jpg"
+                    alt="Melissa"
+                    width={120}
+                    height={120}
+                    className="w-full h-full object-cover"
+                    priority
+                  />
+                </div>
+              </div>
+              {/* Sparkle decorations */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+                className="absolute -top-2 -right-2"
+              >
+                <Sparkles className="w-6 h-6 text-yellow-400" />
+              </motion.div>
+            </motion.div>
+
+            {/* Welcome Text - aria-live for screen readers */}
+            <div aria-live="polite" aria-atomic="true">
+            {isReturningUser ? (
+              <>
+                <motion.h1
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+                >
+                  Bentornato, <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">{existingUserData?.name}!</span>
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-xl text-gray-600 dark:text-gray-300 mb-8"
+                >
+                  È bello rivederti. Vuoi aggiornare il tuo profilo o continuare a studiare?
+                </motion.p>
+              </>
+            ) : (
+              <>
+                <motion.h1
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+                >
+                  Benvenuto in{' '}
+                  <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+                    ConvergioEdu
+                  </span>
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-xl text-gray-600 dark:text-gray-300 mb-8"
+                >
+                  Il tuo compagno di studio intelligente, personalizzato per te.
+                  Impara con 17 Maestri AI, crea mappe mentali, flashcard e molto altro!
+                </motion.p>
+              </>
+            )}
+            </div>
+
+            {/* Features Grid */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
+            >
+              {[
+                { icon: '🎓', label: '17 Maestri AI' },
+                { icon: '🗺️', label: 'Mappe Mentali' },
+                { icon: '📚', label: 'Flashcard FSRS' },
+                { icon: '🎮', label: 'Gamification' },
+              ].map((feature, i) => (
+                <motion.div
+                  key={feature.label}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.6 + i * 0.1 }}
+                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
+                >
+                  <span className="text-2xl mb-2 block">{feature.icon}</span>
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {feature.label}
+                  </span>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.9 }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            >
+              {isReturningUser ? (
+                <>
+                  {/* Primary: Go to app */}
+                  <Button
+                    size="lg"
+                    onClick={handleSkipToApp}
+                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all"
+                  >
+                    Vai all&apos;app
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                  {/* Secondary: Update profile */}
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    onClick={handleStartOnboarding}
+                    className="px-8 py-6 text-lg rounded-xl border-2"
+                  >
+                    <Settings className="w-5 h-5 mr-2" />
+                    Aggiorna profilo
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {/* Primary: Start onboarding */}
+                  <Button
+                    size="lg"
+                    onClick={handleStartOnboarding}
+                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all"
+                  >
+                    Inizia con Melissa
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Button>
+                </>
+              )}
+            </motion.div>
+
+            {/* Voice indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.1 }}
+              className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+            >
+              <Volume2 className="w-4 h-4" />
+              <span>Parla con Melissa usando la voce</span>
+            </motion.div>
+          </motion.div>
+
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-300/20 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-300/20 to-transparent rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+        </div>
+      </div>
+    );
+  }
+
+  // ========== ONBOARDING FLOW (after clicking "Start") ==========
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-950 dark:to-blue-950">
       {/* Progress indicator */}
@@ -117,7 +370,7 @@ function WelcomeContent() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              Benvenuto in ConvergioEdu
+              {existingUserData?.name ? `Aggiornamento profilo di ${existingUserData.name}` : 'Benvenuto in ConvergioEdu'}
             </span>
 
             <div className="flex items-center gap-3">
@@ -137,6 +390,19 @@ function WelcomeContent() {
               <span className="text-sm text-gray-500 dark:text-gray-500">
                 {stepIndex + 1} / {totalSteps}
               </span>
+
+              {/* Skip to app button (for returning users) */}
+              {existingUserData?.name && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSkipToApp}
+                  className="h-7 px-3 text-pink-600 hover:text-pink-700 hover:bg-pink-50"
+                >
+                  Salta
+                  <ArrowRight className="w-3 h-3 ml-1" />
+                </Button>
+              )}
 
               {/* Reset button */}
               <Button
@@ -204,6 +470,7 @@ function WelcomeContent() {
               <CurrentStepComponent
                 useWebSpeechFallback={useWebSpeechFallback}
                 onAzureUnavailable={handleAzureUnavailable}
+                existingUserData={existingUserData}
               />
             </motion.div>
           </AnimatePresence>

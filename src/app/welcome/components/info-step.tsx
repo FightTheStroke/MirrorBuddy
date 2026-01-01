@@ -28,9 +28,17 @@ const LEARNING_DIFFERENCES = [
   { id: 'auditoryProcessing', label: 'Difficoltà Uditive', icon: '👂' },
 ] as const;
 
+interface ExistingUserData {
+  name: string;
+  age?: number;
+  schoolLevel?: 'elementare' | 'media' | 'superiore';
+  learningDifferences?: string[];
+}
+
 interface InfoStepProps {
   useWebSpeechFallback?: boolean;
   onAzureUnavailable?: () => void;
+  existingUserData?: ExistingUserData | null;
 }
 
 /**
@@ -45,7 +53,7 @@ interface InfoStepProps {
  * - School level (optional)
  * - Learning differences (optional, for accessibility presets)
  */
-export function InfoStep({ useWebSpeechFallback = false, onAzureUnavailable }: InfoStepProps) {
+export function InfoStep({ useWebSpeechFallback = false, onAzureUnavailable, existingUserData }: InfoStepProps) {
   const {
     data,
     updateData,
@@ -145,7 +153,7 @@ export function InfoStep({ useWebSpeechFallback = false, onAzureUnavailable }: I
         className="w-full max-w-md mx-auto"
       >
         {/* Melissa continues conversation (already connected from step 1) */}
-        <VoiceOnboardingPanel step="info" onFallbackToWebSpeech={onAzureUnavailable} className="w-full" />
+        <VoiceOnboardingPanel step="info" onFallbackToWebSpeech={onAzureUnavailable} existingUserData={existingUserData} className="w-full" />
 
         {/* Show collected data summary with navigation */}
         <AnimatePresence>

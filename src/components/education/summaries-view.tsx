@@ -145,7 +145,7 @@ export function SummariesView({ className }: SummariesViewProps) {
                   id: tool.toolId,
                   title: tool.title || summaryData.topic || 'Riassunto',
                   data: summaryData,
-                  createdAt: tool.createdAt,
+                  createdAt: new Date(tool.createdAt),
                 })}
               >
                 <CardHeader className="pb-3">
