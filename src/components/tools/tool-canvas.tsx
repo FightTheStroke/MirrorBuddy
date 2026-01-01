@@ -5,9 +5,10 @@
 // Layout: 80% tool canvas + 20% Maestro PiP (picture-in-picture)
 // ============================================================================
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { logger } from '@/lib/logger';
 import {
   Loader2,
   Network,
@@ -30,7 +31,8 @@ import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
 import { DiagramRenderer } from './diagram-renderer';
 import { SummaryTool } from './summary-tool';
-import type { SummaryData } from '@/types/tools';
+import { StudentSummaryEditor } from './student-summary-editor';
+import type { SummaryData, StudentSummaryData } from '@/types/tools';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { ToolType } from '@/lib/realtime/tool-events';
@@ -58,6 +60,17 @@ const toolNames: Record<ToolType, string> = {
   demo: 'Demo Interattiva',
 };
 
+// Get user ID from session storage (matches use-saved-materials.ts pattern)
+function getUserId(): string {
+  if (typeof window === 'undefined') return 'default-user';
+  let userId = sessionStorage.getItem('convergio-user-id');
+  if (!userId) {
+    userId = `user-${crypto.randomUUID()}`;
+    sessionStorage.setItem('convergio-user-id', userId);
+  }
+  return userId;
+}
+
 interface ToolCanvasProps {
   sessionId: string;
   maestroId?: string;
@@ -79,6 +92,33 @@ export function ToolCanvas({
 }: ToolCanvasProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showPiP, setShowPiP] = useState(true);
+
+  // Save student summary to materials archive
+  const handleSaveStudentSummary = useCallback(async (data: StudentSummaryData) => {
+    try {
+      const userId = getUserId();
+      const response = await fetch('/api/tools/saved', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId,
+          type: 'summary',
+          title: data.title,
+          topic: data.topic,
+          content: data,
+          maestroId: data.maestroId,
+          sessionId: data.sessionId,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(`Save failed: ${response.status}`);
+      }
+      logger.info('Student summary saved', { title: data.title });
+    } catch (error) {
+      logger.error('Failed to save student summary', { error: String(error) });
+      throw error;
+    }
+  }, []);
 
   const {
     connectionState,
@@ -276,7 +316,7 @@ export function ToolCanvas({
 
               {/* Tool content */}
               <div className="flex-1 overflow-auto p-4">
-                <ToolRenderer tool={activeTool} />
+                <ToolRenderer tool={activeTool} onSaveStudentSummary={handleSaveStudentSummary} />
               </div>
             </motion.div>
           )}
@@ -369,7 +409,7 @@ export function ToolCanvas({
 }
 
 // Tool-specific renderer
-function ToolRenderer({ tool }: { tool: ActiveToolState }) {
+function ToolRenderer({ tool, onSaveStudentSummary }: { tool: ActiveToolState; onSaveStudentSummary?: (data: StudentSummaryData) => Promise<void> }) {
   // Handle incomplete content during building
   if (tool.status === 'building' && !tool.content) {
     return (
@@ -442,12 +482,24 @@ function ToolRenderer({ tool }: { tool: ActiveToolState }) {
         />
       );
 
-    case 'summary':
-      return (
-        <SummaryTool
-          data={tool.content as SummaryData}
-        />
-      );
+    case 'summary': {
+      const summaryContent = tool.content as Record<string, unknown>;
+      // Check if this is a student-written summary (maieutic method)
+      if (summaryContent.type === 'student_summary') {
+        const studentData = summaryContent as unknown as StudentSummaryData;
+        return (
+          <StudentSummaryEditor
+            initialData={studentData}
+            topic={studentData.topic}
+            maestroId={studentData.maestroId}
+            sessionId={studentData.sessionId}
+            onSave={onSaveStudentSummary}
+          />
+        );
+      }
+      // AI-generated summary (legacy)
+      return <SummaryTool data={summaryContent as unknown as SummaryData} />;
+    }
 
     case 'timeline':
     default:

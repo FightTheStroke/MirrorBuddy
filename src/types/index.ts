@@ -58,6 +58,23 @@ export type VoiceSessionState =
   | 'speaking'
   | 'error';
 
+export type VoiceConnectionState = 'idle' | 'connecting' | 'connected' | 'error';
+
+/**
+ * Handle returned by useVoiceSession hook.
+ * Used to pass voice session state between components without re-creating connections.
+ */
+export interface VoiceSessionHandle {
+  isConnected: boolean;
+  isListening: boolean;
+  isSpeaking: boolean;
+  isMuted: boolean;
+  connectionState: VoiceConnectionState;
+  connect: (maestro: Maestro, connectionInfo: { provider: 'azure'; proxyPort?: number }) => Promise<void>;
+  disconnect: () => void;
+  toggleMute: () => void;
+}
+
 export type EmotionType =
   | 'neutral'
   | 'joy'
