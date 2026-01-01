@@ -1,0 +1,59 @@
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Dependencies (troppo grandi, mai utili)
+node_modules/
+
+# Cache
+.cache/
+.turbo/
+*.tsbuildinfo
+
+# Test artifacts
+coverage/
+playwright-report/
+test-results/
+
+# Generated
+*.generated.ts
+*.generated.js
+prisma/migrations/
+
+# Assets binari (non leggibili)
+public/images/
+public/fonts/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.woff
+*.woff2
+*.ttf
+*.eot
+*.mp3
+*.mp4
+*.webm
+
+# Lock files (enormi, poco utili)
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# IDE/Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
