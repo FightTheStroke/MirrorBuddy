@@ -38,6 +38,8 @@ import {
 import { logger } from '@/lib/logger';
 import { useMindmaps, type SavedMindmap } from '@/lib/hooks/use-saved-materials';
 import { useUIStore } from '@/lib/stores/app-store';
+import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
+import type { Maestro } from '@/types';
 
 interface MindmapNode {
   id: string;
@@ -101,6 +103,13 @@ export function MindmapsView({ className }: MindmapsViewProps) {
   const [newMapTopics, setNewMapTopics] = useState<{ name: string; subtopics: string[] }[]>([
     { name: '', subtopics: [''] },
   ]);
+  const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+
+  // Handle maestro selection and enter focus mode
+  const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
+    setShowMaestroDialog(false);
+    enterFocusMode('mindmap', maestro.id, mode);
+  }, [enterFocusMode]);
 
   // Delete mindmap via API
   const handleDeleteMindmap = async (id: string) => {
@@ -313,7 +322,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
         </div>
         <div className="flex gap-2">
           {/* PRIMARY: Conversation-first approach (Phase 6) */}
-          <Button onClick={() => enterFocusMode('mindmap')}>
+          <Button onClick={() => setShowMaestroDialog(true)}>
             <MessageSquare className="w-4 h-4 mr-2" />
             Crea con un Professore
           </Button>
@@ -536,6 +545,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
               <div className="flex-1 overflow-auto p-4">
                 <MindmapRenderer
                   title={selectedMindmap.title}
+                  markdown={selectedMindmap.markdown}
                   nodes={selectedMindmap.nodes}
                 />
               </div>
@@ -772,6 +782,14 @@ export function MindmapsView({ className }: MindmapsViewProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Maestro selection dialog */}
+      <ToolMaestroSelectionDialog
+        isOpen={showMaestroDialog}
+        toolType="mindmap"
+        onConfirm={handleMaestroConfirm}
+        onClose={() => setShowMaestroDialog(false)}
+      />
     </div>
   );
 }

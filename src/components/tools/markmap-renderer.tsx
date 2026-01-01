@@ -8,6 +8,11 @@ import { Printer, Download, ZoomIn, ZoomOut, Accessibility, RotateCcw, Maximize,
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import {
+  convertParentIdToChildren,
+  detectNodeFormat,
+  type FlatNode,
+} from '@/lib/tools/mindmap-utils';
 
 // Node structure for programmatic mindmap creation
 export interface MindmapNode {
@@ -64,14 +69,27 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
 
   const { settings } = useAccessibilityStore();
 
-  // Get the markdown content
+  // Get the markdown content - ADR 0020: Handle both parentId and children formats
   const getMarkdownContent = useCallback((): string => {
+    // Prefer pre-generated markdown if available
     if (markdown) {
       return markdown;
     }
+
     if (nodes && nodes.length > 0) {
+      // Detect node format and convert if needed
+      const format = detectNodeFormat(nodes);
+
+      if (format === 'parentId') {
+        // Convert parentId format to children format for rendering
+        const treeNodes = convertParentIdToChildren(nodes as FlatNode[]);
+        return nodesToMarkdown(treeNodes, title);
+      }
+
+      // Already in children format or unknown (treat as children)
       return nodesToMarkdown(nodes, title);
     }
+
     return `# ${title}\n## No content`;
   }, [markdown, nodes, title]);
 
