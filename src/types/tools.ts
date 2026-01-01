@@ -339,6 +339,32 @@ Esempio di struttura per "Fotosintesi":
       },
     },
   },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'search_archive',
+      description: 'Cerca materiali salvati nell\'archivio dello studente (mappe mentali, quiz, flashcard, riassunti, demo, compiti). Usa quando lo studente chiede di rivedere qualcosa che ha già creato o quando vuoi recuperare contenuti precedenti per la conversazione.',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: 'Testo da cercare nei titoli e contenuti dei materiali',
+          },
+          toolType: {
+            type: 'string',
+            enum: ['mindmap', 'quiz', 'flashcard', 'summary', 'demo', 'homework', 'diagram', 'timeline'],
+            description: 'Tipo di materiale da cercare (opzionale)',
+          },
+          subject: {
+            type: 'string',
+            description: 'Materia dei materiali da cercare (opzionale)',
+          },
+        },
+        required: [],
+      },
+    },
+  },
 ] as const;
 
 /**

@@ -24,6 +24,69 @@ interface AnalysisResult {
   steps: HomeworkStep[];
 }
 
+// Valid Subject enum values from the system
+const VALID_SUBJECTS = [
+  'mathematics', 'physics', 'chemistry', 'biology', 'history', 'geography',
+  'italian', 'english', 'art', 'music', 'civics', 'economics',
+  'computerScience', 'health', 'philosophy', 'internationalLaw'
+] as const;
+
+// Map AI responses (Italian or abbreviated) to valid Subject values
+const SUBJECT_MAP: Record<string, string> = {
+  // English abbreviations
+  'math': 'mathematics',
+  'maths': 'mathematics',
+  'science': 'biology',
+  'cs': 'computerScience',
+  'pe': 'health',
+  'law': 'internationalLaw',
+  // Italian names
+  'matematica': 'mathematics',
+  'fisica': 'physics',
+  'chimica': 'chemistry',
+  'biologia': 'biology',
+  'scienze': 'biology',
+  'storia': 'history',
+  'geografia': 'geography',
+  'italiano': 'italian',
+  'inglese': 'english',
+  'arte': 'art',
+  'musica': 'music',
+  'educazione civica': 'civics',
+  'economia': 'economics',
+  'informatica': 'computerScience',
+  'salute': 'health',
+  'filosofia': 'philosophy',
+  'diritto': 'internationalLaw',
+};
+
+/**
+ * Normalize AI-detected subject to valid Subject enum value
+ */
+function normalizeSubject(subject: string): string {
+  if (!subject) return 'other';
+  const lower = subject.toLowerCase().trim();
+
+  // Direct match with valid subjects
+  if (VALID_SUBJECTS.includes(lower as typeof VALID_SUBJECTS[number])) {
+    return lower;
+  }
+
+  // Map from abbreviations or Italian
+  if (SUBJECT_MAP[lower]) {
+    return SUBJECT_MAP[lower];
+  }
+
+  // Partial match (e.g., "matematica avanzata" -> "mathematics")
+  for (const [key, value] of Object.entries(SUBJECT_MAP)) {
+    if (lower.includes(key)) {
+      return value;
+    }
+  }
+
+  return 'other';
+}
+
 export async function POST(request: Request) {
   // Rate limiting: 10 requests per minute per IP (vision API is expensive)
   const clientId = getClientIdentifier(request);
@@ -66,7 +129,7 @@ Rispondi SOLO con un JSON valido nel seguente formato (senza markdown o altro te
 
 {
   "title": "titolo breve del problema",
-  "subject": "math|science|italian|history|geography|english|other",
+  "subject": "mathematics|physics|chemistry|biology|history|geography|italian|english|art|music|civics|economics|computerScience|philosophy|other",
   "problemType": "tipo di esercizio (es. equazione, problema, analisi, etc)",
   "steps": [
     {
@@ -160,6 +223,9 @@ Crea 3-5 passaggi maieutici che guidino lo studente a trovare la soluzione da so
           ],
         };
       }
+
+      // Normalize subject to valid enum value
+      analysis.subject = normalizeSubject(analysis.subject);
 
       return NextResponse.json(analysis);
     }

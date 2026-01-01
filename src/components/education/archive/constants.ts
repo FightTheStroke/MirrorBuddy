@@ -115,6 +115,7 @@ export const FILTER_TABS: { value: FilterType; label: string; icon?: typeof Book
   { value: 'flashcard', label: 'Flashcard' },
   { value: 'summary', label: 'Riassunti' },
   { value: 'demo', label: 'Demo' },
+  { value: 'homework', label: 'Compiti' },
   { value: 'webcam', label: 'Foto' },
   { value: 'pdf', label: 'PDF' },
 ];

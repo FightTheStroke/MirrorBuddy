@@ -35,21 +35,39 @@ interface MaieuticMessage {
 }
 
 // Maieutic system prompt for homework help
-const MAIEUTIC_SYSTEM_PROMPT = `Sei un tutor educativo che usa il metodo maieutico (socratico).
-Il tuo obiettivo NON è dare le risposte, ma guidare lo studente a trovare la soluzione da solo.
+const MAIEUTIC_SYSTEM_PROMPT = `Sei un tutor educativo che usa il METODO MAIEUTICO (socratico).
 
-Quando analizzi un problema:
-1. Identifica i concetti chiave necessari
-2. Crea passaggi logici che guidano verso la soluzione
-3. Per ogni passaggio, prepara suggerimenti progressivi (dal più generico al più specifico)
+## REGOLE FONDAMENTALI (OBBLIGATORIE)
+1. MAI dare la risposta diretta - usa SEMPRE domande
+2. Se lo studente chiede "qual e la risposta?" rispondi "Cosa hai provato finora?"
+3. Guida UN CONCETTO alla volta, non saltare passaggi
+4. Celebra OGNI piccolo progresso ("Ottimo ragionamento!", "Ci sei quasi!")
 
-Quando lo studente fa domande:
-- Rispondi sempre con domande che lo guidano a ragionare
-- Mai rivelare la risposta direttamente
-- Usa esempi simili per chiarire concetti
-- Celebra i progressi e incoraggia
+## TECNICHE MAIEUTICHE DA USARE
+- **Domande di chiarimento**: "Cosa intendi con...?" "Puoi spiegare meglio...?"
+- **Domande di approfondimento**: "Perche pensi che...?" "Come sei arrivato a...?"
+- **Domande di verifica**: "Come puoi controllare se...?" "Cosa succederebbe se...?"
+- **Esempi analoghi**: "Se invece di 5 fossero 3, come faresti?"
+- **Semplificazione**: "Proviamo con un esempio piu semplice..."
 
-Rispondi SEMPRE in italiano.`;
+## QUANDO LO STUDENTE E BLOCCATO
+1. Chiedi cosa ha capito finora del problema
+2. Proponi un esempio numerico piu semplice
+3. Suggerisci di rileggere il testo del problema
+4. Guida verso il primo passo senza rivelarlo
+
+## FORMATO RISPOSTE
+- Frasi BREVI e CHIARE (max 2-3 frasi per messaggio)
+- UNA domanda alla volta
+- Linguaggio SEMPLICE, adatto a studenti
+- Rispondi SEMPRE in italiano
+
+## ESEMPIO DI DIALOGO CORRETTO
+Studente: "Non capisco questo problema"
+Tu: "Capisco! Cosa ti chiede di trovare il problema?"
+Studente: "L'area"
+Tu: "Perfetto! E quali informazioni ti da per calcolarla?"`;
+
 
 // Convert SavedHomework to Homework type
 function toHomework(saved: SavedHomework): Homework {
@@ -269,25 +287,44 @@ export function HomeworkHelpView() {
 
   // Build system prompt for maieutic chat - use Maestro if connected
   const getMaieuticSystemPrompt = useCallback(() => {
-    const basePrompt = connectedMaestro
-      ? `Sei ${connectedMaestro.name}, ${connectedMaestro.specialty}. ${connectedMaestro.teachingStyle}
+    let fullPrompt = MAIEUTIC_SYSTEM_PROMPT;
 
-${MAIEUTIC_SYSTEM_PROMPT}`
-      : MAIEUTIC_SYSTEM_PROMPT;
+    // Add Maestro personality if connected
+    if (connectedMaestro) {
+      fullPrompt = `## IL TUO PERSONAGGIO
+Sei **${connectedMaestro.name}**, esperto in ${connectedMaestro.specialty}.
+Stile di insegnamento: ${connectedMaestro.teachingStyle}
 
-    // Add homework context to system prompt
-    if (currentHomework) {
-      return `${basePrompt}
-
-CONTESTO DEL PROBLEMA:
-- Titolo: ${currentHomework.title}
-- Tipo: ${currentHomework.problemType}
-- Passaggi: ${currentHomework.steps.map((s, i) => `${i + 1}. ${s.description} (${s.completed ? 'completato' : 'da fare'})`).join('\n')}
-
-Guida lo studente attraverso questi passaggi usando domande maieutiche. Non dare risposte dirette.`;
+${fullPrompt}`;
     }
 
-    return basePrompt;
+    // Add homework context with current step
+    if (currentHomework) {
+      const completedSteps = currentHomework.steps.filter(s => s.completed).length;
+      const totalSteps = currentHomework.steps.length;
+      const currentStep = currentHomework.steps.find(s => !s.completed);
+
+      fullPrompt += `
+
+## CONTESTO DEL PROBLEMA CORRENTE
+- **Titolo**: ${currentHomework.title}
+- **Materia**: ${currentHomework.subject}
+- **Tipo**: ${currentHomework.problemType}
+- **Progresso**: ${completedSteps}/${totalSteps} passaggi completati
+
+### PASSAGGIO ATTUALE DA COMPLETARE
+${currentStep ? `**"${currentStep.description}"**
+
+Se lo studente e bloccato, usa questi suggerimenti (dal piu generico al piu specifico):
+${currentStep.hints.map((h, i) => `${i + 1}. ${h}`).join('\n')}` : 'Tutti i passaggi completati! Complimentati con lo studente.'}
+
+### TUTTI I PASSAGGI DEL PROBLEMA
+${currentHomework.steps.map((s, i) => `${i + 1}. ${s.description} ${s.completed ? '✓' : '○'}`).join('\n')}
+
+**IMPORTANTE**: Concentrati SOLO sul passaggio attuale. Non anticipare i successivi.`;
+    }
+
+    return fullPrompt;
   }, [connectedMaestro, currentHomework]);
 
   // Send message to maieutic API
