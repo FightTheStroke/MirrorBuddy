@@ -6,14 +6,13 @@
  * @module profile/__tests__/profile-generator.test
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   generateStudentProfile,
   createSynthesisContext,
   formatSynthesisPrompt,
   MELISSA_SYNTHESIS_PROMPT,
   type MaestroInsightInput,
-  type ProfileGenerationOptions,
 } from '../profile-generator';
 import type { ObservationCategory } from '@/types';
 
