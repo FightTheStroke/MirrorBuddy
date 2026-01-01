@@ -18,8 +18,9 @@ import { logger } from '@/lib/logger';
 import type { VoiceSessionHandle } from '@/types';
 import type { Maestro, Subject, MaestroVoice } from '@/types';
 import {
-  MELISSA_ONBOARDING_PROMPT,
   MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
+  generateMelissaOnboardingPrompt,
+  type ExistingUserDataForPrompt,
 } from '@/lib/voice/onboarding-tools';
 
 interface VoiceConnectionInfo {
@@ -39,8 +40,12 @@ interface ExistingUserData {
 
 /**
  * Create Melissa maestro for onboarding with specialized prompts.
+ * Adapts prompt based on existing user data for returning users.
  */
-function createOnboardingMelissa(): Maestro {
+function createOnboardingMelissa(existingData?: ExistingUserDataForPrompt | null): Maestro {
+  const isReturningUser = Boolean(existingData?.name);
+  const dynamicPrompt = generateMelissaOnboardingPrompt(existingData);
+
   return {
     id: 'melissa-onboarding',
     name: 'Melissa',
@@ -51,8 +56,10 @@ function createOnboardingMelissa(): Maestro {
     teachingStyle: 'scaffolding',
     avatar: '/avatars/melissa.jpg',
     color: '#EC4899',
-    systemPrompt: MELISSA_ONBOARDING_PROMPT,
-    greeting: 'Ciao! Sono Melissa, piacere di conoscerti! Come ti chiami?',
+    systemPrompt: dynamicPrompt,
+    greeting: isReturningUser
+      ? `Ciao ${existingData?.name}! Bentornato! Sono Melissa. Vuoi aggiornare qualcosa del tuo profilo?`
+      : 'Ciao! Sono Melissa, piacere di conoscerti! Come ti chiami?',
   };
 }
 
@@ -65,7 +72,6 @@ function WelcomeContent() {
     hasCompletedOnboarding,
     currentStep,
     isReplayMode,
-    azureAvailable,
     startReplay,
     resetOnboarding,
     addVoiceTranscript,
@@ -558,7 +564,7 @@ function WelcomeContent() {
                 onAzureUnavailable={handleAzureUnavailable}
                 voiceSession={voiceSessionHandle}
                 connectionInfo={connectionInfo}
-                onboardingMelissa={createOnboardingMelissa()}
+                onboardingMelissa={createOnboardingMelissa(existingUserData)}
               />
             </motion.div>
           </AnimatePresence>
