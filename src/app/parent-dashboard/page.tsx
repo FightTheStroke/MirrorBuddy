@@ -20,7 +20,9 @@ import {
   BookOpen,
   User,
   TrendingUp,
+  ArrowLeft,
 } from 'lucide-react';
+import Link from 'next/link';
 import type { StudentInsights, ObservationCategory } from '@/types';
 
 // Demo user ID - in production this would come from authentication
@@ -841,9 +843,28 @@ export default function ParentDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        {renderContent()}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      {/* Header with back navigation */}
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
+          <Link href="/">
+            <Button variant="ghost" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Torna all&apos;app
+            </Button>
+          </Link>
+          <div className="flex-1">
+            <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+              Dashboard Genitori
+            </h1>
+          </div>
+        </div>
+      </header>
+
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
+          {renderContent()}
+        </div>
       </div>
 
       {/* Parent-Professor Chat Modal (Issue #63) */}
