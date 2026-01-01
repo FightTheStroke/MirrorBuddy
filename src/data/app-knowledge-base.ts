@@ -315,6 +315,72 @@ export const SCHEDULER_KNOWLEDGE: FeatureCategory = {
 };
 
 // ============================================================================
+// AMBIENT AUDIO
+// ============================================================================
+
+export const AMBIENT_AUDIO_KNOWLEDGE: FeatureCategory = {
+  name: 'Audio Ambientale',
+  icon: 'Headphones',
+  features: [
+    {
+      name: 'Suoni per Concentrazione',
+      description: 'Audio ambientale procedurale per migliorare focus e studio.',
+      location: 'Barra in alto (icona cuffie) | Settings > Audio Ambientale',
+      howToUse: [
+        "Clicca l'icona cuffie nella barra in alto",
+        'Scegli un preset (Focus, Deep Work, Pioggia, ecc.)',
+        'Usa il cursore per regolare il volume',
+        "Clicca play/pause per controllare l'audio",
+      ],
+      tips: [
+        'I suoni sono generati dal browser, non serve scaricare nulla',
+        'Usa cuffie per binaural beats (richiede stereo)',
+        "L'audio si ferma automaticamente durante le chiamate vocali",
+        'Puoi combinare piu suoni nelle impostazioni avanzate',
+      ],
+      troubleshooting: [
+        'Audio non si sente: controlla volume sistema',
+        'Binaural beats non funzionano: usa cuffie stereo',
+        'Audio si ferma: normale durante chiamate vocali (ADR-0018)',
+      ],
+      relatedFeatures: ['Timer Pomodoro', 'Chiamate Vocali'],
+    },
+    {
+      name: 'Preset Audio',
+      description: 'Combinazioni predefinite di suoni per diversi contesti.',
+      location: 'Cuffie > Menu preset | Settings > Audio Ambientale',
+      howToUse: [
+        'Focus: onde alpha per studio rilassato',
+        'Deep Work: beta + rumore marrone per concentrazione intensa',
+        'Pioggia: pioggia + camino + temporale',
+        'Natura: foresta + oceano',
+        'Biblioteca: ambiente silenzioso con fruscii',
+        'Caffe: ambiente da bar/Starbucks',
+      ],
+      tips: [
+        'Deep Work e ottimo per matematica e compiti difficili',
+        'Focus e ideale per lettura e ripasso',
+        'Pioggia aiuta a rilassarsi durante studio lungo',
+      ],
+    },
+    {
+      name: 'Integrazione Pomodoro',
+      description: "L'audio si avvia/ferma con il timer Pomodoro.",
+      location: 'Settings > Audio Ambientale > Pomodoro',
+      howToUse: [
+        "Attiva 'Avvia con Pomodoro' in impostazioni",
+        'Scegli il preset da usare durante focus',
+        'Audio si ferma automaticamente nelle pause (opzionale)',
+      ],
+      tips: [
+        'Combina Deep Work con Pomodoro per massima concentrazione',
+        'Durante le pause puoi tenere audio attivo o fermo',
+      ],
+    },
+  ],
+};
+
+// ============================================================================
 // ACCESSIBILITA
 // ============================================================================
 
@@ -482,6 +548,7 @@ export const ALL_FEATURE_CATEGORIES: FeatureCategory[] = [
   SUPPORT_KNOWLEDGE,
   GAMIFICATION_KNOWLEDGE,
   SCHEDULER_KNOWLEDGE,
+  AMBIENT_AUDIO_KNOWLEDGE,
   ACCESSIBILITY_KNOWLEDGE,
   ACCOUNT_KNOWLEDGE,
 ];
