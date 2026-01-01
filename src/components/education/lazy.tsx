@@ -28,6 +28,14 @@ export const LazyMindmapsView = dynamic(
   }
 );
 
+export const LazySummariesView = dynamic(
+  () => import('./summaries-view').then((mod) => ({ default: mod.SummariesView })),
+  {
+    loading: () => <ViewSkeleton />,
+    ssr: false,
+  }
+);
+
 export const LazyHomeworkHelpView = dynamic(
   () => import('./homework-help-view').then((mod) => ({ default: mod.HomeworkHelpView })),
   {
