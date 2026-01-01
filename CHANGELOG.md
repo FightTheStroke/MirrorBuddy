@@ -67,6 +67,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added session context: topics, conversationId, strengths, areasToImprove
 - Added materials relation for session-tool linking
 
+#### Knowledge Hub Schema (ADR 0022)
+- **Material.searchableText**: Pre-computed searchable content for Fuse.js full-text search
+- **Material.collectionId**: Foreign key to Collection for folder organization
+- **Collection model**: Folders for organizing materials
+  - Nested folders via self-referential `parentId`
+  - User-scoped with unique name per folder level
+  - Color and icon customization
+- **Tag model**: User-defined tags with color support
+- **MaterialTag junction**: Many-to-many Material-Tag relation with cascade delete
+- All new fields properly indexed for query performance
+
 #### Conversation Flow Store
 - `endConversationWithSummary()`: New action for summary-aware session end
 - `loadContextualGreeting()`: Fetch personalized greeting
@@ -80,6 +91,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 - ADR 0019: Session Summaries & Unified Archive
+- ADR 0020: Mindmap Data Structure Fix
+- ADR 0021: Conversational Memory Injection
+- ADR 0022: Knowledge Hub Architecture
 - Claude docs: `docs/claude/session-summaries.md`
 
 ---
