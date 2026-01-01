@@ -9,6 +9,7 @@ import {
   isPushSupported,
   getPushCapabilityStatus,
 } from './vapid';
+import { logger } from '@/lib/logger';
 
 export interface PushSubscriptionJSON {
   endpoint: string;
@@ -24,7 +25,7 @@ export interface PushSubscriptionJSON {
  */
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!isPushSupported()) {
-    console.warn('[Push] Service workers not supported');
+    logger.warn('[Push] Service workers not supported');
     return null;
   }
 
@@ -32,10 +33,10 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     });
-    console.log('[Push] Service worker registered:', registration.scope);
+    logger.debug('[Push] Service worker registered', { scope: registration.scope });
     return registration;
   } catch (error) {
-    console.error('[Push] Service worker registration failed:', error);
+    logger.error('[Push] Service worker registration failed', { error });
     return null;
   }
 }
@@ -75,21 +76,21 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
   // Check capability
   const status = getPushCapabilityStatus();
   if (status !== 'supported') {
-    console.warn('[Push] Cannot subscribe:', status);
+    logger.warn('[Push] Cannot subscribe', { status });
     return null;
   }
 
   // Get VAPID key
   const vapidPublicKey = getVapidPublicKey();
   if (!vapidPublicKey) {
-    console.error('[Push] VAPID public key not configured');
+    logger.error('[Push] VAPID public key not configured');
     return null;
   }
 
   // Request permission
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') {
-    console.log('[Push] Permission denied');
+    logger.info('[Push] Permission denied');
     return null;
   }
 
@@ -99,7 +100,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
     registration = await registerServiceWorker();
   }
   if (!registration) {
-    console.error('[Push] No service worker registration');
+    logger.error('[Push] No service worker registration');
     return null;
   }
 
@@ -112,18 +113,18 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
     });
 
     const json = subscription.toJSON() as PushSubscriptionJSON;
-    console.log('[Push] Subscribed:', json.endpoint.slice(0, 50) + '...');
+    logger.info('[Push] Subscribed', { endpoint: json.endpoint.slice(0, 50) });
 
     // Save to server
     const saved = await saveSubscriptionToServer(json);
     if (!saved) {
-      console.warn('[Push] Failed to save subscription to server');
+      logger.warn('[Push] Failed to save subscription to server');
       // Still return the subscription - it might work next time
     }
 
     return json;
   } catch (error) {
-    console.error('[Push] Subscription failed:', error);
+    logger.error('[Push] Subscription failed', { error });
     return null;
   }
 }
@@ -134,7 +135,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
 export async function unsubscribeFromPush(): Promise<boolean> {
   const subscription = await getExistingSubscription();
   if (!subscription) {
-    console.log('[Push] No subscription to unsubscribe');
+    logger.debug('[Push] No subscription to unsubscribe');
     return true;
   }
 
@@ -145,10 +146,10 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     // Remove from server
     await removeSubscriptionFromServer(subscription.endpoint);
 
-    console.log('[Push] Unsubscribed');
+    logger.info('[Push] Unsubscribed');
     return true;
   } catch (error) {
-    console.error('[Push] Unsubscribe failed:', error);
+    logger.error('[Push] Unsubscribe failed', { error });
     return false;
   }
 }
@@ -170,13 +171,13 @@ async function saveSubscriptionToServer(subscription: PushSubscriptionJSON): Pro
     });
 
     if (!response.ok) {
-      console.error('[Push] Server save failed:', response.status);
+      logger.error('[Push] Server save failed', { status: response.status });
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('[Push] Server save error:', error);
+    logger.error('[Push] Server save error', { error });
     return false;
   }
 }
@@ -194,7 +195,7 @@ async function removeSubscriptionFromServer(endpoint: string): Promise<boolean> 
 
     return response.ok;
   } catch (error) {
-    console.error('[Push] Server delete error:', error);
+    logger.error('[Push] Server delete error', { error });
     return false;
   }
 }
