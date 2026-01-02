@@ -256,8 +256,8 @@ export default function Home() {
           >
             <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
               <Image
-                src="/icon.png"
-                alt="Convergio"
+                src="/logo-brain.png"
+                alt="MirrorBuddy"
                 width={36}
                 height={36}
                 className="w-full h-full object-cover"
@@ -265,7 +265,7 @@ export default function Home() {
             </div>
             {sidebarOpen && (
               <span className="font-bold text-lg text-slate-900 dark:text-white">
-                Convergio
+                MirrorBuddy
               </span>
             )}
           </button>

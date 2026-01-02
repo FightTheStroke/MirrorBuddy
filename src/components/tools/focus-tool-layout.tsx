@@ -466,12 +466,23 @@ export function FocusToolLayout() {
           onMouseLeave={() => setSidebarExpanded(false)}
         >
           {/* Logo/Toggle */}
-          <div className="h-14 flex items-center justify-center border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+          <div className="h-14 flex items-center gap-2 px-2 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+            {/* Brain Logo */}
+            <img
+              src="/logo-brain.png"
+              alt="MirrorBuddy"
+              className="h-8 w-8 object-contain flex-shrink-0"
+            />
+            {sidebarExpanded && (
+              <span className="text-sm font-bold text-slate-800 dark:text-white truncate">
+                MirrorBuddy
+              </span>
+            )}
             <Button
               variant="ghost"
               size="icon-sm"
               onClick={() => setSidebarExpanded(!sidebarExpanded)}
-              className="text-slate-500"
+              className="text-slate-500 ml-auto"
               aria-label={sidebarExpanded ? 'Riduci menu' : 'Espandi menu'}
             >
               {sidebarExpanded ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
@@ -562,165 +573,94 @@ export function FocusToolLayout() {
           </div>
         </div>
 
-        {/* Right: Maestro Panel (Issue #102 - 0.6.2 - 30% width max) */}
+        {/* Right: Maestro Panel - Compact layout like conversation cards */}
         {!rightPanelCollapsed && (
           <div className="w-[30%] max-w-md h-full flex flex-col border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            {/* Maestro Header with Avatar - Gradient header like conversation cards */}
+            {/* Maestro Header - Same style as conversation header */}
             <div
-              className="flex-shrink-0 relative overflow-hidden"
-              style={{
-                background: characterProps?.color
-                  ? `linear-gradient(135deg, ${characterProps.color}15 0%, ${characterProps.color}05 100%)`
-                  : 'linear-gradient(135deg, #3b82f615 0%, #3b82f605 100%)'
-              }}
+              className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700"
+              style={{ backgroundColor: `${characterProps?.color}10` }}
             >
-              <div className="p-4 border-b border-slate-200/50 dark:border-slate-700/50">
-                <div className="flex items-center gap-3">
-                  {characterProps && (
-                    <>
-                      {/* Avatar with ring matching maestro color */}
-                      <div className="relative">
-                        <div
-                          className="w-14 h-14 rounded-full overflow-hidden ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-900 flex-shrink-0"
-                          style={{ borderColor: characterProps.color }}
-                        >
-                          <div
-                            className="w-full h-full bg-cover bg-center"
-                            style={{
-                              backgroundImage: `url(${characterProps.avatar})`,
-                              backgroundColor: characterProps.color,
-                            }}
-                          />
-                        </div>
-                        {/* Active status indicator */}
-                        {voiceConnected && (
-                          <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse" />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base text-slate-900 dark:text-white truncate">
-                          {characterProps.name}
-                        </h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                          {focusToolType ? toolNames[focusToolType] : 'Assistente'}
-                        </p>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Voice Status Badge */}
-                {focusInteractionMode === 'voice' && (
-                  <div className="mt-3">
-                    <div className={cn(
-                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
-                      voiceConnected && !isMuted && 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                      voiceConnected && isMuted && 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                      !voiceConnected && isVoiceActive && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-                      configError && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                    )}>
-                      {configError ? (
-                        <>
-                          <MicOff className="h-3 w-3" />
-                          <span>Voce non disponibile</span>
-                        </>
-                      ) : voiceConnected ? (
-                        <>
-                          {isMuted ? <MicOff className="h-3 w-3" /> : isSpeaking ? <Volume2 className="h-3 w-3" /> : <Mic className="h-3 w-3" />}
-                          <span>{isMuted ? 'Muted' : isSpeaking ? 'Parlando' : 'Voce attiva'}</span>
-                        </>
-                      ) : isVoiceActive ? (
-                        <>
-                          <Loader2 className="h-3 w-3 animate-spin" />
-                          <span>Connessione...</span>
-                        </>
-                      ) : null}
+              {/* Avatar */}
+              {characterProps && (
+                <>
+                  <div className="relative flex-shrink-0">
+                    <div
+                      className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-900"
+                      style={{ borderColor: characterProps.color }}
+                    >
+                      <div
+                        className="w-full h-full bg-cover bg-center"
+                        style={{
+                          backgroundImage: `url(${characterProps.avatar})`,
+                          backgroundColor: characterProps.color,
+                        }}
+                      />
                     </div>
+                    {voiceConnected && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse" />
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Voice Controls - Phone call style */}
-            <div className="flex-shrink-0 p-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
-              <div className="flex flex-col items-center gap-3">
-                {/* Primary voice button - Phone call style */}
-                <Button
-                  variant={voiceConnected ? 'default' : 'outline'}
-                  size="lg"
-                  onClick={handleVoiceToggle}
-                  disabled={!!configError && !isVoiceActive}
-                  className={cn(
-                    'w-full gap-2 shadow-sm transition-all',
-                    voiceConnected && 'bg-green-600 hover:bg-green-700 shadow-green-200 dark:shadow-green-900/30'
-                  )}
-                  style={{
-                    backgroundColor: voiceConnected ? undefined : `${characterProps?.color}15`,
-                    borderColor: voiceConnected ? undefined : characterProps?.color,
-                    color: voiceConnected ? undefined : characterProps?.color,
-                  }}
-                >
-                  {voiceConnected ? (
-                    <>
-                      <Phone className="h-4 w-4" />
-                      <span className="font-semibold">Chiamata in corso</span>
-                    </>
-                  ) : isVoiceActive ? (
-                    <>
+                  {/* Name and status */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-base text-slate-900 dark:text-white truncate">
+                      {characterProps.name}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {voiceConnected ? (isSpeaking ? 'Sta parlando...' : 'In chiamata') : 'Sono qui per aiutarti'}
+                    </p>
+                  </div>
+
+                  {/* Voice call button - inline like conversation header */}
+                  <Button
+                    variant={voiceConnected ? 'destructive' : 'outline'}
+                    size="icon"
+                    onClick={handleVoiceToggle}
+                    disabled={!!configError && !isVoiceActive}
+                    className={cn('relative', voiceConnected && 'animate-pulse')}
+                    style={!voiceConnected ? { borderColor: characterProps.color, color: characterProps.color } : undefined}
+                    title={voiceConnected ? 'Termina chiamata' : `Chiama ${characterProps.name}`}
+                  >
+                    {isVoiceActive && !voiceConnected ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Connessione...</span>
-                    </>
-                  ) : (
-                    <>
+                    ) : voiceConnected ? (
+                      <PhoneOff className="h-4 w-4" />
+                    ) : (
                       <Phone className="h-4 w-4" />
-                      <span className="font-semibold">Chiama {characterProps?.name}</span>
-                    </>
-                  )}
-                </Button>
+                    )}
+                  </Button>
 
-                {/* Secondary controls when connected */}
-                {voiceConnected && (
-                  <div className="flex items-center gap-2 w-full">
+                  {/* Mute button when connected */}
+                  {voiceConnected && (
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="icon"
                       onClick={toggleMute}
-                      className={cn(
-                        'flex-1 transition-colors',
-                        isMuted && 'bg-red-100 text-red-600 border-red-200 dark:bg-red-900/30 dark:text-red-400'
-                      )}
+                      className={cn(isMuted && 'text-red-500')}
                       title={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
                     >
                       {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={handleVoiceToggle}
-                      className="flex-1"
-                      title="Termina chiamata"
-                    >
-                      <PhoneOff className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-
-                {/* Input level indicator */}
-                {voiceConnected && !isMuted && (
-                  <div className="w-full">
-                    <div className="flex items-center gap-2">
-                      <Mic className="h-3 w-3 text-slate-400" />
-                      <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-green-500 transition-all duration-75"
-                          style={{ width: `${Math.min(inputLevel * 100, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </>
+              )}
             </div>
+
+            {/* Audio level indicator - only when voice active */}
+            {voiceConnected && !isMuted && (
+              <div className="flex-shrink-0 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="h-3 w-3 text-slate-400" />
+                  <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-green-500 transition-all duration-75"
+                      style={{ width: `${Math.min(inputLevel * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-3 space-y-3">

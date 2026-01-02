@@ -251,6 +251,11 @@ async function azureChatCompletion(
   if (tools && tools.length > 0) {
     requestBody.tools = tools;
     requestBody.tool_choice = tool_choice ?? 'auto';
+    logger.debug('[Azure Chat] Tools enabled', {
+      toolCount: tools.length,
+      toolNames: tools.map(t => t.function.name),
+      toolChoice: tool_choice ?? 'auto',
+    });
   }
 
   const response = await fetch(url, {
@@ -271,6 +276,14 @@ async function azureChatCompletion(
   const data = await response.json();
   const choice = data.choices[0];
   const message = choice?.message;
+
+  // Debug: Log response details
+  logger.debug('[Azure Chat] Response received', {
+    finishReason: choice?.finish_reason,
+    hasToolCalls: !!(message?.tool_calls && message.tool_calls.length > 0),
+    toolCallNames: message?.tool_calls?.map((tc: ToolCall) => tc.function.name) || [],
+    contentPreview: message?.content?.substring(0, 100) || '(no content)',
+  });
 
   return {
     content: message?.content || '',

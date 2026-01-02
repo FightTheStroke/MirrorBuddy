@@ -94,12 +94,12 @@ export default function ShowcaseLayout({
       <header className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/showcase" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <GraduationCap className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl overflow-hidden">
+              <img src="/logo-brain.png" alt="MirrorBuddy" className="w-full h-full object-contain" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">Convergio Edu</h1>
-              <p className="text-xs text-white/60">La Scuola Che Vorrei</p>
+              <h1 className="text-xl font-bold text-white">MirrorBuddy</h1>
+              <p className="text-xs text-white/60">The school we wished existed</p>
             </div>
           </Link>
 

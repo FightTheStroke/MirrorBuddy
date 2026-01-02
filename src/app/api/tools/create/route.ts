@@ -26,6 +26,7 @@ const VALID_TOOL_TYPES: ToolType[] = [
   'summary',
   'timeline',
   'diagram',
+  'demo',
 ];
 
 interface CreateToolRequest {

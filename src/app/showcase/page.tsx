@@ -90,7 +90,7 @@ export default function ShowcaseHomePage() {
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
           Esplora{' '}
           <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Convergio Edu
+            MirrorBuddy
           </span>
         </h1>
 
