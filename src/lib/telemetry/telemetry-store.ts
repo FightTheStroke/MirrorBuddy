@@ -259,7 +259,8 @@ export const useTelemetryStore = create<TelemetryState>()(
           set((s) => ({
             eventQueue: [...eventsToSend, ...s.eventQueue].slice(-s.config.maxQueueSize),
           }));
-          logger.error('Telemetry flush failed', { error });
+          // Telemetry failure is not critical - log at warn level
+          logger.warn('Telemetry flush failed (non-critical)', { error });
         }
       },
 
@@ -364,9 +365,18 @@ export function initializeTelemetry() {
 
   // Flush on page unload
   const handleUnload = () => {
-    store.endSession();
-    // Use sendBeacon for reliable delivery on close
-    const events = useTelemetryStore.getState().eventQueue;
+    const state = useTelemetryStore.getState();
+
+    // Track session end event
+    if (state.sessionStartedAt) {
+      const durationSeconds = Math.round(
+        (Date.now() - state.sessionStartedAt.getTime()) / 1000
+      );
+      state.trackEvent('navigation', 'session_ended', undefined, durationSeconds);
+    }
+
+    // Use sendBeacon for reliable delivery on unload (fetch() gets aborted)
+    const events = state.eventQueue;
     if (events.length > 0) {
       navigator.sendBeacon(
         '/api/telemetry/events',
