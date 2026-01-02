@@ -24,6 +24,41 @@ npm run dev
 
 ---
 
+## TEST 0: SMOKE TEST AUTOMATICO (OBBLIGATORIO)
+
+**Obiettivo**: Eseguire il test E2E completo che cattura TUTTI gli errori del browser.
+
+```bash
+npx playwright test e2e/full-app-smoke.spec.ts --reporter=list
+```
+
+Questo test automatico:
+- Naviga TUTTE le route dell'app
+- Apre tutti i 16 maestri
+- Testa tutti i 5 coach e 5 buddy
+- Verifica tutti i tool (quiz, flashcard, mindmap, riassunti, demo)
+- Testa impostazioni, calendario, progressi, genitori
+- Cattura TUTTI gli errori della console browser
+- Cattura errori di rete (4xx, 5xx)
+- Cattura crash di pagina
+- Testa keyboard navigation e responsive resize
+
+### Criteri di successo:
+- [ ] Nessun errore console critico (ignorati: 401, 429, HMR, DevTools)
+- [ ] Nessun crash di pagina
+- [ ] Tutti i test passano
+
+### Se fallisce:
+1. Leggi l'output per vedere quali errori
+2. Fixa gli errori PRIMA di procedere con i test manuali
+3. Re-run il test finché non passa
+
+**Status**: ⬜ Non eseguito | ✅ Passed | ❌ Failed
+
+**Note**:
+
+---
+
 ## TEST 9.08: Keyboard Navigation
 
 **Obiettivo**: Verificare che tutti i nuovi componenti UI siano navigabili da tastiera.
