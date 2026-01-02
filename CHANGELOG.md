@@ -5,6 +5,146 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Sprint January 2026 Complete
+
+> **Branch**: `development` | **Plan**: `docs/plans/in-progress/MasterPlan-Sprint-2026-01.md`
+
+### Added
+
+#### Phase 9: Testing & Verification (Tasks 9.01-9.07)
+- **E2E Tests**:
+  - `e2e/mindmap-hierarchy.spec.ts`: Tests mindmap title field and hierarchy rendering (ADR 0020)
+  - `e2e/knowledge-hub.spec.ts`: Tests Knowledge Hub views, search, organization (ADR 0022)
+  - `e2e/accessibility-knowledge-hub.spec.ts`: Axe accessibility audit for WCAG 2.1 AA
+- **Safety Tests**:
+  - `src/lib/safety/__tests__/memory-safety.test.ts`: 27 tests for memory injection attacks
+  - `src/lib/safety/__tests__/knowledge-hub-safety.test.ts`: 22 tests for material content safety
+- **Integration Tests**:
+  - `src/lib/conversation/__tests__/memory-integration.test.ts`: 15 tests for memory flow (ADR 0021)
+- **Total New Tests**: 75+ tests covering adversarial inputs, jailbreak prevention, accessibility
+
+#### Phase 10: Documentation (Tasks 10.01-10.11)
+- Updated `docs/ARCHITECTURE.md`:
+  - Added Conversational Memory section (ADR-0021)
+  - Added Knowledge Hub section (ADR-0022)
+  - Added Tool Focus Selection section (ADR-0020)
+  - Updated ADR count from 18 to 22
+  - Updated statistics (1400+ tests, 150+ components)
+- Finalized ADRs:
+  - ADR 0020: Mindmap Data Structure Fix - Status: Accepted
+  - ADR 0021: Conversational Memory Injection - Status: Accepted
+  - ADR 0022: Knowledge Hub Architecture - Status: Accepted
+- Created Claude docs:
+  - `docs/claude/conversation-memory.md`: Memory injection reference
+  - Updated `docs/claude/knowledge-hub.md`: Full implementation reference
+
+#### Knowledge Hub UI Components (Phase 5, Tasks 5.17-5.22)
+- **SearchBar** (`src/components/education/knowledge-hub/components/search-bar.tsx`):
+  - Debounced search input with configurable delay
+  - Type filter dropdown with ARIA listbox
+  - Keyboard navigation (Escape to clear/blur)
+  - Screen reader announcements
+- **SidebarNavigation** (`src/components/education/knowledge-hub/components/sidebar-navigation.tsx`):
+  - Tree navigation for collections with expand/collapse
+  - Tag toggle selection with checkbox semantics
+  - Quick filters (Recent, Favorites, Archived)
+  - Keyboard navigation (ArrowRight/Left to expand/collapse, Enter/Space to select)
+- **QuickActions** (`src/components/education/knowledge-hub/components/quick-actions.tsx`):
+  - Action buttons: New material, Upload file, Create folder, Create tag
+  - Compact mode (icon-only with tooltips)
+- **BulkToolbar** (`src/components/education/knowledge-hub/components/bulk-toolbar.tsx`):
+  - Bulk operations: Move, Add tags, Archive, Restore, Delete
+  - Selection count display with singular/plural handling
+- **StatsPanel** (`src/components/education/knowledge-hub/components/stats-panel.tsx`):
+  - Material counts by type (mindmap, quiz, flashcard, summary)
+  - Activity statistics (today, this week)
+  - Color-coded type icons
+- **MaterialCard** (`src/components/education/knowledge-hub/components/material-card.tsx`):
+  - Drag & drop with keyboard alternative (Arrow keys)
+  - Selection checkbox, favorite toggle
+  - Context menu with actions (Open, Duplicate, Move, Tags, Archive, Delete)
+  - Tag display with overflow indicator
+  - Relative date formatting (Oggi, Ieri, X giorni fa)
+- **177 Unit Tests** (`src/components/education/knowledge-hub/components/__tests__/`):
+  - `search-bar.test.tsx`: 24 tests (debounce, keyboard, type filter, accessibility)
+  - `sidebar-navigation.test.tsx`: 34 tests (collections, tags, quick filters, keyboard nav)
+  - `quick-actions.test.tsx`: 22 tests (buttons, compact mode, accessibility)
+  - `bulk-toolbar.test.tsx`: 25 tests (visibility, actions, accessibility)
+  - `stats-panel.test.tsx`: 22 tests (counts, styling, color coding)
+  - `material-card.test.tsx`: 50 tests (rendering, selection, favorites, drag & drop, menu)
+- All components WCAG 2.1 AA compliant with keyboard navigation and ARIA attributes
+
+#### Knowledge Hub Hooks (Phase 5, Tasks 5.23-5.28)
+- **useMaterialsSearch** (`src/components/education/knowledge-hub/hooks/use-materials-search.ts`):
+  - Fuse.js fuzzy search integration with configurable threshold
+  - Debounced query execution with adjustable delay
+  - Type filtering (all, quiz, mindmap, flashcard, etc.)
+  - Result highlighting support
+  - Helper functions: `sortMaterialsByRecency`, `filterMaterials`
+- **useCollections** (`src/components/education/knowledge-hub/hooks/use-collections.ts`):
+  - CRUD operations for collections/folders
+  - Hierarchical tree structure with parent-child relationships
+  - Breadcrumb path generation
+  - Material movement between collections
+- **useTags** (`src/components/education/knowledge-hub/hooks/use-tags.ts`):
+  - CRUD operations for tags
+  - Multi-select tag filtering
+  - Tag-to-material association management
+  - Material count tracking per tag
+  - 16 predefined colors with `getRandomTagColor` utility
+- **useSmartCollections** (`src/components/education/knowledge-hub/hooks/use-smart-collections.ts`):
+  - Dynamic collections: Recent (7 days), Favorites, Archived
+  - Time-based: Today, This Week, This Month
+  - Type-based: Quiz, Mindmap, Flashcard, Summary, etc. (13 types)
+  - Auto-sorting by creation date (newest first)
+- **useBulkActions** (`src/components/education/knowledge-hub/hooks/use-bulk-actions.ts`):
+  - Multi-select management with Set-based state
+  - Bulk operations: Move, Add Tags, Archive, Restore, Delete, Duplicate
+  - Loading and error state management
+  - Selection callbacks for external sync
+- **129 Unit Tests** (`src/components/education/knowledge-hub/hooks/__tests__/`):
+  - `use-materials-search.test.ts`: 26 tests (search, debounce, filtering, sorting)
+  - `use-collections.test.ts`: 27 tests (CRUD, tree building, breadcrumbs)
+  - `use-tags.test.ts`: 31 tests (CRUD, selection, material associations)
+  - `use-smart-collections.test.ts`: 20 tests (time filters, type grouping)
+  - `use-bulk-actions.test.ts`: 25 tests (selection, actions, error handling)
+
+#### Knowledge Hub Renderer Registry (Phase 5, Tasks 5.03-5.15)
+- **Renderer Registry** (`src/components/education/knowledge-hub/renderers/index.tsx`):
+  - Lazy loading with dynamic imports for code splitting
+  - Utility functions: `getRendererImport`, `hasRenderer`, `getSupportedRenderers`
+  - `FallbackRenderer` for unknown material types
+  - Display labels and icons for all 12 material types
+- **Type-Safe Renderers** for all material types:
+  - `MindmapRenderer`: Wrapper around MarkMapRenderer
+  - `QuizRenderer`: Interactive quiz with show/hide answers toggle
+  - `FlashcardRenderer`: Flip animation cards with navigation
+  - `SummaryRenderer`: Wrapper around SummaryRenderer with expandAll
+  - `DemoRenderer`: HTML/CSS/JS interactive demos with iframe sandbox
+  - `DiagramRenderer`: Mermaid diagram wrapper
+  - `TimelineRenderer`: Vertical timeline with motion animations
+  - `FormulaRenderer`: KaTeX formula wrapper
+  - `ChartRenderer`: Chart.js wrapper (line, bar, pie, scatter, area)
+  - `PdfRenderer`: PDF viewer with download option
+  - `ImageRenderer`: Accessible image with alt text
+  - `HomeworkRenderer`: Task list with completion tracking
+- **126 Unit Tests** (`src/components/education/knowledge-hub/renderers/__tests__/`):
+  - `index.test.tsx`: 29 tests for registry functions (hasRenderer, getRendererImport, getSupportedRenderers)
+  - `validation.test.ts`: 43 tests for all type guards and validation utilities
+  - `renderers.test.tsx`: 44 tests for all 12 renderer components (rendering, empty states, interactions)
+  - `error-boundary.test.tsx`: 10 tests for RendererErrorBoundary and withErrorBoundary HOC
+
+#### Knowledge Hub Material Dialog (Phase 5, Tasks 5.01-5.02)
+- **Material Dialog** (`src/components/education/knowledge-hub/material-dialog.tsx`):
+  - WCAG 2.1 AA accessible modal with focus trap
+  - Dynamic renderer loading via React.lazy
+  - Edit/Delete actions with confirmation
+  - Loading states and error handling
+  - Keyboard navigation (Escape to close)
+- **Dialog Tests** (`src/components/education/knowledge-hub/__tests__/material-dialog.test.tsx`)
+
+---
+
 ## [Unreleased] - Session Summaries & Unified Archive
 
 > **Branch**: `feature/conversation-summaries-unified-archive` | **Plan**: `docs/plans/SessionSummaryUnifiedArchive-2026-01-01.md`
@@ -53,6 +193,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `GET /api/conversations/[id]/end`: Get conversation summary
 - `GET/PATCH/DELETE /api/parent-notes`: Parent notes CRUD
 
+#### Knowledge Hub API Routes (ADR 0022, MasterPlan Phase 4)
+- `GET /api/conversations/memory`: Load conversation context for memory injection (ADR 0021)
+- `GET/POST /api/collections`: List and create material folders (nested support)
+- `GET/PUT/DELETE /api/collections/[id]`: Single collection operations
+- `GET/POST /api/tags`: List and create user tags with material counts
+- `GET/PUT/DELETE /api/tags/[id]`: Single tag operations
+- `POST /api/materials/bulk`: Bulk operations (move, archive, delete, restore, addTags, removeTags, setTags)
+- Updated `/api/materials`: Added searchableText generation, collection/tag filters
+- Updated `/api/chat`: Added conversation memory injection (ADR 0021)
+- **Security**: All endpoints use cookie auth, Zod validation, Prisma parameterized queries, ownership verification
+
 ### Changed
 
 #### Unified Tool Archive
@@ -67,6 +218,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added session context: topics, conversationId, strengths, areasToImprove
 - Added materials relation for session-tool linking
 
+#### Knowledge Hub Schema (ADR 0022)
+- **Material.searchableText**: Pre-computed searchable content for Fuse.js full-text search
+- **Material.collectionId**: Foreign key to Collection for folder organization
+- **Collection model**: Folders for organizing materials
+  - Nested folders via self-referential `parentId`
+  - User-scoped with unique name per folder level
+  - Color and icon customization
+- **Tag model**: User-defined tags with color support
+- **MaterialTag junction**: Many-to-many Material-Tag relation with cascade delete
+- All new fields properly indexed for query performance
+
 #### Conversation Flow Store
 - `endConversationWithSummary()`: New action for summary-aware session end
 - `loadContextualGreeting()`: Fetch personalized greeting
@@ -80,6 +242,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 - ADR 0019: Session Summaries & Unified Archive
+- ADR 0020: Mindmap Data Structure Fix
+- ADR 0021: Conversational Memory Injection
+- ADR 0022: Knowledge Hub Architecture
 - Claude docs: `docs/claude/session-summaries.md`
 
 ---

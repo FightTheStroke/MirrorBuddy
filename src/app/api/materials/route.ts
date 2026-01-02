@@ -6,8 +6,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { generateSearchableText } from '@/lib/search/searchable-text';
+import type { ToolType } from '@/types/tools';
 
 // Material types for storage (maps from ToolType actions to stored types)
 type MaterialType =
@@ -49,6 +52,8 @@ interface CreateMaterialRequest {
   sessionId?: string;
   subject?: string;
   preview?: string;
+  collectionId?: string;
+  tagIds?: string[];
 }
 
 interface UpdateMaterialRequest {
@@ -58,6 +63,9 @@ interface UpdateMaterialRequest {
   // User interaction (Issue #37 - Archive features)
   userRating?: number;
   isBookmarked?: boolean;
+  // Collection and tags
+  collectionId?: string | null;
+  tagIds?: string[];
 }
 
 /**
@@ -66,8 +74,14 @@ interface UpdateMaterialRequest {
  */
 export async function GET(request: NextRequest) {
   try {
+    // Auth check - prefer cookie, fallback to query param for backwards compatibility
+    const cookieStore = await cookies();
+    const cookieUserId = cookieStore.get('convergio-user-id')?.value;
+
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const queryUserId = searchParams.get('userId');
+    const userId = cookieUserId || queryUserId;
+
     const toolType = searchParams.get('toolType');
     const status = searchParams.get('status') || 'active';
     const limit = parseInt(searchParams.get('limit') || '50', 10);
@@ -75,14 +89,36 @@ export async function GET(request: NextRequest) {
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'Missing userId parameter' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       );
     }
+
+    // Build where clause with filters
+    const collectionId = searchParams.get('collectionId');
+    const tagId = searchParams.get('tagId');
+    const search = searchParams.get('search');
+    const subject = searchParams.get('subject');
 
     const where: Record<string, unknown> = { userId, status };
     if (toolType && VALID_MATERIAL_TYPES.includes(toolType as MaterialType)) {
       where.toolType = toolType;
+    }
+    if (collectionId) {
+      where.collectionId = collectionId;
+    }
+    if (tagId) {
+      where.tags = { some: { tagId } };
+    }
+    if (subject) {
+      where.subject = subject;
+    }
+    if (search) {
+      // Full-text search on searchableText and title
+      where.OR = [
+        { searchableText: { contains: search, mode: 'insensitive' } },
+        { title: { contains: search, mode: 'insensitive' } },
+      ];
     }
 
     const [materials, total] = await Promise.all([
@@ -91,14 +127,25 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         take: Math.min(limit, 100),
         skip: offset,
+        include: {
+          collection: {
+            select: { id: true, name: true, color: true },
+          },
+          tags: {
+            include: {
+              tag: { select: { id: true, name: true, color: true } },
+            },
+          },
+        },
       }),
       prisma.material.count({ where }),
     ]);
 
-    // Parse JSON content for each material
-    const parsed = materials.map((m: { content: string; [key: string]: unknown }) => ({
+    // Parse JSON content and flatten tags
+    const parsed = materials.map((m) => ({
       ...m,
-      content: JSON.parse(m.content),
+      content: JSON.parse(m.content as string),
+      tags: m.tags.map((mt) => mt.tag),
     }));
 
     return NextResponse.json({
@@ -122,8 +169,13 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const body: CreateMaterialRequest & { userId: string } = await request.json();
-    const { userId, toolId, toolType, title, content, maestroId, sessionId, subject, preview } = body;
+    // Auth check - prefer cookie, fallback to body for backwards compatibility
+    const cookieStore = await cookies();
+    const cookieUserId = cookieStore.get('convergio-user-id')?.value;
+
+    const body: CreateMaterialRequest & { userId?: string } = await request.json();
+    const userId = cookieUserId || body.userId;
+    const { toolId, toolType, title, content, maestroId, sessionId, subject, preview, collectionId, tagIds } = body;
 
     // Validate required fields
     if (!userId || !toolId || !toolType || !title || !content) {
@@ -152,6 +204,9 @@ export async function POST(request: NextRequest) {
       where: { toolId },
     });
 
+    // Generate searchable text for full-text search
+    const searchableText = generateSearchableText(toolType as ToolType, content);
+
     if (existing) {
       // Update existing material
       const updated = await prisma.material.update({
@@ -159,6 +214,7 @@ export async function POST(request: NextRequest) {
         data: {
           title,
           content: JSON.stringify(content),
+          searchableText,
           preview,
           updatedAt: new Date(),
         },
@@ -176,7 +232,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create new material
+    // Create new material with optional collection and tags
     const material = await prisma.material.create({
       data: {
         userId,
@@ -184,20 +240,32 @@ export async function POST(request: NextRequest) {
         toolType,
         title,
         content: JSON.stringify(content),
+        searchableText,
         maestroId,
         sessionId,
         subject,
         preview,
+        collectionId,
+        ...(tagIds && tagIds.length > 0 && {
+          tags: {
+            create: tagIds.map(tagId => ({ tagId })),
+          },
+        }),
+      },
+      include: {
+        collection: { select: { id: true, name: true, color: true } },
+        tags: { include: { tag: { select: { id: true, name: true, color: true } } } },
       },
     });
 
-    logger.info('Material created', { toolId, toolType, userId });
+    logger.info('Material created', { toolId, toolType, userId, collectionId, tagCount: tagIds?.length });
 
     return NextResponse.json({
       success: true,
       material: {
         ...material,
         content,
+        tags: material.tags.map(mt => mt.tag),
       },
       created: true,
     });
@@ -217,7 +285,7 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body: UpdateMaterialRequest & { toolId: string } = await request.json();
-    const { toolId, title, content, status, userRating, isBookmarked } = body;
+    const { toolId, title, content, status, userRating, isBookmarked, collectionId, tagIds } = body;
 
     if (!toolId) {
       return NextResponse.json(
@@ -239,7 +307,14 @@ export async function PATCH(request: NextRequest) {
 
     const updateData: Record<string, unknown> = {};
     if (title) updateData.title = title;
-    if (content) updateData.content = JSON.stringify(content);
+    if (content) {
+      updateData.content = JSON.stringify(content);
+      // Regenerate searchable text when content changes
+      updateData.searchableText = generateSearchableText(
+        existing.toolType as ToolType,
+        content
+      );
+    }
     if (status) updateData.status = status;
     // User interaction fields (Issue #37)
     if (typeof userRating === 'number' && userRating >= 1 && userRating <= 5) {
@@ -248,18 +323,38 @@ export async function PATCH(request: NextRequest) {
     if (typeof isBookmarked === 'boolean') {
       updateData.isBookmarked = isBookmarked;
     }
+    // Collection update (null = remove from collection)
+    if (collectionId !== undefined) {
+      updateData.collectionId = collectionId;
+    }
+
+    // Handle tag updates if provided
+    if (tagIds !== undefined) {
+      // Delete existing tags and create new ones in a transaction
+      await prisma.$transaction([
+        prisma.materialTag.deleteMany({ where: { materialId: existing.id } }),
+        ...tagIds.map(tagId =>
+          prisma.materialTag.create({ data: { materialId: existing.id, tagId } })
+        ),
+      ]);
+    }
 
     const updated = await prisma.material.update({
       where: { toolId },
       data: updateData,
+      include: {
+        collection: { select: { id: true, name: true, color: true } },
+        tags: { include: { tag: { select: { id: true, name: true, color: true } } } },
+      },
     });
 
-    logger.info('Material patched', { toolId, fields: Object.keys(updateData) });
+    logger.info('Material patched', { toolId, fields: Object.keys(updateData), tagCount: tagIds?.length });
 
     return NextResponse.json({
       success: true,
       material: {
         ...updated,
+        tags: updated.tags.map(mt => mt.tag),
         content: content || JSON.parse(updated.content),
       },
     });

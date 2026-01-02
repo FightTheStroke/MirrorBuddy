@@ -6,8 +6,9 @@
 // Issue #37: Unified Archive page with bookmark, rating, filters
 // ============================================================================
 
-import { useState, useEffect, useMemo, useCallback, type ChangeEvent } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type ChangeEvent } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import Fuse from 'fuse.js';
 import {
   Grid,
   List,
@@ -60,6 +61,24 @@ export function ArchiveView() {
   // Date range filter (Issue #37)
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
+  // Debounced search query
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounce search query for fuzzy search (Task 7.13)
+  useEffect(() => {
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+    searchTimerRef.current = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 200);
+    return () => {
+      if (searchTimerRef.current) {
+        clearTimeout(searchTimerRef.current);
+      }
+    };
+  }, [searchQuery]);
 
   // Load materials from IndexedDB
   useEffect(() => {
@@ -116,16 +135,21 @@ export function ArchiveView() {
       result = result.filter((item) => new Date(item.createdAt) <= toDate);
     }
 
-    // Filter by search query
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(
-        (item) =>
-          item.title?.toLowerCase().includes(query) ||
-          item.maestroId?.toLowerCase().includes(query) ||
-          item.toolType.toLowerCase().includes(query) ||
-          item.subject?.toLowerCase().includes(query)
-      );
+    // Filter by search query using fuzzy search (Task 7.13)
+    if (debouncedQuery.trim()) {
+      // Use Fuse.js fuzzy search on the pre-filtered results
+      const fuseInstance = new Fuse(result, {
+        keys: [
+          { name: 'title', weight: 2 },
+          { name: 'subject', weight: 1 },
+          { name: 'maestroId', weight: 0.5 },
+          { name: 'toolType', weight: 0.5 },
+        ],
+        threshold: 0.3,
+        ignoreLocation: true,
+        minMatchCharLength: 2,
+      });
+      result = fuseInstance.search(debouncedQuery).map(r => r.item);
     }
 
     // Sort
@@ -145,7 +169,7 @@ export function ArchiveView() {
     });
 
     return result;
-  }, [materials, filter, searchQuery, sortBy, subjectFilter, dateFrom, dateTo]);
+  }, [materials, filter, debouncedQuery, sortBy, subjectFilter, dateFrom, dateTo]);
 
   // Handlers
   const handleDelete = async (toolId: string) => {

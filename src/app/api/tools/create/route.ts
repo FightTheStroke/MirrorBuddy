@@ -16,6 +16,7 @@ import {
   broadcastToolEvent,
   type ToolType,
 } from '@/lib/realtime/tool-events';
+import { validateAuth, validateSessionOwnership } from '@/lib/auth/session-auth';
 
 // Valid tool types
 const VALID_TOOL_TYPES: ToolType[] = [
@@ -49,6 +50,15 @@ interface CreateToolRequest {
  */
 export async function POST(request: NextRequest) {
   try {
+    // #83: Authentication check - tool creation requires authenticated user
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
     const body: CreateToolRequest = await request.json();
     const { sessionId, maestroId, toolType, title, subject, content } = body;
 
@@ -79,6 +89,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid sessionId format' },
         { status: 400 }
+      );
+    }
+
+    // #83: Verify session ownership - user can only create tools in their own sessions
+    const ownsSession = await validateSessionOwnership(sessionId, auth.userId);
+    if (!ownsSession) {
+      return NextResponse.json(
+        { error: 'Session not found or access denied' },
+        { status: 403 }
       );
     }
 

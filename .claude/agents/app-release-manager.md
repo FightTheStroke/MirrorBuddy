@@ -89,20 +89,53 @@ Required test suites:
 
 Manual verification required:
 
-### Student Safety
+### Student Safety (ADR-0004)
 - [ ] All 17 maestri respond appropriately
 - [ ] Safety guardrails block inappropriate content
 - [ ] Crisis keywords trigger helpline info (Telefono Azzurro: 19696)
+- [ ] `injectSafetyGuardrails()` used in all AI prompts
+- [ ] Memory injection cannot override safety rules
+- [ ] Jailbreak detector catches adversarial inputs
 
-### GDPR Compliance
+**Verification command:**
+```bash
+npm test -- run src/lib/safety/__tests__/
+# Should pass ALL safety tests (150+)
+```
+
+### GDPR Compliance (Minors)
 - [ ] Parent dashboard shows consent status
-- [ ] Data export works (JSON/PDF)
-- [ ] Right to erasure honored
+- [ ] Data export works (JSON/PDF) - `/api/user/export`
+- [ ] Right to erasure honored - `/api/user/delete`
+- [ ] Knowledge Hub data can be exported
+- [ ] Memory data respects consent
+- [ ] Audit logging enabled for new endpoints
+
+**Verification command:**
+```bash
+grep -r "convergio-user-id" src/app/api/ --include="*.ts" | wc -l
+# All API routes should check user auth
+```
+
+### WCAG 2.1 AA Compliance
+- [ ] All new components have keyboard navigation
+- [ ] ARIA labels present on interactive elements
+- [ ] Color contrast >= 4.5:1
+- [ ] Focus indicators visible
+- [ ] Screen reader compatible
+
+**Verification command:**
+```bash
+npm test -- run e2e/accessibility*.spec.ts
+# Should pass Axe accessibility audit
+```
 
 ### Educational Quality
 - [ ] Flashcard FSRS intervals are correct
 - [ ] Progress tracking updates XP/levels
-- [ ] Mind maps render properly
+- [ ] Mind maps render with correct title and hierarchy (ADR-0020)
+- [ ] Knowledge Hub renderers show content (not JSON) (ADR-0022)
+- [ ] Conversational memory persists across sessions (ADR-0021)
 
 ### Platform Knowledge Base (Issue #16)
 - [ ] `src/data/app-knowledge-base.ts` updated with new features
@@ -113,8 +146,15 @@ Manual verification required:
 **Verification command:**
 ```bash
 grep "lastUpdated" src/data/app-knowledge-base.ts
-# Should show current month: '2025-12' or later
+# Should show current month: '2026-01' or later
 ```
+
+### E2E Educational Flows
+- [ ] Mindmap creation flow works (voice + text)
+- [ ] Quiz generation and scoring works
+- [ ] Flashcard review with FSRS works
+- [ ] Knowledge Hub search finds materials
+- [ ] Collection and tag organization works
 
 ---
 

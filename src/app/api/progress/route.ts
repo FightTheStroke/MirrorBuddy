@@ -6,9 +6,35 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { serverNotifications } from '@/lib/notifications/server-triggers';
+
+// #92: Zod schema for progress validation
+const ProgressUpdateSchema = z.object({
+  xp: z.number().int().min(0).max(1000000).optional(),
+  level: z.number().int().min(1).max(100).optional(),
+  totalStudyMinutes: z.number().int().min(0).max(100000).optional(),
+  questionsAsked: z.number().int().min(0).max(100000).optional(),
+  sessionsThisWeek: z.number().int().min(0).max(1000).optional(),
+  streak: z.object({
+    current: z.number().int().min(0).max(10000).optional(),
+    longest: z.number().int().min(0).max(10000).optional(),
+    lastStudyDate: z.string().datetime().or(z.date()).optional(),
+  }).optional(),
+  achievements: z.array(z.object({
+    id: z.string(),
+    name: z.string().max(100),
+    description: z.string().max(500).optional(),
+    unlockedAt: z.string().datetime().or(z.date()).optional(),
+  })).max(100).optional(),
+  masteries: z.array(z.object({
+    subject: z.string().max(50),
+    level: z.number().int().min(0).max(100),
+    xp: z.number().int().min(0).optional(),
+  })).max(50).optional(),
+}).strict();
 
 export async function GET() {
   try {
@@ -59,7 +85,21 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const body = await request.json();
+
+    // #92: Validate with Zod before processing
+    const validation = ProgressUpdateSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid progress data',
+          details: validation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
+    }
+
+    const data = validation.data;
 
     // Get current progress for comparison (to detect level ups, streak milestones)
     const currentProgress = await prisma.progress.findUnique({
@@ -126,12 +166,12 @@ export async function PUT(request: NextRequest) {
     if (data.achievements && Array.isArray(data.achievements)) {
       const oldAchievementIds = new Set(oldAchievements.map((a: { id: string }) => a.id));
       const newAchievements = data.achievements.filter(
-        (a: { id: string; name: string; description: string }) => !oldAchievementIds.has(a.id)
+        (a) => !oldAchievementIds.has(a.id)
       );
 
       for (const achievement of newAchievements) {
         serverNotifications
-          .achievement(userId, achievement.id, achievement.name, achievement.description)
+          .achievement(userId, achievement.id, achievement.name, achievement.description || '')
           .catch((err) => {
             logger.error('Failed to send achievement notification', { error: String(err) });
           });

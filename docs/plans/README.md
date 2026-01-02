@@ -1,21 +1,37 @@
 # Implementation Plans
 
-This folder contains all implementation plans for ConvergioEdu features.
+Kanban board per i piani di implementazione di ConvergioEdu.
 
 ## Folder Structure
 
 ```
 docs/plans/
-  completed/     # Finished plans (merged to main)
-  in-progress/   # Plans currently being worked on
-  README.md      # This file
+├── todo/              # Da fare
+├── doing/             # In esecuzione
+├── done/              # Completati
+├── reference/         # Documentazione di riferimento
+└── README.md          # Questo file
 ```
 
-## Plan Status
+## Kanban Board
 
-### Completed
+### TODO
 
-| Plan | Date | Description | ADR |
+| Plan | Data | Descrizione |
+|------|------|-------------|
+| [StudyKitGenerator](todo/StudyKitGenerator-2026-01-02.md) | 2026-01-02 | Trasforma PDF in kit studio (riassunto, mappa, demo, quiz) |
+| [VoiceModelMigration](todo/VoiceModelMigration-2026-01-02.md) | 2026-01-02 | Migrazione modello voice |
+| [KnowledgeBaseOptimization](todo/KnowledgeBaseOptimization-2026-01-01.md) | 2026-01-01 | Knowledge base lazy loading |
+
+### DOING
+
+| Plan | Data | Descrizione | Branch |
+|------|------|-------------|--------|
+| [MasterPlan Sprint 2026-01](doing/MasterPlan-Sprint-2026-01.md) | 2026-01-01 | Sprint planning Q1 2026 | vari |
+
+### DONE
+
+| Plan | Data | Descrizione | ADR |
 |------|------|-------------|-----|
 | MirrorBuddyPlanDec29 | 2025-12-29 | Conversation-First + Triangle of Support | 0010, 0012 |
 | VoiceExperiencePlanDec29 | 2025-12-29 | Voice UX improvements | 0012 |
@@ -23,34 +39,28 @@ docs/plans/
 | MaestroToolsPlanDec30 | 2025-12-30 | Interactive tools system | 0009 |
 | LandingShowcasePlanDec30 | 2025-12-30 | Showcase mode for offline | - |
 | LocalStorageMigrationPlanDec31 | 2025-12-31 | Database-first architecture | 0015 |
-| SessionSummaryUnifiedArchive-2026-01-01 | 2026-01-01 | Session summaries + unified archive | 0019 |
-
-### In Progress
-
-| Plan | Date | Description | ADR | Branch |
-|------|------|-------------|-----|--------|
-| KnowledgeBaseOptimization-2026-01-01 | 2026-01-01 | Knowledge base lazy loading | - | TBD |
-| **UnifiedArchive-2026-01-01** | 2026-01-01 | Knowledge Hub - Unified Material Archive | 0020 | `feature/knowledge-hub` |
-
-## Plan Template
-
-See `@docs/plan-template.md` for the standard plan format.
+| SessionSummaryUnifiedArchive | 2026-01-01 | Session summaries + unified archive | 0019 |
 
 ## Workflow
 
-1. Create plan in `in-progress/`
-2. Create corresponding ADR in `docs/adr/`
-3. Work on dedicated worktree/branch
-4. Thor review before completion
-5. Merge PR to main
-6. Move plan to `completed/`
+```
+TODO ──► DOING ──► DONE
+```
+
+1. **TODO**: Crea piano in `todo/` con nome `[Feature]-[YYYY-MM-DD].md`
+2. **DOING**: Sposta in `doing/` quando inizi il lavoro
+3. **DONE**: Sposta in `done/` dopo merge PR
 
 ## Quality Gates
 
-Before marking a plan as complete:
+Prima di spostare in `done/`:
 
-- [ ] All checkpoints marked done
-- [ ] `npm run lint && npm run typecheck && npm run build` passes
-- [ ] Thor quality review passed
+- [ ] Tutti i checkpoint completati
+- [ ] `npm run lint && npm run typecheck && npm run build` passa
+- [ ] Thor quality review passata
 - [ ] PR merged to main
-- [ ] CHANGELOG updated
+- [ ] CHANGELOG aggiornato
+
+## Plan Template
+
+Vedi `@docs/plan-template.md` per il formato standard.

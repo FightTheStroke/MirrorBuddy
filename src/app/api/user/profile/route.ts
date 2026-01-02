@@ -6,8 +6,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+
+// #92: Zod schema for profile validation
+const ProfileUpdateSchema = z.object({
+  name: z.string().max(100).optional(),
+  age: z.number().int().min(5).max(100).optional(),
+  schoolYear: z.number().int().min(1).max(13).optional(),
+  schoolLevel: z.enum(['elementare', 'media', 'superiore']).optional(),
+  gradeLevel: z.string().max(20).optional(),
+  learningGoals: z.array(z.string().max(200)).max(20).optional(),
+  preferredCoach: z.enum(['melissa', 'roberto', 'chiara', 'andrea', 'favij']).nullable().optional(),
+  preferredBuddy: z.enum(['mario', 'noemi', 'enea', 'bruno', 'sofia']).nullable().optional(),
+}).strict();
 
 export async function GET() {
   try {
@@ -52,26 +65,34 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const body = await request.json();
 
-    // Remove fields that shouldn't be updated directly
-    delete data.id;
-    delete data.userId;
-    delete data.createdAt;
-    delete data.updatedAt;
+    // #92: Validate with Zod before processing
+    const validation = ProfileUpdateSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid profile data',
+          details: validation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
+    }
 
-    // Remove accessibility object - it belongs to Settings, not Profile
-    delete data.accessibility;
+    const data = validation.data;
+
+    // Prepare update data
+    const updateData: Record<string, unknown> = { ...data };
 
     // Stringify learningGoals if it's an array
-    if (Array.isArray(data.learningGoals)) {
-      data.learningGoals = JSON.stringify(data.learningGoals);
+    if (Array.isArray(updateData.learningGoals)) {
+      updateData.learningGoals = JSON.stringify(updateData.learningGoals);
     }
 
     const profile = await prisma.profile.upsert({
       where: { userId },
-      update: data,
-      create: { userId, ...data },
+      update: updateData,
+      create: { userId, ...updateData },
     });
 
     return NextResponse.json({
