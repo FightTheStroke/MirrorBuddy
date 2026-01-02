@@ -66,7 +66,8 @@ export function useConversationInactivity(
     if (!conversationId) return;
 
     const handleBeforeUnload = () => {
-      // Fire and forget - browser will wait for this to complete
+      // Best-effort: sendBeacon may not complete before browser closes.
+      // Inactivity timeout (INACTIVITY_TIMEOUT_MS) serves as fallback for summary generation.
       navigator.sendBeacon(
         `/api/conversations/${conversationId}/end`,
         new Blob(

@@ -86,11 +86,13 @@ export async function POST(request: NextRequest) {
     });
 
     // Process in background (for production, use a queue like BullMQ)
-    // For now, process synchronously with timeout
-    processStudyKit(buffer, title, subject || undefined, (step, progress) => {
-      logger.debug('Study kit progress', { studyKitId: studyKit.id, step, progress });
-    })
-      .then(async (result) => {
+    // Wrapped in async IIFE to ensure all errors (sync and async) are caught
+    (async () => {
+      try {
+        const result = await processStudyKit(buffer, title, subject || undefined, (step, progress) => {
+          logger.debug('Study kit progress', { studyKitId: studyKit.id, step, progress });
+        });
+
         // Update study kit with generated materials
         await prisma.studyKit.update({
           where: { id: studyKit.id },
@@ -106,9 +108,8 @@ export async function POST(request: NextRequest) {
         });
 
         logger.info('Study kit processing complete', { studyKitId: studyKit.id });
-      })
-      .catch(async (error) => {
-        // Update with error status
+      } catch (error) {
+        // Update with error status - guaranteed to run for any error
         await prisma.studyKit.update({
           where: { id: studyKit.id },
           data: {
@@ -121,7 +122,8 @@ export async function POST(request: NextRequest) {
           studyKitId: studyKit.id,
           error: String(error),
         });
-      });
+      }
+    })();
 
     // Return immediately with processing status
     return NextResponse.json({
