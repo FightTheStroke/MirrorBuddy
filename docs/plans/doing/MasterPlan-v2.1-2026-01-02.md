@@ -355,6 +355,44 @@ PRIORITY 3: WAVE 2 - Study Kit Generator (3-4 giorni)
 ONGOING: WAVE 3 - Tech Debt
 ```
 
+## Quality Assurance (OBBLIGATORIO)
+
+### Per ogni task completato:
+```
+1. Implementa fix
+2. npm run lint && npm run typecheck && npm run test:unit
+3. Lancia thor-quality-assurance-guardian per verificare:
+   - Codice scritto correttamente
+   - Nessun task dimenticato
+   - Test coverage adeguata
+   - Nessun TODO lasciato
+4. Solo se thor approva → commit
+```
+
+### Al termine di ogni WAVE:
+```
+1. Tutti i task della WAVE completati
+2. Lancia thor su TUTTA la WAVE
+3. Thor verifica:
+   - Tutte le checkbox marcate
+   - Nessun bug reintrodotto
+   - Documentazione aggiornata
+   - CHANGELOG aggiornato
+4. Solo se thor approva → procedi alla WAVE successiva
+```
+
+### Al termine di WAVE 0 (Critical Bugs):
+```
+1. Tutti i 6 bug fixati e verificati da thor
+2. Crea PR: development → main
+3. Thor fa review finale della PR:
+   - Code review completa
+   - Verifica TUTTE le richieste originali di Roberto soddisfatte
+   - Verifica lint/typecheck/test/build passano
+   - Verifica documentazione completa
+4. Solo se thor approva → merge PR
+```
+
 ## Documentazione (Per ogni fix completato)
 
 - [ ] **ADR**: Se cambia architettura, creare ADR in `docs/adr/`
