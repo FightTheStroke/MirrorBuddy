@@ -146,6 +146,26 @@ function extractSummaryText(data: unknown): string {
   return extractGenericText(data);
 }
 
+/**
+ * Strip HTML tags safely without regex (prevents ReDoS)
+ * Uses O(n) character iteration instead of regex backtracking
+ */
+function stripHtmlTags(html: string): string {
+  let result = '';
+  let inTag = false;
+  for (const char of html) {
+    if (char === '<') {
+      inTag = true;
+    } else if (char === '>') {
+      inTag = false;
+      result += ' ';
+    } else if (!inTag) {
+      result += char;
+    }
+  }
+  return result;
+}
+
 function extractDemoText(data: unknown): string {
   const parts: string[] = [];
   const obj = data as Record<string, unknown>;
@@ -153,10 +173,9 @@ function extractDemoText(data: unknown): string {
   if (obj.title) parts.push(String(obj.title));
   if (obj.description) parts.push(String(obj.description));
 
-  // Extract text from HTML (basic)
+  // Extract text from HTML using safe non-regex stripping
   if (obj.html && typeof obj.html === 'string') {
-    const textOnly = obj.html.replace(/<[^>]+>/g, ' ');
-    parts.push(textOnly);
+    parts.push(stripHtmlTags(obj.html));
   }
 
   return parts.join(' ').trim();
