@@ -71,7 +71,7 @@ const DEFAULT_PREFERENCES: NotificationPreferences = {
 
 // Generate unique ID
 const generateId = (): string => {
-  return `notif_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+  return `notif_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 };
 
 export const useNotificationStore = create<NotificationState>()(

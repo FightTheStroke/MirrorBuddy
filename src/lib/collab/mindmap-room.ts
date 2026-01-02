@@ -107,7 +107,7 @@ const PARTICIPANT_COLORS = [
  * Generate unique room ID
  */
 function generateRoomId(): string {
-  return `room_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `room_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**
@@ -349,7 +349,7 @@ export function addNode(
   // Add node with unique ID
   const newNode: MindmapNode = {
     ...node,
-    id: node.id || `node_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    id: node.id || `node_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
   };
 
   found.node.children.push(newNode);
