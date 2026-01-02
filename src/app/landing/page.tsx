@@ -69,6 +69,7 @@ export default function LandingPage() {
           <div className="text-center">
             {/* Logo */}
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white/10 backdrop-blur-sm mb-8 shadow-2xl shadow-purple-500/25 overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element -- Static logo asset */}
               <img src="/logo-brain.png" alt="MirrorBuddy" className="w-20 h-20 object-contain" />
             </div>
 

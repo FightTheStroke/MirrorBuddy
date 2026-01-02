@@ -95,6 +95,7 @@ export default function ShowcaseLayout({
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/showcase" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element -- Static logo asset */}
               <img src="/logo-brain.png" alt="MirrorBuddy" className="w-full h-full object-contain" />
             </div>
             <div>

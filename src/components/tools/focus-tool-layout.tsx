@@ -468,6 +468,7 @@ export function FocusToolLayout() {
           {/* Logo/Toggle */}
           <div className="h-14 flex items-center gap-2 px-2 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
             {/* Brain Logo */}
+            {/* eslint-disable-next-line @next/next/no-img-element -- Static logo asset */}
             <img
               src="/logo-brain.png"
               alt="MirrorBuddy"
