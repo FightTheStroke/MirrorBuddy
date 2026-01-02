@@ -112,6 +112,28 @@ const activeTools = new Map<string, ToolState>();
 // Session to tools mapping for quick lookup
 const sessionTools = new Map<string, Set<string>>();
 
+// #90: Schedule automatic cleanup for terminal states to prevent memory leaks
+// Default: cleanup after 5 minutes for terminal states
+const TERMINAL_STATE_TTL_MS = 5 * 60 * 1000;
+
+function scheduleToolCleanup(toolId: string, sessionId: string): void {
+  setTimeout(() => {
+    const state = activeTools.get(toolId);
+    // Only delete if still in terminal state (might have been recreated)
+    if (state && ['completed', 'error', 'cancelled'].includes(state.status)) {
+      activeTools.delete(toolId);
+      const sessionToolSet = sessionTools.get(sessionId);
+      if (sessionToolSet) {
+        sessionToolSet.delete(toolId);
+        if (sessionToolSet.size === 0) {
+          sessionTools.delete(sessionId);
+        }
+      }
+      logger.debug('Tool state auto-cleaned', { toolId });
+    }
+  }, TERMINAL_STATE_TTL_MS);
+}
+
 /**
  * Create a new tool state
  */
@@ -253,6 +275,9 @@ export function completeToolState(
 
   activeTools.set(toolId, state);
 
+  // #90: Schedule cleanup to prevent memory leak
+  scheduleToolCleanup(toolId, state.sessionId);
+
   logger.info('Tool state completed', {
     toolId,
     type: state.type,
@@ -282,6 +307,9 @@ export function failToolState(
 
   activeTools.set(toolId, state);
 
+  // #90: Schedule cleanup to prevent memory leak
+  scheduleToolCleanup(toolId, state.sessionId);
+
   logger.error('Tool state failed', {
     toolId,
     type: state.type,
@@ -305,6 +333,9 @@ export function cancelToolState(toolId: string): ToolState | null {
   state.updatedAt = Date.now();
 
   activeTools.set(toolId, state);
+
+  // #90: Schedule cleanup to prevent memory leak
+  scheduleToolCleanup(toolId, state.sessionId);
 
   logger.info('Tool state cancelled', {
     toolId,

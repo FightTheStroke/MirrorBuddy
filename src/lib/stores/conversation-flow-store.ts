@@ -138,7 +138,8 @@ async function loadConversationSummariesFromDB(): Promise<ConversationSummary[]>
 
 /**
  * Update conversation summary in DB.
- * TODO: Call this when ending a conversation to save summary for future context.
+ * NOTE: Integrate with conversation-flow.tsx endSession() for memory persistence.
+ * See ADR-0021 for architecture details.
  */
 async function _updateConversationSummary(
   conversationId: string,

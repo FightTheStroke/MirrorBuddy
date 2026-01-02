@@ -13,6 +13,7 @@ import {
   HEARTBEAT_INTERVAL_MS,
 } from '@/lib/realtime/tool-events';
 import { logger } from '@/lib/logger';
+import { validateAuth, validateSessionOwnership } from '@/lib/auth/session-auth';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -32,6 +33,15 @@ export const dynamic = 'force-dynamic';
  * - mindmap:modify - Mindmap modification (voice commands)
  */
 export async function GET(request: NextRequest) {
+  // #86: Authentication check - SSE requires authenticated user
+  const auth = await validateAuth();
+  if (!auth.authenticated || !auth.userId) {
+    return new Response(
+      JSON.stringify({ error: 'Authentication required' }),
+      { status: 401, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get('sessionId');
 
@@ -48,6 +58,15 @@ export async function GET(request: NextRequest) {
     return new Response(
       JSON.stringify({ error: 'Invalid sessionId format' }),
       { status: 400, headers: { 'Content-Type': 'application/json' } }
+    );
+  }
+
+  // #86: Verify session ownership - user can only subscribe to their own sessions
+  const ownsSession = await validateSessionOwnership(sessionId, auth.userId);
+  if (!ownsSession) {
+    return new Response(
+      JSON.stringify({ error: 'Session not found or access denied' }),
+      { status: 403, headers: { 'Content-Type': 'application/json' } }
     );
   }
 

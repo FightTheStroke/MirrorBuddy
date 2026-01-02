@@ -68,18 +68,16 @@ export function SummariesView({ className }: SummariesViewProps) {
   }, []);
 
   // Handle convert to mindmap
+  // NOTE: Placeholder for future integration with Knowledge Hub
   const handleConvertToMindmap = useCallback((data: SummaryData) => {
-    const result = convertSummaryToMindmap(data);
-    // TODO: Save as mindmap and navigate to mindmaps view
-    console.log('Converted to mindmap:', result);
+    const _result = convertSummaryToMindmap(data);
     alert('Mappa mentale creata! (Funzionalità in sviluppo)');
   }, []);
 
   // Handle generate flashcards
+  // NOTE: Placeholder for future integration with Knowledge Hub
   const handleGenerateFlashcards = useCallback((data: SummaryData) => {
     const result = generateFlashcardsFromSummary(data);
-    // TODO: Save as flashcards and navigate to flashcards view
-    console.log('Generated flashcards:', result);
     alert(`${result.cards.length} flashcard create! (Funzionalità in sviluppo)`);
   }, []);
 

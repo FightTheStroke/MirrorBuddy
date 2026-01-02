@@ -1,0 +1,469 @@
+/**
+ * Unit tests for ToolMaestroSelectionDialog component
+ * Tests: rendering, accessibility, keyboard navigation, step flow
+ * @vitest-environment jsdom
+ */
+
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { ToolMaestroSelectionDialog } from '../tool-maestro-selection-dialog';
+
+// Mock framer-motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+  motion: {
+    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
+      <div {...props}>{children}</div>
+    ),
+  },
+  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+}));
+
+// Mock Next.js Image
+vi.mock('next/image', () => ({
+  default: ({ src, alt, ...props }: { src: string; alt: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt={alt} {...props} />
+  ),
+}));
+
+// Mock maestri data - defined inside the factory to avoid hoisting issues
+vi.mock('@/data', () => {
+  const maestriData = [
+    {
+      id: 'euclide',
+      name: 'Euclide',
+      subject: 'mathematics',
+      specialty: 'Geometria',
+      avatar: '/avatars/euclide.png',
+      personality: 'Logico',
+      teachingStyle: 'Deduttivo',
+      voiceId: 'alloy',
+      color: '#4A90D9',
+      gradient: 'from-blue-500 to-blue-600',
+      systemPrompt: 'Test prompt',
+      greeting: 'Ciao!',
+    },
+    {
+      id: 'feynman',
+      name: 'Feynman',
+      subject: 'physics',
+      specialty: 'Fisica Quantistica',
+      avatar: '/avatars/feynman.png',
+      personality: 'Curioso',
+      teachingStyle: 'Intuitivo',
+      voiceId: 'echo',
+      color: '#9B59B6',
+      gradient: 'from-purple-500 to-purple-600',
+      systemPrompt: 'Test prompt',
+      greeting: 'Ciao!',
+    },
+  ];
+
+  const subjectsData = ['mathematics', 'physics', 'history'];
+
+  return {
+    getMaestriBySubject: (subject: string) =>
+      maestriData.filter((m) => m.subject === subject),
+    getAllSubjects: () => subjectsData,
+    maestri: maestriData,
+  };
+});
+
+describe('ToolMaestroSelectionDialog', () => {
+  const mockOnConfirm = vi.fn();
+  const mockOnClose = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  describe('Rendering', () => {
+    it('renders nothing when closed', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={false}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('renders dialog when open', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('displays correct tool label for mindmap', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByText(/Mappa Mentale/)).toBeInTheDocument();
+    });
+
+    it('displays correct tool label for quiz', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="quiz"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByText(/Quiz/)).toBeInTheDocument();
+    });
+
+    it('renders subject selection buttons', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByText('Matematica')).toBeInTheDocument();
+      expect(screen.getByText('Fisica')).toBeInTheDocument();
+      expect(screen.getByText('Storia')).toBeInTheDocument();
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('has role="dialog" attribute', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('has aria-modal="true" attribute', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true');
+    });
+
+    it('has aria-labelledby pointing to title', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      const dialog = screen.getByRole('dialog');
+      expect(dialog).toHaveAttribute('aria-labelledby', 'dialog-title');
+      expect(screen.getByText(/Scegli Materia/)).toHaveAttribute('id', 'dialog-title');
+    });
+
+    it('close button has aria-label', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByRole('button', { name: 'Chiudi' })).toBeInTheDocument();
+    });
+  });
+
+  describe('Keyboard Navigation', () => {
+    it('closes on Escape key', async () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      fireEvent.keyDown(document, { key: 'Escape' });
+
+      await waitFor(() => {
+        expect(mockOnClose).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('all subject buttons are keyboard accessible', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      const buttons = screen.getAllByRole('button');
+      buttons.forEach((button) => {
+        expect(button).not.toHaveAttribute('tabindex', '-1');
+      });
+    });
+  });
+
+  describe('Step Flow', () => {
+    it('starts at subject step', () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+      expect(screen.getByText(/Scegli Materia/)).toBeInTheDocument();
+    });
+
+    it('advances to mode step when subject has single maestro', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      // Click Mathematics (which has Euclide)
+      await user.click(screen.getByText('Matematica'));
+
+      // Should skip maestro selection and go to mode
+      await waitFor(() => {
+        expect(screen.getByText(/Scegli Modalità/)).toBeInTheDocument();
+      });
+    });
+
+    it('advances to maestro step when subject has no specific maestro', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      // Click History (which has no maestro in our mock)
+      await user.click(screen.getByText('Storia'));
+
+      // Should show all maestri
+      await waitFor(() => {
+        expect(screen.getByText(/Scegli Professore/)).toBeInTheDocument();
+        expect(screen.getByText('Euclide')).toBeInTheDocument();
+        expect(screen.getByText('Feynman')).toBeInTheDocument();
+      });
+    });
+
+    it('shows back button on maestro step', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      await user.click(screen.getByText('Storia'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Indietro')).toBeInTheDocument();
+      });
+    });
+
+    it('goes back to subject step when clicking Indietro', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      await user.click(screen.getByText('Storia'));
+      await user.click(screen.getByText('Indietro'));
+
+      await waitFor(() => {
+        expect(screen.getByText(/Scegli Materia/)).toBeInTheDocument();
+      });
+    });
+  });
+
+  describe('Mode Selection', () => {
+    it('shows voice and chat options', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      // Select a subject that has a maestro
+      await user.click(screen.getByText('Matematica'));
+
+      await waitFor(() => {
+        expect(screen.getByText('Voce')).toBeInTheDocument();
+        expect(screen.getByText('Chat')).toBeInTheDocument();
+      });
+    });
+
+    it('calls onConfirm with voice mode', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      await user.click(screen.getByText('Matematica'));
+      await user.click(screen.getByText('Voce'));
+
+      await waitFor(() => {
+        expect(mockOnConfirm).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 'euclide' }),
+          'voice'
+        );
+      });
+    });
+
+    it('calls onConfirm with chat mode', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      await user.click(screen.getByText('Matematica'));
+      await user.click(screen.getByText('Chat'));
+
+      await waitFor(() => {
+        expect(mockOnConfirm).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 'euclide' }),
+          'chat'
+        );
+      });
+    });
+  });
+
+  describe('Close Behavior', () => {
+    it('calls onClose when clicking close button', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Chiudi' }));
+
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onClose when clicking backdrop', async () => {
+      const user = userEvent.setup();
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      // Click the backdrop (the outer div)
+      const backdrop = screen.getByRole('dialog').parentElement;
+      if (backdrop) {
+        await user.click(backdrop);
+      }
+
+      expect(mockOnClose).toHaveBeenCalled();
+    });
+
+    it('resets state when closed via close button', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      // Go to maestro step
+      await user.click(screen.getByText('Storia'));
+      expect(screen.getByText(/Scegli Professore/)).toBeInTheDocument();
+
+      // Close via close button (which calls handleClose that resets state)
+      await user.click(screen.getByRole('button', { name: 'Chiudi' }));
+
+      // Simulate parent responding to onClose by setting isOpen=false then true
+      rerender(
+        <ToolMaestroSelectionDialog
+          isOpen={false}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      rerender(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should be back at subject step since handleClose reset state
+      expect(screen.getByText(/Scegli Materia/)).toBeInTheDocument();
+    });
+  });
+});

@@ -163,6 +163,7 @@ export function ConversationFlow() {
           ],
           maestroId: activeCharacter.id,
           requestedTool: toolType,
+          enableMemory: true, // ADR 0021: Enable conversational memory injection
         }),
       });
 
@@ -428,7 +429,7 @@ export function ConversationFlow() {
         }
       }
 
-      // Send to AI for response (simulated for now - will integrate with chat API)
+      // Send to AI for response with memory context (ADR 0021)
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -444,6 +445,7 @@ export function ConversationFlow() {
             { role: 'user', content: userMessage },
           ],
           maestroId: activeCharacter.id,
+          enableMemory: true, // ADR 0021: Enable conversational memory injection
         }),
       });
 

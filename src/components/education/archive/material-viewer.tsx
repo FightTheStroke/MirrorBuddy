@@ -3,15 +3,24 @@
 /**
  * Material Viewer Modal
  * Shows the selected material content in an overlay
+ *
+ * Updated in Phase 6 (Task 6.06) to use the Knowledge Hub renderer registry
+ * instead of showing raw JSON for structured content types.
  */
 
-import { useEffect } from 'react';
+import { useEffect, Suspense, lazy, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { X, FileText, ExternalLink } from 'lucide-react';
+import { X, FileText, ExternalLink, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TOOL_ICONS, TOOL_LABELS } from './constants';
 import { formatDate } from './utils';
 import type { ArchiveItem } from './types';
+import {
+  getRendererImport,
+  hasRenderer,
+  FallbackRenderer,
+  type BaseRendererProps,
+} from '@/components/education/knowledge-hub/renderers';
 
 interface MaterialViewerProps {
   item: ArchiveItem;
@@ -31,6 +40,21 @@ export function MaterialViewer({ item, onClose }: MaterialViewerProps) {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
+  // Create lazy component for the renderer if available
+  const LazyRenderer = useMemo(() => {
+    if (!hasRenderer(item.toolType)) return null;
+    const importFn = getRendererImport(item.toolType);
+    if (!importFn) return null;
+    return lazy(importFn);
+  }, [item.toolType]);
+
+  // Loading fallback for lazy-loaded renderers
+  const LoadingFallback = (
+    <div className="flex items-center justify-center py-12">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
+
   // Render content based on tool type
   const renderContent = () => {
     const content = item.content;
@@ -43,7 +67,7 @@ export function MaterialViewer({ item, onClose }: MaterialViewerProps) {
       );
     }
 
-    // Image content (webcam captures)
+    // Image content (webcam captures) - handle specially for base64 data
     if (item.toolType === 'webcam' && typeof content === 'object' && 'imageData' in content) {
       return (
         <div className="flex justify-center">
@@ -57,7 +81,7 @@ export function MaterialViewer({ item, onClose }: MaterialViewerProps) {
       );
     }
 
-    // PDF content
+    // PDF content - handle specially for external URL
     if (item.toolType === 'pdf' && typeof content === 'object' && 'url' in content) {
       return (
         <div className="flex flex-col items-center gap-4">
@@ -76,17 +100,28 @@ export function MaterialViewer({ item, onClose }: MaterialViewerProps) {
       );
     }
 
-    // Mind map, quiz, flashcard, etc. - show JSON preview
+    // Use Knowledge Hub renderer if available for structured content
+    if (typeof content === 'object' && LazyRenderer) {
+      const rendererProps: BaseRendererProps = {
+        data: content as Record<string, unknown>,
+        readOnly: true,
+        className: 'max-h-[60vh] overflow-auto',
+      };
+
+      return (
+        <Suspense fallback={LoadingFallback}>
+          <LazyRenderer {...rendererProps} />
+        </Suspense>
+      );
+    }
+
+    // Fallback for object content without a specific renderer
     if (typeof content === 'object') {
       return (
-        <div className="space-y-4">
-          <div className="text-sm text-slate-500 dark:text-slate-400">
-            Contenuto salvato:
-          </div>
-          <pre className="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg overflow-auto max-h-[50vh] text-xs">
-            {JSON.stringify(content, null, 2)}
-          </pre>
-        </div>
+        <FallbackRenderer
+          data={content as Record<string, unknown>}
+          className="max-h-[50vh] overflow-auto"
+        />
       );
     }
 
