@@ -1,7 +1,7 @@
 # ADR 0022: Knowledge Hub Architecture
 
 ## Status
-Proposed
+Accepted (Implemented 2026-01-02)
 
 ## Date
 2026-01-01
