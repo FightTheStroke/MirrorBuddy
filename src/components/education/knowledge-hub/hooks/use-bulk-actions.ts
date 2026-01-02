@@ -7,7 +7,7 @@
  * Provides selection state and batch action handlers.
  */
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 
 export interface UseBulkActionsOptions {
   /** Callback when materials are moved */
