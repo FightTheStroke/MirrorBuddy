@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useCallback, useState, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   X, Loader2, Send, Mic, MicOff, Phone, PhoneOff, Volume2,
@@ -468,11 +469,12 @@ export function FocusToolLayout() {
           {/* Logo/Toggle */}
           <div className="h-14 flex items-center gap-2 px-2 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
             {/* Brain Logo */}
-            {/* eslint-disable-next-line @next/next/no-img-element -- Static logo asset */}
-            <img
+            <Image
               src="/logo-brain.png"
               alt="MirrorBuddy"
-              className="h-8 w-8 object-contain flex-shrink-0"
+              width={32}
+              height={32}
+              className="object-contain flex-shrink-0"
             />
             {sidebarExpanded && (
               <span className="text-sm font-bold text-slate-800 dark:text-white truncate">
