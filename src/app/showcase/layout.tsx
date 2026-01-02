@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   GraduationCap,
@@ -95,8 +96,7 @@ export default function ShowcaseLayout({
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/showcase" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element -- Static logo asset */}
-              <img src="/logo-brain.png" alt="MirrorBuddy" className="w-full h-full object-contain" />
+              <Image src="/logo-brain.png" alt="MirrorBuddy" width={40} height={40} className="object-contain" />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">MirrorBuddy</h1>
