@@ -26,6 +26,7 @@ const VALID_TOOL_TYPES: ToolType[] = [
   'summary',
   'timeline',
   'diagram',
+  'demo',
 ];
 
 interface CreateToolRequest {
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate tool ID
-    const toolId = `voice-tool-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const toolId = `voice-tool-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 
     // Create tool state
     const toolState = createToolState({

@@ -63,12 +63,22 @@ export async function validateAuth(): Promise<AuthResult> {
 /**
  * Validate that a session belongs to the authenticated user
  * Use for SSE endpoints that need session ownership verification
+ *
+ * Voice sessions (starting with 'voice-') are ephemeral and don't have
+ * a database record, so we allow them for authenticated users.
  */
 export async function validateSessionOwnership(
   sessionId: string,
   userId: string
 ): Promise<boolean> {
   try {
+    // Voice sessions are ephemeral - allow for authenticated users
+    // Format: voice-{maestroId}-{timestamp}
+    if (sessionId.startsWith('voice-')) {
+      logger.debug('Voice session validated', { sessionId, userId });
+      return true;
+    }
+
     // Sessions are stored as Conversations in our schema
     const conversation = await prisma.conversation.findFirst({
       where: {

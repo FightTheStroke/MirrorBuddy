@@ -913,3 +913,36 @@ model HomeworkSession {
   @@index([status])
 }
 
+// ============================================================================
+// STUDY KITS (Wave 2 - PDF Upload to Study Materials Generator)
+// ============================================================================
+
+model StudyKit {
+  id          String   @id @default(cuid())
+  userId      String
+  sourceFile  String   // PDF filename or path
+  title       String
+
+  // Generated materials (JSON strings)
+  summary     String?  // Plain text summary
+  mindmap     String?  // MindmapData JSON
+  demo        String?  // DemoData JSON
+  quiz        String?  // QuizData JSON
+
+  // Processing status
+  status      String   @default("processing") // processing | ready | error
+  errorMessage String?
+
+  // Metadata
+  subject     String?
+  pageCount   Int?
+  wordCount   Int?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+

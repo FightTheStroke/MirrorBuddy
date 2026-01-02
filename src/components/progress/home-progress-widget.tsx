@@ -4,8 +4,7 @@ import { motion } from 'framer-motion';
 import { Trophy, Flame, Clock, BookOpen, Star } from 'lucide-react';
 import { useProgressStore } from '@/lib/stores/app-store';
 import { cn } from '@/lib/utils';
-
-const XP_PER_LEVEL = [0, 100, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000];
+import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
 export function HomeProgressWidget() {
   const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();

@@ -28,7 +28,7 @@ export function DemoSandbox({ data }: DemoSandboxProps) {
     <html>
     <head>
       <meta charset="UTF-8">
-      <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'unsafe-inline';">
+      <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; script-src 'unsafe-inline'; img-src 'self' data: blob:;">
       <style>
         body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; }
         ${css}

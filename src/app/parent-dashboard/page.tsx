@@ -422,11 +422,11 @@ export default function ParentDashboardPage() {
         return (
           <Card className="max-w-2xl mx-auto">
             <CardHeader className="text-center pb-2">
-              <div className="mx-auto w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center mb-4">
-                <Shield className="h-8 w-8 text-indigo-500" />
+              <div className="mx-auto w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4 border border-indigo-200 dark:border-indigo-800">
+                <Shield className="h-7 w-7 sm:h-8 sm:w-8 text-indigo-600 dark:text-indigo-400" />
               </div>
-              <CardTitle className="text-2xl">Consenso per il Dashboard Genitori</CardTitle>
-              <CardDescription className="text-base mt-2">
+              <CardTitle className="text-xl sm:text-2xl">Consenso per il Dashboard Genitori</CardTitle>
+              <CardDescription className="text-sm sm:text-base mt-2">
                 Per visualizzare le osservazioni dei Professori su tuo/a figlio/a, abbiamo bisogno del tuo consenso esplicito.
               </CardDescription>
             </CardHeader>
@@ -542,8 +542,8 @@ export default function ParentDashboardPage() {
 
               {/* Consent button */}
               <div className="pt-2">
-                <Button onClick={handleGiveConsent} className="w-full py-6 text-lg">
-                  <Shield className="h-5 w-5 mr-2" />
+                <Button onClick={handleGiveConsent} className="w-full py-5 sm:py-6 text-base sm:text-lg bg-accent-themed hover:bg-accent-themed/90 shadow-lg">
+                  <Shield className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Acconsento alla Visualizzazione del Profilo
                 </Button>
                 <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-3">
@@ -606,25 +606,29 @@ export default function ParentDashboardPage() {
             {/* Still show the content */}
             <div className="max-w-4xl mx-auto">
               {/* Action Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-                <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleExport('json')}
                     disabled={isExporting}
+                    className="justify-center sm:justify-start"
                   >
                     <FileJson className="h-4 w-4 mr-2" />
-                    Esporta JSON
+                    <span className="hidden sm:inline">Esporta JSON</span>
+                    <span className="sm:hidden">JSON</span>
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => handleExport('pdf')}
                     disabled={isExporting}
+                    className="justify-center sm:justify-start"
                   >
                     <FileText className="h-4 w-4 mr-2" />
-                    Esporta Report
+                    <span className="hidden sm:inline">Esporta Report</span>
+                    <span className="sm:hidden">Report</span>
                   </Button>
                 </div>
                 <Button
@@ -632,6 +636,7 @@ export default function ParentDashboardPage() {
                   size="sm"
                   onClick={handleGenerateProfile}
                   disabled={isGenerating}
+                  className="justify-center sm:justify-start"
                 >
                   {isGenerating ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -644,18 +649,18 @@ export default function ParentDashboardPage() {
 
               {/* Tabbed Content */}
               <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'diary' | 'profile' | 'progress')} className="w-full">
-                <TabsList className="grid w-full max-w-lg grid-cols-3 mb-6">
-                  <TabsTrigger value="diary" className="flex items-center gap-2">
-                    <BookOpen className="h-4 w-4" />
-                    Diario
+                <TabsList className="grid w-full grid-cols-3 mb-6 h-auto">
+                  <TabsTrigger value="diary" className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+                    <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden xs:inline">Diario</span>
                   </TabsTrigger>
-                  <TabsTrigger value="profile" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Profilo
+                  <TabsTrigger value="profile" className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+                    <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden xs:inline">Profilo</span>
                   </TabsTrigger>
-                  <TabsTrigger value="progress" className="flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4" />
-                    Progressi
+                  <TabsTrigger value="progress" className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+                    <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden xs:inline">Progressi</span>
                   </TabsTrigger>
                 </TabsList>
 
@@ -724,33 +729,38 @@ export default function ParentDashboardPage() {
         return (
           <>
             {/* Action Bar */}
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleExport('json')}
                   disabled={isExporting}
+                  className="justify-center sm:justify-start"
                 >
                   <FileJson className="h-4 w-4 mr-2" />
-                  Esporta JSON
+                  <span className="hidden sm:inline">Esporta JSON</span>
+                  <span className="sm:hidden">JSON</span>
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleExport('pdf')}
                   disabled={isExporting}
+                  className="justify-center sm:justify-start"
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  Esporta Report
+                  <span className="hidden sm:inline">Esporta Report</span>
+                  <span className="sm:hidden">Report</span>
                 </Button>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={handleGenerateProfile}
                   disabled={isGenerating}
+                  className="justify-center sm:justify-start"
                 >
                   {isGenerating ? (
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -763,18 +773,19 @@ export default function ParentDashboardPage() {
                   variant="ghost"
                   size="sm"
                   onClick={handleRequestDeletion}
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 justify-center sm:justify-start"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Richiedi Cancellazione
+                  <span className="hidden sm:inline">Richiedi Cancellazione</span>
+                  <span className="sm:hidden">Cancella</span>
                 </Button>
               </div>
             </div>
 
             {/* Confidence Score Banner */}
             {meta && meta.confidenceScore < 0.5 && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
-                <p className="text-sm text-amber-700 dark:text-amber-300">
+              <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 sm:p-4 mb-6">
+                <p className="text-xs sm:text-sm text-amber-700 dark:text-amber-300">
                   <strong>Nota:</strong> Il profilo ha una affidabilita del {Math.round(meta.confidenceScore * 100)}%.
                   Piu sessioni di studio con i Professori miglioreranno la precisione delle osservazioni.
                 </p>
@@ -783,18 +794,18 @@ export default function ParentDashboardPage() {
 
             {/* Tabbed Content */}
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'diary' | 'profile' | 'progress')} className="w-full">
-              <TabsList className="grid w-full max-w-lg grid-cols-3 mb-6">
-                <TabsTrigger value="diary" className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  Diario
+              <TabsList className="grid w-full grid-cols-3 mb-6 h-auto">
+                <TabsTrigger value="diary" className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+                  <BookOpen className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Diario</span>
                 </TabsTrigger>
-                <TabsTrigger value="profile" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Profilo
+                <TabsTrigger value="profile" className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+                  <User className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Profilo</span>
                 </TabsTrigger>
-                <TabsTrigger value="progress" className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  Progressi
+                <TabsTrigger value="progress" className="flex items-center justify-center gap-1 sm:gap-2 py-2 sm:py-2.5 text-xs sm:text-sm">
+                  <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">Progressi</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -845,23 +856,47 @@ export default function ParentDashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
       {/* Header with back navigation */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center gap-4">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-2">
+            <Button variant="ghost" size="sm" className="gap-2 hover:bg-slate-100 dark:hover:bg-slate-800">
               <ArrowLeft className="h-4 w-4" />
-              Torna all&apos;app
+              <span className="hidden sm:inline">Torna all&apos;app</span>
+              <span className="sm:hidden">Indietro</span>
             </Button>
           </Link>
-          <div className="flex-1">
-            <h1 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-slate-100">
               Dashboard Genitori
             </h1>
           </div>
+          {/* Consent Status Indicator - Task 0.5.4 */}
+          {_consentStatus && (
+            <div className="flex items-center gap-2 shrink-0">
+              {_consentStatus.parentConsent && _consentStatus.studentConsent ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-100 dark:bg-green-900/30 border border-green-200 dark:border-green-800">
+                  <Shield className="h-3.5 w-3.5 text-green-600 dark:text-green-400" />
+                  <span className="text-xs font-medium text-green-700 dark:text-green-300 hidden sm:inline">
+                    Consenso attivo
+                  </span>
+                  <span className="text-xs font-medium text-green-700 dark:text-green-300 sm:hidden">
+                    Attivo
+                  </span>
+                </div>
+              ) : _consentStatus.parentConsent ? (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800">
+                  <AlertCircle className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+                  <span className="text-xs font-medium text-amber-700 dark:text-amber-300 hidden sm:inline">
+                    Parziale
+                  </span>
+                </div>
+              ) : null}
+            </div>
+          )}
         </div>
       </header>
 
-      <div className="p-4 md:p-8">
+      <div className="p-4 sm:p-6 md:p-8 pt-6 sm:pt-8">
         <div className="max-w-4xl mx-auto">
           {renderContent()}
         </div>

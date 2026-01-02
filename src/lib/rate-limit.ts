@@ -126,9 +126,14 @@ export function getClientIdentifier(request: Request): string {
  * Rate limit configs for different endpoint types
  */
 export const RATE_LIMITS = {
-  /** Chat API: 20 requests per minute (expensive AI calls) */
+  /** Chat API: 60 requests per minute (expensive AI calls) */
   CHAT: {
-    maxRequests: 20,
+    maxRequests: 60,
+    windowMs: 60 * 1000,
+  },
+  /** Realtime token: 10 requests per minute (voice session tokens) */
+  REALTIME_TOKEN: {
+    maxRequests: 10,
     windowMs: 60 * 1000,
   },
   /** Homework analysis: 10 requests per minute (vision API, very expensive) */

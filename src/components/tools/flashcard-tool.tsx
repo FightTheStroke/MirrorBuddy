@@ -3,7 +3,9 @@
 import { useMemo, useCallback, useState } from 'react';
 import { FlashcardStudy } from '@/components/education/flashcard';
 import { useProgressStore } from '@/lib/stores/app-store';
+import toast from '@/components/ui/toast';
 import type { FlashcardDeckRequest, FlashcardDeck, Flashcard, Rating } from '@/types';
+import { FLASHCARD_XP_BY_RATING } from '@/lib/constants/xp-rewards';
 
 interface FlashcardToolProps {
   request: FlashcardDeckRequest;
@@ -39,14 +41,8 @@ export function FlashcardTool({ request, onComplete }: FlashcardToolProps) {
   const handleRating = useCallback((cardId: string, rating: Rating) => {
     setRatings(prev => ({ ...prev, [cardId]: rating }));
 
-    // Award XP based on rating
-    const xpMap: Record<Rating, number> = {
-      again: 2,
-      hard: 5,
-      good: 10,
-      easy: 15,
-    };
-    addXP(xpMap[rating]);
+    // Award XP based on rating (using centralized constants)
+    addXP(FLASHCARD_XP_BY_RATING[rating]);
   }, [addXP]);
 
   const handleComplete = useCallback(() => {
@@ -55,6 +51,15 @@ export function FlashcardTool({ request, onComplete }: FlashcardToolProps) {
     const goodOrEasy = Object.values(ratings).filter(r => r === 'good' || r === 'easy').length;
     const bonusXP = Math.round((goodOrEasy / cardCount) * 25);
     addXP(bonusXP);
+
+    // Show completion toast with bonus XP
+    if (bonusXP > 0) {
+      toast.success(
+        `Mazzo completato! +${bonusXP} XP bonus`,
+        `Hai completato ${cardCount} carte con ${goodOrEasy} risposte Good/Easy!`,
+        { duration: 5000 }
+      );
+    }
 
     onComplete?.();
   }, [deck.cards.length, ratings, addXP, onComplete]);

@@ -76,7 +76,7 @@ const CONNECTION_TIMEOUT_MS = 120000;
  * Generate connection ID
  */
 function generateConnectionId(): string {
-  return `conn_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `conn_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

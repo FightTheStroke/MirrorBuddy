@@ -129,45 +129,4 @@ test.describe('Mindmap Data Format', () => {
   });
 });
 
-test.describe('Mindmap Accessibility', () => {
-  test('mindmap SVG has accessible role and label', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Mappe Mentali' }).click();
-    await page.waitForTimeout(500);
-
-    const mindmapCard = page.locator('button, [class*="card"]')
-      .filter({ hasText: /Matematica|Storia/i })
-      .first();
-
-    if (await mindmapCard.isVisible().catch(() => false)) {
-      await mindmapCard.click();
-      await page.waitForTimeout(1000);
-
-      const svg = page.locator('svg.markmap, svg[class*="markmap"], svg[role="img"]');
-      if (await svg.isVisible().catch(() => false)) {
-        // Should have accessible attributes
-        const role = await svg.getAttribute('role');
-        const ariaLabel = await svg.getAttribute('aria-label');
-
-        // Either has role or aria-label
-        const isAccessible = role === 'img' || role === 'graphics-document' || ariaLabel;
-        expect(isAccessible).toBeTruthy();
-      }
-    }
-  });
-
-  test('mindmap is keyboard navigable', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Mappe Mentali' }).click();
-    await page.waitForTimeout(500);
-
-    // Tab through the page
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-    await page.keyboard.press('Tab');
-
-    // Should have focus somewhere
-    const focusedElement = page.locator(':focus');
-    await expect(focusedElement).toBeVisible();
-  });
-});
+// Accessibility tests moved to mindmaps-comprehensive.spec.ts

@@ -17,11 +17,12 @@ docs/plans/
 
 ### TODO
 
-| Plan | Data | Descrizione |
-|------|------|-------------|
-| [StudyKitGenerator](todo/StudyKitGenerator-2026-01-02.md) | 2026-01-02 | Trasforma PDF in kit studio (riassunto, mappa, demo, quiz) |
-| [VoiceModelMigration](todo/VoiceModelMigration-2026-01-02.md) | 2026-01-02 | Migrazione modello voice |
-| [KnowledgeBaseOptimization](todo/KnowledgeBaseOptimization-2026-01-01.md) | 2026-01-01 | Knowledge base lazy loading |
+| Plan | Data | Descrizione | Priority |
+|------|------|-------------|----------|
+| 🔴 [TESTS TO BE DONE ASAP](todo/TestToBeDoneAsap.md) | 2026-01-02 | **CRITICAL - E2E failures + Manual tests - BLOCKS PR merge** | **CRITICAL** |
+| [ToolsInChatNavigation](todo/ToolsInChatNavigation-2026-01-02.md) | 2026-01-02 | Fix navigazione tool nella chat normale | MEDIUM |
+| [RepoMigration-MirrorBuddy](todo/RepoMigration-MirrorBuddy-2026-01-02.md) | 2026-01-02 | Rebrand ConvergioEdu → MirrorBuddy + transfer ownership | MEDIUM |
+| [DashboardAnalytics](todo/DashboardAnalytics-2026-01.md) | 2026-01-02 | Dashboard analytics enhancement (backlog) | LOW |
 
 ### DOING
 
@@ -40,6 +41,9 @@ docs/plans/
 | LandingShowcasePlanDec30 | 2025-12-30 | Showcase mode for offline | - |
 | LocalStorageMigrationPlanDec31 | 2025-12-31 | Database-first architecture | 0015 |
 | SessionSummaryUnifiedArchive | 2026-01-01 | Session summaries + unified archive | 0019 |
+| [BRUTAL-VERIFICATION-REPORT](done/BRUTAL-VERIFICATION-REPORT-2026-01-02.md) | 2026-01-02 | Code existence verification (all ✅) | - |
+| [BRUTAL-VERIFICATION-REPORT-FUNCTIONAL](done/BRUTAL-VERIFICATION-REPORT-FUNCTIONAL-2026-01-02.md) | 2026-01-02 | Functional verification (4 issues, 1 fixed) | - |
+| [ManualTests Sprint 2026-01](done/ManualTests-Sprint-2026-01.md) | 2026-01-02 | Merged into TestToBeDoneAsap.md | - |
 
 ## Workflow
 

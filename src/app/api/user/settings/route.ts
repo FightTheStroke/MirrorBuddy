@@ -10,6 +10,7 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { getOrCompute, del, CACHE_TTL } from '@/lib/cache';
 
 // #92: Zod schema for settings validation
 const SettingsUpdateSchema = z.object({
@@ -39,16 +40,25 @@ export async function GET() {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    let settings = await prisma.settings.findUnique({
-      where: { userId },
-    });
+    // WAVE 3: Cache user settings for performance
+    const settings = await getOrCompute(
+      `settings:${userId}`,
+      async () => {
+        let userSettings = await prisma.settings.findUnique({
+          where: { userId },
+        });
 
-    if (!settings) {
-      // Create default settings
-      settings = await prisma.settings.create({
-        data: { userId },
-      });
-    }
+        if (!userSettings) {
+          // Create default settings
+          userSettings = await prisma.settings.create({
+            data: { userId },
+          });
+        }
+
+        return userSettings;
+      },
+      { ttl: CACHE_TTL.SETTINGS }
+    );
 
     return NextResponse.json(settings);
   } catch (error) {
@@ -88,6 +98,9 @@ export async function PUT(request: NextRequest) {
       update: validation.data,
       create: { userId, ...validation.data },
     });
+
+    // WAVE 3: Invalidate cache when settings are updated
+    del(`settings:${userId}`);
 
     return NextResponse.json(settings);
   } catch (error) {

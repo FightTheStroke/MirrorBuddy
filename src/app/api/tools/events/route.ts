@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
 
     // Build event
     const event: ToolEvent = {
-      id: toolId || `tool_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+      id: toolId || `tool_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
       type,
       toolType,
       sessionId,

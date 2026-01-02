@@ -18,6 +18,7 @@ import type {
   ToolCall,
 } from '@/types';
 import type { ToolState, ToolType } from '@/types/tools';
+import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
 // === SETTINGS STORE ===
 
@@ -346,10 +347,6 @@ interface ProgressState {
   loadFromServer: () => Promise<void>;
 }
 
-const XP_PER_LEVEL = [
-  0, 100, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000,
-];
-
 export const useProgressStore = create<ProgressState>()(
   (set, get) => ({
       xp: 0,
@@ -390,6 +387,14 @@ export const useProgressStore = create<ProgressState>()(
               10: 'Leggenda',
             };
             onLevelUp(newLevel, levelTitles[newLevel] || `Livello ${newLevel}`);
+          } else if (amount > 0) {
+            // Show XP toast notification (only if not leveling up to avoid duplicate notifications)
+            // Import toast dynamically to avoid circular dependencies
+            import('@/components/ui/toast').then(({ default: toast }) => {
+              toast.success(`+${amount} XP`, `Totale: ${newXP} XP`, { duration: 3000 });
+            }).catch((err) => {
+              logger.warn('Failed to show XP toast', { error: err });
+            });
           }
           // Update current session XP
           const updatedSession = state.currentSession

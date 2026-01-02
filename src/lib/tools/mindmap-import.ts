@@ -463,7 +463,7 @@ function importFromText(content: string): ImportResult {
  * Generate unique ID
  */
 function generateId(): string {
-  return `node_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `node_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

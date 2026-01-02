@@ -3,6 +3,7 @@
 import { useMemo, useCallback } from 'react';
 import { Quiz } from '@/components/education/quiz';
 import { useProgressStore } from '@/lib/stores/app-store';
+import toast from '@/components/ui/toast';
 import type { QuizRequest, Quiz as QuizType, QuizResult } from '@/types';
 
 interface QuizToolProps {
@@ -38,6 +39,14 @@ export function QuizTool({ request, onComplete }: QuizToolProps) {
     // Award XP
     if (result.xpEarned > 0) {
       addXP(result.xpEarned);
+
+      // Show XP toast notification
+      const scorePercent = Math.round(result.score);
+      toast.success(
+        `Quiz completato! +${result.xpEarned} XP`,
+        `Punteggio: ${scorePercent}% - ${result.masteryAchieved ? 'Maestria raggiunta!' : 'Continua così!'}`,
+        { duration: 5000 }
+      );
     }
 
     // Update mastery based on score

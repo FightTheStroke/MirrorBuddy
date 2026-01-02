@@ -7,7 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - Sprint January 2026 Complete
 
-> **Branch**: `development` | **Plan**: `docs/plans/in-progress/MasterPlan-Sprint-2026-01.md`
+> **Branch**: `development` | **Plan**: `docs/plans/doing/MasterPlan-v2.1-2026-01-02.md`
+
+### Fixed (WAVE 0 Critical Bugs)
+
+- **0.1 Tool Creation**: ToolMaestroSelectionDialog in conversation-flow, Maestro ID mismatch fix
+- **0.2 Memory System**: InactivityMonitor activated, auto-summary on tab close/maestro switch/voice end
+- **0.3 Demo Interattive**: demo-handler registered, CSP img-src for images
+- **0.4 Gamification**: Section 7 in system prompts, XP communication to students
+- **0.5 Parent Dashboard**: `/genitori` route, consent badge, responsive UI
+- **0.6 Focus Layout**: 70/30 split, phone-call style panel, minimized sidebar
+
+### Changed (WAVE 1 Voice Migration)
+
+- **Voice Model**: Migrated from `gpt-4o-realtime-preview` to `gpt-4o-mini-realtime-preview`
+- **Hybrid Logic**: MirrorBuddy uses premium tier, all others use mini (80-90% cost savings)
+- **Config**: Added `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI` env var
+
+### Added (WAVE 2 Study Kit Generator)
+
+- **PDF Parsing**: `study-kit-handler.ts` with pdf-parse v2.4.5 API (PDFParse class)
+- **Pipeline**: extractTextFromPDF → generateSummary → generateMindmap → generateDemo → generateQuiz
+- **API Routes**: `/api/study-kit`, `/api/study-kit/[id]`, `/api/study-kit/upload`
+- **UI**: `/study-kit` page with upload, progress, viewer
+
+### Improved (WAVE 3 Tech Debt)
+
+- **Health Endpoint**: `/api/health` for monitoring
+- **Rate Limiting**: Base implementation on chat/realtime APIs
+- **Caching**: React Query cache for maestri list, settings
 
 ### Added
 

@@ -44,6 +44,86 @@ These children are not broken. The system is.
 
 **ConvergioEdu is our answer: a school that adapts to each student, not students who must adapt to school.**
 
+### The Support Triangle
+
+Every student in ConvergioEdu has access to three types of support:
+
+```
+                         STUDENT
+                            |
+              +-------------+-------------+
+              |             |             |
+              v             v             v
+        +-----------+ +-----------+ +-----------+
+        |   COACH   | |   BUDDY   | |  MAESTRI  |
+        |  (5 AI)   | |  (5 AI)   | |  (16 AI)  |
+        |           | |           | |           |
+        |  Method   | |   Peer    | |  Content  |
+        |  Support  | |  Support  | |  Experts  |
+        +-----------+ +-----------+ +-----------+
+```
+
+| Type | Characters | Relationship | Goal |
+|------|------------|--------------|------|
+| **Maestri** | 16 historical figures | Mentor (vertical) | Teach subjects with passion |
+| **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij | Learning coach (vertical) | Develop METHOD and autonomy |
+| **Buddies** | Mario, Noemi, Enea, Bruno, Sofia | Peer friend (horizontal) | Emotional support, shared struggles |
+
+### The Learning Coach (Support Teacher)
+
+> *"Our success is measured when the student no longer needs us."*
+
+The **Coach** is a virtual Support Teacher—not a subject expert, but a **learning coach**. Their mission is to develop student autonomy, not dependency.
+
+**What Coaches do:**
+- Teach the METHOD, not the content
+- Guide students to create tools themselves (mind maps, flashcards)
+- Use maieutic questioning: "How do you think you should organize this?"
+- Celebrate effort, not just results
+- Direct students to the right Maestro for subject help
+
+**What Coaches never do:**
+- Do homework for students
+- Give direct answers
+- Create content on behalf of students
+
+Each Coach has a unique style:
+- **Melissa** — Enthusiastic, young energy, celebrates wins
+- **Roberto** — Calm, reassuring, steady presence
+- **Chiara** — Freshly graduated, shares recent student experience
+- **Andrea** — Sporty coach energy, active breaks, movement
+- **Favij** — Gaming/digital style, makes studying feel like a quest
+
+### The MirrorBuddy (Peer Support)
+
+> *"Sometimes you need someone who's been there."*
+
+The **Buddy** is a peer—a student one year older who shares the same learning differences. This is the **MirrorBuddy** concept from FightTheStroke.
+
+**Key characteristics:**
+- Same age + 1 year (relatable but slightly more experienced)
+- Same learning differences as the student
+- Speaks like a real teenager, not an adult
+- Never teaches—just understands
+
+**The difference from adults:**
+| Adult says | Buddy says |
+|------------|------------|
+| "You can do it!" | "I've been there too." |
+| "You should try..." | "What worked for me was..." |
+| "It's not that hard." | "I know, it's tough. I struggled too." |
+
+**Why it matters:** Students with learning differences often feel alone. An AI that preaches feels fake. A peer who shares the struggle feels real. Mario doesn't lecture—Mario UNDERSTANDS.
+
+Each Buddy has a unique personality:
+- **Mario** — Casual, uses teen slang, quick jokes
+- **Noemi** — Warm, empathetic, great listener
+- **Enea** — Cheerful class clown, humor to lighten the mood
+- **Bruno** — Thoughtful, introspective, deep conversations
+- **Sofia** — Creative dreamer, sees things from unique angles
+
+**Key principle: Autonomy, not dependency.** The goal is to teach students HOW to learn, not to do the work for them.
+
 ---
 
 ## The Story Behind This
@@ -86,8 +166,6 @@ Each **Maestro** is an AI tutor embodying a legendary figure from history—some
 | **Humboldt** | Geography | Explorer who invented biogeography and ecology |
 | **Ippocrate** | Physical Education | Father of medicine, champion of healthy living |
 | **Smith** | Economics | Wrote *The Wealth of Nations*, founded modern economics |
-| **Chris** | Storytelling | Chris Anderson, TED curator who spread "ideas worth sharing" worldwide |
-
 ### What Makes Each Maestro Special
 
 Every Maestro:
@@ -254,7 +332,7 @@ Want to explore the app without setting up Azure or Ollama? Use **Showcase Mode*
 3. Navigate to `/showcase` to explore all features with pre-recorded responses
 
 Showcase includes:
-- All 17 Maestri with simulated conversations
+- All 16 Maestri with simulated conversations
 - Mind maps, flashcards, quizzes demo
 - Voice UI preview (without actual voice)
 - Full accessibility features

@@ -31,6 +31,16 @@ import { endConversationWithSummary as generateSummary } from '@/lib/conversatio
 import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
 
 // ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/**
+ * Minimum number of messages required before generating a summary.
+ * Set to 2 to ensure there's meaningful conversation beyond just the greeting.
+ */
+const MIN_MESSAGES_FOR_SUMMARY = 2;
+
+// ============================================================================
 // PERSISTENCE HELPERS
 // ============================================================================
 
@@ -274,15 +284,15 @@ interface ConversationFlowState {
     type: CharacterType,
     profile: ExtendedStudentProfile,
     reason?: string
-  ) => void;
-  switchToCoach: (profile: ExtendedStudentProfile) => void;
-  switchToMaestro: (maestro: MaestroFull, profile: ExtendedStudentProfile) => void;
-  switchToBuddy: (profile: ExtendedStudentProfile) => void;
+  ) => Promise<void>;
+  switchToCoach: (profile: ExtendedStudentProfile) => Promise<void>;
+  switchToMaestro: (maestro: MaestroFull, profile: ExtendedStudentProfile) => Promise<void>;
+  switchToBuddy: (profile: ExtendedStudentProfile) => Promise<void>;
   goBack: (profile: ExtendedStudentProfile) => boolean;
 
   // Handoff management
   suggestHandoff: (suggestion: HandoffSuggestion) => void;
-  acceptHandoff: (profile: ExtendedStudentProfile) => void;
+  acceptHandoff: (profile: ExtendedStudentProfile) => Promise<void>;
   dismissHandoff: () => void;
 
   // Conversation history
@@ -579,8 +589,46 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         });
       },
 
-      switchToCharacter: (character, type, profile, _reason) => {
+      switchToCharacter: async (character, type, profile, _reason) => {
         const state = get();
+
+        // Get userId once at the start of the function (avoid duplication)
+        const userId = typeof window !== 'undefined'
+          ? sessionStorage.getItem('convergio-user-id')
+          : null;
+
+        // #98: End current conversation with summary before switching
+        const currentConversationId = state.activeCharacter
+          ? state.conversationsByCharacter[state.activeCharacter.id]?.conversationId
+          : null;
+
+        if (currentConversationId && state.messages.length > MIN_MESSAGES_FOR_SUMMARY) {
+          try {
+            if (userId) {
+              logger.info('Switching character, ending previous conversation', {
+                from: state.activeCharacter?.id,
+                to: character.id,
+                conversationId: currentConversationId
+              });
+
+              const response = await fetch(`/api/conversations/${currentConversationId}/end`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, reason: 'character_switch' }),
+              });
+
+              if (!response.ok) {
+                logger.error('Failed to end conversation on character switch', {
+                  status: response.status
+                });
+              }
+            }
+          } catch (error) {
+            logger.error('Error ending conversation on character switch', {
+              error: String(error)
+            });
+          }
+        }
 
         // 1. Save current conversation to its bucket
         const savedConversations = saveCurrentConversation(state);
@@ -592,12 +640,36 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         let messages = loadConversationMessages(savedConversations, character.id);
 
         if (messages.length === 0) {
+          // #98: Try to load contextual greeting based on previous conversations
+          let greeting = activeCharacter.greeting;
+
+          // userId already retrieved at function start
+          if (userId) {
+            try {
+              const contextualGreeting = await get().loadContextualGreeting(
+                userId,
+                character.id,
+                profile.name,
+                activeCharacter.name
+              );
+
+              if (contextualGreeting) {
+                greeting = contextualGreeting;
+                logger.info('Using contextual greeting', { characterId: character.id });
+              }
+            } catch (error) {
+              logger.warn('Failed to load contextual greeting, using default', {
+                error: String(error)
+              });
+            }
+          }
+
           // No existing conversation - add greeting
           messages = [
             {
               id: crypto.randomUUID(),
               role: 'assistant',
-              content: activeCharacter.greeting,
+              content: greeting,
               timestamp: new Date(),
               characterId: activeCharacter.id,
               characterType: type,
@@ -620,18 +692,18 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         });
       },
 
-      switchToCoach: (profile) => {
+      switchToCoach: async (profile) => {
         const coach = getDefaultSupportTeacher();
-        get().switchToCharacter(coach, 'coach', profile);
+        await get().switchToCharacter(coach, 'coach', profile);
       },
 
-      switchToMaestro: (maestro, profile) => {
-        get().switchToCharacter(maestro, 'maestro', profile);
+      switchToMaestro: async (maestro, profile) => {
+        await get().switchToCharacter(maestro, 'maestro', profile);
       },
 
-      switchToBuddy: (profile) => {
+      switchToBuddy: async (profile) => {
         const buddy = getBuddyForStudent(profile);
-        get().switchToCharacter(buddy, 'buddy', profile);
+        await get().switchToCharacter(buddy, 'buddy', profile);
       },
 
       goBack: (profile) => {
@@ -693,12 +765,12 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         set({ pendingHandoff: suggestion });
       },
 
-      acceptHandoff: (profile) => {
+      acceptHandoff: async (profile) => {
         const state = get();
         if (!state.pendingHandoff) return;
 
         const { toCharacter } = state.pendingHandoff;
-        get().switchToCharacter(toCharacter.character, toCharacter.type, profile);
+        await get().switchToCharacter(toCharacter.character, toCharacter.type, profile);
       },
 
       dismissHandoff: () => {

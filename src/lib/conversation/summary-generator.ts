@@ -64,14 +64,13 @@ export async function endConversationWithSummary(
       content: m.content,
     }));
 
-    if (messages.length < 2) {
-      // Not enough messages to summarize
-      logger.debug('Skipping summary for short conversation', {
+    if (messages.length === 0) {
+      // No messages at all - just mark as inactive
+      logger.debug('Skipping summary for empty conversation', {
         conversationId,
-        messageCount: messages.length,
+        messageCount: 0,
       });
 
-      // Just mark as inactive
       await prisma.conversation.update({
         where: { id: conversationId },
         data: { isActive: false },
@@ -79,6 +78,38 @@ export async function endConversationWithSummary(
 
       return {
         summary: '',
+        keyFacts: { decisions: [], preferences: [], learned: [] },
+        topics: [],
+        learningsCount: 0,
+      };
+    }
+
+    if (messages.length === 1) {
+      // Single message - generate simple summary without AI call
+      const singleMessage = messages[0];
+      const truncatedContent = singleMessage.content.substring(0, 200);
+      const simpleSummary =
+        singleMessage.role === 'user'
+          ? `Lo studente ha chiesto: "${truncatedContent}${singleMessage.content.length > 200 ? '...' : ''}"`
+          : `Il maestro ha risposto: "${truncatedContent}${singleMessage.content.length > 200 ? '...' : ''}"`;
+
+      logger.info('Generating simple summary for single-message conversation', {
+        conversationId,
+        messageRole: singleMessage.role,
+      });
+
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: {
+          isActive: false,
+          summary: simpleSummary,
+          keyFacts: JSON.stringify({ decisions: [], preferences: [], learned: [] }),
+          topics: JSON.stringify([]),
+        },
+      });
+
+      return {
+        summary: simpleSummary,
         keyFacts: { decisions: [], preferences: [], learned: [] },
         topics: [],
         learningsCount: 0,
