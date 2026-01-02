@@ -592,6 +592,11 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
       switchToCharacter: async (character, type, profile, _reason) => {
         const state = get();
 
+        // Get userId once at the start of the function (avoid duplication)
+        const userId = typeof window !== 'undefined'
+          ? sessionStorage.getItem('convergio-user-id')
+          : null;
+
         // #98: End current conversation with summary before switching
         const currentConversationId = state.activeCharacter
           ? state.conversationsByCharacter[state.activeCharacter.id]?.conversationId
@@ -599,12 +604,6 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
 
         if (currentConversationId && state.messages.length > MIN_MESSAGES_FOR_SUMMARY) {
           try {
-            // Get userId from sessionStorage
-            let userId: string | null = null;
-            if (typeof window !== 'undefined') {
-              userId = sessionStorage.getItem('convergio-user-id');
-            }
-
             if (userId) {
               logger.info('Switching character, ending previous conversation', {
                 from: state.activeCharacter?.id,
@@ -644,26 +643,24 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           // #98: Try to load contextual greeting based on previous conversations
           let greeting = activeCharacter.greeting;
 
-          if (typeof window !== 'undefined') {
-            const userId = sessionStorage.getItem('convergio-user-id');
-            if (userId) {
-              try {
-                const contextualGreeting = await get().loadContextualGreeting(
-                  userId,
-                  character.id,
-                  profile.name,
-                  activeCharacter.name
-                );
+          // userId already retrieved at function start
+          if (userId) {
+            try {
+              const contextualGreeting = await get().loadContextualGreeting(
+                userId,
+                character.id,
+                profile.name,
+                activeCharacter.name
+              );
 
-                if (contextualGreeting) {
-                  greeting = contextualGreeting;
-                  logger.info('Using contextual greeting', { characterId: character.id });
-                }
-              } catch (error) {
-                logger.warn('Failed to load contextual greeting, using default', {
-                  error: String(error)
-                });
+              if (contextualGreeting) {
+                greeting = contextualGreeting;
+                logger.info('Using contextual greeting', { characterId: character.id });
               }
+            } catch (error) {
+              logger.warn('Failed to load contextual greeting, using default', {
+                error: String(error)
+              });
             }
           }
 

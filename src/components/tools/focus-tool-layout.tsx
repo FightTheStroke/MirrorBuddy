@@ -21,13 +21,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { ToolPanel } from './tool-panel';
 import { useUIStore, useSettingsStore } from '@/lib/stores/app-store';
-import { getMaestroById } from '@/data/maestri';
+import { getMaestroById } from '@/data';
 import { getSupportTeacherById } from '@/data/support-teachers';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
-import type { MaestroFull } from '@/data/maestri';
-import type { SupportTeacher, Subject } from '@/types';
+import type { Maestro, SupportTeacher, Subject } from '@/types';
 import { cn } from '@/lib/utils';
 
 // Map tool types to suggested maestros (for future use)
@@ -133,7 +132,7 @@ export function FocusToolLayout() {
   ];
 
   // Determine which maestro/coach to use
-  const getMaestroOrCoach = useCallback((): MaestroFull | SupportTeacher | null => {
+  const getMaestroOrCoach = useCallback((): Maestro | SupportTeacher | null => {
     // If specific maestro requested
     if (focusMaestroId) {
       const maestro = getMaestroById(focusMaestroId);
@@ -143,8 +142,11 @@ export function FocusToolLayout() {
       const coach = getSupportTeacherById(focusMaestroId as 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij');
       if (coach) return coach;
 
-      // Character ID provided but not found - log error
-      logger.error('Focus mode character not found', { focusMaestroId });
+      // Character ID provided but not found - log actionable error
+      logger.error('Focus mode character not found. Verify character ID exists in maestri-full.ts or support-teachers.ts', {
+        focusMaestroId,
+        action: 'falling back to default coach'
+      });
     }
 
     // If no focusMaestroId provided, warn about missing maestro selection
@@ -162,13 +164,12 @@ export function FocusToolLayout() {
 
   const character = getMaestroOrCoach();
 
-  // Helper to get display properties from either MaestroFull or SupportTeacher
-  const getCharacterProps = (char: MaestroFull | SupportTeacher | null) => {
+  // Helper to get display properties from either Maestro or SupportTeacher
+  const getCharacterProps = (char: Maestro | SupportTeacher | null) => {
     if (!char) return null;
-    // MaestroFull has displayName, SupportTeacher has name
-    const isMaestro = 'displayName' in char;
+    // Both Maestro and SupportTeacher have 'name' property
     return {
-      name: isMaestro ? (char as MaestroFull).displayName : char.name,
+      name: char.name,
       avatar: char.avatar || '/avatars/default.jpg',
       color: char.color,
       systemPrompt: char.systemPrompt,
@@ -646,8 +647,8 @@ export function FocusToolLayout() {
                     </>
                   ) : (
                     <>
-                      <Mic className="h-4 w-4" />
-                      Parla
+                      <Phone className="h-4 w-4" />
+                      Chiama
                     </>
                   )}
                 </Button>
