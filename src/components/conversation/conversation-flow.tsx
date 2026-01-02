@@ -126,7 +126,15 @@ export function ConversationFlow() {
     const pendingRequest = sessionStorage.getItem('pendingToolRequest');
     if (pendingRequest) {
       try {
-        const { tool, maestroId } = JSON.parse(pendingRequest);
+        const parsed = JSON.parse(pendingRequest);
+        // Validate parsed object has expected properties
+        if (typeof parsed !== 'object' || parsed === null) {
+          throw new Error('Invalid pendingToolRequest format');
+        }
+        const { tool, maestroId } = parsed;
+        if (typeof tool !== 'string' || typeof maestroId !== 'string') {
+          throw new Error('Missing tool or maestroId in pendingToolRequest');
+        }
         if (tool === toolType && maestroId) {
           // Use maestro from pending request - fetch full object for type safety
           const maestro = getMaestroById(maestroId);
@@ -138,6 +146,7 @@ export function ConversationFlow() {
         }
       } catch (error) {
         logger.error('Failed to parse pendingToolRequest', { error });
+        sessionStorage.removeItem('pendingToolRequest'); // Clean up invalid data
       }
     }
 

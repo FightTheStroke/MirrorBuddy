@@ -29,6 +29,10 @@ import type { ToolType } from '@/types/tools';
 import type { Maestro, SupportTeacher, Subject } from '@/types';
 import { cn } from '@/lib/utils';
 
+// Sidebar width classes for expanded/collapsed states
+const SIDEBAR_WIDTH_EXPANDED = 'w-48';
+const SIDEBAR_WIDTH_COLLAPSED = 'w-14';
+
 // Map tool types to suggested maestros (for future use)
 const _TOOL_TO_MAESTRO: Record<ToolType, string> = {
   mindmap: 'melissa', // Coach for general organization
@@ -460,7 +464,7 @@ export function FocusToolLayout() {
         <aside
           className={cn(
             'h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 flex flex-col',
-            sidebarExpanded ? 'w-48' : 'w-14'
+            sidebarExpanded ? SIDEBAR_WIDTH_EXPANDED : SIDEBAR_WIDTH_COLLAPSED
           )}
           onMouseEnter={() => setSidebarExpanded(true)}
           onMouseLeave={() => setSidebarExpanded(false)}
