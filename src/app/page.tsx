@@ -22,6 +22,7 @@ import {
   Star,
   Users,
   FileText,
+  Upload,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -44,11 +45,12 @@ import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore, useUIStore } from '@/lib/stores/app-store';
+import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { FocusToolLayout } from '@/components/tools/focus-tool-layout';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -97,6 +99,31 @@ export default function Home() {
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
   const { focusMode } = useUIStore();
+  const {
+    activeCharacter,
+    conversationsByCharacter,
+    endConversationWithSummary,
+    isActive: isConversationActive
+  } = useConversationFlowStore();
+
+  // Handler to close active conversation before navigating to a different view
+  const handleViewChange = async (newView: View) => {
+    // If there's an active conversation, close it first
+    if (isConversationActive && activeCharacter) {
+      const characterConvo = conversationsByCharacter[activeCharacter.id];
+      if (characterConvo?.conversationId) {
+        const userId = sessionStorage.getItem('convergio-user-id');
+        if (userId) {
+          try {
+            await endConversationWithSummary(characterConvo.conversationId, userId);
+          } catch (error) {
+            console.error('Failed to close conversation:', error);
+          }
+        }
+      }
+    }
+    setCurrentView(newView);
+  };
 
   // Don't render main app until hydration is done and onboarding is completed
   if (!isHydrated || !hasCompletedOnboarding) {
@@ -131,6 +158,7 @@ export default function Home() {
     { id: 'mindmaps' as const, label: 'Mappe Mentali', icon: Network },
     { id: 'summaries' as const, label: 'Riassunti', icon: FileText },
     { id: 'homework' as const, label: 'Materiali', icon: Target },
+    { id: 'studykit' as const, label: 'Study Kit', icon: Upload },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
@@ -261,12 +289,17 @@ export default function Home() {
             return (
               <button
                 key={item.id}
-                onClick={() => {
+                onClick={async () => {
                   if (item.id === 'genitori') {
                     markAsViewed();
+                    // Close active conversation before navigating away
+                    await handleViewChange('genitori');
                     router.push('/parent-dashboard');
+                  } else if (item.id === 'studykit') {
+                    await handleViewChange('studykit');
+                    router.push('/study-kit');
                   } else {
-                    setCurrentView(item.id);
+                    await handleViewChange(item.id);
                   }
                 }}
                 className={cn(

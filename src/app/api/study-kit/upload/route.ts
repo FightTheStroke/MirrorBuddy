@@ -1,0 +1,140 @@
+/**
+ * API Route: Study Kit Upload
+ * POST /api/study-kit/upload
+ *
+ * Upload PDF and start background processing to generate study materials
+ * Wave 2: Study Kit Generator
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+import { processStudyKit } from '@/lib/tools/handlers/study-kit-handler';
+
+export const runtime = 'nodejs';
+export const maxDuration = 300; // 5 minutes for processing
+
+/**
+ * POST /api/study-kit/upload
+ * Upload PDF and generate study kit
+ */
+export async function POST(request: NextRequest) {
+  try {
+    // Auth check
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('convergio-user-id')?.value;
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Parse form data
+    const formData = await request.formData();
+    const file = formData.get('file') as File | null;
+    const title = formData.get('title') as string | null;
+    const subject = formData.get('subject') as string | null;
+
+    if (!file || !title) {
+      return NextResponse.json(
+        { error: 'Missing required fields: file, title' },
+        { status: 400 }
+      );
+    }
+
+    // Validate file type
+    if (!file.type.includes('pdf')) {
+      return NextResponse.json(
+        { error: 'Only PDF files are supported' },
+        { status: 400 }
+      );
+    }
+
+    // Validate file size (max 10MB)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: 'File size must be less than 10MB' },
+        { status: 400 }
+      );
+    }
+
+    logger.info('Processing study kit upload', {
+      userId,
+      filename: file.name,
+      size: file.size,
+      title,
+      subject,
+    });
+
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Create initial study kit record (processing state)
+    const studyKit = await prisma.studyKit.create({
+      data: {
+        userId,
+        sourceFile: file.name,
+        title,
+        subject: subject || undefined,
+        status: 'processing',
+      },
+    });
+
+    // Process in background (for production, use a queue like BullMQ)
+    // For now, process synchronously with timeout
+    processStudyKit(buffer, title, subject || undefined, (step, progress) => {
+      logger.debug('Study kit progress', { studyKitId: studyKit.id, step, progress });
+    })
+      .then(async (result) => {
+        // Update study kit with generated materials
+        await prisma.studyKit.update({
+          where: { id: studyKit.id },
+          data: {
+            status: 'ready',
+            summary: result.summary,
+            mindmap: result.mindmap ? JSON.stringify(result.mindmap) : null,
+            demo: result.demo ? JSON.stringify(result.demo) : null,
+            quiz: result.quiz ? JSON.stringify(result.quiz) : null,
+            pageCount: result.pageCount,
+            wordCount: result.wordCount,
+          },
+        });
+
+        logger.info('Study kit processing complete', { studyKitId: studyKit.id });
+      })
+      .catch(async (error) => {
+        // Update with error status
+        await prisma.studyKit.update({
+          where: { id: studyKit.id },
+          data: {
+            status: 'error',
+            errorMessage: String(error),
+          },
+        });
+
+        logger.error('Study kit processing failed', {
+          studyKitId: studyKit.id,
+          error: String(error),
+        });
+      });
+
+    // Return immediately with processing status
+    return NextResponse.json({
+      success: true,
+      studyKitId: studyKit.id,
+      status: 'processing',
+      message: 'Study kit is being processed. This may take a few minutes.',
+    });
+  } catch (error) {
+    logger.error('Failed to upload study kit', { error: String(error) });
+    return NextResponse.json(
+      { error: 'Failed to upload study kit', details: String(error) },
+      { status: 500 }
+    );
+  }
+}

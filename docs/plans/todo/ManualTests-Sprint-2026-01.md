@@ -325,10 +325,123 @@ npm run dev
 
 ---
 
+## TEST 0.1.5: Tool Creation con 3 Maestri Diversi
+
+**Obiettivo**: Verificare che la creazione di tool funzioni con maestri diversi (non solo Melissa).
+**Origine**: MasterPlan WAVE 0 - Bug 0.1.5
+
+### Procedura:
+
+1. [ ] Apri una conversazione con **Galileo**
+2. [ ] Chiedi: "Fammi una mappa mentale del sistema solare"
+3. [ ] Verifica: mappa creata da Galileo (non Melissa)
+4. [ ] Ripeti con **Marie Curie**: "Fammi un quiz sulla tavola periodica"
+5. [ ] Verifica: quiz creato da Marie Curie
+6. [ ] Ripeti con **Darwin**: "Fammi delle flashcard sull'evoluzione"
+7. [ ] Verifica: flashcard create da Darwin
+
+### Criteri di successo:
+- [ ] Ogni maestro crea il proprio tool (avatar corretto)
+- [ ] Nessun fallback silenzioso a Melissa
+- [ ] Tool salvati con il maestro corretto
+
+**Status**: ⬜ Non testato | ✅ Passed | ❌ Failed
+
+**Note**:
+
+---
+
+## TEST 0.2.5: Memory Persistence
+
+**Obiettivo**: Verificare che i maestri ricordino le conversazioni precedenti.
+**Origine**: MasterPlan WAVE 0 - Bug 0.2.5
+
+### Procedura:
+
+1. [ ] Inizia una conversazione con **Melissa**
+2. [ ] Di': "Mi chiamo Marco, ho 15 anni e studio al liceo scientifico"
+3. [ ] Chiudi la sessione (termina conversazione o cambia pagina)
+4. [ ] Riapri una nuova conversazione con Melissa
+5. [ ] Chiedi: "Ti ricordi come mi chiamo?"
+6. [ ] Chiedi: "Quanti anni ho?"
+
+### Criteri di successo:
+- [ ] Melissa ricorda il nome
+- [ ] Melissa ricorda l'età
+- [ ] Non si ripresenta da capo ogni volta
+
+**Status**: ⬜ Non testato | ✅ Passed | ❌ Failed
+
+**Note**:
+
+---
+
+## TEST 0.3.5: Demo Interattiva con Galileo
+
+**Obiettivo**: Verificare che le demo interattive vengano create dinamicamente con un maestro.
+**Origine**: MasterPlan WAVE 0 - Bug 0.3.5
+
+### Procedura:
+
+1. [ ] Apri una conversazione con **Galileo**
+2. [ ] Chiedi: "Crea una demo interattiva sul sistema solare"
+3. [ ] Attendi generazione (può richiedere 30-60 secondi)
+4. [ ] Verifica che la demo si carichi
+5. [ ] Verifica interattività (pianeti cliccabili, animazioni)
+
+### Criteri di successo:
+- [ ] Demo generata senza errori
+- [ ] Sandbox CSP permette immagini
+- [ ] Demo è interattiva (non statica)
+- [ ] Galileo (non Melissa) è il creatore
+
+**Status**: ⬜ Non testato | ✅ Passed | ❌ Failed
+
+**Note**:
+
+---
+
+## TEST 1.7: Voice Migration Monitoring (7 giorni)
+
+**Obiettivo**: Monitorare stabilità dopo migrazione a `gpt-4o-mini-realtime`.
+**Origine**: MasterPlan WAVE 1.7
+**Durata**: 7 giorni post-deploy production
+
+### Metriche da monitorare:
+
+| Metrica | Target | Giorno 1 | Giorno 3 | Giorno 7 |
+|---------|--------|----------|----------|----------|
+| Uptime voice | > 99% | | | |
+| Latenza media | < 500ms | | | |
+| Error rate | < 1% | | | |
+| Qualità audio | Nessun degrado | | | |
+| User complaints | 0 | | | |
+
+### Come monitorare:
+- Check `/api/health` endpoint giornaliero
+- Review telemetry dashboard
+- User feedback channels
+
+### Criteri di successo:
+- [ ] Nessun downtime voice
+- [ ] Latenza accettabile
+- [ ] Nessun reclamo utenti
+- [ ] Risparmio costi confermato
+
+**Status**: ⬜ Non iniziato | 🔄 In corso | ✅ Completato | ❌ Problemi
+
+**Note**:
+
+---
+
 ## RIEPILOGO
 
 | Test | Status | Tester | Data |
 |------|--------|--------|------|
+| 0.1.5 Tool Creation 3 Maestri | ⬜ | | |
+| 0.2.5 Memory Persistence | ⬜ | | |
+| 0.3.5 Demo Galileo | ⬜ | | |
+| 1.7 Voice Migration Monitoring | ⬜ | | |
 | 9.08 Keyboard Navigation | ⬜ | | |
 | 9.09 Screen Reader | ⬜ | | |
 | 9.10 Search Performance | ⬜ | | |
