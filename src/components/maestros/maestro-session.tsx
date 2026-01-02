@@ -46,14 +46,12 @@ import { VoicePanel } from '@/components/voice';
 import { logger } from '@/lib/logger';
 import toast from '@/components/ui/toast';
 import type { Maestro, ChatMessage, ToolCall, SessionEvaluation } from '@/types';
+import { MAESTRI_XP } from '@/lib/constants/xp-rewards';
 
-// Constants for score/XP calculations (extracted for clarity)
+// Constants for score calculations (extracted for clarity)
 const SCORE_QUESTIONS_WEIGHT = 0.5; // Points per question (max 2 points)
 const SCORE_DURATION_WEIGHT = 0.1;  // Points per minute (max 2 points)
 const SCORE_XP_WEIGHT = 0.005;      // Points per XP (max 0.5 points)
-const XP_PER_MINUTE = 5;            // XP earned per minute of session
-const XP_PER_QUESTION = 10;         // XP earned per question asked
-const MAX_XP_PER_SESSION = 100;     // Maximum XP per session
 
 interface MaestroSessionProps {
   maestro: Maestro;
@@ -370,7 +368,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     setSessionEnded(true);
 
     const sessionDuration = Math.round((Date.now() - sessionStartTime.current) / 60000);
-    const xpEarned = Math.min(MAX_XP_PER_SESSION, sessionDuration * XP_PER_MINUTE + questionCount.current * XP_PER_QUESTION);
+    const xpEarned = Math.min(MAESTRI_XP.MAX_PER_SESSION, sessionDuration * MAESTRI_XP.PER_MINUTE + questionCount.current * MAESTRI_XP.PER_QUESTION);
 
     const evaluation = generateAutoEvaluation(questionCount.current, sessionDuration, xpEarned);
 

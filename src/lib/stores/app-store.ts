@@ -18,6 +18,7 @@ import type {
   ToolCall,
 } from '@/types';
 import type { ToolState, ToolType } from '@/types/tools';
+import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
 // === SETTINGS STORE ===
 
@@ -345,10 +346,6 @@ interface ProgressState {
   syncToServer: () => Promise<void>;
   loadFromServer: () => Promise<void>;
 }
-
-const XP_PER_LEVEL = [
-  0, 100, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000,
-];
 
 export const useProgressStore = create<ProgressState>()(
   (set, get) => ({

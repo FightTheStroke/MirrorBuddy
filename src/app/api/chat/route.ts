@@ -35,19 +35,18 @@ interface ChatRequest {
 }
 
 // Tool context to inject into system prompt (Phase 5: Chat API Enhancement)
-// CRITICAL: These instructions FORCE tool calls when user specifies a topic
+// These instructions guide AI to prioritize tool calls when the user specifies a topic
 const TOOL_CONTEXT: Record<string, string> = {
   mindmap: `
-## ISTRUZIONI CRITICHE - MODALITÀ MAPPA MENTALE
+## MODALITÀ MAPPA MENTALE
 
-HAI ACCESSO AL TOOL "create_mindmap". DEVI USARLO.
+Hai a disposizione il tool "create_mindmap" per creare mappe mentali interattive.
 
-REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
-1. NON rispondere con testo
-2. CHIAMA SUBITO create_mindmap
-3. IL TOOL CREERÀ LA MAPPA, TU DEVI SOLO CHIAMARLO
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_mindmap
+2. Il tool genererà automaticamente la visualizzazione grafica
 
-STRUTTURA GERARCHICA OBBLIGATORIA - ESEMPIO CORRETTO:
+STRUTTURA GERARCHICA - ESEMPIO:
 {
   "title": "La Fotosintesi",
   "nodes": [
@@ -63,80 +62,74 @@ STRUTTURA GERARCHICA OBBLIGATORIA - ESEMPIO CORRETTO:
   ]
 }
 
-REGOLE IMPERATIVE PER LA GERARCHIA:
-1. parentId: null = nodo di PRIMO livello (ramo principale dal centro)
-2. parentId: "X" = nodo FIGLIO del nodo con id "X"
-3. DEVI creare ALMENO 3 livelli di profondità
-4. Ogni nodo di primo livello DEVE avere 2-4 figli
-5. MAI mettere tutti i nodi con parentId: null (mappa PIATTA = ERRORE)
+REGOLE PER LA GERARCHIA:
+1. parentId: null = nodo di primo livello (ramo principale dal centro)
+2. parentId: "X" = nodo figlio del nodo con id "X"
+3. Crea almeno 3 livelli di profondità per una mappa ricca
+4. Ogni nodo di primo livello dovrebbe avere 2-4 figli
+5. Evita mappe piatte con tutti parentId: null
 
-SE generi una mappa con tutti parentId: null, HAI SBAGLIATO.
-
-SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Di cosa vuoi fare la mappa?"`,
+Se lo studente non ha indicato un argomento, chiedi: "Di cosa vuoi fare la mappa?"`,
 
   quiz: `
-## ISTRUZIONI CRITICHE - MODALITÀ QUIZ
+## MODALITÀ QUIZ
 
-HAI ACCESSO AL TOOL "create_quiz". DEVI USARLO.
+Hai a disposizione il tool "create_quiz" per creare quiz interattivi.
 
-REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
-1. NON rispondere con testo
-2. CHIAMA SUBITO create_quiz
-3. IL TOOL CREERÀ IL QUIZ, TU DEVI SOLO CHIAMARLO
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_quiz
+2. Il tool genererà automaticamente il quiz interattivo
 
-ESEMPI - quando lo studente dice:
-- "rivoluzione francese" → CHIAMA create_quiz(topic:"Rivoluzione Francese", questions:[...])
-- "frazioni" → CHIAMA create_quiz(topic:"Le Frazioni", questions:[...])
+ESEMPI:
+- "rivoluzione francese" → usa create_quiz(topic:"Rivoluzione Francese", questions:[...])
+- "frazioni" → usa create_quiz(topic:"Le Frazioni", questions:[...])
 
-SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Su cosa vuoi fare il quiz?"`,
+Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi fare il quiz?"`,
 
   flashcard: `
-## ISTRUZIONI CRITICHE - MODALITÀ FLASHCARD
+## MODALITÀ FLASHCARD
 
-HAI ACCESSO AL TOOL "create_flashcards". DEVI USARLO.
+Hai a disposizione il tool "create_flashcards" per creare set di flashcard.
 
-REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
-1. NON rispondere con testo
-2. CHIAMA SUBITO create_flashcards
-3. IL TOOL CREERÀ LE CARTE, TU DEVI SOLO CHIAMARLO
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_flashcards
+2. Il tool genererà automaticamente le carte
 
-ESEMPI - quando lo studente dice:
-- "verbi irregolari" → CHIAMA create_flashcards(topic:"Verbi Irregolari Inglesi", cards:[...])
-- "capitali europee" → CHIAMA create_flashcards(topic:"Capitali Europee", cards:[...])
+ESEMPI:
+- "verbi irregolari" → usa create_flashcards(topic:"Verbi Irregolari Inglesi", cards:[...])
+- "capitali europee" → usa create_flashcards(topic:"Capitali Europee", cards:[...])
 
-SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Su cosa vuoi le flashcard?"`,
+Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi le flashcard?"`,
 
   demo: `
-## ISTRUZIONI CRITICHE - MODALITÀ DEMO INTERATTIVA
+## MODALITÀ DEMO INTERATTIVA
 
-HAI ACCESSO AL TOOL "create_demo". DEVI USARLO.
+Hai a disposizione il tool "create_demo" per creare visualizzazioni interattive.
 
-REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
-1. NON rispondere con testo
-2. CHIAMA SUBITO create_demo
-3. IL TOOL CREERÀ LA DEMO, TU DEVI SOLO CHIAMARLO
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_demo
+2. Il tool genererà automaticamente la demo interattiva
 
-ESEMPI - quando lo studente dice:
-- "sistema solare" → CHIAMA create_demo(title:"Sistema Solare", html:"<canvas>...", js:"animation code...")
-- "onde" → CHIAMA create_demo(title:"Onde Meccaniche", html:"...", js:"wave simulation...")
+ESEMPI:
+- "sistema solare" → usa create_demo(title:"Sistema Solare", html:"<canvas>...", js:"animation code...")
+- "onde" → usa create_demo(title:"Onde Meccaniche", html:"...", js:"wave simulation...")
 
-SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`,
+Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`,
 
   summary: `
-## ISTRUZIONI CRITICHE - MODALITÀ RIASSUNTO
+## MODALITÀ RIASSUNTO
 
-HAI ACCESSO AL TOOL "create_summary". DEVI USARLO.
+Hai a disposizione il tool "create_summary" per creare riassunti strutturati.
 
-REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
-1. NON rispondere con testo
-2. CHIAMA SUBITO create_summary
-3. IL TOOL CREERÀ IL RIASSUNTO, TU DEVI SOLO CHIAMARLO
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_summary
+2. Il tool genererà automaticamente il riassunto
 
-ESEMPI - quando lo studente dice:
-- "prima guerra mondiale" → CHIAMA create_summary(topic:"Prima Guerra Mondiale", sections:[...])
-- "fotosintesi" → CHIAMA create_summary(topic:"La Fotosintesi", sections:[...])
+ESEMPI:
+- "prima guerra mondiale" → usa create_summary(topic:"Prima Guerra Mondiale", sections:[...])
+- "fotosintesi" → usa create_summary(topic:"La Fotosintesi", sections:[...])
 
-SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Cosa vuoi riassumere?"`,
+Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi riassumere?"`,
 };
 
 export async function POST(request: NextRequest) {
@@ -187,12 +180,29 @@ export async function POST(request: NextRequest) {
           return NextResponse.json(
             {
               error: 'Budget limit exceeded',
-              message: `You have reached your budget limit of $${userSettings.budgetLimit.toFixed(2)}. Please increase your budget in settings.`,
+              message: `Hai raggiunto il limite di budget di $${userSettings.budgetLimit.toFixed(2)}. Puoi aumentarlo nelle impostazioni.`,
               totalSpent: userSettings.totalSpent,
               budgetLimit: userSettings.budgetLimit,
+              settingsUrl: '/settings',
             },
             { status: 402 }
           );
+        }
+
+        // Budget warning threshold (80% usage)
+        const BUDGET_WARNING_THRESHOLD = 0.8;
+        if (userSettings && userSettings.budgetLimit > 0) {
+          const usageRatio = userSettings.totalSpent / userSettings.budgetLimit;
+          if (usageRatio >= BUDGET_WARNING_THRESHOLD && usageRatio < 1) {
+            logger.info('Budget warning threshold reached', {
+              userId,
+              totalSpent: userSettings.totalSpent,
+              budgetLimit: userSettings.budgetLimit,
+              usagePercent: Math.round(usageRatio * 100),
+            });
+            // Continue with request but add warning header for client to handle
+            // Client can show a warning toast based on this header
+          }
         }
       } catch (e) {
         // Settings lookup failure should not block chat
