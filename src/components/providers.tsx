@@ -68,12 +68,18 @@ function StoreInitializer() {
     const handleUnload = () => {
       const settings = useSettingsStore.getState();
       if (settings.pendingSync) {
-        // Use sendBeacon for reliable sync on close
-        navigator.sendBeacon('/api/user/settings', JSON.stringify({
-          theme: settings.theme,
-          language: settings.appearance.language,
-          accentColor: settings.appearance.accentColor,
-        }));
+        // Use sendBeacon for reliable sync on close (Blob ensures application/json content-type)
+        navigator.sendBeacon(
+          '/api/user/settings',
+          new Blob(
+            [JSON.stringify({
+              theme: settings.theme,
+              language: settings.appearance.language,
+              accentColor: settings.appearance.accentColor,
+            })],
+            { type: 'application/json' }
+          )
+        );
       }
     };
 
