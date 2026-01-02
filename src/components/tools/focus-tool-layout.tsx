@@ -181,7 +181,6 @@ export function FocusToolLayout() {
   // Voice session hook - must be after character is defined
   const {
     isConnected: voiceConnected,
-    isListening: _isListening,
     isSpeaking,
     isMuted,
     inputLevel,

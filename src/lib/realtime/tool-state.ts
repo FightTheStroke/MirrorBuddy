@@ -414,6 +414,15 @@ export function cleanupOldTools(maxAge: number = 3600000): number {
 }
 
 /**
+ * Clear all tool states - FOR TESTING ONLY
+ * This completely resets the in-memory state
+ */
+export function clearAllToolStates(): void {
+  activeTools.clear();
+  sessionTools.clear();
+}
+
+/**
  * Get stats for monitoring
  */
 export function getToolStateStats(): {

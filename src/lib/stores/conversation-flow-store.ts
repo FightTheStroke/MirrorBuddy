@@ -31,6 +31,16 @@ import { endConversationWithSummary as generateSummary } from '@/lib/conversatio
 import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
 
 // ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/**
+ * Minimum number of messages required before generating a summary.
+ * Set to 2 to ensure there's meaningful conversation beyond just the greeting.
+ */
+const MIN_MESSAGES_FOR_SUMMARY = 2;
+
+// ============================================================================
 // PERSISTENCE HELPERS
 // ============================================================================
 
@@ -587,7 +597,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           ? state.conversationsByCharacter[state.activeCharacter.id]?.conversationId
           : null;
 
-        if (currentConversationId && state.messages.length > 2) {
+        if (currentConversationId && state.messages.length > MIN_MESSAGES_FOR_SUMMARY) {
           try {
             // Get userId from sessionStorage
             let userId: string | null = null;
