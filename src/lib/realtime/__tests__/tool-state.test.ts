@@ -14,6 +14,7 @@ import {
   getSessionToolStates,
   getActiveToolStates,
   cleanupOldTools,
+  clearAllToolStates,
   getToolStateStats,
 } from '../tool-state';
 
@@ -30,8 +31,8 @@ vi.mock('@/lib/logger', () => ({
 describe('Tool State Management', () => {
   // Reset state between tests
   beforeEach(() => {
-    // Clean up all tools by running cleanup with 0 maxAge
-    cleanupOldTools(0);
+    // Clear all tool states for proper test isolation
+    clearAllToolStates();
   });
 
   describe('createToolState', () => {

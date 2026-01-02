@@ -37,6 +37,7 @@ import { ToolButtons } from './tool-buttons';
 import { ToolPanel } from '@/components/tools/tool-panel';
 import type { ToolType, ToolState } from '@/types/tools';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
+import { getMaestroById } from '@/data/maestri';
 import type { MaestroFull } from '@/data/maestri';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
 
@@ -70,9 +71,10 @@ export { CharacterCard } from './components';
 // ============================================================================
 
 /**
- * Get userId from sessionStorage (client-side)
+ * Get or create userId from sessionStorage (client-side)
+ * Creates a new UUID if one doesn't exist
  */
-function getUserId(): string | null {
+function getOrCreateUserId(): string | null {
   if (typeof window === 'undefined') return null;
   let userId = sessionStorage.getItem('convergio-user-id');
   if (!userId) {
@@ -86,7 +88,7 @@ function getUserId(): string | null {
  * End a conversation and generate summary
  */
 async function endConversationWithSummary(conversationId: string): Promise<void> {
-  const userId = getUserId();
+  const userId = getOrCreateUserId();
   if (!userId) {
     logger.warn('No userId, cannot end conversation');
     return;
@@ -171,10 +173,13 @@ export function ConversationFlow() {
       try {
         const { tool, maestroId } = JSON.parse(pendingRequest);
         if (tool === toolType && maestroId) {
-          // Use maestro from pending request
-          sessionStorage.removeItem('pendingToolRequest');
-          handleMaestroSelected({ id: maestroId } as MaestroFull, toolType);
-          return;
+          // Use maestro from pending request - fetch full object for type safety
+          const maestro = getMaestroById(maestroId);
+          if (maestro) {
+            sessionStorage.removeItem('pendingToolRequest');
+            handleMaestroSelected(maestro, toolType);
+            return;
+          }
         }
       } catch (error) {
         logger.error('Failed to parse pendingToolRequest', { error });
@@ -318,7 +323,7 @@ export function ConversationFlow() {
   useEffect(() => {
     if (!isActive || !activeCharacter) return;
 
-    const userId = getUserId();
+    const userId = getOrCreateUserId();
     if (!userId) return;
 
     const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
@@ -334,7 +339,7 @@ export function ConversationFlow() {
   useEffect(() => {
     if (!isActive || !activeCharacter) return;
 
-    const userId = getUserId();
+    const userId = getOrCreateUserId();
     if (!userId) return;
 
     const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
@@ -342,9 +347,13 @@ export function ConversationFlow() {
 
     const handleBeforeUnload = () => {
       // Fire and forget - browser will wait for this to complete
+      // Use Blob with application/json content-type for proper API parsing
       navigator.sendBeacon(
         `/api/conversations/${conversationId}/end`,
-        JSON.stringify({ userId, reason: 'browser_close' })
+        new Blob(
+          [JSON.stringify({ userId, reason: 'browser_close' })],
+          { type: 'application/json' }
+        )
       );
     };
 
@@ -457,7 +466,7 @@ export function ConversationFlow() {
     addMessage({ role: 'user', content: userMessage });
 
     // #98: Reset inactivity timer on user message
-    const userId = getUserId();
+    const userId = getOrCreateUserId();
     const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
     if (userId && conversationId) {
       inactivityMonitor.trackActivity(conversationId, userId, activeCharacter.id);
@@ -663,7 +672,7 @@ export function ConversationFlow() {
       setMode('text');
 
       // Generate summary for voice call
-      const userId = getUserId();
+      const userId = getOrCreateUserId();
       const conversationId = activeCharacter ? conversationsByCharacter[activeCharacter.id]?.conversationId : null;
       if (userId && conversationId) {
         logger.info('Ending voice call, generating summary', { conversationId });
