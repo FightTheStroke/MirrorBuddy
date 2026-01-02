@@ -48,7 +48,7 @@ function initToastState(): ToastState {
     toastState = {
       toasts: [],
       addToast: (toast) => {
-        const id = `toast_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+        const id = `toast_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
         const newToast: Toast = { ...toast, id };
         toastState!.toasts = [...toastState!.toasts, newToast];
         notifyListeners();

@@ -125,7 +125,7 @@ export function VoiceCallOverlay({
       try {
         // Convert character to Maestro-compatible interface
         const maestroLike = activeCharacterToMaestro(character);
-        await connect(maestroLike, connectionInfo);
+        await connect(maestroLike, { ...connectionInfo, characterType: character.type });
       } catch (error) {
         logger.error('Voice connection failed', { error: String(error) });
         if (error instanceof DOMException && error.name === 'NotAllowedError') {

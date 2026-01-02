@@ -17,7 +17,7 @@ import {
 
 // Generate unique client ID
 function generateClientId(): string {
-  return `sse_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `sse_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

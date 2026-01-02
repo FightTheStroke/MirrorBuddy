@@ -90,15 +90,51 @@ function WelcomeContent() {
   const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
   const lastTranscriptRef = useRef<string | null>(null);
 
+  // Voice reconnection logic (use state to trigger effect re-runs)
+  const [voiceRetryAttempts, setVoiceRetryAttempts] = useState(0);
+  const voiceRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const MAX_VOICE_RETRIES = 3;
+  const VOICE_RETRY_DELAY_MS = 2000; // Start with 2 seconds
+
   // ========== SINGLE VOICE SESSION FOR ALL ONBOARDING STEPS ==========
   const voiceSession = useVoiceSession({
     noiseReductionType: 'far_field',
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('[WelcomePage] Voice error', { message });
-      setUseWebSpeechFallback(true);
+
+      // Retry logic with exponential backoff
+      if (voiceRetryAttempts < MAX_VOICE_RETRIES) {
+        // Temporary issue - will retry (warn level)
+        logger.warn('[WelcomePage] Voice connection issue, will retry', {
+          message,
+          retryAttempt: voiceRetryAttempts + 1,
+          maxRetries: MAX_VOICE_RETRIES,
+        });
+        setVoiceRetryAttempts((prev) => prev + 1);
+        logger.info('[WelcomePage] Scheduling voice reconnection', {
+          nextAttempt: voiceRetryAttempts + 1,
+          maxRetries: MAX_VOICE_RETRIES,
+        });
+      } else {
+        // Max retries exceeded - this is now an actual error
+        logger.error('[WelcomePage] Voice connection failed after all retries', {
+          message,
+          totalAttempts: voiceRetryAttempts,
+          maxRetries: MAX_VOICE_RETRIES,
+        });
+        logger.warn('[WelcomePage] Falling back to Web Speech', {
+          totalAttempts: voiceRetryAttempts,
+        });
+        setUseWebSpeechFallback(true);
+      }
     },
     onTranscript: (role, text) => {
+      // Voice session working - reset retry counter
+      if (voiceRetryAttempts > 0) {
+        logger.info('[WelcomePage] Voice session recovered, resetting retry counter');
+        setVoiceRetryAttempts(0);
+      }
+
       // Deduplicate transcripts
       if (lastTranscriptRef.current === text.substring(0, 50)) return;
       lastTranscriptRef.current = text.substring(0, 50);
@@ -113,7 +149,10 @@ function WelcomeContent() {
         const response = await fetch('/api/realtime/token');
         const data = await response.json();
         if (data.error) {
-          logger.error('[WelcomePage] Voice API error', { error: data.error });
+          // Voice API not available - graceful fallback (not an error in test/dev environments)
+          logger.warn('[WelcomePage] Voice API not available, using Web Speech fallback', {
+            error: data.error,
+          });
           setHasCheckedAzure(true);
           setUseWebSpeechFallback(true);
           return;
@@ -121,7 +160,10 @@ function WelcomeContent() {
         setConnectionInfo(data as VoiceConnectionInfo);
         setHasCheckedAzure(true);
       } catch (error) {
-        logger.error('[WelcomePage] Failed to get voice config', { error: String(error) });
+        // Voice API unavailable - graceful fallback (expected in test environment)
+        logger.warn('[WelcomePage] Voice API unavailable, using Web Speech fallback', {
+          error: String(error),
+        });
         setHasCheckedAzure(true);
         setUseWebSpeechFallback(true);
       }
@@ -164,6 +206,62 @@ function WelcomeContent() {
     }
     fetchExistingData();
   }, [updateData]);
+
+  // Auto-reconnect voice session on error (with retry limit)
+  useEffect(() => {
+    // Only attempt reconnection if we're in retry mode
+    if (
+      connectionInfo &&
+      !useWebSpeechFallback &&
+      voiceRetryAttempts > 0 &&
+      voiceRetryAttempts <= MAX_VOICE_RETRIES
+    ) {
+      const retryDelay = VOICE_RETRY_DELAY_MS * voiceRetryAttempts;
+
+      logger.info('[WelcomePage] Scheduling voice reconnection', {
+        attempt: voiceRetryAttempts,
+        delayMs: retryDelay,
+      });
+
+      // Clear any existing timeout
+      if (voiceRetryTimeoutRef.current) {
+        clearTimeout(voiceRetryTimeoutRef.current);
+      }
+
+      // Schedule reconnection
+      voiceRetryTimeoutRef.current = setTimeout(() => {
+        logger.info('[WelcomePage] Executing voice reconnection attempt', {
+          attempt: voiceRetryAttempts,
+        });
+
+        // Disconnect and reconnect to force fresh session
+        voiceSession.disconnect();
+
+        // Wait a bit before reconnecting
+        setTimeout(() => {
+          if (connectionInfo) {
+            voiceSession.connect(
+              createOnboardingMelissa(existingUserData),
+              connectionInfo
+            );
+          }
+        }, 500);
+      }, retryDelay);
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (voiceRetryTimeoutRef.current) {
+        clearTimeout(voiceRetryTimeoutRef.current);
+      }
+    };
+  }, [
+    connectionInfo,
+    useWebSpeechFallback,
+    voiceRetryAttempts,
+    voiceSession,
+    existingUserData,
+  ]);
 
   // Callback when Azure is unavailable - fallback to Web Speech TTS
   const handleAzureUnavailable = useCallback(() => {
@@ -352,7 +450,7 @@ function WelcomeContent() {
                 >
                   Benvenuto in{' '}
                   <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    ConvergioEdu
+                    MirrorBuddy
                   </span>
                 </motion.h1>
                 <motion.p
@@ -362,7 +460,7 @@ function WelcomeContent() {
                   className="text-xl text-gray-600 dark:text-gray-300 mb-8"
                 >
                   Il tuo compagno di studio intelligente, personalizzato per te.
-                  Impara con 17 Maestri AI, crea mappe mentali, flashcard e molto altro!
+                  Impara con 16 Maestri AI, crea mappe mentali, flashcard e molto altro!
                 </motion.p>
               </>
             )}
@@ -376,7 +474,7 @@ function WelcomeContent() {
               className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
             >
               {[
-                { icon: '🎓', label: '17 Maestri AI' },
+                { icon: '🎓', label: '16 Maestri AI' },
                 { icon: '🗺️', label: 'Mappe Mentali' },
                 { icon: '📚', label: 'Flashcard FSRS' },
                 { icon: '🎮', label: 'Gamification' },
@@ -468,7 +566,7 @@ function WelcomeContent() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {existingUserData?.name ? `Aggiornamento profilo di ${existingUserData.name}` : 'Benvenuto in ConvergioEdu'}
+              {existingUserData?.name ? `Aggiornamento profilo di ${existingUserData.name}` : 'Benvenuto in MirrorBuddy'}
             </span>
 
             <div className="flex items-center gap-3">

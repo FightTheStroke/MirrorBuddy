@@ -46,6 +46,41 @@ When implementing new features:
 4. **Verify**: `npm run lint && npm run typecheck && npm run build`
 5. **Commit**: Conventional format, reference issue if exists
 
+## PLANNING RULES (MANDATORY)
+
+**UN PIANO NON ESEGUITO È PEGGIO DI NESSUN PIANO.**
+
+1. **EXECUTE IMMEDIATELY**
+   - Dopo aver scritto un piano: ESEGUI SUBITO
+   - Zero attesa, zero conferme, zero "lo faccio dopo"
+   - Se scrivi un piano e non lo esegui = HAI FALLITO
+
+2. **TRACK PROGRESS IN REAL-TIME**
+   - Aggiorna il piano mentre lavori: `[ ]` → `[🔄]` → `[✅]`
+   - Se il file piano non è aggiornato, nessuno sa cosa è stato fatto
+
+3. **VERIFY BEFORE "DONE"**
+   - `npm run typecheck && npm run lint && npm run build` DEVE passare
+   - Se fallisce, NON HAI FINITO - torna a fixare
+
+4. **NO PARTIAL EXECUTION**
+   - Un piano con 10 task = fai tutti e 10
+   - "Wave 1 fatto, Wave 2-3 li faccio dopo" = INACCETTABILE
+   - Finisci TUTTO quello che è nel piano
+
+5. **PARALLEL EXECUTION**
+   - Lancia agenti in parallelo per task indipendenti
+   - Max 3 agenti per evitare crash
+   - Checkpoint nel file piano per recovery
+
+6. **SESSION RECOVERY**
+   - Se la sessione si interrompe, il prossimo agente deve:
+     - Leggere il piano
+     - Vedere cosa è `[✅]` e cosa è `[ ]`
+     - Continuare da dove si è fermato
+
+**REGOLA D'ORO: Lavora prima, parla dopo.**
+
 ## Summary Instructions
 
 When compacting: code changes, test output, architectural decisions, open tasks. Discard verbose listings and debug output.

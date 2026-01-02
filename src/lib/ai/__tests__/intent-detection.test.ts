@@ -14,6 +14,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   detectIntent,
+  detectToolType,
   getCharacterTypeLabel,
   shouldSuggestRedirect,
   type DetectedIntent,
@@ -491,6 +492,59 @@ describe('Intent Detection', () => {
   });
 
   // =========================================================================
+  // DETECT TOOL TYPE
+  // =========================================================================
+
+  describe('detectToolType', () => {
+    it('should detect mindmap requests', () => {
+      const messages = [
+        'mappa mentale',
+        'mappa concettuale',
+        'schema',
+        'diagramma',
+      ];
+
+      for (const msg of messages) {
+        expect(detectToolType(msg)).toBe('mindmap');
+      }
+    });
+
+    it('should detect quiz requests', () => {
+      const messages = ['quiz', 'test', 'verifica', 'interrogazione', 'mi interroghi'];
+
+      for (const msg of messages) {
+        expect(detectToolType(msg)).toBe('quiz');
+      }
+    });
+
+    it('should detect flashcard requests', () => {
+      const messages = ['flashcard', 'flash card', 'carte per ripasso'];
+
+      for (const msg of messages) {
+        expect(detectToolType(msg)).toBe('flashcard');
+      }
+    });
+
+    it('should detect demo requests', () => {
+      const messages = ['demo', 'simulazione', 'animazione', 'interattivo'];
+
+      for (const msg of messages) {
+        expect(detectToolType(msg)).toBe('demo');
+      }
+    });
+
+    it('should return null for non-tool requests', () => {
+      expect(detectToolType('ciao come stai')).toBeNull();
+      expect(detectToolType('spiegami la matematica')).toBeNull();
+    });
+
+    it('should be case insensitive', () => {
+      expect(detectToolType('MAPPA MENTALE')).toBe('mindmap');
+      expect(detectToolType('FlashCard')).toBe('flashcard');
+    });
+  });
+
+  // =========================================================================
   // EDGE CASES
   // =========================================================================
 
@@ -521,6 +575,35 @@ describe('Intent Detection', () => {
       const intent = detectIntent(longMessage);
       expect(intent.subject).toBe('mathematics');
       expect(intent.emotionalIndicators).toBeDefined();
+    });
+  });
+
+  // =========================================================================
+  // COMPLEX SCENARIOS
+  // =========================================================================
+
+  describe('Complex Scenarios', () => {
+    it('should prioritize emotional content with multiple emotions', () => {
+      const intent = detectIntent('Sono ansioso e triste, nessuno mi capisce');
+      expect(intent.type).toBe('emotional_support');
+      expect(intent.recommendedCharacter).toBe('buddy');
+      expect(intent.emotionalIndicators?.length).toBeGreaterThan(1);
+    });
+
+    it('should combine subject and emotional detection', () => {
+      const intent = detectIntent('Non capisco la matematica, è troppo difficile');
+      expect(intent.subject).toBe('mathematics');
+      expect(intent.emotionalIndicators).toBeDefined();
+      // Should still recommend maestro for academic help
+      expect(intent.recommendedCharacter).toBe('maestro');
+    });
+
+    it('should handle tool requests with subjects', () => {
+      // Must use TOOL_PATTERNS format: "crea/fai/genera/prepara" + tool
+      const intent = detectIntent('Creami una mappa sulla storia');
+      expect(intent.type).toBe('tool_request');
+      expect(intent.subject).toBe('history');
+      expect(intent.toolType).toBe('mindmap');
     });
   });
 });

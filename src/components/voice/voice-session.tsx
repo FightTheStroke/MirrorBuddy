@@ -347,6 +347,16 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
                 >
                   Riprova
                 </Button>
+                {onSwitchToChat && (
+                  <Button
+                    onClick={onSwitchToChat}
+                    variant="outline"
+                    className="flex-1 border-amber-600 text-amber-400 hover:bg-amber-950"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Usa Chat Testuale
+                  </Button>
+                )}
                 <Button
                   onClick={onClose}
                   variant="outline"
@@ -409,12 +419,26 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
                 </pre>
               </div>
 
-              <Button
-                onClick={onClose}
-                className="w-full mt-4 bg-red-600 hover:bg-red-700"
-              >
-                Chiudi
-              </Button>
+              <div className="flex gap-2 mt-4">
+                {onSwitchToChat && (
+                  <Button
+                    onClick={onSwitchToChat}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  >
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Usa Chat Testuale
+                  </Button>
+                )}
+                <Button
+                  onClick={onClose}
+                  className={cn(
+                    'bg-red-600 hover:bg-red-700',
+                    onSwitchToChat ? 'flex-1' : 'w-full'
+                  )}
+                >
+                  Chiudi
+                </Button>
+              </div>
             </div>
           </Card>
         </motion.div>

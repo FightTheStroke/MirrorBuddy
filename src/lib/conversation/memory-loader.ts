@@ -105,7 +105,10 @@ function mergeKeyFacts(
         }
       }
     } catch {
-      // Invalid JSON, skip
+      // Invalid JSON in keyFacts, log warning and skip
+      logger.warn('Invalid JSON in keyFacts, skipping', {
+        keyFacts: conv.keyFacts?.substring(0, 100),
+      });
     }
   }
 
@@ -132,7 +135,10 @@ function mergeTopics(
         }
       }
     } catch {
-      // Invalid JSON, skip
+      // Invalid JSON in topics, log warning and skip
+      logger.warn('Invalid JSON in topics, skipping', {
+        topics: conv.topics?.substring(0, 100),
+      });
     }
   }
 

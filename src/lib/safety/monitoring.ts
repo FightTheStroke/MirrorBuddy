@@ -102,7 +102,7 @@ const VIOLATION_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
  * Generate unique event ID
  */
 function generateEventId(): string {
-  return `se_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `se_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

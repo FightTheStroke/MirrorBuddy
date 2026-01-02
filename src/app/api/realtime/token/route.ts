@@ -4,12 +4,22 @@
 // SECURITY: API key is NEVER exposed to client
 // ============================================================================
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { logger } from '@/lib/logger';
 
 // WebSocket proxy port (must match instrumentation.ts)
 const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Rate limiting: 10 requests per minute per IP
+  const clientId = getClientIdentifier(request);
+  const rateLimit = checkRateLimit(`realtime-token:${clientId}`, RATE_LIMITS.REALTIME_TOKEN);
+
+  if (!rateLimit.success) {
+    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/realtime/token' });
+    return rateLimitResponse(rateLimit);
+  }
   // Azure OpenAI Realtime configuration (required)
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;

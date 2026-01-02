@@ -1247,7 +1247,7 @@ export async function executeSummaryModification(
  * Generate a tool ID for a voice command.
  */
 export function generateToolId(): string {
-  return `voice-tool-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return `voice-tool-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 }
 
 // ============================================================================

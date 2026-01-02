@@ -17,7 +17,7 @@ const PRINCIPLES = [
   },
   {
     icon: Users,
-    title: '17 Maestri al tuo fianco',
+    title: '16 Maestri al tuo fianco',
     description: 'Da Leonardo a Marie Curie, i più grandi geni della storia ti spiegheranno ogni materia.',
     color: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
   },

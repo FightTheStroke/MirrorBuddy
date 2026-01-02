@@ -28,14 +28,19 @@ import { cn } from '@/lib/utils';
 import { useSettingsStore } from '@/lib/stores/app-store';
 import { logger } from '@/lib/logger';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
-// Note: routeMessage from store is used instead of direct routeToCharacter
-import { analyzeHandoff } from '@/lib/ai/handoff-manager';
-import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
-import type { ExtendedStudentProfile, Subject } from '@/types';
+import type { ExtendedStudentProfile } from '@/types';
 // Tool integration - T-15
 import { ToolButtons } from './tool-buttons';
 import { ToolPanel } from '@/components/tools/tool-panel';
 import type { ToolType, ToolState } from '@/types/tools';
+import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
+import { getMaestroById } from '@/data/maestri';
+import type { MaestroFull } from '@/data/maestri';
+// Extracted hooks and helpers
+import { useToolSSE } from './hooks/use-tool-sse';
+import { useConversationInactivity } from './hooks/use-conversation-inactivity';
+import { useMessageSender } from './hooks/use-message-sender';
+import { getOrCreateUserId, endConversationWithSummary } from './utils/conversation-helpers';
 
 // Map OpenAI function names to ToolType
 const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
@@ -74,9 +79,10 @@ export function ConversationFlow() {
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
   const [voiceSessionId, setVoiceSessionId] = useState<string | null>(null);
+  const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+  const [pendingToolType, setPendingToolType] = useState<ToolType | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const sessionStartTimeRef = useRef<number>(Date.now());
   const _prefersReducedMotion = useReducedMotion(); // For future accessibility features
 
   // Stores
@@ -89,6 +95,7 @@ export function ConversationFlow() {
     pendingHandoff,
     characterHistory,
     sessionId,
+    conversationsByCharacter,
     startConversation,
     endConversation: _endConversation, // Available for future explicit end
     addMessage,
@@ -111,9 +118,9 @@ export function ConversationFlow() {
     preferredBuddy: studentProfile.preferredBuddy,
   }), [studentProfile]);
 
-  // Handle tool request from ToolButtons
-  const handleToolRequest = useCallback(async (toolType: ToolType) => {
-    if (!activeCharacter || isLoading) return;
+  // Handle maestro selection and create tool
+  const handleMaestroSelected = useCallback(async (maestro: MaestroFull, toolType: ToolType) => {
+    if (isLoading) return;
 
     // Create tool prompts based on type
     const toolPrompts: Record<ToolType, string> = {
@@ -155,13 +162,13 @@ export function ConversationFlow() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            { role: 'system', content: activeCharacter.systemPrompt },
+            { role: 'system', content: maestro.systemPrompt },
             ...messages
               .filter((m) => m.role !== 'system')
               .map((m) => ({ role: m.role, content: m.content })),
             { role: 'user', content: toolPrompt },
           ],
-          maestroId: activeCharacter.id,
+          maestroId: maestro.id,
           requestedTool: toolType,
           enableMemory: true, // ADR 0021: Enable conversational memory injection
         }),
@@ -205,7 +212,39 @@ export function ConversationFlow() {
     } finally {
       setIsLoading(false);
     }
-  }, [activeCharacter, isLoading, messages, addMessage]);
+  }, [isLoading, messages, addMessage]);
+
+  // Handle tool request from ToolButtons - show maestro selection dialog
+  const handleToolRequest = useCallback((toolType: ToolType) => {
+    if (isLoading) return;
+
+    // Check for pending tool request in sessionStorage (from maestri-grid)
+    const pendingRequest = sessionStorage.getItem('pendingToolRequest');
+    if (pendingRequest) {
+      try {
+        const parsed = JSON.parse(pendingRequest);
+        // Validate parsed structure before destructuring
+        if (parsed && typeof parsed === 'object' && 'tool' in parsed && 'maestroId' in parsed) {
+          const { tool, maestroId } = parsed;
+          if (tool === toolType && maestroId) {
+            // Use maestro from pending request - fetch full object for type safety
+            const maestro = getMaestroById(maestroId);
+            if (maestro) {
+              sessionStorage.removeItem('pendingToolRequest');
+              handleMaestroSelected(maestro, toolType);
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to parse pendingToolRequest', { error });
+      }
+    }
+
+    // Show maestro selection dialog
+    setPendingToolType(toolType);
+    setShowMaestroDialog(true);
+  }, [isLoading, handleMaestroSelected]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -226,96 +265,26 @@ export function ConversationFlow() {
     }
   }, [isActive, startConversation, extendedProfile]);
 
-  // SSE listener for real-time tool events (Phase 4: Fullscreen Layout)
-  useEffect(() => {
-    if (!sessionId) return;
+  // #98: Inactivity tracking and auto-summary (extracted to hook)
+  useConversationInactivity(isActive, activeCharacter, conversationsByCharacter);
 
-    const eventSource = new EventSource(`/api/tools/sse?sessionId=${sessionId}`);
+  // SSE listener for real-time tool events (extracted to hook)
+  useToolSSE(sessionId, setActiveTool);
 
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-
-        switch (data.type) {
-          case 'connected':
-            logger.debug('SSE connected', { sessionId, clientId: data.clientId });
-            break;
-
-          case 'tool:created':
-            // Tool creation started - show in panel
-            setActiveTool({
-              id: data.toolId,
-              type: data.toolType,
-              status: 'initializing',
-              progress: 0,
-              content: data.data,
-              createdAt: new Date(),
-            });
-            break;
-
-          case 'tool:update':
-            // Incremental update during building
-            setActiveTool((prev) => {
-              if (!prev || prev.id !== data.toolId) return prev;
-              return {
-                ...prev,
-                status: 'building',
-                progress: data.progress ?? prev.progress,
-                content: data.data ?? prev.content,
-              };
-            });
-            break;
-
-          case 'tool:complete':
-            // Tool finished building
-            setActiveTool((prev) => {
-              if (!prev || prev.id !== data.toolId) return prev;
-              return {
-                ...prev,
-                status: 'completed',
-                progress: 1,
-                content: data.data ?? prev.content,
-              };
-            });
-            break;
-
-          case 'tool:error':
-            // Tool build failed
-            setActiveTool((prev) => {
-              if (!prev || prev.id !== data.toolId) return prev;
-              return {
-                ...prev,
-                status: 'error',
-                error: data.error || 'Errore durante la creazione',
-              };
-            });
-            break;
-
-          case 'heartbeat':
-            // Keep-alive, no action needed
-            break;
-
-          default:
-            logger.debug('Unknown SSE event type', { type: data.type });
-        }
-      } catch (error) {
-        logger.error('SSE message parse error', { error: String(error) });
-      }
-    };
-
-    eventSource.onerror = (error) => {
-      logger.error('SSE connection error', { error: String(error) });
-      // EventSource will automatically try to reconnect
-    };
-
-    return () => {
-      eventSource.close();
-      logger.debug('SSE connection closed', { sessionId });
-    };
-  }, [sessionId]);
+  // Message sending with routing and handoff detection (extracted to hook)
+  const { sendMessage } = useMessageSender({
+    activeCharacter,
+    messages,
+    extendedProfile,
+    conversationsByCharacter,
+    pendingHandoff,
+    routeMessage,
+    addMessage,
+    suggestHandoff,
+  });
 
   /**
-   * Handle sending a message.
+   * Handle sending a message - orchestrates UI state and delegates to sendMessage hook.
    */
   const handleSend = useCallback(async () => {
     if (!inputValue.trim() || isLoading || !activeCharacter) return;
@@ -323,157 +292,10 @@ export function ConversationFlow() {
     const userMessage = inputValue.trim();
     setInputValue('');
     setIsLoading(true);
-
-    // Add user message
     addMessage({ role: 'user', content: userMessage });
 
     try {
-      // Route the message to determine if we need to switch characters
-      const routingResult = routeMessage(userMessage, extendedProfile);
-
-      // Track method progress based on intent (autonomy tracking - Issue #28)
-      const methodProgressStore = useMethodProgressStore.getState();
-
-      // Map main Subject type (English) to method-progress Subject type (Italian)
-      const mapToMethodSubject = (subject?: Subject): import('@/lib/method-progress/types').Subject | undefined => {
-        if (!subject) return undefined;
-        const subjectMap: Record<string, import('@/lib/method-progress/types').Subject> = {
-          mathematics: 'matematica',
-          physics: 'scienze',
-          chemistry: 'scienze',
-          biology: 'scienze',
-          history: 'storia',
-          geography: 'geografia',
-          italian: 'italiano',
-          english: 'inglese',
-          art: 'arte',
-          music: 'musica',
-        };
-        return subjectMap[subject] ?? 'other';
-      };
-
-      if (routingResult.intent.type === 'method_help' ||
-          routingResult.intent.type === 'emotional_support') {
-        // Student is seeking help - track as help request
-        const timeElapsed = Math.round((Date.now() - sessionStartTimeRef.current) / 1000);
-        methodProgressStore.recordHelpRequest(
-          routingResult.reason,
-          timeElapsed,
-          mapToMethodSubject(routingResult.intent.subject)
-        );
-      } else if (routingResult.intent.type === 'academic_help' &&
-                 activeCharacter?.type === 'maestro') {
-        // Student is working independently with a maestro
-        // Only track as "solved alone" if they've been working for a while
-        if (messages.length > 4) {
-          methodProgressStore.recordProblemSolvedAlone(
-            userMessage.slice(0, 100),
-            mapToMethodSubject(routingResult.intent.subject)
-          );
-        }
-      }
-
-      // Check if we should suggest a handoff
-      if (
-        routingResult.characterType !== activeCharacter.type &&
-        routingResult.intent.confidence >= 0.7
-      ) {
-        // High confidence different character needed - suggest handoff
-        const { getMaestroById: _getMaestroById } = await import('@/data/maestri');
-        const { getSupportTeacherById } = await import('@/data/support-teachers');
-        const { getBuddyById } = await import('@/data/buddy-profiles');
-
-        let targetCharacter;
-        switch (routingResult.characterType) {
-          case 'maestro':
-            targetCharacter = routingResult.character;
-            break;
-          case 'coach':
-            targetCharacter =
-              getSupportTeacherById(extendedProfile.preferredCoach || 'melissa') ||
-              routingResult.character;
-            break;
-          case 'buddy':
-            targetCharacter =
-              getBuddyById(extendedProfile.preferredBuddy || 'mario') ||
-              routingResult.character;
-            break;
-        }
-
-        if (targetCharacter && targetCharacter.id !== activeCharacter.id) {
-          // Create active character for handoff
-          const handoffCharacter = {
-            type: routingResult.characterType,
-            id: targetCharacter.id,
-            name: targetCharacter.name,
-            character: targetCharacter,
-            greeting:
-              routingResult.characterType === 'buddy' && 'getGreeting' in targetCharacter
-                ? (targetCharacter as { getGreeting: (p: ExtendedStudentProfile) => string }).getGreeting(extendedProfile)
-                : 'greeting' in targetCharacter ? String(targetCharacter.greeting) : '',
-            systemPrompt:
-              routingResult.characterType === 'buddy' && 'getSystemPrompt' in targetCharacter
-                ? (targetCharacter as { getSystemPrompt: (p: ExtendedStudentProfile) => string }).getSystemPrompt(extendedProfile)
-                : 'systemPrompt' in targetCharacter ? String(targetCharacter.systemPrompt) : '',
-            color: targetCharacter.color,
-            voice: 'voice' in targetCharacter ? targetCharacter.voice : 'alloy',
-            voiceInstructions: 'voiceInstructions' in targetCharacter ? targetCharacter.voiceInstructions : '',
-          };
-
-          // Suggest handoff instead of auto-switching
-          suggestHandoff({
-            toCharacter: handoffCharacter,
-            reason: routingResult.reason,
-            confidence: routingResult.intent.confidence,
-          });
-        }
-      }
-
-      // Send to AI for response with memory context (ADR 0021)
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: activeCharacter.systemPrompt },
-            ...messages
-              .filter((m) => m.role !== 'system')
-              .map((m) => ({
-                role: m.role,
-                content: m.content,
-              })),
-            { role: 'user', content: userMessage },
-          ],
-          maestroId: activeCharacter.id,
-          enableMemory: true, // ADR 0021: Enable conversational memory injection
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get response');
-      }
-
-      const data = await response.json();
-      const assistantContent = data.content || data.message || '';
-      addMessage({ role: 'assistant', content: assistantContent });
-
-      // Also check AI response for handoff signals (reactive detection)
-      if (!pendingHandoff) {
-        const handoffAnalysis = analyzeHandoff({
-          message: userMessage,
-          aiResponse: assistantContent,
-          activeCharacter,
-          studentProfile: extendedProfile,
-          recentMessages: messages.slice(-5).map((m) => ({
-            role: m.role === 'system' ? 'assistant' : (m.role as 'user' | 'assistant'),
-            content: m.content,
-          })),
-        });
-
-        if (handoffAnalysis.shouldHandoff && handoffAnalysis.suggestion && handoffAnalysis.confidence > 0.7) {
-          suggestHandoff(handoffAnalysis.suggestion);
-        }
-      }
+      await sendMessage(userMessage);
     } catch (error) {
       logger.error('Chat error', { error });
       addMessage({
@@ -483,17 +305,7 @@ export function ConversationFlow() {
     } finally {
       setIsLoading(false);
     }
-  }, [
-    inputValue,
-    isLoading,
-    activeCharacter,
-    addMessage,
-    messages,
-    extendedProfile,
-    routeMessage,
-    suggestHandoff,
-    pendingHandoff,
-  ]);
+  }, [inputValue, isLoading, activeCharacter, addMessage, sendMessage]);
 
   /**
    * Handle key press in input.
@@ -519,11 +331,19 @@ export function ConversationFlow() {
   /**
    * Handle voice call (full voice conversation).
    */
-  const handleVoiceCall = useCallback(() => {
+  const handleVoiceCall = useCallback(async () => {
     if (isVoiceActive) {
-      // End voice call
+      // #98: End voice call and generate summary
       setIsVoiceActive(false);
       setMode('text');
+
+      // Generate summary for voice call
+      const userId = getOrCreateUserId();
+      const conversationId = activeCharacter ? conversationsByCharacter[activeCharacter.id]?.conversationId : null;
+      if (userId && conversationId) {
+        logger.info('Ending voice call, generating summary', { conversationId });
+        await endConversationWithSummary(conversationId);
+      }
     } else {
       // Start voice call
       setIsVoiceActive(true);
@@ -531,21 +351,21 @@ export function ConversationFlow() {
       // Voice session will be started by VoiceCallOverlay
       // This is a placeholder - Issue #34 tracks voice WebSocket issues
     }
-  }, [isVoiceActive, setMode]);
+  }, [isVoiceActive, setMode, activeCharacter, conversationsByCharacter]);
 
   /**
-   * Handle accepting handoff.
+   * Handle accepting handoff (async to properly end previous conversation).
    */
-  const handleAcceptHandoff = () => {
-    acceptHandoff(extendedProfile);
+  const handleAcceptHandoff = async () => {
+    await acceptHandoff(extendedProfile);
   };
 
   /**
-   * Handle manual character switches.
+   * Handle manual character switches (async to properly end previous conversation).
    */
-  const handleSwitchToCoach = () => switchToCoach(extendedProfile);
-  const handleSwitchToBuddy = () => switchToBuddy(extendedProfile);
-  const handleGoBack = () => goBack(extendedProfile);
+  const handleSwitchToCoach = async () => await switchToCoach(extendedProfile);
+  const handleSwitchToBuddy = async () => await switchToBuddy(extendedProfile);
+  const handleGoBack = () => goBack(extendedProfile); // Sync: only navigates history
 
   // Render idle state (shouldn't happen with auto-start)
   if (!isActive || !activeCharacter) {
@@ -741,6 +561,23 @@ export function ConversationFlow() {
           </Button>
         </div>
       </div>
+
+      {/* Maestro Selection Dialog */}
+      <ToolMaestroSelectionDialog
+        isOpen={showMaestroDialog}
+        toolType={pendingToolType || 'mindmap'}
+        onSelect={(maestro) => {
+          if (pendingToolType) {
+            handleMaestroSelected(maestro, pendingToolType);
+          }
+          setShowMaestroDialog(false);
+          setPendingToolType(null);
+        }}
+        onClose={() => {
+          setShowMaestroDialog(false);
+          setPendingToolType(null);
+        }}
+      />
     </div>
   );
 }

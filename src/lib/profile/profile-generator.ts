@@ -244,7 +244,7 @@ export function generateStudentProfile(
  */
 function convertToObservation(input: MaestroInsightInput): MaestroObservation {
   return {
-    id: `obs_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+    id: `obs_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
     maestroId: input.maestroId,
     maestroName: input.maestroName,
     category: input.category,
@@ -287,7 +287,7 @@ function generateStrategies(growthAreas: MaestroInsightInput[]): LearningStrateg
       const strategyText = templates[Math.floor(Math.random() * templates.length)];
 
       strategies.push({
-        id: `strat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        id: `strat_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`,
         title: getCategoryDisplayName(category),
         description: strategyText,
         suggestedBy,

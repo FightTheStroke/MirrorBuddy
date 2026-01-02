@@ -3,27 +3,36 @@
 /**
  * FocusToolLayout - Fullscreen layout for working with tools
  *
- * Layout:
- * - Left (1/3): Chat with maestro/coach
- * - Right (2/3): Tool panel (mindmap, quiz, etc.)
- * - Header: Minimal with exit button
+ * Layout (Issue #102):
+ * - Left: Minimized sidebar (icons only, expandable on hover/click)
+ * - Center (70%): Tool panel (mindmap, quiz, etc.)
+ * - Right (30%): Maestro panel with avatar, voice UI, chat
+ * - Mobile: Right panel becomes bottom sheet
  * - ESC to exit
  */
 
 import { useEffect, useCallback, useState, useRef } from 'react';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Loader2, Send, Mic, MicOff, Phone, PhoneOff, Volume2 } from 'lucide-react';
+import {
+  X, Loader2, Send, Mic, MicOff, Phone, PhoneOff, Volume2,
+  GraduationCap, BookOpen, Brain, Trophy, Settings, Network,
+  Target, FileText, PanelLeftOpen, PanelLeftClose,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToolPanel } from './tool-panel';
 import { useUIStore, useSettingsStore } from '@/lib/stores/app-store';
-import { getMaestroById } from '@/data/maestri';
+import { getMaestroById } from '@/data';
 import { getSupportTeacherById } from '@/data/support-teachers';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
-import type { MaestroFull } from '@/data/maestri';
-import type { SupportTeacher, Subject } from '@/types';
+import type { Maestro, SupportTeacher, Subject } from '@/types';
 import { cn } from '@/lib/utils';
+
+// Sidebar width classes for expanded/collapsed states
+const SIDEBAR_WIDTH_EXPANDED = 'w-48';
+const SIDEBAR_WIDTH_COLLAPSED = 'w-14';
 
 // Map tool types to suggested maestros (for future use)
 const _TOOL_TO_MAESTRO: Record<ToolType, string> = {
@@ -109,12 +118,26 @@ export function FocusToolLayout() {
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [connectionInfo, setConnectionInfo] = useState<{ provider: 'azure'; proxyPort: number; configured: boolean } | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const lastTranscriptIdRef = useRef<string | null>(null);
 
+  // Sidebar nav items for minimized sidebar
+  const sidebarItems = [
+    { id: 'maestri', label: 'Professori', icon: GraduationCap },
+    { id: 'quiz', label: 'Quiz', icon: Brain },
+    { id: 'flashcards', label: 'Flashcards', icon: BookOpen },
+    { id: 'mindmaps', label: 'Mappe Mentali', icon: Network },
+    { id: 'summaries', label: 'Riassunti', icon: FileText },
+    { id: 'homework', label: 'Materiali', icon: Target },
+    { id: 'progress', label: 'Progressi', icon: Trophy },
+    { id: 'settings', label: 'Impostazioni', icon: Settings },
+  ];
+
   // Determine which maestro/coach to use
-  const getMaestroOrCoach = useCallback((): MaestroFull | SupportTeacher | null => {
+  const getMaestroOrCoach = useCallback((): Maestro | SupportTeacher | null => {
     // If specific maestro requested
     if (focusMaestroId) {
       const maestro = getMaestroById(focusMaestroId);
@@ -123,9 +146,20 @@ export function FocusToolLayout() {
       // Check if it's a coach
       const coach = getSupportTeacherById(focusMaestroId as 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij');
       if (coach) return coach;
+
+      // Character ID provided but not found - log actionable error
+      logger.error('Focus mode character not found. Verify character ID exists in maestri-full.ts or support-teachers.ts', {
+        focusMaestroId,
+        action: 'falling back to default coach'
+      });
     }
 
-    // Default to coach based on preference or tool type
+    // If no focusMaestroId provided, warn about missing maestro selection
+    if (!focusMaestroId) {
+      logger.warn('Focus mode entered without maestro selection, using default coach');
+    }
+
+    // Fallback to coach based on preference
     const preferredCoach = studentProfile?.preferredCoach || 'melissa';
     const coach = getSupportTeacherById(preferredCoach);
     if (coach) return coach;
@@ -135,13 +169,12 @@ export function FocusToolLayout() {
 
   const character = getMaestroOrCoach();
 
-  // Helper to get display properties from either MaestroFull or SupportTeacher
-  const getCharacterProps = (char: MaestroFull | SupportTeacher | null) => {
+  // Helper to get display properties from either Maestro or SupportTeacher
+  const getCharacterProps = (char: Maestro | SupportTeacher | null) => {
     if (!char) return null;
-    // MaestroFull has displayName, SupportTeacher has name
-    const isMaestro = 'displayName' in char;
+    // Both Maestro and SupportTeacher have 'name' property
     return {
-      name: isMaestro ? (char as MaestroFull).displayName : char.name,
+      name: char.name,
       avatar: char.avatar || '/avatars/default.jpg',
       color: char.color,
       systemPrompt: char.systemPrompt,
@@ -154,7 +187,6 @@ export function FocusToolLayout() {
   // Voice session hook - must be after character is defined
   const {
     isConnected: voiceConnected,
-    isListening,
     isSpeaking,
     isMuted,
     inputLevel,
@@ -404,199 +436,124 @@ export function FocusToolLayout() {
 
   if (!focusMode) return null;
 
+  // Tool type display name
+  const toolNames: Record<ToolType, string> = {
+    mindmap: 'Mappa Mentale',
+    quiz: 'Quiz',
+    flashcard: 'Flashcards',
+    summary: 'Riassunto',
+    demo: 'Demo Interattiva',
+    diagram: 'Diagramma',
+    timeline: 'Linea del Tempo',
+    formula: 'Formula',
+    chart: 'Grafico',
+    search: 'Ricerca',
+    webcam: 'Foto',
+    pdf: 'PDF',
+    homework: 'Compiti',
+  };
+
   return (
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-white dark:bg-slate-950"
+        className="fixed inset-0 z-50 bg-white dark:bg-slate-950 flex"
       >
-        {/* Header */}
-        <header className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-          <div className="flex items-center gap-3">
-            {characterProps && (
-              <>
-                <div
-                  className="w-8 h-8 rounded-full bg-cover bg-center"
-                  style={{ backgroundImage: `url(${characterProps.avatar})` }}
-                />
-                <span className="font-semibold text-slate-900 dark:text-white">
-                  {characterProps.name}
-                </span>
-                <span className="text-sm text-slate-500">
-                  • {focusToolType ? focusToolType.charAt(0).toUpperCase() + focusToolType.slice(1) : 'Tool'}
-                </span>
-              </>
+        {/* Left: Minimized Sidebar (Issue #102 - 0.6.1) */}
+        <aside
+          className={cn(
+            'h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 flex flex-col',
+            sidebarExpanded ? SIDEBAR_WIDTH_EXPANDED : SIDEBAR_WIDTH_COLLAPSED
+          )}
+          onMouseEnter={() => setSidebarExpanded(true)}
+          onMouseLeave={() => setSidebarExpanded(false)}
+        >
+          {/* Logo/Toggle */}
+          <div className="h-14 flex items-center gap-2 px-2 border-b border-slate-200 dark:border-slate-800 flex-shrink-0">
+            {/* Brain Logo */}
+            <Image
+              src="/logo-brain.png"
+              alt="MirrorBuddy"
+              width={32}
+              height={32}
+              className="object-contain flex-shrink-0"
+            />
+            {sidebarExpanded && (
+              <span className="text-sm font-bold text-slate-800 dark:text-white truncate">
+                MirrorBuddy
+              </span>
             )}
-          </div>
-          <div className="flex items-center gap-2">
-            {/* Voice status indicator */}
-            {focusInteractionMode === 'voice' && (
-              <div className={cn(
-                'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium',
-                voiceConnected && !isMuted && 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
-                voiceConnected && isMuted && 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                !voiceConnected && isVoiceActive && 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
-                configError && 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-              )}>
-                {configError ? (
-                  <>
-                    <MicOff className="h-3 w-3" />
-                    <span>Voce non disponibile</span>
-                  </>
-                ) : voiceConnected ? (
-                  <>
-                    {isMuted ? <MicOff className="h-3 w-3" /> : isSpeaking ? <Volume2 className="h-3 w-3" /> : <Mic className="h-3 w-3" />}
-                    <span>{isMuted ? 'Muted' : isSpeaking ? 'Parlando' : 'Voce attiva'}</span>
-                  </>
-                ) : isVoiceActive ? (
-                  <>
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    <span>Connessione...</span>
-                  </>
-                ) : null}
-              </div>
-            )}
-            <span className="text-xs text-slate-400">ESC per uscire</span>
             <Button
               variant="ghost"
-              size="icon"
-              onClick={exitFocusMode}
-              aria-label="Chiudi"
+              size="icon-sm"
+              onClick={() => setSidebarExpanded(!sidebarExpanded)}
+              className="text-slate-500 ml-auto"
+              aria-label={sidebarExpanded ? 'Riduci menu' : 'Espandi menu'}
             >
-              <X className="h-5 w-5" />
+              {sidebarExpanded ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
             </Button>
           </div>
-        </header>
 
-        {/* Main content */}
-        <div className="flex h-[calc(100vh-56px)]">
-          {/* Left: Chat panel (1/3) */}
-          <div className="w-1/3 flex flex-col border-r border-slate-200 dark:border-slate-800">
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    'flex',
-                    message.role === 'user' ? 'justify-end' : 'justify-start'
-                  )}
-                >
-                  <div
-                    className={cn(
-                      'max-w-[85%] rounded-2xl px-4 py-2',
-                      message.role === 'user'
-                        ? 'bg-accent-themed text-white rounded-br-md'
-                        : 'bg-slate-100 dark:bg-slate-800 rounded-bl-md'
-                    )}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-md px-4 py-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
+          {/* Nav Items */}
+          <nav className="flex-1 py-2 overflow-y-auto">
+            {sidebarItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={exitFocusMode}
+                className="w-full flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                title={item.label}
+              >
+                <item.icon className="h-5 w-5 flex-shrink-0" />
+                {sidebarExpanded && (
+                  <span className="text-sm font-medium whitespace-nowrap">{item.label}</span>
+                )}
+              </button>
+            ))}
+          </nav>
 
-            {/* Input */}
-            <div className="p-4 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  placeholder={`Scrivi a ${characterProps?.name || 'Coach'}...`}
-                  className="flex-1 px-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl border-0 focus:ring-2 focus:ring-accent-themed outline-none text-sm"
-                  disabled={isLoading}
-                />
-                {/* Voice button with status */}
-                <div className="relative">
-                  {/* Input level indicator */}
-                  {voiceConnected && !isMuted && (
-                    <div
-                      className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-1 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden"
-                    >
-                      <div
-                        className="h-full bg-green-500 transition-all duration-75"
-                        style={{ width: `${Math.min(inputLevel * 100, 100)}%` }}
-                      />
-                    </div>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleVoiceToggle}
-                    disabled={!!configError && !isVoiceActive}
-                    aria-label={isVoiceActive ? 'Disattiva voce' : 'Attiva voce'}
-                    className={cn(
-                      'relative',
-                      voiceConnected && isSpeaking && 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
-                      voiceConnected && isListening && !isSpeaking && 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-                      voiceConnected && isMuted && 'bg-slate-200 text-slate-500 dark:bg-slate-700',
-                      !voiceConnected && isVoiceActive && 'bg-blue-100 text-blue-600 animate-pulse',
-                      configError && 'bg-red-100 text-red-600'
-                    )}
-                    title={configError || (voiceConnected ? (isMuted ? 'Muted' : isSpeaking ? 'Parlando...' : isListening ? 'Ascoltando...' : 'Connesso') : 'Attiva voce')}
-                  >
-                    {voiceConnected ? (
-                      isMuted ? <MicOff className="h-4 w-4" /> : isSpeaking ? <Volume2 className="h-4 w-4" /> : <Phone className="h-4 w-4" />
-                    ) : isVoiceActive ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Mic className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-                {/* Mute button when voice is connected */}
-                {voiceConnected && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleMute}
-                    aria-label={isMuted ? 'Attiva microfono' : 'Silenzia microfono'}
-                    className={cn(
-                      isMuted && 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-                    )}
-                  >
-                    {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                  </Button>
-                )}
-                {/* End call button when connected */}
-                {voiceConnected && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleVoiceToggle}
-                    aria-label="Termina chiamata"
-                    className="bg-red-100 text-red-600 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400"
-                  >
-                    <PhoneOff className="h-4 w-4" />
-                  </Button>
-                )}
-                <Button
-                  size="icon"
-                  onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  className="bg-accent-themed hover:bg-accent-themed/90"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+          {/* Exit Button */}
+          <div className="p-2 border-t border-slate-200 dark:border-slate-800 flex-shrink-0">
+            <button
+              onClick={exitFocusMode}
+              className="w-full flex items-center gap-3 px-3 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+              title="Esci dalla modalità strumento"
+            >
+              <X className="h-5 w-5 flex-shrink-0" />
+              {sidebarExpanded && <span className="text-sm font-medium">Esci</span>}
+            </button>
           </div>
+        </aside>
 
-          {/* Right: Tool panel (2/3) */}
-          <div className="w-2/3 h-full overflow-hidden bg-slate-50 dark:bg-slate-900">
+        {/* Center: Tool Panel (Issue #102 - 0.6.3 - 70% width) */}
+        <div className={cn(
+          'flex-1 h-full overflow-hidden bg-slate-50 dark:bg-slate-900 flex flex-col',
+          rightPanelCollapsed ? 'w-full' : 'w-[70%]'
+        )}>
+          {/* Tool Header */}
+          <header className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <span className="font-semibold text-slate-900 dark:text-white">
+                {focusToolType ? toolNames[focusToolType] : 'Strumento'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400">ESC per uscire</span>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                onClick={() => setRightPanelCollapsed(!rightPanelCollapsed)}
+                className="text-slate-500"
+                aria-label={rightPanelCollapsed ? 'Mostra chat' : 'Nascondi chat'}
+              >
+                {rightPanelCollapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+              </Button>
+            </div>
+          </header>
+
+          {/* Tool Content */}
+          <div className="flex-1 overflow-auto">
             {focusTool ? (
               <ToolPanel
                 tool={focusTool}
@@ -622,6 +579,164 @@ export function FocusToolLayout() {
             )}
           </div>
         </div>
+
+        {/* Right: Maestro Panel - Compact layout like conversation cards */}
+        {!rightPanelCollapsed && (
+          <div className="w-[30%] max-w-md h-full flex flex-col border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+            {/* Maestro Header - Same style as conversation header */}
+            <div
+              className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700"
+              style={{ backgroundColor: `${characterProps?.color}10` }}
+            >
+              {/* Avatar */}
+              {characterProps && (
+                <>
+                  <div className="relative flex-shrink-0">
+                    <div
+                      className="w-12 h-12 rounded-full overflow-hidden ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-900"
+                      style={{ borderColor: characterProps.color }}
+                    >
+                      <div
+                        className="w-full h-full bg-cover bg-center"
+                        style={{
+                          backgroundImage: `url(${characterProps.avatar})`,
+                          backgroundColor: characterProps.color,
+                        }}
+                      />
+                    </div>
+                    {voiceConnected && (
+                      <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-900 rounded-full animate-pulse" />
+                    )}
+                  </div>
+
+                  {/* Name and status */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-base text-slate-900 dark:text-white truncate">
+                      {characterProps.name}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                      {voiceConnected ? (isSpeaking ? 'Sta parlando...' : 'In chiamata') : 'Sono qui per aiutarti'}
+                    </p>
+                  </div>
+
+                  {/* Voice call button - inline like conversation header */}
+                  <Button
+                    variant={voiceConnected ? 'destructive' : 'outline'}
+                    size="icon"
+                    onClick={handleVoiceToggle}
+                    disabled={!!configError && !isVoiceActive}
+                    className={cn('relative', voiceConnected && 'animate-pulse')}
+                    style={!voiceConnected ? { borderColor: characterProps.color, color: characterProps.color } : undefined}
+                    title={voiceConnected ? 'Termina chiamata' : `Chiama ${characterProps.name}`}
+                  >
+                    {isVoiceActive && !voiceConnected ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : voiceConnected ? (
+                      <PhoneOff className="h-4 w-4" />
+                    ) : (
+                      <Phone className="h-4 w-4" />
+                    )}
+                  </Button>
+
+                  {/* Mute button when connected */}
+                  {voiceConnected && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={toggleMute}
+                      className={cn(isMuted && 'text-red-500')}
+                      title={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+                    >
+                      {isMuted ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Audio level indicator - only when voice active */}
+            {voiceConnected && !isMuted && (
+              <div className="flex-shrink-0 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="h-3 w-3 text-slate-400" />
+                  <div className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-green-500 transition-all duration-75"
+                      style={{ width: `${Math.min(inputLevel * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-y-auto p-3 space-y-3">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={cn(
+                    'flex',
+                    message.role === 'user' ? 'justify-end' : 'justify-start'
+                  )}
+                >
+                  <div
+                    className={cn(
+                      'max-w-[85%] rounded-2xl px-4 py-2.5 shadow-sm',
+                      message.role === 'user'
+                        ? 'text-white rounded-br-sm'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-sm'
+                    )}
+                    style={
+                      message.role === 'user'
+                        ? { backgroundColor: characterProps?.color || '#3b82f6' }
+                        : undefined
+                    }
+                  >
+                    <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+                  </div>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-sm px-4 py-2.5 shadow-sm">
+                    <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Chat Input */}
+            <div className="flex-shrink-0 p-3 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <div className="flex items-center gap-2">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder={`Scrivi a ${characterProps?.name || 'Coach'}...`}
+                  className="flex-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-800 rounded-xl border-0 focus:ring-2 outline-none text-sm transition-all"
+                  style={{
+                    '--tw-ring-color': characterProps?.color || '#3b82f6'
+                  } as React.CSSProperties}
+                  disabled={isLoading}
+                />
+                <Button
+                  size="icon"
+                  onClick={handleSend}
+                  disabled={!input.trim() || isLoading}
+                  className="flex-shrink-0 shadow-sm"
+                  style={{
+                    backgroundColor: characterProps?.color || '#3b82f6',
+                  }}
+                >
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </motion.div>
     </AnimatePresence>
   );

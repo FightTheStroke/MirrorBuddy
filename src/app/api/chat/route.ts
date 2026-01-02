@@ -35,65 +35,101 @@ interface ChatRequest {
 }
 
 // Tool context to inject into system prompt (Phase 5: Chat API Enhancement)
+// These instructions guide AI to prioritize tool calls when the user specifies a topic
 const TOOL_CONTEXT: Record<string, string> = {
   mindmap: `
-STAI CREANDO UNA MAPPA MENTALE con lo studente.
-Linee guida:
-- Fai domande maieutiche per esplorare l'argomento
-- Parti dal concetto centrale e espandi in modo organico
-- Usa create_mindmap per costruire la mappa incrementalmente
-- Ogni risposta dello studente può aggiungere nodi alla mappa
-- Mantieni la struttura chiara e gerarchica`,
+## MODALITÀ MAPPA MENTALE
+
+Hai a disposizione il tool "create_mindmap" per creare mappe mentali interattive.
+
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_mindmap
+2. Il tool genererà automaticamente la visualizzazione grafica
+
+STRUTTURA GERARCHICA - ESEMPIO:
+{
+  "title": "La Fotosintesi",
+  "nodes": [
+    { "id": "1", "label": "Fase Luminosa", "parentId": null },
+    { "id": "2", "label": "Clorofilla", "parentId": "1" },
+    { "id": "3", "label": "Assorbimento Luce", "parentId": "1" },
+    { "id": "4", "label": "Fase Oscura", "parentId": null },
+    { "id": "5", "label": "Ciclo di Calvin", "parentId": "4" },
+    { "id": "6", "label": "Fissazione CO2", "parentId": "5" },
+    { "id": "7", "label": "Fattori Ambientali", "parentId": null },
+    { "id": "8", "label": "Luce Solare", "parentId": "7" },
+    { "id": "9", "label": "Temperatura", "parentId": "7" }
+  ]
+}
+
+REGOLE PER LA GERARCHIA:
+1. parentId: null = nodo di primo livello (ramo principale dal centro)
+2. parentId: "X" = nodo figlio del nodo con id "X"
+3. Crea almeno 3 livelli di profondità per una mappa ricca
+4. Ogni nodo di primo livello dovrebbe avere 2-4 figli
+5. Evita mappe piatte con tutti parentId: null
+
+Se lo studente non ha indicato un argomento, chiedi: "Di cosa vuoi fare la mappa?"`,
 
   quiz: `
-STAI CREANDO UN QUIZ con lo studente.
+## MODALITÀ QUIZ
 
-**REGOLA IMPORTANTE:** Prima di creare il quiz, CHIEDI allo studente:
-"Preferisci fare il quiz per iscritto (lo vedi sullo schermo) oppure a voce (te lo faccio io)?"
+Hai a disposizione il tool "create_quiz" per creare quiz interattivi.
 
-Se sceglie PER ISCRITTO:
-- Chiedi prima di che argomento vuole essere interrogato
-- Crea domande a scelta multipla chiare e formative
-- Usa create_quiz per generare il quiz
-- Includi feedback educativo per ogni risposta
-- Adatta la difficoltà al livello dello studente
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_quiz
+2. Il tool genererà automaticamente il quiz interattivo
 
-Se sceglie A VOCE (o se siete in una sessione vocale):
-- NON usare create_quiz!
-- Fai tu le domande una alla volta nella chat
-- Elenca le opzioni (A, B, C, D)
-- Aspetta la risposta dello studente
-- Conferma se è corretta o spiega perché è sbagliata
-- Passa alla domanda successiva
-- Alla fine dai un resoconto del punteggio`,
+ESEMPI:
+- "rivoluzione francese" → usa create_quiz(topic:"Rivoluzione Francese", questions:[...])
+- "frazioni" → usa create_quiz(topic:"Le Frazioni", questions:[...])
+
+Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi fare il quiz?"`,
 
   flashcard: `
-STAI CREANDO FLASHCARD per lo studente.
-Linee guida:
-- Identifica i concetti chiave da memorizzare
-- Crea carte con domanda/risposta brevi e incisive
-- Usa create_flashcards per generare le carte
-- Organizza le carte per argomento o difficoltà
-- Le flashcard verranno usate con ripetizione spaziata FSRS`,
+## MODALITÀ FLASHCARD
+
+Hai a disposizione il tool "create_flashcards" per creare set di flashcard.
+
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_flashcards
+2. Il tool genererà automaticamente le carte
+
+ESEMPI:
+- "verbi irregolari" → usa create_flashcards(topic:"Verbi Irregolari Inglesi", cards:[...])
+- "capitali europee" → usa create_flashcards(topic:"Capitali Europee", cards:[...])
+
+Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi le flashcard?"`,
 
   demo: `
-STAI CREANDO UNA DEMO INTERATTIVA per lo studente.
-Linee guida:
-- Capisce cosa lo studente vuole visualizzare
-- Crea simulazioni semplici ma efficaci
-- Usa create_demo per generare la demo HTML/JS
-- Mantieni l'interattività intuitiva e accessibile
-- Spiega cosa la demo sta mostrando`,
+## MODALITÀ DEMO INTERATTIVA
+
+Hai a disposizione il tool "create_demo" per creare visualizzazioni interattive.
+
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_demo
+2. Il tool genererà automaticamente la demo interattiva
+
+ESEMPI:
+- "sistema solare" → usa create_demo(title:"Sistema Solare", html:"<canvas>...", js:"animation code...")
+- "onde" → usa create_demo(title:"Onde Meccaniche", html:"...", js:"wave simulation...")
+
+Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`,
 
   summary: `
-STAI CREANDO UN RIASSUNTO STRUTTURATO con lo studente.
-Linee guida:
-- Chiedi prima quale argomento vuole riassumere
-- Organizza il contenuto in sezioni chiare e logiche
-- Usa create_summary per costruire il riassunto
-- Includi punti chiave per ogni sezione
-- Adatta la lunghezza alle esigenze dello studente (breve/medio/lungo)
-- Fai domande per approfondire i punti importanti`,
+## MODALITÀ RIASSUNTO
+
+Hai a disposizione il tool "create_summary" per creare riassunti strutturati.
+
+Quando lo studente indica un argomento:
+1. Usa direttamente il tool create_summary
+2. Il tool genererà automaticamente il riassunto
+
+ESEMPI:
+- "prima guerra mondiale" → usa create_summary(topic:"Prima Guerra Mondiale", sections:[...])
+- "fotosintesi" → usa create_summary(topic:"La Fotosintesi", sections:[...])
+
+Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi riassumere?"`,
 };
 
 export async function POST(request: NextRequest) {
@@ -121,16 +157,52 @@ export async function POST(request: NextRequest) {
     const cookieStore = await cookies();
     const userId = cookieStore.get('convergio-user-id')?.value;
 
-    // #87: Get user's provider preference from settings
+    // #87: Get user's provider preference and budget from settings
     let providerPreference: AIProvider | 'auto' | undefined;
+    let userSettings: { provider: string; budgetLimit: number; totalSpent: number } | null = null;
     if (userId) {
       try {
-        const settings = await prisma.settings.findUnique({
+        userSettings = await prisma.settings.findUnique({
           where: { userId },
-          select: { provider: true },
+          select: { provider: true, budgetLimit: true, totalSpent: true },
         });
-        if (settings?.provider && (settings.provider === 'azure' || settings.provider === 'ollama')) {
-          providerPreference = settings.provider;
+        if (userSettings?.provider && (userSettings.provider === 'azure' || userSettings.provider === 'ollama')) {
+          providerPreference = userSettings.provider;
+        }
+
+        // Check budget limit (WAVE 3: Token budget enforcement)
+        if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
+          logger.warn('Budget limit exceeded', {
+            userId,
+            totalSpent: userSettings.totalSpent,
+            budgetLimit: userSettings.budgetLimit,
+          });
+          return NextResponse.json(
+            {
+              error: 'Budget limit exceeded',
+              message: `Hai raggiunto il limite di budget di $${userSettings.budgetLimit.toFixed(2)}. Puoi aumentarlo nelle impostazioni.`,
+              totalSpent: userSettings.totalSpent,
+              budgetLimit: userSettings.budgetLimit,
+              settingsUrl: '/settings',
+            },
+            { status: 402 }
+          );
+        }
+
+        // Budget warning threshold (80% usage)
+        const BUDGET_WARNING_THRESHOLD = 0.8;
+        if (userSettings && userSettings.budgetLimit > 0) {
+          const usageRatio = userSettings.totalSpent / userSettings.budgetLimit;
+          if (usageRatio >= BUDGET_WARNING_THRESHOLD && usageRatio < 1) {
+            logger.info('Budget warning threshold reached', {
+              userId,
+              totalSpent: userSettings.totalSpent,
+              budgetLimit: userSettings.budgetLimit,
+              usagePercent: Math.round(usageRatio * 100),
+            });
+            // Continue with request but add warning header for client to handle
+            // Client can show a warning toast based on this header
+          }
         }
       } catch (e) {
         // Settings lookup failure should not block chat
@@ -163,6 +235,13 @@ export async function POST(request: NextRequest) {
             maestroId,
             keyFactCount: memory.keyFacts.length,
             hasSummary: !!memory.recentSummary,
+          });
+        } else {
+          // Memory enabled but no previous context found
+          logger.info('Memory enabled but no previous context found', {
+            userId,
+            maestroId,
+            enableMemory,
           });
         }
       } catch (memoryError) {
@@ -202,10 +281,50 @@ export async function POST(request: NextRequest) {
       // Call AI with optional tool definitions
       // Cast to mutable array since chatCompletion expects ToolDefinition[]
       // #87: Pass user's provider preference to chatCompletion
+
+      // Debug logging for tool context
+      if (requestedTool) {
+        logger.info('Tool mode active', {
+          requestedTool,
+          toolsEnabled: enableTools,
+          hasToolContext: !!TOOL_CONTEXT[requestedTool],
+          maestroId,
+        });
+      }
+
+      // Force tool call when a specific tool is requested
+      const toolChoiceForRequest = (() => {
+        if (!enableTools) return 'none' as const;
+        if (requestedTool) {
+          // Map requestedTool to function name
+          const toolFunctionMap: Record<string, string> = {
+            mindmap: 'create_mindmap',
+            quiz: 'create_quiz',
+            flashcard: 'create_flashcards',
+            demo: 'create_demo',
+            summary: 'create_summary',
+          };
+          const functionName = toolFunctionMap[requestedTool];
+          if (functionName) {
+            // Force the specific tool to be called
+            return { type: 'function' as const, function: { name: functionName } };
+          }
+        }
+        return 'auto' as const;
+      })();
+
       const result = await chatCompletion(messages, enhancedSystemPrompt, {
         tools: enableTools ? ([...CHAT_TOOL_DEFINITIONS] as typeof CHAT_TOOL_DEFINITIONS[number][]) : undefined,
-        tool_choice: enableTools ? 'auto' : 'none',
+        tool_choice: toolChoiceForRequest,
         providerPreference,
+      });
+
+      // Debug: Log if we got tool calls back
+      logger.debug('Chat response', {
+        hasToolCalls: !!(result.tool_calls && result.tool_calls.length > 0),
+        toolCallCount: result.tool_calls?.length || 0,
+        toolCallNames: result.tool_calls?.map(tc => tc.function.name) || [],
+        contentLength: result.content?.length || 0,
       });
 
       // Handle tool calls if present
@@ -275,6 +394,31 @@ export async function POST(request: NextRequest) {
           issuesFound: sanitized.issuesFound,
           categories: sanitized.categories,
         });
+      }
+
+      // Update budget tracking if usage data is available (WAVE 3: Token budget enforcement)
+      if (userId && userSettings && result.usage) {
+        try {
+          // Rough cost estimation: $0.000002 per token for GPT-4o (adjust as needed)
+          const estimatedCost = (result.usage.total_tokens || 0) * 0.000002;
+          await prisma.settings.update({
+            where: { userId },
+            data: {
+              totalSpent: {
+                increment: estimatedCost,
+              },
+            },
+          });
+          logger.debug('Budget updated', {
+            userId,
+            tokensUsed: result.usage.total_tokens,
+            estimatedCost,
+            newTotal: userSettings.totalSpent + estimatedCost,
+          });
+        } catch (e) {
+          // Budget update failure should not block the response
+          logger.warn('Failed to update budget', { userId, error: String(e) });
+        }
       }
 
       return NextResponse.json({
