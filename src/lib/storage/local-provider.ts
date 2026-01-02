@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Local Storage Provider
+ * MirrorBuddy Local Storage Provider
  * Filesystem-based storage for development environment
  *
  * Stores files in local filesystem with metadata in JSON sidecar files.

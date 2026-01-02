@@ -49,7 +49,7 @@ interface MaterialsDB extends DBSchema {
 // DATABASE INITIALIZATION
 // ============================================================================
 
-const DB_NAME = 'convergio-materials';
+const DB_NAME = 'mirrorbuddy-materials';
 const DB_VERSION = 1;
 
 let dbInstance: IDBPDatabase<MaterialsDB> | null = null;
@@ -380,7 +380,7 @@ export async function getActiveMaterials(): Promise<MaterialRecord[]> {
 
   try {
     // Get userId from sessionStorage (temporary until auth is implemented)
-    const userId = sessionStorage.getItem('convergio-user-id') || 'default-user';
+    const userId = sessionStorage.getItem('mirrorbuddy-user-id') || 'default-user';
 
     const response = await fetch(`/api/materials?userId=${userId}&status=active`);
     if (!response.ok) {

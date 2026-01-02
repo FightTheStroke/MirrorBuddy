@@ -1,6 +1,6 @@
 // ============================================================================
-// CONVERGIO WEB - TYPE DEFINITIONS
-// Migrated from ConvergioApp native macOS application
+// MIRRORBUDDY - TYPE DEFINITIONS
+// Migrated from MirrorBuddyApp native macOS application
 // ============================================================================
 
 // === MAESTRO TYPES ===

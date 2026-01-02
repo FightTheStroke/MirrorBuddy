@@ -1,10 +1,10 @@
 # Education Accessibility Library
 
-TypeScript implementation of accessibility runtime adaptations for the Convergio Education Pack.
+TypeScript implementation of accessibility runtime adaptations for the MirrorBuddycation Pack.
 
 ## Reference
 
-Based on the C implementation in `/Users/roberdan/GitHub/ConvergioCLI/include/nous/education.h` (lines 549-590: a11y_* functions)
+Based on the C implementation in `/Users/roberdan/GitHub/MirrorBuddyCLI/include/nous/education.h` (lines 549-590: a11y_* functions)
 
 ## Features
 
@@ -579,10 +579,10 @@ console.log('Adapted:', adapted);
 
 ## References
 
-- C Implementation: `/Users/roberdan/GitHub/ConvergioCLI/include/nous/education.h` (lines 549-590)
-- C Implementation: `/Users/roberdan/GitHub/ConvergioCLI/src/education/accessibility.c`
-- ADR: `/Users/roberdan/GitHub/ConvergioCLI/docs/adr/015-education-pack.md`
+- C Implementation: `/Users/roberdan/GitHub/MirrorBuddyCLI/include/nous/education.h` (lines 549-590)
+- C Implementation: `/Users/roberdan/GitHub/MirrorBuddyCLI/src/education/accessibility.c`
+- ADR: `/Users/roberdan/GitHub/MirrorBuddyCLI/docs/adr/015-education-pack.md`
 
 ## License
 
-MIT License - Copyright (c) 2025 Convergio.io
+MIT License - Copyright (c) 2025 MirrorBuddy.io

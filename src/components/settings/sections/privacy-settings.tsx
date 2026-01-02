@@ -31,7 +31,7 @@ export function PrivacySettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-slate-600 dark:text-slate-400">
-            I tuoi dati sono al sicuro. Convergio e progettato pensando alla privacy
+            I tuoi dati sono al sicuro. MirrorBuddy e progettato pensando alla privacy
             dei bambini e rispetta le normative COPPA e GDPR.
           </p>
 
@@ -59,7 +59,7 @@ export function PrivacySettings() {
                 const keysToRemove = [];
                 for (let i = 0; i < localStorage.length; i++) {
                   const key = localStorage.key(i);
-                  if (key?.startsWith('convergio')) {
+                  if (key?.startsWith('mirrorbuddy')) {
                     keysToRemove.push(key);
                   }
                 }
@@ -77,7 +77,7 @@ export function PrivacySettings() {
                 }
 
                 // Clear sessionStorage (temporary user ID)
-                sessionStorage.removeItem('convergio-user-id');
+                sessionStorage.removeItem('mirrorbuddy-user-id');
 
                 // Reload to reset state
                 window.location.reload();

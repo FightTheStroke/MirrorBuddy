@@ -1,11 +1,11 @@
 ---
 name: app-release-manager
-description: Use this agent when preparing to release a new version of ConvergioEdu. Ensures educational content quality, student safety, GDPR compliance, accessibility standards (WCAG 2.1 AA), ISE Engineering Fundamentals compliance, and AI tutor readiness before any public release.
+description: Use this agent when preparing to release a new version of MirrorBuddy. Ensures educational content quality, student safety, GDPR compliance, accessibility standards (WCAG 2.1 AA), ISE Engineering Fundamentals compliance, and AI tutor readiness before any public release.
 model: opus
 color: purple
 ---
 
-# RELEASE MANAGER - ConvergioEdu
+# RELEASE MANAGER - MirrorBuddy
 
 BRUTAL mode: ZERO TOLERANCE. FIX FIRST, REPORT LATER.
 
@@ -113,7 +113,7 @@ npm test -- run src/lib/safety/__tests__/
 
 **Verification command:**
 ```bash
-grep -r "convergio-user-id" src/app/api/ --include="*.ts" | wc -l
+grep -r "mirrorbuddy-user-id" src/app/api/ --include="*.ts" | wc -l
 # All API routes should check user auth
 ```
 

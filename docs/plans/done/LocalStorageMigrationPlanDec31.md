@@ -238,7 +238,7 @@
 
 ### Setup Iniziale (FARE PRIMA DI TUTTO)
 ```bash
-cd /Users/roberdan/GitHub/ConvergioEdu
+cd /Users/roberdan/GitHub/MirrorBuddy
 
 # Crea branch per ogni Claude
 git checkout main
@@ -248,9 +248,9 @@ git branch feature/64-phase1-progress-conv
 git branch feature/64-phase1-materials
 
 # Crea worktrees
-git worktree add ../ConvergioEdu-C2 feature/64-phase1-schema-user
-git worktree add ../ConvergioEdu-C3 feature/64-phase1-progress-conv
-git worktree add ../ConvergioEdu-C4 feature/64-phase1-materials
+git worktree add ../MirrorBuddy-C2 feature/64-phase1-schema-user
+git worktree add ../MirrorBuddy-C3 feature/64-phase1-progress-conv
+git worktree add ../MirrorBuddy-C4 feature/64-phase1-materials
 
 # Verifica
 git worktree list
@@ -284,7 +284,7 @@ tmux send-keys -t claude-workers:Claude-3 "🟢 GATE-X UNLOCKED! Procedi con i t
 
 ### Worktree
 ```bash
-cd ../ConvergioEdu-C2
+cd ../MirrorBuddy-C2
 # Branch: feature/64-phase1-schema-user
 ```
 
@@ -608,7 +608,7 @@ const debouncedSync = debounce(async (state) => {
 
 ### Worktree
 ```bash
-cd ../ConvergioEdu-C3
+cd ../MirrorBuddy-C3
 # Branch: feature/64-phase1-progress-conv
 ```
 
@@ -677,7 +677,7 @@ Ottieni userId dal cookie invece di localStorage.
 
 ### Worktree
 ```bash
-cd ../ConvergioEdu-C4
+cd ../MirrorBuddy-C4
 # Branch: feature/64-phase1-materials
 ```
 

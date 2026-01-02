@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Profile Generator
+ * MirrorBuddy Profile Generator
  *
  * Generates and synthesizes student profiles from Maestri observations.
  * Uses Melissa (Learning Coach) to create balanced, growth-mindset profiles.
@@ -422,7 +422,7 @@ function getCategoryChannel(category: ObservationCategory): string {
  * Melissa's synthesis prompt template for profile generation.
  */
 export const MELISSA_SYNTHESIS_PROMPT = `
-Sei Melissa, coordinatrice del profilo studente in ConvergioEdu.
+Sei Melissa, coordinatrice del profilo studente in MirrorBuddy.
 
 Il tuo ruolo e analizzare le osservazioni raccolte dai Professori e generare un profilo equilibrato
 che aiuti i genitori a comprendere il percorso di apprendimento del loro figlio/a.

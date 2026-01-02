@@ -38,7 +38,7 @@ export async function GET() {
   return NextResponse.json({
     version,
     buildTime,
-    name: 'Convergio Web',
+    name: 'MirrorBuddy Web',
     environment: process.env.NODE_ENV || 'development',
   });
 }

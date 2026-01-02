@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { execSync } from 'child_process';
 import { logger } from '@/lib/logger';
 
-// Default subscription for ConvergioEdu
+// Default subscription for MirrorBuddy
 const DEFAULT_SUBSCRIPTION_ID = '8015083b-adad-42ff-922d-feaed61c5d62';
 
 interface CostByService {

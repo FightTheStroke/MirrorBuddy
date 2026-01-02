@@ -1,8 +1,8 @@
-# MirrorBuddyPlanDec29 - ConvergioEdu v2.0 Complete Implementation
+# MirrorBuddyPlanDec29 - MirrorBuddy v2.0 Complete Implementation
 
 **Data**: 2025-12-29
 **Ultimo aggiornamento**: 2025-12-30 12:50 CET
-**Target**: Trasformare ConvergioEdu in piattaforma Conversation-First con il Triangolo del Supporto
+**Target**: Trasformare MirrorBuddy in piattaforma Conversation-First con il Triangolo del Supporto
 **Branch**: `MirrorBuddy`
 **Reference**: ManifestoEdu.md (La Stella Polare)
 
@@ -75,7 +75,7 @@ kitty @ send-text --match title:Claude-4 "🟢 GATE-0 UNLOCKED! Phase 0 complete
 **CLAUDE 3 & 4** (while waiting):
 ```bash
 # Poll every 5 minutes OR wait for kitty notification
-grep "GATE-0" /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MirrorBuddyPlanDec29.md
+grep "GATE-0" /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MirrorBuddyPlanDec29.md
 # When you see 🟢 UNLOCKED, start your tasks
 ```
 
@@ -635,7 +635,7 @@ export const MELISSA: SupportTeacher = {
   role: 'learning_coach',
 
   systemPrompt: `
-    Sei Melissa, docente di sostegno virtuale per ConvergioEdu.
+    Sei Melissa, docente di sostegno virtuale per MirrorBuddy.
 
     IL TUO OBIETTIVO PRIMARIO: Sviluppare l'AUTONOMIA dello studente.
 

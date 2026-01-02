@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Conversation Flow Component
+ * MirrorBuddy Conversation Flow Component
  *
  * The central conversation-first interface that:
  * 1. Shows character selection with photos and introductions
@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useSettingsStore } from '@/lib/stores/app-store';
+import { useSettingsStore, useUIStore } from '@/lib/stores/app-store';
 import { logger } from '@/lib/logger';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import type { ExtendedStudentProfile } from '@/types';
@@ -87,6 +87,7 @@ export function ConversationFlow() {
 
   // Stores
   const { studentProfile } = useSettingsStore();
+  const { enterFocusMode, setFocusTool } = useUIStore();
   const {
     isActive,
     mode,
@@ -187,13 +188,19 @@ export function ConversationFlow() {
         const mappedToolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolType;
         // Extract actual data from result object
         const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
-        setActiveTool({
+        const completedTool: ToolState = {
           ...newTool,
           type: mappedToolType,
           status: 'completed',
           progress: 1,
           content: toolContent,
-        });
+        };
+
+        // Option B: Auto-switch to fullscreen focus mode when tool is created
+        // This prevents scroll jumps in normal chat view
+        enterFocusMode(mappedToolType, maestro.id, 'chat');
+        setFocusTool(completedTool);
+        setActiveTool(null); // Clear local state since focus mode handles it
       } else {
         // No tool was created, clear the state
         setActiveTool(null);
@@ -212,7 +219,7 @@ export function ConversationFlow() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, messages, addMessage]);
+  }, [isLoading, messages, addMessage, enterFocusMode, setFocusTool]);
 
   // Handle tool request from ToolButtons - show maestro selection dialog
   const handleToolRequest = useCallback((toolType: ToolType) => {

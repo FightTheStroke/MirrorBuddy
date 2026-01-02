@@ -9,7 +9,7 @@ interface XPInfoProps {
 }
 
 /**
- * XPInfo - Component that explains how to earn XP in ConvergioEdu
+ * XPInfo - Component that explains how to earn XP in MirrorBuddy
  *
  * Displays clear, visual breakdown of all XP earning opportunities
  */

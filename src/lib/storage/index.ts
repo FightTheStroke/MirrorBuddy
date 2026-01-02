@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Storage Module
+ * MirrorBuddy Storage Module
  * Provider-agnostic file storage abstraction
  *
  * Usage:

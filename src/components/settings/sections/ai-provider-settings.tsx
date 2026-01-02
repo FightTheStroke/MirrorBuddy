@@ -577,7 +577,7 @@ export function AIProviderSettings() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-            Esplora Convergio Edu senza configurare un provider AI. Demo interattive
+            Esplora MirrorBuddy senza configurare un provider AI. Demo interattive
             con contenuti statici: maestri, quiz, flashcards, mappe mentali e altro.
           </p>
           <Link href="/showcase">

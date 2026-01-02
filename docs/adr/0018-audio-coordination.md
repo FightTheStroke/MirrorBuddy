@@ -7,7 +7,7 @@ Accepted
 2026-01-01
 
 ## Context
-ConvergioEdu has multiple audio sources that can conflict:
+MirrorBuddy has multiple audio sources that can conflict:
 1. **Voice Session** (TTS from Maestri via Azure Realtime API)
 2. **Voice Input** (User microphone for speech recognition)
 3. **Ambient Audio** (Procedural noise, binaural beats for focus)

@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Study Scheduler Module
+ * MirrorBuddy Study Scheduler Module
  * Smart Notifications & Proactive Learning Assistant
  *
  * Notifications are delivered by Melissa (docente di sostegno)

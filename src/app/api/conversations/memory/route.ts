@@ -22,7 +22,7 @@ const MemoryQuerySchema = z.object({
  * Used by the frontend to inject context into new conversations.
  *
  * Security:
- * - Validates convergio-user-id cookie (auth)
+ * - Validates mirrorbuddy-user-id cookie (auth)
  * - Validates maestroId query parameter (input validation)
  * - Uses Prisma for parameterized queries (SQL injection prevention)
  */
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   try {
     // 1. Auth check - verify user cookie
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       logger.warn('Memory API: Unauthorized access attempt');

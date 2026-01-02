@@ -45,7 +45,7 @@ function initLogFile(): void {
 ================================================================================
 DEBUG SESSION - ${new Date().toISOString()}
 ================================================================================
-ConvergioEdu Debug Log
+MirrorBuddy Debug Log
 File: ${LOG_FILE}
 Node: ${process.version}
 Platform: ${process.platform}

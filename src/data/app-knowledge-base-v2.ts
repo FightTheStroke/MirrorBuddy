@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu App Knowledge Base v2
+ * MirrorBuddy App Knowledge Base v2
  *
  * OPTIMIZED: Lazy retrieval instead of full injection.
  * Base prompt: ~200 tokens (index only)
@@ -16,7 +16,7 @@
 export const APP_VERSION = {
   version: '1.1.0',
   lastUpdated: '2026-01',
-  releaseNotes: 'https://github.com/ConvergioEdu/convergio-edu/releases',
+  releaseNotes: 'https://github.com/MirrorBuddy/mirrorbuddy/releases',
 };
 
 // ============================================================================
@@ -345,7 +345,7 @@ export function getRelevantKnowledge(query: string): string {
 export function generateCompactIndexPrompt(): string {
   return `## SUPPORTO PIATTAFORMA
 
-Conosci ConvergioEdu v${APP_VERSION.version} e puoi aiutare con:
+Conosci MirrorBuddy v${APP_VERSION.version} e puoi aiutare con:
 - 16 Maestri AI e chiamate vocali
 - Strumenti (flashcard FSRS, mappe mentali, quiz, demo)
 - Coach e Buddy (Triangle of Support)

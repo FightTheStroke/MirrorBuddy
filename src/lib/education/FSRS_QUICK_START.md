@@ -1,11 +1,11 @@
 # FSRS Quick Start Guide
 
-5-minute guide to get started with FSRS in your Convergio web app.
+5-minute guide to get started with FSRS in your MirrorBuddy web app.
 
 ## Installation
 
 Already installed! FSRS is part of the education library at:
-`/Users/roberdan/GitHub/ConvergioWeb/web/src/lib/education/`
+`/Users/roberdan/GitHub/MirrorBuddyWeb/web/src/lib/education/`
 
 ## 1. Import
 
@@ -240,7 +240,7 @@ console.log(`${(retention * 100).toFixed(0)}% retention tomorrow`);
 
 Run the demo to see it in action:
 ```bash
-cd /Users/roberdan/GitHub/ConvergioWeb/web
+cd /Users/roberdan/GitHub/MirrorBuddyWeb/web
 npx tsx src/lib/education/fsrs-demo.ts
 ```
 
@@ -249,7 +249,7 @@ npx tsx src/lib/education/fsrs-demo.ts
 - **Full API Reference**: See `README.md` in this directory
 - **Example Components**: Check `example-flashcard.tsx`
 - **Implementation Details**: Read `FSRS_IMPLEMENTATION.md`
-- **C Reference**: `/Users/roberdan/GitHub/ConvergioCLI/src/education/fsrs.c`
+- **C Reference**: `/Users/roberdan/GitHub/MirrorBuddyCLI/src/education/fsrs.c`
 
 ## Tips
 

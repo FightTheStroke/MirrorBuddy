@@ -1,5 +1,5 @@
 // ============================================================================
-// CONVERGIO WEB - MAESTRI DATA INDEX
+// MIRRORBUDDY - MAESTRI DATA INDEX
 // Combines UI data with full CLI system prompts
 // ============================================================================
 
