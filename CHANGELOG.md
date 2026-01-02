@@ -5,11 +5,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - Knowledge Hub Components
+## [Unreleased] - Sprint January 2026 Complete
 
 > **Branch**: `development` | **Plan**: `docs/plans/in-progress/MasterPlan-Sprint-2026-01.md`
 
 ### Added
+
+#### Phase 9: Testing & Verification (Tasks 9.01-9.07)
+- **E2E Tests**:
+  - `e2e/mindmap-hierarchy.spec.ts`: Tests mindmap title field and hierarchy rendering (ADR 0020)
+  - `e2e/knowledge-hub.spec.ts`: Tests Knowledge Hub views, search, organization (ADR 0022)
+  - `e2e/accessibility-knowledge-hub.spec.ts`: Axe accessibility audit for WCAG 2.1 AA
+- **Safety Tests**:
+  - `src/lib/safety/__tests__/memory-safety.test.ts`: 27 tests for memory injection attacks
+  - `src/lib/safety/__tests__/knowledge-hub-safety.test.ts`: 22 tests for material content safety
+- **Integration Tests**:
+  - `src/lib/conversation/__tests__/memory-integration.test.ts`: 15 tests for memory flow (ADR 0021)
+- **Total New Tests**: 75+ tests covering adversarial inputs, jailbreak prevention, accessibility
+
+#### Phase 10: Documentation (Tasks 10.01-10.11)
+- Updated `docs/ARCHITECTURE.md`:
+  - Added Conversational Memory section (ADR-0021)
+  - Added Knowledge Hub section (ADR-0022)
+  - Added Tool Focus Selection section (ADR-0020)
+  - Updated ADR count from 18 to 22
+  - Updated statistics (1400+ tests, 150+ components)
+- Finalized ADRs:
+  - ADR 0020: Mindmap Data Structure Fix - Status: Accepted
+  - ADR 0021: Conversational Memory Injection - Status: Accepted
+  - ADR 0022: Knowledge Hub Architecture - Status: Accepted
+- Created Claude docs:
+  - `docs/claude/conversation-memory.md`: Memory injection reference
+  - Updated `docs/claude/knowledge-hub.md`: Full implementation reference
 
 #### Knowledge Hub UI Components (Phase 5, Tasks 5.17-5.22)
 - **SearchBar** (`src/components/education/knowledge-hub/components/search-bar.tsx`):

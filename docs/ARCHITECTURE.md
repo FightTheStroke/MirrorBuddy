@@ -528,6 +528,179 @@ if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 }
 
 ---
 
+## Conversational Memory (ADR-0021)
+
+### Memory Injection System
+
+Maestros remember previous conversations through memory injection:
+
+```mermaid
+flowchart LR
+    Start[/"New Conversation"/]
+    Load["Load Previous Context"]
+    DB[(Database)]
+    Enhance["Enhance System Prompt"]
+    AI["AI with Memory"]
+
+    Start --> Load
+    Load --> DB
+    DB --> |"summaries, keyFacts, topics"| Enhance
+    Enhance --> AI
+```
+
+### Memory Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| Memory Loader | `src/lib/conversation/memory-loader.ts` | Load last 3 conversations |
+| Prompt Enhancer | `src/lib/conversation/prompt-enhancer.ts` | Inject memory into system prompt |
+
+### Memory Context Structure
+
+```typescript
+interface ConversationMemory {
+  recentSummary: string | null;   // Last session recap
+  keyFacts: string[];              // Student preferences, decisions
+  topics: string[];                // Discussed subjects
+  lastSessionDate: Date | null;    // For relative dating
+}
+```
+
+### Token Budget
+
+| Component | Max Tokens |
+|-----------|------------|
+| Base System Prompt | ~800 |
+| Recent Summary | ~200 |
+| Key Facts (max 5) | ~100 |
+| Topics (max 10) | ~50 |
+| **Total Enhanced** | **~1150** |
+
+---
+
+## Knowledge Hub (ADR-0022)
+
+### Architecture
+
+File-manager style interface for all educational materials:
+
+```mermaid
+flowchart TB
+    subgraph Views["View Modes"]
+        Explorer["📁 Explorer"]
+        Gallery["🖼️ Gallery"]
+        Timeline["📅 Timeline"]
+        Calendar["📆 Calendar"]
+    end
+
+    subgraph Components["Components"]
+        Search["🔍 SearchBar"]
+        Sidebar["📂 SidebarNav"]
+        Cards["📇 MaterialCards"]
+        Bulk["⚡ BulkToolbar"]
+    end
+
+    subgraph Renderers["12 Renderers"]
+        MR["MindmapRenderer"]
+        QR["QuizRenderer"]
+        FR["FlashcardRenderer"]
+        SR["SummaryRenderer"]
+        DR["DemoRenderer"]
+        More["...8 more"]
+    end
+
+    Views --> Components
+    Components --> Renderers
+```
+
+### Directory Structure
+
+```
+src/components/education/knowledge-hub/
+├── knowledge-hub.tsx           # Main orchestrator
+├── hooks/
+│   ├── use-materials-search.ts # Fuse.js fuzzy search
+│   ├── use-collections.ts      # Folders CRUD
+│   ├── use-tags.ts             # Tags CRUD
+│   ├── use-smart-collections.ts # Dynamic collections
+│   └── use-bulk-actions.ts     # Multi-select operations
+├── views/
+│   ├── explorer-view.tsx       # Sidebar + grid
+│   ├── gallery-view.tsx        # Large cards
+│   ├── timeline-view.tsx       # Chronological
+│   └── calendar-view.tsx       # Calendar view
+├── components/
+│   ├── search-bar.tsx          # Search with type filter
+│   ├── sidebar-navigation.tsx  # Collections & tags
+│   ├── material-card.tsx       # Card with drag & drop
+│   ├── bulk-toolbar.tsx        # Bulk actions
+│   └── stats-panel.tsx         # Statistics
+└── renderers/
+    ├── index.tsx               # Registry with lazy loading
+    └── *-renderer.tsx          # 12 type-specific renderers
+```
+
+### Full-Text Search
+
+```typescript
+// Pre-computed on save
+searchableText = generateSearchableText(toolType, content);
+
+// Client-side fuzzy search with Fuse.js
+const fuse = new Fuse(materials, {
+  keys: ['title', 'subject', 'searchableText'],
+  threshold: 0.3,
+  includeMatches: true,
+});
+```
+
+### Smart Collections
+
+| Collection | Filter |
+|------------|--------|
+| Da ripassare | Flashcards with nextReview <= now |
+| Recenti | Created in last 7 days |
+| Preferiti | isBookmarked = true |
+| Per Maestro | Group by maestroId |
+| Oggi | Created today |
+| Questa settimana | Created this week |
+
+---
+
+## Tool Focus Selection (ADR-0020)
+
+### Dialog Flow
+
+When creating educational tools, users first select maestro and mode:
+
+```mermaid
+flowchart LR
+    Click["Click 'Nuova Mappa'"]
+    Dialog["Selection Dialog"]
+    Select["Select Maestro"]
+    Mode["Select Mode"]
+    Create["Create Tool"]
+
+    Click --> Dialog
+    Dialog --> Select
+    Select --> Mode
+    Mode --> |text/voice| Create
+```
+
+### Components
+
+| Component | Purpose |
+|-----------|---------|
+| `ToolMaestroSelectionDialog` | Modal for selecting maestro and mode |
+| `focus-tool-layout.tsx` | Layout with voice integration |
+
+### Mode Types
+
+- **Text**: Traditional chat-based tool creation
+- **Voice**: Real-time voice conversation with maestro
+
+---
+
 ## Safety & Guardrails
 
 ### 5-Layer Defense System (ADR-0004)
@@ -602,6 +775,10 @@ flowchart TB
 | 0016 | Modularization | Barrel exports, max 300 lines |
 | 0017 | Voice Summaries | Voice-driven summary creation |
 | 0018 | Audio Coordination | Pause ambient during voice |
+| 0019 | Session Summaries | Auto-generate summaries at session end |
+| 0020 | Mindmap Data Fix | Unified title field, hierarchy rendering |
+| 0021 | Conversational Memory | Memory injection into system prompts |
+| 0022 | Knowledge Hub | File-manager interface for materials |
 
 **Location**: `docs/adr/`
 
@@ -639,10 +816,10 @@ npx prisma db push   # Sync schema
 
 ## Statistics
 
-- **Components**: 100+ React components
-- **API Routes**: 50+ REST endpoints
+- **Components**: 150+ React components
+- **API Routes**: 60+ REST endpoints
 - **Zustand Stores**: 8 stores
-- **Prisma Models**: 20+ models
+- **Prisma Models**: 25+ models
 - **Maestri**: 17 subject experts
 - **Coaches**: 5 learning coaches
 - **Buddies**: 5 peer buddies
@@ -650,4 +827,7 @@ npx prisma db push   # Sync schema
 - **Audio Modes**: 14 modes
 - **Audio Presets**: 7 presets
 - **Safety Layers**: 5 layers
-- **ADRs**: 18 architecture decisions
+- **ADRs**: 22 architecture decisions
+- **Knowledge Hub Renderers**: 12 type-specific renderers
+- **Knowledge Hub Hooks**: 5 custom hooks
+- **Unit Tests**: 1400+ tests

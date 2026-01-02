@@ -1,7 +1,7 @@
 # ADR 0021: Conversational Memory Injection
 
 ## Status
-Proposed
+Accepted (Implemented 2026-01-02)
 
 ## Date
 2026-01-01

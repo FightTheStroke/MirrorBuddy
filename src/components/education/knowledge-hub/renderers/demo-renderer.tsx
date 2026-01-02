@@ -86,8 +86,8 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
         <button
           className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-accent-themed text-white hover:brightness-110 transition-all"
           onClick={() => {
-            // In a full implementation, this would open the demo
-            console.log('Opening demo:', demoData);
+            // NOTE: Placeholder - full implementation would render content in modal/iframe
+            alert(`Demo: ${demoData.title || 'Untitled'}\nType: ${demoData.type || 'interactive'}`);
           }}
         >
           <PlayCircle className="w-5 h-5" />

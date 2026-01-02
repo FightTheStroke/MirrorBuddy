@@ -14,3 +14,13 @@ export { ToolResultDisplay, ToolResultsList } from './tool-result-display';
 export { ToolPanel } from './tool-panel';
 export { DemoSandbox } from './demo-sandbox';
 export { SearchResults } from './search-results';
+// Mindmap utilities for node format conversion (ADR 0020)
+export {
+  convertParentIdToChildren,
+  convertChildrenToParentId,
+  detectNodeFormat,
+  generateMarkdownFromFlatNodes,
+  generateMarkdownFromTree,
+  type FlatNode,
+  type TreeNode,
+} from '@/lib/tools/mindmap-utils';
