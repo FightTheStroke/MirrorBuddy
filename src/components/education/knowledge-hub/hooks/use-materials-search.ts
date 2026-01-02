@@ -8,7 +8,6 @@
  */
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import Fuse from 'fuse.js';
 import type { ToolType } from '@/types/tools';
 import type { FuseResult } from '@/lib/search/searchable-text';
 import {
