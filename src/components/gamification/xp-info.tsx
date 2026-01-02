@@ -2,6 +2,7 @@
 
 import { Brain, MessageCircle, Clock, CreditCard, Target, Trophy } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { POMODORO_XP, MAESTRI_XP, FLASHCARD_XP } from '@/lib/constants/xp-rewards';
 
 interface XPInfoProps {
   className?: string;
@@ -31,9 +32,9 @@ export function XPInfo({ className }: XPInfoProps) {
               Sessioni con i Maestri
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• 5 XP al minuto di conversazione</li>
-              <li>• 10 XP per ogni domanda che fai</li>
-              <li>• Massimo 100 XP per sessione</li>
+              <li>• {MAESTRI_XP.PER_MINUTE} XP al minuto di conversazione</li>
+              <li>• {MAESTRI_XP.PER_QUESTION} XP per ogni domanda che fai</li>
+              <li>• Massimo {MAESTRI_XP.MAX_PER_SESSION} XP per sessione</li>
             </ul>
           </div>
         </div>
@@ -46,10 +47,10 @@ export function XPInfo({ className }: XPInfoProps) {
               Flashcards
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• 2 XP per &ldquo;Ancora&rdquo; (ripeti)</li>
-              <li>• 5 XP per &ldquo;Difficile&rdquo;</li>
-              <li>• 10 XP per &ldquo;Bene&rdquo;</li>
-              <li>• 15 XP per &ldquo;Facile&rdquo;</li>
+              <li>• {FLASHCARD_XP.AGAIN} XP per &ldquo;Ancora&rdquo; (ripeti)</li>
+              <li>• {FLASHCARD_XP.HARD} XP per &ldquo;Difficile&rdquo;</li>
+              <li>• {FLASHCARD_XP.GOOD} XP per &ldquo;Bene&rdquo;</li>
+              <li>• {FLASHCARD_XP.EASY} XP per &ldquo;Facile&rdquo;</li>
               <li>• Bonus XP per completare mazzi interi</li>
             </ul>
           </div>
@@ -63,9 +64,9 @@ export function XPInfo({ className }: XPInfoProps) {
               Timer Pomodoro
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• 15 XP per pomodoro completato</li>
-              <li>• +10 XP primo pomodoro del giorno</li>
-              <li>• +15 XP bonus ogni 4 pomodoro (ciclo completo)</li>
+              <li>• {POMODORO_XP.SINGLE} XP per pomodoro completato</li>
+              <li>• +{POMODORO_XP.FIRST_OF_DAY} XP primo pomodoro del giorno</li>
+              <li>• +{POMODORO_XP.CYCLE_BONUS} XP bonus ogni 4 pomodoro (ciclo completo)</li>
             </ul>
           </div>
         </div>

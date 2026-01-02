@@ -10,13 +10,7 @@ import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
 import toast from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
-
-// XP rewards for Pomodoro
-const POMODORO_XP = {
-  SINGLE: 15,           // 1 pomodoro = 15 XP
-  CYCLE_BONUS: 15,      // Bonus for completing 4 pomodoros = +15 XP
-  FIRST_OF_DAY: 10,     // First pomodoro of the day = +10 XP
-};
+import { POMODORO_XP } from '@/lib/constants/xp-rewards';
 
 const PHASE_CONFIG: Record<PomodoroPhase, { color: string; bgColor: string; icon: React.ReactNode }> = {
   idle: { color: 'text-slate-400', bgColor: 'bg-slate-500/20', icon: <Timer className="w-3.5 h-3.5" /> },

@@ -49,6 +49,7 @@ import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { FocusToolLayout } from '@/components/tools/focus-tool-layout';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
+import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
 type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
@@ -130,8 +131,7 @@ export default function Home() {
     return null;
   }
 
-  // XP calculations
-  const XP_PER_LEVEL = [0, 100, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000];
+  // XP calculations (using centralized constants)
   const currentLevelXP = XP_PER_LEVEL[level - 1] || 0;
   const nextLevelXP = XP_PER_LEVEL[level] || XP_PER_LEVEL[XP_PER_LEVEL.length - 1];
   const xpInLevel = xp - currentLevelXP;
