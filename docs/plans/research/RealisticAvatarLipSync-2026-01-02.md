@@ -12,6 +12,43 @@ ConvergioEdu uses **Azure OpenAI Realtime** for voice (WebSocket bidirectional a
 
 ---
 
+## TOP PICKS - Build Your Own "Duix" (Commercial License OK)
+
+These are the best candidates for building a proprietary avatar system for the Maestri:
+
+| Model | License | Commercial | GPU | Real-Time | Quality | Source |
+|-------|---------|------------|-----|-----------|---------|--------|
+| **[LatentSync 1.6](https://github.com/bytedance/LatentSync)** | Apache 2.0 | YES | 8-18GB | Near-RT | Excellent | ByteDance |
+| **[EchoMimicV2](https://github.com/antgroup/echomimic_v2)** | Apache 2.0 | YES | 16-24GB | No | Excellent | CVPR 2025 |
+| **[EchoMimicV3](https://github.com/antgroup/echomimic_v3)** | Apache 2.0 | YES | 24GB+ | No | State-of-art | AAAI 2026 |
+| **[MuseTalk 1.5](https://github.com/TMElyralab/MuseTalk)** | MIT | YES | V100/3090 | YES 30fps | Very Good | Tencent |
+| **[LivePortrait](https://github.com/KwaiVGI/LivePortrait)** | MIT* | YES* | CUDA | Near-RT | Very Good | Kuaishou |
+| **[GeneFace++](https://github.com/yerfor/GeneFacePlusPlus)** | MIT | YES | 3090/A100 | YES 45fps | Excellent | NeRF-based |
+| **[SadTalker](https://github.com/OpenTalker/SadTalker)** | Apache 2.0 | YES | Moderate | No | Good | CVPR 2023 |
+| **[Hallo2](https://github.com/fudan-generative-vision/hallo2)** | Mixed* | Check | A100 | No | Excellent | ICLR 2025 |
+
+*LivePortrait: MIT code but InsightFace dependency is non-commercial. **Replace with MediaPipe for commercial use.**
+*Hallo2: Uses CodeFormer (S-Lab License 1.0) - verify terms before commercial use.
+
+### NOT Commercial (Research Only)
+
+| Model | License | Note |
+|-------|---------|------|
+| **[FLOAT](https://github.com/deepbrainai-research/float)** | CC BY-NC-ND 4.0 | Contact daniel@deepbrain.io for commercial |
+
+### Best for Real-Time (Live Conversation)
+
+For Azure OpenAI Realtime integration, only these support true real-time:
+- **MuseTalk 1.5**: 30fps on V100, single-step inpainting (not diffusion)
+- **GeneFace++**: 45-60fps, NeRF-based 3D face model
+
+### Best for Quality (Near-Real-Time with Buffering)
+
+- **LatentSync 1.6**: 512x512 resolution, Apache 2.0, diffusion-based
+- **EchoMimicV3**: 1.3B params, competes with 10B+ models, semi-body animation
+
+---
+
 ## Options Evaluated
 
 ### 1. Real-Time Browser-Based (3D Stylized)
@@ -110,21 +147,100 @@ Azure OpenAI Realtime (WebSocket)
 
 ---
 
+## Build Your Own "ConvergioAvatar"
+
+### Architecture for Real-Time Pipeline
+
+```
+Azure OpenAI Realtime (WebSocket)
+         ↓ audio chunks (streaming)
+    Audio Buffer (500ms)
+         ↓
+    MuseTalk / GeneFace++ (GPU Server)
+         ↓ video frames (30-60fps)
+    WebRTC Stream
+         ↓
+    Browser (video element)
+```
+
+**Latency:** ~500-800ms (acceptable for conversation)
+**Cost:** GPU server (~$0.50-2/hr cloud or RTX 4090 one-time ~$1500)
+
+### Steps to Build
+
+1. **Generate Maestri faces**: Use Stable Diffusion or licensed images
+2. **Fine-tune model**: Train on Maestri faces (10-30s video each)
+3. **Deploy GPU server**: RTX 4090 local or cloud (RunPod, Lambda Labs)
+4. **Build streaming layer**: WebRTC + FastAPI/Node wrapper
+5. **Integrate with frontend**: Connect to `use-voice-session.ts`
+
+### Hardware Requirements
+
+| Model | Min GPU | Recommended | Real-Time |
+|-------|---------|-------------|-----------|
+| MuseTalk 1.5 | RTX 3090 (24GB) | V100 (32GB) | YES |
+| GeneFace++ | RTX 3090 (24GB) | A100 (40GB) | YES |
+| LatentSync 1.6 | RTX 3090 (24GB) | A100 (40GB) | Near-RT |
+| EchoMimicV3 | RTX 4090 (24GB) | A100 (80GB) | No |
+
+**Mac M3 Max (36GB):** Can run MuseTalk/GeneFace++ with MPS, slower but OK for testing.
+
+---
+
+## Recent Research (2025-2026)
+
+| Paper | Conference | Innovation |
+|-------|------------|------------|
+| KeyFace | CVPR 2025 | Keyframe-based long sequences via SVD |
+| EchoMimicV2 | CVPR 2025 | Semi-body animation |
+| EchoMimicV3 | AAAI 2026 | Unified multi-modal, 1.3B params |
+| Hallo2 | ICLR 2025 | Long-duration, high-resolution |
+| FLOAT | ICCV 2025 | Flow matching, faster than diffusion |
+| GaussianSpeech | ICCV 2025 | 3D Gaussian avatars |
+| Audio-Driven RT Facial | SIGGRAPH Asia 2025 | <15ms latency, VR-ready |
+
+---
+
 ## Open Questions
 
 1. Does Duix.com support BYOLLM (Azure OpenAI) or forces their AI backend?
 2. Can we pipe Azure Realtime audio output → Duix streaming API?
 3. Quality comparison: Duix vs MuseTalk for Italian speakers?
+4. Can MuseTalk run acceptably on Mac M3 Max with MPS?
+5. How to generate consistent Maestri faces (Socrate, Leonardo, etc.)?
 
 ---
 
 ## Sources
 
+### Primary Models (Commercial License OK)
+- [LatentSync GitHub](https://github.com/bytedance/LatentSync) - Apache 2.0
+- [LatentSync HuggingFace Space](https://huggingface.co/spaces/fffiloni/LatentSync)
+- [EchoMimicV2 GitHub](https://github.com/antgroup/echomimic_v2) - Apache 2.0, CVPR 2025
+- [EchoMimicV3 GitHub](https://github.com/antgroup/echomimic_v3) - Apache 2.0, AAAI 2026
+- [MuseTalk GitHub](https://github.com/TMElyralab/MuseTalk) - MIT
+- [LivePortrait GitHub](https://github.com/KwaiVGI/LivePortrait) - MIT (watch InsightFace dep)
+- [GeneFace++ GitHub](https://github.com/yerfor/GeneFacePlusPlus) - MIT
+- [SadTalker GitHub](https://github.com/OpenTalker/SadTalker) - Apache 2.0
+- [Hallo2 GitHub](https://github.com/fudan-generative-vision/hallo2) - ICLR 2025
+
+### Research Only (Non-Commercial)
+- [FLOAT GitHub](https://github.com/deepbrainai-research/float) - CC BY-NC-ND 4.0
+
+### SaaS Options
+- [Duix.com](https://duix.com) - Streaming API, free tier available
+- [Duix.Avatar GitHub](https://github.com/duixcom/Duix-Avatar) - Self-hosted
+
+### Real-Time Browser (3D Stylized)
 - [TalkingHead GitHub](https://github.com/met4citizen/TalkingHead)
 - [Wawa-Lipsync Tutorial](https://wawasensei.dev/tuto/real-time-lipsync-web)
-- [Duix.Avatar GitHub](https://github.com/duixcom/Duix-Avatar)
-- [Duix.com Pricing](https://www.duix.com/pricing)
-- [MuseTalk GitHub](https://github.com/TMElyralab/MuseTalk)
-- [NVIDIA Audio2Face Blog](https://developer.nvidia.com/blog/nvidia-open-sources-audio2face-animation-model)
+
+### Infrastructure
+- [NVIDIA Audio2Face GitHub](https://github.com/NVIDIA/Audio2Face-3D)
+- [NVIDIA Audio2Face NIM](https://build.nvidia.com/nvidia/audio2face-3d)
+
+### Research & Surveys
+- [Awesome Talking Head Synthesis](https://github.com/Kedreamix/Awesome-Talking-Head-Synthesis)
+- [Talking Head Survey (July 2025)](https://arxiv.org/abs/2507.02900)
 - [Best Open Source Lip-Sync Models 2025](https://www.pixazo.ai/blog/best-open-source-lip-sync-models)
 - [HeyGen Alternatives (Hugging Face)](https://huggingface.co/blog/francesca-petracci/heygen-alternatives)
