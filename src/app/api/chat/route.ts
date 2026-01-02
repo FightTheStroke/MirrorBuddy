@@ -35,65 +35,108 @@ interface ChatRequest {
 }
 
 // Tool context to inject into system prompt (Phase 5: Chat API Enhancement)
+// CRITICAL: These instructions FORCE tool calls when user specifies a topic
 const TOOL_CONTEXT: Record<string, string> = {
   mindmap: `
-STAI CREANDO UNA MAPPA MENTALE con lo studente.
-Linee guida:
-- Fai domande maieutiche per esplorare l'argomento
-- Parti dal concetto centrale e espandi in modo organico
-- Usa create_mindmap per costruire la mappa incrementalmente
-- Ogni risposta dello studente può aggiungere nodi alla mappa
-- Mantieni la struttura chiara e gerarchica`,
+## ISTRUZIONI CRITICHE - MODALITÀ MAPPA MENTALE
+
+HAI ACCESSO AL TOOL "create_mindmap". DEVI USARLO.
+
+REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
+1. NON rispondere con testo
+2. CHIAMA SUBITO create_mindmap
+3. IL TOOL CREERÀ LA MAPPA, TU DEVI SOLO CHIAMARLO
+
+STRUTTURA GERARCHICA OBBLIGATORIA - ESEMPIO CORRETTO:
+{
+  "title": "La Fotosintesi",
+  "nodes": [
+    { "id": "1", "label": "Fase Luminosa", "parentId": null },
+    { "id": "2", "label": "Clorofilla", "parentId": "1" },
+    { "id": "3", "label": "Assorbimento Luce", "parentId": "1" },
+    { "id": "4", "label": "Fase Oscura", "parentId": null },
+    { "id": "5", "label": "Ciclo di Calvin", "parentId": "4" },
+    { "id": "6", "label": "Fissazione CO2", "parentId": "5" },
+    { "id": "7", "label": "Fattori Ambientali", "parentId": null },
+    { "id": "8", "label": "Luce Solare", "parentId": "7" },
+    { "id": "9", "label": "Temperatura", "parentId": "7" }
+  ]
+}
+
+REGOLE IMPERATIVE PER LA GERARCHIA:
+1. parentId: null = nodo di PRIMO livello (ramo principale dal centro)
+2. parentId: "X" = nodo FIGLIO del nodo con id "X"
+3. DEVI creare ALMENO 3 livelli di profondità
+4. Ogni nodo di primo livello DEVE avere 2-4 figli
+5. MAI mettere tutti i nodi con parentId: null (mappa PIATTA = ERRORE)
+
+SE generi una mappa con tutti parentId: null, HAI SBAGLIATO.
+
+SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Di cosa vuoi fare la mappa?"`,
 
   quiz: `
-STAI CREANDO UN QUIZ con lo studente.
+## ISTRUZIONI CRITICHE - MODALITÀ QUIZ
 
-**REGOLA IMPORTANTE:** Prima di creare il quiz, CHIEDI allo studente:
-"Preferisci fare il quiz per iscritto (lo vedi sullo schermo) oppure a voce (te lo faccio io)?"
+HAI ACCESSO AL TOOL "create_quiz". DEVI USARLO.
 
-Se sceglie PER ISCRITTO:
-- Chiedi prima di che argomento vuole essere interrogato
-- Crea domande a scelta multipla chiare e formative
-- Usa create_quiz per generare il quiz
-- Includi feedback educativo per ogni risposta
-- Adatta la difficoltà al livello dello studente
+REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
+1. NON rispondere con testo
+2. CHIAMA SUBITO create_quiz
+3. IL TOOL CREERÀ IL QUIZ, TU DEVI SOLO CHIAMARLO
 
-Se sceglie A VOCE (o se siete in una sessione vocale):
-- NON usare create_quiz!
-- Fai tu le domande una alla volta nella chat
-- Elenca le opzioni (A, B, C, D)
-- Aspetta la risposta dello studente
-- Conferma se è corretta o spiega perché è sbagliata
-- Passa alla domanda successiva
-- Alla fine dai un resoconto del punteggio`,
+ESEMPI - quando lo studente dice:
+- "rivoluzione francese" → CHIAMA create_quiz(topic:"Rivoluzione Francese", questions:[...])
+- "frazioni" → CHIAMA create_quiz(topic:"Le Frazioni", questions:[...])
+
+SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Su cosa vuoi fare il quiz?"`,
 
   flashcard: `
-STAI CREANDO FLASHCARD per lo studente.
-Linee guida:
-- Identifica i concetti chiave da memorizzare
-- Crea carte con domanda/risposta brevi e incisive
-- Usa create_flashcards per generare le carte
-- Organizza le carte per argomento o difficoltà
-- Le flashcard verranno usate con ripetizione spaziata FSRS`,
+## ISTRUZIONI CRITICHE - MODALITÀ FLASHCARD
+
+HAI ACCESSO AL TOOL "create_flashcards". DEVI USARLO.
+
+REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
+1. NON rispondere con testo
+2. CHIAMA SUBITO create_flashcards
+3. IL TOOL CREERÀ LE CARTE, TU DEVI SOLO CHIAMARLO
+
+ESEMPI - quando lo studente dice:
+- "verbi irregolari" → CHIAMA create_flashcards(topic:"Verbi Irregolari Inglesi", cards:[...])
+- "capitali europee" → CHIAMA create_flashcards(topic:"Capitali Europee", cards:[...])
+
+SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Su cosa vuoi le flashcard?"`,
 
   demo: `
-STAI CREANDO UNA DEMO INTERATTIVA per lo studente.
-Linee guida:
-- Capisce cosa lo studente vuole visualizzare
-- Crea simulazioni semplici ma efficaci
-- Usa create_demo per generare la demo HTML/JS
-- Mantieni l'interattività intuitiva e accessibile
-- Spiega cosa la demo sta mostrando`,
+## ISTRUZIONI CRITICHE - MODALITÀ DEMO INTERATTIVA
+
+HAI ACCESSO AL TOOL "create_demo". DEVI USARLO.
+
+REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
+1. NON rispondere con testo
+2. CHIAMA SUBITO create_demo
+3. IL TOOL CREERÀ LA DEMO, TU DEVI SOLO CHIAMARLO
+
+ESEMPI - quando lo studente dice:
+- "sistema solare" → CHIAMA create_demo(title:"Sistema Solare", html:"<canvas>...", js:"animation code...")
+- "onde" → CHIAMA create_demo(title:"Onde Meccaniche", html:"...", js:"wave simulation...")
+
+SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`,
 
   summary: `
-STAI CREANDO UN RIASSUNTO STRUTTURATO con lo studente.
-Linee guida:
-- Chiedi prima quale argomento vuole riassumere
-- Organizza il contenuto in sezioni chiare e logiche
-- Usa create_summary per costruire il riassunto
-- Includi punti chiave per ogni sezione
-- Adatta la lunghezza alle esigenze dello studente (breve/medio/lungo)
-- Fai domande per approfondire i punti importanti`,
+## ISTRUZIONI CRITICHE - MODALITÀ RIASSUNTO
+
+HAI ACCESSO AL TOOL "create_summary". DEVI USARLO.
+
+REGOLA ASSOLUTA: Quando lo studente menziona un argomento:
+1. NON rispondere con testo
+2. CHIAMA SUBITO create_summary
+3. IL TOOL CREERÀ IL RIASSUNTO, TU DEVI SOLO CHIAMARLO
+
+ESEMPI - quando lo studente dice:
+- "prima guerra mondiale" → CHIAMA create_summary(topic:"Prima Guerra Mondiale", sections:[...])
+- "fotosintesi" → CHIAMA create_summary(topic:"La Fotosintesi", sections:[...])
+
+SE e SOLO SE lo studente NON ha ancora dato un argomento, chiedi: "Cosa vuoi riassumere?"`,
 };
 
 export async function POST(request: NextRequest) {
@@ -183,6 +226,13 @@ export async function POST(request: NextRequest) {
             keyFactCount: memory.keyFacts.length,
             hasSummary: !!memory.recentSummary,
           });
+        } else {
+          // Memory enabled but no previous context found
+          logger.info('Memory enabled but no previous context found', {
+            userId,
+            maestroId,
+            enableMemory,
+          });
         }
       } catch (memoryError) {
         // Memory loading failure should not block the chat
@@ -221,10 +271,29 @@ export async function POST(request: NextRequest) {
       // Call AI with optional tool definitions
       // Cast to mutable array since chatCompletion expects ToolDefinition[]
       // #87: Pass user's provider preference to chatCompletion
+
+      // Debug logging for tool context
+      if (requestedTool) {
+        logger.info('Tool mode active', {
+          requestedTool,
+          toolsEnabled: enableTools,
+          hasToolContext: !!TOOL_CONTEXT[requestedTool],
+          maestroId,
+        });
+      }
+
       const result = await chatCompletion(messages, enhancedSystemPrompt, {
         tools: enableTools ? ([...CHAT_TOOL_DEFINITIONS] as typeof CHAT_TOOL_DEFINITIONS[number][]) : undefined,
         tool_choice: enableTools ? 'auto' : 'none',
         providerPreference,
+      });
+
+      // Debug: Log if we got tool calls back
+      logger.debug('Chat response', {
+        hasToolCalls: !!(result.tool_calls && result.tool_calls.length > 0),
+        toolCallCount: result.tool_calls?.length || 0,
+        toolCallNames: result.tool_calls?.map(tc => tc.function.name) || [],
+        contentLength: result.content?.length || 0,
       });
 
       // Handle tool calls if present

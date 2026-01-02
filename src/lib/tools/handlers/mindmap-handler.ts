@@ -5,6 +5,7 @@
 
 import { registerToolHandler } from '../tool-executor';
 import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
 import type { MindmapData, MindmapNode, ToolExecutionResult } from '@/types/tools';
 
 /**
@@ -81,6 +82,23 @@ registerToolHandler('create_mindmap', async (args): Promise<ToolExecutionResult>
       toolType: 'mindmap',
       error: 'Nodes array is required and must not be empty',
     };
+  }
+
+  // Validate hierarchy - warn if map is flat
+  const rootNodes = nodes.filter(
+    (n) => !n.parentId || n.parentId === 'null' || n.parentId === ''
+  );
+  const childNodes = nodes.filter(
+    (n) => n.parentId && n.parentId !== 'null' && n.parentId !== ''
+  );
+
+  if (childNodes.length === 0 && nodes.length > 1) {
+    logger.warn('Mindmap generated FLAT - no nodes with parentId', {
+      title,
+      nodeCount: nodes.length,
+      rootNodes: rootNodes.length,
+      allRoots: true,
+    });
   }
 
   // Generate markdown content
