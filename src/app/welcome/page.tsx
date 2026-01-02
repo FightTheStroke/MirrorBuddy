@@ -352,7 +352,7 @@ function WelcomeContent() {
                 >
                   Benvenuto in{' '}
                   <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    ConvergioEdu
+                    MirrorBuddy
                   </span>
                 </motion.h1>
                 <motion.p
@@ -468,7 +468,7 @@ function WelcomeContent() {
         <div className="max-w-2xl mx-auto">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-              {existingUserData?.name ? `Aggiornamento profilo di ${existingUserData.name}` : 'Benvenuto in ConvergioEdu'}
+              {existingUserData?.name ? `Aggiornamento profilo di ${existingUserData.name}` : 'Benvenuto in MirrorBuddy'}
             </span>
 
             <div className="flex items-center gap-3">

@@ -68,12 +68,12 @@ export default function LandingPage() {
         <div className="relative max-w-7xl mx-auto px-4 pt-20 pb-32">
           <div className="text-center">
             {/* Logo */}
-            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-gradient-to-br from-purple-500 to-blue-500 mb-8 shadow-2xl shadow-purple-500/25">
-              <GraduationCap className="w-14 h-14 text-white" />
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white/10 backdrop-blur-sm mb-8 shadow-2xl shadow-purple-500/25 overflow-hidden">
+              <img src="/logo-brain.png" alt="MirrorBuddy" className="w-20 h-20 object-contain" />
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-              Convergio Edu
+              MirrorBuddy
             </h1>
 
             <p className="text-xl md:text-2xl text-white/80 mb-4">
@@ -118,7 +118,7 @@ export default function LandingPage() {
       <section className="relative py-20 bg-black/20">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-            Cos&apos;e Convergio Edu?
+            Cos&apos;e MirrorBuddy?
           </h2>
           <p className="text-white/60 text-center max-w-2xl mx-auto mb-16">
             Una piattaforma completa per l&apos;apprendimento personalizzato
@@ -258,7 +258,7 @@ export default function LandingPage() {
       <footer className="py-8 border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <p className="text-white/40 text-sm">
-            Convergio Edu - La Scuola Che Vorrei
+            MirrorBuddy - The school we wished existed
           </p>
         </div>
       </footer>
