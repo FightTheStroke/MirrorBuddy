@@ -3,6 +3,7 @@
 import { useMemo, useCallback, useState } from 'react';
 import { FlashcardStudy } from '@/components/education/flashcard';
 import { useProgressStore } from '@/lib/stores/app-store';
+import toast from '@/components/ui/toast';
 import type { FlashcardDeckRequest, FlashcardDeck, Flashcard, Rating } from '@/types';
 
 interface FlashcardToolProps {
@@ -55,6 +56,15 @@ export function FlashcardTool({ request, onComplete }: FlashcardToolProps) {
     const goodOrEasy = Object.values(ratings).filter(r => r === 'good' || r === 'easy').length;
     const bonusXP = Math.round((goodOrEasy / cardCount) * 25);
     addXP(bonusXP);
+
+    // Show completion toast with bonus XP
+    if (bonusXP > 0) {
+      toast.success(
+        `Mazzo completato! +${bonusXP} XP bonus`,
+        `Hai completato ${cardCount} carte con ${goodOrEasy} risposte Good/Easy!`,
+        { duration: 5000 }
+      );
+    }
 
     onComplete?.();
   }, [deck.cards.length, ratings, addXP, onComplete]);

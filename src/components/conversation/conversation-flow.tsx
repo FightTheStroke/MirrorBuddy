@@ -36,6 +36,9 @@ import type { ExtendedStudentProfile, Subject } from '@/types';
 import { ToolButtons } from './tool-buttons';
 import { ToolPanel } from '@/components/tools/tool-panel';
 import type { ToolType, ToolState } from '@/types/tools';
+import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
+import type { MaestroFull } from '@/data/maestri';
+import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
 
 // Map OpenAI function names to ToolType
 const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
@@ -63,6 +66,50 @@ import {
 export { CharacterCard } from './components';
 
 // ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Get userId from sessionStorage (client-side)
+ */
+function getUserId(): string | null {
+  if (typeof window === 'undefined') return null;
+  let userId = sessionStorage.getItem('convergio-user-id');
+  if (!userId) {
+    userId = crypto.randomUUID();
+    sessionStorage.setItem('convergio-user-id', userId);
+  }
+  return userId;
+}
+
+/**
+ * End a conversation and generate summary
+ */
+async function endConversationWithSummary(conversationId: string): Promise<void> {
+  const userId = getUserId();
+  if (!userId) {
+    logger.warn('No userId, cannot end conversation');
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/conversations/${conversationId}/end`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, reason: 'explicit' }),
+    });
+
+    if (!response.ok) {
+      logger.error('Failed to end conversation', { status: response.status });
+    } else {
+      logger.info('Conversation ended with summary', { conversationId });
+    }
+  } catch (error) {
+    logger.error('Error ending conversation', { error: String(error) });
+  }
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -74,6 +121,8 @@ export function ConversationFlow() {
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
   const [voiceSessionId, setVoiceSessionId] = useState<string | null>(null);
+  const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+  const [pendingToolType, setPendingToolType] = useState<ToolType | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sessionStartTimeRef = useRef<number>(Date.now());
@@ -89,6 +138,7 @@ export function ConversationFlow() {
     pendingHandoff,
     characterHistory,
     sessionId,
+    conversationsByCharacter,
     startConversation,
     endConversation: _endConversation, // Available for future explicit end
     addMessage,
@@ -111,9 +161,34 @@ export function ConversationFlow() {
     preferredBuddy: studentProfile.preferredBuddy,
   }), [studentProfile]);
 
-  // Handle tool request from ToolButtons
-  const handleToolRequest = useCallback(async (toolType: ToolType) => {
-    if (!activeCharacter || isLoading) return;
+  // Handle tool request from ToolButtons - show maestro selection dialog
+  const handleToolRequest = useCallback((toolType: ToolType) => {
+    if (isLoading) return;
+
+    // Check for pending tool request in sessionStorage (from maestri-grid)
+    const pendingRequest = sessionStorage.getItem('pendingToolRequest');
+    if (pendingRequest) {
+      try {
+        const { tool, maestroId } = JSON.parse(pendingRequest);
+        if (tool === toolType && maestroId) {
+          // Use maestro from pending request
+          sessionStorage.removeItem('pendingToolRequest');
+          handleMaestroSelected({ id: maestroId } as MaestroFull, toolType);
+          return;
+        }
+      } catch (error) {
+        logger.error('Failed to parse pendingToolRequest', { error });
+      }
+    }
+
+    // Show maestro selection dialog
+    setPendingToolType(toolType);
+    setShowMaestroDialog(true);
+  }, [isLoading]);
+
+  // Handle maestro selection and create tool
+  const handleMaestroSelected = useCallback(async (maestro: MaestroFull, toolType: ToolType) => {
+    if (isLoading) return;
 
     // Create tool prompts based on type
     const toolPrompts: Record<ToolType, string> = {
@@ -155,13 +230,13 @@ export function ConversationFlow() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
-            { role: 'system', content: activeCharacter.systemPrompt },
+            { role: 'system', content: maestro.systemPrompt },
             ...messages
               .filter((m) => m.role !== 'system')
               .map((m) => ({ role: m.role, content: m.content })),
             { role: 'user', content: toolPrompt },
           ],
-          maestroId: activeCharacter.id,
+          maestroId: maestro.id,
           requestedTool: toolType,
           enableMemory: true, // ADR 0021: Enable conversational memory injection
         }),
@@ -205,7 +280,7 @@ export function ConversationFlow() {
     } finally {
       setIsLoading(false);
     }
-  }, [activeCharacter, isLoading, messages, addMessage]);
+  }, [isLoading, messages, addMessage]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -225,6 +300,60 @@ export function ConversationFlow() {
       startConversation(extendedProfile);
     }
   }, [isActive, startConversation, extendedProfile]);
+
+  // #98: Register inactivity timeout callback on mount
+  useEffect(() => {
+    inactivityMonitor.setTimeoutCallback(async (conversationId: string) => {
+      logger.info('Conversation timed out due to inactivity', { conversationId });
+      await endConversationWithSummary(conversationId);
+    });
+
+    return () => {
+      // Cleanup on unmount
+      inactivityMonitor.stopAll();
+    };
+  }, []);
+
+  // #98: Track activity when conversation starts or changes
+  useEffect(() => {
+    if (!isActive || !activeCharacter) return;
+
+    const userId = getUserId();
+    if (!userId) return;
+
+    const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
+    if (!conversationId) return;
+
+    // Start/reset inactivity timer
+    inactivityMonitor.trackActivity(conversationId, userId, activeCharacter.id);
+
+    logger.debug('Tracking conversation activity', { conversationId, characterId: activeCharacter.id });
+  }, [isActive, activeCharacter, conversationsByCharacter]);
+
+  // #98: Auto-generate summary when user closes browser/tab
+  useEffect(() => {
+    if (!isActive || !activeCharacter) return;
+
+    const userId = getUserId();
+    if (!userId) return;
+
+    const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
+    if (!conversationId) return;
+
+    const handleBeforeUnload = () => {
+      // Fire and forget - browser will wait for this to complete
+      navigator.sendBeacon(
+        `/api/conversations/${conversationId}/end`,
+        JSON.stringify({ userId, reason: 'browser_close' })
+      );
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [isActive, activeCharacter, conversationsByCharacter]);
 
   // SSE listener for real-time tool events (Phase 4: Fullscreen Layout)
   useEffect(() => {
@@ -326,6 +455,13 @@ export function ConversationFlow() {
 
     // Add user message
     addMessage({ role: 'user', content: userMessage });
+
+    // #98: Reset inactivity timer on user message
+    const userId = getUserId();
+    const conversationId = conversationsByCharacter[activeCharacter.id]?.conversationId;
+    if (userId && conversationId) {
+      inactivityMonitor.trackActivity(conversationId, userId, activeCharacter.id);
+    }
 
     try {
       // Route the message to determine if we need to switch characters
@@ -493,6 +629,7 @@ export function ConversationFlow() {
     routeMessage,
     suggestHandoff,
     pendingHandoff,
+    conversationsByCharacter,
   ]);
 
   /**
@@ -519,11 +656,19 @@ export function ConversationFlow() {
   /**
    * Handle voice call (full voice conversation).
    */
-  const handleVoiceCall = useCallback(() => {
+  const handleVoiceCall = useCallback(async () => {
     if (isVoiceActive) {
-      // End voice call
+      // #98: End voice call and generate summary
       setIsVoiceActive(false);
       setMode('text');
+
+      // Generate summary for voice call
+      const userId = getUserId();
+      const conversationId = activeCharacter ? conversationsByCharacter[activeCharacter.id]?.conversationId : null;
+      if (userId && conversationId) {
+        logger.info('Ending voice call, generating summary', { conversationId });
+        await endConversationWithSummary(conversationId);
+      }
     } else {
       // Start voice call
       setIsVoiceActive(true);
@@ -531,7 +676,7 @@ export function ConversationFlow() {
       // Voice session will be started by VoiceCallOverlay
       // This is a placeholder - Issue #34 tracks voice WebSocket issues
     }
-  }, [isVoiceActive, setMode]);
+  }, [isVoiceActive, setMode, activeCharacter, conversationsByCharacter]);
 
   /**
    * Handle accepting handoff.
@@ -741,6 +886,23 @@ export function ConversationFlow() {
           </Button>
         </div>
       </div>
+
+      {/* Maestro Selection Dialog */}
+      <ToolMaestroSelectionDialog
+        isOpen={showMaestroDialog}
+        toolType={pendingToolType || 'mindmap'}
+        onSelect={(maestro) => {
+          if (pendingToolType) {
+            handleMaestroSelected(maestro, pendingToolType);
+          }
+          setShowMaestroDialog(false);
+          setPendingToolType(null);
+        }}
+        onClose={() => {
+          setShowMaestroDialog(false);
+          setPendingToolType(null);
+        }}
+      />
     </div>
   );
 }

@@ -123,9 +123,17 @@ export function FocusToolLayout() {
       // Check if it's a coach
       const coach = getSupportTeacherById(focusMaestroId as 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij');
       if (coach) return coach;
+
+      // Character ID provided but not found - log error
+      logger.error('Focus mode character not found', { focusMaestroId });
     }
 
-    // Default to coach based on preference or tool type
+    // If no focusMaestroId provided, warn about missing maestro selection
+    if (!focusMaestroId) {
+      logger.warn('Focus mode entered without maestro selection, using default coach');
+    }
+
+    // Fallback to coach based on preference
     const preferredCoach = studentProfile?.preferredCoach || 'melissa';
     const coach = getSupportTeacherById(preferredCoach);
     if (coach) return coach;
