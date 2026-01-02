@@ -22,25 +22,38 @@ This is **development usage** - occasional testing, no real students.
 
 ## Voice Cost Reality Check
 
-### Azure Realtime API Pricing (Actual)
+### Azure Realtime API Pricing (Gennaio 2026)
 
+#### Modello Standard (`gpt-realtime`)
 | Component | Price | Source |
 |-----------|-------|--------|
 | Audio input | $0.06/min | Azure pricing page |
 | Audio output | $0.24/min | Azure pricing page |
 | **Bidirectional conversation** | **$0.30/min** | Combined |
 
+#### Modello Mini (`gpt-realtime-mini`) - **NUOVO, DISPONIBILE**
+| Component | Price | Risparmio |
+|-----------|-------|-----------|
+| Audio input | $0.006/min | 90% |
+| Audio output | $0.024/min | 90% |
+| **Bidirectional conversation** | **~$0.03-0.05/min** | **80-90%** |
+
+> **IMPORTANTE**: `gpt-realtime-mini` (versione 2025-12-15) è ora GA su Azure swedencentral.
+> Basato su GPT-4o-mini invece di GPT-4o. Qualità leggermente inferiore ma sufficiente per tutoring.
+
 ### Cost Per Student Scenarios
 
-| Usage Pattern | Monthly Cost | Notes |
-|---------------|-------------|-------|
-| 15 min/day x 22 days | $99 | Light user |
-| 30 min/day x 22 days | $198 | Moderate |
-| 60 min/day x 22 days | $396 | Heavy (engaged student) |
+| Usage Pattern | Standard ($0.30/min) | **Mini (~$0.04/min)** | Risparmio |
+|---------------|---------------------|----------------------|-----------|
+| 15 min/day x 22 days | $99 | **$13.20** | 87% |
+| 30 min/day x 22 days | $198 | **$26.40** | 87% |
+| 60 min/day x 22 days | $396 | **$52.80** | 87% |
+
+**Con Mini, voice diventa economicamente sostenibile!**
 
 **Text chat comparison**: ~$0.005 per exchange = ~$2-3/month for heavy use
 
-**Voice is 100x more expensive than text.**
+**Voice Standard è 100x più costoso del text. Voice Mini è solo ~10-15x più costoso.**
 
 ---
 
@@ -112,32 +125,32 @@ This is **development usage** - occasional testing, no real students.
 
 This doesn't need GPT-4o. GPT-4o-mini or even a well-prompted Llama would work.
 
-### Option B: Hybrid (Text + Limited Voice)
+### Option B: Hybrid (Text + Limited Voice) - **CON GPT-REALTIME-MINI**
 
 | Feature | Included |
 |---------|----------|
 | Everything in Option A | Yes |
-| Voice sessions | 30 min/month |
-| Additional voice | EUR 0.30/min |
-| Price target | EUR 19.90/month |
-| Estimated COGS | EUR 2 (text) + EUR 9 (voice) = EUR 11 |
-| Margin | ~45% |
+| Voice sessions | 60 min/month |
+| Additional voice | EUR 0.05/min |
+| Price target | EUR 14.90/month |
+| Estimated COGS | EUR 2 (text) + EUR 2.40 (voice) = EUR 4.40 |
+| Margin | **~70%** |
 
-**The 30 min cap is key** - prevents runaway costs.
+**Con Mini possiamo offrire più minuti a prezzo inferiore con margine migliore!**
 
-### Option C: Voice-First Premium
+### Option C: Voice-First Premium - **CON GPT-REALTIME-MINI**
 
 | Feature | Included |
 |---------|----------|
 | Everything in Option A | Yes |
-| Voice sessions | 120 min/month |
+| Voice sessions | 240 min/month |
 | Priority features | Yes |
-| Additional voice | EUR 0.25/min |
-| Price target | EUR 49.90/month |
-| Estimated COGS | EUR 2 (text) + EUR 36 (voice) = EUR 38 |
-| Margin | ~24% |
+| Additional voice | EUR 0.04/min |
+| Price target | EUR 29.90/month |
+| Estimated COGS | EUR 2 (text) + EUR 9.60 (voice) = EUR 11.60 |
+| Margin | **~61%** |
 
-**Risk**: If student uses all 120 min, margin is thin. If they go over, overage revenue helps.
+**Con Mini il tier Premium diventa sostenibile!** Margine del 61% vs 24% con modello standard.
 
 ### Option D: Self-Hosted Voice (Future)
 

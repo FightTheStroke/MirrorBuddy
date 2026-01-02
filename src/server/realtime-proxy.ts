@@ -95,12 +95,29 @@ export function startRealtimeProxy(): void {
     return;
   }
 
-  wss = new WebSocketServer({ port: WS_PROXY_PORT });
+  // #85: Bind to localhost only - prevents external access to unauthenticated WebSocket
+  wss = new WebSocketServer({ port: WS_PROXY_PORT, host: '127.0.0.1' });
   const safeUrl = config.wsUrl.replace(/key=[^&]+/gi, 'key=***');
-  logger.info(`WebSocket proxy started on port ${WS_PROXY_PORT} (${config.provider.toUpperCase()})`);
+  logger.info(`WebSocket proxy started on 127.0.0.1:${WS_PROXY_PORT} (${config.provider.toUpperCase()})`);
   logger.info(`Backend URL: ${safeUrl}`);
 
+  // #85: Allowed origins for WebSocket connections
+  const ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    `http://localhost:${WS_PROXY_PORT}`,
+    `http://127.0.0.1:${WS_PROXY_PORT}`,
+  ];
+
   wss.on('connection', (clientWs: WebSocket, req: IncomingMessage) => {
+    // #85: Validate origin to prevent cross-site WebSocket hijacking
+    const origin = req.headers.origin;
+    if (origin && !ALLOWED_ORIGINS.includes(origin)) {
+      logger.warn('WebSocket connection rejected - invalid origin', { origin });
+      clientWs.close(4003, 'Forbidden: Invalid origin');
+      return;
+    }
+
     const connectionId = crypto.randomUUID();
     const url = new URL(req.url || '/', `http://localhost:${WS_PROXY_PORT}`);
     const maestroId = url.searchParams.get('maestroId') || 'unknown';
