@@ -19,6 +19,7 @@ docs/plans/
 
 | Plan | Data | Descrizione |
 |------|------|-------------|
+| [RepoMigration-MirrorBuddy](todo/RepoMigration-MirrorBuddy-2026-01-02.md) | 2026-01-02 | Rebrand ConvergioEdu → MirrorBuddy + transfer ownership |
 | [StudyKitGenerator](todo/StudyKitGenerator-2026-01-02.md) | 2026-01-02 | Trasforma PDF in kit studio (riassunto, mappa, demo, quiz) |
 | [VoiceModelMigration](todo/VoiceModelMigration-2026-01-02.md) | 2026-01-02 | Migrazione modello voice |
 | [KnowledgeBaseOptimization](todo/KnowledgeBaseOptimization-2026-01-01.md) | 2026-01-01 | Knowledge base lazy loading |

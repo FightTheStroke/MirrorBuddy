@@ -127,7 +127,7 @@ Fai domande che portano lo studente a trovare la risposta:
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -147,7 +147,6 @@ Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al
 | **Socrate** | Filosofia | Pensiero critico, etica, grandi domande |
 | **Marco Tullio Cicerone** | Educazione Civica | Cittadinanza, diritti, doveri, democrazia |
 | **Ippocrate** | Educazione Fisica | Salute, corpo umano, benessere, sport |
-| **Chris** | Storytelling | Narrazioni, presentazioni, public speaking |
 
 ## QUANDO COINVOLGERE ALTRI
 
@@ -347,7 +346,7 @@ Fai domande che portano lo studente a trovare la risposta:
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -367,7 +366,6 @@ Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al
 | **Socrate** | Filosofia | Pensiero critico, etica, grandi domande |
 | **Marco Tullio Cicerone** | Educazione Civica | Cittadinanza, diritti, doveri, democrazia |
 | **Ippocrate** | Educazione Fisica | Salute, corpo umano, benessere, sport |
-| **Chris** | Storytelling | Narrazioni, presentazioni, public speaking |
 
 ## QUANDO COINVOLGERE ALTRI
 
@@ -572,7 +570,7 @@ Fai domande che portano lo studente a trovare la risposta:
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -592,7 +590,6 @@ Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al
 | **Socrate** | Filosofia | Pensiero critico, etica, grandi domande |
 | **Marco Tullio Cicerone** | Educazione Civica | Cittadinanza, diritti, doveri, democrazia |
 | **Ippocrate** | Educazione Fisica | Salute, corpo umano, benessere, sport |
-| **Chris** | Storytelling | Narrazioni, presentazioni, public speaking |
 
 ## IL TUO TONO
 
@@ -773,7 +770,7 @@ NOTA: Quando crei uno strumento, ANNUNCIALO prima (es. "Ti preparo un quiz su qu
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -793,7 +790,6 @@ Conosco tutti i 17 Professori di ConvergioEdu e posso indirizzare lo studente al
 | **Socrate** | Filosofia | Pensiero critico, etica, grandi domande |
 | **Marco Tullio Cicerone** | Educazione Civica | Cittadinanza, diritti, doveri, democrazia |
 | **Ippocrate** | Educazione Fisica | Salute, corpo umano, benessere, sport |
-| **Chris** | Storytelling | Narrazioni, presentazioni, public speaking |
 
 Per ogni materia: "Vai dal [Professore]! È tipo il coach perfetto per quella materia."
 
@@ -983,7 +979,7 @@ NOTA: Quando crei uno strumento, ANNUNCIALO prima (es. "Ti preparo un quiz su qu
 
 ## I NOSTRI PROFESSORI (NPC TUTORIAL)
 
-Conosco tutti i 17 Professori di ConvergioEdu - tipo i tutorial NPC del gioco:
+Conosco tutti i 16 Professori di ConvergioEdu - tipo i tutorial NPC del gioco:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -1003,7 +999,6 @@ Conosco tutti i 17 Professori di ConvergioEdu - tipo i tutorial NPC del gioco:
 | **Socrate** | Filosofia | Pensiero critico, etica, grandi domande |
 | **Marco Tullio Cicerone** | Educazione Civica | Cittadinanza, diritti, doveri, democrazia |
 | **Ippocrate** | Educazione Fisica | Salute, corpo umano, benessere, sport |
-| **Chris** | Storytelling | Narrazioni, presentazioni, public speaking |
 
 ## IL TUO TONO
 

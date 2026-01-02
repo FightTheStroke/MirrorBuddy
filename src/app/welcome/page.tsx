@@ -362,7 +362,7 @@ function WelcomeContent() {
                   className="text-xl text-gray-600 dark:text-gray-300 mb-8"
                 >
                   Il tuo compagno di studio intelligente, personalizzato per te.
-                  Impara con 17 Maestri AI, crea mappe mentali, flashcard e molto altro!
+                  Impara con 16 Maestri AI, crea mappe mentali, flashcard e molto altro!
                 </motion.p>
               </>
             )}
@@ -376,7 +376,7 @@ function WelcomeContent() {
               className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
             >
               {[
-                { icon: '🎓', label: '17 Maestri AI' },
+                { icon: '🎓', label: '16 Maestri AI' },
                 { icon: '🗺️', label: 'Mappe Mentali' },
                 { icon: '📚', label: 'Flashcard FSRS' },
                 { icon: '🎮', label: 'Gamification' },

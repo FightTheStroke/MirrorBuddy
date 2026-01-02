@@ -41,6 +41,7 @@ interface ConnectionInfo {
   configured?: boolean;
   wsUrl?: string;
   token?: string;
+  characterType?: 'maestro' | 'coach' | 'buddy';
 }
 
 interface ConversationMemory {
@@ -1064,7 +1065,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         const proxyPort = connectionInfo.proxyPort || 3001;
         const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
         const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
-        wsUrl = `${protocol}://${host}:${proxyPort}?maestroId=${maestro.id}`;
+        const characterType = connectionInfo.characterType || 'maestro';
+        wsUrl = `${protocol}://${host}:${proxyPort}?maestroId=${maestro.id}&characterType=${characterType}`;
       } else {
         wsUrl = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17';
       }

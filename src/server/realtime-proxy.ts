@@ -21,6 +21,7 @@ interface ProxyConnection {
 const connections = new Map<string, ProxyConnection>();
 
 type Provider = 'openai' | 'azure';
+type CharacterType = 'maestro' | 'coach' | 'buddy';
 
 interface ProviderConfig {
   provider: Provider;
@@ -28,17 +29,27 @@ interface ProviderConfig {
   headers: Record<string, string>;
 }
 
-function getProviderConfig(): ProviderConfig | null {
+function getProviderConfig(characterType: CharacterType = 'maestro'): ProviderConfig | null {
   // Priority 1: Azure OpenAI (GDPR compliant, configured for this project)
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
-  const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
+  const azureDeploymentPremium = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
+  const azureDeploymentMini = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI;
+
+  // Cost optimization: Use mini model by default, premium only for MirrorBuddy
+  // MirrorBuddy (buddy type) needs premium model for emotional detection quality
+  const usePremium = characterType === 'buddy';
+  const azureDeployment = usePremium ? azureDeploymentPremium : (azureDeploymentMini || azureDeploymentPremium);
 
   if (azureEndpoint && azureApiKey && azureDeployment) {
     const normalized = azureEndpoint
       .replace(/^https:\/\//, 'wss://')
       .replace(/^http:\/\//, 'ws://');
     const url = new URL(normalized);
+
+    // Log which deployment is being used
+    const modelTier = usePremium ? 'PREMIUM' : 'MINI';
+    logger.debug(`Using ${modelTier} deployment: ${azureDeployment} for characterType: ${characterType}`);
 
     // =========================================================================
     // AZURE REALTIME API: Preview vs GA
@@ -121,11 +132,20 @@ export function startRealtimeProxy(): void {
     const connectionId = crypto.randomUUID();
     const url = new URL(req.url || '/', `http://localhost:${WS_PROXY_PORT}`);
     const maestroId = url.searchParams.get('maestroId') || 'unknown';
+    const characterType = (url.searchParams.get('characterType') || 'maestro') as CharacterType;
 
-    logger.info(`Client connected: ${connectionId} for maestro: ${maestroId}`);
+    logger.info(`Client connected: ${connectionId} for maestro: ${maestroId} (${characterType})`);
+
+    // Get provider config with appropriate model deployment for this character type
+    const connectionConfig = getProviderConfig(characterType);
+    if (!connectionConfig) {
+      logger.error('Provider config not available for connection');
+      clientWs.close(4000, 'Service unavailable');
+      return;
+    }
 
     // Connect to backend (OpenAI or Azure)
-    const backendWs = new WebSocket(config.wsUrl, { headers: config.headers });
+    const backendWs = new WebSocket(connectionConfig.wsUrl, { headers: connectionConfig.headers });
 
     connections.set(connectionId, {
       clientWs,
@@ -178,7 +198,7 @@ export function startRealtimeProxy(): void {
       logger.error(`Backend WebSocket error for ${connectionId}`, { error: error.message });
       clientWs.send(JSON.stringify({
         type: 'error',
-        error: { message: `${config.provider} connection error: ${error.message}` },
+        error: { message: `${connectionConfig.provider} connection error: ${error.message}` },
       }));
     });
 

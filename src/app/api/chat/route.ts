@@ -121,16 +121,35 @@ export async function POST(request: NextRequest) {
     const cookieStore = await cookies();
     const userId = cookieStore.get('convergio-user-id')?.value;
 
-    // #87: Get user's provider preference from settings
+    // #87: Get user's provider preference and budget from settings
     let providerPreference: AIProvider | 'auto' | undefined;
+    let userSettings: { provider: string; budgetLimit: number; totalSpent: number } | null = null;
     if (userId) {
       try {
-        const settings = await prisma.settings.findUnique({
+        userSettings = await prisma.settings.findUnique({
           where: { userId },
-          select: { provider: true },
+          select: { provider: true, budgetLimit: true, totalSpent: true },
         });
-        if (settings?.provider && (settings.provider === 'azure' || settings.provider === 'ollama')) {
-          providerPreference = settings.provider;
+        if (userSettings?.provider && (userSettings.provider === 'azure' || userSettings.provider === 'ollama')) {
+          providerPreference = userSettings.provider;
+        }
+
+        // Check budget limit (WAVE 3: Token budget enforcement)
+        if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
+          logger.warn('Budget limit exceeded', {
+            userId,
+            totalSpent: userSettings.totalSpent,
+            budgetLimit: userSettings.budgetLimit,
+          });
+          return NextResponse.json(
+            {
+              error: 'Budget limit exceeded',
+              message: `You have reached your budget limit of $${userSettings.budgetLimit.toFixed(2)}. Please increase your budget in settings.`,
+              totalSpent: userSettings.totalSpent,
+              budgetLimit: userSettings.budgetLimit,
+            },
+            { status: 402 }
+          );
         }
       } catch (e) {
         // Settings lookup failure should not block chat
@@ -275,6 +294,31 @@ export async function POST(request: NextRequest) {
           issuesFound: sanitized.issuesFound,
           categories: sanitized.categories,
         });
+      }
+
+      // Update budget tracking if usage data is available (WAVE 3: Token budget enforcement)
+      if (userId && userSettings && result.usage) {
+        try {
+          // Rough cost estimation: $0.000002 per token for GPT-4o (adjust as needed)
+          const estimatedCost = (result.usage.total_tokens || 0) * 0.000002;
+          await prisma.settings.update({
+            where: { userId },
+            data: {
+              totalSpent: {
+                increment: estimatedCost,
+              },
+            },
+          });
+          logger.debug('Budget updated', {
+            userId,
+            tokensUsed: result.usage.total_tokens,
+            estimatedCost,
+            newTotal: userSettings.totalSpent + estimatedCost,
+          });
+        } catch (e) {
+          // Budget update failure should not block the response
+          logger.warn('Failed to update budget', { userId, error: String(e) });
+        }
       }
 
       return NextResponse.json({

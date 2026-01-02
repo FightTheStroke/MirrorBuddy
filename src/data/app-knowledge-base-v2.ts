@@ -169,14 +169,14 @@ export const FEATURE_INDEX: Record<string, KnowledgeCategory[]> = {
 // ============================================================================
 
 const KNOWLEDGE_CONTENT: Record<KnowledgeCategory, string> = {
-  maestri: `**17 Maestri Storici**
+  maestri: `**16 Maestri Storici**
 Tutori AI basati su figure storiche. Dalla home, scegli un Maestro per iniziare.
 - Euclide (Matematica), Marie Curie (Chimica), Feynman (Fisica)
 - Galileo (Astronomia), Darwin (Scienze), Manzoni (Italiano)
 - Shakespeare (Inglese), Erodoto (Storia), Humboldt (Geografia)
 - Da Vinci (Arte), Mozart (Musica), Ada Lovelace (Informatica)
 - Adam Smith (Economia), Socrate (Filosofia), Cicerone (Ed. Civica)
-- Ippocrate (Ed. Fisica), Chris (Storytelling)
+- Ippocrate (Ed. Fisica)
 Ogni Maestro ha stile unico. Possono creare flashcard, mappe, quiz durante le lezioni.`,
 
   voice: `**Chiamate Vocali**
@@ -346,7 +346,7 @@ export function generateCompactIndexPrompt(): string {
   return `## SUPPORTO PIATTAFORMA
 
 Conosci ConvergioEdu v${APP_VERSION.version} e puoi aiutare con:
-- 17 Maestri AI e chiamate vocali
+- 16 Maestri AI e chiamate vocali
 - Strumenti (flashcard FSRS, mappe mentali, quiz, demo)
 - Coach e Buddy (Triangle of Support)
 - Gamification (XP, livelli, streak, Pomodoro)
