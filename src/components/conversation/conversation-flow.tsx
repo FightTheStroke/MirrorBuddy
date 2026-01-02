@@ -144,6 +144,7 @@ export function ConversationFlow() {
     // Show maestro selection dialog
     setPendingToolType(toolType);
     setShowMaestroDialog(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- handleMaestroSelected is defined below and stable
   }, [isLoading]);
 
   // Handle maestro selection and create tool
