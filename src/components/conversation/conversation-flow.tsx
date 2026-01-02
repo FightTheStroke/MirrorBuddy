@@ -359,18 +359,18 @@ export function ConversationFlow() {
   }, [isVoiceActive, setMode, activeCharacter, conversationsByCharacter]);
 
   /**
-   * Handle accepting handoff.
+   * Handle accepting handoff (async to properly end previous conversation).
    */
-  const handleAcceptHandoff = () => {
-    acceptHandoff(extendedProfile);
+  const handleAcceptHandoff = async () => {
+    await acceptHandoff(extendedProfile);
   };
 
   /**
-   * Handle manual character switches.
+   * Handle manual character switches (async to properly end previous conversation).
    */
-  const handleSwitchToCoach = () => switchToCoach(extendedProfile);
-  const handleSwitchToBuddy = () => switchToBuddy(extendedProfile);
-  const handleGoBack = () => goBack(extendedProfile);
+  const handleSwitchToCoach = async () => await switchToCoach(extendedProfile);
+  const handleSwitchToBuddy = async () => await switchToBuddy(extendedProfile);
+  const handleGoBack = () => goBack(extendedProfile); // Sync: only navigates history
 
   // Render idle state (shouldn't happen with auto-start)
   if (!isActive || !activeCharacter) {
