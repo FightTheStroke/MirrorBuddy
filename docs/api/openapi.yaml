@@ -1,0 +1,580 @@
+openapi: 3.0.3
+info:
+  title: ConvergioEdu API
+  description: |
+    **ConvergioEdu** - La Scuola Che Vorrei
+    
+    AI-powered educational platform API for students with learning differences.
+    
+    ## Features
+    - 17 AI "Maestros" specialized in different subjects
+    - Voice-first interaction with Azure Realtime API
+    - FSRS-based spaced repetition flashcards
+    - Real-time collaborative mindmaps
+    - Parent dashboard and progress tracking
+    - Gamification with levels, streaks, and achievements
+    
+    ## Authentication
+    All API endpoints use cookie-based authentication with `convergio-user-id`.
+    The user ID is automatically generated on first visit and stored in sessionStorage.
+    
+    ## Rate Limiting
+    Most endpoints have rate limiting:
+    - General: 10 req/min per IP
+    - Chat: 5 req/min per user
+    - Voice: 10 req/min per user
+    
+  version: 2.0.0
+  contact:
+    name: Roberto D'Angelo
+    email: roberdan@fightthestroke.org
+    url: https://github.com/Roberdan/ConvergioEdu
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://convergio.edu/api
+    description: Production server
+
+tags:
+  - name: Health
+    description: Health check and metrics
+  - name: Maestri
+    description: AI Maestros (teachers) management
+  - name: Chat
+    description: Text-based conversations with Maestros
+  - name: Voice
+    description: Voice-based conversations (Azure Realtime API)
+  - name: Materials
+    description: Educational materials management
+  - name: Flashcards
+    description: FSRS-based spaced repetition flashcards
+  - name: Progress
+    description: Student progress and achievements
+  - name: Profile
+    description: Student profile and insights
+  - name: Parent
+    description: Parent dashboard and notes
+  - name: Collab
+    description: Real-time collaboration features
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Returns the health status of the API and its dependencies
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok, degraded, down]
+                  timestamp:
+                    type: string
+                    format: date-time
+                  version:
+                    type: string
+                  uptime:
+                    type: number
+                    description: Uptime in seconds
+
+  /metrics:
+    get:
+      tags:
+        - Health
+      summary: Get metrics
+      description: Returns Prometheus-compatible metrics
+      operationId: getMetrics
+      responses:
+        '200':
+          description: Metrics in Prometheus format
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /maestri:
+    get:
+      tags:
+        - Maestri
+      summary: List all Maestros
+      description: Returns a list of all available AI Maestros with their specializations
+      operationId: listMaestri
+      responses:
+        '200':
+          description: List of Maestros
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Maestro'
+
+  /maestri/{id}:
+    get:
+      tags:
+        - Maestri
+      summary: Get Maestro by ID
+      description: Returns details about a specific Maestro
+      operationId: getMaestro
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Maestro ID
+      responses:
+        '200':
+          description: Maestro details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Maestro'
+        '404':
+          description: Maestro not found
+
+  /chat:
+    post:
+      tags:
+        - Chat
+      summary: Send chat message
+      description: Send a message to a Maestro and receive a response
+      operationId: sendChatMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - messages
+                - maestroId
+              properties:
+                messages:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChatMessage'
+                maestroId:
+                  type: string
+                requestedTool:
+                  type: string
+                  enum: [mindmap, quiz, flashcard, demo, summary, diagram, timeline]
+                enableMemory:
+                  type: boolean
+                  default: true
+                  description: Enable conversation memory injection (ADR 0021)
+      responses:
+        '200':
+          description: Chat response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content:
+                    type: string
+                  toolCalls:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ToolCall'
+                  conversationId:
+                    type: string
+        '400':
+          description: Invalid request
+        '429':
+          description: Rate limit exceeded
+        '500':
+          description: Internal server error
+
+  /materials:
+    get:
+      tags:
+        - Materials
+      summary: List materials
+      description: Get list of educational materials created by the student
+      operationId: listMaterials
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [mindmap, quiz, flashcard, demo, summary, image]
+        - name: subject
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of materials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  materials:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Material'
+                  total:
+                    type: integer
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+    post:
+      tags:
+        - Materials
+      summary: Create material
+      description: Create a new educational material
+      operationId: createMaterial
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MaterialCreate'
+      responses:
+        '201':
+          description: Material created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Material'
+
+  /flashcards/progress:
+    get:
+      tags:
+        - Flashcards
+      summary: Get flashcard progress
+      description: Returns FSRS-based progress for all flashcards
+      operationId: getFlashcardProgress
+      responses:
+        '200':
+          description: Flashcard progress data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cards:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FlashcardProgress'
+                  stats:
+                    $ref: '#/components/schemas/FSRSStats'
+
+  /flashcards/review:
+    post:
+      tags:
+        - Flashcards
+      summary: Review flashcard
+      description: Record a flashcard review with quality rating (FSRS algorithm)
+      operationId: reviewFlashcard
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - flashcardId
+                - quality
+              properties:
+                flashcardId:
+                  type: string
+                quality:
+                  type: integer
+                  enum: [1, 2, 3, 4]
+                  description: |
+                    Quality rating:
+                    - 1: Again (forgot)
+                    - 2: Hard (remembered with difficulty)
+                    - 3: Good (remembered correctly)
+                    - 4: Easy (remembered very easily)
+      responses:
+        '200':
+          description: Review recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlashcardProgress'
+
+  /progress:
+    get:
+      tags:
+        - Progress
+      summary: Get student progress
+      description: Returns overall student progress including XP, level, streaks
+      operationId: getProgress
+      responses:
+        '200':
+          description: Student progress data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+
+  /profile:
+    get:
+      tags:
+        - Profile
+      summary: Get student profile
+      description: Returns student profile with learning preferences
+      operationId: getProfile
+      responses:
+        '200':
+          description: Student profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+    put:
+      tags:
+        - Profile
+      summary: Update student profile
+      description: Updates student profile information
+      operationId: updateProfile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+
+components:
+  schemas:
+    Maestro:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        subject:
+          type: string
+        icon:
+          type: string
+        personality:
+          type: string
+        expertise:
+          type: array
+          items:
+            type: string
+        systemPrompt:
+          type: string
+
+    ChatMessage:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+
+    ToolCall:
+      type: object
+      properties:
+        type:
+          type: string
+        arguments:
+          type: object
+        result:
+          type: object
+
+    Material:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        type:
+          type: string
+          enum: [mindmap, quiz, flashcard, demo, summary, image]
+        title:
+          type: string
+        content:
+          type: string
+        subject:
+          type: string
+        maestroId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    MaterialCreate:
+      type: object
+      required:
+        - type
+        - title
+        - content
+      properties:
+        type:
+          type: string
+          enum: [mindmap, quiz, flashcard, demo, summary, image]
+        title:
+          type: string
+        content:
+          type: string
+        subject:
+          type: string
+        maestroId:
+          type: string
+
+    FlashcardProgress:
+      type: object
+      properties:
+        id:
+          type: string
+        flashcardId:
+          type: string
+        userId:
+          type: string
+        stability:
+          type: number
+          description: Days until 90% forgetting probability
+        difficulty:
+          type: number
+          minimum: 0
+          maximum: 1
+        lastReview:
+          type: string
+          format: date-time
+        nextReview:
+          type: string
+          format: date-time
+        lapses:
+          type: integer
+          description: Number of times forgotten
+        reps:
+          type: integer
+          description: Total number of reviews
+
+    FSRSStats:
+      type: object
+      properties:
+        totalCards:
+          type: integer
+        cardsDue:
+          type: integer
+        cardsMastered:
+          type: integer
+          description: Cards with stability > 30 days
+        avgStability:
+          type: number
+        avgDifficulty:
+          type: number
+        predictedRetention:
+          type: number
+          minimum: 0
+          maximum: 1
+
+    Progress:
+      type: object
+      properties:
+        xp:
+          type: integer
+        level:
+          type: integer
+        streak:
+          type: integer
+          description: Current daily streak
+        achievements:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              unlockedAt:
+                type: string
+                format: date-time
+
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        age:
+          type: integer
+        schoolYear:
+          type: integer
+        schoolLevel:
+          type: string
+        learningGoals:
+          type: array
+          items:
+            type: string
+        preferredCoach:
+          type: string
+        preferredBuddy:
+          type: string
+
+    ProfileUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        age:
+          type: integer
+        schoolYear:
+          type: integer
+        schoolLevel:
+          type: string
+        learningGoals:
+          type: array
+          items:
+            type: string
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: convergio-user-id
+
+security:
+  - cookieAuth: []
