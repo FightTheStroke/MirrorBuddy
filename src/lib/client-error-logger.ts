@@ -67,6 +67,9 @@ function initClientErrorLogger(): void {
   // Skip in production
   if (process.env.NODE_ENV !== 'development') return;
 
+  // Skip in test/E2E environment (navigator.webdriver is set by Playwright, Selenium, etc.)
+  if (typeof navigator !== 'undefined' && navigator.webdriver) return;
+
   // Global error handler
   const originalOnError = window.onerror;
   window.onerror = (message, source, lineno, colno, error) => {
