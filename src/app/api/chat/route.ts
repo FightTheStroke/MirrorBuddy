@@ -8,7 +8,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
+import { chatCompletion, getActiveProvider, type AIProvider } from '@/lib/ai/providers';
+import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { filterInput, sanitizeOutput } from '@/lib/safety';
@@ -116,9 +117,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get userId from cookie for memory injection
+    // Get userId from cookie for memory injection and provider preference
     const cookieStore = await cookies();
     const userId = cookieStore.get('convergio-user-id')?.value;
+
+    // #87: Get user's provider preference from settings
+    let providerPreference: AIProvider | 'auto' | undefined;
+    if (userId) {
+      try {
+        const settings = await prisma.settings.findUnique({
+          where: { userId },
+          select: { provider: true },
+        });
+        if (settings?.provider && (settings.provider === 'azure' || settings.provider === 'ollama')) {
+          providerPreference = settings.provider;
+        }
+      } catch (e) {
+        // Settings lookup failure should not block chat
+        logger.debug('Failed to load provider preference', { error: String(e) });
+      }
+    }
 
     // Build enhanced system prompt with tool context
     let enhancedSystemPrompt = systemPrompt;
@@ -177,15 +195,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Get active provider info for response
-    const providerConfig = getActiveProvider();
+    // #87: Get active provider info for response (pass preference for consistency)
+    const providerConfig = getActiveProvider(providerPreference);
 
     try {
       // Call AI with optional tool definitions
       // Cast to mutable array since chatCompletion expects ToolDefinition[]
+      // #87: Pass user's provider preference to chatCompletion
       const result = await chatCompletion(messages, enhancedSystemPrompt, {
         tools: enableTools ? ([...CHAT_TOOL_DEFINITIONS] as typeof CHAT_TOOL_DEFINITIONS[number][]) : undefined,
         tool_choice: enableTools ? 'auto' : 'none',
+        providerPreference,
       });
 
       // Handle tool calls if present

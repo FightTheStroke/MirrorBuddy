@@ -16,6 +16,7 @@ import {
   RATE_LIMITS,
 } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 // OpenAI TTS voices
 type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
@@ -118,11 +119,20 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
  * Returns audio/mpeg stream.
  */
 export async function POST(request: NextRequest) {
-  // Rate limit check
+  // Rate limit check (before auth to prevent DDoS on auth lookup)
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`tts:${clientId}`, RATE_LIMITS.TTS);
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
+  }
+
+  // #84: Authentication check - TTS requires authenticated user
+  const auth = await validateAuth();
+  if (!auth.authenticated) {
+    return NextResponse.json(
+      { error: 'Authentication required' },
+      { status: 401 }
+    );
   }
 
   try {

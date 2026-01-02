@@ -182,9 +182,11 @@ export async function chatCompletion(
     maxTokens?: number;
     tools?: ToolDefinition[];
     tool_choice?: 'auto' | 'none' | { type: 'function'; function: { name: string } };
+    providerPreference?: AIProvider | 'auto';  // #87: User's provider preference
   }
 ): Promise<ChatCompletionResult> {
-  const config = getActiveProvider();
+  // #87: Use user's provider preference if specified
+  const config = getActiveProvider(options?.providerPreference);
   if (!config) {
     throw new Error('No AI provider configured');
   }

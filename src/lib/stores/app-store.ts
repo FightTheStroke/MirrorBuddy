@@ -113,7 +113,7 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>()(
   (set, get) => ({
       theme: 'system',
-      provider: 'openai',
+      provider: 'azure',  // #89: Changed from 'openai' - only azure/ollama supported
       model: 'gpt-4o',
       budgetLimit: 50,
       totalSpent: 0,
@@ -189,7 +189,7 @@ export const useSettingsStore = create<SettingsState>()(
         if (!state.pendingSync) return;
 
         try {
-          // Sync settings
+          // Sync settings - #88: Added totalSpent to persist budget tracking
           await fetch('/api/user/settings', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -198,6 +198,7 @@ export const useSettingsStore = create<SettingsState>()(
               provider: state.provider,
               model: state.model,
               budgetLimit: state.budgetLimit,
+              totalSpent: state.totalSpent,  // #88: Now persisted
               language: state.appearance.language,
               accentColor: state.appearance.accentColor,
             }),
@@ -248,6 +249,7 @@ export const useSettingsStore = create<SettingsState>()(
               provider: settings.provider ?? state.provider,
               model: settings.model ?? state.model,
               budgetLimit: settings.budgetLimit ?? state.budgetLimit,
+              totalSpent: settings.totalSpent ?? state.totalSpent,  // #88: Load from server
               appearance: {
                 ...state.appearance,
                 language: settings.language ?? state.appearance.language,
