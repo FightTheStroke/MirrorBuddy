@@ -7,7 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - Sprint January 2026 Complete
 
-> **Branch**: `development` | **Plan**: `docs/plans/doing/MasterPlan-v2.1-2026-01-02.md`
+> **Branch**: `development` | **Plan**: `docs/plans/done/MasterPlan-v2.1-2026-01-02.md`
+
+### Changed (Jan 3 - Rebrand)
+
+- **Package Rename**: `convergio-edu` → `mirrorbuddy`
+- **Source Code**: All headers and comments updated
+- **Metrics**: API metric names updated (`convergio_*` → `mirrorbuddy_*`)
+- **Documentation**: All ADRs and docs updated with new branding
+- **E2E Tests**: Updated to use MirrorBuddy branding
+
+### Added (Jan 3 - Admin Dashboard)
+
+- **Admin Analytics Dashboard** (`/admin/analytics`):
+  - Token usage statistics (total tokens, calls, avg per call, estimated cost)
+  - Voice metrics (sessions, TTS generations, realtime sessions)
+  - Flashcard FSRS stats (cards, reviews, accuracy, cards due)
+  - Rate limiting events (total, by endpoint)
+  - Safety events (total, by severity, unresolved count)
+- **New API Routes**:
+  - `GET /api/dashboard/token-usage` - AI token usage stats
+  - `GET /api/dashboard/voice-metrics` - Voice session metrics
+  - `GET /api/dashboard/fsrs-stats` - Flashcard FSRS statistics
+  - `GET /api/dashboard/rate-limits` - Rate limit events
+  - `GET /api/dashboard/safety-events` - Safety monitoring data
+  - `POST /api/dashboard/safety-events` - Resolve safety events
+- **Database Models**:
+  - `RateLimitEvent` - Stores rate limit violations
+  - `SafetyEvent` - Stores safety monitoring events
+- **Persistence Layer**:
+  - `src/lib/rate-limit.ts` - Rate limit event logging
+  - `src/lib/safety/monitoring.ts` - Safety event persistence
 
 ### Fixed (WAVE 0 Critical Bugs)
 
