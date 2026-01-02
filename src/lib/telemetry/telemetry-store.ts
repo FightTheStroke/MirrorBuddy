@@ -352,6 +352,11 @@ export function trackPerformance(metricName: string, valueMs: number, metadata?:
  * Initialize telemetry on app start.
  */
 export function initializeTelemetry() {
+  // Skip telemetry in test/E2E environment (navigator.webdriver is set by Playwright, Selenium, etc.)
+  if (typeof navigator !== 'undefined' && navigator.webdriver) {
+    return () => {}; // Return no-op cleanup function
+  }
+
   const store = useTelemetryStore.getState();
 
   // Start session
