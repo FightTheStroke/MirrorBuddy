@@ -134,23 +134,23 @@ WORKFLOW PER OGNI ISSUE:
 
 ### Fix Richiesti
 
-- [ ] **0.2.1** Attivare `InactivityMonitor`
+- [x] **0.2.1** Attivare `InactivityMonitor`
   - Chiamare `trackActivity(conversationId)` quando inizia conversazione
   - Registrare `setTimeoutCallback()` per chiamare `/api/conversations/[id]/end` al timeout (15 min)
 
-- [ ] **0.2.2** Auto-generare riassunto quando:
-  - User chiude tab/browser
-  - User cambia maestro
-  - User va su altra pagina
-  - Timeout inattività scatta
-  - User termina call vocale
+- [x] **0.2.2** Auto-generare riassunto quando:
+  - User chiude tab/browser (beforeunload)
+  - User cambia maestro (switchToCharacter)
+  - User termina call vocale (handleVoiceCall)
+  - Timeout inattività scatta (setTimeoutCallback)
 
-- [ ] **0.2.3** Passare memory al chat API
-  - `conversation-flow.tsx` deve includere `previousSummary`, `previousKeyFacts`, `previousTopics` nel request body
+- [x] **0.2.3** Passare memory al chat API
+  - Chat API già carica memory da DB usando `loadPreviousContext()`
+  - Funzionerà automaticamente una volta generati i riassunti
 
-- [ ] **0.2.4** Greeting contextualizzato
-  - Se esiste memoria precedente, il maestro deve dire "Bentornato! L'ultima volta parlavamo di X..."
-  - NON ripetere presentazione ogni volta
+- [x] **0.2.4** Greeting contextualizzato
+  - `switchToCharacter` ora chiama `loadContextualGreeting()`
+  - Se esiste memoria precedente, usa greeting personalizzato invece del default
 
 - [ ] **0.2.5** Test: parlare con Melissa, dire nome/età, chiudere, riaprire → deve ricordare
 

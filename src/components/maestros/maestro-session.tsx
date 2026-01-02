@@ -44,6 +44,7 @@ import { WebcamCapture } from '@/components/tools/webcam-capture';
 import { EvaluationCard } from '@/components/chat/evaluation-card';
 import { VoicePanel } from '@/components/voice';
 import { logger } from '@/lib/logger';
+import toast from '@/components/ui/toast';
 import type { Maestro, ChatMessage, ToolCall, SessionEvaluation } from '@/types';
 
 // Constants for score/XP calculations (extracted for clarity)
@@ -406,6 +407,13 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     // Update progress
     addXP(xpEarned);
     endSession();
+
+    // Show XP toast notification
+    toast.success(
+      `+${xpEarned} XP guadagnati!`,
+      `${sessionDuration} minuti di studio, ${questionCount.current} domande fatte. Ottimo lavoro!`,
+      { duration: 6000 }
+    );
   }, [isVoiceActive, disconnect, maestro.id, messages, addXP, endSession]);
 
   // Handle text submit - wrapped in useCallback for performance

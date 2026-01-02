@@ -8,6 +8,7 @@ import { usePomodoroStore, PomodoroPhase } from '@/lib/stores/pomodoro-store';
 import { useProgressStore } from '@/lib/stores/app-store';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
+import toast from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 
 // XP rewards for Pomodoro
@@ -148,11 +149,18 @@ export function PomodoroHeaderWidget() {
 
           // Notification with XP info
           const bonusText = bonuses.length > 0 ? ` (${bonuses.join(', ')})` : '';
-          showNotification(
+          const notificationBody = isLongBreak
+            ? `Ottimo lavoro! Fai una pausa lunga di ${settings.longBreakMinutes} minuti.${bonusText}`
+            : `Bravo! Fai una pausa di ${settings.shortBreakMinutes} minuti.${bonusText}`;
+
+          // Browser notification (if permitted)
+          showNotification(`Pomodoro completato! +${xpEarned} XP`, notificationBody);
+
+          // Toast notification (always visible)
+          toast.success(
             `Pomodoro completato! +${xpEarned} XP`,
-            isLongBreak
-              ? `Ottimo lavoro! Fai una pausa lunga di ${settings.longBreakMinutes} minuti.${bonusText}`
-              : `Bravo! Fai una pausa di ${settings.shortBreakMinutes} minuti.`
+            notificationBody,
+            { duration: 6000 }
           );
         } else {
           // Break ended

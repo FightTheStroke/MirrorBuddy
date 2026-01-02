@@ -274,15 +274,15 @@ interface ConversationFlowState {
     type: CharacterType,
     profile: ExtendedStudentProfile,
     reason?: string
-  ) => void;
-  switchToCoach: (profile: ExtendedStudentProfile) => void;
-  switchToMaestro: (maestro: MaestroFull, profile: ExtendedStudentProfile) => void;
-  switchToBuddy: (profile: ExtendedStudentProfile) => void;
+  ) => Promise<void>;
+  switchToCoach: (profile: ExtendedStudentProfile) => Promise<void>;
+  switchToMaestro: (maestro: MaestroFull, profile: ExtendedStudentProfile) => Promise<void>;
+  switchToBuddy: (profile: ExtendedStudentProfile) => Promise<void>;
   goBack: (profile: ExtendedStudentProfile) => boolean;
 
   // Handoff management
   suggestHandoff: (suggestion: HandoffSuggestion) => void;
-  acceptHandoff: (profile: ExtendedStudentProfile) => void;
+  acceptHandoff: (profile: ExtendedStudentProfile) => Promise<void>;
   dismissHandoff: () => void;
 
   // Conversation history
@@ -579,8 +579,47 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         });
       },
 
-      switchToCharacter: (character, type, profile, _reason) => {
+      switchToCharacter: async (character, type, profile, _reason) => {
         const state = get();
+
+        // #98: End current conversation with summary before switching
+        const currentConversationId = state.activeCharacter
+          ? state.conversationsByCharacter[state.activeCharacter.id]?.conversationId
+          : null;
+
+        if (currentConversationId && state.messages.length > 2) {
+          try {
+            // Get userId from sessionStorage
+            let userId: string | null = null;
+            if (typeof window !== 'undefined') {
+              userId = sessionStorage.getItem('convergio-user-id');
+            }
+
+            if (userId) {
+              logger.info('Switching character, ending previous conversation', {
+                from: state.activeCharacter?.id,
+                to: character.id,
+                conversationId: currentConversationId
+              });
+
+              const response = await fetch(`/api/conversations/${currentConversationId}/end`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, reason: 'character_switch' }),
+              });
+
+              if (!response.ok) {
+                logger.error('Failed to end conversation on character switch', {
+                  status: response.status
+                });
+              }
+            }
+          } catch (error) {
+            logger.error('Error ending conversation on character switch', {
+              error: String(error)
+            });
+          }
+        }
 
         // 1. Save current conversation to its bucket
         const savedConversations = saveCurrentConversation(state);
@@ -592,12 +631,38 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         let messages = loadConversationMessages(savedConversations, character.id);
 
         if (messages.length === 0) {
+          // #98: Try to load contextual greeting based on previous conversations
+          let greeting = activeCharacter.greeting;
+
+          if (typeof window !== 'undefined') {
+            const userId = sessionStorage.getItem('convergio-user-id');
+            if (userId) {
+              try {
+                const contextualGreeting = await get().loadContextualGreeting(
+                  userId,
+                  character.id,
+                  profile.name,
+                  activeCharacter.name
+                );
+
+                if (contextualGreeting) {
+                  greeting = contextualGreeting;
+                  logger.info('Using contextual greeting', { characterId: character.id });
+                }
+              } catch (error) {
+                logger.warn('Failed to load contextual greeting, using default', {
+                  error: String(error)
+                });
+              }
+            }
+          }
+
           // No existing conversation - add greeting
           messages = [
             {
               id: crypto.randomUUID(),
               role: 'assistant',
-              content: activeCharacter.greeting,
+              content: greeting,
               timestamp: new Date(),
               characterId: activeCharacter.id,
               characterType: type,
@@ -620,18 +685,18 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         });
       },
 
-      switchToCoach: (profile) => {
+      switchToCoach: async (profile) => {
         const coach = getDefaultSupportTeacher();
-        get().switchToCharacter(coach, 'coach', profile);
+        await get().switchToCharacter(coach, 'coach', profile);
       },
 
-      switchToMaestro: (maestro, profile) => {
-        get().switchToCharacter(maestro, 'maestro', profile);
+      switchToMaestro: async (maestro, profile) => {
+        await get().switchToCharacter(maestro, 'maestro', profile);
       },
 
-      switchToBuddy: (profile) => {
+      switchToBuddy: async (profile) => {
         const buddy = getBuddyForStudent(profile);
-        get().switchToCharacter(buddy, 'buddy', profile);
+        await get().switchToCharacter(buddy, 'buddy', profile);
       },
 
       goBack: (profile) => {
@@ -693,12 +758,12 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         set({ pendingHandoff: suggestion });
       },
 
-      acceptHandoff: (profile) => {
+      acceptHandoff: async (profile) => {
         const state = get();
         if (!state.pendingHandoff) return;
 
         const { toCharacter } = state.pendingHandoff;
-        get().switchToCharacter(toCharacter.character, toCharacter.type, profile);
+        await get().switchToCharacter(toCharacter.character, toCharacter.type, profile);
       },
 
       dismissHandoff: () => {

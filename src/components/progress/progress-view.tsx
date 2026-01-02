@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProgressStore } from '@/lib/stores/app-store';
+import { XPInfo } from '@/components/gamification';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectColors, subjectIcons } from '@/data';
 import type { Subject } from '@/types';
@@ -368,6 +369,16 @@ function OverviewTab({ xp, level, levelProgress, streak, masteries }: OverviewTa
               </div>
             </div>
           ))}
+        </CardContent>
+      </Card>
+
+      {/* XP Earning Guide - Full width */}
+      <Card className="lg:col-span-2">
+        <CardHeader>
+          <CardTitle>Come Guadagnare XP</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <XPInfo />
         </CardContent>
       </Card>
     </div>
