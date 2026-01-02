@@ -361,7 +361,7 @@ function escapeXML(text: string): string {
  * Generate unique ID
  */
 function generateId(): string {
-  return `id_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  return `id_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
 }
 
 /**

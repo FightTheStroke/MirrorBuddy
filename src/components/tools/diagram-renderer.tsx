@@ -61,7 +61,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         containerRef.current.innerHTML = '';
 
         // Generate unique ID
-        const id = `mermaid-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        const id = `mermaid-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 
         // Render diagram
         const { svg } = await mermaid.render(id, request.code);
