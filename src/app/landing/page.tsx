@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   GraduationCap,
   Brain,
@@ -69,7 +70,7 @@ export default function LandingPage() {
           <div className="text-center">
             {/* Logo */}
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white/10 backdrop-blur-sm mb-8 shadow-2xl shadow-purple-500/25 overflow-hidden">
-              <img src="/logo-brain.png" alt="MirrorBuddy" className="w-20 h-20 object-contain" />
+              <Image src="/logo-brain.png" alt="MirrorBuddy" width={80} height={80} className="object-contain" />
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">

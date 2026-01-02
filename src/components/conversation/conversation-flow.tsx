@@ -118,43 +118,6 @@ export function ConversationFlow() {
     preferredBuddy: studentProfile.preferredBuddy,
   }), [studentProfile]);
 
-  // Handle tool request from ToolButtons - show maestro selection dialog
-  const handleToolRequest = useCallback((toolType: ToolType) => {
-    if (isLoading) return;
-
-    // Check for pending tool request in sessionStorage (from maestri-grid)
-    const pendingRequest = sessionStorage.getItem('pendingToolRequest');
-    if (pendingRequest) {
-      try {
-        const parsed = JSON.parse(pendingRequest);
-        // Validate parsed object has expected properties
-        if (typeof parsed !== 'object' || parsed === null) {
-          throw new Error('Invalid pendingToolRequest format');
-        }
-        const { tool, maestroId } = parsed;
-        if (typeof tool !== 'string' || typeof maestroId !== 'string') {
-          throw new Error('Missing tool or maestroId in pendingToolRequest');
-        }
-        if (tool === toolType && maestroId) {
-          // Use maestro from pending request - fetch full object for type safety
-          const maestro = getMaestroById(maestroId);
-          if (maestro) {
-            sessionStorage.removeItem('pendingToolRequest');
-            handleMaestroSelected(maestro, toolType);
-            return;
-          }
-        }
-      } catch (error) {
-        logger.error('Failed to parse pendingToolRequest', { error });
-        sessionStorage.removeItem('pendingToolRequest'); // Clean up invalid data
-      }
-    }
-
-    // Show maestro selection dialog
-    setPendingToolType(toolType);
-    setShowMaestroDialog(true);
-  }, [isLoading]);
-
   // Handle maestro selection and create tool
   const handleMaestroSelected = useCallback(async (maestro: MaestroFull, toolType: ToolType) => {
     if (isLoading) return;
@@ -250,6 +213,38 @@ export function ConversationFlow() {
       setIsLoading(false);
     }
   }, [isLoading, messages, addMessage]);
+
+  // Handle tool request from ToolButtons - show maestro selection dialog
+  const handleToolRequest = useCallback((toolType: ToolType) => {
+    if (isLoading) return;
+
+    // Check for pending tool request in sessionStorage (from maestri-grid)
+    const pendingRequest = sessionStorage.getItem('pendingToolRequest');
+    if (pendingRequest) {
+      try {
+        const parsed = JSON.parse(pendingRequest);
+        // Validate parsed structure before destructuring
+        if (parsed && typeof parsed === 'object' && 'tool' in parsed && 'maestroId' in parsed) {
+          const { tool, maestroId } = parsed;
+          if (tool === toolType && maestroId) {
+            // Use maestro from pending request - fetch full object for type safety
+            const maestro = getMaestroById(maestroId);
+            if (maestro) {
+              sessionStorage.removeItem('pendingToolRequest');
+              handleMaestroSelected(maestro, toolType);
+              return;
+            }
+          }
+        }
+      } catch (error) {
+        logger.error('Failed to parse pendingToolRequest', { error });
+      }
+    }
+
+    // Show maestro selection dialog
+    setPendingToolType(toolType);
+    setShowMaestroDialog(true);
+  }, [isLoading, handleMaestroSelected]);
 
   // Auto-scroll to bottom
   useEffect(() => {
