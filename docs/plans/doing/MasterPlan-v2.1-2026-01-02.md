@@ -509,6 +509,42 @@ Test manuali separati:
 - Basic layout implemented (sidebar, tool area, panel)
 - Need: redesign to match phone-call UI style for consistency
 
+### 🔴 NEW: Layout Requirements (da screenshot Roberto)
+
+Il layout focus-tool DEVE essere IDENTICO allo stile delle conversazioni vocali:
+
+**Header (gradient viola):**
+- Avatar circolare piccolo + Nome + "In chiamata vocale" status
+- Bottone chiudi chiamata (icona forbici) in alto a destra
+
+**Panel Destro (stile conversazione):**
+- Avatar GRANDE circolare con ring/bordo bianco
+- Nome sotto avatar
+- Ruolo sotto nome ("Coach di Apprendimento" / "Maestro di [Materia]")
+- Status "Connesso" / indicatore puntini
+- Bottoni: Mute (mic) + End Call (forbici rosse)
+- Testo "Parla ora..."
+
+**Chat Messages (sinistra):**
+- Avatar piccolo per ogni messaggio
+- Timestamp sotto messaggio
+- Icona speaker per messaggi vocali
+
+**Colori:** Gradient viola header, sfondo bianco/grigio chiaro
+
+### 🔴 BUGS ANCORA APERTI (segnalati da Roberto)
+
+**Bug: Tools ANCORA non funzionano!**
+- Potrebbe essere cache browser o server non riavviato
+- Verificare che fix c00507e sia attivo
+- DA INVESTIGARE URGENTE
+
+**Bug: Conversazioni NON riprendono dall'ultima volta!**
+- Memory system implementato ma non funziona
+- `loadContextualGreeting()` potrebbe non essere chiamato
+- `loadPreviousContext()` potrebbe fallire silenziosamente
+- DA INVESTIGARE URGENTE
+
 ### ❌ Not Started
 
 **Bug 0.5 - Parent Dashboard:**
