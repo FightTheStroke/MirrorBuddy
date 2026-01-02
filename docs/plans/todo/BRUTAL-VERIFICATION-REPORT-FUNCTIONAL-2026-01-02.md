@@ -159,13 +159,19 @@ Tutti i 6 bug + 3 waves hanno CODICE implementato:
 
 ---
 
-### 🔴 PROBLEMA 4 (NUOVO): Voice Onboarding Fallback
+### ✅ PROBLEMA 4 (NUOVO): Voice Onboarding Fallback - FIXED
 
 **Problema riportato**:
 > "durante il welcome si passa dalla voce di mellissa a quella web del cazzo"
 
 **Claim nel CHANGELOG.md:639**:
 > "Onboarding Voice Session (#61): Voice session now persists across onboarding steps, preventing disconnect/reconnect and fallback to Web Speech API"
+
+**FIX APPLICATO** (commit: 0440672):
+- Aggiunto retry logic con exponential backoff (2s, 4s, 8s)
+- Max 3 retry attempts prima di fallback permanente
+- Auto-reset retry counter quando voice session recupera
+- Logging chiaro per debug
 
 **Codice verificato**:
 1. **Single voice session**: `src/app/welcome/page.tsx:92-106`
@@ -206,13 +212,14 @@ Tutti i 6 bug + 3 waves hanno CODICE implementato:
 
 **MA `use-voice-session.ts` NON HA RETRY LOGIC** ❌
 
-**SOLUZIONE RICHIESTA**:
-1. Aggiungere retry automatico su errore voce (max 3 tentativi)
-2. Backoff esponenziale (2s, 4s, 8s)
-3. Solo dopo 3 fallimenti → fallback permanente a Web Speech
-4. Log chiari per debug ("Voice session retry 1/3...")
+**SOLUZIONE IMPLEMENTATA** ✅:
+1. ✅ Retry automatico su errore voce (max 3 tentativi)
+2. ✅ Backoff esponenziale (2s, 4s, 8s)
+3. ✅ Solo dopo 3 fallimenti → fallback permanente a Web Speech
+4. ✅ Log chiari per debug ("Voice session retry 1/3...")
 
-**IMPATTO**: ALTO - Gli utenti vedono Melissa passare alla voce robotica mid-onboarding
+**File modificato**: `src/app/welcome/page.tsx`
+**Commit**: 0440672 on development branch
 
 ---
 
@@ -366,7 +373,7 @@ Roberto ha riportato 4 problemi:
 1. ❌ **Tools in full mode broken** - Codice sembra corretto, serve test
 2. ❌ **Mindmaps lineari** - Istruzioni ESPLICITE presenti, ma AI potrebbe ignorarle
 3. ❓ **Layout sbagliato** - Codice CORRISPONDE alla spec, serve screenshot per capire
-4. ❌ **Voice fallback** - BUG CONFERMATO: no retry logic
+4. ✅ **Voice fallback** - FIXED in commit 0440672 (retry logic implementato)
 
 **NEXT STEP OBBLIGATORIO**: Roberto DEVE eseguire i 3 test manuali (TEST 1, 2, 3) per confermare o smentire i problemi funzionali.
 
