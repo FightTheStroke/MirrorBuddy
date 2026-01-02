@@ -81,6 +81,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
       if (kit.status === 'ready') {
         setUploadStatus('success');
         setUploadProgress(100);
+        setIsUploading(false);
         if (pollIntervalRef.current) {
           clearInterval(pollIntervalRef.current);
           pollIntervalRef.current = null;
@@ -89,6 +90,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
       } else if (kit.status === 'error') {
         setUploadStatus('error');
         setErrorMessage(kit.errorMessage || 'Errore durante la generazione');
+        setIsUploading(false);
         if (pollIntervalRef.current) {
           clearInterval(pollIntervalRef.current);
           pollIntervalRef.current = null;

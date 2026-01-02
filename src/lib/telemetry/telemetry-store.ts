@@ -368,7 +368,10 @@ export function initializeTelemetry() {
     // Use sendBeacon for reliable delivery on close
     const events = useTelemetryStore.getState().eventQueue;
     if (events.length > 0) {
-      navigator.sendBeacon('/api/telemetry/events', JSON.stringify({ events }));
+      navigator.sendBeacon(
+        '/api/telemetry/events',
+        new Blob([JSON.stringify({ events })], { type: 'application/json' })
+      );
     }
   };
 
