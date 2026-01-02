@@ -92,15 +92,15 @@ WORKFLOW PER OGNI ISSUE:
 
 ### Fix Richiesti
 
-- [ ] **0.1.1** Aggiungere `ToolMaestroSelectionDialog` a `conversation-flow.tsx`
+- [x] **0.1.1** Aggiungere `ToolMaestroSelectionDialog` a `conversation-flow.tsx`
   - Quando user chiede tool, aprire dialog per scegliere maestro
   - Usare `maestro.id` per POST a /api/chat invece di `activeCharacter.id`
 
-- [ ] **0.1.2** Fix fallback silenzioso in `focus-tool-layout.tsx`
+- [x] **0.1.2** Fix fallback silenzioso in `focus-tool-layout.tsx`
   - Se `focusMaestroId` è null, mostrare errore o dialog di selezione
   - NON fallback silenzioso a Melissa
 
-- [ ] **0.1.3** Verificare `pendingToolRequest` in sessionStorage
+- [x] **0.1.3** Verificare `pendingToolRequest` in sessionStorage
   - `conversation-flow.tsx` deve leggere `pendingToolRequest` se presente
   - Altrimenti aprire dialog selezione maestro
 
@@ -170,9 +170,12 @@ Stesso problema di BUG 0.1: il flusso `conversation-flow.tsx` non permette di se
 
 ### Fix Richiesti
 
-- [ ] **0.3.1** Verificare che `demo-handler.ts` sia registrato in `handlers/index.ts`
-- [ ] **0.3.2** Aggiungere "Demo Interattiva" al dialog di selezione tool
-- [ ] **0.3.3** Stesso fix di 0.1.1: permettere selezione maestro per creare demo
+- [x] **0.3.1** Verificare che `demo-handler.ts` sia registrato in `handlers/index.ts`
+  - ✅ Verified: `demo-handler.ts` is properly registered in `/src/lib/tools/handlers/index.ts`
+- [x] **0.3.2** Aggiungere "Demo Interattiva" al dialog di selezione tool
+  - ✅ Added 'demo' type to ToolMaestroSelectionDialog TOOL_NAMES mapping
+- [x] **0.3.3** Stesso fix di 0.1.1: permettere selezione maestro per creare demo
+  - ✅ Demo creation now uses maestro selection dialog (same flow as other tools)
 - [ ] **0.3.4** Test: chiedere a Galileo di creare demo sul sistema solare
 
 ---
