@@ -46,10 +46,10 @@ export function XPInfo({ className }: XPInfoProps) {
               Flashcards
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• 2 XP per "Ancora" (ripeti)</li>
-              <li>• 5 XP per "Difficile"</li>
-              <li>• 10 XP per "Bene"</li>
-              <li>• 15 XP per "Facile"</li>
+              <li>• 2 XP per &ldquo;Ancora&rdquo; (ripeti)</li>
+              <li>• 5 XP per &ldquo;Difficile&rdquo;</li>
+              <li>• 10 XP per &ldquo;Bene&rdquo;</li>
+              <li>• 15 XP per &ldquo;Facile&rdquo;</li>
               <li>• Bonus XP per completare mazzi interi</li>
             </ul>
           </div>
