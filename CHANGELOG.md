@@ -47,6 +47,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `material-card.test.tsx`: 50 tests (rendering, selection, favorites, drag & drop, menu)
 - All components WCAG 2.1 AA compliant with keyboard navigation and ARIA attributes
 
+#### Knowledge Hub Hooks (Phase 5, Tasks 5.23-5.28)
+- **useMaterialsSearch** (`src/components/education/knowledge-hub/hooks/use-materials-search.ts`):
+  - Fuse.js fuzzy search integration with configurable threshold
+  - Debounced query execution with adjustable delay
+  - Type filtering (all, quiz, mindmap, flashcard, etc.)
+  - Result highlighting support
+  - Helper functions: `sortMaterialsByRecency`, `filterMaterials`
+- **useCollections** (`src/components/education/knowledge-hub/hooks/use-collections.ts`):
+  - CRUD operations for collections/folders
+  - Hierarchical tree structure with parent-child relationships
+  - Breadcrumb path generation
+  - Material movement between collections
+- **useTags** (`src/components/education/knowledge-hub/hooks/use-tags.ts`):
+  - CRUD operations for tags
+  - Multi-select tag filtering
+  - Tag-to-material association management
+  - Material count tracking per tag
+  - 16 predefined colors with `getRandomTagColor` utility
+- **useSmartCollections** (`src/components/education/knowledge-hub/hooks/use-smart-collections.ts`):
+  - Dynamic collections: Recent (7 days), Favorites, Archived
+  - Time-based: Today, This Week, This Month
+  - Type-based: Quiz, Mindmap, Flashcard, Summary, etc. (13 types)
+  - Auto-sorting by creation date (newest first)
+- **useBulkActions** (`src/components/education/knowledge-hub/hooks/use-bulk-actions.ts`):
+  - Multi-select management with Set-based state
+  - Bulk operations: Move, Add Tags, Archive, Restore, Delete, Duplicate
+  - Loading and error state management
+  - Selection callbacks for external sync
+- **129 Unit Tests** (`src/components/education/knowledge-hub/hooks/__tests__/`):
+  - `use-materials-search.test.ts`: 26 tests (search, debounce, filtering, sorting)
+  - `use-collections.test.ts`: 27 tests (CRUD, tree building, breadcrumbs)
+  - `use-tags.test.ts`: 31 tests (CRUD, selection, material associations)
+  - `use-smart-collections.test.ts`: 20 tests (time filters, type grouping)
+  - `use-bulk-actions.test.ts`: 25 tests (selection, actions, error handling)
+
 #### Knowledge Hub Renderer Registry (Phase 5, Tasks 5.03-5.15)
 - **Renderer Registry** (`src/components/education/knowledge-hub/renderers/index.tsx`):
   - Lazy loading with dynamic imports for code splitting

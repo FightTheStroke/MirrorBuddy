@@ -212,23 +212,23 @@ Componenti riutilizzabili con ACCESSIBILITY.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.17 | SearchBar component (keyboard, aria) | `src/components/education/knowledge-hub/components/search-bar.tsx` | ✅ | |
-| 5.18 | SidebarNavigation (keyboard nav) | `src/components/education/knowledge-hub/components/sidebar-navigation.tsx` | ✅ | |
-| 5.19 | QuickActions component | `src/components/education/knowledge-hub/components/quick-actions.tsx` | ✅ | |
-| 5.20 | BulkToolbar component | `src/components/education/knowledge-hub/components/bulk-toolbar.tsx` | ✅ | |
-| 5.21 | StatsPanel component | `src/components/education/knowledge-hub/components/stats-panel.tsx` | ✅ | |
-| 5.22 | MaterialCard with drag & drop (keyboard alternative) | `src/components/education/knowledge-hub/components/material-card.tsx` | ✅ | |
+| 5.17 | SearchBar component (keyboard, aria) | `src/components/education/knowledge-hub/components/search-bar.tsx` | ✅ | ✅ |
+| 5.18 | SidebarNavigation (keyboard nav) | `src/components/education/knowledge-hub/components/sidebar-navigation.tsx` | ✅ | ✅ |
+| 5.19 | QuickActions component | `src/components/education/knowledge-hub/components/quick-actions.tsx` | ✅ | ✅ |
+| 5.20 | BulkToolbar component | `src/components/education/knowledge-hub/components/bulk-toolbar.tsx` | ✅ | ✅ |
+| 5.21 | StatsPanel component | `src/components/education/knowledge-hub/components/stats-panel.tsx` | ✅ | ✅ |
+| 5.22 | MaterialCard with drag & drop (keyboard alternative) | `src/components/education/knowledge-hub/components/material-card.tsx` | ✅ | ✅ |
 
 ### 5D: Knowledge Hub Hooks
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.23 | useMaterialsSearch hook | `src/components/education/knowledge-hub/hooks/use-materials-search.ts` | | |
-| 5.24 | useCollections hook | `src/components/education/knowledge-hub/hooks/use-collections.ts` | | |
-| 5.25 | useTags hook | `src/components/education/knowledge-hub/hooks/use-tags.ts` | | |
-| 5.26 | useSmartCollections hook | `src/components/education/knowledge-hub/hooks/use-smart-collections.ts` | | |
-| 5.27 | useBulkActions hook | `src/components/education/knowledge-hub/hooks/use-bulk-actions.ts` | | |
-| 5.28 | Unit tests for all hooks | `src/components/education/knowledge-hub/hooks/__tests__/` | | |
+| 5.23 | useMaterialsSearch hook | `src/components/education/knowledge-hub/hooks/use-materials-search.ts` | ✅ | |
+| 5.24 | useCollections hook | `src/components/education/knowledge-hub/hooks/use-collections.ts` | ✅ | |
+| 5.25 | useTags hook | `src/components/education/knowledge-hub/hooks/use-tags.ts` | ✅ | |
+| 5.26 | useSmartCollections hook | `src/components/education/knowledge-hub/hooks/use-smart-collections.ts` | ✅ | |
+| 5.27 | useBulkActions hook | `src/components/education/knowledge-hub/hooks/use-bulk-actions.ts` | ✅ | |
+| 5.28 | Unit tests for all hooks | `src/components/education/knowledge-hub/hooks/__tests__/` | ✅ | |
 
 ---
 
