@@ -19,9 +19,7 @@ docs/plans/
 
 | Plan | Data | Descrizione | Priority |
 |------|------|-------------|----------|
-| 🔴 [FUNCTIONAL VERIFICATION](todo/BRUTAL-VERIFICATION-REPORT-FUNCTIONAL-2026-01-02.md) | 2026-01-02 | **CRITICAL - Functional issues found - BLOCKS PR merge** | **CRITICAL** |
-| 🔴 [BRUTAL VERIFICATION REPORT](todo/BRUTAL-VERIFICATION-REPORT-2026-01-02.md) | 2026-01-02 | Code existence verified - See functional report for issues | HIGH |
-| [ManualTests Sprint 2026-01](todo/ManualTests-Sprint-2026-01.md) | 2026-01-02 | Test manuali per chiudere MasterPlan v2.1 | HIGH |
+| 🔴 [TESTS TO BE DONE ASAP](todo/TestToBeDoneAsap.md) | 2026-01-02 | **CRITICAL - E2E failures + Manual tests - BLOCKS PR merge** | **CRITICAL** |
 | [ToolsInChatNavigation](todo/ToolsInChatNavigation-2026-01-02.md) | 2026-01-02 | Fix navigazione tool nella chat normale | MEDIUM |
 | [RepoMigration-MirrorBuddy](todo/RepoMigration-MirrorBuddy-2026-01-02.md) | 2026-01-02 | Rebrand ConvergioEdu → MirrorBuddy + transfer ownership | MEDIUM |
 | [DashboardAnalytics](todo/DashboardAnalytics-2026-01.md) | 2026-01-02 | Dashboard analytics enhancement (backlog) | LOW |
@@ -43,6 +41,9 @@ docs/plans/
 | LandingShowcasePlanDec30 | 2025-12-30 | Showcase mode for offline | - |
 | LocalStorageMigrationPlanDec31 | 2025-12-31 | Database-first architecture | 0015 |
 | SessionSummaryUnifiedArchive | 2026-01-01 | Session summaries + unified archive | 0019 |
+| [BRUTAL-VERIFICATION-REPORT](done/BRUTAL-VERIFICATION-REPORT-2026-01-02.md) | 2026-01-02 | Code existence verification (all ✅) | - |
+| [BRUTAL-VERIFICATION-REPORT-FUNCTIONAL](done/BRUTAL-VERIFICATION-REPORT-FUNCTIONAL-2026-01-02.md) | 2026-01-02 | Functional verification (4 issues, 1 fixed) | - |
+| [ManualTests Sprint 2026-01](done/ManualTests-Sprint-2026-01.md) | 2026-01-02 | Merged into TestToBeDoneAsap.md | - |
 
 ## Workflow
 
