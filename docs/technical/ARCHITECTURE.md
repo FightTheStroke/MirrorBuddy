@@ -827,7 +827,7 @@ npx prisma db push   # Sync schema
 - **Audio Modes**: 14 modes
 - **Audio Presets**: 7 presets
 - **Safety Layers**: 5 layers
-- **ADRs**: 22 architecture decisions
+- **ADRs**: 23 architecture decisions
 - **Knowledge Hub Renderers**: 12 type-specific renderers
 - **Knowledge Hub Hooks**: 5 custom hooks
 - **Unit Tests**: 1400+ tests

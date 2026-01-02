@@ -10,14 +10,22 @@ Reference files with `@docs/claude/filename.md` in conversation.
 
 | File | Purpose |
 |------|---------|
-| `mirrorbuddy.md` | Triangle of Support, Coach/Buddy system, character routing |
-| `voice-api.md` | Azure Realtime API, models, session config, debug |
-| `tools.md` | Tool execution, mindmap/quiz/flashcard creation |
+| `ambient-audio.md` | Procedural audio, presets, Pomodoro integration |
+| `api-routes.md` | API endpoints reference |
+| `buddies.md` | 5 Peer Buddies definitions |
+| `coaches.md` | 5 Learning Coaches definitions |
+| `conversation-memory.md` | Memory injection, context management |
+| `database.md` | Prisma schema, models, relations |
+| `knowledge-hub.md` | Materials, collections, search |
+| `mirrorbuddy.md` | Triangle of Support, character routing |
 | `notifications.md` | Server-side notifications, PWA push |
+| `onboarding.md` | Voice onboarding with Melissa |
 | `parent-dashboard.md` | GDPR consent, parent-professor chat |
 | `pomodoro.md` | Timer phases, XP rewards |
-| `onboarding.md` | Voice onboarding with Melissa |
-| `ambient-audio.md` | Procedural audio, presets, Pomodoro integration |
+| `session-summaries.md` | Session summary generation |
+| `summary-tool.md` | Summary tool, export formats |
+| `tools.md` | Tool execution, mindmap/quiz/flashcard |
+| `voice-api.md` | Azure Realtime API, models, debug |
 
 ## Context Optimization (Jan 2026)
 

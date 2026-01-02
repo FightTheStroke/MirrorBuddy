@@ -24,7 +24,12 @@ npx prisma db push   # Sync schema
 
 ## On-Demand Docs
 
-Load with `@docs/claude/<name>.md`: mirrorbuddy | voice-api | tools | notifications | parent-dashboard | pomodoro | onboarding | database | api-routes | summary-tool
+Load with `@docs/claude/<name>.md`:
+
+**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub
+**Voice**: voice-api | ambient-audio | onboarding
+**Features**: pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory
+**Characters**: buddies | coaches
 
 ## Quick Reference
 
