@@ -1,4 +1,4 @@
-# ConvergioEdu Financial Analysis: Pricing & Unit Economics
+# MirrorBuddy Financial Analysis: Pricing & Unit Economics
 
 **Date**: January 2, 2026
 **Author**: Amy (CFO Analysis)
@@ -480,7 +480,7 @@ At 50 students using 30 min voice: 1,500 min/month = EUR 320 savings
 
 ## 10. Conclusion
 
-ConvergioEdu can be a profitable business with the right pricing structure. The key constraints are:
+MirrorBuddy can be a profitable business with the right pricing structure. The key constraints are:
 
 1. **Voice is expensive** - 100x text cost. Must be capped or pay-as-you-go.
 2. **Text is cheap** - With GPT-4o-mini, essentially negligible.

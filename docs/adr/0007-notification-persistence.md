@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu needs a notification system to inform students about:
+MirrorBuddy needs a notification system to inform students about:
 - Level ups and XP milestones
 - Streak achievements and warnings
 - Study reminders

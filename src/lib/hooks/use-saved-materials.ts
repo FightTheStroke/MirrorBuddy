@@ -104,10 +104,10 @@ function getUserId(): string {
   // For now, use a session-based ID
   if (typeof window === 'undefined') return 'default-user';
 
-  let userId = sessionStorage.getItem('convergio-user-id');
+  let userId = sessionStorage.getItem('mirrorbuddy-user-id');
   if (!userId) {
     userId = `user-${crypto.randomUUID()}`;
-    sessionStorage.setItem('convergio-user-id', userId);
+    sessionStorage.setItem('mirrorbuddy-user-id', userId);
   }
   return userId;
 }

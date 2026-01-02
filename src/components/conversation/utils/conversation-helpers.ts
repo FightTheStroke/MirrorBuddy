@@ -11,10 +11,10 @@ import { logger } from '@/lib/logger';
  */
 export function getOrCreateUserId(): string | null {
   if (typeof window === 'undefined') return null;
-  let userId = sessionStorage.getItem('convergio-user-id');
+  let userId = sessionStorage.getItem('mirrorbuddy-user-id');
   if (!userId) {
     userId = crypto.randomUUID();
-    sessionStorage.setItem('convergio-user-id', userId);
+    sessionStorage.setItem('mirrorbuddy-user-id', userId);
   }
   return userId;
 }

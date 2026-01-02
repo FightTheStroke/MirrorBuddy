@@ -1,5 +1,5 @@
 /**
- * Structured logger for Convergio Web
+ * Structured logger for MirrorBuddy Web
  * - Production: silent (no console output)
  * - Development: logs to console
  *

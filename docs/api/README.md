@@ -1,6 +1,6 @@
-# ConvergioEdu API Documentation
+# MirrorBuddy API Documentation
 
-This directory contains OpenAPI 3.0 specification for the ConvergioEdu API.
+This directory contains OpenAPI 3.0 specification for the MirrorBuddy API.
 
 ## Files
 
@@ -35,7 +35,7 @@ Install the "OpenAPI (Swagger) Editor" extension in VS Code, then open `openapi.
 
 ## API Overview
 
-**ConvergioEdu** provides a comprehensive REST API for:
+**MirrorBuddy** provides a comprehensive REST API for:
 
 ### Core Features
 - **Maestri** - 17 AI teachers specialized in different subjects

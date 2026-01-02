@@ -41,7 +41,7 @@ interface PrinciplesStepProps {
 }
 
 /**
- * Step 3: Principles of ConvergioEdu
+ * Step 3: Principles of MirrorBuddy
  *
  * Brief, engaging overview of what makes the platform special.
  */

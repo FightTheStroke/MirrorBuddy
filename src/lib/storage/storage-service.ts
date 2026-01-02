@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Storage Service
+ * MirrorBuddy Storage Service
  * Abstract interface for file storage operations
  *
  * All storage providers (local, Azure, S3) implement this interface.

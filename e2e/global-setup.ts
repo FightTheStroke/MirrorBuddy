@@ -25,7 +25,7 @@ async function globalSetup() {
         origin: 'http://localhost:3000',
         localStorage: [
           {
-            name: 'convergio-onboarding',
+            name: 'mirrorbuddy-onboarding',
             value: JSON.stringify({
               state: {
                 hasCompletedOnboarding: true,

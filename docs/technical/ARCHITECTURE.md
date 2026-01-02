@@ -1,4 +1,4 @@
-# ConvergioEdu Architecture
+# MirrorBuddy Architecture
 
 > AI-powered educational platform for students with learning differences.
 > Last updated: 2026-01-01
@@ -67,7 +67,7 @@ flowchart TB
 
 ## Overview
 
-ConvergioEdu is a Next.js 14 application providing AI tutoring for K-12 students with learning differences (dyslexia, ADHD, autism, etc.).
+MirrorBuddy is a Next.js 14 application providing AI tutoring for K-12 students with learning differences (dyslexia, ADHD, autism, etc.).
 
 ### Tech Stack
 

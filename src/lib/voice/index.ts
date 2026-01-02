@@ -1,7 +1,7 @@
 /**
  * Voice Module
  *
- * Exports voice-related functionality for the ConvergioEdu platform.
+ * Exports voice-related functionality for the MirrorBuddy platform.
  * Includes tool definitions, execution, and utilities for Azure Realtime API.
  *
  * Part of I-02: Voice Tool Commands

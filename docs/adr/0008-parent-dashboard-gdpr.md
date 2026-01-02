@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu generates insights about students from their AI conversations with Maestri. Parents need visibility into their children's learning progress, but this involves processing personal data of minors.
+MirrorBuddy generates insights about students from their AI conversations with Maestri. Parents need visibility into their children's learning progress, but this involves processing personal data of minors.
 
 ### Legal Requirements
 

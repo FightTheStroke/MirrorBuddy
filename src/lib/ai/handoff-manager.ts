@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Handoff Manager
+ * MirrorBuddy Handoff Manager
  *
  * Manages character handoffs during conversations.
  * Detects when a character should suggest switching to another,

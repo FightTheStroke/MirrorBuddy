@@ -1,5 +1,5 @@
 /**
- * Convergio Education Maestri - Index
+ * MirrorBuddycation Maestri - Index
  * Auto-generated from CLI markdown files
  */
 import type { MaestroFull } from './types';

@@ -4,7 +4,7 @@
 // ============================================================================
 
 /**
- * All supported tool types in ConvergioEdu
+ * All supported tool types in MirrorBuddy
  */
 export type ToolType =
   | 'mindmap'      // Mappa mentale interattiva (MarkMap)

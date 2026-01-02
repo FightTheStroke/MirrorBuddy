@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
 
     // Get userId from cookie for memory injection and provider preference
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     // #87: Get user's provider preference and budget from settings
     let providerPreference: AIProvider | 'auto' | undefined;

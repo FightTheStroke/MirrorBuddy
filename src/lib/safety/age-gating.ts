@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Age Gating Module
+ * MirrorBuddy Age Gating Module
  * Ensures content is appropriate for the student's age group
  *
  * This module provides:

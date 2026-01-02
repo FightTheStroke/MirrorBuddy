@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu PDF Module
+ * MirrorBuddy PDF Module
  * Client-side PDF processing for Vision API analysis
  *
  * Related: Issue #21, ADR-0001

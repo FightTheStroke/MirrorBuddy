@@ -1,5 +1,5 @@
 // ============================================================================
-// CONVERGIO WEB - MAIN APPLICATION STORE (Zustand)
+// MIRRORBUDDY - MAIN APPLICATION STORE (Zustand)
 // With database sync via API routes
 // ============================================================================
 

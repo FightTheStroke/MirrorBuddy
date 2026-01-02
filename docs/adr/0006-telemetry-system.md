@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu needs observability into user engagement and application usage patterns:
+MirrorBuddy needs observability into user engagement and application usage patterns:
 
 | Requirement | Purpose |
 |-------------|---------|

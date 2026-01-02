@@ -1,5 +1,5 @@
 /**
- * CONVERGIO EDUCATION - MASTERY LEARNING
+ * MIRRORBUDDY - MASTERY LEARNING
  *
  * TypeScript implementation of mastery learning system inspired by Khan Academy.
  * Tracks skill mastery, detects gaps, and provides learning path recommendations.
@@ -10,7 +10,7 @@
  * - Adaptive difficulty: Adjusts based on performance
  * - Persistent state: Saves to database via /api/progress
  *
- * Copyright (c) 2025 Convergio.io
+ * Copyright (c) 2025 MirrorBuddy.io
  * Licensed under MIT License
  */
 

@@ -549,15 +549,15 @@ test('app title is MirrorBuddy', async ({ page }) => {
   await expect(page).toHaveTitle(/MirrorBuddy/);
 });
 
-test('no Convergio text visible', async ({ page }) => {
+test('no MirrorBuddy text visible', async ({ page }) => {
   await page.goto('/');
   const body = await page.textContent('body');
-  expect(body).not.toContain('Convergio');
+  expect(body).not.toContain('MirrorBuddy');
 });
 ```
 
 - [ ] 3.6.1 - Title test PASS
-- [ ] 3.6.2 - No Convergio test PASS
+- [ ] 3.6.2 - No MirrorBuddy test PASS
 
 ## 3.7 PR Ready
 

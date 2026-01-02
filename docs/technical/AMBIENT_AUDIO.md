@@ -298,4 +298,4 @@ When adding new audio modes:
 
 ## License
 
-Part of ConvergioEdu - MIT License
+Part of MirrorBuddy - MIT License

@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Safety Module
+ * MirrorBuddy Safety Module
  *
  * Central export for all child-safety guardrails.
  * MUST be imported by any code that creates AI character prompts.

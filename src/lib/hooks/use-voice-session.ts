@@ -1,5 +1,5 @@
 // ============================================================================
-// CONVERGIO WEB - VOICE SESSION HOOK (REWRITTEN)
+// MIRRORBUDDY - VOICE SESSION HOOK (REWRITTEN)
 // Azure OpenAI Realtime API with proper audio handling
 // ============================================================================
 

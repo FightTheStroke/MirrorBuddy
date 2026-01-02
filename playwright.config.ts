@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
 /**
- * Convergio-Edu E2E Test Configuration
+ * mirrorbuddy-Edu E2E Test Configuration
  * Tests for educational platform with AI-powered tutoring
  */
 export default defineConfig({

@@ -36,7 +36,7 @@ interface EventPayload {
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     const body: EventPayload = await request.json();
 

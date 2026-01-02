@@ -1,15 +1,15 @@
-# LandingShowcasePlanDec30 - Modalità Showcase Offline per Convergio Edu
+# LandingShowcasePlanDec30 - Modalità Showcase Offline per MirrorBuddy
 
 **Data**: 2025-12-30
 **Target**: Creare una modalità showcase che funzioni COMPLETAMENTE OFFLINE senza LLM
-**Branch**: feature/demo-mode (worktree: /Users/roberdan/GitHub/ConvergioEdu-Demo)
+**Branch**: feature/demo-mode (worktree: /Users/roberdan/GitHub/MirrorBuddy-Demo)
 **Metodo**: VERIFICA BRUTALE - ogni task testato prima di dichiararlo fatto
 
 ---
 
 ## 🎯 OBIETTIVO
 
-Quando l'utente avvia Convergio Edu SENZA provider LLM configurato (né Azure OpenAI né Ollama):
+Quando l'utente avvia MirrorBuddy SENZA provider LLM configurato (né Azure OpenAI né Ollama):
 1. Mostra una **Landing Page** che spiega il prodotto
 2. Offre **Wizard Configurazione** per Azure/Ollama
 3. Permette accesso a **Showcase Offline** con contenuti statici ma impressionanti
@@ -44,7 +44,7 @@ Quando l'utente avvia Convergio Edu SENZA provider LLM configurato (né Azure Op
 
 ```
 1. PRIMA di iniziare: leggi TUTTO questo file
-2. Lavori nel worktree: /Users/roberdan/GitHub/ConvergioEdu-Demo
+2. Lavori nel worktree: /Users/roberdan/GitHub/MirrorBuddy-Demo
 3. Trova i task assegnati a te (cerca "CLAUDE X" dove X è il tuo numero)
 4. Per OGNI task:
    a. Leggi i file indicati
@@ -89,7 +89,7 @@ kitty @ send-text --match title:Claude-4 "🟢 GATE-1 UNLOCKED! Start Phase 1C t
 **CLAUDE 3 e CLAUDE 4** (waiting for GATE-1):
 Attendi notifica o poll ogni 5 min:
 ```bash
-grep "GATE-1" /Users/roberdan/GitHub/ConvergioEdu-Demo/docs/plans/LandingShowcasePlanDec30.md | grep -q "🟢 UNLOCKED"
+grep "GATE-1" /Users/roberdan/GitHub/MirrorBuddy-Demo/docs/plans/LandingShowcasePlanDec30.md | grep -q "🟢 UNLOCKED"
 ```
 
 ---
@@ -151,7 +151,7 @@ grep "GATE-1" /Users/roberdan/GitHub/ConvergioEdu-Demo/docs/plans/LandingShowcas
 
 ### Comandi di Monitoraggio
 ```bash
-cd /Users/roberdan/GitHub/ConvergioEdu-Demo
+cd /Users/roberdan/GitHub/MirrorBuddy-Demo
 npm run lint && npm run typecheck
 git status
 ```
@@ -168,7 +168,7 @@ Deve funzionare sia server-side che client-side.
 
 #### File da leggere PRIMA
 ```bash
-cat /Users/roberdan/GitHub/ConvergioEdu-Demo/src/lib/ai/providers.ts
+cat /Users/roberdan/GitHub/MirrorBuddy-Demo/src/lib/ai/providers.ts
 ```
 
 #### Azioni richieste
@@ -274,7 +274,7 @@ Layout per tutte le pagine `/showcase/*` con:
 #### Obiettivo
 Landing page `/landing` con:
 - Hero section con logo e tagline
-- Sezione "Cos'è Convergio Edu" con features
+- Sezione "Cos'è MirrorBuddy" con features
 - Sezione "Configura il tuo LLM"
 - Link "Esplora Showcase"
 
@@ -325,7 +325,7 @@ Aggiungere alla landing page due sezioni espandibili:
 
 #### Obiettivo
 Home page `/showcase` con:
-- Titolo "Esplora Convergio Edu"
+- Titolo "Esplora MirrorBuddy"
 - Grid di cards per navigare alle varie sezioni
 - Ogni card ha icona, titolo, descrizione
 
@@ -346,7 +346,7 @@ Pagina `/showcase/maestri` che mostra tutti i 17 Maestri.
 
 #### File da leggere
 ```bash
-cat /Users/roberdan/GitHub/ConvergioEdu-Demo/src/data/maestri-full.ts | head -200
+cat /Users/roberdan/GitHub/MirrorBuddy-Demo/src/data/maestri-full.ts | head -200
 ```
 
 #### Implementazione
@@ -506,7 +506,7 @@ Banner riutilizzabile che appare in tutte le pagine showcase.
 ### Worktrees (CLAUDE 1 crea all'inizio)
 
 ```bash
-cd /Users/roberdan/GitHub/ConvergioEdu-Demo
+cd /Users/roberdan/GitHub/MirrorBuddy-Demo
 
 # Tutti lavorano nello stesso worktree per semplicità
 # MA su file DIVERSI per evitare conflitti!
@@ -533,7 +533,7 @@ git commit -m "feat(showcase): T-XX - [descrizione]
 ## VERIFICATION CHECKLIST (Prima del merge)
 
 ```bash
-cd /Users/roberdan/GitHub/ConvergioEdu-Demo
+cd /Users/roberdan/GitHub/MirrorBuddy-Demo
 npm run lint        # 0 errors, 0 warnings
 npm run typecheck   # no errors
 npm run build       # success
