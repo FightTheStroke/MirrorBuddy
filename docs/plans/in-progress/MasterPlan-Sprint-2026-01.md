@@ -212,12 +212,12 @@ Componenti riutilizzabili con ACCESSIBILITY.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.17 | SearchBar component (keyboard, aria) | `src/components/education/knowledge-hub/components/search-bar.tsx` | | |
-| 5.18 | SidebarNavigation (keyboard nav) | `src/components/education/knowledge-hub/components/sidebar-navigation.tsx` | | |
-| 5.19 | QuickActions component | `src/components/education/knowledge-hub/components/quick-actions.tsx` | | |
-| 5.20 | BulkToolbar component | `src/components/education/knowledge-hub/components/bulk-toolbar.tsx` | | |
-| 5.21 | StatsPanel component | `src/components/education/knowledge-hub/components/stats-panel.tsx` | | |
-| 5.22 | MaterialCard with drag & drop (keyboard alternative) | `src/components/education/knowledge-hub/components/material-card.tsx` | | |
+| 5.17 | SearchBar component (keyboard, aria) | `src/components/education/knowledge-hub/components/search-bar.tsx` | ✅ | |
+| 5.18 | SidebarNavigation (keyboard nav) | `src/components/education/knowledge-hub/components/sidebar-navigation.tsx` | ✅ | |
+| 5.19 | QuickActions component | `src/components/education/knowledge-hub/components/quick-actions.tsx` | ✅ | |
+| 5.20 | BulkToolbar component | `src/components/education/knowledge-hub/components/bulk-toolbar.tsx` | ✅ | |
+| 5.21 | StatsPanel component | `src/components/education/knowledge-hub/components/stats-panel.tsx` | ✅ | |
+| 5.22 | MaterialCard with drag & drop (keyboard alternative) | `src/components/education/knowledge-hub/components/material-card.tsx` | ✅ | |
 
 ### 5D: Knowledge Hub Hooks
 

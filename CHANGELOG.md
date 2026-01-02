@@ -11,6 +11,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Knowledge Hub UI Components (Phase 5, Tasks 5.17-5.22)
+- **SearchBar** (`src/components/education/knowledge-hub/components/search-bar.tsx`):
+  - Debounced search input with configurable delay
+  - Type filter dropdown with ARIA listbox
+  - Keyboard navigation (Escape to clear/blur)
+  - Screen reader announcements
+- **SidebarNavigation** (`src/components/education/knowledge-hub/components/sidebar-navigation.tsx`):
+  - Tree navigation for collections with expand/collapse
+  - Tag toggle selection with checkbox semantics
+  - Quick filters (Recent, Favorites, Archived)
+  - Keyboard navigation (ArrowRight/Left to expand/collapse, Enter/Space to select)
+- **QuickActions** (`src/components/education/knowledge-hub/components/quick-actions.tsx`):
+  - Action buttons: New material, Upload file, Create folder, Create tag
+  - Compact mode (icon-only with tooltips)
+- **BulkToolbar** (`src/components/education/knowledge-hub/components/bulk-toolbar.tsx`):
+  - Bulk operations: Move, Add tags, Archive, Restore, Delete
+  - Selection count display with singular/plural handling
+- **StatsPanel** (`src/components/education/knowledge-hub/components/stats-panel.tsx`):
+  - Material counts by type (mindmap, quiz, flashcard, summary)
+  - Activity statistics (today, this week)
+  - Color-coded type icons
+- **MaterialCard** (`src/components/education/knowledge-hub/components/material-card.tsx`):
+  - Drag & drop with keyboard alternative (Arrow keys)
+  - Selection checkbox, favorite toggle
+  - Context menu with actions (Open, Duplicate, Move, Tags, Archive, Delete)
+  - Tag display with overflow indicator
+  - Relative date formatting (Oggi, Ieri, X giorni fa)
+- **177 Unit Tests** (`src/components/education/knowledge-hub/components/__tests__/`):
+  - `search-bar.test.tsx`: 24 tests (debounce, keyboard, type filter, accessibility)
+  - `sidebar-navigation.test.tsx`: 34 tests (collections, tags, quick filters, keyboard nav)
+  - `quick-actions.test.tsx`: 22 tests (buttons, compact mode, accessibility)
+  - `bulk-toolbar.test.tsx`: 25 tests (visibility, actions, accessibility)
+  - `stats-panel.test.tsx`: 22 tests (counts, styling, color coding)
+  - `material-card.test.tsx`: 50 tests (rendering, selection, favorites, drag & drop, menu)
+- All components WCAG 2.1 AA compliant with keyboard navigation and ARIA attributes
+
 #### Knowledge Hub Renderer Registry (Phase 5, Tasks 5.03-5.15)
 - **Renderer Registry** (`src/components/education/knowledge-hub/renderers/index.tsx`):
   - Lazy loading with dynamic imports for code splitting
