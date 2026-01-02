@@ -484,6 +484,30 @@ Common errors (ALL FIXED - see Issues 1-5 below):
 
 ---
 
+## NEXT STEPS / TODO
+
+### ⬜ Re-run E2E Tests (PRIORITY)
+
+**Obiettivo**: Verificare che tutti i fix applicati (Issues 1-5) abbiano risolto i problemi E2E
+
+**Command**:
+```bash
+npx playwright test e2e/full-app-smoke.spec.ts --reporter=list
+```
+
+**Criteri di successo**:
+- [ ] 100% test passati (o almeno >95%)
+- [ ] Nessun errore telemetry ERR_ABORTED
+- [ ] Nessun errore Voice API su Firefox
+- [ ] Nessun errore font download
+- [ ] Nessun errore Debug API CORS
+
+**Quando fare**: Dopo aver verificato che tutti i fix sono committati su development
+
+**Status**: ⬜ Da fare
+
+---
+
 ## AZIONI POST-TEST
 
 Quando tutti i CRITICAL tests sono ✅:
