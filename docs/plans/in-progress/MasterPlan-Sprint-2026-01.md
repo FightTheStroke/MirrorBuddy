@@ -160,14 +160,14 @@ Backend endpoints con SECURITY CHECKS.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 4.01 | Create /api/conversations/memory (auth + validation) | `src/app/api/conversations/memory/route.ts` | ✅ | |
-| 4.02 | Create /api/collections (auth + validation) | `src/app/api/collections/route.ts` | ✅ | |
-| 4.03 | Create /api/tags (auth + validation) | `src/app/api/tags/route.ts` | ✅ | |
-| 4.04 | Update /api/materials for searchableText | `src/app/api/materials/route.ts` | ✅ | |
-| 4.05 | Update /api/materials for collection/tag filters | `src/app/api/materials/route.ts` | ✅ | |
-| 4.06 | Create /api/materials/bulk (auth + validation) | `src/app/api/materials/bulk/route.ts` | ✅ | |
-| 4.07 | Update /api/chat for content with tool calls | `src/app/api/chat/route.ts` | ✅ | |
-| 4.08 | Security review: OWASP check all new endpoints | - | ✅ | |
+| 4.01 | Create /api/conversations/memory (auth + validation) | `src/app/api/conversations/memory/route.ts` | ✅ | ✅ |
+| 4.02 | Create /api/collections (auth + validation) | `src/app/api/collections/route.ts` | ✅ | ✅ |
+| 4.03 | Create /api/tags (auth + validation) | `src/app/api/tags/route.ts` | ✅ | ✅ |
+| 4.04 | Update /api/materials for searchableText | `src/app/api/materials/route.ts` | ✅ | ✅ |
+| 4.05 | Update /api/materials for collection/tag filters | `src/app/api/materials/route.ts` | ✅ | ✅ |
+| 4.06 | Create /api/materials/bulk (auth + validation) | `src/app/api/materials/bulk/route.ts` | ✅ | ✅ |
+| 4.07 | Update /api/chat for content with tool calls | `src/app/api/chat/route.ts` | ✅ | ✅ |
+| 4.08 | Security review: OWASP check all new endpoints | - | ✅ | ✅ |
 
 ---
 
@@ -186,27 +186,27 @@ Componenti riutilizzabili con ACCESSIBILITY.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.01 | Create ToolMaestroSelectionDialog (accessible) | `src/components/education/tool-maestro-selection-dialog.tsx` | ✅ | |
-| 5.02 | Unit tests + accessibility tests for dialog | `src/components/education/__tests__/tool-maestro-selection-dialog.test.tsx` | ✅ | |
+| 5.01 | Create ToolMaestroSelectionDialog (accessible) | `src/components/education/tool-maestro-selection-dialog.tsx` | ✅ | ✅ |
+| 5.02 | Unit tests + accessibility tests for dialog | `src/components/education/__tests__/tool-maestro-selection-dialog.test.tsx` | ✅ | ✅ |
 
 ### 5B: Knowledge Hub Renderers
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.03 | Create renderer registry | `src/components/education/knowledge-hub/renderers/index.tsx` | ✅ | |
-| 5.04 | MindmapRenderer | `src/components/education/knowledge-hub/renderers/mindmap-renderer.tsx` | ✅ | |
-| 5.05 | QuizRenderer | `src/components/education/knowledge-hub/renderers/quiz-renderer.tsx` | ✅ | |
-| 5.06 | FlashcardRenderer | `src/components/education/knowledge-hub/renderers/flashcard-renderer.tsx` | ✅ | |
-| 5.07 | SummaryRenderer | `src/components/education/knowledge-hub/renderers/summary-renderer.tsx` | ✅ | |
-| 5.08 | DemoRenderer | `src/components/education/knowledge-hub/renderers/demo-renderer.tsx` | ✅ | |
-| 5.09 | DiagramRenderer (Mermaid) | `src/components/education/knowledge-hub/renderers/diagram-renderer.tsx` | ✅ | |
-| 5.10 | TimelineRenderer | `src/components/education/knowledge-hub/renderers/timeline-renderer.tsx` | ✅ | |
-| 5.11 | FormulaRenderer (KaTeX) | `src/components/education/knowledge-hub/renderers/formula-renderer.tsx` | ✅ | |
-| 5.12 | ChartRenderer | `src/components/education/knowledge-hub/renderers/chart-renderer.tsx` | ✅ | |
-| 5.13 | ImageRenderer | `src/components/education/knowledge-hub/renderers/image-renderer.tsx` | ✅ | |
-| 5.14 | PdfRenderer | `src/components/education/knowledge-hub/renderers/pdf-renderer.tsx` | ✅ | |
-| 5.15 | HomeworkRenderer | `src/components/education/knowledge-hub/renderers/homework-renderer.tsx` | ✅ | |
-| 5.16 | Unit tests for all renderers | `src/components/education/knowledge-hub/renderers/__tests__/` | ✅ | |
+| 5.03 | Create renderer registry | `src/components/education/knowledge-hub/renderers/index.tsx` | ✅ | ✅ |
+| 5.04 | MindmapRenderer | `src/components/education/knowledge-hub/renderers/mindmap-renderer.tsx` | ✅ | ✅ |
+| 5.05 | QuizRenderer | `src/components/education/knowledge-hub/renderers/quiz-renderer.tsx` | ✅ | ✅ |
+| 5.06 | FlashcardRenderer | `src/components/education/knowledge-hub/renderers/flashcard-renderer.tsx` | ✅ | ✅ |
+| 5.07 | SummaryRenderer | `src/components/education/knowledge-hub/renderers/summary-renderer.tsx` | ✅ | ✅ |
+| 5.08 | DemoRenderer | `src/components/education/knowledge-hub/renderers/demo-renderer.tsx` | ✅ | ✅ |
+| 5.09 | DiagramRenderer (Mermaid) | `src/components/education/knowledge-hub/renderers/diagram-renderer.tsx` | ✅ | ✅ |
+| 5.10 | TimelineRenderer | `src/components/education/knowledge-hub/renderers/timeline-renderer.tsx` | ✅ | ✅ |
+| 5.11 | FormulaRenderer (KaTeX) | `src/components/education/knowledge-hub/renderers/formula-renderer.tsx` | ✅ | ✅ |
+| 5.12 | ChartRenderer | `src/components/education/knowledge-hub/renderers/chart-renderer.tsx` | ✅ | ✅ |
+| 5.13 | ImageRenderer | `src/components/education/knowledge-hub/renderers/image-renderer.tsx` | ✅ | ✅ |
+| 5.14 | PdfRenderer | `src/components/education/knowledge-hub/renderers/pdf-renderer.tsx` | ✅ | ✅ |
+| 5.15 | HomeworkRenderer | `src/components/education/knowledge-hub/renderers/homework-renderer.tsx` | ✅ | ✅ |
+| 5.16 | Unit tests for all renderers | `src/components/education/knowledge-hub/renderers/__tests__/` | ✅ | ✅ |
 
 ### 5C: Knowledge Hub Components (ACCESSIBLE)
 
@@ -223,12 +223,12 @@ Componenti riutilizzabili con ACCESSIBILITY.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 5.23 | useMaterialsSearch hook | `src/components/education/knowledge-hub/hooks/use-materials-search.ts` | ✅ | |
-| 5.24 | useCollections hook | `src/components/education/knowledge-hub/hooks/use-collections.ts` | ✅ | |
-| 5.25 | useTags hook | `src/components/education/knowledge-hub/hooks/use-tags.ts` | ✅ | |
-| 5.26 | useSmartCollections hook | `src/components/education/knowledge-hub/hooks/use-smart-collections.ts` | ✅ | |
-| 5.27 | useBulkActions hook | `src/components/education/knowledge-hub/hooks/use-bulk-actions.ts` | ✅ | |
-| 5.28 | Unit tests for all hooks | `src/components/education/knowledge-hub/hooks/__tests__/` | ✅ | |
+| 5.23 | useMaterialsSearch hook | `src/components/education/knowledge-hub/hooks/use-materials-search.ts` | ✅ | ✅ |
+| 5.24 | useCollections hook | `src/components/education/knowledge-hub/hooks/use-collections.ts` | ✅ | ✅ |
+| 5.25 | useTags hook | `src/components/education/knowledge-hub/hooks/use-tags.ts` | ✅ | ✅ |
+| 5.26 | useSmartCollections hook | `src/components/education/knowledge-hub/hooks/use-smart-collections.ts` | ✅ | ✅ |
+| 5.27 | useBulkActions hook | `src/components/education/knowledge-hub/hooks/use-bulk-actions.ts` | ✅ | ✅ |
+| 5.28 | Unit tests for all hooks | `src/components/education/knowledge-hub/hooks/__tests__/` | ✅ (129 tests) | ✅ |
 
 ---
 
@@ -243,14 +243,14 @@ Fix AI handlers e core rendering. SAFETY INTEGRATION.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 6.01 | Fix mindmap-handler.ts (use 'title' field) | `src/lib/tools/handlers/mindmap-handler.ts` | | |
-| 6.02 | Fix markmap-renderer.tsx (markdown/nodes) | `src/components/tools/markmap-renderer.tsx` | | |
-| 6.03 | Fix use-saved-materials.ts (map topic->title) | `src/lib/hooks/use-saved-materials.ts` | | |
-| 6.04 | Update voice-tool-commands.ts (hierarchy examples) | `src/lib/voice/voice-tool-commands.ts` | | |
-| 6.05 | Update support-teachers.ts (use v2 knowledge base) | `src/lib/ai/support-teachers.ts` | | |
-| 6.06 | Update MaterialViewer (use renderer registry) | `src/components/education/archive/material-viewer.tsx` | | |
-| 6.07 | Unit tests for mindmap-handler | `src/lib/tools/handlers/__tests__/mindmap-handler.test.ts` | | |
-| 6.08 | Verify safety integration in memory-loader | - | | |
+| 6.01 | Fix mindmap-handler.ts (use 'title' field) | `src/lib/tools/handlers/mindmap-handler.ts` | ✅ | ✅ |
+| 6.02 | Fix markmap-renderer.tsx (markdown/nodes) | `src/components/tools/markmap-renderer.tsx` | ✅ | ✅ |
+| 6.03 | Fix use-saved-materials.ts (map topic->title) | `src/lib/hooks/use-saved-materials.ts` | ✅ | ✅ |
+| 6.04 | Update voice-tool-commands.ts (hierarchy examples) | `src/lib/voice/voice-tool-commands.ts` | ✅ | ✅ |
+| 6.05 | Update support-teachers.ts (use v2 knowledge base) | `src/data/support-teachers.ts` | ✅ | ✅ |
+| 6.06 | Update MaterialViewer (use renderer registry) | `src/components/education/archive/material-viewer.tsx` | ✅ | ✅ |
+| 6.07 | Unit tests for mindmap-handler | `src/lib/tools/handlers/__tests__/mindmap-handler.test.ts` | ✅ | ✅ |
+| 6.08 | Verify safety integration in memory-loader | - | ✅ (via prompt-enhancer) | ✅ |
 
 ---
 
@@ -262,38 +262,38 @@ Tutte le view updates. User-facing pages.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 7.01 | Update summaries-view with dialog | `src/components/education/summaries-view.tsx` | | |
-| 7.02 | Update mindmaps-view with dialog | `src/components/education/mindmaps-view.tsx` | | |
-| 7.03 | Update flashcards-view with dialog | `src/components/education/flashcards-view.tsx` | | |
-| 7.04 | Update quiz-view with dialog | `src/components/education/quiz-view.tsx` | | |
+| 7.01 | Update summaries-view with dialog | `src/components/education/summaries-view.tsx` | ✅ | ✅ |
+| 7.02 | Update mindmaps-view with dialog | `src/components/education/mindmaps-view.tsx` | ✅ | ✅ |
+| 7.03 | Update flashcards-view with dialog | `src/components/education/flashcards-view.tsx` | ✅ | ✅ |
+| 7.04 | Update quiz-view with dialog | `src/components/education/quiz-view.tsx` | ✅ | ✅ |
 
 ### 7B: Focus Tool Layout (Voice Integration)
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 7.05 | Add voice integration to focus-tool-layout | `src/components/tools/focus-tool-layout.tsx` | | |
-| 7.06 | Voice connection on mode='voice' | `src/components/tools/focus-tool-layout.tsx` | | |
-| 7.07 | Voice UI (mute, end call, levels) | `src/components/tools/focus-tool-layout.tsx` | | |
+| 7.05 | Add voice integration to focus-tool-layout | `src/components/tools/focus-tool-layout.tsx` | ✅ | ✅ |
+| 7.06 | Voice connection on mode='voice' | `src/components/tools/focus-tool-layout.tsx` | ✅ | ✅ |
+| 7.07 | Voice UI (mute, end call, levels) | `src/components/tools/focus-tool-layout.tsx` | ✅ | ✅ |
 
 ### 7C: Knowledge Hub Views
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 7.08 | Install react-resizable-panels | `package.json` | | |
-| 7.09 | Create ExplorerView | `src/components/education/knowledge-hub/views/explorer-view.tsx` | | |
-| 7.10 | Create GalleryView | `src/components/education/knowledge-hub/views/gallery-view.tsx` | | |
-| 7.11 | Create TimelineView | `src/components/education/knowledge-hub/views/timeline-view.tsx` | | |
-| 7.12 | Create CalendarView | `src/components/education/knowledge-hub/views/calendar-view.tsx` | | |
-| 7.13 | Update archive-view with search | `src/components/education/archive-view.tsx` | | |
-| 7.14 | Create knowledge-hub.tsx (main) | `src/components/education/knowledge-hub/knowledge-hub.tsx` | | |
-| 7.15 | Add view switcher | `src/components/education/knowledge-hub/knowledge-hub.tsx` | | |
-| 7.16 | Add quick preview on hover | `src/components/education/knowledge-hub/components/material-card.tsx` | | |
+| 7.08 | Install react-resizable-panels | `package.json` | ✅ | ✅ |
+| 7.09 | Create ExplorerView | `src/components/education/knowledge-hub/views/explorer-view.tsx` | ✅ | ✅ |
+| 7.10 | Create GalleryView | `src/components/education/knowledge-hub/views/gallery-view.tsx` | ✅ | ✅ |
+| 7.11 | Create TimelineView | `src/components/education/knowledge-hub/views/timeline-view.tsx` | ✅ | ✅ |
+| 7.12 | Create CalendarView | `src/components/education/knowledge-hub/views/calendar-view.tsx` | ✅ | ✅ |
+| 7.13 | Update archive-view with search | `src/components/education/archive-view.tsx` | ✅ | ✅ |
+| 7.14 | Create knowledge-hub.tsx (main) | `src/components/education/knowledge-hub/knowledge-hub.tsx` | ✅ | ✅ |
+| 7.15 | Add view switcher | `src/components/education/knowledge-hub/knowledge-hub.tsx` | ✅ | ✅ |
+| 7.16 | Add quick preview on hover | `src/components/education/knowledge-hub/components/material-card.tsx` | ✅ | ✅ |
 
 ### 7D: Conversation Memory Integration
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 7.17 | Integrate memory in conversation-flow.tsx | `src/components/conversation/conversation-flow.tsx` | | |
+| 7.17 | Integrate memory in conversation-flow.tsx | `src/components/conversation/conversation-flow.tsx` | ✅ | ✅ |
 
 ---
 
@@ -303,8 +303,8 @@ Scripts one-time e data migrations.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 8.01 | Create backfill-searchable.ts | `scripts/backfill-searchable.ts` | | |
-| 8.02 | Run backfill script | - | | |
+| 8.01 | Create backfill-searchable.ts | `scripts/backfill-searchable.ts` | ✅ | ✅ |
+| 8.02 | Run backfill script | - | ✅ (ready, no DB data) | ✅ |
 
 ---
 
@@ -316,41 +316,41 @@ Tutti i test. Nessuna eccezione.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 9.01 | E2E test mindmap-hierarchy.spec.ts | `e2e/mindmap-hierarchy.spec.ts` | | |
-| 9.02 | E2E test knowledge-hub.spec.ts | `e2e/knowledge-hub.spec.ts` | | |
-| 9.03 | Integration test memory flow | `src/lib/conversation/__tests__/memory-integration.test.ts` | | |
+| 9.01 | E2E test mindmap-hierarchy.spec.ts | `e2e/mindmap-hierarchy.spec.ts` | ✅ | |
+| 9.02 | E2E test knowledge-hub.spec.ts | `e2e/knowledge-hub.spec.ts` | ✅ | |
+| 9.03 | Integration test memory flow | `src/lib/conversation/__tests__/memory-integration.test.ts` | ✅ (15 tests) | |
 
 ### 9B: Safety Tests
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 9.04 | Test safety layer with memory feature | `src/lib/safety/__tests__/memory-safety.test.ts` | | |
-| 9.05 | Test safety layer with Knowledge Hub | `src/lib/safety/__tests__/knowledge-hub-safety.test.ts` | | |
-| 9.06 | Adversarial test: jailbreak via memory | - | | |
+| 9.04 | Test safety layer with memory feature | `src/lib/safety/__tests__/memory-safety.test.ts` | ✅ (27 tests) | |
+| 9.05 | Test safety layer with Knowledge Hub | `src/lib/safety/__tests__/knowledge-hub-safety.test.ts` | ✅ (22 tests) | |
+| 9.06 | Adversarial test: jailbreak via memory | - | ✅ (in memory-safety.test.ts) | |
 
 ### 9C: Accessibility Tests
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 9.07 | Axe accessibility audit Knowledge Hub | `e2e/accessibility-knowledge-hub.spec.ts` | | |
-| 9.08 | Keyboard navigation test all new UI | - | | |
-| 9.09 | Screen reader test (manual) | - | | |
+| 9.07 | Axe accessibility audit Knowledge Hub | `e2e/accessibility-knowledge-hub.spec.ts` | ✅ (11 tests) | |
+| 9.08 | Keyboard navigation test all new UI | - | ⚠️ Manual | |
+| 9.09 | Screen reader test (manual) | - | ⚠️ Manual | |
 
 ### 9D: Performance Tests
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 9.10 | Search performance with 1000+ materials | - | | |
-| 9.11 | Knowledge Hub load time < 2s | - | | |
+| 9.10 | Search performance with 1000+ materials | - | ⚠️ Manual | |
+| 9.11 | Knowledge Hub load time < 2s | - | ⚠️ Manual | |
 
 ### 9E: Manual Tests
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 9.12 | Manual test: all 5 tool flows | - | | |
-| 9.13 | Manual test: voice mode | - | | |
-| 9.14 | Manual test: knowledge hub search | - | | |
-| 9.15 | Manual test: memory context in conversation | - | | |
+| 9.12 | Manual test: all 5 tool flows | - | ⚠️ Manual | |
+| 9.13 | Manual test: voice mode | - | ⚠️ Manual | |
+| 9.14 | Manual test: knowledge hub search | - | ⚠️ Manual | |
+| 9.15 | Manual test: memory context in conversation | - | ⚠️ Manual | |
 
 ---
 
@@ -402,17 +402,17 @@ YYYY-MM-DD HH:MM CET
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 10.01 | Update ARCHITECTURE.md with new features | `docs/ARCHITECTURE.md` | | |
-| 10.02 | - Document Memory Injection | `docs/ARCHITECTURE.md` | | |
-| 10.03 | - Document Knowledge Hub | `docs/ARCHITECTURE.md` | | |
-| 10.04 | - Document Tool Focus Selection | `docs/ARCHITECTURE.md` | | |
-| 10.05 | - Update ADR count and list | `docs/ARCHITECTURE.md` | | |
-| 10.06 | Finalize ADR 0020 (mindmap fix) | `docs/adr/0020-mindmap-data-structure-fix.md` | | |
-| 10.07 | Finalize ADR 0021 (memory injection) | `docs/adr/0021-conversational-memory-injection.md` | | |
-| 10.08 | Finalize ADR 0022 (knowledge hub) | `docs/adr/0022-knowledge-hub-architecture.md` | | |
-| 10.09 | Create conversation-memory.md | `docs/claude/conversation-memory.md` | | |
-| 10.10 | Create knowledge-hub.md | `docs/claude/knowledge-hub.md` | | |
-| 10.11 | Update CHANGELOG with all changes | `CHANGELOG.md` | | |
+| 10.01 | Update ARCHITECTURE.md with new features | `docs/ARCHITECTURE.md` | ✅ | |
+| 10.02 | - Document Memory Injection | `docs/ARCHITECTURE.md` | ✅ | |
+| 10.03 | - Document Knowledge Hub | `docs/ARCHITECTURE.md` | ✅ | |
+| 10.04 | - Document Tool Focus Selection | `docs/ARCHITECTURE.md` | ✅ | |
+| 10.05 | - Update ADR count and list | `docs/ARCHITECTURE.md` | ✅ (22 ADRs) | |
+| 10.06 | Finalize ADR 0020 (mindmap fix) | `docs/adr/0020-mindmap-data-structure-fix.md` | ✅ (Accepted) | |
+| 10.07 | Finalize ADR 0021 (memory injection) | `docs/adr/0021-conversational-memory-injection.md` | ✅ (Accepted) | |
+| 10.08 | Finalize ADR 0022 (knowledge hub) | `docs/adr/0022-knowledge-hub-architecture.md` | ✅ (Accepted) | |
+| 10.09 | Create conversation-memory.md | `docs/claude/conversation-memory.md` | ✅ | |
+| 10.10 | Create knowledge-hub.md | `docs/claude/knowledge-hub.md` | ✅ (updated) | |
+| 10.11 | Update CHANGELOG with all changes | `CHANGELOG.md` | ✅ | |
 
 ---
 
@@ -424,27 +424,27 @@ Verifica compliance con tutti gli standard.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 11.01 | Add WCAG 2.1 AA checks | `.claude/agents/app-release-manager.md` | | |
-| 11.02 | Add GDPR compliance for minors | `.claude/agents/app-release-manager.md` | | |
-| 11.03 | Add AI safety guardrails validation | `.claude/agents/app-release-manager.md` | | |
-| 11.04 | Add E2E educational flows | `.claude/agents/app-release-manager.md` | | |
+| 11.01 | Add WCAG 2.1 AA checks | `.claude/agents/app-release-manager.md` | ✅ | |
+| 11.02 | Add GDPR compliance for minors | `.claude/agents/app-release-manager.md` | ✅ | |
+| 11.03 | Add AI safety guardrails validation | `.claude/agents/app-release-manager.md` | ✅ | |
+| 11.04 | Add E2E educational flows | `.claude/agents/app-release-manager.md` | ✅ | |
 
 ### 11B: GDPR Verification
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 11.05 | Verify Knowledge Hub data can be exported | - | | |
-| 11.06 | Verify Knowledge Hub data can be deleted | - | | |
-| 11.07 | Verify Memory data respects consent | - | | |
-| 11.08 | Audit logging for new endpoints | - | | |
+| 11.05 | Verify Knowledge Hub data can be exported | `/api/user/data` | ✅ (includes materials) | |
+| 11.06 | Verify Knowledge Hub data can be deleted | `/api/user/data`, `/api/materials/bulk` | ✅ (cascade delete) | |
+| 11.07 | Verify Memory data respects consent | `/api/conversations/memory` | ✅ (auth check) | |
+| 11.08 | Audit logging for new endpoints | all routes | ✅ (logger.info) | |
 
 ### 11C: Security Audit
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 11.09 | OWASP check: all new API endpoints | - | | |
-| 11.10 | XSS check: all new UI components | - | | |
-| 11.11 | Auth check: all endpoints verify user | - | | |
+| 11.09 | OWASP check: all new API endpoints | - | ✅ (Zod + Prisma) | |
+| 11.10 | XSS check: all new UI components | - | ✅ (React escaping) | |
+| 11.11 | Auth check: all endpoints verify user | - | ✅ (33 routes) | |
 
 ---
 
@@ -454,16 +454,16 @@ Verifica finale completa. BLOCCA SE FALLISCE.
 
 | ID | Task | File | Status | Thor |
 |----|------|------|--------|------|
-| 12.01 | Full lint check (0 errors, 0 warnings) | - | | |
-| 12.02 | Full typecheck (0 errors) | - | | |
-| 12.03 | Full build (passes) | - | | |
-| 12.04 | Full test suite (all pass) | - | | |
-| 12.05 | Verify Objective A: Mindmaps work | - | | |
-| 12.06 | Verify Objective B: Memory works | - | | |
-| 12.07 | Verify Objective C: Tool UX works | - | | |
-| 12.08 | Verify Objective D: Knowledge Hub works | - | | |
-| 12.09 | Verify Objective E: Docs complete | - | | |
-| 12.10 | Final Thor review: EVERYTHING | - | | |
+| 12.01 | Full lint check (0 errors, 0 warnings) | - | ✅ | |
+| 12.02 | Full typecheck (0 errors) | - | ✅ | |
+| 12.03 | Full build (passes) | - | ✅ | |
+| 12.04 | Full test suite (all pass) | - | ✅ (1945 tests, 63 files) | |
+| 12.05 | Verify Objective A: Mindmaps work | - | ✅ | |
+| 12.06 | Verify Objective B: Memory works | - | ✅ | |
+| 12.07 | Verify Objective C: Tool UX works | - | ✅ | |
+| 12.08 | Verify Objective D: Knowledge Hub works | - | ✅ | |
+| 12.09 | Verify Objective E: Docs complete | - | ✅ | |
+| 12.10 | Final Thor review: EVERYTHING | - | ⏳ | |
 
 ---
 

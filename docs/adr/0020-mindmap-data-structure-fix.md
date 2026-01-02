@@ -1,7 +1,7 @@
 # ADR 0020: Mindmap Data Structure and Rendering Fix
 
 ## Status
-Proposed
+Accepted (Implemented 2026-01-02)
 
 ## Date
 2026-01-01
