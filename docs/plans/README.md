@@ -17,12 +17,14 @@ docs/plans/
 
 ### TODO
 
-| Plan | Data | Descrizione |
-|------|------|-------------|
-| [RepoMigration-MirrorBuddy](todo/RepoMigration-MirrorBuddy-2026-01-02.md) | 2026-01-02 | Rebrand ConvergioEdu → MirrorBuddy + transfer ownership |
-| [StudyKitGenerator](todo/StudyKitGenerator-2026-01-02.md) | 2026-01-02 | Trasforma PDF in kit studio (riassunto, mappa, demo, quiz) |
-| [VoiceModelMigration](todo/VoiceModelMigration-2026-01-02.md) | 2026-01-02 | Migrazione modello voice |
-| [KnowledgeBaseOptimization](todo/KnowledgeBaseOptimization-2026-01-01.md) | 2026-01-01 | Knowledge base lazy loading |
+| Plan | Data | Descrizione | Priority |
+|------|------|-------------|----------|
+| 🔴 [FUNCTIONAL VERIFICATION](todo/BRUTAL-VERIFICATION-REPORT-FUNCTIONAL-2026-01-02.md) | 2026-01-02 | **CRITICAL - Functional issues found - BLOCKS PR merge** | **CRITICAL** |
+| 🔴 [BRUTAL VERIFICATION REPORT](todo/BRUTAL-VERIFICATION-REPORT-2026-01-02.md) | 2026-01-02 | Code existence verified - See functional report for issues | HIGH |
+| [ManualTests Sprint 2026-01](todo/ManualTests-Sprint-2026-01.md) | 2026-01-02 | Test manuali per chiudere MasterPlan v2.1 | HIGH |
+| [ToolsInChatNavigation](todo/ToolsInChatNavigation-2026-01-02.md) | 2026-01-02 | Fix navigazione tool nella chat normale | MEDIUM |
+| [RepoMigration-MirrorBuddy](todo/RepoMigration-MirrorBuddy-2026-01-02.md) | 2026-01-02 | Rebrand ConvergioEdu → MirrorBuddy + transfer ownership | MEDIUM |
+| [DashboardAnalytics](todo/DashboardAnalytics-2026-01.md) | 2026-01-02 | Dashboard analytics enhancement (backlog) | LOW |
 
 ### DOING
 

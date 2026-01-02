@@ -90,15 +90,45 @@ function WelcomeContent() {
   const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
   const lastTranscriptRef = useRef<string | null>(null);
 
+  // Voice reconnection logic (use state to trigger effect re-runs)
+  const [voiceRetryAttempts, setVoiceRetryAttempts] = useState(0);
+  const voiceRetryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const MAX_VOICE_RETRIES = 3;
+  const VOICE_RETRY_DELAY_MS = 2000; // Start with 2 seconds
+
   // ========== SINGLE VOICE SESSION FOR ALL ONBOARDING STEPS ==========
   const voiceSession = useVoiceSession({
     noiseReductionType: 'far_field',
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('[WelcomePage] Voice error', { message });
-      setUseWebSpeechFallback(true);
+      logger.error('[WelcomePage] Voice error', {
+        message,
+        retryAttempt: voiceRetryAttempts,
+        maxRetries: MAX_VOICE_RETRIES,
+      });
+
+      // Retry logic with exponential backoff
+      if (voiceRetryAttempts < MAX_VOICE_RETRIES) {
+        setVoiceRetryAttempts((prev) => prev + 1);
+        logger.info('[WelcomePage] Will attempt voice reconnection', {
+          nextAttempt: voiceRetryAttempts + 1,
+          maxRetries: MAX_VOICE_RETRIES,
+        });
+      } else {
+        // Max retries exceeded - fallback permanently to Web Speech
+        logger.warn('[WelcomePage] Max voice retries exceeded, falling back to Web Speech', {
+          totalAttempts: voiceRetryAttempts,
+        });
+        setUseWebSpeechFallback(true);
+      }
     },
     onTranscript: (role, text) => {
+      // Voice session working - reset retry counter
+      if (voiceRetryAttempts > 0) {
+        logger.info('[WelcomePage] Voice session recovered, resetting retry counter');
+        setVoiceRetryAttempts(0);
+      }
+
       // Deduplicate transcripts
       if (lastTranscriptRef.current === text.substring(0, 50)) return;
       lastTranscriptRef.current = text.substring(0, 50);
@@ -164,6 +194,62 @@ function WelcomeContent() {
     }
     fetchExistingData();
   }, [updateData]);
+
+  // Auto-reconnect voice session on error (with retry limit)
+  useEffect(() => {
+    // Only attempt reconnection if we're in retry mode
+    if (
+      connectionInfo &&
+      !useWebSpeechFallback &&
+      voiceRetryAttempts > 0 &&
+      voiceRetryAttempts <= MAX_VOICE_RETRIES
+    ) {
+      const retryDelay = VOICE_RETRY_DELAY_MS * voiceRetryAttempts;
+
+      logger.info('[WelcomePage] Scheduling voice reconnection', {
+        attempt: voiceRetryAttempts,
+        delayMs: retryDelay,
+      });
+
+      // Clear any existing timeout
+      if (voiceRetryTimeoutRef.current) {
+        clearTimeout(voiceRetryTimeoutRef.current);
+      }
+
+      // Schedule reconnection
+      voiceRetryTimeoutRef.current = setTimeout(() => {
+        logger.info('[WelcomePage] Executing voice reconnection attempt', {
+          attempt: voiceRetryAttempts,
+        });
+
+        // Disconnect and reconnect to force fresh session
+        voiceSession.disconnect();
+
+        // Wait a bit before reconnecting
+        setTimeout(() => {
+          if (connectionInfo) {
+            voiceSession.connect(
+              createOnboardingMelissa(existingUserData),
+              connectionInfo
+            );
+          }
+        }, 500);
+      }, retryDelay);
+    }
+
+    // Cleanup timeout on unmount
+    return () => {
+      if (voiceRetryTimeoutRef.current) {
+        clearTimeout(voiceRetryTimeoutRef.current);
+      }
+    };
+  }, [
+    connectionInfo,
+    useWebSpeechFallback,
+    voiceRetryAttempts,
+    voiceSession,
+    existingUserData,
+  ]);
 
   // Callback when Azure is unavailable - fallback to Web Speech TTS
   const handleAzureUnavailable = useCallback(() => {
