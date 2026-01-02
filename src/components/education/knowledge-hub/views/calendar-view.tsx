@@ -17,12 +17,16 @@ import type { KnowledgeHubMaterial } from './explorer-view';
 
 /** Convert KnowledgeHubMaterial to Material for MaterialCard */
 function toMaterial(m: KnowledgeHubMaterial): Material {
+  const createdAt = m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt);
+  const updatedAt = m.updatedAt
+    ? (m.updatedAt instanceof Date ? m.updatedAt : new Date(m.updatedAt))
+    : createdAt;
   return {
     id: m.id,
     title: m.title,
     type: m.toolType,
-    createdAt: m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
-    updatedAt: m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
+    createdAt,
+    updatedAt,
     collectionId: m.collectionId,
     isFavorite: m.isFavorite,
     isArchived: m.isArchived,

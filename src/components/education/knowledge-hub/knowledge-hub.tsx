@@ -378,9 +378,13 @@ export function KnowledgeHub({
                     createdAt: previewMaterial.createdAt instanceof Date
                       ? previewMaterial.createdAt
                       : new Date(previewMaterial.createdAt),
-                    updatedAt: previewMaterial.createdAt instanceof Date
-                      ? previewMaterial.createdAt
-                      : new Date(previewMaterial.createdAt),
+                    updatedAt: previewMaterial.updatedAt
+                      ? (previewMaterial.updatedAt instanceof Date
+                          ? previewMaterial.updatedAt
+                          : new Date(previewMaterial.updatedAt))
+                      : (previewMaterial.createdAt instanceof Date
+                          ? previewMaterial.createdAt
+                          : new Date(previewMaterial.createdAt)),
                     tags: previewMaterial.tags,
                     isFavorite: previewMaterial.isFavorite,
                   }}
