@@ -282,9 +282,30 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      // Force tool call when a specific tool is requested
+      const toolChoiceForRequest = (() => {
+        if (!enableTools) return 'none' as const;
+        if (requestedTool) {
+          // Map requestedTool to function name
+          const toolFunctionMap: Record<string, string> = {
+            mindmap: 'create_mindmap',
+            quiz: 'create_quiz',
+            flashcard: 'create_flashcards',
+            demo: 'create_demo',
+            summary: 'create_summary',
+          };
+          const functionName = toolFunctionMap[requestedTool];
+          if (functionName) {
+            // Force the specific tool to be called
+            return { type: 'function' as const, function: { name: functionName } };
+          }
+        }
+        return 'auto' as const;
+      })();
+
       const result = await chatCompletion(messages, enhancedSystemPrompt, {
         tools: enableTools ? ([...CHAT_TOOL_DEFINITIONS] as typeof CHAT_TOOL_DEFINITIONS[number][]) : undefined,
-        tool_choice: enableTools ? 'auto' : 'none',
+        tool_choice: toolChoiceForRequest,
         providerPreference,
       });
 
