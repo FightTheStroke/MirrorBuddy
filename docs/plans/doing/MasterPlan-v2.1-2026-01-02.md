@@ -22,6 +22,51 @@ Piano unificato che risolve **6 bug critici** + implementa feature pianificate.
 
 ---
 
+## GitHub Issues WAVE 0
+
+| Bug | Issue | Track | Status |
+|-----|-------|-------|--------|
+| 0.1 Tool Creation | [#97](https://github.com/Roberdan/ConvergioEdu/issues/97) | A | Open |
+| 0.2 Memory Maestri | [#98](https://github.com/Roberdan/ConvergioEdu/issues/98) | B | Open |
+| 0.3 Demo Interattive | [#99](https://github.com/Roberdan/ConvergioEdu/issues/99) | A | Open |
+| 0.4 Gamification | [#100](https://github.com/Roberdan/ConvergioEdu/issues/100) | C | Open |
+| 0.5 Parent Dashboard | [#101](https://github.com/Roberdan/ConvergioEdu/issues/101) | D | Open |
+| 0.6 Layout Full Screen | [#102](https://github.com/Roberdan/ConvergioEdu/issues/102) | D | Open |
+
+### Gestione Issues
+
+```
+WORKFLOW PER OGNI ISSUE:
+
+1. PRIMA DI INIZIARE:
+   - Assegna issue a te stesso
+   - Sposta in "In Progress" (se usi Projects)
+   - Crea branch: git checkout -b fix/issue-{numero}-{descrizione-breve}
+
+2. DURANTE IL LAVORO:
+   - Committa con: "fix: {descrizione} (#{numero})"
+   - Aggiorna checklist nell'issue man mano
+   - Se trovi problemi aggiuntivi, aggiungi task alla checklist
+
+3. DOPO IL FIX:
+   - npm run lint && npm run typecheck && npm run test:unit
+   - Lancia thor-quality-assurance-guardian
+   - Solo se thor approva:
+     - Committa finale
+     - Aggiorna issue: "Fixed in {commit-sha}"
+     - Marca tutti i checkbox come completati
+     - NON chiudere l'issue (si chiude con PR)
+
+4. AL TERMINE DI WAVE 0:
+   - Tutti i fix su development
+   - Crea PR: development → main
+   - Nel corpo PR, elenca: "Closes #97, #98, #99, #100, #101, #102"
+   - Thor review finale
+   - Merge chiude automaticamente le issues
+```
+
+---
+
 # WAVE 0: CRITICAL BUGS [ASAP]
 
 ## BUG 0.1: Tool Creation con Maestri NON FUNZIONA
