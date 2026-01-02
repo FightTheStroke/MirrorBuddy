@@ -26,12 +26,12 @@ Piano unificato che risolve **6 bug critici** + implementa feature pianificate.
 
 | Bug | Issue | Track | Status |
 |-----|-------|-------|--------|
-| 0.1 Tool Creation | [#97](https://github.com/Roberdan/ConvergioEdu/issues/97) | A | Open |
-| 0.2 Memory Maestri | [#98](https://github.com/Roberdan/ConvergioEdu/issues/98) | B | Open |
-| 0.3 Demo Interattive | [#99](https://github.com/Roberdan/ConvergioEdu/issues/99) | A | Open |
-| 0.4 Gamification | [#100](https://github.com/Roberdan/ConvergioEdu/issues/100) | C | Open |
+| 0.1 Tool Creation | [#97](https://github.com/Roberdan/ConvergioEdu/issues/97) | A | ✅ Fixed |
+| 0.2 Memory Maestri | [#98](https://github.com/Roberdan/ConvergioEdu/issues/98) | B | ✅ Fixed |
+| 0.3 Demo Interattive | [#99](https://github.com/Roberdan/ConvergioEdu/issues/99) | A | ✅ Fixed |
+| 0.4 Gamification | [#100](https://github.com/Roberdan/ConvergioEdu/issues/100) | C | ⚠️ Partial |
 | 0.5 Parent Dashboard | [#101](https://github.com/Roberdan/ConvergioEdu/issues/101) | D | Open |
-| 0.6 Layout Full Screen | [#102](https://github.com/Roberdan/ConvergioEdu/issues/102) | D | Open |
+| 0.6 Layout Full Screen | [#102](https://github.com/Roberdan/ConvergioEdu/issues/102) | D | ⚠️ Partial |
 
 ### Gestione Issues
 
@@ -104,7 +104,8 @@ WORKFLOW PER OGNI ISSUE:
   - `conversation-flow.tsx` deve leggere `pendingToolRequest` se presente
   - Altrimenti aprire dialog selezione maestro
 
-- [ ] **0.1.4** Test E2E: creare tool con 3 maestri diversi, verificare che funzioni
+- [x] **0.1.4** Fix Maestro ID mismatch: focus-tool-layout now uses @/data getMaestroById
+- [ ] **0.1.5** Test E2E: creare tool con 3 maestri diversi, verificare che funzioni
 
 ---
 
@@ -176,7 +177,8 @@ Stesso problema di BUG 0.1: il flusso `conversation-flow.tsx` non permette di se
   - ✅ Added 'demo' type to ToolMaestroSelectionDialog TOOL_NAMES mapping
 - [x] **0.3.3** Stesso fix di 0.1.1: permettere selezione maestro per creare demo
   - ✅ Demo creation now uses maestro selection dialog (same flow as other tools)
-- [ ] **0.3.4** Test: chiedere a Galileo di creare demo sul sistema solare
+- [x] **0.3.4** Fix demo images not showing: added img-src to CSP in demo-sandbox.tsx
+- [ ] **0.3.5** Test: chiedere a Galileo di creare demo sul sistema solare
 
 ---
 
@@ -475,6 +477,45 @@ Test manuali separati:
 
 ---
 
+## WAVE 0 Progress Summary
+
+### ✅ Completed (PR #103)
+
+**Bug 0.1 - Tool Creation:**
+- ToolMaestroSelectionDialog added to conversation-flow.tsx
+- Focus fallback fixed in focus-tool-layout.tsx
+- pendingToolRequest handling implemented
+- **Critical Fix**: Maestro ID mismatch resolved (was using wrong import)
+
+**Bug 0.2 - Memory System:**
+- InactivityMonitor activated with trackActivity
+- Auto-summary on: tab close, maestro switch, voice end, timeout
+- Memory passed to chat API
+- Contextual greetings based on previous conversations
+
+**Bug 0.3 - Demo Interattive:**
+- demo-handler properly registered
+- Demo type added to tool selection dialog
+- Same maestro selection flow as other tools
+- **Critical Fix**: Images now show (CSP img-src added)
+
+### ⚠️ Partial
+
+**Bug 0.4 - Gamification:**
+- XP system works but Maestri don't communicate it
+- Need: system prompt updates, XP toast notifications
+
+**Bug 0.6 - Layout Full Screen:**
+- Basic layout implemented (sidebar, tool area, panel)
+- Need: redesign to match phone-call UI style for consistency
+
+### ❌ Not Started
+
+**Bug 0.5 - Parent Dashboard:**
+- UI integration improvements not done
+
+---
+
 **Autore**: Claude Opus 4.5
-**Versione**: 2.0
-**Ultimo Update**: 2026-01-02
+**Versione**: 2.1
+**Ultimo Update**: 2026-01-02 15:30
