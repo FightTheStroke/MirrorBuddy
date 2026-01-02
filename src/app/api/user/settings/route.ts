@@ -2,12 +2,33 @@
 // API ROUTE: User settings
 // GET: Get current settings
 // PUT: Update settings
+// #92: Added Zod validation for type safety
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+
+// #92: Zod schema for settings validation
+const SettingsUpdateSchema = z.object({
+  theme: z.enum(['light', 'dark', 'system']).optional(),
+  language: z.string().max(10).optional(),
+  accentColor: z.string().max(20).optional(),
+  provider: z.enum(['azure', 'ollama']).optional(),  // #89: Only valid providers
+  model: z.string().max(50).optional(),
+  budgetLimit: z.number().min(0).max(10000).optional(),
+  totalSpent: z.number().min(0).optional(),  // #88: Now accepted
+  // Accessibility
+  fontSize: z.enum(['small', 'medium', 'large', 'extra-large']).optional(),
+  highContrast: z.boolean().optional(),
+  dyslexiaFont: z.boolean().optional(),
+  reducedMotion: z.boolean().optional(),
+  voiceEnabled: z.boolean().optional(),
+  simplifiedLanguage: z.boolean().optional(),
+  adhdMode: z.boolean().optional(),
+}).strict();  // Reject unknown fields
 
 export async function GET() {
   try {
@@ -48,18 +69,24 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const body = await request.json();
 
-    // Remove fields that shouldn't be updated directly
-    delete data.id;
-    delete data.userId;
-    delete data.createdAt;
-    delete data.updatedAt;
+    // #92: Validate with Zod before writing to DB
+    const validation = SettingsUpdateSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid settings data',
+          details: validation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
+    }
 
     const settings = await prisma.settings.upsert({
       where: { userId },
-      update: data,
-      create: { userId, ...data },
+      update: validation.data,
+      create: { userId, ...validation.data },
     });
 
     return NextResponse.json(settings);

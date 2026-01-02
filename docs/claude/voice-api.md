@@ -2,15 +2,55 @@
 
 > **LEGGI QUESTO PRIMA DI TOCCARE IL CODICE VOICE**
 
-## Modelli Disponibili (Dicembre 2025)
+## Modelli Disponibili (Gennaio 2026)
 
-| Modello | Versione | Stato | Note |
-|---------|----------|-------|------|
-| `gpt-realtime` | 2025-08-28 | **GA** | Raccomandato, qualità massima (ATTUALE) |
-| `gpt-realtime-mini` | 2025-12-15 | GA | Più veloce, costo minore (FUTURO) |
-| `gpt-4o-realtime-preview` | 2025-06-03 | **Deprecated** | NON usare |
+| Modello | Versione | Stato | Costo Audio | Note |
+|---------|----------|-------|-------------|------|
+| `gpt-realtime` | 2025-08-28 | **GA** | $0.30/min | Qualità massima (ATTUALE) |
+| `gpt-realtime-mini` | 2025-12-15 | **GA** | ~$0.03-0.05/min | **90% risparmio** - RACCOMANDATO |
+| `gpt-4o-realtime-preview` | 2025-06-03 | Deprecated | - | NON usare |
 
 **Deployment attuale**: `gpt-4o-realtime` → modello `gpt-realtime` (GA)
+
+### Confronto Pricing Dettagliato
+
+| Metrica | `gpt-realtime` | `gpt-realtime-mini` | Risparmio |
+|---------|----------------|---------------------|-----------|
+| Audio Input | $100/1M tokens | $10/1M tokens | 90% |
+| Audio Output | $200/1M tokens | $20/1M tokens | 90% |
+| Text Input | $5/1M tokens | $0.60/1M tokens | 88% |
+| Text Output | $20/1M tokens | $2.40/1M tokens | 88% |
+| **Costo pratico bidirezionale** | ~$0.30/min | ~$0.03-0.05/min | **80-90%** |
+
+### Quando Usare Mini vs Standard
+
+| Use Case | Modello Consigliato | Motivo |
+|----------|---------------------|--------|
+| Tutoring educativo | **Mini** | System prompt guida la personalità |
+| Onboarding studenti | **Mini** | Conversazioni semplici |
+| Supporto emotivo (MirrorBuddy) | Standard | Richiede sfumature emotive |
+| Demo/testing | **Mini** | Risparmio costi |
+
+### Migrazione a Mini
+
+1. Deploy nuovo modello:
+```bash
+az cognitiveservices account deployment create \
+  --resource-group rg-virtualbpm-prod \
+  --name aoai-virtualbpm-prod \
+  --deployment-name gpt-realtime-mini \
+  --model-name gpt-realtime-mini \
+  --model-version 2025-12-15 \
+  --sku-name Standard \
+  --sku-capacity 1
+```
+
+2. Aggiorna `.env.local`:
+```bash
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime-mini
+```
+
+3. Test qualità con Maestri prima di produzione
 
 ## Session Config Ottimale (Issue #61)
 
