@@ -101,22 +101,28 @@ function WelcomeContent() {
     noiseReductionType: 'far_field',
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('[WelcomePage] Voice error', {
-        message,
-        retryAttempt: voiceRetryAttempts,
-        maxRetries: MAX_VOICE_RETRIES,
-      });
 
       // Retry logic with exponential backoff
       if (voiceRetryAttempts < MAX_VOICE_RETRIES) {
+        // Temporary issue - will retry (warn level)
+        logger.warn('[WelcomePage] Voice connection issue, will retry', {
+          message,
+          retryAttempt: voiceRetryAttempts + 1,
+          maxRetries: MAX_VOICE_RETRIES,
+        });
         setVoiceRetryAttempts((prev) => prev + 1);
-        logger.info('[WelcomePage] Will attempt voice reconnection', {
+        logger.info('[WelcomePage] Scheduling voice reconnection', {
           nextAttempt: voiceRetryAttempts + 1,
           maxRetries: MAX_VOICE_RETRIES,
         });
       } else {
-        // Max retries exceeded - fallback permanently to Web Speech
-        logger.warn('[WelcomePage] Max voice retries exceeded, falling back to Web Speech', {
+        // Max retries exceeded - this is now an actual error
+        logger.error('[WelcomePage] Voice connection failed after all retries', {
+          message,
+          totalAttempts: voiceRetryAttempts,
+          maxRetries: MAX_VOICE_RETRIES,
+        });
+        logger.warn('[WelcomePage] Falling back to Web Speech', {
           totalAttempts: voiceRetryAttempts,
         });
         setUseWebSpeechFallback(true);
@@ -143,7 +149,10 @@ function WelcomeContent() {
         const response = await fetch('/api/realtime/token');
         const data = await response.json();
         if (data.error) {
-          logger.error('[WelcomePage] Voice API error', { error: data.error });
+          // Voice API not available - graceful fallback (not an error in test/dev environments)
+          logger.warn('[WelcomePage] Voice API not available, using Web Speech fallback', {
+            error: data.error,
+          });
           setHasCheckedAzure(true);
           setUseWebSpeechFallback(true);
           return;
@@ -151,7 +160,10 @@ function WelcomeContent() {
         setConnectionInfo(data as VoiceConnectionInfo);
         setHasCheckedAzure(true);
       } catch (error) {
-        logger.error('[WelcomePage] Failed to get voice config', { error: String(error) });
+        // Voice API unavailable - graceful fallback (expected in test environment)
+        logger.warn('[WelcomePage] Voice API unavailable, using Web Speech fallback', {
+          error: String(error),
+        });
         setHasCheckedAzure(true);
         setUseWebSpeechFallback(true);
       }
