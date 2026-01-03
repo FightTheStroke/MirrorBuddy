@@ -201,7 +201,7 @@
 | 2.4 | C-1: STT Discrepancy (P1) | [x] | 3 Gen | 3 Gen | - | Claude-A |
 | 2.5 | C-6: Timer + XP Bar (P2) | [x] | 3 Gen | 3 Gen | - | Claude-A |
 | 2.6 | C-7: Demo Accessibility (P1) | [x] | 3 Gen | 3 Gen | - | Claude-A |
-| 2.7 | C-8: Cafe Audio (P2) | [ ] | - | - | SKIP: requires CC0 download | Claude-A |
+| 2.7 | C-8: Cafe Audio (P2) | [x] | 3 Gen | 3 Gen | N/A: already procedural (createCafeNode in generators.ts) | Claude-A |
 | 2.8 | C-10: Demo in frame (P1) | [x] | 3 Gen | 3 Gen | Verified: already in-frame | Claude-A |
 | 2.9 | C-11: Triple voice cleanup (P1) | [x] | 3 Gen | 3 Gen | Verified: no evidence in code | Claude-A |
 | 2.10 | C-17: Fullscreen on Tool Creation (P1) | [x] | 3 Gen | 3 Gen | Fixed in voice-session.tsx, maestro-session.tsx | Claude-A |
@@ -209,7 +209,7 @@
 | 2.12 | C-19: ESC Key Inconsistent (P1) | [x] | 3 Gen | 3 Gen | Fixed: 4 components (parent-professor-chat, session-rating-modal, achievements, character-switcher) | Claude-A |
 | 2.13 | C-20: Tool Not Interactive (P2) | [x] | 3 Gen | 3 Gen | Fixed: pointer-events + circle styling for expand/collapse | Claude-A |
 | 2.14 | C-21: Summary Tool Missing Features (P2) | [x] | 3 Gen | 3 Gen | Fixed: PDF export, convert to mindmap, generate flashcards | Claude-A |
-| - | PR created | [ ] | | | | Claude-A |
+| - | PR #106 updated | [x] | 3 Gen | 3 Gen | Commit 5f91602 pushed to development | Claude-A |
 
 ---
 

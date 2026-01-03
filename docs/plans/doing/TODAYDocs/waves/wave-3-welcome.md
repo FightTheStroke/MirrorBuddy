@@ -160,16 +160,16 @@ Design and implement a welcome experience for MirrorBuddy that functions as a **
 
 | Step | Task | Status | Date | Signature |
 |------|------|--------|------|-----------|
-| 3.1 | hero-section.tsx | [ ] | | Claude-B1 |
-| 3.2 | features-section.tsx | [ ] | | Claude-B2 |
-| 3.3 | guides-section.tsx | [ ] | | Claude-B3 |
-| 3.4 | quick-start.tsx | [ ] | | Claude-B1 |
-| 3.5 | Refactor page.tsx | [ ] | | Claude-B1 |
-| 3.6 | Skip flow | [ ] | | Claude-B1 |
-| 3.7 | Returning user logic | [ ] | | Claude-B1 |
-| 3.8 | Settings link | [ ] | | Claude-B1 |
-| 3.9 | E2E tests | [ ] | | Claude-B1 |
-| - | PR created | [ ] | | Claude-B1 |
+| 3.1 | hero-section.tsx | [x] | 3 Gen | Claude-A |
+| 3.2 | features-section.tsx | [x] | 3 Gen | Claude-A |
+| 3.3 | guides-section.tsx | [x] | 3 Gen | Claude-A |
+| 3.4 | quick-start.tsx | [x] | 3 Gen | Claude-A |
+| 3.5 | Refactor page.tsx | [x] | 3 Gen | Claude-A |
+| 3.6 | Skip flow | [x] | 3 Gen | Claude-A (handleSkipWithConfirmation) |
+| 3.7 | Returning user logic | [x] | 3 Gen | Claude-A (already in page.tsx) |
+| 3.8 | Settings link | [x] | 3 Gen | Claude-A (profile-settings.tsx + /welcome?replay=true) |
+| 3.9 | E2E tests | [x] | 3 Gen | Claude-A (e2e/welcome.spec.ts - 18 tests) |
+| - | PR created | [ ] | | Claude-A |
 
 ---
 
