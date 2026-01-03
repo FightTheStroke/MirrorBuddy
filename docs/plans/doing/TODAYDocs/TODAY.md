@@ -22,14 +22,14 @@ W4  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/11  
 W5  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/9   ⏸️  Needs W3+W4
 ```
 
-| W | What | Who | ✓ | Tasks | Start | Done | Time |
-|---|------|-----|---|-------|-------|------|------|
-| 0 | QA + Plan Update | Roberto | ✅ | 3/3 (100%) | 17:15 | 18:44 | 1h29m |
-| 1-2 | Bug Fixes (21: 7 P0, 9 P1, 5 P2) | Claude-A | ⏳ | 0/21 (0%) | - | - | - |
-| 3 | Welcome Experience | B1, B2, B3 | ⏸️ | 0/9 (0%) | - | - | - |
-| 4 | Supporti Consolidation | C1, C2 | ⏸️ | 0/11 (0%) | - | - | - |
-| 5 | Thor QA + Merge | Thor + Roberto | ⏸️ | 0/9 (0%) | - | - | - |
-| **TOT** | **Full Plan Execution** | **All** | 🔄 | **3/53 (6%)** | 3 Gen | - | 1h29m |
+| Wave | Who | ✓ | Tasks | Start | Done | Time |
+|------|-----|---|-------|-------|------|------|
+| **W0**: QA + Plan Update | Roberto | ✅ | 3/3 (100%) | 17:15 | 18:44 | 1h29m |
+| **W1-2**: Bug Fixes (7 P0, 9 P1, 5 P2) | Claude-A | ⏳ | 0/21 (0%) | - | - | - |
+| **W3**: Welcome Experience | B1, B2, B3 | ⏸️ | 0/9 (0%) | - | - | - |
+| **W4**: Supporti Consolidation | C1, C2 | ⏸️ | 0/11 (0%) | - | - | - |
+| **W5**: Thor QA + Merge | Thor + Roberto | ⏸️ | 0/9 (0%) | - | - | - |
+| **TOTAL**: Full Plan | **All** | 🔄 | **3/53 (6%)** | 3 Gen | - | 1h29m |
 
 ### Wave 0: QA & Planning (COMPLETE)
 
