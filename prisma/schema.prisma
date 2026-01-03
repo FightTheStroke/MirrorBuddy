@@ -495,6 +495,9 @@ model Material {
   collection   Collection? @relation(fields: [collectionId], references: [id])
   tags         MaterialTag[]
 
+  // Study Kit integration (links back to originating Study Kit)
+  sourceStudyKitId String?
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -505,6 +508,7 @@ model Material {
   @@index([createdAt])
   @@index([isBookmarked])
   @@index([collectionId])
+  @@index([sourceStudyKitId])
 }
 
 // ============================================================================

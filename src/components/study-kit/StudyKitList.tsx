@@ -149,8 +149,8 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
             <div
               key={kit.id}
               className={cn(
-                'bg-white dark:bg-slate-800 border rounded-lg p-4 transition-all',
-                'hover:shadow-md hover:border-primary',
+                'bg-white dark:bg-slate-800 border rounded-2xl p-4 transition-all shadow-sm',
+                'hover:shadow-lg hover:border-primary',
                 kit.status === 'ready'
                   ? 'border-slate-200 dark:border-slate-700'
                   : kit.status === 'processing'

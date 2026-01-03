@@ -176,7 +176,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
       <div
         className={cn(
           'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
-          file ? 'border-green-500 bg-green-50 dark:bg-green-950' : 'border-slate-300 dark:border-slate-600 hover:border-primary',
+          file ? 'border-primary bg-primary/5' : 'border-slate-300 dark:border-slate-600 hover:border-primary',
           uploadStatus !== 'idle' && 'pointer-events-none opacity-50'
         )}
         onDrop={handleDrop}
@@ -194,7 +194,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
 
         {file ? (
           <div className="flex items-center justify-center gap-3">
-            <FileText className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <FileText className="w-8 h-8 text-primary" />
             <div className="text-left">
               <p className="font-medium text-slate-900 dark:text-white">{file.name}</p>
               <p className="text-sm text-slate-500">

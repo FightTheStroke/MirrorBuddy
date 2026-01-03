@@ -91,21 +91,21 @@ export function StudyKitView() {
 
       {/* Info cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-          <h3 className="font-medium text-blue-900 dark:text-blue-100 text-sm">Riassunto</h3>
-          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">Sintesi dei concetti chiave</p>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Riassunto</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Sintesi dei concetti chiave</p>
         </div>
-        <div className="bg-green-50 dark:bg-green-950/50 border border-green-200 dark:border-green-800 rounded-lg p-3">
-          <h3 className="font-medium text-green-900 dark:text-green-100 text-sm">Mappa Mentale</h3>
-          <p className="text-xs text-green-700 dark:text-green-300 mt-1">Collegamenti tra concetti</p>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Mappa Mentale</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Collegamenti tra concetti</p>
         </div>
-        <div className="bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
-          <h3 className="font-medium text-purple-900 dark:text-purple-100 text-sm">Demo</h3>
-          <p className="text-xs text-purple-700 dark:text-purple-300 mt-1">Simulazioni STEM</p>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Demo</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Simulazioni STEM</p>
         </div>
-        <div className="bg-orange-50 dark:bg-orange-950/50 border border-orange-200 dark:border-orange-800 rounded-lg p-3">
-          <h3 className="font-medium text-orange-900 dark:text-orange-100 text-sm">Quiz</h3>
-          <p className="text-xs text-orange-700 dark:text-orange-300 mt-1">Verifica comprensione</p>
+        <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Quiz</h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Verifica comprensione</p>
         </div>
       </div>
     </div>

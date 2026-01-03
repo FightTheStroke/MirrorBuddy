@@ -9,8 +9,10 @@ import { useState, useEffect, useMemo, useCallback, useRef, type ChangeEvent } f
 import { AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Fuse from 'fuse.js';
-import { Grid, List, Search, X, ChevronRight, Home } from 'lucide-react';
+import { Grid, List, Search, X, ChevronRight, Home, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { getActiveMaterials, deleteMaterial } from '@/lib/storage/materials-db';
@@ -224,30 +226,32 @@ export function SupportiView({
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <div className="relative flex-1 sm:flex-initial">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
                 type="text"
                 placeholder="Cerca..."
                 value={searchQuery}
                 onChange={handleSearchChange}
-                className="pl-9 w-full sm:w-48 h-10 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-primary"
+                className="pl-9 w-full sm:w-48"
                 aria-label="Cerca materiali"
               />
               {searchQuery && (
                 <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <X className="w-4 h-4 text-slate-400" />
+                  <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               )}
             </div>
 
-            <select
-              value={sortBy}
-              onChange={e => setSortBy(e.target.value as SortBy)}
-              className="appearance-none pl-8 pr-8 h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm cursor-pointer"
-              aria-label="Ordina per"
-            >
-              {SORT_OPTIONS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-            </select>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortBy)}>
+              <SelectTrigger className="w-[140px]" aria-label="Ordina per">
+                <SelectValue placeholder="Ordina per" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <div className="flex border rounded-lg dark:border-slate-700">
               <Button
@@ -275,7 +279,7 @@ export function SupportiView({
         {/* Content */}
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState filter="all" />
