@@ -457,7 +457,7 @@ export function ParentDashboard({
                 settings.highContrast ? 'text-white' : 'text-slate-900 dark:text-white'
               )}
             >
-              {stats.hours}h
+              {stats?.hours ?? 0}h
             </p>
             <p className="text-sm text-slate-500">Tempo totale</p>
           </CardContent>
@@ -477,7 +477,7 @@ export function ParentDashboard({
                 settings.highContrast ? 'text-white' : 'text-slate-900 dark:text-white'
               )}
             >
-              {stats.sessions}
+              {stats?.sessions ?? 0}
             </p>
             <p className="text-sm text-slate-500">Sessioni</p>
           </CardContent>
@@ -497,7 +497,7 @@ export function ParentDashboard({
                 settings.highContrast ? 'text-white' : 'text-slate-900 dark:text-white'
               )}
             >
-              {stats.maestri}
+              {stats?.maestri ?? 0}
             </p>
             <p className="text-sm text-slate-500">Maestri</p>
           </CardContent>
