@@ -106,6 +106,13 @@
 - [x] 4.1.1 - CHANGELOG.md aggiornato (rebrand + dashboard entries)
 - [x] 4.1.2 - Piano completato documentato
 
+## WAVE 4.5: POST-REVIEW FIXES ✅
+
+- [x] 4.5.1 - Auth aggiunta a tutti i 5 dashboard API routes (Codex P1)
+- [x] 4.5.2 - SessionStorage migration code chiamato in Providers
+- [x] 4.5.3 - E2E test aggiornato per gestire 401
+- [x] 4.5.4 - Risposto al commento Codex su PR #105
+
 ---
 
 # WAVE 5: AZIONI ROBERTO ⏳
