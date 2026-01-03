@@ -27,10 +27,8 @@ import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
-// Summary generation moved to API call to avoid Prisma in client bundle
-// API: POST /api/conversations/[id]/end
-// Contextual greeting also uses API to avoid Prisma in client bundle
-// API: POST /api/conversations/greeting
+import { endConversationWithSummary as generateSummary } from '@/lib/conversation/summary-generator';
+import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
 
 // ============================================================================
 // CONSTANTS
@@ -472,7 +470,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         });
       },
 
-      endConversationWithSummary: async (conversationId: string, userId: string) => {
+      endConversationWithSummary: async (conversationId: string, _userId: string) => {
         const state = get();
 
         // Stop inactivity monitoring
@@ -484,15 +482,10 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
           : 0;
 
         try {
-          // Generate summary via API (avoiding Prisma in client bundle)
-          const response = await fetch(`/api/conversations/${conversationId}/end`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId }),
-          });
-          const result = response.ok ? await response.json() : null;
+          // Generate summary
+          const result = await generateSummary(conversationId);
 
-          if (result && result.success) {
+          if (result) {
             set({
               sessionSummary: {
                 topics: result.topics,
@@ -805,15 +798,12 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
         maestroName: string
       ): Promise<string | null> => {
         try {
-          const response = await fetch('/api/conversations/greeting', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, characterId, studentName, maestroName }),
-          });
-
-          if (!response.ok) return null;
-
-          const result = await response.json();
+          const result = await getGreetingForCharacter(
+            userId,
+            characterId,
+            studentName,
+            maestroName
+          );
           return result?.greeting || null;
         } catch (error) {
           console.error('Failed to load contextual greeting:', error);

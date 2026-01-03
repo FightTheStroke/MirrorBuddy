@@ -101,20 +101,11 @@ export async function POST(request: NextRequest) {
       where: { userId },
     });
 
-    const totalMinutes = sessions.reduce((sum: number, s: { duration: number | null }) => sum + (s.duration || 0), 0);
-    const uniqueMaestroIds = sessions
-      .map((s: { maestroId: string | null }) => s.maestroId)
-      .filter((id: string | null): id is string => id !== null);
-    const maestriInteracted: string[] = Array.from(new Set(uniqueMaestroIds));
+    const totalMinutes = sessions.reduce((sum: number, s) => sum + (s.duration || 0), 0);
+    const maestriInteracted = [...new Set(sessions.map((s) => s.maestroId).filter((id): id is string => id !== null))];
 
     // Convert Learning entries to MaestroInsightInput format
-    const insights: MaestroInsightInput[] = learnings.map((learning: {
-      maestroId: string | null;
-      category: string;
-      insight: string;
-      confidence: number;
-      createdAt: Date;
-    }) => ({
+    const insights: MaestroInsightInput[] = learnings.map((learning) => ({
       maestroId: learning.maestroId || 'unknown',
       maestroName: getMaestroDisplayName(learning.maestroId || 'unknown'),
       category: mapCategoryFromLearning(learning.category),

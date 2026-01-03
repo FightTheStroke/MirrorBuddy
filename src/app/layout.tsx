@@ -1,12 +1,9 @@
 import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import './globals.css';
 
-// System font stack - avoids external font fetching which may be blocked
-// This stack uses Inter if available locally, falls back to system UI fonts
-const fontFamily = {
-  className: 'font-sans', // Use Tailwind's sans font stack
-};
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'MirrorBuddy - The school we wished existed',
@@ -44,7 +41,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" suppressHydrationWarning>
-      <body className={`${fontFamily.className} antialiased`}>
+      <body className={`${inter.className} antialiased`}>
         <Providers>
           <main id="main-content">
             {children}

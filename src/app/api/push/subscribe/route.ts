@@ -175,7 +175,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       hasSubscriptions: subscriptions.length > 0,
       count: subscriptions.length,
-      subscriptions: subscriptions.map((s: { id: string; userAgent: string | null; createdAt: Date }) => ({
+      subscriptions: subscriptions.map(s => ({
         id: s.id,
         device: parseUserAgent(s.userAgent),
         createdAt: s.createdAt,

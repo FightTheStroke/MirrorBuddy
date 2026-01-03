@@ -119,11 +119,11 @@ export async function GET(request: NextRequest) {
     // Calculate learning patterns
     const avgSessionDuration = calculateAverageSessionDuration(sessions);
     const questionsPerSession = sessions.length > 0
-      ? Math.round(sessions.reduce((sum: number, s: { questions: number }) => sum + s.questions, 0) / sessions.length)
+      ? Math.round(sessions.reduce((sum, s) => sum + s.questions, 0) / sessions.length)
       : 0;
     const preferredStudyTime = determinePreferredStudyTime(sessions);
-    const uniqueSubjects = new Set(sessions.map((s: { subject: string }) => s.subject)).size;
-    const uniqueMaestros = new Set(sessions.map((s: { maestroId: string | null }) => s.maestroId)).size;
+    const uniqueSubjects = new Set(sessions.map(s => s.subject)).size;
+    const uniqueMaestros = new Set(sessions.map(s => s.maestroId)).size;
 
     // Calculate growth indicators
     const xpGrowthRate = calculateXpGrowthRate(sessions);

@@ -8,26 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
-// Local types (Prisma types unavailable at build time)
-interface Message {
-  id: string;
-  role: string;
-  content: string;
-  createdAt: Date;
-}
-
-interface Conversation {
-  id: string;
-  userId: string;
-  maestroId: string;
-  isActive: boolean;
-  summary: string | null;
-  keyFacts: string | null;
-  topics: string;
-  messageCount: number;
-  updatedAt: Date;
-  createdAt: Date;
-}
+import type { Conversation, Message } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {

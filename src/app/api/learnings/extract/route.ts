@@ -8,14 +8,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { extractLearnings } from '@/lib/ai/summarize';
-
-// Local Message interface (Prisma types unavailable at build time)
-interface Message {
-  id: string;
-  role: string;
-  content: string;
-  createdAt: Date;
-}
+import type { Message } from '@prisma/client';
 
 export async function POST(request: NextRequest) {
   try {

@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       },
       select: { eventId: true },
     });
-    const existingIdSet = new Set(existingIds.map((e: { eventId: string }) => e.eventId));
+    const existingIdSet = new Set(existingIds.map((e) => e.eventId));
     const newEvents = validEvents.filter((e) => !existingIdSet.has(e.id));
 
     if (newEvents.length === 0) {

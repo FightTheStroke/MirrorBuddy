@@ -50,7 +50,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       studentId: conversation.studentId,
       title: conversation.title,
       messageCount: conversation.messageCount,
-      messages: conversation.messages.map((m: { id: string; role: string; content: string; createdAt: Date }) => ({
+      messages: conversation.messages.map((m) => ({
         id: m.id,
         role: m.role,
         content: m.content,

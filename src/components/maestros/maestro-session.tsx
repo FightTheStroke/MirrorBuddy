@@ -195,7 +195,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
 
   // Session tracking
   const [sessionEnded, setSessionEnded] = useState(false);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const sessionStartTime = useRef(Date.now());
   const questionCount = useRef(0);
   const lastTranscriptIdRef = useRef<string | null>(null);
@@ -293,17 +292,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
       }
     };
   }, [maestro.greeting, maestro.id]);
-
-  // Live session timer - updates every second
-  useEffect(() => {
-    if (sessionEnded) return;
-
-    const timer = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - sessionStartTime.current) / 1000));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [sessionEnded]);
 
   // Fetch voice connection info on mount (like CharacterChatView pattern)
   useEffect(() => {
@@ -581,48 +569,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
               {isVoiceActive && isConnected ? 'In chiamata vocale' : maestro.specialty}
             </p>
           </div>
-
-          {/* Session Timer + XP Progress Bar */}
-          {!sessionEnded && (
-            <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm">
-              {/* Timer */}
-              <div className="flex items-center gap-1.5 text-white/90">
-                <Clock className="w-4 h-4" />
-                <span className="font-mono text-sm font-medium">
-                  {String(Math.floor(elapsedSeconds / 60)).padStart(2, '0')}:
-                  {String(elapsedSeconds % 60).padStart(2, '0')}
-                </span>
-              </div>
-
-              {/* Divider */}
-              <div className="w-px h-6 bg-white/20" />
-
-              {/* XP Progress */}
-              {(() => {
-                const currentXP = Math.min(
-                  MAESTRI_XP.MAX_PER_SESSION,
-                  Math.floor(elapsedSeconds / 60) * MAESTRI_XP.PER_MINUTE + questionCount.current * MAESTRI_XP.PER_QUESTION
-                );
-                const progress = (currentXP / MAESTRI_XP.MAX_PER_SESSION) * 100;
-                return (
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-yellow-300" />
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-xs font-medium text-white/90">
-                        {currentXP}/{MAESTRI_XP.MAX_PER_SESSION} XP
-                      </span>
-                      <div className="w-16 h-1.5 bg-white/20 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-yellow-300 rounded-full transition-all duration-500"
-                          style={{ width: `${progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          )}
 
           {/* Voice Call Button */}
           <Button
