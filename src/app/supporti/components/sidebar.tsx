@@ -77,7 +77,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const isActive = (type: string | null, subject: string | null, maestro: string | null) => {
+  const _isActive = (type: string | null, subject: string | null, maestro: string | null) => {
     return type === currentType && subject === currentSubject && maestro === currentMaestro;
   };
 
