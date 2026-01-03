@@ -675,6 +675,32 @@ export const InteractiveMarkMapRenderer = forwardRef<
               }
             });
 
+            // C-20 FIX: Style expand/collapse circles for better visibility and ensure they're clickable
+            const circles = svgRef.current.querySelectorAll('circle');
+            circles.forEach((circle) => {
+              if (circle instanceof SVGCircleElement) {
+                circle.style.cursor = 'pointer';
+                circle.style.pointerEvents = 'auto';
+                const r = parseFloat(circle.getAttribute('r') || '4');
+                if (r < 6) {
+                  circle.setAttribute('r', '6');
+                }
+                if (!circle.getAttribute('stroke')) {
+                  circle.setAttribute('stroke', isHighContrast ? '#ffffff' : '#475569');
+                  circle.setAttribute('stroke-width', '2');
+                }
+              }
+            });
+
+            // C-20 FIX: Ensure all g elements (node groups) have pointer-events enabled
+            const nodeGroups = svgRef.current.querySelectorAll('g.markmap-node');
+            nodeGroups.forEach((g) => {
+              if (g instanceof SVGGElement) {
+                g.style.pointerEvents = 'auto';
+                g.style.cursor = 'pointer';
+              }
+            });
+
             if (isHighContrast) {
               const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
               rect.setAttribute('width', '100%');

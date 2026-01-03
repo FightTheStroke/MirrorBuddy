@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mic, MicOff, PhoneOff, VolumeX, Send, MessageSquare, Camera, Brain, BookOpen, Search, Network, AlertCircle } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, VolumeX, Send, MessageSquare, Camera, Brain, BookOpen, Search, Network, AlertCircle, Clock, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CanvasWaveform, CircularWaveform } from './waveform';
@@ -12,11 +12,22 @@ import { usePermissions } from '@/lib/hooks/use-permissions';
 import { ToolResultDisplay } from '@/components/tools';
 import { WebcamCapture } from '@/components/tools/webcam-capture';
 import { SessionGradeDisplay } from './session-grade';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore, useUIStore } from '@/lib/stores/app-store';
 import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { Maestro } from '@/types';
+import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
+
+// C-2 FIX: Helper to get userId from cookie or sessionStorage
+function getUserId(): string | null {
+  if (typeof window === 'undefined') return null;
+  // Try cookie first (server-compatible)
+  const cookieMatch = document.cookie.match(/mirrorbuddy-user-id=([^;]+)/);
+  if (cookieMatch) return cookieMatch[1];
+  // Fallback to sessionStorage
+  return sessionStorage.getItem('mirrorbuddy-user-id');
+}
 
 interface ConnectionInfo {
   provider: 'azure';
@@ -47,13 +58,27 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
   const [showGrade, setShowGrade] = useState(false);
   const [finalSessionDuration, setFinalSessionDuration] = useState(0);
   const [finalQuestionCount, setFinalQuestionCount] = useState(0);
+  const [_sessionSummary, setSessionSummary] = useState<string | null>(null);
 
   // Track session start time
   const sessionStartTime = useRef<Date>(new Date());
   const questionCount = useRef<number>(0);
 
+  // C-2 FIX: Track conversation ID for memory persistence
+  const conversationIdRef = useRef<string | null>(null);
+  const savedMessagesRef = useRef<Set<string>>(new Set()); // Track which messages we've saved
+
   // Progress store for session tracking
-  const { currentSession, endSession, startSession } = useProgressStore();
+  const { currentSession, endSession, startSession, xp, level } = useProgressStore();
+
+  // C-17 FIX: UI store for focus mode on tool creation
+  const { enterFocusMode, setFocusTool } = useUIStore();
+
+  // C-17 FIX: Track which tool calls we've already processed for focus mode
+  const processedToolsRef = useRef<Set<string>>(new Set());
+
+  // C-6 FIX: Timer state for elapsed session time
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Check permissions before starting
   const { permissions, requestMicrophone, isLoading: permissionsLoading } = usePermissions();
@@ -105,6 +130,108 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
     }
   }, [isConnected, currentSession, maestro.id, maestro.specialty, startSession]);
 
+  // C-17 FIX: Auto-switch to focus mode when a tool is created
+  // This provides fullscreen tool experience during voice sessions
+  useEffect(() => {
+    // Find newly completed tool calls that we haven't processed yet
+    const completedTools = toolCalls.filter(
+      (tc) => tc.status === 'completed' && !processedToolsRef.current.has(tc.id)
+    );
+
+    if (completedTools.length === 0) return;
+
+    // Process the first new completed tool
+    const toolCall = completedTools[0];
+    processedToolsRef.current.add(toolCall.id);
+
+    // Map tool type from function name to ToolType
+    const toolTypeMap: Record<string, string> = {
+      create_mindmap: 'mindmap',
+      create_quiz: 'quiz',
+      create_flashcards: 'flashcard',
+      create_summary: 'summary',
+      create_demo: 'demo',
+      create_diagram: 'diagram',
+      create_timeline: 'timeline',
+      web_search: 'search',
+    };
+    const mappedToolType = (toolTypeMap[toolCall.type] || 'mindmap') as import('@/types/tools').ToolType;
+
+    // Extract tool content
+    const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
+
+    // Enter focus mode with the completed tool
+    enterFocusMode(mappedToolType, maestro.id, 'voice');
+    setFocusTool({
+      id: toolCall.id,
+      type: mappedToolType,
+      status: 'completed',
+      progress: 1,
+      content: toolContent,
+      createdAt: new Date(),
+    });
+
+    logger.debug('[VoiceSession] C-17: Entered focus mode for tool', {
+      toolId: toolCall.id,
+      toolType: mappedToolType,
+    });
+  }, [toolCalls, enterFocusMode, setFocusTool, maestro.id]);
+
+  // C-2 FIX: Create conversation in DB when voice session connects
+  useEffect(() => {
+    if (!isConnected || conversationIdRef.current) return;
+
+    const createConversation = async () => {
+      try {
+        const response = await fetch('/api/conversations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            maestroId: maestro.id,
+            title: `Sessione vocale con ${maestro.name}`,
+          }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          conversationIdRef.current = data.id;
+          logger.debug('[VoiceSession] Conversation created for memory persistence', { conversationId: data.id });
+        }
+      } catch (error) {
+        logger.error('[VoiceSession] Failed to create conversation', { error: String(error) });
+      }
+    };
+
+    createConversation();
+  }, [isConnected, maestro.id, maestro.name]);
+
+  // C-2 FIX: Save transcript messages to DB for memory persistence
+  useEffect(() => {
+    if (!conversationIdRef.current || transcript.length === 0) return;
+
+    const saveNewMessages = async () => {
+      for (const entry of transcript) {
+        const messageKey = `${entry.role}-${entry.content.slice(0, 50)}`;
+        if (savedMessagesRef.current.has(messageKey)) continue;
+
+        try {
+          await fetch(`/api/conversations/${conversationIdRef.current}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              role: entry.role,
+              content: entry.content,
+            }),
+          });
+          savedMessagesRef.current.add(messageKey);
+        } catch (error) {
+          logger.error('[VoiceSession] Failed to save message', { error: String(error) });
+        }
+      }
+    };
+
+    saveNewMessages();
+  }, [transcript]);
+
   // Auto-pause ambient audio during voice session (ADR-0018)
   const ambientPlaybackState = useAmbientAudioStore((s) => s.playbackState);
   const pauseAmbient = useAmbientAudioStore((s) => s.pause);
@@ -128,6 +255,34 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
       }
     }
   }, [isConnected, ambientPlaybackState, pauseAmbient, playAmbient]);
+
+  // C-6 FIX: Timer that increments every second when connected
+  useEffect(() => {
+    if (!isConnected) return; // Early return, reset handled in cleanup
+
+    const interval = setInterval(() => {
+      setElapsedSeconds((prev) => prev + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+      setElapsedSeconds(0); // Reset on cleanup
+    };
+  }, [isConnected]);
+
+  // C-6 FIX: Calculate XP progress for current level
+  const currentLevelXP = XP_PER_LEVEL[level - 1] || 0;
+  const nextLevelXP = XP_PER_LEVEL[level] || XP_PER_LEVEL[XP_PER_LEVEL.length - 1];
+  const xpProgress = nextLevelXP > currentLevelXP
+    ? ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
+    : 100;
+
+  // C-6 FIX: Format elapsed time as MM:SS
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Handle webcam capture completion
   const handleWebcamCapture = useCallback((imageData: string) => {
@@ -215,8 +370,34 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
   }, [connectionInfo, isConnected, connectionState, maestro, connect, permissions.microphone, permissionsLoading]);
 
   // Handle close - show grade first
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback(async () => {
     disconnect();
+
+    // C-2 FIX: End conversation and generate summary for memory persistence
+    if (conversationIdRef.current && transcript.length > 0) {
+      const userId = getUserId();
+      if (userId) {
+        try {
+          const response = await fetch(`/api/conversations/${conversationIdRef.current}/end`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, reason: 'explicit' }),
+          });
+          if (response.ok) {
+            const result = await response.json();
+            setSessionSummary(result.summary || null);
+            logger.info('[VoiceSession] Conversation ended with summary', {
+              conversationId: conversationIdRef.current,
+              summaryLength: result.summary?.length || 0,
+              topicsCount: result.topics?.length || 0,
+            });
+          }
+        } catch (error) {
+          logger.error('[VoiceSession] Failed to end conversation', { error: String(error) });
+        }
+      }
+    }
+
     // Show grade if session was active
     if (currentSession || transcript.length > 0) {
       // Calculate metrics at the moment of closing (not during render)
@@ -229,7 +410,7 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
     } else {
       onClose();
     }
-  }, [disconnect, onClose, currentSession, transcript.length]);
+  }, [disconnect, onClose, currentSession, transcript]);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -486,6 +667,32 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
                 <PhoneOff className="h-5 w-5" />
               </Button>
             </div>
+
+            {/* C-6 FIX: Timer + XP Bar */}
+            {isConnected && (
+              <div className="mt-4 flex items-center gap-4">
+                {/* Timer */}
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg">
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  <span className="text-sm font-mono text-slate-200">{formatTime(elapsedSeconds)}</span>
+                </div>
+
+                {/* XP Progress Bar */}
+                <div className="flex-1 flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <Trophy className="h-4 w-4 text-amber-400" />
+                    <span className="text-xs font-medium text-amber-400">Lv.{level}</span>
+                  </div>
+                  <div className="flex-1 h-2 bg-slate-800/50 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-300"
+                      style={{ width: `${Math.min(100, Math.max(0, xpProgress))}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-slate-400">{xp} XP</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main visualization */}

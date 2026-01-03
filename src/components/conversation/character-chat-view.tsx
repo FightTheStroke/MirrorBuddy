@@ -143,9 +143,21 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
   const lastTranscriptIdRef = useRef<string | null>(null);
   const conversationIdRef = useRef<string | null>(null);
   const hasLoadedMessages = useRef(false);
+  const lastCharacterIdRef = useRef<string | null>(null);
 
   // Conversation persistence
   const { conversations, createConversation, addMessage: addMessageToStore } = useConversationStore();
+
+  // C-5 FIX: Reset conversation state when character changes
+  useEffect(() => {
+    if (lastCharacterIdRef.current !== null && lastCharacterIdRef.current !== characterId) {
+      // Character changed - reset state to load new character's conversation
+      hasLoadedMessages.current = false;
+      setMessages([]);
+      conversationIdRef.current = null;
+    }
+    lastCharacterIdRef.current = characterId;
+  }, [characterId]);
 
   const character = getCharacterInfo(characterId, characterType);
 
@@ -255,7 +267,7 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Load or create conversation on mount
+  // C-13 FIX: Load or create conversation on mount - fetch messages from server
   useEffect(() => {
     if (hasLoadedMessages.current) return;
     hasLoadedMessages.current = true;
@@ -264,37 +276,61 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
       // Find existing conversation for this character
       const existingConv = conversations.find(c => c.maestroId === characterId);
 
-      if (existingConv && existingConv.messages.length > 0) {
-        // Load existing messages
+      if (existingConv) {
         conversationIdRef.current = existingConv.id;
-        setMessages(existingConv.messages.map(m => ({
-          id: m.id,
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-          timestamp: new Date(m.timestamp),
-        })));
-        logger.debug('Loaded existing conversation', { characterId, messageCount: existingConv.messages.length });
-      } else {
-        // Create new conversation
-        const newConvId = await createConversation(characterId);
-        conversationIdRef.current = newConvId;
 
-        // Add greeting
-        const greetingMessage = {
-          id: 'greeting',
-          role: 'assistant' as const,
-          content: character.greeting,
-          timestamp: new Date(),
-        };
-        setMessages([greetingMessage]);
+        // C-13 FIX: Fetch messages from server (store only has empty array)
+        try {
+          const response = await fetch(`/api/conversations/${existingConv.id}`);
+          if (response.ok) {
+            const convData = await response.json();
+            if (convData.messages && convData.messages.length > 0) {
+              setMessages(convData.messages.map((m: { id: string; role: string; content: string; createdAt: string }) => ({
+                id: m.id,
+                role: m.role as 'user' | 'assistant',
+                content: m.content,
+                timestamp: new Date(m.createdAt),
+              })));
+              logger.debug('Loaded messages from server', { characterId, messageCount: convData.messages.length });
+              return;
+            }
+          }
+        } catch (error) {
+          logger.warn('Failed to load messages from server', { error: String(error) });
+        }
 
-        // Persist greeting
-        await addMessageToStore(newConvId, {
-          role: 'assistant',
-          content: character.greeting,
-        });
-        logger.debug('Created new conversation', { characterId, convId: newConvId });
+        // Fallback: use store messages if available
+        if (existingConv.messages.length > 0) {
+          setMessages(existingConv.messages.map(m => ({
+            id: m.id,
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+            timestamp: new Date(m.timestamp),
+          })));
+          logger.debug('Loaded existing conversation from store', { characterId, messageCount: existingConv.messages.length });
+          return;
+        }
       }
+
+      // Create new conversation
+      const newConvId = await createConversation(characterId);
+      conversationIdRef.current = newConvId;
+
+      // Add greeting
+      const greetingMessage = {
+        id: 'greeting',
+        role: 'assistant' as const,
+        content: character.greeting,
+        timestamp: new Date(),
+      };
+      setMessages([greetingMessage]);
+
+      // Persist greeting
+      await addMessageToStore(newConvId, {
+        role: 'assistant',
+        content: character.greeting,
+      });
+      logger.debug('Created new conversation', { characterId, convId: newConvId });
     }
 
     initConversation();

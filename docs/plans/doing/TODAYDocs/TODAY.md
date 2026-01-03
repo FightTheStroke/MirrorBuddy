@@ -11,12 +11,12 @@
 ## 📊 DASHBOARD
 
 ```
-17:15 ──────────────────────────────────────────────────► 18:44 (NOW)  │  ~24h remaining
-       ┃██████┃
-       W0 DONE                    3/53 tasks (6%) YELLOW 🟡
+17:15 ──────────────────────────────────────────────────► NOW  │  In Progress
+       ┃█████████████████████████████████┃
+       W0 DONE + W1-2 DONE           24/53 tasks (45%) GREEN 🟢
 
 W0  ████████████████████ DONE     3/3   ✅  17:15→18:44  1h29m
-W1-2░░░░░░░░░░░░░░░░░░░░ READY    0/21  🔶  P0:7 P1:9 P2:5
+W1-2████████████████████ DONE    21/21  ✅  P0:7✅ P1:9✅ P2:4✅ SKIP:1
 W3  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/9   ⏸️  Needs W1-2
 W4  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/11  ⏸️  Needs W1-2
 W5  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/9   ⏸️  Needs W3+W4
@@ -25,11 +25,11 @@ W5  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/9   
 | Wave | Who | Status | Tasks | Start | Done | Dur |
 |------|-----|--------|-------|-------|------|-----|
 | **W0**: QA + Plan Update | Roberto | ✅ | 3/3 (100%) | 17:15 | 18:44 | 1h29m |
-| **W1-2**: Bug Fixes (7 P0, 9 P1, 5 P2) | Claude-A | ⏳ | 0/21 (0%) | - | - | - |
+| **W1-2**: Bug Fixes (7 P0, 9 P1, 5 P2) | Claude-A | ✅ | 21/21 (100%) | 18:44 | 3 Gen | - |
 | **W3**: Welcome Experience | B1, B2, B3 | ⏸️ | 0/9 (0%) | - | - | - |
 | **W4**: Supporti Consolidation | C1, C2 | ⏸️ | 0/11 (0%) | - | - | - |
 | **W5**: Thor QA + Merge | Thor + Roberto | ⏸️ | 0/9 (0%) | - | - | - |
-| **TOTAL**: Full Plan | **All** | 🔄 | **3/53 (6%)** | 3 Gen | - | 1h29m |
+| **TOTAL**: Full Plan | **All** | 🔄 | **24/53 (45%)** | 3 Gen | - | - |
 
 ### Wave 0: QA & Planning (COMPLETE)
 
@@ -169,27 +169,27 @@ This plan is split into focused sub-files for token optimization.
 
 | # | Bug Description | P | ✓ |
 |---|-----------------|---|---|
-| 1.1 | C-5: History per Coach/Buddy (not global) | 0 | ⏳ |
-| 1.2 | C-9: Header Counters real-time update | 0 | ⏳ |
-| 1.3 | C-12: Mindmap Hierarchy (flat → nested) | 0 | ⏳ |
-| 1.4 | C-13: Conversation Persistence broken | 0 | ⏳ |
-| 1.5 | C-14: Material Save intermittent | 0 | ⏳ |
-| 1.6 | C-15: Save Material Error (use-saved-materials.ts:171) | 0 | ⏳ |
-| 1.7 | C-16: Sandbox SecurityError (html-preview.tsx:65) | 0 | ⏳ |
-| 2.1 | C-2: Session Recap + Memory | 1 | ⏳ |
-| 2.2 | C-3: Input/Voice panel sticky | 1 | ⏳ |
-| 2.3 | C-4: Azure OpenAI Costs empty | 1 | ⏳ |
-| 2.4 | C-1: STT Discrepancy | 1 | ⏳ |
-| 2.5 | C-6: Timer + XP Bar in voice panel | 2 | ⏳ |
-| 2.6 | C-7: Demo Accessibility settings | 1 | ⏳ |
-| 2.7 | C-8: Cafe Ambient Audio realistic | 2 | ⏳ |
-| 2.8 | C-10: Demo in frame (not new tab) | 1 | ⏳ |
-| 2.9 | C-11: Triple "Chiamata Terminata" cleanup | 1 | ⏳ |
-| 2.10 | C-17: Fullscreen on Tool Creation | 1 | ⏳ |
-| 2.11 | C-18: PDF Parsing Failure | 1 | ⏳ |
-| 2.12 | C-19: ESC Key Inconsistent | 1 | ⏳ |
-| 2.13 | C-20: Mindmap Not Interactive | 2 | ⏳ |
-| 2.14 | C-21: Summary Missing Export/Convert/Flashcard | 2 | ⏳ |
+| 1.1 | C-5: History per Coach/Buddy (not global) | 0 | ✅ |
+| 1.2 | C-9: Header Counters real-time update | 0 | ✅ |
+| 1.3 | C-12: Mindmap Hierarchy (flat → nested) | 0 | ✅ |
+| 1.4 | C-13: Conversation Persistence broken | 0 | ✅ |
+| 1.5 | C-14: Material Save intermittent | 0 | ✅ |
+| 1.6 | C-15: Save Material Error (use-saved-materials.ts:171) | 0 | ✅ |
+| 1.7 | C-16: Sandbox SecurityError (html-preview.tsx:65) | 0 | ✅ |
+| 2.1 | C-2: Session Recap + Memory | 1 | ✅ |
+| 2.2 | C-3: Input/Voice panel sticky | 1 | ✅ |
+| 2.3 | C-4: Azure OpenAI Costs empty | 1 | ✅ |
+| 2.4 | C-1: STT Discrepancy | 1 | ✅ |
+| 2.5 | C-6: Timer + XP Bar in voice panel | 2 | ✅ |
+| 2.6 | C-7: Demo Accessibility settings | 1 | ✅ |
+| 2.7 | C-8: Cafe Ambient Audio realistic | 2 | SKIP |
+| 2.8 | C-10: Demo in frame (not new tab) | 1 | ✅ |
+| 2.9 | C-11: Triple "Chiamata Terminata" cleanup | 1 | ✅ |
+| 2.10 | C-17: Fullscreen on Tool Creation | 1 | ✅ |
+| 2.11 | C-18: PDF Parsing Failure | 1 | ✅ |
+| 2.12 | C-19: ESC Key Inconsistent | 1 | ✅ |
+| 2.13 | C-20: Mindmap Not Interactive | 2 | ✅ |
+| 2.14 | C-21: Summary Missing Export/Convert/Flashcard | 2 | ✅ |
 | PR | Create PR fix/wave-1-2-bugs | - | ⏳ |
 
 ### Wave 3 (B1, B2, B3)
