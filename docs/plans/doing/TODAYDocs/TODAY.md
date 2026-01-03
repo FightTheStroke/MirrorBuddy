@@ -1,6 +1,6 @@
 # TODAY.md - 3 Gennaio 2026
 
-**Status**: COMPLETE - Pending Roberto Approval
+**Status**: IN PROGRESS - Wave 6 Tech Debt
 **Owner**: Roberto + Claude
 **Branch**: development
 **Operating Mode**: PLAN -> EXECUTE -> VERIFY -> CLOSE
@@ -11,15 +11,16 @@
 ## 📊 DASHBOARD
 
 ```
-17:15 ──────────────────────────────────────────────────► DONE │  100% Complete
+17:15 ──────────────────────────────────────────────────► NOW  │  Wave 6 Running
        ┃████████████████████████████████████████████████┃
-       W0-W5 ALL COMPLETE   53/53 tasks (100%) GREEN 🟢
+       W0-W5 DONE + W6 IN PROGRESS   53/62 tasks (85%)
 
 W0  ████████████████████ DONE     3/3   ✅  17:15→18:44  1h29m
 W1-2████████████████████ DONE    21/21  ✅  P0:7✅ P1:9✅ P2:5✅
 W3  ████████████████████ DONE     9/9   ✅  All components + E2E
 W4  ████████████████████ DONE    11/11  ✅  Supporti + E2E (e8119ba)
 W5  ████████████████████ DONE     9/9   ✅  Thor QA + Final (23dc31d)
+W6  ░░░░░░░░░░░░░░░░░░░░ PROG     0/9   🔄  Tech Debt Cleanup
 ```
 
 | Wave | Who | Status | Tasks | Start | Done | Dur |
@@ -29,7 +30,8 @@ W5  ████████████████████ DONE     9/9   
 | **W3**: Welcome Experience | Claude-A | ✅ | 9/9 (100%) | 3 Gen | 3 Gen | - |
 | **W4**: Supporti Consolidation | Claude-A | ✅ | 11/11 (100%) | 3 Gen | 3 Gen | - |
 | **W5**: Thor QA + Final | Thor + Claude | ✅ | 9/9 (100%) | 3 Gen | 3 Gen | - |
-| **TOTAL**: Full Plan | **All** | ✅ | **53/53 (100%)** | 3 Gen | 3 Gen | - |
+| **W6**: Tech Debt Cleanup | Claude | 🔄 | 0/9 (0%) | 3 Gen | - | - |
+| **TOTAL**: Full Plan | **All** | 🔄 | **53/62 (85%)** | 3 Gen | - | - |
 
 ### Wave 0: QA & Planning (COMPLETE)
 
@@ -152,6 +154,7 @@ This plan is split into focused sub-files for token optimization.
 | 3 | Welcome | Claude-A | ✅ | [wave-3-welcome.md](waves/wave-3-welcome.md) |
 | 4 | Supporti | Claude-A | ✅ | [wave-4-supporti.md](waves/wave-4-supporti.md) |
 | 5 | Thor + Final | Thor+Claude | ✅ | This file |
+| 6 | Tech Debt | Claude | 🔄 | This file |
 
 ---
 
@@ -238,6 +241,30 @@ This plan is split into focused sub-files for token optimization.
 | 5.8 | CHANGELOG update | ✅ | Claude |
 | 5.9 | Final: typecheck + lint + build | ✅ | Claude |
 | - | Committed (23dc31d) | ✅ | Claude |
+
+### Wave 6 (Claude) - Tech Debt Cleanup
+
+Thor QA found 39 pre-existing violations in legacy code:
+
+| Category | Count | Action |
+|----------|-------|--------|
+| `@next/next/no-img-element` | 13 | ✅ ACCEPTED (data URLs, documented) |
+| `react-hooks/*` | 24 | 🔧 Fix or document with justification |
+| `@ts-expect-error` | 2 | 📝 Add explanatory comments |
+| `TODO` | 2 | 📋 Create issues or implement |
+| `MOCK_DATA` | 0 | ✅ None found |
+
+| # | Task | ✓ | By |
+|---|------|---|-----|
+| 6.1 | Review react-hooks/exhaustive-deps (7 files) | ✅ | Claude |
+| 6.2 | Review react-hooks/set-state-in-effect (5 files) | ✅ | Claude |
+| 6.3 | Review react-hooks/purity (1 file) | ✅ | Claude |
+| 6.4 | Document @ts-expect-error Pyodide | ✅ | Claude |
+| 6.5 | Document @ts-expect-error test fallback | ✅ | Claude |
+| 6.6 | Resolve TODO: summaries-view.tsx:79 | ✅ | Claude |
+| 6.7 | Resolve TODO: summaries-view.tsx:90 | ✅ | Claude |
+| 6.8 | Verify all tests pass | ✅ | Claude |
+| 6.9 | Verify CI green | 🔄 | Claude |
 
 **Thor Quality Gate Criteria** (automated by thor-quality-assurance-guardian):
 ```bash

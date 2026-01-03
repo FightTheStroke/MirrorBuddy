@@ -23,7 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SummaryRenderer } from '@/components/tools/summary-renderer';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 import { cn } from '@/lib/utils';
-import { useSavedTools } from '@/lib/hooks/use-saved-materials';
+import { useSavedTools, autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import {
   exportSummaryToPdf,
   convertSummaryToMindmap,
@@ -70,24 +70,26 @@ export function SummariesView({ className }: SummariesViewProps) {
 
   // Handle convert to mindmap
   // BUG 29 FIX: Replace alert with toast notification
-  const handleConvertToMindmap = useCallback((data: SummaryData) => {
+  const handleConvertToMindmap = useCallback(async (data: SummaryData) => {
     const result = convertSummaryToMindmap(data);
-    toast.success(
-      'Mappa mentale generata!',
-      `Creati ${result.nodes.length} nodi da "${result.topic}". Salvataggio in arrivo...`
-    );
-    // TODO: Save to Knowledge Hub when API is ready
+    const saved = await autoSaveMaterial('mindmap', result.topic, { nodes: result.nodes });
+    if (saved) {
+      toast.success('Mappa mentale salvata!', `Creati ${result.nodes.length} nodi da "${result.topic}".`);
+    } else {
+      toast.error('Errore', 'Impossibile salvare la mappa mentale.');
+    }
   }, []);
 
   // Handle generate flashcards
   // BUG 29 FIX: Replace alert with toast notification
-  const handleGenerateFlashcards = useCallback((data: SummaryData) => {
+  const handleGenerateFlashcards = useCallback(async (data: SummaryData) => {
     const result = generateFlashcardsFromSummary(data);
-    toast.success(
-      'Flashcard generate!',
-      `Create ${result.cards.length} flashcard da "${result.topic}". Salvataggio in arrivo...`
-    );
-    // TODO: Save to Knowledge Hub when API is ready
+    const saved = await autoSaveMaterial('flashcard', result.topic, { cards: result.cards });
+    if (saved) {
+      toast.success('Flashcard salvate!', `Create ${result.cards.length} flashcard da "${result.topic}".`);
+    } else {
+      toast.error('Errore', 'Impossibile salvare le flashcard.');
+    }
   }, []);
 
   return (

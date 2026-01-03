@@ -243,7 +243,7 @@ export function useMindmaps() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadMindmaps();
   }, [loadMindmaps]);
@@ -308,7 +308,7 @@ export function useQuizzes() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadQuizzes();
   }, [loadQuizzes]);
@@ -364,7 +364,7 @@ export function useFlashcardDecks() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadDecks();
   }, [loadDecks]);
@@ -431,7 +431,7 @@ export function useHomeworkSessions() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadSessions();
   }, [loadSessions]);
@@ -560,7 +560,7 @@ export function useDemos() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadDemos();
   }, [loadDemos]);
@@ -610,7 +610,7 @@ export function useSavedTools(toolType: ToolType) {
     setLoading(false);
   }, [userId, toolType]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadTools();
   }, [loadTools]);

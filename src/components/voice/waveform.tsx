@@ -323,8 +323,8 @@ export function Waveform({
   // Pre-compute random factors for each bar (stable between renders)
   const randomFactors = useMemo(
     () => bars.map(() => 0.5 + Math.random() * 0.5),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [barCount] // Only regenerate when bar count changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- bars derived from barCount, only regenerate on count change
+    [barCount]
   );
   const [time, setTime] = useState(0);
 
