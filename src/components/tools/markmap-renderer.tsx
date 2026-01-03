@@ -111,11 +111,24 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
   // Render mindmap
   useEffect(() => {
     const renderMindmap = async () => {
-      if (!svgRef.current) return;
+      if (!svgRef.current || !containerRef.current) return;
+
+      // FIX BUG 16: Check container dimensions before rendering to prevent SVGLength error
+      const container = containerRef.current;
+      const rect = container.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        // Container not yet laid out, wait for next frame
+        requestAnimationFrame(() => renderMindmap());
+        return;
+      }
 
       try {
         setError(null);
         setRendered(false);
+
+        // Set explicit dimensions on SVG to prevent SVGLength error
+        svgRef.current.setAttribute('width', String(rect.width));
+        svgRef.current.setAttribute('height', String(rect.height - 60)); // Account for toolbar
 
         // Clear previous content
         svgRef.current.innerHTML = '';
@@ -687,12 +700,14 @@ export function MarkMapRenderer({ title, markdown, nodes, className }: MarkMapRe
           <>
             <svg
               ref={svgRef}
+              width="100%"
+              height="100%"
               className={cn(
                 'absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing',
                 !rendered && 'animate-pulse rounded-lg',
                 !rendered && (settings.highContrast ? 'bg-gray-800' : 'bg-slate-100 dark:bg-slate-700/50')
               )}
-              style={{ touchAction: 'none' }}
+              style={{ touchAction: 'none', minWidth: '400px', minHeight: '300px' }}
             />
             {rendered && (
               <div className="absolute bottom-2 left-2 text-xs text-slate-400 dark:text-slate-500 pointer-events-none select-none">
