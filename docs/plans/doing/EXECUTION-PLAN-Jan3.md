@@ -70,11 +70,11 @@ Questi fix risolvono la causa radice di più bug.
 - [x] Possibile causa: AI non genera parametri corretti o JSON parsing issue
 - [ ] Richiede debug con logs reali per identificare il punto di fallimento
 
-### 2.7 Materiali Page (BUG 17,18)
-- [ ] Unificare Materiali + Study Kit
-- [ ] Creare archivio materiali
-- [ ] Integrare upload PDF
-- [ ] Verificare: `npm run typecheck && npm run lint`
+### 2.7 Materiali Page (BUG 17,18) ✅ COMPLETATO
+- [x] Unificare Materiali + Study Kit: ArchiveView già esisteva, ora wired in navigation
+- [x] Creare archivio materiali: LazyArchiveView aggiunto a page.tsx con navigazione "Archivio"
+- [x] Integrare upload PDF: Study Kit + Archivio ora accessibili dal sidebar
+- [x] Verificare: lint passed
 
 ### 2.8 PDF Parsing (BUG 19)
 - [ ] Investigare quale API fa parsing
@@ -176,6 +176,12 @@ Questi fix risolvono la causa radice di più bug.
 - [ ] Trovare audio realistico bar
 - [ ] Sostituire file
 - [ ] Verificare: `npm run typecheck && npm run lint`
+
+### 4.3 Convergio → MirrorBuddy Cleanup
+- [ ] Verificare tutti i riferimenti a "Convergio" nel repo (27 file trovati)
+- [ ] 3 in source code: migrate-session-key.ts, providers.tsx (backwards compat OK)
+- [ ] Resto in docs/plans - aggiornare nomi dove necessario
+- [ ] Verificare che UI non mostri mai "Convergio"
 
 ---
 
