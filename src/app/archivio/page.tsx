@@ -1,12 +1,9 @@
 /**
- * Archivio Page
- * Route: /archivio
- *
- * Unified archive view for all saved materials (mindmaps, quizzes, flashcards, etc.)
- * T-18: Unified Archive page
+ * Archivio Page - REDIRECT to /supporti (Wave 4)
+ * Route: /archivio -> /supporti
  */
 
-import { ArchiveView } from '@/components/education/archive-view';
+import { redirect } from 'next/navigation';
 
 export const metadata = {
   title: 'Archivio | MirrorBuddy',
@@ -14,9 +11,5 @@ export const metadata = {
 };
 
 export default function ArchivioPage() {
-  return (
-    <main className="container mx-auto px-4 py-8 max-w-7xl">
-      <ArchiveView />
-    </main>
-  );
+  redirect('/supporti');
 }

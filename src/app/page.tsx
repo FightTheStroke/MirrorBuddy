@@ -40,7 +40,6 @@ import {
   LazyHomeworkHelpView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
-  LazyArchiveView,
 } from '@/components/education';
 import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
@@ -53,7 +52,7 @@ import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indi
 import { cn } from '@/lib/utils';
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'archive' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'supporti' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -161,7 +160,7 @@ export default function Home() {
     { id: 'summaries' as const, label: 'Riassunti', icon: FileText },
     { id: 'homework' as const, label: 'Materiali', icon: Target },
     { id: 'studykit' as const, label: 'Study Kit', icon: Upload },
-    { id: 'archive' as const, label: 'Archivio', icon: Archive },
+    { id: 'supporti' as const, label: 'Supporti', icon: Archive },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
@@ -301,6 +300,9 @@ export default function Home() {
                   } else if (item.id === 'studykit') {
                     await handleViewChange('studykit');
                     router.push('/study-kit');
+                  } else if (item.id === 'supporti') {
+                    await handleViewChange('supporti');
+                    router.push('/supporti');
                   } else {
                     await handleViewChange(item.id);
                   }
@@ -412,7 +414,7 @@ export default function Home() {
 
           {currentView === 'homework' && <LazyHomeworkHelpView />}
 
-          {currentView === 'archive' && <LazyArchiveView />}
+          {/* Supporti view is at /supporti route */}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 
