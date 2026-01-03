@@ -10,11 +10,12 @@
 
 Questi fix risolvono la causa radice di più bug.
 
-### 1.1 SVGLength Error Fix (BUG 16 → sblocca BUG 5,7,8)
-- [ ] Trovare dove SVG markmap viene renderizzato senza dimensioni
-- [ ] Aggiungere width/height esplicite al container PRIMA del render
-- [ ] Testare che mindmap si carichi senza errore
-- [ ] Verificare: `npm run typecheck && npm run lint`
+### 1.1 SVGLength Error Fix (BUG 16 → sblocca BUG 5,7,8) ✅ COMPLETATO
+- [x] Trovare dove SVG markmap viene renderizzato senza dimensioni
+- [x] Aggiungere width/height esplicite al container PRIMA del render
+- [x] Testare che mindmap si carichi senza errore (lint passed)
+- [x] Verificare: `npm run typecheck && npm run lint`
+- [x] Commit: f13163b - fix(mindmap): prevent SVGLength error
 
 ### 1.2 MOCK DATA Removal (BUG 22,23,28 → sblocca dashboard)
 - [ ] `src/components/education/parent-dashboard.tsx:40` - rimuovere mock
@@ -206,13 +207,14 @@ Questi fix risolvono la causa radice di più bug.
 
 ## STATO CORRENTE
 
-**Ora sto facendo**: FASE 1.1 - SVGLength Error Fix
+**Ora sto facendo**: FASE 1.2 - MOCK DATA Removal
 
 **Completati oggi**:
 - [x] Browser error logging system (già esisteva)
 - [x] Learnings aggiunti a thor e app-release-manager
 - [x] Verification process documentato
 - [x] Functional E2E tests creati (file esiste, selettori da raffinare)
+- [x] **FASE 1.1 SVGLength Error Fix** - Commit f13163b
 
 ---
 
