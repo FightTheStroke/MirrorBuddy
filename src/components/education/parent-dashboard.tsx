@@ -37,114 +37,39 @@ import type {
 } from '@/types';
 
 // ============================================================================
-// MOCK DATA - Will be replaced with real API data
+// EMPTY STATE COMPONENT (BUG 22 FIX: Removed mock data)
 // ============================================================================
 
-const MOCK_INSIGHTS: StudentInsights = {
-  studentId: 'student-1',
-  studentName: 'Marco',
-  lastUpdated: new Date(),
-  strengths: [
-    {
-      id: 'obs-1',
-      maestroId: 'leonardo',
-      maestroName: 'Leonardo da Vinci',
-      category: 'creativity',
-      observation: 'Eccelle nel disegno e nella visualizzazione di concetti astratti',
-      isStrength: true,
-      confidence: 0.9,
-      createdAt: new Date(),
-    },
-    {
-      id: 'obs-2',
-      maestroId: 'mozart',
-      maestroName: 'Wolfgang Amadeus Mozart',
-      category: 'artistic_sensitivity',
-      observation: 'Ricorda melodie e ritmi con facilità, ottima memoria uditiva',
-      isStrength: true,
-      confidence: 0.85,
-      createdAt: new Date(),
-    },
-    {
-      id: 'obs-3',
-      maestroId: 'socrate',
-      maestroName: 'Socrate',
-      category: 'critical_thinking',
-      observation: 'Fa domande profonde e non si accontenta di risposte superficiali',
-      isStrength: true,
-      confidence: 0.88,
-      createdAt: new Date(),
-    },
-  ],
-  growthAreas: [
-    {
-      id: 'obs-4',
-      maestroId: 'montessori',
-      maestroName: 'Maria Montessori',
-      category: 'study_method',
-      observation: 'Può migliorare nell\'organizzazione del tempo di studio',
-      isStrength: false,
-      confidence: 0.82,
-      createdAt: new Date(),
-    },
-    {
-      id: 'obs-5',
-      maestroId: 'archimede',
-      maestroName: 'Archimede',
-      category: 'logical_reasoning',
-      observation: 'Preferisce visualizzare i problemi, il calcolo mentale richiede più pratica',
-      isStrength: false,
-      confidence: 0.75,
-      createdAt: new Date(),
-    },
-    {
-      id: 'obs-6',
-      maestroId: 'dante',
-      maestroName: 'Dante Alighieri',
-      category: 'verbal_expression',
-      observation: 'Più fluido nell\'espressione orale che nella scrittura',
-      isStrength: false,
-      confidence: 0.78,
-      createdAt: new Date(),
-    },
-  ],
-  strategies: [
-    {
-      id: 'strat-1',
-      title: 'Mappe visive per la matematica',
-      description: 'Usa diagrammi e disegni per rappresentare i problemi matematici prima di risolverli',
-      suggestedBy: ['archimede', 'leonardo'],
-      forAreas: ['logical_reasoning'],
-      priority: 'high',
-    },
-    {
-      id: 'strat-2',
-      title: 'Registra prima di scrivere',
-      description: 'Prima di scrivere un tema, registra i tuoi pensieri a voce e poi trascrivi',
-      suggestedBy: ['dante', 'cicerone'],
-      forAreas: ['verbal_expression'],
-      priority: 'high',
-    },
-    {
-      id: 'strat-3',
-      title: 'Sessioni brevi con pause',
-      description: 'Studia per 15-20 minuti, poi fai una pausa di 5 minuti con movimento',
-      suggestedBy: ['montessori'],
-      forAreas: ['study_method'],
-      priority: 'medium',
-    },
-  ],
-  learningStyle: {
-    preferredChannel: 'visual',
-    optimalSessionDuration: 20,
-    preferredTimeOfDay: 'morning',
-    motivators: ['gamification', 'feedback immediato', 'sfide creative'],
-    challengePreference: 'step_by_step',
-  },
-  totalSessions: 47,
-  totalMinutes: 1230,
-  maestriInteracted: ['leonardo', 'mozart', 'socrate', 'montessori', 'archimede', 'dante'],
-};
+function EmptyInsightsState() {
+  const { settings } = useAccessibilityStore();
+
+  return (
+    <div className={cn(
+      'p-8 text-center rounded-xl border-2 border-dashed',
+      settings.highContrast
+        ? 'border-yellow-400 bg-gray-900'
+        : 'border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900'
+    )}>
+      <Users className={cn(
+        'w-12 h-12 mx-auto mb-4',
+        settings.highContrast ? 'text-yellow-400' : 'text-slate-400'
+      )} />
+      <h3 className={cn(
+        'text-lg font-semibold mb-2',
+        settings.highContrast ? 'text-yellow-400' : 'text-slate-700 dark:text-slate-200'
+      )}>
+        Nessun dato disponibile
+      </h3>
+      <p className={cn(
+        'text-sm max-w-md mx-auto',
+        settings.highContrast ? 'text-white' : 'text-slate-500 dark:text-slate-400'
+      )}>
+        Il profilo dello studente verrà generato dopo alcune sessioni di studio con i Professori.
+        Torna più tardi per vedere le osservazioni e i suggerimenti personalizzati.
+      </p>
+    </div>
+  );
+}
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -464,19 +389,32 @@ interface ParentDashboardProps {
 }
 
 export function ParentDashboard({
-  insights = MOCK_INSIGHTS,
+  insights,
   className,
 }: ParentDashboardProps) {
   const { settings } = useAccessibilityStore();
 
   const stats = useMemo(
-    () => ({
+    () => insights ? ({
       hours: Math.round(insights.totalMinutes / 60),
       sessions: insights.totalSessions,
       maestri: insights.maestriInteracted.length,
-    }),
+    }) : null,
     [insights]
   );
+
+  // BUG 22 FIX: Show empty state when no insights data is available
+  if (!insights) {
+    return (
+      <div className={cn(
+        'p-6',
+        settings.highContrast ? 'bg-black' : 'bg-slate-50 dark:bg-slate-950',
+        className
+      )}>
+        <EmptyInsightsState />
+      </div>
+    );
+  }
 
   return (
     <div
