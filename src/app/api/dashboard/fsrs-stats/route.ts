@@ -1,14 +1,22 @@
 // ============================================================================
 // API ROUTE: FSRS Statistics
 // GET: Flashcard spaced repetition stats for dashboard
+// SECURITY: Requires authentication
 // ============================================================================
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 export async function GET(request: Request) {
   try {
+    // Require authentication for admin dashboard
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get('days') ?? '7', 10);
     const startDate = new Date();

@@ -2,6 +2,7 @@
 // API ROUTE: Safety Events
 // GET: Safety monitoring statistics for dashboard
 // POST: Resolve a safety event
+// SECURITY: Requires authentication
 // ============================================================================
 
 import { NextResponse } from 'next/server';
@@ -11,9 +12,16 @@ import {
   resolveSafetyEvent,
 } from '@/lib/safety/monitoring';
 import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 export async function GET(request: Request) {
   try {
+    // Require authentication for admin dashboard
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get('days') ?? '7', 10);
     const severity = searchParams.get('severity') ?? undefined;
@@ -72,6 +80,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    // Require authentication for admin action
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await request.json();
     const { eventId, resolvedBy, resolution } = body;
 
