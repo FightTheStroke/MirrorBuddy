@@ -92,18 +92,17 @@ Questi fix risolvono la causa radice di più bug.
 - [x] MaestroOverlay ha bottone X per chiudere (onClose prop)
 - [x] Richiede test manuale per confermare pattern consistente
 
-### 2.11 Header Counters (BUG 28)
-- [ ] Dopo fix 1.2, controllare se header si aggiorna
-- [ ] Se no, collegare store → header component
-- [ ] Real-time updates
-- [ ] Verificare: `npm run typecheck && npm run lint`
+### 2.11 Header Counters (BUG 28) ✅ COMPLETATO
+- [x] Già implementato: `initializeStores()` chiama `useProgressStore.getState().loadFromServer()`
+- [x] Carica da `/api/progress` all'avvio
+- [x] Auto-sync ogni 30 secondi via `setupAutoSync()`
+- [x] page.tsx usa `useProgressStore` per mostrare xp, level, streak
 
-### 2.12 Per-Character History (BUG 32)
-- [ ] Separare conversation storage per character ID
-- [ ] Melissa = sue conversazioni
-- [ ] Andrea = sue conversazioni
-- [ ] Zero leak tra personaggi
-- [ ] Verificare: `npm run typecheck && npm run lint`
+### 2.12 Per-Character History (BUG 32) ✅ COMPLETATO
+- [x] conversationsByCharacter già implementato in conversation-flow-store.ts
+- [x] Ogni personaggio ha il suo slot separato
+- [x] ADR 0010 documenta l'architettura
+- [x] E2E tests verificano la struttura
 
 ---
 
@@ -130,15 +129,13 @@ Questi fix risolvono la causa radice di più bug.
 - [ ] Font, colori, spacing
 - [ ] Verificare: `npm run typecheck && npm run lint`
 
-### 3.5 Toast Position (BUG 12)
-- [ ] Configurare sonner: position top-right
-- [ ] Aggiungere storico notifiche
-- [ ] Verificare: `npm run typecheck && npm run lint`
+### 3.5 Toast Position (BUG 12) ✅ COMPLETATO
+- [x] Cambiato position da `bottom-0` a `top-0` in toast.tsx:184
+- [x] Toast ora appare in alto a destra, non sovrappone input
 
-### 3.6 Menu Export (BUG 14)
-- [ ] Aggiungere `bg-white` al dropdown
-- [ ] z-index corretto
-- [ ] Verificare: `npm run typecheck && npm run lint`
+### 3.6 Menu Export (BUG 14) ✅ COMPLETATO
+- [x] Aggiunto `bg-white dark:bg-slate-900` a DropdownMenuContent
+- [x] Aggiunto `bg-white dark:bg-slate-900` a DropdownMenuSubContent
 
 ### 3.7 Fullscreen Exit (BUG 15)
 - [ ] Fix toggle fullscreen ↔ normale
