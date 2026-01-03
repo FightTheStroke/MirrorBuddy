@@ -23,12 +23,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SummaryRenderer } from '@/components/tools/summary-renderer';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 import { cn } from '@/lib/utils';
-import { useSavedTools } from '@/lib/hooks/use-saved-materials';
+import { useSavedTools, autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import {
   exportSummaryToPdf,
   convertSummaryToMindmap,
   generateFlashcardsFromSummary,
 } from '@/lib/tools/summary-export';
+import { toast } from '@/components/ui/toast';
 import type { SummaryData } from '@/types/tools';
 import type { Maestro } from '@/types';
 import { useUIStore } from '@/lib/stores/app-store';
@@ -68,17 +69,27 @@ export function SummariesView({ className }: SummariesViewProps) {
   }, []);
 
   // Handle convert to mindmap
-  // NOTE: Placeholder for future integration with Knowledge Hub
-  const handleConvertToMindmap = useCallback((data: SummaryData) => {
-    const _result = convertSummaryToMindmap(data);
-    alert('Mappa mentale creata! (Funzionalità in sviluppo)');
+  // BUG 29 FIX: Replace alert with toast notification
+  const handleConvertToMindmap = useCallback(async (data: SummaryData) => {
+    const result = convertSummaryToMindmap(data);
+    const saved = await autoSaveMaterial('mindmap', result.topic, { nodes: result.nodes });
+    if (saved) {
+      toast.success('Mappa mentale salvata!', `Creati ${result.nodes.length} nodi da "${result.topic}".`);
+    } else {
+      toast.error('Errore', 'Impossibile salvare la mappa mentale.');
+    }
   }, []);
 
   // Handle generate flashcards
-  // NOTE: Placeholder for future integration with Knowledge Hub
-  const handleGenerateFlashcards = useCallback((data: SummaryData) => {
+  // BUG 29 FIX: Replace alert with toast notification
+  const handleGenerateFlashcards = useCallback(async (data: SummaryData) => {
     const result = generateFlashcardsFromSummary(data);
-    alert(`${result.cards.length} flashcard create! (Funzionalità in sviluppo)`);
+    const saved = await autoSaveMaterial('flashcard', result.topic, { cards: result.cards });
+    if (saved) {
+      toast.success('Flashcard salvate!', `Create ${result.cards.length} flashcard da "${result.topic}".`);
+    } else {
+      toast.error('Errore', 'Impossibile salvare le flashcard.');
+    }
   }, []);
 
   return (

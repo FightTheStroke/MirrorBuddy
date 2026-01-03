@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
   try {
     // Auth check - prefer cookie, fallback to query param for backwards compatibility
     const cookieStore = await cookies();
-    const cookieUserId = cookieStore.get('convergio-user-id')?.value;
+    const cookieUserId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     const { searchParams } = new URL(request.url);
     const queryUserId = searchParams.get('userId');
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
   try {
     // Auth check - prefer cookie, fallback to body for backwards compatibility
     const cookieStore = await cookies();
-    const cookieUserId = cookieStore.get('convergio-user-id')?.value;
+    const cookieUserId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     const body: CreateMaterialRequest & { userId?: string } = await request.json();
     const userId = cookieUserId || body.userId;

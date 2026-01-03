@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, development]
   pull_request:
-    branches: [main]
+    branches: [main, development]
 
 # Minimal permissions for security (ISE best practice)
-# Triggered on PRs to main and pushes to main
+# Triggered on PRs to main/development and pushes to main/development
 permissions:
   contents: read
 

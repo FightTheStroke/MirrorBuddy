@@ -1,6 +1,6 @@
 /**
  * @file accessibility.ts
- * @brief Accessibility runtime adaptations for Convergio Education
+ * @brief Accessibility runtime adaptations for MirrorBuddycation
  *
  * Implements accessibility adaptations for students with:
  * - Dyslexia (DY01-07)
@@ -9,7 +9,7 @@
  * - Cerebral Palsy (CP01-05)
  * - Autism (AU01-06)
  *
- * Reference: /Users/roberdan/GitHub/ConvergioCLI/include/nous/education.h
+ * Reference: /Users/roberdan/GitHub/MirrorBuddyCLI/include/nous/education.h
  */
 
 import { CSSProperties } from 'react';

@@ -99,7 +99,7 @@ export default function TestVoicePage() {
     return () => {
       navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Run once on mount, callback identity doesn't matter
   }, []);
 
   // Initialize playback context with selected output device

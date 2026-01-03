@@ -246,7 +246,7 @@ export function WebcamCapture({
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- One-time mount initialization, stream cleanup handled separately
   }, []);
 
   // Cleanup on unmount
@@ -288,7 +288,7 @@ export function WebcamCapture({
     }, 1000);
 
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- doCapture excluded to prevent re-triggering countdown
   }, [countdown]);
 
   // Capture function

@@ -14,6 +14,14 @@ import { CharacterRoleBadge } from './character-role-badge';
 import { AudioDeviceSelector } from './audio-device-selector';
 import { CHARACTER_AVATARS } from './constants';
 
+// C-2 FIX: Helper to get userId from cookie or sessionStorage
+function getUserId(): string | null {
+  if (typeof window === 'undefined') return null;
+  const cookieMatch = document.cookie.match(/mirrorbuddy-user-id=([^;]+)/);
+  if (cookieMatch) return cookieMatch[1];
+  return sessionStorage.getItem('mirrorbuddy-user-id');
+}
+
 /**
  * Voice connection info from /api/realtime/token
  */
@@ -63,6 +71,10 @@ export function VoiceCallOverlay({
   const [configError, setConfigError] = useState<string | null>(null);
   const hasAttemptedConnection = useRef(false);
 
+  // C-2 FIX: Track conversation for memory persistence
+  const conversationIdRef = useRef<string | null>(null);
+  const savedMessagesRef = useRef<Set<string>>(new Set());
+
   const voiceSession = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
@@ -93,6 +105,61 @@ export function VoiceCallOverlay({
   useEffect(() => {
     onSessionIdChange?.(sessionId);
   }, [sessionId, onSessionIdChange]);
+
+  // C-2 FIX: Create conversation in DB when voice session connects
+  useEffect(() => {
+    if (!isConnected || conversationIdRef.current) return;
+
+    const createConversation = async () => {
+      try {
+        const response = await fetch('/api/conversations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            maestroId: character.id,
+            title: `Sessione vocale con ${character.name}`,
+          }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          conversationIdRef.current = data.id;
+          logger.debug('[VoiceCallOverlay] Conversation created for memory persistence', { conversationId: data.id });
+        }
+      } catch (error) {
+        logger.error('[VoiceCallOverlay] Failed to create conversation', { error: String(error) });
+      }
+    };
+
+    createConversation();
+  }, [isConnected, character.id, character.name]);
+
+  // C-2 FIX: Save transcript messages to DB for memory persistence
+  useEffect(() => {
+    if (!conversationIdRef.current || transcript.length === 0) return;
+
+    const saveNewMessages = async () => {
+      for (const entry of transcript) {
+        const messageKey = `${entry.role}-${entry.content.slice(0, 50)}`;
+        if (savedMessagesRef.current.has(messageKey)) continue;
+
+        try {
+          await fetch(`/api/conversations/${conversationIdRef.current}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              role: entry.role,
+              content: entry.content,
+            }),
+          });
+          savedMessagesRef.current.add(messageKey);
+        } catch (error) {
+          logger.error('[VoiceCallOverlay] Failed to save message', { error: String(error) });
+        }
+      }
+    };
+
+    saveNewMessages();
+  }, [transcript]);
 
   // Fetch connection info on mount
   useEffect(() => {
@@ -140,10 +207,32 @@ export function VoiceCallOverlay({
   }, [connectionInfo, isConnected, connectionState, character, connect]);
 
   // Handle end call
-  const handleEndCall = useCallback(() => {
+  const handleEndCall = useCallback(async () => {
     disconnect();
+
+    // C-2 FIX: End conversation and generate summary for memory persistence
+    if (conversationIdRef.current && transcript.length > 0) {
+      const userId = getUserId();
+      if (userId) {
+        try {
+          const response = await fetch(`/api/conversations/${conversationIdRef.current}/end`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, reason: 'explicit' }),
+          });
+          if (response.ok) {
+            logger.info('[VoiceCallOverlay] Conversation ended with summary', {
+              conversationId: conversationIdRef.current,
+            });
+          }
+        } catch (error) {
+          logger.error('[VoiceCallOverlay] Failed to end conversation', { error: String(error) });
+        }
+      }
+    }
+
     onEnd();
-  }, [disconnect, onEnd]);
+  }, [disconnect, onEnd, transcript.length]);
 
   // Status text
   const getStatusText = () => {

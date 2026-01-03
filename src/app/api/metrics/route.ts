@@ -106,7 +106,7 @@ export async function GET() {
 
     // User metrics
     metrics.push({
-      name: 'convergio_users_total',
+      name: 'mirrorbuddy_users_total',
       type: 'gauge',
       help: 'Total number of registered users',
       labels: {},
@@ -114,7 +114,7 @@ export async function GET() {
     });
 
     metrics.push({
-      name: 'convergio_users_active',
+      name: 'mirrorbuddy_users_active',
       type: 'gauge',
       help: 'Number of active users',
       labels: { period: '1h' },
@@ -122,7 +122,7 @@ export async function GET() {
     });
 
     metrics.push({
-      name: 'convergio_users_active',
+      name: 'mirrorbuddy_users_active',
       type: 'gauge',
       help: 'Number of active users',
       labels: { period: '24h' },
@@ -131,7 +131,7 @@ export async function GET() {
 
     // Session metrics
     metrics.push({
-      name: 'convergio_sessions_total',
+      name: 'mirrorbuddy_sessions_total',
       type: 'counter',
       help: 'Total number of sessions',
       labels: { period: '1h' },
@@ -139,7 +139,7 @@ export async function GET() {
     });
 
     metrics.push({
-      name: 'convergio_sessions_total',
+      name: 'mirrorbuddy_sessions_total',
       type: 'counter',
       help: 'Total number of sessions',
       labels: { period: '24h' },
@@ -149,7 +149,7 @@ export async function GET() {
     // Event metrics by category
     for (const cat of eventCounts) {
       metrics.push({
-        name: 'convergio_events_total',
+        name: 'mirrorbuddy_events_total',
         type: 'counter',
         help: 'Total events by category',
         labels: { category: cat.category, period: '1h' },
@@ -159,7 +159,7 @@ export async function GET() {
 
     // Error metrics
     metrics.push({
-      name: 'convergio_errors_total',
+      name: 'mirrorbuddy_errors_total',
       type: 'counter',
       help: 'Total number of errors',
       labels: { period: '1h' },
@@ -168,7 +168,7 @@ export async function GET() {
 
     // Performance metrics
     metrics.push({
-      name: 'convergio_api_response_ms',
+      name: 'mirrorbuddy_api_response_ms',
       type: 'gauge',
       help: 'Average API response time in milliseconds',
       labels: { period: '1h' },
@@ -178,7 +178,7 @@ export async function GET() {
     // Maestro usage metrics
     for (const m of maestroUsage) {
       metrics.push({
-        name: 'convergio_maestro_sessions',
+        name: 'mirrorbuddy_maestro_sessions',
         type: 'counter',
         help: 'Sessions by maestro',
         labels: { maestro_id: m.maestroId, period: '24h' },

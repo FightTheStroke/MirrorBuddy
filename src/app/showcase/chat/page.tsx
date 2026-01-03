@@ -244,7 +244,7 @@ const MARIO_CONVERSATION: ConversationNode = {
             {
               id: 'x5',
               role: 'assistant',
-              content: 'E un antico genio greco che ha inventato un sacco di cose! Qui su Convergio Edu, ti puo insegnare matematica in modo divertente. In modalita completa, potresti parlarci e fare domande. Lui e super paziente!',
+              content: 'E un antico genio greco che ha inventato un sacco di cose! Qui su MirrorBuddy, ti puo insegnare matematica in modo divertente. In modalita completa, potresti parlarci e fare domande. Lui e super paziente!',
             },
           ],
         },

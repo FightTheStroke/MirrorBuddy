@@ -928,7 +928,7 @@ export function DiagnosticsTab() {
         <CardContent className="space-y-4">
           <p className="text-slate-600 dark:text-slate-400">
             Hai bisogno di aiuto con la configurazione o hai problemi tecnici?
-            Puoi chiedere al tuo Coach: conosce tutte le funzionalita di ConvergioEdu!
+            Puoi chiedere al tuo Coach: conosce tutte le funzionalita di MirrorBuddy!
           </p>
 
           <div className="flex flex-wrap gap-2 text-xs text-slate-500">

@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="public/logo.jpeg" alt="ConvergioEdu Logo" width="200">
+  <img src="public/logo.jpeg" alt="MirrorBuddy Logo" width="200">
 </p>
 
-<h1 align="center">ConvergioEdu</h1>
+<h1 align="center">MirrorBuddy</h1>
 <h3 align="center">La Scuola Che Vorrei</h3>
 
 <p align="center">
@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Roberdan/ConvergioEdu/actions/workflows/ci.yml"><img src="https://github.com/Roberdan/ConvergioEdu/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/Roberdan/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/Roberdan/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/tests-1945%20passed-brightgreen" alt="Tests: 1945 passed">
   <img src="https://img.shields.io/badge/coverage-80.75%25-brightgreen" alt="Coverage: 80.75%">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
-  <a href="https://github.com/Roberdan/ConvergioEdu/releases"><img src="https://img.shields.io/github/v/release/Roberdan/ConvergioEdu?include_prereleases&label=version" alt="Version"></a>
+  <a href="https://github.com/Roberdan/MirrorBuddy/releases"><img src="https://img.shields.io/github/v/release/Roberdan/MirrorBuddy?include_prereleases&label=version" alt="Version"></a>
 </p>
 
 <p align="center">
@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <img src="public/screenshots/home.png" alt="ConvergioEdu Homepage" width="800">
+  <img src="public/screenshots/home.png" alt="MirrorBuddy Homepage" width="800">
 </p>
 
 ---
@@ -42,11 +42,11 @@ Traditional schools were designed for the "average" student. But there is no ave
 
 These children are not broken. The system is.
 
-**ConvergioEdu is our answer: a school that adapts to each student, not students who must adapt to school.**
+**MirrorBuddy is our answer: a school that adapts to each student, not students who must adapt to school.**
 
 ### The Support Triangle
 
-Every student in ConvergioEdu has access to three types of support:
+Every student in MirrorBuddy has access to three types of support:
 
 ```
                          STUDENT
@@ -142,7 +142,7 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 
 ## Learning WITH the Greats, Not About Them
 
-Here's what makes ConvergioEdu different.
+Here's what makes MirrorBuddy different.
 
 Instead of reading *about* Euclid in a textbook, students learn mathematics **with Euclid himself**. Instead of memorizing dates about Darwin, they explore evolution **alongside Darwin**. Instead of watching a video about Marie Curie, they discuss chemistry **with Curie**.
 
@@ -179,7 +179,7 @@ Every Maestro:
 
 ## Built for Every Mind
 
-ConvergioEdu isn't just "accessible." It's designed from the ground up for neurodiversity.
+MirrorBuddy isn't just "accessible." It's designed from the ground up for neurodiversity.
 
 | Condition | How We Adapt |
 |-----------|--------------|
@@ -315,7 +315,7 @@ The Settings page provides comprehensive configuration:
 
 ### AI Providers
 
-ConvergioEdu supports multiple AI providers. Choose based on your needs:
+MirrorBuddy supports multiple AI providers. Choose based on your needs:
 
 | Provider | Voice Support | Best For | Cost |
 |----------|--------------|----------|------|
@@ -414,8 +414,8 @@ Requires a Service Principal with "Cost Management Reader" role.
 
 ```bash
 # Clone the repository
-git clone https://github.com/Roberdan/ConvergioEdu.git
-cd ConvergioEdu
+git clone https://github.com/Roberdan/MirrorBuddy.git
+cd MirrorBuddy
 
 # Install dependencies
 npm install
@@ -447,15 +447,15 @@ npm run test       # Run Playwright E2E tests
 
 ---
 
-## The Convergio Ecosystem
+## The MirrorBuddy Ecosystem
 
-ConvergioEdu is part of a larger vision:
+MirrorBuddy is part of a larger vision:
 
 | Project | Description |
 |---------|-------------|
 | [**convergio-cli**](https://github.com/Roberdan/convergio-cli) | CLI with 50+ specialized AI agents |
-| [**MyConvergio**](https://github.com/Roberdan/MyConvergio) | Native macOS/iOS app |
-| [**Convergio**](https://github.com/Roberdan/Convergio) | Core framework |
+| [**MyMirrorBuddy**](https://github.com/Roberdan/MyMirrorBuddy) | Native macOS/iOS app |
+| [**MirrorBuddy**](https://github.com/Roberdan/MirrorBuddy) | Core framework |
 
 ---
 
@@ -485,6 +485,8 @@ For developers working on voice features, see:
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+**Important:** All PRs must follow the [Execution Checklist](docs/EXECUTION-CHECKLIST.md). PRs without a completed checklist will be rejected.
 
 This project was born for inclusion. Every contribution must be:
 - Keyboard accessible

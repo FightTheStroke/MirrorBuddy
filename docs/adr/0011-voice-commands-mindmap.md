@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu implements a "conversation-first" approach where students interact with AI Maestri through natural dialogue rather than forms. Issue #23 established this principle, and Issue #44 extended it to mindmaps with real-time voice commands.
+MirrorBuddy implements a "conversation-first" approach where students interact with AI Maestri through natural dialogue rather than forms. Issue #23 established this principle, and Issue #44 extended it to mindmaps with real-time voice commands.
 
 ### Problem
 

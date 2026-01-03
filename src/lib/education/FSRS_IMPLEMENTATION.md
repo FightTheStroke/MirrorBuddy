@@ -1,9 +1,9 @@
 # FSRS Implementation Summary
 
 **Date**: December 27, 2025
-**Location**: `/Users/roberdan/GitHub/ConvergioWeb/web/src/lib/education/`
+**Location**: `/Users/roberdan/GitHub/MirrorBuddyWeb/web/src/lib/education/`
 **Algorithm**: FSRS-4.5 (Free Spaced Repetition Scheduler)
-**Reference**: Based on C implementation at `/Users/roberdan/GitHub/ConvergioCLI/src/education/fsrs.c`
+**Reference**: Based on C implementation at `/Users/roberdan/GitHub/MirrorBuddyCLI/src/education/fsrs.c`
 
 ## Files Created
 
@@ -243,7 +243,7 @@ async function handleReview(cardId: string, quality: Quality) {
 
 Run the demo:
 ```bash
-cd /Users/roberdan/GitHub/ConvergioWeb/web
+cd /Users/roberdan/GitHub/MirrorBuddyWeb/web
 npx tsx src/lib/education/fsrs-demo.ts
 ```
 
@@ -259,7 +259,7 @@ Expected output:
 
 TypeScript compilation:
 ```bash
-cd /Users/roberdan/GitHub/ConvergioWeb/web
+cd /Users/roberdan/GitHub/MirrorBuddyWeb/web
 npx tsc --noEmit src/lib/education/fsrs.ts
 # No errors = success
 ```
@@ -326,14 +326,14 @@ CREATE INDEX idx_flashcards_tags ON flashcards USING GIN(tags);
 
 ## References
 
-- **C Implementation**: `/Users/roberdan/GitHub/ConvergioCLI/src/education/fsrs.c`
+- **C Implementation**: `/Users/roberdan/GitHub/MirrorBuddyCLI/src/education/fsrs.c`
 - **FSRS Algorithm**: https://github.com/open-spaced-repetition/fsrs4anki
 - **Research Paper**: https://blog.duolingo.com/spaced-repetition/
 - **Anki FSRS**: https://docs.ankiweb.net/fsrs.html
 
 ## License
 
-MIT License - Copyright (c) 2025 Convergio.io
+MIT License - Copyright (c) 2025 MirrorBuddy.io
 
 ---
 

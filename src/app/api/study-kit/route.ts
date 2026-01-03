@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   try {
     // Auth check
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json(

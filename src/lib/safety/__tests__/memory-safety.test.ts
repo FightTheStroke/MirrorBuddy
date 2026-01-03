@@ -234,7 +234,7 @@ describe('Memory API Security', () => {
     // This is tested at integration level, but unit test verifies patterns
     const validPatterns = [
       '/api/conversations/memory?userId=',
-      'convergio-user-id',
+      'mirrorbuddy-user-id',
     ];
 
     // These patterns indicate auth is expected

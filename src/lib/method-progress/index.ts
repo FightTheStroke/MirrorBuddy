@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Method Progress Module
+ * MirrorBuddy Method Progress Module
  * Tracks HOW students learn, not just WHAT they learn
  *
  * Measures autonomy development through:

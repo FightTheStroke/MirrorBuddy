@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Storage Types
+ * MirrorBuddy Storage Types
  * Type definitions for the storage service abstraction
  *
  * Related: ADR-0001, #22 Storage Architecture

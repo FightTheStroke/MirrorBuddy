@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu PDF Processor
+ * MirrorBuddy PDF Processor
  * Client-side PDF to image conversion using pdf.js
  *
  * Converts PDF pages to images for Vision API analysis.

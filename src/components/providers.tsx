@@ -12,6 +12,7 @@ import {
 } from '@/lib/stores/app-store';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { initializeTelemetry } from '@/lib/telemetry';
+import { migrateSessionStorageKey } from '@/lib/storage/migrate-session-key';
 
 // Debug logger - captures all browser errors to file (dev only)
 import '@/lib/client-error-logger';
@@ -47,6 +48,9 @@ function StoreInitializer() {
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
+
+    // Migrate old session key (convergio → mirrorbuddy) for existing users
+    migrateSessionStorageKey();
 
     // Initialize stores from database
     initializeStores().catch(() => {

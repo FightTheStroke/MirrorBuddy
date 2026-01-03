@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Conversation Flow Store
+ * MirrorBuddy Conversation Flow Store
  *
  * Manages the state of the conversation-first interface:
  * - Current active character (Coach, Maestro, Buddy)
@@ -594,7 +594,7 @@ export const useConversationFlowStore = create<ConversationFlowState>()(
 
         // Get userId once at the start of the function (avoid duplication)
         const userId = typeof window !== 'undefined'
-          ? sessionStorage.getItem('convergio-user-id')
+          ? sessionStorage.getItem('mirrorbuddy-user-id')
           : null;
 
         // #98: End current conversation with summary before switching

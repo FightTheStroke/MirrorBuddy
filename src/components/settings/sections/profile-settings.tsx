@@ -1,7 +1,9 @@
 'use client';
 
-import { User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { User, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { TeachingStyle } from '@/lib/stores/app-store';
 import { TEACHING_STYLES } from '../constants';
@@ -18,6 +20,8 @@ interface ProfileSettingsProps {
 }
 
 export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
+  const router = useRouter();
+
   const gradeLevels = [
     { value: '', label: 'Seleziona...' },
     { value: 'primary', label: 'Scuola Primaria (6-10 anni)' },
@@ -141,6 +145,29 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
               )}
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Wave 3: Review Introduction Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <RotateCcw className="w-5 h-5 text-pink-500" />
+            Introduzione
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Rivedi l&apos;introduzione a MirrorBuddy e scopri tutte le funzionalita disponibili.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => router.push('/welcome?replay=true')}
+            className="w-full sm:w-auto"
+          >
+            <RotateCcw className="w-4 h-4 mr-2" />
+            Rivedi introduzione
+          </Button>
         </CardContent>
       </Card>
     </div>

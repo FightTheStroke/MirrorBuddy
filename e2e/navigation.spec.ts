@@ -7,7 +7,7 @@ test.describe('Navigation', () => {
 
   test('homepage loads with maestri grid', async ({ page }) => {
     // Check title or main heading
-    await expect(page.locator('text=Convergio-Edu').first()).toBeVisible();
+    await expect(page.locator('text=MirrorBuddy').first()).toBeVisible();
 
     // Check maestri are displayed
     await expect(page.locator('text=Euclide').first()).toBeVisible({ timeout: 10000 });
@@ -38,7 +38,7 @@ test.describe('Navigation', () => {
     );
 
     // Should start open
-    await expect(page.locator('aside').locator('text=Convergio-Edu')).toBeVisible();
+    await expect(page.locator('aside').locator('text=MirrorBuddy')).toBeVisible();
 
     // Click to collapse
     await collapseButton.first().click();
@@ -47,7 +47,7 @@ test.describe('Navigation', () => {
     // Click to expand again
     await collapseButton.first().click();
     await page.waitForTimeout(300);
-    await expect(page.locator('aside').locator('text=Convergio-Edu')).toBeVisible();
+    await expect(page.locator('aside').locator('text=MirrorBuddy')).toBeVisible();
   });
 });
 

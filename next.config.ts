@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   env: {
     APP_VERSION: packageJson.version,
   },
+  // C-18 FIX: External packages that should not be bundled by Next.js
+  // pdf-parse uses pdfjs-dist which has native dependencies
+  serverExternalPackages: ['pdf-parse'],
   // Add security headers for proper permissions handling
   async headers() {
     const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';

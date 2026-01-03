@@ -44,7 +44,7 @@ interface OnboardingData {
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json({
@@ -137,7 +137,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    let userId = cookieStore.get('convergio-user-id')?.value;
+    let userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     const body = await request.json();
 
@@ -165,7 +165,7 @@ export async function POST(request: NextRequest) {
       });
       userId = user.id;
 
-      cookieStore.set('convergio-user-id', userId, {
+      cookieStore.set('mirrorbuddy-user-id', userId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

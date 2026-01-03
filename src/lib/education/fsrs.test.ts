@@ -1,5 +1,5 @@
 /**
- * CONVERGIO EDUCATION - FSRS Algorithm Unit Tests
+ * MIRRORBUDDY - FSRS Algorithm Unit Tests
  *
  * Tests for the Free Spaced Repetition Scheduler algorithm.
  * These tests verify the core learning science logic.

@@ -379,24 +379,85 @@ function convertToXMindTopic(node: MindmapNode): unknown {
 }
 
 /**
- * Generate simple SVG representation of mindmap
+ * Generate simple SVG representation of mindmap with full tree layout
  */
 function generateSimpleSVG(mindmap: MindmapData): string {
-  // Very basic SVG generation for fallback
+  const width = 1200;
+  const height = 800;
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const levelSpacing = 150;
+  const nodeHeight = 30;
+
   const lines: string[] = [];
   lines.push('<?xml version="1.0" encoding="UTF-8"?>');
-  lines.push('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600">');
+  lines.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">`);
   lines.push('<style>');
-  lines.push('  text { font-family: Arial, sans-serif; font-size: 14px; }');
-  lines.push('  .root { font-size: 20px; font-weight: bold; }');
+  lines.push('  text { font-family: Arial, sans-serif; font-size: 14px; fill: #333; }');
+  lines.push('  .root { font-size: 18px; font-weight: bold; }');
+  lines.push('  .level1 { font-size: 14px; font-weight: 600; }');
+  lines.push('  .level2 { font-size: 12px; }');
+  lines.push('  line { stroke: #666; stroke-width: 1.5; }');
+  lines.push('  rect.node { fill: #f0f0f0; stroke: #999; rx: 5; }');
+  lines.push('  rect.root-node { fill: #4a90d9; stroke: #2a70b9; rx: 8; }');
   lines.push('</style>');
   lines.push('<rect width="100%" height="100%" fill="white"/>');
 
-  // Root node
-  lines.push(`<text x="400" y="300" text-anchor="middle" class="root">${escapeXML(mindmap.root.text)}</text>`);
+  // Calculate positions for each node
+  interface NodePosition {
+    x: number;
+    y: number;
+    node: MindmapNode;
+    level: number;
+  }
+  const positions: NodePosition[] = [];
 
-  // Note: Full SVG generation would require proper tree layout algorithm
-  // This is a placeholder for the export system
+  function calculatePositions(
+    node: MindmapNode,
+    x: number,
+    y: number,
+    level: number,
+    angleStart: number,
+    angleEnd: number
+  ): void {
+    positions.push({ x, y, node, level });
+
+    if (!node.children || node.children.length === 0) return;
+
+    const angleRange = angleEnd - angleStart;
+    const angleStep = angleRange / node.children.length;
+
+    node.children.forEach((child, index) => {
+      const angle = angleStart + angleStep * (index + 0.5);
+      const distance = levelSpacing * (level === 0 ? 1.2 : 0.8);
+      const childX = x + Math.cos(angle) * distance;
+      const childY = y + Math.sin(angle) * distance;
+
+      // Draw connection line
+      lines.push(`<line x1="${x}" y1="${y}" x2="${childX}" y2="${childY}"/>`);
+
+      calculatePositions(child, childX, childY, level + 1, angle - angleStep / 2, angle + angleStep / 2);
+    });
+  }
+
+  // Start layout from center
+  calculatePositions(mindmap.root, centerX, centerY, 0, 0, 2 * Math.PI);
+
+  // Render nodes (after lines so nodes appear on top)
+  for (const pos of positions) {
+    const textWidth = Math.min(pos.node.text.length * 8, 200);
+    const rectWidth = textWidth + 16;
+    const rectHeight = nodeHeight;
+    const rectX = pos.x - rectWidth / 2;
+    const rectY = pos.y - rectHeight / 2;
+
+    const nodeClass = pos.level === 0 ? 'root-node' : 'node';
+    const textClass = pos.level === 0 ? 'root' : pos.level === 1 ? 'level1' : 'level2';
+    const textFill = pos.level === 0 ? 'white' : '#333';
+
+    lines.push(`<rect class="${nodeClass}" x="${rectX}" y="${rectY}" width="${rectWidth}" height="${rectHeight}"/>`);
+    lines.push(`<text x="${pos.x}" y="${pos.y + 5}" text-anchor="middle" class="${textClass}" fill="${textFill}">${escapeXML(pos.node.text.substring(0, 25))}</text>`);
+  }
 
   lines.push('</svg>');
   return lines.join('\n');

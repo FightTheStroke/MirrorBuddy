@@ -104,10 +104,10 @@ function getUserId(): string {
   // For now, use a session-based ID
   if (typeof window === 'undefined') return 'default-user';
 
-  let userId = sessionStorage.getItem('convergio-user-id');
+  let userId = sessionStorage.getItem('mirrorbuddy-user-id');
   if (!userId) {
     userId = `user-${crypto.randomUUID()}`;
-    sessionStorage.setItem('convergio-user-id', userId);
+    sessionStorage.setItem('mirrorbuddy-user-id', userId);
   }
   return userId;
 }
@@ -243,7 +243,7 @@ export function useMindmaps() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadMindmaps();
   }, [loadMindmaps]);
@@ -308,7 +308,7 @@ export function useQuizzes() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadQuizzes();
   }, [loadQuizzes]);
@@ -364,7 +364,7 @@ export function useFlashcardDecks() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadDecks();
   }, [loadDecks]);
@@ -431,7 +431,7 @@ export function useHomeworkSessions() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadSessions();
   }, [loadSessions]);
@@ -560,7 +560,7 @@ export function useDemos() {
     setLoading(false);
   }, [userId]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadDemos();
   }, [loadDemos]);
@@ -610,7 +610,7 @@ export function useSavedTools(toolType: ToolType) {
     setLoading(false);
   }, [userId, toolType]);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern, see docs/adr/0015-database-first-architecture.md */
   useEffect(() => {
     loadTools();
   }, [loadTools]);
@@ -629,27 +629,87 @@ export function useSavedTools(toolType: ToolType) {
 
 /**
  * Auto-save utility for tool results (used by tool-result-display.tsx)
- * Checks for duplicates by title before saving
+ * C-14 FIX: Now accepts toolId to enable proper upsert behavior
+ * C-15 FIX: Removed silent failure - logs errors properly
  */
 export async function autoSaveMaterial(
   toolType: ToolType,
   title: string,
   content: Record<string, unknown>,
-  options?: { subject?: string }
-): Promise<void> {
-  if (typeof window === 'undefined') return;
+  options?: { subject?: string; toolId?: string }
+): Promise<boolean> {
+  if (typeof window === 'undefined') return false;
 
   try {
     const userId = getUserId();
+    // C-14 FIX: Use provided toolId or generate one based on content hash
+    // This ensures the same content gets the same ID for proper upsert
+    const toolId = options?.toolId || generateContentHash(toolType, title, content);
 
-    // Check if already saved (by title)
-    const existing = await fetchMaterials(toolType, userId);
-    if (existing.some((m) => m.title === title)) {
-      return; // Already saved
+    const result = await saveMaterialToAPIWithId(userId, toolId, toolType, title, content, options);
+    return result !== null;
+  } catch (error) {
+    // C-15 FIX: Log error instead of silent failure
+    logger.error('Auto-save material failed', {
+      toolType,
+      title,
+      error: error instanceof Error ? error.message : String(error)
+    });
+    return false;
+  }
+}
+
+/**
+ * Generate a stable hash for content to use as toolId
+ * This ensures the same content always gets the same ID (for upsert)
+ */
+function generateContentHash(toolType: string, title: string, content: Record<string, unknown>): string {
+  const str = `${toolType}-${title}-${JSON.stringify(content)}`;
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return `auto-${Math.abs(hash).toString(36)}`;
+}
+
+/**
+ * Save material with explicit toolId (for upsert behavior)
+ */
+async function saveMaterialToAPIWithId(
+  userId: string,
+  toolId: string,
+  toolType: ToolType,
+  title: string,
+  content: Record<string, unknown>,
+  options?: { subject?: string; maestroId?: string; preview?: string }
+): Promise<SavedMaterial | null> {
+  try {
+    const response = await fetch('/api/materials', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        toolId,
+        toolType,
+        title,
+        content,
+        ...options,
+      }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`API error: ${response.status} - ${JSON.stringify(errorData)}`);
     }
-
-    await saveMaterialToAPI(userId, toolType, title, content, options);
-  } catch {
-    // Silent failure - API might be unavailable
+    const data = await response.json();
+    return data.material;
+  } catch (error) {
+    logger.error('Failed to save material', {
+      error: error instanceof Error ? error.message : String(error),
+      toolType,
+      title
+    });
+    return null;
   }
 }

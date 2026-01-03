@@ -7,7 +7,89 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - Sprint January 2026 Complete
 
-> **Branch**: `development` | **Plan**: `docs/plans/doing/MasterPlan-v2.1-2026-01-02.md`
+> **Branch**: `development` | **Plan**: `docs/plans/done/MasterPlan-v2.1-2026-01-02.md`
+
+### Changed (Jan 3 - Rebrand)
+
+- **Package Rename**: `convergio-edu` → `mirrorbuddy`
+- **Source Code**: All headers and comments updated
+- **Metrics**: API metric names updated (`convergio_*` → `mirrorbuddy_*`)
+- **Documentation**: All ADRs and docs updated with new branding
+- **E2E Tests**: Updated to use MirrorBuddy branding
+
+### Added (Jan 3 - Wave 4: Supporti Consolidation)
+
+- **New /supporti page**: Unified material browsing experience
+  - Sidebar navigation with collapsible sections (type/subject/maestro)
+  - Grid and list view modes with toggle
+  - Full-text search with Fuse.js and debouncing
+  - URL-based filtering (?type=mindmap&subject=math)
+  - Breadcrumb navigation
+  - Responsive design (mobile/desktop)
+- **Redirect /archivio -> /supporti**: Legacy route preserved
+- **Updated navigation**: Main nav shows "Supporti" instead of "Archivio"
+- **E2E tests**: 23 tests for supporti page (e2e/supporti.spec.ts)
+
+### Added (Jan 3 - Wave 3: Welcome Experience)
+
+- **Enhanced /welcome page**: Visual landing experience
+  - hero-section.tsx with Melissa avatar
+  - features-section.tsx with feature cards
+  - guides-section.tsx for getting started
+  - quick-start.tsx with voice/text options
+- **Skip flow**: handleSkipWithConfirmation with user consent
+- **Returning user support**: Personalized greeting
+- **Replay from settings**: /welcome?replay=true parameter
+- **E2E tests**: 18 tests for welcome page (e2e/welcome.spec.ts)
+
+### Fixed (Jan 3 - Wave 1-2: Bug Fixes)
+
+- **P0 Critical (7 fixes)**:
+  - C-5: History per Coach/Buddy (not global)
+  - C-9: Header Counters real-time update
+  - C-12: Mindmap Hierarchy (flat → nested)
+  - C-13: Conversation Persistence
+  - C-14: Material Save intermittent
+  - C-15: Save Material Error handling
+  - C-16: Sandbox SecurityError (srcdoc)
+- **P1 High (9 fixes)**:
+  - C-1: STT Discrepancy fix
+  - C-2: Session Recap + Memory
+  - C-3: Input/Voice panel sticky
+  - C-4: Azure OpenAI Costs display
+  - C-7: Demo Accessibility settings
+  - C-10: Demo in frame (not new tab)
+  - C-11: Triple "Chiamata Terminata" cleanup
+  - C-17: Fullscreen on Tool Creation
+  - C-18: PDF Parsing Failure
+  - C-19: ESC Key Inconsistent
+- **P2 Medium (5 fixes)**:
+  - C-6: Timer + XP Bar in voice panel
+  - C-8: Cafe Ambient Audio (procedural)
+  - C-20: Mindmap Interactive (pan/zoom)
+  - C-21: Summary Export/Convert/Flashcard
+
+### Added (Jan 3 - Admin Dashboard)
+
+- **Admin Analytics Dashboard** (`/admin/analytics`):
+  - Token usage statistics (total tokens, calls, avg per call, estimated cost)
+  - Voice metrics (sessions, TTS generations, realtime sessions)
+  - Flashcard FSRS stats (cards, reviews, accuracy, cards due)
+  - Rate limiting events (total, by endpoint)
+  - Safety events (total, by severity, unresolved count)
+- **New API Routes**:
+  - `GET /api/dashboard/token-usage` - AI token usage stats
+  - `GET /api/dashboard/voice-metrics` - Voice session metrics
+  - `GET /api/dashboard/fsrs-stats` - Flashcard FSRS statistics
+  - `GET /api/dashboard/rate-limits` - Rate limit events
+  - `GET /api/dashboard/safety-events` - Safety monitoring data
+  - `POST /api/dashboard/safety-events` - Resolve safety events
+- **Database Models**:
+  - `RateLimitEvent` - Stores rate limit violations
+  - `SafetyEvent` - Stores safety monitoring events
+- **Persistence Layer**:
+  - `src/lib/rate-limit.ts` - Rate limit event logging
+  - `src/lib/safety/monitoring.ts` - Safety event persistence
 
 ### Fixed (WAVE 0 Critical Bugs)
 

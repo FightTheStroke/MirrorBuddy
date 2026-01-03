@@ -1,6 +1,6 @@
 # Technical Documentation
 
-Documentazione tecnica dettagliata per ConvergioEdu.
+Documentazione tecnica dettagliata per MirrorBuddy.
 
 ## Contents
 

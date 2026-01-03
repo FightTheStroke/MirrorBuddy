@@ -1,4 +1,4 @@
-# Repository Migration: ConvergioEdu → MirrorBuddy
+# Repository Migration: MirrorBuddy → MirrorBuddy
 
 **Data**: 2026-01-02
 **Issue**: #66
@@ -24,7 +24,7 @@
 
 ## Obiettivo
 
-Migrare completamente il repository da ConvergioEdu a MirrorBuddy:
+Migrare completamente il repository da MirrorBuddy a MirrorBuddy:
 1. Rinominare tutte le occorrenze nel codice e nella documentazione
 2. Trasferire ownership a FightTheStroke
 3. Aggiornare infrastruttura (Vercel, dominio, etc.)
@@ -35,10 +35,10 @@ Migrare completamente il repository da ConvergioEdu a MirrorBuddy:
 
 | Pattern | Sostituzione | File | Occorrenze |
 |---------|-------------|------|------------|
-| `convergio-edu` | `mirrorbuddy` | package.json, package-lock.json | ~3 |
-| `ConvergioEdu` | `MirrorBuddy` | docs, components, comments | ~150 |
-| `Convergio Edu` | `MirrorBuddy` | UI text, landing | ~15 |
-| `Convergio` | `MirrorBuddy` | UI text, comments | ~30 |
+| `mirrorbuddy` | `mirrorbuddy` | package.json, package-lock.json | ~3 |
+| `MirrorBuddy` | `MirrorBuddy` | docs, components, comments | ~150 |
+| `MirrorBuddy` | `MirrorBuddy` | UI text, landing | ~15 |
+| `MirrorBuddy` | `MirrorBuddy` | UI text, comments | ~30 |
 | `convergio` | `mirrorbuddy` | sessionStorage keys, vars | ~20 |
 | **Totale** | | **179 files** | **~557** |
 
@@ -130,7 +130,7 @@ CLAUDE.md, README.md, CONTRIBUTING.md, SECURITY.md
 #!/bin/bash
 set -e
 
-echo "=== ConvergioEdu → MirrorBuddy Migration ==="
+echo "=== MirrorBuddy → MirrorBuddy Migration ==="
 echo ""
 
 # Colors
@@ -171,9 +171,9 @@ echo "----------------------"
 
 # package.json - name field
 if [ "$DRY_RUN" != "true" ]; then
-    sed -i '' 's/"name": "convergio-edu"/"name": "mirrorbuddy"/g' package.json
-    sed -i '' 's/ConvergioEdu/MirrorBuddy/g' package.json
-    sed -i '' 's|Roberdan/ConvergioEdu|FightTheStroke/MirrorBuddy|g' package.json
+    sed -i '' 's/"name": "mirrorbuddy"/"name": "mirrorbuddy"/g' package.json
+    sed -i '' 's/MirrorBuddy/MirrorBuddy/g' package.json
+    sed -i '' 's|Roberdan/MirrorBuddy|FightTheStroke/MirrorBuddy|g' package.json
     echo -e "${GREEN}Updated: package.json${NC}"
 fi
 
@@ -186,15 +186,15 @@ echo "---------------------------------"
 
 # Find and replace in source files
 find src -type f \( -name "*.ts" -o -name "*.tsx" \) | while read file; do
-    if grep -q -E "convergio|Convergio|ConvergioEdu" "$file" 2>/dev/null; then
+    if grep -q -E "convergio|MirrorBuddy|MirrorBuddy" "$file" 2>/dev/null; then
         if [ "$DRY_RUN" != "true" ]; then
             # Order matters: most specific first
-            sed -i '' 's/ConvergioEdu/MirrorBuddy/g' "$file"
-            sed -i '' 's/Convergio Edu/MirrorBuddy/g' "$file"
-            sed -i '' 's/Convergio-Edu/MirrorBuddy/g' "$file"
-            sed -i '' 's/convergio-edu/mirrorbuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
+            sed -i '' 's/mirrorbuddy/mirrorbuddy/g' "$file"
             sed -i '' 's/convergio-user-id/mirrorbuddy-user-id/g' "$file"
-            sed -i '' 's/Convergio/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
             sed -i '' "s/'convergio'/'mirrorbuddy'/g" "$file"
             echo -e "${GREEN}Updated: $file${NC}"
         else
@@ -208,14 +208,14 @@ echo "Phase 3: Documentation (.md)"
 echo "----------------------------"
 
 find . -name "*.md" -not -path "./node_modules/*" | while read file; do
-    if grep -q -E "convergio|Convergio|ConvergioEdu" "$file" 2>/dev/null; then
+    if grep -q -E "convergio|MirrorBuddy|MirrorBuddy" "$file" 2>/dev/null; then
         if [ "$DRY_RUN" != "true" ]; then
-            sed -i '' 's/ConvergioEdu/MirrorBuddy/g' "$file"
-            sed -i '' 's/Convergio Edu/MirrorBuddy/g' "$file"
-            sed -i '' 's/Convergio-Edu/MirrorBuddy/g' "$file"
-            sed -i '' 's/convergio-edu/mirrorbuddy/g' "$file"
-            sed -i '' 's|Roberdan/ConvergioEdu|FightTheStroke/MirrorBuddy|g' "$file"
-            sed -i '' 's/Convergio/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
+            sed -i '' 's/mirrorbuddy/mirrorbuddy/g' "$file"
+            sed -i '' 's|Roberdan/MirrorBuddy|FightTheStroke/MirrorBuddy|g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
             echo -e "${GREEN}Updated: $file${NC}"
         else
             echo "  Would update: $file"
@@ -228,9 +228,9 @@ echo "Phase 4: Config files"
 echo "---------------------"
 
 # tsconfig.json
-if grep -q "ConvergioEdu" tsconfig.json 2>/dev/null; then
+if grep -q "MirrorBuddy" tsconfig.json 2>/dev/null; then
     if [ "$DRY_RUN" != "true" ]; then
-        sed -i '' 's/ConvergioEdu-Memory/MirrorBuddy-Memory/g' tsconfig.json
+        sed -i '' 's/MirrorBuddy-Memory/MirrorBuddy-Memory/g' tsconfig.json
         echo -e "${GREEN}Updated: tsconfig.json${NC}"
     else
         echo "  Would update: tsconfig.json"
@@ -262,9 +262,9 @@ echo "Phase 5: E2E tests"
 echo "------------------"
 
 find e2e -type f -name "*.ts" 2>/dev/null | while read file; do
-    if grep -q -E "convergio|Convergio|ConvergioEdu" "$file" 2>/dev/null; then
+    if grep -q -E "convergio|MirrorBuddy|MirrorBuddy" "$file" 2>/dev/null; then
         if [ "$DRY_RUN" != "true" ]; then
-            sed -i '' 's/ConvergioEdu/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
             sed -i '' 's/convergio/mirrorbuddy/g' "$file"
             echo -e "${GREEN}Updated: $file${NC}"
         else
@@ -278,9 +278,9 @@ echo "Phase 6: Scripts"
 echo "----------------"
 
 find scripts -type f \( -name "*.sh" -o -name "*.ts" -o -name "*.js" \) 2>/dev/null | while read file; do
-    if grep -q -E "convergio|Convergio|ConvergioEdu" "$file" 2>/dev/null; then
+    if grep -q -E "convergio|MirrorBuddy|MirrorBuddy" "$file" 2>/dev/null; then
         if [ "$DRY_RUN" != "true" ]; then
-            sed -i '' 's/ConvergioEdu/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
             sed -i '' 's/convergio/mirrorbuddy/g' "$file"
             echo -e "${GREEN}Updated: $file${NC}"
         else
@@ -307,9 +307,9 @@ echo "Phase 8: Claude config"
 echo "----------------------"
 
 find .claude -type f -name "*.md" 2>/dev/null | while read file; do
-    if grep -q -E "convergio|Convergio|ConvergioEdu" "$file" 2>/dev/null; then
+    if grep -q -E "convergio|MirrorBuddy|MirrorBuddy" "$file" 2>/dev/null; then
         if [ "$DRY_RUN" != "true" ]; then
-            sed -i '' 's/ConvergioEdu/MirrorBuddy/g' "$file"
+            sed -i '' 's/MirrorBuddy/MirrorBuddy/g' "$file"
             sed -i '' 's/convergio/mirrorbuddy/g' "$file"
             echo -e "${GREEN}Updated: $file${NC}"
         else
@@ -329,7 +329,7 @@ echo "3. Run: npm run typecheck"
 echo "4. Run: npm run build"
 echo "5. Run: npm run test"
 echo "6. Review changes: git diff"
-echo "7. Commit: git add -A && git commit -m 'chore: rebrand ConvergioEdu to MirrorBuddy'"
+echo "7. Commit: git add -A && git commit -m 'chore: rebrand MirrorBuddy to MirrorBuddy'"
 echo ""
 ```
 
@@ -339,22 +339,22 @@ echo ""
 #!/bin/bash
 # scripts/audit-convergio-refs.sh
 
-echo "=== Audit: ConvergioEdu References ==="
+echo "=== Audit: MirrorBuddy References ==="
 echo ""
 
 echo "By pattern:"
 echo "-----------"
-echo -n "convergio-edu: "
-grep -r "convergio-edu" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
+echo -n "mirrorbuddy: "
+grep -r "mirrorbuddy" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
 
-echo -n "ConvergioEdu: "
-grep -r "ConvergioEdu" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
+echo -n "MirrorBuddy: "
+grep -r "MirrorBuddy" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
 
-echo -n "Convergio Edu: "
-grep -r "Convergio Edu" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
+echo -n "MirrorBuddy: "
+grep -r "MirrorBuddy" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
 
-echo -n "Convergio (standalone): "
-grep -rw "Convergio" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | grep -v ConvergioEdu | wc -l
+echo -n "MirrorBuddy (standalone): "
+grep -rw "MirrorBuddy" --include="*.ts" --include="*.tsx" --include="*.json" --include="*.md" . 2>/dev/null | grep -v node_modules | grep -v MirrorBuddy | wc -l
 
 echo -n "convergio-user-id: "
 grep -r "convergio-user-id" --include="*.ts" --include="*.tsx" . 2>/dev/null | grep -v node_modules | wc -l
@@ -363,16 +363,16 @@ echo ""
 echo "By file type:"
 echo "-------------"
 echo -n ".tsx files: "
-grep -rl "convergio\|Convergio" --include="*.tsx" . 2>/dev/null | grep -v node_modules | wc -l
+grep -rl "convergio\|MirrorBuddy" --include="*.tsx" . 2>/dev/null | grep -v node_modules | wc -l
 
 echo -n ".ts files: "
-grep -rl "convergio\|Convergio" --include="*.ts" . 2>/dev/null | grep -v node_modules | wc -l
+grep -rl "convergio\|MirrorBuddy" --include="*.ts" . 2>/dev/null | grep -v node_modules | wc -l
 
 echo -n ".md files: "
-grep -rl "convergio\|Convergio" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
+grep -rl "convergio\|MirrorBuddy" --include="*.md" . 2>/dev/null | grep -v node_modules | wc -l
 
 echo -n ".json files: "
-grep -rl "convergio\|Convergio" --include="*.json" . 2>/dev/null | grep -v node_modules | wc -l
+grep -rl "convergio\|MirrorBuddy" --include="*.json" . 2>/dev/null | grep -v node_modules | wc -l
 
 echo ""
 echo "Critical files:"
@@ -417,7 +417,7 @@ export function migrateSessionStorageKey() {
 
 ```
 # Prima
-https://github.com/Roberdan/ConvergioEdu
+https://github.com/Roberdan/MirrorBuddy
 
 # Dopo
 https://github.com/FightTheStroke/MirrorBuddy

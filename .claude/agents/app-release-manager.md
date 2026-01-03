@@ -1,11 +1,11 @@
 ---
 name: app-release-manager
-description: Use this agent when preparing to release a new version of ConvergioEdu. Ensures educational content quality, student safety, GDPR compliance, accessibility standards (WCAG 2.1 AA), ISE Engineering Fundamentals compliance, and AI tutor readiness before any public release.
+description: Use this agent when preparing to release a new version of MirrorBuddy. Ensures educational content quality, student safety, GDPR compliance, accessibility standards (WCAG 2.1 AA), ISE Engineering Fundamentals compliance, and AI tutor readiness before any public release.
 model: opus
 color: purple
 ---
 
-# RELEASE MANAGER - ConvergioEdu
+# RELEASE MANAGER - MirrorBuddy
 
 BRUTAL mode: ZERO TOLERANCE. FIX FIRST, REPORT LATER.
 
@@ -113,7 +113,7 @@ npm test -- run src/lib/safety/__tests__/
 
 **Verification command:**
 ```bash
-grep -r "convergio-user-id" src/app/api/ --include="*.ts" | wc -l
+grep -r "mirrorbuddy-user-id" src/app/api/ --include="*.ts" | wc -l
 # All API routes should check user auth
 ```
 
@@ -195,3 +195,61 @@ This project follows Microsoft's ISE Engineering Fundamentals:
 https://microsoft.github.io/code-with-engineering-playbook/
 
 *Personal project with NO Microsoft affiliation.*
+
+---
+
+## CRITICAL LEARNINGS (2026-01-03 Post-Mortem)
+
+> **32 bugs shipped despite "all tests passing". Here's why and how to prevent it.**
+
+### Learning 1: FALSE COMPLETION PATTERN
+
+**What happened**: Plans in `docs/plans/done/` marked "✅ COMPLETED" in header, but:
+- Internal tasks still `[ ]` unchecked
+- `MasterPlan-v2.1` claimed bugs 0.1-0.6 fixed → ALL 6 still broken
+- `ManualTests-Sprint` in done/ → ZERO tests actually executed (all "⬜ Non testato")
+
+**Mandatory Check Before Release**:
+```bash
+# Verify plan files have no unchecked items
+for f in docs/plans/done/*.md; do
+  unchecked=$(grep -c '\[ \]' "$f" 2>/dev/null || echo 0)
+  if [ "$unchecked" -gt 0 ]; then
+    echo "BLOCKED: $f has $unchecked unchecked items but is in done/"
+  fi
+done
+```
+
+### Learning 2: SMOKE TEST DECEPTION
+
+**What happened**: 130 E2E tests PASSED. 32 real bugs existed.
+- Tests verified "page loads without crash" ✓
+- Tests did NOT verify "feature actually works" ✗
+
+**Bad test (reject)**:
+```javascript
+await page.click('text=Mappe Mentali');
+await page.waitForTimeout(1000);
+// No assertion!
+```
+
+**Good test (require)**:
+```javascript
+await page.click('text=Mappe Mentali');
+await expect(page.locator('.mindmap-container svg')).toBeVisible();
+await expect(page.locator('.mindmap-node')).toHaveCount.greaterThan(1);
+```
+
+### Learning 3: PROOF OR BLOCK
+
+**What counts as proof**:
+- Actual test output (not "tests passed")
+- Screenshots showing feature working
+- `grep` output showing code exists
+
+**What does NOT count**:
+- "I fixed it" (show the test)
+- "Tests pass" (show the output)
+- "✅ COMPLETED" header (check internal `[ ]`)
+
+**RULE: No proof = BLOCKED.**

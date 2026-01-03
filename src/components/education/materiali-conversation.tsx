@@ -673,13 +673,13 @@ export function MaterialiConversation({
         )}
       </AnimatePresence>
 
-      {/* Input area */}
+      {/* C-3 FIX: Input area - sticky at bottom to prevent scrolling away */}
       <footer
         className={cn(
-          'border-t p-4 shrink-0',
+          'border-t p-4 shrink-0 sticky bottom-0 z-10',
           settings.highContrast
             ? 'border-yellow-400 bg-black'
-            : 'border-slate-200 dark:border-slate-700'
+            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
         )}
       >
         <form onSubmit={handleSubmit} className="flex gap-2 items-end">

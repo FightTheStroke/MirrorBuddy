@@ -59,3 +59,11 @@ export const LazyHTMLSnippetsView = dynamic(
     ssr: false,
   }
 );
+
+export const LazyArchiveView = dynamic(
+  () => import('./archive-view').then((mod) => ({ default: mod.ArchiveView })),
+  {
+    loading: () => <ViewSkeleton />,
+    ssr: false,
+  }
+);

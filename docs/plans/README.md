@@ -1,6 +1,6 @@
 # Implementation Plans
 
-Kanban board per i piani di implementazione di ConvergioEdu.
+Kanban board per i piani di implementazione di MirrorBuddy.
 
 ## Folder Structure
 
@@ -21,7 +21,7 @@ docs/plans/
 |------|------|-------------|----------|
 | 🔴 [TESTS TO BE DONE ASAP](todo/TestToBeDoneAsap.md) | 2026-01-02 | **CRITICAL - E2E failures + Manual tests - BLOCKS PR merge** | **CRITICAL** |
 | [ToolsInChatNavigation](todo/ToolsInChatNavigation-2026-01-02.md) | 2026-01-02 | Fix navigazione tool nella chat normale | MEDIUM |
-| [RepoMigration-MirrorBuddy](todo/RepoMigration-MirrorBuddy-2026-01-02.md) | 2026-01-02 | Rebrand ConvergioEdu → MirrorBuddy + transfer ownership | MEDIUM |
+| [RepoMigration-MirrorBuddy](todo/RepoMigration-MirrorBuddy-2026-01-02.md) | 2026-01-02 | Rebrand MirrorBuddy → MirrorBuddy + transfer ownership | MEDIUM |
 | [DashboardAnalytics](todo/DashboardAnalytics-2026-01.md) | 2026-01-02 | Dashboard analytics enhancement (backlog) | LOW |
 
 ### DOING
