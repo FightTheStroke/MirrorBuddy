@@ -30,35 +30,39 @@ export const CHAT_TOOL_DEFINITIONS = [
     type: 'function' as const,
     function: {
       name: 'create_mindmap',
-      description: `Crea una mappa mentale interattiva ben strutturata su un argomento. Usa questo strumento quando lo studente chiede di visualizzare concetti, creare schemi, o organizzare informazioni.
+      description: `Crea una mappa mentale con GERARCHIA. OBBLIGATORIO usare parentId per i sotto-nodi.
 
-IMPORTANTE - Struttura della mappa:
-- Il "title" è il nodo centrale/principale della mappa
-- I nodi senza parentId sono i RAMI PRINCIPALI che partono dal centro
-- Ogni ramo principale deve avere 2-4 sotto-nodi (con parentId = id del ramo)
-- Crea almeno 3-5 rami principali per una mappa utile
-- Usa 2-3 livelli di profondità (rami → sotto-rami → dettagli)
+SBAGLIATO (mappa piatta):
+nodes: [{"id":"1","label":"A"},{"id":"2","label":"B"},{"id":"3","label":"C"}]
 
-Esempio di struttura per "Fotosintesi":
-- title: "La Fotosintesi"
-- Rami principali (parentId omesso): "Fase Luminosa", "Fase Oscura", "Fattori Limitanti", "Importanza"
-- Sotto-rami di "Fase Luminosa": "Clorofilla", "Acqua", "ATP e NADPH"`,
+CORRETTO (mappa gerarchica):
+nodes: [
+  {"id":"1","label":"Geografia"},
+  {"id":"2","label":"Posizione","parentId":"1"},
+  {"id":"3","label":"Confini","parentId":"1"},
+  {"id":"4","label":"Nord Italia","parentId":"2"}
+]
+
+REGOLE:
+1. Nodi SENZA parentId = rami principali (max 4-5)
+2. Nodi CON parentId = sotto-nodi (OBBLIGATORIO per creare gerarchia)
+3. Almeno 2 livelli di profondità`,
       parameters: {
         type: 'object',
         properties: {
           title: {
             type: 'string',
-            description: 'Titolo/argomento principale che appare al CENTRO della mappa mentale',
+            description: 'Titolo centrale della mappa',
           },
           nodes: {
             type: 'array',
-            description: 'Nodi della mappa organizzati gerarchicamente. I nodi senza parentId sono i rami principali dal centro. I sotto-nodi hanno parentId = id del loro nodo padre.',
+            description: 'Nodi gerarchici. IMPORTANTE: i sotto-nodi DEVONO avere parentId!',
             items: {
               type: 'object',
               properties: {
-                id: { type: 'string', description: 'ID univoco del nodo (es: "1", "2", "2a", "2b")' },
-                label: { type: 'string', description: 'Testo breve del nodo (max 5-7 parole)' },
-                parentId: { type: 'string', description: 'ID del nodo padre. OMETTI per i rami principali (che partono dal centro). INCLUDI per i sotto-nodi.' },
+                id: { type: 'string', description: 'ID univoco (es: "1", "2", "3")' },
+                label: { type: 'string', description: 'Testo breve (max 5 parole)' },
+                parentId: { type: 'string', description: 'ID del padre. OMETTI SOLO per rami principali, INCLUDI per sotto-nodi!' },
               },
               required: ['id', 'label'],
             },

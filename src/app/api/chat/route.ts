@@ -38,36 +38,29 @@ interface ChatRequest {
 // These instructions guide AI to prioritize tool calls when the user specifies a topic
 const TOOL_CONTEXT: Record<string, string> = {
   mindmap: `
-## MODALITÀ MAPPA MENTALE
+## MODALITÀ MAPPA MENTALE - GERARCHIA OBBLIGATORIA
 
-Hai a disposizione il tool "create_mindmap" per creare mappe mentali interattive.
+SBAGLIATO (mappa piatta - NON fare così):
+nodes: [{"id":"1","label":"A"},{"id":"2","label":"B"},{"id":"3","label":"C"}]
 
-Quando lo studente indica un argomento:
-1. Usa direttamente il tool create_mindmap
-2. Il tool genererà automaticamente la visualizzazione grafica
-
-STRUTTURA GERARCHICA - ESEMPIO:
+CORRETTO (mappa gerarchica):
 {
   "title": "La Fotosintesi",
   "nodes": [
-    { "id": "1", "label": "Fase Luminosa", "parentId": null },
-    { "id": "2", "label": "Clorofilla", "parentId": "1" },
-    { "id": "3", "label": "Assorbimento Luce", "parentId": "1" },
-    { "id": "4", "label": "Fase Oscura", "parentId": null },
-    { "id": "5", "label": "Ciclo di Calvin", "parentId": "4" },
-    { "id": "6", "label": "Fissazione CO2", "parentId": "5" },
-    { "id": "7", "label": "Fattori Ambientali", "parentId": null },
-    { "id": "8", "label": "Luce Solare", "parentId": "7" },
-    { "id": "9", "label": "Temperatura", "parentId": "7" }
+    {"id":"1","label":"Fase Luminosa"},
+    {"id":"2","label":"Clorofilla","parentId":"1"},
+    {"id":"3","label":"ATP","parentId":"1"},
+    {"id":"4","label":"Fase Oscura"},
+    {"id":"5","label":"Ciclo di Calvin","parentId":"4"},
+    {"id":"6","label":"Glucosio","parentId":"5"}
   ]
 }
 
-REGOLE PER LA GERARCHIA:
-1. parentId: null = nodo di primo livello (ramo principale dal centro)
-2. parentId: "X" = nodo figlio del nodo con id "X"
-3. Crea almeno 3 livelli di profondità per una mappa ricca
-4. Ogni nodo di primo livello dovrebbe avere 2-4 figli
-5. Evita mappe piatte con tutti parentId: null
+REGOLE OBBLIGATORIE:
+1. Nodi SENZA parentId = rami principali (max 3-5)
+2. Nodi CON parentId = sotto-nodi (DEVONO avere parentId!)
+3. Ogni ramo principale DEVE avere almeno 2 figli
+4. MAI fare mappe piatte dove tutti i nodi sono senza parentId
 
 Se lo studente non ha indicato un argomento, chiedi: "Di cosa vuoi fare la mappa?"`,
 

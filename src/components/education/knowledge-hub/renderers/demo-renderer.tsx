@@ -16,11 +16,12 @@
  * }
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlayCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HTMLPreview } from '@/components/education/html-preview';
+import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import type { BaseRendererProps } from './index';
 
 interface DemoData {
@@ -36,11 +37,114 @@ interface DemoData {
 }
 
 /**
+ * C-7 FIX: Generate accessibility CSS based on user settings
+ */
+function generateAccessibilityCSS(settings: {
+  dyslexiaFont: boolean;
+  extraLetterSpacing: boolean;
+  increasedLineHeight: boolean;
+  highContrast: boolean;
+  largeText: boolean;
+  fontSize: number;
+  lineSpacing: number;
+  customBackgroundColor: string;
+  customTextColor: string;
+}): string {
+  const rules: string[] = [];
+
+  // Base styles to ensure accessibility overrides work
+  rules.push(`
+    * {
+      font-size: ${settings.fontSize * 100}% !important;
+      line-height: ${settings.lineSpacing * 1.4}em !important;
+    }
+  `);
+
+  // Dyslexia-friendly font
+  if (settings.dyslexiaFont) {
+    rules.push(`
+      @import url('https://fonts.cdnfonts.com/css/opendyslexic');
+      * {
+        font-family: 'OpenDyslexic', sans-serif !important;
+      }
+    `);
+  }
+
+  // Extra letter spacing
+  if (settings.extraLetterSpacing) {
+    rules.push(`
+      * {
+        letter-spacing: 0.05em !important;
+        word-spacing: 0.1em !important;
+      }
+    `);
+  }
+
+  // Increased line height
+  if (settings.increasedLineHeight) {
+    rules.push(`
+      * {
+        line-height: ${Math.max(settings.lineSpacing, 1.8)}em !important;
+      }
+    `);
+  }
+
+  // High contrast mode
+  if (settings.highContrast) {
+    rules.push(`
+      body, html {
+        background-color: #000 !important;
+        color: #fff !important;
+      }
+      * {
+        border-color: #fff !important;
+      }
+      a, a:visited {
+        color: #ffff00 !important;
+      }
+      button, input, select, textarea {
+        background-color: #333 !important;
+        color: #fff !important;
+        border: 2px solid #fff !important;
+      }
+    `);
+  }
+
+  // Large text
+  if (settings.largeText) {
+    rules.push(`
+      * {
+        font-size: ${settings.fontSize * 120}% !important;
+      }
+    `);
+  }
+
+  return rules.join('\n');
+}
+
+/**
  * Build HTML code from separate html/css/js parts or use existing code
  */
-function buildDemoCode(demoData: DemoData): string | null {
+function buildDemoCode(demoData: DemoData, accessibilityCSS: string = ''): string | null {
   // If we have a direct code property, use it
   if (demoData.code) {
+    // C-7 FIX: Inject accessibility CSS into existing code
+    if (accessibilityCSS && demoData.code.includes('<head>')) {
+      return demoData.code.replace(
+        '<head>',
+        `<head><style id="accessibility-styles">${accessibilityCSS}</style>`
+      );
+    }
+    if (accessibilityCSS && demoData.code.includes('<html>')) {
+      return demoData.code.replace(
+        '<html>',
+        `<html><head><style id="accessibility-styles">${accessibilityCSS}</style></head>`
+      );
+    }
+    // Fallback: wrap with style tag at the beginning
+    if (accessibilityCSS) {
+      return `<style id="accessibility-styles">${accessibilityCSS}</style>${demoData.code}`;
+    }
     return demoData.code;
   }
 
@@ -51,6 +155,7 @@ function buildDemoCode(demoData: DemoData): string | null {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style id="accessibility-styles">${accessibilityCSS}</style>
   <style>${demoData.css || ''}</style>
 </head>
 <body>
@@ -70,6 +175,9 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
   const demoData = data as DemoData;
   const [showDemo, setShowDemo] = useState(false);
 
+  // C-7 FIX: Get accessibility settings from store
+  const settings = useAccessibilityStore((state) => state.settings);
+
   const title = demoData.title || 'Demo Interattiva';
   const description = demoData.description || 'Clicca per avviare la demo';
   const type = demoData.type || 'interactive';
@@ -80,7 +188,9 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
     interactive: 'Interattivo',
   };
 
-  const demoCode = buildDemoCode(demoData);
+  // C-7 FIX: Generate accessibility CSS and inject into demo code
+  const accessibilityCSS = useMemo(() => generateAccessibilityCSS(settings), [settings]);
+  const demoCode = useMemo(() => buildDemoCode(demoData, accessibilityCSS), [demoData, accessibilityCSS]);
   const hasCode = !!demoCode;
 
   return (
