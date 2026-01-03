@@ -382,18 +382,6 @@ export function detectToolType(message: string): ToolType | null {
   return null;
 }
 
-/**
- * Calculates confidence score based on pattern matches.
- * Reserved for future use with more sophisticated confidence scoring.
- */
-function _calculateConfidence(
-  _message: string,
-  _patterns: RegExp[]
-): number {
-  // Placeholder for future pattern-based confidence calculation
-  return 0.75;
-}
-
 // ============================================================================
 // MAIN DETECTION FUNCTION
 // ============================================================================

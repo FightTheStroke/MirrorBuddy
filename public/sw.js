@@ -35,7 +35,7 @@ self.addEventListener('push', (event) => {
   }
 
   const {
-    title = 'mirrorbuddyEdu',
+    title = 'MirrorBuddy',
     body = '',
     icon = '/icons/notification.png',
     badge = '/icons/badge.png',

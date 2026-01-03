@@ -1,5 +1,5 @@
 // ============================================================================
-// mirrorbuddy WEB - DATABASE SCHEMA
+// MIRRORBUDDY WEB - DATABASE SCHEMA
 // SQLite for local, PostgreSQL for cloud (same schema works for both)
 // ============================================================================
 
@@ -961,6 +961,7 @@ model RateLimitEvent {
 
   @@index([userId, timestamp])
   @@index([endpoint, timestamp])
+  @@index([timestamp]) // Standalone index for time-range queries
 }
 
 // ============================================================================
@@ -980,5 +981,6 @@ model SafetyEvent {
 
   @@index([userId, timestamp])
   @@index([severity, timestamp])
+  @@index([timestamp]) // Standalone index for time-range queries
 }
 
