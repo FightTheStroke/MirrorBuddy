@@ -34,58 +34,23 @@ Load with `@docs/claude/<name>.md`:
 **Features**: pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory  
 **Characters**: buddies | coaches
 
-## Quick Reference
+## Project Rules
 
-- **Accessibility**: WCAG 2.1 AA, 7 profiles in `src/lib/accessibility/`
-- **Database**: Prisma at `prisma/schema.prisma`
-- **Path aliases**: `@/lib/...`, `@/components/...`
+**Verification**: `npm run lint && npm run typecheck && npm run build && npm run test`
 
-## New Feature Guidelines
+**Process**:
+- Tests first: Write failing test → implement → pass
+- Update CHANGELOG for user-facing changes
+- Add to `@docs/claude/` if complex feature
+- Types in `src/types/index.ts`
+- Conventional commits, reference issue if exists
 
-When implementing new features:
-1. **Tests first**: Write failing test → implement → pass
-2. **Docs**: Update CHANGELOG, add to `@docs/claude/` if complex
-3. **Types**: Add to `src/types/index.ts`
-4. **Verify**: `npm run lint && npm run typecheck && npm run build`
-5. **Commit**: Conventional format, reference issue if exists
-
-## PLANNING RULES (MANDATORY)
-
-⚠️ These rules apply **ONLY AFTER the execution plan has been approved**,  
-in accordance with **SmartClaude.md**.
-
-**UN PIANO NON ESEGUITO È PEGGIO DI NESSUN PIANO.**
-
-1. **EXECUTE IMMEDIATELY (POST-APPROVAL)**
-   - Dopo approvazione del piano: ESEGUI SUBITO
-   - Zero attesa, zero conferme, zero "lo faccio dopo"
-   - Se il piano è approvato e non lo esegui = HAI FALLITO
-
-2. **TRACK PROGRESS IN REAL-TIME**
-   - Aggiorna il piano mentre lavori: `[ ]` → `[🔄]` → `[✅]`
-   - Se il file piano non è aggiornato, nessuno sa cosa è stato fatto
-
-3. **VERIFY BEFORE "DONE"**
-   - `npm run typecheck && npm run lint && npm run build` DEVE passare
-   - Se fallisce, NON HAI FINITO - torna a fixare
-
-4. **NO PARTIAL EXECUTION**
-   - Un piano con 10 task = fai tutti e 10
-   - "Wave 1 fatto, Wave 2-3 li faccio dopo" = INACCETTABILE
-   - Finisci TUTTO quello che è nel piano
-
-5. **PARALLEL EXECUTION**
-   - Lancia agenti in parallelo per task indipendenti
-   - Max 3 agenti per evitare crash
-   - Checkpoint nel file piano per recovery
-
-6. **SESSION RECOVERY**
-   - Se la sessione si interrompe, il prossimo agente deve:
-     - Leggere il piano
-     - Vedere cosa è `[✅]` e cosa è `[ ]`
-     - Continuare da dove si è fermato
-
-**REGOLA D'ORO: Lavora prima, parla dopo.**
+**Constraints**:
+- WCAG 2.1 AA accessibility (7 profiles in `src/lib/accessibility/`)
+- NO localStorage for user data (ADR 0015) - Zustand + REST only
+- Azure OpenAI primary, Ollama fallback only
+- Prisma for all DB operations (`prisma/schema.prisma`)
+- Path aliases: `@/lib/...`, `@/components/...`
 
 ## Summary Instructions
 
