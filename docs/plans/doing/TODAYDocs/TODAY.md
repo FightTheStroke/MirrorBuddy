@@ -23,11 +23,11 @@
 
 ### Wave 0: QA & Planning (COMPLETE)
 
-| Task | Status | Started | Completed | Duration | Owner |
-|------|--------|---------|-----------|----------|-------|
-| Manual QA execution (10 items) | ✅ | 17:15 CET | 18:30 CET | 1h 15m | Roberto |
-| Update plan with QA findings | ✅ | 18:30 CET | 18:44 CET | 14m | Claude |
-| Decision: NOT merge PR #106 | ✅ | 18:30 CET | 18:30 CET | - | Roberto |
+| Task | ✓ | Start | Done | Time | By |
+|------|---|-------|------|------|-----|
+| Manual QA execution (10 items) | ✅ | 17:15 | 18:30 | 1h 15m | R |
+| Update plan with QA findings | ✅ | 18:30 | 18:44 | 14m | C |
+| Decision: NOT merge PR #106 | ✅ | 18:30 | 18:30 | - | R |
 
 **Result**: 6/10 QA FAIL, 10 new bugs discovered, all added to Wave 1-2
 
@@ -84,16 +84,16 @@ This plan is split into focused sub-files for token optimization.
 
 ## SEZIONE A: VERIFIED FIXES (No action needed)
 
-| Bug | Description | Evidence | File |
-|-----|-------------|----------|------|
-| BUG 1 | Voice switching | No Web Speech fallback | `use-onboarding-tts.ts:206-215` |
-| BUG 12 | Toast position | `top-0 right-0` | `toast.tsx:184` |
-| BUG 14 | Dropdown transparent | `bg-white dark:bg-slate-900` | `dropdown-menu.tsx:49,67` |
-| BUG 16 | SVGLength error | Container dimension check | `markmap-renderer.tsx:116` |
-| BUG 22 | Parent dashboard mock | Empty state added | `parent-dashboard.tsx:40` |
-| BUG 23 | Metrics mock data | Empty state added | `success-metrics-dashboard.tsx:78` |
-| BUG 29 | Placeholder alerts | toast.success() | `summaries-view.tsx:72-91` |
-| BUG 31 | Skip welcome | "Salta intro" link | `welcome/page.tsx:537-545` |
+| # | Description | Evidence / File |
+|---|-------------|-----------------|
+| 1 | Voice switching | No Web Speech fallback → `use-onboarding-tts.ts:206-215` |
+| 12 | Toast position | `top-0 right-0` → `toast.tsx:184` |
+| 14 | Dropdown transparent | `bg-white dark:bg-slate-900` → `dropdown-menu.tsx:49,67` |
+| 16 | SVGLength error | Container dimension check → `markmap-renderer.tsx:116` |
+| 22 | Parent dashboard mock | Empty state added → `parent-dashboard.tsx:40` |
+| 23 | Metrics mock data | Empty state added → `success-metrics-dashboard.tsx:78` |
+| 29 | Placeholder alerts | toast.success() → `summaries-view.tsx:72-91` |
+| 31 | Skip welcome | "Salta intro" link → `welcome/page.tsx:537-545` |
 
 **Build Status**: Typecheck PASS, Lint PASS, Build PASS
 
@@ -101,12 +101,10 @@ This plan is split into focused sub-files for token optimization.
 
 ## SEZIONE B: PR #106 STATUS
 
-| Field | Value |
-|-------|-------|
-| State | **OPEN (NOT MERGING)** |
-| URL | https://github.com/Roberdan/ConvergioEdu/pull/106 |
-| QA Result | **FAILED - 6/10 items failed** |
-| Decision | **Stay on development, do NOT merge** |
+**State**: OPEN (NOT MERGING)
+**URL**: https://github.com/Roberdan/ConvergioEdu/pull/106
+**QA**: FAILED - 6/10 items failed
+**Decision**: Stay on development, do NOT merge
 
 **QA Execution Complete** (3 Gennaio 2026, 18:30 CET):
 - [x] Manual QA executed -> [qa/manual-qa.md](qa/manual-qa.md)
@@ -119,19 +117,19 @@ This plan is split into focused sub-files for token optimization.
 
 ## SEZIONE C: QA-DISCOVERED BUGS (Found during Wave 0)
 
-| Bug | Description | Priority | QA Item |
-|-----|-------------|----------|---------|
-| BUG-NEW-1 (C-11) | Triple "Chiamata Terminata" TTS on voice cleanup | P1 | Skip button |
-| BUG 7 (C-12) | Mindmap completely flat, no hierarchy | P0 | QA-2 FAIL |
-| BUG 11 (C-13) | Conversation persistence broken + console error | P0 | QA-4 FAIL |
-| BUG 13 (C-14) | Material save intermittent, no save button | P0 | QA-5 FAIL |
-| BUG-NEW-2 (C-15) | Failed to save material error at use-saved-materials.ts:171 | P0 | QA-5 error |
-| BUG-NEW-3 (C-16) | Sandbox SecurityError at html-preview.tsx:65 | P0 | QA-5 error |
-| BUG 8 (C-17) | Fullscreen not activating on tool creation | P1 | QA-3 FAIL |
-| BUG 19 (C-18) | PDF parsing completely failed | P1 | QA-7 FAIL |
-| BUG 27 (C-19) | ESC key inconsistent across app | P1 | QA-10 FAIL |
-| BUG 5 (C-20) | Mindmap nodes not interactive/expandable | P2 | QA-1 partial |
-| BUG 26 (C-21) | Summary missing Export/Convert/Flashcard features | P2 | QA-9 partial |
+| ID | Description | P | QA |
+|----|-------------|---|-----|
+| C-11 (NEW-1) | Triple "Chiamata Terminata" TTS on voice cleanup | 1 | Skip |
+| C-12 (7) | Mindmap completely flat, no hierarchy | 0 | QA-2 |
+| C-13 (11) | Conversation persistence broken + console error | 0 | QA-4 |
+| C-14 (13) | Material save intermittent, no save button | 0 | QA-5 |
+| C-15 (NEW-2) | Failed to save material error at use-saved-materials.ts:171 | 0 | QA-5 |
+| C-16 (NEW-3) | Sandbox SecurityError at html-preview.tsx:65 | 0 | QA-5 |
+| C-17 (8) | Fullscreen not activating on tool creation | 1 | QA-3 |
+| C-18 (19) | PDF parsing completely failed | 1 | QA-7 |
+| C-19 (27) | ESC key inconsistent across app | 1 | QA-10 |
+| C-20 (5) | Mindmap nodes not interactive/expandable | 2 | QA-1 |
+| C-21 (26) | Summary missing Export/Convert/Flashcard features | 2 | QA-9 |
 
 **Discovered**: 3 Gennaio 2026, 17:15-18:30 CET (during Manual QA execution)
 **Total**: 10 new bugs (5 P0, 3 P1, 2 P2) added to Wave 1-2
@@ -155,23 +153,23 @@ This plan is split into focused sub-files for token optimization.
 
 ### Wave 0: Prerequisites (Roberto)
 
-| Step | Task | Status | Date | Signature |
-|------|------|--------|------|-----------|
-| 0.1 | Manual QA (10 items) | [x] | 3 Gen 2026, 18:30 CET | Roberto |
-| 0.2 | Update plan with QA findings | [x] | 3 Gen 2026, 18:44 CET | Claude |
-| 0.3 | Decision: NOT merge PR #106 | [x] | 3 Gen 2026, 18:30 CET | Roberto |
+| # | Task | ✓ | When | By |
+|---|------|---|------|-----|
+| 0.1 | Manual QA (10 items) | ✅ | 3 Gen 18:30 | Roberto |
+| 0.2 | Update plan with QA findings | ✅ | 3 Gen 18:44 | Claude |
+| 0.3 | Decision: NOT merge PR #106 | ✅ | 3 Gen 18:30 | Roberto |
 
 ### Wave 1-2: Bug Fixes (Claude-A) - 21 bugs total
 
-| Step | Task | Status | Started | Completed | Duration |
-|------|------|--------|---------|-----------|----------|
+| # | Task (Priority) | ✓ | Start | Done | Time |
+|---|-----------------|---|-------|------|------|
 | 1.1 | C-5: History per Coach/Buddy (P0) | [ ] | | | |
 | 1.2 | C-9: Header Counters (P0) | [ ] | | | |
-| 1.3 | C-12: Mindmap Hierarchy (P0, QA) | [ ] | | | |
-| 1.4 | C-13: Conversation Persistence (P0, QA) | [ ] | | | |
-| 1.5 | C-14: Material Save (P0, QA) | [ ] | | | |
-| 1.6 | C-15: Save Material Error (P0, QA) | [ ] | | | |
-| 1.7 | C-16: Sandbox SecurityError (P0, QA) | [ ] | | | |
+| 1.3 | C-12: Mindmap Hierarchy (P0) | [ ] | | | |
+| 1.4 | C-13: Conversation Persistence (P0) | [ ] | | | |
+| 1.5 | C-14: Material Save (P0) | [ ] | | | |
+| 1.6 | C-15: Save Material Error (P0) | [ ] | | | |
+| 1.7 | C-16: Sandbox SecurityError (P0) | [ ] | | | |
 | 2.1 | C-2: Session Recap + Memory (P1) | [ ] | | | |
 | 2.2 | C-3: Layout sticky (P1) | [ ] | | | |
 | 2.3 | C-4: Azure costs (P1) | [ ] | | | |
@@ -180,59 +178,59 @@ This plan is split into focused sub-files for token optimization.
 | 2.6 | C-7: Demo Accessibility (P1) | [ ] | | | |
 | 2.7 | C-8: Cafe Audio (P2) | [ ] | | | |
 | 2.8 | C-10: Demo in frame (P1) | [ ] | | | |
-| 2.9 | C-11: Triple voice cleanup (P1, QA) | [ ] | | | |
-| 2.10 | C-17: Fullscreen on Tool Creation (P1, QA) | [ ] | | | |
-| 2.11 | C-18: PDF Parsing (P1, QA) | [ ] | | | |
-| 2.12 | C-19: ESC Key Inconsistent (P1, QA) | [ ] | | | |
-| 2.13 | C-20: Tool Not Interactive (P2, QA) | [ ] | | | |
-| 2.14 | C-21: Summary Missing Features (P2, QA) | [ ] | | | |
+| 2.9 | C-11: Triple voice cleanup (P1) | [ ] | | | |
+| 2.10 | C-17: Fullscreen Tool Creation (P1) | [ ] | | | |
+| 2.11 | C-18: PDF Parsing (P1) | [ ] | | | |
+| 2.12 | C-19: ESC Key Inconsistent (P1) | [ ] | | | |
+| 2.13 | C-20: Tool Not Interactive (P2) | [ ] | | | |
+| 2.14 | C-21: Summary Missing Features (P2) | [ ] | | | |
 | - | PR fix/wave-1-2-bugs created | [ ] | | | |
 
 ### Wave 3: Welcome Experience (Claude-B team)
 
-| Step | Task | Status | Date | Signature |
-|------|------|--------|------|-----------|
-| 3.1 | hero-section.tsx | [ ] | | Claude-B1 |
-| 3.2 | features-section.tsx | [ ] | | Claude-B2 |
-| 3.3 | guides-section.tsx | [ ] | | Claude-B3 |
-| 3.4 | quick-start.tsx | [ ] | | Claude-B1 |
-| 3.5 | Refactor page.tsx | [ ] | | Claude-B1 |
-| 3.6 | Skip flow | [ ] | | Claude-B1 |
-| 3.7 | Returning user logic | [ ] | | Claude-B1 |
-| 3.8 | Settings link | [ ] | | Claude-B1 |
-| 3.9 | E2E tests | [ ] | | Claude-B1 |
-| - | PR feat/welcome-experience created | [ ] | | Claude-B1 |
+| # | Task | ✓ | By |
+|---|------|---|----|
+| 3.1 | hero-section.tsx | [ ] | B1 |
+| 3.2 | features-section.tsx | [ ] | B2 |
+| 3.3 | guides-section.tsx | [ ] | B3 |
+| 3.4 | quick-start.tsx | [ ] | B1 |
+| 3.5 | Refactor page.tsx | [ ] | B1 |
+| 3.6 | Skip flow | [ ] | B1 |
+| 3.7 | Returning user logic | [ ] | B1 |
+| 3.8 | Settings link | [ ] | B1 |
+| 3.9 | E2E tests | [ ] | B1 |
+| - | PR feat/welcome-experience | [ ] | B1 |
 
 ### Wave 4: Supporti (Claude-C team)
 
-| Step | Task | Status | Date | Signature |
-|------|------|--------|------|-----------|
-| 4.1 | Struttura base | [ ] | | Claude-C1 |
-| 4.2 | Sidebar | [ ] | | Claude-C1 |
-| 4.3 | Material card | [ ] | | Claude-C2 |
-| 4.8 | Redirect /archivio | [ ] | | Claude-C2 |
-| 4.9 | Redirect /materiali | [ ] | | Claude-C2 |
-| 4.10 | Navigation update | [ ] | | Claude-C1 |
-| 4.4 | Filtri tipo | [ ] | | Claude-C1 |
-| 4.5 | Filtri materia | [ ] | | Claude-C1 |
-| 4.6 | Filtri data | [ ] | | Claude-C1 |
-| 4.7 | Search full-text | [ ] | | Claude-C1 |
-| 4.11 | E2E tests | [ ] | | Claude-C1 |
-| - | PR feat/supporti-consolidation created | [ ] | | Claude-C1 |
+| # | Task | ✓ | By |
+|---|------|---|----|
+| 4.1 | Struttura base | [ ] | C1 |
+| 4.2 | Sidebar | [ ] | C1 |
+| 4.3 | Material card | [ ] | C2 |
+| 4.8 | Redirect /archivio | [ ] | C2 |
+| 4.9 | Redirect /materiali | [ ] | C2 |
+| 4.10 | Navigation update | [ ] | C1 |
+| 4.4 | Filtri tipo | [ ] | C1 |
+| 4.5 | Filtri materia | [ ] | C1 |
+| 4.6 | Filtri data | [ ] | C1 |
+| 4.7 | Search full-text | [ ] | C1 |
+| 4.11 | E2E tests | [ ] | C1 |
+| - | PR feat/supporti-consolidation | [ ] | C1 |
 
 ### Wave 5: Thor Quality Gate + Merge
 
-| Step | Task | Status | Date | Signature |
-|------|------|--------|------|-----------|
-| 5.1 | Thor: Pre-merge quality gate (bugfixes PR) | [ ] | | Thor |
-| 5.2 | Thor: Pre-merge quality gate (welcome PR) | [ ] | | Thor |
-| 5.3 | Thor: Pre-merge quality gate (supporti PR) | [ ] | | Thor |
-| 5.4 | Merge PR bugfixes | [ ] | | Roberto |
-| 5.5 | Rebase + Merge PR welcome | [ ] | | Roberto |
-| 5.6 | Rebase + Merge PR supporti | [ ] | | Roberto |
-| 5.7 | Thor: Post-merge integration test | [ ] | | Thor |
-| 5.8 | CHANGELOG update | [ ] | | Claude |
-| 5.9 | Final verification: typecheck + lint + build | [ ] | | Claude |
+| # | Task | ✓ | By |
+|---|------|---|----|
+| 5.1 | Thor: Pre-merge QA (bugfixes PR) | [ ] | Thor |
+| 5.2 | Thor: Pre-merge QA (welcome PR) | [ ] | Thor |
+| 5.3 | Thor: Pre-merge QA (supporti PR) | [ ] | Thor |
+| 5.4 | Merge PR bugfixes | [ ] | Roberto |
+| 5.5 | Rebase + Merge PR welcome | [ ] | Roberto |
+| 5.6 | Rebase + Merge PR supporti | [ ] | Roberto |
+| 5.7 | Thor: Post-merge integration test | [ ] | Thor |
+| 5.8 | CHANGELOG update | [ ] | Claude |
+| 5.9 | Final: typecheck + lint + build | [ ] | Claude |
 
 **Thor Quality Gate Criteria** (automated by thor-quality-assurance-guardian):
 ```bash
