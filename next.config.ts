@@ -5,15 +5,6 @@ const nextConfig: NextConfig = {
   env: {
     APP_VERSION: packageJson.version,
   },
-  // Skip TypeScript errors during build (network blocks Prisma generate)
-  // In production, ensure prisma generate runs before build
-  typescript: {
-    ignoreBuildErrors: process.env.SKIP_TYPE_CHECK === 'true',
-  },
-  // Enable system TLS certs for Turbopack to access Google Fonts
-  experimental: {
-    turbopackUseSystemTlsCerts: true,
-  },
   // Add security headers for proper permissions handling
   async headers() {
     const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';

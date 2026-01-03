@@ -69,27 +69,26 @@ export async function GET() {
 
     // Calculate today's stats
     const todaySessions = todayEvents.filter(
-      (e: { category: string; action: string }) => e.category === 'navigation' && e.action === 'session_started'
+      (e) => e.category === 'navigation' && e.action === 'session_started'
     ).length;
 
     const todayStudyMinutes = studySessions
-      .filter((s: { startedAt: Date }) => s.startedAt >= todayStart)
-      .reduce((sum: number, s: { duration: number | null }) => sum + (s.duration || 0), 0);
+      .filter((s) => s.startedAt >= todayStart)
+      .reduce((sum, s) => sum + (s.duration || 0), 0);
 
     const todayQuestions = todayEvents.filter(
-      (e: { category: string; action: string }) => e.category === 'conversation' && e.action === 'question_asked'
+      (e) => e.category === 'conversation' && e.action === 'question_asked'
     ).length;
 
     // Calculate weekly stats
     const weeklyActiveMinutes = studySessions.reduce(
-      (sum: number, s: { duration: number | null }) => sum + (s.duration || 0),
+      (sum, s) => sum + (s.duration || 0),
       0
     );
 
-    const uniqueMaestroIds = studySessions
-      .map((s: { maestroId: string | null }) => s.maestroId)
-      .filter((id: string | null): id is string => id !== null);
-    const weeklyMaestrosUsed: string[] = Array.from(new Set(uniqueMaestroIds));
+    const weeklyMaestrosUsed = [
+      ...new Set(studySessions.map((s) => s.maestroId).filter(Boolean)),
+    ];
 
     // Build daily activity chart (last 7 days)
     const dailyActivityChart = buildDailyActivityChart(studySessions, now);
@@ -108,7 +107,7 @@ export async function GET() {
       sessionsThisWeek: sessions.length,
       studyMinutesThisWeek: weeklyActiveMinutes,
       questionsThisWeek: weekEvents.filter(
-        (e: { category: string; action: string }) => e.category === 'conversation' && e.action === 'question_asked'
+        (e) => e.category === 'conversation' && e.action === 'question_asked'
       ).length,
       maestrosUsedThisWeek: weeklyMaestrosUsed.length,
     });

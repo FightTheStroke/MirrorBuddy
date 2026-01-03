@@ -12,18 +12,6 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 
-// Inline type for Notification record
-interface NotificationRecord {
-  id: string;
-  type: string;
-  title: string;
-  message: string;
-  actionUrl: string | null;
-  metadata: string | null;
-  read: boolean;
-  createdAt: Date;
-}
-
 /**
  * GET /api/notifications
  * Returns notifications for a user
@@ -75,7 +63,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        notifications: notifications.map((n: NotificationRecord) => ({
+        notifications: notifications.map((n) => ({
           id: n.id,
           type: n.type,
           title: n.title,

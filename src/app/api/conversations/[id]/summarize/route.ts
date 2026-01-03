@@ -13,13 +13,8 @@ import {
   extractTopics,
   extractLearnings,
 } from '@/lib/ai/summarize';
-// Local Message interface (Prisma types unavailable at build time)
-interface Message {
-  id: string;
-  role: string;
-  content: string;
-  createdAt: Date;
-}
+import type { Message } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -93,7 +88,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       : summary;
 
     // Transaction: delete old messages, update conversation, save learnings
-    await prisma.$transaction(async (tx: typeof prisma) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Delete summarized messages
       await tx.message.deleteMany({
         where: {

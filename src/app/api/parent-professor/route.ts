@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Build message history
-      messages = conversation.messages.map((m: { role: string; content: string }) => ({
+      messages = conversation.messages.map((m) => ({
         role: m.role as 'user' | 'assistant' | 'system',
         content: m.content,
       }));
@@ -251,16 +251,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(
-      conversations.map((c: {
-        id: string;
-        maestroId: string;
-        studentId: string | null;
-        title: string;
-        messageCount: number;
-        messages: Array<{ content: string }>;
-        createdAt: Date;
-        updatedAt: Date;
-      }) => ({
+      conversations.map((c) => ({
         id: c.id,
         maestroId: c.maestroId,
         studentId: c.studentId,

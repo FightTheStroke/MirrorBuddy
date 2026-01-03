@@ -59,7 +59,7 @@ export async function endConversationWithSummary(
     }
 
     // Convert messages to summary format
-    const messages: Message[] = conversation.messages.map((m: { role: string; content: string }) => ({
+    const messages: Message[] = conversation.messages.map((m) => ({
       role: m.role,
       content: m.content,
     }));
@@ -264,13 +264,7 @@ export async function getRecentSummaries(
     },
   });
 
-  return conversations.map((c: {
-    id: string;
-    maestroId: string;
-    summary: string | null;
-    topics: string;
-    updatedAt: Date;
-  }) => ({
+  return conversations.map((c) => ({
     id: c.id,
     maestroId: c.maestroId,
     summary: c.summary ?? '',

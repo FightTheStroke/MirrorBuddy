@@ -172,19 +172,7 @@ export async function getRecentParentNotes(
     take: limit,
   });
 
-  return notes.map((note: {
-    id: string;
-    sessionId: string;
-    maestroId: string;
-    subject: string;
-    duration: number;
-    summary: string;
-    highlights: string;
-    concerns: string | null;
-    suggestions: string | null;
-    generatedAt: Date;
-    viewedAt: Date | null;
-  }) => ({
+  return notes.map((note) => ({
     id: note.id,
     sessionId: note.sessionId,
     maestroId: note.maestroId,
