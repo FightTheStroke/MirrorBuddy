@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Flame, Clock, BookOpen, Star } from 'lucide-react';
 import { useProgressStore } from '@/lib/stores/app-store';
@@ -7,7 +8,26 @@ import { cn } from '@/lib/utils';
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
 export function HomeProgressWidget() {
-  const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
+  const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked, currentSession } = useProgressStore();
+  const [liveMinutes, setLiveMinutes] = useState(0);
+
+  // C-9 FIX: Track current session time in real-time
+  useEffect(() => {
+    // Early return if no session - don't update state to avoid lint warning
+    if (!currentSession?.startedAt) return;
+
+    const updateLiveTime = () => {
+      const elapsed = Math.floor((Date.now() - new Date(currentSession.startedAt).getTime()) / 60000);
+      setLiveMinutes(elapsed);
+    };
+
+    updateLiveTime(); // Initial update
+    const interval = setInterval(updateLiveTime, 60000); // Update every minute
+    return () => {
+      clearInterval(interval);
+      setLiveMinutes(0); // Reset on cleanup instead of in effect body
+    };
+  }, [currentSession?.startedAt]);
 
   // Calculate XP progress to next level
   const currentLevelXP = XP_PER_LEVEL[level - 1] || 0;
@@ -16,10 +36,12 @@ export function HomeProgressWidget() {
   const xpNeeded = nextLevelXP - currentLevelXP;
   const progressPercent = Math.min(100, (xpInLevel / xpNeeded) * 100);
 
-  // Format study time
-  const hours = Math.floor(totalStudyMinutes / 60);
-  const minutes = totalStudyMinutes % 60;
+  // Format study time - include current session if active
+  const displayMinutes = totalStudyMinutes + liveMinutes;
+  const hours = Math.floor(displayMinutes / 60);
+  const minutes = displayMinutes % 60;
   const studyTimeStr = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
+  const isSessionActive = !!currentSession;
 
   return (
     <div className="mb-6 p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm">
@@ -62,9 +84,14 @@ export function HomeProgressWidget() {
             <span className="font-semibold text-slate-700 dark:text-slate-300">{sessionsThisWeek}</span>
           </div>
 
-          <div className="flex items-center gap-1.5" title="Tempo di studio">
-            <Clock className="w-4 h-4 text-green-500" />
-            <span className="font-semibold text-slate-700 dark:text-slate-300">{studyTimeStr}</span>
+          <div className="flex items-center gap-1.5" title={isSessionActive ? "Sessione in corso" : "Tempo di studio"}>
+            <Clock className={cn("w-4 h-4", isSessionActive ? "text-green-500 animate-pulse" : "text-green-500")} />
+            <span className={cn("font-semibold", isSessionActive ? "text-green-600 dark:text-green-400" : "text-slate-700 dark:text-slate-300")}>
+              {studyTimeStr}
+            </span>
+            {isSessionActive && (
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Sessione attiva" />
+            )}
           </div>
 
           <div className="flex items-center gap-1.5" title="Domande fatte">

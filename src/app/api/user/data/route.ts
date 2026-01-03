@@ -16,7 +16,7 @@ import { logger } from '@/lib/logger';
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
@@ -91,7 +91,7 @@ export async function GET() {
 export async function DELETE() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json({ success: true, message: 'No user data to delete' });
@@ -105,7 +105,7 @@ export async function DELETE() {
     });
 
     // Clear the user cookie
-    cookieStore.delete('convergio-user-id');
+    cookieStore.delete('mirrorbuddy-user-id');
 
     return NextResponse.json({
       success: true,

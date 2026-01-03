@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Intent Detection System
+ * MirrorBuddy Intent Detection System
  *
  * Analyzes student messages to determine:
  * 1. What the student needs (subject help, method help, emotional support)
@@ -210,7 +210,7 @@ const TOOL_PATTERNS: RegExp[] = [
  */
 const TECH_SUPPORT_PATTERNS: RegExp[] = [
   // App-specific navigation (bidirectional - app context can appear before or after question)
-  /\b(app|applicazione|sito|convergio|piattaforma)\b/i,
+  /\b(app|applicazione|sito|mirrorbuddy|piattaforma)\b/i,
   /\b(come si usa|come (funziona|uso) (l'|la )?app)\b/i,
 
   // Voice/audio features (bidirectional matching)
@@ -380,18 +380,6 @@ export function detectToolType(message: string): ToolType | null {
   }
 
   return null;
-}
-
-/**
- * Calculates confidence score based on pattern matches.
- * Reserved for future use with more sophisticated confidence scoring.
- */
-function _calculateConfidence(
-  _message: string,
-  _patterns: RegExp[]
-): number {
-  // Placeholder for future pattern-based confidence calculation
-  return 0.75;
 }
 
 // ============================================================================

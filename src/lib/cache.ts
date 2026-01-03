@@ -1,5 +1,5 @@
 /**
- * CONVERGIO EDUCATION - Simple In-Memory Cache
+ * MIRRORBUDDY - Simple In-Memory Cache
  *
  * Lightweight caching for frequently accessed data without external dependencies.
  * Suitable for MVP/single-instance deployments.

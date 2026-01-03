@@ -6,7 +6,7 @@
 // Part of Session Summary & Unified Archive feature
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, X, Send, Loader2 } from 'lucide-react';
 
 interface SessionRatingModalProps {
@@ -31,6 +31,18 @@ export function SessionRatingModal({
   const [feedback, setFeedback] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // C-19 FIX: Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

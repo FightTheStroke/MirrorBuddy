@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Jailbreak Detector
+ * MirrorBuddy Jailbreak Detector
  * Advanced detection of prompt injection and jailbreak attempts
  *
  * This module provides sophisticated detection beyond simple pattern matching:

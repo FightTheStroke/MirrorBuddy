@@ -1,4 +1,4 @@
-# ConvergioEdu: Mission-Driven Strategy for Maximum Impact
+# MirrorBuddy: Mission-Driven Strategy for Maximum Impact
 
 **Date**: January 2, 2026
 **Author**: Amy (CFO Strategic Analysis)
@@ -240,7 +240,7 @@ This provides:
 
 | Type | Description | Value |
 |------|-------------|-------|
-| Content integration | Embed Khan videos in ConvergioEdu | Brand + content |
+| Content integration | Embed Khan videos in MirrorBuddy | Brand + content |
 | Technology collaboration | Khan uses our DSA accessibility layer | Reach + credibility |
 | Co-grant applications | Joint applications to foundations | Higher success rate |
 | Mutual referral | They refer DSA students to us | User acquisition |
@@ -521,7 +521,7 @@ Annual to AID: EUR 22,400
 - DeA Scuola
 
 **Partnership model**:
-- Bundle ConvergioEdu with digital textbooks
+- Bundle MirrorBuddy with digital textbooks
 - Co-marketing to schools
 - Content integration (textbook-specific help)
 
@@ -725,7 +725,7 @@ Italian legal structure for organizations that:
 - Cannot distribute >50% of profits to shareholders
 - Get tax benefits and credibility
 
-**Perfect for ConvergioEdu because**:
+**Perfect for MirrorBuddy because**:
 - Mission-driven but revenue-generating
 - Can accept donations AND charge for services
 - Credibility with schools and government
@@ -738,8 +738,8 @@ Italian legal structure for organizations that:
 
 | Entity | Structure | Purpose |
 |--------|-----------|---------|
-| ConvergioEdu SRL | For-profit | B2B sales, premium features |
-| Fondazione ConvergioEdu | Non-profit | Free access, grants, advocacy |
+| MirrorBuddy SRL | For-profit | B2B sales, premium features |
+| Fondazione MirrorBuddy | Non-profit | Free access, grants, advocacy |
 
 **How it works**:
 - SRL sells to schools and non-DSA users
@@ -1108,7 +1108,7 @@ Italian legal structure for organizations that:
 
 ### The Recommended Path
 
-**ConvergioEdu should pursue the Hybrid Impact Model**:
+**MirrorBuddy should pursue the Hybrid Impact Model**:
 
 1. **Structure as Impresa Sociale** to lock in mission and gain credibility
 2. **Implement ISEE-based pricing** to maximize adoption while maintaining revenue
@@ -1133,7 +1133,7 @@ Italian legal structure for organizations that:
 
 ### The Mission Delivered
 
-With this strategy, ConvergioEdu will:
+With this strategy, MirrorBuddy will:
 
 - **Serve 150,000+ students** with learning differences
 - **Provide free access** to those who can't afford it (via ISEE and scholarships)

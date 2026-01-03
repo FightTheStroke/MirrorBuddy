@@ -1,5 +1,5 @@
 // ============================================================================
-// CONVERGIO WEB - DATABASE SCHEMA
+// MIRRORBUDDY WEB - DATABASE SCHEMA
 // SQLite for local, PostgreSQL for cloud (same schema works for both)
 // ============================================================================
 
@@ -944,5 +944,43 @@ model StudyKit {
   @@index([userId])
   @@index([status])
   @@index([createdAt])
+}
+
+// ============================================================================
+// RATE LIMIT EVENTS (Dashboard Analytics - Wave 2)
+// ============================================================================
+
+model RateLimitEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  endpoint  String
+  limit     Int
+  window    Int      // Window in seconds
+  ipAddress String?
+  timestamp DateTime @default(now())
+
+  @@index([userId, timestamp])
+  @@index([endpoint, timestamp])
+  @@index([timestamp]) // Standalone index for time-range queries
+}
+
+// ============================================================================
+// SAFETY EVENTS (Dashboard Analytics - Wave 2)
+// ============================================================================
+
+model SafetyEvent {
+  id              String    @id @default(cuid())
+  userId          String?
+  type            String    // content_filter | age_verification | harassment | etc.
+  severity        String    // low | medium | high | critical
+  conversationId  String?
+  resolvedBy      String?
+  resolvedAt      DateTime?
+  resolution      String?
+  timestamp       DateTime  @default(now())
+
+  @@index([userId, timestamp])
+  @@index([severity, timestamp])
+  @@index([timestamp]) // Standalone index for time-range queries
 }
 

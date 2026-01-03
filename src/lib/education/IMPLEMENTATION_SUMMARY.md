@@ -2,7 +2,7 @@
 
 ## Overview
 
-Successfully implemented accessibility runtime adaptations in TypeScript for the Convergio web app, based on the C implementation in `/Users/roberdan/GitHub/ConvergioCLI/include/nous/education.h`.
+Successfully implemented accessibility runtime adaptations in TypeScript for the MirrorBuddy web app, based on the C implementation in `/Users/roberdan/GitHub/MirrorBuddyCLI/include/nous/education.h`.
 
 ## Files Created
 
@@ -279,10 +279,10 @@ See example components:
 
 ## Resources
 
-- C Header: `/Users/roberdan/GitHub/ConvergioCLI/include/nous/education.h`
-- C Implementation: `/Users/roberdan/GitHub/ConvergioCLI/src/education/accessibility.c`
-- Documentation: `/Users/roberdan/GitHub/ConvergioWeb/web/src/lib/education/ACCESSIBILITY.md`
-- Examples: `/Users/roberdan/GitHub/ConvergioWeb/web/src/lib/education/examples/`
+- C Header: `/Users/roberdan/GitHub/MirrorBuddyCLI/include/nous/education.h`
+- C Implementation: `/Users/roberdan/GitHub/MirrorBuddyCLI/src/education/accessibility.c`
+- Documentation: `/Users/roberdan/GitHub/MirrorBuddyWeb/web/src/lib/education/ACCESSIBILITY.md`
+- Examples: `/Users/roberdan/GitHub/MirrorBuddyWeb/web/src/lib/education/examples/`
 
 ## Summary
 

@@ -1,10 +1,12 @@
 # Dashboard Analytics Enhancement Plan
 
 **Data**: 2026-01-02
-**Status**: Backlog
+**Status**: ✅ COMPLETATO (core functionality)
 **Owner**: Roberto
 **Priority**: Media
 **Estimated Effort**: ~27h (parallelizzabile)
+
+> **Note**: Core dashboard implemented with all 5 API endpoints and UI. Voice latency instrumentation (firstByteMs, etc.) deferred as "nice to have".
 
 ---
 

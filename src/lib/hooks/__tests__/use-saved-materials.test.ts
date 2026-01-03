@@ -464,47 +464,40 @@ describe('use-saved-materials', () => {
   // autoSaveMaterial
   // ============================================================================
   describe('autoSaveMaterial', () => {
-    it('should save material if not already saved', async () => {
-      // Fetch existing (empty)
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ materials: [] }),
-      });
-      // Save new
+    // C-14/C-15 FIX: autoSaveMaterial now uses upsert pattern (single POST call)
+    // and returns boolean instead of void
+    it('should save material using upsert pattern', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ material: { id: '1' } }),
       });
 
-      await autoSaveMaterial('mindmap', 'New Mindmap', { nodes: [] });
+      const result = await autoSaveMaterial('mindmap', 'New Mindmap', { nodes: [] });
 
-      expect(mockFetch).toHaveBeenCalledTimes(2);
-      expect(mockFetch).toHaveBeenLastCalledWith('/api/materials', expect.objectContaining({
+      expect(result).toBe(true);
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
         method: 'POST',
       }));
     });
 
-    it('should not save if material with same title exists', async () => {
+    it('should return false when save fails', async () => {
       mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          materials: [{ title: 'Existing Mindmap', toolType: 'mindmap' }],
-        }),
+        ok: false,
+        json: async () => ({ error: 'Failed to save' }),
       });
 
-      await autoSaveMaterial('mindmap', 'Existing Mindmap', { nodes: [] });
+      const result = await autoSaveMaterial('mindmap', 'Test Mindmap', { nodes: [] });
 
-      // Should only fetch, not save
-      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result).toBe(false);
     });
 
-    it('should handle fetch errors silently', async () => {
+    it('should handle fetch errors and return false', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      // Should not throw
-      await expect(
-        autoSaveMaterial('quiz', 'Test Quiz', { questions: [] })
-      ).resolves.toBeUndefined();
+      // Should not throw, returns false on error
+      const result = await autoSaveMaterial('quiz', 'Test Quiz', { questions: [] });
+      expect(result).toBe(false);
     });
   });
 

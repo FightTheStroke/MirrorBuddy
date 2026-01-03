@@ -3,8 +3,7 @@
 import { Suspense, useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { RotateCcw, Wifi, WifiOff, Cloud, Volume2, ArrowRight, Settings, Sparkles } from 'lucide-react';
+import { RotateCcw, Wifi, WifiOff, Cloud, Volume2, ArrowRight, Sparkles } from 'lucide-react';
 import { useOnboardingStore, getStepIndex, getTotalSteps } from '@/lib/stores/onboarding-store';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { WelcomeStep } from './components/welcome-step';
@@ -12,6 +11,10 @@ import { InfoStep } from './components/info-step';
 import { PrinciplesStep } from './components/principles-step';
 import { MaestriStep } from './components/maestri-step';
 import { ReadyStep } from './components/ready-step';
+import { HeroSection } from './components/hero-section';
+import { FeaturesSection } from './components/features-section';
+import { GuidesSection } from './components/guides-section';
+import { QuickStart } from './components/quick-start';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -318,11 +321,6 @@ function WelcomeContent() {
     }
   };
 
-  // Skip to app - for returning users who don't want to update anything
-  const handleSkipToApp = useCallback(() => {
-    router.push('/');
-  }, [router]);
-
   // Start onboarding - transition from landing page to actual onboarding
   const handleStartOnboarding = useCallback(() => {
     setShowLandingPage(false);
@@ -376,183 +374,51 @@ function WelcomeContent() {
   }
 
   // ========== LANDING PAGE (shown first) ==========
+  // Wave 3: Refactored to use modular components
   if (showLandingPage) {
     const isReturningUser = Boolean(existingUserData?.name);
 
+    // Handler for skip - marks onboarding as complete and goes to dashboard
+    const handleSkipWithConfirmation = () => {
+      useOnboardingStore.getState().completeOnboarding();
+      router.push('/');
+    };
+
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-950 dark:to-blue-950 relative overflow-hidden">
-        {/* Hero Section */}
+        {/* Main content container */}
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center max-w-2xl mx-auto"
+            className="w-full"
           >
-            {/* Logo / Avatar */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
-              className="relative w-32 h-32 mx-auto mb-8"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-pink-300/20 to-transparent rounded-full blur-xl opacity-50" />
-              <div className="relative w-full h-full rounded-full bg-gradient-to-br from-pink-400 to-purple-600 p-1">
-                <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
-                  <Image
-                    src="/avatars/melissa.jpg"
-                    alt="Melissa"
-                    width={120}
-                    height={120}
-                    className="w-full h-full object-cover"
-                    priority
-                  />
-                </div>
-              </div>
-              {/* Sparkle decorations */}
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-                className="absolute -top-2 -right-2"
-              >
-                <Sparkles className="w-6 h-6 text-yellow-400" />
-              </motion.div>
-            </motion.div>
+            {/* Hero Section - Logo, Avatar, Welcome Text */}
+            <HeroSection
+              userName={existingUserData?.name}
+              isReturningUser={isReturningUser}
+            />
 
-            {/* Welcome Text - aria-live for screen readers */}
-            <div aria-live="polite" aria-atomic="true">
-            {isReturningUser ? (
-              <>
-                <motion.h1
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4"
-                >
-                  Bentornato, <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">{existingUserData?.name}!</span>
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-xl text-gray-600 dark:text-gray-300 mb-8"
-                >
-                  È bello rivederti. Vuoi aggiornare il tuo profilo o continuare a studiare?
-                </motion.p>
-              </>
-            ) : (
-              <>
-                <motion.h1
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4"
-                >
-                  Benvenuto in{' '}
-                  <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                    MirrorBuddy
-                  </span>
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-xl text-gray-600 dark:text-gray-300 mb-8"
-                >
-                  Il tuo compagno di studio intelligente, personalizzato per te.
-                  Impara con 16 Maestri AI, crea mappe mentali, flashcard e molto altro!
-                </motion.p>
-              </>
-            )}
-            </div>
+            {/* Features Section - Key capabilities */}
+            <FeaturesSection />
 
-            {/* Features Grid */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10"
-            >
-              {[
-                { icon: '🎓', label: '16 Maestri AI' },
-                { icon: '🗺️', label: 'Mappe Mentali' },
-                { icon: '📚', label: 'Flashcard FSRS' },
-                { icon: '🎮', label: 'Gamification' },
-              ].map((feature, i) => (
-                <motion.div
-                  key={feature.label}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.6 + i * 0.1 }}
-                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700"
-                >
-                  <span className="text-2xl mb-2 block">{feature.icon}</span>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {feature.label}
-                  </span>
-                </motion.div>
-              ))}
-            </motion.div>
+            {/* Guides Section - Meet the AI characters */}
+            <GuidesSection />
 
-            {/* Action Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4"
-            >
-              {isReturningUser ? (
-                <>
-                  {/* Primary: Go to app */}
-                  <Button
-                    size="lg"
-                    onClick={handleSkipToApp}
-                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all"
-                  >
-                    Vai all&apos;app
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                  {/* Secondary: Update profile */}
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={handleStartOnboarding}
-                    className="px-8 py-6 text-lg rounded-xl border-2"
-                  >
-                    <Settings className="w-5 h-5 mr-2" />
-                    Aggiorna profilo
-                  </Button>
-                </>
-              ) : (
-                <>
-                  {/* Primary: Start onboarding */}
-                  <Button
-                    size="lg"
-                    onClick={handleStartOnboarding}
-                    className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all"
-                  >
-                    Inizia con Melissa
-                    <ArrowRight className="w-5 h-5 ml-2" />
-                  </Button>
-                </>
-              )}
-            </motion.div>
-
-            {/* Voice indicator */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.1 }}
-              className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400"
-            >
-              <Volume2 className="w-4 h-4" />
-              <span>Parla con Melissa usando la voce</span>
-            </motion.div>
+            {/* Quick Start Section - CTAs */}
+            <QuickStart
+              isReturningUser={isReturningUser}
+              onStartWithVoice={handleStartOnboarding}
+              onStartWithoutVoice={handleStartOnboarding}
+              onSkip={handleSkipWithConfirmation}
+              onUpdateProfile={isReturningUser ? handleStartOnboarding : undefined}
+            />
           </motion.div>
 
-          {/* Decorative elements */}
-          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-300/20 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-300/20 to-transparent rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+          {/* Decorative elements - pointer-events-none to not block clicks */}
+          <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-300/20 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-300/20 to-transparent rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
         </div>
       </div>
     );
@@ -587,18 +453,19 @@ function WelcomeContent() {
                 {stepIndex + 1} / {totalSteps}
               </span>
 
-              {/* Skip to app button (for returning users) */}
-              {existingUserData?.name && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSkipToApp}
-                  className="h-7 px-3 text-pink-600 hover:text-pink-700 hover:bg-pink-50"
-                >
-                  Salta
-                  <ArrowRight className="w-3 h-3 ml-1" />
-                </Button>
-              )}
+              {/* Skip to app button (for all users) */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  useOnboardingStore.getState().completeOnboarding();
+                  router.push('/');
+                }}
+                className="h-7 px-3 text-pink-600 hover:text-pink-700 hover:bg-pink-50"
+              >
+                Salta
+                <ArrowRight className="w-3 h-3 ml-1" />
+              </Button>
 
               {/* Reset button */}
               <Button

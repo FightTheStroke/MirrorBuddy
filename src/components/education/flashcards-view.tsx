@@ -106,10 +106,10 @@ interface FlashcardsViewProps {
 // Get user ID for API calls
 function getUserId(): string {
   if (typeof window === 'undefined') return 'default-user';
-  let userId = sessionStorage.getItem('convergio-user-id');
+  let userId = sessionStorage.getItem('mirrorbuddy-user-id');
   if (!userId) {
     userId = `user-${crypto.randomUUID()}`;
-    sessionStorage.setItem('convergio-user-id', userId);
+    sessionStorage.setItem('mirrorbuddy-user-id', userId);
   }
   return userId;
 }
@@ -161,7 +161,7 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
   }, []);
 
   // Load decks on mount - setState in effect is intentional for data fetching
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern */
   useEffect(() => {
     loadDecks();
   }, [loadDecks]);

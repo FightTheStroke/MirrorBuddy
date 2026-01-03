@@ -1,7 +1,7 @@
-# ConversationFirstPlanDec29 - ConvergioEdu v2.0 Architecture Overhaul
+# ConversationFirstPlanDec29 - MirrorBuddy v2.0 Architecture Overhaul
 
 **Data**: 2025-12-29
-**Target**: Trasformare ConvergioEdu da Form-First a Conversation-First
+**Target**: Trasformare MirrorBuddy da Form-First a Conversation-First
 **Epic Reference**: GitHub Issue #23
 **ManifestoEdu**: La stella polare di questo progetto
 
@@ -206,7 +206,7 @@ Opzioni:
 Accepted
 
 ## Context
-ConvergioEdu needs to store student materials (photos, PDFs, generated tools).
+MirrorBuddy needs to store student materials (photos, PDFs, generated tools).
 Current: No storage strategy. Files are base64 in memory only.
 
 ## Decision
@@ -690,7 +690,7 @@ export const MELISSA: SupportTeacher = {
     Fai domande invece di dare risposte.
   `,
   systemPrompt: `
-    Sei Melissa, docente di sostegno virtuale per ConvergioEdu.
+    Sei Melissa, docente di sostegno virtuale per MirrorBuddy.
 
     IL TUO OBIETTIVO PRIMARIO: Sviluppare l'AUTONOMIA dello studente.
 

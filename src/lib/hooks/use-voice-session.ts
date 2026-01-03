@@ -1,5 +1,5 @@
 // ============================================================================
-// CONVERGIO WEB - VOICE SESSION HOOK (REWRITTEN)
+// MIRRORBUDDY - VOICE SESSION HOOK (REWRITTEN)
 // Azure OpenAI Realtime API with proper audio handling
 // ============================================================================
 
@@ -535,12 +535,22 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     // Get language setting from settings store
     const appearance = useSettingsStore.getState().appearance;
     const language = appearance?.language || 'it';
+    // C-1 FIX: Full language names for instructions
     const languageNames: Record<string, string> = {
       it: 'Italian (Italiano)',
       en: 'English',
       es: 'Spanish (Español)',
       fr: 'French (Français)',
       de: 'German (Deutsch)',
+    };
+    // C-1 FIX: Azure Realtime API expects full language name for transcription
+    // See: https://learn.microsoft.com/en-us/azure/ai-services/openai/realtime-audio-reference
+    const transcriptionLanguages: Record<string, string> = {
+      it: 'Italian',
+      en: 'English',
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
     };
 
     // Fetch conversation memory
@@ -604,7 +614,9 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         },
         input_audio_transcription: {
           model: 'whisper-1',
-          language: language,  // Force transcription to use the language from settings
+          // C-1 FIX: Use full language name instead of ISO code
+          // Azure Realtime API expects "Italian", "English", etc.
+          language: transcriptionLanguages[language] || 'Italian',
         },
         turn_detection: {
           type: 'server_vad',

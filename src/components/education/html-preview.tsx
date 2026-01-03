@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import DOMPurify from 'dompurify';
 import {
@@ -58,18 +58,25 @@ export function HTMLPreview({
     });
   }, [code]);
 
-  // Inject the sanitized HTML into the iframe
-  useEffect(() => {
-    if (iframeRef.current && view === 'preview') {
-      const iframe = iframeRef.current;
-      const doc = iframe.contentDocument || iframe.contentWindow?.document;
-      if (doc) {
-        doc.open();
-        doc.write(sanitizedCode);
-        doc.close();
-      }
-    }
-  }, [sanitizedCode, view]);
+  // C-16 FIX: Use srcdoc instead of contentDocument injection
+  // This avoids SecurityError when sandbox lacks allow-same-origin
+  // srcdoc is safer and doesn't require cross-origin access
+  const iframeSrcDoc = useMemo(() => {
+    // Wrap in full HTML document structure
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+${sanitizedCode}
+</body>
+</html>`;
+  }, [sanitizedCode]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code);
@@ -188,6 +195,7 @@ export function HTMLPreview({
             title={title}
             className="w-full h-full min-h-[400px] bg-white"
             sandbox="allow-scripts"
+            srcDoc={iframeSrcDoc}
           />
         ) : (
           <pre className="p-4 h-full overflow-auto bg-slate-900 text-slate-100 text-sm font-mono">

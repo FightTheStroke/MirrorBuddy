@@ -21,7 +21,9 @@ export interface AuthResult {
 export async function validateAuth(): Promise<AuthResult> {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    // Check new cookie first, fallback to legacy cookie for existing users
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value
+      || cookieStore.get('convergio-user-id')?.value;
 
     if (!userId) {
       return {

@@ -138,7 +138,7 @@ export function CodeRunner({ request, onResult, autoRun = false, className }: Co
 
   useEffect(() => {
     if (autoRun) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- Auto-execution on mount when autoRun enabled
       runCode();
     }
   }, [autoRun, runCode]);

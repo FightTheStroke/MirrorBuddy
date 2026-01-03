@@ -21,4 +21,5 @@ export {
   LazyHomeworkHelpView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
+  LazyArchiveView,
 } from './lazy';

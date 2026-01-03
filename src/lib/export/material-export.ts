@@ -181,7 +181,7 @@ export async function exportMaterialsBulk(
 
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
-  const filename = `convergio-export-${formatDateCompact(new Date())}.json`;
+  const filename = `mirrorbuddy-export-${formatDateCompact(new Date())}.json`;
 
   return {
     blob,

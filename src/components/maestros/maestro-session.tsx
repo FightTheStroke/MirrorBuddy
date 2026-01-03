@@ -38,7 +38,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTTS } from '@/components/accessibility';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore, useUIStore } from '@/lib/stores/app-store';
 import { ToolResultDisplay } from '@/components/tools';
 import { WebcamCapture } from '@/components/tools/webcam-capture';
 import { EvaluationCard } from '@/components/chat/evaluation-card';
@@ -209,6 +209,12 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
   const { addXP, endSession } = useProgressStore();
   const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
+  // C-17 FIX: UI store for focus mode on tool creation
+  const { enterFocusMode, setFocusTool } = useUIStore();
+
+  // C-17 FIX: Track which tool calls we've already processed for focus mode
+  const processedToolsRef = useRef<Set<string>>(new Set());
+
   // Voice session hook
   const {
     isConnected,
@@ -343,6 +349,53 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     }
     previousMessageCount.current = currentCount;
   }, [messages.length, toolCalls.length]);
+
+  // C-17 FIX: Auto-switch to focus mode when a tool is created
+  // This provides fullscreen tool experience during maestro sessions
+  useEffect(() => {
+    // Find newly completed tool calls that we haven't processed yet
+    const completedTools = toolCalls.filter(
+      (tc) => tc.status === 'completed' && !processedToolsRef.current.has(tc.id)
+    );
+
+    if (completedTools.length === 0) return;
+
+    // Process the first new completed tool
+    const toolCall = completedTools[0];
+    processedToolsRef.current.add(toolCall.id);
+
+    // Map tool type from function name to ToolType
+    const toolTypeMap: Record<string, string> = {
+      create_mindmap: 'mindmap',
+      create_quiz: 'quiz',
+      create_flashcards: 'flashcard',
+      create_summary: 'summary',
+      create_demo: 'demo',
+      create_diagram: 'diagram',
+      create_timeline: 'timeline',
+      web_search: 'search',
+    };
+    const mappedToolType = (toolTypeMap[toolCall.type] || 'mindmap') as import('@/types/tools').ToolType;
+
+    // Extract tool content
+    const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
+
+    // Enter focus mode with the completed tool
+    enterFocusMode(mappedToolType, maestro.id, isVoiceActive ? 'voice' : 'chat');
+    setFocusTool({
+      id: toolCall.id,
+      type: mappedToolType,
+      status: 'completed',
+      progress: 1,
+      content: toolContent,
+      createdAt: new Date(),
+    });
+
+    logger.debug('[MaestroSession] C-17: Entered focus mode for tool', {
+      toolId: toolCall.id,
+      toolType: mappedToolType,
+    });
+  }, [toolCalls, enterFocusMode, setFocusTool, maestro.id, isVoiceActive]);
 
   // Focus input when not in voice mode
   useEffect(() => {

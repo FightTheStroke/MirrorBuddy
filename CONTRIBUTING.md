@@ -1,11 +1,11 @@
-# Contributing to ConvergioEdu
+# Contributing to MirrorBuddy
 
-Thank you for your interest in contributing to ConvergioEdu!
+Thank you for your interest in contributing to MirrorBuddy!
 
 ## How to Contribute
 
 ### Reporting Bugs
-1. Open an [Issue](https://github.com/Roberdan/ConvergioEdu/issues)
+1. Open an [Issue](https://github.com/Roberdan/MirrorBuddy/issues)
 2. Describe the problem in detail
 3. Include steps to reproduce the bug
 
@@ -15,13 +15,18 @@ Thank you for your interest in contributing to ConvergioEdu!
 3. Discuss with maintainers before implementing
 
 ### Pull Requests
+
+**MANDATORY:** All PRs must follow the [Execution Checklist](docs/EXECUTION-CHECKLIST.md). PRs that do not complete this checklist will be rejected without review.
+
 1. Fork the repository
 2. Create a branch: `git checkout -b feature/feature-name`
-3. Make your changes
-4. Verify: `npm run lint && npm run typecheck && npm run build`
-5. Commit: `git commit -m "feat: description"`
-6. Push: `git push origin feature/feature-name`
-7. Open a Pull Request
+3. **Create and get approval for an execution plan** before implementing
+4. Make your changes (only what's in the approved plan)
+5. Complete the [Execution Checklist](docs/EXECUTION-CHECKLIST.md)
+6. Verify: `npm run lint && npm run typecheck && npm run build`
+7. Commit: `git commit -m "feat: description"`
+8. Push: `git push origin feature/feature-name`
+9. Open a Pull Request using the PR template
 
 ## Guidelines
 

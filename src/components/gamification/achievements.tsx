@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Trophy,
@@ -43,6 +43,20 @@ const categoryColors: Record<Achievement['category'], string> = {
 
 export function AchievementsGrid({ achievements, className }: AchievementsGridProps) {
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+
+  // C-19 FIX: Handle Escape key to close modal
+  const closeModal = useCallback(() => setSelectedAchievement(null), []);
+
+  useEffect(() => {
+    if (!selectedAchievement) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [selectedAchievement, closeModal]);
 
   const unlockedCount = achievements.filter(a => a.unlockedAt).length;
 

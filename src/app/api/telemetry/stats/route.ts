@@ -12,7 +12,7 @@ import type { UsageStats, ChartData, TimeSeriesPoint } from '@/lib/telemetry/typ
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });

@@ -1,0 +1,105 @@
+name: Execution Compliance Guard
+
+on:
+  pull_request:
+    branches: [main]
+
+# Minimal permissions for security
+permissions:
+  contents: read
+
+# This workflow detects workaround patterns that indicate plan violations.
+# See docs/EXECUTION-CHECKLIST.md for the full list of prohibited patterns.
+
+jobs:
+  compliance-check:
+    name: Check for Workaround Patterns
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for bypass flags in code
+        run: |
+          echo "Checking for workaround bypass flags..."
+
+          # Check for skip flags (case insensitive)
+          if grep -riE "SKIP_TYPE_CHECK|SKIP_LINT|SKIP_TEST|SKIP_BUILD" src/ --include="*.ts" --include="*.tsx" --include="*.js" 2>/dev/null; then
+            echo "::error::EXECUTION VIOLATION: Skip/bypass flags detected in source code"
+            exit 1
+          fi
+
+          echo "No bypass flags detected"
+
+      - name: Check for new workaround markers
+        run: |
+          echo "Checking for workaround markers in changed files..."
+
+          # Get list of changed files in this PR
+          git fetch origin main --depth=1
+          CHANGED_FILES=$(git diff --name-only origin/main...HEAD -- '*.ts' '*.tsx' '*.js' || true)
+
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No TypeScript/JavaScript files changed"
+            exit 0
+          fi
+
+          # Check for HACK, WORKAROUND markers (not TODO/FIXME as those are warnings)
+          VIOLATIONS=""
+          for file in $CHANGED_FILES; do
+            if [ -f "$file" ]; then
+              # Check for explicit workaround markers
+              FOUND=$(grep -nE "// HACK:|// WORKAROUND:|/\* HACK:|/\* WORKAROUND:" "$file" 2>/dev/null || true)
+              if [ -n "$FOUND" ]; then
+                VIOLATIONS="$VIOLATIONS\n$file:\n$FOUND"
+              fi
+            fi
+          done
+
+          if [ -n "$VIOLATIONS" ]; then
+            echo "::error::EXECUTION VIOLATION: Workaround markers detected in changed files"
+            echo -e "$VIOLATIONS"
+            exit 1
+          fi
+
+          echo "No workaround markers detected"
+
+      - name: Check for stub-only type files
+        run: |
+          echo "Checking for stub-only type definition files..."
+
+          # Get changed .d.ts files
+          git fetch origin main --depth=1
+          CHANGED_DTS=$(git diff --name-only origin/main...HEAD -- '*.d.ts' || true)
+
+          if [ -z "$CHANGED_DTS" ]; then
+            echo "No .d.ts files changed"
+            exit 0
+          fi
+
+          # Check if any .d.ts file contains only 'any' types (stub pattern)
+          for file in $CHANGED_DTS; do
+            if [ -f "$file" ]; then
+              # Count actual type definitions vs 'any' usage
+              ANY_COUNT=$(grep -c ": any" "$file" 2>/dev/null || echo "0")
+              LINE_COUNT=$(wc -l < "$file" | tr -d ' ')
+
+              # If more than 50% of lines use 'any', flag as potential stub
+              if [ "$LINE_COUNT" -gt 0 ] && [ "$ANY_COUNT" -gt 0 ]; then
+                RATIO=$((ANY_COUNT * 100 / LINE_COUNT))
+                if [ "$RATIO" -gt 50 ]; then
+                  echo "::warning file=$file::High 'any' type usage ($RATIO%) - verify this is not a stub file"
+                fi
+              fi
+            fi
+          done
+
+          echo "Stub check complete"
+
+      - name: Verify PR template usage
+        run: |
+          echo "Checking PR description for required sections..."
+
+          # This is informational - GitHub API would be needed for full enforcement
+          echo "Note: Manual review required to verify PR template completion"
+          echo "Reviewers: Ensure the PR follows docs/EXECUTION-CHECKLIST.md"

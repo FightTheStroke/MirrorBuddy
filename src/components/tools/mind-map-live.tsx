@@ -94,6 +94,19 @@ export function MindMapLive({
     (content: string, animate = true) => {
       if (!svgRef.current || !content.trim()) return;
 
+      // FIX BUG 16: Check SVG dimensions before rendering to prevent SVGLength error
+      const svg = svgRef.current;
+      const rect = svg.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        // Container not yet laid out, wait for next frame
+        requestAnimationFrame(() => renderMindmap(content, animate));
+        return;
+      }
+
+      // Set explicit dimensions on SVG
+      svg.setAttribute('width', String(rect.width));
+      svg.setAttribute('height', String(rect.height));
+
       try {
         const { root } = transformer.transform(content);
 
@@ -521,6 +534,8 @@ export function MindMapLive({
         ) : (
           <svg
             ref={svgRef}
+            width="100%"
+            height="100%"
             className={cn(
               'w-full h-full min-h-[300px]',
               status === 'connecting' && 'animate-pulse rounded-lg',
@@ -529,6 +544,7 @@ export function MindMapLive({
                   ? 'bg-gray-800'
                   : 'bg-slate-100 dark:bg-slate-700/50')
             )}
+            style={{ minWidth: '400px', minHeight: '300px' }}
           />
         )}
       </div>

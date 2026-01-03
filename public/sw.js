@@ -35,7 +35,7 @@ self.addEventListener('push', (event) => {
   }
 
   const {
-    title = 'ConvergioEdu',
+    title = 'MirrorBuddy',
     body = '',
     icon = '/icons/notification.png',
     badge = '/icons/badge.png',
@@ -49,7 +49,7 @@ self.addEventListener('push', (event) => {
     body,
     icon,
     badge,
-    tag: tag || `convergio-${Date.now()}`,
+    tag: tag || `mirrorbuddy-${Date.now()}`,
     data: notificationData,
     requireInteraction,
     actions,

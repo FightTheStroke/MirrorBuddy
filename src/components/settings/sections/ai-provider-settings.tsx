@@ -117,19 +117,45 @@ export function AIProviderSettings() {
 
     const fetchCosts = async () => {
       try {
-        const [costData, forecastData] = await Promise.all([
-          fetch('/api/azure/costs?days=30').then(res => res.json()),
-          fetch('/api/azure/costs?type=forecast').then(res => res.json()),
+        const [costRes, forecastRes] = await Promise.all([
+          fetch('/api/azure/costs?days=30'),
+          fetch('/api/azure/costs?type=forecast'),
         ]);
 
         if (cancelled) return;
 
-        if (costData.error && costData.configured === false) {
-          setCostsConfigured(false);
-        } else {
-          setCosts(costData);
-          setForecast(forecastData);
+        // C-4 FIX: Check response status before parsing
+        if (!costRes.ok || !forecastRes.ok) {
+          const costData = await costRes.json();
+          // If explicitly configured: false, show config form
+          if (costData.configured === false) {
+            setCostsConfigured(false);
+          } else {
+            // API error but configured - show error state
+            setCostsConfigured(true);
+            setCosts(null);
+          }
+          return;
         }
+
+        const [costData, forecastData] = await Promise.all([
+          costRes.json(),
+          forecastRes.json(),
+        ]);
+
+        // C-4 FIX: Validate response has required fields
+        if (costData.error || costData.totalCost === undefined) {
+          if (costData.configured === false) {
+            setCostsConfigured(false);
+          } else {
+            setCostsConfigured(true);
+            setCosts(null);
+          }
+          return;
+        }
+
+        setCosts(costData);
+        setForecast(forecastData.error ? null : forecastData);
       } catch {
         if (!cancelled) setCostsConfigured(false);
       } finally {
@@ -525,7 +551,14 @@ export function AIProviderSettings() {
                   </div>
                 )}
               </div>
-            ) : null}
+            ) : (
+              // C-4 FIX: Show error message when costs data unavailable
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Impossibile recuperare i dati sui costi Azure. Verifica la connessione o riprova piu tardi.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -577,7 +610,7 @@ export function AIProviderSettings() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-            Esplora Convergio Edu senza configurare un provider AI. Demo interattive
+            Esplora MirrorBuddy senza configurare un provider AI. Demo interattive
             con contenuti statici: maestri, quiz, flashcards, mappe mentali e altro.
           </p>
           <Link href="/showcase">

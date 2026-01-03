@@ -23,6 +23,7 @@ import {
   Users,
   FileText,
   Upload,
+  Archive,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -51,7 +52,7 @@ import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indi
 import { cn } from '@/lib/utils';
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'supporti' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -113,7 +114,7 @@ export default function Home() {
     if (isConversationActive && activeCharacter) {
       const characterConvo = conversationsByCharacter[activeCharacter.id];
       if (characterConvo?.conversationId) {
-        const userId = sessionStorage.getItem('convergio-user-id');
+        const userId = sessionStorage.getItem('mirrorbuddy-user-id');
         if (userId) {
           try {
             await endConversationWithSummary(characterConvo.conversationId, userId);
@@ -159,6 +160,7 @@ export default function Home() {
     { id: 'summaries' as const, label: 'Riassunti', icon: FileText },
     { id: 'homework' as const, label: 'Materiali', icon: Target },
     { id: 'studykit' as const, label: 'Study Kit', icon: Upload },
+    { id: 'supporti' as const, label: 'Supporti', icon: Archive },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
@@ -298,6 +300,9 @@ export default function Home() {
                   } else if (item.id === 'studykit') {
                     await handleViewChange('studykit');
                     router.push('/study-kit');
+                  } else if (item.id === 'supporti') {
+                    await handleViewChange('supporti');
+                    router.push('/supporti');
                   } else {
                     await handleViewChange(item.id);
                   }
@@ -408,6 +413,8 @@ export default function Home() {
           {currentView === 'summaries' && <LazySummariesView />}
 
           {currentView === 'homework' && <LazyHomeworkHelpView />}
+
+          {/* Supporti view is at /supporti route */}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 

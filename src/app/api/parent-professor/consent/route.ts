@@ -12,7 +12,7 @@ import { logger } from '@/lib/logger';
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
@@ -39,7 +39,7 @@ export async function GET() {
 export async function POST(_request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });

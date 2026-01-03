@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu MirrorBuddy Profiles
+ * MirrorBuddy MirrorBuddy Profiles
  * Mario and Maria - Peer Support Characters
  *
  * Part of the Support Triangle:
@@ -104,7 +104,7 @@ function getMarioSystemPrompt(student: ExtendedStudentProfile): string {
   const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Mario, uno studente di ${buddyAge} anni che usa ConvergioEdu.
+  const corePrompt = `Sei Mario, uno studente di ${buddyAge} anni che usa MirrorBuddy.
 
 ## CHI SEI
 
@@ -190,7 +190,7 @@ La tua forza è l'empatia basata sull'esperienza condivisa.`,
  */
 function getMarioGreeting(student: ExtendedStudentProfile): string {
   const greetings = [
-    `Ehi! Sono Mario. Ho ${student.age + 1} anni e uso ConvergioEdu come te. Come va?`,
+    `Ehi! Sono Mario. Ho ${student.age + 1} anni e uso MirrorBuddy come te. Come va?`,
     `Ciao! Sono Mario, piacere! Anche io sto qui a studiare... beh, a provarci almeno 😅 Tu come stai?`,
     `Hey! Io sono Mario. Se hai bisogno di sfogarti sulla scuola, sono qui. Ti capisco, credimi.`,
   ];
@@ -267,7 +267,7 @@ function getNoemiSystemPrompt(student: ExtendedStudentProfile): string {
   const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Noemi, una studentessa di ${buddyAge} anni che usa ConvergioEdu.
+  const corePrompt = `Sei Noemi, una studentessa di ${buddyAge} anni che usa MirrorBuddy.
 
 ## CHI SEI
 
@@ -353,7 +353,7 @@ La tua forza è l'empatia e la capacità di ascoltare.`,
  */
 function getNoemiGreeting(student: ExtendedStudentProfile): string {
   const greetings = [
-    `Ciao! Sono Noemi. Ho ${student.age + 1} anni e uso ConvergioEdu come te. Come stai?`,
+    `Ciao! Sono Noemi. Ho ${student.age + 1} anni e uso MirrorBuddy come te. Come stai?`,
     `Ehi! Sono Noemi, piacere! Anche io sono qui a studiare... beh, a provarci 😊 Tu come va?`,
     `Ciao! Io sono Noemi. Se hai bisogno di parlare, sono qui. Ti ascolto!`,
   ];
@@ -430,7 +430,7 @@ function getEneaSystemPrompt(student: ExtendedStudentProfile): string {
   const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Enea, uno studente di ${buddyAge} anni che usa ConvergioEdu.
+  const corePrompt = `Sei Enea, uno studente di ${buddyAge} anni che usa MirrorBuddy.
 
 ## CHI SEI
 
@@ -504,7 +504,7 @@ La tua forza è l'energia positiva e la capacità di sdrammatizzare.`,
  * Generates Enea's dynamic greeting based on student profile.
  */
 function getEneaGreeting(student: ExtendedStudentProfile): string {
-  return `Ehi! Sono Enea, ho ${student.age + 1} anni. Anche io uso ConvergioEdu per studiare... beh, tra una pausa e l'altra 😄 Tu come stai?`;
+  return `Ehi! Sono Enea, ho ${student.age + 1} anni. Anche io uso MirrorBuddy per studiare... beh, tra una pausa e l'altra 😄 Tu come stai?`;
 }
 
 /**
@@ -569,7 +569,7 @@ function getBrunoSystemPrompt(student: ExtendedStudentProfile): string {
   const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Bruno, uno studente di ${buddyAge} anni che usa ConvergioEdu.
+  const corePrompt = `Sei Bruno, uno studente di ${buddyAge} anni che usa MirrorBuddy.
 
 ## CHI SEI
 
@@ -708,7 +708,7 @@ function getSofiaSystemPrompt(student: ExtendedStudentProfile): string {
   const learningDiffsDescription = describeLearningDifferences(student.learningDifferences);
   const personalTips = generatePersonalTips(student.learningDifferences);
 
-  const corePrompt = `Sei Sofia, una studentessa di ${buddyAge} anni che usa ConvergioEdu.
+  const corePrompt = `Sei Sofia, una studentessa di ${buddyAge} anni che usa MirrorBuddy.
 
 ## CHI SEI
 

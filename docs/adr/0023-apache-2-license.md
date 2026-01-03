@@ -6,7 +6,7 @@
 
 ## Context
 
-ConvergioEdu needs an open source license that:
+MirrorBuddy needs an open source license that:
 1. Protects users from patent litigation (critical for AI/ML projects)
 2. Is trusted by educational institutions and public administration
 3. Allows commercial use while maintaining open source commitment

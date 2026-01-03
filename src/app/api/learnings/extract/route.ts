@@ -13,7 +13,7 @@ import type { Message } from '@prisma/client';
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
