@@ -75,106 +75,23 @@ export interface Milestone {
 }
 
 // ============================================================================
-// MOCK DATA
+// EMPTY STATE COMPONENT (BUG 23 FIX: Removed mock data)
 // ============================================================================
 
-const MOCK_METRICS: SuccessMetricsData = {
-  studentId: 'student-1',
-  studentName: 'Marco',
-  lastUpdated: new Date(),
-  overallScore: 72,
-  metrics: [
-    {
-      id: 'engagement',
-      name: 'Coinvolgimento',
-      description: 'Quanto attivamente partecipa e con che costanza',
-      currentScore: 85,
-      previousScore: 78,
-      trend: 'up',
-      history: [],
-      subMetrics: [
-        { id: 'streak', name: 'Giorni consecutivi', value: 12, target: 30, unit: 'giorni' },
-        { id: 'sessions_week', name: 'Sessioni/settimana', value: 4, target: 5, unit: 'sessioni' },
-        { id: 'avg_duration', name: 'Durata media', value: 22, target: 20, unit: 'minuti' },
-        { id: 'completion_rate', name: 'Attività completate', value: 87, target: 80, unit: '%' },
-      ],
-    },
-    {
-      id: 'autonomy',
-      name: 'Autonomia',
-      description: 'Capacità di studiare in modo indipendente',
-      currentScore: 68,
-      previousScore: 55,
-      trend: 'up',
-      history: [],
-      subMetrics: [
-        { id: 'self_start', name: 'Sessioni avviate da solo', value: 75, target: 80, unit: '%' },
-        { id: 'maestro_choice', name: 'Scelta Maestro appropriata', value: 82, target: 85, unit: '%' },
-        { id: 'melissa_ratio', name: 'Tempo con Melissa', value: 25, target: 20, unit: '%' },
-        { id: 'help_requests', name: 'Richieste di aiuto', value: 3, target: 5, unit: '/sessione' },
-      ],
-    },
-    {
-      id: 'method',
-      name: 'Metodo di Studio',
-      description: 'Sviluppo e applicazione di tecniche di studio',
-      currentScore: 62,
-      previousScore: 58,
-      trend: 'up',
-      history: [],
-      subMetrics: [
-        { id: 'techniques', name: 'Tecniche utilizzate', value: 5, target: 7, unit: 'diverse' },
-        { id: 'cross_subject', name: 'Applicazione cross-materia', value: 60, target: 70, unit: '%' },
-        { id: 'planning', name: 'Pianificazione sessioni', value: 45, target: 60, unit: '%' },
-        { id: 'review_habits', name: 'Ripasso regolare', value: 70, target: 75, unit: '%' },
-      ],
-    },
-    {
-      id: 'emotional',
-      name: 'Connessione Emotiva',
-      description: 'Rapporto positivo con l\'apprendimento',
-      currentScore: 78,
-      previousScore: 80,
-      trend: 'stable',
-      history: [],
-      subMetrics: [
-        { id: 'sentiment', name: 'Sentiment positivo', value: 82, target: 75, unit: '%' },
-        { id: 'buddy_interactions', name: 'Interazioni con Mario', value: 8, target: 5, unit: '/settimana' },
-        { id: 'frustration_recovery', name: 'Recupero frustrazione', value: 75, target: 70, unit: '%' },
-        { id: 'curiosity', name: 'Domande spontanee', value: 12, target: 10, unit: '/sessione' },
-      ],
-    },
-  ],
-  milestones: [
-    {
-      id: 'milestone-1',
-      title: 'Prima settimana completata',
-      description: '7 giorni consecutivi di studio',
-      achievedAt: new Date('2025-12-15'),
-      metricId: 'engagement',
-    },
-    {
-      id: 'milestone-2',
-      title: 'Autonomia crescente',
-      description: 'Avviato 10 sessioni da solo',
-      achievedAt: new Date('2025-12-20'),
-      metricId: 'autonomy',
-    },
-    {
-      id: 'milestone-3',
-      title: 'Multi-tecnico',
-      description: 'Usato 5 tecniche di studio diverse',
-      achievedAt: new Date('2025-12-25'),
-      metricId: 'method',
-    },
-    {
-      id: 'milestone-4',
-      title: 'Super curioso',
-      description: '50 domande spontanee poste ai Professori',
-      metricId: 'emotional',
-    },
-  ],
-};
+function EmptyMetricsState() {
+  return (
+    <div className="p-8 text-center rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900">
+      <Target className="w-12 h-12 mx-auto mb-4 text-slate-400" />
+      <h3 className="text-lg font-semibold mb-2 text-slate-700 dark:text-slate-200">
+        Nessuna metrica disponibile
+      </h3>
+      <p className="text-sm max-w-md mx-auto text-slate-500 dark:text-slate-400">
+        Le metriche di successo verranno calcolate dopo alcune sessioni di studio.
+        Inizia a interagire con i Professori per vedere i tuoi progressi.
+      </p>
+    </div>
+  );
+}
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -597,7 +514,8 @@ export function SuccessMetricsDashboard({
     }
   }, [studentId, methodProgress]);
 
-  // Transform store data to dashboard format, or use provided data, or fall back to mock
+  // Transform store data to dashboard format, or use provided data
+  // BUG 23 FIX: Return null instead of mock data when no real data available
   const metricsData = useMemo(() => {
     if (data) return data;
 
@@ -606,19 +524,32 @@ export function SuccessMetricsDashboard({
       return transformMethodProgressToMetrics(methodProgress, studentName);
     }
 
-    // Fall back to mock data
-    return MOCK_METRICS;
+    // No real data available - return null for empty state
+    return null;
   }, [data, methodProgress, studentName]);
 
   const achievedMilestones = useMemo(
-    () => metricsData.milestones.filter((m) => m.achievedAt),
-    [metricsData.milestones]
+    () => metricsData?.milestones.filter((m) => m.achievedAt) ?? [],
+    [metricsData]
   );
 
   const pendingMilestones = useMemo(
-    () => metricsData.milestones.filter((m) => !m.achievedAt),
-    [metricsData.milestones]
+    () => metricsData?.milestones.filter((m) => !m.achievedAt) ?? [],
+    [metricsData]
   );
+
+  // BUG 23 FIX: Show empty state when no metrics data available
+  if (!metricsData) {
+    return (
+      <div className={cn(
+        'p-6',
+        settings.highContrast ? 'bg-black' : 'bg-slate-50 dark:bg-slate-950',
+        className
+      )}>
+        <EmptyMetricsState />
+      </div>
+    );
+  }
 
   return (
     <div

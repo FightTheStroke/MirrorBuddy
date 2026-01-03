@@ -1,6 +1,9 @@
+
+
 # CLAUDE.md
 
-AI-powered educational platform for students with learning differences. 17 AI "Maestros", voice, FSRS flashcards, mind maps, quizzes, gamification.
+AI-powered educational platform for students with learning differences.  
+17 AI "Maestros", voice, FSRS flashcards, mind maps, quizzes, gamification.
 
 ## Commands
 
@@ -26,9 +29,9 @@ npx prisma db push   # Sync schema
 
 Load with `@docs/claude/<name>.md`:
 
-**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub
-**Voice**: voice-api | ambient-audio | onboarding
-**Features**: pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory
+**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub  
+**Voice**: voice-api | ambient-audio | onboarding  
+**Features**: pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory  
 **Characters**: buddies | coaches
 
 ## Quick Reference
@@ -48,12 +51,15 @@ When implementing new features:
 
 ## PLANNING RULES (MANDATORY)
 
+⚠️ These rules apply **ONLY AFTER the execution plan has been approved**,  
+in accordance with **SmartClaude.md**.
+
 **UN PIANO NON ESEGUITO È PEGGIO DI NESSUN PIANO.**
 
-1. **EXECUTE IMMEDIATELY**
-   - Dopo aver scritto un piano: ESEGUI SUBITO
+1. **EXECUTE IMMEDIATELY (POST-APPROVAL)**
+   - Dopo approvazione del piano: ESEGUI SUBITO
    - Zero attesa, zero conferme, zero "lo faccio dopo"
-   - Se scrivi un piano e non lo esegui = HAI FALLITO
+   - Se il piano è approvato e non lo esegui = HAI FALLITO
 
 2. **TRACK PROGRESS IN REAL-TIME**
    - Aggiorna il piano mentre lavori: `[ ]` → `[🔄]` → `[✅]`
@@ -83,4 +89,5 @@ When implementing new features:
 
 ## Summary Instructions
 
-When compacting: code changes, test output, architectural decisions, open tasks. Discard verbose listings and debug output.
+When compacting: code changes, test output, architectural decisions, open tasks.  
+Discard verbose listings and debug output.

@@ -524,7 +524,7 @@ function WelcomeContent() {
                   </Button>
                 </>
               ) : (
-                <>
+                <div className="flex flex-col items-center gap-3">
                   {/* Primary: Start onboarding */}
                   <Button
                     size="lg"
@@ -534,7 +534,17 @@ function WelcomeContent() {
                     Inizia con Melissa
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
-                </>
+                  {/* Skip onboarding link */}
+                  <button
+                    onClick={() => {
+                      useOnboardingStore.getState().completeOnboarding();
+                      router.push('/');
+                    }}
+                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors underline-offset-2 hover:underline"
+                  >
+                    Salta intro e inizia subito
+                  </button>
+                </div>
               )}
             </motion.div>
 
@@ -587,18 +597,19 @@ function WelcomeContent() {
                 {stepIndex + 1} / {totalSteps}
               </span>
 
-              {/* Skip to app button (for returning users) */}
-              {existingUserData?.name && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleSkipToApp}
-                  className="h-7 px-3 text-pink-600 hover:text-pink-700 hover:bg-pink-50"
-                >
-                  Salta
-                  <ArrowRight className="w-3 h-3 ml-1" />
-                </Button>
-              )}
+              {/* Skip to app button (for all users) */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  useOnboardingStore.getState().completeOnboarding();
+                  router.push('/');
+                }}
+                className="h-7 px-3 text-pink-600 hover:text-pink-700 hover:bg-pink-50"
+              >
+                Salta
+                <ArrowRight className="w-3 h-3 ml-1" />
+              </Button>
 
               {/* Reset button */}
               <Button
