@@ -113,7 +113,7 @@ export default function Home() {
     if (isConversationActive && activeCharacter) {
       const characterConvo = conversationsByCharacter[activeCharacter.id];
       if (characterConvo?.conversationId) {
-        const userId = sessionStorage.getItem('convergio-user-id');
+        const userId = sessionStorage.getItem('mirrorbuddy-user-id');
         if (userId) {
           try {
             await endConversationWithSummary(characterConvo.conversationId, userId);

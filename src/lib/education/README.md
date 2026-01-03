@@ -1,6 +1,6 @@
-# Convergio Education Library
+# MirrorBuddycation Library
 
-TypeScript implementation of education features for the Convergio Education Pack.
+TypeScript implementation of education features for the MirrorBuddycation Pack.
 
 ## Modules
 
@@ -387,8 +387,8 @@ async function handleReview(cardId: string, quality: Quality) {
 
 - [FSRS Algorithm Paper](https://github.com/open-spaced-repetition/fsrs4anki/wiki/The-Algorithm)
 - [Duolingo's FSRS Implementation](https://blog.duolingo.com/spaced-repetition/)
-- C Implementation: `/Users/roberdan/GitHub/ConvergioCLI/src/education/fsrs.c`
+- C Implementation: `/Users/roberdan/GitHub/MirrorBuddyCLI/src/education/fsrs.c`
 
 ## License
 
-MIT License - Copyright (c) 2025 Convergio.io
+MIT License - Copyright (c) 2025 MirrorBuddy.io

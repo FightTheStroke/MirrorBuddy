@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Character Router
+ * MirrorBuddy Character Router
  *
  * Routes students to the appropriate character based on:
  * 1. Detected intent (academic, method, emotional)

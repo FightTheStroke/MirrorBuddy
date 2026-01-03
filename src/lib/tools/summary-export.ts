@@ -116,7 +116,7 @@ export function generateSummaryHtml(data: SummaryData): string {
       ${lengthLabel ? `<div class="meta">Riassunto ${lengthLabel}</div>` : ''}
       ${sections}
       <div class="footer">
-        Generato con ConvergioEdu - ${new Date().toLocaleDateString('it-IT')}
+        Generato con MirrorBuddy - ${new Date().toLocaleDateString('it-IT')}
       </div>
     </body>
     </html>

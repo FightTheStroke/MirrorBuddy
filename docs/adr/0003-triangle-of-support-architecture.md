@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu is an AI-powered educational platform for students with learning differences (dyslexia, ADHD, autism, cerebral palsy). The original architecture had 17 "Maestri" (historical figure tutors) that provided subject-specific tutoring.
+MirrorBuddy is an AI-powered educational platform for students with learning differences (dyslexia, ADHD, autism, cerebral palsy). The original architecture had 17 "Maestri" (historical figure tutors) that provided subject-specific tutoring.
 
 However, students with learning differences need more than content expertise:
 

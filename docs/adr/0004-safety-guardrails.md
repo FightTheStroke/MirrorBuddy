@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu is an AI-powered educational platform for **minors** (ages 6-19) with learning differences. AI systems interacting with children require robust safety measures to:
+MirrorBuddy is an AI-powered educational platform for **minors** (ages 6-19) with learning differences. AI systems interacting with children require robust safety measures to:
 
 1. **Prevent harmful content** - No violence, sexual content, substance abuse
 2. **Protect privacy** - No collection of personal information

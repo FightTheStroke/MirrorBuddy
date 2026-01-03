@@ -8,7 +8,7 @@
 
 ## Context
 
-ConvergioEdu uses **Azure OpenAI Realtime** for voice (WebSocket bidirectional audio stream). Any avatar solution must work with real-time audio output, not pre-generated TTS with timestamps.
+MirrorBuddy uses **Azure OpenAI Realtime** for voice (WebSocket bidirectional audio stream). Any avatar solution must work with real-time audio output, not pre-generated TTS with timestamps.
 
 ---
 
@@ -128,7 +128,7 @@ Azure OpenAI Realtime (WebSocket)
 
 ---
 
-## Recommendation for ConvergioEdu
+## Recommendation for MirrorBuddy
 
 ### Phase 1: MVP (No additional cost)
 - Use **TalkingHead + HeadAudio** for real-time lip-sync
@@ -147,7 +147,7 @@ Azure OpenAI Realtime (WebSocket)
 
 ---
 
-## Build Your Own "ConvergioAvatar"
+## Build Your Own "MirrorBuddyAvatar"
 
 ### Architecture for Real-Time Pipeline
 

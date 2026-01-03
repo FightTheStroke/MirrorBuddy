@@ -1,4 +1,4 @@
-# ConvergioEdu Voice Strategy - Revised Analysis
+# MirrorBuddy Voice Strategy - Revised Analysis
 
 **Date**: January 2, 2026
 **Author**: Amy Chen, CFO
@@ -12,22 +12,22 @@
 
 > **"Super affordable for disabled students like Mario. Make non-disabled users pay premium, but disabled students must have unlimited voice/accessibility features always available."**
 
-This is not just a business constraint - it IS the business. ConvergioEdu exists to serve students with learning differences. Every pricing decision must answer: "Can Mario afford unlimited voice?"
+This is not just a business constraint - it IS the business. MirrorBuddy exists to serve students with learning differences. Every pricing decision must answer: "Can Mario afford unlimited voice?"
 
 ### Open Source Commitment
 
-**ConvergioEdu will ALWAYS have an open source version.**
+**MirrorBuddy will ALWAYS have an open source version.**
 
 | Version | License | Features | Target |
 |---------|---------|----------|--------|
-| **ConvergioEdu OSS** | Apache 2.0 | Core Maestros, basic tools, self-hostable | Developers, schools, NGOs |
-| **ConvergioEdu Cloud** | Proprietary | Hosted service, voice, premium features | Families, students |
+| **MirrorBuddy OSS** | Apache 2.0 | Core Maestros, basic tools, self-hostable | Developers, schools, NGOs |
+| **MirrorBuddy Cloud** | Proprietary | Hosted service, voice, premium features | Families, students |
 
 **Why Open Source Matters**:
 1. **Mission alignment**: Education is a right - code should be accessible too
 2. **Trust**: Families can verify what their children use
 3. **Community**: Contributors improve the platform for everyone
-4. **Sustainability**: If ConvergioEdu disappears, the code lives on
+4. **Sustainability**: If MirrorBuddy disappears, the code lives on
 5. **Adoption**: Schools and governments prefer open source for procurement
 
 **What's Open Source**:
@@ -59,9 +59,9 @@ This is not just a business constraint - it IS the business. ConvergioEdu exists
 
 | Tier | Monthly Price | Target User | Voice Included |
 |------|---------------|-------------|----------------|
-| **ConvergioEdu Free** | EUR 0 | All students | 30 min/day (self-hosted) |
-| **ConvergioEdu Pro** | EUR 9.90 | DSA-certified students | **UNLIMITED** (self-hosted) |
-| **ConvergioEdu Premium** | EUR 24.90 | Non-DSA families | UNLIMITED (hybrid quality) |
+| **MirrorBuddy Free** | EUR 0 | All students | 30 min/day (self-hosted) |
+| **MirrorBuddy Pro** | EUR 9.90 | DSA-certified students | **UNLIMITED** (self-hosted) |
+| **MirrorBuddy Premium** | EUR 24.90 | Non-DSA families | UNLIMITED (hybrid quality) |
 
 ### Key Numbers
 
@@ -284,7 +284,7 @@ This is not just a business constraint - it IS the business. ConvergioEdu exists
 - Plus users: GPT-4o voice with daily soft limits, then mini
 - Pro users ($200/month): True unlimited GPT-4o voice
 
-**Lesson for ConvergioEdu**: "Unlimited" can mean "generous limits that feel unlimited for normal use."
+**Lesson for MirrorBuddy**: "Unlimited" can mean "generous limits that feel unlimited for normal use."
 
 #### Character.AI - Free Voice
 
@@ -303,7 +303,7 @@ This is not just a business constraint - it IS the business. ConvergioEdu exists
 - Voice calls (bidirectional)
 - Advanced features
 
-**Lesson for ConvergioEdu**: We can offer TTS-only voice for free tier.
+**Lesson for MirrorBuddy**: We can offer TTS-only voice for free tier.
 
 #### Replika - Free Voice (Limited)
 
@@ -317,7 +317,7 @@ This is not just a business constraint - it IS the business. ConvergioEdu exists
 - Free: Basic text chat only
 - Pro ($7.99-19.99/month): Unlimited voice calls, romantic mode
 
-**Lesson for ConvergioEdu**: Emotional connection drives conversions. Our "Maestros" can have this effect.
+**Lesson for MirrorBuddy**: Emotional connection drives conversions. Our "Maestros" can have this effect.
 
 #### Perplexity Pro ($20/month)
 
@@ -326,7 +326,7 @@ This is not just a business constraint - it IS the business. ConvergioEdu exists
 2. **Standard STT/TTS**: Not advanced conversational voice
 3. **Text-first architecture**: Voice is transcribe-respond-speak
 
-**Lesson for ConvergioEdu**: Voice doesn't need to be the primary feature to be valuable.
+**Lesson for MirrorBuddy**: Voice doesn't need to be the primary feature to be valuable.
 
 ### 3.2 Industry Cost Benchmarks
 
@@ -349,7 +349,7 @@ This is not just a business constraint - it IS the business. ConvergioEdu exists
 4. **Defining "unlimited" loosely** (soft caps, quality degradation)
 5. **Cross-subsidizing** from other user segments
 
-**ConvergioEdu can do #2, #3, and #5.**
+**MirrorBuddy can do #2, #3, and #5.**
 
 ---
 
@@ -479,9 +479,9 @@ Following Netflix/Claude/OpenAI simplicity:
 
 | Tier | Price | Who It's For | Voice | Quality |
 |------|-------|--------------|-------|---------|
-| **ConvergioEdu Free** | EUR 0 | Everyone | 30 min/day | Self-hosted |
-| **ConvergioEdu Pro** | EUR 9.90/month | DSA-certified students | **UNLIMITED** | Self-hosted |
-| **ConvergioEdu Premium** | EUR 24.90/month | Non-DSA families | **UNLIMITED** | Hybrid (Azure + Self-hosted) |
+| **MirrorBuddy Free** | EUR 0 | Everyone | 30 min/day | Self-hosted |
+| **MirrorBuddy Pro** | EUR 9.90/month | DSA-certified students | **UNLIMITED** | Self-hosted |
+| **MirrorBuddy Premium** | EUR 24.90/month | Non-DSA families | **UNLIMITED** | Hybrid (Azure + Self-hosted) |
 
 ### What Each Tier Includes
 
@@ -539,7 +539,7 @@ Mario's Story:
 4. Verified within 24 hours
 5. Automatically upgraded to Pro at EUR 9.90
 6. Gets UNLIMITED voice forever
-7. Cost to ConvergioEdu: ~EUR 7.20/month
+7. Cost to MirrorBuddy: ~EUR 7.20/month
 8. Subsidized by Premium users
 ```
 

@@ -62,9 +62,9 @@ describe('Summary Export', () => {
       expect(html).toContain('Riassunto Medio');
     });
 
-    it('includes ConvergioEdu branding', () => {
+    it('includes MirrorBuddy branding', () => {
       const html = generateSummaryHtml(mockSummaryData);
-      expect(html).toContain('ConvergioEdu');
+      expect(html).toContain('MirrorBuddy');
     });
 
     it('escapes HTML in content', () => {

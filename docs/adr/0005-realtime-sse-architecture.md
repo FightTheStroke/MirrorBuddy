@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu's Maestri (AI tutors) can create educational tools for students:
+MirrorBuddy's Maestri (AI tutors) can create educational tools for students:
 - Mind maps
 - Flashcards
 - Quizzes

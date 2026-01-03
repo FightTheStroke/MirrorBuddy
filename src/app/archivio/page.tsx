@@ -9,7 +9,7 @@
 import { ArchiveView } from '@/components/education/archive-view';
 
 export const metadata = {
-  title: 'Archivio | ConvergioEdu',
+  title: 'Archivio | MirrorBuddy',
   description: 'Tutti i tuoi materiali di studio salvati',
 };
 

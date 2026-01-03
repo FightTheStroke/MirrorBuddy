@@ -3,7 +3,7 @@
 **Data**: 2026-01-02
 **Problema**: I tool nella visualizzazione normale con i professori sballano la navigazione
 **Priorita**: MEDIA
-**Status**: [ ] DA DISCUTERE CON ROBERTO
+**Status**: ✅ COMPLETATO - Option B implementata (auto-switch fullscreen)
 
 ---
 

@@ -24,7 +24,7 @@ interface UsePermissionsReturn {
 }
 
 // Cache key for localStorage
-const PERMISSIONS_CACHE_KEY = 'convergio-permissions-cache';
+const PERMISSIONS_CACHE_KEY = 'mirrorbuddy-permissions-cache';
 
 // Get cached permissions from localStorage
 function getCachedPermissions(): Partial<PermissionsState> {

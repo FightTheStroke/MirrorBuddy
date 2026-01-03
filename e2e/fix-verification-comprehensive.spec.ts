@@ -55,7 +55,7 @@ test.describe('Fix #9: Auto-save Quiz/Mindmap/Flashcards', () => {
     const _quizData = await page.evaluate(() => {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (key && (key.includes('quiz') || key.includes('convergio'))) {
+        if (key && (key.includes('quiz') || key.includes('mirrorbuddy'))) {
           return localStorage.getItem(key);
         }
       }

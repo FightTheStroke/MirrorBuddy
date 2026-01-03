@@ -1,5 +1,5 @@
 /**
- * CONVERGIO EDUCATION - FSRS (Free Spaced Repetition Scheduler)
+ * MIRRORBUDDY - FSRS (Free Spaced Repetition Scheduler)
  *
  * TypeScript implementation of the FSRS algorithm (2024 version) for optimal
  * spaced repetition scheduling based on Duolingo's research.
@@ -8,7 +8,7 @@
  *
  * Phase: FASE 11 - Learning Science
  *
- * Copyright (c) 2025 Convergio.io
+ * Copyright (c) 2025 MirrorBuddy.io
  * Licensed under MIT License
  */
 

@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-ConvergioEdu needs to store student-generated materials:
+MirrorBuddy needs to store student-generated materials:
 - **Homework photos**: Captured via webcam or uploaded, analyzed by AI vision
 - **Mind maps**: Generated as PNG/SVG exports
 - **PDF documents**: Uploaded study materials (Phase 1A requirement)

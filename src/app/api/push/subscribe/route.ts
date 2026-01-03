@@ -12,7 +12,7 @@ import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } f
 // Helper to get userId from cookies (consistent with other APIs)
 async function getUserId(): Promise<string | null> {
   const cookieStore = await cookies();
-  return cookieStore.get('convergio-user-id')?.value || null;
+  return cookieStore.get('mirrorbuddy-user-id')?.value || null;
 }
 
 interface SubscriptionBody {
