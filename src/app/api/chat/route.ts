@@ -159,13 +159,14 @@ export async function POST(request: NextRequest) {
 
     // #87: Get user's provider preference and budget from settings
     let providerPreference: AIProvider | 'auto' | undefined;
-    let userSettings: { provider: string; budgetLimit: number; totalSpent: number } | null = null;
+    type UserSettingsResult = { provider: string; budgetLimit: number; totalSpent: number } | null;
+    let userSettings: UserSettingsResult = null;
     if (userId) {
       try {
         userSettings = await prisma.settings.findUnique({
           where: { userId },
           select: { provider: true, budgetLimit: true, totalSpent: true },
-        });
+        }) as UserSettingsResult;
         if (userSettings?.provider && (userSettings.provider === 'azure' || userSettings.provider === 'ollama')) {
           providerPreference = userSettings.provider;
         }

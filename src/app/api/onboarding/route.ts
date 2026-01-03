@@ -163,9 +163,10 @@ export async function POST(request: NextRequest) {
       const user = await prisma.user.create({
         data: {},
       });
-      userId = user.id;
+      const newUserId = user.id;
+      userId = newUserId;
 
-      cookieStore.set('mirrorbuddy-user-id', userId, {
+      cookieStore.set('mirrorbuddy-user-id', newUserId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

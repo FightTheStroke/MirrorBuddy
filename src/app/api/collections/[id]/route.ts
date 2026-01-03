@@ -193,7 +193,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
           select: { children: true },
         },
       },
-    });
+    }) as { id: string; _count: { children: number } } | null;
 
     if (!existing) {
       return NextResponse.json(

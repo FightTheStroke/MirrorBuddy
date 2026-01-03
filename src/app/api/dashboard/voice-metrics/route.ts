@@ -9,6 +9,13 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/session-auth';
 
+// Inline types for telemetry event data
+interface TelemetryEventData {
+  action?: string | null;
+  value: number | null;
+  timestamp: Date;
+}
+
 export async function GET(request: Request) {
   try {
     // Require authentication for admin dashboard
@@ -63,18 +70,18 @@ export async function GET(request: Request) {
     ]);
 
     // Calculate metrics
-    const voiceSessions = voiceEvents.filter(e => e.action === 'session_started').length;
+    const voiceSessions = voiceEvents.filter((e: TelemetryEventData) => e.action === 'session_started').length;
     const voiceMinutes = voiceEvents
-      .filter(e => e.action === 'session_duration')
-      .reduce((sum, e) => sum + (e.value || 0), 0) / 60;
+      .filter((e: TelemetryEventData) => e.action === 'session_duration')
+      .reduce((sum: number, e: TelemetryEventData) => sum + (e.value || 0), 0) / 60;
 
     const ttsGenerations = ttsEvents.length;
-    const ttsCharacters = ttsEvents.reduce((sum, e) => sum + (e.value || 0), 0);
+    const ttsCharacters = ttsEvents.reduce((sum: number, e: TelemetryEventData) => sum + (e.value || 0), 0);
 
-    const realtimeSessions = realtimeEvents.filter(e => e.action === 'session_started').length;
+    const realtimeSessions = realtimeEvents.filter((e: TelemetryEventData) => e.action === 'session_started').length;
     const realtimeMinutes = realtimeEvents
-      .filter(e => e.action === 'session_duration')
-      .reduce((sum, e) => sum + (e.value || 0), 0) / 60;
+      .filter((e: TelemetryEventData) => e.action === 'session_duration')
+      .reduce((sum: number, e: TelemetryEventData) => sum + (e.value || 0), 0) / 60;
 
     // Daily breakdown
     const dailySessions: Record<string, number> = {};

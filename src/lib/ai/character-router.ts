@@ -30,7 +30,8 @@ import {
   type BuddyId,
 } from '@/data/buddy-profiles';
 import { detectIntent, type DetectedIntent } from './intent-detection';
-import { injectSafetyGuardrails } from '@/lib/safety';
+// Import directly to avoid pulling Prisma-dependent monitoring into client bundle
+import { injectSafetyGuardrails } from '@/lib/safety/safety-prompts';
 
 // ============================================================================
 // TYPES

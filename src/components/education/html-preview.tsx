@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import { cn } from '@/lib/utils';
+import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 
 interface HTMLPreviewProps {
   code: string;
@@ -26,6 +27,96 @@ interface HTMLPreviewProps {
   maestroId?: string;
   onClose?: () => void;
   allowSave?: boolean;
+}
+
+/**
+ * Generate accessibility CSS from store settings to inject into iframe
+ */
+function generateAccessibilityCSS(settings: {
+  dyslexiaFont: boolean;
+  extraLetterSpacing: boolean;
+  increasedLineHeight: boolean;
+  highContrast: boolean;
+  largeText: boolean;
+  reducedMotion: boolean;
+  fontSize: number;
+  lineSpacing: number;
+}): string {
+  const styles: string[] = [];
+
+  // Dyslexia font support
+  if (settings.dyslexiaFont) {
+    styles.push(`
+      body, * {
+        font-family: 'OpenDyslexic', 'Comic Sans MS', 'Trebuchet MS', sans-serif !important;
+      }
+    `);
+  }
+
+  // Extra letter spacing
+  if (settings.extraLetterSpacing) {
+    styles.push(`
+      body, * {
+        letter-spacing: 0.05em !important;
+      }
+    `);
+  }
+
+  // Increased line height
+  if (settings.increasedLineHeight || settings.lineSpacing > 1.0) {
+    const lineHeight = Math.max(settings.lineSpacing, settings.increasedLineHeight ? 1.8 : 1.0);
+    styles.push(`
+      body, * {
+        line-height: ${lineHeight} !important;
+      }
+    `);
+  }
+
+  // High contrast mode
+  if (settings.highContrast) {
+    styles.push(`
+      body {
+        background-color: #000 !important;
+        color: #ffff00 !important;
+      }
+      a, button {
+        color: #ffff00 !important;
+        text-decoration: underline !important;
+      }
+      input, textarea, select {
+        background-color: #000 !important;
+        color: #fff !important;
+        border: 2px solid #fff !important;
+      }
+      :focus-visible {
+        outline: 3px solid #ffff00 !important;
+        outline-offset: 3px !important;
+      }
+    `);
+  }
+
+  // Large text
+  if (settings.largeText || settings.fontSize > 1.0) {
+    const fontMultiplier = (settings.largeText ? 1.2 : 1) * settings.fontSize;
+    styles.push(`
+      body, * {
+        font-size: ${fontMultiplier * 100}% !important;
+      }
+    `);
+  }
+
+  // Reduced motion
+  if (settings.reducedMotion) {
+    styles.push(`
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    `);
+  }
+
+  return styles.length > 0 ? `<style data-accessibility="true">${styles.join('\n')}</style>` : '';
 }
 
 export function HTMLPreview({
@@ -44,6 +135,9 @@ export function HTMLPreview({
   const [saving, setSaving] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
+  // Get accessibility settings
+  const { settings: accessibilitySettings } = useAccessibilityStore();
+
   // Sanitize HTML to prevent XSS attacks
   // Allow safe interactive styling but block scripts and dangerous handlers
   const sanitizedCode = useMemo(() => {
@@ -58,18 +152,32 @@ export function HTMLPreview({
     });
   }, [code]);
 
-  // Inject the sanitized HTML into the iframe
+  // Generate accessibility CSS for iframe
+  const accessibilityCSS = useMemo(() => {
+    return generateAccessibilityCSS(accessibilitySettings);
+  }, [accessibilitySettings]);
+
+  // Inject the sanitized HTML into the iframe with accessibility styles
   useEffect(() => {
     if (iframeRef.current && view === 'preview') {
       const iframe = iframeRef.current;
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       if (doc) {
         doc.open();
-        doc.write(sanitizedCode);
+        // Inject accessibility CSS at the end of the document to override demo styles
+        const codeWithAccessibility = sanitizedCode.replace(
+          '</head>',
+          `${accessibilityCSS}</head>`
+        );
+        // If no </head> tag, append at the end of content
+        const finalCode = codeWithAccessibility.includes(accessibilityCSS)
+          ? codeWithAccessibility
+          : sanitizedCode + accessibilityCSS;
+        doc.write(finalCode);
         doc.close();
       }
     }
-  }, [sanitizedCode, view]);
+  }, [sanitizedCode, accessibilityCSS, view]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code);

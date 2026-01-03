@@ -12,6 +12,25 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { StudyKit } from '@/types/study-kit';
 
+// Inline type for StudyKit record from Prisma
+interface StudyKitRecord {
+  id: string;
+  userId: string;
+  sourceFile: string;
+  title: string;
+  summary: string | null;
+  mindmap: string | null;
+  demo: string | null;
+  quiz: string | null;
+  status: string;
+  errorMessage: string | null;
+  subject: string | null;
+  pageCount: number | null;
+  wordCount: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /**
  * GET /api/study-kit
  * List study kits for current user
@@ -57,7 +76,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Parse JSON fields
-    const parsedKits: StudyKit[] = studyKits.map((kit) => ({
+    const parsedKits: StudyKit[] = studyKits.map((kit: StudyKitRecord) => ({
       id: kit.id,
       userId: kit.userId,
       sourceFile: kit.sourceFile,

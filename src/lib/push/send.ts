@@ -108,7 +108,7 @@ export async function sendPushToUser(
   let successCount = 0;
 
   await Promise.all(
-    subscriptions.map(async (sub) => {
+    subscriptions.map(async (sub: { endpoint: string; p256dh: string; auth: string }) => {
       const success = await sendPushToSubscription(
         { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
         payload
