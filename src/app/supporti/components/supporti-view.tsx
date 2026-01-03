@@ -9,7 +9,7 @@ import { useState, useEffect, useMemo, useCallback, useRef, type ChangeEvent } f
 import { AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Fuse from 'fuse.js';
-import { Grid, List, Search, ArrowUpDown, X, ChevronRight, Home } from 'lucide-react';
+import { Grid, List, Search, X, ChevronRight, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';

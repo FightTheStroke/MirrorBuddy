@@ -68,7 +68,7 @@ test.describe('Supporti Page - Wave 4', () => {
       // Type section is expanded by default
       // Check if any type buttons are visible (if materials exist)
       const typeButtons = page.locator('aside button').filter({ hasText: /Mindmap|Quiz|Flashcard|Demo|Riassunto/i });
-      const count = await typeButtons.count();
+      const _count = await typeButtons.count();
 
       // Click to collapse
       await typeToggle.click();
