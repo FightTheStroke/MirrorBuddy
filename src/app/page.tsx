@@ -23,6 +23,7 @@ import {
   Users,
   FileText,
   Upload,
+  Archive,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -39,6 +40,7 @@ import {
   LazyHomeworkHelpView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
+  LazyArchiveView,
 } from '@/components/education';
 import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
@@ -51,7 +53,7 @@ import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indi
 import { cn } from '@/lib/utils';
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'archive' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -159,6 +161,7 @@ export default function Home() {
     { id: 'summaries' as const, label: 'Riassunti', icon: FileText },
     { id: 'homework' as const, label: 'Materiali', icon: Target },
     { id: 'studykit' as const, label: 'Study Kit', icon: Upload },
+    { id: 'archive' as const, label: 'Archivio', icon: Archive },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
@@ -408,6 +411,8 @@ export default function Home() {
           {currentView === 'summaries' && <LazySummariesView />}
 
           {currentView === 'homework' && <LazyHomeworkHelpView />}
+
+          {currentView === 'archive' && <LazyArchiveView />}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 
