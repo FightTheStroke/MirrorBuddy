@@ -193,7 +193,8 @@ function DailyChart({
 }
 
 export default function AdminAnalyticsPage() {
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DashboardData>({
     tokenUsage: null,
@@ -203,8 +204,10 @@ export default function AdminAnalyticsPage() {
     safetyEvents: null,
   });
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    }
     setError(null);
 
     try {
@@ -234,7 +237,8 @@ export default function AdminAnalyticsPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch dashboard data');
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -248,7 +252,7 @@ export default function AdminAnalyticsPage() {
     return n.toString();
   };
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -276,8 +280,8 @@ export default function AdminAnalyticsPage() {
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">Last 7 days</p>
           </div>
-          <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <Button variant="outline" size="sm" onClick={() => fetchData(true)} disabled={refreshing}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
