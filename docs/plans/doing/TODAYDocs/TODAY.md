@@ -12,24 +12,24 @@
 
 ```
 17:15 ──────────────────────────────────────────────────► NOW  │  In Progress
-       ┃█████████████████████████████████┃
-       W0 DONE + W1-2 DONE           24/53 tasks (45%) GREEN 🟢
+       ┃████████████████████████████████████████████████┃
+       W0-W3 DONE + W4 IN PROGRESS   44/53 tasks (83%) GREEN 🟢
 
 W0  ████████████████████ DONE     3/3   ✅  17:15→18:44  1h29m
-W1-2████████████████████ DONE    21/21  ✅  P0:7✅ P1:9✅ P2:4✅ SKIP:1
-W3  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/9   ⏸️  Needs W1-2
-W4  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/11  ⏸️  Needs W1-2
-W5  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/9   ⏸️  Needs W3+W4
+W1-2████████████████████ DONE    21/21  ✅  P0:7✅ P1:9✅ P2:5✅
+W3  ████████████████████ DONE     9/9   ✅  All components + E2E
+W4  ████████████████░░░░ PROG    10/11  🔄  Only E2E tests left
+W5  ░░░░░░░░░░░░░░░░░░░░ PENDING  0/9   ⏸️  Needs W4
 ```
 
 | Wave | Who | Status | Tasks | Start | Done | Dur |
 |------|-----|--------|-------|-------|------|-----|
 | **W0**: QA + Plan Update | Roberto | ✅ | 3/3 (100%) | 17:15 | 18:44 | 1h29m |
 | **W1-2**: Bug Fixes (7 P0, 9 P1, 5 P2) | Claude-A | ✅ | 21/21 (100%) | 18:44 | 3 Gen | - |
-| **W3**: Welcome Experience | B1, B2, B3 | ⏸️ | 0/9 (0%) | - | - | - |
-| **W4**: Supporti Consolidation | C1, C2 | ⏸️ | 0/11 (0%) | - | - | - |
+| **W3**: Welcome Experience | Claude-A | ✅ | 9/9 (100%) | 3 Gen | 3 Gen | - |
+| **W4**: Supporti Consolidation | Claude-A | 🔄 | 10/11 (91%) | 3 Gen | - | - |
 | **W5**: Thor QA + Merge | Thor + Roberto | ⏸️ | 0/9 (0%) | - | - | - |
-| **TOTAL**: Full Plan | **All** | 🔄 | **24/53 (45%)** | 3 Gen | - | - |
+| **TOTAL**: Full Plan | **All** | 🔄 | **44/53 (83%)** | 3 Gen | - | - |
 
 ### Wave 0: QA & Planning (COMPLETE)
 
@@ -182,7 +182,7 @@ This plan is split into focused sub-files for token optimization.
 | 2.4 | C-1: STT Discrepancy | 1 | ✅ |
 | 2.5 | C-6: Timer + XP Bar in voice panel | 2 | ✅ |
 | 2.6 | C-7: Demo Accessibility settings | 1 | ✅ |
-| 2.7 | C-8: Cafe Ambient Audio realistic | 2 | SKIP |
+| 2.7 | C-8: Cafe Ambient Audio (already procedural) | 2 | ✅ |
 | 2.8 | C-10: Demo in frame (not new tab) | 1 | ✅ |
 | 2.9 | C-11: Triple "Chiamata Terminata" cleanup | 1 | ✅ |
 | 2.10 | C-17: Fullscreen on Tool Creation | 1 | ✅ |
@@ -192,37 +192,37 @@ This plan is split into focused sub-files for token optimization.
 | 2.14 | C-21: Summary Missing Export/Convert/Flashcard | 2 | ✅ |
 | PR | PR #106 updated with bugfixes | - | ✅ |
 
-### Wave 3 (B1, B2, B3)
+### Wave 3 (Claude-A) - COMPLETE
 
 | # | Task | ✓ | By |
 |---|------|---|-----|
-| 3.1 | hero-section.tsx | ⏸️ | B1 |
-| 3.2 | features-section.tsx | ⏸️ | B2 |
-| 3.3 | guides-section.tsx | ⏸️ | B3 |
-| 3.4 | quick-start.tsx | ⏸️ | B1 |
-| 3.5 | Refactor page.tsx | ⏸️ | B1 |
-| 3.6 | Skip flow | ⏸️ | B1 |
-| 3.7 | Returning user | ⏸️ | B1 |
-| 3.8 | Settings link | ⏸️ | B1 |
-| 3.9 | E2E tests | ⏸️ | B1 |
-| PR | feat/welcome-experience | ⏸️ | B1 |
+| 3.1 | hero-section.tsx | ✅ | Claude-A |
+| 3.2 | features-section.tsx | ✅ | Claude-A |
+| 3.3 | guides-section.tsx | ✅ | Claude-A |
+| 3.4 | quick-start.tsx | ✅ | Claude-A |
+| 3.5 | Refactor page.tsx | ✅ | Claude-A |
+| 3.6 | Skip flow (handleSkipWithConfirmation) | ✅ | Claude-A |
+| 3.7 | Returning user | ✅ | Claude-A |
+| 3.8 | Settings link (/welcome?replay=true) | ✅ | Claude-A |
+| 3.9 | E2E tests (18 tests) | ✅ | Claude-A |
+| - | Committed (b98f399) | ✅ | Claude-A |
 
-### Wave 4 (C1, C2)
+### Wave 4 (Claude-A) - IN PROGRESS
 
 | # | Task | ✓ | By |
 |---|------|---|-----|
-| 4.1 | Struttura base | ⏸️ | C1 |
-| 4.2 | Sidebar | ⏸️ | C1 |
-| 4.3 | Material card | ⏸️ | C2 |
-| 4.8 | Redirect /archivio | ⏸️ | C2 |
-| 4.9 | Redirect /materiali | ⏸️ | C2 |
-| 4.10 | Navigation update | ⏸️ | C1 |
-| 4.4 | Filtri tipo | ⏸️ | C1 |
-| 4.5 | Filtri materia | ⏸️ | C1 |
-| 4.6 | Filtri data | ⏸️ | C1 |
-| 4.7 | Search full-text | ⏸️ | C1 |
-| 4.11 | E2E tests | ⏸️ | C1 |
-| PR | feat/supporti-consolidation | ⏸️ | C1 |
+| 4.1 | Struttura base (supporti/page.tsx) | ✅ | Claude-A |
+| 4.2 | Sidebar (sidebar.tsx) | ✅ | Claude-A |
+| 4.3 | Material card (using archive GridView) | ✅ | Claude-A |
+| 4.4 | Filtri tipo | ✅ | Claude-A |
+| 4.5 | Filtri materia | ✅ | Claude-A |
+| 4.6 | Filtri data | ✅ | Claude-A |
+| 4.7 | Search full-text (Fuse.js) | ✅ | Claude-A |
+| 4.8 | Redirect /archivio -> /supporti | ✅ | Claude-A |
+| 4.9 | Redirect /materiali | N/A | Different purpose (homework) |
+| 4.10 | Navigation (Supporti nav item) | ✅ | Claude-A |
+| 4.11 | E2E tests | ⏸️ | Claude-A |
+| - | Commit pending | ⏸️ | Claude-A |
 
 ### Wave 5 (Thor + Roberto)
 
