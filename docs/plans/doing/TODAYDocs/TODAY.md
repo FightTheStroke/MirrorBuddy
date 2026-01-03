@@ -159,38 +159,38 @@ This plan is split into focused sub-files for token optimization.
 
 ### Wave 0 (Roberto)
 
-| # | Task | ✓ | Time | By |
-|---|------|---|------|-----|
-| 0.1 | Manual QA (10 items) | ✅ | 18:30 | R |
-| 0.2 | Update plan + findings | ✅ | 18:44 | C |
-| 0.3 | NOT merge PR #106 | ✅ | 18:30 | R |
+| # | Task | ✓ | When | By |
+|---|------|---|---------|---------|
+| 0.1 | Manual QA (10 items) | ✅ | 3 Gen 18:30 | Roberto |
+| 0.2 | Update plan with QA findings | ✅ | 3 Gen 18:44 | Claude |
+| 0.3 | Decision: NOT merge PR #106 | ✅ | 3 Gen 18:30 | Roberto |
 
 ### Wave 1-2 (Claude-A) - 21 bugs
 
-| # | Bug | P | ✓ |
-|---|-----|---|---|
-| 1.1 | C-5: History per Coach | 0 | ⏳ |
-| 1.2 | C-9: Header Counters | 0 | ⏳ |
-| 1.3 | C-12: Mindmap Hierarchy | 0 | ⏳ |
-| 1.4 | C-13: Conversation Persist | 0 | ⏳ |
-| 1.5 | C-14: Material Save | 0 | ⏳ |
-| 1.6 | C-15: Save Error | 0 | ⏳ |
-| 1.7 | C-16: Sandbox Error | 0 | ⏳ |
-| 2.1 | C-2: Session Recap | 1 | ⏳ |
-| 2.2 | C-3: Layout sticky | 1 | ⏳ |
-| 2.3 | C-4: Azure costs | 1 | ⏳ |
-| 2.4 | C-1: STT bug | 1 | ⏳ |
-| 2.5 | C-6: Timer + XP | 2 | ⏳ |
-| 2.6 | C-7: Demo A11y | 1 | ⏳ |
-| 2.7 | C-8: Cafe Audio | 2 | ⏳ |
-| 2.8 | C-10: Demo frame | 1 | ⏳ |
-| 2.9 | C-11: Triple voice | 1 | ⏳ |
-| 2.10 | C-17: Fullscreen | 1 | ⏳ |
-| 2.11 | C-18: PDF parse | 1 | ⏳ |
-| 2.12 | C-19: ESC key | 1 | ⏳ |
-| 2.13 | C-20: Mindmap interact | 2 | ⏳ |
-| 2.14 | C-21: Summary features | 2 | ⏳ |
-| PR | Create fix/wave-1-2-bugs | - | ⏳ |
+| # | Bug Description | P | ✓ |
+|---|-----------------|---|---|
+| 1.1 | C-5: History per Coach/Buddy (not global) | 0 | ⏳ |
+| 1.2 | C-9: Header Counters real-time update | 0 | ⏳ |
+| 1.3 | C-12: Mindmap Hierarchy (flat → nested) | 0 | ⏳ |
+| 1.4 | C-13: Conversation Persistence broken | 0 | ⏳ |
+| 1.5 | C-14: Material Save intermittent | 0 | ⏳ |
+| 1.6 | C-15: Save Material Error (use-saved-materials.ts:171) | 0 | ⏳ |
+| 1.7 | C-16: Sandbox SecurityError (html-preview.tsx:65) | 0 | ⏳ |
+| 2.1 | C-2: Session Recap + Memory | 1 | ⏳ |
+| 2.2 | C-3: Input/Voice panel sticky | 1 | ⏳ |
+| 2.3 | C-4: Azure OpenAI Costs empty | 1 | ⏳ |
+| 2.4 | C-1: STT Discrepancy | 1 | ⏳ |
+| 2.5 | C-6: Timer + XP Bar in voice panel | 2 | ⏳ |
+| 2.6 | C-7: Demo Accessibility settings | 1 | ⏳ |
+| 2.7 | C-8: Cafe Ambient Audio realistic | 2 | ⏳ |
+| 2.8 | C-10: Demo in frame (not new tab) | 1 | ⏳ |
+| 2.9 | C-11: Triple "Chiamata Terminata" cleanup | 1 | ⏳ |
+| 2.10 | C-17: Fullscreen on Tool Creation | 1 | ⏳ |
+| 2.11 | C-18: PDF Parsing Failure | 1 | ⏳ |
+| 2.12 | C-19: ESC Key Inconsistent | 1 | ⏳ |
+| 2.13 | C-20: Mindmap Not Interactive | 2 | ⏳ |
+| 2.14 | C-21: Summary Missing Export/Convert/Flashcard | 2 | ⏳ |
+| PR | Create PR fix/wave-1-2-bugs | - | ⏳ |
 
 ### Wave 3 (B1, B2, B3)
 
@@ -227,16 +227,16 @@ This plan is split into focused sub-files for token optimization.
 ### Wave 5 (Thor + Roberto)
 
 | # | Task | ✓ | By |
-|---|------|---|-----|
-| 5.1 | Pre-merge QA (bugfixes) | ⏸️ | Thor |
-| 5.2 | Pre-merge QA (welcome) | ⏸️ | Thor |
-| 5.3 | Pre-merge QA (supporti) | ⏸️ | Thor |
-| 5.4 | Merge bugfixes PR | ⏸️ | R |
-| 5.5 | Merge welcome PR | ⏸️ | R |
-| 5.6 | Merge supporti PR | ⏸️ | R |
-| 5.7 | Post-merge integration | ⏸️ | Thor |
-| 5.8 | CHANGELOG update | ⏸️ | C |
-| 5.9 | typecheck+lint+build | ⏸️ | C |
+|---|------|---|---------|
+| 5.1 | Thor: Pre-merge QA (bugfixes PR) | ⏸️ | Thor |
+| 5.2 | Thor: Pre-merge QA (welcome PR) | ⏸️ | Thor |
+| 5.3 | Thor: Pre-merge QA (supporti PR) | ⏸️ | Thor |
+| 5.4 | Merge PR bugfixes | ⏸️ | Roberto |
+| 5.5 | Rebase + Merge PR welcome | ⏸️ | Roberto |
+| 5.6 | Rebase + Merge PR supporti | ⏸️ | Roberto |
+| 5.7 | Thor: Post-merge integration test | ⏸️ | Thor |
+| 5.8 | CHANGELOG update | ⏸️ | Claude |
+| 5.9 | Final: typecheck + lint + build | ⏸️ | Claude |
 
 **Thor Quality Gate Criteria** (automated by thor-quality-assurance-guardian):
 ```bash
@@ -257,15 +257,15 @@ npm run typecheck && npm run lint && npm run build  # All must pass
 
 ## FINAL APPROVAL
 
-| Checkpoint | ✓ | By |
-|------------|---|-----|
-| Piano OK | ⏳ | R |
-| W0 done | ⏳ | R |
-| W1-2 done | ⏳ | R |
-| W3 done | ⏳ | R |
-| W4 done | ⏳ | R |
-| W5 done | ⏳ | R |
-| **RELEASE** | ⏳ | **R** |
+| Checkpoint | Status | Approver |
+|------------|--------|----------|
+| Piano approvato | ⏳ | Roberto |
+| Wave 0 complete | ⏳ | Roberto |
+| Wave 1-2 complete | ⏳ | Roberto |
+| Wave 3 complete | ⏳ | Roberto |
+| Wave 4 complete | ⏳ | Roberto |
+| Wave 5 complete | ⏳ | Roberto |
+| **RELEASE APPROVED** | ⏳ | **Roberto** |
 
 ---
 
