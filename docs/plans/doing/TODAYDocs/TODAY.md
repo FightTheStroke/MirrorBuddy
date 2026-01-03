@@ -190,7 +190,7 @@ This plan is split into focused sub-files for token optimization.
 | 2.12 | C-19: ESC Key Inconsistent | 1 | ✅ |
 | 2.13 | C-20: Mindmap Not Interactive | 2 | ✅ |
 | 2.14 | C-21: Summary Missing Export/Convert/Flashcard | 2 | ✅ |
-| PR | Create PR fix/wave-1-2-bugs | - | ⏳ |
+| PR | PR #106 updated with bugfixes | - | ✅ |
 
 ### Wave 3 (B1, B2, B3)
 
