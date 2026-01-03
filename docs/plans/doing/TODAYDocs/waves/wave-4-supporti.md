@@ -32,55 +32,11 @@ Design a **single consolidated area called "Supporti"** that:
 
 ## Navigation Dimensions
 
-### 1. By Tool Type
-```
-Supporti/
-+-- Mind Maps
-+-- Summaries
-+-- Flashcards
-+-- Quiz
-+-- Interactive Demos
-+-- Documents (PDF, images)
-```
-
-### 2. By Subject/Topic
-```
-Supporti/
-+-- Mathematics
-|   +-- Geometry
-|   +-- Algebra
-+-- History
-|   +-- French Revolution
-|   +-- Roman Empire
-+-- Sciences
-|   +-- Photosynthesis
-+-- [Auto-tagged by AI]
-```
-### 3. By Timeline/Date
-```
-Supporti/
-+-- Today
-+-- This Week
-+-- This Month
-+-- Complete Archive
-+-- [Sortable by creation/modification date]
-```
-### 4. By Maestro/Coach
-```
-Supporti/
-+-- Created with Galileo
-+-- Created with Leonardo
-+-- Created with Marie Curie
-+-- Created by Study Kit (self-generated)
-```
-### 5. By Status
-```
-Supporti/
-+-- To Study
-+-- In Progress
-+-- Completed
-+-- Favorites (bookmarked)
-```
+1. **By Tool Type**: Mind Maps, Summaries, Flashcards, Quiz, Demos, Documents
+2. **By Subject/Topic**: Auto-tagged by AI (Math, History, Sciences, etc.)
+3. **By Timeline/Date**: Today, This Week, This Month, Complete Archive (sortable)
+4. **By Maestro/Coach**: Filter by creator (Galileo, Leonardo, Marie Curie, Study Kit)
+5. **By Status**: To Study, In Progress, Completed, Favorites (bookmarked)
 
 ## Information Architecture
 
@@ -230,19 +186,27 @@ Supporti/
 
 ---
 
-## Evidence Section (per VERIFICATION-PROCESS.md)
+## Evidence Section (Thor Quality Gate)
 
-| Check | Result | Timestamp |
-|-------|--------|-----------|
-| `npm run typecheck` | [ ] PASS / FAIL | |
-| `npm run lint` | [ ] PASS / FAIL | |
-| `npm run build` | [ ] PASS / FAIL | |
-| `grep -ri PLACEHOLDER src/` | [ ] 0 matches | |
-| Manual testing | [ ] Done | |
+| Check | Command | Result | Timestamp |
+|-------|---------|--------|-----------|
+| Typecheck | `npm run typecheck` | [ ] PASS / FAIL | |
+| Lint | `npm run lint` | [ ] PASS / FAIL | |
+| Build | `npm run build` | [ ] PASS / FAIL | |
+| Workarounds | `grep -r "@ts-ignore\|TODO\|HACK" src/` | [ ] 0 matches | |
+| Placeholders | `grep -ri "PLACEHOLDER\|MOCK_DATA" src/` | [ ] 0 matches | |
+| E2E assertions | Manual review of test files | [ ] All tests have expect() | |
+| Zero functionality loss | All existing tools accessible | [ ] Verified | |
+| Redirects working | /archivio, /materiali redirect | [ ] Tested | |
+| Manual testing | All 5 navigation dimensions tested | [ ] Done | |
 
 **Verified by**: _________________ **Date**: _________________
 
-**PR Compliance**: Before creating PR, complete `docs/EXECUTION-CHECKLIST.md`
+**Thor Validation**: Before creating PR, invoke Thor quality gate:
+```bash
+# In worktree wt-supporti, before creating PR:
+# Thor will verify all checks above + non-breaking migration
+```
 
 ---
 

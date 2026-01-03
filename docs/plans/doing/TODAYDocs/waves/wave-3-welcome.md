@@ -173,19 +173,27 @@ Design and implement a welcome experience for MirrorBuddy that functions as a **
 
 ---
 
-## Evidence Section (per VERIFICATION-PROCESS.md)
+## Evidence Section (Thor Quality Gate)
 
-| Check | Result | Timestamp |
-|-------|--------|-----------|
-| `npm run typecheck` | [ ] PASS / FAIL | |
-| `npm run lint` | [ ] PASS / FAIL | |
-| `npm run build` | [ ] PASS / FAIL | |
-| `grep -ri PLACEHOLDER src/` | [ ] 0 matches | |
-| Manual testing | [ ] Done | |
+| Check | Command | Result | Timestamp |
+|-------|---------|--------|-----------|
+| Typecheck | `npm run typecheck` | [ ] PASS / FAIL | |
+| Lint | `npm run lint` | [ ] PASS / FAIL | |
+| Build | `npm run build` | [ ] PASS / FAIL | |
+| Workarounds | `grep -r "@ts-ignore\|TODO\|HACK" src/` | [ ] 0 matches | |
+| Placeholders | `grep -ri "PLACEHOLDER\|MOCK_DATA" src/` | [ ] 0 matches | |
+| E2E assertions | Manual review of test files | [ ] All tests have expect() | |
+| Accessibility | WCAG 2.1 AA compliance check | [ ] PASS | |
+| Responsive | Mobile/tablet/desktop tested | [ ] Done | |
+| Manual testing | All flows tested (voice, visual, skip) | [ ] Done | |
 
 **Verified by**: _________________ **Date**: _________________
 
-**PR Compliance**: Before creating PR, complete `docs/EXECUTION-CHECKLIST.md`
+**Thor Validation**: Before creating PR, invoke Thor quality gate:
+```bash
+# In worktree wt-welcome, before creating PR:
+# Thor will verify all checks above + accessibility compliance
+```
 
 ---
 

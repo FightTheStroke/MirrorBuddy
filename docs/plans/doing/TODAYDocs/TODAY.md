@@ -22,6 +22,15 @@ This plan is split into focused sub-files for token optimization.
 
 **Agent Instructions**: Read only the file(s) relevant to your assigned work.
 
+**Execution Model**: Sequential waves with controlled parallelism
+- Wave 0: Roberto (manual QA + PR merge)
+- Wave 1-2: 1 agent (Claude-A) - sequential bugfixes → **BLOCKS Wave 3-4**
+- Wave 3: Up to 3 agents (B1, B2, B3) - parallel component creation
+- Wave 4: 2 agents (C1, C2) - mixed parallel/sequential
+- **Max concurrent: 3 agents** (adheres to Claude Code limits)
+- **Execution order**: Wave 0 → Wave 1-2 → Wave 3 → Wave 4 → Wave 5
+- **NO parallel execution** of Wave 3 + Wave 4 (would exceed 3-agent limit)
+
 ---
 
 ## EXECUTIVE SUMMARY
@@ -67,20 +76,24 @@ This plan is split into focused sub-files for token optimization.
 
 **Action Required**:
 1. [ ] Complete Manual QA -> [qa/manual-qa.md](qa/manual-qa.md)
-2. [ ] If QA PASS: `gh pr merge 106 --merge`
-3. [ ] If QA FAIL: Create issue for failed items
+2. [ ] If QA PASS: `gh pr merge 106 --merge` -> Proceed to Wave 1
+3. [ ] If QA FAIL:
+   - Document failed items in `docs/issues/qa-failures-$(date +%Y%m%d).md`
+   - Create GitHub issues for each failure
+   - DEFER Wave 1-4 until failures resolved
+   - Re-run QA before proceeding
 
 ---
 
 ## EXECUTION WAVES OVERVIEW
 
-| Wave | Content | File | Status |
-|------|---------|------|--------|
-| Wave 0 | QA + PR merge + Worktrees | This file + [qa/manual-qa.md](qa/manual-qa.md) | [ ] |
-| Wave 1-2 | Bug fixes (10 issues) | [waves/wave-1-2-bugfixes.md](waves/wave-1-2-bugfixes.md) | [ ] |
-| Wave 3 | Welcome Experience | [waves/wave-3-welcome.md](waves/wave-3-welcome.md) | [ ] |
-| Wave 4 | Supporti Consolidation | [waves/wave-4-supporti.md](waves/wave-4-supporti.md) | [ ] |
-| Wave 5 | Merge + Verification | This file | [ ] |
+| Wave | Content | File | Agents | Status |
+|------|---------|------|--------|--------|
+| Wave 0 | QA + PR merge + Worktrees | This file + [qa/manual-qa.md](qa/manual-qa.md) | Roberto | [ ] |
+| Wave 1-2 | Bug fixes (10 issues) | [waves/wave-1-2-bugfixes.md](waves/wave-1-2-bugfixes.md) | 1 (Claude-A) | [ ] BLOCKED by Wave 0 |
+| Wave 3 | Welcome Experience | [waves/wave-3-welcome.md](waves/wave-3-welcome.md) | 3 (B1, B2, B3) | [ ] BLOCKED by Wave 0 |
+| Wave 4 | Supporti Consolidation | [waves/wave-4-supporti.md](waves/wave-4-supporti.md) | 2 (C1, C2) | [ ] BLOCKED by Wave 0 |
+| Wave 5 | Thor + Merge + Verification | This file | Thor + Roberto | [ ] BLOCKED by Wave 1-4 |
 
 ---
 
@@ -142,29 +155,33 @@ This plan is split into focused sub-files for token optimization.
 | 4.11 | E2E tests | [ ] | | Claude-C1 |
 | - | PR feat/supporti-consolidation created | [ ] | | Claude-C1 |
 
-### Wave 5: Merge & Verification
+### Wave 5: Thor Quality Gate + Merge
 
 | Step | Task | Status | Date | Signature |
 |------|------|--------|------|-----------|
-| 5.1 | PLACEHOLDER/MOCK check (0 matches) | [ ] | | Claude |
-| 5.2 | Thor quality gate passed | [ ] | | Thor |
-| 5.3 | EXECUTION-CHECKLIST.md for bugfixes PR | [ ] | | Claude-A |
-| 5.4 | EXECUTION-CHECKLIST.md for welcome PR | [ ] | | Claude-B |
-| 5.5 | EXECUTION-CHECKLIST.md for supporti PR | [ ] | | Claude-C |
-| 5.6 | Merge PR bugfixes | [ ] | | Roberto |
-| 5.7 | Rebase + Merge PR welcome | [ ] | | Roberto |
-| 5.8 | Rebase + Merge PR supporti | [ ] | | Roberto |
-| 5.9 | typecheck | [ ] | | Claude |
-| 5.10 | lint | [ ] | | Claude |
-| 5.11 | build | [ ] | | Claude |
-| 5.12 | E2E suite | [ ] | | Claude |
-| 5.13 | CHANGELOG | [ ] | | Claude |
+| 5.1 | Thor: Pre-merge quality gate (bugfixes PR) | [ ] | | Thor |
+| 5.2 | Thor: Pre-merge quality gate (welcome PR) | [ ] | | Thor |
+| 5.3 | Thor: Pre-merge quality gate (supporti PR) | [ ] | | Thor |
+| 5.4 | Merge PR bugfixes | [ ] | | Roberto |
+| 5.5 | Rebase + Merge PR welcome | [ ] | | Roberto |
+| 5.6 | Rebase + Merge PR supporti | [ ] | | Roberto |
+| 5.7 | Thor: Post-merge integration test | [ ] | | Thor |
+| 5.8 | CHANGELOG update | [ ] | | Claude |
+| 5.9 | Final verification: typecheck + lint + build | [ ] | | Claude |
 
-**Pre-Merge Verification** (per `docs/plans/VERIFICATION-PROCESS.md`):
+**Thor Quality Gate Criteria** (automated by thor-quality-assurance-guardian):
 ```bash
-grep -ri PLACEHOLDER src/ | wc -l  # Must be 0
-grep -ri MOCK_DATA src/ | wc -l    # Must be 0
+# Workaround pattern detection
+grep -r "@ts-ignore\|@ts-expect-error\|eslint-disable\|TODO\|HACK\|FIXME" src/ --include="*.ts" --include="*.tsx" | wc -l  # Must be 0
+
+# Placeholder/Mock detection
+grep -ri "PLACEHOLDER\|MOCK_DATA" src/ --include="*.ts" --include="*.tsx" | wc -l  # Must be 0
+
+# Build verification
 npm run typecheck && npm run lint && npm run build  # All must pass
+
+# E2E assertion verification
+# Thor validates: ogni E2E test ha expect() assertions, non solo waitFor()
 ```
 
 ---
@@ -211,7 +228,9 @@ All must pass. No exceptions.
 
 *Created: 3 January 2026*
 *Author: Claude Opus 4.5*
-*Last Updated: 3 January 2026 (Integrated BUG 28/20 from legacy files - now 10 open issues)*
+*Last Updated: 3 January 2026 (Aligned with Thor + Guardian protocols)*
 *Operating Mode: PLAN -> EXECUTE -> VERIFY -> CLOSE*
 *Worktrees: wt-bugfixes, wt-welcome, wt-supporti*
-*Max Parallel Agents: 3 (per CLAUDE.md)*
+*Max Parallel Agents: 3 (per Claude Code constraints)*
+*Quality Gate: Thor (thor-quality-assurance-guardian)*
+*Compliance: execution.md, guardian.md, file-size-limits.md*
