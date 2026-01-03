@@ -11,6 +11,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { StudyKit } from '@/types/study-kit';
+import { deleteMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
 
 /**
  * GET /api/study-kit/[id]
@@ -126,6 +127,9 @@ export async function DELETE(
         { status: 403 }
       );
     }
+
+    // Delete related materials first (Phase 1 - T-03)
+    await deleteMaterialsFromStudyKit(id);
 
     // Delete study kit
     await prisma.studyKit.delete({

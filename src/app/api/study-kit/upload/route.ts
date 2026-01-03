@@ -11,6 +11,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { processStudyKit } from '@/lib/tools/handlers/study-kit-handler';
+import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for processing
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
         });
 
         // Update study kit with generated materials
-        await prisma.studyKit.update({
+        const updatedKit = await prisma.studyKit.update({
           where: { id: studyKit.id },
           data: {
             status: 'ready',
@@ -106,6 +107,9 @@ export async function POST(request: NextRequest) {
             wordCount: result.wordCount,
           },
         });
+
+        // Sync materials to archive (Phase 1 - T-02)
+        await saveMaterialsFromStudyKit(userId, updatedKit);
 
         logger.info('Study kit processing complete', { studyKitId: studyKit.id });
       } catch (error) {

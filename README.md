@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.jpeg" alt="MirrorBuddy Logo" width="200">
+  <img src="public/logo-mirrorbuddy-full.png" alt="MirrorBuddy Logo" width="200">
 </p>
 
 <h1 align="center">MirrorBuddy</h1>
