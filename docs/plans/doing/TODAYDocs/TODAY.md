@@ -22,8 +22,8 @@ W4  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/11  
 W5  ░░░░░░░░░░░░░░░░░░░░ BLOCKED  0/9   ⏸️  Needs W3+W4
 ```
 
-| Wave | Who | ✓ | Tasks | Start | Done | Time |
-|------|-----|---|-------|-------|------|------|
+| Wave | Who | Status | Tasks | Start | Done | Dur |
+|------|-----|--------|-------|-------|------|-----|
 | **W0**: QA + Plan Update | Roberto | ✅ | 3/3 (100%) | 17:15 | 18:44 | 1h29m |
 | **W1-2**: Bug Fixes (7 P0, 9 P1, 5 P2) | Claude-A | ⏳ | 0/21 (0%) | - | - | - |
 | **W3**: Welcome Experience | B1, B2, B3 | ⏸️ | 0/9 (0%) | - | - | - |
