@@ -4,7 +4,40 @@
 **Owner**: Roberto + Claude
 **Branch**: development
 **Operating Mode**: PLAN -> EXECUTE -> VERIFY -> CLOSE
-**Blockers**: PR #106 in attesa di merge
+**Blockers**: PR #106 NOT merging - extensive QA failures (6/10 FAIL, 10 new bugs discovered)
+
+---
+
+## EXECUTION DASHBOARD
+
+### Overall Progress
+
+| Phase | Status | Progress | Started | Completed | Duration |
+|-------|--------|----------|---------|-----------|----------|
+| **Wave 0** | ✅ COMPLETE | 3/3 (100%) | 3 Gen 2026, 17:15 CET | 3 Gen 2026, 18:44 CET | 1h 29m |
+| **Wave 1-2** | ⏳ READY | 0/21 (0%) | - | - | - |
+| **Wave 3** | ⏸️ BLOCKED | 0/9 (0%) | - | - | - |
+| **Wave 4** | ⏸️ BLOCKED | 0/11 (0%) | - | - | - |
+| **Wave 5** | ⏸️ BLOCKED | 0/9 (0%) | - | - | - |
+| **TOTAL** | 🔄 IN PROGRESS | 3/53 (6%) | 3 Gen 2026 | - | - |
+
+### Wave 0: QA & Planning (COMPLETE)
+
+| Task | Status | Started | Completed | Duration | Owner |
+|------|--------|---------|-----------|----------|-------|
+| Manual QA execution (10 items) | ✅ | 17:15 CET | 18:30 CET | 1h 15m | Roberto |
+| Update plan with QA findings | ✅ | 18:30 CET | 18:44 CET | 14m | Claude |
+| Decision: NOT merge PR #106 | ✅ | 18:30 CET | 18:30 CET | - | Roberto |
+
+**Result**: 6/10 QA FAIL, 10 new bugs discovered, all added to Wave 1-2
+
+### Wave 1-2: Bug Fixes (READY - 21 bugs)
+
+**Status**: Ready to execute
+**P0 Critical**: 7 bugs (33%)
+**P1 High**: 9 bugs (43%)
+**P2 Medium**: 5 bugs (24%)
+**Blocking**: Wave 3 and Wave 4
 
 ---
 
@@ -35,15 +68,17 @@ This plan is split into focused sub-files for token optimization.
 
 ## EXECUTIVE SUMMARY
 
-| Category | Count | Action |
+| Category | Count | Status |
 |----------|-------|--------|
-| Code-verified fixes | 8 | None (verified working) |
-| Manual QA required | 10 | Execute manual tests |
-| Open issues (unfixed) | 10 | Requires development |
+| Code-verified fixes | 8 | Verified working (Section A) |
+| Manual QA executed | 10/10 | COMPLETE - 1 PASS, 3 partial, 6 FAIL |
+| Open bugs (Wave 1-2) | 21 | 11 initial + 10 QA-discovered |
 | New initiatives | 2 | Welcome Experience + Supporti |
-| PR #106 | 1 | Merge after QA |
+| PR #106 | 1 | NOT MERGING - QA failures |
 
-**ZERO DEFERRED** - All requested work is in the execution plan.
+**QA RESULT**: 6/10 FAIL, 10 new bugs discovered (3 Gennaio 2026, 18:30 CET)
+**DECISION**: Stay on development, execute complete TODAY.md plan with all bugs
+**ZERO DEFERRED** - All discovered issues tracked in Wave 1-2
 
 ---
 
@@ -68,20 +103,39 @@ This plan is split into focused sub-files for token optimization.
 
 | Field | Value |
 |-------|-------|
-| State | **OPEN** |
+| State | **OPEN (NOT MERGING)** |
 | URL | https://github.com/Roberdan/ConvergioEdu/pull/106 |
-| Additions | 8453 |
-| Deletions | 1402 |
-| Files | 100+ |
+| QA Result | **FAILED - 6/10 items failed** |
+| Decision | **Stay on development, do NOT merge** |
 
-**Action Required**:
-1. [ ] Complete Manual QA -> [qa/manual-qa.md](qa/manual-qa.md)
-2. [ ] If QA PASS: `gh pr merge 106 --merge` -> Proceed to Wave 1
-3. [ ] If QA FAIL:
-   - Document failed items in `docs/issues/qa-failures-$(date +%Y%m%d).md`
-   - Create GitHub issues for each failure
-   - DEFER Wave 1-4 until failures resolved
-   - Re-run QA before proceeding
+**QA Execution Complete** (3 Gennaio 2026, 18:30 CET):
+- [x] Manual QA executed -> [qa/manual-qa.md](qa/manual-qa.md)
+- QA FAIL: 6/10 complete failures, 3/10 partial pass, 1/10 pass
+- 10 new bugs discovered (C-12 through C-21)
+- **Action**: All bugs added to Wave 1-2, execute complete plan on development branch
+- PR #106 will remain open, NOT merged until all work complete and user-approved
+
+---
+
+## SEZIONE C: QA-DISCOVERED BUGS (Found during Wave 0)
+
+| Bug | Description | Priority | QA Item |
+|-----|-------------|----------|---------|
+| BUG-NEW-1 (C-11) | Triple "Chiamata Terminata" TTS on voice cleanup | P1 | Skip button |
+| BUG 7 (C-12) | Mindmap completely flat, no hierarchy | P0 | QA-2 FAIL |
+| BUG 11 (C-13) | Conversation persistence broken + console error | P0 | QA-4 FAIL |
+| BUG 13 (C-14) | Material save intermittent, no save button | P0 | QA-5 FAIL |
+| BUG-NEW-2 (C-15) | Failed to save material error at use-saved-materials.ts:171 | P0 | QA-5 error |
+| BUG-NEW-3 (C-16) | Sandbox SecurityError at html-preview.tsx:65 | P0 | QA-5 error |
+| BUG 8 (C-17) | Fullscreen not activating on tool creation | P1 | QA-3 FAIL |
+| BUG 19 (C-18) | PDF parsing completely failed | P1 | QA-7 FAIL |
+| BUG 27 (C-19) | ESC key inconsistent across app | P1 | QA-10 FAIL |
+| BUG 5 (C-20) | Mindmap nodes not interactive/expandable | P2 | QA-1 partial |
+| BUG 26 (C-21) | Summary missing Export/Convert/Flashcard features | P2 | QA-9 partial |
+
+**Discovered**: 3 Gennaio 2026, 17:15-18:30 CET (during Manual QA execution)
+**Total**: 10 new bugs (5 P0, 3 P1, 2 P2) added to Wave 1-2
+**Details**: See [wave-1-2-bugfixes.md](waves/wave-1-2-bugfixes.md) for full specifications
 
 ---
 
@@ -89,10 +143,10 @@ This plan is split into focused sub-files for token optimization.
 
 | Wave | Content | File | Agents | Status |
 |------|---------|------|--------|--------|
-| Wave 0 | QA + PR merge + Worktrees | This file + [qa/manual-qa.md](qa/manual-qa.md) | Roberto | [ ] |
-| Wave 1-2 | Bug fixes (10 issues) | [waves/wave-1-2-bugfixes.md](waves/wave-1-2-bugfixes.md) | 1 (Claude-A) | [ ] BLOCKED by Wave 0 |
-| Wave 3 | Welcome Experience | [waves/wave-3-welcome.md](waves/wave-3-welcome.md) | 3 (B1, B2, B3) | [ ] BLOCKED by Wave 0 |
-| Wave 4 | Supporti Consolidation | [waves/wave-4-supporti.md](waves/wave-4-supporti.md) | 2 (C1, C2) | [ ] BLOCKED by Wave 0 |
+| Wave 0 | QA + Plan Update | This file + [qa/manual-qa.md](qa/manual-qa.md) | Roberto | [COMPLETE] |
+| Wave 1-2 | Bug fixes (21 issues: 11 initial + 10 QA-discovered) | [waves/wave-1-2-bugfixes.md](waves/wave-1-2-bugfixes.md) | 1 (Claude-A) | [ ] READY |
+| Wave 3 | Welcome Experience | [waves/wave-3-welcome.md](waves/wave-3-welcome.md) | 3 (B1, B2, B3) | [ ] BLOCKED by Wave 1-2 |
+| Wave 4 | Supporti Consolidation | [waves/wave-4-supporti.md](waves/wave-4-supporti.md) | 2 (C1, C2) | [ ] BLOCKED by Wave 1-2 |
 | Wave 5 | Thor + Merge + Verification | This file | Thor + Roberto | [ ] BLOCKED by Wave 1-4 |
 
 ---
@@ -103,25 +157,36 @@ This plan is split into focused sub-files for token optimization.
 
 | Step | Task | Status | Date | Signature |
 |------|------|--------|------|-----------|
-| 0.1 | Manual QA (10 items) | [ ] | | Roberto |
-| 0.2 | Merge PR #106 | [ ] | | Roberto |
-| 0.3 | Create worktrees | [ ] | | Roberto |
+| 0.1 | Manual QA (10 items) | [x] | 3 Gen 2026, 18:30 CET | Roberto |
+| 0.2 | Update plan with QA findings | [x] | 3 Gen 2026, 18:44 CET | Claude |
+| 0.3 | Decision: NOT merge PR #106 | [x] | 3 Gen 2026, 18:30 CET | Roberto |
 
-### Wave 1-2: Bug Fixes (Claude-A)
+### Wave 1-2: Bug Fixes (Claude-A) - 21 bugs total
 
-| Step | Task | Status | Date | Signature |
-|------|------|--------|------|-----------|
-| 1.1 | C-5: Storico per Coach/Buddy (P0) | [ ] | | Claude-A |
-| 1.2 | C-9: Header Counters Real-time (P0) | [ ] | | Claude-A |
-| 2.1 | C-2: Session Recap + Memory (P1) | [ ] | | Claude-A |
-| 2.2 | C-3: Layout sticky (P1) | [ ] | | Claude-A |
-| 2.3 | C-4: Azure costs (P1) | [ ] | | Claude-A |
-| 2.4 | C-1: STT Discrepancy (P1) | [ ] | | Claude-A |
-| 2.5 | C-6: Timer + XP Bar (P2) | [ ] | | Claude-A |
-| 2.6 | C-7: Demo Accessibility (P1) | [ ] | | Claude-A |
-| 2.7 | C-8: Cafe Audio Realistico (P2) | [ ] | | Claude-A |
-| 2.8 | C-10: Demo in frame (P1) | [ ] | | Claude-A |
-| - | PR fix/wave-1-2-bugs created | [ ] | | Claude-A |
+| Step | Task | Status | Started | Completed | Duration |
+|------|------|--------|---------|-----------|----------|
+| 1.1 | C-5: History per Coach/Buddy (P0) | [ ] | | | |
+| 1.2 | C-9: Header Counters (P0) | [ ] | | | |
+| 1.3 | C-12: Mindmap Hierarchy (P0, QA) | [ ] | | | |
+| 1.4 | C-13: Conversation Persistence (P0, QA) | [ ] | | | |
+| 1.5 | C-14: Material Save (P0, QA) | [ ] | | | |
+| 1.6 | C-15: Save Material Error (P0, QA) | [ ] | | | |
+| 1.7 | C-16: Sandbox SecurityError (P0, QA) | [ ] | | | |
+| 2.1 | C-2: Session Recap + Memory (P1) | [ ] | | | |
+| 2.2 | C-3: Layout sticky (P1) | [ ] | | | |
+| 2.3 | C-4: Azure costs (P1) | [ ] | | | |
+| 2.4 | C-1: STT Discrepancy (P1) | [ ] | | | |
+| 2.5 | C-6: Timer + XP Bar (P2) | [ ] | | | |
+| 2.6 | C-7: Demo Accessibility (P1) | [ ] | | | |
+| 2.7 | C-8: Cafe Audio (P2) | [ ] | | | |
+| 2.8 | C-10: Demo in frame (P1) | [ ] | | | |
+| 2.9 | C-11: Triple voice cleanup (P1, QA) | [ ] | | | |
+| 2.10 | C-17: Fullscreen on Tool Creation (P1, QA) | [ ] | | | |
+| 2.11 | C-18: PDF Parsing (P1, QA) | [ ] | | | |
+| 2.12 | C-19: ESC Key Inconsistent (P1, QA) | [ ] | | | |
+| 2.13 | C-20: Tool Not Interactive (P2, QA) | [ ] | | | |
+| 2.14 | C-21: Summary Missing Features (P2, QA) | [ ] | | | |
+| - | PR fix/wave-1-2-bugs created | [ ] | | | |
 
 ### Wave 3: Welcome Experience (Claude-B team)
 
