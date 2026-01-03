@@ -12,12 +12,15 @@
  *   description?: string;
  *   type: 'simulation' | 'animation' | 'interactive';
  *   content: unknown;
+ *   code?: string; // HTML/CSS/JS code for the demo
  * }
  */
 
-import { motion } from 'framer-motion';
-import { PlayCircle, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { PlayCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { HTMLPreview } from '@/components/education/html-preview';
 import type { BaseRendererProps } from './index';
 
 interface DemoData {
@@ -26,6 +29,38 @@ interface DemoData {
   type?: 'simulation' | 'animation' | 'interactive';
   content?: unknown;
   previewImage?: string;
+  code?: string; // HTML/CSS/JS code for the demo
+  html?: string;
+  css?: string;
+  js?: string;
+}
+
+/**
+ * Build HTML code from separate html/css/js parts or use existing code
+ */
+function buildDemoCode(demoData: DemoData): string | null {
+  // If we have a direct code property, use it
+  if (demoData.code) {
+    return demoData.code;
+  }
+
+  // If we have html/css/js parts, combine them
+  if (demoData.html || demoData.css || demoData.js) {
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>${demoData.css || ''}</style>
+</head>
+<body>
+  ${demoData.html || ''}
+  <script>${demoData.js || ''}</script>
+</body>
+</html>`;
+  }
+
+  return null;
 }
 
 /**
@@ -33,6 +68,7 @@ interface DemoData {
  */
 export function DemoRenderer({ data, className }: BaseRendererProps) {
   const demoData = data as DemoData;
+  const [showDemo, setShowDemo] = useState(false);
 
   const title = demoData.title || 'Demo Interattiva';
   const description = demoData.description || 'Clicca per avviare la demo';
@@ -44,57 +80,103 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
     interactive: 'Interattivo',
   };
 
+  const demoCode = buildDemoCode(demoData);
+  const hasCode = !!demoCode;
+
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden',
-        className
-      )}
-    >
-      <div className="p-4 bg-gradient-to-r from-accent-themed/10 to-purple-500/10">
-        <div className="flex items-center gap-3">
-          <div className="p-3 rounded-full bg-accent-themed/20">
-            <PlayCircle className="w-8 h-8 text-accent-themed" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-              {title}
-            </h3>
-            <span className="text-sm text-slate-500">{typeLabels[type]}</span>
+    <>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className={cn(
+          'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden',
+          className
+        )}
+      >
+        <div className="p-4 bg-gradient-to-r from-accent-themed/10 to-purple-500/10">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-full bg-accent-themed/20">
+              <PlayCircle className="w-8 h-8 text-accent-themed" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                {title}
+              </h3>
+              <span className="text-sm text-slate-500">{typeLabels[type]}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="p-4 bg-white dark:bg-slate-800">
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-          {description}
-        </p>
+        <div className="p-4 bg-white dark:bg-slate-800">
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            {description}
+          </p>
 
-        {demoData.previewImage && (
-          <div className="mb-4 rounded-lg overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={demoData.previewImage}
-              alt={`Anteprima di ${title}`}
-              className="w-full h-48 object-cover"
-            />
-          </div>
+          {demoData.previewImage && (
+            <div className="mb-4 rounded-lg overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={demoData.previewImage}
+                alt={`Anteprima di ${title}`}
+                className="w-full h-48 object-cover"
+              />
+            </div>
+          )}
+
+          <button
+            className={cn(
+              'w-full flex items-center justify-center gap-2 p-3 rounded-lg transition-all',
+              hasCode
+                ? 'bg-accent-themed text-white hover:brightness-110'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-500 cursor-not-allowed'
+            )}
+            onClick={() => hasCode && setShowDemo(true)}
+            disabled={!hasCode}
+          >
+            <PlayCircle className="w-5 h-5" />
+            {hasCode ? 'Avvia Demo' : 'Demo non disponibile'}
+          </button>
+        </div>
+      </motion.div>
+
+      {/* Demo Modal */}
+      <AnimatePresence>
+        {showDemo && demoCode && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setShowDemo(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative w-full max-w-4xl max-h-[90vh] bg-white dark:bg-slate-900 rounded-xl shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setShowDemo(false)}
+                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                aria-label="Chiudi demo"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {/* Demo content */}
+              <HTMLPreview
+                code={demoCode}
+                title={title}
+                description={description}
+                onClose={() => setShowDemo(false)}
+                allowSave={false}
+              />
+            </motion.div>
+          </motion.div>
         )}
-
-        <button
-          className="w-full flex items-center justify-center gap-2 p-3 rounded-lg bg-accent-themed text-white hover:brightness-110 transition-all"
-          onClick={() => {
-            // NOTE: Placeholder - full implementation would render content in modal/iframe
-            alert(`Demo: ${demoData.title || 'Untitled'}\nType: ${demoData.type || 'interactive'}`);
-          }}
-        >
-          <PlayCircle className="w-5 h-5" />
-          Avvia Demo
-          <ExternalLink className="w-4 h-4 ml-auto" />
-        </button>
-      </div>
-    </motion.div>
+      </AnimatePresence>
+    </>
   );
 }

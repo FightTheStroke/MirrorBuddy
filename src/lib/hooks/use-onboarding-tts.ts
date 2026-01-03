@@ -149,9 +149,10 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
   );
 
   /**
-   * Speak text using Web Speech API (fallback)
+   * Speak text using Web Speech API (DEPRECATED - BUG 1 FIX)
+   * Kept for reference but no longer used to avoid voice switching
    */
-  const speakWebSpeech = useCallback((textToSpeak: string) => {
+  const _speakWebSpeech = useCallback((textToSpeak: string) => {
     if (!window.speechSynthesis) {
       setState((prev) => ({
         ...prev,
@@ -202,7 +203,8 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
 
 
   /**
-   * Main speak function - OpenAI TTS preferred, Web Speech as fallback
+   * Main speak function - OpenAI TTS only (BUG 1 FIX: no Web Speech fallback)
+   * We prefer silence over a jarring voice switch during onboarding
    */
   const speak = useCallback(
     async (textToSpeak: string) => {
@@ -210,15 +212,15 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
 
       stop(); // Stop any existing playback
 
-      // Always try OpenAI TTS first (Melissa's real voice)
+      // BUG 1 FIX: Only use OpenAI TTS (Melissa's real voice)
+      // Do NOT fallback to Web Speech - it sounds different and causes jarring voice switching
       const success = await speakOpenAI(textToSpeak);
-      if (success) return;
-
-      // If OpenAI failed (not configured or error), fallback to Web Speech
-      logger.debug('[OnboardingTTS] OpenAI failed, using Web Speech fallback');
-      speakWebSpeech(textToSpeak);
+      if (!success) {
+        // Log but don't fallback - silence is better than wrong voice
+        logger.warn('[OnboardingTTS] OpenAI TTS failed, no audio will play (avoiding voice switch)');
+      }
     },
-    [speakOpenAI, speakWebSpeech, stop]
+    [speakOpenAI, stop]
   );
 
   // Auto-speak on mount/text change

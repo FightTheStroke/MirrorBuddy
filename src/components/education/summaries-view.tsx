@@ -29,6 +29,7 @@ import {
   convertSummaryToMindmap,
   generateFlashcardsFromSummary,
 } from '@/lib/tools/summary-export';
+import { toast } from '@/components/ui/toast';
 import type { SummaryData } from '@/types/tools';
 import type { Maestro } from '@/types';
 import { useUIStore } from '@/lib/stores/app-store';
@@ -68,17 +69,25 @@ export function SummariesView({ className }: SummariesViewProps) {
   }, []);
 
   // Handle convert to mindmap
-  // NOTE: Placeholder for future integration with Knowledge Hub
+  // BUG 29 FIX: Replace alert with toast notification
   const handleConvertToMindmap = useCallback((data: SummaryData) => {
-    const _result = convertSummaryToMindmap(data);
-    alert('Mappa mentale creata! (Funzionalità in sviluppo)');
+    const result = convertSummaryToMindmap(data);
+    toast.success(
+      'Mappa mentale generata!',
+      `Creati ${result.nodes.length} nodi da "${result.topic}". Salvataggio in arrivo...`
+    );
+    // TODO: Save to Knowledge Hub when API is ready
   }, []);
 
   // Handle generate flashcards
-  // NOTE: Placeholder for future integration with Knowledge Hub
+  // BUG 29 FIX: Replace alert with toast notification
   const handleGenerateFlashcards = useCallback((data: SummaryData) => {
     const result = generateFlashcardsFromSummary(data);
-    alert(`${result.cards.length} flashcard create! (Funzionalità in sviluppo)`);
+    toast.success(
+      'Flashcard generate!',
+      `Create ${result.cards.length} flashcard da "${result.topic}". Salvataggio in arrivo...`
+    );
+    // TODO: Save to Knowledge Hub when API is ready
   }, []);
 
   return (

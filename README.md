@@ -486,6 +486,8 @@ For developers working on voice features, see:
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
+**Important:** All PRs must follow the [Execution Checklist](docs/EXECUTION-CHECKLIST.md). PRs without a completed checklist will be rejected.
+
 This project was born for inclusion. Every contribution must be:
 - Keyboard accessible
 - Screen reader compatible
