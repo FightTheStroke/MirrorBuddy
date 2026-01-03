@@ -13,7 +13,7 @@
 ```
 17:15 ──────────────────────────────────────────────────► NOW  │  ALL COMPLETE
        ┃████████████████████████████████████████████████┃
-       W0-W6 ALL DONE                62/62 tasks (100%)
+       W0-W7 ALL DONE                73/73 tasks (100%)
 
 W0  ████████████████████ DONE     3/3   ✅  17:15→18:44  1h29m
 W1-2████████████████████ DONE    21/21  ✅  P0:7✅ P1:9✅ P2:5✅
@@ -21,6 +21,7 @@ W3  ████████████████████ DONE     9/9   
 W4  ████████████████████ DONE    11/11  ✅  Supporti + E2E (e8119ba)
 W5  ████████████████████ DONE     9/9   ✅  Thor QA + Final (23dc31d)
 W6  ████████████████████ DONE     9/9   ✅  Tech Debt (67ff79b)
+W7  ████████████████████ DONE    11/11  ✅  UI Consolidation
 ```
 
 | Wave | Who | Status | Tasks | Start | Done | Dur |
@@ -31,7 +32,8 @@ W6  ████████████████████ DONE     9/9   
 | **W4**: Supporti Consolidation | Claude-A | ✅ | 11/11 (100%) | 3 Gen | 3 Gen | - |
 | **W5**: Thor QA + Final | Thor + Claude | ✅ | 9/9 (100%) | 3 Gen | 3 Gen | - |
 | **W6**: Tech Debt Cleanup | Claude | ✅ | 9/9 (100%) | 3 Gen | 3 Gen | - |
-| **TOTAL**: Full Plan | **All** | ✅ | **62/62 (100%)** | 3 Gen | 3 Gen | - |
+| **W7**: UI Consolidation | Claude | ✅ | 11/11 (100%) | 3 Gen | 3 Gen | - |
+| **TOTAL**: Full Plan | **All** | ✅ | **73/73 (100%)** | 3 Gen | 3 Gen | - |
 
 ### Wave 0: QA & Planning (COMPLETE)
 
@@ -154,7 +156,8 @@ This plan is split into focused sub-files for token optimization.
 | 3 | Welcome | Claude-A | ✅ | [wave-3-welcome.md](waves/wave-3-welcome.md) |
 | 4 | Supporti | Claude-A | ✅ | [wave-4-supporti.md](waves/wave-4-supporti.md) |
 | 5 | Thor + Final | Thor+Claude | ✅ | This file |
-| 6 | Tech Debt | Claude | 🔄 | This file |
+| 6 | Tech Debt | Claude | ✅ | This file |
+| 7 | UI Consolidation | Claude | ✅ | This file |
 
 ---
 
@@ -265,6 +268,24 @@ Thor QA found 39 pre-existing violations in legacy code:
 | 6.7 | Resolve TODO: summaries-view.tsx:90 | ✅ | Claude |
 | 6.8 | Verify all tests pass | ✅ | Claude |
 | 6.9 | Verify CI green | ✅ | Claude |
+
+### Wave 7 (Claude) - UI Consolidation
+
+Post-plan work to consolidate all tools into unified sidebar navigation:
+
+| # | Task | ✓ | By |
+|---|------|---|-----|
+| 7.1 | Integrate Study Kit inline (remove route navigation) | ✅ | Claude |
+| 7.2 | Integrate Supporti inline (remove route navigation) | ✅ | Claude |
+| 7.3 | Integrate Archivio into sidebar | ✅ | Claude |
+| 7.4 | Integrate Genitori inline (remove route navigation) | ✅ | Claude |
+| 7.5 | Add lazy loading for new inline views | ✅ | Claude |
+| 7.6 | Fix QuizRenderer to support both tool and KnowledgeHub formats | ✅ | Claude |
+| 7.7 | Add markdown rendering to StudyKitViewer | ✅ | Claude |
+| 7.8 | Separate accessibility settings parent/student | ✅ | Claude |
+| 7.9 | Add AccessibilityTab to GenitoriView | ✅ | Claude |
+| 7.10 | Update ARCHITECTURE.md with context system | ✅ | Claude |
+| 7.11 | Update guide avatars (andrea.png, roberto.png, sofia.png) | ✅ | Claude |
 
 **Thor Quality Gate Criteria** (automated by thor-quality-assurance-guardian):
 ```bash

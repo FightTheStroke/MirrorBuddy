@@ -8,7 +8,11 @@ interface AccessibilityProviderProps {
 }
 
 export function AccessibilityProvider({ children }: AccessibilityProviderProps) {
-  const { settings } = useAccessibilityStore();
+  const getActiveSettings = useAccessibilityStore((state) => state.getActiveSettings);
+  const currentContext = useAccessibilityStore((state) => state.currentContext);
+
+  // Get settings based on current context (student or parent)
+  const settings = getActiveSettings();
 
   // Apply accessibility classes to document
   useEffect(() => {
@@ -99,7 +103,7 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     return () => {
       motionMediaQuery.removeEventListener('change', syncWithSystem);
     };
-  }, [settings]);
+  }, [settings, currentContext]);
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -142,7 +146,8 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
 
 // Hook for TTS (Text-to-Speech)
 export function useTTS() {
-  const { settings } = useAccessibilityStore();
+  const getActiveSettings = useAccessibilityStore((state) => state.getActiveSettings);
+  const settings = getActiveSettings();
 
   const speak = (text: string) => {
     if (!settings.ttsEnabled || typeof window === 'undefined') return;
