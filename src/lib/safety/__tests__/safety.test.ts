@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Safety Module Test Suite
+ * MirrorBuddy Safety Module Test Suite
  * Adversarial testing for child protection guardrails
  *
  * This suite tests all safety modules against:

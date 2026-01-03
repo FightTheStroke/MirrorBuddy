@@ -109,7 +109,7 @@ test.describe('Permission Persistence', () => {
 
     // Check if localStorage has permission cache
     const cachedPermissions = await page.evaluate(() => {
-      return localStorage.getItem('convergio-permissions-cache');
+      return localStorage.getItem('mirrorbuddy-permissions-cache');
     });
 
     // Permission cache may or may not exist yet
@@ -133,7 +133,7 @@ test.describe('Permission Persistence', () => {
 
     // Check cache structure
     const cachedPermissions = await page.evaluate(() => {
-      const cached = localStorage.getItem('convergio-permissions-cache');
+      const cached = localStorage.getItem('mirrorbuddy-permissions-cache');
       return cached ? JSON.parse(cached) : null;
     });
 

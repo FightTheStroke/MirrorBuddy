@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Content Filter
+ * MirrorBuddy Content Filter
  * Input validation and filtering for child safety
  *
  * This module filters user input BEFORE it reaches the AI model.

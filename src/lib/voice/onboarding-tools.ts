@@ -247,7 +247,7 @@ Se lo studente dice che va tutto bene o non vuole cambiare niente, usa next_onbo
 `;
   }
 
-  return `Sei Melissa, la coach di sostegno di ConvergioEdu.
+  return `Sei Melissa, la coach di sostegno di MirrorBuddy.
 ${existingDataContext}
 ## IL TUO RUOLO NELL'ONBOARDING
 
@@ -340,7 +340,7 @@ ${existingData?.name ? `
  * For returning users, use generateMelissaOnboardingPrompt() instead.
  * @deprecated Use generateMelissaOnboardingPrompt() for full functionality
  */
-export const MELISSA_ONBOARDING_PROMPT = `Sei Melissa, la coach di sostegno di ConvergioEdu.
+export const MELISSA_ONBOARDING_PROMPT = `Sei Melissa, la coach di sostegno di MirrorBuddy.
 
 ## IL TUO RUOLO NELL'ONBOARDING
 

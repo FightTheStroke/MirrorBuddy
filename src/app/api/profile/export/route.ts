@@ -370,7 +370,7 @@ function generateProfileHTML(profile: {
   </section>
 
   <footer>
-    <p>Questo profilo è stato generato da ConvergioEdu</p>
+    <p>Questo profilo è stato generato da MirrorBuddy</p>
     <p>La Scuola Che Vorrei - Supporto personalizzato per studenti con differenze di apprendimento</p>
   </footer>
 </body>

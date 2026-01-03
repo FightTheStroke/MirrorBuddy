@@ -2,7 +2,7 @@
 
 ## Overview
 
-ConvergioEdu is an AI-powered educational platform designed for students with learning differences (dyslexia, ADHD, autism, cerebral palsy). Given our vulnerable user base of minors, security and privacy are paramount concerns.
+MirrorBuddy is an AI-powered educational platform designed for students with learning differences (dyslexia, ADHD, autism, cerebral palsy). Given our vulnerable user base of minors, security and privacy are paramount concerns.
 
 ## Supported Versions
 
@@ -82,7 +82,7 @@ Instead, please report vulnerabilities through one of these channels:
 
 ### In Scope
 
-- ConvergioEdu web application (this repository)
+- MirrorBuddy web application (this repository)
 - API endpoints under `/api/*`
 - Authentication and session management
 - Student data handling
@@ -119,7 +119,7 @@ We follow a coordinated disclosure approach:
 
 ## Recognition
 
-We appreciate security researchers who help keep ConvergioEdu safe. With your permission, we will:
+We appreciate security researchers who help keep MirrorBuddy safe. With your permission, we will:
 
 - Acknowledge your contribution in our release notes
 - Add you to our Security Hall of Fame (coming soon)

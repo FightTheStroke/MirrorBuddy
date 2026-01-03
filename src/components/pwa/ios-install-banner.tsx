@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { X, Share, Plus } from 'lucide-react';
 import { isIOSSafariBrowser } from '@/lib/push/vapid';
 
@@ -27,8 +28,14 @@ interface IOSInstallBannerProps {
  */
 export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBannerProps) {
   const [visible, setVisible] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
+    // Never show on welcome/onboarding page - it interferes with the flow
+    if (pathname === '/welcome') {
+      return;
+    }
+
     // Only show on iOS Safari (not installed as PWA)
     if (!isIOSSafariBrowser() && !forceShow) {
       return;
@@ -47,7 +54,7 @@ export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBan
     // Show banner after short delay for better UX
     const timer = setTimeout(() => setVisible(true), 2000);
     return () => clearTimeout(timer);
-  }, [forceShow]);
+  }, [forceShow, pathname]);
 
   const handleDismiss = () => {
     localStorage.setItem(BANNER_DISMISSED_KEY, new Date().toISOString());
@@ -66,7 +73,7 @@ export function IOSInstallBanner({ forceShow = false, onDismiss }: IOSInstallBan
             <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
               <Plus className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-white font-semibold">Installa ConvergioEdu</h3>
+            <h3 className="text-white font-semibold">Installa MirrorBuddy</h3>
           </div>
           <button
             onClick={handleDismiss}

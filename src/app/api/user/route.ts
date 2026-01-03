@@ -11,7 +11,7 @@ import { logger } from '@/lib/logger';
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('convergio-user-id')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
       // Create new user for local mode
@@ -25,7 +25,7 @@ export async function GET() {
       });
 
       // Set cookie (1 year expiry)
-      cookieStore.set('convergio-user-id', user.id, {
+      cookieStore.set('mirrorbuddy-user-id', user.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -57,7 +57,7 @@ export async function GET() {
         },
       });
 
-      cookieStore.set('convergio-user-id', user.id, {
+      cookieStore.set('mirrorbuddy-user-id', user.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

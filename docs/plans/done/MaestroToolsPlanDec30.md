@@ -11,7 +11,7 @@
 **Apri Kitty, poi copia e incolla QUESTO:**
 
 ```
-Esegui il piano in /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MaestroToolsPlanDec30.md - Sei il COORDINATORE (CLAUDE 1). Workflow: 1) Crea branch e worktree per ogni Claude (vedi sezione GIT WORKFLOW), 2) Lancia 4 Claude con claude-parallel.sh, 3) Invia ogni Claude al suo worktree, 4) Invia i task, 5) Monitora e sincronizza i gate, 6) Quando ogni Claude finisce deve fare commit+push+PR, 7) Tu fai merge delle PR in ordine, 8) Cleanup worktree e branch. Segui le regole BRUTAL MODE. Mai chiudere issue senza prova.
+Esegui il piano in /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MaestroToolsPlanDec30.md - Sei il COORDINATORE (CLAUDE 1). Workflow: 1) Crea branch e worktree per ogni Claude (vedi sezione GIT WORKFLOW), 2) Lancia 4 Claude con claude-parallel.sh, 3) Invia ogni Claude al suo worktree, 4) Invia i task, 5) Monitora e sincronizza i gate, 6) Quando ogni Claude finisce deve fare commit+push+PR, 7) Tu fai merge delle PR in ordine, 8) Cleanup worktree e branch. Segui le regole BRUTAL MODE. Mai chiudere issue senza prova.
 ```
 
 **Tutto qui. CLAUDE 1 leggerà il piano e farà il resto.**
@@ -39,7 +39,7 @@ echo $KITTY_PID  # Deve stampare un numero
 #### STEP 0: Setup Worktrees (CLAUDE 1 fa questo PRIMA di tutto)
 
 ```bash
-cd /Users/roberdan/GitHub/ConvergioEdu
+cd /Users/roberdan/GitHub/MirrorBuddy
 
 # Crea branch per ogni fase
 git checkout MirrorBuddy
@@ -48,9 +48,9 @@ git branch feature/tools-phase2-ui
 git branch feature/tools-phase3-integration
 
 # Crea worktree per ogni Claude
-git worktree add ../ConvergioEdu-C2 feature/tools-phase1-backend
-git worktree add ../ConvergioEdu-C3 feature/tools-phase2-ui
-git worktree add ../ConvergioEdu-C4 feature/tools-phase3-integration
+git worktree add ../MirrorBuddy-C2 feature/tools-phase1-backend
+git worktree add ../MirrorBuddy-C3 feature/tools-phase2-ui
+git worktree add ../MirrorBuddy-C4 feature/tools-phase3-integration
 
 # Verifica
 git worktree list
@@ -60,10 +60,10 @@ git worktree list
 
 | Claude | Worktree | Branch | PR |
 |--------|----------|--------|-----|
-| CLAUDE 1 | `/Users/roberdan/GitHub/ConvergioEdu` | MirrorBuddy | Coordina solo |
-| CLAUDE 2 | `/Users/roberdan/GitHub/ConvergioEdu-C2` | feature/tools-phase1-backend | PR #1 |
-| CLAUDE 3 | `/Users/roberdan/GitHub/ConvergioEdu-C3` | feature/tools-phase2-ui | PR #2 |
-| CLAUDE 4 | `/Users/roberdan/GitHub/ConvergioEdu-C4` | feature/tools-phase3-integration | PR #3 |
+| CLAUDE 1 | `/Users/roberdan/GitHub/MirrorBuddy` | MirrorBuddy | Coordina solo |
+| CLAUDE 2 | `/Users/roberdan/GitHub/MirrorBuddy-C2` | feature/tools-phase1-backend | PR #1 |
+| CLAUDE 3 | `/Users/roberdan/GitHub/MirrorBuddy-C3` | feature/tools-phase2-ui | PR #2 |
+| CLAUDE 4 | `/Users/roberdan/GitHub/MirrorBuddy-C4` | feature/tools-phase3-integration | PR #3 |
 
 ---
 
@@ -76,18 +76,18 @@ git worktree list
 
 **STEP 2: Invia ogni Claude al suo worktree**
 ```bash
-kitty @ send-text --match title:Claude-2 "cd /Users/roberdan/GitHub/ConvergioEdu-C2" && kitty @ send-key --match title:Claude-2 Return
-kitty @ send-text --match title:Claude-3 "cd /Users/roberdan/GitHub/ConvergioEdu-C3" && kitty @ send-key --match title:Claude-3 Return
-kitty @ send-text --match title:Claude-4 "cd /Users/roberdan/GitHub/ConvergioEdu-C4" && kitty @ send-key --match title:Claude-4 Return
+kitty @ send-text --match title:Claude-2 "cd /Users/roberdan/GitHub/MirrorBuddy-C2" && kitty @ send-key --match title:Claude-2 Return
+kitty @ send-text --match title:Claude-3 "cd /Users/roberdan/GitHub/MirrorBuddy-C3" && kitty @ send-key --match title:Claude-3 Return
+kitty @ send-text --match title:Claude-4 "cd /Users/roberdan/GitHub/MirrorBuddy-C4" && kitty @ send-key --match title:Claude-4 Return
 ```
 
 **STEP 3: Invia i task**
 ```bash
-kitty @ send-text --match title:Claude-2 "Leggi /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MaestroToolsPlanDec30.md, sei CLAUDE 2 (BACKEND). Lavori nel worktree feature/tools-phase1-backend. Esegui T-00 → T-06. Quando finisci: commit, push, crea PR verso MirrorBuddy." && kitty @ send-key --match title:Claude-2 Return
+kitty @ send-text --match title:Claude-2 "Leggi /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MaestroToolsPlanDec30.md, sei CLAUDE 2 (BACKEND). Lavori nel worktree feature/tools-phase1-backend. Esegui T-00 → T-06. Quando finisci: commit, push, crea PR verso MirrorBuddy." && kitty @ send-key --match title:Claude-2 Return
 
-kitty @ send-text --match title:Claude-3 "Leggi /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MaestroToolsPlanDec30.md, sei CLAUDE 3 (FRONTEND). Lavori nel worktree feature/tools-phase2-ui. ATTENDI GATE-1 poi esegui T-07 → T-12. Quando finisci: commit, push, crea PR." && kitty @ send-key --match title:Claude-3 Return
+kitty @ send-text --match title:Claude-3 "Leggi /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MaestroToolsPlanDec30.md, sei CLAUDE 3 (FRONTEND). Lavori nel worktree feature/tools-phase2-ui. ATTENDI GATE-1 poi esegui T-07 → T-12. Quando finisci: commit, push, crea PR." && kitty @ send-key --match title:Claude-3 Return
 
-kitty @ send-text --match title:Claude-4 "Leggi /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MaestroToolsPlanDec30.md, sei CLAUDE 4 (INTEGRATION). Lavori nel worktree feature/tools-phase3-integration. ATTENDI GATE-2 poi esegui T-15 → T-22. Quando finisci: commit, push, crea PR." && kitty @ send-key --match title:Claude-4 Return
+kitty @ send-text --match title:Claude-4 "Leggi /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MaestroToolsPlanDec30.md, sei CLAUDE 4 (INTEGRATION). Lavori nel worktree feature/tools-phase3-integration. ATTENDI GATE-2 poi esegui T-15 → T-22. Quando finisci: commit, push, crea PR." && kitty @ send-key --match title:Claude-4 Return
 ```
 
 ---
@@ -128,7 +128,7 @@ gh pr create --title "feat(tools): Phase X - [description]" --body "## Summary
 ### Merge & Cleanup (CLAUDE 1 fa questo alla fine)
 
 ```bash
-cd /Users/roberdan/GitHub/ConvergioEdu
+cd /Users/roberdan/GitHub/MirrorBuddy
 
 # 1. Merge tutte le PR (in ordine!)
 gh pr merge [PR-1-number] --merge
@@ -139,9 +139,9 @@ gh pr merge [PR-3-number] --merge
 git pull origin MirrorBuddy
 
 # 3. Cleanup worktrees
-git worktree remove ../ConvergioEdu-C2
-git worktree remove ../ConvergioEdu-C3
-git worktree remove ../ConvergioEdu-C4
+git worktree remove ../MirrorBuddy-C2
+git worktree remove ../MirrorBuddy-C3
+git worktree remove ../MirrorBuddy-C4
 
 # 4. Cleanup branches
 git branch -d feature/tools-phase1-backend
@@ -178,7 +178,7 @@ kitty @ send-text --match title:Claude-4 "🟢 GATE-2 UNLOCKED! Inizia i tuoi ta
 Se sei CLAUDE 3 o CLAUDE 4 in attesa di gate:
 ```bash
 # Poll ogni 5 minuti
-while ! grep "GATE-1" /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MaestroToolsPlanDec30.md | grep -q "🟢 UNLOCKED"; do
+while ! grep "GATE-1" /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MaestroToolsPlanDec30.md | grep -q "🟢 UNLOCKED"; do
   echo "$(date): Waiting for GATE-1..."
   sleep 300
 done
@@ -476,10 +476,10 @@ git status
 git fetch && git log HEAD..origin/MirrorBuddy --oneline
 
 # Leggi plan file per aggiornamenti
-grep -E "^\\| (✅|🔄|⬜)" /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MaestroToolsPlanDec30.md
+grep -E "^\\| (✅|🔄|⬜)" /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MaestroToolsPlanDec30.md
 
 # Conta task completati
-grep -c "^| ✅" /Users/roberdan/GitHub/ConvergioEdu/docs/plans/MaestroToolsPlanDec30.md
+grep -c "^| ✅" /Users/roberdan/GitHub/MirrorBuddy/docs/plans/MaestroToolsPlanDec30.md
 ```
 
 ### Se Conflitti Git

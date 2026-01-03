@@ -13,7 +13,7 @@ test.describe('Showcase Mode', () => {
 
   test('showcase home page loads with navigation', async ({ page }) => {
     // Check header (may have multiple elements, use first)
-    await expect(page.locator('text=Convergio Edu').first()).toBeVisible();
+    await expect(page.locator('text=MirrorBuddy').first()).toBeVisible();
     await expect(page.locator('text=Showcase').first()).toBeVisible();
 
     // Check showcase banner (note: may have accent as Modalità, multiple elements possible)
@@ -63,8 +63,8 @@ test.describe('Landing Page', () => {
   test('landing page shows setup options', async ({ page }) => {
     await page.goto('/landing');
 
-    // Check hero section (with or without hyphen)
-    await expect(page.locator('text=/Convergio[-\\s]?Edu/i').first()).toBeVisible();
+    // Check hero section
+    await expect(page.locator('text=/MirrorBuddy/i').first()).toBeVisible();
 
     // Check for some content on landing page
     const hasProvider = await page.locator('text=/Azure|Ollama|OpenAI/i').first().isVisible().catch(() => false);

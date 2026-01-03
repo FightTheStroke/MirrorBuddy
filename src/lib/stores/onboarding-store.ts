@@ -12,7 +12,7 @@ import { create } from 'zustand';
 export type OnboardingStep =
   | 'welcome' // Step 1: Melissa intro + chiede nome
   | 'info' // Step 2: Info opzionali (skippabile)
-  | 'principles' // Step 3: Principi ConvergioEdu
+  | 'principles' // Step 3: Principi MirrorBuddy
   | 'maestri' // Step 4: Carousel maestri
   | 'ready'; // Step 5: CTA finale
 
@@ -171,17 +171,17 @@ export const useOnboardingStore = create<OnboardingState>()(
 
         // Clear any remaining localStorage (legacy/session data)
         const storeKeys = [
-          'convergio-settings',
-          'convergio-progress',
-          'convergio-conversations',
-          'convergio-learnings',
-          'convergio-html-snippets',
-          'convergio-calendar',
-          'convergio-onboarding',
-          'convergio-accessibility',
-          'convergio-notifications',
-          'convergio-pomodoro',
-          'convergio-user-id',
+          'mirrorbuddy-settings',
+          'mirrorbuddy-progress',
+          'mirrorbuddy-conversations',
+          'mirrorbuddy-learnings',
+          'mirrorbuddy-html-snippets',
+          'mirrorbuddy-calendar',
+          'mirrorbuddy-onboarding',
+          'mirrorbuddy-accessibility',
+          'mirrorbuddy-notifications',
+          'mirrorbuddy-pomodoro',
+          'mirrorbuddy-user-id',
         ];
 
         storeKeys.forEach((key) => {
@@ -189,10 +189,10 @@ export const useOnboardingStore = create<OnboardingState>()(
         });
 
         // Clear sessionStorage (temporary user ID)
-        sessionStorage.removeItem('convergio-user-id');
+        sessionStorage.removeItem('mirrorbuddy-user-id');
 
         // Clear IndexedDB (legacy materials storage)
-        const databases = ['convergio-materials', 'convergio-flashcards'];
+        const databases = ['mirrorbuddy-materials', 'mirrorbuddy-flashcards'];
         for (const dbName of databases) {
           try {
             indexedDB.deleteDatabase(dbName);

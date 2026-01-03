@@ -50,7 +50,7 @@ test.describe('Language Settings', () => {
 
       // Verify language is stored in localStorage
       const storedSettings = await page.evaluate(() => {
-        return localStorage.getItem('convergio-settings');
+        return localStorage.getItem('mirrorbuddy-settings');
       });
 
       expect(storedSettings).toBeTruthy();
@@ -89,7 +89,7 @@ test.describe('Language Persistence in LocalStorage', () => {
 
     // Check localStorage for language setting
     const storedSettings = await page.evaluate(() => {
-      return localStorage.getItem('convergio-settings');
+      return localStorage.getItem('mirrorbuddy-settings');
     });
 
     if (storedSettings) {

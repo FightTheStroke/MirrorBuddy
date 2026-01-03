@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Age Gating Module - Unit Tests
+ * MirrorBuddy Age Gating Module - Unit Tests
  *
  * Comprehensive test suite covering:
  * - Age bracket determination

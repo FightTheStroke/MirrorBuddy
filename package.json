@@ -1,17 +1,17 @@
 {
-  "name": "convergio-edu",
+  "name": "mirrorbuddy",
   "version": "2.0.0",
   "private": true,
-  "description": "ConvergioEdu - La Scuola Che Vorrei: AI-powered educational platform for students with learning differences",
+  "description": "MirrorBuddy - La Scuola Che Vorrei: AI-powered educational platform for students with learning differences",
   "author": "Roberto D'Angelo <roberdan@fightthestroke.org>",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Roberdan/ConvergioEdu"
+    "url": "https://github.com/Roberdan/MirrorBuddy"
   },
-  "homepage": "https://github.com/Roberdan/ConvergioEdu",
+  "homepage": "https://github.com/Roberdan/MirrorBuddy",
   "bugs": {
-    "url": "https://github.com/Roberdan/ConvergioEdu/issues"
+    "url": "https://github.com/Roberdan/MirrorBuddy/issues"
   },
   "keywords": [
     "education",

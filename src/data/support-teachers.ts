@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Support Teachers
+ * MirrorBuddy Support Teachers
  * Melissa and Roberto - Learning Coaches
  *
  * Part of the Support Triangle:
@@ -16,7 +16,7 @@ import { generateCompactIndexPrompt } from './app-knowledge-base-v2';
 
 // ============================================================================
 // PLATFORM KNOWLEDGE
-// Issue #16: Coaches know the ConvergioEdu platform and can help students use it
+// Issue #16: Coaches know the MirrorBuddy platform and can help students use it
 // Knowledge base is in app-knowledge-base-v2.ts (optimized with lazy retrieval)
 // ============================================================================
 
@@ -39,7 +39,7 @@ ${generateCompactIndexPrompt()}`;
  * - Maieutic questioning approach
  * - Celebrate effort, not just results
  */
-const MELISSA_CORE_PROMPT = `Sei Melissa, docente di sostegno virtuale per ConvergioEdu.
+const MELISSA_CORE_PROMPT = `Sei Melissa, docente di sostegno virtuale per MirrorBuddy.
 
 ## IL TUO OBIETTIVO PRIMARIO
 
@@ -127,7 +127,7 @@ Fai domande che portano lo studente a trovare la risposta:
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di MirrorBuddy e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -258,7 +258,7 @@ NON sei un'esperta di materia - per quello ci sono i Professori.`,
  * - Calm, reassuring
  * - Guides peacefully
  */
-const ROBERTO_CORE_PROMPT = `Sei Roberto, docente di sostegno virtuale per ConvergioEdu.
+const ROBERTO_CORE_PROMPT = `Sei Roberto, docente di sostegno virtuale per MirrorBuddy.
 
 ## IL TUO OBIETTIVO PRIMARIO
 
@@ -346,7 +346,7 @@ Fai domande che portano lo studente a trovare la risposta:
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di MirrorBuddy e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -477,7 +477,7 @@ NON sei un esperto di materia - per quello ci sono i Professori.`,
  * Chiara è appena laureata, fresca di studi, capisce le difficoltà recenti.
  * Stile: accademico ma accessibile, organizzata, metodica.
  */
-const CHIARA_CORE_PROMPT = `Sei Chiara, docente di sostegno virtuale per ConvergioEdu.
+const CHIARA_CORE_PROMPT = `Sei Chiara, docente di sostegno virtuale per MirrorBuddy.
 
 ## IL TUO OBIETTIVO PRIMARIO
 
@@ -570,7 +570,7 @@ Fai domande che portano lo studente a trovare la risposta:
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di MirrorBuddy e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -679,7 +679,7 @@ NON sei un'esperta di materia - per quello ci sono i Professori.`,
  * Andrea è sportiva, energica, pratica. Ottima per studenti che hanno bisogno
  * di movimento, pause attive, e un approccio dinamico allo studio.
  */
-const ANDREA_CORE_PROMPT = `Sei Andrea, docente di sostegno virtuale per ConvergioEdu.
+const ANDREA_CORE_PROMPT = `Sei Andrea, docente di sostegno virtuale per MirrorBuddy.
 
 ## IL TUO OBIETTIVO PRIMARIO
 
@@ -770,7 +770,7 @@ NOTA: Quando crei uno strumento, ANNUNCIALO prima (es. "Ti preparo un quiz su qu
 
 ## I NOSTRI PROFESSORI
 
-Conosco tutti i 16 Professori di ConvergioEdu e posso indirizzare lo studente al più adatto:
+Conosco tutti i 16 Professori di MirrorBuddy e posso indirizzare lo studente al più adatto:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|
@@ -887,7 +887,7 @@ NON sei un'esperta di materia - per quello ci sono i Professori.`,
  * Favij (Lorenzo) è un coach dal mondo gaming/digital. Parla il linguaggio
  * dei ragazzi, usa metafore da videogiochi, rende lo studio più "gamificato".
  */
-const FAVIJ_CORE_PROMPT = `Sei Lorenzo (tutti ti chiamano Favij), coach virtuale per ConvergioEdu.
+const FAVIJ_CORE_PROMPT = `Sei Lorenzo (tutti ti chiamano Favij), coach virtuale per MirrorBuddy.
 
 ## IL TUO OBIETTIVO PRIMARIO
 
@@ -979,7 +979,7 @@ NOTA: Quando crei uno strumento, ANNUNCIALO prima (es. "Ti preparo un quiz su qu
 
 ## I NOSTRI PROFESSORI (NPC TUTORIAL)
 
-Conosco tutti i 16 Professori di ConvergioEdu - tipo i tutorial NPC del gioco:
+Conosco tutti i 16 Professori di MirrorBuddy - tipo i tutorial NPC del gioco:
 
 | Professore | Materia | Quando consigliarlo |
 |---------|---------|---------------------|

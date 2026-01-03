@@ -367,7 +367,7 @@ test.describe('Separate Conversations Per Character (#33)', () => {
 
     // Check that the Zustand store has the correct structure
     const storeStructure = await page.evaluate(() => {
-      const storageKey = 'convergio-conversation-flow';
+      const storageKey = 'mirrorbuddy-conversation-flow';
       const stored = localStorage.getItem(storageKey);
       if (!stored) return null;
 
@@ -396,7 +396,7 @@ test.describe('Separate Conversations Per Character (#33)', () => {
 
     // Simulate storing separate conversations via store
     const testResult = await page.evaluate(() => {
-      const storageKey = 'convergio-conversation-flow';
+      const storageKey = 'mirrorbuddy-conversation-flow';
 
       // Create test data with separate conversations
       const testData = {

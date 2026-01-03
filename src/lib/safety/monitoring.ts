@@ -1,5 +1,5 @@
 /**
- * ConvergioEdu Safety Monitoring Module
+ * MirrorBuddy Safety Monitoring Module
  * Logs and tracks safety-related events for analysis and compliance
  *
  * This module provides:
@@ -12,6 +12,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { prisma } from '@/lib/db';
 
 /**
  * Types of safety events to monitor
@@ -161,7 +162,30 @@ export function logSafetyEvent(
     checkViolationPattern(event.userId, event);
   }
 
+  // Persist to database (async, don't block)
+  persistSafetyEventToDb(event).catch(err => {
+    console.error('Failed to persist safety event:', err);
+  });
+
   return event;
+}
+
+/**
+ * Persist safety event to database for dashboard analytics
+ */
+async function persistSafetyEventToDb(event: SafetyEvent): Promise<void> {
+  await prisma.safetyEvent.create({
+    data: {
+      userId: event.userId ?? null,
+      type: event.type,
+      severity: event.severity,
+      conversationId: event.sessionId ?? null,
+      // Events start unresolved; can be resolved later by admin
+      resolvedBy: null,
+      resolvedAt: null,
+      resolution: null,
+    },
+  });
 }
 
 /**
@@ -448,4 +472,122 @@ export function getSummary(): {
     criticalCount: eventBuffer.filter(e => e.severity === 'critical').length,
     alertCount: eventBuffer.filter(e => e.severity === 'alert').length,
   };
+}
+
+// ============================================================================
+// DATABASE PERSISTENCE (Dashboard Analytics)
+// ============================================================================
+
+/**
+ * Get safety events from database for dashboard analytics
+ */
+export async function getSafetyEventsFromDb(options: {
+  startDate?: Date;
+  endDate?: Date;
+  severity?: string;
+  type?: string;
+  unresolvedOnly?: boolean;
+  limit?: number;
+} = {}): Promise<{
+  events: Array<{
+    id: string;
+    userId: string | null;
+    type: string;
+    severity: string;
+    conversationId: string | null;
+    resolvedBy: string | null;
+    resolvedAt: Date | null;
+    resolution: string | null;
+    timestamp: Date;
+  }>;
+  total: number;
+}> {
+  const where = {
+    ...(options.startDate || options.endDate ? {
+      timestamp: {
+        ...(options.startDate && { gte: options.startDate }),
+        ...(options.endDate && { lte: options.endDate }),
+      },
+    } : {}),
+    ...(options.severity && { severity: options.severity }),
+    ...(options.type && { type: options.type }),
+    ...(options.unresolvedOnly && { resolvedAt: null }),
+  };
+
+  const [events, total] = await Promise.all([
+    prisma.safetyEvent.findMany({
+      where,
+      orderBy: { timestamp: 'desc' },
+      take: options.limit ?? 100,
+    }),
+    prisma.safetyEvent.count({ where }),
+  ]);
+
+  return { events, total };
+}
+
+/**
+ * Get aggregated safety stats for dashboard
+ */
+export async function getSafetyStatsFromDb(
+  startDate: Date,
+  endDate: Date
+): Promise<{
+  totalEvents: number;
+  bySeverity: Record<string, number>;
+  byType: Record<string, number>;
+  unresolvedCount: number;
+  criticalCount: number;
+}> {
+  const events = await prisma.safetyEvent.findMany({
+    where: {
+      timestamp: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    select: {
+      severity: true,
+      type: true,
+      resolvedAt: true,
+    },
+  });
+
+  const bySeverity: Record<string, number> = {};
+  const byType: Record<string, number> = {};
+  let unresolvedCount = 0;
+  let criticalCount = 0;
+
+  for (const event of events) {
+    bySeverity[event.severity] = (bySeverity[event.severity] || 0) + 1;
+    byType[event.type] = (byType[event.type] || 0) + 1;
+    if (!event.resolvedAt) unresolvedCount++;
+    if (event.severity === 'critical') criticalCount++;
+  }
+
+  return {
+    totalEvents: events.length,
+    bySeverity,
+    byType,
+    unresolvedCount,
+    criticalCount,
+  };
+}
+
+/**
+ * Resolve a safety event (admin action)
+ */
+export async function resolveSafetyEvent(
+  eventId: string,
+  resolvedBy: string,
+  resolution: string
+): Promise<void> {
+  await prisma.safetyEvent.update({
+    where: { id: eventId },
+    data: {
+      resolvedBy,
+      resolvedAt: new Date(),
+      resolution,
+    },
+  });
 }
