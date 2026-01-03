@@ -43,6 +43,34 @@ const VALID_MATERIAL_TYPES: MaterialType[] = [
   'chart',
 ];
 
+// Inline type for Material from Prisma query
+interface MaterialRecord {
+  id: string;
+  toolId: string;
+  type: string;
+  title: string;
+  content: string;
+  preview: string | null;
+  searchableText: string | null;
+  maestroId: string | null;
+  subject: string | null;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+  rating: number | null;
+  studyCount: number;
+  sessionId: string | null;
+  collectionId: string | null;
+  tags: { tag: { id: string; name: string; color: string | null } }[];
+}
+
+// Inline type for Tag
+interface TagRecord {
+  id: string;
+  name: string;
+  color: string | null;
+}
+
 interface CreateMaterialRequest {
   toolId: string;
   toolType: MaterialType;
@@ -142,10 +170,10 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Parse JSON content and flatten tags
-    const parsed = materials.map((m) => ({
+    const parsed = materials.map((m: MaterialRecord) => ({
       ...m,
       content: JSON.parse(m.content as string),
-      tags: m.tags.map((mt) => mt.tag),
+      tags: m.tags.map((mt: { tag: TagRecord }) => mt.tag),
     }));
 
     return NextResponse.json({
@@ -265,7 +293,7 @@ export async function POST(request: NextRequest) {
       material: {
         ...material,
         content,
-        tags: material.tags.map(mt => mt.tag),
+        tags: material.tags.map((mt: { tag: TagRecord }) => mt.tag),
       },
       created: true,
     });
@@ -354,7 +382,7 @@ export async function PATCH(request: NextRequest) {
       success: true,
       material: {
         ...updated,
-        tags: updated.tags.map(mt => mt.tag),
+        tags: updated.tags.map((mt: { tag: TagRecord }) => mt.tag),
         content: content || JSON.parse(updated.content),
       },
     });

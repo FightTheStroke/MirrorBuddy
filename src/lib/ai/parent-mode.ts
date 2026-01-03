@@ -6,7 +6,21 @@
  * provides insights based on the child's Learning records.
  */
 
-import type { Learning } from '@prisma/client';
+// Define Learning interface locally (Prisma types unavailable at build time)
+interface Learning {
+  id: string;
+  userId: string;
+  category: string;
+  insight: string;
+  confidence: number;
+  occurrences: number;
+  firstObserved: Date;
+  lastObserved: Date;
+  conversationId: string | null;
+  maestroId: string | null;
+  subject: string | null;
+  metadata: string | null;
+}
 
 /**
  * Parent mode instructions that wrap around the Maestro's system prompt

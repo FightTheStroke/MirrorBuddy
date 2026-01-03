@@ -150,7 +150,7 @@ export async function POST(request: NextRequest) {
           select: { materials: true },
         },
       },
-    });
+    }) as { id: string; name: string; [key: string]: unknown };
 
     logger.info('Collection created', {
       userId,

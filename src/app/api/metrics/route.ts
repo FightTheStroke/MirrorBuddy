@@ -41,14 +41,14 @@ export async function GET() {
         where: { timestamp: { gte: hourAgo }, userId: { not: null } },
         select: { userId: true },
         distinct: ['userId'],
-      }).then((r) => r.length),
+      }).then((r: { userId: string | null }[]) => r.length),
 
       // Active users in last 24 hours
       prisma.telemetryEvent.findMany({
         where: { timestamp: { gte: dayAgo }, userId: { not: null } },
         select: { userId: true },
         distinct: ['userId'],
-      }).then((r) => r.length),
+      }).then((r: { userId: string | null }[]) => r.length),
 
       // Sessions in last hour
       prisma.telemetryEvent.count({

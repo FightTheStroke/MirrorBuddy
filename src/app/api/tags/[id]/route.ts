@@ -64,7 +64,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Flatten materials for easier consumption
     const response = {
       ...tag,
-      materials: tag.materials.map(mt => mt.material),
+      materials: tag.materials.map((mt: {
+        material: { id: string; toolType: string; title: string | null; createdAt: Date };
+      }) => mt.material),
     };
 
     return NextResponse.json(response);

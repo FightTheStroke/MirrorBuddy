@@ -8,7 +8,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
-import type { QuizResult } from '@prisma/client';
+
+// Local QuizResult interface (Prisma types unavailable at build time)
+interface QuizResult {
+  id: string;
+  userId: string;
+  quizId: string;
+  subject: string | null;
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+  answers: string;
+  completedAt: Date;
+}
 
 export async function GET(request: NextRequest) {
   try {

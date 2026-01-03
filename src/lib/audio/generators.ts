@@ -273,23 +273,65 @@ export function createFireplaceNode(audioContext: AudioContext): ScriptProcessor
 }
 
 /**
- * Generate cafe ambience (murmur + subtle clinking)
+ * Generate realistic cafe ambience with multiple audio layers:
+ * - Multiple conversation murmurs (filtered pink noise at human voice frequency range)
+ * - Espresso machine hissing (occasional filtered white noise)
+ * - Coffee cup clinks and ceramic sounds (multi-frequency sine bursts)
+ * - Cash register/door bell dings (high frequency sine)
+ * - Distant background music (very low modulated tone)
+ * - Chair/movement sounds (filtered noise bursts)
  */
 export function createCafeNode(audioContext: AudioContext): ScriptProcessorNode {
   const bufferSize = 4096;
   const cafe = audioContext.createScriptProcessor(bufferSize, 1, 1);
   const sampleRate = audioContext.sampleRate;
 
-  // Pink noise state for murmur
+  // ===== CONVERSATION MURMUR (Main layer) =====
+  // Primary pink noise for crowd murmur
   let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+  // Secondary murmur (different filter for variety)
+  let c0 = 0, c1 = 0, c2 = 0;
+  // Vocal range bandpass state (simulates human voice ~300-3000Hz)
+  let vocalFilter = 0;
+  let vocalFilterPrev = 0;
+
+  // ===== ESPRESSO MACHINE =====
+  let espressoTimer = 0;
+  let espressoIntensity = 0;
+  let espressoFilterState = 0;
+  const espressoInterval = sampleRate * (8 + Math.random() * 15); // Every 8-23 seconds
+
+  // ===== COFFEE CUP CLINKS =====
   let clinkTimer = 0;
   let clinkPhase = 0;
   let clinkIntensity = 0;
+  let clinkFreq = 1200;
+  // Secondary clink for ceramic resonance
+  let clink2Phase = 0;
+  let clink2Intensity = 0;
+
+  // ===== CASH REGISTER / DOOR BELL =====
+  let dingTimer = 0;
+  let dingPhase = 0;
+  let dingIntensity = 0;
+  const dingInterval = sampleRate * (15 + Math.random() * 30); // Every 15-45 seconds
+
+  // ===== BACKGROUND MUSIC (Very distant) =====
+  let musicPhase = 0;
+  const musicBaseFreq = 150 + Math.random() * 50; // Low bass note
+  let musicModulation = 0;
+
+  // ===== CHAIR/MOVEMENT SOUNDS =====
+  let chairTimer = 0;
+  let chairIntensity = 0;
+  let chairFilterState = 0;
 
   cafe.addEventListener('audioprocess', (e) => {
     const output = e.outputBuffer.getChannelData(0);
     for (let i = 0; i < bufferSize; i++) {
-      // Murmur (filtered pink noise)
+      let sample = 0;
+
+      // ===== PRIMARY MURMUR (Pink noise filtered to voice range) =====
       const white = Math.random() * 2 - 1;
       b0 = 0.99886 * b0 + white * 0.0555179;
       b1 = 0.99332 * b1 + white * 0.0750759;
@@ -297,21 +339,99 @@ export function createCafeNode(audioContext: AudioContext): ScriptProcessorNode 
       b3 = 0.86650 * b3 + white * 0.3104856;
       b4 = 0.55000 * b4 + white * 0.5329522;
       b5 = -0.7616 * b5 - white * 0.0168980;
-      const murmur = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
+      const pinkNoise = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
       b6 = white * 0.115926;
 
-      // Occasional clinks (sine wave bursts)
-      clinkTimer++;
-      if (clinkTimer > sampleRate * (1 + Math.random() * 4)) {
-        clinkTimer = 0;
-        clinkIntensity = 0.2 + Math.random() * 0.3;
-        clinkPhase = 0;
-      }
-      clinkPhase += (800 + Math.random() * 400) / sampleRate * Math.PI * 2;
-      clinkIntensity *= 0.995;
-      const clink = Math.sin(clinkPhase) * clinkIntensity * 0.1;
+      // Bandpass filter to simulate voice range (simple 2-pole)
+      const cutoff = 0.15; // Normalized cutoff
+      vocalFilter = vocalFilter + cutoff * (pinkNoise - vocalFilter);
+      const bandpass = vocalFilter - vocalFilterPrev;
+      vocalFilterPrev = vocalFilter * 0.95;
+      const primaryMurmur = bandpass * 2.5;
 
-      output[i] = (murmur + clink) * 0.6;
+      // ===== SECONDARY MURMUR (Different texture) =====
+      const white2 = Math.random() * 2 - 1;
+      c0 = 0.98 * c0 + white2 * 0.02;
+      c1 = 0.96 * c1 + c0 * 0.04;
+      c2 = 0.94 * c2 + c1 * 0.06;
+      const secondaryMurmur = c2 * 0.4;
+
+      sample += primaryMurmur * 0.5 + secondaryMurmur * 0.3;
+
+      // ===== ESPRESSO MACHINE (Steam hiss) =====
+      espressoTimer++;
+      if (espressoTimer > espressoInterval && espressoIntensity < 0.01) {
+        espressoTimer = 0;
+        espressoIntensity = 0.4 + Math.random() * 0.3;
+      }
+      if (espressoIntensity > 0.01) {
+        const steamNoise = (Math.random() * 2 - 1);
+        // High-pass filter for steam sound
+        espressoFilterState = 0.8 * espressoFilterState + steamNoise * 0.2;
+        const steam = (steamNoise - espressoFilterState) * espressoIntensity;
+        sample += steam * 0.15;
+        espressoIntensity *= 0.9985; // Slow decay (2-3 seconds of steam)
+      }
+
+      // ===== COFFEE CUP CLINKS =====
+      clinkTimer++;
+      if (clinkTimer > sampleRate * (0.8 + Math.random() * 3)) {
+        clinkTimer = 0;
+        clinkIntensity = 0.15 + Math.random() * 0.25;
+        clink2Intensity = 0.1 + Math.random() * 0.15;
+        clinkFreq = 1000 + Math.random() * 800; // Varied pitch
+        clinkPhase = 0;
+        clink2Phase = 0;
+      }
+      if (clinkIntensity > 0.001) {
+        // Primary clink tone
+        clinkPhase += clinkFreq / sampleRate * Math.PI * 2;
+        const clink1 = Math.sin(clinkPhase) * clinkIntensity;
+        // Harmonic overtone (ceramic resonance)
+        clink2Phase += (clinkFreq * 2.3) / sampleRate * Math.PI * 2;
+        const clink2 = Math.sin(clink2Phase) * clink2Intensity * 0.5;
+        sample += (clink1 + clink2) * 0.12;
+        clinkIntensity *= 0.993;
+        clink2Intensity *= 0.991;
+      }
+
+      // ===== DOOR BELL / CASH REGISTER =====
+      dingTimer++;
+      if (dingTimer > dingInterval && dingIntensity < 0.01) {
+        dingTimer = 0;
+        dingIntensity = 0.2 + Math.random() * 0.2;
+        dingPhase = 0;
+      }
+      if (dingIntensity > 0.001) {
+        dingPhase += 2400 / sampleRate * Math.PI * 2;
+        const ding = Math.sin(dingPhase) * dingIntensity;
+        sample += ding * 0.08;
+        dingIntensity *= 0.997;
+      }
+
+      // ===== BACKGROUND MUSIC (Very distant, barely audible) =====
+      musicModulation += 0.00003;
+      const musicFreq = musicBaseFreq + Math.sin(musicModulation * 3) * 20;
+      musicPhase += musicFreq / sampleRate * Math.PI * 2;
+      // Simple chord: root + fifth
+      const music = (Math.sin(musicPhase) + Math.sin(musicPhase * 1.5) * 0.5) * 0.02;
+      sample += music;
+
+      // ===== CHAIR/MOVEMENT SOUNDS =====
+      chairTimer++;
+      if (chairTimer > sampleRate * (3 + Math.random() * 8)) {
+        chairTimer = 0;
+        chairIntensity = 0.15 + Math.random() * 0.2;
+      }
+      if (chairIntensity > 0.01) {
+        const chairNoise = Math.random() * 2 - 1;
+        chairFilterState = 0.7 * chairFilterState + chairNoise * 0.3;
+        sample += chairFilterState * chairIntensity * 0.1;
+        chairIntensity *= 0.995;
+      }
+
+      // Final output with soft limiting
+      output[i] = Math.tanh(sample * 0.7) * 0.6;
     }
   });
 
