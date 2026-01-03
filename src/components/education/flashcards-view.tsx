@@ -161,7 +161,7 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
   }, []);
 
   // Load decks on mount - setState in effect is intentional for data fetching
-  /* eslint-disable react-hooks/set-state-in-effect */
+  /* eslint-disable react-hooks/set-state-in-effect -- ADR 0015: Data loading pattern */
   useEffect(() => {
     loadDecks();
   }, [loadDecks]);
