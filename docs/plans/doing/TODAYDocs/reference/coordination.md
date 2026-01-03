@@ -66,24 +66,35 @@ git worktree add ../wt-supporti -b feat/supporti-consolidation
 
 ### Parallel Execution Groups
 
+**IMPORTANT**: Max 3 concurrent agents at any time (Claude Code limit)
+
+**Execution Sequence**:
+1. **Wave 1-2 FIRST** (sequential, blocking)
+2. **THEN Wave 3 OR Wave 4** (not both simultaneously)
+
 **Group A: Bugfixes (Sequential - 1 Agent)**
 - Agent: Claude-A
 - Worktree: `wt-bugfixes`
 - Tasks: 1.1 -> 1.2 -> 2.1 -> 2.2 -> 2.3 -> 2.4 -> 2.5 -> 2.6 -> 2.7 -> 2.8
-- Reason: Memory/conversation code has interdependencies + all bug fixes in single worktree
+- Reason: Memory/conversation code has interdependencies
+- **Blocks**: Wave 3 and Wave 4 (must complete first)
 
 **Group B: Welcome Components (Parallel - up to 3 Agents)**
 - Agents: Claude-B1, Claude-B2, Claude-B3
 - Worktree: `wt-welcome`
-- Parallel tasks: 3.1, 3.2, 3.3 (3.4 waits or joins)
+- Parallel tasks: 3.1, 3.2, 3.3 (max 3 concurrent)
 - Sequential after: 3.5 -> 3.6 -> 3.7 -> 3.8 -> 3.9
+- **Starts after**: Wave 1-2 complete
 
 **Group C: Supporti (Mixed - 2 Agents max)**
 - Agents: Claude-C1, Claude-C2
 - Worktree: `wt-supporti`
-- Phase 1 (parallel): 4.1
-- Phase 2 (parallel): 4.2 + 4.3, 4.8 + 4.9 + 4.10
-- Phase 3 (sequential): 4.4 -> 4.5 -> 4.6 -> 4.7 -> 4.11
+- Phase 1: 4.1 (C1 solo)
+- Phase 2: 4.2+4.3+4.8+4.9+4.10 (C1 + C2 parallel)
+- Phase 3: 4.4 -> 4.5 -> 4.6 -> 4.7 -> 4.11 (sequential)
+- **Starts after**: Wave 1-2 complete
+- **Can run parallel with**: Wave 3 (total = 3+2 = 5 agents, VIOLATES LIMIT)
+- **CORRECTION**: Wave 3 completes THEN Wave 4 starts
 
 ---
 
@@ -189,16 +200,21 @@ All must pass. No exceptions.
 
 Before creating ANY Pull Request:
 
-1. **Complete `docs/EXECUTION-CHECKLIST.md`** for the PR
-2. **Run PLACEHOLDER/MOCK check**:
+1. **Fill Evidence Section** in the wave file (all checks)
+2. **Invoke Thor quality gate**:
    ```bash
-   grep -ri PLACEHOLDER src/ | wc -l  # Must be 0
-   grep -ri MOCK_DATA src/ | wc -l    # Must be 0
+   # Thor runs automatically via thor-quality-assurance-guardian agent
+   # Checks:
+   # - No workarounds (@ts-ignore, TODO, HACK, etc.)
+   # - No placeholders (PLACEHOLDER, MOCK_DATA)
+   # - Build/lint/typecheck pass
+   # - E2E tests have assertions (not just waitFor)
+   # - Accessibility compliance (where applicable)
    ```
-3. **Fill Evidence Section** in the wave file
-4. **Request Thor quality gate** before merge
+3. **Thor approval required** before merge
+4. **Guardian protocol**: Verify no scope creep, no autonomous decisions undisclosed
 
-Reference: `docs/plans/VERIFICATION-PROCESS.md`
+Reference: `~/.claude/rules/guardian.md` and `thor-quality-assurance-guardian` agent
 
 ---
 
