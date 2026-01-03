@@ -6,12 +6,40 @@
  * Wave 2: Study Kit Generator
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import type { StudyKit } from '@/types/study-kit';
+
+/**
+ * Simple markdown to HTML parser for basic formatting
+ */
+function parseMarkdown(text: string): string {
+  if (!text) return '';
+
+  return text
+    // Escape HTML first
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    // Headers (### → h3, ## → h2, # → h1)
+    .replace(/^### (.+)$/gm, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 class="text-xl font-semibold mt-5 mb-2">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-6 mb-3">$1</h1>')
+    // Bold and italic
+    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Lists (- item)
+    .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
+    // Numbered lists (1. item)
+    .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 list-decimal">$1</li>')
+    // Line breaks
+    .replace(/\n\n/g, '</p><p class="mb-3">')
+    .replace(/\n/g, '<br/>');
+}
 
 // Import renderers from Knowledge Hub
 import { MindmapRenderer } from '@/components/education/knowledge-hub/renderers/mindmap-renderer';
@@ -27,6 +55,12 @@ interface StudyKitViewerProps {
 export function StudyKitViewer({ studyKit, onDelete, className }: StudyKitViewerProps) {
   const [activeTab, setActiveTab] = useState('summary');
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Parse markdown summary once
+  const parsedSummary = useMemo(
+    () => parseMarkdown(studyKit.summary || ''),
+    [studyKit.summary]
+  );
 
   const handleDelete = async () => {
     if (!confirm('Sei sicuro di voler eliminare questo Study Kit?')) {
@@ -53,13 +87,13 @@ export function StudyKitViewer({ studyKit, onDelete, className }: StudyKitViewer
   };
 
   const handleDownload = () => {
-    // Create a downloadable JSON file with all materials
-    const data = JSON.stringify(studyKit, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
+    // Create a downloadable markdown file with the summary
+    const content = `# ${studyKit.title}\n\n${studyKit.subject ? `**Materia:** ${studyKit.subject}\n\n` : ''}${studyKit.summary || 'Nessun riassunto disponibile'}`;
+    const blob = new Blob([content], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${studyKit.title.replace(/\s+/g, '-')}.json`;
+    a.download = `${studyKit.title.replace(/\s+/g, '-')}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -140,11 +174,10 @@ export function StudyKitViewer({ studyKit, onDelete, className }: StudyKitViewer
         <TabsContent value="summary" className="space-y-4 mt-6">
           <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6">
             {studyKit.summary ? (
-              <div className="prose prose-slate dark:prose-invert max-w-none">
-                <p className="whitespace-pre-wrap leading-relaxed">
-                  {studyKit.summary}
-                </p>
-              </div>
+              <div
+                className="prose prose-slate dark:prose-invert max-w-none leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: `<p class="mb-3">${parsedSummary}</p>` }}
+              />
             ) : (
               <p className="text-slate-500 text-center py-8">
                 Riassunto non disponibile

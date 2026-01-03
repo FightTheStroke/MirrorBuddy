@@ -106,18 +106,29 @@ const defaultADHDStats: ADHDSessionStats = {
   lastSessionDate: null,
 };
 
+// User context type
+export type AccessibilityContext = 'student' | 'parent';
+
 // Store interface
 interface AccessibilityStore {
   settings: AccessibilitySettings;
+  parentSettings: AccessibilitySettings; // Separate settings for parent dashboard
+  currentContext: AccessibilityContext;
   adhdConfig: ADHDSessionConfig;
   adhdStats: ADHDSessionStats;
   adhdSessionState: ADHDSessionState;
   adhdTimeRemaining: number;
   adhdSessionProgress: number;
 
+  // Context switching
+  setContext: (context: AccessibilityContext) => void;
+  getActiveSettings: () => AccessibilitySettings;
+
   // Settings actions
   updateSettings: (updates: Partial<AccessibilitySettings>) => void;
+  updateParentSettings: (updates: Partial<AccessibilitySettings>) => void;
   resetSettings: () => void;
+  resetParentSettings: () => void;
 
   // Profile presets
   applyDyslexiaProfile: () => void;
@@ -152,11 +163,21 @@ interface AccessibilityStore {
 export const useAccessibilityStore = create<AccessibilityStore>()(
   (set, get) => ({
       settings: defaultAccessibilitySettings,
+      parentSettings: defaultAccessibilitySettings,
+      currentContext: 'student' as AccessibilityContext,
       adhdConfig: defaultADHDConfig,
       adhdStats: defaultADHDStats,
       adhdSessionState: 'idle',
       adhdTimeRemaining: defaultADHDConfig.workDuration,
       adhdSessionProgress: 0,
+
+      // Context switching
+      setContext: (context) => set({ currentContext: context }),
+
+      getActiveSettings: () => {
+        const state = get();
+        return state.currentContext === 'parent' ? state.parentSettings : state.settings;
+      },
 
       // Settings actions
       updateSettings: (updates) =>
@@ -164,9 +185,19 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
           settings: { ...state.settings, ...updates },
         })),
 
+      updateParentSettings: (updates) =>
+        set((state) => ({
+          parentSettings: { ...state.parentSettings, ...updates },
+        })),
+
       resetSettings: () =>
         set({
           settings: defaultAccessibilitySettings,
+        }),
+
+      resetParentSettings: () =>
+        set({
+          parentSettings: defaultAccessibilitySettings,
         }),
 
       // Profile presets

@@ -22,4 +22,7 @@ export {
   LazyCalendarView,
   LazyHTMLSnippetsView,
   LazyArchiveView,
+  LazySupportiView,
+  LazyStudyKitView,
+  LazyGenitoriView,
 } from './lazy';

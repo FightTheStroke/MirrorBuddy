@@ -6,3 +6,4 @@
 export { StudyKitUpload } from './StudyKitUpload';
 export { StudyKitViewer } from './StudyKitViewer';
 export { StudyKitList } from './StudyKitList';
+export { StudyKitView } from './StudyKitView';

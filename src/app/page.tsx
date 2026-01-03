@@ -40,6 +40,10 @@ import {
   LazyHomeworkHelpView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
+  LazySupportiView,
+  LazyStudyKitView,
+  LazyArchiveView,
+  LazyGenitoriView,
 } from '@/components/education';
 import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
@@ -52,7 +56,7 @@ import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indi
 import { cn } from '@/lib/utils';
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'supporti' | 'calendar' | 'demos' | 'progress' | 'genitori' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'supporti' | 'calendar' | 'demos' | 'progress' | 'archivio' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -161,6 +165,7 @@ export default function Home() {
     { id: 'homework' as const, label: 'Materiali', icon: Target },
     { id: 'studykit' as const, label: 'Study Kit', icon: Upload },
     { id: 'supporti' as const, label: 'Supporti', icon: Archive },
+    { id: 'archivio' as const, label: 'Archivio', icon: BookOpen },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'demos' as const, label: 'Demo', icon: Brain },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
@@ -294,18 +299,8 @@ export default function Home() {
                 onClick={async () => {
                   if (item.id === 'genitori') {
                     markAsViewed();
-                    // Close active conversation before navigating away
-                    await handleViewChange('genitori');
-                    router.push('/parent-dashboard');
-                  } else if (item.id === 'studykit') {
-                    await handleViewChange('studykit');
-                    router.push('/study-kit');
-                  } else if (item.id === 'supporti') {
-                    await handleViewChange('supporti');
-                    router.push('/supporti');
-                  } else {
-                    await handleViewChange(item.id);
                   }
+                  await handleViewChange(item.id);
                 }}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
@@ -414,13 +409,19 @@ export default function Home() {
 
           {currentView === 'homework' && <LazyHomeworkHelpView />}
 
-          {/* Supporti view is at /supporti route */}
+          {currentView === 'studykit' && <LazyStudyKitView />}
+
+          {currentView === 'supporti' && <LazySupportiView />}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 
           {currentView === 'demos' && <LazyHTMLSnippetsView />}
 
           {currentView === 'progress' && <LazyProgressView />}
+
+          {currentView === 'archivio' && <LazyArchiveView />}
+
+          {currentView === 'genitori' && <LazyGenitoriView />}
 
           {currentView === 'settings' && <LazySettingsView />}
         </motion.div>

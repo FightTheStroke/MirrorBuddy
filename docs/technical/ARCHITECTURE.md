@@ -1,7 +1,7 @@
 # MirrorBuddy Architecture
 
 > AI-powered educational platform for students with learning differences.
-> Last updated: 2026-01-01
+> Last updated: 2026-01-03
 
 ---
 
@@ -328,6 +328,28 @@ Pomodoro completed:   15 XP
 - **Motion**: Reduced animations
 - **TTS**: Auto-read with speed control (0.5x - 2.0x)
 - **Colors**: Custom background/text
+
+### Parent/Student Context Separation
+
+The accessibility system supports separate settings for parents and students:
+
+```typescript
+type AccessibilityContext = 'student' | 'parent';
+
+interface AccessibilityStore {
+  settings: AccessibilitySettings;        // Student settings
+  parentSettings: AccessibilitySettings;  // Parent settings
+  currentContext: AccessibilityContext;   // Active context
+
+  setContext: (context) => void;          // Switch context
+  getActiveSettings: () => Settings;      // Get current settings
+  updateParentSettings: (updates) => void; // Update parent settings
+}
+```
+
+- When viewing the Parent Dashboard (Genitori), context switches to 'parent'
+- Each context has independent accessibility preferences
+- `AccessibilityProvider` uses `getActiveSettings()` to apply the correct settings
 
 **Location**: `src/lib/accessibility/`
 

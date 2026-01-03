@@ -6,15 +6,12 @@
  * Displays saved quiz materials with questions and answer options.
  * Supports read-only review mode for Knowledge Hub.
  *
- * Expected data format:
- * {
- *   title?: string;
- *   questions: QuizQuestion[];
- *   showAnswers?: boolean;
- * }
+ * Supports two data formats:
+ * 1. Knowledge Hub format: { title, questions: [{id, question, options: [{id, text, isCorrect}]}] }
+ * 2. Tool format (Study Kit): { topic, questions: [{question, options: string[], correctIndex}] }
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle, XCircle, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -35,19 +32,69 @@ interface QuizQuestion {
 
 interface QuizData {
   title?: string;
+  topic?: string; // From tools format
   questions: QuizQuestion[];
   showAnswers?: boolean;
+}
+
+// Input format from tools/Study Kit
+interface ToolQuizQuestion {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation?: string;
+}
+
+interface ToolQuizData {
+  topic?: string;
+  title?: string;
+  questions: ToolQuizQuestion[];
+}
+
+/**
+ * Normalize quiz data from either format to the renderer format
+ */
+function normalizeQuizData(data: unknown): QuizData {
+  const rawData = data as Record<string, unknown>;
+
+  // Check if it's the tool format (options is string[])
+  const questions = rawData.questions as unknown[];
+  if (questions && questions.length > 0) {
+    const firstQuestion = questions[0] as Record<string, unknown>;
+
+    // Tool format: options is string[] with correctIndex
+    if (Array.isArray(firstQuestion.options) && typeof firstQuestion.options[0] === 'string') {
+      const toolData = rawData as unknown as ToolQuizData;
+      return {
+        title: toolData.title || toolData.topic,
+        questions: toolData.questions.map((q, qIndex) => ({
+          id: `question-${qIndex}`,
+          question: q.question,
+          options: q.options.map((opt, optIndex) => ({
+            id: `option-${qIndex}-${optIndex}`,
+            text: opt,
+            isCorrect: optIndex === q.correctIndex,
+          })),
+          explanation: q.explanation,
+        })),
+      };
+    }
+  }
+
+  // Already in QuizData format
+  return rawData as unknown as QuizData;
 }
 
 /**
  * Render a quiz for review in Knowledge Hub.
  */
 export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
-  const quizData = data as unknown as QuizData;
+  // Normalize data from either format
+  const quizData = useMemo(() => normalizeQuizData(data), [data]);
   const [showAnswers, setShowAnswers] = useState(quizData.showAnswers ?? readOnly ?? false);
 
   const questions = quizData.questions || [];
-  const title = quizData.title || 'Quiz';
+  const title = quizData.title || quizData.topic || 'Quiz';
 
   if (questions.length === 0) {
     return (
@@ -78,16 +125,16 @@ export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
       <div className="space-y-4">
         {questions.map((q, qIndex) => (
           <div
-            key={q.id}
+            key={q.id || `question-${qIndex}`}
             className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
           >
             <p className="font-medium text-slate-900 dark:text-slate-100 mb-3">
               {qIndex + 1}. {q.question}
             </p>
             <div className="space-y-2">
-              {q.options.map((opt) => (
+              {q.options.map((opt, optIndex) => (
                 <div
-                  key={opt.id}
+                  key={opt.id || `option-${qIndex}-${optIndex}`}
                   className={cn(
                     'flex items-center gap-2 p-2 rounded-lg transition-colors',
                     showAnswers && opt.isCorrect && 'bg-green-100 dark:bg-green-900/30',
