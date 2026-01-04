@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <img src="public/screenshots/home.png" alt="MirrorBuddy Homepage" width="800">
+  <img src="public/screenshots/welcome.png" alt="MirrorBuddy Welcome Page" width="800">
 </p>
 
 ---
