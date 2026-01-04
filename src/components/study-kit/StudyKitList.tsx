@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { FileText, Loader2, AlertCircle, Clock, CheckCircle2, Eye } from 'lucide-react';
+import { FileText, Loader2, AlertCircle, Clock, CheckCircle2, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { StudyKit } from '@/types/study-kit';
@@ -51,6 +51,28 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
   useEffect(() => {
     loadStudyKits();
   }, [loadStudyKits]);
+
+  const handleDelete = async (kitId: string, kitTitle: string) => {
+    if (!confirm(`Sei sicuro di voler eliminare "${kitTitle}"?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/study-kit/${kitId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete study kit');
+      }
+
+      // Remove from local state
+      setStudyKits(prev => prev.filter(kit => kit.id !== kitId));
+    } catch (err) {
+      console.error('Failed to delete study kit', err);
+      alert('Errore durante l\'eliminazione. Riprova.');
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -188,24 +210,76 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                     )}
                   </div>
 
-                  {kit.status === 'error' && kit.errorMessage && (
-                    <p className="text-xs text-red-600 dark:text-red-400 mt-2">
-                      {kit.errorMessage}
-                    </p>
+                  {kit.status === 'processing' && (
+                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <Loader2 className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0 animate-spin" />
+                        <div className="flex-1">
+                          <p className="text-xs font-medium text-blue-800 dark:text-blue-300">
+                            Generazione in corso...
+                          </p>
+                          <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
+                            Questo processo può richiedere alcuni minuti
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {kit.status === 'error' && (
+                    <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-xs font-medium text-red-800 dark:text-red-300">
+                            Generazione fallita
+                          </p>
+                          {kit.errorMessage && (
+                            <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+                              {kit.errorMessage}
+                            </p>
+                          )}
+                          <p className="text-xs text-red-600 dark:text-red-500 mt-2">
+                            Puoi eliminare questo Study Kit e riprovare con un altro file.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
 
-                {kit.status === 'ready' && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => onSelect?.(kit)}
-                    className="ml-4"
-                  >
-                    <Eye className="w-4 h-4 mr-2" />
-                    Apri
-                  </Button>
-                )}
+                <div className="ml-4 flex items-center gap-2">
+                  {kit.status === 'ready' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onSelect?.(kit)}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Apri
+                    </Button>
+                  )}
+                  {kit.status === 'error' && (
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDelete(kit.id, kit.title)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Elimina
+                    </Button>
+                  )}
+                  {kit.status === 'processing' && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDelete(kit.id, kit.title)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Annulla
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

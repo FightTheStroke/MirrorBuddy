@@ -128,24 +128,30 @@ function generateAccessibilityCSS(settings: {
 function buildDemoCode(demoData: DemoData, accessibilityCSS: string = ''): string | null {
   // If we have a direct code property, use it
   if (demoData.code) {
-    // C-7 FIX: Inject accessibility CSS into existing code
-    if (accessibilityCSS && demoData.code.includes('<head>')) {
+    // KaTeX support for STEM formulas
+    const katexHead = `
+  <!-- KaTeX for STEM mathematical formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
+`;
+
+    // C-7 FIX: Inject accessibility CSS and KaTeX into existing code
+    if (demoData.code.includes('<head>')) {
       return demoData.code.replace(
         '<head>',
-        `<head><style id="accessibility-styles">${accessibilityCSS}</style>`
+        `<head>${katexHead}<style id="accessibility-styles">${accessibilityCSS}</style>`
       );
     }
-    if (accessibilityCSS && demoData.code.includes('<html>')) {
+    if (demoData.code.includes('<html>')) {
       return demoData.code.replace(
         '<html>',
-        `<html><head><style id="accessibility-styles">${accessibilityCSS}</style></head>`
+        `<html><head>${katexHead}<style id="accessibility-styles">${accessibilityCSS}</style></head>`
       );
     }
     // Fallback: wrap with style tag at the beginning
-    if (accessibilityCSS) {
-      return `<style id="accessibility-styles">${accessibilityCSS}</style>${demoData.code}`;
-    }
-    return demoData.code;
+    return `${katexHead}<style id="accessibility-styles">${accessibilityCSS}</style>${demoData.code}`;
   }
 
   // If we have html/css/js parts, combine them
@@ -155,6 +161,11 @@ function buildDemoCode(demoData: DemoData, accessibilityCSS: string = ''): strin
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- KaTeX for STEM mathematical formulas -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
+    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
   <style id="accessibility-styles">${accessibilityCSS}</style>
   <style>${demoData.css || ''}</style>
 </head>

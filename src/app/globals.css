@@ -409,7 +409,11 @@ body {
     color: black !important;
   }
 
-  .no-print {
+  .no-print,
+  button,
+  nav,
+  aside,
+  footer {
     display: none !important;
   }
 
@@ -426,9 +430,101 @@ body {
   /* Page breaks for educational content */
   h1, h2, h3 {
     page-break-after: avoid;
+    break-after: avoid;
   }
 
   .page-break {
     page-break-before: always;
+    break-before: always;
+  }
+
+  /* Optimize for print */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  /* Study Kit specific styles */
+  .prose {
+    max-width: 100% !important;
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
+  }
+
+  .prose h1 { font-size: 24pt !important; margin-top: 0 !important; }
+  .prose h2 { font-size: 18pt !important; }
+  .prose h3 { font-size: 14pt !important; }
+  .prose p { margin-bottom: 12pt !important; }
+
+  /* Hide tabs navigation */
+  [role="tablist"] {
+    display: none !important;
+  }
+
+  /* Show only active tab content */
+  [role="tabpanel"]:not([hidden]) {
+    display: block !important;
+  }
+
+  /* Study Kit Viewer: Hide ALL UI chrome, show ONLY summary */
+  /* Hide action buttons (Download, PDF, Delete) */
+  button[aria-label*="Scarica"],
+  button[aria-label*="Stampa"],
+  button[aria-label*="Elimina"],
+  button[title*="Scarica"],
+  button[title*="Stampa"],
+  button[title*="PDF"] {
+    display: none !important;
+  }
+
+  /* Hide all SVG icons in Study Kit header */
+  header svg,
+  .lucide {
+    display: none !important;
+  }
+
+  /* Hide metadata stats (page count, word count, materials) */
+  .text-xs.text-slate-500 {
+    display: none !important;
+  }
+
+  /* Hide subject subtitle */
+  .text-sm.text-slate-600 {
+    display: none !important;
+  }
+
+  /* Hide demo and quiz tabs content when printing */
+  [role="tabpanel"][id*="demo"],
+  [role="tabpanel"][id*="quiz"],
+  [role="tabpanel"][id*="mindmap"] {
+    display: none !important;
+  }
+
+  /* Ensure summary tab is visible */
+  [role="tabpanel"][id*="summary"] {
+    display: block !important;
+  }
+
+  /* Clean up borders and backgrounds for print */
+  * {
+    border: none !important;
+    background: white !important;
+  }
+
+  /* Preserve essential content styling */
+  .prose,
+  .prose * {
+    background: transparent !important;
+  }
+
+  /* Page breaks for long content */
+  .prose > * {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  .prose > p {
+    orphans: 3;
+    widows: 3;
   }
 }
