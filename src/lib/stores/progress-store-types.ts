@@ -21,7 +21,12 @@ export interface StudySession {
   endedAt?: Date;
   durationMinutes?: number;
   questionsAsked: number;
-  xpEarned: number; // Backward compatibility
+  /**
+   * @deprecated Use `mirrorBucksEarned` instead. This field mirrors mirrorBucksEarned
+   * for backward compatibility and will be removed in a future version.
+   */
+  xpEarned: number;
+  /** Primary currency earned in this session - source of truth */
   mirrorBucksEarned: number;
   grade?: SessionGrade;
 }

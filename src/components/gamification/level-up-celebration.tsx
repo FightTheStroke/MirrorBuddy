@@ -8,13 +8,19 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
-// Pre-generate confetti positions to avoid Math.random during render
+// Pre-generate confetti positions at module load to avoid hydration issues
+// Uses seeded randomization based on index for reproducibility across SSR/client
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 9999) * 10000;
+  return x - Math.floor(x);
+}
+
 function generateConfettiParticles(count: number) {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
-    left: `${(i * 2) % 100}%`,
-    delay: `${(i * 0.04) % 2}s`,
-    duration: `${3 + (i % 3)}s`,
+    left: `${Math.floor(seededRandom(i * 7 + 1) * 100)}%`,
+    delay: `${(seededRandom(i * 13 + 2) * 2).toFixed(2)}s`,
+    duration: `${(2.5 + seededRandom(i * 17 + 3) * 2).toFixed(1)}s`,
   }));
 }
 
@@ -52,10 +58,10 @@ export function LevelUpCelebration({
     // Trigger animation after mount
     const showTimer = setTimeout(() => setIsVisible(true), 50);
 
-    // Auto-dismiss after 5 seconds
+    // Auto-dismiss after 8 seconds (WCAG 2.2.1 recommends sufficient time for users)
     const dismissTimer = setTimeout(() => {
       handleDismiss();
-    }, 5000);
+    }, 8000);
 
     return () => {
       clearTimeout(showTimer);

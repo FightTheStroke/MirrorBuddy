@@ -12,6 +12,39 @@ import type { SubjectMastery, SeasonHistory } from '@/types';
 import type { SessionGrade, ProgressState } from './progress-store-types';
 import type { StoreApi } from 'zustand';
 
+/**
+ * Fire-and-forget fetch with exponential backoff retry.
+ * @param url - API endpoint
+ * @param options - Fetch options
+ * @param maxRetries - Maximum retry attempts (default: 3)
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  maxRetries = 3
+): Promise<void> {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.ok) return;
+      // Don't retry on client errors (4xx)
+      if (response.status >= 400 && response.status < 500) {
+        logger.warn('Client error, not retrying', { url, status: response.status });
+        return;
+      }
+      throw new Error(`HTTP ${response.status}`);
+    } catch (err) {
+      if (attempt === maxRetries) {
+        logger.warn('Max retries reached for API call', { url, error: err });
+        return;
+      }
+      // Exponential backoff: 1s, 2s, 4s
+      const delay = Math.pow(2, attempt) * 1000;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+}
+
 type SetState = StoreApi<ProgressState>['setState'];
 type GetState = StoreApi<ProgressState>['getState'];
 
@@ -60,8 +93,8 @@ export function createProgressActions(set: SetState, get: GetState) {
             });
         }
 
-        // Persist to gamification DB (fire and forget)
-        fetch('/api/gamification/points', {
+        // Persist to gamification DB with retry
+        fetchWithRetry('/api/gamification/points', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -70,16 +103,15 @@ export function createProgressActions(set: SetState, get: GetState) {
             sourceId,
             sourceType,
           }),
-        }).catch((err) => {
-          logger.warn('Failed to persist points to gamification DB', { error: err });
         });
 
-        // Update current session
+        // Update current session (xpEarned mirrors mirrorBucksEarned for backward compat)
+        const newMbEarned = (state.currentSession?.mirrorBucksEarned ?? 0) + amount;
         const updatedSession = state.currentSession
           ? {
               ...state.currentSession,
-              xpEarned: state.currentSession.xpEarned + amount,
-              mirrorBucksEarned: state.currentSession.mirrorBucksEarned + amount,
+              xpEarned: newMbEarned,
+              mirrorBucksEarned: newMbEarned,
             }
           : null;
 
@@ -152,13 +184,11 @@ export function createProgressActions(set: SetState, get: GetState) {
           onStreakMilestone(newCurrent);
         }
 
-        // Persist to gamification DB (fire and forget)
-        fetch('/api/gamification/streak', {
+        // Persist to gamification DB with retry
+        fetchWithRetry('/api/gamification/streak', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ minutes: studyMinutes || 0 }),
-        }).catch((err) => {
-          logger.warn('Failed to persist streak to gamification DB', { error: err });
         });
 
         return {
@@ -221,6 +251,17 @@ export function createProgressActions(set: SetState, get: GetState) {
 
     startSession: (maestroId: string, subject: string) =>
       set((state: ProgressState) => {
+        // Session template (xpEarned mirrors mirrorBucksEarned for backward compat)
+        const newSession = {
+          id: crypto.randomUUID(),
+          maestroId,
+          subject,
+          startedAt: new Date(),
+          questionsAsked: 0,
+          xpEarned: 0, // @deprecated - use mirrorBucksEarned
+          mirrorBucksEarned: 0,
+        };
+
         // End any existing session first
         if (state.currentSession) {
           const endedSession = {
@@ -231,29 +272,13 @@ export function createProgressActions(set: SetState, get: GetState) {
             ),
           };
           return {
-            currentSession: {
-              id: crypto.randomUUID(),
-              maestroId,
-              subject,
-              startedAt: new Date(),
-              questionsAsked: 0,
-              xpEarned: 0,
-              mirrorBucksEarned: 0,
-            },
+            currentSession: newSession,
             sessionHistory: [endedSession, ...state.sessionHistory].slice(0, 100),
             pendingSync: true,
           };
         }
         return {
-          currentSession: {
-            id: crypto.randomUUID(),
-            maestroId,
-            subject,
-            startedAt: new Date(),
-            questionsAsked: 0,
-            xpEarned: 0,
-            mirrorBucksEarned: 0,
-          },
+          currentSession: newSession,
           pendingSync: true,
         };
       }),

@@ -6,6 +6,20 @@
 import type { Season, SeasonName } from '@/types';
 
 /**
+ * Check if a year is a leap year.
+ */
+function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+/**
+ * Get the last day of February for a given year.
+ */
+function getFebruaryEndDay(year: number): number {
+  return isLeapYear(year) ? 29 : 28;
+}
+
+/**
  * Get the current season based on today's date.
  * Seasons are aligned with Italian school trimesters:
  * - Autunno (Fall): Sep 1 - Nov 30
@@ -28,10 +42,11 @@ export function getCurrentSeason(): Season {
     };
   } else if (month === 11 || month === 0 || month === 1) {
     // Dec, Jan, Feb (11, 0, 1)
+    const endYear = month === 11 ? year + 1 : year;
     return {
       name: 'Inverno',
       startDate: new Date(month === 11 ? year : year - 1, 11, 1), // Dec 1
-      endDate: new Date(year, 1, 28, 23, 59, 59), // Feb 28 (leap year handled)
+      endDate: new Date(endYear, 1, getFebruaryEndDay(endYear), 23, 59, 59),
       icon: '❄️',
     };
   } else if (month >= 2 && month <= 4) {
@@ -87,7 +102,7 @@ export function getSeasonByName(name: SeasonName, year: number): Season {
       return {
         name: 'Inverno',
         startDate: new Date(year, 11, 1),
-        endDate: new Date(year + 1, 1, 28, 23, 59, 59),
+        endDate: new Date(year + 1, 1, getFebruaryEndDay(year + 1), 23, 59, 59),
         icon: '❄️',
       };
     case 'Primavera':
