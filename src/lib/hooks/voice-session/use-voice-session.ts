@@ -222,7 +222,8 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     return () => {
       disconnect();
     };
-  }, [disconnect]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps: cleanup should only run on unmount, not when disconnect changes
 
   // ============================================================================
   // ACTIONS

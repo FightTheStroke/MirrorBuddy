@@ -2,6 +2,8 @@
 
 # CLAUDE.md
 
+icon: public/logo-brain.png
+
 AI-powered educational platform for students with learning differences.  
 17 AI "Maestros", voice, FSRS flashcards, mind maps, quizzes, gamification.
 
