@@ -130,9 +130,9 @@ export function PomodoroHeaderWidget() {
             bonuses.push(`+${POMODORO_XP.CYCLE_BONUS} ciclo completo`);
           }
 
-          // Award XP and update streak
+          // Award XP and update streak with focus minutes
           addXP(xpEarned);
-          updateStreak();
+          updateStreak(settings.focusMinutes);
 
           const nextPhase = isLongBreak ? 'longBreak' : 'shortBreak';
           const nextTime = isLongBreak ? settings.longBreakMinutes * 60 : settings.shortBreakMinutes * 60;

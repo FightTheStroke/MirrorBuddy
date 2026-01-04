@@ -13,8 +13,28 @@ import { serverNotifications } from '@/lib/notifications/server-triggers';
 
 // #92: Zod schema for progress validation
 const ProgressUpdateSchema = z.object({
-  xp: z.number().int().min(0).max(1000000).optional(),
+  xp: z.number().int().min(0).max(10000000).optional(), // Backward compatibility
+  mirrorBucks: z.number().int().min(0).max(10000000).optional(),
   level: z.number().int().min(1).max(100).optional(),
+  // Season system
+  seasonMirrorBucks: z.number().int().min(0).max(10000000).optional(),
+  seasonLevel: z.number().int().min(1).max(100).optional(),
+  allTimeLevel: z.number().int().min(1).max(100).optional(),
+  currentSeason: z.object({
+    name: z.enum(['Autunno', 'Inverno', 'Primavera', 'Estate']),
+    startDate: z.string().datetime().or(z.date()),
+    endDate: z.string().datetime().or(z.date()),
+    icon: z.string(),
+  }).optional(),
+  seasonHistory: z.array(z.object({
+    season: z.enum(['Autunno', 'Inverno', 'Primavera', 'Estate']),
+    year: z.number().int(),
+    mirrorBucksEarned: z.number().int(),
+    levelReached: z.number().int(),
+    achievementsUnlocked: z.number().int(),
+    studyMinutes: z.number().int(),
+  })).optional(),
+  // Other fields
   totalStudyMinutes: z.number().int().min(0).max(100000).optional(),
   questionsAsked: z.number().int().min(0).max(100000).optional(),
   sessionsThisWeek: z.number().int().min(0).max(1000).optional(),
@@ -56,9 +76,15 @@ export async function GET() {
       });
     }
 
-    // Parse JSON fields
+    // Parse JSON fields and add season data
     return NextResponse.json({
       ...progress,
+      mirrorBucks: progress.xp ?? 0, // Map xp to mirrorBucks for backward compatibility
+      seasonMirrorBucks: progress.seasonMirrorBucks ?? 0,
+      seasonLevel: progress.seasonLevel ?? 1,
+      allTimeLevel: progress.allTimeLevel ?? progress.level ?? 1,
+      currentSeason: progress.currentSeason ? JSON.parse(progress.currentSeason) : null,
+      seasonHistory: progress.seasonHistory ? JSON.parse(progress.seasonHistory) : [],
       achievements: JSON.parse(progress.achievements || '[]'),
       masteries: JSON.parse(progress.masteries || '[]'),
       streak: {
@@ -115,8 +141,27 @@ export async function PUT(request: NextRequest) {
     // Map from frontend format to database format
     const updateData: Record<string, unknown> = {};
 
-    if (data.xp !== undefined) updateData.xp = data.xp;
+    // MirrorBucks system (xp is backward compatibility alias)
+    if (data.mirrorBucks !== undefined) {
+      updateData.xp = data.mirrorBucks;
+    } else if (data.xp !== undefined) {
+      updateData.xp = data.xp;
+    }
+
     if (data.level !== undefined) updateData.level = data.level;
+    if (data.seasonMirrorBucks !== undefined) updateData.seasonMirrorBucks = data.seasonMirrorBucks;
+    if (data.seasonLevel !== undefined) updateData.seasonLevel = data.seasonLevel;
+    if (data.allTimeLevel !== undefined) updateData.allTimeLevel = data.allTimeLevel;
+
+    // Season data as JSON
+    if (data.currentSeason !== undefined) {
+      updateData.currentSeason = JSON.stringify(data.currentSeason);
+    }
+    if (data.seasonHistory !== undefined) {
+      updateData.seasonHistory = JSON.stringify(data.seasonHistory);
+    }
+
+    // Other fields
     if (data.totalStudyMinutes !== undefined) updateData.totalStudyMinutes = data.totalStudyMinutes;
     if (data.questionsAsked !== undefined) updateData.questionsAsked = data.questionsAsked;
     if (data.sessionsThisWeek !== undefined) updateData.sessionsThisWeek = data.sessionsThisWeek;
@@ -180,6 +225,12 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       ...progress,
+      mirrorBucks: progress.xp ?? 0,
+      seasonMirrorBucks: progress.seasonMirrorBucks ?? 0,
+      seasonLevel: progress.seasonLevel ?? 1,
+      allTimeLevel: progress.allTimeLevel ?? progress.level ?? 1,
+      currentSeason: progress.currentSeason ? JSON.parse(progress.currentSeason) : null,
+      seasonHistory: progress.seasonHistory ? JSON.parse(progress.seasonHistory) : [],
       achievements: JSON.parse(progress.achievements || '[]'),
       masteries: JSON.parse(progress.masteries || '[]'),
       streak: {

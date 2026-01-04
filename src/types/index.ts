@@ -45,6 +45,9 @@ export type {
   GradeType,
   Grade,
   SubjectGrades,
+  SeasonName,
+  Season,
+  SeasonHistory,
 } from './gamification';
 
 // User types

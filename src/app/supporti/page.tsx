@@ -1,44 +1,40 @@
 'use client';
 
 /**
- * Supporti Page (Wave 4)
- * Consolidated archive for all learning materials
+ * Supporti Page (Wave 4) - DEPRECATED
+ * Redirects to /zaino (school metaphor)
  * Route: /supporti
  */
 
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { SupportiView } from './components/supporti-view';
+import { useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-function SupportiContent() {
+function SupportiRedirect() {
+  const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Extract filter params from URL
-  const type = searchParams.get('type') || undefined;
-  const subject = searchParams.get('subject') || undefined;
-  const maestro = searchParams.get('maestro') || undefined;
-  const source = searchParams.get('source') || undefined;
+  useEffect(() => {
+    // Preserve query parameters
+    const queryString = searchParams.toString();
+    const destination = queryString ? `/zaino?${queryString}` : '/zaino';
+    router.replace(destination);
+  }, [router, searchParams]);
 
   return (
-    <SupportiView
-      initialType={type}
-      initialSubject={subject}
-      initialMaestro={maestro}
-      initialSource={source}
-    />
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+    </div>
   );
 }
 
 export default function SupportiPage() {
   return (
-    <main className="h-full">
-      <Suspense fallback={
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-        </div>
-      }>
-        <SupportiContent />
-      </Suspense>
-    </main>
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    }>
+      <SupportiRedirect />
+    </Suspense>
   );
 }
