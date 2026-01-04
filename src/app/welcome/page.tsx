@@ -146,12 +146,41 @@ function WelcomeContent() {
     },
   });
 
-  // Fetch voice connection info on mount
+  // Fetch voice connection info on mount (with sessionStorage cache to avoid rate limits)
   useEffect(() => {
     async function fetchConnectionInfo() {
       try {
+        // Check cache first (valid for browser session)
+        const cached = sessionStorage.getItem('voice-connection-info');
+        if (cached) {
+          try {
+            const data = JSON.parse(cached);
+            // Verify it's still valid (has required fields)
+            if (data.provider && data.proxyPort !== undefined) {
+              setConnectionInfo(data as VoiceConnectionInfo);
+              setHasCheckedAzure(true);
+              return;
+            }
+          } catch {
+            // Invalid cache, fetch fresh
+            sessionStorage.removeItem('voice-connection-info');
+          }
+        }
+
+        // Fetch from API
         const response = await fetch('/api/realtime/token');
         const data = await response.json();
+
+        if (response.status === 429) {
+          // Rate limited - use Web Speech fallback
+          logger.warn('[WelcomePage] Rate limit exceeded, using Web Speech fallback', {
+            retryAfter: data.retryAfter,
+          });
+          setHasCheckedAzure(true);
+          setUseWebSpeechFallback(true);
+          return;
+        }
+
         if (data.error) {
           // Voice API not available - graceful fallback (not an error in test/dev environments)
           logger.warn('[WelcomePage] Voice API not available, using Web Speech fallback', {
@@ -161,6 +190,9 @@ function WelcomeContent() {
           setUseWebSpeechFallback(true);
           return;
         }
+
+        // Cache for session
+        sessionStorage.setItem('voice-connection-info', JSON.stringify(data));
         setConnectionInfo(data as VoiceConnectionInfo);
         setHasCheckedAzure(true);
       } catch (error) {

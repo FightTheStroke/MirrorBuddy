@@ -299,17 +299,44 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     };
   }, [maestro.greeting, maestro.id]);
 
-  // Fetch voice connection info on mount (like CharacterChatView pattern)
+  // Fetch voice connection info on mount (with sessionStorage cache to avoid rate limits)
   useEffect(() => {
     async function fetchConnectionInfo() {
       try {
+        // Check cache first (valid for browser session)
+        const cached = sessionStorage.getItem('voice-connection-info');
+        if (cached) {
+          try {
+            const data = JSON.parse(cached);
+            // Verify it's still valid (has required fields)
+            if (data.provider && data.proxyPort !== undefined) {
+              setConnectionInfo(data);
+              return;
+            }
+          } catch {
+            // Invalid cache, fetch fresh
+            sessionStorage.removeItem('voice-connection-info');
+          }
+        }
+
+        // Fetch from API
         const response = await fetch('/api/realtime/token');
         const data = await response.json();
+
+        if (response.status === 429) {
+          logger.warn('Rate limit exceeded for voice token', { retryAfter: data.retryAfter });
+          setConfigError('Troppe richieste. Riprova tra qualche secondo.');
+          return;
+        }
+
         if (data.error) {
           logger.error('Voice API error', { error: data.error });
           setConfigError(data.message || 'Servizio vocale non configurato');
           return;
         }
+
+        // Cache for session
+        sessionStorage.setItem('voice-connection-info', JSON.stringify(data));
         setConnectionInfo(data);
       } catch (error) {
         logger.error('Failed to get voice connection info', { error: String(error) });

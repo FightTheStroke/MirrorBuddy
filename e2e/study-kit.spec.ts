@@ -83,9 +83,8 @@ test.describe('Study Kit Viewer - Quiz Interactive', () => {
     const hasRedBorder = await page.locator('.border-red-500, [class*="bg-red"]').first().isVisible({ timeout: 2000 }).catch(() => false);
     expect(hasGreenBorder || hasRedBorder).toBeTruthy();
 
-    // Should show explanation after answer
-    const explanation = page.locator('text=/Spiegazione|Risposta corretta/i').first();
-    const hasExplanation = await explanation.isVisible({ timeout: 2000 }).catch(() => false);
+    // Should show explanation after answer (optional check)
+    const _hasExplanation = await page.locator('text=/Spiegazione|Risposta corretta/i').first().isVisible({ timeout: 2000 }).catch(() => false);
 
     // F-Q3: After answering all questions, should show completion screen
     // For now, just verify next button exists to continue
@@ -137,8 +136,7 @@ test.describe('Study Kit Viewer - Demo Interactive', () => {
         await expect(modal).toBeVisible({ timeout: 3000 });
 
         // F-D2: Should have iframe with demo content (KaTeX may be present)
-        const iframe = page.locator('iframe').first();
-        const hasIframe = await iframe.isVisible({ timeout: 2000 }).catch(() => false);
+        const _hasIframe = await page.locator('iframe').first().isVisible({ timeout: 2000 }).catch(() => false);
 
         // F-D3: Should have close button
         const closeButton = page.locator('button[aria-label*="Chiudi"]').first();
