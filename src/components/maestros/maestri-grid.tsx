@@ -2,12 +2,11 @@
 
 import { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { MaestroCard } from './maestro-card';
+import { PersonalizedSuggestion } from './personalized-suggestion';
 import { maestri, subjectNames, subjectIcons, subjectColors, getAllSubjects } from '@/data';
 import { cn } from '@/lib/utils';
 import type { Maestro, Subject } from '@/types';
-import type { ToolType } from '@/types/tools';
 
 type SessionMode = 'voice' | 'chat';
 
@@ -21,18 +20,20 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
 
   const subjects = getAllSubjects();
 
-  // Filter maestri based on search and subject (React Compiler handles memoization)
-  const filteredMaestri = maestri.filter((m) => {
-    const matchesSearch =
-      m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      subjectNames[m.subject].toLowerCase().includes(searchQuery.toLowerCase());
+  // Filter and sort maestri alphabetically by name
+  const filteredMaestri = maestri
+    .filter((m) => {
+      const matchesSearch =
+        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        subjectNames[m.subject].toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesSubject =
-      selectedSubject === 'all' || m.subject === selectedSubject;
+      const matchesSubject =
+        selectedSubject === 'all' || m.subject === selectedSubject;
 
-    return matchesSearch && matchesSubject;
-  });
+      return matchesSearch && matchesSubject;
+    })
+    .sort((a, b) => a.name.localeCompare(b.name, 'it'));
 
   // Click on maestro goes directly to voice
   const handleSelect = (maestro: Maestro) => {
@@ -41,103 +42,63 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
     }
   };
 
-  // Handle tool request from maestro card - opens chat with tool request
-  const handleToolRequest = (maestro: Maestro, tool: ToolType) => {
-    // Store tool request in sessionStorage for chat to pick up
-    sessionStorage.setItem('pendingToolRequest', JSON.stringify({ tool, maestroId: maestro.id }));
-    if (onMaestroSelect) {
-      onMaestroSelect(maestro, 'chat');
-    }
-  };
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            I Tuoi Professori
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Scegli un professore per iniziare a studiare
-          </p>
-        </div>
+    <div className="space-y-4">
+      {/* Dynamic Hero */}
+      <PersonalizedSuggestion onMaestroSelect={handleSelect} />
 
-        {/* Search */}
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+      {/* Search + Filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Cerca professore o materia..."
+            placeholder="Cerca..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+            className="w-40 pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
+            aria-label="Cerca professore o materia"
           />
         </div>
-      </div>
-
-      {/* Subject filters */}
-      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setSelectedSubject('all')}
           className={cn(
-            'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all',
+            'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
             selectedSubject === 'all'
-              ? 'bg-accent-themed text-white'
+              ? 'bg-violet-600 text-white'
               : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
           )}
         >
-          ✨ Tutti ({maestri.length})
+          Tutti
         </button>
         {subjects.map((subject) => {
-          const count = maestri.filter((m) => m.subject === subject).length;
           const isSelected = selectedSubject === subject;
           return (
             <button
               key={subject}
               onClick={() => setSelectedSubject(subject)}
               className={cn(
-                'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all',
+                'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 isSelected
                   ? 'text-white'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
               )}
-              style={
-                isSelected
-                  ? { backgroundColor: subjectColors[subject] }
-                  : {}
-              }
+              style={isSelected ? { backgroundColor: subjectColors[subject] } : undefined}
+              aria-pressed={isSelected}
             >
               <span>{subjectIcons[subject]}</span>
-              {subjectNames[subject]} ({count})
+              <span className="hidden sm:inline">{subjectNames[subject]}</span>
             </button>
           );
         })}
       </div>
 
-      {/* Grid */}
-      <motion.div
-        layout
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-      >
-        {filteredMaestri.map((maestro, index) => (
-          <motion.div
-            key={maestro.id}
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ delay: index * 0.05 }}
-          >
-            <MaestroCard
-              maestro={maestro}
-              onSelect={handleSelect}
-              showToolButtons={true}
-              onToolRequest={handleToolRequest}
-            />
-          </motion.div>
+      {/* Grid - compact cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {filteredMaestri.map((maestro) => (
+          <MaestroCard key={maestro.id} maestro={maestro} onSelect={handleSelect} />
         ))}
-      </motion.div>
+      </div>
 
       {/* Empty state */}
       {filteredMaestri.length === 0 && (

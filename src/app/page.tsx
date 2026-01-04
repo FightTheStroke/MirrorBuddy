@@ -6,24 +6,21 @@ import { motion } from 'framer-motion';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import {
   GraduationCap,
-  BookOpen,
-  Brain,
   Trophy,
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
-  Target,
   Flame,
-  Network,
   Calendar,
   Heart,
   Sparkles,
   Clock,
   Star,
   Users,
-  FileText,
-  Upload,
-  Archive,
+  Pencil,      // Astuccio icon
+  Backpack,    // Zaino icon
+  Coins,       // MirrorBucks icon
+  BookOpen,    // Sessions stat icon
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -33,19 +30,12 @@ import { NotificationBell } from '@/components/notifications/notification-bell';
 import { PomodoroHeaderWidget } from '@/components/pomodoro';
 import { AmbientAudioHeaderWidget } from '@/components/ambient-audio';
 import {
-  LazyQuizView,
-  LazyFlashcardsView,
-  LazyMindmapsView,
-  LazySummariesView,
-  LazyHomeworkHelpView,
   LazyCalendarView,
-  LazyHTMLSnippetsView,
-  LazySupportiView,
-  LazyStudyKitView,
-  LazyArchiveView,
+  LazySupportiView,    // Used for Zaino (archive)
+  LazyStudyKitView,    // Used for Astuccio (tools hub)
   LazyGenitoriView,
 } from '@/components/education';
-import { CharacterChatView } from '@/components/conversation';
+import { CharacterChatView, ActiveMaestroAvatar } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { Button } from '@/components/ui/button';
@@ -54,9 +44,10 @@ import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { FocusToolLayout } from '@/components/tools/focus-tool-layout';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
-import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'quiz' | 'flashcards' | 'mindmaps' | 'summaries' | 'homework' | 'studykit' | 'supporti' | 'calendar' | 'demos' | 'progress' | 'archivio' | 'genitori' | 'settings';
+// Simplified views: removed quiz, flashcards, mindmaps, summaries, homework, demos, archivio
+// These are now accessed via Zaino (browse) or Astuccio (create)
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'astuccio' | 'zaino' | 'calendar' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -101,7 +92,17 @@ export default function Home() {
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
 
-  const { xp, level, streak, totalStudyMinutes, sessionsThisWeek, questionsAsked } = useProgressStore();
+  const {
+    mirrorBucks: _mirrorBucks, // All-time (not shown, season takes priority)
+    seasonMirrorBucks,
+    seasonLevel,
+    level: _level, // All-time level (not shown, season takes priority)
+    currentSeason,
+    streak,
+    totalStudyMinutes,
+    sessionsThisWeek,
+    questionsAsked
+  } = useProgressStore();
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
   const { focusMode } = useUIStore();
@@ -136,12 +137,12 @@ export default function Home() {
     return null;
   }
 
-  // XP calculations (using centralized constants)
-  const currentLevelXP = XP_PER_LEVEL[level - 1] || 0;
-  const nextLevelXP = XP_PER_LEVEL[level] || XP_PER_LEVEL[XP_PER_LEVEL.length - 1];
-  const xpInLevel = xp - currentLevelXP;
-  const xpNeeded = nextLevelXP - currentLevelXP;
-  const progressPercent = Math.min(100, (xpInLevel / xpNeeded) * 100);
+  // MirrorBucks calculations (100 levels per season, 1000 MB per level)
+  const MB_PER_LEVEL = 1000;
+  const mbInLevel = seasonMirrorBucks % MB_PER_LEVEL;
+  const mbNeeded = MB_PER_LEVEL;
+  const progressPercent = Math.min(100, (mbInLevel / mbNeeded) * 100);
+  const seasonName = currentSeason?.name || 'Autunno';
 
   // Format study time
   const hours = Math.floor(totalStudyMinutes / 60);
@@ -154,23 +155,17 @@ export default function Home() {
   const coachInfo = COACH_INFO[selectedCoach];
   const buddyInfo = BUDDY_INFO[selectedBuddy];
 
+  // Simplified navigation: Zaino = archive, Astuccio = tools hub
   const navItems = [
     { id: 'coach' as const, label: coachInfo.name, icon: Sparkles, isChat: true, avatar: coachInfo.avatar },
     { id: 'buddy' as const, label: buddyInfo.name, icon: Heart, isChat: true, avatar: buddyInfo.avatar },
     { id: 'maestri' as const, label: 'Professori', icon: GraduationCap },
-    { id: 'quiz' as const, label: 'Quiz', icon: Brain },
-    { id: 'flashcards' as const, label: 'Flashcards', icon: BookOpen },
-    { id: 'mindmaps' as const, label: 'Mappe Mentali', icon: Network },
-    { id: 'summaries' as const, label: 'Riassunti', icon: FileText },
-    { id: 'homework' as const, label: 'Materiali', icon: Target },
-    { id: 'studykit' as const, label: 'Study Kit', icon: Upload },
-    { id: 'supporti' as const, label: 'Supporti', icon: Archive },
-    { id: 'archivio' as const, label: 'Archivio', icon: BookOpen },
+    { id: 'astuccio' as const, label: 'Astuccio', icon: Pencil },     // Tools hub (create)
+    { id: 'zaino' as const, label: 'Zaino', icon: Backpack },         // Materials archive (browse)
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
-    { id: 'demos' as const, label: 'Demo', icon: Brain },
-    { id: 'progress' as const, label: 'Progressi', icon: Trophy },
-    { id: 'genitori' as const, label: 'Genitori', icon: Users },
+    { id: 'progress' as const, label: 'Dashboard', icon: Trophy },    // Renamed from Progressi
     { id: 'settings' as const, label: 'Impostazioni', icon: Settings },
+    // 'genitori' accessed via Parent Access button at sidebar bottom
   ];
 
   return (
@@ -182,19 +177,20 @@ export default function Home() {
           sidebarOpen ? 'left-64' : 'left-20'
         )}
       >
-        {/* Level + XP Progress */}
-        <div className="flex items-center gap-3 min-w-[200px]">
-          <div className="w-8 h-8 rounded-full bg-accent-themed flex items-center justify-center flex-shrink-0">
-            <Trophy className="w-4 h-4 text-white" />
+        {/* Level + MirrorBucks Progress */}
+        <div className="flex items-center gap-3 min-w-[240px]">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
+            <Coins className="w-4 h-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-baseline gap-2 text-sm">
-              <span className="font-bold text-slate-900 dark:text-white">Lv.{level}</span>
-              <span className="text-xs text-slate-500">{xpInLevel}/{xpNeeded} XP</span>
+              <span className="font-bold text-slate-900 dark:text-white">Lv.{seasonLevel}</span>
+              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">{seasonName}</span>
+              <span className="text-xs text-slate-500">{mbInLevel}/{mbNeeded} MB</span>
             </div>
-            <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-32">
+            <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-36">
               <motion.div
-                className="h-full bg-accent-themed rounded-full"
+                className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 0.5 }}
@@ -231,7 +227,7 @@ export default function Home() {
           {streak.current >= 3 && (
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium">
               <Flame className="w-3 h-3" />
-              +{Math.min(streak.current * 10, 50)}% XP
+              +{Math.min(streak.current * 10, 50)}% MB
             </div>
           )}
         </div>
@@ -297,9 +293,6 @@ export default function Home() {
               <button
                 key={item.id}
                 onClick={async () => {
-                  if (item.id === 'genitori') {
-                    markAsViewed();
-                  }
                   await handleViewChange(item.id);
                 }}
                 className={cn(
@@ -325,9 +318,6 @@ export default function Home() {
                 ) : (
                   <div className="relative flex-shrink-0">
                     <item.icon className="h-5 w-5" />
-                    {item.id === 'genitori' && hasNewInsights && (
-                      <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse" />
-                    )}
                   </div>
                 )}
                 {sidebarOpen && <span className="font-medium">{item.label}</span>}
@@ -336,24 +326,42 @@ export default function Home() {
           })}
         </nav>
 
-        {/* XP Progress */}
-        {sidebarOpen && (
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-            <div className="mb-2 flex justify-between text-sm">
-              <span className="text-slate-600 dark:text-slate-400">XP</span>
-              <span className="font-medium text-slate-900 dark:text-white">
-                {xp.toLocaleString()}
-              </span>
+        {/* Active Maestro Avatar - shows during conversation */}
+        <div className="px-4 mb-2">
+          <ActiveMaestroAvatar
+            onReturnToMaestro={() => setCurrentView('maestro-session')}
+          />
+        </div>
+
+        {/* Parent Access Button - replaces old XP bar */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <button
+            onClick={() => {
+              markAsViewed();
+              handleViewChange('genitori');
+            }}
+            className={cn(
+              'w-full flex items-center justify-center gap-2',
+              'px-4 py-2.5 rounded-xl',
+              'bg-indigo-100 dark:bg-indigo-900/40',
+              'hover:bg-indigo-200 dark:hover:bg-indigo-800/50',
+              'border border-indigo-200 dark:border-indigo-700',
+              'text-indigo-700 dark:text-indigo-300',
+              'text-sm font-medium',
+              'transition-all duration-200',
+              'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
+              'relative'
+            )}
+          >
+            <div className="relative">
+              <Users className="w-4 h-4" />
+              {hasNewInsights && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              )}
             </div>
-            <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
-              <motion.div
-                className="h-full bg-accent-themed"
-                initial={{ width: 0 }}
-                animate={{ width: `${(xp % 1000) / 10}%` }}
-              />
-            </div>
-          </div>
-        )}
+            {sidebarOpen && <span>Area Genitori</span>}
+          </button>
+        </div>
       </aside>
 
       {/* Main content */}
@@ -399,27 +407,13 @@ export default function Home() {
             />
           )}
 
-          {currentView === 'quiz' && <LazyQuizView />}
+          {currentView === 'astuccio' && <LazyStudyKitView />}
 
-          {currentView === 'flashcards' && <LazyFlashcardsView />}
-
-          {currentView === 'mindmaps' && <LazyMindmapsView />}
-
-          {currentView === 'summaries' && <LazySummariesView />}
-
-          {currentView === 'homework' && <LazyHomeworkHelpView />}
-
-          {currentView === 'studykit' && <LazyStudyKitView />}
-
-          {currentView === 'supporti' && <LazySupportiView />}
+          {currentView === 'zaino' && <LazySupportiView />}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 
-          {currentView === 'demos' && <LazyHTMLSnippetsView />}
-
           {currentView === 'progress' && <LazyProgressView />}
-
-          {currentView === 'archivio' && <LazyArchiveView />}
 
           {currentView === 'genitori' && <LazyGenitoriView />}
 

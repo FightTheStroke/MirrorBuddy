@@ -5,6 +5,79 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Gamification Fortnite/Duolingo Style
+
+> **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
+
+### Added (Jan 4 - MirrorBucks & Seasons Gamification)
+
+#### Phase 1: Zaino/Astuccio Navigation
+- **Zaino** (`/zaino`): Material archive with dynamic navigation
+  - Filter by materia, data, tipo
+  - Search with Fuse.js fuzzy matching
+  - Preview for mindmaps, demos, summaries
+  - Responsive grid/list view toggle
+- **Astuccio** (`/astuccio`): Creative tools hub
+  - Quick access to all tool types (Quiz, Mappa, Demo, Flashcard, Riassunto)
+  - Tool cards with descriptions and icons
+  - Direct navigation to focused tool creation
+
+#### Phase 2: MirrorBucks & Seasons System
+- **MirrorBucks Currency**: Replaces XP system (Fortnite-style)
+  - 5 MB/minute active conversation
+  - 30 MB per quiz (50 MB if perfect)
+  - 20 MB per mindmap created
+  - 5 MB per flashcard reviewed
+  - 15 MB per Pomodoro completed
+- **Seasonal Progression**: 100 levels per trimester
+  - Autunno (Sep-Nov), Inverno (Dec-Feb), Primavera (Mar-May), Estate (Jun-Aug)
+  - Season reset with history preserved
+  - Current season indicator in dashboard
+- **Achievement System**: 23 unlockable badges
+  - Onboarding (first_chat, first_quiz, first_mindmap, first_flashcards)
+  - Streak (3, 7, 30, 100 days)
+  - Level milestones (10, 50, 100)
+  - Exploration (all subjects, all maestri, all tools)
+  - Time-based (hour studied, night owl, early bird)
+  - Mastery (subject master, quiz perfectionist)
+- **Level-Up Celebrations**: Confetti animation with coach notification
+- **Leaderboard**: Personal stats (day/week/season/year) - multi-user ready
+
+#### Phase 3: Maestri Redesign
+- **Enhanced Maestro Cards**: Larger avatars, emotional design
+  - Rotating famous quotes per maestro (5+ each)
+  - Personalized suggestions ("Ieri hai studiato X")
+  - Removed redundant tool buttons
+- **Sidebar Avatar**: Maestro appears during active conversation
+- **Session Context**: 5-min timeout triggers summary/close
+
+#### Phase 4: Professional Dashboard
+- **Dashboard** (`/dashboard`): Complete telemetry visualization
+  - Study time (today/week/month/season)
+  - MirrorBucks earned and level progress
+  - Sessions per maestro
+  - Learning trends
+  - Azure costs (if configured)
+  - Token usage statistics
+
+#### Phase 5: Fix & Polish
+- **Tool Buttons Responsive**: Flex-wrap on narrow screens
+- **Parent Access Button**: Fixed bottom-left, replaces XP bar concept
+  - Visible on all pages except parent-dashboard, landing, welcome
+  - Icon-only on mobile, full text on desktop
+- **Coach Knowledge Updated**: v2.0 knowledge base with all new features
+  - Zaino/Astuccio navigation
+  - MirrorBucks/Seasons terminology
+  - Achievement system
+  - Dashboard features
+
+### Changed (Jan 4)
+
+- Knowledge base version bumped to 2.0.0
+- Navigation keywords updated for new features
+
+---
+
 ## [Unreleased] - Sprint January 2026 Complete
 
 > **Branch**: `development` | **Plan**: `docs/plans/done/MasterPlan-v2.1-2026-01-02.md`

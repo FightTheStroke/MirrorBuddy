@@ -16,12 +16,13 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useProgressStore } from '@/lib/stores';
-import { XPInfo } from '@/components/gamification';
+import { XPInfo, Leaderboard } from '@/components/gamification';
+import { AnalyticsDashboard } from '@/components/dashboard';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectColors, subjectIcons } from '@/data';
 import type { Subject } from '@/types';
 
-type ProgressTab = 'overview' | 'achievements' | 'mastery' | 'history';
+type ProgressTab = 'overview' | 'analytics' | 'achievements' | 'mastery' | 'history';
 
 const ACHIEVEMENTS = [
   { id: 'first_session', name: 'Prima Lezione', desc: 'Completa la tua prima sessione', icon: '🎓', xp: 50 },
@@ -44,6 +45,7 @@ export function ProgressView() {
 
   const tabs: Array<{ id: ProgressTab; label: string; icon: React.ReactNode }> = [
     { id: 'overview', label: 'Panoramica', icon: <TrendingUp className="w-4 h-4" /> },
+    { id: 'analytics', label: 'Analytics', icon: <Zap className="w-4 h-4" /> },
     { id: 'achievements', label: 'Traguardi', icon: <Trophy className="w-4 h-4" /> },
     { id: 'mastery', label: 'Padronanza', icon: <Star className="w-4 h-4" /> },
     { id: 'history', label: 'Cronologia', icon: <Calendar className="w-4 h-4" /> },
@@ -145,6 +147,8 @@ export function ProgressView() {
             masteries={masteriesRecord}
           />
         )}
+
+        {activeTab === 'analytics' && <AnalyticsDashboard />}
 
         {activeTab === 'achievements' && (
           <AchievementsTab
@@ -372,10 +376,17 @@ function OverviewTab({ xp, level, levelProgress, streak, masteries }: OverviewTa
         </CardContent>
       </Card>
 
-      {/* XP Earning Guide - Full width */}
-      <Card className="lg:col-span-2">
+      {/* Personal Leaderboard */}
+      <Card>
+        <CardContent className="p-4">
+          <Leaderboard />
+        </CardContent>
+      </Card>
+
+      {/* XP Earning Guide */}
+      <Card>
         <CardHeader>
-          <CardTitle>Come Guadagnare XP</CardTitle>
+          <CardTitle>Come Guadagnare MB</CardTitle>
         </CardHeader>
         <CardContent>
           <XPInfo />

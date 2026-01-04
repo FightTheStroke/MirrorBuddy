@@ -31,14 +31,17 @@ export interface Achievement {
   name: string;
   description: string;
   icon: string;
-  category: 'study' | 'mastery' | 'streak' | 'social' | 'exploration' | 'xp';
+  category: 'study' | 'mastery' | 'streak' | 'social' | 'exploration' | 'xp' | 'onboarding' | 'time';
   requirement: number;
   xpReward: number;
+  mirrorBucksReward: number;
   unlockedAt?: Date;
+  condition?: (state: Record<string, unknown>) => boolean;
 }
 
 export interface Progress {
-  xp: number;
+  xp: number; // Backward compatibility alias
+  mirrorBucks: number;
   level: number;
   xpToNextLevel: number;
   streak: Streak;
@@ -47,6 +50,32 @@ export interface Progress {
   totalStudyMinutes: number;
   sessionsThisWeek: number;
   questionsAsked: number;
+  // Season system
+  seasonMirrorBucks: number;
+  seasonLevel: number;
+  allTimeLevel: number;
+  currentSeason: Season;
+  seasonHistory: SeasonHistory[];
+}
+
+// === SEASON TYPES ===
+
+export type SeasonName = 'Autunno' | 'Inverno' | 'Primavera' | 'Estate';
+
+export interface Season {
+  name: SeasonName;
+  startDate: Date;
+  endDate: Date;
+  icon: string;
+}
+
+export interface SeasonHistory {
+  season: SeasonName;
+  year: number;
+  mirrorBucksEarned: number;
+  levelReached: number;
+  achievementsUnlocked: number;
+  studyMinutes: number;
 }
 
 // === GRADE TYPES (Italian System) ===
