@@ -168,6 +168,50 @@ Open http://localhost:3000 and start learning.
 
 ---
 
+## Azure Cost Management
+
+Monitor Azure spending with the included Python backend:
+
+```bash
+# Setup
+cd backend
+cp .env.example .env
+# Edit .env with your Azure subscription ID
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run API server
+uvicorn api.main:app --reload
+```
+
+**Endpoints:**
+- `GET /api/v1/costs?days=30` — Cost summary by service
+- `GET /api/v1/costs/forecast` — Monthly forecast
+- `GET /api/v1/costs/drilldown?days=30` — Detailed breakdown with AI model usage
+
+**Configuration** (all from `.env`, never hardcoded):
+```env
+AZURE_SUBSCRIPTION_ID=your-subscription-id  # Required
+AZURE_SUBSCRIPTION_NAME=My Subscription     # Optional display name
+# Optional - for service principal auth (if not using az login)
+AZURE_TENANT_ID=...
+AZURE_CLIENT_ID=...
+AZURE_CLIENT_SECRET=...
+```
+
+**Quick test** (requires `az login`):
+```bash
+cd backend && python3 -c "
+from api.azure_costs import AzureCostService
+import asyncio
+result = asyncio.run(AzureCostService().get_cost_summary(7))
+print(f'Last 7 days: \${result.total_cost:.2f}')
+"
+```
+
+---
+
 ## Documentation
 
 | Document | Description |
@@ -177,6 +221,7 @@ Open http://localhost:3000 and start learning.
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture details |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [CLAUDE.md](CLAUDE.md) | Developer quick reference |
+| [backend/.env.example](backend/.env.example) | Azure Cost API configuration |
 
 ---
 
