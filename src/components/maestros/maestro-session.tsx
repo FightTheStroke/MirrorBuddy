@@ -46,7 +46,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     webcamRequest,
     configError,
     sessionEnded,
-    previousMessageCount,
+    previousMessageCount: previousMessageCountRef,
     isConnected,
     isListening,
     isSpeaking,
@@ -69,11 +69,11 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
     const currentCount = messages.length + toolCalls.length;
-    if (currentCount > previousMessageCount.current) {
+    if (currentCount > previousMessageCountRef.current) {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-    previousMessageCount.current = currentCount;
-  }, [messages.length, toolCalls.length, previousMessageCount]);
+    previousMessageCountRef.current = currentCount;
+  }, [messages.length, toolCalls.length, previousMessageCountRef]);
 
   // Focus input when not in voice mode
   useEffect(() => {

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { int16ToFloat32 } from './audio-utils';
 import {
@@ -97,6 +97,7 @@ export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (v
       // Determine when to play this chunk
       // If we're behind schedule, catch up; otherwise schedule ahead
       if (refs.nextPlayTimeRef.current < currentTime + CHUNK_GAP_TOLERANCE) {
+        // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
         refs.nextPlayTimeRef.current = currentTime + SCHEDULE_AHEAD_TIME;
       }
 
@@ -151,6 +152,7 @@ export function usePlayNextChunk(
     if (!ctx || refs.audioQueueRef.current.length === 0) {
       // Check if there are still scheduled sources playing
       if (refs.scheduledSourcesRef.current.length === 0) {
+        // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
         refs.isPlayingRef.current = false;
         setSpeaking(false);
         setOutputLevel(0);

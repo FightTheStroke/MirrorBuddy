@@ -83,7 +83,7 @@ export function VoiceSession({ maestro, onClose, onSwitchToChat }: VoiceSessionP
   });
 
   // Connection management
-  const { connectionInfo, configError } = useConnection({
+  const { connectionInfo: _connectionInfo, configError } = useConnection({
     maestro,
     connect,
     isConnected,

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { useSettingsStore } from '@/lib/stores';
 import type { Maestro } from '@/types';

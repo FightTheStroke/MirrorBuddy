@@ -14,13 +14,12 @@ export function useMediaDevices() {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const mics = devices.filter(d => d.kind === 'audioinput');
       setAvailableMics(mics);
-      if (mics.length > 0 && !selectedMicId) {
-        setSelectedMicId(mics[0].deviceId);
-      }
+      // Only set default if no selection exists
+      setSelectedMicId(prev => prev || (mics.length > 0 ? mics[0].deviceId : ''));
     } catch (error) {
       logger.error('Error fetching microphones', { error });
     }
-  }, [selectedMicId]);
+  }, []);
 
   const refreshCameras = useCallback(async () => {
     try {
@@ -29,21 +28,19 @@ export function useMediaDevices() {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const cams = devices.filter(d => d.kind === 'videoinput');
       setAvailableCameras(cams);
-      if (cams.length > 0 && !selectedCamId) {
-        setSelectedCamId(cams[0].deviceId);
-      }
+      // Only set default if no selection exists
+      setSelectedCamId(prev => prev || (cams.length > 0 ? cams[0].deviceId : ''));
     } catch (error) {
       logger.error('Error fetching cameras', { error });
     }
-  }, [selectedCamId]);
+  }, []);
 
+  // Initialize devices on mount
   useEffect(() => {
     refreshMicrophones();
-  }, [refreshMicrophones]);
-
-  useEffect(() => {
     refreshCameras();
-  }, [refreshCameras]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     availableMics,

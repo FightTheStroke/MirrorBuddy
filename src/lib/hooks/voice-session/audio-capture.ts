@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { resample, float32ToInt16, int16ArrayToBase64 } from './audio-utils';
 import { AZURE_SAMPLE_RATE, CAPTURE_BUFFER_SIZE } from './constants';
@@ -40,6 +40,7 @@ export function useStartAudioCapture(
     logger.debug(`[VoiceSession] Starting audio capture at ${nativeSampleRate}Hz, resampling to ${AZURE_SAMPLE_RATE}Hz`);
 
     const source = context.createMediaStreamSource(refs.mediaStreamRef.current);
+    // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
     refs.sourceNodeRef.current = source;
 
     // Create analyser for input levels

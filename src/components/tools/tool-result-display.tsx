@@ -3,7 +3,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, CheckCircle, XCircle, Code, BarChart2, GitBranch, Calculator, HelpCircle, Layers, Network, FileText, Play } from 'lucide-react';
-import { CodeRunner } from './code-runner';
 import { ChartRenderer } from './chart-renderer';
 import { DiagramRenderer } from './diagram-renderer';
 import { FormulaRenderer } from './formula-renderer';
@@ -13,7 +12,7 @@ import { SummaryTool } from './summary-tool';
 import { DemoSandbox } from './demo-sandbox';
 import { LiveMindmap } from './live-mindmap';
 import { cn } from '@/lib/utils';
-import type { ToolCall, CodeExecutionRequest, ChartRequest, DiagramRequest, FormulaRequest, QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
+import type { ToolCall, ChartRequest, DiagramRequest, FormulaRequest, QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
 import type { SummaryData, DemoData, MindmapNode } from '@/types/tools';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import toast from '@/components/ui/toast';

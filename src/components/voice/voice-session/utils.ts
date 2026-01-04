@@ -1,4 +1,6 @@
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
+import type { StudySession } from '@/lib/stores/progress-store';
+import type { ConnectionError } from './types';
 
 export function calculateXpProgress(xp: number, level: number): number {
   const currentLevelXP = XP_PER_LEVEL[level - 1] || 0;
@@ -7,7 +9,7 @@ export function calculateXpProgress(xp: number, level: number): number {
 }
 
 export function getStateText(
-  configError: any,
+  configError: ConnectionError | null,
   permissionsLoading: boolean,
   connectionState: string,
   isListening: boolean,
@@ -24,6 +26,6 @@ export function getStateText(
   return 'Disconnesso';
 }
 
-export function calculateSessionXP(currentSession: any, transcriptLength: number): number {
+export function calculateSessionXP(currentSession: StudySession | null, transcriptLength: number): number {
   return currentSession?.xpEarned || Math.max(5, transcriptLength * 2);
 }

@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { getUserId } from './helpers';
 import type { WebcamRequest } from './types';
+import type { StudySession } from '@/lib/stores/progress-store';
 
 interface HandlersProps {
   disconnect: () => void;
@@ -11,7 +12,7 @@ interface HandlersProps {
   onSwitchToChat?: () => void;
   conversationIdRef: React.MutableRefObject<string | null>;
   transcript: Array<{ role: string; content: string }>;
-  currentSession: any;
+  currentSession: StudySession | null;
   sessionStartTime: React.MutableRefObject<Date>;
   questionCount: React.MutableRefObject<number>;
   endSession: () => void;
