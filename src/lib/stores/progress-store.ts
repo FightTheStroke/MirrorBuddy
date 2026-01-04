@@ -85,6 +85,7 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
           if (progressRes.ok) {
             const data = await progressRes.json();
             set((state) => ({
+              // Legacy fields
               xp: data.xp ?? state.xp,
               level: data.level ?? state.level,
               streak: data.streak ?? state.streak,
@@ -92,6 +93,13 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
               achievements: data.achievements ?? state.achievements,
               totalStudyMinutes: data.totalStudyMinutes ?? state.totalStudyMinutes,
               questionsAsked: data.questionsAsked ?? state.questionsAsked,
+              // MirrorBucks/Season fields
+              mirrorBucks: data.mirrorBucks ?? state.mirrorBucks,
+              seasonMirrorBucks: data.seasonMirrorBucks ?? state.seasonMirrorBucks,
+              seasonLevel: data.seasonLevel ?? state.seasonLevel,
+              allTimeLevel: data.allTimeLevel ?? state.allTimeLevel,
+              currentSeason: data.currentSeason ?? state.currentSeason,
+              seasonHistory: data.seasonHistory ?? state.seasonHistory,
             }));
           }
 
