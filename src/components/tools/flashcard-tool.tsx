@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback, useState } from 'react';
 import { FlashcardStudy } from '@/components/education/flashcard';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore } from '@/lib/stores';
 import toast from '@/components/ui/toast';
 import type { FlashcardDeckRequest, FlashcardDeck, Flashcard, Rating } from '@/types';
 import { FLASHCARD_XP_BY_RATING } from '@/lib/constants/xp-rewards';

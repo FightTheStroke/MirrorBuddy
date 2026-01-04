@@ -14,7 +14,7 @@
  * }
  */
 
-import { MarkMapRenderer, type MindmapNode } from '@/components/tools/markmap-renderer';
+import { MarkMapRenderer, type MindmapNode } from '@/components/tools/markmap';
 import type { BaseRendererProps } from './index';
 
 interface MindmapData {

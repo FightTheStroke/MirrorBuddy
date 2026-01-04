@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Settings2, Mic, Volume2, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAudioDevices } from '@/lib/hooks/use-audio-devices';
-import { useSettingsStore } from '@/lib/stores/app-store';
+import { useSettingsStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 
 interface AudioDeviceSelectorProps {

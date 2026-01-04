@@ -44,9 +44,11 @@ These children are not broken. The system is.
 
 **MirrorBuddy is our answer: a school that adapts to each student, not students who must adapt to school.**
 
-### The Support Triangle
+---
 
-Every student in MirrorBuddy has access to three types of support:
+## The Support Triangle
+
+Every student in MirrorBuddy has access to three types of AI support:
 
 ```
                          STUDENT
@@ -69,60 +71,13 @@ Every student in MirrorBuddy has access to three types of support:
 | **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij | Learning coach (vertical) | Develop METHOD and autonomy |
 | **Buddies** | Mario, Noemi, Enea, Bruno, Sofia | Peer friend (horizontal) | Emotional support, shared struggles |
 
-### The Learning Coach (Support Teacher)
+### Learning WITH the Greats, Not About Them
 
-> *"Our success is measured when the student no longer needs us."*
+Instead of reading *about* Euclid in a textbook, students learn mathematics **with Euclid himself**. Instead of memorizing dates about Darwin, they explore evolution **alongside Darwin**. Instead of watching a video about Marie Curie, they discuss chemistry **with Curie**.
 
-The **Coach** is a virtual Support Teacher—not a subject expert, but a **learning coach**. Their mission is to develop student autonomy, not dependency.
+Each **Maestro** is an AI tutor embodying a legendary figure from history:
 
-**What Coaches do:**
-- Teach the METHOD, not the content
-- Guide students to create tools themselves (mind maps, flashcards)
-- Use maieutic questioning: "How do you think you should organize this?"
-- Celebrate effort, not just results
-- Direct students to the right Maestro for subject help
-
-**What Coaches never do:**
-- Do homework for students
-- Give direct answers
-- Create content on behalf of students
-
-Each Coach has a unique style:
-- **Melissa** — Enthusiastic, young energy, celebrates wins
-- **Roberto** — Calm, reassuring, steady presence
-- **Chiara** — Freshly graduated, shares recent student experience
-- **Andrea** — Sporty coach energy, active breaks, movement
-- **Favij** — Gaming/digital style, makes studying feel like a quest
-
-### The MirrorBuddy (Peer Support)
-
-> *"Sometimes you need someone who's been there."*
-
-The **Buddy** is a peer—a student one year older who shares the same learning differences. This is the **MirrorBuddy** concept from FightTheStroke.
-
-**Key characteristics:**
-- Same age + 1 year (relatable but slightly more experienced)
-- Same learning differences as the student
-- Speaks like a real teenager, not an adult
-- Never teaches—just understands
-
-**The difference from adults:**
-| Adult says | Buddy says |
-|------------|------------|
-| "You can do it!" | "I've been there too." |
-| "You should try..." | "What worked for me was..." |
-| "It's not that hard." | "I know, it's tough. I struggled too." |
-
-**Why it matters:** Students with learning differences often feel alone. An AI that preaches feels fake. A peer who shares the struggle feels real. Mario doesn't lecture—Mario UNDERSTANDS.
-
-Each Buddy has a unique personality:
-- **Mario** — Casual, uses teen slang, quick jokes
-- **Noemi** — Warm, empathetic, great listener
-- **Enea** — Cheerful class clown, humor to lighten the mood
-- **Bruno** — Thoughtful, introspective, deep conversations
-- **Sofia** — Creative dreamer, sees things from unique angles
-
-**Key principle: Autonomy, not dependency.** The goal is to teach students HOW to learn, not to do the work for them.
+**16 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Science), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (PE), Smith (Economics)
 
 ---
 
@@ -140,289 +95,39 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 
 ---
 
-## Learning WITH the Greats, Not About Them
+## Features at a Glance
 
-Here's what makes MirrorBuddy different.
+- **🎤 Voice Sessions** — Natural voice conversations with AI Maestri (Azure OpenAI Realtime API)
+- **🗺️ Mind Maps** — Auto-generated, interactive visualizations with voice commands
+- **🎴 FSRS Flashcards** — Spaced repetition backed by cognitive science
+- **📝 Quizzes** — Adaptive assessments with instant feedback
+- **📸 Homework Help** — Photo capture + AI-powered step-by-step guidance (no direct answers)
+- **🎮 Gamification** — XP, levels, badges, streaks, leaderboards
+- **⏱️ Pomodoro Timer** — ADHD-friendly focus sessions
+- **📊 Progress Tracking** — Subject mastery, session history, analytics
+- **♿ Accessibility** — WCAG 2.1 AA, 7 specialized profiles for neurodiversity
 
-Instead of reading *about* Euclid in a textbook, students learn mathematics **with Euclid himself**. Instead of memorizing dates about Darwin, they explore evolution **alongside Darwin**. Instead of watching a video about Marie Curie, they discuss chemistry **with Curie**.
-
-Each **Maestro** is an AI tutor embodying a legendary figure from history—someone who revolutionized their field. Students don't just learn subjects; they learn *from the masters*.
-
-| Maestro | Subject | Why This Legend? |
-|---------|---------|------------------|
-| **Euclide** | Mathematics | Father of geometry, wrote *Elements*—the most influential math textbook ever |
-| **Leonardo** | Art | The original Renaissance polymath who merged art and science |
-| **Darwin** | Science | Changed our understanding of life itself with evolution |
-| **Curie** | Chemistry | First woman to win a Nobel, pioneer of radioactivity |
-| **Feynman** | Physics | Made quantum physics understandable, legendary teacher |
-| **Galileo** | Astronomy | Father of modern science and the scientific method |
-| **Lovelace** | Computer Science | The first programmer, a century before computers existed |
-| **Shakespeare** | English | The Bard who shaped the English language |
-| **Mozart** | Music | Composed masterpieces from age 5, pure musical genius |
-| **Socrate** | Philosophy | Invented the Socratic method—learning through questions |
-| **Erodoto** | History | The "Father of History" who pioneered historical inquiry |
-| **Manzoni** | Italian | Italy's greatest novelist, master of language |
-| **Cicerone** | Civic Education | Rome's greatest orator, defender of the republic |
-| **Humboldt** | Geography | Explorer who invented biogeography and ecology |
-| **Ippocrate** | Physical Education | Father of medicine, champion of healthy living |
-| **Smith** | Economics | Wrote *The Wealth of Nations*, founded modern economics |
-### What Makes Each Maestro Special
-
-Every Maestro:
-- **Speaks naturally** — Real voice conversations, not text-to-speech robots
-- **Adapts in real-time** — Slower when you struggle, faster when you're ready
-- **Never judges** — No frustration, no impatience, infinite patience
-- **Creates for you** — Generates mind maps, flashcards, quizzes on the fly
-- **Remembers you** — Knows your progress, your struggles, your victories
+**→ See full feature documentation: [FEATURES.md](FEATURES.md)**
 
 ---
 
 ## Built for Every Mind
 
-MirrorBuddy isn't just "accessible." It's designed from the ground up for neurodiversity.
-
-| Condition | How We Adapt |
-|-----------|--------------|
-| **Dyslexia** | OpenDyslexic font, extra spacing, text-to-speech, visual learning |
-| **Dyscalculia** | Step-by-step breakdowns, visual number representations |
-| **ADHD** | Reduced distractions, focus mode, movement breaks, gamification |
-| **Autism** | Predictable layouts, sensory-friendly colors, clear structure |
-| **Cerebral Palsy** | Large touch targets, full keyboard navigation, voice control |
-
-WCAG 2.1 AA compliant. Because accessibility isn't a feature—it's the foundation.
-
----
-
-## Getting Started
-
-New users are guided through a friendly **onboarding experience**:
-
-1. **Welcome** — Meet the platform and its mission
-2. **Core Principles** — Learn about our educational philosophy
-3. **Meet the Maestri** — Browse your AI tutors with carousel preview
-4. **Ready to Learn** — Jump into your first session
-
-The onboarding only appears once and can be reset from Settings.
-
----
-
-## Features in Detail
-
-### Voice Sessions
-
-Talk to your Maestro like you would talk to a real teacher. Ask questions, discuss concepts, explore ideas—all through natural voice conversation.
-
-- **Unified voice+chat** — side-by-side layout lets you type while talking
-- **Real-time voice interaction** powered by Azure OpenAI Realtime API
-- **Automatic transcription** — voice messages appear in chat with 🔊 indicator
-- **Voice-to-voice** responses with natural intonation
-- **Interrupt anytime** — the Maestro listens and adapts
-- **Session evaluation** — automatic feedback at session end with grades and XP
-- **Parent diary integration** — session insights saved for parents (GDPR compliant)
-- **Device selection** — choose your preferred microphone and speaker
-- **Visual waveform** — see your voice levels in real-time
-
-### Mind Maps
-
-Visual learners rejoice. Every concept can become a mind map.
-
-- **Auto-generated** from conversations with your Maestro
-- **Interactive** — expand, collapse, zoom, pan
-- **Voice commands** — "aggiungi un nodo", "espandi questo concetto", "collega A a B"
-- **Multi-format export** — PNG, SVG, Markdown, FreeMind, XMind, JSON
-- **Import support** — load existing mind maps from other tools
-- **Powered by MarkMap** for beautiful, responsive visualizations
-- **Hierarchical structure** that mirrors how concepts connect
-
-### FSRS Flashcards
-
-Spaced repetition done right, backed by cognitive science.
-
-- **FSRS algorithm** (Free Spaced Repetition Scheduler) — more effective than Anki's SM-2
-- **Optimal review timing** based on your memory patterns
-- **Difficulty tracking** per card
-- **Auto-generated** from your learning sessions
-- **Progress analytics** showing retention rates
-
-### Quizzes
-
-Test your knowledge with adaptive assessments.
-
-- **Multiple choice** and **open-ended** questions
-- **Instant feedback** with explanations
-- **Difficulty adapts** to your performance
-- **Generated from** your flashcards and conversations
-- **Mastery gates** — must pass to unlock new content
-
-### Homework Help
-
-Get help with your homework using AI-powered analysis.
-
-- **Photo capture** — take a picture of your homework with the webcam
-- **Countdown timer** — 0, 3, 5, or 10 second delay for positioning
-- **AI analysis** — Maestro analyzes your work and provides feedback
-- **Step-by-step guidance** — get help without getting the answer
-- **Works offline** — camera capture works without internet
-
-### Gamification
-
-Learning should be rewarding.
-
-- **XP system** — earn points for every activity
-- **Levels** — watch yourself grow
-- **Badges** — achievements for milestones
-- **Streaks** — daily consistency rewards
-- **Leaderboards** (optional) — friendly competition
-
-### Pomodoro Timer
-
-ADHD-friendly focus sessions with built-in breaks.
-
-- **Configurable intervals** — 25/5/15 min default (fully customizable)
-- **Visual countdown** — see time remaining at a glance
-- **Break reminders** — notifications when it's time to rest
-- **XP rewards** — earn points for completed focus sessions
-- **Header widget** — always visible, never intrusive
-
-### Progress Tracking
-
-Know exactly where you stand.
-
-- **Subject mastery** — percentage complete per topic
-- **Session history** — what you learned and when
-- **Time tracking** — minutes spent learning
-- **Weak areas** — automatically identified for review
-- **Parent dashboard** — GDPR-compliant insights for parents (requires dual consent)
-
----
-
-## Configuration
-
-### Settings Overview
-
-The Settings page provides comprehensive configuration:
-
-| Tab | Description |
-|-----|-------------|
-| **Profile** | Student name, age, learning style preferences |
-| **Accessibility** | Dyslexia font, ADHD mode, motion reduction, high contrast |
-| **Appearance** | Theme (light/dark/system), color schemes |
-| **AI Provider** | Azure OpenAI or Ollama configuration |
-| **Audio/Video** | Preferred microphone, speaker, and camera selection |
-| **Notifications** | Study reminders and progress alerts |
-| **Privacy** | Data export (GDPR), delete account |
-| **Diagnostics** | System checks, API connectivity, troubleshooting |
-
-### AI Providers
-
-MirrorBuddy supports multiple AI providers. Choose based on your needs:
-
-| Provider | Voice Support | Best For | Cost |
-|----------|--------------|----------|------|
-| **Azure OpenAI** | Full voice | Production, schools | Pay-per-use |
-| **Ollama** | Text only | Local dev, privacy | Free |
-| **Showcase Mode** | Simulated | Demo, no API needed | Free |
-
-### Try Without an API Key (Showcase Mode)
-
-Want to explore the app without setting up Azure or Ollama? Use **Showcase Mode**:
-
-1. Go to **Settings → AI Provider**
-2. Click **"Modalità Showcase"** button
-3. Navigate to `/showcase` to explore all features with pre-recorded responses
-
-Showcase includes:
-- All 16 Maestri with simulated conversations
-- Mind maps, flashcards, quizzes demo
-- Voice UI preview (without actual voice)
-- Full accessibility features
-
-Perfect for demos, presentations, or trying the app before committing to an API.
-
-### Option 1: Azure OpenAI (Recommended)
-
-Full functionality including voice sessions.
-
-```bash
-# .env.local
-
-# Chat (text conversations)
-AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
-AZURE_OPENAI_API_VERSION=2024-08-01-preview
-
-# Voice (real-time conversations) — REQUIRED for voice features
-AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
-AZURE_OPENAI_REALTIME_API_KEY=your-api-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
-AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview
-```
-
-**Note:** Voice features require the `gpt-4o-realtime-preview` model, currently available in select Azure regions.
-
-### Option 2: Ollama (100% Local)
-
-Free, private, runs entirely on your machine. No voice support.
-
-```bash
-# Install Ollama
-brew install ollama
-
-# Start the server
-ollama serve
-
-# Pull a model (in another terminal)
-ollama pull llama3.2        # Fast, good for education (~2GB)
-ollama pull mistral         # Alternative (~4GB)
-ollama pull llama3.1:70b    # Best quality (needs 64GB+ RAM)
-```
-
-```bash
-# .env.local
-OLLAMA_URL=http://localhost:11434
-OLLAMA_MODEL=llama3.2
-```
-
-The app auto-detects Ollama when Azure is not configured.
-
-### Azure Cost Management (Optional)
-
-Track your Azure spending in the Settings page.
-
-```bash
-# .env.local (optional)
-AZURE_TENANT_ID=your-tenant-id
-AZURE_CLIENT_ID=your-service-principal-client-id
-AZURE_CLIENT_SECRET=your-service-principal-secret
-AZURE_SUBSCRIPTION_ID=your-subscription-id
-```
-
-Requires a Service Principal with "Cost Management Reader" role.
+**WCAG 2.1 AA:** Dyslexia (OpenDyslexic, spacing, TTS) | Dyscalculia (visual numbers) | ADHD (focus mode, breaks) | Autism (predictable layouts) | Cerebral Palsy (large targets, keyboard, voice)
 
 ---
 
 ## Quick Start
 
-### Prerequisites
-
-- Node.js 18+
-- npm or yarn
-- Azure OpenAI account (for voice) OR Ollama (for local text-only)
-
-### Installation
-
 ```bash
-# Clone the repository
+# Clone and install
 git clone https://github.com/Roberdan/MirrorBuddy.git
 cd MirrorBuddy
-
-# Install dependencies
 npm install
 
 # Configure environment
 cp .env.example .env.local
-# Edit .env.local with your API keys
+# Edit .env.local with your Azure OpenAI or Ollama credentials
 
 # Initialize database
 npx prisma generate
@@ -434,78 +139,17 @@ npm run dev
 
 Open http://localhost:3000 and start learning.
 
-### Available Scripts
-
-```bash
-npm run dev        # Start development server
-npm run build      # Build for production
-npm run start      # Start production server
-npm run lint       # Run ESLint
-npm run typecheck  # Run TypeScript compiler
-npm run test       # Run Playwright E2E tests
-```
+**→ See full setup guide: [SETUP.md](SETUP.md)**
 
 ---
 
-## The MirrorBuddy Ecosystem
+## Architecture
 
-MirrorBuddy is part of a larger vision:
+**Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (primary, chat+voice) / Ollama (fallback, text) → Prisma ORM (SQLite/PostgreSQL)
 
-| Project | Description |
-|---------|-------------|
-| [**convergio-cli**](https://github.com/Roberdan/convergio-cli) | CLI with 50+ specialized AI agents |
-| [**MyMirrorBuddy**](https://github.com/Roberdan/MyMirrorBuddy) | Native macOS/iOS app |
-| [**MirrorBuddy**](https://github.com/Roberdan/MirrorBuddy) | Core framework |
+**Key Decision (ADR 0015):** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.
 
----
-
-## Architecture Overview
-
-MirrorBuddy follows a clean layered architecture with clear separation of concerns:
-
-```mermaid
-flowchart TB
-    User([Student])
-
-    subgraph Frontend["Frontend Layer"]
-        UI[Next.js 16 App Router<br/>React + TypeScript + Tailwind]
-        State[Zustand State Management]
-    end
-
-    subgraph Backend["Backend Layer"]
-        API[API Routes]
-    end
-
-    subgraph AI["AI Providers"]
-        Azure[Azure OpenAI<br/>Chat + Voice Realtime]
-        Ollama[Ollama<br/>Local Text-Only]
-    end
-
-    subgraph Data["Data Layer"]
-        DB[(Prisma ORM<br/>SQLite/PostgreSQL)]
-    end
-
-    User --> UI
-    UI <--> State
-    UI --> API
-    State <-- REST --> API
-    API --> Azure
-    API -.fallback.-> Ollama
-    API <--> DB
-
-    style Azure fill:#0078D4,stroke:#005A9E,color:#fff,stroke-width:2px
-    style Ollama fill:#77B05D,stroke:#5A8A44,color:#fff,stroke-width:2px
-    style State fill:#FF4785,stroke:#DB2C66,color:#fff,stroke-width:2px
-    style DB fill:#336791,stroke:#26516D,color:#fff,stroke-width:2px
-```
-
-### Key Architectural Decisions
-
-**ADR 0015 - State Management**: Zustand stores sync with backend via REST APIs. User data is NEVER stored in localStorage—only in the database via API calls. This ensures data consistency, GDPR compliance, and proper server-side validation.
-
-**AI Provider Strategy**: Azure OpenAI is the primary provider (supports both chat and voice). Ollama serves as a local fallback for text-only interactions when Azure is unavailable or for offline development.
-
-**Data Flow**: All user interactions flow through the Next.js frontend → Zustand state → API routes → AI providers/Database. This unidirectional flow ensures predictable state management and proper separation of concerns.
+**→ Full architecture & diagram: [ARCHITECTURE.md](ARCHITECTURE.md)**
 
 ---
 
@@ -519,16 +163,20 @@ flowchart TB
 | State | Zustand |
 | Voice | Azure OpenAI Realtime API |
 | Mind Maps | MarkMap |
-| Diagrams | Mermaid.js (flowchart, sequence, class, state, ER) |
-| Math | KaTeX |
 | Database | Prisma + SQLite/PostgreSQL |
 | Testing | Playwright E2E |
 
-### Developer Documentation
+---
 
-For developers working on voice features, see:
-- [`docs/AZURE_REALTIME_API.md`](docs/AZURE_REALTIME_API.md) — Comprehensive guide to Azure Realtime API integration, including common bugs and solutions
-- [`CLAUDE.md`](CLAUDE.md) — Architecture overview and development commands
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [FEATURES.md](FEATURES.md) | Comprehensive feature documentation |
+| [SETUP.md](SETUP.md) | Installation and configuration guide |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture details |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+| [CLAUDE.md](CLAUDE.md) | Developer quick reference |
 
 ---
 

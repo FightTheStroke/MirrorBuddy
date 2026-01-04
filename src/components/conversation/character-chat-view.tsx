@@ -13,7 +13,7 @@ import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { VoicePanel } from '@/components/voice';
 import { ToolPanel } from '@/components/tools/tool-panel';
 import { ToolButtons } from './tool-buttons';
-import { useConversationStore } from '@/lib/stores/app-store';
+import { useConversationStore } from '@/lib/stores';
 import type { ExtendedStudentProfile, Subject, Maestro, MaestroVoice } from '@/types';
 import type { ToolType, ToolState } from '@/types/tools';
 

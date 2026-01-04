@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, X, Coffee, Brain, Timer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePomodoroStore, PomodoroPhase } from '@/lib/stores/pomodoro-store';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore } from '@/lib/stores';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
 import toast from '@/components/ui/toast';

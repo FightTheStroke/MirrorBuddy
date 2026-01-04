@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { CharacterChatView } from '@/components/conversation';
 import { cn } from '@/lib/utils';
-import { useSettingsStore } from '@/lib/stores/app-store';
+import { useSettingsStore } from '@/lib/stores';
 
 type CharacterCategory = 'coach' | 'buddy' | 'maestri';
 type CharacterId = 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij' | 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia' | string;

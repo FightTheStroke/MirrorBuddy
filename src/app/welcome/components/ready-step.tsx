@@ -7,7 +7,7 @@ import { Rocket, ArrowLeft, PartyPopper, Sparkles, Volume2, VolumeX } from 'luci
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import { useSettingsStore } from '@/lib/stores/app-store';
+import { useSettingsStore } from '@/lib/stores';
 import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
 
 // Pre-defined sparkle offsets (avoids Math.random during render)

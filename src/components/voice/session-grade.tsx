@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Star, Trophy, TrendingUp, Clock, MessageSquare, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useProgressStore, type SessionGrade } from '@/lib/stores/app-store';
+import { useProgressStore, type SessionGrade } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { Maestro } from '@/types';

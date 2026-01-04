@@ -168,46 +168,38 @@ function StatusBadge({ status }: { status: ToolCall['status'] }) {
 
 function ToolContent({ toolCall, sessionId }: { toolCall: ToolCall; sessionId?: string | null }) {
   switch (toolCall.type) {
-    case 'run_code':
-      return (
-        <CodeRunner
-          request={toolCall.arguments as unknown as CodeExecutionRequest}
-          autoRun
-        />
-      );
-
-    case 'create_chart':
+    case 'chart':
       return (
         <ChartRenderer
           request={toolCall.arguments as unknown as ChartRequest}
         />
       );
 
-    case 'create_diagram':
+    case 'diagram':
       return (
         <DiagramRenderer
           request={toolCall.arguments as unknown as DiagramRequest}
         />
       );
 
-    case 'show_formula':
+    case 'formula':
       return (
         <FormulaRenderer
           request={toolCall.arguments as unknown as FormulaRequest}
         />
       );
 
-    case 'create_quiz':
+    case 'quiz':
       return (
         <AutoSaveQuiz request={toolCall.arguments as unknown as QuizRequest} toolId={toolCall.id} />
       );
 
-    case 'create_flashcard':
+    case 'flashcard':
       return (
         <AutoSaveFlashcard request={toolCall.arguments as unknown as FlashcardDeckRequest} toolId={toolCall.id} />
       );
 
-    case 'create_mindmap':
+    case 'mindmap':
       return (
         <AutoSaveMindmap
           request={toolCall.arguments as unknown as MindmapRequest}
@@ -216,12 +208,12 @@ function ToolContent({ toolCall, sessionId }: { toolCall: ToolCall; sessionId?: 
         />
       );
 
-    case 'create_summary':
+    case 'summary':
       return (
         <AutoSaveSummary request={toolCall.arguments as unknown as SummaryData} toolId={toolCall.id} />
       );
 
-    case 'create_demo':
+    case 'demo':
       return (
         <AutoSaveDemo request={toolCall.arguments as unknown as DemoData} toolId={toolCall.id} />
       );

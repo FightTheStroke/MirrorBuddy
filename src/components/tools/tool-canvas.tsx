@@ -26,7 +26,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useToolStream, type ActiveToolState } from '@/lib/hooks/use-tool-stream';
-import { MindmapRenderer } from './markmap-renderer';
+import { MindmapRenderer } from './markmap';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
 import { DiagramRenderer } from './diagram-renderer';

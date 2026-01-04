@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Bot, Check, Cloud, Server, DollarSign, TrendingUp, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useSettingsStore } from '@/lib/stores/app-store';
+import { useSettingsStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 
 interface CostSummary {

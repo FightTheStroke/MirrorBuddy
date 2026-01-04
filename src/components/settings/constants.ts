@@ -1,4 +1,4 @@
-import type { TeachingStyle } from '@/lib/stores/app-store';
+import type { TeachingStyle } from '@/lib/stores';
 
 // Teaching style options with descriptions
 export const TEACHING_STYLES: Array<{

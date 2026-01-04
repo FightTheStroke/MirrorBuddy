@@ -5,7 +5,7 @@ import { Headphones, Volume2, VolumeX, Play, Pause, Settings, ChevronDown } from
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { useAmbientAudio } from '@/lib/hooks/use-ambient-audio';
-import { useVoiceSessionStore } from '@/lib/stores/app-store';
+import { useVoiceSessionStore } from '@/lib/stores';
 import type { AudioPreset } from '@/types';
 import { cn } from '@/lib/utils';
 

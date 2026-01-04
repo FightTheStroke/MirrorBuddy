@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToolPanel } from './tool-panel';
-import { useUIStore, useSettingsStore } from '@/lib/stores/app-store';
+import { useUIStore, useSettingsStore } from '@/lib/stores';
 import { getMaestroById } from '@/data';
 import { getSupportTeacherById } from '@/data/support-teachers';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';

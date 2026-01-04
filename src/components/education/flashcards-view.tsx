@@ -20,7 +20,7 @@ import { FlashcardStudy } from './flashcard';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import type { FlashcardDeck, Flashcard, Subject, Rating, CardState, Maestro } from '@/types';
-import { useUIStore } from '@/lib/stores/app-store';
+import { useUIStore } from '@/lib/stores';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 
 // FSRS-5 Parameters (optimized defaults)

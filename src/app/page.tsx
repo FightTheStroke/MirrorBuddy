@@ -49,7 +49,7 @@ import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { Button } from '@/components/ui/button';
-import { useProgressStore, useSettingsStore, useUIStore } from '@/lib/stores/app-store';
+import { useProgressStore, useSettingsStore, useUIStore } from '@/lib/stores';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { FocusToolLayout } from '@/components/tools/focus-tool-layout';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';

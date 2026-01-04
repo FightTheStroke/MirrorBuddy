@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Mic, Volume2, Video, RefreshCw, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useSettingsStore } from '@/lib/stores/app-store';
+import { useSettingsStore } from '@/lib/stores';
 import { logger } from '@/lib/logger';
 
 // Audio/Video Settings - Global device preferences

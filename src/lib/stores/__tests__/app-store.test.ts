@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { useUIStore } from '../app-store';
+import { useUIStore } from '../ui-store';
 
 describe('app-store', () => {
   describe('useUIStore - Focus Mode', () => {

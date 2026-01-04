@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MindmapRenderer, createMindmapFromTopics } from '@/components/tools/markmap-renderer';
+import { MindmapRenderer, createMindmapFromTopics } from '@/components/tools/markmap';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import type { Subject } from '@/types';
@@ -37,7 +37,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { logger } from '@/lib/logger';
 import { useMindmaps, type SavedMindmap } from '@/lib/hooks/use-saved-materials';
-import { useUIStore } from '@/lib/stores/app-store';
+import { useUIStore } from '@/lib/stores';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 import type { Maestro } from '@/types';
 

@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { useVoiceSessionStore } from '@/lib/stores/app-store';
+import { useVoiceSessionStore } from '@/lib/stores';
 import { useHomeworkSessions, type SavedHomework } from '@/lib/hooks/use-saved-materials';
 import type { Homework, Subject, Maestro } from '@/types';
 

@@ -7,7 +7,7 @@ import { Brain, Play, Trophy, Target, Sparkles, MessageSquare, Loader2, Trash2, 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Quiz } from './quiz';
-import { useProgressStore, useUIStore } from '@/lib/stores/app-store';
+import { useProgressStore, useUIStore } from '@/lib/stores';
 import { useQuizzes } from '@/lib/hooks/use-saved-materials';
 import type { Quiz as QuizType, QuizResult, Subject, Maestro } from '@/types';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
