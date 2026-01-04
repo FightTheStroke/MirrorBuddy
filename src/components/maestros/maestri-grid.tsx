@@ -95,8 +95,8 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
 
       {/* Grid - compact cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-        {filteredMaestri.map((maestro) => (
-          <MaestroCard key={maestro.id} maestro={maestro} onSelect={handleSelect} />
+        {filteredMaestri.map((maestro, index) => (
+          <MaestroCard key={maestro.id} maestro={maestro} onSelect={handleSelect} index={index} />
         ))}
       </div>
 

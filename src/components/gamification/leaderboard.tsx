@@ -131,13 +131,13 @@ export function Leaderboard({ showPeriodSelector = true, defaultPeriod = 'week',
 
       {/* Period selector tabs */}
       {showPeriodSelector && (
-        <div className="flex gap-1 rounded-lg bg-muted/50 p-1">
+        <div className="flex gap-1 rounded-lg bg-muted/50 p-1 overflow-x-auto">
           {PERIODS.map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
               className={cn(
-                'flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-all',
+                'flex-1 min-w-[60px] rounded-md px-2 sm:px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap',
                 period === p
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
