@@ -163,7 +163,7 @@ export async function updateStreak(userId: string, minutesStudied: number) {
   );
 
   let newCurrentStreak = streak.currentStreak;
-  let newTodayMinutes = streak.todayMinutes;
+  let newTodayMinutes: number;
 
   if (isNewDay) {
     if (daysSinceLastActivity === 1) {

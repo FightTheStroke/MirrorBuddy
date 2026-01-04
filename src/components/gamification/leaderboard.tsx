@@ -6,7 +6,7 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, memo } from 'react';
 import { useProgressStore } from '@/lib/stores/progress-store';
 import { cn } from '@/lib/utils';
 
@@ -183,35 +183,35 @@ interface LeaderboardRowProps {
   isCurrentPeriod: boolean;
 }
 
-function LeaderboardRow({ entry, rank, isCurrentPeriod }: LeaderboardRowProps) {
+const LeaderboardRow = memo(function LeaderboardRow({ entry, rank, isCurrentPeriod }: LeaderboardRowProps) {
   return (
     <div
-      className={`flex items-center gap-3 rounded-lg border p-3 transition-all ${
+      className={`flex items-center gap-2 sm:gap-3 rounded-lg border p-2 sm:p-3 transition-all ${
         isCurrentPeriod
           ? 'border-blue-500/50 bg-blue-500/10'
           : 'border-muted bg-muted/30'
       }`}
     >
-      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-semibold">
+      <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-muted text-xs sm:text-sm font-semibold flex-shrink-0">
         {rank}
       </div>
 
-      <div className="flex-1">
-        <p className="text-sm font-medium">{entry.label}</p>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>Livello {entry.level}</span>
-          <span>•</span>
-          <span>{entry.studyMinutes} min</span>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs sm:text-sm font-medium truncate">{entry.label}</p>
+        <div className="flex items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
+          <span>Lv.{entry.level}</span>
+          <span className="hidden xs:inline">•</span>
+          <span className="hidden xs:inline">{entry.studyMinutes} min</span>
         </div>
       </div>
 
-      <div className="text-right">
-        <p className="text-lg font-semibold">{entry.mirrorBucks.toLocaleString()}</p>
+      <div className="text-right flex-shrink-0">
+        <p className="text-sm sm:text-lg font-semibold">{entry.mirrorBucks.toLocaleString()}</p>
         <p className="text-xs text-muted-foreground">MB</p>
       </div>
     </div>
   );
-}
+});
 
 function getPeriodLabel(period: TimePeriod, type: 'current' | 'previous' | 'title' | 'tab'): string {
   const labels: Record<TimePeriod, Record<typeof type, string>> = {

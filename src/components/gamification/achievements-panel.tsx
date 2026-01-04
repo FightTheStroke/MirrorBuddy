@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import { useProgressStore } from '@/lib/stores/progress-store';
 import { ACHIEVEMENTS, getAchievementsByCategory } from '@/lib/gamification/achievements';
 import type { Achievement } from '@/types';
@@ -72,7 +72,7 @@ interface AchievementCardProps {
   compact?: boolean;
 }
 
-function AchievementCard({ achievement, compact = false }: AchievementCardProps) {
+const AchievementCard = memo(function AchievementCard({ achievement, compact = false }: AchievementCardProps) {
   const isUnlocked = !!achievement.unlockedAt;
 
   if (compact) {
@@ -129,4 +129,4 @@ function AchievementCard({ achievement, compact = false }: AchievementCardProps)
       )}
     </div>
   );
-}
+});

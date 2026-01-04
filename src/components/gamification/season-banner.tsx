@@ -43,25 +43,25 @@ export function SeasonBanner({ variant = 'full', className = '' }: SeasonBannerP
 
   return (
     <div
-      className={`flex items-center justify-between p-4 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-cyan-500/10 rounded-xl border border-purple-500/20 ${className}`}
+      className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-purple-500/10 via-blue-500/10 to-cyan-500/10 rounded-xl border border-purple-500/20 ${className}`}
       role="banner"
     >
-      <div className="flex items-center gap-3">
-        <span className="text-3xl" aria-hidden="true">
+      <div className="flex items-center gap-2 sm:gap-3">
+        <span className="text-2xl sm:text-3xl" aria-hidden="true">
           {currentSeason.icon}
         </span>
         <div>
-          <h3 className="text-lg font-semibold">Stagione {currentSeason.name}</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-base sm:text-lg font-semibold">Stagione {currentSeason.name}</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             {daysRemaining} {daysRemaining === 1 ? 'giorno' : 'giorni'} rimanenti
           </p>
         </div>
       </div>
-      <div className="text-right">
+      <div className="text-left sm:text-right w-full sm:w-auto flex sm:block items-center justify-between">
         <p className="text-xs text-muted-foreground uppercase tracking-wide">
           Livello Stagionale
         </p>
-        <p className="text-2xl font-bold">{seasonLevel}</p>
+        <p className="text-xl sm:text-2xl font-bold">{seasonLevel}</p>
       </div>
     </div>
   );
