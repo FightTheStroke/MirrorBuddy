@@ -455,11 +455,15 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
       const int16Data = float32ToInt16(resampledData);
       const base64 = int16ArrayToBase64(int16Data);
 
-      // Send to Azure
-      wsRef.current.send(JSON.stringify({
-        type: 'input_audio_buffer.append',
-        audio: base64,
-      }));
+      // CRITICAL FIX: Don't send audio while maestro is speaking (prevents echo loop)
+      // Only send audio when there's no active response from Azure
+      if (!hasActiveResponseRef.current) {
+        wsRef.current.send(JSON.stringify({
+          type: 'input_audio_buffer.append',
+          audio: base64,
+        }));
+      }
+      // If maestro is speaking, silently drop the audio to prevent echo feedback
 
       // Update input level (throttled)
       const now = performance.now();
@@ -620,9 +624,9 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         },
         turn_detection: {
           type: 'server_vad',
-          threshold: 0.5,                // Balanced sensitivity (0.0-1.0)
+          threshold: 0.6,                // Slightly less sensitive to reduce false positives
           prefix_padding_ms: 300,        // Audio before detected speech
-          silence_duration_ms: 500,      // Silence before turn ends (balanced)
+          silence_duration_ms: 700,      // Longer silence to avoid cutting off natural pauses
           create_response: true,         // Auto-respond when speech stops
           interrupt_response: !options.disableBargeIn,  // Control barge-in at Azure level
         },
