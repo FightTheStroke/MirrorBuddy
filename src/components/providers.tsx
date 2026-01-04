@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { ThemeProvider } from 'next-themes';
 import { AccessibilityProvider } from '@/components/accessibility';
 import { ToastContainer } from '@/components/ui/toast';
 import { IOSInstallBanner } from '@/components/pwa';
+import { ParentAccessButton } from '@/components/navigation/parent-access-button';
 import {
   useSettingsStore,
   initializeStores,
@@ -99,6 +101,25 @@ function StoreInitializer() {
   return null;
 }
 
+// Pages where parent access button should NOT appear
+const EXCLUDED_PATHS = [
+  '/',  // Home page has its own button in sidebar
+  '/parent-dashboard',
+  '/genitori',
+  '/landing',
+  '/welcome',
+  '/showcase',
+];
+
+function ConditionalParentAccess() {
+  const pathname = usePathname();
+  const shouldHide = EXCLUDED_PATHS.some((p) =>
+    p === '/' ? pathname === '/' : pathname?.startsWith(p)
+  );
+  if (shouldHide) return null;
+  return <ParentAccessButton />;
+}
+
 export function Providers({ children }: ProvidersProps) {
   return (
     <ThemeProvider
@@ -115,6 +136,7 @@ export function Providers({ children }: ProvidersProps) {
         {children}
         <ToastContainer />
         <IOSInstallBanner />
+        <ConditionalParentAccess />
       </AccessibilityProvider>
     </ThemeProvider>
   );
