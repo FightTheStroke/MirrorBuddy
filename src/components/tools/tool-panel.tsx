@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { X, Minimize2, Maximize2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { MarkMapRenderer } from './markmap-renderer';
+import { MarkMapRenderer } from './markmap';
 import { LiveMindmap } from './live-mindmap';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';

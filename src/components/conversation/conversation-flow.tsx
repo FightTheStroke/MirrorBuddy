@@ -25,7 +25,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useSettingsStore, useUIStore } from '@/lib/stores/app-store';
+import { useSettingsStore, useUIStore } from '@/lib/stores';
 import { logger } from '@/lib/logger';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import type { ExtendedStudentProfile } from '@/types';

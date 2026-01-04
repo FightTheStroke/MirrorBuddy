@@ -15,13 +15,13 @@ import {
   InteractiveMarkMapRenderer,
   type InteractiveMarkMapHandle,
   type InteractiveMarkMapRendererProps,
-} from './interactive-markmap-renderer';
+} from './interactive-markmap';
 import {
   useMindmapModifications,
   type MindmapModificationCallbacks,
 } from '@/lib/hooks/use-mindmap-modifications';
 import { logger } from '@/lib/logger';
-import type { MindmapNode } from './markmap-renderer';
+import type { MindmapNode } from './markmap';
 
 // ============================================================================
 // TYPES

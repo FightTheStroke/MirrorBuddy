@@ -19,7 +19,7 @@ export { SummaryRenderer } from '@/components/tools/summary-renderer';
 export { FormulaRenderer } from '@/components/tools/formula-renderer';
 export { ChartRenderer } from '@/components/tools/chart-renderer';
 export { DiagramRenderer } from '@/components/tools/diagram-renderer';
-export { MarkMapRenderer } from '@/components/tools/markmap-renderer';
+export { MarkMapRenderer } from '@/components/tools/markmap';
 
 // Re-export validation utilities
 export {

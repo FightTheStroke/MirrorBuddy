@@ -32,7 +32,7 @@ import {
 import { toast } from '@/components/ui/toast';
 import type { SummaryData } from '@/types/tools';
 import type { Maestro } from '@/types';
-import { useUIStore } from '@/lib/stores/app-store';
+import { useUIStore } from '@/lib/stores';
 
 interface SummariesViewProps {
   className?: string;

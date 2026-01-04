@@ -18,7 +18,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
 import { Card } from '@/components/ui/card';
-import { useSettingsStore } from '@/lib/stores/app-store';
+import { useSettingsStore } from '@/lib/stores';
 
 interface WebcamCaptureProps {
   purpose: string;

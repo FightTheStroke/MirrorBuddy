@@ -9,7 +9,7 @@ import {
   useSettingsStore,
   initializeStores,
   setupAutoSync,
-} from '@/lib/stores/app-store';
+} from '@/lib/stores';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import { initializeTelemetry } from '@/lib/telemetry';
 import { migrateSessionStorageKey } from '@/lib/storage/migrate-session-key';

@@ -5,7 +5,7 @@ import { User, RotateCcw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { TeachingStyle } from '@/lib/stores/app-store';
+import type { TeachingStyle } from '@/lib/stores';
 import { TEACHING_STYLES } from '../constants';
 
 // Profile Settings

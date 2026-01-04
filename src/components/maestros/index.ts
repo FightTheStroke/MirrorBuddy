@@ -1,0 +1,14 @@
+/**
+ * Barrel export for Maestro components
+ * Maintains backward compatibility for existing imports
+ */
+
+export { MaestroSession } from './maestro-session';
+export { MessageBubble } from './message-bubble';
+export { MaestroSessionHeader } from './maestro-session-header';
+export { MaestroSessionInput } from './maestro-session-input';
+export { MaestroSessionToolButtons } from './maestro-session-tool-buttons';
+export { MaestroSessionMessages } from './maestro-session-messages';
+export { MaestroSessionWebcam } from './maestro-session-webcam';
+export { generateAutoEvaluation } from './maestro-session-utils';
+export { useMaestroSessionLogic } from './use-maestro-session-logic';

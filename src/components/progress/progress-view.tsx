@@ -15,7 +15,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore } from '@/lib/stores';
 import { XPInfo } from '@/components/gamification';
 import { cn } from '@/lib/utils';
 import { subjectNames, subjectColors, subjectIcons } from '@/data';

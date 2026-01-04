@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Trophy, Flame, Clock, BookOpen, Star } from 'lucide-react';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import { XP_PER_LEVEL } from '@/lib/constants/xp-rewards';
 

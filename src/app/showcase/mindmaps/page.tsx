@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, X, Globe, History, Leaf } from 'lucide-react';
-import { MindmapRenderer, createMindmapFromTopics } from '@/components/tools/markmap-renderer';
+import { MindmapRenderer, createMindmapFromTopics } from '@/components/tools/markmap';
 
 // Pre-built mindmaps for showcase
 const showcaseMindmaps = [

@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback } from 'react';
 import { Quiz } from '@/components/education/quiz';
-import { useProgressStore } from '@/lib/stores/app-store';
+import { useProgressStore } from '@/lib/stores';
 import toast from '@/components/ui/toast';
 import type { QuizRequest, Quiz as QuizType, QuizResult } from '@/types';
 

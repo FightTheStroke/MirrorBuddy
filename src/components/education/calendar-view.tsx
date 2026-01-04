@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useCalendarStore, type SchoolEvent } from '@/lib/stores/app-store';
+import { useCalendarStore, type SchoolEvent } from '@/lib/stores';
 import { maestri as MAESTRI } from '@/data/maestri';
 import { cn } from '@/lib/utils';
 import { useScheduler } from '@/lib/hooks/use-scheduler';
