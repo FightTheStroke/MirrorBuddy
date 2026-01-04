@@ -5,10 +5,10 @@
 
 'use client';
 
-import { useCallback, useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores';
 import type { Maestro } from '@/types';
-import type { UseVoiceSessionOptions, ConnectionInfo } from './types';
+import type { UseVoiceSessionOptions } from './types';
 import { useInitPlaybackContext, useScheduleQueuedChunks, usePlayNextChunk } from './audio-playback';
 import { useStartAudioCapture } from './audio-capture';
 import { useSendGreeting, useSendSessionConfig } from './session-config';

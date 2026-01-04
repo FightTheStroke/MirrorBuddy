@@ -9,7 +9,6 @@ import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import type { Maestro } from '@/types';
 import type { ConnectionInfo, UseVoiceSessionOptions } from './types';
-import { AZURE_SAMPLE_RATE } from './constants';
 
 export interface ConnectionRefs {
   wsRef: React.MutableRefObject<WebSocket | null>;
@@ -191,6 +190,7 @@ export function useDisconnect(
 
     if (refs.processorRef.current) {
       refs.processorRef.current.disconnect();
+      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
       refs.processorRef.current = null;
     }
     if (refs.sourceNodeRef.current) {

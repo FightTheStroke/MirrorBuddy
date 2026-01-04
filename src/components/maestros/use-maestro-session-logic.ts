@@ -22,9 +22,13 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
   const [webcamRequest, setWebcamRequest] = useState<{ purpose: string; instructions?: string; callId: string } | null>(null);
   const [sessionEnded, setSessionEnded] = useState(false);
 
-  const sessionStartTime = useRef(Date.now());
+  const sessionStartTimeRef = useRef<number | null>(null);
+  if (sessionStartTimeRef.current === null) {
+    // eslint-disable-next-line react-hooks/purity -- Intentional lazy initialization
+    sessionStartTimeRef.current = Date.now();
+  }
   const questionCount = useRef(0);
-  const previousMessageCount = useRef(0);
+  const previousMessageCountRef = useRef(0);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const processedToolsRef = useRef<Set<string>>(new Set());
 
@@ -139,7 +143,7 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     }
     setSessionEnded(true);
 
-    const sessionDuration = Math.round((Date.now() - sessionStartTime.current) / 60000);
+    const sessionDuration = Math.round((Date.now() - (sessionStartTimeRef.current || Date.now())) / 60000);
     const xpEarned = Math.min(
       MAESTRI_XP.MAX_PER_SESSION,
       sessionDuration * MAESTRI_XP.PER_MINUTE + questionCount.current * MAESTRI_XP.PER_QUESTION
@@ -202,7 +206,7 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     showWebcam,
     webcamRequest,
     sessionEnded,
-    previousMessageCount,
+    previousMessageCount: previousMessageCountRef,
 
     // Voice state (from voice connection hook)
     isVoiceActive: voiceConnection.isVoiceActive,

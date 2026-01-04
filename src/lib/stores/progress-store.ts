@@ -18,7 +18,7 @@ export interface SessionGrade {
   areasToImprove: string[];
 }
 
-interface StudySession {
+export interface StudySession {
   id: string;
   maestroId: string;
   subject: string;

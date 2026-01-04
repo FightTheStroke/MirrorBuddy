@@ -10,7 +10,6 @@ import { logger } from '@/lib/logger';
 import { base64ToInt16Array } from './audio-utils';
 import { MAX_QUEUE_SIZE } from './constants';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
-import type { UseVoiceSessionOptions } from './types';
 
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
@@ -54,6 +53,7 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
       case 'session.updated':
         logger.debug('[VoiceSession] Session configured, ready for conversation');
         logger.debug('[VoiceSession] Full session.updated event', { eventPreview: JSON.stringify(event).slice(0, 500) });
+        // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
         deps.sessionReadyRef.current = true;
         logger.debug('[VoiceSession] Starting audio capture...');
         deps.startAudioCapture();

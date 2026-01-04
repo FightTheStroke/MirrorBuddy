@@ -58,6 +58,7 @@ export function useCancelResponse(refs: ActionRefs, setSpeaking: (value: boolean
     if (refs.wsRef.current?.readyState === WebSocket.OPEN && refs.hasActiveResponseRef.current) {
       logger.debug('[VoiceSession] Cancelling active response');
       refs.wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
+      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
       refs.hasActiveResponseRef.current = false;
     }
     // Always clear local audio queue and stop scheduled sources
