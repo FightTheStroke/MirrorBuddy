@@ -185,50 +185,6 @@ const TOOL_CATEGORIES: ToolCategory[] = [
   },
 ];
 
-// Additional colors for new tool types
-const ADDITIONAL_COLORS = {
-  amber: {
-    gradient: 'from-amber-50 to-amber-100 dark:from-amber-950 dark:to-amber-900',
-    border: 'border-amber-200 dark:border-amber-800',
-    hoverBorder: 'hover:border-amber-400 dark:hover:border-amber-600',
-    icon: 'text-amber-600 dark:text-amber-400',
-    title: 'text-amber-900 dark:text-amber-100',
-    description: 'text-amber-700 dark:text-amber-300',
-  },
-  rose: {
-    gradient: 'from-rose-50 to-rose-100 dark:from-rose-950 dark:to-rose-900',
-    border: 'border-rose-200 dark:border-rose-800',
-    hoverBorder: 'hover:border-rose-400 dark:hover:border-rose-600',
-    icon: 'text-rose-600 dark:text-rose-400',
-    title: 'text-rose-900 dark:text-rose-100',
-    description: 'text-rose-700 dark:text-rose-300',
-  },
-  emerald: {
-    gradient: 'from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900',
-    border: 'border-emerald-200 dark:border-emerald-800',
-    hoverBorder: 'hover:border-emerald-400 dark:hover:border-emerald-600',
-    icon: 'text-emerald-600 dark:text-emerald-400',
-    title: 'text-emerald-900 dark:text-emerald-100',
-    description: 'text-emerald-700 dark:text-emerald-300',
-  },
-  violet: {
-    gradient: 'from-violet-50 to-violet-100 dark:from-violet-950 dark:to-violet-900',
-    border: 'border-violet-200 dark:border-violet-800',
-    hoverBorder: 'hover:border-violet-400 dark:hover:border-violet-600',
-    icon: 'text-violet-600 dark:text-violet-400',
-    title: 'text-violet-900 dark:text-violet-100',
-    description: 'text-violet-700 dark:text-violet-300',
-  },
-  sky: {
-    gradient: 'from-sky-50 to-sky-100 dark:from-sky-950 dark:to-sky-900',
-    border: 'border-sky-200 dark:border-sky-800',
-    hoverBorder: 'hover:border-sky-400 dark:hover:border-sky-600',
-    icon: 'text-sky-600 dark:text-sky-400',
-    title: 'text-sky-900 dark:text-sky-100',
-    description: 'text-sky-700 dark:text-sky-300',
-  },
-};
-
 // Category header colors
 const CATEGORY_COLORS = {
   blue: {
@@ -470,6 +426,3 @@ export function AstuccioView() {
     </div>
   );
 }
-
-// Export additional colors for tool-card.tsx
-export { ADDITIONAL_COLORS };

@@ -493,7 +493,7 @@ function renderDiagram(data: DiagramPrintData): string {
     flowchart: 'Diagramma di flusso',
     sequence: 'Diagramma di sequenza',
     class: 'Diagramma delle classi',
-    er: 'Diagramma entita-relazioni',
+    er: 'Diagramma entità-relazioni',
   };
 
   return `
@@ -502,7 +502,7 @@ function renderDiagram(data: DiagramPrintData): string {
       ${
         data.mermaidCode
           ? `<pre style="white-space: pre-wrap; word-wrap: break-word; font-family: monospace; font-size: 0.875em; padding: 1em; background: #f1f5f9; border-radius: 4px; overflow-x: auto;">${escapeHtml(data.mermaidCode)}</pre>
-             <p style="font-size: 0.875em; color: #64748b; margin-top: 0.5em;"><em>Nota: Questo e il codice Mermaid del diagramma. Per visualizzarlo graficamente, apri il materiale nell'app.</em></p>`
+             <p style="font-size: 0.875em; color: #64748b; margin-top: 0.5em;"><em>Nota: Questo è il codice Mermaid del diagramma. Per visualizzarlo graficamente, apri il materiale nell'app.</em></p>`
           : '<p>Nessun codice diagramma disponibile.</p>'
       }
     </div>
@@ -603,7 +603,7 @@ function generateAccessibleHtml(options: PrintOptions): string {
             ${contentTypeLabels[contentType] || contentType}
             ${showDate ? ` | ${new Date().toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}` : ''}
           </div>
-          ${a11yFeatures.length > 0 ? `<div class="a11y-indicator" aria-label="Impostazioni accessibilita attive">Accessibilita: ${a11yFeatures.join(', ')}</div>` : ''}
+          ${a11yFeatures.length > 0 ? `<div class="a11y-indicator" aria-label="Impostazioni accessibilità attive">Accessibilità: ${a11yFeatures.join(', ')}</div>` : ''}
         </header>
 
         <article>

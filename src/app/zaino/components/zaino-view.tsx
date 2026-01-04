@@ -666,7 +666,7 @@ export function ZainoView({
           >
             <h3 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-3 flex items-center gap-2">
               <Backpack className="w-5 h-5" aria-hidden="true" />
-              Il tuo Zaino e vuoto
+              Il tuo Zaino è vuoto
             </h3>
             <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-4">
               Inizia a creare materiali di studio con i Maestri!
