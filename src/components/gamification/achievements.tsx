@@ -30,6 +30,8 @@ const categoryIcons: Record<Achievement['category'], React.ReactNode> = {
   social: <Target className="w-6 h-6" />,
   exploration: <Compass className="w-6 h-6" />,
   xp: <Zap className="w-6 h-6" />,
+  onboarding: <Trophy className="w-6 h-6" />,
+  time: <BookOpen className="w-6 h-6" />,
 };
 
 const categoryColors: Record<Achievement['category'], string> = {
@@ -39,6 +41,8 @@ const categoryColors: Record<Achievement['category'], string> = {
   social: 'from-pink-400 to-pink-600',
   exploration: 'from-cyan-400 to-cyan-600',
   xp: 'from-purple-400 to-purple-600',
+  onboarding: 'from-green-400 to-green-600',
+  time: 'from-indigo-400 to-indigo-600',
 };
 
 export function AchievementsGrid({ achievements, className }: AchievementsGridProps) {
@@ -205,28 +209,28 @@ function AchievementDetail({ achievement }: AchievementDetailProps) {
 // Predefined achievements for the app
 export const defaultAchievements: Achievement[] = [
   // Study achievements
-  { id: 'first_session', name: 'Prima Lezione', description: 'Completa la tua prima sessione di studio', icon: '📚', category: 'study', requirement: 1, xpReward: 50 },
-  { id: 'study_10', name: 'Studente Attivo', description: 'Completa 10 sessioni di studio', icon: '📖', category: 'study', requirement: 10, xpReward: 100 },
-  { id: 'study_50', name: 'Studente Dedicato', description: 'Completa 50 sessioni di studio', icon: '🎓', category: 'study', requirement: 50, xpReward: 250 },
-  { id: 'study_100', name: 'Studioso', description: 'Completa 100 sessioni di studio', icon: '🏆', category: 'study', requirement: 100, xpReward: 500 },
+  { id: 'first_session', name: 'Prima Lezione', description: 'Completa la tua prima sessione di studio', icon: '📚', category: 'study', requirement: 1, xpReward: 50, mirrorBucksReward: 50 },
+  { id: 'study_10', name: 'Studente Attivo', description: 'Completa 10 sessioni di studio', icon: '📖', category: 'study', requirement: 10, xpReward: 100, mirrorBucksReward: 100 },
+  { id: 'study_50', name: 'Studente Dedicato', description: 'Completa 50 sessioni di studio', icon: '🎓', category: 'study', requirement: 50, xpReward: 250, mirrorBucksReward: 250 },
+  { id: 'study_100', name: 'Studioso', description: 'Completa 100 sessioni di studio', icon: '🏆', category: 'study', requirement: 100, xpReward: 500, mirrorBucksReward: 500 },
 
   // Streak achievements
-  { id: 'streak_3', name: 'Tre Giorni!', description: 'Mantieni una serie di 3 giorni', icon: '🔥', category: 'streak', requirement: 3, xpReward: 75 },
-  { id: 'streak_7', name: 'Una Settimana!', description: 'Mantieni una serie di 7 giorni', icon: '🔥', category: 'streak', requirement: 7, xpReward: 150 },
-  { id: 'streak_30', name: 'Un Mese!', description: 'Mantieni una serie di 30 giorni', icon: '🔥', category: 'streak', requirement: 30, xpReward: 500 },
-  { id: 'streak_100', name: 'Leggenda!', description: 'Mantieni una serie di 100 giorni', icon: '🔥', category: 'streak', requirement: 100, xpReward: 1000 },
+  { id: 'streak_3', name: 'Tre Giorni!', description: 'Mantieni una serie di 3 giorni', icon: '🔥', category: 'streak', requirement: 3, xpReward: 75, mirrorBucksReward: 100 },
+  { id: 'streak_7', name: 'Una Settimana!', description: 'Mantieni una serie di 7 giorni', icon: '🔥', category: 'streak', requirement: 7, xpReward: 150, mirrorBucksReward: 250 },
+  { id: 'streak_30', name: 'Un Mese!', description: 'Mantieni una serie di 30 giorni', icon: '🔥', category: 'streak', requirement: 30, xpReward: 500, mirrorBucksReward: 1000 },
+  { id: 'streak_100', name: 'Leggenda!', description: 'Mantieni una serie di 100 giorni', icon: '🔥', category: 'streak', requirement: 100, xpReward: 1000, mirrorBucksReward: 5000 },
 
   // Mastery achievements
-  { id: 'master_1', name: 'Primo Professore', description: 'Raggiungi la padronanza in una materia', icon: '⭐', category: 'mastery', requirement: 1, xpReward: 200 },
-  { id: 'master_5', name: 'Multidisciplinare', description: 'Raggiungi la padronanza in 5 materie', icon: '⭐', category: 'mastery', requirement: 5, xpReward: 500 },
-  { id: 'perfect_quiz', name: 'Perfezionista', description: 'Completa un quiz con il 100%', icon: '💯', category: 'mastery', requirement: 1, xpReward: 100 },
+  { id: 'master_1', name: 'Primo Professore', description: 'Raggiungi la padronanza in una materia', icon: '⭐', category: 'mastery', requirement: 1, xpReward: 200, mirrorBucksReward: 1000 },
+  { id: 'master_5', name: 'Multidisciplinare', description: 'Raggiungi la padronanza in 5 materie', icon: '⭐', category: 'mastery', requirement: 5, xpReward: 500, mirrorBucksReward: 2500 },
+  { id: 'perfect_quiz', name: 'Perfezionista', description: 'Completa un quiz con il 100%', icon: '💯', category: 'mastery', requirement: 1, xpReward: 100, mirrorBucksReward: 200 },
 
   // Exploration achievements
-  { id: 'all_maestros', name: 'Collezionista', description: 'Studia con tutti i 17 professori', icon: '🧭', category: 'exploration', requirement: 17, xpReward: 300 },
-  { id: 'curious', name: 'Curioso', description: 'Fai 50 domande ai professori', icon: '❓', category: 'exploration', requirement: 50, xpReward: 150 },
+  { id: 'all_maestros', name: 'Collezionista', description: 'Studia con tutti i 17 professori', icon: '🧭', category: 'exploration', requirement: 17, xpReward: 300, mirrorBucksReward: 500 },
+  { id: 'curious', name: 'Curioso', description: 'Fai 50 domande ai professori', icon: '❓', category: 'exploration', requirement: 50, xpReward: 150, mirrorBucksReward: 200 },
 
   // XP achievements
-  { id: 'xp_1000', name: 'Mille Punti', description: 'Accumula 1000 XP', icon: '⚡', category: 'xp', requirement: 1000, xpReward: 100 },
-  { id: 'xp_5000', name: 'Cinquemila', description: 'Accumula 5000 XP', icon: '⚡', category: 'xp', requirement: 5000, xpReward: 250 },
-  { id: 'xp_10000', name: 'Diecimila!', description: 'Accumula 10000 XP', icon: '⚡', category: 'xp', requirement: 10000, xpReward: 500 },
+  { id: 'xp_1000', name: 'Mille Punti', description: 'Accumula 1000 XP', icon: '⚡', category: 'xp', requirement: 1000, xpReward: 100, mirrorBucksReward: 100 },
+  { id: 'xp_5000', name: 'Cinquemila', description: 'Accumula 5000 XP', icon: '⚡', category: 'xp', requirement: 5000, xpReward: 250, mirrorBucksReward: 250 },
+  { id: 'xp_10000', name: 'Diecimila!', description: 'Accumula 10000 XP', icon: '⚡', category: 'xp', requirement: 10000, xpReward: 500, mirrorBucksReward: 500 },
 ];

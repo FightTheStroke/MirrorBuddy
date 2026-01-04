@@ -71,3 +71,16 @@ export function onStudyReminder(subject?: string): void {
 export function onBreakReminder(studyMinutes: number): void {
   notificationService.breakReminder(studyMinutes);
 }
+
+/**
+ * Call when MirrorBucks are earned (significant amounts)
+ */
+export function onMirrorBucksEarned(amount: number, reason?: string): void {
+  // Only notify for significant amounts (50+ MB)
+  if (amount >= 50) {
+    // For now, just log - can be extended with coach announcements
+    import('@/lib/logger').then(({ logger }) => {
+      logger.info('Significant MirrorBucks earned', { amount, reason });
+    });
+  }
+}

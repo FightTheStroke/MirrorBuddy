@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -34,7 +35,12 @@ export function MaestroSessionHeader({
       className="flex items-center gap-4 p-4 rounded-t-2xl text-white"
       style={{ background: `linear-gradient(to right, ${maestro.color}, ${maestro.color}dd)` }}
     >
-      <div className="relative">
+      <motion.div
+        className="relative"
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+      >
         <Image
           src={maestro.avatar}
           alt={maestro.name}
@@ -42,11 +48,16 @@ export function MaestroSessionHeader({
           height={56}
           className="rounded-full border-2 border-white/30 object-cover"
         />
-        <span className={cn(
-          "absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full",
-          isVoiceActive && isConnected ? "bg-green-400 animate-pulse" : "bg-green-400"
-        )} />
-      </div>
+        <motion.span
+          className={cn(
+            "absolute bottom-0 right-0 w-4 h-4 border-2 border-white rounded-full",
+            isVoiceActive && isConnected ? "bg-green-400 animate-pulse" : "bg-green-400"
+          )}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3 }}
+        />
+      </motion.div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-bold truncate">{maestro.name}</h2>

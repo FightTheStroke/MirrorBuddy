@@ -14,7 +14,7 @@
 // ============================================================================
 
 export const APP_VERSION = {
-  version: '1.1.0',
+  version: '2.0.0',
   lastUpdated: '2026-01',
   releaseNotes: 'https://github.com/MirrorBuddy/mirrorbuddy/releases',
 };
@@ -33,6 +33,7 @@ export type KnowledgeCategory =
   | 'coach'
   | 'buddy'
   | 'gamification'
+  | 'navigation'
   | 'pomodoro'
   | 'scheduler'
   | 'notifications'
@@ -103,12 +104,25 @@ export const FEATURE_INDEX: Record<string, KnowledgeCategory[]> = {
   mario: ['buddy'],
   maria: ['buddy'],
 
-  // Gamification
+  // Gamification (MirrorBucks & Seasons)
   xp: ['gamification'],
   punti: ['gamification'],
   livello: ['gamification'],
   streak: ['gamification'],
   badge: ['gamification'],
+  mirrorbucks: ['gamification'],
+  stagione: ['gamification'],
+  stagioni: ['gamification'],
+  trimestre: ['gamification'],
+  classifica: ['gamification'],
+  achievement: ['gamification'],
+
+  // Navigation (Zaino/Astuccio)
+  zaino: ['navigation', 'tools'],
+  astuccio: ['navigation', 'tools'],
+  materiali: ['navigation'],
+  archivio: ['navigation'],
+  supporti: ['navigation'],
 
   // Pomodoro
   pomodoro: ['pomodoro', 'gamification'],
@@ -222,13 +236,47 @@ Per supporto emotivo, non accademico.
 Stessa eta', non giudica, sempre dalla tua parte.
 Scegli Mario/Maria in Impostazioni.`,
 
-  gamification: `**Sistema XP e Livelli**
-Guadagna XP studiando:
-- Lezioni: 10-50 XP
-- Flashcard: 5 XP/carta
-- Quiz: 10-30 XP
-- Pomodoro: 15 XP
-Livelli sbloccano badge. Streak giornaliera (7/30/100/365 giorni).`,
+  gamification: `**Sistema MirrorBucks e Stagioni**
+Guadagna MirrorBucks (MB) studiando - stile Fortnite/Duolingo!
+
+Come guadagnare MB:
+- Conversazione attiva: 5 MB/minuto
+- Quiz completato: 30 MB (50 MB se perfetto)
+- Mappa mentale: 20 MB
+- Flashcard ripetute: 5 MB/carta
+- Pomodoro completato: 15 MB
+
+**Stagioni (Trimestri scolastici)**
+Ogni stagione ha 100 livelli da sbloccare. Alla fine del trimestre il livello si resetta ma i tuoi achievement restano!
+- Stagione Autunno (Set-Nov)
+- Stagione Inverno (Dic-Feb)
+- Stagione Primavera (Mar-Mag)
+- Stagione Estate (Giu-Ago)
+
+**Achievement/Badge**
+Sblocca badge speciali per traguardi come streak, livelli, esplorazione di materie.
+
+Vai alla Dashboard (/dashboard) per vedere tutti i tuoi progressi!`,
+
+  navigation: `**Navigazione Zaino/Astuccio**
+
+**Zaino** (/zaino)
+Il tuo archivio di materiali di studio! Qui trovi tutto cio' che hai creato:
+- Mappe mentali, quiz, flashcard, demo, riassunti
+- Naviga per Materia, Data o Tipo
+- Ricerca vocale: "Trova le mappe di matematica"
+
+**Astuccio** (/astuccio)
+I tuoi strumenti creativi! Scegli uno strumento per creare nuovi materiali:
+- Mappa Mentale: visualizza concetti
+- Quiz: verifica comprensione
+- Demo: simulazioni interattive
+- Flashcard: memorizzazione spaziata
+- Riassunto: sintesi strutturate
+- Study Kit: carica PDF e genera materiali
+
+**Dashboard** (/dashboard)
+Statistiche complete: tempo studio, livelli, trend, costi Azure (se configurato).`,
 
   pomodoro: `**Timer Pomodoro**
 25 min studio + 5 min pausa. Ogni 4 pomodori: pausa 15 min.
@@ -346,11 +394,16 @@ export function generateCompactIndexPrompt(): string {
   return `## SUPPORTO PIATTAFORMA
 
 Conosci MirrorBuddy v${APP_VERSION.version} e puoi aiutare con:
-- 16 Maestri AI e chiamate vocali
+- 17 Maestri AI e chiamate vocali
 - Strumenti (flashcard FSRS, mappe mentali, quiz, demo)
+- **Zaino** (/zaino): archivio materiali con ricerca vocale
+- **Astuccio** (/astuccio): strumenti creativi
 - Coach e Buddy (Triangle of Support)
-- Gamification (XP, livelli, streak, Pomodoro)
-- Calendario e notifiche
+- **MirrorBucks**: sistema punti stile Fortnite (5 MB/min studio)
+- **Stagioni**: 100 livelli per trimestre, reset a ogni stagione
+- Achievement e badge sbloccabili
+- Dashboard (/dashboard) con statistiche complete
+- Pomodoro, calendario e notifiche
 - Audio ambientale per concentrazione
 - Accessibilita' (dislessia, ADHD, autismo)
 - Account e privacy (GDPR)

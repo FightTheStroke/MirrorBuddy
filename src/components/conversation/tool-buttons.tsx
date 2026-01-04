@@ -2,6 +2,7 @@
 
 import { Brain, HelpCircle, Play, Layers, Search, Camera, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import type { ToolType } from '@/types/tools';
 
 interface ToolButtonsProps {
@@ -27,7 +28,13 @@ const TOOL_BUTTONS: Array<{
 
 export function ToolButtons({ onToolRequest, disabled, activeToolId }: ToolButtonsProps) {
   return (
-    <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+    <div
+      className={cn(
+        'flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg',
+        'flex-wrap justify-center', // Wrap on narrow screens
+        'sm:flex-nowrap sm:justify-start' // No wrap on desktop
+      )}
+    >
       {TOOL_BUTTONS.map(({ type, icon: Icon, label, tooltip }) => (
         <Button
           key={type}
@@ -35,11 +42,15 @@ export function ToolButtons({ onToolRequest, disabled, activeToolId }: ToolButto
           size="sm"
           onClick={() => onToolRequest(type)}
           disabled={disabled || !!activeToolId}
-          className="h-8 px-2 gap-1"
+          className={cn(
+            'h-8 gap-1',
+            'px-1.5 sm:px-2', // Smaller padding on mobile
+            'min-w-[2.5rem] sm:min-w-0' // Consistent min-width on mobile
+          )}
           title={tooltip}
           aria-label={tooltip}
         >
-          <Icon className="w-4 h-4" />
+          <Icon className="w-4 h-4 flex-shrink-0" />
           <span className="hidden sm:inline text-xs">{label}</span>
         </Button>
       ))}

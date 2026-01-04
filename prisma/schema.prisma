@@ -37,6 +37,7 @@ model User {
   calendarEvents    CalendarEvent[]
   htmlSnippets      HtmlSnippet[]
   homeworkSessions  HomeworkSession[]
+  gamification      UserGamification?
 }
 
 model Profile {
@@ -110,8 +111,16 @@ model Progress {
   userId            String    @unique
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // MirrorBucks system (xp is backward compatibility)
   xp                Int       @default(0)
   level             Int       @default(1)
+
+  // Season system
+  seasonMirrorBucks Int       @default(0)
+  seasonLevel       Int       @default(1)
+  allTimeLevel      Int       @default(1)
+  currentSeason     String?   // JSON: Season object
+  seasonHistory     String    @default("[]") // JSON: SeasonHistory[]
 
   // Streak
   streakCurrent     Int       @default(0)
@@ -986,5 +995,116 @@ model SafetyEvent {
   @@index([userId, timestamp])
   @@index([severity, timestamp])
   @@index([timestamp]) // Standalone index for time-range queries
+}
+
+// ============================================================================
+// GAMIFICATION SYSTEM (MirrorBuddyGamification Plan)
+// ============================================================================
+
+model UserGamification {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Points & Level
+  totalPoints     Int      @default(0)
+  seasonPoints    Int      @default(0)   // Reset each season
+  level           Int      @default(1)
+  tier            String   @default("principiante") // principiante -> leggenda
+
+  // Season tracking
+  currentSeason   String   // e.g., "2026-Q1"
+  seasonStartDate DateTime @default(now())
+
+  // MirrorBucks (renamed from XP)
+  mirrorBucks     Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  achievements    UserAchievement[]
+  streak          DailyStreak?
+  pointsHistory   PointsTransaction[]
+
+  @@index([level])
+  @@index([totalPoints])
+  @@index([currentSeason])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  code        String   @unique  // e.g., "first_session", "streak_7"
+  name        String
+  description String
+  category    String   // COMPLETION, MASTERY, CONSISTENCY, SOCIAL, MILESTONE
+  icon        String   // Emoji or icon name
+  points      Int      @default(0) // Bonus points when unlocked
+  tier        String   @default("bronze") // bronze, silver, gold, platinum
+  requirement String   // JSON describing unlock condition
+  isSecret    Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@index([category])
+  @@index([tier])
+}
+
+model UserAchievement {
+  id             String   @id @default(cuid())
+  gamificationId String
+  gamification   UserGamification @relation(fields: [gamificationId], references: [id], onDelete: Cascade)
+  achievementId  String
+  achievement    Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  unlockedAt DateTime @default(now())
+  progress   Int      @default(100) // 0-100, 100 = unlocked
+
+  @@unique([gamificationId, achievementId])
+  @@index([gamificationId])
+  @@index([achievementId])
+  @@index([unlockedAt])
+}
+
+model DailyStreak {
+  id             String   @id @default(cuid())
+  gamificationId String   @unique
+  gamification   UserGamification @relation(fields: [gamificationId], references: [id], onDelete: Cascade)
+
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
+  lastActivityAt DateTime @default(now())
+
+  // Daily goal tracking
+  dailyGoalMinutes Int     @default(30)
+  todayMinutes     Int     @default(0)
+  goalMetToday     Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([currentStreak])
+  @@index([lastActivityAt])
+}
+
+model PointsTransaction {
+  id             String   @id @default(cuid())
+  gamificationId String
+  gamification   UserGamification @relation(fields: [gamificationId], references: [id], onDelete: Cascade)
+
+  points      Int
+  reason      String   // "study_session", "flashcard_review", "voice_interaction", "achievement_bonus"
+  sourceId    String?  // ID of the triggering entity (session, flashcard, etc.)
+  sourceType  String?  // "StudySession", "FlashcardProgress", "Conversation"
+  multiplier  Float    @default(1.0) // Streak multiplier applied
+
+  createdAt DateTime @default(now())
+
+  @@index([gamificationId])
+  @@index([createdAt])
+  @@index([reason])
 }
 

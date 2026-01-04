@@ -6,3 +6,4 @@
 
 export { ConversationFlow } from './conversation-flow';
 export { CharacterChatView } from './character-chat-view';
+export { ActiveMaestroAvatar } from './components/active-maestro-avatar';
