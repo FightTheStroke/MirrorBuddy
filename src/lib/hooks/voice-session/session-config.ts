@@ -102,6 +102,16 @@ export function useSendSessionConfig(
       de: 'de',
     };
 
+    // Vocabulary hints for whisper-1 transcription (keyword list format)
+    // Note: gpt-4o-transcribe NOT supported in Realtime API (only via /audio endpoint)
+    const transcriptionPrompts: Record<string, string> = {
+      it: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia, scienze, inglese, arte, musica, lezione, compiti, esercizio, spiegazione, domanda, risposta, bravo, corretto, sbagliato, aiuto, grazie, sì, no, non capisco, ripeti',
+      en: 'MirrorBuddy, teacher, math, English, history, geography, science, art, music, lesson, homework, exercise, explanation, question, answer, correct, wrong, help, thank you, yes, no, I don\'t understand, repeat',
+      es: 'MirrorBuddy, maestro, matemáticas, español, historia, geografía, ciencias, arte, música, lección, deberes, ejercicio, explicación, pregunta, respuesta, correcto, incorrecto, ayuda, gracias, sí, no, no entiendo, repite',
+      fr: 'MirrorBuddy, professeur, mathématiques, français, histoire, géographie, sciences, art, musique, leçon, devoirs, exercice, explication, question, réponse, correct, incorrect, aide, merci, oui, non, je ne comprends pas, répète',
+      de: 'MirrorBuddy, Lehrer, Mathematik, Deutsch, Geschichte, Geographie, Wissenschaft, Kunst, Musik, Lektion, Hausaufgaben, Übung, Erklärung, Frage, Antwort, richtig, falsch, Hilfe, danke, ja, nein, ich verstehe nicht, wiederhole',
+    };
+
     // Fetch conversation memory
     let memoryContext = '';
     try {
@@ -163,8 +173,9 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         },
         input_audio_transcription: {
           model: 'whisper-1',
-          // Use ISO language code (it, en, es, etc.)
           language: transcriptionLanguages[language] || 'it',
+          // Keyword hints to improve transcription accuracy
+          prompt: transcriptionPrompts[language] || transcriptionPrompts.it,
         },
         turn_detection: {
           type: 'server_vad',
