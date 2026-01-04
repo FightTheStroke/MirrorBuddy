@@ -23,7 +23,7 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock base renderers that we wrap
-vi.mock('@/components/tools/markmap-renderer', () => ({
+vi.mock('@/components/tools/markmap', () => ({
   MarkMapRenderer: ({ title }: { title: string }) => (
     <div data-testid="markmap-renderer">{title}</div>
   ),
