@@ -64,9 +64,11 @@ function getAccessibilityStyles(settings: Partial<AccessibilitySettings>): strin
     ? "'OpenDyslexic', 'Comic Sans MS', Arial, sans-serif"
     : "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
-  const fontSize = settings.largeText
-    ? `${(settings.fontSize || 1) * 1.2 * 16}px`
-    : `${(settings.fontSize || 1) * 16}px`;
+  // Dyslexic users get extra large font (1.4x) in addition to any other settings
+  const baseFontSize = settings.fontSize || 1;
+  const dyslexiaMultiplier = settings.dyslexiaFont ? 1.4 : 1;
+  const largeTextMultiplier = settings.largeText ? 1.2 : 1;
+  const fontSize = `${baseFontSize * dyslexiaMultiplier * largeTextMultiplier * 16}px`;
 
   const lineHeight = settings.increasedLineHeight
     ? Math.max(settings.lineSpacing || 1.5, 1.8)
@@ -115,6 +117,7 @@ function getAccessibilityStyles(settings: Partial<AccessibilitySettings>): strin
       max-width: 800px;
       margin: 0 auto;
       padding: 40px 20px;
+      ${settings.dyslexiaFont ? 'text-transform: uppercase;' : ''}
     }
 
     /* Headings */
@@ -403,6 +406,11 @@ function renderSummary(data: SummaryData): string {
   };
 
   let html = '';
+
+  // Show topic as subtitle
+  if (data.topic) {
+    html += `<h2>${escapeHtml(data.topic)}</h2>`;
+  }
 
   if (data.length) {
     html += `<div class="meta">Tipo: Riassunto ${lengthLabels[data.length] || ''}</div>`;
