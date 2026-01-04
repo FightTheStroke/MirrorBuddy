@@ -459,6 +459,56 @@ MirrorBuddy is part of a larger vision:
 
 ---
 
+## Architecture Overview
+
+MirrorBuddy follows a clean layered architecture with clear separation of concerns:
+
+```mermaid
+flowchart TB
+    User([Student])
+
+    subgraph Frontend["Frontend Layer"]
+        UI[Next.js 16 App Router<br/>React + TypeScript + Tailwind]
+        State[Zustand State Management]
+    end
+
+    subgraph Backend["Backend Layer"]
+        API[API Routes]
+    end
+
+    subgraph AI["AI Providers"]
+        Azure[Azure OpenAI<br/>Chat + Voice Realtime]
+        Ollama[Ollama<br/>Local Text-Only]
+    end
+
+    subgraph Data["Data Layer"]
+        DB[(Prisma ORM<br/>SQLite/PostgreSQL)]
+    end
+
+    User --> UI
+    UI <--> State
+    UI --> API
+    State <-- REST --> API
+    API --> Azure
+    API -.fallback.-> Ollama
+    API <--> DB
+
+    style Azure fill:#0078D4,stroke:#005A9E,color:#fff,stroke-width:2px
+    style Ollama fill:#77B05D,stroke:#5A8A44,color:#fff,stroke-width:2px
+    style State fill:#FF4785,stroke:#DB2C66,color:#fff,stroke-width:2px
+    style DB fill:#336791,stroke:#26516D,color:#fff,stroke-width:2px
+```
+
+### Key Architectural Decisions
+
+**ADR 0015 - State Management**: Zustand stores sync with backend via REST APIs. User data is NEVER stored in localStorage—only in the database via API calls. This ensures data consistency, GDPR compliance, and proper server-side validation.
+
+**AI Provider Strategy**: Azure OpenAI is the primary provider (supports both chat and voice). Ollama serves as a local fallback for text-only interactions when Azure is unavailable or for offline development.
+
+**Data Flow**: All user interactions flow through the Next.js frontend → Zustand state → API routes → AI providers/Database. This unidirectional flow ensures predictable state management and proper separation of concerns.
+
+---
+
 ## Tech Stack
 
 | Layer | Technology |
