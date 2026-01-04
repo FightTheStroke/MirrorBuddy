@@ -13,7 +13,9 @@
 
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, HelpCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { BaseRendererProps } from './index';
 
@@ -105,65 +107,72 @@ export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={cn('space-y-6', className)}
-    >
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-          {title}
-        </h3>
-        <button
-          onClick={() => setShowAnswers(!showAnswers)}
-          className="text-sm text-accent-themed hover:underline"
-        >
-          {showAnswers ? 'Nascondi risposte' : 'Mostra risposte'}
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        {questions.map((q, qIndex) => (
-          <div
-            key={q.id || `question-${qIndex}`}
-            className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+    <Card className={className}>
+      <CardContent className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+            {title}
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAnswers(!showAnswers)}
           >
-            <p className="font-medium text-slate-900 dark:text-slate-100 mb-3">
-              {qIndex + 1}. {q.question}
-            </p>
-            <div className="space-y-2">
-              {q.options.map((opt, optIndex) => (
-                <div
-                  key={opt.id || `option-${qIndex}-${optIndex}`}
-                  className={cn(
-                    'flex items-center gap-2 p-2 rounded-lg transition-colors',
-                    showAnswers && opt.isCorrect && 'bg-green-100 dark:bg-green-900/30',
-                    showAnswers && !opt.isCorrect && 'bg-slate-50 dark:bg-slate-700/50'
-                  )}
-                >
-                  {showAnswers ? (
-                    opt.isCorrect ? (
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    ) : (
-                      <XCircle className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                    )
-                  ) : (
-                    <HelpCircle className="w-5 h-5 text-slate-400 flex-shrink-0" />
-                  )}
-                  <span className="text-sm text-slate-700 dark:text-slate-300">
-                    {opt.text}
-                  </span>
-                </div>
-              ))}
-            </div>
-            {showAnswers && q.explanation && (
-              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 italic">
-                {q.explanation}
+            {showAnswers ? 'Nascondi risposte' : 'Mostra risposte'}
+          </Button>
+        </div>
+
+        <div className="space-y-4">
+          {questions.map((q, qIndex) => (
+            <motion.div
+              key={q.id || `question-${qIndex}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: qIndex * 0.1 }}
+            >
+              <p className="text-xl font-semibold mb-4">
+                {qIndex + 1}. {q.question}
               </p>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.div>
+              <div className="space-y-3">
+                {q.options.map((opt, optIndex) => (
+                  <div
+                    key={opt.id || `option-${qIndex}-${optIndex}`}
+                    className={cn(
+                      'w-full p-4 rounded-xl border-2 transition-all',
+                      showAnswers && opt.isCorrect && 'border-green-500 bg-green-50 dark:bg-green-900/20',
+                      showAnswers && !opt.isCorrect && 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50',
+                      !showAnswers && 'border-slate-200 dark:border-slate-700'
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-700 dark:text-slate-300">
+                        {opt.text}
+                      </span>
+                      {showAnswers && opt.isCorrect && (
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                      )}
+                      {showAnswers && !opt.isCorrect && (
+                        <XCircle className="w-5 h-5 text-slate-400" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {showAnswers && q.explanation && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 bg-slate-100 dark:bg-slate-800 rounded-xl mt-4"
+                >
+                  <p className="text-slate-700 dark:text-slate-300">
+                    {q.explanation}
+                  </p>
+                </motion.div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

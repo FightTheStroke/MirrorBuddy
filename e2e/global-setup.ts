@@ -19,7 +19,18 @@ async function globalSetup() {
 
   // Create storage state with onboarding completed
   const storageState = {
-    cookies: [],
+    cookies: [
+      {
+        name: 'mirrorbuddy-user-id',
+        value: 'test-user',
+        domain: 'localhost',
+        path: '/',
+        expires: -1,
+        httpOnly: false,
+        secure: false,
+        sameSite: 'Lax',
+      },
+    ],
     origins: [
       {
         origin: 'http://localhost:3000',
