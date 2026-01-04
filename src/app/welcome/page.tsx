@@ -12,8 +12,9 @@ import { PrinciplesStep } from './components/principles-step';
 import { MaestriStep } from './components/maestri-step';
 import { ReadyStep } from './components/ready-step';
 import { HeroSection } from './components/hero-section';
+import { MaestriShowcaseSection } from './components/maestri-showcase-section';
+import { SupportSection } from './components/support-section';
 import { FeaturesSection } from './components/features-section';
-import { GuidesSection } from './components/guides-section';
 import { QuickStart } from './components/quick-start';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -379,13 +380,36 @@ function WelcomeContent() {
     const isReturningUser = Boolean(existingUserData?.name);
 
     // Handler for skip - marks onboarding as complete and goes to dashboard
-    const handleSkipWithConfirmation = () => {
-      useOnboardingStore.getState().completeOnboarding();
-      router.push('/');
+    const handleSkipWithConfirmation = async () => {
+      try {
+        logger.info('[WelcomePage] Skip button clicked, marking onboarding complete');
+
+        // CRITICAL: Persist to database FIRST before updating local state
+        const response = await fetch('/api/onboarding', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hasCompletedOnboarding: true }),
+        });
+
+        if (!response.ok) {
+          logger.error('[WelcomePage] Failed to persist onboarding completion', { status: response.status });
+          // Still update local state and redirect even if API fails
+        }
+
+        // Update local state
+        useOnboardingStore.getState().completeOnboarding();
+
+        logger.info('[WelcomePage] Redirecting to dashboard');
+        router.push('/');
+      } catch (error) {
+        logger.error('[WelcomePage] Error in handleSkipWithConfirmation', { error: String(error) });
+        // Fallback: still try to redirect even on error
+        router.push('/');
+      }
     };
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 dark:from-gray-900 dark:via-purple-950 dark:to-blue-950 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/20 to-purple-50/20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
         {/* Main content container */}
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
           <motion.div
@@ -394,17 +418,20 @@ function WelcomeContent() {
             transition={{ duration: 0.6 }}
             className="w-full"
           >
-            {/* Hero Section - Logo, Avatar, Welcome Text */}
+            {/* Hero Section - Logo, Welcome Text */}
             <HeroSection
               userName={existingUserData?.name}
               isReturningUser={isReturningUser}
             />
 
-            {/* Features Section - Key capabilities */}
-            <FeaturesSection />
+            {/* 1. MAESTRI - The absolute protagonists (primary value) */}
+            <MaestriShowcaseSection />
 
-            {/* Guides Section - Meet the AI characters */}
-            <GuidesSection />
+            {/* 2. SUPPORT - Coaches and Buddies (secondary support) */}
+            <SupportSection />
+
+            {/* 3. PLATFORM TOOLS - Integrated tools */}
+            <FeaturesSection />
 
             {/* Quick Start Section - CTAs */}
             <QuickStart

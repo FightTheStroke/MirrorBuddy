@@ -2,7 +2,6 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Sparkles } from 'lucide-react';
 
 interface HeroSectionProps {
   userName?: string;
@@ -13,7 +12,7 @@ interface HeroSectionProps {
  * Hero Section for MirrorBuddy Welcome Page
  *
  * Displays:
- * - Animated Melissa avatar with sparkle decoration
+ * - MirrorBuddy logo
  * - Personalized welcome message (new vs returning user)
  * - MirrorBuddy branding and value proposition
  *
@@ -21,35 +20,22 @@ interface HeroSectionProps {
  */
 export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
   return (
-    <div className="text-center max-w-2xl mx-auto">
-      {/* Avatar with animation */}
+    <div className="text-center max-w-3xl mx-auto">
+      {/* MirrorBuddy Logo */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
-        className="relative w-32 h-32 mx-auto mb-8"
+        transition={{ duration: 0.5, type: 'spring' }}
+        className="mb-8"
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-pink-300/20 to-transparent rounded-full blur-xl opacity-50" />
-        <div className="relative w-full h-full rounded-full bg-gradient-to-br from-pink-400 to-purple-600 p-1">
-          <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 flex items-center justify-center overflow-hidden">
-            <Image
-              src="/avatars/melissa.jpg"
-              alt="Melissa - La tua coach di apprendimento"
-              width={120}
-              height={120}
-              className="w-full h-full object-cover"
-              priority
-            />
-          </div>
-        </div>
-        {/* Sparkle decoration */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-          className="absolute -top-2 -right-2"
-        >
-          <Sparkles className="w-6 h-6 text-yellow-400" aria-hidden="true" />
-        </motion.div>
+        <Image
+          src="/logo-mirrorbuddy-full.png"
+          alt="MirrorBuddy Logo"
+          width={300}
+          height={80}
+          className="mx-auto"
+          priority
+        />
       </motion.div>
 
       {/* Welcome Text */}
@@ -59,8 +45,8 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
             <motion.h1
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+              transition={{ delay: 0.1 }}
+              className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
             >
               Bentornato,{' '}
               <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
@@ -70,10 +56,18 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-xl text-gray-600 dark:text-gray-300 mb-8"
+              transition={{ delay: 0.2 }}
+              className="text-2xl text-gray-700 dark:text-gray-200 mb-4 font-semibold"
             >
-              E bello rivederti. Vuoi aggiornare il tuo profilo o continuare a studiare?
+              Pronto per la tua prossima avventura di apprendimento?
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto"
+            >
+              I tuoi 17 Maestri storici - da Socrate a Einstein, da Leonardo a Marie Curie - ti aspettano per continuare il tuo viaggio di apprendimento.
             </motion.p>
           </>
         ) : (
@@ -81,8 +75,8 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
             <motion.h1
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4"
+              transition={{ delay: 0.1 }}
+              className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
             >
               Benvenuto in{' '}
               <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
@@ -92,12 +86,24 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-xl text-gray-600 dark:text-gray-300 mb-8"
+              transition={{ delay: 0.2 }}
+              className="text-2xl text-gray-700 dark:text-gray-200 mb-4 font-semibold"
             >
-              Il tuo compagno di studio intelligente, personalizzato per te.
-              Impara con i nostri Maestri AI, crea mappe mentali, flashcard e molto altro!
+              La scuola che vorrei: dove ogni studente trova il suo modo di imparare
             </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto space-y-4"
+            >
+              <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                Impara <strong className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">CON i più grandi</strong>, non solo su di loro
+              </p>
+              <p className="text-base">
+                Studia matematica <strong className="text-blue-600 dark:text-blue-400">con Euclide</strong>, fisica <strong className="text-purple-600 dark:text-purple-400">con Feynman</strong>, chimica <strong className="text-pink-600 dark:text-pink-400">con Marie Curie</strong>. 17 Maestri storici ti accompagnano personalmente.
+              </p>
+            </motion.div>
           </>
         )}
       </div>
