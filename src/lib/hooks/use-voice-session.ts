@@ -543,14 +543,15 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
       fr: 'French (Français)',
       de: 'German (Deutsch)',
     };
-    // C-1 FIX: Azure Realtime API expects full language name for transcription
-    // See: https://learn.microsoft.com/en-us/azure/ai-services/openai/realtime-audio-reference
+    // FIX: Azure Realtime API expects ISO language codes for transcription
+    // NOT full names - the error message clearly shows: 'it', 'en', 'es', etc.
+    // See error: "Invalid value: 'Italian'. Supported values are: 'it', 'en', ..."
     const transcriptionLanguages: Record<string, string> = {
-      it: 'Italian',
-      en: 'English',
-      es: 'Spanish',
-      fr: 'French',
-      de: 'German',
+      it: 'it',
+      en: 'en',
+      es: 'es',
+      fr: 'fr',
+      de: 'de',
     };
 
     // Fetch conversation memory
@@ -614,9 +615,8 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         },
         input_audio_transcription: {
           model: 'whisper-1',
-          // C-1 FIX: Use full language name instead of ISO code
-          // Azure Realtime API expects "Italian", "English", etc.
-          language: transcriptionLanguages[language] || 'Italian',
+          // Use ISO language code (it, en, es, etc.)
+          language: transcriptionLanguages[language] || 'it',
         },
         turn_detection: {
           type: 'server_vad',
