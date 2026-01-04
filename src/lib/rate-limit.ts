@@ -133,9 +133,9 @@ export const RATE_LIMITS = {
     maxRequests: 60,
     windowMs: 60 * 1000,
   },
-  /** Realtime token: 10 requests per minute (voice session tokens) */
+  /** Realtime token: 30 requests per minute (voice session tokens) */
   REALTIME_TOKEN: {
-    maxRequests: 10,
+    maxRequests: 30,
     windowMs: 60 * 1000,
   },
   /** Homework analysis: 10 requests per minute (vision API, very expensive) */
