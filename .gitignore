@@ -65,3 +65,7 @@ e2e/.auth/
 backend/.env
 backend/.env.*
 !backend/.env.example
+
+# Python
+__pycache__/
+*.pyc
