@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'MirrorBuddy - The school we wished existed',
-  description: 'AI-powered educational platform with 16 historical Maestros, voice tutoring, and personalized learning for students with learning differences.',
+  description: 'AI-powered educational platform with 17 historical Maestros, 5 Coaches, 5 Buddies, voice tutoring, and personalized learning for students with learning differences.',
   keywords: ['education', 'AI', 'tutoring', 'voice', 'learning', 'DSA', 'ADHD', 'MirrorBuddy'],
   manifest: '/manifest.json',
   icons: {
