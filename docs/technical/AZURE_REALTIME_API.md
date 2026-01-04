@@ -126,20 +126,43 @@ const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.include
     instructions: 'You are...',
     input_audio_format: 'pcm16',
     input_audio_transcription: {
-      model: 'whisper-1',
-      language: 'it',                 // Force transcription language
+      model: 'whisper-1',             // ONLY whisper-1 supported (see below)
+      language: 'it',                 // ISO code from settings
+      prompt: 'keyword1, keyword2',   // Vocabulary hints (optional)
     },
     turn_detection: {
       type: 'server_vad',
-      threshold: 0.4,
+      threshold: 0.6,
       prefix_padding_ms: 300,
-      silence_duration_ms: 400,
+      silence_duration_ms: 700,
       create_response: true,
     },
     tools: [...],                     // Optional: function calling
   }
 }
 ```
+
+### input_audio_transcription - IMPORTANT
+
+> ⚠️ **ONLY `whisper-1` IS SUPPORTED** ⚠️
+>
+> The Realtime API does NOT support `gpt-4o-transcribe` or `gpt-4o-mini-transcribe`.
+> Those models are only available via the separate `/audio/transcriptions` endpoint.
+> Using them gives: `Invalid value: 'gpt-4o-transcribe'. Supported values are: 'whisper-1'`
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `model` | string | Must be `whisper-1` |
+| `language` | string | ISO-639-1 code (it, en, es, fr, de) |
+| `prompt` | string | Keyword list to improve accuracy |
+
+**Prompt format for whisper-1**: comma-separated keywords, NOT sentences.
+```typescript
+prompt: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia...'
+```
+
+**Audio flow note**: The model receives raw audio directly and understands it correctly.
+The transcription shown in chat is generated separately by Whisper and may have errors.
 
 ### What We DON'T Use (But Documentation Mentions)
 
@@ -780,6 +803,7 @@ WS_PROXY_PORT=3001
 | 2025-12-29 | **ws.onmessage doesn't receive events** | WebSocket sends Blob, code expected String |
 | 2025-12-30 | session.update format confusion | Clarified: current code uses Preview API flat format |
 | 2026-01-01 | **Only first word plays in onboarding** | Chunk scheduling bug - chunks 4+ never scheduled (see below) |
+| 2026-01-04 | **gpt-4o-transcribe not working** | Only `whisper-1` supported in Realtime API. Added prompt with keywords. |
 
 ---
 

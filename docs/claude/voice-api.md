@@ -52,18 +52,71 @@ AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime-mini
 
 3. Test qualità con Maestri prima di produzione
 
+## Trascrizione Audio (input_audio_transcription)
+
+### Modelli Disponibili nel Realtime API
+
+| Modello | Stato | Note |
+|---------|-------|------|
+| `whisper-1` | **Supportato** | Unico modello funzionante |
+| `gpt-4o-transcribe` | **NON supportato** | Solo via `/audio` endpoint separato |
+| `gpt-4o-mini-transcribe` | **NON supportato** | Solo via `/audio` endpoint separato |
+
+> **IMPORTANTE**: Il Realtime API supporta SOLO `whisper-1` per la trascrizione.
+> `gpt-4o-transcribe` dà errore: `Invalid value. Supported values are: 'whisper-1'`
+
+### Configurazione Attuale
+
+```typescript
+input_audio_transcription: {
+  model: 'whisper-1',
+  language: transcriptionLanguages[language] || 'it',  // Dinamico da settings
+  prompt: transcriptionPrompts[language],  // Keyword hints per accuratezza
+}
+```
+
+### Prompt per Migliorare Accuratezza
+
+Whisper-1 supporta un parametro `prompt` con **lista di keyword** (non frasi):
+
+```typescript
+const transcriptionPrompts = {
+  it: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia, scienze...',
+  en: 'MirrorBuddy, teacher, math, English, history, geography, science...',
+  // ... altre lingue
+};
+```
+
+Questo aiuta Whisper a riconoscere termini specifici del dominio educativo.
+
+### Flusso Audio vs Trascrizione
+
+```
+Audio User → [2 percorsi paralleli]
+├── 1. Audio raw → Modello GPT-4o (lui capisce SEMPRE bene)
+└── 2. Audio → Whisper STT → Trascrizione chat (può avere errori)
+```
+
+La trascrizione mostrata nella chat è **separata** da ciò che il modello capisce.
+Il modello riceve l'audio originale e lo interpreta correttamente.
+
 ## Session Config Ottimale (Issue #61)
 
-Hardcoded in `use-voice-session.ts` - NON modificabili dall'utente:
+Hardcoded in `session-config.ts` - NON modificabili dall'utente:
 
 ```typescript
 {
   input_audio_noise_reduction: { type: 'near_field' },
+  input_audio_transcription: {
+    model: 'whisper-1',
+    language: 'it',  // da settings
+    prompt: '...',   // keyword educative
+  },
   turn_detection: {
     type: 'server_vad',
-    threshold: 0.5,
+    threshold: 0.6,
     prefix_padding_ms: 300,
-    silence_duration_ms: 500,
+    silence_duration_ms: 700,
     create_response: true,
     interrupt_response: true,  // false per onboarding
   },
