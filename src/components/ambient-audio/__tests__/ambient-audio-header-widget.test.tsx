@@ -30,7 +30,7 @@ vi.mock('@/lib/hooks/use-ambient-audio', () => ({
   }),
 }));
 
-vi.mock('@/lib/stores/app-store', () => ({
+vi.mock('@/lib/stores', () => ({
   useVoiceSessionStore: (selector: (state: { isConnected: boolean }) => boolean) => {
     const state = { isConnected: mockVoiceConnected };
     return selector ? selector(state) : state;

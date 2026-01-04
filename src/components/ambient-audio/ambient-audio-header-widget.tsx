@@ -78,7 +78,7 @@ export function AmbientAudioHeaderWidget() {
     return (
       <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
         <Headphones className="w-4 h-4" />
-        <span className="text-xs hidden sm:inline">In pausa</span>
+        <span className="text-xs">In pausa</span>
       </div>
     );
   }
