@@ -40,7 +40,13 @@ export interface Achievement {
 }
 
 export interface Progress {
-  xp: number; // Backward compatibility alias
+  /**
+   * @deprecated Use `mirrorBucks` instead. This field exists only for backward
+   * compatibility with legacy code. It mirrors the value of `mirrorBucks` and
+   * should be treated as read-only. Will be removed in a future version.
+   */
+  xp: number;
+  /** Primary currency - source of truth for all points/rewards */
   mirrorBucks: number;
   level: number;
   xpToNextLevel: number;
