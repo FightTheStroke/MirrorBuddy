@@ -44,7 +44,7 @@ describe('app-store', () => {
     describe('enterFocusMode', () => {
       it('enables focus mode with tool type', () => {
         const { enterFocusMode } = useUIStore.getState();
-        enterFocusMode('mindmap');
+        enterFocusMode({ toolType: 'mindmap' });
 
         const state = useUIStore.getState();
         expect(state.focusMode).toBe(true);
@@ -53,7 +53,7 @@ describe('app-store', () => {
 
       it('sets maestro ID when provided', () => {
         const { enterFocusMode } = useUIStore.getState();
-        enterFocusMode('quiz', 'euclide-matematica');
+        enterFocusMode({ toolType: 'quiz', maestroId: 'euclide-matematica' });
 
         const state = useUIStore.getState();
         expect(state.focusMaestroId).toBe('euclide-matematica');
@@ -61,7 +61,7 @@ describe('app-store', () => {
 
       it('defaults to chat interaction mode', () => {
         const { enterFocusMode } = useUIStore.getState();
-        enterFocusMode('flashcard');
+        enterFocusMode({ toolType: 'flashcard' });
 
         const state = useUIStore.getState();
         expect(state.focusInteractionMode).toBe('chat');
@@ -69,7 +69,7 @@ describe('app-store', () => {
 
       it('sets voice interaction mode when specified', () => {
         const { enterFocusMode } = useUIStore.getState();
-        enterFocusMode('mindmap', 'euclide-matematica', 'voice');
+        enterFocusMode({ toolType: 'mindmap', maestroId: 'euclide-matematica', interactionMode: 'voice' });
 
         const state = useUIStore.getState();
         expect(state.focusInteractionMode).toBe('voice');
@@ -77,20 +77,39 @@ describe('app-store', () => {
 
       it('sets chat interaction mode when specified', () => {
         const { enterFocusMode } = useUIStore.getState();
-        enterFocusMode('summary', undefined, 'chat');
+        enterFocusMode({ toolType: 'summary', interactionMode: 'chat' });
 
         const state = useUIStore.getState();
         expect(state.focusInteractionMode).toBe('chat');
       });
 
-      it('clears focus tool when entering', () => {
+      it('clears focus tool when entering without initialTool', () => {
         useUIStore.setState({ focusTool: { type: 'quiz', data: {} } as never });
 
         const { enterFocusMode } = useUIStore.getState();
-        enterFocusMode('mindmap');
+        enterFocusMode({ toolType: 'mindmap' });
 
         const state = useUIStore.getState();
         expect(state.focusTool).toBeNull();
+      });
+
+      it('sets focus tool atomically when initialTool provided', () => {
+        const { enterFocusMode } = useUIStore.getState();
+        const initialTool = {
+          id: 'test-tool-1',
+          type: 'mindmap' as const,
+          status: 'completed' as const,
+          progress: 1,
+          content: { nodes: [] },
+          createdAt: new Date(),
+        };
+
+        enterFocusMode({ toolType: 'mindmap', maestroId: 'euclide-matematica', initialTool });
+
+        const state = useUIStore.getState();
+        expect(state.focusMode).toBe(true);
+        expect(state.focusToolType).toBe('mindmap');
+        expect(state.focusTool).toEqual(initialTool);
       });
     });
 

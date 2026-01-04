@@ -151,7 +151,7 @@ export function QuizView() {
   // Handle maestro selection and enter focus mode
   const handleMaestroConfirm = (maestro: Maestro, mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
-    enterFocusMode('quiz', maestro.id, mode);
+    enterFocusMode({ toolType: 'quiz', maestroId: maestro.id, interactionMode: mode });
   };
 
   // Convert SavedQuiz to QuizType for the Quiz component

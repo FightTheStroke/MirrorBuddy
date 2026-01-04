@@ -33,7 +33,7 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
   const processedToolsRef = useRef<Set<string>>(new Set());
 
   const { addXP, endSession } = useProgressStore();
-  const { enterFocusMode, setFocusTool } = useUIStore();
+  const { enterFocusMode } = useUIStore();
 
   const onQuestionAsked = useCallback(() => {
     questionCount.current += 1;
@@ -120,21 +120,26 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     const mappedToolType = (toolTypeMap[toolCall.type] || 'mindmap') as import('@/types/tools').ToolType;
     const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
 
-    enterFocusMode(mappedToolType, maestro.id, voiceConnection.isVoiceActive ? 'voice' : 'chat');
-    setFocusTool({
-      id: toolCall.id,
-      type: mappedToolType,
-      status: 'completed',
-      progress: 1,
-      content: toolContent,
-      createdAt: new Date(),
+    // Set focus mode with tool atomically to prevent race condition
+    enterFocusMode({
+      toolType: mappedToolType,
+      maestroId: maestro.id,
+      interactionMode: voiceConnection.isVoiceActive ? 'voice' : 'chat',
+      initialTool: {
+        id: toolCall.id,
+        type: mappedToolType,
+        status: 'completed',
+        progress: 1,
+        content: toolContent,
+        createdAt: new Date(),
+      },
     });
 
     logger.debug('[MaestroSession] C-17: Entered focus mode for tool', {
       toolId: toolCall.id,
       toolType: mappedToolType,
     });
-  }, [toolCalls, enterFocusMode, setFocusTool, maestro.id, voiceConnection.isVoiceActive]);
+  }, [toolCalls, enterFocusMode, maestro.id, voiceConnection.isVoiceActive]);
 
   const handleEndSession = useCallback(async () => {
     if (voiceConnection.isVoiceActive) {

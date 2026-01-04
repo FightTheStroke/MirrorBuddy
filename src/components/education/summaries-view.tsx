@@ -52,7 +52,7 @@ export function SummariesView({ className }: SummariesViewProps) {
   // Handle maestro selection and enter focus mode
   const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
-    enterFocusMode('summary', maestro.id, mode);
+    enterFocusMode({ toolType: 'summary', maestroId: maestro.id, interactionMode: mode });
   }, [enterFocusMode]);
 
   // Handle delete

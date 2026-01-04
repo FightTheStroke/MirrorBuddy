@@ -12,9 +12,11 @@ import { useEffect, Suspense, lazy, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { X, FileText, ExternalLink, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { PrintButton } from '@/components/zaino/print-button';
 import { TOOL_ICONS, TOOL_LABELS } from './constants';
 import { formatDate } from './utils';
 import type { ArchiveItem } from './types';
+import type { PrintableContentType } from '@/lib/tools/accessible-print';
 import {
   getRendererImport,
   hasRenderer,
@@ -163,14 +165,26 @@ export function MaterialViewer({ item, onClose }: MaterialViewerProps) {
               </p>
             </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label="Chiudi"
-          >
-            <X className="w-5 h-5" />
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* Print button - only show for printable content types */}
+            {item.content && !['webcam', 'pdf'].includes(item.toolType) && (
+              <PrintButton
+                title={item.title || `${label} del ${formatDate(item.createdAt)}`}
+                contentType={item.toolType as PrintableContentType}
+                content={item.content}
+                variant="outline"
+                size="sm"
+              />
+            )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              aria-label="Chiudi"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </div>
         </div>
 
         {/* Content */}

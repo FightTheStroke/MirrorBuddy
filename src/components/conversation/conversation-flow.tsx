@@ -87,7 +87,7 @@ export function ConversationFlow() {
 
   // Stores
   const { studentProfile } = useSettingsStore();
-  const { enterFocusMode, setFocusTool } = useUIStore();
+  const { enterFocusMode } = useUIStore();
   const {
     isActive,
     mode,
@@ -196,10 +196,14 @@ export function ConversationFlow() {
           content: toolContent,
         };
 
-        // Option B: Auto-switch to fullscreen focus mode when tool is created
-        // This prevents scroll jumps in normal chat view
-        enterFocusMode(mappedToolType, maestro.id, 'chat');
-        setFocusTool(completedTool);
+        // Auto-switch to fullscreen focus mode with tool atomically
+        // This prevents race condition where focusMode=true but focusTool=null
+        enterFocusMode({
+          toolType: mappedToolType,
+          maestroId: maestro.id,
+          interactionMode: 'chat',
+          initialTool: completedTool,
+        });
         setActiveTool(null); // Clear local state since focus mode handles it
       } else {
         // No tool was created, clear the state
@@ -219,7 +223,7 @@ export function ConversationFlow() {
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, messages, addMessage, enterFocusMode, setFocusTool]);
+  }, [isLoading, messages, addMessage, enterFocusMode]);
 
   // Handle tool request from ToolButtons - show maestro selection dialog
   const handleToolRequest = useCallback((toolType: ToolType) => {

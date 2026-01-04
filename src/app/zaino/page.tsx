@@ -2,7 +2,7 @@
 
 /**
  * Zaino Page (Backpack - School Metaphor)
- * Replaces "Supporti" with school-themed navigation
+ * Redesigned with faceted filtering, no hierarchical navigation
  * Route: /zaino
  */
 
@@ -17,14 +17,12 @@ function ZainoContent() {
   const type = searchParams.get('type') || undefined;
   const subject = searchParams.get('subject') || undefined;
   const maestro = searchParams.get('maestro') || undefined;
-  const source = searchParams.get('source') || undefined;
 
   return (
     <ZainoView
       initialType={type}
       initialSubject={subject}
       initialMaestro={maestro}
-      initialSource={source}
     />
   );
 }
