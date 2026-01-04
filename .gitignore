@@ -60,3 +60,8 @@ prisma/dev.db-journal
 # E2E test auth state
 e2e/.auth/
 .zed/
+
+# Backend environment
+backend/.env
+backend/.env.*
+!backend/.env.example
