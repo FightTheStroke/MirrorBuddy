@@ -63,8 +63,21 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, subject, sourceStudyKitId, topics, visualOverview } = body;
 
-    if (!title || !topics || !Array.isArray(topics)) {
-      return NextResponse.json({ error: 'Title and topics required' }, { status: 400 });
+    // Input validation
+    if (!title || typeof title !== 'string' || title.length < 1 || title.length > 200) {
+      return NextResponse.json({ error: 'Title must be 1-200 characters' }, { status: 400 });
+    }
+    if (!topics || !Array.isArray(topics) || topics.length === 0) {
+      return NextResponse.json({ error: 'Topics array is required and cannot be empty' }, { status: 400 });
+    }
+    // Validate each topic in the array
+    for (const topic of topics) {
+      if (!topic.title || typeof topic.title !== 'string' || topic.title.length > 200) {
+        return NextResponse.json({ error: 'Each topic must have a valid title (max 200 chars)' }, { status: 400 });
+      }
+      if (topic.keyConcepts && !Array.isArray(topic.keyConcepts)) {
+        return NextResponse.json({ error: 'keyConcepts must be an array' }, { status: 400 });
+      }
     }
 
     // Create path with topics
