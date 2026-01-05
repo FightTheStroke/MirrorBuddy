@@ -35,7 +35,7 @@ Load with `@docs/claude/<name>.md`:
 
 **Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub
 **Voice**: voice-api | ambient-audio | onboarding
-**Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory
+**Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator
 **Characters**: buddies | coaches
 
 ## Project Rules
