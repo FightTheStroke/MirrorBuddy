@@ -26,7 +26,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   voiceBargeInEnabled: boolean;
   sendSessionConfig: () => void;
   sendGreeting: () => void;
-  initPlaybackContext: () => Promise<AudioContext | undefined>;
+  initPlaybackContext: () => Promise<{ context: AudioContext; analyser: AnalyserNode | null; gainNode: GainNode | null } | undefined>;
   startAudioCapture: () => void;
   playNextChunk: () => void;
   scheduleQueuedChunks: () => void;

@@ -221,6 +221,7 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     isSpeaking: voiceConnection.isSpeaking,
     isMuted: voiceConnection.isMuted,
     inputLevel: voiceConnection.inputLevel,
+    outputLevel: voiceConnection.outputLevel,
     connectionState: voiceConnection.connectionState,
     voiceSessionId: voiceConnection.voiceSessionId,
     toggleMute: voiceConnection.toggleMute,

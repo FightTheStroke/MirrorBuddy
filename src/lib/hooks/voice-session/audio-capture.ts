@@ -54,6 +54,19 @@ export function useStartAudioCapture(
 
     processor.onaudioprocess = (event) => {
       if (wsRef.current?.readyState !== WebSocket.OPEN) return;
+
+      // ALWAYS update input level (even when muted) - for visualization
+      const now = performance.now();
+      if (now - refs.lastLevelUpdateRef.current > 30 && refs.analyserRef.current) {
+        refs.lastLevelUpdateRef.current = now;
+        const dataArray = new Uint8Array(refs.analyserRef.current.frequencyBinCount);
+        refs.analyserRef.current.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        // Scale up for better visualization (mic levels are often quiet)
+        setInputLevel(Math.min(1, (average / 255) * 2));
+      }
+
+      // Don't send audio if muted
       if (isMuted) return;
 
       const inputData = event.inputBuffer.getChannelData(0);
@@ -74,16 +87,6 @@ export function useStartAudioCapture(
         }));
       }
       // If maestro is speaking, silently drop the audio to prevent echo feedback
-
-      // Update input level (throttled)
-      const now = performance.now();
-      if (now - refs.lastLevelUpdateRef.current > 50 && refs.analyserRef.current) {
-        refs.lastLevelUpdateRef.current = now;
-        const dataArray = new Uint8Array(refs.analyserRef.current.frequencyBinCount);
-        refs.analyserRef.current.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-        setInputLevel(average / 255);
-      }
     };
 
     source.connect(processor);

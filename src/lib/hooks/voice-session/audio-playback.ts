@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
 import { int16ToFloat32 } from './audio-utils';
 import {
@@ -23,13 +23,18 @@ export interface AudioPlaybackRefs {
   nextPlayTimeRef: React.MutableRefObject<number>;
   scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
   playNextChunkRef: React.MutableRefObject<(() => void) | null>;
+  playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>;
+  gainNodeRef: React.MutableRefObject<GainNode | null>;
 }
 
 /**
  * Initialize or resume the playback AudioContext at Azure's sample rate (24kHz)
+ * Also sets up the analyser and gain node for real-time level monitoring
  */
 export function useInitPlaybackContext(
   playbackContextRef: React.MutableRefObject<AudioContext | null>,
+  playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>,
+  gainNodeRef: React.MutableRefObject<GainNode | null>,
   preferredOutputId?: string
 ) {
   return useCallback(async () => {
@@ -39,13 +44,25 @@ export function useInitPlaybackContext(
         logger.debug('[VoiceSession] 🔊 Resuming suspended AudioContext...');
         await playbackContextRef.current.resume();
       }
-      return playbackContextRef.current;
+      return { context: playbackContextRef.current, analyser: playbackAnalyserRef.current, gainNode: gainNodeRef.current };
     }
 
     const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     // CRITICAL: Create playback context at 24kHz to match Azure output
     playbackContextRef.current = new AudioContextClass({ sampleRate: AZURE_SAMPLE_RATE });
     logger.debug(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
+
+    // Create analyser for real-time output level monitoring
+    playbackAnalyserRef.current = playbackContextRef.current.createAnalyser();
+    playbackAnalyserRef.current.fftSize = 256;
+    playbackAnalyserRef.current.smoothingTimeConstant = 0.3;
+
+    // Create gain node (audio goes through gain -> analyser -> destination)
+    gainNodeRef.current = playbackContextRef.current.createGain();
+    gainNodeRef.current.connect(playbackAnalyserRef.current);
+    playbackAnalyserRef.current.connect(playbackContextRef.current.destination);
+
+    logger.debug('[VoiceSession] 🔊 Playback analyser and gain node created');
 
     // Set output device if specified (setSinkId API)
     if (preferredOutputId && 'setSinkId' in playbackContextRef.current) {
@@ -63,17 +80,19 @@ export function useInitPlaybackContext(
       await playbackContextRef.current.resume();
     }
 
-    return playbackContextRef.current;
-  }, [playbackContextRef, preferredOutputId]);
+    return { context: playbackContextRef.current, analyser: playbackAnalyserRef.current, gainNode: gainNodeRef.current };
+  }, [playbackContextRef, playbackAnalyserRef, gainNodeRef, preferredOutputId]);
 }
 
 /**
  * Schedule all queued audio chunks for time-based playback
  * Uses AudioContext.currentTime for precise scheduling to prevent stuttering
+ * Audio is routed through gainNode -> analyser -> destination for real-time level monitoring
  */
 export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (value: boolean) => void, setOutputLevel: (value: number) => void) {
   return useCallback(() => {
     const ctx = refs.playbackContextRef.current;
+    const gainNode = refs.gainNodeRef.current;
     if (!ctx || refs.audioQueueRef.current.length === 0) return;
 
     const currentTime = ctx.currentTime;
@@ -89,7 +108,13 @@ export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (v
 
       const source = ctx.createBufferSource();
       source.buffer = buffer;
-      source.connect(ctx.destination);
+
+      // Connect to gain node (which routes to analyser -> destination) or fallback to direct
+      if (gainNode) {
+        source.connect(gainNode);
+      } else {
+        source.connect(ctx.destination);
+      }
 
       // Calculate chunk duration
       const chunkDuration = float32Data.length / AZURE_SAMPLE_RATE;
@@ -125,14 +150,6 @@ export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (v
       } catch (e) {
         logger.error('[VoiceSession] Playback scheduling error', { error: e });
       }
-
-      // Calculate and update output level (RMS)
-      let sumSquares = 0;
-      for (let i = 0; i < float32Data.length; i++) {
-        sumSquares += float32Data[i] * float32Data[i];
-      }
-      const rms = Math.sqrt(sumSquares / float32Data.length);
-      setOutputLevel(Math.min(rms * 5, 1));
     }
   }, [refs, setSpeaking, setOutputLevel]);
 }
@@ -179,4 +196,65 @@ export function usePlayNextChunk(
     // Schedule all queued chunks
     scheduleQueuedChunks();
   }, [refs, scheduleQueuedChunks, setSpeaking, setOutputLevel]);
+}
+
+/**
+ * Hook to poll the playback analyser for real-time output levels
+ * Returns a function to start/stop the polling
+ */
+export function useOutputLevelPolling(
+  playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>,
+  isPlayingRef: React.MutableRefObject<boolean>,
+  setOutputLevel: (value: number) => void
+) {
+  const animationFrameRef = useRef<number | null>(null);
+  const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
+
+  const pollLevel = useCallback(() => {
+    const analyser = playbackAnalyserRef.current;
+
+    if (!analyser || !isPlayingRef.current) {
+      setOutputLevel(0);
+      animationFrameRef.current = null;
+      return;
+    }
+
+    // Initialize data array if needed
+    if (!dataArrayRef.current || dataArrayRef.current.length !== analyser.frequencyBinCount) {
+      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
+    }
+
+    // Get frequency data from analyser
+    analyser.getByteFrequencyData(dataArrayRef.current);
+
+    // Calculate average level
+    let sum = 0;
+    for (let i = 0; i < dataArrayRef.current.length; i++) {
+      sum += dataArrayRef.current[i];
+    }
+    const average = sum / dataArrayRef.current.length;
+
+    // Scale and set output level (0-1 range)
+    // Multiply by 2 for better visualization sensitivity
+    setOutputLevel(Math.min(1, (average / 255) * 2.5));
+
+    // Continue polling
+    animationFrameRef.current = requestAnimationFrame(pollLevel);
+  }, [playbackAnalyserRef, isPlayingRef, setOutputLevel]);
+
+  const startPolling = useCallback(() => {
+    if (!animationFrameRef.current) {
+      animationFrameRef.current = requestAnimationFrame(pollLevel);
+    }
+  }, [pollLevel]);
+
+  const stopPolling = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    setOutputLevel(0);
+  }, [setOutputLevel]);
+
+  return { startPolling, stopPolling };
 }

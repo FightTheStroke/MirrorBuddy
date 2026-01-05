@@ -9,7 +9,7 @@ import { useRef, useEffect, useState } from 'react';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores';
 import type { Maestro } from '@/types';
 import type { UseVoiceSessionOptions } from './types';
-import { useInitPlaybackContext, useScheduleQueuedChunks, usePlayNextChunk } from './audio-playback';
+import { useInitPlaybackContext, useScheduleQueuedChunks, usePlayNextChunk, useOutputLevelPolling } from './audio-playback';
 import { useStartAudioCapture } from './audio-capture';
 import { useSendGreeting, useSendSessionConfig } from './session-config';
 import { useHandleServerEvent } from './event-handlers';
@@ -73,6 +73,8 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const nextPlayTimeRef = useRef<number>(0);
   const scheduledSourcesRef = useRef<AudioBufferSourceNode[]>([]);
   const isBufferingRef = useRef(true);
+  const playbackAnalyserRef = useRef<AnalyserNode | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
 
   // Session state
   const sessionReadyRef = useRef(false);
@@ -87,7 +89,12 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // AUDIO PLAYBACK
   // ============================================================================
 
-  const initPlaybackContext = useInitPlaybackContext(playbackContextRef, preferredOutputId);
+  const initPlaybackContext = useInitPlaybackContext(
+    playbackContextRef,
+    playbackAnalyserRef,
+    gainNodeRef,
+    preferredOutputId
+  );
 
   const audioPlaybackRefs = {
     playbackContextRef,
@@ -97,15 +104,33 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     nextPlayTimeRef,
     scheduledSourcesRef,
     playNextChunkRef,
+    playbackAnalyserRef,
+    gainNodeRef,
   };
 
   const scheduleQueuedChunks = useScheduleQueuedChunks(audioPlaybackRefs, setSpeaking, setOutputLevel);
   const playNextChunk = usePlayNextChunk(audioPlaybackRefs, scheduleQueuedChunks, setSpeaking, setOutputLevel);
 
+  // Real-time output level polling from playback analyser
+  const { startPolling, stopPolling } = useOutputLevelPolling(
+    playbackAnalyserRef,
+    isPlayingRef,
+    setOutputLevel
+  );
+
   // Keep ref updated with latest playNextChunk
   useEffect(() => {
     playNextChunkRef.current = playNextChunk;
   }, [playNextChunk]);
+
+  // Start/stop output level polling when speaking state changes
+  useEffect(() => {
+    if (isSpeaking) {
+      startPolling();
+    } else {
+      stopPolling();
+    }
+  }, [isSpeaking, startPolling, stopPolling]);
 
   // ============================================================================
   // AUDIO CAPTURE

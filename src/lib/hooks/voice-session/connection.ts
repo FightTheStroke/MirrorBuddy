@@ -40,7 +40,7 @@ export function useConnect(
   connectionState: 'idle' | 'connecting' | 'connected' | 'error',
   handleServerEvent: (event: Record<string, unknown>) => void,
   preferredMicrophoneId?: string,
-  initPlaybackContext?: () => Promise<AudioContext | undefined>,
+  initPlaybackContext?: () => Promise<{ context: AudioContext; analyser: AnalyserNode | null; gainNode: GainNode | null } | undefined>,
   options: UseVoiceSessionOptions = {}
 ) {
   return useCallback(async (maestro: Maestro, connectionInfo: ConnectionInfo) => {
