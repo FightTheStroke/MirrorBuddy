@@ -31,9 +31,9 @@ npx prisma db push   # Sync schema
 
 Load with `@docs/claude/<name>.md`:
 
-**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub  
-**Voice**: voice-api | ambient-audio | onboarding  
-**Features**: pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory  
+**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub
+**Voice**: voice-api | ambient-audio | onboarding
+**Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory
 **Characters**: buddies | coaches
 
 ## Project Rules

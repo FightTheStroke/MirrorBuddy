@@ -9,6 +9,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 5 - Progressive Learning Path MVP)
+
+#### Plan 8: AI-Powered Learning Paths
+- **Learning Path Generation** (`/api/learning-path/generate`):
+  - AI-powered pedagogical analysis extracts 2-5 macro-topics from PDF content
+  - Automatic difficulty assessment (basic/intermediate/advanced)
+  - Key concepts extraction (3-5 per topic)
+  - Estimated study time calculation
+  - Mermaid flowchart generation for visual overview
+- **Progressive Unlock System**:
+  - Complete one topic to unlock the next
+  - Quiz-based completion with score tracking
+  - Path progress persistence (completedTopics, progressPercent)
+- **Topic Steps**:
+  - Overview (text + mermaid diagram)
+  - Mindmap (auto-generated from topic content)
+  - Flashcards (key concepts as cards)
+  - Quiz (final assessment)
+- **UI Components** (`src/components/education/learning-path/`):
+  - `LearningPathView`: Full path display with topic cards
+  - `TopicDetail`: Expandable topic with internal steps
+  - `VisualOverview`: Mermaid SVG rendering (DOMPurify sanitized)
+  - `LearningPathsList`: User's paths listing
+- **Zaino Integration**:
+  - "Percorsi" filter in backpack view
+  - Navigation between paths and topics
+  - "Genera Percorso" button in StudyKitViewer
+- **Database Models** (`prisma/schema.prisma`):
+  - `LearningPath`: Path metadata with progress tracking
+  - `LearningPathTopic`: Topics with status and order
+  - `TopicStep`: Steps within topics
+  - `TopicAttempt`: Quiz attempt history
+- **Security & Quality**:
+  - XSS protection with DOMPurify for SVG content
+  - Race condition prevention with Prisma transactions
+  - Input validation on all API routes
+  - 70+ unit tests covering core functionality
+
 ### Added (Jan 4 - MirrorBucks & Seasons Gamification)
 
 #### Phase 1: Zaino/Astuccio Navigation
