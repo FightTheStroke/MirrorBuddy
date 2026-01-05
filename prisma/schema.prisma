@@ -954,8 +954,149 @@ model StudyKit {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Relations
+  learningPaths LearningPath[]
+
   @@index([userId])
   @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// LEARNING PATH (Plan 8 - Progressive Learning Path MVP)
+// Progressive learning journey generated from PDF analysis
+// ============================================================================
+
+model LearningPath {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  subject     String?
+
+  // Source reference
+  sourceStudyKitId String?
+  sourceStudyKit   StudyKit? @relation(fields: [sourceStudyKitId], references: [id])
+
+  // Progress tracking
+  totalTopics       Int    @default(0)
+  completedTopics   Int    @default(0)
+  progressPercent   Float  @default(0)
+  estimatedMinutes  Int    @default(0)
+
+  // Status: generating | ready | in_progress | completed
+  status      String   @default("generating")
+
+  // Visual overview (Mermaid diagram)
+  visualOverview String?  // Mermaid diagram code
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  // Relations
+  topics      LearningPathTopic[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([sourceStudyKitId])
+  @@index([createdAt])
+}
+
+model LearningPathTopic {
+  id          String   @id @default(cuid())
+  pathId      String
+  path        LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+
+  order       Int      // Display/progression order
+  title       String
+  description String
+  keyConcepts String   @default("[]") // JSON array of strings
+  difficulty  String   @default("intermediate") // basic | intermediate | advanced
+
+  // Status: locked | unlocked | in_progress | completed
+  status      String   @default("locked")
+
+  // Time estimates
+  estimatedMinutes Int @default(10)
+
+  // Quiz performance
+  quizScore   Int?     // Last quiz score (0-100)
+
+  // Related materials from user's library
+  relatedMaterials String @default("[]") // JSON: RelatedMaterial[]
+
+  // Timestamps
+  startedAt   DateTime?
+  completedAt DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  steps       TopicStep[]
+  attempts    TopicAttempt[]
+
+  @@index([pathId])
+  @@index([order])
+  @@index([status])
+}
+
+model TopicStep {
+  id          String   @id @default(cuid())
+  topicId     String
+  topic       LearningPathTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  order       Int      // Step order within topic
+  type        String   // overview | mindmap | flashcard | quiz
+  title       String
+  content     String   @default("{}") // JSON content varies by type
+
+  // Completion status
+  isCompleted Boolean  @default(false)
+  completedAt DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([topicId])
+  @@index([order])
+  @@index([type])
+}
+
+// ============================================================================
+// TOPIC ATTEMPT - Track quiz attempts and study sessions per topic
+// Plan 8 MVP - Wave 3: Progress Tracking [F-15, F-17]
+// ============================================================================
+
+model TopicAttempt {
+  id          String   @id @default(cuid())
+  topicId     String
+  topic       LearningPathTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId      String
+
+  // Attempt type: quiz | study | review
+  type        String   @default("quiz")
+
+  // Quiz results
+  score       Int?     // 0-100
+  totalQuestions Int?
+  correctAnswers Int?
+  passed      Boolean  @default(false)
+
+  // Time tracking
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  durationSeconds Int?
+
+  // Answers (JSON array for quiz attempts)
+  answers     String?  // JSON: number[] for quiz answers
+
+  createdAt   DateTime @default(now())
+
+  @@index([topicId])
+  @@index([userId])
+  @@index([type])
   @@index([createdAt])
 }
 

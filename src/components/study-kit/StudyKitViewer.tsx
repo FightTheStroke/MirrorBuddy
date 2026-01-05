@@ -7,7 +7,7 @@
  */
 
 import { useState, useMemo } from 'react';
-import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2, Printer } from 'lucide-react';
+import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2, Printer, Route, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
@@ -153,12 +153,15 @@ function transformQuizData(quizData: QuizData, studyKit: StudyKit): QuizType {
 interface StudyKitViewerProps {
   studyKit: StudyKit;
   onDelete?: () => void;
+  onGeneratePath?: (pathId: string) => void;
   className?: string;
 }
 
-export function StudyKitViewer({ studyKit, onDelete, className }: StudyKitViewerProps) {
+export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }: StudyKitViewerProps) {
   const [activeTab, setActiveTab] = useState('summary');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isGeneratingPath, setIsGeneratingPath] = useState(false);
+  const [generatedPathId, setGeneratedPathId] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
 
   // Parse markdown summary once
@@ -232,6 +235,35 @@ export function StudyKitViewer({ studyKit, onDelete, className }: StudyKitViewer
     window.print();
   };
 
+  const handleGeneratePath = async () => {
+    setIsGeneratingPath(true);
+    try {
+      const response = await fetch('/api/learning-path/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studyKitId: studyKit.id }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate learning path');
+      }
+
+      const data = await response.json();
+      const pathId = data.path?.id;
+
+      if (pathId) {
+        setGeneratedPathId(pathId);
+        onGeneratePath?.(pathId);
+      }
+    } catch (error) {
+      console.error('Failed to generate learning path', error);
+      alert('Errore durante la generazione del percorso');
+    } finally {
+      setIsGeneratingPath(false);
+    }
+  };
+
   // Count available materials
   const materialCount = [
     studyKit.summary,
@@ -261,6 +293,35 @@ export function StudyKitViewer({ studyKit, onDelete, className }: StudyKitViewer
         </div>
 
         <div className="no-print flex items-center gap-2">
+          {/* Generate Learning Path button */}
+          {generatedPathId ? (
+            <Button
+              size="sm"
+              onClick={() => onGeneratePath?.(generatedPathId)}
+              className="gap-2 bg-green-600 hover:bg-green-700"
+              title="Vai al percorso di apprendimento"
+            >
+              <Route className="w-4 h-4" />
+              <span className="hidden sm:inline">Vai al Percorso</span>
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={handleGeneratePath}
+              disabled={isGeneratingPath || !studyKit.summary}
+              className="gap-2"
+              title="Genera un percorso di apprendimento progressivo"
+            >
+              {isGeneratingPath ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Route className="w-4 h-4" />
+              )}
+              <span className="hidden sm:inline">
+                {isGeneratingPath ? 'Generando...' : 'Genera Percorso'}
+              </span>
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
