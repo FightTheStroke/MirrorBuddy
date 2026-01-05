@@ -18,6 +18,7 @@ export default defineConfig({
         'src/lib/safety/**/*.ts',
         'src/lib/tools/**/*.ts',
         'src/lib/profile/**/*.ts',
+        'src/lib/pdf-generator/**/*.ts',
       ],
       exclude: [
         'node_modules/',
