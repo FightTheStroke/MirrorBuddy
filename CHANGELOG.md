@@ -11,32 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (Jan 5 - Progressive Learning Path MVP)
 
-#### Plan 8: Percorsi di Studio Guidati
+#### Plan 8: Guided Study Paths
 
-**Cosa fa**: Trasforma un PDF in un percorso di studio strutturato, come un videogioco educativo.
+**What it does**: Transforms a PDF into a structured learning journey, like an educational video game.
 
-**Come funziona**:
-1. Lo studente carica un PDF (es. "La Rivoluzione Francese")
-2. L'AI analizza il contenuto e identifica 3-5 argomenti principali
-3. Li ordina dal più semplice al più complesso
-4. Crea per ogni argomento: panoramica, mappa mentale, flashcard, quiz
-5. Lo studente procede passo dopo passo, sbloccando l'argomento successivo solo dopo aver completato quello corrente
+**How it works**:
+1. Student uploads a PDF (e.g., "The French Revolution")
+2. AI analyzes the content and identifies 3-5 main topics
+3. Orders them from simplest to most complex (pedagogical sequencing)
+4. Creates for each topic: overview, mind map, flashcards, quiz
+5. Student progresses step by step, unlocking the next topic only after completing the current one
 
-**Perché serve**: Uno studente con DSA davanti a 50 pagine di PDF non sa da dove iniziare. Il Learning Path gli dà una struttura chiara, un obiettivo alla volta, e feedback immediato sui progressi.
+**Why it matters**: A student with learning differences facing 50 pages of PDF doesn't know where to start. Learning Path provides clear structure, one goal at a time, and immediate progress feedback.
 
-**Dove si trova**:
-- Zaino → filtro "Percorsi" per vedere i percorsi creati
-- Study Kit → bottone "Genera Percorso" per crearne uno nuovo
+**Where to find it**:
+- Zaino → "Percorsi" filter to view created paths
+- Study Kit → "Genera Percorso" button to create a new one
 
-#### Dettagli Tecnici
+#### Technical Details
 
-- **Analisi AI**: Estrae 2-5 macro-topic con difficoltà (base/intermedio/avanzato), concetti chiave (3-5 per topic), tempo stimato
-- **Sistema sblocco**: `locked` → `unlocked` → `in_progress` → `completed`
-- **4 step per argomento**: overview, mindmap, flashcard, quiz (70% per passare)
-- **Visual overview**: Diagramma Mermaid con flusso degli argomenti
-- **Tracking**: Progresso salvato in DB (completedTopics, progressPercent)
-- **Sicurezza**: DOMPurify per SVG, Prisma transactions, input validation
-- **Test**: 70+ unit test
+- **AI Analysis**: Extracts 2-5 macro-topics with difficulty (basic/intermediate/advanced), key concepts (3-5 per topic), estimated time
+- **Unlock System**: `locked` → `unlocked` → `in_progress` → `completed`
+- **4 steps per topic**: overview, mindmap, flashcard, quiz (70% to pass)
+- **Visual overview**: Mermaid diagram showing topic flow
+- **Tracking**: Progress saved in DB (completedTopics, progressPercent)
+- **Security**: DOMPurify for SVG, Prisma transactions, input validation
+- **Tests**: 70+ unit tests
 
 ### Added (Jan 4 - MirrorBucks & Seasons Gamification)
 

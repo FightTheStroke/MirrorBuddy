@@ -1,35 +1,35 @@
 # Learning Path
 
-## Cos'è e a cosa serve
+## What it is and why it matters
 
-**Problema**: Uno studente carica un PDF di 50 pagine sulla Rivoluzione Francese. Da dove inizia? Cosa studia prima? Come sa se ha capito?
+**Problem**: A student uploads a 50-page PDF about the French Revolution. Where do they start? What should they study first? How do they know if they understood it?
 
-**Soluzione**: Il Learning Path prende quel PDF e lo trasforma automaticamente in un **percorso di studio guidato**:
+**Solution**: Learning Path takes that PDF and automatically transforms it into a **guided study journey**:
 
-1. **Analisi AI**: Legge il PDF e identifica 3-5 argomenti principali (es. "Cause della Rivoluzione", "La Presa della Bastiglia", "Il Terrore", "Napoleone")
+1. **AI Analysis**: Reads the PDF and identifies 3-5 main topics (e.g., "Causes of the Revolution", "The Storming of the Bastille", "The Terror", "Napoleon")
 
-2. **Ordine pedagogico**: Li mette in ordine dal più semplice al più complesso, come farebbe un insegnante
+2. **Pedagogical ordering**: Arranges them from simplest to most complex, like a teacher would
 
-3. **Sblocco progressivo**: Lo studente inizia dal primo argomento. Solo quando lo completa, si sblocca il secondo. Come un videogioco.
+3. **Progressive unlocking**: Student starts with the first topic. Only when they complete it, the second one unlocks. Like a video game.
 
-4. **Per ogni argomento**:
-   - **Panoramica**: Riassunto + mappa visuale
-   - **Mappa mentale**: Per visualizzare i concetti
-   - **Flashcard**: Per memorizzare i punti chiave
-   - **Quiz finale**: Per verificare se ha capito (deve passare per sbloccare il prossimo)
+4. **For each topic**:
+   - **Overview**: Summary + visual map
+   - **Mind map**: To visualize concepts
+   - **Flashcards**: To memorize key points
+   - **Final quiz**: To verify understanding (must pass to unlock the next topic)
 
-5. **Tracciamento**: Lo studente vede sempre a che punto è (es. "2/4 argomenti completati - 50%")
+5. **Progress tracking**: Student always sees where they are (e.g., "2/4 topics completed - 50%")
 
-**Dove si trova**:
-- Dallo Zaino → filtro "Percorsi"
-- Da uno Study Kit → bottone "Genera Percorso"
+**Where to find it**:
+- From Zaino → "Percorsi" filter
+- From Study Kit → "Genera Percorso" button
 
-**Esempio pratico**:
-> Mario carica il PDF di Storia. L'AI crea un percorso con 4 tappe. Mario parte dalla prima ("Le Cause"), legge la panoramica, studia le flashcard, fa il quiz (85%). Tappa completata! Si sblocca "La Presa della Bastiglia". Mario continua finché non completa tutto il percorso.
+**Practical example**:
+> Mario uploads a History PDF. The AI creates a path with 4 stages. Mario starts with the first one ("The Causes"), reads the overview, studies the flashcards, takes the quiz (85%). Stage completed! "The Storming of the Bastille" unlocks. Mario continues until he completes the entire path.
 
 ---
 
-## Documentazione Tecnica
+## Technical Documentation
 
 AI-powered progressive learning paths that transform PDF study materials into structured, gamified learning journeys with automatic topic extraction, progress tracking, and adaptive content.
 
