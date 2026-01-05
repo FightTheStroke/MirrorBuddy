@@ -19,9 +19,9 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
-// Mock prisma
-vi.mock('@/lib/db', () => ({
-  prisma: {
+// Mock prisma - use vi.hoisted to ensure mockPrisma is available during mock hoisting
+const { mockPrisma } = vi.hoisted(() => {
+  const mock = {
     learningPathTopic: {
       findUnique: vi.fn(),
       update: vi.fn(),
@@ -30,7 +30,17 @@ vi.mock('@/lib/db', () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
-  },
+    $transaction: vi.fn(),
+  };
+  // Make $transaction call the callback with the same mock
+  mock.$transaction.mockImplementation(async (callback: (tx: typeof mock) => Promise<unknown>) => {
+    return callback(mock);
+  });
+  return { mockPrisma: mock };
+});
+
+vi.mock('@/lib/db', () => ({
+  prisma: mockPrisma,
 }));
 
 import { prisma } from '@/lib/db';

@@ -27,6 +27,9 @@ vi.mock('@/lib/ai/providers', () => ({
 import { chatCompletion } from '@/lib/ai/providers';
 const mockChatCompletion = vi.mocked(chatCompletion);
 
+// Minimum valid text (>100 chars) for tests that need to bypass validation
+const MIN_VALID_TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.';
+
 describe('topic-analyzer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -128,7 +131,7 @@ describe('topic-analyzer', () => {
 
       mockChatCompletion.mockResolvedValue(mockResponse);
 
-      const result = await analyzeTopics('Test text', 'Test Doc');
+      const result = await analyzeTopics(MIN_VALID_TEXT, 'Test Doc');
 
       // Verify F-07: 3-5 key concepts
       expect(result.topics[0].keyConcepts.length).toBeGreaterThanOrEqual(3);
@@ -152,7 +155,7 @@ describe('topic-analyzer', () => {
 
       mockChatCompletion.mockResolvedValue(mockResponse);
 
-      const result = await analyzeTopics('Test', 'Test');
+      const result = await analyzeTopics(MIN_VALID_TEXT, 'Test');
 
       // Verify F-09: suggested order exists
       expect(result.suggestedOrder).toEqual(['t1', 't2']);
@@ -166,7 +169,7 @@ describe('topic-analyzer', () => {
     it('should handle malformed JSON gracefully', async () => {
       mockChatCompletion.mockResolvedValue({ content: 'invalid json', provider: 'azure' as const, model: 'gpt-4o' });
 
-      await expect(analyzeTopics('text', 'title')).rejects.toThrow('Failed to parse topic analysis response');
+      await expect(analyzeTopics(MIN_VALID_TEXT, 'title')).rejects.toThrow('Failed to parse topic analysis response');
     });
 
     it('should handle missing topics array', async () => {
@@ -176,7 +179,19 @@ describe('topic-analyzer', () => {
         model: 'gpt-4o',
       });
 
-      await expect(analyzeTopics('text', 'title')).rejects.toThrow('Invalid topic analysis structure: missing topics array');
+      await expect(analyzeTopics(MIN_VALID_TEXT, 'title')).rejects.toThrow('Invalid topic analysis structure: missing topics array');
+    });
+
+    it('should reject text that is too short', async () => {
+      await expect(analyzeTopics('short text', 'title')).rejects.toThrow('Invalid input: text is too short');
+    });
+
+    it('should reject empty text', async () => {
+      await expect(analyzeTopics('', 'title')).rejects.toThrow('Invalid input: text is required');
+    });
+
+    it('should reject empty title', async () => {
+      await expect(analyzeTopics(MIN_VALID_TEXT, '')).rejects.toThrow('Invalid input: title is required');
     });
   });
 
