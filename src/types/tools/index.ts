@@ -49,6 +49,8 @@ export type {
 export {
   SUMMARY_STRUCTURE_TEMPLATE,
   createEmptyStudentSummary,
+  countWords,
+  calculateSummaryWordCount,
 } from './tool-data-types';
 
 // Tool request types

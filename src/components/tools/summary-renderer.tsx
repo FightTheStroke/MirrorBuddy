@@ -11,9 +11,9 @@
 
 import { motion } from 'framer-motion';
 import { FileText, ChevronDown, ChevronRight } from 'lucide-react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import type { SummarySection } from '@/types/tools';
+import { calculateSummaryWordCount, type SummarySection } from '@/types/tools';
 
 // ============================================================================
 // TYPES
@@ -46,6 +46,8 @@ export function SummaryRenderer({
   const [expandedSections, setExpandedSections] = useState<Set<number>>(
     expandAll ? new Set(sections.map((_, i) => i)) : new Set()
   );
+
+  const wordCount = useMemo(() => calculateSummaryWordCount(sections), [sections]);
 
   const toggleSection = useCallback((index: number) => {
     setExpandedSections((prev) => {
@@ -83,11 +85,13 @@ export function SummaryRenderer({
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">
             {title}
           </h2>
-          {length && (
-            <span className="text-sm text-slate-500 dark:text-slate-400">
-              Riassunto {getLengthLabel()}
+          <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+            {length && <span>Riassunto {getLengthLabel()}</span>}
+            <span className="flex items-center gap-1">
+              <FileText className="w-3.5 h-3.5" />
+              {wordCount} parole
             </span>
-          )}
+          </div>
         </div>
       </div>
 
