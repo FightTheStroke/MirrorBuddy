@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
 """
-Genera PDF completo per Mario: L'ATMOSFERA E IL CLIMA
-- Pagine originali del libro
-- Riassunti semplificati
-- Mappe mentali
-
-Requisiti: pip install pymupdf reportlab pillow
+Genera PDF LIGHT per Mario: L'ATMOSFERA E IL CLIMA
+Identico alla versione completa ma senza pagine scansionate del libro.
 """
 
-import fitz  # PyMuPDF
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
@@ -17,8 +12,7 @@ import os
 import math
 
 # Percorsi
-PDF_ORIGINALE = "/Users/roberdan/Downloads/1-5-26, 12:34 Microsoft Lens.pdf"
-OUTPUT_PDF = "/Users/roberdan/Downloads/ATMOSFERA_COMPLETO_MARIO.pdf"
+OUTPUT_PDF = "/Users/roberdan/Downloads/ATMOSFERA_MARIO_LIGHT.pdf"
 
 # Colori
 GRIGIO_CHIARO = HexColor("#F5F5F5")
@@ -76,18 +70,6 @@ def calcola_punto_bordo_box(box_cx, box_cy, box_w, box_h, target_x, target_y):
     return (box_cx, box_cy)
 
 
-def estrai_pagina_come_immagine(pdf_path, page_num, dpi=150):
-    """Estrae una pagina del PDF come immagine PNG."""
-    doc = fitz.open(pdf_path)
-    page = doc[page_num]
-    zoom = dpi / 72
-    mat = fitz.Matrix(zoom, zoom)
-    pix = page.get_pixmap(matrix=mat)
-    img_data = pix.tobytes("png")
-    doc.close()
-    return img_data
-
-
 def disegna_titolo_sezione(c, titolo, y):
     """Disegna un titolo di sezione."""
     c.setFillColor(NERO)
@@ -133,27 +115,6 @@ def disegna_esempio(c, testo, y):
     c.drawString(3.5*cm, y - 25, "ESEMPIO: " + testo.upper())
 
     return y - 55
-
-
-def aggiungi_pagina_libro(c, pdf_path, page_num, label):
-    """Aggiunge una pagina del libro originale al PDF."""
-    c.showPage()
-
-    c.setFont(FONT_BOLD, 16)
-    c.setFillColor(GRIGIO_SCURO)
-    c.drawCentredString(A4[0]/2, A4[1] - 1.5*cm, f"PAGINA ORIGINALE DEL LIBRO - {label}".upper())
-
-    img_data = estrai_pagina_come_immagine(pdf_path, page_num, dpi=120)
-
-    temp_path = f"/tmp/atm_page_{page_num}.png"
-    with open(temp_path, "wb") as f:
-        f.write(img_data)
-
-    img_width = A4[0] - 2*cm
-    img_height = A4[1] - 3*cm
-    c.drawImage(temp_path, 1*cm, 1*cm, width=img_width, height=img_height, preserveAspectRatio=True)
-
-    os.remove(temp_path)
 
 
 def crea_copertina(c):
@@ -908,7 +869,7 @@ def crea_mappa_tempo_clima(c):
 
 def main():
     """Funzione principale."""
-    print("Creazione PDF completo per Mario - ATMOSFERA E CLIMA...")
+    print("Creazione PDF LIGHT per Mario - ATMOSFERA E CLIMA...")
 
     c = canvas.Canvas(OUTPUT_PDF, pagesize=A4)
 
@@ -922,50 +883,36 @@ def main():
 
     # SEZIONE 1: PRESSIONE
     print("  - Sezione: Pressione atmosferica...")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 0, "PRESSIONE ATMOSFERICA")
     crea_sezione_pressione(c)
     crea_mappa_pressione(c)
 
     # SEZIONE 2: VENTI
     print("  - Sezione: I venti...")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 1, "I VENTI (1/2)")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 4, "MONSONI E BREZZE (2/2)")
     crea_sezione_venti(c)
     crea_mappa_venti(c)
 
     # SEZIONE 3: CIRCOLAZIONE
     print("  - Sezione: Circolazione atmosferica...")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 2, "CIRCOLAZIONE (1/2)")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 3, "CORRENTI A GETTO (2/2)")
     crea_sezione_circolazione(c)
     crea_mappa_circolazione(c)
 
     # SEZIONE 4: UMIDITA'
     print("  - Sezione: Umidita'...")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 5, "UMIDITA'")
     crea_sezione_umidita(c)
     crea_mappa_umidita(c)
 
     # SEZIONE 5: NUBI
     print("  - Sezione: Nubi e precipitazioni...")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 6, "NUBI (1/2)")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 7, "PRECIPITAZIONI (2/2)")
     crea_sezione_nubi(c)
     crea_mappa_nubi(c)
 
     # SEZIONE 6: PERTURBAZIONI
     print("  - Sezione: Perturbazioni...")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 8, "PERTURBAZIONI (1/2)")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 9, "FRONTI E TORNADO (2/2)")
     crea_sezione_perturbazioni(c)
     crea_mappa_perturbazioni(c)
 
     # SEZIONE 7: TEMPO E CLIMA
     print("  - Sezione: Tempo e clima...")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 10, "PREVISIONI (1/2)")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 11, "STRUMENTI METEO (2/2)")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 12, "TEMPO E CLIMA (1/2)")
-    aggiungi_pagina_libro(c, PDF_ORIGINALE, 13, "FATTORI CLIMA (2/2)")
     crea_sezione_tempo_clima(c)
     crea_mappa_tempo_clima(c)
 
