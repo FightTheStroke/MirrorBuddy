@@ -150,3 +150,15 @@ export {
   SUMMARY_STRUCTURE_TEMPLATE,
   createEmptyStudentSummary,
 } from './tools';
+
+// Learning Path types
+export type {
+  TopicStatus,
+  TopicStepType,
+  TopicDifficulty,
+  TopicStep,
+  LearningPathTopic,
+  LearningPath,
+  TopicProgressUpdate,
+  LearningPathProgress,
+} from './learning-path';
