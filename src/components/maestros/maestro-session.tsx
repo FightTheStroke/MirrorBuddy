@@ -52,6 +52,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     isSpeaking,
     isMuted,
     inputLevel,
+    outputLevel,
     connectionState,
     voiceSessionId,
     toggleMute,
@@ -156,6 +157,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
             isSpeaking={isSpeaking}
             isMuted={isMuted}
             inputLevel={inputLevel}
+            outputLevel={outputLevel}
             connectionState={connectionState}
             configError={configError}
             onToggleMute={toggleMute}

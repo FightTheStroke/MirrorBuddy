@@ -195,6 +195,7 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
     isSpeaking,
     isMuted,
     inputLevel,
+    outputLevel,
     connectionState,
     connect,
     disconnect,
@@ -801,6 +802,7 @@ export function CharacterChatView({ characterId, characterType }: CharacterChatV
             isSpeaking={isSpeaking}
             isMuted={isMuted}
             inputLevel={inputLevel}
+            outputLevel={outputLevel}
             connectionState={connectionState}
             configError={configError}
             onToggleMute={toggleMute}
