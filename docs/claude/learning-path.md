@@ -1,5 +1,36 @@
 # Learning Path
 
+## Cos'è e a cosa serve
+
+**Problema**: Uno studente carica un PDF di 50 pagine sulla Rivoluzione Francese. Da dove inizia? Cosa studia prima? Come sa se ha capito?
+
+**Soluzione**: Il Learning Path prende quel PDF e lo trasforma automaticamente in un **percorso di studio guidato**:
+
+1. **Analisi AI**: Legge il PDF e identifica 3-5 argomenti principali (es. "Cause della Rivoluzione", "La Presa della Bastiglia", "Il Terrore", "Napoleone")
+
+2. **Ordine pedagogico**: Li mette in ordine dal più semplice al più complesso, come farebbe un insegnante
+
+3. **Sblocco progressivo**: Lo studente inizia dal primo argomento. Solo quando lo completa, si sblocca il secondo. Come un videogioco.
+
+4. **Per ogni argomento**:
+   - **Panoramica**: Riassunto + mappa visuale
+   - **Mappa mentale**: Per visualizzare i concetti
+   - **Flashcard**: Per memorizzare i punti chiave
+   - **Quiz finale**: Per verificare se ha capito (deve passare per sbloccare il prossimo)
+
+5. **Tracciamento**: Lo studente vede sempre a che punto è (es. "2/4 argomenti completati - 50%")
+
+**Dove si trova**:
+- Dallo Zaino → filtro "Percorsi"
+- Da uno Study Kit → bottone "Genera Percorso"
+
+**Esempio pratico**:
+> Mario carica il PDF di Storia. L'AI crea un percorso con 4 tappe. Mario parte dalla prima ("Le Cause"), legge la panoramica, studia le flashcard, fa il quiz (85%). Tappa completata! Si sblocca "La Presa della Bastiglia". Mario continua finché non completa tutto il percorso.
+
+---
+
+## Documentazione Tecnica
+
 AI-powered progressive learning paths that transform PDF study materials into structured, gamified learning journeys with automatic topic extraction, progress tracking, and adaptive content.
 
 ## Key Files

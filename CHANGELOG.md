@@ -11,41 +11,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added (Jan 5 - Progressive Learning Path MVP)
 
-#### Plan 8: AI-Powered Learning Paths
-- **Learning Path Generation** (`/api/learning-path/generate`):
-  - AI-powered pedagogical analysis extracts 2-5 macro-topics from PDF content
-  - Automatic difficulty assessment (basic/intermediate/advanced)
-  - Key concepts extraction (3-5 per topic)
-  - Estimated study time calculation
-  - Mermaid flowchart generation for visual overview
-- **Progressive Unlock System**:
-  - Complete one topic to unlock the next
-  - Quiz-based completion with score tracking
-  - Path progress persistence (completedTopics, progressPercent)
-- **Topic Steps**:
-  - Overview (text + mermaid diagram)
-  - Mindmap (auto-generated from topic content)
-  - Flashcards (key concepts as cards)
-  - Quiz (final assessment)
-- **UI Components** (`src/components/education/learning-path/`):
-  - `LearningPathView`: Full path display with topic cards
-  - `TopicDetail`: Expandable topic with internal steps
-  - `VisualOverview`: Mermaid SVG rendering (DOMPurify sanitized)
-  - `LearningPathsList`: User's paths listing
-- **Zaino Integration**:
-  - "Percorsi" filter in backpack view
-  - Navigation between paths and topics
-  - "Genera Percorso" button in StudyKitViewer
-- **Database Models** (`prisma/schema.prisma`):
-  - `LearningPath`: Path metadata with progress tracking
-  - `LearningPathTopic`: Topics with status and order
-  - `TopicStep`: Steps within topics
-  - `TopicAttempt`: Quiz attempt history
-- **Security & Quality**:
-  - XSS protection with DOMPurify for SVG content
-  - Race condition prevention with Prisma transactions
-  - Input validation on all API routes
-  - 70+ unit tests covering core functionality
+#### Plan 8: Percorsi di Studio Guidati
+
+**Cosa fa**: Trasforma un PDF in un percorso di studio strutturato, come un videogioco educativo.
+
+**Come funziona**:
+1. Lo studente carica un PDF (es. "La Rivoluzione Francese")
+2. L'AI analizza il contenuto e identifica 3-5 argomenti principali
+3. Li ordina dal più semplice al più complesso
+4. Crea per ogni argomento: panoramica, mappa mentale, flashcard, quiz
+5. Lo studente procede passo dopo passo, sbloccando l'argomento successivo solo dopo aver completato quello corrente
+
+**Perché serve**: Uno studente con DSA davanti a 50 pagine di PDF non sa da dove iniziare. Il Learning Path gli dà una struttura chiara, un obiettivo alla volta, e feedback immediato sui progressi.
+
+**Dove si trova**:
+- Zaino → filtro "Percorsi" per vedere i percorsi creati
+- Study Kit → bottone "Genera Percorso" per crearne uno nuovo
+
+#### Dettagli Tecnici
+
+- **Analisi AI**: Estrae 2-5 macro-topic con difficoltà (base/intermedio/avanzato), concetti chiave (3-5 per topic), tempo stimato
+- **Sistema sblocco**: `locked` → `unlocked` → `in_progress` → `completed`
+- **4 step per argomento**: overview, mindmap, flashcard, quiz (70% per passare)
+- **Visual overview**: Diagramma Mermaid con flusso degli argomenti
+- **Tracking**: Progresso salvato in DB (completedTopics, progressPercent)
+- **Sicurezza**: DOMPurify per SVG, Prisma transactions, input validation
+- **Test**: 70+ unit test
 
 ### Added (Jan 4 - MirrorBucks & Seasons Gamification)
 
