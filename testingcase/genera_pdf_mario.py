@@ -33,6 +33,23 @@ GRIGIO_SCURO = HexColor("#333333")
 NERO = black
 BIANCO = white
 
+# Font directory e registrazione OpenDyslexic
+FONT_DIR = os.path.join(os.path.dirname(__file__), "fonts")
+
+try:
+    pdfmetrics.registerFont(TTFont('OpenDyslexic', os.path.join(FONT_DIR, 'OpenDyslexic-Regular.ttf')))
+    pdfmetrics.registerFont(TTFont('OpenDyslexic-Bold', os.path.join(FONT_DIR, 'OpenDyslexic-Bold.ttf')))
+    pdfmetrics.registerFont(TTFont('OpenDyslexic-Italic', os.path.join(FONT_DIR, 'OpenDyslexic-Italic.ttf')))
+    FONT_NORMAL = 'OpenDyslexic'
+    FONT_BOLD = 'OpenDyslexic-Bold'
+    FONT_ITALIC = 'OpenDyslexic-Italic'
+    print("Font OpenDyslexic caricato (ottimizzato per dislessia)")
+except Exception as e:
+    print(f"Font OpenDyslexic non trovato, uso Helvetica: {e}")
+    FONT_NORMAL = 'Helvetica'
+    FONT_BOLD = 'Helvetica-Bold'
+    FONT_ITALIC = 'Helvetica-Oblique'
+
 
 def calcola_punto_bordo_ellisse(cx, cy, rx, ry, target_x, target_y):
     """Calcola il punto sul bordo dell'ellisse nella direzione del target."""
@@ -97,7 +114,7 @@ def estrai_pagina_come_immagine(pdf_path, page_num, dpi=150):
 def disegna_titolo_sezione(c, titolo, y):
     """Disegna un titolo di sezione."""
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 28)
+    c.setFont(FONT_BOLD, 28)
     c.drawCentredString(A4[0]/2, y, titolo.upper())
     # Linea sotto
     c.setStrokeColor(NERO)
@@ -109,7 +126,7 @@ def disegna_titolo_sezione(c, titolo, y):
 def disegna_sottotitolo(c, testo, y):
     """Disegna un sottotitolo."""
     c.setFillColor(GRIGIO_SCURO)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawString(2*cm, y, testo.upper())
     return y - 30
 
@@ -117,7 +134,7 @@ def disegna_sottotitolo(c, testo, y):
 def disegna_testo(c, testo, y, indent=2*cm):
     """Disegna testo normale."""
     c.setFillColor(NERO)
-    c.setFont("Helvetica", 14)
+    c.setFont(FONT_NORMAL, 14)
 
     # Wrap text manualmente
     max_width = A4[0] - 4*cm
@@ -154,11 +171,11 @@ def disegna_box_concetto(c, titolo, contenuti, y):
 
     # Titolo box
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawString(2.5*cm, y - 25, titolo.upper())
 
     # Contenuti
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     current_y = y - 50
     for contenuto in contenuti:
         c.drawString(3*cm, current_y, "→ " + contenuto.upper())
@@ -175,7 +192,7 @@ def disegna_esempio(c, testo, y):
     c.roundRect(3*cm, y - 40, A4[0] - 6*cm, 35, 5, fill=0, stroke=1)
     c.setDash([])
 
-    c.setFont("Helvetica-Oblique", 12)
+    c.setFont(FONT_ITALIC, 12)
     c.drawString(3.5*cm, y - 25, "ESEMPIO: " + testo.upper())
 
     return y - 55
@@ -186,7 +203,7 @@ def aggiungi_pagina_libro(c, pdf_path, page_num, label):
     c.showPage()
 
     # Titolo
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.setFillColor(GRIGIO_SCURO)
     c.drawCentredString(A4[0]/2, A4[1] - 1.5*cm, f"PAGINA ORIGINALE DEL LIBRO - {label}".upper())
 
@@ -220,19 +237,19 @@ def crea_copertina(c):
 
     # Titolo principale
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 42)
+    c.setFont(FONT_BOLD, 42)
     c.drawCentredString(A4[0]/2, A4[1] - 6*cm, "FISICA")
 
-    c.setFont("Helvetica-Bold", 36)
+    c.setFont(FONT_BOLD, 36)
     c.drawCentredString(A4[0]/2, A4[1] - 8*cm, "LE FORZE")
 
     # Sottotitolo
-    c.setFont("Helvetica", 20)
+    c.setFont(FONT_NORMAL, 20)
     c.drawCentredString(A4[0]/2, A4[1] - 11*cm, "MATERIALE DI STUDIO")
     c.drawCentredString(A4[0]/2, A4[1] - 12*cm, "PER MARIO")
 
     # Contenuto
-    c.setFont("Helvetica", 16)
+    c.setFont(FONT_NORMAL, 16)
     y = A4[1] - 15*cm
     argomenti = [
         "1. LE FORZE",
@@ -245,7 +262,7 @@ def crea_copertina(c):
         y -= 30
 
     # Footer
-    c.setFont("Helvetica-Oblique", 12)
+    c.setFont(FONT_ITALIC, 12)
     c.drawCentredString(A4[0]/2, 3*cm, "FONT GRANDE - TUTTO MAIUSCOLO - CONCETTI SEMPLICI")
     c.drawCentredString(A4[0]/2, 2.5*cm, "ADATTATO PER DSA")
 
@@ -255,14 +272,14 @@ def crea_super_mappa(c):
     c.showPage()
     y = A4[1] - 2*cm
 
-    c.setFont("Helvetica-Bold", 28)
+    c.setFont(FONT_BOLD, 28)
     c.drawCentredString(A4[0]/2, y, "PANORAMICA: COSA STUDIEREMO")
     c.setLineWidth(3)
     c.line(3*cm, y - 15, A4[0] - 3*cm, y - 15)
     y -= 50
 
     # Sottotitolo esplicativo
-    c.setFont("Helvetica", 14)
+    c.setFont(FONT_NORMAL, 14)
     c.drawCentredString(A4[0]/2, y, "QUESTA MAPPA TI AIUTA A CAPIRE COME SONO COLLEGATI GLI ARGOMENTI")
     y -= 80
 
@@ -275,7 +292,7 @@ def crea_super_mappa(c):
     c.setLineWidth(4)
     c.ellipse(cx - rx, cy - ry, cx + rx, cy + ry, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 22)
+    c.setFont(FONT_BOLD, 22)
     c.drawCentredString(cx, cy + 5, "LE FORZE")
 
     # I tre argomenti principali come nodi
@@ -310,11 +327,11 @@ def crea_super_mappa(c):
 
         # Testo
         c.setFillColor(NERO)
-        c.setFont("Helvetica-Bold", 13)
+        c.setFont(FONT_BOLD, 13)
         c.drawCentredString(ax, ay + 25, titolo)
-        c.setFont("Helvetica", 11)
+        c.setFont(FONT_NORMAL, 11)
         c.drawCentredString(ax, ay + 5, sotto1)
-        c.setFont("Helvetica-Bold", 11)
+        c.setFont(FONT_BOLD, 11)
         c.drawCentredString(ax, ay - 15, sotto2)
 
     # Box istruzioni in basso
@@ -324,9 +341,9 @@ def crea_super_mappa(c):
     c.roundRect(2*cm, 2*cm, A4[0] - 4*cm, 80, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawCentredString(A4[0]/2, 2*cm + 60, "COME USARE QUESTO MATERIALE:")
-    c.setFont("Helvetica", 12)
+    c.setFont(FONT_NORMAL, 12)
     c.drawCentredString(A4[0]/2, 2*cm + 40, "1. LEGGI LE PAGINE DEL LIBRO")
     c.drawCentredString(A4[0]/2, 2*cm + 25, "2. STUDIA IL RIASSUNTO SEMPLIFICATO")
     c.drawCentredString(A4[0]/2, 2*cm + 10, "3. USA LA MAPPA MENTALE PER RIPASSARE")
@@ -398,7 +415,7 @@ def crea_mappa_forze(c):
     c.showPage()
     y = A4[1] - 2*cm
 
-    c.setFont("Helvetica-Bold", 22)
+    c.setFont(FONT_BOLD, 22)
     c.drawCentredString(A4[0]/2, y, "MAPPA MENTALE: LE FORZE")
     c.setLineWidth(2)
     c.line(4*cm, y - 10, A4[0] - 4*cm, y - 10)
@@ -412,7 +429,7 @@ def crea_mappa_forze(c):
     c.setLineWidth(3)
     c.ellipse(cx - rx, cy - ry, cx + rx, cy + ry, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 20)
+    c.setFont(FONT_BOLD, 20)
     c.drawCentredString(cx, cy + 5, "LE FORZE")
 
     # Rami
@@ -442,9 +459,9 @@ def crea_mappa_forze(c):
 
         # Testo
         c.setFillColor(NERO)
-        c.setFont("Helvetica-Bold", 12)
+        c.setFont(FONT_BOLD, 12)
         c.drawCentredString(nx, ny + 20, titolo)
-        c.setFont("Helvetica", 10)
+        c.setFont(FONT_NORMAL, 10)
         for i, s in enumerate(sotto):
             c.drawCentredString(nx, ny - 5 - i*15, s)
 
@@ -480,10 +497,10 @@ def crea_sezione_elastica(c):
     c.roundRect(3*cm, y - 120, A4[0] - 6*cm, 110, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 28)
+    c.setFont(FONT_BOLD, 28)
     c.drawCentredString(A4[0]/2, y - 40, "F = K × X")
 
-    c.setFont("Helvetica", 14)
+    c.setFont(FONT_NORMAL, 14)
     c.drawCentredString(A4[0]/2, y - 70, "F = FORZA (IN NEWTON)")
     c.drawCentredString(A4[0]/2, y - 90, "K = COSTANTE ELASTICA (DUREZZA MOLLA)")
     c.drawCentredString(A4[0]/2, y - 110, "X = ALLUNGAMENTO (IN METRI)")
@@ -523,7 +540,7 @@ def crea_mappa_elastica(c):
     c.showPage()
     y = A4[1] - 2*cm
 
-    c.setFont("Helvetica-Bold", 22)
+    c.setFont(FONT_BOLD, 22)
     c.drawCentredString(A4[0]/2, y, "MAPPA MENTALE: FORZA ELASTICA")
     c.setLineWidth(2)
     c.line(4*cm, y - 10, A4[0] - 4*cm, y - 10)
@@ -537,7 +554,7 @@ def crea_mappa_elastica(c):
     c.setLineWidth(3)
     c.ellipse(cx - rx, cy - ry, cx + rx, cy + ry, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawCentredString(cx, cy + 10, "FORZA")
     c.drawCentredString(cx, cy - 10, "ELASTICA")
 
@@ -547,7 +564,7 @@ def crea_mappa_elastica(c):
     c.setFillColor(BIANCO)
     c.roundRect(cx - 60, formula_box_y, 120, formula_box_h, 5, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawCentredString(cx, cy - 58, "F = K × X")
 
     # Rami
@@ -581,9 +598,9 @@ def crea_mappa_elastica(c):
         c.roundRect(nx - box_w/2, ny - box_h/2, box_w, box_h, 8, fill=1, stroke=1)
 
         c.setFillColor(NERO)
-        c.setFont("Helvetica-Bold", 12)
+        c.setFont(FONT_BOLD, 12)
         c.drawCentredString(nx, ny + 15, titolo)
-        c.setFont("Helvetica", 9)
+        c.setFont(FONT_NORMAL, 9)
         for i, s in enumerate(sotto):
             c.drawCentredString(nx, ny - 5 - i*12, s)
 
@@ -621,10 +638,10 @@ def crea_sezione_peso(c):
     c.roundRect(3*cm, y - 100, A4[0] - 6*cm, 90, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 32)
+    c.setFont(FONT_BOLD, 32)
     c.drawCentredString(A4[0]/2, y - 40, "P = M × G")
 
-    c.setFont("Helvetica", 14)
+    c.setFont(FONT_NORMAL, 14)
     c.drawCentredString(A4[0]/2, y - 70, "SE HAI MASSA 50 KG:")
     c.drawCentredString(A4[0]/2, y - 90, "PESO = 50 × 10 = 500 NEWTON")
 
@@ -642,7 +659,7 @@ def crea_sezione_peso(c):
     y = A4[1] - 2*cm
 
     # Tabella confronto
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawCentredString(A4[0]/2, y, "CONFRONTO MASSA VS PESO")
     y -= 40
 
@@ -653,9 +670,9 @@ def crea_sezione_peso(c):
     c.roundRect(2*cm, y - 200, 8*cm, 190, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawCentredString(6*cm, y - 25, "MASSA")
-    c.setFont("Helvetica", 12)
+    c.setFont(FONT_NORMAL, 12)
     testi_massa = [
         "QUANTA ROBA C'E'",
         "E' UNO SCALARE",
@@ -672,9 +689,9 @@ def crea_sezione_peso(c):
     c.roundRect(A4[0] - 10*cm, y - 200, 8*cm, 190, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawCentredString(A4[0] - 6*cm, y - 25, "PESO")
-    c.setFont("Helvetica", 12)
+    c.setFont(FONT_NORMAL, 12)
     testi_peso = [
         "FORZA CHE TI TIRA",
         "E' UN VETTORE",
@@ -696,7 +713,7 @@ def crea_mappa_peso(c):
     c.showPage()
     y = A4[1] - 2*cm
 
-    c.setFont("Helvetica-Bold", 22)
+    c.setFont(FONT_BOLD, 22)
     c.drawCentredString(A4[0]/2, y, "MAPPA MENTALE: FORZA-PESO")
     c.setLineWidth(2)
     c.line(4*cm, y - 10, A4[0] - 4*cm, y - 10)
@@ -710,9 +727,9 @@ def crea_mappa_peso(c):
     c.setLineWidth(3)
     c.ellipse(cx - rx, cy - ry, cx + rx, cy + ry, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawCentredString(cx, cy + 10, "FORZA-PESO")
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawCentredString(cx, cy - 12, "P = M × G")
 
     # Rami
@@ -739,9 +756,9 @@ def crea_mappa_peso(c):
         c.roundRect(nx - box_w/2, ny - box_h/2, box_w, box_h, 8, fill=1, stroke=1)
 
         c.setFillColor(NERO)
-        c.setFont("Helvetica-Bold", 11)
+        c.setFont(FONT_BOLD, 11)
         c.drawCentredString(nx, ny + 20, titolo)
-        c.setFont("Helvetica", 9)
+        c.setFont(FONT_NORMAL, 9)
         for i, s in enumerate(sotto):
             c.drawCentredString(nx, ny - 2 - i*14, s)
 
@@ -759,11 +776,11 @@ def crea_guida_esercizio_71(c):
 
     # Testo problema
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "IL PROBLEMA DICE:")
     y -= 25
 
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(2*cm, y, "UN ELASTICO HA COSTANTE K = 44 N/M")
     y -= 20
     c.drawString(2*cm, y, "LO TIRI CON UNA FORZA DI 9,6 N")
@@ -778,18 +795,18 @@ def crea_guida_esercizio_71(c):
     c.roundRect(2*cm, y - 80, A4[0] - 4*cm, 75, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawString(2.5*cm, y - 25, "USA LA FORMULA:")
-    c.setFont("Helvetica-Bold", 24)
+    c.setFont(FONT_BOLD, 24)
     c.drawCentredString(A4[0]/2, y - 55, "F = K × X")
 
     y -= 110
 
     # Passi
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 1: SCRIVI COSA SAI")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "F = 9,6 N (LA FORZA)")
     y -= 20
     c.drawString(3*cm, y, "K = 44 N/M (LA COSTANTE)")
@@ -797,26 +814,26 @@ def crea_guida_esercizio_71(c):
     c.drawString(3*cm, y, "X = ? (DEVI TROVARE QUESTO!)")
     y -= 35
 
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 2: GIRA LA FORMULA")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "DA: F = K × X")
     y -= 20
     c.drawString(3*cm, y, "A:  X = F ÷ K")
     y -= 35
 
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 3: METTI I NUMERI")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "X = 9,6 ÷ 44")
     y -= 35
 
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 4: FAI IL CALCOLO")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "9,6 ÷ 44 = 0,218...")
     y -= 35
 
@@ -826,9 +843,9 @@ def crea_guida_esercizio_71(c):
     c.setLineWidth(3)
     c.roundRect(3*cm, y - 50, A4[0] - 6*cm, 45, 8, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawCentredString(A4[0]/2, y - 30, "RISPOSTA: X = 0,22 M")
-    c.setFont("Helvetica", 12)
+    c.setFont(FONT_NORMAL, 12)
     c.drawCentredString(A4[0]/2, y - 45, "(L'ELASTICO SI ALLUNGA DI 22 CENTIMETRI)")
 
 
@@ -841,11 +858,11 @@ def crea_guida_esercizio_74(c):
 
     # Testo problema
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "IL PROBLEMA DICE:")
     y -= 25
 
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(2*cm, y, "GUARDA IL GRAFICO CON DUE MOLLE (A E B)")
     y -= 20
     c.drawString(2*cm, y, "RISPONDI A 3 DOMANDE:")
@@ -858,13 +875,13 @@ def crea_guida_esercizio_74(c):
     c.roundRect(2*cm, y - 100, A4[0] - 4*cm, 95, 8, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 13)
+    c.setFont(FONT_BOLD, 13)
     c.drawString(2.5*cm, y - 20, "DOMANDA 1: QUALE MOLLA E' PIU' RIGIDA?")
-    c.setFont("Helvetica", 12)
+    c.setFont(FONT_NORMAL, 12)
     c.drawString(2.5*cm, y - 40, "GUARDA IL GRAFICO:")
     c.drawString(2.5*cm, y - 55, "→ LA MOLLA A SI ALLUNGA POCO = PIU' RIGIDA")
     c.drawString(2.5*cm, y - 70, "→ LA MOLLA B SI ALLUNGA TANTO = PIU' MORBIDA")
-    c.setFont("Helvetica-Bold", 12)
+    c.setFont(FONT_BOLD, 12)
     c.drawString(2.5*cm, y - 90, "RISPOSTA: LA MOLLA A E' PIU' RIGIDA")
 
     y -= 120
@@ -874,9 +891,9 @@ def crea_guida_esercizio_74(c):
     c.roundRect(2*cm, y - 130, A4[0] - 4*cm, 125, 8, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 13)
+    c.setFont(FONT_BOLD, 13)
     c.drawString(2.5*cm, y - 20, "DOMANDA 2: CALCOLA K PER OGNI MOLLA")
-    c.setFont("Helvetica", 12)
+    c.setFont(FONT_NORMAL, 12)
     c.drawString(2.5*cm, y - 40, "USA: K = F ÷ X")
     c.drawString(2.5*cm, y - 60, "MOLLA A: DAL GRAFICO LEGGI F=10N, X=2,8CM=0,028M")
     c.drawString(2.5*cm, y - 75, "         K = 10 ÷ 0,028 = 360 N/M")
@@ -890,9 +907,9 @@ def crea_guida_esercizio_74(c):
     c.roundRect(2*cm, y - 110, A4[0] - 4*cm, 105, 8, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 13)
+    c.setFont(FONT_BOLD, 13)
     c.drawString(2.5*cm, y - 20, "DOMANDA 3: ALLUNGAMENTO CON F = 13 N")
-    c.setFont("Helvetica", 12)
+    c.setFont(FONT_NORMAL, 12)
     c.drawString(2.5*cm, y - 40, "USA: X = F ÷ K")
     c.drawString(2.5*cm, y - 60, "MOLLA A: X = 13 ÷ 360 = 0,036 M = 3,6 CM")
     c.drawString(2.5*cm, y - 80, "MOLLA B: X = 13 ÷ 73 = 0,18 M = 18 CM")
@@ -900,7 +917,7 @@ def crea_guida_esercizio_74(c):
     y -= 130
 
     # Riepilogo
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawCentredString(A4[0]/2, y, "RISPOSTE: K(A)=360 N/M, K(B)=73 N/M")
     y -= 20
     c.drawCentredString(A4[0]/2, y, "X(A)=3,6 CM, X(B)=18 CM")
@@ -915,11 +932,11 @@ def crea_guida_esercizio_76(c):
 
     # Testo problema
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "IL PROBLEMA DICE:")
     y -= 25
 
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(2*cm, y, "UNA MOLLA HA K = 250 N/M")
     y -= 20
     c.drawString(2*cm, y, "A RIPOSO E' LUNGA 20,0 CM")
@@ -936,18 +953,18 @@ def crea_guida_esercizio_76(c):
     c.roundRect(2*cm, y - 80, A4[0] - 4*cm, 75, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawString(2.5*cm, y - 25, "USA LA FORMULA:")
-    c.setFont("Helvetica-Bold", 24)
+    c.setFont(FONT_BOLD, 24)
     c.drawCentredString(A4[0]/2, y - 55, "F = K × X")
 
     y -= 110
 
     # Passi
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 1: TROVA L'ALLUNGAMENTO X")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "LA MOLLA AUMENTA DEL 25%")
     y -= 20
     c.drawString(3*cm, y, "25% DI 20 CM = ?")
@@ -957,28 +974,28 @@ def crea_guida_esercizio_76(c):
     c.drawString(3*cm, y, "QUINDI X = 5 CM = 0,05 M")
     y -= 35
 
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 2: SCRIVI COSA SAI")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "K = 250 N/M")
     y -= 20
     c.drawString(3*cm, y, "X = 0,05 M")
     y -= 35
 
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 3: USA LA FORMULA")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "F = K × X")
     y -= 20
     c.drawString(3*cm, y, "F = 250 × 0,05")
     y -= 35
 
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawString(2*cm, y, "PASSO 4: FAI IL CALCOLO")
     y -= 25
-    c.setFont("Helvetica", 13)
+    c.setFont(FONT_NORMAL, 13)
     c.drawString(3*cm, y, "250 × 0,05 = 12,5")
     y -= 35
 
@@ -988,7 +1005,7 @@ def crea_guida_esercizio_76(c):
     c.setLineWidth(3)
     c.roundRect(3*cm, y - 50, A4[0] - 6*cm, 45, 8, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawCentredString(A4[0]/2, y - 30, "RISPOSTA: F = 12,5 N")
 
 
@@ -997,7 +1014,7 @@ def crea_promemoria_formula(c):
     c.showPage()
     y = A4[1] - 2*cm
 
-    c.setFont("Helvetica-Bold", 28)
+    c.setFont(FONT_BOLD, 28)
     c.drawCentredString(A4[0]/2, y, "PROMEMORIA FORMULE")
     c.setLineWidth(3)
     c.line(3*cm, y - 15, A4[0] - 3*cm, y - 15)
@@ -1010,11 +1027,11 @@ def crea_promemoria_formula(c):
     c.roundRect(2*cm, y - 120, A4[0] - 4*cm, 115, 15, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawCentredString(A4[0]/2, y - 25, "FORZA ELASTICA (MOLLE)")
-    c.setFont("Helvetica-Bold", 36)
+    c.setFont(FONT_BOLD, 36)
     c.drawCentredString(A4[0]/2, y - 65, "F = K × X")
-    c.setFont("Helvetica", 14)
+    c.setFont(FONT_NORMAL, 14)
     c.drawCentredString(A4[0]/2, y - 95, "F = FORZA (N)  |  K = COSTANTE (N/M)  |  X = ALLUNGAMENTO (M)")
 
     y -= 150
@@ -1023,18 +1040,18 @@ def crea_promemoria_formula(c):
     c.setFillColor(BIANCO)
     c.roundRect(2*cm, y - 80, 7*cm, 75, 10, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawCentredString(5.5*cm, y - 20, "TROVI X?")
-    c.setFont("Helvetica-Bold", 22)
+    c.setFont(FONT_BOLD, 22)
     c.drawCentredString(5.5*cm, y - 50, "X = F ÷ K")
 
     # Come trovare K
     c.setFillColor(BIANCO)
     c.roundRect(A4[0] - 9*cm, y - 80, 7*cm, 75, 10, fill=1, stroke=1)
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 14)
+    c.setFont(FONT_BOLD, 14)
     c.drawCentredString(A4[0] - 5.5*cm, y - 20, "TROVI K?")
-    c.setFont("Helvetica-Bold", 22)
+    c.setFont(FONT_BOLD, 22)
     c.drawCentredString(A4[0] - 5.5*cm, y - 50, "K = F ÷ X")
 
     y -= 120
@@ -1044,11 +1061,11 @@ def crea_promemoria_formula(c):
     c.roundRect(2*cm, y - 100, A4[0] - 4*cm, 95, 15, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 18)
+    c.setFont(FONT_BOLD, 18)
     c.drawCentredString(A4[0]/2, y - 25, "COME CALCOLARE LA PERCENTUALE")
-    c.setFont("Helvetica", 16)
+    c.setFont(FONT_NORMAL, 16)
     c.drawCentredString(A4[0]/2, y - 55, "25% DI 20 = 25 ÷ 100 × 20 = 5")
-    c.setFont("Helvetica", 14)
+    c.setFont(FONT_NORMAL, 14)
     c.drawCentredString(A4[0]/2, y - 85, "(DIVIDI PER 100, POI MOLTIPLICA)")
 
     y -= 130
@@ -1058,9 +1075,9 @@ def crea_promemoria_formula(c):
     c.roundRect(2*cm, y - 100, A4[0] - 4*cm, 95, 10, fill=1, stroke=1)
 
     c.setFillColor(NERO)
-    c.setFont("Helvetica-Bold", 16)
+    c.setFont(FONT_BOLD, 16)
     c.drawCentredString(A4[0]/2, y - 20, "ATTENZIONE ALLE UNITA'!")
-    c.setFont("Helvetica", 14)
+    c.setFont(FONT_NORMAL, 14)
     c.drawCentredString(A4[0]/2, y - 50, "CM → M: DIVIDI PER 100")
     c.drawCentredString(A4[0]/2, y - 70, "ESEMPIO: 5 CM = 5 ÷ 100 = 0,05 M")
 
