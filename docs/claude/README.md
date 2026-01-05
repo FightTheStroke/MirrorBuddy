@@ -17,6 +17,7 @@ Reference files with `@docs/claude/filename.md` in conversation.
 | `conversation-memory.md` | Memory injection, context management |
 | `database.md` | Prisma schema, models, relations |
 | `knowledge-hub.md` | Materials, collections, search |
+| `learning-path.md` | Progressive learning paths, topic analysis |
 | `mirrorbuddy.md` | Triangle of Support, character routing |
 | `notifications.md` | Server-side notifications, PWA push |
 | `onboarding.md` | Voice onboarding with Melissa |
