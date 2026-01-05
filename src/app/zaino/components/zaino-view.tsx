@@ -31,6 +31,7 @@ import {
   Calculator,
   BarChart3,
   BookOpen,
+  Route,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +55,11 @@ import {
   MaterialViewer,
 } from '@/components/education/archive';
 import type { ToolType } from '@/types/tools';
+import {
+  LearningPathsList,
+  LearningPathView,
+  TopicDetail,
+} from '@/components/education/learning-path';
 
 interface ZainoViewProps {
   initialType?: string;
@@ -63,12 +69,13 @@ interface ZainoViewProps {
 
 // Tool filter chips with icons and colors
 const TYPE_FILTERS: Array<{
-  id: ToolType | 'all' | 'bookmarked';
+  id: ToolType | 'all' | 'bookmarked' | 'percorsi';
   label: string;
   icon: typeof Brain;
   color: string;
 }> = [
   { id: 'all', label: 'Tutti', icon: Backpack, color: 'slate' },
+  { id: 'percorsi', label: 'Percorsi', icon: Route, color: 'sky' },
   { id: 'bookmarked', label: 'Preferiti', icon: BookmarkCheck, color: 'amber' },
   { id: 'mindmap', label: 'Mappe', icon: Brain, color: 'blue' },
   { id: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'green' },
@@ -164,6 +171,12 @@ const CHIP_COLORS: Record<string, { bg: string; text: string; border: string; ac
     border: 'border-teal-200 dark:border-teal-800',
     activeBg: 'bg-teal-500 dark:bg-teal-400 text-white dark:text-teal-950',
   },
+  sky: {
+    bg: 'bg-sky-50 dark:bg-sky-900/30',
+    text: 'text-sky-700 dark:text-sky-300',
+    border: 'border-sky-200 dark:border-sky-800',
+    activeBg: 'bg-sky-500 dark:bg-sky-400 text-white dark:text-sky-950',
+  },
 };
 
 // Animation variants
@@ -192,11 +205,16 @@ export function ZainoView({
   const [showFilters, setShowFilters] = useState(false);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Learning path navigation state
+  const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
+
   // Get current filters from URL
   const typeFilter = searchParams.get('type') || initialType || 'all';
   const subjectFilter = searchParams.get('subject') || initialSubject || null;
   const maestroFilter = searchParams.get('maestro') || initialMaestro || null;
   const isBookmarked = typeFilter === 'bookmarked';
+  const isPercorsi = typeFilter === 'percorsi';
 
   // Load all maestri
   const allMaestri = useMemo(() =>
@@ -337,6 +355,10 @@ export function ZainoView({
   }, []);
 
   const handleTypeFilter = (type: string) => {
+    // Reset learning path selection when switching filters
+    setSelectedPathId(null);
+    setSelectedTopicId(null);
+
     if (type === 'bookmarked') {
       navigate({ type: 'bookmarked', subject: null, maestro: null });
     } else if (type === 'all') {
@@ -603,61 +625,90 @@ export function ZainoView({
           </AnimatePresence>
         </motion.div>
 
-        {/* Results Count */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mb-4 text-sm text-slate-600 dark:text-slate-400"
-        >
-          {filtered.length} {filtered.length === 1 ? 'materiale' : 'materiali'}
-          {debouncedQuery && ` per "${debouncedQuery}"`}
-          {typeFilter && typeFilter !== 'all' && (
-            <span> in {TOOL_LABELS[typeFilter as ToolType] || typeFilter}</span>
-          )}
-        </motion.div>
-
-        {/* Content */}
-        {isLoading ? (
-          <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            <span className="ml-3 text-slate-600 dark:text-slate-400">Caricamento materiali...</span>
-          </div>
-        ) : filtered.length === 0 ? (
+        {/* Learning Paths View */}
+        {isPercorsi ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
           >
-            <EmptyState filter={(typeFilter || 'all') as FilterType} />
-          </motion.div>
-        ) : (
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {viewMode === 'grid' ? (
-              <GridView
-                items={filtered}
-                onDelete={handleDelete}
-                onView={handleView}
-                onBookmark={handleBookmark}
-                onRate={handleRate}
+            {selectedTopicId && selectedPathId ? (
+              <TopicDetail
+                pathId={selectedPathId}
+                topicId={selectedTopicId}
+                onBack={() => setSelectedTopicId(null)}
+                onComplete={() => setSelectedTopicId(null)}
+              />
+            ) : selectedPathId ? (
+              <LearningPathView
+                pathId={selectedPathId}
+                onBack={() => setSelectedPathId(null)}
+                onTopicSelect={(topicId) => setSelectedTopicId(topicId)}
               />
             ) : (
-              <ListView
-                items={filtered}
-                onDelete={handleDelete}
-                onView={handleView}
-                onBookmark={handleBookmark}
-                onRate={handleRate}
+              <LearningPathsList
+                onSelect={(pathId) => setSelectedPathId(pathId)}
               />
             )}
           </motion.div>
+        ) : (
+          <>
+            {/* Results Count */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+              className="mb-4 text-sm text-slate-600 dark:text-slate-400"
+            >
+              {filtered.length} {filtered.length === 1 ? 'materiale' : 'materiali'}
+              {debouncedQuery && ` per "${debouncedQuery}"`}
+              {typeFilter && typeFilter !== 'all' && (
+                <span> in {TOOL_LABELS[typeFilter as ToolType] || typeFilter}</span>
+              )}
+            </motion.div>
+
+            {/* Content */}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <span className="ml-3 text-slate-600 dark:text-slate-400">Caricamento materiali...</span>
+              </div>
+            ) : filtered.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <EmptyState filter={(typeFilter || 'all') as FilterType} />
+              </motion.div>
+            ) : (
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {viewMode === 'grid' ? (
+                  <GridView
+                    items={filtered}
+                    onDelete={handleDelete}
+                    onView={handleView}
+                    onBookmark={handleBookmark}
+                    onRate={handleRate}
+                  />
+                ) : (
+                  <ListView
+                    items={filtered}
+                    onDelete={handleDelete}
+                    onView={handleView}
+                    onBookmark={handleBookmark}
+                    onRate={handleRate}
+                  />
+                )}
+              </motion.div>
+            )}
+          </>
         )}
 
         {/* Empty Backpack Tips */}
-        {!isLoading && counts.total === 0 && (
+        {!isLoading && counts.total === 0 && !isPercorsi && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
