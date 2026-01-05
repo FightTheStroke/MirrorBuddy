@@ -130,7 +130,7 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
   // Handle maestro selection and enter focus mode
   const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
-    enterFocusMode('flashcard', maestro.id, mode);
+    enterFocusMode({ toolType: 'flashcard', maestroId: maestro.id, interactionMode: mode });
   }, [enterFocusMode]);
 
   // Fetch decks from API
