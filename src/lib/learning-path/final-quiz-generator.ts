@@ -25,6 +25,9 @@ export interface FinalQuizOptions {
   distributeByDifficulty?: boolean;
 }
 
+/** Minimum score percentage required to pass the final quiz */
+const PASSING_SCORE_THRESHOLD = 70;
+
 const DEFAULT_OPTIONS: Required<FinalQuizOptions> = {
   totalQuestions: 10,
   distributeByDifficulty: true,
@@ -187,7 +190,7 @@ export function evaluateQuizResults(
   });
 
   const score = Math.round((correctCount / quiz.questions.length) * 100);
-  const passed = score >= 70; // 70% threshold for passing
+  const passed = score >= PASSING_SCORE_THRESHOLD;
 
   return {
     score,

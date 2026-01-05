@@ -70,88 +70,91 @@ export async function completeTopic(
 ): Promise<TopicCompletionResult> {
   logger.info('Completing topic', { topicId, quizScore });
 
-  // Get topic and path info
-  const topic = await prisma.learningPathTopic.findUnique({
-    where: { id: topicId },
-    include: {
-      path: {
-        include: {
-          topics: {
-            orderBy: { order: 'asc' },
+  // Use transaction to prevent race conditions
+  return await prisma.$transaction(async (tx) => {
+    // Get topic and path info
+    const topic = await tx.learningPathTopic.findUnique({
+      where: { id: topicId },
+      include: {
+        path: {
+          include: {
+            topics: {
+              orderBy: { order: 'asc' },
+            },
           },
         },
       },
-    },
-  });
-
-  if (!topic) {
-    throw new Error('Topic not found');
-  }
-
-  if (topic.status === 'locked') {
-    throw new Error('Cannot complete a locked topic');
-  }
-
-  // Mark topic as completed
-  await prisma.learningPathTopic.update({
-    where: { id: topicId },
-    data: {
-      status: 'completed',
-      completedAt: new Date(),
-      quizScore: quizScore ?? null,
-    },
-  });
-
-  // Find next topic
-  const currentOrder = topic.order;
-  const nextTopic = topic.path.topics.find((t) => t.order === currentOrder + 1);
-  let unlockedNext = false;
-  let nextTopicId: string | undefined;
-
-  // Unlock next topic if exists and is locked
-  if (nextTopic && nextTopic.status === 'locked') {
-    await prisma.learningPathTopic.update({
-      where: { id: nextTopic.id },
-      data: { status: 'unlocked' },
     });
-    unlockedNext = true;
-    nextTopicId = nextTopic.id;
-    logger.info('Next topic unlocked', { nextTopicId });
-  }
 
-  // Calculate new progress
-  const completedCount = topic.path.topics.filter((t) => t.status === 'completed').length + 1;
-  const totalCount = topic.path.topics.length;
-  const progressPercent = Math.round((completedCount / totalCount) * 100);
-  const pathCompleted = completedCount === totalCount;
+    if (!topic) {
+      throw new Error('Topic not found');
+    }
 
-  // Update path progress
-  await prisma.learningPath.update({
-    where: { id: topic.pathId },
-    data: {
-      completedTopics: completedCount,
+    if (topic.status === 'locked') {
+      throw new Error('Cannot complete a locked topic');
+    }
+
+    // Mark topic as completed
+    await tx.learningPathTopic.update({
+      where: { id: topicId },
+      data: {
+        status: 'completed',
+        completedAt: new Date(),
+        quizScore: quizScore ?? null,
+      },
+    });
+
+    // Find next topic
+    const currentOrder = topic.order;
+    const nextTopic = topic.path.topics.find((t) => t.order === currentOrder + 1);
+    let unlockedNext = false;
+    let nextTopicId: string | undefined;
+
+    // Unlock next topic if exists and is locked
+    if (nextTopic && nextTopic.status === 'locked') {
+      await tx.learningPathTopic.update({
+        where: { id: nextTopic.id },
+        data: { status: 'unlocked' },
+      });
+      unlockedNext = true;
+      nextTopicId = nextTopic.id;
+      logger.info('Next topic unlocked', { nextTopicId });
+    }
+
+    // Calculate new progress
+    const completedCount = topic.path.topics.filter((t) => t.status === 'completed').length + 1;
+    const totalCount = topic.path.topics.length;
+    const progressPercent = Math.round((completedCount / totalCount) * 100);
+    const pathCompleted = completedCount === totalCount;
+
+    // Update path progress
+    await tx.learningPath.update({
+      where: { id: topic.pathId },
+      data: {
+        completedTopics: completedCount,
+        progressPercent,
+        status: pathCompleted ? 'completed' : 'in_progress',
+        completedAt: pathCompleted ? new Date() : null,
+      },
+    });
+
+    logger.info('Topic completed', {
+      topicId,
       progressPercent,
-      status: pathCompleted ? 'completed' : 'in_progress',
-      completedAt: pathCompleted ? new Date() : null,
-    },
-  });
+      pathCompleted,
+      unlockedNext,
+    });
 
-  logger.info('Topic completed', {
-    topicId,
-    progressPercent,
-    pathCompleted,
-    unlockedNext,
+    return {
+      topicId,
+      newStatus: 'completed' as const,
+      quizScore,
+      unlockedNext,
+      nextTopicId,
+      pathProgress: progressPercent,
+      pathCompleted,
+    };
   });
-
-  return {
-    topicId,
-    newStatus: 'completed',
-    quizScore,
-    unlockedNext,
-    nextTopicId,
-    pathProgress: progressPercent,
-    pathCompleted,
-  };
 }
 
 /**

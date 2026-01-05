@@ -1001,6 +1001,7 @@ model LearningPath {
   @@index([status])
   @@index([sourceStudyKitId])
   @@index([createdAt])
+  @@index([userId, status])
 }
 
 model LearningPathTopic {

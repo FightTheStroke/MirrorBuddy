@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react';
 import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2, Printer, Route, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import toast from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import type { StudyKit } from '@/types/study-kit';
 
@@ -258,7 +259,7 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
       }
     } catch (error) {
       console.error('Failed to generate learning path', error);
-      alert('Errore durante la generazione del percorso');
+      toast.error('Errore durante la generazione del percorso');
     } finally {
       setIsGeneratingPath(false);
     }

@@ -75,6 +75,15 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const body: UpdateTopicRequest = await request.json();
     const { status, quizScore } = body;
 
+    // Input validation
+    const validStatuses: TopicStatus[] = ['locked', 'unlocked', 'in_progress', 'completed'];
+    if (status && !validStatuses.includes(status)) {
+      return NextResponse.json({ error: 'Invalid status value' }, { status: 400 });
+    }
+    if (quizScore !== undefined && (typeof quizScore !== 'number' || quizScore < 0 || quizScore > 100)) {
+      return NextResponse.json({ error: 'Quiz score must be a number between 0 and 100' }, { status: 400 });
+    }
+
     // Get topic with path
     const topic = await prisma.learningPathTopic.findUnique({
       where: { id: topicId },

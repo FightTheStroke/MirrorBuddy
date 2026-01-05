@@ -40,6 +40,17 @@ export async function analyzeTopics(
   title: string,
   subject?: string
 ): Promise<TopicAnalysisResult> {
+  // Input validation
+  if (!text || typeof text !== 'string') {
+    throw new Error('Invalid input: text is required and must be a string');
+  }
+  if (!title || typeof title !== 'string') {
+    throw new Error('Invalid input: title is required and must be a string');
+  }
+  if (text.trim().length < 100) {
+    throw new Error('Invalid input: text is too short for meaningful analysis (minimum 100 characters)');
+  }
+
   logger.info('Starting topic analysis', { title, subject, textLength: text.length });
 
   // Truncate text for AI processing (max ~12000 chars to leave room for response)

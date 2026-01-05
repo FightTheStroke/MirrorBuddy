@@ -19,6 +19,34 @@ export type TopicStepType = 'overview' | 'mindmap' | 'flashcard' | 'quiz';
 export type TopicDifficulty = 'basic' | 'intermediate' | 'advanced';
 
 /**
+ * Step content types based on step type
+ */
+export interface OverviewContent {
+  text: string;
+  mermaidCode?: string;
+}
+
+export interface MindmapContent {
+  nodes: Array<{ id: string; label: string; parentId?: string }>;
+  svgData?: string;
+}
+
+export interface FlashcardContent {
+  cards: Array<{ front: string; back: string }>;
+}
+
+export interface QuizContent {
+  questions: Array<{
+    question: string;
+    options: string[];
+    correctIndex: number;
+    explanation?: string;
+  }>;
+}
+
+export type StepContent = OverviewContent | MindmapContent | FlashcardContent | QuizContent;
+
+/**
  * A single step within a topic (overview, mindmap, flashcard set, or quiz)
  */
 export interface TopicStep {
@@ -27,7 +55,7 @@ export interface TopicStep {
   order: number;
   type: TopicStepType;
   title: string;
-  content: unknown; // JSON content varies by type
+  content: StepContent;
   isCompleted: boolean;
   completedAt?: Date;
 }

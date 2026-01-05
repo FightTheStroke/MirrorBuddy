@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import mermaid from 'mermaid';
+import DOMPurify from 'dompurify';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { LearningPathTopic, TopicStatus, TopicDifficulty } from '@/types';
@@ -146,7 +147,12 @@ export function VisualOverview({
         const { svg } = await mermaid.render(id, code);
 
         if (containerRef.current && !cancelled) {
-          containerRef.current.innerHTML = svg;
+          // Sanitize SVG to prevent XSS attacks
+          const sanitizedSvg = DOMPurify.sanitize(svg, {
+            USE_PROFILES: { svg: true, svgFilters: true },
+            ADD_TAGS: ['use'],
+          });
+          containerRef.current.innerHTML = sanitizedSvg;
           setRendered(true);
 
           // Add click handlers to nodes if callback provided

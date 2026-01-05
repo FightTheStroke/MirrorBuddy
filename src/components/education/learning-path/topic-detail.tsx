@@ -101,6 +101,10 @@ export function TopicDetail({
   const handleStepComplete = async (stepId: string) => {
     if (!topic) return;
 
+    // Store previous state for rollback
+    const previousTopic = topic;
+    const previousStepIndex = activeStepIndex;
+
     // Optimistic update
     setTopic((prev) => {
       if (!prev) return prev;
@@ -131,6 +135,9 @@ export function TopicDetail({
         onComplete?.();
       } catch (err) {
         console.error('Failed to complete topic', err);
+        // Revert optimistic update on error
+        setTopic(previousTopic);
+        setActiveStepIndex(previousStepIndex);
       }
     }
   };
@@ -208,23 +215,29 @@ export function TopicDetail({
       </div>
 
       {/* Key concepts */}
-      {topic.keyConcepts.length > 0 && (
-        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            Concetti chiave
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {topic.keyConcepts.map((concept, i) => (
+      {(() => {
+        // Parse keyConcepts from JSON string if needed
+        const concepts: string[] = typeof topic.keyConcepts === 'string'
+          ? JSON.parse(topic.keyConcepts || '[]')
+          : (topic.keyConcepts ?? []);
+        return concepts.length > 0 ? (
+          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+              Concetti chiave
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {concepts.map((concept, i) => (
               <span
                 key={i}
                 className="px-2 py-1 text-xs bg-white dark:bg-slate-700 rounded-full text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600"
               >
                 {concept}
               </span>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        ) : null;
+      })()}
 
       {/* Steps */}
       <div className="space-y-3">
@@ -375,14 +388,14 @@ function StepContent({ step }: StepContentProps) {
   // This is a simplified version - in a full implementation,
   // each type would have its own specialized renderer
 
-  const content = step.content as Record<string, unknown>;
+  const content = step.content;
 
   switch (step.type) {
     case 'overview':
       return (
         <div className="prose prose-sm dark:prose-invert max-w-none">
-          {typeof content === 'object' && 'text' in content ? (
-            <p>{String(content.text)}</p>
+          {'text' in content ? (
+            <p>{content.text}</p>
           ) : (
             <p className="text-slate-500">Contenuto panoramica non disponibile</p>
           )}
