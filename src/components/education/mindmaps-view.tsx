@@ -108,7 +108,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
   // Handle maestro selection and enter focus mode
   const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
-    enterFocusMode('mindmap', maestro.id, mode);
+    enterFocusMode({ toolType: 'mindmap', maestroId: maestro.id, interactionMode: mode });
   }, [enterFocusMode]);
 
   // Delete mindmap via API
