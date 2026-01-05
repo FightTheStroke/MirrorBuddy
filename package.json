@@ -26,6 +26,7 @@
   ],
   "scripts": {
     "dev": "next dev",
+    "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; next dev",
     "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build",
     "start": "next start",
     "lint": "eslint",
