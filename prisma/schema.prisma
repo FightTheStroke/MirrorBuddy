@@ -1250,3 +1250,50 @@ model PointsTransaction {
   @@index([reason])
 }
 
+// ============================================================================
+// RAG EMBEDDINGS (Plan 9 - Semantic Search for Learning Materials)
+// Stores vector embeddings for semantic similarity search.
+//
+// PostgreSQL Migration (required for vector search):
+// 1. Change datasource provider to "postgresql"
+// 2. Create pgvector extension: CREATE EXTENSION vector;
+// 3. Change 'vector' field type to Unsupported("vector(1536)")
+// 4. Add vector index: CREATE INDEX ON "ContentEmbedding" USING ivfflat (vector vector_cosine_ops);
+// ============================================================================
+
+model ContentEmbedding {
+  id          String   @id @default(cuid())
+  userId      String
+
+  // Source content reference
+  sourceType  String   // "material" | "flashcard" | "studykit" | "message"
+  sourceId    String   // ID of the source entity
+  chunkIndex  Int      @default(0) // Position within chunked content
+
+  // The actual text that was embedded
+  content     String
+
+  // Vector embedding (stored as JSON for SQLite, will be vector(1536) for PostgreSQL)
+  // For PostgreSQL: change to Unsupported("vector(1536)") and use raw SQL
+  vector      String   // JSON array of 1536 floats
+
+  // Embedding metadata
+  model       String   @default("text-embedding-3-small")
+  dimensions  Int      @default(1536)
+  tokenCount  Int      @default(0)
+
+  // Search optimization
+  subject     String?  // Subject area for filtered search
+  tags        String   @default("[]") // JSON array of tags
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([sourceType, sourceId, chunkIndex])
+  @@index([userId])
+  @@index([sourceType])
+  @@index([sourceId])
+  @@index([subject])
+  @@index([createdAt])
+}
+
