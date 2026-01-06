@@ -21,3 +21,16 @@ export {
   type Quality,
   type FSRSStats,
 } from './fsrs';
+
+// Adaptive Quiz - Review suggestions, seen concepts, difficulty adjustment
+export {
+  analyzeQuizPerformance,
+  generateReviewSuggestions,
+  checkSeenConcepts,
+  calculateDifficultyAdjustment,
+  selectQuestionsForDifficulty,
+  type ReviewSuggestion,
+  type SeenConcept,
+  type DifficultyAdjustment,
+  type QuizAnalysis,
+} from './adaptive-quiz';

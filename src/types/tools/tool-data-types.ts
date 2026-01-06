@@ -10,6 +10,7 @@ export interface MindmapNode {
   id: string;
   label: string;
   parentId?: string | null;
+  children?: MindmapNode[];
 }
 
 export interface MindmapData {

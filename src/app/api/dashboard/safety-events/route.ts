@@ -24,7 +24,10 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get('days') ?? '7', 10);
-    const severity = searchParams.get('severity') ?? undefined;
+    const severityParam = searchParams.get('severity');
+    const severity = severityParam && ['info', 'warning', 'alert', 'critical'].includes(severityParam)
+      ? severityParam as 'info' | 'warning' | 'alert' | 'critical'
+      : undefined;
     const unresolvedOnly = searchParams.get('unresolved') === 'true';
     const limit = parseInt(searchParams.get('limit') ?? '100', 10);
 

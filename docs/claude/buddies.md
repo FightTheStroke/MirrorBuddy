@@ -335,7 +335,7 @@ See [ADR 0004: Safety Guardrails](../adr/0004-safety-guardrails.md) for full cri
 
 | File | Purpose |
 |------|---------|
-| `src/data/buddy-profiles.ts` | Buddy definitions (Mario, Maria) |
+| `src/data/buddy-profiles/` | Buddy definitions (Mario, Maria, etc.) - modular structure |
 | `src/lib/ai/character-router.ts` | Routing logic |
 | `src/lib/ai/handoff-manager.ts` | Character transitions |
 | `src/lib/ai/intent-detection.ts` | Emotional intent detection |

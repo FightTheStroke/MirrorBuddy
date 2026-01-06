@@ -89,18 +89,18 @@ Io posso aiutarti a organizzare lo studio e trovare il metodo giusto."
 
 ---
 
-### Davide (Alternative Coach)
+### Roberto (Alternative Coach)
 
 ```typescript
 {
-  id: 'davide',
-  name: 'Davide',
+  id: 'roberto',
+  name: 'Roberto',
   role: 'coach',
   gender: 'male',
   age: 28,
   voice: 'echo',           // Calm, reassuring male voice
   color: '#3B82F6',        // Blue accent
-  avatar: '/avatars/davide.png'
+  avatar: '/avatars/roberto.png'
 }
 ```
 
@@ -127,7 +127,7 @@ Tono: pacato, sicuro, mai ansioso.
 #### System Prompt Highlights
 ```markdown
 ## Chi sono
-Sono Davide, il tuo coach di apprendimento. Ho 28 anni e ti aiuto
+Sono Roberto, il tuo coach di apprendimento. Ho 28 anni e ti aiuto
 a trovare calma e metodo nello studio.
 
 ## Il mio approccio
@@ -178,8 +178,8 @@ if (intent.type === 'method_help' ||
 When students need subject-specific help:
 
 ```typescript
-// Melissa/Davide detect academic need
-"Per le equazioni di secondo grado, Archimede è il migliore!
+// Coach (Melissa/Roberto/Chiara/Andrea/Favij) detects academic need
+"Per le equazioni di secondo grado, Euclide è il migliore!
 Vuoi che lo chiami? Io resto qui per aiutarti con il metodo dopo."
 ```
 
@@ -216,12 +216,12 @@ export function getSupportTeacherByGender(
   gender: 'male' | 'female'
 ): SupportTeacher {
   return gender === 'male'
-    ? supportTeachers.davide
-    : supportTeachers.melissa;
+    ? ROBERTO
+    : MELISSA;
 }
 
 export function getDefaultSupportTeacher(): SupportTeacher {
-  return supportTeachers.melissa; // Default to Melissa
+  return MELISSA; // Default to Melissa
 }
 ```
 
@@ -254,7 +254,14 @@ interface StudentProfile {
 
 | File | Purpose |
 |------|---------|
-| `src/data/support-teachers.ts` | Coach definitions (Melissa, Davide) |
+| `src/data/support-teachers/support-teachers.ts` | Main export file with utility functions |
+| `src/data/support-teachers/melissa.ts` | Melissa coach profile (default) |
+| `src/data/support-teachers/roberto.ts` | Roberto coach profile (male alternative) |
+| `src/data/support-teachers/chiara.ts` | Chiara coach profile (academic/organized) |
+| `src/data/support-teachers/andrea.ts` | Andrea coach profile (sporty/energetic) |
+| `src/data/support-teachers/favij.ts` | Favij coach profile (gaming/digital) |
+| `src/data/support-teachers/shared.ts` | Shared prompts and knowledge (PLATFORM_KNOWLEDGE, COMMON_TOOLS_SECTION, etc.) |
+| `src/data/support-teachers/types.ts` | Type definitions |
 | `src/lib/ai/character-router.ts` | Routing logic |
 | `src/lib/ai/handoff-manager.ts` | Character transitions |
 | `src/components/conversation/conversation-flow.tsx` | UI rendering |
@@ -263,9 +270,9 @@ interface StudentProfile {
 
 ```typescript
 interface SupportTeacher {
-  id: 'melissa' | 'davide';
+  id: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
   name: string;
-  role: 'coach';
+  role: 'learning_coach';
   gender: 'male' | 'female';
   age: number;
   voice: string;
@@ -274,6 +281,7 @@ interface SupportTeacher {
   systemPrompt: string;
   voiceInstructions: string;
   greeting: string;
+  personality: string;
 }
 ```
 
