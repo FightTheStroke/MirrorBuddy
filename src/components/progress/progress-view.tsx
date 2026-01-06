@@ -16,7 +16,6 @@ import { useProgressStore } from '@/lib/stores';
 import { AnalyticsDashboard, DashboardLayout, DashboardCard, StatCard } from '@/components/dashboard';
 import { TimeStudyChart } from '@/components/dashboard/time-study-chart';
 import { MaestroUsageChart } from '@/components/dashboard/maestro-usage-chart';
-import { AzureCostsCard } from '@/components/dashboard/azure-costs-card';
 import { AchievementsPanel } from '@/components/gamification/achievements-panel';
 import { SeasonBanner } from '@/components/gamification/season-banner';
 import { cn } from '@/lib/utils';
@@ -156,10 +155,6 @@ export function ProgressView() {
 
         <DashboardCard>
           <SeasonBanner variant="full" />
-        </DashboardCard>
-
-        <DashboardCard>
-          <AzureCostsCard />
         </DashboardCard>
       </DashboardLayout>
 
