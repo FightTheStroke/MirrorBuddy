@@ -1,65 +1,17 @@
 'use client';
 
-// ============================================================================
-// LIVE MIND MAP COMPONENT
-// Real-time growing mind map that updates as AI streams content
-// Uses SSE connection to receive tool:update events
-// ============================================================================
-
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Markmap } from 'markmap-view';
-import { Transformer } from 'markmap-lib';
-import {
-  Network,
-  Loader2,
-  CheckCircle2,
-  XCircle,
-  Sparkles,
-  ZoomIn,
-  ZoomOut,
-  RotateCcw,
-} from 'lucide-react';
+import { Network, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import type { ToolEvent } from '@/lib/realtime/tool-events';
+import type { MindMapLiveProps, LiveStatus, UseMindMapLiveOptions } from './mind-map-live/types';
 
-// ============================================================================
-// TYPES
-// ============================================================================
-
-export interface MindMapLiveProps {
-  sessionId: string;
-  toolId?: string;
-  title?: string;
-  initialContent?: string;
-  onComplete?: (content: string) => void;
-  onError?: (error: string) => void;
-  className?: string;
-}
-
-type LiveStatus = 'connecting' | 'waiting' | 'building' | 'complete' | 'error';
-
-// ============================================================================
-// TRANSFORMER INSTANCE
-// ============================================================================
-
-const transformer = new Transformer();
-
-// ============================================================================
-// HELPER: Clear SVG children safely (no innerHTML)
-// ============================================================================
-
-function clearSvgChildren(svg: SVGSVGElement): void {
-  while (svg.firstChild) {
-    svg.removeChild(svg.firstChild);
-  }
-}
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
+export type { MindMapLiveProps, UseMindMapLiveOptions };
+import { useMindmapRenderer } from './mind-map-live/hooks/use-mindmap-renderer';
+import { useSSEConnection } from './mind-map-live/hooks/use-sse-connection';
+import { StatusIndicator } from './mind-map-live/components/status-indicator';
+import { ZoomControls } from './mind-map-live/components/zoom-controls';
 
 export function MindMapLive({
   sessionId,
@@ -70,308 +22,80 @@ export function MindMapLive({
   onError,
   className,
 }: MindMapLiveProps) {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const markmapRef = useRef<Markmap | null>(null);
-  const contentRef = useRef<string>(initialContent);
+  const svgRef = React.useRef<SVGSVGElement>(null);
+  const { renderMindmap, markmapRef } = useMindmapRenderer(svgRef);
 
-  const [status, setStatus] = useState<LiveStatus>('connecting');
   const [title, setTitle] = useState(initialTitle || 'Mappa in costruzione...');
   const [progress, setProgress] = useState(0);
   const [nodeCount, setNodeCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
+  const [status, setStatus] = useState<LiveStatus>('connecting');
 
   const { settings } = useAccessibilityStore();
 
-  // Count nodes in markdown content
-  const countNodes = useCallback((markdown: string): number => {
-    const lines = markdown.split('\n');
-    return lines.filter((line) => line.trim().startsWith('#')).length;
+  const handleUpdate = useCallback((content: string) => {
+    const count = renderMindmap(content, true);
+    if (count !== undefined) {
+      setNodeCount(count);
+    }
+  }, [renderMindmap]);
+
+  const handleProgress = useCallback((prog: number) => {
+    setProgress(prog);
   }, []);
 
-  // Render or update the mindmap
-  const renderMindmap = useCallback(
-    (content: string, animate = true) => {
-      if (!svgRef.current || !content.trim()) return;
+  const handleTitle = useCallback((newTitle: string) => {
+    setTitle(newTitle);
+  }, []);
 
-      // FIX BUG 16: Check SVG dimensions before rendering to prevent SVGLength error
-      const svg = svgRef.current;
-      const rect = svg.getBoundingClientRect();
-      if (rect.width === 0 || rect.height === 0) {
-        // Container not yet laid out, wait for next frame
-        requestAnimationFrame(() => renderMindmap(content, animate));
-        return;
-      }
+  const handleComplete = useCallback((content: string) => {
+    renderMindmap(content, true);
+    onComplete?.(content);
+  }, [renderMindmap, onComplete]);
 
-      // Set explicit dimensions on SVG
-      svg.setAttribute('width', String(rect.width));
-      svg.setAttribute('height', String(rect.height));
+  const handleError = useCallback((err: string) => {
+    setError(err);
+    onError?.(err);
+  }, [onError]);
 
-      try {
-        const { root } = transformer.transform(content);
+  useSSEConnection({
+    sessionId,
+    toolId,
+    initialContent,
+    onUpdate: handleUpdate,
+    onProgress: handleProgress,
+    onTitle: handleTitle,
+    onComplete: handleComplete,
+    onError: handleError,
+    onStatusChange: setStatus,
+  });
 
-        // Font settings
-        const fontFamily =
-          settings.dyslexiaFont
-            ? 'OpenDyslexic, Comic Sans MS, sans-serif'
-            : 'Arial, Helvetica, sans-serif';
-
-        const isHighContrast = settings.highContrast;
-
-        if (markmapRef.current) {
-          // Update existing markmap
-          markmapRef.current.setData(root);
-          markmapRef.current.fit();
-        } else {
-          // Clear SVG safely (no innerHTML)
-          clearSvgChildren(svgRef.current);
-
-          // Create new markmap
-          markmapRef.current = Markmap.create(
-            svgRef.current,
-            {
-              autoFit: true,
-              duration: animate ? 500 : 0, // Smooth animation on updates
-              maxWidth: 280,
-              paddingX: 16,
-              spacingVertical: 8,
-              spacingHorizontal: 60,
-              color: (node) => {
-                if (isHighContrast) {
-                  const colors = ['#ffff00', '#00ffff', '#ff00ff', '#00ff00', '#ff8000'];
-                  return colors[node.state?.depth % colors.length] || '#ffffff';
-                }
-                const colors = [
-                  '#3b82f6',
-                  '#10b981',
-                  '#f59e0b',
-                  '#ef4444',
-                  '#8b5cf6',
-                  '#ec4899',
-                ];
-                return colors[node.state?.depth % colors.length] || '#64748b';
-              },
-            },
-            root
-          );
-
-          // Apply custom styles
-          setTimeout(() => {
-            if (svgRef.current) {
-              const textElements = svgRef.current.querySelectorAll('text, foreignObject');
-              textElements.forEach((el) => {
-                if (el instanceof SVGElement || el instanceof HTMLElement) {
-                  el.style.fontFamily = fontFamily;
-                  if (settings.largeText) {
-                    el.style.fontSize = '15px';
-                  }
-                }
-              });
-            }
-          }, 100);
-        }
-
-        setNodeCount(countNodes(content));
-      } catch (err) {
-        logger.error('MindMapLive render error', { error: String(err) });
-      }
-    },
-    [settings.dyslexiaFont, settings.highContrast, settings.largeText, countNodes]
-  );
-
-  // SSE connection for real-time updates
-  useEffect(() => {
-    if (!sessionId) return;
-
-    let eventSource: EventSource | null = null;
-    let reconnectTimeout: NodeJS.Timeout | null = null;
-    let reconnectAttempts = 0;
-    const maxReconnects = 5;
-
-    const connect = () => {
-      setStatus('connecting');
-
-      eventSource = new EventSource(`/api/tools/stream?sessionId=${sessionId}`);
-
-      eventSource.onopen = () => {
-        setStatus('waiting');
-        reconnectAttempts = 0;
-        logger.info('MindMapLive SSE connected', { sessionId });
-      };
-
-      eventSource.onmessage = (event) => {
-        if (!event.data) return;
-
-        try {
-          const data: ToolEvent = JSON.parse(event.data);
-
-          // Filter for mindmap events
-          if (data.toolType !== 'mindmap') return;
-
-          // Filter for specific tool if provided
-          if (toolId && data.id !== toolId) return;
-
-          switch (data.type) {
-            case 'tool:created':
-              setStatus('building');
-              if (data.data.title) {
-                setTitle(data.data.title);
-              }
-              contentRef.current = `# ${data.data.title || 'Mappa Mentale'}\n`;
-              renderMindmap(contentRef.current, false);
-              break;
-
-            case 'tool:update':
-              if (data.data.chunk) {
-                contentRef.current += data.data.chunk;
-                renderMindmap(contentRef.current, true);
-              }
-              if (data.data.progress !== undefined) {
-                setProgress(data.data.progress);
-              }
-              break;
-
-            case 'tool:complete':
-              setStatus('complete');
-              setProgress(100);
-              if (data.data.content && typeof data.data.content === 'string') {
-                contentRef.current = data.data.content;
-                renderMindmap(contentRef.current, true);
-              }
-              onComplete?.(contentRef.current);
-              break;
-
-            case 'tool:error':
-              setStatus('error');
-              setError(data.data.error || 'Errore durante la creazione');
-              onError?.(data.data.error || 'Unknown error');
-              break;
-
-            case 'tool:cancelled':
-              setStatus('error');
-              setError('Creazione annullata');
-              break;
-          }
-        } catch {
-          // Ignore parse errors (might be heartbeat)
-        }
-      };
-
-      eventSource.onerror = () => {
-        if (eventSource?.readyState === EventSource.CLOSED) {
-          setStatus('error');
-          setError('Connessione persa');
-
-          // Attempt reconnection
-          if (reconnectAttempts < maxReconnects) {
-            reconnectAttempts++;
-            reconnectTimeout = setTimeout(connect, 2000 * reconnectAttempts);
-          }
-        }
-      };
-    };
-
-    connect();
-
-    // If we have initial content, render it
-    if (initialContent) {
-      setStatus('building');
-      contentRef.current = initialContent;
-      renderMindmap(initialContent, false);
-    }
-
-    return () => {
-      eventSource?.close();
-      if (reconnectTimeout) clearTimeout(reconnectTimeout);
-    };
-  }, [sessionId, toolId, initialContent, renderMindmap, onComplete, onError]);
-
-  // Zoom controls
   const handleZoomIn = useCallback(() => {
     if (markmapRef.current) {
       markmapRef.current.rescale(1.25);
     }
     setZoom((z) => Math.min(z * 1.25, 3));
-  }, []);
+  }, [markmapRef]);
 
   const handleZoomOut = useCallback(() => {
     if (markmapRef.current) {
       markmapRef.current.rescale(0.8);
     }
     setZoom((z) => Math.max(z * 0.8, 0.5));
-  }, []);
+  }, [markmapRef]);
 
   const handleReset = useCallback(() => {
     if (markmapRef.current) {
       markmapRef.current.fit();
     }
     setZoom(1);
-  }, []);
+  }, [markmapRef]);
 
-  // Status indicator
-  const StatusIndicator = () => {
-    switch (status) {
-      case 'connecting':
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2 text-blue-500"
-          >
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">Connessione in corso...</span>
-          </motion.div>
-        );
-      case 'waiting':
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2 text-amber-500"
-          >
-            <Network className="w-4 h-4" />
-            <span className="text-sm">In attesa del Professore...</span>
-          </motion.div>
-        );
-      case 'building':
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2 text-emerald-500"
-          >
-            <Sparkles className="w-4 h-4 animate-pulse" />
-            <span className="text-sm">
-              Costruendo... {nodeCount} nodi ({progress}%)
-            </span>
-          </motion.div>
-        );
-      case 'complete':
-        return (
-          <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex items-center gap-2 text-emerald-600"
-          >
-            <CheckCircle2 className="w-4 h-4" />
-            <span className="text-sm">Completata! {nodeCount} nodi</span>
-          </motion.div>
-        );
-      case 'error':
-        return (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center gap-2 text-red-500"
-          >
-            <XCircle className="w-4 h-4" />
-            <span className="text-sm">{error}</span>
-          </motion.div>
-        );
-      default:
-        return null;
-    }
-  };
+  if (initialContent && status === 'connecting') {
+    setStatus('building');
+    handleUpdate(initialContent);
+  }
 
   return (
     <motion.div
@@ -388,7 +112,6 @@ export function MindMapLive({
       aria-label={`Mappa mentale in tempo reale: ${title}`}
       aria-live="polite"
     >
-      {/* Header */}
       <div
         className={cn(
           'flex items-center justify-between px-4 py-3 border-b',
@@ -422,63 +145,18 @@ export function MindMapLive({
             >
               {title}
             </h3>
-            <StatusIndicator />
+            <StatusIndicator status={status} nodeCount={nodeCount} progress={progress} error={error} />
           </div>
         </div>
 
-        {/* Zoom controls */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={handleZoomOut}
-            className={cn(
-              'p-1.5 rounded transition-colors',
-              settings.highContrast
-                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
-            )}
-            title="Riduci zoom"
-            aria-label="Riduci zoom"
-          >
-            <ZoomOut className="w-4 h-4" />
-          </button>
-          <span
-            className={cn(
-              'text-xs min-w-[3rem] text-center',
-              settings.highContrast ? 'text-white' : 'text-slate-500'
-            )}
-          >
-            {Math.round(zoom * 100)}%
-          </span>
-          <button
-            onClick={handleZoomIn}
-            className={cn(
-              'p-1.5 rounded transition-colors',
-              settings.highContrast
-                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
-            )}
-            title="Aumenta zoom"
-            aria-label="Aumenta zoom"
-          >
-            <ZoomIn className="w-4 h-4" />
-          </button>
-          <button
-            onClick={handleReset}
-            className={cn(
-              'p-1.5 rounded transition-colors ml-1',
-              settings.highContrast
-                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
-            )}
-            title="Ripristina vista"
-            aria-label="Ripristina vista"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-        </div>
+        <ZoomControls
+          zoom={zoom}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onReset={handleReset}
+        />
       </div>
 
-      {/* Progress bar */}
       <AnimatePresence>
         {status === 'building' && (
           <motion.div
@@ -497,7 +175,6 @@ export function MindMapLive({
         )}
       </AnimatePresence>
 
-      {/* Mind map container */}
       <div
         className={cn(
           'p-4 overflow-auto',
@@ -549,7 +226,6 @@ export function MindMapLive({
         )}
       </div>
 
-      {/* Screen reader announcement */}
       <div className="sr-only" aria-live="assertive">
         {status === 'complete' &&
           `Mappa mentale "${title}" completata con ${nodeCount} nodi.`}
@@ -560,61 +236,21 @@ export function MindMapLive({
   );
 }
 
-// ============================================================================
-// HOOK FOR PROGRAMMATIC CONTROL
-// ============================================================================
+import { useMindMapLive as useMindMapLiveHook } from './mind-map-live/hooks/use-mind-map-live';
 
-export interface UseMindMapLiveOptions {
-  sessionId: string;
-  onComplete?: (content: string) => void;
-  onError?: (error: string) => void;
-}
-
-export function useMindMapLive({ sessionId, onComplete, onError }: UseMindMapLiveOptions) {
-  const [isActive, setIsActive] = useState(false);
-  const [toolId, setToolId] = useState<string | null>(null);
-  const [content, setContent] = useState<string>('');
-
-  const start = useCallback((id: string, initialTitle?: string) => {
-    setToolId(id);
-    setContent(initialTitle ? `# ${initialTitle}\n` : '');
-    setIsActive(true);
-  }, []);
-
-  const stop = useCallback(() => {
-    setIsActive(false);
-    setToolId(null);
-  }, []);
-
-  const handleComplete = useCallback(
-    (finalContent: string) => {
-      setContent(finalContent);
-      onComplete?.(finalContent);
-    },
-    [onComplete]
-  );
-
-  const handleError = useCallback(
-    (error: string) => {
-      onError?.(error);
-    },
-    [onError]
-  );
-
+export function useMindMapLive(options: UseMindMapLiveOptions) {
+  const hookResult = useMindMapLiveHook(options);
+  
   return {
-    isActive,
-    toolId,
-    content,
-    start,
-    stop,
-    MindMapComponent: isActive
+    ...hookResult,
+    MindMapComponent: hookResult.isActive
       ? () => (
           <MindMapLive
-            sessionId={sessionId}
-            toolId={toolId || undefined}
-            initialContent={content}
-            onComplete={handleComplete}
-            onError={handleError}
+            sessionId={hookResult.sessionId}
+            toolId={hookResult.toolId || undefined}
+            initialContent={hookResult.content}
+            onComplete={hookResult.handleComplete}
+            onError={hookResult.handleError}
           />
         )
       : null,

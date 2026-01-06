@@ -22,8 +22,8 @@
 
 | File | Purpose |
 |------|---------|
-| `src/data/support-teachers.ts` | 5 coach profiles |
-| `src/data/buddy-profiles.ts` | Mario & Maria profiles |
+| `src/data/support-teachers/` | 5 coach profiles (modular structure) |
+| `src/data/buddy-profiles/` | Mario & Maria profiles (modular structure) |
 | `src/data/app-knowledge-base.ts` | Platform docs for coaches |
 | `src/lib/ai/character-router.ts` | Routes to appropriate character |
 | `src/lib/ai/handoff-manager.ts` | Transitions between characters |

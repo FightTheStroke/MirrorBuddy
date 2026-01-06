@@ -64,7 +64,7 @@ export function QuizReviewSuggestions({
         }));
 
         setSuggestions(mockSuggestions);
-      } catch (err) {
+      } catch (_err) {
         setError('Impossibile caricare i suggerimenti di ripasso');
       } finally {
         setLoading(false);

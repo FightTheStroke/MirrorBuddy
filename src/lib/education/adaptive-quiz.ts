@@ -8,7 +8,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { hybridSearch, type HybridRetrievalResult } from '@/lib/rag';
+import { hybridSearch, type HybridRetrievalResult as _HybridRetrievalResult } from '@/lib/rag';
 import type { Quiz, QuizResult, Question, Subject } from '@/types';
 
 /**

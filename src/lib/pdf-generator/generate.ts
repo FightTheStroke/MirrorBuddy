@@ -10,7 +10,7 @@ import { extractStudyKitContent } from './utils/content-extractor';
 import type {
   DSAProfile,
   PDFGeneratorRequest,
-  PDFGeneratorResponse,
+  PDFGeneratorResponse as _PDFGeneratorResponse,
   ExtractedContent,
 } from './types';
 import React, { type ReactElement } from 'react';

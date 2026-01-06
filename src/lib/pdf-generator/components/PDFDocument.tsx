@@ -36,7 +36,7 @@ interface PDFDocumentProps {
 /**
  * Create dynamic styles based on profile configuration
  */
-function createStyles(profile: ProfileConfig, format: 'A4' | 'Letter') {
+function createStyles(profile: ProfileConfig, _format: 'A4' | 'Letter') {
   return StyleSheet.create({
     page: {
       flexDirection: 'column',
