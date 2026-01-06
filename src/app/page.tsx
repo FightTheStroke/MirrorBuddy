@@ -37,7 +37,7 @@ import {
   LazyStudyKitView,    // Used for Astuccio (tools hub)
   LazyGenitoriView,
 } from '@/components/education';
-import { ZainoView } from '@/app/zaino/components/zaino-view';
+import { ZainoView } from '@/app/supporti/components/zaino-view';
 import { CharacterChatView, ActiveMaestroAvatar } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';

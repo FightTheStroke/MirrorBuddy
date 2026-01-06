@@ -7,7 +7,7 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { ZainoView } from '@/app/zaino/components/zaino-view';
+import { ZainoView } from '@/app/supporti/components/zaino-view';
 
 function SupportiContent() {
   const searchParams = useSearchParams();
