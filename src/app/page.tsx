@@ -17,10 +17,13 @@ import {
   Clock,
   Star,
   Users,
-  Pencil,      // Astuccio icon
-  Backpack,    // Zaino icon
-  Coins,       // MirrorBucks icon
-  BookOpen,    // Sessions stat icon
+  Pencil,
+  Backpack,
+  Coins,
+  BookOpen,
+  ChevronUp,
+  ChevronDown,
+  Bug,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
@@ -67,6 +70,62 @@ const BUDDY_INFO = {
   sofia: { name: 'Sofia', avatar: '/avatars/sofia.png' },
 } as const;
 
+// DEBUG: Tutte le pagine del progetto
+type DebugPage = {
+  href: string;
+  note: string;
+  status?: 'ok' | 'dead' | 'redirect' | 'inline';
+  external?: boolean;
+};
+
+const debugPages: DebugPage[] = [
+  // PAGINE PRINCIPALI (visibili nella sidebar)
+  { href: '/', note: 'Home (page.tsx principale)' },
+  { href: '/dashboard', note: 'Dashboard studente' },
+  { href: '/conversazioni', note: 'Chat standalone' },
+  
+  // REDIRECT - PAGINE MORTE
+  { href: '/archivio', note: 'REDIRECT -> /supporti', status: 'redirect' },
+  { href: '/genitori', note: 'REDIRECT -> /parent-dashboard', status: 'redirect' },
+  { href: '/supporti', note: 'REDIRECT -> /zaino', status: 'redirect' },
+  
+  // PAGINE NON COLLEGATE
+  { href: '/materiali', note: 'HomeworkHelpView' },
+  { href: '/welcome', note: 'Onboarding' },
+  { href: '/landing', note: 'Marketing page' },
+  { href: '/study-kit', note: 'Study Kit' },
+  { href: '/parent-dashboard', note: 'Dashboard genitori standalone' },
+  
+  // SHOWCASE
+  { href: '/showcase', note: 'Showcase home' },
+  { href: '/showcase/maestri', note: 'Showcase - Professori' },
+  { href: '/showcase/mindmaps', note: 'Showcase - Mappe mentali' },
+  { href: '/showcase/quiz', note: 'Showcase - Quiz' },
+  { href: '/showcase/flashcards', note: 'Showcase - Flashcards' },
+  { href: '/showcase/accessibility', note: 'Showcase - Accessibilita' },
+  { href: '/showcase/chat', note: 'Showcase - Chat simulata' },
+  { href: '/showcase/solar-system', note: 'Showcase - Sistema solare' },
+  
+  // TEST
+  { href: '/test-voice', note: 'Test voice' },
+  { href: '/test-audio', note: 'Test audio' },
+  
+  // ADMIN
+  { href: '/admin/analytics', note: 'Analytics admin' },
+  
+  // VIEWS INLINE (usate nel main page.tsx)
+  { href: 'inline: astuccio', note: 'LazyStudyKitView', status: 'inline' },
+  { href: 'inline: zaino', note: 'LazySupportiView', status: 'inline' },
+  { href: 'inline: calendar', note: 'LazyCalendarView', status: 'inline' },
+  { href: 'inline: progress', note: 'LazyProgressView', status: 'inline' },
+  { href: 'inline: genitori', note: 'LazyGenitoriView', status: 'inline' },
+  { href: 'inline: settings', note: 'LazySettingsView', status: 'inline' },
+  { href: 'inline: coach', note: 'CharacterChatView (coach)', status: 'inline' },
+  { href: 'inline: buddy', note: 'CharacterChatView (buddy)', status: 'inline' },
+  { href: 'inline: maestri', note: 'MaestriGrid', status: 'inline' },
+  { href: 'inline: maestro-session', note: 'MaestroSession', status: 'inline' },
+];
+
 export default function Home() {
   const router = useRouter();
   const { hasCompletedOnboarding, isHydrated, hydrateFromApi } = useOnboardingStore();
@@ -86,6 +145,7 @@ export default function Home() {
   // Start with Maestri as the first view
   const [currentView, setCurrentView] = useState<View>('maestri');
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [debugMenuOpen, setDebugMenuOpen] = useState(false);
 
   // Maestro session state
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
@@ -325,6 +385,66 @@ export default function Home() {
             );
           })}
         </nav>
+
+        {/* DEBUG MENU - Tutte le pagine */}
+        <div className="px-2 pb-2">
+          <button
+            onClick={() => setDebugMenuOpen(!debugMenuOpen)}
+            className={cn(
+              'w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs',
+              debugMenuOpen
+                ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+            )}
+          >
+            <span className="font-bold">DEBUG MENU</span>
+            {debugMenuOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+          </button>
+          
+          {debugMenuOpen && (
+            <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 max-h-64 overflow-y-auto">
+              <div className="text-xs text-slate-400 mb-2 font-bold">TUTTE LE PAGINE (usa NUMERO per riferirti):</div>
+              {debugPages.map((page, idx) => {
+                const isInline = page.href.startsWith('inline:');
+                const isRedirect = page.status === 'redirect';
+                const isDead = page.status === 'dead';
+                const isInlineStatus = page.status === 'inline';
+                
+                return isInline ? (
+                  <div
+                    key={page.href}
+                    className={cn(
+                      'block px-2 py-1.5 rounded-lg text-xs mb-1',
+                      isInlineStatus
+                        ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                    )}
+                  >
+                    <span className="font-bold">[{idx + 1}] {page.href}</span>
+                    {page.note && <span className="ml-2 opacity-75">- {page.note}</span>}
+                  </div>
+                ) : (
+                  <a
+                    key={page.href}
+                    href={page.href}
+                    target="_self"
+                    className={cn(
+                      'block px-2 py-1.5 rounded-lg text-xs mb-1 transition-colors',
+                      isDead
+                        ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30'
+                        : isRedirect
+                        ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30'
+                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    )}
+                  >
+                    <span className="font-bold">[{idx + 1}] {page.href}</span>
+                    {page.note && <span className="ml-2 opacity-75">- {page.note}</span>}
+                  </a>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {/* Active Maestro Avatar - shows during conversation */}
         <div className="px-4 mb-2">
