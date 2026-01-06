@@ -4,7 +4,7 @@
  * VoicePanel - Shared side panel for voice calls
  *
  * Used by both MaestroSession and CharacterChatView for consistent voice UI.
- * ChatGPT-style design with voice-reactive orbs instead of waveforms.
+ * Shows avatar, connection status, audio visualizer, and controls.
  */
 
 import { motion } from 'framer-motion';
@@ -12,14 +12,15 @@ import Image from 'next/image';
 import { Mic, MicOff, PhoneOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
-import { VoiceOrb } from '@/components/voice/voice-orb';
 import { cn } from '@/lib/utils';
+
+const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
 export interface VoicePanelCharacter {
   name: string;
   avatar?: string;
   specialty?: string;
-  color: string; // Hex color like '#3B82F6' or tailwind gradient like 'from-purple-500 to-indigo-600'
+  color: string;
 }
 
 export interface VoicePanelProps {
@@ -29,20 +30,15 @@ export interface VoicePanelProps {
   isSpeaking: boolean;
   isMuted: boolean;
   inputLevel: number;
-  outputLevel: number;
+  outputLevel?: number;
   connectionState: string;
   configError: string | null;
   onToggleMute: () => void;
   onEndCall: () => void;
 }
 
-/**
- * Extract hex color from string (handles both hex and tailwind gradient)
- */
-function extractColor(color: string): string {
-  if (color.startsWith('#')) return color;
-  // Default blue for gradient strings
-  return '#3B82F6';
+function isHexColor(color: string): boolean {
+  return color.startsWith('#');
 }
 
 export function VoicePanel({
@@ -52,7 +48,7 @@ export function VoicePanel({
   isSpeaking,
   isMuted,
   inputLevel,
-  outputLevel,
+  outputLevel = 0,
   connectionState,
   configError,
   onToggleMute,
@@ -67,121 +63,117 @@ export function VoicePanel({
     return 'Avvio chiamata...';
   };
 
-  const orbColor = extractColor(character.color);
+  const backgroundStyle = isHexColor(character.color)
+    ? { background: `linear-gradient(to bottom, ${character.color}, ${character.color}dd)` }
+    : undefined;
+
+  const backgroundClass = !isHexColor(character.color)
+    ? `bg-gradient-to-b ${character.color}`
+    : '';
 
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
-      className="w-72 flex flex-col items-center justify-between gap-4 p-6 rounded-2xl bg-gradient-to-b from-slate-900 to-slate-950"
+      className={cn(
+        "w-64 flex flex-col items-center justify-center gap-4 p-4 rounded-2xl",
+        backgroundClass
+      )}
+      style={backgroundStyle}
     >
-      {/* Top section: Avatar or Orb */}
-      <div className="flex flex-col items-center gap-3">
-        {/* Main visualization area */}
-        <div className="relative">
-          {isConnected ? (
-            // Voice-reactive orb when connected
-            <div className="relative">
-              <VoiceOrb
-                level={outputLevel}
-                isActive={isSpeaking}
-                color={orbColor}
-                glowColor={orbColor}
-                size={140}
-              />
-              {/* Small avatar overlay in center */}
-              {character.avatar && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <Image
-                    src={character.avatar}
-                    alt={character.name}
-                    width={50}
-                    height={50}
-                    className="rounded-full border-2 border-white/30 object-cover"
-                  />
-                </div>
-              )}
-            </div>
-          ) : (
-            // Static avatar when not connected
-            <motion.div
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-            >
-              {character.avatar ? (
-                <Image
-                  src={character.avatar}
-                  alt={character.name}
-                  width={100}
-                  height={100}
-                  className="rounded-full border-4 border-white/20 object-cover"
-                />
-              ) : (
-                <div
-                  className="w-24 h-24 rounded-full flex items-center justify-center text-white text-4xl font-bold"
-                  style={{ background: orbColor }}
-                >
-                  {character.name.charAt(0)}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </div>
+      <motion.div
+        animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
+        transition={{ repeat: Infinity, duration: 1.5 }}
+        className="relative"
+      >
+        {character.avatar ? (
+          <Image
+            src={character.avatar}
+            alt={character.name}
+            width={80}
+            height={80}
+            className={cn(
+              'rounded-full border-4 object-cover transition-colors duration-300',
+              isConnected ? 'border-white' : 'border-white/50',
+              isSpeaking && 'border-white shadow-lg shadow-white/30'
+            )}
+          />
+        ) : (
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
+            {character.name.charAt(0)}
+          </div>
+        )}
+        {isConnected && (
+          <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-400 border-2 border-white/50 rounded-full animate-pulse" />
+        )}
+      </motion.div>
 
-        {/* Name and status */}
-        <div className="text-center">
-          <h3 className="text-lg font-semibold text-white">{character.name}</h3>
-          {character.specialty && (
-            <p className="text-xs text-white/50">{character.specialty}</p>
-          )}
-          <p className={cn(
-            "text-sm mt-2 font-medium",
-            configError ? "text-red-400" :
-            isSpeaking ? "text-white" :
-            isListening ? "text-green-400" :
-            "text-white/60"
-          )}>
-            {getStatusText()}
-          </p>
-        </div>
+      <div className="text-center">
+        <h3 className="text-lg font-semibold text-white">{character.name}</h3>
+        {character.specialty && (
+          <p className="text-xs text-white/70">{character.specialty}</p>
+        )}
+        <p className={cn(
+          "text-xs mt-1",
+          configError ? "text-red-200" : "text-white/60"
+        )}>
+          {getStatusText()}
+        </p>
       </div>
 
-      {/* Middle section: Student mic visualization */}
       {isConnected && (
-        <div className="flex flex-col items-center gap-2">
-          <VoiceOrb
-            level={inputLevel}
-            isActive={isListening && !isMuted}
-            color={isMuted ? '#6B7280' : '#10B981'}
-            glowColor={isMuted ? '#6B7280' : '#10B981'}
-            size={60}
-          />
-          <div className="flex items-center gap-1.5">
-            {isMuted ? (
-              <MicOff className="w-3.5 h-3.5 text-red-400" />
-            ) : (
-              <Mic className={cn(
-                "w-3.5 h-3.5 transition-colors",
-                isListening && inputLevel > 0.02 ? "text-green-400" : "text-white/40"
-              )} />
-            )}
-            <span className={cn(
-              "text-xs font-medium transition-colors",
-              isMuted ? "text-red-400" :
-              isListening && inputLevel > 0.02 ? "text-green-400" :
-              "text-white/50"
-            )}>
-              {isMuted ? 'Muto' :
-               isListening && inputLevel > 0.02 ? 'Parli tu' :
-               'Il tuo microfono'}
-            </span>
-          </div>
+        <div className="flex items-center gap-1.5 h-10 px-2">
+          {VISUALIZER_BAR_OFFSETS.map((offset, i) => {
+            const baseHeight = 8;
+            
+            const getBarStyle = () => {
+              const variance = 1 + (offset % 3) * 0.15;
+              
+              if (isSpeaking) {
+                const level = outputLevel * variance;
+                return {
+                  height: baseHeight + level * 28,
+                  opacity: 0.4 + level * 0.6,
+                };
+              }
+              if (isListening && !isMuted) {
+                const level = inputLevel * variance;
+                return {
+                  height: baseHeight + level * 32,
+                  opacity: 0.3 + level * 0.7,
+                };
+              }
+              return { height: baseHeight, opacity: 0.2 };
+            };
+
+            const style = getBarStyle();
+
+            return (
+              <motion.div
+                key={i}
+                initial={false}
+                animate={{ 
+                  height: style.height,
+                  opacity: style.opacity,
+                  scaleY: isSpeaking || (isListening && !isMuted) ? 1 : 0.8,
+                }}
+                transition={{ duration: 0.06, ease: 'easeOut' }}
+                className={cn(
+                  "w-2 rounded-full",
+                  isSpeaking 
+                    ? "bg-gradient-to-t from-white/60 to-white" 
+                    : isListening && !isMuted 
+                      ? "bg-gradient-to-t from-white/40 to-white/90" 
+                      : "bg-white/20"
+                )}
+              />
+            );
+          })}
         </div>
       )}
 
-      {/* Bottom section: Controls */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 mt-2">
         <AudioDeviceSelector compact />
 
         {isConnected && (
@@ -191,10 +183,10 @@ export function VoicePanel({
             onClick={onToggleMute}
             aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
             className={cn(
-              'rounded-full w-12 h-12 transition-all',
+              'rounded-full w-12 h-12 transition-colors',
               isMuted
-                ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30 ring-2 ring-red-500/50'
-                : 'bg-white/10 text-white hover:bg-white/20'
+                ? 'bg-white/20 text-white hover:bg-white/30'
+                : 'bg-white/30 text-white hover:bg-white/40'
             )}
           >
             {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -205,12 +197,21 @@ export function VoicePanel({
           variant="ghost"
           size="icon"
           onClick={onEndCall}
-          aria-label="Termina chiamata"
           className="rounded-full w-12 h-12 bg-red-500 text-white hover:bg-red-600"
         >
           <PhoneOff className="w-5 h-5" />
         </Button>
       </div>
+
+      {isConnected && (
+        <p
+          className="text-xs text-white/60"
+          aria-live="polite"
+          role="status"
+        >
+          {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
+        </p>
+      )}
     </motion.div>
   );
 }
