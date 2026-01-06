@@ -199,7 +199,7 @@ flowchart LR
 
 **MirrorBuddy Feature**: Buddies dynamically mirror the student's learning differences (dyslexia, ADHD, autism, etc.) so students feel understood.
 
-**Location**: `src/data/buddy-profiles.ts`
+**Location**: `src/data/buddy-profiles/` (modular structure)
 
 ---
 
@@ -237,7 +237,7 @@ FSRS_K_FACTOR = 19.0            // stability growth
 4 = Easy (1.3x stability)
 ```
 
-**Location**: `src/lib/education/fsrs.ts`
+**Location**: `src/lib/education/fsrs/` (modular structure)
 
 ### Tool Execution (ADR-0009)
 
@@ -825,12 +825,13 @@ npx prisma db push   # Sync schema
 | Purpose | Path |
 |---------|------|
 | Types | `src/types/index.ts` |
-| AI Providers | `src/lib/ai/providers.ts` |
+| AI Providers | `src/lib/ai/providers/` (modular) |
 | Safety | `src/lib/safety/` |
-| FSRS | `src/lib/education/fsrs.ts` |
+| FSRS | `src/lib/education/fsrs/` (modular) |
+| Accessibility | `src/lib/education/accessibility/` (modular) |
 | Maestri | `src/data/maestri/` |
-| Coaches | `src/data/support-teachers.ts` |
-| Buddies | `src/data/buddy-profiles.ts` |
+| Coaches | `src/data/support-teachers/` (modular) |
+| Buddies | `src/data/buddy-profiles/` (modular) |
 | Stores | `src/lib/stores/` |
 | API | `src/app/api/` |
 

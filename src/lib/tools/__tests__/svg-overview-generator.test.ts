@@ -3,7 +3,7 @@
  * @module tools/svg-overview-generator
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({

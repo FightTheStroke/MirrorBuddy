@@ -458,6 +458,7 @@ describe('Intent Detection', () => {
         subject: 'mathematics',
         recommendedCharacter: 'maestro',
         reason: 'Academic help needed',
+        emotionalIndicators: [],
       };
 
       const result = shouldSuggestRedirect(intent, 'maestro');
@@ -484,6 +485,7 @@ describe('Intent Detection', () => {
         confidence: 0.5,
         recommendedCharacter: 'coach',
         reason: 'General conversation',
+        emotionalIndicators: [],
       };
 
       const result = shouldSuggestRedirect(intent, 'maestro');

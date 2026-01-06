@@ -18,7 +18,7 @@ import {
   operatorColors,
   wordPartColors,
 } from '../profiles';
-import type { DSAProfile, ProfileConfig } from '../types';
+import type { DSAProfile, ProfileConfig as _ProfileConfig } from '../types';
 
 describe('PDF Generator Profiles', () => {
   describe('getProfile', () => {

@@ -18,7 +18,8 @@ import type {
 import type { MaestroFull } from '@/data/maestri';
 import type { ActiveCharacter, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
 // Note: routeToCharacter, suggestCharacterSwitch, getCharacterGreeting available from character-router if needed
-import { detectIntent, type IntentType } from './intent-detection';
+import { detectIntent } from './intent-detection';
+import type { IntentType } from './intent-detection/types';
 import {
   getSupportTeacherById,
   getDefaultSupportTeacher,

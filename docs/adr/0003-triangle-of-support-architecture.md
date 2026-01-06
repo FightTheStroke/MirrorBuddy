@@ -189,8 +189,8 @@ Example: If student has ADHD and dyslexia, Mario says:
 | `src/lib/ai/character-router.ts` | Main routing logic |
 | `src/lib/ai/intent-detection.ts` | Intent classification |
 | `src/lib/ai/handoff-manager.ts` | Character transition handling |
-| `src/data/support-teachers.ts` | Melissa/Davide definitions |
-| `src/data/buddy-profiles.ts` | Mario/Maria definitions |
+| `src/data/support-teachers/` | Coach definitions (modular structure) |
+| `src/data/buddy-profiles/` | Buddy definitions (modular structure) |
 
 ## References
 - ManifestoEdu.md - Vision document
