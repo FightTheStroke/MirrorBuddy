@@ -14,13 +14,11 @@ function SupportiContent() {
 
   const type = searchParams.get('type') || undefined;
   const subject = searchParams.get('subject') || undefined;
-  const maestro = searchParams.get('maestro') || undefined;
 
   return (
     <ZainoView
       initialType={type}
       initialSubject={subject}
-      initialMaestro={maestro}
     />
   );
 }

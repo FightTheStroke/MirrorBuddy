@@ -65,7 +65,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Visualizza i collegamenti tra concetti con mappe interattive',
         icon: Brain,
         color: 'blue',
-        route: '/maestri?tool=mindmap',
+        route: '/mindmap',
       },
       {
         id: 'quiz',
@@ -73,7 +73,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Verifica la tua comprensione con quiz personalizzati',
         icon: HelpCircle,
         color: 'green',
-        route: '/maestri?tool=quiz',
+        route: '/quiz',
       },
       {
         id: 'flashcard',
@@ -81,7 +81,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Memorizza con flashcard intelligenti e ripetizione spaziata',
         icon: Layers,
         color: 'orange',
-        route: '/maestri?tool=flashcard',
+        route: '/flashcard',
       },
       {
         id: 'demo',
@@ -89,7 +89,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Esplora concetti STEM con simulazioni interattive',
         icon: Play,
         color: 'purple',
-        route: '/maestri?tool=demo',
+        route: '/demo',
       },
       {
         id: 'summary',
@@ -97,7 +97,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Genera sintesi chiare e strutturate dei concetti chiave',
         icon: FileText,
         color: 'cyan',
-        route: '/maestri?tool=summary',
+        route: '/summary',
       },
       {
         id: 'diagram',
@@ -105,7 +105,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Crea diagrammi di flusso e schemi visivi',
         icon: GitBranch,
         color: 'indigo',
-        route: '/maestri?tool=diagram',
+        route: '/diagram',
       },
       {
         id: 'timeline',
@@ -113,7 +113,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Organizza eventi storici o sequenze in modo visivo',
         icon: Clock,
         color: 'amber',
-        route: '/maestri?tool=timeline',
+        route: '/timeline',
       },
       {
         id: 'formula',
@@ -121,7 +121,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Visualizza e comprendi formule matematiche e scientifiche',
         icon: Calculator,
         color: 'rose',
-        route: '/maestri?tool=formula',
+        route: '/formula',
       },
       {
         id: 'chart',
@@ -129,7 +129,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Crea grafici e visualizzazioni per dati e statistiche',
         icon: BarChart3,
         color: 'emerald',
-        route: '/maestri?tool=chart',
+        route: '/chart',
       },
     ],
   },
@@ -146,7 +146,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Carica un documento PDF e genera automaticamente materiali di studio',
         icon: Upload,
         color: 'teal',
-        route: '/maestri?tool=pdf&upload=true',
+        route: '/pdf',
       },
       {
         id: 'webcam',
@@ -154,7 +154,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Fotografa la lavagna o i tuoi appunti per generare materiali',
         icon: Camera,
         color: 'pink',
-        route: '/maestri?tool=webcam&capture=true',
+        route: '/webcam',
       },
       {
         id: 'homework',
@@ -162,7 +162,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Carica un esercizio e ricevi assistenza guidata passo-passo',
         icon: BookOpen,
         color: 'violet',
-        route: '/maestri?tool=homework',
+        route: '/homework',
       },
     ],
   },
@@ -179,7 +179,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
         description: 'Cerca informazioni, video e risorse educative sul web',
         icon: Search,
         color: 'sky',
-        route: '/maestri?tool=search',
+        route: '/search',
       },
     ],
   },
