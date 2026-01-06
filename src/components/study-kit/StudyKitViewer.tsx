@@ -7,7 +7,8 @@
  */
 
 import { useState, useMemo } from 'react';
-import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2, Printer, Route, Loader2 } from 'lucide-react';
+import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2, Printer, Route, Loader2, Accessibility } from 'lucide-react';
+import { ExportPDFModal } from './ExportPDFModal';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import toast from '@/components/ui/toast';
@@ -164,6 +165,7 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
   const [isGeneratingPath, setIsGeneratingPath] = useState(false);
   const [generatedPathId, setGeneratedPathId] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
+  const [showPDFExport, setShowPDFExport] = useState(false);
 
   // Parse markdown summary once
   const parsedSummary = useMemo(
@@ -337,13 +339,24 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
           <Button
             variant="outline"
             size="sm"
+            onClick={() => setShowPDFExport(true)}
+            aria-label="Esporta PDF accessibile per DSA"
+            title="Esporta PDF accessibile per DSA"
+            className="no-print gap-1"
+          >
+            <Accessibility className="w-4 h-4" />
+            <span className="hidden sm:inline">PDF DSA</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handlePrint}
             aria-label="Stampa o salva come PDF"
             title="Stampa o salva come PDF"
             className="no-print"
           >
             <Printer className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">PDF</span>
+            <span className="hidden sm:inline">Stampa</span>
           </Button>
           {onDelete && (
             <Button
@@ -514,6 +527,13 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* PDF Export Modal */}
+      <ExportPDFModal
+        studyKit={studyKit}
+        isOpen={showPDFExport}
+        onClose={() => setShowPDFExport(false)}
+      />
     </div>
   );
 }

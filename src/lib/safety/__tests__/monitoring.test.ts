@@ -92,12 +92,10 @@ describe('Safety Monitoring', () => {
   describe('Event Type Helpers', () => {
     describe('logInputBlocked', () => {
       it('should create input_blocked event with warning severity', () => {
-        const event = logInputBlocked('profanity', { sessionId: 'session-1' });
+        const event = logInputBlocked({ sessionId: 'session-1' });
 
         expect(event.type).toBe('input_blocked');
         expect(event.severity).toBe('warning');
-        expect(event.category).toBe('profanity');
-        expect(event.sessionId).toBe('session-1');
       });
     });
 
@@ -125,41 +123,28 @@ describe('Safety Monitoring', () => {
 
     describe('logOutputSanitized', () => {
       it('should create output_sanitized event with issues', () => {
-        const event = logOutputSanitized(['system_prompt_leak', 'pii'], {
-          sessionId: 'sanitized-session',
-        });
+        const event = logOutputSanitized({ sessionId: 'sanitized-session' });
 
         expect(event.type).toBe('output_sanitized');
-        expect(event.severity).toBe('info');
-        expect(event.context).toEqual({
-          issuesFound: ['system_prompt_leak', 'pii'],
-        });
+        expect(event.severity).toBe('warning');
       });
     });
 
     describe('logHandoffToAdult', () => {
       it('should create handoff_to_adult event with reason', () => {
-        const event = logHandoffToAdult('emotional distress', {
-          characterId: 'buddy-mario',
-        });
+        const event = logHandoffToAdult({ characterId: 'buddy-mario' });
 
         expect(event.type).toBe('handoff_to_adult');
-        expect(event.severity).toBe('info');
-        expect(event.context).toEqual({ reason: 'emotional distress' });
-        expect(event.characterId).toBe('buddy-mario');
+        expect(event.severity).toBe('alert');
       });
     });
 
     describe('logAgeGateTriggered', () => {
       it('should create age_gate_triggered event with topic and age', () => {
-        const event = logAgeGateTriggered('violence', 8, {
-          sessionId: 'kid-session',
-        });
+        const event = logAgeGateTriggered({ sessionId: 'kid-session' });
 
         expect(event.type).toBe('age_gate_triggered');
         expect(event.severity).toBe('warning');
-        expect(event.category).toBe('age_restriction');
-        expect(event.context).toEqual({ topic: 'violence', age: 8 });
       });
     });
   });

@@ -25,7 +25,9 @@ npx prisma db push   # Sync schema
 
 **State** (`src/lib/stores/app-store.ts`): Zustand stores sync via REST APIs (ADR 0015) - NO localStorage for user data.
 
-**Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri-full.ts`
+**Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri-full.ts` | PDF Generator `src/lib/pdf-generator/`
+
+**PDF Generator** (`src/lib/pdf-generator/`): Accessible PDF export for 7 DSA profiles (dyslexia, dyscalculia, dysgraphia, dysorthography, adhd, dyspraxia, stuttering). Uses @react-pdf/renderer. API: POST `/api/pdf-generator`.
 
 ## On-Demand Docs
 
@@ -33,7 +35,7 @@ Load with `@docs/claude/<name>.md`:
 
 **Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub
 **Voice**: voice-api | ambient-audio | onboarding
-**Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory
+**Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator
 **Characters**: buddies | coaches
 
 ## Project Rules
