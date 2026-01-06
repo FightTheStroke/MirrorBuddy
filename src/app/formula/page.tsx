@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Suspense } from 'react';
 import { FormulaRenderer } from '@/components/tools/formula-renderer';
 import type { FormulaRequest } from '@/types/tools';
+import { ToolLayout } from '@/components/tools/tool-layout';
 
 export default function FormulaPage() {
   const [request, setRequest] = useState<FormulaRequest | null>(null);
@@ -17,26 +17,24 @@ export default function FormulaPage() {
   };
 
   return (
-    <main className="h-full">
-      <Suspense fallback={
+    <ToolLayout
+      title="Formula"
+      subtitle="Visualizza e comprendi formule matematiche e scientifiche"
+      backRoute="/astuccio"
+      backLabel="Torna all'Astuccio"
+    >
+      {request ? (
+        <FormulaRenderer request={request} />
+      ) : (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+          <button
+            onClick={handleCreateFormula}
+            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Crea nuova formula
+          </button>
         </div>
-      }>
-        {request ? (
-          <FormulaRenderer request={request} />
-        ) : (
-          <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Formula</h1>
-            <button
-              onClick={handleCreateFormula}
-              className="px-4 py-2 bg-primary text-white rounded-lg"
-            >
-              Crea nuova formula
-            </button>
-          </div>
-        )}
-      </Suspense>
-    </main>
+      )}
+    </ToolLayout>
   );
 }

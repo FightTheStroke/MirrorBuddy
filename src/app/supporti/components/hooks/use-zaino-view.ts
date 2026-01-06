@@ -110,7 +110,7 @@ export function useZainoView({
   );
 
   const filtered = useMemo(() => {
-    if (isLoading || materials.length === 0) return [];
+    if (materials.length === 0) return [];
 
     let result = [...materials];
 
@@ -180,7 +180,6 @@ export function useZainoView({
     isBookmarked,
     debouncedQuery,
     sortBy,
-    isLoading,
   ]);
 
   const handleTypeFilter = useCallback((type: string) => {
