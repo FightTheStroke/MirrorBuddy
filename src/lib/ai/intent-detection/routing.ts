@@ -34,6 +34,17 @@ export function detectIntent(message: string): DetectedIntent {
     ['frustration', 'anxiety', 'sadness', 'loneliness', 'overwhelm'].includes(e)
   );
 
+  if (wantsMethod) {
+    return {
+      type: 'method_help',
+      confidence: 0.8,
+      subject,
+      emotionalIndicators: emotions,
+      recommendedCharacter: 'coach',
+      reason: 'Requesting study method or organization help',
+    };
+  }
+
   if (emotions.length >= 2 && hasStrongNegativeEmotion && !subject) {
     return {
       type: 'emotional_support',
@@ -66,17 +77,6 @@ export function detectIntent(message: string): DetectedIntent {
       emotionalIndicators: emotions,
       recommendedCharacter: 'coach',
       reason: `Tool creation request (${toolType || 'unspecified'}) - coach can help identify subject`,
-    };
-  }
-
-  if (wantsMethod) {
-    return {
-      type: 'method_help',
-      confidence: 0.8,
-      subject,
-      emotionalIndicators: emotions,
-      recommendedCharacter: 'coach',
-      reason: 'Requesting study method or organization help',
     };
   }
 

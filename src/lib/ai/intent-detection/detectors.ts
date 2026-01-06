@@ -41,7 +41,12 @@ export function isCrisis(message: string): boolean {
 }
 
 export function isMethodRequest(message: string): boolean {
-  return METHOD_PATTERNS.some((pattern) => pattern.test(message));
+  if (METHOD_PATTERNS.some((pattern) => pattern.test(message))) {
+    return true;
+  }
+
+  // Fallback keywords to catch wording variations for method/coaching needs
+  return /\b(metodo\s+di\s+studio|organizzarmi|organizz\w*|concentrarmi|concentrar[ei]|gestire\s+(meglio\s+)?(il\s+)?tempo|strategia(\s+di\s+studio)?|tecnica(\s+di\s+studio)?|non\s+so\s+da\s+dove\s+iniziare|studiare\s+meglio|consiglio\s+.*studiare|come\s+(devo|posso)\s+studiare)\b/i.test(message);
 }
 
 export function isToolRequest(message: string): boolean {
