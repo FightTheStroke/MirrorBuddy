@@ -81,7 +81,6 @@ type DebugPage = {
 const debugPages: DebugPage[] = [
   // PAGINE PRINCIPALI (visibili nella sidebar)
   { href: '/', note: 'Home - I Professori' },
-  { href: '/dashboard', note: 'Dashboard studente' },
   
   // REDIRECT - PAGINE MORTE
   { href: '/archivio', note: 'REDIRECT -> /supporti', status: 'redirect' },
@@ -222,7 +221,7 @@ export default function Home() {
     { id: 'astuccio' as const, label: 'Astuccio', icon: Pencil },     // Tools hub (create)
     { id: 'zaino' as const, label: 'Zaino', icon: Backpack },         // Materials archive (browse)
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
-    { id: 'progress' as const, label: 'Dashboard', icon: Trophy },    // Renamed from Progressi
+    { id: 'progress' as const, label: 'Progressi', icon: Trophy },
     { id: 'settings' as const, label: 'Impostazioni', icon: Settings },
     // 'genitori' accessed via Parent Access button at sidebar bottom
   ];
