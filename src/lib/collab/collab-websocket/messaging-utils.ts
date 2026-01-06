@@ -4,7 +4,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import type { CollabEvent } from '../mindmap-room';
+import type { CollabEvent } from '../mindmap-room/events';
 import { connections, roomConnections } from './connection-manager';
 import { unregisterConnectionById } from './connection-manager';
 

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { int16ToFloat32 } from './audio-utils';
 import {
@@ -209,6 +209,7 @@ export function useOutputLevelPolling(
 ) {
   const animationFrameRef = useRef<number | null>(null);
   const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
+  const pollLevelRef = useRef<(() => void) | null>(null);
 
   const pollLevel = useCallback(() => {
     const analyser = playbackAnalyserRef.current;
@@ -239,14 +240,23 @@ export function useOutputLevelPolling(
     setOutputLevel(Math.min(1, (average / 255) * 2.5));
 
     // Continue polling
-    animationFrameRef.current = requestAnimationFrame(pollLevel);
+    animationFrameRef.current = requestAnimationFrame(() => {
+      if (pollLevelRef.current) pollLevelRef.current();
+    });
   }, [playbackAnalyserRef, isPlayingRef, setOutputLevel]);
+
+  useEffect(() => {
+    // Store pollLevel in ref to enable recursion without linter issues
+    pollLevelRef.current = pollLevel;
+  }, [pollLevel]);
 
   const startPolling = useCallback(() => {
     if (!animationFrameRef.current) {
-      animationFrameRef.current = requestAnimationFrame(pollLevel);
+      if (pollLevelRef.current) {
+        animationFrameRef.current = requestAnimationFrame(pollLevelRef.current);
+      }
     }
-  }, [pollLevel]);
+  }, []);
 
   const stopPolling = useCallback(() => {
     if (animationFrameRef.current) {

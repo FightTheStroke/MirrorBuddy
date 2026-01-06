@@ -21,9 +21,8 @@ export function handleCursorMove(
     {
       type: 'user:cursor',
       roomId: connection.roomId,
-      userId: connection.userId,
       timestamp: Date.now(),
-      data: { cursor: data.cursor },
+      data: { cursor: data.cursor, userId: connection.userId },
     },
     connectionId
   );
@@ -43,9 +42,8 @@ export function handleNodeSelect(
     {
       type: 'user:select',
       roomId: connection.roomId,
-      userId: connection.userId,
       timestamp: Date.now(),
-      data: { nodeId: data.nodeId },
+      data: { nodeId: data.nodeId, userId: connection.userId },
     },
     connectionId
   );

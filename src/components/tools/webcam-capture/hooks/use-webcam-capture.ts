@@ -8,7 +8,7 @@ import { logger } from '@/lib/logger';
 import { useSettingsStore } from '@/lib/stores';
 import { isMobile, enumerateCameras as enumerateCamerasUtil, type CameraDevice } from '../utils/camera-utils';
 import { captureImageFromVideo } from '../utils/capture-utils';
-import { TIMER_OPTIONS, type TimerOption, type ErrorType } from '../constants';
+import { TIMER_OPTIONS as _TIMER_OPTIONS, type TimerOption, type ErrorType } from '../constants';
 
 interface UseWebcamCaptureProps {
   showTimer: boolean;
