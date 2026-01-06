@@ -34,10 +34,10 @@ import { PomodoroHeaderWidget } from '@/components/pomodoro';
 import { AmbientAudioHeaderWidget } from '@/components/ambient-audio';
 import {
   LazyCalendarView,
-  LazySupportiView,    // Used for Zaino (archive)
   LazyStudyKitView,    // Used for Astuccio (tools hub)
   LazyGenitoriView,
 } from '@/components/education';
+import { ZainoView } from '@/app/zaino/components/zaino-view';
 import { CharacterChatView, ActiveMaestroAvatar } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
@@ -83,9 +83,9 @@ const debugPages: DebugPage[] = [
   { href: '/', note: 'Home - I Professori' },
   
   // REDIRECT - PAGINE MORTE
-  { href: '/archivio', note: 'REDIRECT -> /supporti', status: 'redirect' },
+  { href: '/archivio', note: 'REDIRECT -> /supporti (ZainoView)', status: 'redirect' },
   { href: '/genitori', note: 'REDIRECT -> /parent-dashboard', status: 'redirect' },
-  { href: '/supporti', note: 'REDIRECT -> /zaino', status: 'redirect' },
+  { href: '/supporti', note: 'ZainoView - tutti i materiali', status: 'ok' },
   
   // PAGINE NON COLLEGATE
   { href: '/materiali', note: 'HomeworkHelpView' },
@@ -113,7 +113,7 @@ const debugPages: DebugPage[] = [
   
   // VIEWS INLINE (usate nel main page.tsx)
   { href: 'inline: astuccio', note: 'LazyStudyKitView', status: 'inline' },
-  { href: 'inline: zaino', note: 'LazySupportiView', status: 'inline' },
+  { href: 'inline: zaino', note: 'ZainoView', status: 'inline' },
   { href: 'inline: calendar', note: 'LazyCalendarView', status: 'inline' },
   { href: 'inline: progress', note: 'LazyProgressView', status: 'inline' },
   { href: 'inline: genitori', note: 'LazyGenitoriView', status: 'inline' },
@@ -527,7 +527,7 @@ export default function Home() {
 
           {currentView === 'astuccio' && <LazyStudyKitView />}
 
-          {currentView === 'zaino' && <LazySupportiView />}
+          {currentView === 'zaino' && <ZainoView />}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 

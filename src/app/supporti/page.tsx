@@ -1,40 +1,40 @@
 'use client';
 
 /**
- * Supporti Page (Wave 4) - DEPRECATED
- * Redirects to /zaino (school metaphor)
+ * Supporti Page - Shows ZainoView directly
  * Route: /supporti
  */
 
-import { useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { ZainoView } from '@/app/zaino/components/zaino-view';
 
-function SupportiRedirect() {
-  const router = useRouter();
+function SupportiContent() {
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    // Preserve query parameters
-    const queryString = searchParams.toString();
-    const destination = queryString ? `/zaino?${queryString}` : '/zaino';
-    router.replace(destination);
-  }, [router, searchParams]);
+  const type = searchParams.get('type') || undefined;
+  const subject = searchParams.get('subject') || undefined;
+  const maestro = searchParams.get('maestro') || undefined;
 
   return (
-    <div className="flex items-center justify-center h-64">
-      <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-    </div>
+    <ZainoView
+      initialType={type}
+      initialSubject={subject}
+      initialMaestro={maestro}
+    />
   );
 }
 
 export default function SupportiPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-      </div>
-    }>
-      <SupportiRedirect />
-    </Suspense>
+    <main className="h-full">
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+        </div>
+      }>
+        <SupportiContent />
+      </Suspense>
+    </main>
   );
 }
