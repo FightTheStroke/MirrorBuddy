@@ -3,15 +3,14 @@
  * @brief Search and controls bar component
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Grid, List, SlidersHorizontal } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Search, X, Grid, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 import { SORT_OPTIONS } from '@/components/education/archive';
 import type { SortBy, ViewMode } from '@/components/education/archive';
-import { AdvancedFilters } from './advanced-filters';
 
 interface SearchControlsProps {
   searchQuery: string;
@@ -20,18 +19,9 @@ interface SearchControlsProps {
   onSortChange: (value: SortBy) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
-  showFilters: boolean;
-  onToggleFilters: () => void;
-  hasAdvancedFilters: boolean;
-  subjectFilter: string | null;
-  maestroFilter: string | null;
-  subjects: string[];
-  allMaestri: Array<{ id: string; name: string }>;
-  counts: {
-    bySubject: Record<string, number>;
-    byMaestro: Record<string, number>;
-  };
-  onNavigate: (params: Record<string, string | null>) => void;
+  hasActiveFilters: boolean;
+  filteredCount: number;
+  onClearFilters: () => void;
 }
 
 export function SearchControls({
@@ -41,15 +31,9 @@ export function SearchControls({
   onSortChange,
   viewMode,
   onViewModeChange,
-  showFilters,
-  onToggleFilters,
-  hasAdvancedFilters,
-  subjectFilter,
-  maestroFilter,
-  subjects,
-  allMaestri,
-  counts,
-  onNavigate,
+  hasActiveFilters,
+  filteredCount,
+  onClearFilters,
 }: SearchControlsProps) {
   return (
     <motion.div
@@ -80,24 +64,21 @@ export function SearchControls({
           )}
         </div>
 
-        <Button
-          variant={showFilters || hasAdvancedFilters ? 'secondary' : 'outline'}
-          onClick={onToggleFilters}
-          className={cn(
-            'gap-2 h-11 min-w-[44px]',
-            hasAdvancedFilters && 'ring-2 ring-primary'
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">
+            {filteredCount} {filteredCount === 1 ? 'risultato' : 'risultati'}
+          </span>
+          {hasActiveFilters && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onClearFilters}
+              className="ml-2"
+            >
+              Resetta filtri
+            </Button>
           )}
-          aria-expanded={showFilters}
-          aria-label="Filtri avanzati"
-        >
-          <SlidersHorizontal className="w-4 h-4" />
-          <span className="hidden sm:inline">Filtri</span>
-          {hasAdvancedFilters && (
-            <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full">
-              {(subjectFilter ? 1 : 0) + (maestroFilter ? 1 : 0)}
-            </span>
-          )}
-        </Button>
+        </div>
 
         <Select value={sortBy} onValueChange={(v) => onSortChange(v as SortBy)}>
           <SelectTrigger className="w-full sm:w-[160px] h-11" aria-label="Ordina per">
@@ -141,21 +122,6 @@ export function SearchControls({
           </Button>
         </div>
       </div>
-
-      <AnimatePresence>
-        {showFilters && (
-          <AdvancedFilters
-            subjectFilter={subjectFilter}
-            maestroFilter={maestroFilter}
-            subjects={subjects}
-            allMaestri={allMaestri}
-            counts={counts}
-            onNavigate={onNavigate}
-            hasAdvancedFilters={hasAdvancedFilters}
-          />
-        )}
-      </AnimatePresence>
     </motion.div>
   );
 }
-

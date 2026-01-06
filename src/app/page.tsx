@@ -34,10 +34,10 @@ import { PomodoroHeaderWidget } from '@/components/pomodoro';
 import { AmbientAudioHeaderWidget } from '@/components/ambient-audio';
 import {
   LazyCalendarView,
-  LazyStudyKitView,    // Used for Astuccio (tools hub)
   LazyGenitoriView,
 } from '@/components/education';
 import { ZainoView } from '@/app/supporti/components/zaino-view';
+import { AstuccioView } from '@/app/astuccio/components/astuccio-view';
 import { CharacterChatView, ActiveMaestroAvatar } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
@@ -81,29 +81,19 @@ type DebugPage = {
 const debugPages: DebugPage[] = [
   // PAGINE PRINCIPALI (visibili nella sidebar)
   { href: '/', note: 'Home - I Professori' },
+  { href: '/supporti', note: 'Zaino - materiali salvati', status: 'ok' },
   
-  // REDIRECT - PAGINE MORTE
-  { href: '/archivio', note: 'REDIRECT -> /supporti (ZainoView)', status: 'redirect' },
-  { href: '/genitori', note: 'REDIRECT -> /parent-dashboard', status: 'redirect' },
-  { href: '/supporti', note: 'ZainoView - tutti i materiali', status: 'ok' },
-  { href: '/zaino', note: 'Deprecated - use /supporti', status: 'dead' },
-  
-  // PAGINE NON COLLEGATE
-  { href: '/materiali', note: 'HomeworkHelpView' },
+  // PAGINE NON COLLEGATE (potenzialmente da rimuovere)
   { href: '/welcome', note: 'Onboarding' },
   { href: '/landing', note: 'Marketing page' },
   { href: '/study-kit', note: 'Study Kit' },
   { href: '/parent-dashboard', note: 'Dashboard genitori standalone' },
+  { href: '/materiali', note: 'HomeworkHelpView' },
   
   // SHOWCASE
   { href: '/showcase', note: 'Showcase home' },
   { href: '/showcase/maestri', note: 'Showcase - Professori' },
-  { href: '/showcase/mindmaps', note: 'Showcase - Mappe mentali' },
-  { href: '/showcase/quiz', note: 'Showcase - Quiz' },
-  { href: '/showcase/flashcards', note: 'Showcase - Flashcards' },
   { href: '/showcase/accessibility', note: 'Showcase - Accessibilita' },
-  { href: '/showcase/chat', note: 'Showcase - Chat simulata' },
-  { href: '/showcase/solar-system', note: 'Showcase - Sistema solare' },
   
   // TEST
   { href: '/test-voice', note: 'Test voice' },
@@ -111,18 +101,6 @@ const debugPages: DebugPage[] = [
   
   // ADMIN
   { href: '/admin/analytics', note: 'Analytics admin' },
-  
-  // VIEWS INLINE (usate nel main page.tsx)
-  { href: 'inline: astuccio', note: 'LazyStudyKitView', status: 'inline' },
-  { href: 'inline: supporti', note: 'ZainoView', status: 'inline' },
-  { href: 'inline: calendar', note: 'LazyCalendarView', status: 'inline' },
-  { href: 'inline: progress', note: 'LazyProgressView', status: 'inline' },
-  { href: 'inline: genitori', note: 'LazyGenitoriView', status: 'inline' },
-  { href: 'inline: settings', note: 'LazySettingsView', status: 'inline' },
-  { href: 'inline: coach', note: 'CharacterChatView (coach)', status: 'inline' },
-  { href: 'inline: buddy', note: 'CharacterChatView (buddy)', status: 'inline' },
-  { href: 'inline: maestri', note: 'MaestriGrid', status: 'inline' },
-  { href: 'inline: maestro-session', note: 'MaestroSession', status: 'inline' },
 ];
 
 export default function Home() {
@@ -526,7 +504,7 @@ export default function Home() {
             />
           )}
 
-          {currentView === 'astuccio' && <LazyStudyKitView />}
+          {currentView === 'astuccio' && <AstuccioView />}
 
           {currentView === 'supporti' && <ZainoView />}
 

@@ -142,3 +142,99 @@ export const containerVariants = {
   },
 };
 
+export const DATE_FILTER_IDS = ['today', 'yesterday', 'week', 'month', 'quarter', 'year', 'all'];
+
+export const DATE_FILTERS: Array<{
+  id: string;
+  label: string;
+  icon: typeof Clock;
+  color: string;
+  getRange: () => { start: Date; end: Date };
+}> = [
+  {
+    id: 'today',
+    label: 'Oggi',
+    icon: Clock,
+    color: 'emerald',
+    getRange: () => {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      return { start, end };
+    },
+  },
+  {
+    id: 'yesterday',
+    label: 'Ieri',
+    icon: Clock,
+    color: 'green',
+    getRange: () => {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59);
+      return { start, end };
+    },
+  },
+  {
+    id: 'week',
+    label: 'Questa settimana',
+    icon: Clock,
+    color: 'teal',
+    getRange: () => {
+      const now = new Date();
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      const start = new Date(now.getFullYear(), now.getMonth(), diff);
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      return { start, end };
+    },
+  },
+  {
+    id: 'month',
+    label: 'Questo mese',
+    icon: Clock,
+    color: 'cyan',
+    getRange: () => {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth(), 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      return { start, end };
+    },
+  },
+  {
+    id: 'quarter',
+    label: 'Ultimi 3 mesi',
+    icon: Clock,
+    color: 'blue',
+    getRange: () => {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), now.getMonth() - 3, now.getDate());
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      return { start, end };
+    },
+  },
+  {
+    id: 'year',
+    label: 'Questo anno',
+    icon: Clock,
+    color: 'indigo',
+    getRange: () => {
+      const now = new Date();
+      const start = new Date(now.getFullYear(), 0, 1);
+      const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+      return { start, end };
+    },
+  },
+  {
+    id: 'all',
+    label: 'Tutto',
+    icon: Clock,
+    color: 'slate',
+    getRange: () => {
+      const start = new Date(2000, 0, 1);
+      const end = new Date(2100, 11, 31);
+      return { start, end };
+    },
+  },
+];
+

@@ -45,9 +45,17 @@ export function ProgressView() {
     .filter((s) => s.endedAt && new Date(s.startedAt) >= today)
     .reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
 
-  const now = Date.now();
-  const weekAgo = new Date(now - 7 * 24 * 60 * 60 * 1000);
-  const twoWeeksAgo = new Date(now - 14 * 24 * 60 * 60 * 1000);
+  const dateRange = useMemo(() => {
+    const now = new Date();
+    const weekAgo = new Date(now);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const twoWeeksAgo = new Date(now);
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    return { weekAgo, twoWeeksAgo };
+  }, []);
+
+  const weekAgo = dateRange.weekAgo;
+  const twoWeeksAgo = dateRange.twoWeeksAgo;
 
   const weeklyMinutes = sessionHistory
     .filter((s) => s.endedAt && new Date(s.startedAt) >= weekAgo)
@@ -76,8 +84,8 @@ export function ProgressView() {
   const currentLevelXP = xp % xpToNextLevel;
   const levelProgress = (currentLevelXP / xpToNextLevel) * 100;
 
-  const unlockedAchievementIds = (achievements || []).map(a => a.id);
-  const achievementProgress = (unlockedAchievementIds.length / ACHIEVEMENTS.length) * 100;
+  const _unlockedAchievementIds = (achievements || []).map(a => a.id);
+  const _achievementProgress = (_unlockedAchievementIds.length / ACHIEVEMENTS.length) * 100;
 
   const masteriesRecord = useMemo(() => {
     const record: Record<string, typeof masteries[0]> = {};
@@ -196,7 +204,7 @@ export function ProgressView() {
 
         {activeTab === 'achievements' && (
           <AchievementsTab
-            unlocked={unlockedAchievementIds}
+            unlocked={_unlockedAchievementIds}
             allAchievements={ACHIEVEMENTS}
           />
         )}

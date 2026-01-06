@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence } from 'framer-motion';
+import { AlertCircle } from 'lucide-react';
 import { MaterialViewer } from '@/components/education/archive';
 import { useZainoView } from './hooks/use-zaino-view';
 import { ZainoHeader } from './components/zaino-header';
@@ -13,13 +14,11 @@ import { EmptyStateTips } from './components/empty-state-tips';
 interface ZainoViewProps {
   initialType?: string;
   initialSubject?: string;
-  initialMaestro?: string;
 }
 
 export function ZainoView({
   initialType,
   initialSubject,
-  initialMaestro,
 }: ZainoViewProps) {
   const {
     sortBy,
@@ -29,18 +28,15 @@ export function ZainoView({
     viewMode,
     setViewMode,
     isLoading,
+    error,
     selectedItem,
     filtered,
-    showFilters,
-    setShowFilters,
     typeFilter,
+    dateFilter,
     subjectFilter,
-    maestroFilter,
+    subjects,
     isPercorsi,
     counts,
-    subjects,
-    allMaestri,
-    hasAdvancedFilters,
     selectedPathId,
     setSelectedPathId,
     selectedTopicId,
@@ -51,23 +47,44 @@ export function ZainoView({
     handleBookmark,
     handleRate,
     handleTypeFilter,
+    handleDateFilter,
+    handleSubjectFilter,
+    clearAllFilters,
     getFilterCount,
-    navigate,
+    getSubjectFilterCount,
+    hasActiveFilters,
     debouncedQuery,
-  } = useZainoView({ initialType, initialSubject, initialMaestro });
+  } = useZainoView({ initialType, initialSubject });
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <ZainoHeader />
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
+            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-red-700 dark:text-red-300 mb-2">
+              Qualcosa è andato storto
+            </h3>
+            <p className="text-red-600 dark:text-red-400">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Ricarica la pagina
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-teal-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <ZainoHeader />
 
-        <FilterChips
-          typeFilter={typeFilter}
-          onFilterChange={handleTypeFilter}
-          getFilterCount={getFilterCount}
-        />
-
-        {!isPercorsi && (
+        <div className="mb-6">
           <SearchControls
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
@@ -75,17 +92,23 @@ export function ZainoView({
             onSortChange={setSortBy}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
-            showFilters={showFilters}
-            onToggleFilters={() => setShowFilters(!showFilters)}
-            hasAdvancedFilters={hasAdvancedFilters}
-            subjectFilter={subjectFilter}
-            maestroFilter={maestroFilter}
-            subjects={subjects}
-            allMaestri={allMaestri}
-            counts={counts}
-            onNavigate={navigate}
+            hasActiveFilters={hasActiveFilters}
+            filteredCount={filtered.length}
+            onClearFilters={clearAllFilters}
           />
-        )}
+        </div>
+
+        <FilterChips
+          typeFilter={typeFilter}
+          dateFilter={dateFilter}
+          subjectFilter={subjectFilter}
+          subjects={subjects}
+          onTypeFilterChange={handleTypeFilter}
+          onDateFilterChange={handleDateFilter}
+          onSubjectFilterChange={handleSubjectFilter}
+          getTypeFilterCount={getFilterCount}
+          getSubjectFilterCount={getSubjectFilterCount}
+        />
 
         {isPercorsi ? (
           <LearningPathsView
