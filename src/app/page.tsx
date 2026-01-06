@@ -80,9 +80,8 @@ type DebugPage = {
 
 const debugPages: DebugPage[] = [
   // PAGINE PRINCIPALI (visibili nella sidebar)
-  { href: '/', note: 'Home (page.tsx principale)' },
+  { href: '/', note: 'Home - I Professori' },
   { href: '/dashboard', note: 'Dashboard studente' },
-  { href: '/conversazioni', note: 'Chat standalone' },
   
   // REDIRECT - PAGINE MORTE
   { href: '/archivio', note: 'REDIRECT -> /supporti', status: 'redirect' },
