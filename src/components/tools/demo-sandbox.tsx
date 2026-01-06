@@ -5,23 +5,24 @@ import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface DemoSandboxProps {
-  data: {
+  data?: {
     title?: string;
     html: string;
     css?: string;
     js?: string;
-  };
+  } | null;
 }
 
-// Note: Validation is already done by demo-handler.ts before reaching this component.
-// The demo-handler sanitizes HTML and validates JS before returning data.
-// This component trusts the data has been pre-validated.
-
-export function DemoSandbox({ data }: DemoSandboxProps) {
+export function DemoSandbox(props: DemoSandboxProps) {
+  const { data } = props;
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [key, setKey] = useState(0);
 
-  const { html, css = '', js = '' } = data;
+  const demoData = data || { html: '<div class="p-8 text-center"><h2 class="text-2xl font-bold mb-4">Demo Interattiva</h2><p>Seleziona un maestro per creare una demo</p></div>' };
+  const html = demoData.html || '';
+  const css = demoData.css || '';
+  const js = demoData.js || '';
+  const title = demoData.title || 'Simulazione Interattiva';
 
   const fullHtml = `
     <!DOCTYPE html>
@@ -49,7 +50,7 @@ export function DemoSandbox({ data }: DemoSandboxProps) {
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-2 px-4 pt-4">
         <h3 className="font-medium text-slate-900 dark:text-white">
-          {data.title || 'Simulazione Interattiva'}
+          {title}
         </h3>
         <Button variant="ghost" size="sm" onClick={handleRefresh}>
           <RefreshCw className="w-4 h-4 mr-1" />

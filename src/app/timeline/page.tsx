@@ -1,8 +1,9 @@
 'use client';
 
-import { Suspense } from 'react';
+import { useState } from 'react';
 import { TimelineView } from '@/components/education/knowledge-hub/views/timeline-view';
 import type { KnowledgeHubMaterial } from '@/components/education/knowledge-hub/views';
+import { ToolLayout } from '@/components/tools/tool-layout';
 
 export default function TimelinePage() {
   const handleSelectMaterial = (material: KnowledgeHubMaterial) => {
@@ -10,17 +11,16 @@ export default function TimelinePage() {
   };
 
   return (
-    <main className="h-full">
-      <Suspense fallback={
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-        </div>
-      }>
-        <TimelineView
-          materials={[]}
-          onSelectMaterial={handleSelectMaterial}
-        />
-      </Suspense>
-    </main>
+    <ToolLayout
+      title="Linea Temporale"
+      subtitle="Organizza eventi storici o sequenze in modo visivo"
+      backRoute="/astuccio"
+      backLabel="Torna all'Astuccio"
+    >
+      <TimelineView
+        materials={[]}
+        onSelectMaterial={handleSelectMaterial}
+      />
+    </ToolLayout>
   );
 }

@@ -1,42 +1,41 @@
 'use client';
 
 import { useState } from 'react';
-import { Suspense } from 'react';
 import { ChartRenderer } from '@/components/tools/chart-renderer';
 import type { ChartRequest } from '@/types/tools';
+import { ToolLayout } from '@/components/tools/tool-layout';
 
 export default function ChartPage() {
   const [request, setRequest] = useState<ChartRequest | null>(null);
 
   const handleCreateChart = () => {
-    setRequest({
+    const newChart: ChartRequest = {
       type: 'bar',
       title: 'Nuovo Grafico',
       data: { labels: [], datasets: [] },
-    });
+    };
+    setRequest(newChart);
   };
 
   return (
-    <main className="h-full">
-      <Suspense fallback={
+    <ToolLayout
+      title="Grafico"
+      subtitle="Crea grafici e visualizzazioni per dati e statistiche"
+      backRoute="/astuccio"
+      backLabel="Torna all'Astuccio"
+    >
+      {request ? (
+        <ChartRenderer request={request} />
+      ) : (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+          <button
+            onClick={handleCreateChart}
+            className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+          >
+            Crea nuovo grafico
+          </button>
         </div>
-      }>
-        {request ? (
-          <ChartRenderer request={request} />
-        ) : (
-          <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Grafico</h1>
-            <button
-              onClick={handleCreateChart}
-              className="px-4 py-2 bg-primary text-white rounded-lg"
-            >
-              Crea nuovo grafico
-            </button>
-          </div>
-        )}
-      </Suspense>
-    </main>
+      )}
+    </ToolLayout>
   );
 }

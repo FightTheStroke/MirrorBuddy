@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense } from 'react';
 import { SearchResults } from '@/components/tools/search-results';
 import type { SearchResult } from '@/types/tools';
+import { ToolLayout } from '@/components/tools/tool-layout';
 
 export default function SearchPage() {
   const searchData = {
@@ -11,14 +11,13 @@ export default function SearchPage() {
   };
 
   return (
-    <main className="h-full">
-      <Suspense fallback={
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-        </div>
-      }>
-        <SearchResults data={searchData} />
-      </Suspense>
-    </main>
+    <ToolLayout
+      title="Ricerca Web"
+      subtitle="Cerca informazioni, video e risorse educative sul web"
+      backRoute="/astuccio"
+      backLabel="Torna all'Astuccio"
+    >
+      <SearchResults data={searchData} />
+    </ToolLayout>
   );
 }

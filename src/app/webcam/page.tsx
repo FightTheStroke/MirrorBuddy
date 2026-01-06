@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Suspense } from 'react';
 import { WebcamCapture } from '@/components/tools/webcam-capture';
+import { ToolLayout } from '@/components/tools/tool-layout';
 
 export default function WebcamPage() {
   const [purpose] = useState<'homework' | 'notes'>('homework');
@@ -17,18 +17,17 @@ export default function WebcamPage() {
   }, []);
 
   return (
-    <main className="h-full">
-      <Suspense fallback={
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
-        </div>
-      }>
-        <WebcamCapture
-          purpose={purpose}
-          onCapture={handleCapture}
-          onClose={handleClose}
-        />
-      </Suspense>
-    </main>
+    <ToolLayout
+      title="Scatta Foto"
+      subtitle="Fotografa la lavagna o i tuoi appunti per generare materiali"
+      backRoute="/astuccio"
+      backLabel="Torna all'Astuccio"
+    >
+      <WebcamCapture
+        purpose={purpose}
+        onCapture={handleCapture}
+        onClose={handleClose}
+      />
+    </ToolLayout>
   );
 }
