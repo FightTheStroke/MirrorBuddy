@@ -37,6 +37,7 @@ export function logJailbreakAttempt(a?: string | LogOpts, b?: string, c?: string
   return logSafetyEvent('jailbreak_attempt', 'alert', {
     userId: opts.userId,
     sessionId: opts.sessionId,
+    category: opts.category ?? 'jailbreak',
     context: { category: opts.category ?? opts.reason },
   });
 }
@@ -46,6 +47,7 @@ export function logCrisisDetected(a?: string | LogOpts, b?: string, c?: string[]
   return logSafetyEvent('crisis_detected', 'critical', {
     userId: opts.userId,
     sessionId: opts.sessionId,
+    category: opts.category ?? 'crisis',
     context: { keywords: opts.keywords },
     autoHandled: false,
   });
@@ -80,10 +82,20 @@ export function logAgeGateTriggered(a?: string | LogOpts, b?: string, c?: number
 
 export function shouldTerminateSession(sessionId: string): boolean {
   const sessionEvents = eventBuffer.filter(e => e.sessionId === sessionId);
-  const criticalCount = sessionEvents.filter(
-    e => e.severity === 'critical' || e.type === 'crisis_detected'
-  ).length;
-  return criticalCount >= 2;
+  
+  // Terminate on any critical event
+  const hasCritical = sessionEvents.some(e => e.severity === 'critical');
+  if (hasCritical) return true;
+  
+  // Terminate on 3+ alert events
+  const alertCount = sessionEvents.filter(e => e.severity === 'alert').length;
+  if (alertCount >= 3) return true;
+  
+  // Terminate on 2+ jailbreak attempts
+  const jailbreakCount = sessionEvents.filter(e => e.type === 'jailbreak_attempt').length;
+  if (jailbreakCount >= 2) return true;
+  
+  return false;
 }
 
 export function clearEventBuffer(): void {
