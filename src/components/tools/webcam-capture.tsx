@@ -7,7 +7,7 @@ import { useWebcamCapture } from './webcam-capture/hooks/use-webcam-capture';
 import { WebcamHeader } from './webcam-capture/components/webcam-header';
 import { WebcamPreview } from './webcam-capture/components/webcam-preview';
 import { WebcamControls } from './webcam-capture/components/webcam-controls';
-import { isContinuityCamera, type CameraDevice } from './webcam-capture/utils/camera-utils';
+import { isContinuityCamera as _isContinuityCamera, type CameraDevice } from './webcam-capture/utils/camera-utils';
 
 interface WebcamCaptureProps {
   purpose: string;

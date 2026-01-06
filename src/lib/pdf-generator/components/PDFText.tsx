@@ -4,9 +4,9 @@
  */
 
 import React from 'react';
-import { Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Text, View as _View, StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
-import { operatorColors, wordPartColors } from '../profiles';
+import { operatorColors, wordPartColors as _wordPartColors } from '../profiles';
 
 // Use generic style type compatible with react-pdf
 type PDFStyle = object | object[];
@@ -140,7 +140,7 @@ function processForDysorthography(text: string): React.ReactNode {
   if (typeof text !== 'string') return text;
 
   // Common Italian spelling patterns to highlight
-  const patterns = [
+  const _patterns = [
     /\b(gli|gn|sc|ch|gh)\w*/gi,
   ];
 

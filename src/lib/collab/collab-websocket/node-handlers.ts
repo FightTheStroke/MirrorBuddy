@@ -3,10 +3,12 @@
  * @brief Node operation handlers
  */
 
-import type { MindmapNode } from '@/lib/tools/mindmap-export';
+import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
+import type { MindmapNode } from '@/types/tools';
 import { addNode, updateNode, deleteNode, moveNode, getRoomState } from '../mindmap-room';
 import { connections } from './connection-manager';
 import { sendToConnection, broadcastToRoom } from './messaging-utils';
+import { convertExportNodeToToolNode } from '../mindmap-room/node-converter';
 
 export function handleNodeAdd(
   connectionId: string,
@@ -15,21 +17,15 @@ export function handleNodeAdd(
   const connection = connections.get(connectionId);
   if (!connection || !connection.roomId) return;
 
-  const result = addNode(
-    connection.roomId,
-    connection.userId,
-    data.node,
-    data.parentId
-  );
+  const toolNode = 'text' in data.node ? convertExportNodeToToolNode(data.node as ExportNode) : data.node;
+  const result = addNode(connection.roomId, connection.userId, toolNode, data.parentId);
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:add',
+      type: 'node:added',
       roomId: connection.roomId,
-      userId: connection.userId,
+      data: { nodeId: toolNode.id, node: toolNode, parentId: data.parentId, userId: connection.userId },
       timestamp: Date.now(),
-      version: result.version,
-      data: { node: data.node, parentId: data.parentId },
     });
 
     sendToConnection(connectionId, {
@@ -47,26 +43,27 @@ export function handleNodeAdd(
 
 export function handleNodeUpdate(
   connectionId: string,
-  data: { nodeId: string; changes: Partial<MindmapNode> }
+  data: { nodeId: string; changes: Partial<MindmapNode> | Partial<ExportNode> }
 ): void {
   const connection = connections.get(connectionId);
   if (!connection || !connection.roomId) return;
+
+  const toolChanges: Partial<MindmapNode> =
+    'text' in data.changes && data.changes.text ? { label: data.changes.text } : (data.changes as Partial<MindmapNode>);
 
   const result = updateNode(
     connection.roomId,
     connection.userId,
     data.nodeId,
-    data.changes
+    toolChanges
   );
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:update',
+      type: 'node:updated',
       roomId: connection.roomId,
-      userId: connection.userId,
+      data: { nodeId: data.nodeId, changes: toolChanges, userId: connection.userId },
       timestamp: Date.now(),
-      version: result.version,
-      data: { nodeId: data.nodeId, changes: data.changes },
     });
 
     sendToConnection(connectionId, {
@@ -97,12 +94,10 @@ export function handleNodeDelete(
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:delete',
+      type: 'node:deleted',
       roomId: connection.roomId,
-      userId: connection.userId,
+      data: { nodeId: data.nodeId, userId: connection.userId },
       timestamp: Date.now(),
-      version: result.version,
-      data: { nodeId: data.nodeId },
     });
 
     sendToConnection(connectionId, {
@@ -134,12 +129,10 @@ export function handleNodeMove(
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:move',
+      type: 'node:moved',
       roomId: connection.roomId,
-      userId: connection.userId,
+      data: { nodeId: data.nodeId, newParentId: data.newParentId, userId: connection.userId },
       timestamp: Date.now(),
-      version: result.version,
-      data: { nodeId: data.nodeId, targetParentId: data.newParentId },
     });
 
     sendToConnection(connectionId, {

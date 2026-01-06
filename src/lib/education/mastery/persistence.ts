@@ -6,6 +6,7 @@
 
 import { logger } from '@/lib/logger';
 import type { MasteryState, TopicProgress } from './types';
+import { SkillStatus } from './types';
 
 /**
  * Serialize mastery state for API storage
@@ -43,7 +44,7 @@ function deserializeMasteryState(data: unknown[]): MasteryState {
       ...typedItem,
       lastAttempt: new Date(typedItem.lastAttempt),
       masteredAt: typedItem.masteredAt ? new Date(typedItem.masteredAt) : undefined,
-      status: typedItem.status as any,
+      status: (typedItem.status as SkillStatus) || SkillStatus.NOT_STARTED,
     });
   }
 

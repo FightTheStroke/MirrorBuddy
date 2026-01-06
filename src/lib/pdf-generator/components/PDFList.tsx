@@ -75,7 +75,7 @@ function createListStyles(profile: ProfileConfig) {
 /**
  * Get bullet character based on profile
  */
-function getBullet(profile: ProfileConfig, index: number): string {
+function getBullet(profile: ProfileConfig, _index: number): string {
   if (profile.options.bulletPoints) {
     return '\u2022'; // Standard bullet
   }

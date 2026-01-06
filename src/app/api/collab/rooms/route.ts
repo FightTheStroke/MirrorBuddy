@@ -7,10 +7,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { createRoom, getRoomStats } from '@/lib/collab/mindmap-room';
-import type { MindmapData } from '@/lib/tools/mindmap-export';
+import type { MindmapData as ExportMindmapData } from '@/lib/tools/mindmap-export';
+import type { MindmapData as _MindmapData } from '@/lib/collab/mindmap-room';
+import { convertExportNodeToToolNode } from '@/lib/collab/mindmap-room/node-converter';
 
 interface CreateRoomRequest {
-  mindmap: MindmapData;
+  mindmap: ExportMindmapData;
   user: {
     id: string;
     name: string;
@@ -49,21 +51,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate room ID
+    const roomId = `room_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
+
+    // Convert export format to tool format
+    const toolRoot = convertExportNodeToToolNode(mindmap.root);
+
     // Create room
-    const room = createRoom(mindmap, user);
+    const room = createRoom(roomId, user, toolRoot);
 
     logger.info('Collaboration room created via API', {
-      roomId: room.roomId,
+      roomId: room.id,
       hostId: user.id,
-      mindmapTitle: mindmap.title,
     });
 
     return NextResponse.json({
       success: true,
       room: {
-        roomId: room.roomId,
-        mindmapId: room.mindmapId,
-        hostId: room.hostId,
+        roomId: room.id,
         participantCount: room.participants.size,
         version: room.version,
         createdAt: room.createdAt,

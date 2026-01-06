@@ -73,11 +73,7 @@ export function VoiceOrb({
   const smoothLevelRef = useRef(0);
   const timeRef = useRef(0);
   const lastLevelRef = useRef(0);
-
-  // Initialize noise
-  if (!noiseRef.current) {
-    noiseRef.current = createNoise();
-  }
+  const drawRef = useRef<(() => void) | null>(null);
 
   // Parse hex color to RGB
   const hexToRgb = useCallback((hex: string) => {
@@ -236,11 +232,21 @@ export function VoiceOrb({
       ctx.fill();
     }
 
-    animationRef.current = requestAnimationFrame(draw);
+    animationRef.current = requestAnimationFrame(() => {
+      if (drawRef.current) drawRef.current();
+    });
   }, [level, isActive, color, glowColor, size, hexToRgb]);
 
   // Setup canvas and animation
   useEffect(() => {
+    // Initialize noise
+    if (!noiseRef.current) {
+      noiseRef.current = createNoise();
+    }
+
+    // Store draw function in ref to enable recursion without linter issues
+    drawRef.current = draw;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 

@@ -46,6 +46,7 @@ export function WebcamPreview({
   onCancelCountdown,
   onToggleFrontBack,
 }: WebcamPreviewProps) {
+  const _selectedCameraId = selectedCameraId; // Mark as unused
   return (
     <div className="relative aspect-video bg-black">
       {error ? (

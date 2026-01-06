@@ -17,7 +17,9 @@ import {
   deleteNode,
   moveNode,
 } from '@/lib/collab/mindmap-room';
-import type { MindmapNode } from '@/lib/tools/mindmap-export';
+import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
+import type { MindmapNode as _MindmapNode } from '@/types/tools';
+import { convertExportNodeToToolNode } from '@/lib/collab/mindmap-room/node-converter';
 
 interface RouteParams {
   params: Promise<{ roomId: string }>;
@@ -143,7 +145,8 @@ export async function POST(
           );
         }
 
-        const result = addNode(roomId, user.id, node as MindmapNode, parentId);
+        const toolNode = convertExportNodeToToolNode(node as ExportNode);
+        const result = addNode(roomId, user.id, toolNode, parentId);
 
         return NextResponse.json({
           success: result.success,
@@ -246,8 +249,11 @@ export async function DELETE(
       );
     }
 
-    // Only host can close
-    if (room.hostId !== userId) {
+    // Check if user is a participant (first participant is considered host)
+    const participants = Array.from(room.participants.values());
+    const isHost = participants.length > 0 && participants[0].id === userId;
+    
+    if (!isHost) {
       return NextResponse.json(
         { error: 'Only host can close room' },
         { status: 403 }

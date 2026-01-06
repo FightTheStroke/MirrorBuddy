@@ -4,7 +4,9 @@
  */
 
 import { logger } from '@/lib/logger';
-import type { MindmapNode } from '@/lib/tools/mindmap-export';
+import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
+import type { MindmapNode as _MindmapNode } from '@/types/tools';
+import { convertExportNodeToToolNode } from '../mindmap-room/node-converter';
 import type { CollabMessage } from './types';
 import { connections } from './connection-manager';
 import { sendToConnection } from './messaging-utils';
@@ -51,12 +53,14 @@ export function handleMessage(
       connection.isAlive = true;
       break;
 
-    case 'room:create':
-      handleCreateRoom(connectionId, message.data as {
-        mindmap: { title: string; root: MindmapNode };
+    case 'room:create': {
+      const data = message.data as {
+        mindmap: { title: string; root: ExportNode };
         user: { id: string; name: string; avatar: string };
-      });
+      };
+      handleCreateRoom(connectionId, data);
       break;
+    }
 
     case 'room:join':
       handleJoinRoom(connectionId, message.roomId!, message.data as {
@@ -84,19 +88,29 @@ export function handleMessage(
       });
       break;
 
-    case 'node:add':
-      handleNodeAdd(connectionId, message.data as {
-        node: MindmapNode;
+    case 'node:add': {
+      const data = message.data as {
+        node: ExportNode;
         parentId: string;
+      };
+      handleNodeAdd(connectionId, {
+        node: convertExportNodeToToolNode(data.node),
+        parentId: data.parentId,
       });
       break;
+    }
 
-    case 'node:update':
-      handleNodeUpdate(connectionId, message.data as {
+    case 'node:update': {
+      const data = message.data as {
         nodeId: string;
-        changes: Partial<MindmapNode>;
+        changes: Partial<ExportNode>;
+      };
+      handleNodeUpdate(connectionId, {
+        nodeId: data.nodeId,
+        changes: data.changes,
       });
       break;
+    }
 
     case 'node:delete':
       handleNodeDelete(connectionId, message.data as {
