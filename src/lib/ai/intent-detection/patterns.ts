@@ -3,32 +3,32 @@ import type { EmotionalIndicator } from './types';
 
 export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
   mathematics: [
-    /\b(matemat|calcol|equazion|formul|geometr|algebra|aritmetica)\b/i,
+    /\b(matematic\w*|calcol\w*|equazion\w*|formul\w*|geometr\w*|algebr\w*|aritmetic\w*|derivat\w*|percentual\w*)\b/i,
     /\b(problema|esercizio)\s+(di\s+)?(matematica|calcolo)\b/i,
   ],
   physics: [
-    /\b(fisica|forza|energia|velocità|accelerazione|moto|gravità)\b/i,
-    /\b(legge|principio)\s+(di\s+)?(fisica|newton)\b/i,
+    /\b(fisic\w*|forz\w*|energia\w*|velocità|velocita|acceleraz\w*|moto\b|gravità|gravita|cinematic\w*|dinamic\w*|meccanic\w*)\b/i,
+    /\b(legge|leggi|principio)\s+(di\s+)?(fisica|newton)\b/i,
   ],
   chemistry: [
     /\b(chimica|elemento|composto|reazione|molecola|atomo)\b/i,
     /\b(tavola\s+periodica|formula\s+chimica)\b/i,
   ],
   biology: [
-    /\b(biologia|cellula|organismo|sistema|anatomia|fisiologia)\b/i,
+    /\b(biologia|cellula|organismo|sistema|anatomia|fisiologia|fotosintes[iì])\b/i,
     /\b(pianta|animale|corpo\s+umano)\b/i,
   ],
   history: [
-    /\b(storia|storico|epoca|periodo|guerra|battaglia)\b/i,
-    /\b(antico|medioevo|rinascimento|rivoluzione)\b/i,
+    /\b(storia|storico|epoca|periodo|guerra|battaglia|risorgimento|romana|romani|greci|grecia|greco)\b/i,
+    /\b(antico|antich[iy]|medioevo|medioevale|rinascimento|rivoluzione|mondiale)\b/i,
   ],
   geography: [
     /\b(geografia|paese|nazione|continente|capitale|montagna|fiume)\b/i,
     /\b(mappa|cartina|territorio)\b/i,
   ],
   italian: [
-    /\b(italiano|grammatica|sintassi|analisi|letteratura|poesia)\b/i,
-    /\b(verbo|sostantivo|aggettivo|analisi\s+grammaticale)\b/i,
+    /\b(italiano|grammatica|sintassi|analisi|letteratura|poesia|divina\s+commedia|promessi\s+sposi|manzoni|dante)\b/i,
+    /\b(verbo|sostantivo|aggettivo|analisi\s+grammaticale|analisi\s+del\s+periodo)\b/i,
   ],
   english: [
     /\b(inglese|english|grammar|verb|noun|adjective)\b/i,
@@ -44,7 +44,9 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
   ],
   civics: [],
   economics: [],
-  computerScience: [],
+  computerScience: [
+    /\b(informatica|programmazione|coding|algoritm[oi]|computer|software|hardware)\b/i,
+  ],
   health: [],
   philosophy: [],
   internationalLaw: [],
@@ -52,28 +54,28 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
 
 export const EMOTIONAL_PATTERNS: Record<EmotionalIndicator, RegExp[]> = {
   frustration: [
-    /\b(non\s+capisco|non\s+riesco|difficile|impossibile|frustrato)\b/i,
-    /\b(bloccato|perso|confuso)\b/i,
+    /\b(non\s+capisco|non\s+riesco|difficile|impossibile|frustrat[oa])\b/i,
+    /\b(bloccato|perso|confuso|non\s+ce\s+la\s+faccio|mi\s+arrendo|stuf[ao])\b/i,
   ],
   anxiety: [
-    /\b(ansia|ansioso|preoccupato|paura|timore)\b/i,
-    /\b(non\s+ce\s+la\s+faccio|tempo|scadenza)\b/i,
+    /\b(ansia|ansioso|ansiosa|preoccupat[oa]|paura|timore|stressat[oa]|stress)\b/i,
+    /\b(non\s+ce\s+la\s+faccio\s+in\s+tempo|poco\s+tempo|senza\s+tempo|scadenza|in\s+ritardo)\b/i,
   ],
   sadness: [
-    /\b(triste|tristezza|depresso|demoralizzato)\b/i,
-    /\b(male|male|non\s+va\s+bene)\b/i,
+    /\b(trist[oe]|tristezza|depresso|depressa|demoralizzat[oa])\b/i,
+    /\b(male|non\s+va\s+bene|non\s+ho\s+voglia|mi\s+sento\s+giu)\b/i,
   ],
   loneliness: [
-    /\b(solo|solitario|isolato|nessuno)\b/i,
-    /\b(non\s+ho\s+amici|nessuno\s+mi\s+capisce)\b/i,
+    /\b(solo|solitaria?|isolat[oa]|nessuno)\b/i,
+    /\b(non\s+ho\s+amici|nessuno\s+mi\s+capisce|mi\s+sento\s+sol[oa]|mi\s+sento\s+esclus[oa]|emarginat[oa])\b/i,
   ],
   overwhelm: [
     /\b(troppo|troppa|sovraccarico|sopraffatto)\b/i,
     /\b(non\s+so\s+da\s+dove\s+iniziare|troppe\s+cose)\b/i,
   ],
   excitement: [
-    /\b(eccitato|entusiasta|felice|contento)\b/i,
-    /\b(bello|fantastico|meraviglioso)\b/i,
+    /\b(eccitat[oa]|entusiasta|felice|content[oa]|evviva)\b/i,
+    /\b(bello|fantastico|meraviglioso|ce\s+l'ho\s+fatta|finalmente)\b/i,
   ],
   confidence: [
     /\b(sicuro|fiducioso|capace|bravo)\b/i,
@@ -82,16 +84,15 @@ export const EMOTIONAL_PATTERNS: Record<EmotionalIndicator, RegExp[]> = {
 };
 
 export const METHOD_PATTERNS: RegExp[] = [
-  /\b(come\s+studio|metodo\s+di\s+studio|organizz|pianific)\b/i,
-  /\b(come\s+imparo|tecnica|strategia)\b/i,
-  /\b(come\s+ripasso|schemat|riassunt)\b/i,
+  /\b(come\s+studio|come\s+(devo|posso)\s+studiare|metodo\s+di\s+studio|organizz|pianific|non\s+so\s+da\s+dove\s+iniziare)\b/i,
+  /\b(come\s+imparo|tecnica|strategia|memorizz|concentr[ao]|concentrarmi)\b/i,
+  /\b(come\s+ripasso|schemat|riassunt|gestire\s+(meglio\s+)?(il\s+)?tempo)\b/i,
 ];
 
 export const TOOL_PATTERNS: RegExp[] = [
-  /\b(mappa\s+mentale|schema|diagramma)\b/i,
-  /\b(flashcard|carte|ripasso)\b/i,
-  /\b(quiz|test|verifica)\b/i,
-  /\b(mi\s+aiuti|fai)\s+(a\s+fare|con)\s+(le\s+)?flashcard\b/i,
+  /\b(crea(mi)?|fammi|fai|genera|prepara|costruisci|voglio|vorrei|dammi)\s+(una\s+)?(mappa\s*(mentale|concettuale)?|schema|diagramma|flashcard|carte\s+di\s+ripasso|quiz|test|verifica)\b/i,
+  /\b(flashcard|mappa\s*(mentale|concettuale)?|schema)\b.*\b(su|di)\b/i,
+  /\b(prepara|crea)\b.*\b(quiz|test|verifica)\b/i,
 ];
 
 export const TECH_SUPPORT_PATTERNS: RegExp[] = [
@@ -106,12 +107,13 @@ export const TECH_SUPPORT_PATTERNS: RegExp[] = [
   /\b(account|profilo|login|accesso|password)\b.*\b(creare|cambiare|recuperare|dove)\b/i,
   /\b(bug|errore|problema\s+tecnico|bloccato)\b/i,
   /\b(non\s+(carica|funziona|si\s+apre|risponde|va))\b/i,
+  /\b(badge|punti\s+(esperienza|xp)|streak)\b/i,
 ];
 
 export const TOOL_TYPE_PATTERNS: Record<ToolType, RegExp[]> = {
   mindmap: [
     /\b(mappa\s*(mentale|concettuale)?)\b/i,
-    /\b(schema|diagramma)\b/i,
+    /\b(schema|diagramma|mappa)\b/i,
     /\b(organizza\s*(le\s+)?idee)\b/i,
   ],
   quiz: [
