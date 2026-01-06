@@ -48,9 +48,9 @@ import { FocusToolLayout } from '@/components/tools/focus-tool-layout';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
 
-// Simplified views: removed quiz, flashcards, mindmaps, summaries, homework, demos, archivio
-// These are now accessed via Zaino (browse) or Astuccio (create)
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'astuccio' | 'zaino' | 'calendar' | 'progress' | 'genitori' | 'settings';
+// Simplified views: removed quiz, flashcards, mindmaps, summaries, homework, demos, archivio, zaino
+// These are now accessed via Supporti (browse) or Astuccio (create)
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'astuccio' | 'supporti' | 'calendar' | 'progress' | 'genitori' | 'settings';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -86,6 +86,7 @@ const debugPages: DebugPage[] = [
   { href: '/archivio', note: 'REDIRECT -> /supporti (ZainoView)', status: 'redirect' },
   { href: '/genitori', note: 'REDIRECT -> /parent-dashboard', status: 'redirect' },
   { href: '/supporti', note: 'ZainoView - tutti i materiali', status: 'ok' },
+  { href: '/zaino', note: 'Deprecated - use /supporti', status: 'dead' },
   
   // PAGINE NON COLLEGATE
   { href: '/materiali', note: 'HomeworkHelpView' },
@@ -113,7 +114,7 @@ const debugPages: DebugPage[] = [
   
   // VIEWS INLINE (usate nel main page.tsx)
   { href: 'inline: astuccio', note: 'LazyStudyKitView', status: 'inline' },
-  { href: 'inline: zaino', note: 'ZainoView', status: 'inline' },
+  { href: 'inline: supporti', note: 'ZainoView', status: 'inline' },
   { href: 'inline: calendar', note: 'LazyCalendarView', status: 'inline' },
   { href: 'inline: progress', note: 'LazyProgressView', status: 'inline' },
   { href: 'inline: genitori', note: 'LazyGenitoriView', status: 'inline' },
@@ -219,7 +220,7 @@ export default function Home() {
     { id: 'buddy' as const, label: buddyInfo.name, icon: Heart, isChat: true, avatar: buddyInfo.avatar },
     { id: 'maestri' as const, label: 'Professori', icon: GraduationCap },
     { id: 'astuccio' as const, label: 'Astuccio', icon: Pencil },     // Tools hub (create)
-    { id: 'zaino' as const, label: 'Zaino', icon: Backpack },         // Materials archive (browse)
+    { id: 'supporti' as const, label: 'Zaino', icon: Backpack },         // Materials archive (browse)
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
     { id: 'settings' as const, label: 'Impostazioni', icon: Settings },
@@ -527,7 +528,7 @@ export default function Home() {
 
           {currentView === 'astuccio' && <LazyStudyKitView />}
 
-          {currentView === 'zaino' && <ZainoView />}
+          {currentView === 'supporti' && <ZainoView />}
 
           {currentView === 'calendar' && <LazyCalendarView />}
 
