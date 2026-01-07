@@ -49,9 +49,9 @@ export function ZainoView({
     handleTypeFilter,
     handleDateFilter,
     handleSubjectFilter,
+    getSubjectFilterCount,
     clearAllFilters,
     getFilterCount,
-    getSubjectFilterCount,
     hasActiveFilters,
     debouncedQuery,
   } = useZainoView({ initialType, initialSubject });

@@ -6,7 +6,7 @@
  * Issue #70: Real-time summary tool
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileText,
@@ -36,11 +36,14 @@ import { useUIStore } from '@/lib/stores';
 
 interface SummariesViewProps {
   className?: string;
+  initialMaestroId?: string | null;
+  initialMode?: 'voice' | 'chat' | null;
 }
 
-export function SummariesView({ className }: SummariesViewProps) {
+export function SummariesView({ className, initialMaestroId, initialMode }: SummariesViewProps) {
   const { tools, loading, deleteTool } = useSavedTools('summary');
   const { enterFocusMode } = useUIStore();
+  const initialProcessed = useRef(false);
   const [selectedSummary, setSelectedSummary] = useState<{
     id: string;
     title: string;
@@ -48,6 +51,17 @@ export function SummariesView({ className }: SummariesViewProps) {
     createdAt: Date;
   } | null>(null);
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+
+  // Auto-open maestro dialog when coming from Astuccio with parameters
+  useEffect(() => {
+    if (initialMaestroId && initialMode && !initialProcessed.current) {
+      initialProcessed.current = true;
+      const timer = setTimeout(() => {
+        setShowMaestroDialog(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [initialMaestroId, initialMode]);
 
   // Handle maestro selection and enter focus mode
   const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {

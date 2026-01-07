@@ -1,24 +1,92 @@
 'use client';
 
-import { Suspense } from 'react';
-import { HomeworkHelpView } from '@/components/education/homework-help-view';
+import { Suspense, useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { MessageSquare, BookOpen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { ToolLayout } from '@/components/tools/tool-layout';
+import { ToolMaestroSelectionDialog } from '@/components/education/tool-maestro-selection-dialog';
+import { useUIStore } from '@/lib/stores';
+import type { Maestro } from '@/types';
 
-export default function HomeworkPage() {
+function HomeworkPageContent() {
+  const searchParams = useSearchParams();
+  const maestroId = searchParams.get('maestroId');
+  const mode = searchParams.get('mode') as 'voice' | 'chat' | null;
+  const { enterFocusMode } = useUIStore();
+  const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+  const initialProcessed = useRef(false);
+
+  // Auto-open maestro dialog when coming from Astuccio with parameters
+  useEffect(() => {
+    if (maestroId && mode && !initialProcessed.current) {
+      initialProcessed.current = true;
+      const timer = setTimeout(() => {
+        setShowMaestroDialog(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [maestroId, mode]);
+
+  const handleMaestroConfirm = useCallback((maestro: Maestro, interactionMode: 'voice' | 'chat') => {
+    setShowMaestroDialog(false);
+    enterFocusMode({ toolType: 'homework', maestroId: maestro.id, interactionMode });
+  }, [enterFocusMode]);
+
   return (
     <ToolLayout
       title="Aiuto Compiti"
       subtitle="Carica un esercizio e ricevi assistenza guidata passo-passo"
       backRoute="/astuccio"
-      backLabel="Torna all'Astuccio"
     >
-      <Suspense fallback={
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      <div className="max-w-2xl mx-auto space-y-6">
+        <Card className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 border-violet-200 dark:border-violet-800">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-xl bg-violet-500/10">
+                <BookOpen className="w-6 h-6 text-violet-600 dark:text-violet-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-violet-900 dark:text-violet-100 mb-1">
+                  Come funziona l&apos;Aiuto Compiti?
+                </h3>
+                <p className="text-sm text-violet-800 dark:text-violet-200">
+                  Scegli un Professore, poi carica una foto del tuo esercizio o
+                  scrivi il problema. Il Professore ti guiderà passo-passo
+                  senza darti direttamente la risposta.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-center">
+          <Button size="lg" onClick={() => setShowMaestroDialog(true)}>
+            <MessageSquare className="w-5 h-5 mr-2" />
+            Inizia con un Professore
+          </Button>
         </div>
-      }>
-        <HomeworkHelpView />
-      </Suspense>
+      </div>
+
+      <ToolMaestroSelectionDialog
+        isOpen={showMaestroDialog}
+        toolType="homework"
+        onConfirm={handleMaestroConfirm}
+        onClose={() => setShowMaestroDialog(false)}
+      />
     </ToolLayout>
+  );
+}
+
+export default function HomeworkPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+      </div>
+    }>
+      <HomeworkPageContent />
+    </Suspense>
   );
 }

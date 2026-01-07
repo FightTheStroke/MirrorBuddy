@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
   MessageSquare,
   PlusCircle,
@@ -22,11 +22,24 @@ import { CreateMindmapModal } from './mindmaps-view/components/create-mindmap-mo
 
 interface MindmapsViewProps {
   className?: string;
+  initialMaestroId?: string | null;
+  initialMode?: 'voice' | 'chat' | null;
 }
 
-export function MindmapsView({ className }: MindmapsViewProps) {
+export function MindmapsView({ className, initialMaestroId, initialMode }: MindmapsViewProps) {
   const { enterFocusMode } = useUIStore();
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+  const initialProcessed = useRef(false);
+
+  useEffect(() => {
+    if (initialMaestroId && initialMode && !initialProcessed.current) {
+      initialProcessed.current = true;
+      const timer = setTimeout(() => {
+        setShowMaestroDialog(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [initialMaestroId, initialMode]);
 
   const {
     mindmaps,
@@ -63,6 +76,16 @@ export function MindmapsView({ className }: MindmapsViewProps) {
     },
     [enterFocusMode]
   );
+
+  const handleInitialMaestroConfirm = useCallback(() => {
+    if (initialMaestroId && initialMode) {
+      enterFocusMode({
+        toolType: 'mindmap',
+        maestroId: initialMaestroId,
+        interactionMode: initialMode,
+      });
+    }
+  }, [enterFocusMode, initialMaestroId, initialMode]);
 
   const addTopic = () => {
     setNewMapTopics([...newMapTopics, { name: '', subtopics: [''] }]);
@@ -209,7 +232,7 @@ export function MindmapsView({ className }: MindmapsViewProps) {
       <ToolMaestroSelectionDialog
         isOpen={showMaestroDialog}
         toolType="mindmap"
-        onConfirm={handleMaestroConfirm}
+        onConfirm={initialMaestroId && initialMode ? handleInitialMaestroConfirm : handleMaestroConfirm}
         onClose={() => setShowMaestroDialog(false)}
       />
     </div>
