@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Brain,
   HelpCircle,
@@ -27,6 +26,7 @@ import { ToolMaestroSelectionDialog } from '@/components/education/tool-maestro-
 import type { ToolType } from '@/types/tools';
 import type { Maestro } from '@/types';
 import { cn } from '@/lib/utils';
+import { useUIStore } from '@/lib/stores';
 
 interface Tool {
   id: ToolType;
@@ -106,31 +106,38 @@ const categoryVariants = {
 };
 
 export function AstuccioView() {
-  const router = useRouter();
+  const { enterFocusMode } = useUIStore();
   const [selectedTool, setSelectedTool] = useState<ToolType | null>(null);
   const [isMaestroDialogOpen, setIsMaestroDialogOpen] = useState(false);
   const [pendingToolRoute, setPendingToolRoute] = useState<string | null>(null);
+  const [pendingToolType, setPendingToolType] = useState<ToolType | null>(null);
 
   const handleToolClick = useCallback((route: string, toolId: ToolType) => {
     setSelectedTool(toolId);
     setPendingToolRoute(route);
+    setPendingToolType(toolId);
     setIsMaestroDialogOpen(true);
   }, []);
 
   const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
-    if (pendingToolRoute) {
-      const params = new URLSearchParams({ maestroId: maestro.id, mode });
-      router.push(`${pendingToolRoute}?${params.toString()}`);
+    if (pendingToolType && pendingToolRoute) {
+      enterFocusMode({
+        toolType: pendingToolType,
+        maestroId: maestro.id,
+        interactionMode: mode,
+      });
     }
     setIsMaestroDialogOpen(false);
     setSelectedTool(null);
     setPendingToolRoute(null);
-  }, [pendingToolRoute, router]);
+    setPendingToolType(null);
+  }, [pendingToolType, pendingToolRoute, enterFocusMode]);
 
   const handleMaestroClose = useCallback(() => {
     setIsMaestroDialogOpen(false);
     setSelectedTool(null);
     setPendingToolRoute(null);
+    setPendingToolType(null);
   }, []);
 
   return (
