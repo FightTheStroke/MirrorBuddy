@@ -10,7 +10,6 @@ interface ToolLayoutProps {
   title: string;
   subtitle?: string;
   backRoute?: string;
-  backLabel?: string;
   className?: string;
 }
 
@@ -19,7 +18,6 @@ export function ToolLayout({
   title,
   subtitle,
   backRoute = '/',
-  backLabel = 'Torna indietro',
   className,
 }: ToolLayoutProps) {
   const router = useRouter();
