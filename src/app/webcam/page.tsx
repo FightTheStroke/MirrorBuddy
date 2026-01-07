@@ -1,19 +1,18 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { WebcamCapture } from '@/components/tools/webcam-capture';
 import { ToolLayout } from '@/components/tools/tool-layout';
 
 export default function WebcamPage() {
-  const [purpose] = useState<'homework' | 'notes'>('homework');
-  const [captured, setCaptured] = useState<string | null>(null);
+  const purpose = 'homework' as const;
 
-  const handleCapture = useCallback((dataUrl: string) => {
-    setCaptured(dataUrl);
+  const handleCapture = useCallback((_dataUrl: string) => {
+    // Handle captured image
   }, []);
 
   const handleClose = useCallback(() => {
-    setCaptured(null);
+    // Handle close
   }, []);
 
   return (
@@ -21,7 +20,6 @@ export default function WebcamPage() {
       title="Scatta Foto"
       subtitle="Fotografa la lavagna o i tuoi appunti per generare materiali"
       backRoute="/astuccio"
-      backLabel="Torna all'Astuccio"
     >
       <WebcamCapture
         purpose={purpose}
