@@ -3,7 +3,7 @@
  * @brief Custom hook for flashcards view logic
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import type {
   FlashcardDeck,
   Flashcard,
@@ -15,8 +15,15 @@ import { useUIStore } from '@/lib/stores';
 import { getUserId } from '../utils/user-id';
 import { fsrs5Schedule } from '../utils/fsrs';
 
-export function useFlashcardsView() {
+interface UseFlashcardsViewOptions {
+  initialMaestroId?: string | null;
+  initialMode?: 'voice' | 'chat' | null;
+}
+
+export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
+  const { initialMaestroId, initialMode } = options;
   const { enterFocusMode } = useUIStore();
+  const initialProcessed = useRef(false);
 
   const [decks, setDecks] = useState<FlashcardDeck[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,6 +32,17 @@ export function useFlashcardsView() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingDeck, setEditingDeck] = useState<FlashcardDeck | null>(null);
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+
+  // Auto-open maestro dialog when coming from Astuccio with parameters
+  useEffect(() => {
+    if (initialMaestroId && initialMode && !initialProcessed.current) {
+      initialProcessed.current = true;
+      const timer = setTimeout(() => {
+        setShowMaestroDialog(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [initialMaestroId, initialMode]);
 
   const handleMaestroConfirm = useCallback(
     (maestro: Maestro, mode: 'voice' | 'chat') => {

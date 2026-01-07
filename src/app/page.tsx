@@ -23,7 +23,6 @@ import {
   BookOpen,
   ChevronUp,
   ChevronDown,
-  Bug,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';

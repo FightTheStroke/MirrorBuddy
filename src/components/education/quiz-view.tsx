@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Brain, Play, Trophy, Target, Sparkles, MessageSquare, Loader2, Trash2, Clock } from 'lucide-react';
@@ -139,7 +139,12 @@ const sampleQuizzes: QuizType[] = [
   },
 ];
 
-export function QuizView() {
+interface QuizViewProps {
+  initialMaestroId?: string | null;
+  initialMode?: 'voice' | 'chat' | null;
+}
+
+export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   const _router = useRouter();
   const { enterFocusMode } = useUIStore();
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
@@ -147,6 +152,18 @@ export function QuizView() {
   const { addXP } = useProgressStore();
   const { quizzes: savedQuizzes, loading, deleteQuiz } = useQuizzes();
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
+  const initialProcessed = useRef(false);
+
+  // Auto-open maestro dialog when coming from Astuccio with parameters
+  useEffect(() => {
+    if (initialMaestroId && initialMode && !initialProcessed.current) {
+      initialProcessed.current = true;
+      const timer = setTimeout(() => {
+        setShowMaestroDialog(true);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [initialMaestroId, initialMode]);
 
   // Handle maestro selection and enter focus mode
   const handleMaestroConfirm = (maestro: Maestro, mode: 'voice' | 'chat') => {
