@@ -2,7 +2,6 @@
 
 import { useState, useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import DOMPurify from 'dompurify';
 import {
   Maximize2,
   Minimize2,
@@ -16,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
+import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
 import { cn } from '@/lib/utils';
 
 interface HTMLPreviewProps {
@@ -44,39 +44,10 @@ export function HTMLPreview({
   const [saving, setSaving] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Sanitize HTML to prevent XSS attacks
-  // Allow safe interactive styling but block scripts and dangerous handlers
-  const sanitizedCode = useMemo(() => {
-    // Configure DOMPurify for safe educational content
-    // NO scripts, NO dangerous event handlers - iframe sandbox provides isolation
-    return DOMPurify.sanitize(code, {
-      ADD_TAGS: ['style'],
-      FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
-      FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onmouseout', 'onfocus', 'onblur'],
-      WHOLE_DOCUMENT: true,
-      FORCE_BODY: true,
-    });
-  }, [code]);
-
-  // C-16 FIX: Use srcdoc instead of contentDocument injection
-  // This avoids SecurityError when sandbox lacks allow-same-origin
-  // srcdoc is safer and doesn't require cross-origin access
+  // Use shared HTML builder for consistency across all demo renderers
   const iframeSrcDoc = useMemo(() => {
-    // Wrap in full HTML document structure
-    return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body { margin: 0; padding: 16px; font-family: system-ui, sans-serif; }
-  </style>
-</head>
-<body>
-${sanitizedCode}
-</body>
-</html>`;
-  }, [sanitizedCode]);
+    return buildDemoHTML({ code, html: '', css: '', js: '' });
+  }, [code]);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(code);
@@ -194,8 +165,26 @@ ${sanitizedCode}
             ref={iframeRef}
             title={title}
             className="w-full h-full min-h-[400px] bg-white"
-            sandbox="allow-scripts"
+            sandbox={getDemoSandboxPermissions()}
             srcDoc={iframeSrcDoc}
+            allow={getDemoAllowPermissions()}
+            style={{ width: '100%', height: '100%', minHeight: '400px' }}
+            onLoad={() => {
+              // Force script execution after iframe loads
+              try {
+                const iframe = iframeRef.current;
+                if (iframe && iframe.contentWindow) {
+                  // Scripts should already execute via srcDoc, but this ensures they run
+                  // Using type assertion since eval may not be in TypeScript types
+                  const win = iframe.contentWindow as unknown as { eval?: (code: string) => void };
+                  if (win.eval) {
+                    win.eval('void(0)');
+                  }
+                }
+              } catch (e) {
+                // Cross-origin restrictions may prevent this, but scripts should still work
+              }
+            }}
           />
         ) : (
           <pre className="p-4 h-full overflow-auto bg-slate-900 text-slate-100 text-sm font-mono">

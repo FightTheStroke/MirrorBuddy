@@ -22,6 +22,7 @@ import { PlayCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HTMLPreview } from '@/components/education/html-preview';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
 import type { BaseRendererProps } from './index';
 
 interface DemoData {
@@ -154,26 +155,24 @@ function buildDemoCode(demoData: DemoData, accessibilityCSS: string = ''): strin
     return `${katexHead}<style id="accessibility-styles">${accessibilityCSS}</style>${demoData.code}`;
   }
 
-  // If we have html/css/js parts, combine them
+  // If we have html/css/js parts, combine them using shared builder
   if (demoData.html || demoData.css || demoData.js) {
-    return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    const baseHtml = buildDemoHTML({
+      html: demoData.html || '',
+      css: demoData.css || '',
+      js: demoData.js || '',
+    });
+    
+    // Inject KaTeX and accessibility CSS
+    const katexHead = `
   <!-- KaTeX for STEM mathematical formulas -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
     onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
-  <style id="accessibility-styles">${accessibilityCSS}</style>
-  <style>${demoData.css || ''}</style>
-</head>
-<body>
-  ${demoData.html || ''}
-  <script>${demoData.js || ''}</script>
-</body>
-</html>`;
+  <style id="accessibility-styles">${accessibilityCSS}</style>`;
+    
+    return baseHtml.replace('<head>', `<head>${katexHead}`);
   }
 
   return null;
