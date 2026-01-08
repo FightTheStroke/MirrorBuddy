@@ -15,6 +15,7 @@
 
 import { useState, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { useSettingsStore, useUIStore } from '@/lib/stores';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
 import type { ExtendedStudentProfile, ToolType } from '@/types';
@@ -167,7 +168,10 @@ export function ConversationFlow() {
   }
 
   return (
-    <div className="relative flex flex-col h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden">
+    <div className={cn(
+      "relative h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden",
+      isVoiceActive ? "flex flex-row" : "flex flex-col"
+    )}>
       <ConversationContent
         activeCharacter={activeCharacter}
         characterHistory={characterHistory}

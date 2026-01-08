@@ -6,6 +6,7 @@ import { ToolLayout } from './tool-layout';
 import { ChatLayout } from './chat-layout';
 import { VoiceCallPanel } from './voice-call-panel';
 import { useTTS } from '@/components/accessibility';
+import { cn } from '@/lib/utils';
 import type { ToolType, ToolState } from '@/types/tools';
 import type { ActiveCharacter, FlowMessage, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
 
@@ -84,9 +85,15 @@ export function ConversationContent({
   const { stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
   return (
-    <div className="flex gap-4 h-full">
+    <div className={cn(
+      "flex gap-4",
+      isVoiceActive ? "flex-1 min-w-0 flex-col" : "w-full h-full flex-col"
+    )}>
       {/* Main content area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className={cn(
+        "flex flex-col min-w-0",
+        isVoiceActive ? "flex-1" : "w-full h-full"
+      )}>
         {/* Header - hidden when voice is active (all controls in panel) */}
         {!isVoiceActive && (
           <ConversationHeader
