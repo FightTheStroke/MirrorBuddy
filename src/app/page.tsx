@@ -123,6 +123,24 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [debugMenuOpen, setDebugMenuOpen] = useState(false);
 
+  // Auto-compress sidebar when window is too narrow
+  useEffect(() => {
+    const handleResize = () => {
+      // Compress sidebar if window width is less than 1024px (lg breakpoint)
+      // This ensures enough space for the main content
+      if (window.innerWidth < 1024) {
+        setSidebarOpen(false);
+      }
+    };
+
+    // Check on mount
+    handleResize();
+
+    // Listen for resize events
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // Maestro session state
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');

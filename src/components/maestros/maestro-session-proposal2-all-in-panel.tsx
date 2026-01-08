@@ -1,38 +1,33 @@
 'use client';
 
 /**
- * MaestroSession - Unified conversation layout matching Coach/Buddy pattern
- *
- * Layout identical to CharacterChatView:
- * - Flex layout with chat on left, voice panel on right (side by side)
- * - Header with avatar, name, specialty, voice call button
- * - Messages area with inline tools
- * - Input area with tool buttons at bottom
- * - VoicePanel as sibling when voice active (NOT overlay)
- * - Evaluation inline in chat when session ends
+ * PROPOSTA 2: Tutto nella barra della chiamata vocale
+ * 
+ * Tutti i controlli audio sono nel VoicePanel laterale quando la chiamata è attiva.
+ * Mantiene il layout side-by-side con tutti i controlli nel pannello laterale.
  */
 
 import { useRef, useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useTTS } from '@/components/accessibility';
-import { VoicePanel } from '@/components/voice';
+import { VoicePanelProposal2 } from '@/components/voice/voice-panel-proposal2-all-in-panel';
 import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore } from '@/lib/stores';
 import type { Maestro } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
-import { MaestroSessionHeader } from './maestro-session-header';
+import { MaestroSessionHeaderProposal2 } from './maestro-session-header-proposal2-minimal';
 import { MaestroSessionMessages } from './maestro-session-messages';
 import { MaestroSessionInput } from './maestro-session-input';
 import { MaestroSessionWebcam } from './maestro-session-webcam';
 import { cn } from '@/lib/utils';
 
-interface MaestroSessionProps {
+interface MaestroSessionProposal2Props {
   maestro: Maestro;
   onClose: () => void;
   initialMode?: 'voice' | 'chat';
 }
 
-export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: MaestroSessionProps) {
+export function MaestroSessionProposal2({ maestro, onClose, initialMode = 'voice' }: MaestroSessionProposal2Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [fullscreenToolId, setFullscreenToolId] = useState<string | null>(null);
@@ -98,13 +93,11 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     const newFullscreenId = fullscreenToolId === toolId ? null : toolId;
     
     if (newFullscreenId !== null) {
-      // Entering fullscreen: save current sidebar state and compress it
       if (sidebarStateBeforeFullscreen.current === null) {
         sidebarStateBeforeFullscreen.current = useUIStore.getState().sidebarOpen;
       }
       setSidebarOpen(false);
     } else {
-      // Exiting fullscreen: restore sidebar state
       if (sidebarStateBeforeFullscreen.current !== null) {
         setSidebarOpen(sidebarStateBeforeFullscreen.current);
         sidebarStateBeforeFullscreen.current = null;
@@ -131,24 +124,24 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
         </div>
       )}
 
-      {/* Normal chat view */}
+      {/* Side-by-side layout with voice panel */}
       <div className={cn(
         'flex flex-col sm:flex-row gap-2 sm:gap-4 h-[calc(100vh-8rem)]',
         isToolFullscreen && 'opacity-0 pointer-events-none'
       )}>
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full sm:w-auto">
-          <MaestroSessionHeader
-            maestro={maestro}
-            isVoiceActive={isVoiceActive}
-            isConnected={isConnected}
-            configError={configError}
-            ttsEnabled={ttsEnabled}
-            onVoiceCall={handleVoiceCall}
-            onStopTTS={stopTTS}
-            onClearChat={clearChat}
-            onClose={onClose}
-          />
+          {/* Header only shown when NOT in voice call - when in call, everything is in the panel */}
+          {!isVoiceActive && (
+            <MaestroSessionHeaderProposal2
+              maestro={maestro}
+              isVoiceActive={isVoiceActive}
+              isConnected={isConnected}
+              configError={configError}
+              onVoiceCall={handleVoiceCall}
+              onClose={onClose}
+            />
+          )}
 
           <MaestroSessionWebcam
             showWebcam={showWebcam}
@@ -190,11 +183,11 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
           />
         </div>
 
-        {/* Voice Panel (Side by Side on desktop, full width on mobile) */}
+        {/* Voice Panel with all controls */}
         <AnimatePresence>
           {isVoiceActive && (
             <div className="w-full sm:w-auto sm:flex-shrink-0">
-              <VoicePanel
+              <VoicePanelProposal2
                 character={{
                   name: maestro.name,
                   avatar: maestro.avatar,
@@ -209,8 +202,12 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
                 outputLevel={outputLevel}
                 connectionState={connectionState}
                 configError={configError}
+                ttsEnabled={ttsEnabled}
                 onToggleMute={toggleMute}
                 onEndCall={handleVoiceCall}
+                onStopTTS={stopTTS}
+                onClearChat={clearChat}
+                onClose={onClose}
               />
             </div>
           )}

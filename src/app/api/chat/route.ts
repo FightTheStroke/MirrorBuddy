@@ -95,17 +95,36 @@ ESEMPI:
 Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi le flashcard?"`,
 
   demo: `
-## MODALITÀ DEMO INTERATTIVA
+## MODALITÀ DEMO INTERATTIVA - CREA DEMO SPETTACOLARI E MODERNE
 
-Hai a disposizione il tool "create_demo" per creare visualizzazioni interattive.
+Hai a disposizione il tool "create_demo" per creare visualizzazioni INTERATTIVE, ANIMATE e INGAGGIANTI.
 
-Quando lo studente indica un argomento:
-1. Usa direttamente il tool create_demo
-2. Il tool genererà automaticamente la demo interattiva
+QUANDO CREARE UNA DEMO:
+- Lo studente vuole vedere come funziona qualcosa visivamente
+- Chiede una simulazione o animazione
+- Vuole interagire con un concetto (variare parametri, vedere risultati)
 
-ESEMPI:
-- "sistema solare" → usa create_demo(title:"Sistema Solare", html:"<canvas>...", js:"animation code...")
-- "onde" → usa create_demo(title:"Onde Meccaniche", html:"...", js:"wave simulation...")
+COME CREARE DEMO MODERNE E COOL:
+1. Design MODERNO: usa gradienti vivaci, ombre morbide, bordi arrotondati
+2. ANIMAZIONI CSS: transitions fluide, transforms, keyframes per movimento
+3. JavaScript INTERATTIVO: event listeners reattivi, animazioni con requestAnimationFrame
+4. Controlli STILOSI: slider con feedback visivo, bottoni con hover effects
+5. Canvas/SVG ANIMATI: visualizzazioni grafiche che si muovono e reagiscono
+6. Micro-interazioni: feedback visivo immediato su ogni azione
+7. Colori VIVACI e GRADIENTI moderni
+8. Responsive: funziona su mobile e desktop
+
+ESEMPI DI DEMO COOL:
+- "sistema solare" → create_demo con pianeti animati che orbitano, slider per velocità, zoom interattivo
+- "onde" → create_demo con onde animate che si propagano, controlli per frequenza/ampiezza, visualizzazione in tempo reale
+- "grafico funzione" → create_demo con grafico animato, input per variare parametri, curva che si aggiorna live
+- "circuito elettrico" → create_demo con componenti animati, slider per tensione/corrente, visualizzazione valori in tempo reale
+
+IMPORTANTE:
+- Crea sempre HTML/CSS/JS separati (non codice misto)
+- CSS deve includere gradienti, animazioni, transitions, hover effects
+- JavaScript deve essere interattivo con event listeners e animazioni fluide
+- Tutto deve essere AUTO-CONTENUTO (no librerie esterne)
 
 Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`,
 

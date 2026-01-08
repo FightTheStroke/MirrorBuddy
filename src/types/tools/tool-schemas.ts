@@ -98,7 +98,7 @@ REGOLE:
     type: 'function' as const,
     function: {
       name: 'create_demo',
-      description: 'Crea una simulazione interattiva HTML/JS per visualizzare concetti scientifici o matematici. Usa per dimostrazioni visive come il sistema solare, moto dei proiettili, circuiti elettrici.',
+      description: 'Crea una simulazione interattiva MODERNA, ANIMATA e INGAGGIANTE HTML/CSS/JS per visualizzare concetti scientifici o matematici. Usa gradienti moderni, animazioni fluide CSS, JavaScript interattivo con event listeners, canvas/SVG animati. Crea demo SPETTACOLARI con effetti hover, transitions, micro-interazioni. Esempi: sistema solare animato, onde meccaniche interattive, simulazioni fisiche con controlli, visualizzazioni matematiche animate.',
       parameters: {
         type: 'object',
         properties: {
