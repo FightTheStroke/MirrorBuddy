@@ -15,7 +15,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useTTS } from '@/components/accessibility';
-import { VoicePanel } from '@/components/voice';
+import { HeaderVariantF } from './header-variants/variant-f-vertical-panel';
 import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore } from '@/lib/stores';
 import type { Maestro } from '@/types';
@@ -138,17 +138,20 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
       )}>
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full sm:w-auto">
-          <MaestroSessionHeader
-            maestro={maestro}
-            isVoiceActive={isVoiceActive}
-            isConnected={isConnected}
-            configError={configError}
-            ttsEnabled={ttsEnabled}
-            onVoiceCall={handleVoiceCall}
-            onStopTTS={stopTTS}
-            onClearChat={clearChat}
-            onClose={onClose}
-          />
+          {/* Header only shown when NOT in voice call - when in call, everything is in Variant F panel */}
+          {!isVoiceActive && (
+            <MaestroSessionHeader
+              maestro={maestro}
+              isVoiceActive={isVoiceActive}
+              isConnected={isConnected}
+              configError={configError}
+              ttsEnabled={ttsEnabled}
+              onVoiceCall={handleVoiceCall}
+              onStopTTS={stopTTS}
+              onClearChat={clearChat}
+              onClose={onClose}
+            />
+          )}
 
           <MaestroSessionWebcam
             showWebcam={showWebcam}
@@ -190,27 +193,26 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
           />
         </div>
 
-        {/* Voice Panel (Side by Side on desktop, full width on mobile) */}
+        {/* Voice Panel - Variant F (Side by Side on desktop, full width on mobile) */}
         <AnimatePresence>
           {isVoiceActive && (
             <div className="w-full sm:w-auto sm:flex-shrink-0">
-              <VoicePanel
-                character={{
-                  name: maestro.name,
-                  avatar: maestro.avatar,
-                  specialty: maestro.specialty,
-                  color: maestro.color,
-                }}
+              <HeaderVariantF
+                maestro={maestro}
+                isVoiceActive={isVoiceActive}
                 isConnected={isConnected}
                 isListening={isListening}
                 isSpeaking={isSpeaking}
                 isMuted={isMuted}
                 inputLevel={inputLevel}
                 outputLevel={outputLevel}
-                connectionState={connectionState}
                 configError={configError}
+                ttsEnabled={ttsEnabled}
+                onVoiceCall={handleVoiceCall}
                 onToggleMute={toggleMute}
-                onEndCall={handleVoiceCall}
+                onStopTTS={stopTTS}
+                onClearChat={clearChat}
+                onClose={onClose}
               />
             </div>
           )}

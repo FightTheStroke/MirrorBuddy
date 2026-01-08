@@ -293,7 +293,46 @@ Rispondi SOLO con JSON (no markdown, no spiegazioni):
 }
 
 /**
- * Register the demo handler - accepts description, generates code
+ * Validate and enhance the maestro's description
+ * Returns suggestions if description is too vague
+ */
+function validateDescription(description: {
+  visualization: string;
+  interaction: string;
+}): { valid: boolean; suggestions?: string[] } {
+  const suggestions: string[] = [];
+  
+  // Check for visual elements
+  const visualKeywords = ['blocchi', 'griglia', 'cerchi', 'timeline', 'mappa', 'grafico', 'particelle', 
+    'forme', 'elementi', 'punti', 'linea', 'barra', 'torta', 'albero', 'diagramma'];
+  const hasVisual = visualKeywords.some(k => description.visualization.toLowerCase().includes(k));
+  if (!hasVisual) {
+    suggestions.push('Specifica il tipo di elemento visivo: blocchi, griglia, timeline, mappa, grafico, particelle');
+  }
+  
+  // Check for interaction type
+  const interactionKeywords = ['slider', 'click', 'trascina', 'drag', 'hover', 'input', 'bottone', 
+    'seleziona', 'cambia', 'muovi', 'scrolla', 'naviga'];
+  const hasInteraction = interactionKeywords.some(k => description.interaction.toLowerCase().includes(k));
+  if (!hasInteraction) {
+    suggestions.push('Specifica il tipo di interazione: slider, click, drag & drop, hover, bottoni');
+  }
+  
+  // Check for quantities (helps generate better demos)
+  const hasNumbers = /\d+/.test(description.visualization) || 
+    ['alcuni', 'pochi', 'molti', 'tanti'].some(w => description.visualization.toLowerCase().includes(w));
+  if (!hasNumbers) {
+    suggestions.push('Indica quantità specifiche: "5 blocchi", "3 righe", "una dozzina di particelle"');
+  }
+  
+  return {
+    valid: suggestions.length === 0,
+    suggestions: suggestions.length > 0 ? suggestions : undefined,
+  };
+}
+
+/**
+ * Register the demo handler - accepts description, validates, generates code
  */
 registerToolHandler('create_demo', async (args): Promise<ToolExecutionResult> => {
   const { title, concept, visualization, interaction, wowFactor } = args as {
@@ -310,11 +349,23 @@ registerToolHandler('create_demo', async (args): Promise<ToolExecutionResult> =>
       success: false,
       toolId: nanoid(),
       toolType: 'demo',
-      error: 'Title, concept, visualization, and interaction are required',
+      error: 'Mancano informazioni. Specifica: titolo, concetto, visualizzazione (cosa si vede), interazione (cosa può fare lo studente)',
     };
   }
 
-  logger.info('Generating demo from description', { title, concept });
+  // Validate description quality
+  const validation = validateDescription({ visualization, interaction });
+  if (!validation.valid && validation.suggestions) {
+    logger.info('Demo description needs refinement', { title, suggestions: validation.suggestions });
+    // We continue anyway but log for debugging - the AI generator will do its best
+  }
+
+  logger.info('Generating demo from description', { 
+    title, 
+    concept, 
+    visualizationLength: visualization.length,
+    interactionLength: interaction.length,
+  });
 
   // Generate code from description using technical agent
   const code = await generateDemoCode({ title, concept, visualization, interaction, wowFactor });

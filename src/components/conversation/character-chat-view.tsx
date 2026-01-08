@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { VoicePanel } from '@/components/voice';
+import { VoicePanelVariantF } from '@/components/voice/voice-panel-variant-f';
 import { ToolPanel } from '@/components/tools/tool-panel';
 import { getCharacterInfo } from './character-chat-view/utils/character-utils';
 import { useCharacterChat } from './character-chat-view/hooks/use-character-chat';
@@ -10,6 +10,7 @@ import { ChatHeader } from './character-chat-view/components/chat-header';
 import { MessagesList } from './character-chat-view/components/messages-list';
 import { ChatInput } from './character-chat-view/components/chat-input';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
+import { useTTS } from '@/components/accessibility';
 
 interface CharacterChatViewProps {
   characterId:
@@ -32,6 +33,7 @@ export function CharacterChatView({
 }: CharacterChatViewProps) {
   const character = getCharacterInfo(characterId, characterType);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
+  const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
   const {
     messages,
@@ -124,7 +126,7 @@ export function CharacterChatView({
 
       <AnimatePresence>
         {isVoiceActive && (
-          <VoicePanel
+          <VoicePanelVariantF
             character={{
               name: character.name,
               avatar: character.avatar,
@@ -139,8 +141,10 @@ export function CharacterChatView({
             outputLevel={outputLevel}
             connectionState={connectionState}
             configError={configError}
+            ttsEnabled={ttsEnabled}
             onToggleMute={toggleMute}
             onEndCall={handleVoiceCall}
+            onStopTTS={stopTTS}
           />
         )}
       </AnimatePresence>

@@ -1,10 +1,13 @@
 'use client';
 
 /**
- * VARIANTE E: Avatar Centrato + Info a Sinistra
+ * VARIANTE E: Avatar Centrato + Info Sinistra (Migliorata)
  * 
- * Basata sulla B: Avatar grande al centro con visualizer circolare.
- * Nome e stato a sinistra in alto, tutti i controlli a destra.
+ * - Avatar al centro con aura animata dinamica
+ * - Nome e stato a sinistra
+ * - Controlli audio a destra
+ * - X in alto a destra (con Esc)
+ * - Device selector e reload in alto a sinistra
  */
 
 import Image from 'next/image';
@@ -14,8 +17,7 @@ import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
-
-const VISUALIZER_BARS = [10, 14, 8, 16, 12, 14, 10];
+import { useEffect } from 'react';
 
 interface HeaderVariantProps {
   maestro: Maestro;
@@ -48,131 +50,208 @@ export function HeaderVariantE(props: HeaderVariantProps) {
     : isConnected && isListening ? 'In ascolto...'
     : isConnected ? 'Connesso' : 'Connessione...';
 
+  // Handle Esc key
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
+  // Calculate aura intensity based on voice activity
+  const getAuraIntensity = () => {
+    if (!isVoiceActive || !isConnected) return 0;
+    if (isSpeaking) return outputLevel;
+    if (isListening && !isMuted) return inputLevel;
+    return 0.1; // Subtle pulse when connected but silent
+  };
+
+  const auraIntensity = getAuraIntensity();
+
   return (
     <div
-      className="flex items-center p-4 sm:p-5 rounded-t-2xl text-white min-h-[120px]"
+      className="relative p-4 sm:p-5 rounded-t-2xl text-white min-h-[120px]"
       style={{ background: `linear-gradient(180deg, ${maestro.color}, ${maestro.color}dd)` }}
     >
-      {/* Left: Name and status */}
-      <div className="flex flex-col gap-1 min-w-0 flex-shrink-0">
+      {/* Top bar: Left controls and Right close button */}
+      <div className="absolute top-3 left-4 right-4 flex items-center justify-between z-10">
+        {/* Left: Device selector and reload */}
         <div className="flex items-center gap-2">
-          <h2 className="text-xl font-bold">{maestro.name}</h2>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-white/20">Professore</span>
-        </div>
-        <p className="text-sm text-white/80">{statusText}</p>
-        
-        {/* Horizontal visualizer */}
-        <div className="flex items-center gap-1 h-6 mt-1">
-          {VISUALIZER_BARS.map((offset, i) => {
-            const base = 6;
-            const variance = 1 + (offset % 3) * 0.12;
-            const style = !isVoiceActive || !isConnected
-              ? { height: base, opacity: 0.2 }
-              : isSpeaking
-                ? { height: base + outputLevel * variance * 18, opacity: 0.5 + outputLevel * 0.5 }
-                : isListening && !isMuted
-                  ? { height: base + inputLevel * variance * 22, opacity: 0.4 + inputLevel * 0.6 }
-                  : { height: base, opacity: 0.25 };
-
-            return (
-              <motion.div
-                key={i}
-                initial={false}
-                animate={style}
-                transition={{ duration: 0.05 }}
-                className="w-1.5 rounded-full bg-white"
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Center: Avatar with ring visualizer */}
-      <div className="flex-1 flex justify-center">
-        <div className="relative">
-          {/* Pulsing ring visualizer */}
-          <motion.div
-            className="absolute inset-0 rounded-full"
-            animate={{
-              scale: isVoiceActive && isConnected ? (isSpeaking ? [1, 1.18, 1] : [1, 1.1, 1]) : 1,
-              opacity: isVoiceActive && isConnected ? [0.3, 0.7, 0.3] : 0.2,
-            }}
-            transition={{ repeat: Infinity, duration: isSpeaking ? 0.7 : 1.5 }}
-            style={{ 
-              background: `radial-gradient(circle, transparent 55%, ${isVoiceActive ? 'white' : 'transparent'} 100%)`,
-              width: '100px', height: '100px', margin: '-10px'
-            }}
-          />
-          
-          <motion.div
-            animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
-            transition={{ repeat: Infinity, duration: 1 }}
+          <AudioDeviceSelector compact />
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClearChat}
+            className="rounded-full h-8 w-8 text-white/80 hover:text-white hover:bg-white/20"
+            aria-label="Nuova conversazione"
           >
-            <Image
-              src={maestro.avatar}
-              alt={maestro.name}
-              width={80}
-              height={80}
-              className={cn(
-                'w-20 h-20 rounded-full border-4 object-cover transition-all relative z-10',
-                isConnected ? 'border-white shadow-2xl' : 'border-white/50'
-              )}
-            />
-          </motion.div>
-          
-          <span className={cn(
-            "absolute bottom-0 right-0 w-5 h-5 border-2 border-white rounded-full z-20",
-            isVoiceActive && isConnected ? "bg-green-400 animate-pulse" : "bg-green-400"
-          )} />
+            <RotateCcw className="w-4 h-4" />
+          </Button>
         </div>
-      </div>
 
-      {/* Right: All controls */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <AudioDeviceSelector compact />
-
+        {/* Right: Close button */}
         <Button
           variant="ghost"
           size="icon"
-          onClick={onToggleMute}
-          disabled={!isVoiceActive || !isConnected}
-          className={cn(
-            'rounded-full h-10 w-10 text-white',
-            !isVoiceActive && 'opacity-40',
-            isMuted ? 'bg-red-500/40' : 'bg-white/20 hover:bg-white/30'
-          )}
+          onClick={onClose}
+          className="rounded-full h-8 w-8 text-white/80 hover:text-white hover:bg-white/20"
+          aria-label="Chiudi (Esc)"
         >
-          {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+          <X className="w-4 h-4" />
         </Button>
+      </div>
 
-        <Button
-          variant={isVoiceActive ? 'destructive' : 'ghost'}
-          size="icon"
-          onClick={onVoiceCall}
-          disabled={!!configError && !isVoiceActive}
-          className={cn(
-            'rounded-full h-12 w-12',
-            isVoiceActive ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-white/20 hover:bg-white/30',
-            configError && !isVoiceActive && 'opacity-40'
-          )}
-        >
-          {isVoiceActive ? <PhoneOff className="w-6 h-6" /> : <Phone className="w-6 h-6" />}
-        </Button>
+      {/* Main content area - centered vertically */}
+      <div className="flex items-center gap-6 pt-8 min-h-[80px]">
+        {/* Left: Name and status */}
+        <div className="flex flex-col gap-1.5 min-w-0 flex-shrink-0 justify-center">
+          <h2 className="text-xl sm:text-2xl font-bold">{maestro.name}</h2>
+          <p className="text-sm text-white/80">{statusText}</p>
+        </div>
 
-        <div className="w-px h-10 bg-white/20 mx-1" />
+        {/* Center: Avatar with animated aura - vertically centered */}
+        <div className="flex-1 flex justify-center items-center">
+          <div className="relative">
+            {/* Animated aura rings - dynamic based on voice */}
+            {isVoiceActive && isConnected && (
+              <>
+                {/* Outer ring - most subtle */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 border-white/20"
+                  animate={{
+                    scale: isSpeaking ? [1, 1.15 + auraIntensity * 0.1, 1] : [1, 1.08, 1],
+                    opacity: [0.2, 0.4 + auraIntensity * 0.3, 0.2],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: isSpeaking ? 0.8 : 2,
+                    ease: 'easeInOut',
+                  }}
+                  style={{
+                    width: '100px',
+                    height: '100px',
+                    margin: '-10px',
+                  }}
+                />
+                {/* Middle ring */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 border-white/30"
+                  animate={{
+                    scale: isSpeaking ? [1, 1.12 + auraIntensity * 0.08, 1] : [1, 1.06, 1],
+                    opacity: [0.3, 0.5 + auraIntensity * 0.4, 0.3],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: isSpeaking ? 0.7 : 1.8,
+                    ease: 'easeInOut',
+                  }}
+                  style={{
+                    width: '90px',
+                    height: '90px',
+                    margin: '-5px',
+                  }}
+                />
+                {/* Inner ring - most visible */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 border-white/40"
+                  animate={{
+                    scale: isSpeaking ? [1, 1.08 + auraIntensity * 0.06, 1] : [1, 1.04, 1],
+                    opacity: [0.4, 0.6 + auraIntensity * 0.3, 0.4],
+                  }}
+                  transition={{
+                    repeat: Infinity,
+                    duration: isSpeaking ? 0.6 : 1.5,
+                    ease: 'easeInOut',
+                  }}
+                  style={{
+                    width: '85px',
+                    height: '85px',
+                    margin: '-2.5px',
+                  }}
+                />
+              </>
+            )}
 
-        <Button variant="ghost" size="icon" onClick={ttsEnabled ? onStopTTS : undefined}
-          disabled={!ttsEnabled} className={cn('rounded-full h-10 w-10 text-white hover:bg-white/20', !ttsEnabled && 'opacity-40')}>
-          {ttsEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
-        </Button>
-        
-        <Button variant="ghost" size="icon" onClick={onClearChat} className="rounded-full h-10 w-10 text-white hover:bg-white/20">
-          <RotateCcw className="w-5 h-5" />
-        </Button>
-        
-        <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full h-10 w-10 text-white hover:bg-white/20">
-          <X className="w-5 h-5" />
-        </Button>
+            {/* Avatar - static, no movement */}
+            <div className="relative z-10">
+              <Image
+                src={maestro.avatar}
+                alt={maestro.name}
+                width={80}
+                height={80}
+                className={cn(
+                  'w-20 h-20 rounded-full border-4 object-cover',
+                  isConnected ? 'border-white shadow-2xl' : 'border-white/50'
+                )}
+              />
+              <span className={cn(
+                "absolute bottom-0 right-0 w-5 h-5 border-2 border-white rounded-full z-20",
+                isVoiceActive && isConnected ? "bg-green-400 animate-pulse" : "bg-green-400"
+              )} />
+            </div>
+          </div>
+        </div>
+
+        {/* Right: Audio controls */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Mute and TTS buttons - same size, close together */}
+          <div className="flex items-center gap-1.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleMute}
+              disabled={!isVoiceActive || !isConnected}
+              className={cn(
+                'rounded-full h-10 w-10 text-white',
+                !isVoiceActive && 'opacity-40',
+                isMuted ? 'bg-red-500/40 hover:bg-red-500/50' : 'bg-white/20 hover:bg-white/30'
+              )}
+              aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+            >
+              {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={ttsEnabled ? onStopTTS : undefined}
+              disabled={!ttsEnabled}
+              className={cn(
+                'rounded-full h-10 w-10 text-white',
+                !ttsEnabled && 'opacity-40',
+                'bg-white/20 hover:bg-white/30'
+              )}
+              aria-label={ttsEnabled ? 'Disattiva lettura vocale' : 'Lettura vocale disattivata'}
+            >
+              {ttsEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            </Button>
+          </div>
+
+          {/* Call button - green when inactive, red when active (iPhone style) */}
+          <Button
+            variant={isVoiceActive ? 'destructive' : 'default'}
+            size="icon"
+            onClick={onVoiceCall}
+            disabled={!!configError && !isVoiceActive}
+            className={cn(
+              'rounded-full h-12 w-12',
+              isVoiceActive
+                ? 'bg-red-500 hover:bg-red-600 animate-pulse'
+                : 'bg-green-500 hover:bg-green-600',
+              configError && !isVoiceActive && 'opacity-40'
+            )}
+            aria-label={isVoiceActive ? 'Termina chiamata' : 'Avvia chiamata'}
+          >
+            {isVoiceActive ? (
+              <PhoneOff className="w-6 h-6" />
+            ) : (
+              <Phone className="w-6 h-6" />
+            )}
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -8,7 +8,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { HeaderVariantA, HeaderVariantB, HeaderVariantC, HeaderVariantD, HeaderVariantE } from '@/components/maestros/header-variants';
+import { HeaderVariantA, HeaderVariantB, HeaderVariantC, HeaderVariantD } from '@/components/maestros/header-variants';
+import { HeaderVariantE } from '@/components/maestros/header-variants/variant-e-centered-info-left';
+import { HeaderVariantF } from '@/components/maestros/header-variants/variant-f-vertical-panel';
 import { MaestroSessionMessages } from '@/components/maestros/maestro-session-messages';
 import { MaestroSessionInput } from '@/components/maestros/maestro-session-input';
 import { maestri } from '@/data';
@@ -17,7 +19,7 @@ import { useTTS } from '@/components/accessibility';
 import type { Maestro } from '@/types';
 import { useRef } from 'react';
 
-type Variant = 'A' | 'B' | 'C' | 'D' | 'E';
+type Variant = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 
 const VARIANT_NAMES: Record<Variant, string> = {
   A: 'Bilanciato',
@@ -25,6 +27,7 @@ const VARIANT_NAMES: Record<Variant, string> = {
   C: 'Compact Pro',
   D: 'Glassmorphism',
   E: 'Avatar Centro + Info Sinistra',
+  F: 'Pannello Verticale Destro',
 };
 
 function TestSession({ maestro, variant }: { maestro: Maestro; variant: Variant }) {
@@ -66,6 +69,48 @@ function TestSession({ maestro, variant }: { maestro: Maestro; variant: Variant 
       handleSubmit();
     }
   };
+
+  // Variant F is a vertical panel, needs different layout
+  if (variant === 'F') {
+    return (
+      <div className="flex gap-4 h-[calc(100vh-12rem)]">
+        <div className="flex-1 flex flex-col">
+          <div className="p-4 bg-white dark:bg-slate-900 rounded-t-2xl border-b">
+            <h3 className="text-lg font-semibold">Chat Area</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Il pannello vocale è sulla destra</p>
+          </div>
+          <MaestroSessionMessages
+            messages={messages}
+            toolCalls={toolCalls}
+            maestro={maestro}
+            isLoading={isLoading}
+            ttsEnabled={ttsEnabled}
+            speak={speak}
+            voiceSessionId={voiceSessionId}
+            messagesEndRef={messagesEndRef}
+            fullscreenToolId={null}
+            onToggleToolFullscreen={() => {}}
+          />
+          <MaestroSessionInput
+            maestro={maestro}
+            input={input}
+            isLoading={isLoading}
+            sessionEnded={sessionEnded}
+            isVoiceActive={isVoiceActive}
+            showEndSession={!sessionEnded && messages.length > 1}
+            inputRef={inputRef}
+            onInputChange={setInput}
+            onKeyDown={handleKeyDown}
+            onSubmit={() => handleSubmit()}
+            onRequestTool={requestTool}
+            onRequestPhoto={handleRequestPhoto}
+            onEndSession={handleEndSession}
+          />
+        </div>
+        <HeaderVariantF {...headerProps} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-[calc(100vh-12rem)]">
@@ -133,7 +178,7 @@ export default function TestProposalsPage() {
             <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
               Variante:
             </span>
-            {(['A', 'B', 'C', 'D', 'E'] as Variant[]).map((v) => (
+            {(['A', 'B', 'C', 'D', 'E', 'F'] as Variant[]).map((v) => (
               <Button
                 key={v}
                 variant={selectedVariant === v ? 'default' : 'outline'}
