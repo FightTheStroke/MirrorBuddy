@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Brain,
   HelpCircle,
@@ -23,6 +24,7 @@ import {
 import { motion } from 'framer-motion';
 import { ToolCard } from './tool-card';
 import { ToolMaestroSelectionDialog } from '@/components/education/tool-maestro-selection-dialog';
+import { StudyKitView } from '@/components/study-kit/StudyKitView';
 import type { ToolType } from '@/types/tools';
 import type { Maestro } from '@/types';
 import { cn } from '@/lib/utils';
@@ -48,6 +50,19 @@ interface ToolCategory {
 
 const TOOL_CATEGORIES: ToolCategory[] = [
   {
+    id: 'carica',
+    title: 'Carica',
+    subtitle: 'Importa i tuoi materiali per generare supporti di studio',
+    icon: FolderUp,
+    color: 'teal',
+    tools: [
+      { id: 'pdf', title: 'Carica PDF', description: 'Carica un documento PDF e genera automaticamente materiali di studio', icon: Upload, color: 'teal', route: '/pdf' },
+      { id: 'webcam', title: 'Scatta Foto', description: 'Fotografa la lavagna o i tuoi appunti per generare materiali', icon: Camera, color: 'pink', route: '/webcam' },
+      { id: 'homework', title: 'Aiuto Compiti', description: 'Carica un esercizio e ricevi assistenza guidata passo-passo', icon: BookOpen, color: 'violet', route: '/homework' },
+      { id: 'pdf', title: 'Study Kit', description: 'Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz', icon: BookOpen, color: 'indigo', route: '/study-kit' },
+    ],
+  },
+  {
     id: 'crea',
     title: 'Crea',
     subtitle: 'Genera materiali di studio con l\'aiuto dei Maestri',
@@ -63,18 +78,6 @@ const TOOL_CATEGORIES: ToolCategory[] = [
       { id: 'timeline', title: 'Linea Temporale', description: 'Organizza eventi storici o sequenze in modo visivo', icon: Clock, color: 'amber', route: '/timeline' },
       { id: 'formula', title: 'Formula', description: 'Visualizza e comprendi formule matematiche e scientifiche', icon: Calculator, color: 'rose', route: '/formula' },
       { id: 'chart', title: 'Grafico', description: 'Crea grafici e visualizzazioni per dati e statistiche', icon: BarChart3, color: 'emerald', route: '/chart' },
-    ],
-  },
-  {
-    id: 'carica',
-    title: 'Carica',
-    subtitle: 'Importa i tuoi materiali per generare supporti di studio',
-    icon: FolderUp,
-    color: 'teal',
-    tools: [
-      { id: 'pdf', title: 'Carica PDF', description: 'Carica un documento PDF e genera automaticamente materiali di studio', icon: Upload, color: 'teal', route: '/pdf' },
-      { id: 'webcam', title: 'Scatta Foto', description: 'Fotografa la lavagna o i tuoi appunti per generare materiali', icon: Camera, color: 'pink', route: '/webcam' },
-      { id: 'homework', title: 'Aiuto Compiti', description: 'Carica un esercizio e ricevi assistenza guidata passo-passo', icon: BookOpen, color: 'violet', route: '/homework' },
     ],
   },
   {
@@ -106,13 +109,21 @@ const categoryVariants = {
 };
 
 export function AstuccioView() {
+  const router = useRouter();
   const { enterFocusMode } = useUIStore();
   const [selectedTool, setSelectedTool] = useState<ToolType | null>(null);
   const [isMaestroDialogOpen, setIsMaestroDialogOpen] = useState(false);
   const [pendingToolRoute, setPendingToolRoute] = useState<string | null>(null);
   const [pendingToolType, setPendingToolType] = useState<ToolType | null>(null);
+  const [showStudyKit, setShowStudyKit] = useState(false);
 
   const handleToolClick = useCallback((route: string, toolId: ToolType) => {
+    // Study Kit doesn't need maestro selection, show directly
+    if (route === '/study-kit') {
+      setShowStudyKit(true);
+      return;
+    }
+    
     setSelectedTool(toolId);
     setPendingToolRoute(route);
     setPendingToolType(toolId);
@@ -124,7 +135,7 @@ export function AstuccioView() {
       enterFocusMode({
         toolType: pendingToolType,
         maestroId: maestro.id,
-        interactionMode: mode,
+        interactionMode: 'chat', // Always use chat mode
       });
     }
     setIsMaestroDialogOpen(false);
@@ -139,6 +150,21 @@ export function AstuccioView() {
     setPendingToolRoute(null);
     setPendingToolType(null);
   }, []);
+
+  // Show Study Kit view if selected
+  if (showStudyKit) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <button
+          onClick={() => setShowStudyKit(false)}
+          className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
+        >
+          ← Torna all'Astuccio
+        </button>
+        <StudyKitView />
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -171,7 +197,7 @@ export function AstuccioView() {
               </div>
               <div className={cn('grid gap-4', category.tools.length === 1 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : category.tools.length <= 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4')}>
                 {category.tools.map((tool, index) => (
-                  <motion.div key={tool.id} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.05 }}>
+                  <motion.div key={tool.route} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.05 }}>
                     <ToolCard title={tool.title} description={tool.description} icon={tool.icon} color={tool.color} onClick={() => handleToolClick(tool.route, tool.id)} isActive={selectedTool === tool.id} />
                   </motion.div>
                 ))}

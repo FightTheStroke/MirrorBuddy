@@ -118,6 +118,11 @@ function initClientErrorLogger(): void {
       return String(arg);
     }).join(' ');
 
+    // Filter out known non-critical errors
+    if (message.includes('clipboard') && message.includes('model does not support image input')) {
+      return; // Silently ignore Azure Realtime SDK clipboard warnings
+    }
+
     const errorArg = args.find(arg => arg instanceof Error);
 
     sendLog({

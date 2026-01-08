@@ -14,8 +14,6 @@ import {
   ArrowRight,
   ArrowLeft,
   X,
-  Mic,
-  MessageSquare,
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -78,7 +76,7 @@ interface ToolMaestroSelectionDialogProps {
   onClose: () => void;
 }
 
-type Step = 'subject' | 'maestro' | 'mode';
+type Step = 'subject' | 'maestro';
 
 export function ToolMaestroSelectionDialog({
   isOpen,
@@ -145,48 +143,37 @@ export function ToolMaestroSelectionDialog({
     setSelectedSubject(subject);
     const maestri = getMaestriBySubject(subject);
     if (maestri.length === 1) {
-      // Auto-select if only one maestro
+      // Auto-select if only one maestro and confirm immediately with chat mode
       setSelectedMaestro(maestri[0]);
-      setStep('mode');
+      onConfirm(maestri[0], 'chat');
+      // Reset state
+      setStep('subject');
+      setSelectedSubject(null);
+      setSelectedMaestro(null);
     } else if (maestri.length > 1) {
       setStep('maestro');
     } else {
       // No maestro for this subject, show all maestri
       setStep('maestro');
     }
-  }, []);
+  }, [onConfirm]);
 
   const handleMaestroSelect = useCallback((maestro: Maestro) => {
     setSelectedMaestro(maestro);
-    setStep('mode');
-  }, []);
-
-  const handleModeSelect = useCallback((mode: 'voice' | 'chat') => {
-    if (selectedMaestro) {
-      onConfirm(selectedMaestro, mode);
-      // Reset state
-      setStep('subject');
-      setSelectedSubject(null);
-      setSelectedMaestro(null);
-    }
-  }, [selectedMaestro, onConfirm]);
+    // Confirm immediately with chat mode
+    onConfirm(maestro, 'chat');
+    // Reset state
+    setStep('subject');
+    setSelectedSubject(null);
+    setSelectedMaestro(null);
+  }, [onConfirm]);
 
   const handleBack = useCallback(() => {
-    if (step === 'mode') {
-      // If we auto-selected maestro, go back to subject
-      if (availableMaestri.length === 1) {
-        setStep('subject');
-        setSelectedMaestro(null);
-        setSelectedSubject(null);
-      } else {
-        setStep('maestro');
-        setSelectedMaestro(null);
-      }
-    } else if (step === 'maestro') {
+    if (step === 'maestro') {
       setStep('subject');
       setSelectedSubject(null);
     }
-  }, [step, availableMaestri.length]);
+  }, [step]);
 
   const handleClose = useCallback(() => {
     setStep('subject');
@@ -225,11 +212,9 @@ export function ToolMaestroSelectionDialog({
             <div className="flex items-center gap-2">
               {step === 'subject' && <BookOpen className="h-5 w-5 text-accent-themed" />}
               {step === 'maestro' && <GraduationCap className="h-5 w-5 text-accent-themed" />}
-              {step === 'mode' && <Mic className="h-5 w-5 text-accent-themed" />}
               <h2 id="dialog-title" className="text-lg font-semibold">
                 {step === 'subject' && `Crea ${toolLabel} - Scegli Materia`}
                 {step === 'maestro' && `Crea ${toolLabel} - Scegli Professore`}
-                {step === 'mode' && `Crea ${toolLabel} - Scegli Modalità`}
               </h2>
             </div>
             <button
@@ -315,68 +300,11 @@ export function ToolMaestroSelectionDialog({
                 </motion.div>
               )}
 
-              {/* Step 3: Mode Selection */}
-              {step === 'mode' && selectedMaestro && (
-                <motion.div
-                  key="mode"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
-                  <div className="flex items-center gap-3 mb-4 p-3 bg-slate-50 dark:bg-slate-800 rounded-lg">
-                    <div className="w-10 h-10 rounded-full overflow-hidden">
-                      <Image
-                        src={selectedMaestro.avatar}
-                        alt={selectedMaestro.name}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div>
-                      <p className="font-semibold">{selectedMaestro.name}</p>
-                      <p className="text-sm text-slate-500">{selectedMaestro.specialty}</p>
-                    </div>
-                  </div>
-
-                  <p className="text-slate-600 dark:text-slate-400 mb-4">
-                    Come preferisci interagire con {selectedMaestro.name}?
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => handleModeSelect('voice')}
-                      className="p-6 flex flex-col items-center gap-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-accent-themed hover:bg-accent-themed/5 transition-all"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-accent-themed/10 flex items-center justify-center">
-                        <Mic className="h-8 w-8 text-accent-themed" />
-                      </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-lg">Voce</p>
-                        <p className="text-sm text-slate-500">Parla con {selectedMaestro.name}</p>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={() => handleModeSelect('chat')}
-                      className="p-6 flex flex-col items-center gap-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 hover:border-accent-themed hover:bg-accent-themed/5 transition-all"
-                    >
-                      <div className="w-16 h-16 rounded-full bg-accent-themed/10 flex items-center justify-center">
-                        <MessageSquare className="h-8 w-8 text-accent-themed" />
-                      </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-lg">Chat</p>
-                        <p className="text-sm text-slate-500">Scrivi a {selectedMaestro.name}</p>
-                      </div>
-                    </button>
-                  </div>
-                </motion.div>
-              )}
             </AnimatePresence>
           </div>
 
           {/* Footer with back button */}
-          {step !== 'subject' && (
+          {step === 'maestro' && (
             <div className="p-4 border-t border-slate-200 dark:border-slate-700">
               <Button variant="outline" onClick={handleBack} className="w-full">
                 <ArrowLeft className="mr-2 h-4 w-4" />

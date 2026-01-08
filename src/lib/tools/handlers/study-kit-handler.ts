@@ -159,13 +159,22 @@ Rispondi SOLO con un JSON valido in questo formato:
  */
 export async function generateDemo(text: string, title: string, subject?: string): Promise<DemoData | null> {
   // Only generate demo for STEM subjects
-  const stemSubjects = ['matematica', 'fisica', 'chimica', 'biologia', 'scienze', 'informatica', 'mathematics', 'physics', 'chemistry', 'biology', 'science', 'computer'];
-  const isSTEM = subject && stemSubjects.some(s => subject.toLowerCase().includes(s));
+  const stemSubjects = [
+    'matematica', 'fisica', 'chimica', 'biologia', 'scienze', 'informatica',
+    'mathematics', 'physics', 'chemistry', 'biology', 'science', 'computer',
+    'scienza', 'scientifico', 'matematica', 'fisico', 'chimico', 'biologico',
+    'stem', 's.t.e.m.', 'ingegneria', 'engineering', 'tecnologia', 'technology'
+  ];
+  
+  const subjectLower = subject?.toLowerCase() || '';
+  const isSTEM = stemSubjects.some(s => subjectLower.includes(s.toLowerCase()));
 
   if (!isSTEM) {
-    logger.info('Skipping demo generation for non-STEM subject', { subject });
+    logger.info('Skipping demo generation for non-STEM subject', { subject, subjectLower });
     return null;
   }
+
+  logger.info('Generating demo for STEM subject', { subject, title });
 
   const prompt = `Sei un tutor educativo. Crea una dimostrazione interattiva HTML/CSS/JS per questo argomento.
 
