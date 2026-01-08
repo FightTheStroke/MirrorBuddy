@@ -156,6 +156,8 @@ const TYPED_SUBJECT_MAP: Record<Subject, string> = {
   health: 'da-vinci',
   philosophy: 'socrate',
   internationalLaw: 'cesare',
+  spanish: 'cervantes',
+  storytelling: 'chris',
 };
 
 /**

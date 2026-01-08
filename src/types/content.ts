@@ -21,6 +21,7 @@ export type Subject =
   | 'geography'
   | 'italian'
   | 'english'
+  | 'spanish'
   | 'art'
   | 'music'
   | 'civics'

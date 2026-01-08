@@ -20,6 +20,7 @@ export const subjectColors: Record<Subject, string> = {
   geography: '#06B6D4',      // Cyan
   italian: '#EF4444',        // Red
   english: '#EC4899',        // Pink
+  spanish: '#E74C3C',        // Spanish Red
   art: '#F97316',            // Orange
   music: '#A855F7',          // Violet
   civics: '#6366F1',         // Indigo
@@ -40,6 +41,7 @@ export const subjectNames: Record<Subject, string> = {
   geography: 'Geografia',
   italian: 'Italiano',
   english: 'Inglese',
+  spanish: 'Spagnolo',
   art: 'Arte',
   music: 'Musica',
   civics: 'Educazione Civica',
@@ -60,6 +62,7 @@ export const subjectIcons: Record<Subject, string> = {
   geography: '🌍',
   italian: '📖',
   english: '🇬🇧',
+  spanish: '🇪🇸',
   art: '🎨',
   music: '🎵',
   civics: '⚖️',
@@ -84,6 +87,7 @@ const ID_MAP: Record<string, string> = {
   'manzoni': 'manzoni-italiano',
   'omero': 'omero-italiano',
   'shakespeare': 'shakespeare-inglese',
+  'cervantes': 'cervantes-spagnolo',
   'leonardo': 'leonardo-arte',
   'mozart': 'mozart-musica',
   'cicerone': 'cicerone-civica',
@@ -92,7 +96,6 @@ const ID_MAP: Record<string, string> = {
   'ippocrate': 'ippocrate-corpo',
   'socrate': 'socrate-filosofia',
   'chris': 'chris-storytelling',
-  'omero': 'omero-italiano',
 };
 
 // Get full system prompt from CLI export
@@ -290,12 +293,27 @@ Remember: You are the blind poet who sees with the mind's eye. Your voice carrie
     subject: 'english',
     specialty: 'Lingua Inglese e Letteratura',
     voice: 'alloy',
-    voiceInstructions: 'You are William Shakespeare. Speak with Elizabethan theatrical flair. Be expressive and full of emotion. Use dramatic examples and poetic turns of phrase. Make language feel like performance and art.',
-    teachingStyle: 'Drammatico, poetico, rende l\'inglese vivo e teatrale',
+    voiceInstructions: 'You are William Shakespeare. Speak with Elizabethan theatrical flair. Be expressive and full of emotion. Use dramatic examples and poetic turns of phrase. Make language feel like performance and art. Alternate between Italian explanations and English practice.',
+    teachingStyle: 'Drammatico, poetico, alterna italiano e inglese per l\'apprendimento',
     avatar: '/maestri/shakespeare.png',
     color: subjectColors.english,
-    greeting: 'Good morrow, dear student! I am William Shakespeare. Together we shall unlock the beauty of the English tongue.',
+    greeting: 'Good morrow, dear student! I am William Shakespeare. Together we shall unlock the beauty of the English tongue. Ti parlerò in italiano per spiegarti e in inglese per praticare!',
     systemPrompt: getFullSystemPrompt('shakespeare'),
+  },
+
+  // === SPANISH ===
+  {
+    id: 'cervantes',
+    name: 'Cervantes',
+    subject: 'spanish',
+    specialty: 'Lingua Spagnola e Letteratura',
+    voice: 'echo',
+    voiceInstructions: 'You are Miguel de Cervantes, author of Don Quixote. Speak with Spanish passion and adventurous enthusiasm. Use storytelling analogies and make language learning feel like an adventure. Alternate between Italian explanations and Spanish practice.',
+    teachingStyle: 'Avventuroso, narrativo, alterna italiano e spagnolo per l\'apprendimento',
+    avatar: '/maestri/cervantes.png',
+    color: subjectColors.spanish,
+    greeting: '¡Hola, joven aventurero! Sono Miguel de Cervantes. Insieme esploreremo la bellissima lingua spagnola come un\'avventura! Te la spiegherò in italiano e la praticheremo in español!',
+    systemPrompt: getFullSystemPrompt('cervantes'),
   },
 
   // === ART ===
