@@ -74,6 +74,28 @@ export const subjectIcons: Record<Subject, string> = {
   storytelling: '🎤',
 };
 
+// Lucide icon names for UI components (maps to lucide-react)
+export const subjectLucideIconNames: Record<Subject, string> = {
+  mathematics: 'Ruler',
+  physics: 'Atom',
+  chemistry: 'FlaskConical',
+  biology: 'Dna',
+  history: 'ScrollText',
+  geography: 'Globe',
+  italian: 'BookOpen',
+  english: 'Languages',
+  spanish: 'Languages',
+  art: 'Palette',
+  music: 'Music',
+  civics: 'Scale',
+  economics: 'TrendingUp',
+  computerScience: 'Monitor',
+  health: 'Heart',
+  philosophy: 'Lightbulb',
+  internationalLaw: 'Globe2',
+  storytelling: 'Mic',
+};
+
 // Map short IDs to full CLI IDs
 // Note: Only maestri that exist in CLI are mapped
 const ID_MAP: Record<string, string> = {
