@@ -53,6 +53,7 @@ function sanitizeHtml(html: string): string {
 
 /**
  * Technical agent that generates SPECTACULAR HTML/CSS/JS from description
+ * Creates interactive visualizations for ANY subject
  */
 async function generateDemoCode(description: {
   title: string;
@@ -61,14 +62,112 @@ async function generateDemoCode(description: {
   interaction: string;
   wowFactor?: string;
 }): Promise<{ html: string; css: string; js: string } | null> {
-  const prompt = `Crea una demo SPETTACOLARE per:
+  const prompt = `Crea una demo SPETTACOLARE e INTERATTIVA per:
 TITOLO: ${description.title}
 CONCETTO: ${description.concept}
 VISUALIZZAZIONE: ${description.visualization}
 INTERAZIONE: ${description.interaction}
 ${description.wowFactor ? `WOW: ${description.wowFactor}` : ''}
 
-USA QUESTO TEMPLATE BASE (poi personalizza per il concetto):
+=== ESEMPI DI DEMO PER MATERIA (ispirati a questi) ===
+
+MATEMATICA - Frazioni:
+- Pizza/torta che si divide in fette cliccabili
+- Slider per scegliere denominatore, fette si animano
+- Colora le fette per rappresentare la frazione
+- Confronta frazioni side-by-side
+
+MATEMATICA - Moltiplicazione:
+- Griglia di blocchi colorati (righe × colonne)
+- Blocchi appaiono uno per uno con animazione
+- Cambia numeri e vedi la griglia trasformarsi
+- Conta animata del totale
+
+FISICA - Gravità:
+- Oggetti diversi (piuma, palla, mattone) che cadono
+- Slider per cambiare gravità (Terra, Luna, Giove)
+- Tracce colorate delle traiettorie
+- Timer e velocimetro in tempo reale
+
+FISICA - Onde:
+- Corda/molla che vibra con animazione fluida
+- Slider per frequenza e ampiezza
+- Vedi lunghezza d'onda cambiare
+- Punti che oscillano su e giù
+
+STORIA - Timeline:
+- Linea del tempo navigabile con drag
+- Eventi come card che appaiono con hover
+- Zoom in/out per dettagli
+- Personaggi animati che raccontano
+
+STORIA - Mappe:
+- Mappa che cambia confini nel tempo
+- Slider temporale (es: 1800-2000)
+- Paesi che si colorano/espandono
+- Popup con info su ogni cambiamento
+
+GEOGRAFIA - Ciclo dell'acqua:
+- Animazione continua: evaporazione → nuvole → pioggia
+- Clicca su ogni fase per spiegazione
+- Sole che scalda, nuvole che si formano
+- Particelle d'acqua che si muovono
+
+GEOGRAFIA - Climi:
+- Mappa o globo con zone climatiche
+- Hover per vedere temperatura, pioggia
+- Animazione stagioni che cambiano
+- Confronto tra climi diversi
+
+ITALIANO - Analisi grammaticale:
+- Frase che si scompone in parole
+- Ogni parola si colora per tipo (nome, verbo, aggettivo)
+- Drag & drop per riordinare
+- Tooltip con spiegazione grammaticale
+
+ITALIANO - Figure retoriche:
+- Testo che si trasforma visivamente
+- Metafora: parola → immagine
+- Similitudine: connessione animata
+- Click per vedere la trasformazione
+
+SCIENZE - Cellula:
+- Cellula grande esplorabile
+- Zoom su ogni organello
+- Hover per nome e funzione
+- Animazioni dei processi interni
+
+SCIENZE - Fotosintesi:
+- Pianta con foglia in sezione
+- Sole → luce entra nella foglia
+- CO2 entra, O2 esce (particelle animate)
+- Glucosio si forma (molecole che si assemblano)
+
+CHIMICA - Reazioni:
+- Molecole che si avvicinano
+- Legami che si rompono/formano
+- Energia rilasciata (flash, particelle)
+- Equazione che si bilancia visivamente
+
+CHIMICA - Stati della materia:
+- Contenitore con particelle
+- Slider temperatura: freddo → caldo
+- Particelle si muovono più velocemente
+- Cambio di stato visibile (ghiaccio → acqua → vapore)
+
+ARTE - Prospettiva:
+- Scena 3D semplificata
+- Linee di fuga che appaiono
+- Punto di fuga che si può spostare
+- Oggetti che cambiano dimensione
+
+MUSICA - Onde sonore:
+- Visualizzazione forma d'onda
+- Bottoni per note diverse
+- Frequenza → altezza visiva
+- Colori diversi per ogni nota
+
+=== TEMPLATE BASE (PERSONALIZZA!) ===
 
 HTML:
 <div class="demo-container">
