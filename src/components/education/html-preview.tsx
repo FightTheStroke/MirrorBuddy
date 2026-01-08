@@ -5,12 +5,8 @@ import { motion } from 'framer-motion';
 import {
   Maximize2,
   Minimize2,
-  Code,
-  Eye,
-  Copy,
-  Check,
-  ExternalLink,
   Save,
+  Check,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,9 +33,7 @@ export function HTMLPreview({
   onClose,
   allowSave = true,
 }: HTMLPreviewProps) {
-  const [view, setView] = useState<'preview' | 'code'>('preview');
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -48,12 +42,6 @@ export function HTMLPreview({
   const iframeSrcDoc = useMemo(() => {
     return buildDemoHTML({ code, html: '', css: '', js: '' });
   }, [code]);
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   const handleSave = async () => {
     if (saving) return;
@@ -70,13 +58,6 @@ export function HTMLPreview({
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleOpenInNewTab = () => {
-    const blob = new Blob([code], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   return (
@@ -99,44 +80,8 @@ export function HTMLPreview({
           )}
         </div>
         <div className="flex items-center gap-2">
-          {/* View toggle */}
-          <div className="flex bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
-            <button
-              onClick={() => setView('preview')}
-              aria-label="Visualizza anteprima"
-              className={cn(
-                'px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
-                view === 'preview'
-                  ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400'
-              )}
-            >
-              <Eye className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setView('code')}
-              aria-label="Visualizza codice"
-              className={cn(
-                'px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
-                view === 'code'
-                  ? 'bg-white dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-600 dark:text-slate-400'
-              )}
-            >
-              <Code className="w-4 h-4" />
-            </button>
-          </div>
-
-          <Button variant="ghost" size="icon-sm" onClick={handleCopy} aria-label={copied ? 'Copiato' : 'Copia codice'}>
-            {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-          </Button>
-
-          <Button variant="ghost" size="icon-sm" onClick={handleOpenInNewTab} aria-label="Apri in nuova scheda">
-            <ExternalLink className="w-4 h-4" />
-          </Button>
-
           {allowSave && (
-            <Button variant="ghost" size="icon-sm" onClick={handleSave} aria-label={saved ? 'Salvato' : 'Salva snippet'}>
+            <Button variant="ghost" size="icon-sm" onClick={handleSave} aria-label={saved ? 'Salvato' : 'Salva demo'}>
               {saved ? <Check className="w-4 h-4 text-green-500" /> : <Save className="w-4 h-4" />}
             </Button>
           )}
@@ -151,46 +96,40 @@ export function HTMLPreview({
           </Button>
 
           {onClose && (
-            <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Chiudi anteprima">
+            <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Chiudi demo">
               <X className="w-4 h-4" />
             </Button>
           )}
         </div>
       </div>
 
-      {/* Content */}
+      {/* Content - Only show iframe execution, no code view */}
       <div className="flex-1 overflow-hidden">
-        {view === 'preview' ? (
-          <iframe
-            ref={iframeRef}
-            title={title}
-            className="w-full h-full min-h-[400px] bg-white"
-            sandbox={getDemoSandboxPermissions()}
-            srcDoc={iframeSrcDoc}
-            allow={getDemoAllowPermissions()}
-            style={{ width: '100%', height: '100%', minHeight: '400px' }}
-            onLoad={() => {
-              // Force script execution after iframe loads
-              try {
-                const iframe = iframeRef.current;
-                if (iframe && iframe.contentWindow) {
-                  // Scripts should already execute via srcDoc, but this ensures they run
-                  // Using type assertion since eval may not be in TypeScript types
-                  const win = iframe.contentWindow as unknown as { eval?: (code: string) => void };
-                  if (win.eval) {
-                    win.eval('void(0)');
-                  }
+        <iframe
+          ref={iframeRef}
+          title={title}
+          className="w-full h-full min-h-[400px] bg-white"
+          sandbox={getDemoSandboxPermissions()}
+          srcDoc={iframeSrcDoc}
+          allow={getDemoAllowPermissions()}
+          style={{ width: '100%', height: '100%', minHeight: '400px' }}
+          onLoad={() => {
+            // Force script execution after iframe loads
+            try {
+              const iframe = iframeRef.current;
+              if (iframe && iframe.contentWindow) {
+                // Scripts should already execute via srcDoc, but this ensures they run
+                // Using type assertion since eval may not be in TypeScript types
+                const win = iframe.contentWindow as unknown as { eval?: (code: string) => void };
+                if (win.eval) {
+                  win.eval('void(0)');
                 }
-              } catch (e) {
-                // Cross-origin restrictions may prevent this, but scripts should still work
               }
-            }}
-          />
-        ) : (
-          <pre className="p-4 h-full overflow-auto bg-slate-900 text-slate-100 text-sm font-mono">
-            <code>{code}</code>
-          </pre>
-        )}
+            } catch (e) {
+              // Cross-origin restrictions may prevent this, but scripts should still work
+            }
+          }}
+        />
       </div>
     </motion.div>
   );
