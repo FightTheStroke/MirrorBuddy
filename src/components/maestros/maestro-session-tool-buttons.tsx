@@ -12,6 +12,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useContainerWidth } from '@/components/conversation/hooks/use-container-width';
 
 type ToolType = 'mindmap' | 'quiz' | 'flashcards' | 'demo' | 'search' | 'summary' | 'diagram' | 'timeline';
 
@@ -102,9 +103,14 @@ export function MaestroSessionToolButtons({
     },
   ];
 
+  const { containerRef, hideLabels } = useContainerWidth(80, toolButtons.length);
+
   return (
-    <div className="overflow-x-auto -mx-4 px-4 mb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-      <div className="flex gap-1 min-w-max">
+    <div className="w-full mb-2">
+      <div
+        ref={containerRef}
+        className="flex flex-wrap gap-1 justify-center items-center"
+      >
         {toolButtons.map((tool) => {
           const Icon = tool.icon;
           return (
@@ -114,11 +120,12 @@ export function MaestroSessionToolButtons({
               size="sm"
               onClick={tool.onClick}
               disabled={isLoading || sessionEnded}
-              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white whitespace-nowrap flex-shrink-0"
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex-shrink-0"
               title={tool.title}
+              aria-label={tool.title}
             >
-              <Icon className="w-4 h-4 mr-1 sm:mr-1.5" />
-              <span className="text-xs">{tool.label}</span>
+              <Icon className="w-4 h-4" />
+              {!hideLabels && <span className="text-xs ml-1.5">{tool.label}</span>}
             </Button>
           );
         })}

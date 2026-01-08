@@ -38,11 +38,13 @@ export function ChatInput({
   return (
     <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-b-2xl">
       {characterType === 'coach' && (
-        <ToolButtons
-          onToolRequest={onToolRequest}
-          disabled={isLoading}
-          activeToolId={activeTool?.id}
-        />
+        <div className="mb-2">
+          <ToolButtons
+            onToolRequest={onToolRequest}
+            disabled={isLoading}
+            activeToolId={activeTool?.id}
+          />
+        </div>
       )}
       <div className="flex gap-3">
         <textarea

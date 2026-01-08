@@ -97,6 +97,8 @@ const DEFAULT_MAESTRO_BY_SUBJECT: Record<Subject, string> = {
   health: 'ippocrate-salute', // Fallback will find actual maestro if exists
   philosophy: 'socrate-filosofia',
   internationalLaw: 'grozio-diritto', // Fallback will find actual maestro if exists
+  spanish: 'cervantes-spagnolo',
+  storytelling: 'chris-storytelling',
 };
 
 // ============================================================================

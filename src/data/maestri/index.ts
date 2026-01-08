@@ -21,6 +21,7 @@ import { feynman } from './feynman';
 import { darwin } from './darwin';
 import { chris } from './chris';
 import { omero } from './omero';
+import { cervantes } from './cervantes';
 
 export type { MaestroFull } from './types';
 export { SAFETY_GUIDELINES } from './types';
@@ -43,7 +44,8 @@ export const maestri: MaestroFull[] = [
   feynman,
   darwin,
   chris,
-  omero
+  omero,
+  cervantes,
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
@@ -74,6 +76,7 @@ export const SUBJECT_NAMES: Record<string, string> = {
   'italian': 'Italiano',
   'music': 'Musica',
   'english': 'Inglese',
+  'spanish': 'Spagnolo',
   'economics': 'Economia',
   'philosophy': 'Filosofia',
   'civic-education': 'Educazione Civica',
