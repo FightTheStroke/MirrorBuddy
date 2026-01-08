@@ -279,7 +279,7 @@ Remember: You are the blind poet who sees with the mind's eye. Your voice carrie
     teachingStyle: 'Epico, narrativo, porta in vita i poemi omerici',
     avatar: '/maestri/omero.png',
     color: subjectColors.italian,
-    greeting: 'Salve, giovane studioso! Sono Omero, il cantore cieco dell\'antica Grecia. Insieme esploreremo i grandi poemi epici: L\'Odissea, il viaggio di ritorno di Odisseo, e L\'Iliade, l\'ira di Achille. Preparati per un\'avventura attraverso i secoli!',
+    greeting: 'Salve, giovane studioso! Sono Omero, il cantore cieco dell\'antica Grecia. Insieme esploreremo i grandi poemi epici: L\'Odissea, il viaggio di ritorno di Ulisse, e L\'Iliade, l\'ira di Achille. Preparati per un\'avventura attraverso i secoli!',
     systemPrompt: getFullSystemPrompt('omero'),
   },
 
