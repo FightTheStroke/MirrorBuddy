@@ -77,7 +77,7 @@ Each Maestro gets examples matching their teaching style:
 - **Darwin**: Evolution trees, transformations
 - **Curie**: Atoms, radioactivity, chemical reactions
 - **Leonardo**: Machines, gears, perspective
-- **Cervantes**: Adventure maps, Spanish vocabulary journeys
+- **Álex Pina**: Heist planning boards, karaoke lyrics, escape rooms
 - **Shakespeare**: Theatrical stages, word trees
 
 ### 4. Validation Before Generation
@@ -107,12 +107,13 @@ If validation fails, suggestions are logged for debugging.
 - **Demo content language**: Based on user's language settings
 - **Language Maestros**: Shakespeare (English), Cervantes (Spanish) use bilingual approach
 
-## New Maestro: Cervantes
+## New Maestro: Álex Pina
 
-Added Miguel de Cervantes as Spanish language professor:
+Added Álex Pina (creator of La Casa de Papel) as Spanish language professor:
 - Subject: `spanish`
-- Style: Adventurous, storytelling-based
+- Style: Modern, dramatic, teaches through series and pop culture
 - Bilingual: Italian explanations + Spanish practice
+- Catchphrases: "¡Tengo un plan!", "Somos la resistencia", "¡Bella ciao!"
 - Icon: 🇪🇸
 
 ## Consequences
@@ -131,4 +132,5 @@ Added Miguel de Cervantes as Spanish language professor:
 
 ## References
 - ADR 0025: Demo Generation Architecture
-- `src/data/maestri/cervantes.ts`: New Spanish professor
+- ADR 0027: Bilingual Voice Recognition for Language Teachers
+- `src/data/maestri/alex-pina.ts`: Spanish professor (Álex Pina)
