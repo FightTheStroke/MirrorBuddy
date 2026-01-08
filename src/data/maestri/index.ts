@@ -21,7 +21,7 @@ import { feynman } from './feynman';
 import { darwin } from './darwin';
 import { chris } from './chris';
 import { omero } from './omero';
-import { cervantes } from './cervantes';
+import { alexPina } from './alex-pina';
 
 export type { MaestroFull } from './types';
 export { SAFETY_GUIDELINES } from './types';
@@ -45,7 +45,7 @@ export const maestri: MaestroFull[] = [
   darwin,
   chris,
   omero,
-  cervantes,
+  alexPina,
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
