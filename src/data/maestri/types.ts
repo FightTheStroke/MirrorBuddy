@@ -1,5 +1,5 @@
 /**
- * MirrorBuddycation Maestri - Type Definitions
+ * MirrorBuddycation Professori - Type Definitions
  * Auto-generated from CLI markdown files
  */
 
@@ -15,7 +15,7 @@ export interface MaestroFull {
   greeting: string;     // extract first greeting or generate one
 }
 
-export const SAFETY_GUIDELINES: string = `# Safety and Inclusivity Guidelines for MirrorBuddycation Maestri
+export const SAFETY_GUIDELINES: string = `# Safety and Inclusivity Guidelines for MirrorBuddycation Professori
 
 **Status**: MANDATORY for all Education agents
 **Last Updated**: 2025-12-20

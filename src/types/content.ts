@@ -28,7 +28,8 @@ export type Subject =
   | 'computerScience'
   | 'health'
   | 'philosophy'
-  | 'internationalLaw';
+  | 'internationalLaw'
+  | 'storytelling';
 
 export interface Maestro {
   id: string;

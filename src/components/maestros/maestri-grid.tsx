@@ -35,7 +35,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
     })
     .sort((a, b) => a.name.localeCompare(b.name, 'it'));
 
-  // Click on maestro goes directly to voice
+  // Click on professore goes directly to voice
   const handleSelect = (maestro: Maestro) => {
     if (onMaestroSelect) {
       onMaestroSelect(maestro, 'voice');

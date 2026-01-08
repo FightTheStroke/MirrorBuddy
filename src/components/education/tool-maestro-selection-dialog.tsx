@@ -1,8 +1,8 @@
 'use client';
 
 /**
- * ToolMaestroSelectionDialog - Modal for selecting subject/maestro before entering tool focus mode
- * Shows subject selection, then maestro selection for that subject
+ * ToolMaestroSelectionDialog - Modal for selecting subject/professore before entering tool focus mode
+ * Shows subject selection, then professore selection for that subject
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -40,11 +40,11 @@ const SUBJECT_LABELS: Record<string, string> = {
   health: 'Salute',
   philosophy: 'Filosofia',
   internationalLaw: 'Diritto Internazionale',
+  storytelling: 'Storytelling',
   astronomy: 'Astronomia',
   'computer-science': 'Informatica',
   'civic-education': 'Educazione Civica',
   science: 'Scienze',
-  storytelling: 'Storytelling',
   'physical-education': 'Educazione Fisica',
 };
 

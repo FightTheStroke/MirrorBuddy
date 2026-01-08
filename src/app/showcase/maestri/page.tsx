@@ -33,11 +33,11 @@ export default function MaestriShowcasePage() {
         <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
           Incontra i{' '}
           <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Maestri
+            Professori
           </span>
         </h1>
         <p className="text-white/70 max-w-xl mx-auto">
-          17 AI tutors ispirati a grandi figure storiche. Ogni maestro ha il suo stile
+          18 Professori AI ispirati a grandi figure storiche. Ogni professore ha il suo stile
           didattico unico, adattato per studenti con diverse esigenze.
         </p>
       </motion.div>

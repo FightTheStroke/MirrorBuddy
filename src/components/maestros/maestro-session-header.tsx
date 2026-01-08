@@ -62,7 +62,7 @@ export function MaestroSessionHeader({
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-bold truncate">{maestro.name}</h2>
           <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-white/20">
-            Maestro
+            Professore
           </span>
         </div>
         <p className="text-sm text-white/80 truncate">

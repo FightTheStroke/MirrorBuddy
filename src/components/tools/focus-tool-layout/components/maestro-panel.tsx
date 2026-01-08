@@ -1,6 +1,6 @@
 /**
  * @file maestro-panel.tsx
- * @brief Maestro panel component
+ * @brief Professore panel component
  */
 
 import { Loader2, Phone, PhoneOff, Mic, MicOff, Volume2 } from 'lucide-react';

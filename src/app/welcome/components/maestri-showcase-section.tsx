@@ -13,7 +13,7 @@ interface MaestroShowcase {
   color: string;
 }
 
-// Featured maestri - the greatest minds in history
+// Featured professori - the greatest minds in history
 const FEATURED_MAESTRI: MaestroShowcase[] = [
   {
     id: 'euclide',
@@ -27,7 +27,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     id: 'feynman',
     name: 'Richard Feynman',
     subject: 'Fisica',
-    tagline: 'Premio Nobel, maestro di chiarezza',
+    tagline: 'Premio Nobel, professore di chiarezza',
     avatar: '/maestri/feynman.png',
     color: 'from-cyan-400 to-blue-500',
   },
@@ -82,12 +82,12 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
 ];
 
 /**
- * Maestri Showcase Section
+ * Professori Showcase Section
  *
  * THE PRIMARY VALUE PROPOSITION of MirrorBuddy:
  * Learn WITH the greatest minds in history, not just ABOUT them.
  *
- * This section showcases 8 featured maestri out of 17 total,
+ * This section showcases 8 featured professori out of 18 total,
  * emphasizing the revolutionary concept of learning directly
  * from historical figures.
  */
@@ -120,7 +120,7 @@ export function MaestriShowcaseSection() {
         >
           Impara{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-            CON i Grandi Maestri
+            CON i Grandi Professori
           </span>
         </h2>
 
@@ -128,11 +128,11 @@ export function MaestriShowcaseSection() {
           Non leggere <em>su</em> Euclide in un libro. Studia matematica <strong>con Euclide stesso</strong>.
         </p>
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          17 menti straordinarie della storia diventano i tuoi maestri personali.
+          18 menti straordinarie della storia diventano i tuoi professori personali.
         </p>
       </motion.div>
 
-      {/* Maestri Grid */}
+      {/* Professori Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
         {FEATURED_MAESTRI.map((maestro, i) => (
           <motion.div
@@ -154,7 +154,7 @@ export function MaestriShowcaseSection() {
               <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
                 <Image
                   src={maestro.avatar}
-                  alt={`${maestro.name} - Maestro di ${maestro.subject}`}
+                  alt={`${maestro.name} - Professore di ${maestro.subject}`}
                   width={96}
                   height={96}
                   className="w-full h-full object-cover"
@@ -176,7 +176,7 @@ export function MaestriShowcaseSection() {
         ))}
       </div>
 
-      {/* Additional Maestri Teaser */}
+      {/* Additional Professori Teaser */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
