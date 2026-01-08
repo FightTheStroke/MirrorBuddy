@@ -84,14 +84,9 @@ export function useMaestroChatHandlers({
   }, [input, isLoading, messages, maestro.systemPrompt, maestro.id, setInput, setIsLoading, setMessages, setToolCalls, onQuestionAsked]);
 
   const clearChat = useCallback(() => {
-    setMessages([{
-      id: 'greeting',
-      role: 'assistant',
-      content: maestro.greeting,
-      timestamp: new Date(),
-    }]);
+    setMessages([]);
     setToolCalls([]);
-  }, [maestro.greeting, setMessages, setToolCalls]);
+  }, [setMessages, setToolCalls]);
 
   const handleWebcamCapture = useCallback((imageData: string) => {
     setMessages(prev => [

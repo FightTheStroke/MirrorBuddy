@@ -68,6 +68,7 @@ export function MaestroSessionHeader({
         <p className="text-sm text-white/80 truncate">
           {isVoiceActive && isConnected ? 'In chiamata vocale' : maestro.specialty}
         </p>
+        <p className="text-xs text-white/70 truncate mt-1">{maestro.greeting}</p>
       </div>
 
       {/* Voice Call Button */}
