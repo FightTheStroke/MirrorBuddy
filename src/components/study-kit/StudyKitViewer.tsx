@@ -60,33 +60,13 @@ import { PlayCircle, X } from 'lucide-react';
 import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
 
 function buildDemoCode(demoData: DemoData): string | null {
-  // Use shared HTML builder for consistency
-  const baseHtml = buildDemoHTML({
+  // Use shared HTML builder for consistency - no KaTeX injection (causes rendering issues)
+  return buildDemoHTML({
     html: demoData.html || '',
     css: demoData.css || '',
     js: demoData.js || '',
     code: ('code' in demoData && typeof demoData.code === 'string') ? demoData.code : undefined,
   });
-
-  if (!baseHtml) return null;
-
-  // Inject KaTeX support for STEM formulas
-  const katexHead = `
-  <!-- KaTeX for STEM mathematical formulas -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>`;
-
-  // Inject KaTeX into head
-  if (baseHtml.includes('<head>')) {
-    return baseHtml.replace('<head>', `<head>${katexHead}`);
-  }
-  if (baseHtml.includes('<html>')) {
-    return baseHtml.replace('<html>', `<html><head>${katexHead}</head>`);
-  }
-
-  return baseHtml;
 }
 
 /**
