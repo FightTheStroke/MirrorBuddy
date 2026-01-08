@@ -115,7 +115,7 @@ Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi riassumere?"`,
 
 /**
  * Build dynamic demo context based on maestro's teaching style
- * Maestro DESCRIBES the demo creatively, technical agent generates code
+ * Includes CAPABILITY PALETTE so maestro knows what's technically possible
  */
 function getDemoContext(maestroId?: string): string {
   const maestro = maestroId ? getMaestroById(maestroId) : null;
@@ -123,40 +123,111 @@ function getDemoContext(maestroId?: string): string {
   const maestroName = maestro?.name || 'Maestro';
   
   return `
-## MODALITÀ DEMO INTERATTIVA - DESCRIVI LA TUA IDEA CREATIVA
+## MODALITÀ DEMO INTERATTIVA
 
-Tu sei ${maestroName}. Il tuo stile è: "${teachingStyle}"
+Tu sei ${maestroName}. Il tuo stile: "${teachingStyle}"
 
-IMPORTANTE: NON scrivere codice! DESCRIVI la demo con la tua creatività unica.
+### 🎨 PALETTE DI CAPACITÀ - Cosa puoi chiedere:
 
-COME USARE IL TOOL create_demo:
-1. Scegli un TITOLO accattivante
-2. Indica il CONCETTO da visualizzare
-3. DESCRIVI CREATIVAMENTE come vuoi che appaia (usa metafore, analogie, immagini)
-4. Spiega l'INTERAZIONE: cosa può fare lo studente?
-5. Aggiungi un effetto WOW che renda memorabile la demo
+**ELEMENTI VISIVI disponibili:**
+- Blocchi/forme colorate (quadrati, cerchi, rettangoli)
+- Griglia di elementi (es: array per moltiplicazione)
+- Linea del tempo (timeline orizzontale navigabile)
+- Mappa/canvas (area disegnabile)
+- Grafici (barre, linee, torta)
+- Personaggi/icone (figure semplici animate)
+- Testo grande animato (numeri, parole)
+- Particelle (sfondo decorativo)
 
-ESEMPI DI DESCRIZIONI CREATIVE (ispirati al tuo stile):
-${maestroName === 'Euclide' ? `
-- "La moltiplicazione come costruzione geometrica: immagina di costruire un rettangolo mattone per mattone. Ogni numero è un lato, e l'area è il risultato. Lo studente trascina i mattoni e vede crescere il rettangolo."
-- "Le frazioni come divisione di un quadrato perfetto: il quadrato si illumina e si divide in parti uguali, come le mattonelle di un pavimento greco."` : ''}
-${maestroName === 'Feynman' ? `
-- "La moltiplicazione come palloncini che si moltiplicano! Parti con un gruppo di palloncini colorati, poi - BAM! - si duplicano. È come vedere la matematica esplodere di colori!"
-- "Immagina le particelle come biglie colorate che rimbalzano. Più energia = più velocità = più caos colorato!"` : ''}
-${maestroName === 'Erodoto' ? `
-- "Un viaggio nel tempo: lo studente naviga su una mappa antica, e ad ogni tappa appare un personaggio storico che racconta la sua storia."
-- "Le civiltà come fiumi che scorrono paralleli, a volte si incontrano e mescolano i loro colori."` : ''}
-${!['Euclide', 'Feynman', 'Erodoto'].includes(maestroName || '') ? `
-- "Trasforma il concetto in qualcosa di visivo e tangibile"
-- "Usa metafore dalla vita quotidiana dello studente"
-- "Crea un'esperienza che lo studente non dimenticherà"` : ''}
+**INTERAZIONI possibili:**
+- Slider (l'utente trascina per cambiare un valore)
+- Click su elementi (seleziona, attiva, rivela)
+- Drag & drop (trascina oggetti)
+- Hover (mostra info al passaggio mouse)
+- Input numerico (inserisci valori)
+- Bottoni (esegui azione)
+- Navigazione (avanti/indietro, zoom)
 
-RICORDA:
-- Ogni tua demo deve riflettere il TUO modo unico di insegnare
-- Pensa a come STUPIRE lo studente
-- La descrizione sarà trasformata automaticamente in una demo animata e interattiva
+**ANIMAZIONI disponibili:**
+- Elementi che appaiono uno per uno
+- Movimento fluido (oggetti che si spostano)
+- Crescita/riduzione (scale)
+- Rotazione
+- Pulsazione (pulse)
+- Cambio colore graduale
+- Esplosione di particelle/confetti (celebrazione)
+- Transizioni tra stati
+
+**FEEDBACK possibili:**
+- Suono visivo (flash, shake quando corretto/sbagliato)
+- Contatore animato (numeri che scorrono)
+- Progress bar
+- Stelle/punti che appaiono
+- Messaggio di successo
+
+### 🎯 COME DESCRIVERE LA TUA DEMO:
+
+1. **TITOLO**: Nome accattivante
+2. **CONCETTO**: Cosa insegna (es: "moltiplicazione", "ciclo dell'acqua")
+3. **VISUALIZZAZIONE**: Descrivi COME vuoi che appaia usando gli elementi dalla palette
+   - "Voglio una GRIGLIA di BLOCCHI colorati, 3 righe per 4 colonne"
+   - "Voglio una TIMELINE con 5 PUNTI cliccabili"
+   - "Voglio PARTICELLE che si muovono e si raggruppano"
+4. **INTERAZIONE**: Cosa può fare lo studente usando le interazioni dalla palette
+   - "Lo studente usa uno SLIDER per cambiare il numero di righe"
+   - "Lo studente CLICCA sui blocchi per colorarli"
+   - "Lo studente TRASCINA i personaggi sulla mappa"
+5. **WOW FACTOR**: Cosa rende memorabile
+   - "Quando trova la risposta, CONFETTI colorati!"
+   - "I numeri CRESCONO con animazione contatore"
+
+### 💡 ESEMPI PER IL TUO STILE (${maestroName}):
+
+${getStyleExamples(maestroName)}
+
+### ⚠️ IMPORTANTE:
+- Usa termini dalla PALETTE sopra così posso capire cosa vuoi
+- Sii specifico: "5 blocchi in fila" è meglio di "alcuni blocchi"
+- Indica i colori se importanti: "blocchi BLU e ROSSI"
+- Descrivi l'animazione: "appaiono UNO PER UNO" vs "appaiono TUTTI INSIEME"
 
 Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi esplorare insieme?"`;
+}
+
+/**
+ * Get style-specific examples based on maestro
+ */
+function getStyleExamples(maestroName: string | undefined): string {
+  switch (maestroName) {
+    case 'Euclide':
+      return `- "GRIGLIA di blocchi che formano un RETTANGOLO. SLIDER per righe e colonne. L'AREA appare come NUMERO GRANDE animato. Quando cambi i valori, i blocchi APPAIONO UNO PER UNO."
+- "CERCHIO che si divide in SPICCHI (frazioni). CLICK su ogni spicchio per COLORARLO. Il numero di spicchi colorati / totale appare sopra."`;
+    
+    case 'Feynman':
+      return `- "PARTICELLE colorate che RIMBALZANO in un contenitore. SLIDER per la TEMPERATURA. Più caldo = movimento più VELOCE e CAOTICO. I colori cambiano da BLU (freddo) a ROSSO (caldo)!"
+- "PALLONCINI che si MOLTIPLICANO! Clicca il bottone e ogni palloncino si DUPLICA con un POP animato. Conta i palloncini = moltiplicazione!"`;
+    
+    case 'Erodoto':
+      return `- "TIMELINE orizzontale con 5 PUNTI. HOVER su ogni punto per vedere l'evento. CLICK per espandere la storia completa. PERSONAGGIO animato che cammina lungo la timeline."
+- "MAPPA antica con CONFINI che CAMBIANO. SLIDER per l'anno (500 AC → 2000 DC). I territori cambiano COLORE gradualmente. CLICK su una regione per info."`;
+    
+    case 'Darwin':
+      return `- "ALBERO della vita che CRESCE. Ogni RAMO è una specie. CLICK su un ramo per vedere le caratteristiche. Le specie APPAIONO una dopo l'altra seguendo l'evoluzione."
+- "Ambiente con CREATURE che cambiano. SLIDER per il tempo (milioni di anni). Le creature si TRASFORMANO gradualmente. I più adatti BRILLANO."`;
+    
+    case 'Curie':
+      return `- "ATOMI che VIBRANO. Alcuni sono STABILI (verdi), altri RADIOATTIVI (brillano). CLICK su un atomo radioattivo per vedere il DECADIMENTO animato. CONTATORE Geiger che fa TIC-TIC."
+- "MOLECOLE che si COMBINANO. DRAG molecole insieme. Se la reazione funziona = FLASH di luce ed ENERGIA rilasciata visibile!"`;
+    
+    case 'Leonardo':
+      return `- "MACCHINA con INGRANAGGI. CLICK per farla partire. Gli ingranaggi RUOTANO collegati. Cambia la VELOCITÀ di uno e vedi gli effetti sugli altri."
+- "Foglio da DISEGNO con PROSPETTIVA. TRASCINA il punto di fuga. Le linee guida si AGGIORNANO. POSIZIONA oggetti e vedi come cambiano dimensioni."`;
+    
+    default:
+      return `- "GRIGLIA di elementi colorati. SLIDER per cambiare quantità. Gli elementi APPAIONO con animazione. CLICK per interagire."
+- "DIAGRAMMA interattivo. HOVER per info. CLICK per espandere. Transizioni FLUIDE tra stati."
+- "TIMELINE navigabile. DRAG per scorrere. PUNTI cliccabili con POPUP informativi."`;
+  }
 }
 
 export async function POST(request: NextRequest) {
