@@ -32,11 +32,11 @@ export function MaestroSessionHeader({
 }: MaestroSessionHeaderProps) {
   return (
     <div
-      className="flex items-center gap-4 p-4 rounded-t-2xl text-white"
+      className="flex items-start gap-4 p-4 rounded-t-2xl text-white"
       style={{ background: `linear-gradient(to right, ${maestro.color}, ${maestro.color}dd)` }}
     >
       <motion.div
-        className="relative"
+        className="relative flex-shrink-0"
         initial={{ scale: 0, rotate: -180 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15 }}
@@ -68,7 +68,7 @@ export function MaestroSessionHeader({
         <p className="text-sm text-white/80 truncate">
           {isVoiceActive && isConnected ? 'In chiamata vocale' : maestro.specialty}
         </p>
-        <p className="text-xs text-white/70 truncate mt-1">{maestro.greeting}</p>
+        <p className="text-xs text-white/70 mt-1 whitespace-normal break-words">{maestro.greeting}</p>
       </div>
 
       {/* Voice Call Button */}
