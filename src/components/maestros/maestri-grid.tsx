@@ -1,12 +1,55 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, Filter } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  Ruler,
+  Atom,
+  FlaskConical,
+  Dna,
+  ScrollText,
+  Globe,
+  BookOpen,
+  Languages,
+  Palette,
+  Music,
+  Scale,
+  TrendingUp,
+  Monitor,
+  Heart,
+  Lightbulb,
+  Globe2,
+  Mic,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { MaestroCard } from './maestro-card';
 import { PersonalizedSuggestion } from './personalized-suggestion';
-import { maestri, subjectNames, subjectIcons, subjectColors, getAllSubjects } from '@/data';
+import { maestri, subjectNames, subjectColors, getAllSubjects } from '@/data';
 import { cn } from '@/lib/utils';
 import type { Maestro, Subject } from '@/types';
+
+// Map subjects to Lucide icon components
+const subjectLucideIcons: Record<Subject, LucideIcon> = {
+  mathematics: Ruler,
+  physics: Atom,
+  chemistry: FlaskConical,
+  biology: Dna,
+  history: ScrollText,
+  geography: Globe,
+  italian: BookOpen,
+  english: Languages,
+  spanish: Languages,
+  art: Palette,
+  music: Music,
+  civics: Scale,
+  economics: TrendingUp,
+  computerScience: Monitor,
+  health: Heart,
+  philosophy: Lightbulb,
+  internationalLaw: Globe2,
+  storytelling: Mic,
+};
 
 type SessionMode = 'voice' | 'chat';
 
@@ -73,12 +116,13 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
         </button>
         {subjects.map((subject) => {
           const isSelected = selectedSubject === subject;
+          const SubjectIcon = subjectLucideIcons[subject];
           return (
             <button
               key={subject}
               onClick={() => setSelectedSubject(subject)}
               className={cn(
-                'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
                 isSelected
                   ? 'text-white'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -86,7 +130,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
               style={isSelected ? { backgroundColor: subjectColors[subject] } : undefined}
               aria-pressed={isSelected}
             >
-              <span>{subjectIcons[subject]}</span>
+              <SubjectIcon className="w-4 h-4" aria-hidden="true" />
               <span className="hidden sm:inline">{subjectNames[subject]}</span>
             </button>
           );

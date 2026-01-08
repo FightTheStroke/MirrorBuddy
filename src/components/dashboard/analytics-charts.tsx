@@ -16,28 +16,21 @@ export interface StatCardProps {
   label: string;
   value: string;
   subtext: string;
-  color: 'blue' | 'purple' | 'green' | 'amber';
+  color?: string; // Deprecated, kept for backwards compatibility
 }
 
-export function StatCard({ icon, label, value, subtext, color }: StatCardProps) {
-  const colors = {
-    blue: 'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-600',
-    purple: 'from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 text-purple-600',
-    green: 'from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 text-green-600',
-    amber: 'from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 text-amber-600',
-  };
-
+export function StatCard({ icon, label, value, subtext }: StatCardProps) {
   return (
-    <Card className={cn('bg-gradient-to-br', colors[color].split(' ').slice(0, 4).join(' '))}>
+    <Card>
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
-          <div className={cn('p-2 rounded-lg bg-white/50 dark:bg-black/20', colors[color].split(' ').slice(-1))}>
+          <div className="text-muted-foreground">
             {icon}
           </div>
           <div>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
-            <p className="text-xl font-bold text-slate-900 dark:text-white">{value}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">{subtext}</p>
+            <p className="text-xs text-muted-foreground">{label}</p>
+            <p className="text-xl font-bold text-foreground">{value}</p>
+            <p className="text-xs text-muted-foreground">{subtext}</p>
           </div>
         </div>
       </CardContent>

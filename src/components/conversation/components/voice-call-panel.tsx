@@ -10,6 +10,7 @@ import { AnimatePresence } from 'framer-motion';
 import { VoicePanelVariantF } from '@/components/voice/voice-panel-variant-f';
 import { logger } from '@/lib/logger';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
+import type { Maestro } from '@/types';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 
 // Helper to get userId from cookie or sessionStorage
@@ -26,20 +27,20 @@ interface VoiceConnectionInfo {
   configured: boolean;
 }
 
-function activeCharacterToMaestro(character: ActiveCharacter) {
+function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
   return {
     id: character.id,
     name: character.name,
-    subject: 'methodology' as const,
+    subject: 'mathematics', // Placeholder for coach/buddy
     specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
-    voice: (character.voice || 'alloy') as const,
+    voice: character.voice || 'alloy',
     voiceInstructions: character.voiceInstructions || '',
     teachingStyle: character.type === 'coach' ? 'scaffolding' : 'peer-support',
-    avatar: character.avatar || '/avatars/default.jpg',
+    avatar: (character as unknown as { avatar?: string }).avatar || '/avatars/default.jpg',
     color: character.color,
     systemPrompt: character.systemPrompt,
     greeting: character.greeting,
-  };
+  } as Maestro;
 }
 
 interface VoiceCallPanelProps {
@@ -203,7 +204,7 @@ export function VoiceCallPanel({
       <VoicePanelVariantF
         character={{
           name: character.name,
-          avatar: character.avatar,
+          avatar: (character as unknown as { avatar?: string }).avatar || '/avatars/default.jpg',
           specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
           color: character.color,
         }}

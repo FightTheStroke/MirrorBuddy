@@ -19,6 +19,7 @@ import { MaestroUsageChart } from '@/components/dashboard/maestro-usage-chart';
 import { AchievementsPanel } from '@/components/gamification/achievements-panel';
 import { SeasonBanner } from '@/components/gamification/season-banner';
 import { cn } from '@/lib/utils';
+import { PageHeader } from '@/components/ui/page-header';
 import { ACHIEVEMENTS } from './progress-view/constants';
 import { OverviewTab } from './progress-view/components/overview-tab';
 import { AchievementsTab } from './progress-view/components/achievements-tab';
@@ -97,14 +98,7 @@ export function ProgressView() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-          I Tuoi Progressi
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">
-          Monitora il tuo percorso di apprendimento
-        </p>
-      </div>
+      <PageHeader icon={Trophy} title="I Tuoi Progressi" />
 
       <DashboardLayout>
         <DashboardCard>

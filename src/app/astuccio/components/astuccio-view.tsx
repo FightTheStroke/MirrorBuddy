@@ -17,6 +17,7 @@ import {
   BookOpen,
   Sparkles,
   Pencil,
+  PencilRuler,
   FolderUp,
   Globe,
 } from 'lucide-react';
@@ -28,13 +29,13 @@ import type { ToolType } from '@/types/tools';
 import type { Maestro } from '@/types';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/lib/stores';
+import { PageHeader } from '@/components/ui/page-header';
 
 interface Tool {
   id: ToolType;
   title: string;
   description: string;
   icon: typeof Brain;
-  color: string;
   route: string;
 }
 
@@ -43,7 +44,6 @@ interface ToolCategory {
   title: string;
   subtitle: string;
   icon: typeof Pencil;
-  color: string;
   tools: Tool[];
 }
 
@@ -53,12 +53,11 @@ const TOOL_CATEGORIES: ToolCategory[] = [
     title: 'Carica',
     subtitle: 'Importa i tuoi materiali per generare supporti di studio',
     icon: FolderUp,
-    color: 'teal',
     tools: [
-      { id: 'pdf', title: 'Carica PDF', description: 'Carica un documento PDF e genera automaticamente materiali di studio', icon: Upload, color: 'teal', route: '/pdf' },
-      { id: 'webcam', title: 'Scatta Foto', description: 'Fotografa la lavagna o i tuoi appunti per generare materiali', icon: Camera, color: 'pink', route: '/webcam' },
-      { id: 'homework', title: 'Aiuto Compiti', description: 'Carica un esercizio e ricevi assistenza guidata passo-passo', icon: BookOpen, color: 'violet', route: '/homework' },
-      { id: 'pdf', title: 'Study Kit', description: 'Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz', icon: BookOpen, color: 'indigo', route: '/study-kit' },
+      { id: 'pdf', title: 'Carica PDF', description: 'Carica un documento PDF e genera automaticamente materiali di studio', icon: Upload, route: '/pdf' },
+      { id: 'webcam', title: 'Scatta Foto', description: 'Fotografa la lavagna o i tuoi appunti per generare materiali', icon: Camera, route: '/webcam' },
+      { id: 'homework', title: 'Aiuto Compiti', description: 'Carica un esercizio e ricevi assistenza guidata passo-passo', icon: BookOpen, route: '/homework' },
+      { id: 'pdf', title: 'Study Kit', description: 'Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz', icon: BookOpen, route: '/study-kit' },
     ],
   },
   {
@@ -66,17 +65,16 @@ const TOOL_CATEGORIES: ToolCategory[] = [
     title: 'Crea',
     subtitle: 'Genera materiali di studio con l\'aiuto dei Maestri',
     icon: Pencil,
-    color: 'blue',
     tools: [
-      { id: 'mindmap', title: 'Mappa Mentale', description: 'Visualizza i collegamenti tra concetti con mappe interattive', icon: Brain, color: 'blue', route: '/mindmap' },
-      { id: 'quiz', title: 'Quiz', description: 'Verifica la tua comprensione con quiz personalizzati', icon: HelpCircle, color: 'green', route: '/quiz' },
-      { id: 'flashcard', title: 'Flashcard', description: 'Memorizza con flashcard intelligenti e ripetizione spaziata', icon: Layers, color: 'orange', route: '/flashcard' },
-      { id: 'demo', title: 'Demo Interattiva', description: 'Esplora concetti STEM con simulazioni interattive', icon: Play, color: 'purple', route: '/demo' },
-      { id: 'summary', title: 'Riassunto', description: 'Genera sintesi chiare e strutturate dei concetti chiave', icon: FileText, color: 'cyan', route: '/summary' },
-      { id: 'diagram', title: 'Diagramma', description: 'Crea diagrammi di flusso e schemi visivi', icon: GitBranch, color: 'indigo', route: '/diagram' },
-      { id: 'timeline', title: 'Linea Temporale', description: 'Organizza eventi storici o sequenze in modo visivo', icon: Clock, color: 'amber', route: '/timeline' },
-      { id: 'formula', title: 'Formula', description: 'Visualizza e comprendi formule matematiche e scientifiche', icon: Calculator, color: 'rose', route: '/formula' },
-      { id: 'chart', title: 'Grafico', description: 'Crea grafici e visualizzazioni per dati e statistiche', icon: BarChart3, color: 'emerald', route: '/chart' },
+      { id: 'mindmap', title: 'Mappa Mentale', description: 'Visualizza i collegamenti tra concetti con mappe interattive', icon: Brain, route: '/mindmap' },
+      { id: 'quiz', title: 'Quiz', description: 'Verifica la tua comprensione con quiz personalizzati', icon: HelpCircle, route: '/quiz' },
+      { id: 'flashcard', title: 'Flashcard', description: 'Memorizza con flashcard intelligenti e ripetizione spaziata', icon: Layers, route: '/flashcard' },
+      { id: 'demo', title: 'Demo Interattiva', description: 'Esplora concetti STEM con simulazioni interattive', icon: Play, route: '/demo' },
+      { id: 'summary', title: 'Riassunto', description: 'Genera sintesi chiare e strutturate dei concetti chiave', icon: FileText, route: '/summary' },
+      { id: 'diagram', title: 'Diagramma', description: 'Crea diagrammi di flusso e schemi visivi', icon: GitBranch, route: '/diagram' },
+      { id: 'timeline', title: 'Linea Temporale', description: 'Organizza eventi storici o sequenze in modo visivo', icon: Clock, route: '/timeline' },
+      { id: 'formula', title: 'Formula', description: 'Visualizza e comprendi formule matematiche e scientifiche', icon: Calculator, route: '/formula' },
+      { id: 'chart', title: 'Grafico', description: 'Crea grafici e visualizzazioni per dati e statistiche', icon: BarChart3, route: '/chart' },
     ],
   },
   {
@@ -84,18 +82,12 @@ const TOOL_CATEGORIES: ToolCategory[] = [
     title: 'Cerca',
     subtitle: 'Trova risorse e approfondimenti sul web',
     icon: Globe,
-    color: 'sky',
     tools: [
-      { id: 'search', title: 'Ricerca Web', description: 'Cerca informazioni, video e risorse educative sul web', icon: Search, color: 'sky', route: '/search' },
+      { id: 'search', title: 'Ricerca Web', description: 'Cerca informazioni, video e risorse educative sul web', icon: Search, route: '/search' },
     ],
   },
 ];
 
-const CATEGORY_COLORS = {
-  blue: { bg: 'bg-blue-100/50 dark:bg-blue-900/20', border: 'border-blue-200 dark:border-blue-800', icon: 'text-blue-600 dark:text-blue-400', title: 'text-blue-900 dark:text-blue-100', subtitle: 'text-blue-600 dark:text-blue-400' },
-  teal: { bg: 'bg-teal-100/50 dark:bg-teal-900/20', border: 'border-teal-200 dark:border-teal-800', icon: 'text-teal-600 dark:text-teal-400', title: 'text-teal-900 dark:text-teal-100', subtitle: 'text-teal-600 dark:text-teal-400' },
-  sky: { bg: 'bg-sky-100/50 dark:bg-sky-900/20', border: 'border-sky-200 dark:border-sky-800', icon: 'text-sky-600 dark:text-sky-400', title: 'text-sky-900 dark:text-sky-100', subtitle: 'text-sky-600 dark:text-sky-400' },
-};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -166,37 +158,29 @@ export function AstuccioView() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-10 text-center">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <Sparkles className="w-10 h-10 text-primary animate-pulse" />
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white">Il Tuo Astuccio</h1>
-          <Sparkles className="w-10 h-10 text-primary animate-pulse" />
-        </div>
-        <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">Tutti gli strumenti per studiare meglio. Scegli una categoria e inizia a creare i tuoi materiali.</p>
-      </motion.div>
+      <PageHeader icon={PencilRuler} title="Il Tuo Astuccio" />
 
       <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-10">
         {TOOL_CATEGORIES.map((category) => {
-          const colors = CATEGORY_COLORS[category.color as keyof typeof CATEGORY_COLORS];
           const CategoryIcon = category.icon;
           return (
             <motion.section key={category.id} variants={categoryVariants} className="space-y-4">
-              <div className={cn('flex items-center gap-4 p-4 rounded-xl border', colors.bg, colors.border)}>
-                <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center bg-white dark:bg-slate-800 shadow-sm')}>
-                  <CategoryIcon className={cn('w-6 h-6', colors.icon)} />
+              <div className="flex items-center gap-4 p-4 rounded-xl border bg-muted/50 border-border">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-card shadow-sm">
+                  <CategoryIcon className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div>
-                  <h2 className={cn('text-xl font-bold', colors.title)}>{category.title}</h2>
-                  <p className={cn('text-sm', colors.subtitle)}>{category.subtitle}</p>
+                  <h2 className="text-xl font-bold text-foreground">{category.title}</h2>
+                  <p className="text-sm text-muted-foreground">{category.subtitle}</p>
                 </div>
                 <div className="ml-auto">
-                  <span className={cn('text-sm font-medium px-3 py-1 rounded-full bg-white dark:bg-slate-800', colors.title)}>{category.tools.length} strumenti</span>
+                  <span className="text-sm font-medium px-3 py-1 rounded-full bg-card border text-foreground">{category.tools.length} strumenti</span>
                 </div>
               </div>
               <div className={cn('grid gap-4', category.tools.length === 1 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : category.tools.length <= 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4')}>
                 {category.tools.map((tool, index) => (
                   <motion.div key={tool.route} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.05 }}>
-                    <ToolCard title={tool.title} description={tool.description} icon={tool.icon} color={tool.color} onClick={() => handleToolClick(tool.route, tool.id)} isActive={selectedTool === tool.id} />
+                    <ToolCard title={tool.title} description={tool.description} icon={tool.icon} onClick={() => handleToolClick(tool.route, tool.id)} isActive={selectedTool === tool.id} />
                   </motion.div>
                 ))}
               </div>

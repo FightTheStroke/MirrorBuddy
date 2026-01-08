@@ -17,7 +17,7 @@ import {
   Clock,
   Star,
   Users,
-  Pencil,
+  PencilRuler,
   Backpack,
   Coins,
   BookOpen,
@@ -214,7 +214,7 @@ export default function Home() {
     { id: 'coach' as const, label: coachInfo.name, icon: Sparkles, isChat: true, avatar: coachInfo.avatar },
     { id: 'buddy' as const, label: buddyInfo.name, icon: Heart, isChat: true, avatar: buddyInfo.avatar },
     { id: 'maestri' as const, label: 'Professori', icon: GraduationCap },
-    { id: 'astuccio' as const, label: 'Astuccio', icon: Pencil },     // Tools hub (create)
+    { id: 'astuccio' as const, label: 'Astuccio', icon: PencilRuler },     // Tools hub (create)
     { id: 'supporti' as const, label: 'Zaino', icon: Backpack },         // Materials archive (browse)
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
