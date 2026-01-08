@@ -126,7 +126,7 @@ export function useWebcamCapture({
             hasMediaDevices: !!navigator.mediaDevices,
             hasGetUserMedia: !!navigator.mediaDevices?.getUserMedia,
           });
-        } catch (logErr) {
+        } catch (_logErr) {
           // If logging fails, at least log the basic error
           console.error('Camera error (logging failed):', errorMessage, errorName);
         }

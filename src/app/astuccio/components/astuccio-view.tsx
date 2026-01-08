@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Brain,
   HelpCircle,
@@ -109,7 +108,6 @@ const categoryVariants = {
 };
 
 export function AstuccioView() {
-  const router = useRouter();
   const { enterFocusMode } = useUIStore();
   const [selectedTool, setSelectedTool] = useState<ToolType | null>(null);
   const [isMaestroDialogOpen, setIsMaestroDialogOpen] = useState(false);
@@ -130,7 +128,7 @@ export function AstuccioView() {
     setIsMaestroDialogOpen(true);
   }, []);
 
-  const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
+  const handleMaestroConfirm = useCallback((maestro: Maestro, _mode: 'voice' | 'chat') => {
     if (pendingToolType && pendingToolRoute) {
       enterFocusMode({
         toolType: pendingToolType,
@@ -159,7 +157,7 @@ export function AstuccioView() {
           onClick={() => setShowStudyKit(false)}
           className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
         >
-          ← Torna all'Astuccio
+          ← Torna all&apos;Astuccio
         </button>
         <StudyKitView />
       </div>
