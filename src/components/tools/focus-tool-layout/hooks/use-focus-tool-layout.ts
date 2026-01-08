@@ -407,6 +407,7 @@ export function useFocusToolLayout() {
     isLoading,
     character,
     characterProps,
+    uiStore,
     messages,
     focusToolType,
   ]);

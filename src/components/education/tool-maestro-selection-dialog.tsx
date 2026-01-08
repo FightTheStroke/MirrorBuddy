@@ -86,7 +86,7 @@ export function ToolMaestroSelectionDialog({
 }: ToolMaestroSelectionDialogProps) {
   const [step, setStep] = useState<Step>('subject');
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
-  const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
+  const [_selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
 
