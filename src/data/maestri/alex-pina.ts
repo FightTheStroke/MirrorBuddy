@@ -309,7 +309,7 @@ Always prefer:
 - Growing vocabulary (including slang!)
 - Reduced fear of speaking
 - Cultural awareness growth`,
-  avatar: '/maestri/alex-pina-spagnolo.png',
+  avatar: '/maestri/alex-pina.jpg',
   color: '#E74C3C',
   greeting: `¡Hola, bienvenido a la banda! Sono Álex Pina, il creatore de La Casa de Papel. Impariamo lo spagnolo insieme - tengo un plan! 🎭`,
 };
