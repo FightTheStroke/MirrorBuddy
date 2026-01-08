@@ -98,54 +98,45 @@ REGOLE:
     type: 'function' as const,
     function: {
       name: 'create_demo',
-      description: `Crea una demo interattiva SPETTACOLARE. REQUISITI OBBLIGATORI:
+      description: `Crea una demo interattiva descrivendo COSA vuoi visualizzare, non COME.
 
-STILE:
-- Background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
-- Card bianca con border-radius: 20px e box-shadow: 0 25px 50px rgba(0,0,0,0.25)
-- Bottoni colorati con hover scale(1.1) e transizioni fluide
-- Font grande e leggibile
+DESCRIVI in linguaggio naturale:
+- Cosa deve mostrare la demo (concetto da visualizzare)
+- Come deve essere l'interazione (cosa succede quando l'utente clicca/muove/cambia)
+- Quale effetto WOW vuoi creare (cosa rende memorabile questa demo)
+- Come si collega a quello che state studiando
 
-ANIMAZIONI:
-- USA CANVAS per animazioni fluide (requestAnimationFrame)
-- Particelle colorate come sfondo
-- Elementi che pulsano, si muovono, reagiscono
+ESEMPI DI DESCRIZIONI CREATIVE:
+- "Voglio mostrare la moltiplicazione come un giardino: ogni numero è una fila di fiori, e moltiplicare significa creare un campo rettangolare. Lo studente sceglie quante file e quanti fiori per fila, e vede crescere il giardino animato."
+- "Immagina le frazioni come una pizza: lo studente può tagliare la pizza in fette e colorarne alcune. Deve essere super colorato con la pizza che gira!"
+- "Il sistema solare con i pianeti che orbitano a velocità diverse. Lo studente può accelerare il tempo e vedere come Mercurio fa più giri di Saturno."
 
-PER MATEMATICA:
-- Blocchi colorati che si moltiplicano/sommano visivamente
-- Numeri grandi con effetto contatore animato
-- Confetti/stelle quando risposta corretta
-- Slider per cambiare numeri in tempo reale
-
-ESEMPIO MINIMO:
-html: <div id="app"><canvas id="bg"></canvas><div class="card"><h1>Titolo</h1><div id="viz"></div><button onclick="calc()">Calcola</button></div></div>
-css: body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#667eea,#764ba2);font-family:system-ui}#bg{position:fixed;top:0;left:0;z-index:-1}.card{background:white;padding:40px;border-radius:20px;box-shadow:0 25px 50px rgba(0,0,0,.25);text-align:center}button{background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;padding:15px 40px;border-radius:50px;font-size:18px;cursor:pointer;transition:all .3s}button:hover{transform:scale(1.1)}
-js: const c=document.getElementById('bg'),ctx=c.getContext('2d');c.width=innerWidth;c.height=innerHeight;let particles=[];for(let i=0;i<50;i++)particles.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*3+1,dx:Math.random()*2-1,dy:Math.random()*2-1});function animate(){ctx.clearRect(0,0,c.width,c.height);particles.forEach(p=>{p.x+=p.dx;p.y+=p.dy;if(p.x<0||p.x>c.width)p.dx*=-1;if(p.y<0||p.y>c.height)p.dy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.5)';ctx.fill()});requestAnimationFrame(animate)}animate();function calc(){document.getElementById('viz').innerHTML='<h2 style="color:#667eea;font-size:48px">Risultato!</h2>'}`,
+NON scrivere codice HTML/CSS/JS - descrivi solo l'idea creativa!`,
       parameters: {
         type: 'object',
         properties: {
           title: {
             type: 'string',
-            description: 'Titolo accattivante',
+            description: 'Titolo accattivante della demo',
           },
-          description: {
+          concept: {
             type: 'string',
-            description: 'Cosa fa la demo (1 frase)',
+            description: 'Il concetto educativo da visualizzare (es: moltiplicazione, frazioni, sistema solare)',
           },
-          html: {
+          visualization: {
             type: 'string',
-            description: 'HTML con canvas per sfondo, card centrale, controlli interattivi',
+            description: 'DESCRIZIONE CREATIVA di come visualizzare il concetto. Usa metafore, analogie, idee originali. Più dettagli meglio è!',
           },
-          css: {
+          interaction: {
             type: 'string',
-            description: 'CSS con gradienti, ombre, transizioni, hover effects',
+            description: 'Come lo studente interagisce: cosa può cliccare, trascinare, cambiare? Cosa succede?',
           },
-          js: {
+          wowFactor: {
             type: 'string',
-            description: 'JS con animazioni canvas, event listeners, calcoli in tempo reale',
+            description: 'Cosa rende questa demo memorabile e divertente? Animazioni, sorprese, feedback?',
           },
         },
-        required: ['title', 'html', 'css', 'js'],
+        required: ['title', 'concept', 'visualization', 'interaction'],
       },
     },
   },
