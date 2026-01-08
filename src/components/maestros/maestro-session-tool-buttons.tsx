@@ -103,24 +103,26 @@ export function MaestroSessionToolButtons({
   ];
 
   return (
-    <div className="flex gap-1 mb-2">
-      {toolButtons.map((tool) => {
-        const Icon = tool.icon;
-        return (
-          <Button
-            key={tool.id}
-            variant="ghost"
-            size="sm"
-            onClick={tool.onClick}
-            disabled={isLoading || sessionEnded}
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
-            title={tool.title}
-          >
-            <Icon className="w-4 h-4 mr-1" />
-            <span className="text-xs">{tool.label}</span>
-          </Button>
-        );
-      })}
+    <div className="overflow-x-auto -mx-4 px-4 mb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="flex gap-1 min-w-max">
+        {toolButtons.map((tool) => {
+          const Icon = tool.icon;
+          return (
+            <Button
+              key={tool.id}
+              variant="ghost"
+              size="sm"
+              onClick={tool.onClick}
+              disabled={isLoading || sessionEnded}
+              className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white whitespace-nowrap flex-shrink-0"
+              title={tool.title}
+            >
+              <Icon className="w-4 h-4 mr-1 sm:mr-1.5" />
+              <span className="text-xs">{tool.label}</span>
+            </Button>
+          );
+        })}
+      </div>
     </div>
   );
 }

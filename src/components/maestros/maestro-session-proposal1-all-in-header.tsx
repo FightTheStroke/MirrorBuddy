@@ -1,38 +1,31 @@
 'use client';
 
 /**
- * MaestroSession - Unified conversation layout matching Coach/Buddy pattern
- *
- * Layout identical to CharacterChatView:
- * - Flex layout with chat on left, voice panel on right (side by side)
- * - Header with avatar, name, specialty, voice call button
- * - Messages area with inline tools
- * - Input area with tool buttons at bottom
- * - VoicePanel as sibling when voice active (NOT overlay)
- * - Evaluation inline in chat when session ends
+ * PROPOSTA 1: Tutto nell'header
+ * 
+ * Tutti i controlli audio sono nell'header quando la chiamata è attiva.
+ * Rimuove il VoicePanel laterale per massimizzare lo spazio centrale.
  */
 
 import { useRef, useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import { useTTS } from '@/components/accessibility';
-import { VoicePanel } from '@/components/voice';
 import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore } from '@/lib/stores';
 import type { Maestro } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
-import { MaestroSessionHeader } from './maestro-session-header';
+import { MaestroSessionHeaderProposal1 } from './maestro-session-header-proposal1-all-in-header';
 import { MaestroSessionMessages } from './maestro-session-messages';
 import { MaestroSessionInput } from './maestro-session-input';
 import { MaestroSessionWebcam } from './maestro-session-webcam';
 import { cn } from '@/lib/utils';
 
-interface MaestroSessionProps {
+interface MaestroSessionProposal1Props {
   maestro: Maestro;
   onClose: () => void;
   initialMode?: 'voice' | 'chat';
 }
 
-export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: MaestroSessionProps) {
+export function MaestroSessionProposal1({ maestro, onClose, initialMode = 'voice' }: MaestroSessionProposal1Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [fullscreenToolId, setFullscreenToolId] = useState<string | null>(null);
@@ -98,13 +91,11 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     const newFullscreenId = fullscreenToolId === toolId ? null : toolId;
     
     if (newFullscreenId !== null) {
-      // Entering fullscreen: save current sidebar state and compress it
       if (sidebarStateBeforeFullscreen.current === null) {
         sidebarStateBeforeFullscreen.current = useUIStore.getState().sidebarOpen;
       }
       setSidebarOpen(false);
     } else {
-      // Exiting fullscreen: restore sidebar state
       if (sidebarStateBeforeFullscreen.current !== null) {
         setSidebarOpen(sidebarStateBeforeFullscreen.current);
         sidebarStateBeforeFullscreen.current = null;
@@ -131,20 +122,25 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
         </div>
       )}
 
-      {/* Normal chat view */}
+      {/* Full width layout - no side panel */}
       <div className={cn(
-        'flex flex-col sm:flex-row gap-2 sm:gap-4 h-[calc(100vh-8rem)]',
+        'flex flex-col h-[calc(100vh-8rem)]',
         isToolFullscreen && 'opacity-0 pointer-events-none'
       )}>
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full sm:w-auto">
-          <MaestroSessionHeader
+        <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full">
+          <MaestroSessionHeaderProposal1
             maestro={maestro}
             isVoiceActive={isVoiceActive}
             isConnected={isConnected}
+            isListening={isListening}
+            isSpeaking={isSpeaking}
+            isMuted={isMuted}
+            inputLevel={inputLevel}
+            outputLevel={outputLevel}
             configError={configError}
             ttsEnabled={ttsEnabled}
             onVoiceCall={handleVoiceCall}
+            onToggleMute={toggleMute}
             onStopTTS={stopTTS}
             onClearChat={clearChat}
             onClose={onClose}
@@ -189,32 +185,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
             onEndSession={handleEndSession}
           />
         </div>
-
-        {/* Voice Panel (Side by Side on desktop, full width on mobile) */}
-        <AnimatePresence>
-          {isVoiceActive && (
-            <div className="w-full sm:w-auto sm:flex-shrink-0">
-              <VoicePanel
-                character={{
-                  name: maestro.name,
-                  avatar: maestro.avatar,
-                  specialty: maestro.specialty,
-                  color: maestro.color,
-                }}
-                isConnected={isConnected}
-                isListening={isListening}
-                isSpeaking={isSpeaking}
-                isMuted={isMuted}
-                inputLevel={inputLevel}
-                outputLevel={outputLevel}
-                connectionState={connectionState}
-                configError={configError}
-                onToggleMute={toggleMute}
-                onEndCall={handleVoiceCall}
-              />
-            </div>
-          )}
-        </AnimatePresence>
       </div>
     </>
   );

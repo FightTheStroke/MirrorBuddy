@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useProgressStore, useUIStore } from '@/lib/stores';
+import { useProgressStore } from '@/lib/stores';
 import toast from '@/components/ui/toast';
 import { generateAutoEvaluation } from './maestro-session-utils';
 import { MAESTRI_XP } from '@/lib/constants/xp-rewards';
@@ -30,10 +30,8 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
   const questionCount = useRef(0);
   const previousMessageCountRef = useRef(0);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const processedToolsRef = useRef<Set<string>>(new Set());
 
   const { addXP, endSession } = useProgressStore();
-  const { enterFocusMode } = useUIStore();
 
   const onQuestionAsked = useCallback(() => {
     questionCount.current += 1;
@@ -91,50 +89,8 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     };
   }, [maestro.id]);
 
-  // Auto-switch to focus mode for completed tools
-  useEffect(() => {
-    const completedTools = toolCalls.filter(
-      (tc) => tc.status === 'completed' && !processedToolsRef.current.has(tc.id)
-    );
-
-    if (completedTools.length === 0) return;
-
-    const toolCall = completedTools[0];
-    processedToolsRef.current.add(toolCall.id);
-
-    const toolTypeMap: Record<string, string> = {
-      create_mindmap: 'mindmap',
-      create_quiz: 'quiz',
-      create_flashcards: 'flashcard',
-      create_summary: 'summary',
-      create_demo: 'demo',
-      create_diagram: 'diagram',
-      create_timeline: 'timeline',
-      web_search: 'search',
-    };
-    const mappedToolType = (toolTypeMap[toolCall.type] || 'mindmap') as import('@/types/tools').ToolType;
-    const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
-
-    // Set focus mode with tool atomically to prevent race condition
-    enterFocusMode({
-      toolType: mappedToolType,
-      maestroId: maestro.id,
-      interactionMode: voiceConnection.isVoiceActive ? 'voice' : 'chat',
-      initialTool: {
-        id: toolCall.id,
-        type: mappedToolType,
-        status: 'completed',
-        progress: 1,
-        content: toolContent,
-        createdAt: new Date(),
-      },
-    });
-
-    logger.debug('[MaestroSession] C-17: Entered focus mode for tool', {
-      toolId: toolCall.id,
-      toolType: mappedToolType,
-    });
-  }, [toolCalls, enterFocusMode, maestro.id, voiceConnection.isVoiceActive]);
+  // Tools are now displayed inline in the chat instead of opening in fullscreen
+  // Removed auto-switch to focus mode - tools remain integrated in the chat interface
 
   const handleEndSession = useCallback(async () => {
     if (voiceConnection.isVoiceActive) {

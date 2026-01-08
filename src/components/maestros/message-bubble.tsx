@@ -44,7 +44,7 @@ export function MessageBubble({
       )}
       <div
         className={cn(
-          'max-w-[75%] rounded-2xl px-4 py-3',
+          'max-w-[75%] min-w-[120px] sm:min-w-[200px] rounded-2xl px-4 py-3',
           isUser
             ? 'text-white rounded-br-md'
             : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm'
@@ -56,7 +56,7 @@ export function MessageBubble({
             <Volume2 className="w-3 h-3" /> Trascrizione vocale
           </span>
         )}
-        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+        <p className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.content}</p>
         <div className="flex items-center justify-between mt-1 gap-2">
           <span className="text-xs opacity-60">
             {new Date(message.timestamp).toLocaleTimeString('it-IT', {

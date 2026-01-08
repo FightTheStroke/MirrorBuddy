@@ -1,0 +1,270 @@
+'use client';
+
+/**
+ * PROPOSTA 2: Tutto nella barra della chiamata vocale
+ * 
+ * Tutti i controlli audio (visualizzatore, mute, device selector, TTS, clear, close)
+ * sono consolidati nel VoicePanel laterale quando la chiamata è attiva.
+ * Mantiene il layout side-by-side ma con tutti i controlli nel pannello laterale.
+ */
+
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { Mic, MicOff, PhoneOff, Volume2, VolumeX, RotateCcw, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
+import { cn } from '@/lib/utils';
+
+const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
+
+export interface VoicePanelProposal2Character {
+  name: string;
+  avatar?: string;
+  specialty?: string;
+  color: string;
+}
+
+export interface VoicePanelProposal2Props {
+  character: VoicePanelProposal2Character;
+  isConnected: boolean;
+  isListening: boolean;
+  isSpeaking: boolean;
+  isMuted: boolean;
+  inputLevel: number;
+  outputLevel?: number;
+  connectionState: string;
+  configError: string | null;
+  ttsEnabled: boolean;
+  onToggleMute: () => void;
+  onEndCall: () => void;
+  onStopTTS: () => void;
+  onClearChat: () => void;
+  onClose: () => void;
+}
+
+function isHexColor(color: string): boolean {
+  return color.startsWith('#');
+}
+
+export function VoicePanelProposal2({
+  character,
+  isConnected,
+  isListening,
+  isSpeaking,
+  isMuted,
+  inputLevel,
+  outputLevel = 0,
+  connectionState,
+  configError,
+  ttsEnabled,
+  onToggleMute,
+  onEndCall,
+  onStopTTS,
+  onClearChat,
+  onClose,
+}: VoicePanelProposal2Props) {
+  const getStatusText = () => {
+    if (configError) return configError;
+    if (connectionState === 'connecting') return 'Connessione...';
+    if (isConnected && isSpeaking) return `${character.name} sta parlando...`;
+    if (isConnected && isListening) return 'In ascolto...';
+    if (isConnected) return 'Connesso';
+    return 'Avvio chiamata...';
+  };
+
+  const backgroundStyle = isHexColor(character.color)
+    ? { background: `linear-gradient(to bottom, ${character.color}, ${character.color}dd)` }
+    : undefined;
+
+  const backgroundClass = !isHexColor(character.color)
+    ? `bg-gradient-to-b ${character.color}`
+    : '';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      className={cn(
+        "w-64 flex flex-col items-center justify-between gap-4 p-4 rounded-2xl",
+        backgroundClass
+      )}
+      style={backgroundStyle}
+    >
+      {/* Top section: Avatar and info */}
+      <div className="flex flex-col items-center gap-3">
+        <motion.div
+          animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          className="relative"
+        >
+          {character.avatar ? (
+            <Image
+              src={character.avatar}
+              alt={character.name}
+              width={80}
+              height={80}
+              className={cn(
+                'rounded-full border-4 object-cover transition-colors duration-300',
+                isConnected ? 'border-white' : 'border-white/50',
+                isSpeaking && 'border-white shadow-lg shadow-white/30'
+              )}
+            />
+          ) : (
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
+              {character.name.charAt(0)}
+            </div>
+          )}
+          {isConnected && (
+            <span className="absolute bottom-1 right-1 w-4 h-4 bg-green-400 border-2 border-white/50 rounded-full animate-pulse" />
+          )}
+        </motion.div>
+
+        <div className="text-center">
+          <h3 className="text-lg font-semibold text-white">{character.name}</h3>
+          {character.specialty && (
+            <p className="text-xs text-white/70">{character.specialty}</p>
+          )}
+          <p className={cn(
+            "text-xs mt-1",
+            configError ? "text-red-200" : "text-white/60"
+          )}>
+            {getStatusText()}
+          </p>
+        </div>
+
+        {/* Audio visualizer */}
+        {isConnected && (
+          <div className="flex items-center gap-1.5 h-10 px-2">
+            {VISUALIZER_BAR_OFFSETS.map((offset, i) => {
+              const baseHeight = 8;
+              
+              const getBarStyle = () => {
+                const variance = 1 + (offset % 3) * 0.15;
+                
+                if (isSpeaking) {
+                  const level = outputLevel * variance;
+                  return {
+                    height: baseHeight + level * 28,
+                    opacity: 0.4 + level * 0.6,
+                  };
+                }
+                if (isListening && !isMuted) {
+                  const level = inputLevel * variance;
+                  return {
+                    height: baseHeight + level * 32,
+                    opacity: 0.3 + level * 0.7,
+                  };
+                }
+                return { height: baseHeight, opacity: 0.2 };
+              };
+
+              const style = getBarStyle();
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={false}
+                  animate={{ 
+                    height: style.height,
+                    opacity: style.opacity,
+                    scaleY: isSpeaking || (isListening && !isMuted) ? 1 : 0.8,
+                  }}
+                  transition={{ duration: 0.06, ease: 'easeOut' }}
+                  className={cn(
+                    "w-2 rounded-full",
+                    isSpeaking 
+                      ? "bg-gradient-to-t from-white/60 to-white" 
+                      : isListening && !isMuted 
+                        ? "bg-gradient-to-t from-white/40 to-white/90" 
+                        : "bg-white/20"
+                  )}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Middle section: Controls */}
+      <div className="flex flex-col items-center gap-3 w-full">
+        {/* Audio device selector */}
+        <AudioDeviceSelector compact />
+
+        {/* Main controls row */}
+        <div className="flex items-center gap-2 w-full justify-center">
+          {isConnected && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleMute}
+              aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+              className={cn(
+                'rounded-full w-12 h-12 transition-colors',
+                isMuted
+                  ? 'bg-white/20 text-white hover:bg-white/30'
+                  : 'bg-white/30 text-white hover:bg-white/40'
+              )}
+            >
+              {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            </Button>
+          )}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onEndCall}
+            className="rounded-full w-12 h-12 bg-red-500 text-white hover:bg-red-600"
+          >
+            <PhoneOff className="w-5 h-5" />
+          </Button>
+        </div>
+
+        {/* Secondary controls row */}
+        <div className="flex items-center gap-2 w-full justify-center pt-2 border-t border-white/20">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={ttsEnabled ? onStopTTS : undefined}
+            disabled={!ttsEnabled}
+            className="rounded-full w-10 h-10 text-white hover:bg-white/20"
+            aria-label={ttsEnabled ? 'Disattiva lettura vocale' : 'Lettura vocale disattivata'}
+          >
+            {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClearChat}
+            className="rounded-full w-10 h-10 text-white hover:bg-white/20"
+            aria-label="Nuova conversazione"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-full w-10 h-10 text-white hover:bg-white/20"
+            aria-label="Chiudi"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Bottom: Status text */}
+      {isConnected && (
+        <p
+          className="text-xs text-white/60 text-center"
+          aria-live="polite"
+          role="status"
+        >
+          {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
+        </p>
+      )}
+    </motion.div>
+  );
+}

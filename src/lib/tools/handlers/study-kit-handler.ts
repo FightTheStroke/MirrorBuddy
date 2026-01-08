@@ -176,7 +176,7 @@ export async function generateDemo(text: string, title: string, subject?: string
 
   logger.info('Generating demo for STEM subject', { subject, title });
 
-  const prompt = `Sei un tutor educativo. Crea una dimostrazione interattiva HTML/CSS/JS per questo argomento.
+  const prompt = `Sei un creatore di demo interattive educative. Crea una dimostrazione SPETTACOLARE, MODERNA e INGAGGIANTE HTML/CSS/JS per questo argomento.
 
 Titolo: ${title}
 Materia: ${subject}
@@ -184,21 +184,51 @@ Materia: ${subject}
 DOCUMENTO:
 ${text.substring(0, 6000)} ${text.length > 6000 ? '...' : ''}
 
-Crea una demo interattiva che visualizza un concetto chiave. Usa HTML semplice, CSS per lo stile, e JavaScript vanilla per l'interattività.
+Crea una demo INTERATTIVA e ANIMATA che visualizza il concetto in modo coinvolgente e memorabile.
+
+REQUISITI ESSENZIALI:
+- Design MODERNO e PULITO con gradienti, ombre, animazioni fluide
+- ANIMAZIONI CSS (transitions, transforms, keyframes) per rendere tutto dinamico
+- JavaScript VANILLA per interattività reattiva (event listeners, DOM manipulation)
+- Controlli interattivi STILOSI (slider con feedback visivo, bottoni con hover effects, input con animazioni)
+- Canvas o SVG per visualizzazioni grafiche animate
+- Colori VIVACI e GRADIENTI moderni
+- Effetti HOVER e TRANSITIONS su tutti gli elementi interattivi
+- Responsive design che funziona su mobile e desktop
+
+STILE VISIVO:
+- Usa gradienti moderni (linear-gradient, radial-gradient)
+- Ombre morbide (box-shadow con blur)
+- Animazioni fluide (transition: all 0.3s ease)
+- Hover effects su tutti gli elementi cliccabili
+- Loading animations quando appropriato
+- Micro-interazioni che danno feedback immediato
+
+JAVASCRIPT:
+- Event listeners per click, mouseover, input changes
+- Animazioni JavaScript (requestAnimationFrame per animazioni fluide)
+- Manipolazione DOM dinamica
+- Calcoli in tempo reale che si aggiornano visivamente
+- Feedback visivo immediato alle azioni dell'utente
+
+ESEMPI DI COSA CREARE:
+- Simulazioni fisiche animate (palline che rimbalzano, onde che si propagano)
+- Visualizzazioni matematiche interattive (grafici che si animano, forme che si trasformano)
+- Esperimenti virtuali con controlli (slider per variare parametri, vedere risultati in tempo reale)
+- Giochi educativi mini con feedback visivo
 
 IMPORTANTE:
-- NON usare librerie esterne
-- Crea controlli interattivi (slider, bottoni)
-- Usa canvas o SVG per visualizzazioni
-- Codice sicuro (no fetch, no localStorage)
+- NON usare librerie esterne (solo vanilla JS)
+- Codice sicuro (no fetch, no localStorage, no eval)
+- Tutto deve essere AUTO-CONTENUTO nel codice HTML/CSS/JS
 
 Rispondi SOLO con JSON in questo formato:
 {
-  "title": "Titolo demo",
-  "description": "Breve descrizione",
-  "html": "<div>...</div>",
-  "css": "/* styles */",
-  "js": "// javascript"
+  "title": "Titolo demo accattivante",
+  "description": "Descrizione entusiasmante di cosa fa la demo",
+  "html": "<div class='container'>...</div>",
+  "css": "/* CSS moderno con gradienti, animazioni, transitions */",
+  "js": "// JavaScript con animazioni, event listeners, interattività fluida"
 }`;
 
   const result = await chatCompletion(

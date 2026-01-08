@@ -22,14 +22,75 @@ export function buildDemoHTML(demoData: DemoData): string {
     // Check if it already has DOCTYPE and html structure
     if (demoData.code.includes('<!DOCTYPE html>') || demoData.code.includes('<html>')) {
       // Ensure viewport meta tag is present
-      if (!demoData.code.includes('viewport')) {
-        return demoData.code.replace(
+      let finalCode = demoData.code;
+      if (!finalCode.includes('viewport')) {
+        finalCode = finalCode.replace(
           /<head>/i,
           `<head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">`
         );
       }
-      return demoData.code;
+      
+      // Ensure proper responsive CSS is injected if missing
+      if (!finalCode.includes('box-sizing: border-box')) {
+        const responsiveCSS = `
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow-x: auto;
+      overflow-y: auto;
+    }
+    
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #1e293b;
+      background-color: #ffffff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 12px;
+        font-size: 14px;
+      }
+    }
+    
+    @media (min-width: 1920px) {
+      body {
+        padding: 24px;
+        font-size: 18px;
+      }
+    }
+    
+    canvas, svg {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    * {
+      max-width: 100%;
+    }`;
+        
+        // Inject CSS into head or before closing head tag
+        if (finalCode.includes('</head>')) {
+          finalCode = finalCode.replace('</head>', `<style>${responsiveCSS}</style></head>`);
+        } else if (finalCode.includes('<head>')) {
+          finalCode = finalCode.replace('<head>', `<head><style>${responsiveCSS}</style>`);
+        }
+      }
+      
+      return finalCode;
     }
     // Wrap code without structure
     return buildHTMLFromParts(demoData.code, '', '');
