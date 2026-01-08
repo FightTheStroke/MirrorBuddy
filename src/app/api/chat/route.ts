@@ -224,9 +224,10 @@ function getStyleExamples(maestroName: string | undefined): string {
       return `- "MACHINE with GEARS. CLICK to start it. Gears ROTATE connected. Change the SPEED of one and see effects on others."
 - "DRAWING sheet with PERSPECTIVE. DRAG the vanishing point. Guide lines UPDATE. POSITION objects and see how sizes change."`;
     
-    case 'Cervantes':
-      return `- "ADVENTURE MAP with STOPS. CLICK on each stop for a story fragment in Spanish. CHARACTER travels the path. WORDS appear one by one with pronunciation."
-- "WINDMILL with rotating BLADES. DRAG Don Quixote toward it. Spanish VOCABULARY appears as he gets closer. QUIZ popup at the end!"`;
+    case 'Álex Pina':
+      return `- "HEIST PLANNING BOARD with PHASES. CLICK on each phase for Spanish vocabulary. Characters from 'la banda' appear. WORDS appear dramatically one by one."
+- "MUSIC VIDEO with LYRICS. Song plays with KARAOKE style Spanish text. CLICK on words to see meaning. PRONUNCIATION button for each line!"
+- "ESCAPE ROOM style game. SOLVE Spanish puzzles to unlock doors. TIMER adds suspense. Victory = CONFETTI and '¡Bella ciao!'"`;
     
     case 'Shakespeare':
       return `- "STAGE with CHARACTERS. DRAG words to complete the dialogue. Characters SPEAK when complete. Star RATING for pronunciation."

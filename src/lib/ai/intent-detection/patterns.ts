@@ -54,9 +54,11 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
     /spagnol/i,
     /español/i,
     /spanish/i,
-    /cervantes/i,
-    /don\s*quixote/i,
+    /casa\s*di?\s*carta/i,
+    /money\s*heist/i,
+    /alex\s*pina/i,
     /castellano/i,
+    /reggaeton/i,
   ],
   storytelling: [
     /storytelling/i,
