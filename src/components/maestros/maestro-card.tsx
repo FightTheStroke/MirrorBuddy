@@ -30,7 +30,7 @@ export function MaestroCard({ maestro, onSelect, isSelected = false }: MaestroCa
         ['--tw-ring-color' as string]: maestro.color,
         ['--tw-ring-offset-color' as string]: 'var(--background)',
       }}
-      aria-label={`Studia con ${maestro.name}`}
+      aria-label={`Studia con il Professore ${maestro.name}`}
     >
       <div className="flex items-start gap-3">
         {/* Avatar - compact 56x56 */}

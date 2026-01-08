@@ -1,5 +1,5 @@
 // ============================================================================
-// MAESTRI QUOTES - Motivational quotes for each maestro
+// PROFESSORI QUOTES - Motivational quotes for each professore
 // ============================================================================
 
 export interface MaestroQuote {
@@ -154,7 +154,7 @@ export const maestroQuotes: Record<string, string[]> = {
 };
 
 /**
- * Get a random quote for a maestro
+ * Get a random quote for a professore
  */
 export function getRandomQuote(maestroId: string): string {
   const quotes = maestroQuotes[maestroId];
@@ -165,7 +165,7 @@ export function getRandomQuote(maestroId: string): string {
 }
 
 /**
- * Get all quotes for a maestro
+ * Get all quotes for a professore
  */
 export function getMaestroQuotes(maestroId: string): string[] {
   return maestroQuotes[maestroId] || [];
