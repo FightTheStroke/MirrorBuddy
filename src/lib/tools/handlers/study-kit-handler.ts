@@ -176,65 +176,52 @@ export async function generateDemo(text: string, title: string, subject?: string
 
   logger.info('Generating demo for STEM subject', { subject, title });
 
-  const prompt = `Sei un creatore di demo interattive educative. Crea una dimostrazione SPETTACOLARE, MODERNA e INGAGGIANTE HTML/CSS/JS per questo argomento.
+  const prompt = `Crea una demo HTML/CSS/JS SPETTACOLARE per: "${title}" (${subject})
 
-Titolo: ${title}
-Materia: ${subject}
+CONTENUTO DA VISUALIZZARE:
+${text.substring(0, 4000)}
 
-DOCUMENTO:
-${text.substring(0, 6000)} ${text.length > 6000 ? '...' : ''}
+REQUISITI OBBLIGATORI:
+1. USA CANVAS per animazioni fluide (no SVG statico)
+2. COLORI VIVACI: usa gradienti (#667eea→#764ba2, #f093fb→#f5576c, #4facfe→#00f2fe)
+3. ANIMAZIONI: tutto deve muoversi, pulsare, reagire
+4. INTERATTIVITÀ: click, drag, slider che cambiano tutto in tempo reale
+5. EFFETTI PARTICELLE: aggiungi particelle animate come sfondo
 
-Crea una demo INTERATTIVA e ANIMATA che visualizza il concetto in modo coinvolgente e memorabile.
+ESEMPIO DI STILE CSS DA USARE:
+body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+.card { background: rgba(255,255,255,0.95); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 40px; border-radius: 50px; font-size: 18px; cursor: pointer; transform: scale(1); transition: all 0.3s ease; }
+button:hover { transform: scale(1.1); box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5); }
 
-REQUISITI ESSENZIALI:
-- Design MODERNO e PULITO con gradienti, ombre, animazioni fluide
-- ANIMAZIONI CSS (transitions, transforms, keyframes) per rendere tutto dinamico
-- JavaScript VANILLA per interattività reattiva (event listeners, DOM manipulation)
-- Controlli interattivi STILOSI (slider con feedback visivo, bottoni con hover effects, input con animazioni)
-- Canvas o SVG per visualizzazioni grafiche animate
-- Colori VIVACI e GRADIENTI moderni
-- Effetti HOVER e TRANSITIONS su tutti gli elementi interattivi
-- Responsive design che funziona su mobile e desktop
+ESEMPIO DI ANIMAZIONE CANVAS DA USARE:
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); /* draw stuff */ requestAnimationFrame(animate); }
+animate();
 
-STILE VISIVO:
-- Usa gradienti moderni (linear-gradient, radial-gradient)
-- Ombre morbide (box-shadow con blur)
-- Animazioni fluide (transition: all 0.3s ease)
-- Hover effects su tutti gli elementi cliccabili
-- Loading animations quando appropriato
-- Micro-interazioni che danno feedback immediato
+PER MATEMATICA (moltiplicazioni, addizioni, ecc):
+- Mostra BLOCCHI COLORATI che si moltiplicano visivamente
+- ANIMAZIONI di blocchi che appaiono uno per uno
+- NUMERI GRANDI che cambiano con effetto contatore
+- CONFETTI quando la risposta è corretta
+- SUONI simulati con feedback visivo (flash, shake)
 
-JAVASCRIPT:
-- Event listeners per click, mouseover, input changes
-- Animazioni JavaScript (requestAnimationFrame per animazioni fluide)
-- Manipolazione DOM dinamica
-- Calcoli in tempo reale che si aggiornano visivamente
-- Feedback visivo immediato alle azioni dell'utente
+STRUTTURA OBBLIGATORIA:
+- Container centrato con max-width: 800px
+- Canvas a schermo pieno come sfondo animato
+- Card centrale con controlli
+- Bottoni grandi e colorati
+- Risultato mostrato in grande con animazione
 
-ESEMPI DI COSA CREARE:
-- Simulazioni fisiche animate (palline che rimbalzano, onde che si propagano)
-- Visualizzazioni matematiche interattive (grafici che si animano, forme che si trasformano)
-- Esperimenti virtuali con controlli (slider per variare parametri, vedere risultati in tempo reale)
-- Giochi educativi mini con feedback visivo
-
-IMPORTANTE:
-- NON usare librerie esterne (solo vanilla JS)
-- Codice sicuro (no fetch, no localStorage, no eval)
-- Tutto deve essere AUTO-CONTENUTO nel codice HTML/CSS/JS
-
-Rispondi SOLO con JSON in questo formato:
-{
-  "title": "Titolo demo accattivante",
-  "description": "Descrizione entusiasmante di cosa fa la demo",
-  "html": "<div class='container'>...</div>",
-  "css": "/* CSS moderno con gradienti, animazioni, transitions */",
-  "js": "// JavaScript con animazioni, event listeners, interattività fluida"
-}`;
+Rispondi SOLO con JSON valido (no markdown, no commenti):
+{"title":"...","description":"...","html":"...","css":"...","js":"..."}`;
 
   const result = await chatCompletion(
     [{ role: 'user', content: prompt }],
-    'Sei un tutor educativo. Rispondi SOLO con JSON valido.',
-    { temperature: 0.7, maxTokens: 2000 }
+    'Sei un esperto di visualizzazioni interattive. Genera SOLO JSON valido con demo spettacolari.',
+    { temperature: 0.8, maxTokens: 4000 }
   );
 
   // Parse JSON response
