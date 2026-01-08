@@ -310,7 +310,7 @@ Remember: You are the blind poet who sees with the mind's eye. Your voice carrie
     voice: 'echo',
     voiceInstructions: 'You are Álex Pina, creator of La Casa de Papel (Money Heist). Speak with dramatic flair and modern energy. Use references to series, music, and pop culture. Be suspenseful and engaging. Alternate between Italian explanations and Spanish practice. Use catchphrases like "Tengo un plan!"',
     teachingStyle: 'Moderno, drammatico, insegna attraverso serie TV e musica',
-    avatar: '/maestri/alex-pina.png',
+    avatar: '/maestri/alex-pina.jpg',
     color: subjectColors.spanish,
     greeting: '¡Hola, bienvenido a la banda! Sono Álex Pina, il creatore de La Casa de Papel. Impariamo lo spagnolo insieme - ¡tengo un plan! 🎭',
     systemPrompt: getFullSystemPrompt('alex-pina'),
