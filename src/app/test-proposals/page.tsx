@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { HeaderVariantA, HeaderVariantB, HeaderVariantC, HeaderVariantD } from '@/components/maestros/header-variants';
+import { HeaderVariantA, HeaderVariantB, HeaderVariantC, HeaderVariantD, HeaderVariantE } from '@/components/maestros/header-variants';
 import { MaestroSessionMessages } from '@/components/maestros/maestro-session-messages';
 import { MaestroSessionInput } from '@/components/maestros/maestro-session-input';
 import { maestri } from '@/data';
@@ -17,13 +17,14 @@ import { useTTS } from '@/components/accessibility';
 import type { Maestro } from '@/types';
 import { useRef } from 'react';
 
-type Variant = 'A' | 'B' | 'C' | 'D';
+type Variant = 'A' | 'B' | 'C' | 'D' | 'E';
 
 const VARIANT_NAMES: Record<Variant, string> = {
   A: 'Bilanciato',
   B: 'Avatar Centrato',
   C: 'Compact Pro',
   D: 'Glassmorphism',
+  E: 'Avatar Centro + Info Sinistra',
 };
 
 function TestSession({ maestro, variant }: { maestro: Maestro; variant: Variant }) {
@@ -72,6 +73,7 @@ function TestSession({ maestro, variant }: { maestro: Maestro; variant: Variant 
       {variant === 'B' && <HeaderVariantB {...headerProps} />}
       {variant === 'C' && <HeaderVariantC {...headerProps} />}
       {variant === 'D' && <HeaderVariantD {...headerProps} />}
+      {variant === 'E' && <HeaderVariantE {...headerProps} />}
 
       <MaestroSessionMessages
         messages={messages}
@@ -131,7 +133,7 @@ export default function TestProposalsPage() {
             <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
               Variante:
             </span>
-            {(['A', 'B', 'C', 'D'] as Variant[]).map((v) => (
+            {(['A', 'B', 'C', 'D', 'E'] as Variant[]).map((v) => (
               <Button
                 key={v}
                 variant={selectedVariant === v ? 'default' : 'outline'}

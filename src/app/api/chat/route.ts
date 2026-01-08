@@ -115,7 +115,7 @@ Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi riassumere?"`,
 
 /**
  * Build dynamic demo context based on maestro's teaching style
- * Each maestro creates demos with their unique creative approach
+ * Maestro DESCRIBES the demo creatively, technical agent generates code
  */
 function getDemoContext(maestroId?: string): string {
   const maestro = maestroId ? getMaestroById(maestroId) : null;
@@ -123,43 +123,40 @@ function getDemoContext(maestroId?: string): string {
   const maestroName = maestro?.name || 'Maestro';
   
   return `
-## MODALITÀ DEMO INTERATTIVA - CREA DEMO SPETTACOLARI
+## MODALITÀ DEMO INTERATTIVA - DESCRIVI LA TUA IDEA CREATIVA
 
-Tu sei ${maestroName}. Il tuo stile di insegnamento è: "${teachingStyle}"
+Tu sei ${maestroName}. Il tuo stile è: "${teachingStyle}"
 
-CREA UNA DEMO CHE RIFLETTA IL TUO STILE UNICO:
-- Inventa un modo CREATIVO e ORIGINALE di spiegare il concetto
-- La demo deve essere MEMORABILE e diversa da una lezione tradizionale
-- Usa il tuo approccio caratteristico per rendere il concetto comprensibile
+IMPORTANTE: NON scrivere codice! DESCRIVI la demo con la tua creatività unica.
 
-REQUISITI TECNICI:
-1. USA CANVAS per animazioni fluide (requestAnimationFrame)
-2. Background con gradiente colorato (#667eea→#764ba2 o altri colori vivaci)
-3. Card centrale bianca con ombre morbide (border-radius: 20px)
-4. Bottoni colorati con hover effects (transform: scale(1.1))
-5. TUTTO deve essere ANIMATO e INTERATTIVO
+COME USARE IL TOOL create_demo:
+1. Scegli un TITOLO accattivante
+2. Indica il CONCETTO da visualizzare
+3. DESCRIVI CREATIVAMENTE come vuoi che appaia (usa metafore, analogie, immagini)
+4. Spiega l'INTERAZIONE: cosa può fare lo studente?
+5. Aggiungi un effetto WOW che renda memorabile la demo
 
-ACCESSIBILITÀ OBBLIGATORIA:
-- Font grande e leggibile (min 16px)
-- Alto contrasto tra testo e sfondo
-- Bottoni grandi facili da cliccare (min 44px)
-- Animazioni che non causano motion sickness (ridotte se prefers-reduced-motion)
-- Colori che funzionano per daltonici (usa forme oltre ai colori)
+ESEMPI DI DESCRIZIONI CREATIVE (ispirati al tuo stile):
+${maestroName === 'Euclide' ? `
+- "La moltiplicazione come costruzione geometrica: immagina di costruire un rettangolo mattone per mattone. Ogni numero è un lato, e l'area è il risultato. Lo studente trascina i mattoni e vede crescere il rettangolo."
+- "Le frazioni come divisione di un quadrato perfetto: il quadrato si illumina e si divide in parti uguali, come le mattonelle di un pavimento greco."` : ''}
+${maestroName === 'Feynman' ? `
+- "La moltiplicazione come palloncini che si moltiplicano! Parti con un gruppo di palloncini colorati, poi - BAM! - si duplicano. È come vedere la matematica esplodere di colori!"
+- "Immagina le particelle come biglie colorate che rimbalzano. Più energia = più velocità = più caos colorato!"` : ''}
+${maestroName === 'Erodoto' ? `
+- "Un viaggio nel tempo: lo studente naviga su una mappa antica, e ad ogni tappa appare un personaggio storico che racconta la sua storia."
+- "Le civiltà come fiumi che scorrono paralleli, a volte si incontrano e mescolano i loro colori."` : ''}
+${!['Euclide', 'Feynman', 'Erodoto'].includes(maestroName || '') ? `
+- "Trasforma il concetto in qualcosa di visivo e tangibile"
+- "Usa metafore dalla vita quotidiana dello studente"
+- "Crea un'esperienza che lo studente non dimenticherà"` : ''}
 
-CREATIVITÀ - IDEE PER OGNI MATERIA:
-- MATEMATICA: blocchi colorati che si moltiplicano, numeri che danzano, frazioni come pizza
-- FISICA: palline che rimbalzano, onde che si propagano, pianeti che orbitano
-- CHIMICA: molecole che si combinano, atomi che vibrano, reazioni colorate
-- STORIA: timeline interattiva, personaggi che parlano, mappe animate
-- GEOGRAFIA: globo che ruota, climi che cambiano, viaggi virtuali
-- ITALIANO: parole che volano, analisi grammaticale visiva, storie animate
+RICORDA:
+- Ogni tua demo deve riflettere il TUO modo unico di insegnare
+- Pensa a come STUPIRE lo studente
+- La descrizione sarà trasformata automaticamente in una demo animata e interattiva
 
-STRUTTURA CODICE:
-- html: container con canvas sfondo + card centrale + controlli
-- css: gradienti, ombre, transizioni, hover effects, @media prefers-reduced-motion
-- js: animazioni canvas, event listeners, feedback visivo immediato
-
-Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`;
+Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi esplorare insieme?"`;
 }
 
 export async function POST(request: NextRequest) {
