@@ -24,9 +24,9 @@ export async function extractStudyKitContent(
     const url = `${baseUrl}/api/study-kit/${kitIdOrStudyKit}`;
     const response = await fetch(url);
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch study kit: ${response.status}`);
-    }
+  if (!response.ok) {
+    throw new Error(`Failed to fetch study kit: ${response.status}`);
+  }
 
     const data = await response.json();
     studyKit = data.studyKit || data;
@@ -69,7 +69,7 @@ export async function extractStudyKitContent(
   const readingTime = Math.ceil(wordCount / 200);
 
   const kitId = typeof studyKit.id === 'string' ? studyKit.id : String(studyKit.id || '');
-  
+
   return {
     title: String(studyKit.title || 'Untitled'),
     subject: studyKit.subject ? String(studyKit.subject) : undefined,

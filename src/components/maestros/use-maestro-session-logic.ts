@@ -62,14 +62,9 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     onQuestionAsked,
   });
 
-  // Initialize greeting and pending tool request
+  // Initialize pending tool request (greeting is now shown in header)
   useEffect(() => {
-    setMessages([{
-      id: 'greeting',
-      role: 'assistant',
-      content: maestro.greeting,
-      timestamp: new Date(),
-    }]);
+    setMessages([]);
 
     const pendingRequest = sessionStorage.getItem('pendingToolRequest');
     if (pendingRequest) {
@@ -94,7 +89,7 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [maestro.greeting, maestro.id]);
+  }, [maestro.id]);
 
   // Auto-switch to focus mode for completed tools
   useEffect(() => {
