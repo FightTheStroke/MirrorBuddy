@@ -17,6 +17,7 @@ import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
 import { executeToolCall } from '@/lib/tools/tool-executor';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
+import { getMaestroById } from '@/data';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
@@ -94,39 +95,7 @@ ESEMPI:
 
 Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi le flashcard?"`,
 
-  demo: `
-## MODALITÀ DEMO INTERATTIVA - CREA DEMO SPETTACOLARI E MODERNE
-
-Hai a disposizione il tool "create_demo" per creare visualizzazioni INTERATTIVE, ANIMATE e INGAGGIANTI.
-
-QUANDO CREARE UNA DEMO:
-- Lo studente vuole vedere come funziona qualcosa visivamente
-- Chiede una simulazione o animazione
-- Vuole interagire con un concetto (variare parametri, vedere risultati)
-
-COME CREARE DEMO MODERNE E COOL:
-1. Design MODERNO: usa gradienti vivaci, ombre morbide, bordi arrotondati
-2. ANIMAZIONI CSS: transitions fluide, transforms, keyframes per movimento
-3. JavaScript INTERATTIVO: event listeners reattivi, animazioni con requestAnimationFrame
-4. Controlli STILOSI: slider con feedback visivo, bottoni con hover effects
-5. Canvas/SVG ANIMATI: visualizzazioni grafiche che si muovono e reagiscono
-6. Micro-interazioni: feedback visivo immediato su ogni azione
-7. Colori VIVACI e GRADIENTI moderni
-8. Responsive: funziona su mobile e desktop
-
-ESEMPI DI DEMO COOL:
-- "sistema solare" → create_demo con pianeti animati che orbitano, slider per velocità, zoom interattivo
-- "onde" → create_demo con onde animate che si propagano, controlli per frequenza/ampiezza, visualizzazione in tempo reale
-- "grafico funzione" → create_demo con grafico animato, input per variare parametri, curva che si aggiorna live
-- "circuito elettrico" → create_demo con componenti animati, slider per tensione/corrente, visualizzazione valori in tempo reale
-
-IMPORTANTE:
-- Crea sempre HTML/CSS/JS separati (non codice misto)
-- CSS deve includere gradienti, animazioni, transitions, hover effects
-- JavaScript deve essere interattivo con event listeners e animazioni fluide
-- Tutto deve essere AUTO-CONTENUTO (no librerie esterne)
-
-Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`,
+  demo: '', // Dynamic - built in getDemoContext() below
 
   summary: `
 ## MODALITÀ RIASSUNTO
@@ -143,6 +112,55 @@ ESEMPI:
 
 Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi riassumere?"`,
 };
+
+/**
+ * Build dynamic demo context based on maestro's teaching style
+ * Each maestro creates demos with their unique creative approach
+ */
+function getDemoContext(maestroId?: string): string {
+  const maestro = maestroId ? getMaestroById(maestroId) : null;
+  const teachingStyle = maestro?.teachingStyle || 'Interattivo e coinvolgente';
+  const maestroName = maestro?.name || 'Maestro';
+  
+  return `
+## MODALITÀ DEMO INTERATTIVA - CREA DEMO SPETTACOLARI
+
+Tu sei ${maestroName}. Il tuo stile di insegnamento è: "${teachingStyle}"
+
+CREA UNA DEMO CHE RIFLETTA IL TUO STILE UNICO:
+- Inventa un modo CREATIVO e ORIGINALE di spiegare il concetto
+- La demo deve essere MEMORABILE e diversa da una lezione tradizionale
+- Usa il tuo approccio caratteristico per rendere il concetto comprensibile
+
+REQUISITI TECNICI:
+1. USA CANVAS per animazioni fluide (requestAnimationFrame)
+2. Background con gradiente colorato (#667eea→#764ba2 o altri colori vivaci)
+3. Card centrale bianca con ombre morbide (border-radius: 20px)
+4. Bottoni colorati con hover effects (transform: scale(1.1))
+5. TUTTO deve essere ANIMATO e INTERATTIVO
+
+ACCESSIBILITÀ OBBLIGATORIA:
+- Font grande e leggibile (min 16px)
+- Alto contrasto tra testo e sfondo
+- Bottoni grandi facili da cliccare (min 44px)
+- Animazioni che non causano motion sickness (ridotte se prefers-reduced-motion)
+- Colori che funzionano per daltonici (usa forme oltre ai colori)
+
+CREATIVITÀ - IDEE PER OGNI MATERIA:
+- MATEMATICA: blocchi colorati che si moltiplicano, numeri che danzano, frazioni come pizza
+- FISICA: palline che rimbalzano, onde che si propagano, pianeti che orbitano
+- CHIMICA: molecole che si combinano, atomi che vibrano, reazioni colorate
+- STORIA: timeline interattiva, personaggi che parlano, mappe animate
+- GEOGRAFIA: globo che ruota, climi che cambiano, viaggi virtuali
+- ITALIANO: parole che volano, analisi grammaticale visiva, storie animate
+
+STRUTTURA CODICE:
+- html: container con canvas sfondo + card centrale + controlli
+- css: gradienti, ombre, transizioni, hover effects, @media prefers-reduced-motion
+- js: animazioni canvas, event listeners, feedback visivo immediato
+
+Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi visualizzare nella demo?"`;
+}
 
 export async function POST(request: NextRequest) {
   // Rate limiting: 20 requests per minute per IP
@@ -224,9 +242,16 @@ export async function POST(request: NextRequest) {
 
     // Build enhanced system prompt with tool context
     let enhancedSystemPrompt = systemPrompt;
-    if (requestedTool && TOOL_CONTEXT[requestedTool]) {
-      enhancedSystemPrompt = `${systemPrompt}\n\n${TOOL_CONTEXT[requestedTool]}`;
-      logger.debug('Tool context injected', { requestedTool, maestroId });
+    if (requestedTool) {
+      // Use dynamic context for demo (includes maestro's teaching style)
+      const toolContext = requestedTool === 'demo' 
+        ? getDemoContext(maestroId) 
+        : TOOL_CONTEXT[requestedTool];
+      
+      if (toolContext) {
+        enhancedSystemPrompt = `${systemPrompt}\n\n${toolContext}`;
+        logger.debug('Tool context injected', { requestedTool, maestroId });
+      }
     }
 
     // Inject conversation memory if enabled and user is authenticated (ADR 0021)
