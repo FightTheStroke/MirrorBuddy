@@ -23,11 +23,12 @@ import {
   BookOpen,
   ChevronUp,
   ChevronDown,
+  MessageSquare,
 } from 'lucide-react';
 import Image from 'next/image';
 import { MaestriGrid } from '@/components/maestros/maestri-grid';
 import { MaestroSession } from '@/components/maestros/maestro-session';
-import type { Maestro } from '@/types';
+import type { Maestro, ToolType } from '@/types';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { PomodoroHeaderWidget } from '@/components/pomodoro';
 import { AmbientAudioHeaderWidget } from '@/components/ambient-audio';
@@ -37,19 +38,18 @@ import {
 } from '@/components/education';
 import { ZainoView } from '@/app/supporti/components/zaino-view';
 import { AstuccioView } from '@/app/astuccio/components/astuccio-view';
-import { CharacterChatView, ActiveMaestroAvatar } from '@/components/conversation';
+import { CharacterChatView, ActiveMaestroAvatar, ConversationHistory, ConversationDetail } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { Button } from '@/components/ui/button';
 import { useProgressStore, useSettingsStore, useUIStore } from '@/lib/stores';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
-import { FocusToolLayout } from '@/components/tools/focus-tool-layout';
 import { useParentInsightsIndicator } from '@/lib/hooks/use-parent-insights-indicator';
 import { cn } from '@/lib/utils';
 
 // Simplified views: removed quiz, flashcards, mindmaps, summaries, homework, demos, archivio, zaino
 // These are now accessed via Supporti (browse) or Astuccio (create)
-type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'astuccio' | 'supporti' | 'calendar' | 'progress' | 'genitori' | 'settings';
+type View = 'coach' | 'buddy' | 'maestri' | 'maestro-session' | 'astuccio' | 'supporti' | 'calendar' | 'progress' | 'genitori' | 'settings' | 'storia';
 type MaestroSessionMode = 'voice' | 'chat';
 
 // Character info for sidebar display
@@ -155,6 +155,10 @@ export default function Home() {
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
+  const [requestedToolType, setRequestedToolType] = useState<ToolType | undefined>(undefined);
+
+  // Storia (conversation history) state
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
   const {
     mirrorBucks: _mirrorBucks, // All-time (not shown, season takes priority)
@@ -169,7 +173,6 @@ export default function Home() {
   } = useProgressStore();
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
-  const { focusMode } = useUIStore();
   const {
     activeCharacter,
     conversationsByCharacter,
@@ -193,7 +196,20 @@ export default function Home() {
         }
       }
     }
+    // Reset conversation history detail view when navigating away
+    if (newView !== 'storia') {
+      setSelectedConversationId(null);
+    }
     setCurrentView(newView);
+  };
+
+  // Handler for when a tool is requested from the astuccio
+  const handleToolRequest = (toolType: ToolType, maestro: Maestro) => {
+    setRequestedToolType(toolType);
+    setSelectedMaestro(maestro);
+    setMaestroSessionMode('chat'); // Start in chat mode for tool requests
+    setMaestroSessionKey(prev => prev + 1);
+    setCurrentView('maestro-session');
   };
 
   // Don't render main app until hydration is done and onboarding is completed
@@ -224,8 +240,9 @@ export default function Home() {
     { id: 'coach' as const, label: coachInfo.name, icon: Sparkles, isChat: true, avatar: coachInfo.avatar },
     { id: 'buddy' as const, label: buddyInfo.name, icon: Heart, isChat: true, avatar: buddyInfo.avatar },
     { id: 'maestri' as const, label: 'Professori', icon: GraduationCap },
-    { id: 'astuccio' as const, label: 'Astuccio', icon: PencilRuler },     // Tools hub (create)
-    { id: 'supporti' as const, label: 'Zaino', icon: Backpack },         // Materials archive (browse)
+    { id: 'storia' as const, label: 'Storia', icon: MessageSquare },      // Conversation history
+    { id: 'astuccio' as const, label: 'Astuccio', icon: PencilRuler },    // Tools hub (create)
+    { id: 'supporti' as const, label: 'Zaino', icon: Backpack },          // Materials archive (browse)
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
     { id: 'progress' as const, label: 'Progressi', icon: Trophy },
     { id: 'settings' as const, label: 'Impostazioni', icon: Settings },
@@ -526,12 +543,16 @@ export default function Home() {
             <MaestroSession
               key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
               maestro={selectedMaestro}
-              onClose={() => setCurrentView('maestri')}
+              onClose={() => {
+                setCurrentView('maestri');
+                setRequestedToolType(undefined); // Clear tool type when closing
+              }}
               initialMode={maestroSessionMode}
+              requestedToolType={requestedToolType}
             />
           )}
 
-          {currentView === 'astuccio' && <AstuccioView />}
+          {currentView === 'astuccio' && <AstuccioView onToolRequest={handleToolRequest} />}
 
           {currentView === 'supporti' && <ZainoView />}
 
@@ -542,11 +563,24 @@ export default function Home() {
           {currentView === 'genitori' && <LazyGenitoriView />}
 
           {currentView === 'settings' && <LazySettingsView />}
+
+          {currentView === 'storia' && (
+            <div className="max-w-6xl mx-auto">
+              {selectedConversationId ? (
+                <ConversationDetail
+                  conversationId={selectedConversationId}
+                  onBack={() => setSelectedConversationId(null)}
+                />
+              ) : (
+                <ConversationHistory
+                  onConversationSelect={(id) => setSelectedConversationId(id)}
+                />
+              )}
+            </div>
+          )}
         </motion.div>
       </main>
 
-      {/* Focus Mode Overlay - renders above everything when active */}
-      {focusMode && <FocusToolLayout />}
     </div>
   );
 }

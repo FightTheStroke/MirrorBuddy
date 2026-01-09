@@ -42,7 +42,6 @@ interface SummariesViewProps {
 
 export function SummariesView({ className, initialMaestroId, initialMode }: SummariesViewProps) {
   const { tools, loading, deleteTool } = useSavedTools('summary');
-  const { enterFocusMode } = useUIStore();
   const initialProcessed = useRef(false);
   const [selectedSummary, setSelectedSummary] = useState<{
     id: string;
@@ -63,11 +62,11 @@ export function SummariesView({ className, initialMaestroId, initialMode }: Summ
     }
   }, [initialMaestroId, initialMode]);
 
-  // Handle maestro selection and enter focus mode
+  // Handle maestro selection (focus mode has been removed)
   const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
-    enterFocusMode({ toolType: 'summary', maestroId: maestro.id, interactionMode: mode });
-  }, [enterFocusMode]);
+    // Focus mode has been removed
+  }, []);
 
   // Handle delete
   const handleDelete = useCallback(async (id: string) => {

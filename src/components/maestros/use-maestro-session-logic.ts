@@ -6,14 +6,15 @@ import { MAESTRI_XP } from '@/lib/constants/xp-rewards';
 import { useMaestroVoiceConnection } from './use-maestro-voice-connection';
 import { useMaestroChatHandlers } from './use-maestro-chat-handlers';
 import { logger } from '@/lib/logger';
-import type { Maestro, ChatMessage, ToolCall } from '@/types';
+import type { Maestro, ChatMessage, ToolCall, ToolType } from '@/types';
 
 interface UseMaestroSessionLogicProps {
   maestro: Maestro;
   initialMode: 'voice' | 'chat';
+  requestedToolType?: ToolType;
 }
 
-export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessionLogicProps) {
+export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType }: UseMaestroSessionLogicProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -60,10 +61,43 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     onQuestionAsked,
   });
 
-  // Initialize pending tool request (greeting is now shown in header)
+  // Initialize session with contextual greeting based on requested tool
   useEffect(() => {
-    setMessages([]);
+    const initialMessages: ChatMessage[] = [];
 
+    // Add contextual initial message if a tool was requested from the astuccio
+    if (requestedToolType) {
+      const contextualGreetings: Record<ToolType, string> = {
+        mindmap: `Ciao! Vedo che vuoi creare una mappa mentale. Su quale argomento vorresti lavorare?`,
+        quiz: `Ciao! Vuoi creare un quiz per verificare le tue conoscenze. Di quale materia o argomento?`,
+        flashcard: `Ciao! Creiamo insieme delle flashcard! Quale argomento vuoi memorizzare?`,
+        summary: `Ciao! Vuoi un riassunto. Di quale testo o argomento?`,
+        demo: `Ciao! Creiamo una demo interattiva! Quale concetto STEM vuoi esplorare?`,
+        search: `Ciao! Cosa vorresti cercare?`,
+        pdf: `Ciao! Sono pronto ad aiutarti. Cosa vuoi caricare?`,
+        webcam: `Ciao! Sono pronto ad aiutarti. Cosa vuoi fotografare?`,
+        homework: `Ciao! Sono pronto ad aiutarti con i compiti. Cosa vuoi caricare?`,
+        diagram: `Ciao! Creiamo un diagramma insieme. Quale concetto vuoi visualizzare?`,
+        timeline: `Ciao! Creiamo una linea temporale. Quale periodo storico o sequenza di eventi vuoi organizzare?`,
+        formula: `Ciao! Vuoi lavorare con le formule. Quale formula matematica o scientifica vuoi esplorare?`,
+        chart: `Ciao! Creiamo un grafico insieme. Quali dati vuoi visualizzare?`,
+        'study-kit': `Ciao! Creiamo materiali di studio completi. Carica un PDF per iniziare!`,
+      };
+
+      const greeting = contextualGreetings[requestedToolType];
+      if (greeting) {
+        initialMessages.push({
+          id: `initial-${Date.now()}`,
+          role: 'assistant',
+          content: greeting,
+          timestamp: new Date(),
+        });
+      }
+    }
+
+    setMessages(initialMessages);
+
+    // Handle legacy pendingToolRequest from sessionStorage (backward compatibility)
     const pendingRequest = sessionStorage.getItem('pendingToolRequest');
     if (pendingRequest) {
       try {
@@ -87,7 +121,7 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [maestro.id]);
+  }, [maestro.id, requestedToolType]);
 
   // Tools are now displayed inline in the chat instead of opening in fullscreen
   // Removed auto-switch to focus mode - tools remain integrated in the chat interface

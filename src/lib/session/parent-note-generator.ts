@@ -117,12 +117,35 @@ Valutazione del maestro:
 }
 
 /**
- * Save parent note to database
+ * Check if user has granted parent consent for parent notes
+ */
+export async function hasParentConsent(userId: string): Promise<boolean> {
+  const profile = await prisma.studentInsightProfile.findUnique({
+    where: { userId },
+    select: { parentConsent: true },
+  });
+
+  return profile?.parentConsent ?? false;
+}
+
+/**
+ * Save parent note to database (only if consent is granted)
  */
 export async function saveParentNote(
   session: SessionInfo,
   note: ParentNote
-): Promise<string> {
+): Promise<string | null> {
+  // Check GDPR consent before saving (ADR 0008)
+  const hasConsent = await hasParentConsent(session.userId);
+
+  if (!hasConsent) {
+    logger.info('Parent note skipped - no parent consent', {
+      userId: session.userId,
+      sessionId: session.sessionId,
+    });
+    return null;
+  }
+
   const parentNote = await prisma.parentNote.create({
     data: {
       userId: session.userId,
@@ -143,6 +166,30 @@ export async function saveParentNote(
   });
 
   return parentNote.id;
+}
+
+/**
+ * Generate and save parent note (with GDPR consent check)
+ * Returns null if consent not granted
+ */
+export async function generateAndSaveParentNote(
+  session: SessionInfo,
+  evaluation: MaestroEvaluation
+): Promise<string | null> {
+  // Check consent first (ADR 0008)
+  const hasConsent = await hasParentConsent(session.userId);
+
+  if (!hasConsent) {
+    logger.info('Parent note generation skipped - no parent consent', {
+      userId: session.userId,
+      sessionId: session.sessionId,
+    });
+    return null;
+  }
+
+  // Generate and save note
+  const note = await generateParentNote(session, evaluation);
+  return saveParentNote(session, note);
 }
 
 /**

@@ -27,7 +27,6 @@ interface MindmapsViewProps {
 }
 
 export function MindmapsView({ className, initialMaestroId, initialMode }: MindmapsViewProps) {
-  const { enterFocusMode } = useUIStore();
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
   const initialProcessed = useRef(false);
 
@@ -68,24 +67,15 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
   const handleMaestroConfirm = useCallback(
     (maestro: Maestro, mode: 'voice' | 'chat') => {
       setShowMaestroDialog(false);
-      enterFocusMode({
-        toolType: 'mindmap',
-        maestroId: maestro.id,
-        interactionMode: mode,
-      });
+      // Focus mode has been removed, close dialog only
     },
-    [enterFocusMode]
+    []
   );
 
   const handleInitialMaestroConfirm = useCallback(() => {
-    if (initialMaestroId && initialMode) {
-      enterFocusMode({
-        toolType: 'mindmap',
-        maestroId: initialMaestroId,
-        interactionMode: initialMode,
-      });
-    }
-  }, [enterFocusMode, initialMaestroId, initialMode]);
+    setShowMaestroDialog(false);
+    // Focus mode has been removed
+  }, []);
 
   const addTopic = () => {
     setNewMapTopics([...newMapTopics, { name: '', subtopics: [''] }]);

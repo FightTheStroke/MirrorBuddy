@@ -26,7 +26,7 @@ export function useSessionEffects({
   const processedToolsRef = useRef<Set<string>>(new Set());
 
   const { currentSession, startSession } = useProgressStore();
-  const { enterFocusMode } = useUIStore();
+  useUIStore(); // Keep store import for potential future use
 
   // Start session when connected
   useEffect(() => {
@@ -36,7 +36,7 @@ export function useSessionEffects({
     }
   }, [isConnected, currentSession, maestro.id, maestro.specialty, startSession]);
 
-  // Auto-switch to focus mode when a tool is created
+  // Track tool completions (focus mode has been removed)
   useEffect(() => {
     const completedTools = toolCalls.filter(
       (tc) => tc.status === 'completed' && !processedToolsRef.current.has(tc.id)
@@ -59,28 +59,11 @@ export function useSessionEffects({
     };
     const mappedToolType = (toolTypeMap[toolCall.type] || 'mindmap') as import('@/types/tools').ToolType;
 
-    const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
-
-    // Set focus mode with tool atomically to prevent race condition
-    enterFocusMode({
-      toolType: mappedToolType,
-      maestroId: maestro.id,
-      interactionMode: 'voice',
-      initialTool: {
-        id: toolCall.id,
-        type: mappedToolType,
-        status: 'completed',
-        progress: 1,
-        content: toolContent,
-        createdAt: new Date(),
-      },
-    });
-
-    logger.debug('[VoiceSession] Entered focus mode for tool', {
+    logger.debug('[VoiceSession] Tool created', {
       toolId: toolCall.id,
       toolType: mappedToolType,
     });
-  }, [toolCalls, enterFocusMode, maestro.id]);
+  }, [toolCalls, maestro.id]);
 
   // Create conversation in DB when voice session connects
   useEffect(() => {
