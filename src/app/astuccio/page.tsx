@@ -7,7 +7,7 @@ export default function AstuccioPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/');
+    router.replace('/?view=astuccio');
   }, [router]);
 
   return (

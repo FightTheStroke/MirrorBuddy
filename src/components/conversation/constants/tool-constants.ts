@@ -26,5 +26,6 @@ export const TOOL_PROMPTS: Record<ToolType, string> = {
   chart: 'Crea un grafico',
   pdf: 'Analizza il PDF',
   homework: 'Aiutami con i compiti',
+  'study-kit': 'Crea un kit di studio',
 };
 

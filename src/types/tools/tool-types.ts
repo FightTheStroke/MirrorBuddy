@@ -18,7 +18,8 @@ export type ToolType =
   | 'chart'        // Grafico (Chart.js)
   | 'webcam'       // Foto da webcam
   | 'pdf'          // PDF caricato
-  | 'homework';    // Compiti con metodo maieutico
+  | 'homework'     // Compiti con metodo maieutico
+  | 'study-kit';   // Bulk PDF processing with study materials
 
 /**
  * Tool state for real-time UI updates

@@ -79,27 +79,37 @@ type DebugPage = {
 
 const debugPages: DebugPage[] = [
   // PAGINE PRINCIPALI (visibili nella sidebar)
-  { href: '/', note: 'Home - I Professori' },
+  { href: '/', note: 'Home - I Professori', status: 'ok' },
   { href: '/supporti', note: 'Zaino - materiali salvati', status: 'ok' },
-  
-  // PAGINE NON COLLEGATE (potenzialmente da rimuovere)
-  { href: '/welcome', note: 'Onboarding' },
-  { href: '/landing', note: 'Marketing page' },
-  { href: '/study-kit', note: 'Study Kit' },
-  { href: '/parent-dashboard', note: 'Dashboard genitori standalone' },
-  { href: '/materiali', note: 'HomeworkHelpView' },
-  
-  // SHOWCASE
-  { href: '/showcase', note: 'Showcase home' },
-  { href: '/showcase/maestri', note: 'Showcase - Professori' },
-  { href: '/showcase/accessibility', note: 'Showcase - Accessibilita' },
-  
-  // TEST
-  { href: '/test-voice', note: 'Test voice' },
-  { href: '/test-audio', note: 'Test audio' },
-  
+
+  // REDIRECT PAGES (redirectano a home con view)
+  { href: '/astuccio', note: 'Redirect -> /?view=astuccio', status: 'redirect' },
+  { href: '/archivio', note: 'Redirect -> /supporti', status: 'redirect' },
+  { href: '/study-kit', note: 'Redirect -> /?view=astuccio', status: 'redirect' },
+
+  // PAGINE ORFANE (non linkate dalla nav principale)
+  { href: '/welcome', note: 'Onboarding (auto-redirect se non completato)', status: 'ok' },
+  { href: '/landing', note: 'Marketing page - ORFANA', status: 'dead' },
+  { href: '/parent-dashboard', note: 'Dashboard genitori standalone - ORFANA', status: 'dead' },
+  { href: '/materiali', note: 'HomeworkHelpView legacy - ORFANA', status: 'dead' },
+
+  // SHOWCASE (demo pages - non linkate)
+  { href: '/showcase', note: 'Showcase home', status: 'dead' },
+  { href: '/showcase/maestri', note: 'Showcase - Professori', status: 'dead' },
+  { href: '/showcase/accessibility', note: 'Showcase - Accessibilita', status: 'dead' },
+  { href: '/showcase/flashcards', note: 'Showcase - Flashcards', status: 'dead' },
+  { href: '/showcase/quiz', note: 'Showcase - Quiz', status: 'dead' },
+  { href: '/showcase/mindmaps', note: 'Showcase - Mindmaps', status: 'dead' },
+  { href: '/showcase/chat', note: 'Showcase - Chat', status: 'dead' },
+  { href: '/showcase/solar-system', note: 'Showcase - Solar System demo', status: 'dead' },
+
+  // TEST (dev-only, non per produzione)
+  { href: '/test-voice', note: 'DEV ONLY - Test voice', status: 'dead' },
+  { href: '/test-audio', note: 'DEV ONLY - Test audio', status: 'dead' },
+  { href: '/test-proposals', note: 'DEV ONLY - Test proposals', status: 'dead' },
+
   // ADMIN
-  { href: '/admin/analytics', note: 'Analytics admin' },
+  { href: '/admin/analytics', note: 'Analytics admin (dev only)', status: 'dead' },
 ];
 
 export default function Home() {

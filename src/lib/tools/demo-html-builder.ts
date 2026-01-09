@@ -170,14 +170,12 @@ function buildHTMLFromParts(html: string, css: string, js: string): string {
   ${js ? `<script>
     (function() {
       'use strict';
-      
-      // Ensure DOM is ready
+
       function executeDemoScript() {
         try {
           ${js}
         } catch (error) {
           console.error('Demo script error:', error);
-          // Show error in demo if possible
           const errorDiv = document.createElement('div');
           errorDiv.style.cssText = 'position:fixed;top:10px;right:10px;background:#ef4444;color:white;padding:8px 12px;border-radius:4px;font-size:12px;z-index:9999;';
           errorDiv.textContent = 'Errore nello script: ' + error.message;
@@ -185,17 +183,13 @@ function buildHTMLFromParts(html: string, css: string, js: string): string {
           setTimeout(() => errorDiv.remove(), 5000);
         }
       }
-      
-      // Execute when DOM is ready
+
+      // Execute once when DOM is ready (no double execution)
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', executeDemoScript);
       } else {
-        // DOM already loaded
         executeDemoScript();
       }
-      
-      // Also execute after a short delay to ensure everything is ready
-      setTimeout(executeDemoScript, 100);
     })();
   </script>` : ''}
 </body>
@@ -207,7 +201,9 @@ function buildHTMLFromParts(html: string, css: string, js: string): string {
  * Same permissions everywhere for consistency
  */
 export function getDemoSandboxPermissions(): string {
-  return 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-pointer-lock allow-downloads allow-top-navigation allow-top-navigation-by-user-activation allow-popups-to-escape-sandbox';
+  // Removed allow-top-navigation* to prevent button clicks from navigating instead of executing JS
+  // Removed allow-popups-to-escape-sandbox as unnecessary and security risk
+  return 'allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-pointer-lock allow-downloads';
 }
 
 /**

@@ -1,10 +1,10 @@
 'use client';
 
 import { AnimatePresence } from 'framer-motion';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Backpack } from 'lucide-react';
 import { MaterialViewer } from '@/components/education/archive';
+import { PageHeader } from '@/components/ui/page-header';
 import { useZainoView } from './hooks/use-zaino-view';
-import { ZainoHeader } from './components/zaino-header';
 import { FilterChips } from './components/filter-chips';
 import { SearchControls } from './components/search-controls';
 import { LearningPathsView } from './components/learning-paths-view';
@@ -50,6 +50,7 @@ export function ZainoView({
     handleDateFilter,
     handleSubjectFilter,
     getSubjectFilterCount,
+    getDateFilterCount,
     clearAllFilters,
     getFilterCount,
     hasActiveFilters,
@@ -60,7 +61,7 @@ export function ZainoView({
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <ZainoHeader />
+          <PageHeader icon={Backpack} title="Il Tuo Zaino" />
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-red-700 dark:text-red-300 mb-2">
@@ -82,7 +83,7 @@ export function ZainoView({
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <ZainoHeader />
+        <PageHeader icon={Backpack} title="Il Tuo Zaino" />
 
         <div className="mb-6">
           <SearchControls
@@ -108,6 +109,7 @@ export function ZainoView({
           onSubjectFilterChange={handleSubjectFilter}
           getTypeFilterCount={getFilterCount}
           getSubjectFilterCount={getSubjectFilterCount}
+          getDateFilterCount={getDateFilterCount}
         />
 
         {isPercorsi ? (

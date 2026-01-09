@@ -39,7 +39,7 @@ export function CalendarView() {
   } = useCalendarView();
 
   return (
-    <div className="space-y-6">
+    <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
       <CalendarHeader onAddClick={openAddForm} activeTab={activeTab} />
 
       <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />

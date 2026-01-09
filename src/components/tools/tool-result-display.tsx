@@ -445,7 +445,7 @@ function AutoSaveSummary({ request, toolId }: { request: SummaryData; toolId?: s
     const mindmapTitle = `Mappa: ${data.topic}`;
     autoSaveMaterial('mindmap', mindmapTitle, { nodes }, { subject: 'general' });
 
-    toast.success('Mappa mentale salvata nell\'archivio!');
+    toast.success('Mappa mentale salvata nello zaino!');
     logger.info('[SummaryTool] Converted to mindmap', { topic: data.topic, nodeCount: nodes.length });
   }, []);
 
@@ -486,7 +486,7 @@ function AutoSaveSummary({ request, toolId }: { request: SummaryData; toolId?: s
     const flashcardName = `Flashcard: ${data.topic}`;
     autoSaveMaterial('flashcard', flashcardName, { cards: limitedCards }, { subject: 'general' });
 
-    toast.success(`${limitedCards.length} flashcard salvate nell'archivio!`);
+    toast.success(`${limitedCards.length} flashcard salvate nello zaino!`);
     logger.info('[SummaryTool] Generated flashcards', { topic: data.topic, cardCount: limitedCards.length });
   }, []);
 

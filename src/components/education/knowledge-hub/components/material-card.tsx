@@ -89,6 +89,7 @@ const TYPE_ICONS: Record<ToolType, React.ReactNode> = {
   webcam: <FileText className="w-4 h-4" />,
   homework: <FileText className="w-4 h-4" />,
   search: <FileText className="w-4 h-4" />,
+  'study-kit': <FileText className="w-4 h-4" />,
 };
 
 const TYPE_COLORS: Record<ToolType, string> = {
@@ -105,6 +106,7 @@ const TYPE_COLORS: Record<ToolType, string> = {
   webcam: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400',
   homework: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
   search: 'bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400',
+  'study-kit': 'bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-400',
 };
 
 const TYPE_LABELS: Record<ToolType, string> = {
@@ -121,6 +123,7 @@ const TYPE_LABELS: Record<ToolType, string> = {
   webcam: 'Immagine',
   homework: 'Compito',
   search: 'Ricerca',
+  'study-kit': 'Study Kit',
 };
 
 function formatDate(date: Date): string {
