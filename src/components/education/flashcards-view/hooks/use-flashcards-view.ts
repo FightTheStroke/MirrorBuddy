@@ -22,7 +22,6 @@ interface UseFlashcardsViewOptions {
 
 export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
   const { initialMaestroId, initialMode } = options;
-  const { enterFocusMode } = useUIStore();
   const initialProcessed = useRef(false);
 
   const [decks, setDecks] = useState<FlashcardDeck[]>([]);
@@ -47,13 +46,9 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
   const handleMaestroConfirm = useCallback(
     (maestro: Maestro, mode: 'voice' | 'chat') => {
       setShowMaestroDialog(false);
-      enterFocusMode({
-        toolType: 'flashcard',
-        maestroId: maestro.id,
-        interactionMode: mode,
-      });
+      // Focus mode has been removed
     },
-    [enterFocusMode]
+    []
   );
 
   const loadDecks = useCallback(async () => {

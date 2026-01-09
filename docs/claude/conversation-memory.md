@@ -1,110 +1,84 @@
-# Conversational Memory
+# Conversation Memory System
 
-Maestros remember previous conversations through memory injection into system prompts.
+Maestros remember previous conversations through memory injection into system prompts and automatic session summaries. See ADR 0019 and ADR 0021 for architectural decisions.
 
-## Key Files
+## Overview
 
-| Area | Files |
-|------|-------|
-| ADR | `docs/adr/0021-conversational-memory-injection.md` |
-| Memory Loader | `src/lib/conversation/memory-loader.ts` |
-| Prompt Enhancer | `src/lib/conversation/prompt-enhancer.ts` |
-| API | `src/app/api/conversations/memory/route.ts` |
-| Integration | `src/components/conversation/conversation-flow.tsx` |
+The system consists of three flows:
+
+1. **Memory Injection Flow**: Previous context is loaded and injected into Maestro system prompts when starting a conversation
+2. **Summary Generation Flow**: When a session ends (explicit close or 15-min timeout), conversation summaries are generated and stored
+3. **Parent Notes Flow**: Parent-friendly summaries are auto-generated after each session (with GDPR consent)
 
 ## Architecture
 
-### Memory Flow
+### Memory Injection Flow
 
 ```
-1. User starts conversation with Maestro
-2. System loads previous context (last 3 conversations)
-3. Memory injected into system prompt
-4. AI responds with context awareness
-5. On session end, new summary generated
+Start Conversation
+  ↓
+loadPreviousContext(userId, maestroId)
+  └─ Fetch last 3 closed conversations from DB
+  └─ Extract: summary, keyFacts, topics, lastSessionDate
+  ↓
+enhanceSystemPrompt(basePrompt, memory)
+  └─ Append memory section to system prompt
+  └─ Add instructions to use context
+  ↓
+Send enhanced prompt to Maestro
+  └─ Maestro responds with context awareness
 ```
 
-### Memory Context Structure
-
-```typescript
-interface ConversationMemory {
-  recentSummary: string | null;   // Last session recap
-  keyFacts: string[];              // Max 5 key facts
-  topics: string[];                // Max 10 topics
-  lastSessionDate: Date | null;    // For relative dating
-}
-```
-
-## Components
-
-### Memory Loader (`memory-loader.ts`)
-
-```typescript
-// Load previous context from database
-export async function loadPreviousContext(
-  userId: string,
-  maestroId: string
-): Promise<ConversationMemory>
-
-// Merge key facts from multiple conversations
-export function mergeKeyFacts(conversations: Conversation[]): string[]
-
-// Format relative dates (oggi, ieri, X giorni fa)
-export function formatRelativeDate(date: Date | null): string
-```
-
-### Prompt Enhancer (`prompt-enhancer.ts`)
-
-```typescript
-// Inject memory into system prompt
-export function enhanceSystemPrompt(options: {
-  basePrompt: string;
-  memory: ConversationMemory;
-  safetyOptions?: SafetyOptions;
-}): string
-
-// Check if prompt has memory context
-export function hasMemoryContext(prompt: string): boolean
-
-// Extract base prompt without memory
-export function extractBasePrompt(enhanced: string): string
-```
-
-## System Prompt Enhancement
-
-Memory is appended to the base system prompt:
+### Summary Generation Flow
 
 ```
-[Base Maestro System Prompt]
-
-## Memoria delle Sessioni Precedenti
-
-### Ultimo Incontro (ieri)
-Lo studente ha lavorato su frazioni e ha mostrato difficolta con i denominatori.
-
-### Fatti Chiave dello Studente
-- Preferisce esempi visivi
-- Ha difficolta con frazioni
-- Apprende meglio con esercizi pratici
-
-### Argomenti Trattati
-frazioni, denominatori, matematica
-
-ISTRUZIONI: Usa queste informazioni per personalizzare l'interazione.
+User sends message
+  ↓
+inactivityMonitor.trackActivity() (resets 15-min timer)
+  ↓
+Explicit close OR 15-min timeout triggers
+  ↓
+endConversationWithSummary(conversationId)
+  └─ Fetch all messages
+  └─ Parallel generation:
+     ├─ generateConversationSummary()
+     ├─ extractKeyFacts() → { decisions, preferences, learned }
+     ├─ extractTopics()
+     └─ extractLearnings() → save to Learning table
+  ↓
+Update Conversation record with summary, keyFacts, topics
+  └─ Set isActive = false
 ```
 
-## Token Budget
+### Parent Notes Flow
 
-| Component | Max Tokens |
-|-----------|------------|
-| Base System Prompt | ~800 |
-| Recent Summary | ~200 |
-| Key Facts (max 5) | ~100 |
-| Topics (max 10) | ~50 |
-| **Total Enhanced** | **~1150** |
+```
+Session ends (summary generated)
+  ↓
+generateAndSaveParentNote(session, evaluation)
+  └─ Check hasParentConsent() (ADR 0008 - GDPR)
+  └─ Generate AI parent note (brief, positive, practical)
+  ↓
+Save to ParentNote table
+  └─ summary, highlights[], concerns?, suggestions?
+  └─ Track viewedAt timestamp
+```
 
-## API Endpoint
+## Key Files
 
+| Component | Files | Purpose |
+|-----------|-------|---------|
+| Memory Loading | `src/lib/conversation/memory-loader.ts` | Load last 3 conversations, merge context |
+| Prompt Enhancement | `src/lib/conversation/prompt-enhancer.ts` | Inject memory into system prompt |
+| Summary Generation | `src/lib/conversation/summary-generator.ts` | Generate & save summaries, learnings |
+| Activity Monitoring | `src/lib/conversation/inactivity-monitor.ts` | Track 15-min timeout |
+| Contextual Greetings | `src/lib/conversation/contextual-greeting.ts` | Personalized greeting with context |
+| Parent Notes | `src/lib/session/parent-note-generator.ts` | Generate parent-friendly notes (GDPR consent) |
+| Maestro Evaluation | `src/lib/session/maestro-evaluation.ts` | AI evaluation of session |
+
+## API Endpoints
+
+### Get Conversation Memory
 ```
 GET /api/conversations/memory?maestroId=xxx
 
@@ -117,32 +91,121 @@ Response:
 }
 ```
 
-## Safety Integration
+### List Conversations
+```
+GET /api/conversations?page=1&limit=20&maestroId=xxx&active=true
 
-Memory injection uses `injectSafetyGuardrails()` to ensure:
-- Safety rules come BEFORE memory context
-- Memory cannot override safety rules
-- Crisis keywords are still detected
-
-```typescript
-const enhancedPrompt = enhanceSystemPrompt({
-  basePrompt,
-  memory,
-  safetyOptions: { role: 'maestro' }, // Injects safety guardrails
-});
+Response: { items: [...], pagination: {...} }
 ```
 
-## Test Coverage
+### Create Conversation
+```
+POST /api/conversations
+Body: { maestroId: string, title?: string }
+```
 
-- **Unit Tests**: `src/lib/conversation/__tests__/memory-loader.test.ts` (16 tests)
-- **Unit Tests**: `src/lib/conversation/__tests__/prompt-enhancer.test.ts` (12 tests)
+### Get Contextual Greeting
+```
+GET /api/conversations/greeting?maestroId=xxx&name=StudentName
+
+Response: { greeting: string, topics: [...] }
+```
+
+## Database Models
+
+### Conversation
+```prisma
+id           String    // CUID
+userId       String    // Foreign key
+maestroId    String    // Character ID
+title        String?
+
+// Summary system
+summary      String?   // Generated summary
+keyFacts     String?   // JSON: { decisions, preferences, learned }
+topics       String    // JSON array
+
+// Status
+isActive     Boolean   // true = ongoing, false = ended
+lastMessageAt DateTime?
+isParentMode Boolean   // true = parent conversation
+
+messages     Message[]  // Related messages
+
+createdAt    DateTime
+updatedAt    DateTime
+```
+
+### Message
+```prisma
+id             String
+conversationId String  // Foreign key
+role           String  // 'user' | 'assistant'
+content        String
+
+toolCalls      String?  // JSON
+tokenCount     Int?
+
+createdAt      DateTime
+```
+
+### ParentNote
+```prisma
+id          String
+userId      String
+sessionId   String
+maestroId   String
+subject     String
+duration    Int        // minutes
+
+summary     String     // Parent-friendly summary
+highlights  String     // JSON array
+concerns    String?    // JSON array (optional)
+suggestions String?    // JSON array (optional)
+
+generatedAt DateTime
+viewedAt    DateTime?  // Null if unread
+```
+
+## Token Budget
+
+| Component | Max Tokens |
+|-----------|------------|
+| Base System Prompt | ~800 |
+| Recent Summary | ~200 |
+| Key Facts (max 5) | ~100 |
+| Topics (max 10) | ~50 |
+| **Total Enhanced** | **~1150** |
+
+## Safety Integration
+
+Memory injection respects safety guardrails:
+- Safety rules are injected BEFORE memory context
+- Memory cannot override safety rules
+- Crisis keywords detected regardless of memory
+
+## Configuration
+
+```typescript
+// In memory-loader.ts
+const MAX_KEY_FACTS = 5;      // Max facts to inject
+const MAX_TOPICS = 10;         // Max topics to inject
+const MAX_CONVERSATIONS = 3;   // Conversations to merge
+
+// In inactivity-monitor.ts
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000;  // 15 minutes
+```
+
+## Testing
+
+- **Unit**: `src/lib/conversation/__tests__/memory-*.test.ts` (27 tests)
 - **Integration**: `src/lib/conversation/__tests__/memory-integration.test.ts` (15 tests)
 - **Safety**: `src/lib/safety/__tests__/memory-safety.test.ts` (27 tests)
 
-## Usage in Components
+## Usage Examples
 
+### In Components
 ```typescript
-// In conversation-flow.tsx
 const memory = await loadPreviousContext(userId, maestroId);
 const enhancedPrompt = enhanceSystemPrompt({
   basePrompt: maestro.systemPrompt,
@@ -150,3 +213,19 @@ const enhancedPrompt = enhanceSystemPrompt({
   safetyOptions: { role: 'maestro' },
 });
 ```
+
+### In API Routes
+```typescript
+// End conversation with summary
+await endConversationWithSummary(conversationId);
+
+// Generate parent note (with GDPR check)
+await generateAndSaveParentNote(session, evaluation);
+```
+
+## References
+
+- ADR 0019: Session Summaries & Unified Archive
+- ADR 0021: Conversational Memory Injection
+- ADR 0008: Parent Dashboard & GDPR
+- ADR 0015: Database-First Architecture

@@ -146,7 +146,6 @@ interface QuizViewProps {
 
 export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   const _router = useRouter();
-  const { enterFocusMode } = useUIStore();
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const { addXP } = useProgressStore();
@@ -165,10 +164,10 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
     }
   }, [initialMaestroId, initialMode]);
 
-  // Handle maestro selection and enter focus mode
+  // Handle maestro selection (focus mode has been removed)
   const handleMaestroConfirm = (maestro: Maestro, mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
-    enterFocusMode({ toolType: 'quiz', maestroId: maestro.id, interactionMode: mode });
+    // Focus mode has been removed
   };
 
   // Convert SavedQuiz to QuizType for the Quiz component

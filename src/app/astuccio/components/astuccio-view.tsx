@@ -99,8 +99,12 @@ const categoryVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] as const } },
 };
 
-export function AstuccioView() {
-  const { enterFocusMode } = useUIStore();
+interface AstuccioViewProps {
+  onToolRequest?: (toolType: ToolType, maestro: Maestro) => void;
+}
+
+export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
+  useUIStore(); // Keep store import for potential future use
   const [selectedTool, setSelectedTool] = useState<ToolType | null>(null);
   const [isMaestroDialogOpen, setIsMaestroDialogOpen] = useState(false);
   const [pendingToolRoute, setPendingToolRoute] = useState<string | null>(null);
@@ -113,7 +117,7 @@ export function AstuccioView() {
       setShowStudyKit(true);
       return;
     }
-    
+
     setSelectedTool(toolId);
     setPendingToolRoute(route);
     setPendingToolType(toolId);
@@ -121,18 +125,14 @@ export function AstuccioView() {
   }, []);
 
   const handleMaestroConfirm = useCallback((maestro: Maestro, _mode: 'voice' | 'chat') => {
-    if (pendingToolType && pendingToolRoute) {
-      enterFocusMode({
-        toolType: pendingToolType,
-        maestroId: maestro.id,
-        interactionMode: 'chat', // Always use chat mode
-      });
+    if (pendingToolType && onToolRequest) {
+      onToolRequest(pendingToolType, maestro);
     }
     setIsMaestroDialogOpen(false);
     setSelectedTool(null);
     setPendingToolRoute(null);
     setPendingToolType(null);
-  }, [pendingToolType, pendingToolRoute, enterFocusMode]);
+  }, [pendingToolType, onToolRequest]);
 
   const handleMaestroClose = useCallback(() => {
     setIsMaestroDialogOpen(false);

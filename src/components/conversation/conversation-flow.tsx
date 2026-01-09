@@ -40,7 +40,7 @@ export function ConversationFlow() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { studentProfile } = useSettingsStore();
-  const { enterFocusMode } = useUIStore();
+  useUIStore(); // Keep store import for potential future use
   const {
     isActive,
     mode,
@@ -88,7 +88,6 @@ export function ConversationFlow() {
     setIsLoading,
     messages,
     addMessage,
-    enterFocusMode,
   });
 
   useConversationEffects({

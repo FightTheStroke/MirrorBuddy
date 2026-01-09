@@ -32,7 +32,7 @@ export function useConversationInactivity(
   useEffect(() => {
     inactivityMonitor.setTimeoutCallback(async (conversationId: string) => {
       logger.info('Conversation timed out due to inactivity', { conversationId });
-      await endConversationWithSummary(conversationId);
+      await endConversationWithSummary(conversationId, 'timeout');
     });
 
     return () => {

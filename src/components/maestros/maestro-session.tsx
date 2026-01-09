@@ -18,7 +18,7 @@ import { useTTS } from '@/components/accessibility';
 import { HeaderVariantF } from './header-variants/variant-f-vertical-panel';
 import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore } from '@/lib/stores';
-import type { Maestro } from '@/types';
+import type { Maestro, ToolType } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
 import { MaestroSessionHeader } from './maestro-session-header';
 import { MaestroSessionMessages } from './maestro-session-messages';
@@ -30,9 +30,10 @@ interface MaestroSessionProps {
   maestro: Maestro;
   onClose: () => void;
   initialMode?: 'voice' | 'chat';
+  requestedToolType?: ToolType;
 }
 
-export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: MaestroSessionProps) {
+export function MaestroSession({ maestro, onClose, initialMode = 'voice', requestedToolType }: MaestroSessionProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [fullscreenToolId, setFullscreenToolId] = useState<string | null>(null);
@@ -71,7 +72,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice' }: Maes
     handleRequestPhoto,
     setShowWebcam,
     setWebcamRequest,
-  } = useMaestroSessionLogic({ maestro, initialMode });
+  } = useMaestroSessionLogic({ maestro, initialMode, requestedToolType });
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
