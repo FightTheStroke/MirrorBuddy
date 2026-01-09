@@ -42,12 +42,51 @@ function validateCode(code: string): { safe: boolean; violations: string[] } {
   return { safe: violations.length === 0, violations };
 }
 
+function decodeHtmlEntities(str: string): string {
+  // Decode numeric HTML entities (&#106; or &#x6A;)
+  return str
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
+}
+
 function sanitizeHtml(html: string): string {
+  if (!html) return '';
+
   let sanitized = html;
-  // Remove dangerous protocols
+
+  // 1. Remove <script> tags and their content (including nested and unclosed)
+  sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+  // Also remove unclosed script tags (malformed HTML)
+  sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*/gi, '');
+
+  // 2. Remove event handlers (onclick, onload, onerror, onmouseover, etc.)
+  // Replace with data-removed-* to track what was removed
+  sanitized = sanitized.replace(
+    /\s+on(\w+)\s*=\s*["'][^"']*["']/gi,
+    (_, eventName) => ` data-removed-${eventName}`
+  );
+
+  // 3. Remove dangerous URL protocols
+  // First decode HTML entities to catch encoded protocols
+  const hrefMatch = sanitized.match(/href\s*=\s*["']([^"']*)["']/gi);
+  if (hrefMatch) {
+    hrefMatch.forEach(match => {
+      const decoded = decodeHtmlEntities(match);
+      const decodedLower = decoded.toLowerCase();
+      if (decodedLower.includes('javascript:') ||
+          decodedLower.includes('vbscript:') ||
+          decodedLower.includes('data:')) {
+        sanitized = sanitized.replace(match, 'href="removed:"');
+      }
+    });
+  }
+
+  // Also handle direct (non-encoded) dangerous protocols
   sanitized = sanitized
     .replace(/javascript\s*:/gi, 'removed:')
-    .replace(/vbscript\s*:/gi, 'removed:');
+    .replace(/vbscript\s*:/gi, 'removed:')
+    .replace(/href\s*=\s*["']data:[^"']*["']/gi, 'href="removed:"');
+
   return sanitized;
 }
 
