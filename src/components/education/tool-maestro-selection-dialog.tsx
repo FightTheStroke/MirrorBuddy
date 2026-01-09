@@ -63,6 +63,7 @@ const TOOL_LABELS: Record<ToolType, string> = {
   webcam: 'Foto',
   pdf: 'PDF',
   homework: 'Compiti',
+  'study-kit': 'Study Kit',
 };
 
 const getSubjectLabel = (subject: string): string => {

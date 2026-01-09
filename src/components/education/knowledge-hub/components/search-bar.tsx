@@ -50,6 +50,7 @@ const TYPE_LABELS: Record<ToolType | 'all', string> = {
   webcam: 'Immagini',
   homework: 'Compiti',
   search: 'Ricerche',
+  'study-kit': 'Study Kit',
 };
 
 /**

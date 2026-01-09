@@ -81,6 +81,7 @@ export const TOOL_ICONS: Record<ToolType, typeof Brain> = {
   webcam: Camera,
   pdf: FileText,
   homework: FileText,
+  'study-kit': BookmarkCheck,
 };
 
 // ============================================================================
@@ -101,6 +102,7 @@ export const TOOL_LABELS: Record<ToolType, string> = {
   webcam: 'Foto',
   pdf: 'PDF',
   homework: 'Compiti',
+  'study-kit': 'Study Kit',
 };
 
 // ============================================================================

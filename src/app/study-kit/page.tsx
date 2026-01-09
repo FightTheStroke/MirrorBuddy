@@ -13,7 +13,7 @@ export default function StudyKitPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/astuccio');
+    router.replace('/?view=astuccio');
   }, [router]);
 
   return (

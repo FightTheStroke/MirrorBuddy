@@ -77,10 +77,6 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
-  const _isActive = (type: string | null, subject: string | null, maestro: string | null) => {
-    return type === currentType && subject === currentSubject && maestro === currentMaestro;
-  };
-
   return (
     <aside className="w-56 flex-shrink-0 border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-4 overflow-y-auto">
       <nav aria-label="Filtri materiali">

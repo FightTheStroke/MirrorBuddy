@@ -114,20 +114,8 @@ export function HTMLPreview({
           allow={getDemoAllowPermissions()}
           style={{ width: '100%', height: '100%', minHeight: '400px' }}
           onLoad={() => {
-            // Force script execution after iframe loads
-            try {
-              const iframe = iframeRef.current;
-              if (iframe && iframe.contentWindow) {
-                // Scripts should already execute via srcDoc, but this ensures they run
-                // Using type assertion since eval may not be in TypeScript types
-                const win = iframe.contentWindow as unknown as { eval?: (code: string) => void };
-                if (win.eval) {
-                  win.eval('void(0)');
-                }
-              }
-            } catch (e) {
-              // Cross-origin restrictions may prevent this, but scripts should still work
-            }
+            // Scripts execute automatically via srcDoc - just log for debugging
+            console.debug('[HtmlPreview] iframe loaded');
           }}
         />
       </div>

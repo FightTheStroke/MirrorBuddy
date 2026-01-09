@@ -20,6 +20,7 @@ interface FilterChipsProps {
   onSubjectFilterChange: (subject: string | null) => void;
   getTypeFilterCount: (id: string) => number;
   getSubjectFilterCount: (id: string) => number;
+  getDateFilterCount: (id: string) => number;
 }
 
 export function FilterChips({
@@ -32,6 +33,7 @@ export function FilterChips({
   onSubjectFilterChange,
   getTypeFilterCount,
   getSubjectFilterCount,
+  getDateFilterCount,
 }: FilterChipsProps) {
   const [showMoreTypes, setShowMoreTypes] = useState(false);
   const [showSubjects, setShowSubjects] = useState(true);
@@ -175,6 +177,7 @@ export function FilterChips({
         </h3>
         <div className="flex flex-wrap gap-2">
           {DATE_FILTERS.map((filter) => {
+            const count = getDateFilterCount(filter.id);
             const isActive = dateFilter === filter.id || (filter.id === 'all' && dateFilter === 'all');
             const colors = CHIP_COLORS[filter.color] || CHIP_COLORS.slate;
 
@@ -190,6 +193,9 @@ export function FilterChips({
                 )}
               >
                 <span>{filter.label}</span>
+                <span className={cn('text-xs px-1.5 py-0.5 rounded', isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-600')}>
+                  {count}
+                </span>
               </button>
             );
           })}

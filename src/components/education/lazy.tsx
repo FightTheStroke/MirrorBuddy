@@ -68,14 +68,6 @@ export const LazyArchiveView = dynamic(
   }
 );
 
-export const LazySupportiView = dynamic(
-  () => import('@/app/supporti/components/supporti-view').then((mod) => ({ default: mod.SupportiView })),
-  {
-    loading: () => <ViewSkeleton />,
-    ssr: false,
-  }
-);
-
 export const LazyStudyKitView = dynamic(
   () => import('@/components/study-kit/StudyKitView').then((mod) => ({ default: mod.StudyKitView })),
   {

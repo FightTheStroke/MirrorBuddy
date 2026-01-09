@@ -57,7 +57,7 @@ const TOOL_CATEGORIES: ToolCategory[] = [
       { id: 'pdf', title: 'Carica PDF', description: 'Carica un documento PDF e genera automaticamente materiali di studio', icon: Upload, route: '/pdf' },
       { id: 'webcam', title: 'Scatta Foto', description: 'Fotografa la lavagna o i tuoi appunti per generare materiali', icon: Camera, route: '/webcam' },
       { id: 'homework', title: 'Aiuto Compiti', description: 'Carica un esercizio e ricevi assistenza guidata passo-passo', icon: BookOpen, route: '/homework' },
-      { id: 'pdf', title: 'Study Kit', description: 'Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz', icon: BookOpen, route: '/study-kit' },
+      { id: 'study-kit', title: 'Study Kit', description: 'Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz', icon: BookOpen, route: '/study-kit' },
     ],
   },
   {

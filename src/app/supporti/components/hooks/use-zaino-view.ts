@@ -117,6 +117,10 @@ export function useZainoView({
     try {
       if (isBookmarked) {
         result = result.filter((item) => item.isBookmarked);
+      } else if (isPercorsi) {
+        // Percorsi is handled separately in UI via LearningPathsView
+        // Don't filter materials here - return empty to show only paths view
+        return [];
       } else if (typeFilter && typeFilter !== 'all') {
         result = result.filter((item) => item.toolType === typeFilter);
       }

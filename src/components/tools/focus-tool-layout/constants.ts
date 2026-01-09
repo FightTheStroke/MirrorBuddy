@@ -44,6 +44,7 @@ export const TOOL_NAMES: Record<ToolType, string> = {
   webcam: 'Foto',
   pdf: 'PDF',
   homework: 'Compiti',
+  'study-kit': 'Study Kit',
 };
 
 export const TOOL_NAMES_LOWERCASE: Record<ToolType, string> = {
@@ -60,6 +61,7 @@ export const TOOL_NAMES_LOWERCASE: Record<ToolType, string> = {
   webcam: 'foto',
   pdf: 'PDF',
   homework: 'compiti',
+  'study-kit': 'study kit',
 };
 
 export const SIDEBAR_ITEMS = [

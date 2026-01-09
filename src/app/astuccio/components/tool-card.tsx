@@ -38,7 +38,6 @@ export function ToolCard({
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
       aria-label={`${title}: ${description}`}
-      tabIndex={0}
     >
       <div className="mb-4">
         <Icon className="w-8 h-8 text-muted-foreground" aria-hidden="true" />
@@ -57,7 +56,7 @@ export function ToolCard({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="absolute top-3 right-3 w-3 h-3 bg-primary rounded-full"
-          aria-label="Strumento selezionato"
+          aria-hidden="true"
         />
       )}
     </motion.button>
