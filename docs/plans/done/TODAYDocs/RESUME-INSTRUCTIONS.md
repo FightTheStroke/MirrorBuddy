@@ -8,7 +8,7 @@
 ## Quick Start
 
 ```bash
-cd /Users/roberdan/GitHub/MirrorBuddy/ConvergioEdu
+cd /Users/roberdan/GitHub/MirrorBuddy
 git status
 cat docs/plans/doing/TODAYDocs/TODAY.md
 ```
