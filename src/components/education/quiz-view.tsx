@@ -7,142 +7,17 @@ import { Brain, Play, Trophy, Target, Sparkles, MessageSquare, Loader2, Trash2, 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Quiz } from './quiz';
-import { useProgressStore, useUIStore } from '@/lib/stores';
+import { useProgressStore } from '@/lib/stores';
 import { useQuizzes } from '@/lib/hooks/use-saved-materials';
 import type { Quiz as QuizType, QuizResult, Subject, Maestro } from '@/types';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import { cn } from '@/lib/utils';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
+import type { QuizViewProps } from './quiz-view/types';
+import { sampleQuizzes } from './quiz-view/constants';
 
-// Sample quizzes for demonstration
-const sampleQuizzes: QuizType[] = [
-  {
-    id: 'math-basics',
-    title: 'Matematica - Le basi',
-    subject: 'mathematics' as Subject,
-    questions: [
-      {
-        id: '1',
-        text: 'Quanto fa 7 x 8?',
-        type: 'multiple_choice',
-        options: ['54', '56', '58', '64'],
-        correctAnswer: 1,
-        hints: ['Pensa: 7 x 8 = 7 x (10-2)'],
-        explanation: '7 x 8 = 56. Un trucco: 56 = 7 x 8, i numeri sono in ordine: 5, 6, 7, 8!',
-        difficulty: 1,
-        subject: 'mathematics',
-        topic: 'Moltiplicazioni',
-      },
-      {
-        id: '2',
-        text: 'Quale di queste frazioni è equivalente a 1/2?',
-        type: 'multiple_choice',
-        options: ['2/3', '3/6', '4/6', '5/8'],
-        correctAnswer: 1,
-        hints: ['Moltiplica numeratore e denominatore per lo stesso numero'],
-        explanation: '3/6 = 1/2 perché 3 ÷ 3 = 1 e 6 ÷ 3 = 2',
-        difficulty: 2,
-        subject: 'mathematics',
-        topic: 'Frazioni',
-      },
-      {
-        id: '3',
-        text: 'Il teorema di Pitagora dice che in un triangolo rettangolo...',
-        type: 'multiple_choice',
-        options: [
-          'La somma degli angoli è 180°',
-          'L\'ipotenusa al quadrato è uguale alla somma dei quadrati dei cateti',
-          'I lati sono tutti uguali',
-          'L\'area è base per altezza diviso 2',
-        ],
-        correctAnswer: 1,
-        hints: ['Pensa a un triangolo con un angolo retto (90°)'],
-        explanation: 'a² + b² = c², dove c è l\'ipotenusa e a, b sono i cateti',
-        difficulty: 3,
-        subject: 'mathematics',
-        topic: 'Geometria',
-      },
-    ],
-    masteryThreshold: 70,
-    xpReward: 50,
-  },
-  {
-    id: 'history-rome',
-    title: 'Storia - Roma Antica',
-    subject: 'history' as Subject,
-    questions: [
-      {
-        id: '1',
-        text: 'In che anno fu fondata Roma secondo la tradizione?',
-        type: 'multiple_choice',
-        options: ['853 a.C.', '753 a.C.', '653 a.C.', '553 a.C.'],
-        correctAnswer: 1,
-        hints: ['Il numero contiene due cifre uguali'],
-        explanation: 'Roma fu fondata tradizionalmente il 21 aprile 753 a.C. da Romolo',
-        difficulty: 2,
-        subject: 'history',
-        topic: 'Roma Antica',
-      },
-      {
-        id: '2',
-        text: 'Chi era Giulio Cesare?',
-        type: 'multiple_choice',
-        options: [
-          'Un imperatore romano',
-          'Un generale e dittatore romano',
-          'Un filosofo greco',
-          'Un re di Roma',
-        ],
-        correctAnswer: 1,
-        hints: ['Fu assassinato alle Idi di Marzo'],
-        explanation: 'Giulio Cesare fu un generale e dittatore romano, assassinato nel 44 a.C.',
-        difficulty: 1,
-        subject: 'history',
-        topic: 'Roma Antica',
-      },
-    ],
-    masteryThreshold: 70,
-    xpReward: 40,
-  },
-  {
-    id: 'science-body',
-    title: 'Scienze - Il Corpo Umano',
-    subject: 'biology' as Subject,
-    questions: [
-      {
-        id: '1',
-        text: 'Quante ossa ha il corpo umano adulto?',
-        type: 'multiple_choice',
-        options: ['106', '206', '306', '406'],
-        correctAnswer: 1,
-        hints: ['Il numero inizia con 2'],
-        explanation: 'Il corpo umano adulto ha 206 ossa. I neonati ne hanno circa 270, ma alcune si fondono durante la crescita.',
-        difficulty: 2,
-        subject: 'biology',
-        topic: 'Anatomia',
-      },
-      {
-        id: '2',
-        text: 'Qual è l\'organo più grande del corpo umano?',
-        type: 'multiple_choice',
-        options: ['Il fegato', 'Il cervello', 'La pelle', 'I polmoni'],
-        correctAnswer: 2,
-        hints: ['Lo puoi vedere e toccare ogni giorno'],
-        explanation: 'La pelle è l\'organo più grande, con una superficie di circa 2 metri quadrati!',
-        difficulty: 1,
-        subject: 'biology',
-        topic: 'Anatomia',
-      },
-    ],
-    masteryThreshold: 70,
-    xpReward: 40,
-  },
-];
+export type { QuizViewProps } from './quiz-view/types';
 
-interface QuizViewProps {
-  initialMaestroId?: string | null;
-  initialMode?: 'voice' | 'chat' | null;
-}
 
 export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   const _router = useRouter();
@@ -165,7 +40,7 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   }, [initialMaestroId, initialMode]);
 
   // Handle maestro selection (focus mode has been removed)
-  const handleMaestroConfirm = (maestro: Maestro, mode: 'voice' | 'chat') => {
+  const handleMaestroConfirm = (_maestro: Maestro, _mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
     // Focus mode has been removed
   };

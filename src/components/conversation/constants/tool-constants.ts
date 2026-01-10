@@ -1,17 +1,5 @@
 import type { ToolType } from '@/types/tools';
 
-export const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
-  create_mindmap: 'mindmap',
-  create_quiz: 'quiz',
-  create_demo: 'demo',
-  web_search: 'search',
-  create_flashcards: 'flashcard',
-  create_diagram: 'diagram',
-  create_timeline: 'timeline',
-  create_summary: 'summary',
-  open_student_summary: 'summary',
-};
-
 export const TOOL_PROMPTS: Record<ToolType, string> = {
   mindmap: 'Crea una mappa mentale su questo argomento',
   quiz: 'Crea un quiz per verificare la mia comprensione',
@@ -28,4 +16,3 @@ export const TOOL_PROMPTS: Record<ToolType, string> = {
   homework: 'Aiutami con i compiti',
   'study-kit': 'Crea un kit di studio',
 };
-

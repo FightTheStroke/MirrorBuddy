@@ -5,15 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-// Canvas-based real-time waveform visualization
-interface CanvasWaveformProps {
-  analyser: AnalyserNode | null;
-  isActive: boolean;
-  color?: string;
-  backgroundColor?: string;
-  height?: number;
-  className?: string;
-}
+import type { CanvasWaveformProps, SimpleLevelWaveformProps, WaveformProps, CircularWaveformProps } from './waveform/types';
 
 export function CanvasWaveform({
   analyser,
@@ -149,16 +141,6 @@ export function CanvasWaveform({
   );
 }
 
-// Simple canvas waveform that takes audio level instead of analyser
-// For use when we only have level data (0-1)
-interface SimpleLevelWaveformProps {
-  level: number; // 0-1
-  isActive: boolean;
-  color?: string;
-  backgroundColor?: string;
-  height?: number;
-  className?: string;
-}
 
 export function SimpleLevelWaveform({
   level,
@@ -304,13 +286,6 @@ export function SimpleLevelWaveform({
   );
 }
 
-interface WaveformProps {
-  level: number; // 0-1
-  isActive: boolean;
-  color?: string;
-  barCount?: number;
-  className?: string;
-}
 
 export function Waveform({
   level,
@@ -373,15 +348,6 @@ export function Waveform({
   );
 }
 
-// Circular waveform for avatar
-interface CircularWaveformProps {
-  level: number;
-  isActive: boolean;
-  color?: string;
-  size?: number;
-  image?: string;
-  className?: string;
-}
 
 export function CircularWaveform({
   level,

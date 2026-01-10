@@ -9,59 +9,11 @@ import { nanoid } from 'nanoid';
 import { logger } from '@/lib/logger';
 import type {
   TelemetryEvent,
-  TelemetryCategory,
   TelemetryConfig,
-  UsageStats,
 } from './types';
+import type { TelemetryState } from './telemetry-store/types';
 
-// ============================================================================
-// STORE STATE
-// ============================================================================
-
-interface TelemetryState {
-  // Configuration
-  config: TelemetryConfig;
-
-  // Session management
-  sessionId: string;
-  sessionStartedAt: Date | null;
-
-  // Event queue (batched before sending)
-  eventQueue: TelemetryEvent[];
-
-  // Local stats (updated in real-time)
-  localStats: {
-    todaySessions: number;
-    todayStudyMinutes: number;
-    todayPageViews: number;
-    todayQuestions: number;
-    lastActivityAt: Date | null;
-  };
-
-  // Cached usage stats from server
-  usageStats: UsageStats | null;
-  lastFetchedAt: Date | null;
-
-  // Actions
-  trackEvent: (
-    category: TelemetryCategory,
-    action: string,
-    label?: string,
-    value?: number,
-    metadata?: Record<string, string | number | boolean>
-  ) => void;
-
-  startSession: () => void;
-  endSession: () => void;
-
-  flushEvents: () => Promise<void>;
-
-  updateConfig: (config: Partial<TelemetryConfig>) => void;
-
-  fetchUsageStats: () => Promise<void>;
-
-  clearLocalData: () => void;
-}
+export type { TelemetryState } from './telemetry-store/types';
 
 // ============================================================================
 // DEFAULT CONFIG
@@ -290,6 +242,29 @@ export const useTelemetryStore = create<TelemetryState>()(
         } catch (error) {
           logger.error('Failed to fetch usage stats', { error });
         }
+      },
+
+      // Update local stats
+      updateLocalStats: (stats) => {
+        set((state) => ({
+          localStats: {
+            ...state.localStats,
+            ...stats,
+          },
+        }));
+      },
+
+      // Reset local stats
+      resetLocalStats: () => {
+        set({
+          localStats: {
+            todaySessions: 0,
+            todayStudyMinutes: 0,
+            todayPageViews: 0,
+            todayQuestions: 0,
+            lastActivityAt: null,
+          },
+        });
       },
 
       // Clear local telemetry data

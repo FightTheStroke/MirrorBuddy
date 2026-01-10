@@ -10,6 +10,7 @@
 import { prisma } from '@/lib/db';
 import type { ToolType } from '@/types/tools';
 import { randomUUID } from 'crypto';
+import { generateMaterialEmbeddingAsync } from './tool-embedding';
 
 // ============================================================================
 // TYPES
@@ -24,6 +25,10 @@ export interface SaveToolParams {
   maestroId?: string;
   conversationId?: string;
   sessionId?: string;
+  /** Optional source toolId for auto-linking derived materials (Wave 3) */
+  sourceToolId?: string;
+  /** Optional message ID for linking tool to the message that created it */
+  messageId?: string;
 }
 
 export interface SavedTool {
@@ -101,6 +106,7 @@ function materialToSavedTool(material: {
 
 /**
  * Save a tool to the database (using Material table)
+ * If sourceToolId is provided, creates a "derived_from" edge (Wave 3)
  */
 export async function saveTool(params: SaveToolParams): Promise<SavedTool> {
   const toolId = `tool-${randomUUID()}`;
@@ -116,9 +122,40 @@ export async function saveTool(params: SaveToolParams): Promise<SavedTool> {
       maestroId: params.maestroId ?? null,
       conversationId: params.conversationId ?? null,
       sessionId: params.sessionId ?? null,
+      messageId: params.messageId ?? null,
       status: 'active',
     },
   });
+
+  // Wave 3: Auto-link if derived from another material
+  if (params.sourceToolId) {
+    try {
+      const sourceMaterial = await prisma.material.findUnique({
+        where: { toolId: params.sourceToolId },
+        select: { id: true },
+      });
+
+      if (sourceMaterial) {
+        await prisma.materialEdge.create({
+          data: {
+            fromId: sourceMaterial.id,
+            toId: material.id,
+            relationType: 'derived_from',
+            weight: 1.0,
+          },
+        });
+      }
+    } catch {
+      // Non-blocking: log but don't fail the save
+      console.warn('Failed to create derived_from edge', {
+        sourceToolId: params.sourceToolId,
+        newToolId: toolId,
+      });
+    }
+  }
+
+  // Wave 4: Generate embedding async (non-blocking)
+  generateMaterialEmbeddingAsync(material.id, params.userId, params.content, params.type);
 
   return materialToSavedTool(material);
 }

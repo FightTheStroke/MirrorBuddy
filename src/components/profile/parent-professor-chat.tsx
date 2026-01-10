@@ -1,29 +1,20 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
-import {
-  Send,
-  X,
-  Loader2,
-  MessageCircle,
-  AlertTriangle,
-  Shield,
-  CheckCircle,
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { X } from 'lucide-react';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
 import { getMaestroById } from '@/data/maestri';
+import { ConsentModal } from './parent-professor-chat-consent';
+import { ChatMessages } from './parent-professor-chat-messages';
+import { ChatInput } from './parent-professor-chat-input';
+import {
+  initializeChatHistory,
+  saveConsent,
+  sendMessageToMaestro,
+} from './parent-professor-chat-utils';
 
 interface Message {
   id: string;
@@ -71,52 +62,22 @@ export function ParentProfessorChat({
 
   // Check for existing consent and load conversation history
   useEffect(() => {
-    const initializeChat = async () => {
+    const loadChat = async () => {
       setIsLoadingHistory(true);
       try {
-        // Check consent from database
-        const consentResponse = await fetch('/api/parent-professor/consent');
-        if (consentResponse.ok) {
-          const consentData = await consentResponse.json();
-          if (consentData.hasConsented) {
-            setShowConsentModal(false);
-            setHasConsented(true);
-          }
+        const result = await initializeChatHistory(maestroId, studentId);
+        setConversationId(result.conversationId);
+        setMessages(result.messages);
+        if (result.hasConsented) {
+          setShowConsentModal(false);
+          setHasConsented(true);
         }
-
-        // Load existing conversation for this maestro/student
-        const response = await fetch(`/api/parent-professor?studentId=${studentId}&limit=20`);
-        if (response.ok) {
-          const conversations = await response.json();
-          // Find conversation with this maestro
-          const existing = conversations.find(
-            (c: { maestroId: string }) => c.maestroId === maestroId
-          );
-          if (existing) {
-            // Load full conversation with messages
-            const convResponse = await fetch(`/api/parent-professor/${existing.id}`);
-            if (convResponse.ok) {
-              const convData = await convResponse.json();
-              setConversationId(convData.id);
-              setMessages(
-                convData.messages.map((m: { id: string; role: string; content: string; createdAt: string }) => ({
-                  id: m.id,
-                  role: m.role as 'user' | 'assistant',
-                  content: m.content,
-                  createdAt: new Date(m.createdAt),
-                }))
-              );
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Failed to initialize chat:', err);
       } finally {
         setIsLoadingHistory(false);
       }
     };
 
-    initializeChat();
+    loadChat();
   }, [maestroId, studentId]);
 
   // Scroll to bottom when new messages arrive
@@ -145,12 +106,7 @@ export function ParentProfessorChat({
   const handleConsent = useCallback(async () => {
     setShowConsentModal(false);
     setHasConsented(true);
-    // Store consent in database
-    try {
-      await fetch('/api/parent-professor/consent', { method: 'POST' });
-    } catch (err) {
-      console.error('Failed to save consent:', err);
-    }
+    await saveConsent();
   }, []);
 
   const handleSendMessage = async () => {
@@ -169,25 +125,15 @@ export function ParentProfessorChat({
     setError(null);
 
     try {
-      const response = await fetch('/api/parent-professor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          maestroId,
-          studentId,
-          studentName,
-          message: userMessage.content,
-          conversationId,
-          maestroSystemPrompt: maestro?.systemPrompt || '',
-          maestroDisplayName: maestroName,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Errore nella comunicazione con il server');
-      }
-
-      const data = await response.json();
+      const data = await sendMessageToMaestro(
+        maestroId,
+        studentId,
+        studentName,
+        userMessage.content,
+        conversationId,
+        maestro?.systemPrompt || '',
+        maestroName
+      );
 
       if (data.blocked) {
         setError(data.content);
@@ -223,67 +169,14 @@ export function ParentProfessorChat({
 
   return (
     <>
-      {/* Consent Modal */}
-      <Dialog open={showConsentModal} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-indigo-500" />
-              Conversazione con {maestroName}
-            </DialogTitle>
-            <DialogDescription className="text-left space-y-3 pt-4">
-              <p>
-                Sta per iniziare una conversazione con il Professore {maestroName}
-                riguardo al percorso di apprendimento di {studentName}.
-              </p>
+      <ConsentModal
+        isOpen={showConsentModal}
+        maestroName={maestroName}
+        studentName={studentName}
+        onConsent={handleConsent}
+        onCancel={onClose}
+      />
 
-              <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="font-medium text-amber-800 dark:text-amber-200">
-                      Disclaimer importante
-                    </p>
-                    <p className="text-amber-700 dark:text-amber-300 mt-1">
-                      I Professori sono assistenti AI che forniscono osservazioni pedagogiche.
-                      Le loro valutazioni non sostituiscono pareri medici, psicologici o
-                      diagnosi professionali. Per questioni cliniche, consultare specialisti qualificati.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2 text-sm">
-                <p className="font-medium">In questa conversazione:</p>
-                <ul className="space-y-1.5">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    I messaggi vengono salvati in modo sicuro
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Il Professore utilizza un linguaggio formale
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                    Le osservazioni si basano sulle sessioni di studio
-                  </li>
-                </ul>
-              </div>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={onClose}>
-              Annulla
-            </Button>
-            <Button onClick={handleConsent} className="bg-indigo-600 hover:bg-indigo-700">
-              Ho capito, continua
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Chat Interface */}
       {hasConsented && (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
@@ -318,125 +211,26 @@ export function ParentProfessorChat({
               </div>
             </CardHeader>
 
-            {/* Messages */}
-            <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
-              {isLoadingHistory && (
-                <div className="text-center py-8 text-slate-500">
-                  <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin" />
-                  <p>Caricamento conversazione...</p>
-                </div>
-              )}
+            <ChatMessages
+              messages={messages}
+              isLoading={isLoading}
+              isLoadingHistory={isLoadingHistory}
+              error={error}
+              maestro={maestro ?? null}
+              maestroId={maestroId}
+              maestroName={maestroName}
+              studentName={studentName}
+              messagesEndRef={messagesEndRef}
+            />
 
-              {!isLoadingHistory && messages.length === 0 && (
-                <div className="text-center py-8 text-slate-500">
-                  <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Inizia la conversazione con {maestroName}</p>
-                  <p className="text-sm mt-1">
-                    Chieda informazioni sui progressi di {studentName}
-                  </p>
-                </div>
-              )}
-
-              <AnimatePresence>
-                {messages.map((message) => (
-                  <motion.div
-                    key={message.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={cn(
-                      'flex gap-3',
-                      message.role === 'user' ? 'justify-end' : 'justify-start'
-                    )}
-                  >
-                    {message.role === 'assistant' && (
-                      <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                        <Image
-                          src={maestro?.avatar || `/maestri/${maestroId}.png`}
-                          alt={maestroName}
-                          width={32}
-                          height={32}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                    )}
-                    <div
-                      className={cn(
-                        'max-w-[80%] rounded-2xl px-4 py-2',
-                        message.role === 'user'
-                          ? 'bg-indigo-600 text-white'
-                          : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
-                      <p
-                        className={cn(
-                          'text-xs mt-1',
-                          message.role === 'user'
-                            ? 'text-indigo-200'
-                            : 'text-slate-500'
-                        )}
-                      >
-                        {message.createdAt.toLocaleTimeString('it-IT', {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-
-              {isLoading && (
-                <div className="flex gap-3 justify-start">
-                  <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                    <Image
-                      src={maestro?.avatar || `/maestri/${maestroId}.png`}
-                      alt={maestroName}
-                      width={32}
-                      height={32}
-                      className="object-cover w-full h-full"
-                    />
-                  </div>
-                  <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl px-4 py-3">
-                    <Loader2 className="h-5 w-5 animate-spin text-slate-500" />
-                  </div>
-                </div>
-              )}
-
-              {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                  <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-                </div>
-              )}
-
-              <div ref={messagesEndRef} />
-            </CardContent>
-
-            {/* Input */}
-            <div className="flex-shrink-0 p-4 border-t bg-white dark:bg-slate-900">
-              <div className="flex gap-2">
-                <textarea
-                  ref={inputRef}
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Scrivi un messaggio..."
-                  className="flex-1 resize-none rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  rows={2}
-                  disabled={isLoading}
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!inputValue.trim() || isLoading}
-                  className="bg-indigo-600 hover:bg-indigo-700"
-                >
-                  <Send className="h-5 w-5" />
-                </Button>
-              </div>
-              <p className="text-xs text-slate-500 mt-2 text-center">
-                Le risposte sono generate da AI e potrebbero contenere imprecisioni.
-              </p>
-            </div>
+            <ChatInput
+              value={inputValue}
+              isLoading={isLoading}
+              onChange={setInputValue}
+              onSend={handleSendMessage}
+              onKeyDown={handleKeyDown}
+              inputRef={inputRef}
+            />
           </Card>
         </motion.div>
       )}

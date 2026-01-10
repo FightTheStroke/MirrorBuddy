@@ -32,6 +32,7 @@ function toMaterial(m: KnowledgeHubMaterial): Material {
 export interface TimelineViewProps {
   materials: KnowledgeHubMaterial[];
   onSelectMaterial: (material: KnowledgeHubMaterial) => void;
+  onFindSimilar?: (toolId: string) => void;
   selectedMaterialIds?: Set<string>;
   onToggleMaterialSelection?: (id: string) => void;
   className?: string;
@@ -74,6 +75,7 @@ function formatDateLabel(date: Date): string {
 export function TimelineView({
   materials,
   onSelectMaterial,
+  onFindSimilar,
   selectedMaterialIds = new Set(),
   onToggleMaterialSelection,
   className,
@@ -156,6 +158,11 @@ export function TimelineView({
                         <MaterialCard
                           material={toMaterial(material)}
                           onOpen={() => onSelectMaterial(material)}
+                          onFindSimilar={
+                            onFindSimilar
+                              ? () => onFindSimilar(material.toolId ?? material.id)
+                              : undefined
+                          }
                           isSelected={selectedMaterialIds.has(material.id)}
                           onSelect={
                             onToggleMaterialSelection

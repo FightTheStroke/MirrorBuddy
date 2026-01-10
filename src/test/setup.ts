@@ -6,6 +6,10 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
+// Mock server-only module - it throws when imported outside of server components
+// This allows testing modules that import server-only code
+vi.mock('server-only', () => ({}));
+
 // Mock console methods for cleaner test output
 global.console = {
   ...console,

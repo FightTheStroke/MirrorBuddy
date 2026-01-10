@@ -1,3 +1,4 @@
+import 'server-only';
 import { prisma } from '@/lib/db';
 import type { SafetyEventType, EventSeverity } from './types';
 

@@ -83,7 +83,9 @@ export function CalendarView() {
           preferences={
             schedule?.preferences || DEFAULT_NOTIFICATION_PREFERENCES
           }
-          onUpdate={updatePreferences}
+          onUpdate={async (prefs) => {
+            await updatePreferences(prefs);
+          }}
           isLoading={schedulerLoading}
         />
       )}

@@ -2,7 +2,7 @@
  * Type definitions for Archive components
  */
 
-import type { MaterialRecord } from '@/lib/storage/materials-db';
+import type { MaterialRecord } from '@/lib/storage/materials-db-utils';
 
 export interface ArchiveItem extends MaterialRecord {
   title?: string;

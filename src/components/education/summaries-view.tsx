@@ -32,7 +32,6 @@ import {
 import { toast } from '@/components/ui/toast';
 import type { SummaryData } from '@/types/tools';
 import type { Maestro } from '@/types';
-import { useUIStore } from '@/lib/stores';
 
 interface SummariesViewProps {
   className?: string;
@@ -63,7 +62,7 @@ export function SummariesView({ className, initialMaestroId, initialMode }: Summ
   }, [initialMaestroId, initialMode]);
 
   // Handle maestro selection (focus mode has been removed)
-  const handleMaestroConfirm = useCallback((maestro: Maestro, mode: 'voice' | 'chat') => {
+  const handleMaestroConfirm = useCallback((_maestro: Maestro, _mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
     // Focus mode has been removed
   }, []);

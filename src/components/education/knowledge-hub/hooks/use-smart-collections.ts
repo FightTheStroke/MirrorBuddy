@@ -14,6 +14,15 @@
 import { useMemo } from 'react';
 import type { ToolType } from '@/types/tools';
 import type { SearchableMaterial } from '@/lib/search/searchable-text';
+import {
+  defaultSort,
+  startOfDay,
+  startOfWeek,
+  startOfMonth,
+  daysAgo,
+  TYPE_LABELS,
+  AVAILABLE_TYPES,
+} from './smart-collection-utils';
 
 export interface SmartCollectionDefinition {
   id: string;
@@ -66,39 +75,6 @@ export interface UseSmartCollectionsReturn {
   getCollection: (id: string) => SmartCollection | undefined;
 }
 
-// Default sort: newest first
-const defaultSort = (a: MaterialWithExtras, b: MaterialWithExtras) =>
-  new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-
-// Date helpers
-const startOfDay = (date: Date): Date => {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
-
-const startOfWeek = (date: Date): Date => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
-
-const startOfMonth = (date: Date): Date => {
-  const d = new Date(date);
-  d.setDate(1);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
-
-const daysAgo = (days: number): Date => {
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
 
 /**
  * Hook for smart/dynamic material collections.
@@ -204,50 +180,16 @@ export function useSmartCollections(
 
   // By type
   const byType = useMemo<Record<ToolType, SmartCollection>>(() => {
-    const types: ToolType[] = [
-      'mindmap',
-      'quiz',
-      'flashcard',
-      'summary',
-      'demo',
-      'diagram',
-      'timeline',
-      'formula',
-      'chart',
-      'pdf',
-      'webcam',
-      'homework',
-      'search',
-      'study-kit',
-    ];
-
-    const typeLabels: Record<ToolType, string> = {
-      mindmap: 'Mappe Mentali',
-      quiz: 'Quiz',
-      flashcard: 'Flashcard',
-      summary: 'Riassunti',
-      demo: 'Demo',
-      diagram: 'Diagrammi',
-      timeline: 'Timeline',
-      formula: 'Formule',
-      chart: 'Grafici',
-      pdf: 'PDF',
-      webcam: 'Immagini',
-      homework: 'Compiti',
-      search: 'Ricerche',
-      'study-kit': 'Study Kit',
-    };
-
     const result = {} as Record<ToolType, SmartCollection>;
 
-    for (const type of types) {
+    for (const type of AVAILABLE_TYPES) {
       const filtered = materials
         .filter((m) => m.toolType === type && !m.isArchived)
         .sort(defaultSort);
 
       result[type] = {
         id: `smart-type-${type}`,
-        name: typeLabels[type],
+        name: TYPE_LABELS[type],
         icon: type,
         count: filtered.length,
         materials: filtered,

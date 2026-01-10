@@ -115,7 +115,7 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
         const voiceToolType = getToolTypeFromName(toolName);
         if (voiceToolType) {
           const methodTool = voiceToolType === 'mindmap' ? 'mind_map'
-            : voiceToolType === 'flashcards' ? 'flashcard'
+            : voiceToolType === 'flashcard' ? 'flashcard'
             : voiceToolType === 'quiz' ? 'quiz'
             : voiceToolType === 'summary' ? 'summary'
             : 'diagram';

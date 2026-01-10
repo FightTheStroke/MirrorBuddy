@@ -29,6 +29,10 @@ npx prisma db push   # Sync schema
 
 **PDF Generator** (`src/lib/pdf-generator/`): Accessible PDF export for 7 DSA profiles (dyslexia, dyscalculia, dysgraphia, dysorthography, adhd, dyspraxia, stuttering). Uses @react-pdf/renderer. API: POST `/api/pdf-generator`.
 
+## Modular Rules (auto-loaded)
+
+`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md
+
 ## On-Demand Docs
 
 Load with `@docs/claude/<name>.md`:
@@ -37,6 +41,32 @@ Load with `@docs/claude/<name>.md`:
 **Voice**: voice-api | ambient-audio | onboarding
 **Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator
 **Characters**: buddies | coaches
+
+## LSP (active)
+
+TypeScript LSP installed - provides go-to-definition, find-references, type hints for 1300+ TS files.
+
+## Workflow (MANDATORY for non-trivial tasks)
+
+1. **`/prompt`** → Extract F-xx requirements, user confirms
+2. **`/planner`** → Create plan with waves/tasks in DB, user approves
+3. **`/execute {plan_id}`** → Run tasks, Thor validates per wave
+4. **Closure** → User approves ("finito"), never self-declare
+
+**Skip workflow ONLY for**: single-file fixes, typos, trivial changes.
+**Uncertain if trivial?** → Use the workflow.
+
+## Request Format (helps understanding)
+
+Structure requests as:
+- **What**: Specific action (add/fix/refactor/remove)
+- **Where**: File path or component name
+- **Why**: Context or problem being solved
+- **Acceptance**: How to verify it works
+
+**Good**: "Add maestro Economia in `maestri-society.ts`, avatar `economy.png`, color `#3B82F6`, specialized in microeconomics for DSA students. Verify: appears in list, voice works."
+
+**Bad**: "Add an economics teacher"
 
 ## Project Rules
 
@@ -49,6 +79,17 @@ Load with `@docs/claude/<name>.md`:
 - Types in `src/types/index.ts`
 - Conventional commits, reference issue if exists
 
+## Closure Protocol (Thor enforced)
+
+**NEVER say "fatto/done" without**:
+1. Verification command output shown (lint, typecheck, build)
+2. All F-xx requirements listed with [x] or [ ] status
+3. All deliverables listed with file paths
+4. User approval - agent cannot self-declare complete
+
+For plans: `thor-quality-assurance-guardian` validates before closure.
+Skip Thor ONLY for trivial single-file changes.
+
 **Constraints**:
 - WCAG 2.1 AA accessibility (7 profiles in `src/lib/accessibility/`)
 - NO localStorage for user data (ADR 0015) - Zustand + REST only
@@ -56,7 +97,39 @@ Load with `@docs/claude/<name>.md`:
 - Prisma for all DB operations (`prisma/schema.prisma`)
 - Path aliases: `@/lib/...`, `@/components/...`
 
+## Optimization Health Check (run periodically)
+
+When user asks "check optimization" or at start of long sessions:
+
+```bash
+# 1. Verify .claudeignore is effective
+wc -l .claudeignore  # Should be ~60+ lines
+
+# 2. Check rules are loaded
+ls .claude/rules/    # Should show 4 files
+
+# 3. Verify no large files crept in
+find src -name "*.ts" -o -name "*.tsx" | xargs wc -l | awk '$1 > 300' | head -10
+```
+
+**If issues found**:
+- Large files (>300 lines): Suggest split per ADR 0016
+- Missing rules: Recreate from ADR 0029
+- .claudeignore outdated: Add new generated/test dirs
+
 ## Summary Instructions
 
-When compacting: code changes, test output, architectural decisions, open tasks.  
-Discard verbose listings and debug output.
+**KEEP when compacting**:
+- Code changes with exact file paths and line numbers
+- F-xx requirements with status ([x] done, [ ] pending)
+- Test results: which passed, which failed, why
+- Architectural decisions made
+- Open tasks and blockers
+- User preferences expressed in conversation
+
+**DISCARD**:
+- Verbose file listings and directory trees
+- Debug output and stack traces (keep only error message)
+- Intermediate exploration steps
+- Repeated explanations of same concept
+- Full file contents (keep only changed sections)

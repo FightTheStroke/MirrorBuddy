@@ -210,7 +210,7 @@ export function useDisconnect(
 
     if (refs.processorRef.current) {
       refs.processorRef.current.disconnect();
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
+       
       refs.processorRef.current = null;
     }
     if (refs.sourceNodeRef.current) {

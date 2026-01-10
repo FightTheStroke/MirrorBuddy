@@ -1,75 +1,25 @@
+/**
+ * Tool Canvas Component
+ * Real-time display of tools being built by Maestri
+ * Layout: 80% tool canvas + 20% Maestro PiP (picture-in-picture)
+ */
+
 'use client';
-// ============================================================================
-// TOOL CANVAS COMPONENT
-// Real-time display of tools being built by Maestri
-// Layout: 80% tool canvas + 20% Maestro PiP (picture-in-picture)
-// ============================================================================
 
 import { useState, useMemo, useCallback } from 'react';
-import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Network } from 'lucide-react';
 import { logger } from '@/lib/logger';
-import {
-  Loader2,
-  Network,
-  Layers,
-  HelpCircle,
-  FileText,
-  Clock,
-  GitBranch,
-  CheckCircle,
-  XCircle,
-  Pause,
-  X,
-  Maximize2,
-  Minimize2,
-  Sparkles,
-} from 'lucide-react';
 import { useToolStream, type ActiveToolState } from '@/lib/hooks/use-tool-stream';
-import { MindmapRenderer } from './markmap';
-import { QuizTool } from './quiz-tool';
-import { FlashcardTool } from './flashcard-tool';
-import { DiagramRenderer } from './diagram-renderer';
-import { SummaryTool } from './summary-tool';
-import { StudentSummaryEditor } from './student-summary-editor';
-import type { SummaryData, StudentSummaryData } from '@/types/tools';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import type { ToolType } from '@/lib/realtime/tool-events';
-import type { MindmapRequest, QuizRequest, FlashcardDeckRequest, DiagramRequest } from '@/types';
-
-// Tool icons mapping
-const toolIcons: Record<ToolType, React.ReactNode> = {
-  mindmap: <Network className="w-5 h-5" />,
-  flashcards: <Layers className="w-5 h-5" />,
-  quiz: <HelpCircle className="w-5 h-5" />,
-  summary: <FileText className="w-5 h-5" />,
-  timeline: <Clock className="w-5 h-5" />,
-  diagram: <GitBranch className="w-5 h-5" />,
-  demo: <Sparkles className="w-5 h-5" />,
-};
-
-// Tool display names
-const toolNames: Record<ToolType, string> = {
-  mindmap: 'Mappa Mentale',
-  flashcards: 'Flashcard',
-  quiz: 'Quiz',
-  summary: 'Riassunto',
-  timeline: 'Linea del Tempo',
-  diagram: 'Diagramma',
-  demo: 'Demo Interattiva',
-};
-
-// Get user ID from session storage (matches use-saved-materials.ts pattern)
-function getUserId(): string {
-  if (typeof window === 'undefined') return 'default-user';
-  let userId = sessionStorage.getItem('mirrorbuddy-user-id');
-  if (!userId) {
-    userId = `user-${crypto.randomUUID()}`;
-    sessionStorage.setItem('mirrorbuddy-user-id', userId);
-  }
-  return userId;
-}
+import type { StudentSummaryData } from '@/types/tools';
+import { getUserId } from './tool-canvas/utils';
+import { ConnectionOverlay } from './tool-canvas/components/connection-overlay';
+import { ToolHeader } from './tool-canvas/components/tool-header';
+import { ToolRenderer } from './tool-canvas/components/tool-renderer';
+import { MaestroPip } from './tool-canvas/components/maestro-pip';
+import { CheckCircle, XCircle, Pause, Loader2 } from 'lucide-react';
 
 interface ToolCanvasProps {
   sessionId: string;
@@ -181,44 +131,7 @@ export function ToolCanvas({
       role="region"
       aria-label="Tool Canvas"
     >
-      {/* Connection status overlay */}
-      <AnimatePresence>
-        {connectionState !== 'connected' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm"
-          >
-            <div className="text-center space-y-4">
-              {connectionState === 'connecting' && (
-                <>
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto" />
-                  <p className="text-slate-400">Connessione in corso...</p>
-                </>
-              )}
-              {connectionState === 'reconnecting' && (
-                <>
-                  <Loader2 className="w-8 h-8 animate-spin text-yellow-500 mx-auto" />
-                  <p className="text-slate-400">Riconnessione...</p>
-                </>
-              )}
-              {connectionState === 'error' && (
-                <>
-                  <XCircle className="w-8 h-8 text-red-500 mx-auto" />
-                  <p className="text-slate-400">Connessione fallita</p>
-                </>
-              )}
-              {connectionState === 'disconnected' && (
-                <>
-                  <div className="w-8 h-8 rounded-full bg-slate-700 mx-auto" />
-                  <p className="text-slate-400">Disconnesso</p>
-                </>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <ConnectionOverlay connectionState={connectionState} />
 
       {/* Main canvas area (80%) */}
       <div className="absolute inset-0 pr-0 md:pr-[20%]">
@@ -250,62 +163,13 @@ export function ToolCanvas({
               exit={{ opacity: 0, scale: 0.95 }}
               className="h-full flex flex-col"
             >
-              {/* Tool header */}
-              <div className="flex items-center justify-between p-4 border-b border-slate-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white">
-                    {toolIcons[activeTool.type]}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">
-                      {activeTool.title}
-                    </h3>
-                    <p className="text-sm text-slate-400">
-                      {toolNames[activeTool.type]}
-                      {activeTool.subject && ` • ${activeTool.subject}`}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {/* Status badge */}
-                  {statusInfo && (
-                    <span
-                      className={cn(
-                        'px-3 py-1 rounded-full text-sm flex items-center gap-1.5',
-                        statusInfo.color,
-                        statusInfo.bg
-                      )}
-                    >
-                      {statusInfo.icon}
-                      {statusInfo.text}
-                    </span>
-                  )}
-
-                  {/* Controls */}
-                  <button
-                    onClick={() => setIsFullscreen(!isFullscreen)}
-                    className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
-                    aria-label={isFullscreen ? 'Esci da fullscreen' : 'Fullscreen'}
-                  >
-                    {isFullscreen ? (
-                      <Minimize2 className="w-5 h-5 text-slate-400" />
-                    ) : (
-                      <Maximize2 className="w-5 h-5 text-slate-400" />
-                    )}
-                  </button>
-
-                  {onCancel && activeTool.status === 'building' && (
-                    <button
-                      onClick={onCancel}
-                      className="p-2 rounded-lg hover:bg-red-900/50 transition-colors"
-                      aria-label="Annulla"
-                    >
-                      <X className="w-5 h-5 text-red-400" />
-                    </button>
-                  )}
-                </div>
-              </div>
+              <ToolHeader
+                tool={activeTool}
+                statusInfo={statusInfo}
+                isFullscreen={isFullscreen}
+                onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
+                onCancel={onCancel}
+              />
 
               {/* Progress bar */}
               {activeTool.status === 'building' && (
@@ -326,72 +190,13 @@ export function ToolCanvas({
       {/* Maestro PiP (20%) - Right side */}
       <AnimatePresence>
         {showPiP && (
-          <motion.div
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 100, opacity: 0 }}
-            className="hidden md:block absolute top-0 right-0 w-[20%] h-full border-l border-slate-800 bg-slate-900/95"
-          >
-            {/* PiP Header */}
-            <div className="p-4 border-b border-slate-800">
-              <div className="flex items-center gap-3">
-                {maestroAvatar ? (
-                  <Image
-                    src={maestroAvatar}
-                    alt={maestroName}
-                    width={48}
-                    height={48}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-bold">
-                    {maestroName.charAt(0)}
-                  </div>
-                )}
-                <div>
-                  <p className="font-medium text-white">{maestroName}</p>
-                  <p className="text-xs text-slate-400">Sta costruendo...</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Building animation */}
-            <div className="p-4">
-              <div className="aspect-square rounded-xl bg-slate-800 flex items-center justify-center overflow-hidden">
-                {activeTool?.status === 'building' && (
-                  <BuildingAnimation toolType={activeTool.type} />
-                )}
-                {(!activeTool || activeTool.status === 'completed') && (
-                  <div className="text-center p-4">
-                    <p className="text-sm text-slate-500">
-                      {activeTool
-                        ? 'Strumento completato!'
-                        : 'In attesa...'}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div className="p-4 border-t border-slate-800">
-              <div className="text-xs text-slate-500 space-y-1">
-                <p>Eventi ricevuti: {eventsReceived}</p>
-                {activeTool && (
-                  <p>Chunks: {activeTool.chunks.length}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Hide PiP button */}
-            <button
-              onClick={() => setShowPiP(false)}
-              className="absolute top-2 right-2 p-1 rounded hover:bg-slate-800 transition-colors"
-              aria-label="Nascondi PiP"
-            >
-              <X className="w-4 h-4 text-slate-500" />
-            </button>
-          </motion.div>
+          <MaestroPip
+            maestroName={maestroName}
+            maestroAvatar={maestroAvatar}
+            activeTool={activeTool}
+            eventsReceived={eventsReceived}
+            onHide={() => setShowPiP(false)}
+          />
         )}
       </AnimatePresence>
 
@@ -405,132 +210,6 @@ export function ToolCanvas({
         </button>
       )}
     </div>
-  );
-}
-
-// Tool-specific renderer
-function ToolRenderer({ tool, onSaveStudentSummary }: { tool: ActiveToolState; onSaveStudentSummary?: (data: StudentSummaryData) => Promise<void> }) {
-  // Handle incomplete content during building
-  if (tool.status === 'building' && !tool.content) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto" />
-          <p className="text-slate-400">Preparazione in corso...</p>
-          {tool.chunks.length > 0 && (
-            <p className="text-xs text-slate-500">
-              Ricevuti {tool.chunks.length} frammenti
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Error state
-  if (tool.status === 'error') {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center space-y-4 p-8 bg-red-900/20 rounded-xl">
-          <XCircle className="w-12 h-12 text-red-400 mx-auto" />
-          <p className="text-red-400">{tool.errorMessage || 'Si è verificato un errore'}</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Cancelled state
-  if (tool.status === 'cancelled') {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center space-y-4 p-8 bg-yellow-900/20 rounded-xl">
-          <Pause className="w-12 h-12 text-yellow-400 mx-auto" />
-          <p className="text-yellow-400">Costruzione annullata</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Render based on tool type
-  switch (tool.type) {
-    case 'mindmap':
-      return (
-        <MindmapRenderer
-          title={(tool.content as MindmapRequest)?.title || tool.title}
-          nodes={(tool.content as MindmapRequest)?.nodes || []}
-        />
-      );
-
-    case 'quiz':
-      return (
-        <QuizTool
-          request={tool.content as QuizRequest}
-        />
-      );
-
-    case 'flashcards':
-      return (
-        <FlashcardTool
-          request={tool.content as FlashcardDeckRequest}
-        />
-      );
-
-    case 'diagram':
-      return (
-        <DiagramRenderer
-          request={tool.content as DiagramRequest}
-        />
-      );
-
-    case 'summary': {
-      const summaryContent = tool.content as Record<string, unknown>;
-      // Check if this is a student-written summary (maieutic method)
-      if (summaryContent.type === 'student_summary') {
-        const studentData = summaryContent as unknown as StudentSummaryData;
-        return (
-          <StudentSummaryEditor
-            initialData={studentData}
-            topic={studentData.topic}
-            maestroId={studentData.maestroId}
-            sessionId={studentData.sessionId}
-            onSave={onSaveStudentSummary}
-          />
-        );
-      }
-      // AI-generated summary (legacy)
-      return <SummaryTool data={summaryContent as unknown as SummaryData} />;
-    }
-
-    case 'timeline':
-    default:
-      // Fallback for unsupported types
-      return (
-        <div className="p-4 rounded-xl bg-slate-800 border border-slate-700">
-          <pre className="text-sm text-slate-400 overflow-x-auto whitespace-pre-wrap">
-            {JSON.stringify(tool.content, null, 2)}
-          </pre>
-        </div>
-      );
-  }
-}
-
-// Building animation component
-function BuildingAnimation({ toolType }: { toolType: ToolType }) {
-  return (
-    <motion.div
-      animate={{
-        scale: [1, 1.1, 1],
-        rotate: [0, 5, -5, 0],
-      }}
-      transition={{
-        duration: 2,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
-      className="text-blue-500"
-    >
-      {toolIcons[toolType]}
-    </motion.div>
   );
 }
 

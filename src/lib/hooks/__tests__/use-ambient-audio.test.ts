@@ -7,8 +7,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useAmbientAudio } from '../use-ambient-audio';
 
-// Mock the audio engine
-vi.mock('@/lib/audio/engine', () => ({
+// Mock the audio module (hook imports from @/lib/audio, not @/lib/audio/engine)
+vi.mock('@/lib/audio', () => ({
+  AmbientAudioEngine: vi.fn(),
   getAudioEngine: vi.fn(() => ({
     initialize: vi.fn().mockResolvedValue(undefined),
     stopAll: vi.fn(),

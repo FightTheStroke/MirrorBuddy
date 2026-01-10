@@ -12,22 +12,10 @@ import {
   extractTopics,
   extractLearnings,
 } from '@/lib/ai/summarize';
+import type { Message, ConversationSummaryResult } from './summary-types';
+import { saveLearnings } from './learning-persistence';
 
-interface Message {
-  role: string;
-  content: string;
-}
-
-interface ConversationSummaryResult {
-  summary: string;
-  keyFacts: {
-    decisions: string[];
-    preferences: string[];
-    learned: string[];
-  };
-  topics: string[];
-  learningsCount: number;
-}
+export type { ConversationSummaryResult, Message };
 
 /**
  * End a conversation and generate summary
@@ -142,39 +130,12 @@ export async function endConversationWithSummary(
         include: { profile: true },
       });
 
-      for (const learning of learnings) {
-        // Check if similar learning already exists
-        const existing = await prisma.learning.findFirst({
-          where: {
-            userId: conversation.userId,
-            category: learning.category,
-            insight: learning.insight,
-          },
-        });
-
-        if (existing) {
-          // Update existing - increase confidence and occurrences
-          await prisma.learning.update({
-            where: { id: existing.id },
-            data: {
-              confidence: Math.min(1, existing.confidence + learning.confidence * 0.1),
-              occurrences: existing.occurrences + 1,
-            },
-          });
-        } else {
-          // Create new learning
-          await prisma.learning.create({
-            data: {
-              userId: conversation.userId,
-              maestroId: conversation.maestroId,
-              subject: user?.profile?.schoolLevel ?? undefined,
-              category: learning.category,
-              insight: learning.insight,
-              confidence: learning.confidence,
-            },
-          });
-        }
-      }
+      await saveLearnings(
+        conversation.userId,
+        conversation.maestroId,
+        learnings,
+        user?.profile?.schoolLevel
+      );
     }
 
     logger.info('Conversation summary generated', {

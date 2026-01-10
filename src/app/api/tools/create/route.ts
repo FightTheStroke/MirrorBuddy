@@ -21,7 +21,7 @@ import { validateAuth, validateSessionOwnership } from '@/lib/auth/session-auth'
 // Valid tool types
 const VALID_TOOL_TYPES: ToolType[] = [
   'mindmap',
-  'flashcards',
+  'flashcard',
   'quiz',
   'summary',
   'timeline',
