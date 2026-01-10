@@ -4,7 +4,7 @@
 
 import type { CharacterType, SupportTeacher, BuddyProfile, ExtendedStudentProfile } from '@/types';
 import type { MaestroFull } from '@/data/maestri';
-import type { DetectedIntent } from './intent-detection';
+import type { DetectedIntent } from '@/lib/ai/intent-detection';
 
 /**
  * Result of character routing.

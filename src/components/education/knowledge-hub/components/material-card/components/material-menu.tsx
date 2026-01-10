@@ -24,7 +24,7 @@ interface MaterialMenuProps {
   onArchive?: (id: string) => void;
   onDelete?: (id: string) => void;
   materialId: string;
-  menuRef: React.RefObject<HTMLDivElement>;
+  menuRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export function MaterialMenu({

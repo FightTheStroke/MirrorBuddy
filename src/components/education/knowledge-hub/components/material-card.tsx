@@ -34,7 +34,7 @@ export function MaterialCard({
 }: MaterialCardProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleClick = useCallback(() => {

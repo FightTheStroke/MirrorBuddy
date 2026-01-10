@@ -145,10 +145,14 @@ export function KnowledgeHub({
       updatedAt: new Date(),
     })),
     onCreateCollection: async (col) => {
-      await onCreateCollection?.(col.name, col.parentId);
+      if (onCreateCollection) {
+        await onCreateCollection(col.name, col.parentId);
+      }
     },
     onMoveToCollection: async (ids, colId) => {
-      await onMoveMaterials?.(ids, colId);
+      if (onMoveMaterials) {
+        await onMoveMaterials(ids, colId);
+      }
     },
   });
 
@@ -156,13 +160,13 @@ export function KnowledgeHub({
   const displayedMaterials = useMemo<KnowledgeHubMaterial[]>(() => {
     if (hasSearched && searchResults.length > 0) {
       const searchIds = new Set(searchResults.map((r) => r.item.id));
-      return materials.filter((m) => searchIds.has(m.id));
+      return materials.filter((m: KnowledgeHubMaterial) => searchIds.has(m.id));
     }
     if (hasSearched) {
       return [];
     }
     if (selectedCollectionId) {
-      return materials.filter((m) => m.collectionId === selectedCollectionId);
+      return materials.filter((m: KnowledgeHubMaterial) => m.collectionId === selectedCollectionId);
     }
     return materials;
   }, [materials, searchResults, hasSearched, selectedCollectionId]);

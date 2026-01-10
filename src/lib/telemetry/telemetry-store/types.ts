@@ -47,4 +47,6 @@ export interface TelemetryState {
   updateLocalStats: (stats: Partial<TelemetryState['localStats']>) => void;
   fetchUsageStats: () => Promise<void>;
   resetLocalStats: () => void;
+  updateConfig: (config: Partial<TelemetryConfig>) => void;
+  clearLocalData: () => void;
 }

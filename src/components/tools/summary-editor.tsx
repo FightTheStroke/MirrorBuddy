@@ -24,9 +24,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { SummarySection } from '@/types/tools';
-import type { SummaryEditorProps, EditState } from './types';
+import type { SummaryEditorProps, EditState } from './summary-editor/types';
 
-export type { SummaryEditorProps, EditState } from './types';
+export type { SummaryEditorProps, EditState } from './summary-editor/types';
 
 // ============================================================================
 // COMPONENT
@@ -41,7 +41,7 @@ export function SummaryEditor({
   className,
 }: SummaryEditorProps) {
   const [expandedSections, setExpandedSections] = useState<Set<number>>(
-    new Set(sections.map((_, i) => i))
+    new Set(sections.map((_: SummarySection, i: number) => i))
   );
   const [editState, setEditState] = useState<EditState | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -100,7 +100,7 @@ export function SummaryEditor({
 
       case 'section-title':
         if (editState.sectionIndex !== undefined) {
-          const updated = sections.map((s, i) =>
+          const updated = sections.map((s: SummarySection, i: number) =>
             i === editState.sectionIndex ? { ...s, title: editValue.trim() } : s
           );
           onSectionsChange?.(updated);
@@ -109,7 +109,7 @@ export function SummaryEditor({
 
       case 'section-content':
         if (editState.sectionIndex !== undefined) {
-          const updated = sections.map((s, i) =>
+          const updated = sections.map((s: SummarySection, i: number) =>
             i === editState.sectionIndex ? { ...s, content: editValue.trim() } : s
           );
           onSectionsChange?.(updated);
@@ -121,7 +121,7 @@ export function SummaryEditor({
           editState.sectionIndex !== undefined &&
           editState.pointIndex !== undefined
         ) {
-          const updated = sections.map((s, i) => {
+          const updated = sections.map((s: SummarySection, i: number) => {
             if (i === editState.sectionIndex) {
               const keyPoints = [...(s.keyPoints || [])];
               keyPoints[editState.pointIndex!] = editValue.trim();

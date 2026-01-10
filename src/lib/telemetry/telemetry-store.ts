@@ -9,9 +9,7 @@ import { nanoid } from 'nanoid';
 import { logger } from '@/lib/logger';
 import type {
   TelemetryEvent,
-  TelemetryCategory,
   TelemetryConfig,
-  UsageStats,
 } from './types';
 import type { TelemetryState } from './telemetry-store/types';
 
@@ -244,6 +242,29 @@ export const useTelemetryStore = create<TelemetryState>()(
         } catch (error) {
           logger.error('Failed to fetch usage stats', { error });
         }
+      },
+
+      // Update local stats
+      updateLocalStats: (stats) => {
+        set((state) => ({
+          localStats: {
+            ...state.localStats,
+            ...stats,
+          },
+        }));
+      },
+
+      // Reset local stats
+      resetLocalStats: () => {
+        set({
+          localStats: {
+            todaySessions: 0,
+            todayStudyMinutes: 0,
+            todayPageViews: 0,
+            todayQuestions: 0,
+            lastActivityAt: null,
+          },
+        });
       },
 
       // Clear local telemetry data

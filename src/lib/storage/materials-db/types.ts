@@ -3,7 +3,6 @@
  */
 
 import type { DBSchema } from 'idb';
-import type { ToolType } from '@/types/tools';
 
 // Database schema
 export interface MaterialsDB extends DBSchema {
