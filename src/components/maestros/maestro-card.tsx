@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { subjectIcons } from '@/data';
@@ -12,12 +11,12 @@ interface MaestroCardProps {
   maestro: Maestro;
   onSelect: (maestro: Maestro) => void;
   isSelected?: boolean;
-  index?: number; // For staggered entry animation
+  index?: number;
 }
 
-export function MaestroCard({ maestro, onSelect, isSelected = false, index = 0 }: MaestroCardProps) {
+export function MaestroCard({ maestro, onSelect, isSelected = false }: MaestroCardProps) {
   return (
-    <motion.button
+    <button
       onClick={() => onSelect(maestro)}
       className={cn(
         'relative w-full p-4 rounded-xl text-left transition-all duration-200',
@@ -31,16 +30,7 @@ export function MaestroCard({ maestro, onSelect, isSelected = false, index = 0 }
         ['--tw-ring-color' as string]: maestro.color,
         ['--tw-ring-offset-color' as string]: 'var(--background)',
       }}
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        duration: 0.3,
-        delay: index * 0.05,
-        ease: 'easeOut',
-      }}
-      whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.98 }}
-      aria-label={`Studia con ${maestro.name}`}
+      aria-label={`Studia con il Professore ${maestro.name}`}
     >
       <div className="flex items-start gap-3">
         {/* Avatar - compact 56x56 */}
@@ -79,13 +69,6 @@ export function MaestroCard({ maestro, onSelect, isSelected = false, index = 0 }
           <Play className="w-4 h-4 ml-0.5" />
         </div>
       </div>
-
-      {/* Hover glow */}
-      <motion.div
-        className="absolute inset-0 rounded-xl opacity-0 pointer-events-none"
-        style={{ boxShadow: `0 8px 24px ${maestro.color}25` }}
-        whileHover={{ opacity: 1 }}
-      />
-    </motion.button>
+    </button>
   );
 }

@@ -107,13 +107,25 @@ export async function POST(request: NextRequest) {
       format,
     });
 
-    // Generate PDF
+    // Prepare study kit data for PDF generation (avoid fetch in server-side)
+    const studyKitData = {
+      id: studyKit.id,
+      title: studyKit.title,
+      subject: studyKit.subject,
+      summary: studyKit.summary,
+      mindmap: studyKit.mindmap ? JSON.parse(studyKit.mindmap) : null,
+      demo: studyKit.demo ? JSON.parse(studyKit.demo) : null,
+      quiz: studyKit.quiz ? JSON.parse(studyKit.quiz) : null,
+    };
+
+    // Generate PDF - pass studyKit directly to avoid fetch
     const { buffer, filename, size } = await generateAccessiblePDF({
       kitId,
       materialId,
       profile: profile as DSAProfile,
       format,
       studentId: userId,
+      studyKit: studyKitData, // Pass directly to avoid server-side fetch
     });
 
     // Save metadata to Zaino (student's materials)

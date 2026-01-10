@@ -416,10 +416,7 @@ export function migrateSessionStorageKey() {
 ## GitHub URL Updates
 
 ```
-# Prima
-https://github.com/Roberdan/MirrorBuddy
-
-# Dopo
+# Migrato a:
 https://github.com/FightTheStroke/MirrorBuddy
 ```
 

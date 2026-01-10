@@ -1,9 +1,12 @@
 import { AnimatePresence } from 'framer-motion';
 import { ToolMaestroSelectionDialog } from '../tool-maestro-selection-dialog';
-import { ConversationHeader, HandoffBanner, VoiceCallOverlay } from './index';
+import { ConversationHeader, HandoffBanner } from './index';
 import { ConversationInput } from './conversation-input';
 import { ToolLayout } from './tool-layout';
 import { ChatLayout } from './chat-layout';
+import { VoiceCallPanel } from './voice-call-panel';
+import { useTTS } from '@/components/accessibility';
+import { cn } from '@/lib/utils';
 import type { ToolType, ToolState } from '@/types/tools';
 import type { ActiveCharacter, FlowMessage, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
 
@@ -79,74 +82,88 @@ export function ConversationContent({
   onSetVoiceSessionId,
 }: ConversationContentProps) {
   const hasActiveTool = activeTool && activeTool.status !== 'error';
+  const { stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
   return (
-    <>
-      <AnimatePresence>
-        {isVoiceActive && activeCharacter && (
-          <VoiceCallOverlay
-            character={activeCharacter}
-            onEnd={onVoiceCall}
-            onSessionIdChange={onSetVoiceSessionId}
+    <div className={cn(
+      "flex gap-4",
+      isVoiceActive ? "flex-1 min-w-0 flex-col" : "w-full h-full flex-col"
+    )}>
+      {/* Main content area */}
+      <div className={cn(
+        "flex flex-col min-w-0",
+        isVoiceActive ? "flex-1" : "w-full h-full"
+      )}>
+        {/* Header - hidden when voice is active (all controls in panel) */}
+        {!isVoiceActive && (
+          <ConversationHeader
+            currentCharacter={activeCharacter}
+            onSwitchToCoach={onSwitchToCoach}
+            onSwitchToBuddy={onSwitchToBuddy}
+            onGoBack={onGoBack}
+            canGoBack={characterHistory.length > 1}
+            isVoiceActive={isVoiceActive}
+            onVoiceCall={onVoiceCall}
           />
         )}
-      </AnimatePresence>
 
-      <ConversationHeader
-        currentCharacter={activeCharacter}
-        onSwitchToCoach={onSwitchToCoach}
-        onSwitchToBuddy={onSwitchToBuddy}
-        onGoBack={onGoBack}
-        canGoBack={characterHistory.length > 1}
-        isVoiceActive={isVoiceActive}
-        onVoiceCall={onVoiceCall}
-      />
+        <AnimatePresence>
+          {pendingHandoff && (
+            <HandoffBanner
+              suggestion={pendingHandoff}
+              onAccept={onAcceptHandoff}
+              onDismiss={onDismissHandoff}
+            />
+          )}
+        </AnimatePresence>
 
-      <AnimatePresence>
-        {pendingHandoff && (
-          <HandoffBanner
-            suggestion={pendingHandoff}
-            onAccept={onAcceptHandoff}
-            onDismiss={onDismissHandoff}
+        {hasActiveTool ? (
+          <ToolLayout
+            activeTool={activeTool}
+            activeCharacter={activeCharacter}
+            messages={messages}
+            isLoading={isLoading}
+            isToolMinimized={isToolMinimized}
+            voiceSessionId={voiceSessionId}
+            onCloseTool={() => onSetActiveTool(null)}
+            onToggleMinimize={onToggleMinimize}
+          />
+        ) : (
+          <ChatLayout
+            messages={messages}
+            activeCharacter={activeCharacter}
+            isLoading={isLoading}
+            messagesEndRef={messagesEndRef}
           />
         )}
-      </AnimatePresence>
 
-      {hasActiveTool ? (
-        <ToolLayout
-          activeTool={activeTool}
-          activeCharacter={activeCharacter}
-          messages={messages}
+        <ConversationInput
+          inputValue={inputValue}
+          onInputChange={onInputChange}
+          onSend={onSend}
+          onKeyPress={onKeyPress}
           isLoading={isLoading}
-          isToolMinimized={isToolMinimized}
-          voiceSessionId={voiceSessionId}
-          onCloseTool={() => onSetActiveTool(null)}
-          onToggleMinimize={onToggleMinimize}
+          activeCharacter={activeCharacter}
+          mode={mode}
+          isMuted={isMuted}
+          onVoiceToggle={onVoiceToggle}
+          onMuteToggle={onMuteToggle}
+          onToolRequest={onToolRequest}
+          activeToolId={activeTool?.id}
+          inputRef={inputRef}
         />
-      ) : (
-        <ChatLayout
-          messages={messages}
-          activeCharacter={activeCharacter}
-          isLoading={isLoading}
-          messagesEndRef={messagesEndRef}
+      </div>
+
+      {/* Voice call panel - side by side layout when active */}
+      {isVoiceActive && activeCharacter && (
+        <VoiceCallPanel
+          character={activeCharacter}
+          onEnd={onVoiceCall}
+          onSessionIdChange={onSetVoiceSessionId}
+          ttsEnabled={ttsEnabled}
+          onStopTTS={stopTTS}
         />
       )}
-
-      <ConversationInput
-        inputValue={inputValue}
-        onInputChange={onInputChange}
-        onSend={onSend}
-        onKeyPress={onKeyPress}
-        isLoading={isLoading}
-        activeCharacter={activeCharacter}
-        mode={mode}
-        isMuted={isMuted}
-        onVoiceToggle={onVoiceToggle}
-        onMuteToggle={onMuteToggle}
-        onToolRequest={onToolRequest}
-        activeToolId={activeTool?.id}
-        inputRef={inputRef}
-      />
 
       <ToolMaestroSelectionDialog
         isOpen={showMaestroDialog}
@@ -159,7 +176,7 @@ export function ConversationContent({
         }}
         onClose={onCloseDialog}
       />
-    </>
+    </div>
   );
 }
 

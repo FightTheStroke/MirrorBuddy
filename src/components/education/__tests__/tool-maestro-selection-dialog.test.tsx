@@ -242,7 +242,7 @@ describe('ToolMaestroSelectionDialog', () => {
       expect(screen.getByText(/Scegli Materia/)).toBeInTheDocument();
     });
 
-    it('advances to mode step when subject has single maestro', async () => {
+    it('calls onConfirm immediately when subject has single maestro', async () => {
       const user = userEvent.setup();
       render(
         <ToolMaestroSelectionDialog
@@ -256,9 +256,12 @@ describe('ToolMaestroSelectionDialog', () => {
       // Click Mathematics (which has Euclide)
       await user.click(screen.getByText('Matematica'));
 
-      // Should skip maestro selection and go to mode
+      // Should skip maestro selection and call onConfirm directly with chat mode
       await waitFor(() => {
-        expect(screen.getByText(/Scegli Modalità/)).toBeInTheDocument();
+        expect(mockOnConfirm).toHaveBeenCalledWith(
+          expect.objectContaining({ id: 'euclide' }),
+          'chat'
+        );
       });
     });
 
@@ -322,8 +325,8 @@ describe('ToolMaestroSelectionDialog', () => {
     });
   });
 
-  describe('Mode Selection', () => {
-    it('shows voice and chat options', async () => {
+  describe('Direct Confirmation (No Mode Selection)', () => {
+    it('calls onConfirm immediately when maestro selected', async () => {
       const user = userEvent.setup();
       render(
         <ToolMaestroSelectionDialog
@@ -334,38 +337,25 @@ describe('ToolMaestroSelectionDialog', () => {
         />
       );
 
-      // Select a subject that has a maestro
-      await user.click(screen.getByText('Matematica'));
+      // Select a subject with no maestro to get to maestro step
+      await user.click(screen.getByText('Storia'));
 
+      // Select a maestro
       await waitFor(() => {
-        expect(screen.getByText('Voce')).toBeInTheDocument();
-        expect(screen.getByText('Chat')).toBeInTheDocument();
+        expect(screen.getByText('Euclide')).toBeInTheDocument();
       });
-    });
 
-    it('calls onConfirm with voice mode', async () => {
-      const user = userEvent.setup();
-      render(
-        <ToolMaestroSelectionDialog
-          isOpen={true}
-          toolType="mindmap"
-          onConfirm={mockOnConfirm}
-          onClose={mockOnClose}
-        />
-      );
-
-      await user.click(screen.getByText('Matematica'));
-      await user.click(screen.getByText('Voce'));
+      await user.click(screen.getByText('Euclide'));
 
       await waitFor(() => {
         expect(mockOnConfirm).toHaveBeenCalledWith(
           expect.objectContaining({ id: 'euclide' }),
-          'voice'
+          'chat'
         );
       });
     });
 
-    it('calls onConfirm with chat mode', async () => {
+    it('always uses chat mode (no voice/chat selection)', async () => {
       const user = userEvent.setup();
       render(
         <ToolMaestroSelectionDialog
@@ -376,12 +366,13 @@ describe('ToolMaestroSelectionDialog', () => {
         />
       );
 
+      // Select subject with single maestro
       await user.click(screen.getByText('Matematica'));
-      await user.click(screen.getByText('Chat'));
 
       await waitFor(() => {
+        // Should be called with 'chat' mode directly
         expect(mockOnConfirm).toHaveBeenCalledWith(
-          expect.objectContaining({ id: 'euclide' }),
+          expect.any(Object),
           'chat'
         );
       });

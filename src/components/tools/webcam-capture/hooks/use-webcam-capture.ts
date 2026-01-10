@@ -98,23 +98,70 @@ export function useWebcamCapture({
         }
       } catch (err) {
         clearTimeout(timeoutId);
-        const errorMsg = String(err);
-        logger.error('Camera error', { error: errorMsg, deviceId });
+        
+        // Extract error information safely
+        let errorName = 'UnknownError';
+        let errorMessage = 'Unknown error';
+        let errorType = 'Unknown';
+        
+        try {
+          const errorObj = err as Error | DOMException;
+          errorName = errorObj?.name || (err as { name?: string })?.name || 'UnknownError';
+          errorMessage = errorObj?.message || (err as { message?: string })?.message || String(err) || 'Unknown error';
+          errorType = errorObj?.constructor?.name || 'Unknown';
+        } catch {
+          // Fallback if error extraction fails
+          errorMessage = String(err) || 'Unknown error';
+        }
+        
+        const errorMsg = errorMessage || errorName;
+        
+        // Log error with safe serialization
+        try {
+          logger.error('Camera error', { 
+            error: errorMessage,
+            errorName,
+            errorType,
+            deviceId: deviceId || null,
+            hasMediaDevices: !!navigator.mediaDevices,
+            hasGetUserMedia: !!navigator.mediaDevices?.getUserMedia,
+          });
+        } catch (_logErr) {
+          // If logging fails, at least log the basic error
+          console.error('Camera error (logging failed):', errorMessage, errorName);
+        }
 
         if (
+          errorName === 'NotAllowedError' ||
+          errorName === 'PermissionDeniedError' ||
           errorMsg.includes('Permission') ||
-          errorMsg.includes('NotAllowedError')
+          errorMsg.includes('NotAllowedError') ||
+          errorMsg.includes('permission denied')
         ) {
           setError(
             'Permesso fotocamera negato. Abilita l\'accesso alla fotocamera nelle impostazioni del browser.'
           );
           setErrorType('permission');
         } else if (
+          errorName === 'NotFoundError' ||
+          errorName === 'DevicesNotFoundError' ||
           errorMsg.includes('NotFoundError') ||
-          errorMsg.includes('DevicesNotFoundError')
+          errorMsg.includes('DevicesNotFoundError') ||
+          errorMsg.includes('no camera')
         ) {
           setError(
             'Nessuna fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera.'
+          );
+          setErrorType('unavailable');
+        } else if (
+          errorName === 'NotReadableError' ||
+          errorName === 'TrackStartError' ||
+          errorMsg.includes('NotReadableError') ||
+          errorMsg.includes('in use') ||
+          errorMsg.includes('busy')
+        ) {
+          setError(
+            'La fotocamera è già in uso da un\'altra applicazione. Chiudi le altre app e riprova.'
           );
           setErrorType('unavailable');
         } else {

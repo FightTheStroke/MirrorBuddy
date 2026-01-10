@@ -187,14 +187,14 @@ STORAGE_PROVIDER=local  # or 'azure'
 STORAGE_LOCAL_PATH=./uploads
 
 # Azure Blob Storage (Production)
-AZURE_STORAGE_ACCOUNT_NAME=convergioedu
+AZURE_STORAGE_ACCOUNT_NAME=mirrorbuddy
 AZURE_STORAGE_ACCOUNT_KEY=xxx
 AZURE_STORAGE_CONTAINER=student-materials
 # OR use connection string:
 AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;...
 
 # Optional: CDN endpoint
-AZURE_CDN_ENDPOINT=https://cdn.convergioedu.com
+AZURE_CDN_ENDPOINT=https://cdn.mirrorbuddy.org
 
 # File Limits
 MAX_FILE_SIZE_MB=10

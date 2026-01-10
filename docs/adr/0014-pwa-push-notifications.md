@@ -77,7 +77,7 @@ npx web-push generate-vapid-keys
 # Environment variables
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=BL...
 VAPID_PRIVATE_KEY=...
-VAPID_SUBJECT=mailto:support@convergioedu.com
+VAPID_SUBJECT=mailto:support@mirrorbuddy.org
 ```
 
 ### Database Model

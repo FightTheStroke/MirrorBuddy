@@ -102,7 +102,7 @@ GLOBAL:
 
 ## PR FOR ROBERTO
 
-**PR #105**: https://github.com/Roberdan/ConvergioEdu/pull/105
+**PR #105**: https://github.com/FightTheStroke/MirrorBuddy/pull/105
 
 ### Roberto's Remaining Actions:
 1. Review and merge PR #105

@@ -125,7 +125,7 @@ Implement a **custom telemetry system** with three layers:
 │                                                             │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │   Prometheus Data Source                             │  │
-│  │   URL: https://convergioedu.com/api/metrics          │  │
+│  │   URL: https://mirrorbuddy.org/api/metrics            │  │
 │  │                                                       │  │
 │  │   Dashboards:                                        │  │
 │  │   - Active Users (gauge)                             │  │

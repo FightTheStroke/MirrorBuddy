@@ -57,51 +57,16 @@ import { PlayCircle, X } from 'lucide-react';
 /**
  * Build HTML code for demo from DemoData with KaTeX support
  */
+import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
+
 function buildDemoCode(demoData: DemoData): string | null {
-  // If we have a direct code property, use it
-  if ('code' in demoData && typeof demoData.code === 'string') {
-    // KaTeX support for STEM formulas
-    const katexHead = `
-  <!-- KaTeX for STEM mathematical formulas -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
-`;
-
-    // Inject KaTeX into existing code
-    if (demoData.code.includes('<head>')) {
-      return demoData.code.replace('<head>', `<head>${katexHead}`);
-    }
-    if (demoData.code.includes('<html>')) {
-      return demoData.code.replace('<html>', `<html><head>${katexHead}</head>`);
-    }
-    // Fallback: wrap with style tag at the beginning
-    return `${katexHead}${demoData.code}`;
-  }
-
-  // If we have html/css/js parts, combine them
-  if (demoData.html || demoData.css || demoData.js) {
-    return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- KaTeX for STEM mathematical formulas -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
-  <style>${demoData.css || ''}</style>
-</head>
-<body>
-  ${demoData.html || ''}
-  <script>${demoData.js || ''}</script>
-</body>
-</html>`;
-  }
-
-  return null;
+  // Use shared HTML builder for consistency - no KaTeX injection (causes rendering issues)
+  return buildDemoHTML({
+    html: demoData.html || '',
+    css: demoData.css || '',
+    js: demoData.js || '',
+    code: ('code' in demoData && typeof demoData.code === 'string') ? demoData.code : undefined,
+  });
 }
 
 /**

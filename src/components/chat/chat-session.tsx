@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { useConversationStore } from '@/lib/stores';
+import { useSettingsStore } from '@/lib/stores/settings-store';
 import { logger } from '@/lib/logger';
 import { useTTS } from '@/components/accessibility';
 import type { Maestro, ChatMessage, ToolCall } from '@/types';
@@ -37,9 +39,12 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const conversationIdRef = useRef<string | null>(null);
 
   const { settings } = useAccessibilityStore();
   const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
+  const { createConversation, addMessage: addMessageToStore } = useConversationStore();
+  const { studentProfile } = useSettingsStore();
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -51,20 +56,60 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
     inputRef.current?.focus();
   }, []);
 
-  // Add greeting message on mount
+  // Create conversation and add greeting message on mount
   useEffect(() => {
-    const greetingMessage: ChatMessage = {
-      id: 'greeting',
-      role: 'assistant',
-      content: maestro.greeting,
-      timestamp: new Date(),
-    };
-    setMessages([greetingMessage]);
+    async function initConversation() {
+      // Create conversation for this maestro
+      const convId = await createConversation(maestro.id);
+      conversationIdRef.current = convId;
 
-    if (settings.ttsAutoRead) {
-      speak(maestro.greeting);
+      // Try to get contextual greeting based on previous conversations
+      let greetingText = maestro.greeting;
+      try {
+        const studentName = studentProfile?.name || 'Studente';
+        const response = await fetch(
+          `/api/conversations/greeting?characterId=${maestro.id}&studentName=${encodeURIComponent(studentName)}&maestroName=${encodeURIComponent(maestro.name)}`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hasContext && data.greeting) {
+            greetingText = data.greeting;
+            logger.info('Contextual greeting loaded', {
+              maestroId: maestro.id,
+              topics: data.topics,
+            });
+          }
+        }
+      } catch (error) {
+        // Fall back to static greeting on error
+        logger.debug('Failed to load contextual greeting, using default', {
+          error: String(error),
+        });
+      }
+
+      // Add greeting message
+      const greetingMessage: ChatMessage = {
+        id: 'greeting',
+        role: 'assistant',
+        content: greetingText,
+        timestamp: new Date(),
+      };
+      setMessages([greetingMessage]);
+
+      // Persist greeting to database
+      await addMessageToStore(convId, {
+        role: 'assistant',
+        content: greetingText,
+      });
+
+      if (settings.ttsAutoRead) {
+        speak(greetingText);
+      }
     }
-  }, [maestro.greeting, settings.ttsAutoRead, speak]);
+
+    initConversation();
+  }, [maestro.id, maestro.name, maestro.greeting, settings.ttsAutoRead, studentProfile?.name, speak, createConversation, addMessageToStore]);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -92,8 +137,16 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
     setInput('');
     setIsLoading(true);
 
+    // Persist user message to database
+    if (conversationIdRef.current) {
+      addMessageToStore(conversationIdRef.current, {
+        role: 'user',
+        content: userMessage.content,
+      });
+    }
+
     try {
-      // Call chat API
+      // Call chat API with memory enabled (ADR 0021)
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -104,6 +157,7 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
           })),
           systemPrompt: maestro.systemPrompt,
           maestroId: maestro.id,
+          enableMemory: true,
         }),
       });
 
@@ -123,6 +177,14 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
 
       setMessages((prev) => [...prev, assistantMessage]);
 
+      // Persist assistant message to database
+      if (conversationIdRef.current) {
+        addMessageToStore(conversationIdRef.current, {
+          role: 'assistant',
+          content: assistantMessage.content,
+        });
+      }
+
       // Handle tool calls if any
       if (data.toolCalls) {
         setToolCalls((prev) => [...prev, ...data.toolCalls]);
@@ -141,6 +203,14 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
+
+      // Persist error message to database
+      if (conversationIdRef.current) {
+        addMessageToStore(conversationIdRef.current, {
+          role: 'assistant',
+          content: errorMessage.content,
+        });
+      }
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
@@ -160,16 +230,26 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const clearChat = () => {
-    setMessages([
-      {
-        id: 'greeting',
-        role: 'assistant',
-        content: maestro.greeting,
-        timestamp: new Date(),
-      },
-    ]);
+  const clearChat = async () => {
+    // Create new conversation
+    const newConvId = await createConversation(maestro.id);
+    conversationIdRef.current = newConvId;
+
+    // Reset messages with greeting
+    const greetingMessage: ChatMessage = {
+      id: 'greeting',
+      role: 'assistant',
+      content: maestro.greeting,
+      timestamp: new Date(),
+    };
+    setMessages([greetingMessage]);
     setToolCalls([]);
+
+    // Persist greeting to new conversation
+    await addMessageToStore(newConvId, {
+      role: 'assistant',
+      content: maestro.greeting,
+    });
   };
 
   return (

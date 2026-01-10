@@ -20,17 +20,27 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
     const maestroId = searchParams.get('maestroId');
     const activeOnly = searchParams.get('active') === 'true';
 
+    const where = {
+      userId,
+      ...(maestroId && { maestroId }),
+      ...(activeOnly && { isActive: true }),
+    };
+
+    // Get total count for pagination
+    const total = await prisma.conversation.count({ where });
+
+    // Calculate offset
+    const offset = (page - 1) * limit;
+
     const conversations = await prisma.conversation.findMany({
-      where: {
-        userId,
-        ...(maestroId && { maestroId }),
-        ...(activeOnly && { isActive: true }),
-      },
+      where,
       orderBy: { updatedAt: 'desc' },
+      skip: offset,
       take: limit,
       include: {
         messages: {
@@ -40,15 +50,25 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      conversations.map((c: Conversation & { messages: Message[] }) => ({
-        ...c,
-        topics: JSON.parse(c.topics || '[]'),
-        keyFacts: c.keyFacts ? JSON.parse(c.keyFacts) : null,
-        lastMessage: c.messages[0]?.content?.slice(0, 100),
-        messages: undefined, // Remove full messages from list
-      }))
-    );
+    const items = conversations.map((c: Conversation & { messages: Message[] }) => ({
+      ...c,
+      topics: JSON.parse(c.topics || '[]'),
+      keyFacts: c.keyFacts ? JSON.parse(c.keyFacts) : null,
+      lastMessage: c.messages[0]?.content?.slice(0, 100),
+      messages: undefined, // Remove full messages from list
+    }));
+
+    return NextResponse.json({
+      items,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page < Math.ceil(total / limit),
+        hasPrevPage: page > 1,
+      },
+    });
   } catch (error) {
     logger.error('Conversations GET error', { error: String(error) });
 

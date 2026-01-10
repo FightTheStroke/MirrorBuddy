@@ -5,6 +5,11 @@
  *
  * Closes a conversation, generates summary, evaluation, and parent note.
  * Part of Session Summary & Unified Archive feature.
+ *
+ * GDPR Compliance (ADR 0008):
+ * - Parent notes are only saved if user has granted parentConsent
+ * - Use generateAndSaveParentNote() which includes consent check
+ * - No consent = note generation skipped, logged, conversation still ends normally
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,6 +17,10 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { endConversationWithSummary } from '@/lib/conversation/summary-generator';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
+import { generateMaestroEvaluation } from '@/lib/session/maestro-evaluation';
+import { generateAndSaveParentNote } from '@/lib/session/parent-note-generator';
+import { getMaestroById } from '@/data/maestri';
+import type { MaestroFull } from '@/data/maestri';
 
 interface RouteParams {
   params: Promise<{
@@ -74,6 +83,75 @@ export async function POST(request: NextRequest, context: RouteParams) {
         { error: 'Failed to generate summary' },
         { status: 500 }
       );
+    }
+
+    // Generate parent note (non-blocking - don't fail conversation end if this fails)
+    try {
+      // Fetch conversation with messages for evaluation
+      const conversationWithMessages = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'asc' },
+          },
+        },
+      });
+
+      if (conversationWithMessages && conversationWithMessages.messages.length > 0) {
+        // Calculate session duration (in minutes)
+        const startTime = conversationWithMessages.createdAt;
+        const endTime = new Date();
+        const durationMinutes = Math.max(
+          1,
+          Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60))
+        );
+
+        // Get maestro name
+        const maestro: MaestroFull | undefined = getMaestroById(conversation.maestroId);
+        const maestroName = maestro?.name || 'Maestro';
+
+        // Determine subject from maestro or use default
+        const subject = maestro?.subject || 'Studio generale';
+
+        // Generate maestro evaluation
+        const messages = conversationWithMessages.messages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        }));
+
+        const evaluation = await generateMaestroEvaluation(messages);
+
+        // Generate and save parent note (with GDPR consent check - ADR 0008)
+        // This will skip generation if user hasn't granted parent consent
+        const parentNoteId = await generateAndSaveParentNote(
+          {
+            sessionId: conversationId,
+            userId,
+            maestroId: conversation.maestroId,
+            maestroName,
+            subject,
+            duration: durationMinutes,
+            topics: result.topics,
+            summary: result.summary,
+          },
+          evaluation
+        );
+
+        if (parentNoteId) {
+          logger.info('Parent note generated and saved', {
+            conversationId,
+            userId,
+            parentNoteId,
+            duration: durationMinutes,
+          });
+        }
+      }
+    } catch (error) {
+      // Log error but don't block conversation end
+      logger.error('Failed to generate parent note (non-blocking)', {
+        conversationId,
+        error: String(error),
+      });
     }
 
     logger.info('Conversation ended', {

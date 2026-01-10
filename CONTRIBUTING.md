@@ -5,7 +5,7 @@ Thank you for your interest in contributing to MirrorBuddy!
 ## How to Contribute
 
 ### Reporting Bugs
-1. Open an [Issue](https://github.com/Roberdan/MirrorBuddy/issues)
+1. Open an [Issue](https://github.com/FightTheStroke/MirrorBuddy/issues)
 2. Describe the problem in detail
 3. Include steps to reproduce the bug
 

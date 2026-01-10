@@ -150,10 +150,17 @@ export const useConversationStore = create<ConversationState>()(
       loadFromServer: async () => {
         try {
           const response = await fetch('/api/conversations?limit=50');
+
+          // No user cookie yet (pre-onboarding), not an error
+          if (response.status === 401) {
+            return;
+          }
+
           if (response.ok) {
-            const conversations = await response.json();
+            const data = await response.json();
+            const items = data.items || [];
             set({
-              conversations: conversations.map((c: {
+              conversations: items.map((c: {
                 id: string;
                 title: string;
                 maestroId: string;

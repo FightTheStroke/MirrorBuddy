@@ -98,32 +98,45 @@ REGOLE:
     type: 'function' as const,
     function: {
       name: 'create_demo',
-      description: 'Crea una simulazione interattiva HTML/JS per visualizzare concetti scientifici o matematici. Usa per dimostrazioni visive come il sistema solare, moto dei proiettili, circuiti elettrici.',
+      description: `Crea una demo interattiva descrivendo COSA vuoi visualizzare, non COME.
+
+DESCRIVI in linguaggio naturale:
+- Cosa deve mostrare la demo (concetto da visualizzare)
+- Come deve essere l'interazione (cosa succede quando l'utente clicca/muove/cambia)
+- Quale effetto WOW vuoi creare (cosa rende memorabile questa demo)
+- Come si collega a quello che state studiando
+
+ESEMPI DI DESCRIZIONI CREATIVE:
+- "Voglio mostrare la moltiplicazione come un giardino: ogni numero è una fila di fiori, e moltiplicare significa creare un campo rettangolare. Lo studente sceglie quante file e quanti fiori per fila, e vede crescere il giardino animato."
+- "Immagina le frazioni come una pizza: lo studente può tagliare la pizza in fette e colorarne alcune. Deve essere super colorato con la pizza che gira!"
+- "Il sistema solare con i pianeti che orbitano a velocità diverse. Lo studente può accelerare il tempo e vedere come Mercurio fa più giri di Saturno."
+
+NON scrivere codice HTML/CSS/JS - descrivi solo l'idea creativa!`,
       parameters: {
         type: 'object',
         properties: {
           title: {
             type: 'string',
-            description: 'Titolo della simulazione',
+            description: 'Titolo accattivante della demo',
           },
-          description: {
+          concept: {
             type: 'string',
-            description: 'Breve descrizione di cosa mostra la demo',
+            description: 'Il concetto educativo da visualizzare (es: moltiplicazione, frazioni, sistema solare)',
           },
-          html: {
+          visualization: {
             type: 'string',
-            description: 'Codice HTML per la struttura',
+            description: 'DESCRIZIONE CREATIVA di come visualizzare il concetto. Usa metafore, analogie, idee originali. Più dettagli meglio è!',
           },
-          css: {
+          interaction: {
             type: 'string',
-            description: 'Codice CSS per lo stile (opzionale)',
+            description: 'Come lo studente interagisce: cosa può cliccare, trascinare, cambiare? Cosa succede?',
           },
-          js: {
+          wowFactor: {
             type: 'string',
-            description: 'Codice JavaScript per l\'interattività (opzionale)',
+            description: 'Cosa rende questa demo memorabile e divertente? Animazioni, sorprese, feedback?',
           },
         },
-        required: ['title', 'html'],
+        required: ['title', 'concept', 'visualization', 'interaction'],
       },
     },
   },

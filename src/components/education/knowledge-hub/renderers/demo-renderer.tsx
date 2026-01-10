@@ -22,6 +22,7 @@ import { PlayCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HTMLPreview } from '@/components/education/html-preview';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
 import type { BaseRendererProps } from './index';
 
 interface DemoData {
@@ -126,54 +127,32 @@ function generateAccessibilityCSS(settings: {
  * Build HTML code from separate html/css/js parts or use existing code
  */
 function buildDemoCode(demoData: DemoData, accessibilityCSS: string = ''): string | null {
-  // If we have a direct code property, use it
+  // If we have a direct code property, use shared builder
   if (demoData.code) {
-    // KaTeX support for STEM formulas
-    const katexHead = `
-  <!-- KaTeX for STEM mathematical formulas -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
-`;
-
-    // C-7 FIX: Inject accessibility CSS and KaTeX into existing code
-    if (demoData.code.includes('<head>')) {
-      return demoData.code.replace(
-        '<head>',
-        `<head>${katexHead}<style id="accessibility-styles">${accessibilityCSS}</style>`
-      );
+    const baseHtml = buildDemoHTML({ html: '', css: '', js: '', code: demoData.code });
+    
+    // Inject only accessibility CSS (no KaTeX - causes rendering issues)
+    if (accessibilityCSS && baseHtml.includes('</head>')) {
+      return baseHtml.replace('</head>', `<style id="accessibility-styles">${accessibilityCSS}</style></head>`);
     }
-    if (demoData.code.includes('<html>')) {
-      return demoData.code.replace(
-        '<html>',
-        `<html><head>${katexHead}<style id="accessibility-styles">${accessibilityCSS}</style></head>`
-      );
-    }
-    // Fallback: wrap with style tag at the beginning
-    return `${katexHead}<style id="accessibility-styles">${accessibilityCSS}</style>${demoData.code}`;
+    
+    return baseHtml;
   }
 
-  // If we have html/css/js parts, combine them
+  // If we have html/css/js parts, use shared builder
   if (demoData.html || demoData.css || demoData.js) {
-    return `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- KaTeX for STEM mathematical formulas -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.css" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.27/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-    onload="renderMathInElement(document.body, {delimiters: [{left: '$$', right: '$$', display: true}, {left: '$', right: '$', display: false}]});"></script>
-  <style id="accessibility-styles">${accessibilityCSS}</style>
-  <style>${demoData.css || ''}</style>
-</head>
-<body>
-  ${demoData.html || ''}
-  <script>${demoData.js || ''}</script>
-</body>
-</html>`;
+    const baseHtml = buildDemoHTML({
+      html: demoData.html || '',
+      css: demoData.css || '',
+      js: demoData.js || '',
+    });
+    
+    // Inject only accessibility CSS
+    if (accessibilityCSS && baseHtml.includes('</head>')) {
+      return baseHtml.replace('</head>', `<style id="accessibility-styles">${accessibilityCSS}</style></head>`);
+    }
+    
+    return baseHtml;
   }
 
   return null;

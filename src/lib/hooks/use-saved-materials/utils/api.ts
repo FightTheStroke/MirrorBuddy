@@ -116,31 +116,70 @@ export async function saveMaterialToAPIWithId(
   options?: { subject?: string; maestroId?: string; preview?: string }
 ): Promise<SavedMaterial | null> {
   try {
+    const requestBody = {
+      userId,
+      toolId,
+      toolType,
+      title,
+      content,
+      ...options,
+    };
+
     const response = await fetch('/api/materials', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId,
-        toolId,
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      let errorData: Record<string, unknown> = {};
+      try {
+        errorData = await response.json();
+      } catch {
+        // If response is not JSON, try to get text
+        const text = await response.text().catch(() => '');
+        errorData = { message: text || `HTTP ${response.status}` };
+      }
+      
+      const errorMessage = `API error: ${response.status} - ${JSON.stringify(errorData)}`;
+      logger.error('Failed to save material - API error', {
+        error: errorMessage,
+        status: response.status,
+        statusText: response.statusText,
         toolType,
         title,
-        content,
-        ...options,
-      }),
-    });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        `API error: ${response.status} - ${JSON.stringify(errorData)}`
-      );
+        userId,
+        toolId,
+        errorData,
+      });
+      throw new Error(errorMessage);
     }
+
     const data = await response.json();
+    if (!data.material) {
+      logger.warn('Save material response missing material field', {
+        toolType,
+        title,
+        response: data,
+      });
+      return null;
+    }
+    
     return data.material;
   } catch (error) {
+    const errorMessage = error instanceof Error 
+      ? error.message 
+      : typeof error === 'string' 
+        ? error 
+        : String(error);
+    
     logger.error('Failed to save material', {
-      error: error instanceof Error ? error.message : String(error),
-      toolType,
-      title,
+      error: errorMessage || 'Unknown error',
+      toolType: toolType || 'unknown',
+      title: title || 'untitled',
+      userId: userId || 'unknown',
+      toolId: toolId || 'unknown',
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
     });
     return null;
   }

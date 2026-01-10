@@ -218,6 +218,7 @@ export function useSmartCollections(
       'webcam',
       'homework',
       'search',
+      'study-kit',
     ];
 
     const typeLabels: Record<ToolType, string> = {
@@ -234,6 +235,7 @@ export function useSmartCollections(
       webcam: 'Immagini',
       homework: 'Compiti',
       search: 'Ricerche',
+      'study-kit': 'Study Kit',
     };
 
     const result = {} as Record<ToolType, SmartCollection>;

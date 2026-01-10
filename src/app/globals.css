@@ -175,6 +175,21 @@ html.light,
   transform: translateY(0);
 }
 
+/* Card Interactive Variant */
+.card-interactive {
+  cursor: pointer;
+  transition: all 200ms;
+}
+.card-interactive:hover {
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  border-color: hsl(var(--primary) / 0.3);
+}
+.card-interactive:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px hsl(var(--primary));
+  outline-offset: 2px;
+}
+
 * {
   border-color: hsl(var(--border));
 }

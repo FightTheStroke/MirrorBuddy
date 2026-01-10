@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   Trophy,
@@ -10,12 +10,17 @@ import {
   Star,
   Calendar,
   Zap,
+  Coins,
 } from 'lucide-react';
 import { useProgressStore } from '@/lib/stores';
-import { AnalyticsDashboard } from '@/components/dashboard';
+import { AnalyticsDashboard, DashboardLayout, DashboardCard, StatCard } from '@/components/dashboard';
+import { TimeStudyChart } from '@/components/dashboard/time-study-chart';
+import { MaestroUsageChart } from '@/components/dashboard/maestro-usage-chart';
+import { AchievementsPanel } from '@/components/gamification/achievements-panel';
+import { SeasonBanner } from '@/components/gamification/season-banner';
 import { cn } from '@/lib/utils';
-import { ACHIEVEMENTS, formatMinutes } from './progress-view/constants';
-import { StatCard } from './progress-view/components/stat-card';
+import { PageHeader } from '@/components/ui/page-header';
+import { ACHIEVEMENTS } from './progress-view/constants';
 import { OverviewTab } from './progress-view/components/overview-tab';
 import { AchievementsTab } from './progress-view/components/achievements-tab';
 import { MasteryTab } from './progress-view/components/mastery-tab';
@@ -25,7 +30,48 @@ type ProgressTab = 'overview' | 'analytics' | 'achievements' | 'mastery' | 'hist
 
 export function ProgressView() {
   const [activeTab, setActiveTab] = useState<ProgressTab>('overview');
-  const { xp, level, streak, totalStudyMinutes, masteries, achievements } = useProgressStore();
+  const { 
+    xp, level, streak, totalStudyMinutes, masteries, achievements,
+    mirrorBucks, sessionHistory, loadFromServer 
+  } = useProgressStore();
+
+  useEffect(() => {
+    loadFromServer();
+  }, [loadFromServer]);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const todayMinutes = sessionHistory
+    .filter((s) => s.endedAt && new Date(s.startedAt) >= today)
+    .reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
+
+  const dateRange = useMemo(() => {
+    const now = new Date();
+    const weekAgo = new Date(now);
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const twoWeeksAgo = new Date(now);
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    return { weekAgo, twoWeeksAgo };
+  }, []);
+
+  const weekAgo = dateRange.weekAgo;
+  const twoWeeksAgo = dateRange.twoWeeksAgo;
+
+  const weeklyMinutes = sessionHistory
+    .filter((s) => s.endedAt && new Date(s.startedAt) >= weekAgo)
+    .reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
+
+  const lastWeekMinutes = sessionHistory
+    .filter((s) => {
+      const sessionDate = new Date(s.startedAt);
+      return s.endedAt && sessionDate >= twoWeeksAgo && sessionDate < weekAgo;
+    })
+    .reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
+
+  const weeklyChange = lastWeekMinutes === 0
+    ? (weeklyMinutes > 0 ? 100 : 0)
+    : Math.round(((weeklyMinutes - lastWeekMinutes) / lastWeekMinutes) * 100);
 
   const tabs: Array<{ id: ProgressTab; label: string; icon: React.ReactNode }> = [
     { id: 'overview', label: 'Panoramica', icon: <TrendingUp className="w-4 h-4" /> },
@@ -39,8 +85,8 @@ export function ProgressView() {
   const currentLevelXP = xp % xpToNextLevel;
   const levelProgress = (currentLevelXP / xpToNextLevel) * 100;
 
-  const unlockedAchievementIds = (achievements || []).map(a => a.id);
-  const achievementProgress = (unlockedAchievementIds.length / ACHIEVEMENTS.length) * 100;
+  const _unlockedAchievementIds = (achievements || []).map(a => a.id);
+  const _achievementProgress = (_unlockedAchievementIds.length / ACHIEVEMENTS.length) * 100;
 
   const masteriesRecord = useMemo(() => {
     const record: Record<string, typeof masteries[0]> = {};
@@ -52,45 +98,67 @@ export function ProgressView() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-          I Tuoi Progressi
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">
-          Monitora il tuo percorso di apprendimento
-        </p>
-      </div>
+      <PageHeader icon={Trophy} title="I Tuoi Progressi" />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={<Zap className="w-6 h-6 text-amber-500" />}
-          label="Livello"
-          value={level.toString()}
-          subtext={`${currentLevelXP} / ${xpToNextLevel} XP`}
-          color="amber"
-        />
-        <StatCard
-          icon={<Flame className="w-6 h-6 text-orange-500" />}
-          label="Streak"
-          value={`${streak.current} giorni`}
-          subtext={`Record: ${streak.longest}`}
-          color="orange"
-        />
-        <StatCard
-          icon={<Clock className="w-6 h-6 text-blue-500" />}
-          label="Tempo Studio"
-          value={formatMinutes(totalStudyMinutes)}
-          subtext="Totale"
-          color="blue"
-        />
-        <StatCard
-          icon={<Trophy className="w-6 h-6 text-purple-500" />}
-          label="Traguardi"
-          value={`${unlockedAchievementIds.length}/${ACHIEVEMENTS.length}`}
-          subtext={`${achievementProgress.toFixed(0)}%`}
-          color="purple"
-        />
-      </div>
+      <DashboardLayout>
+        <DashboardCard>
+          <StatCard
+            icon={<Coins className="w-6 h-6" />}
+            label="MirrorBucks"
+            value={mirrorBucks.toString()}
+            subtext="Totale"
+            color="amber"
+          />
+        </DashboardCard>
+
+        <DashboardCard>
+          <StatCard
+            icon={<Trophy className="w-6 h-6" />}
+            label="Livello"
+            value={level.toString()}
+            subtext={`${currentLevelXP} / ${xpToNextLevel} XP`}
+            color="purple"
+          />
+        </DashboardCard>
+
+        <DashboardCard>
+          <StatCard
+            icon={<Flame className="w-6 h-6" />}
+            label="Streak"
+            value={`${streak.current} giorni`}
+            subtext={`Record: ${streak.longest}`}
+            color="green"
+          />
+        </DashboardCard>
+
+        <DashboardCard>
+          <StatCard
+            icon={<Clock className="w-6 h-6" />}
+            label="Tempo Oggi"
+            value={`${todayMinutes} min`}
+            subtext={`${weeklyChange > 0 ? '+' : ''}${weeklyChange}% vs settimana scorsa`}
+            color="blue"
+          />
+        </DashboardCard>
+
+        <DashboardCard span={2}>
+          <TimeStudyChart sessions={sessionHistory} />
+        </DashboardCard>
+
+        <DashboardCard>
+          <MaestroUsageChart sessions={sessionHistory} />
+        </DashboardCard>
+
+        <DashboardCard>
+          <div className="h-full">
+            <AchievementsPanel compact className="h-full" />
+          </div>
+        </DashboardCard>
+
+        <DashboardCard>
+          <SeasonBanner variant="full" />
+        </DashboardCard>
+      </DashboardLayout>
 
       <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 pb-4">
         {tabs.map(tab => (
@@ -130,7 +198,7 @@ export function ProgressView() {
 
         {activeTab === 'achievements' && (
           <AchievementsTab
-            unlocked={unlockedAchievementIds}
+            unlocked={_unlockedAchievementIds}
             allAchievements={ACHIEVEMENTS}
           />
         )}
@@ -141,6 +209,33 @@ export function ProgressView() {
 
         {activeTab === 'history' && <HistoryTab />}
       </motion.div>
+
+      <div className="mt-8 p-6 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+        <h2 className="text-lg font-semibold mb-4">Riepilogo Totali</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p className="text-sm text-slate-500">Tempo totale</p>
+            <p className="text-2xl font-bold">{Math.round(totalStudyMinutes / 60)}h</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Sessioni totali</p>
+            <p className="text-2xl font-bold">{sessionHistory.length}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Media sessione</p>
+            <p className="text-2xl font-bold">
+              {sessionHistory.length > 0
+                ? Math.round(totalStudyMinutes / sessionHistory.length)
+                : 0}
+              min
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Streak massimo</p>
+            <p className="text-2xl font-bold">{streak.longest}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -38,12 +38,14 @@ export function ConversationInput({
 }: ConversationInputProps) {
   return (
     <div className="p-4 border-t border-slate-200 dark:border-slate-700">
-      <div className="flex items-center gap-2">
+      <div className="mb-2">
         <ToolButtons
           onToolRequest={onToolRequest}
           disabled={isLoading}
           activeToolId={activeToolId}
         />
+      </div>
+      <div className="flex items-center gap-2">
         <input
           ref={inputRef}
           type="text"

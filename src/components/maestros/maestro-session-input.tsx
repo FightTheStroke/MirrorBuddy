@@ -39,7 +39,7 @@ export function MaestroSessionInput({
   onEndSession,
 }: MaestroSessionInputProps) {
   return (
-    <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-b-2xl">
+    <div className="p-2 sm:p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-b-2xl">
       {/* Tool buttons */}
       <MaestroSessionToolButtons
         isLoading={isLoading}
@@ -48,7 +48,7 @@ export function MaestroSessionInput({
         onRequestPhoto={onRequestPhoto}
       />
 
-      <div className="flex gap-3">
+      <div className="flex gap-2 sm:gap-3">
         <textarea
           ref={inputRef}
           value={input}
@@ -61,7 +61,7 @@ export function MaestroSessionInput({
                 ? 'Parla o scrivi...'
                 : `Scrivi un messaggio a ${maestro.name}...`
           }
-          className="flex-1 resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm focus:outline-none focus:ring-2"
+          className="flex-1 resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 sm:px-4 py-2 sm:py-3 text-sm focus:outline-none focus:ring-2"
           style={{ '--tw-ring-color': maestro.color } as React.CSSProperties}
           rows={1}
           disabled={isLoading || sessionEnded}
@@ -70,12 +70,12 @@ export function MaestroSessionInput({
           onClick={onSubmit}
           disabled={!input.trim() || isLoading || sessionEnded}
           style={{ backgroundColor: maestro.color }}
-          className="hover:opacity-90"
+          className="hover:opacity-90 flex-shrink-0 h-9 sm:h-auto"
         >
           {isLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
+            <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
           ) : (
-            <Send className="h-5 w-5" />
+            <Send className="h-4 w-4 sm:h-5 sm:w-5" />
           )}
         </Button>
       </div>

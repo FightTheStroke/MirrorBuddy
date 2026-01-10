@@ -1,6 +1,6 @@
 #!/bin/bash
-PROJ_DIR="$HOME/.claude/projects/-Users-roberdan-GitHub-ConvergioEdu"
-OUTPUT="/Users/roberdan/GitHub/ConvergioEdu/roberdanAsksJan5.md"
+PROJ_DIR="$HOME/.claude/projects/-Users-roberdan-GitHub-MirrorBuddy"
+OUTPUT="/Users/roberdan/GitHub/MirrorBuddy/roberdanAsksJan5.md"
 CUTOFF=$(date -v-1d +%Y-%m-%d 2>/dev/null || date -d "1 day ago" +%Y-%m-%d)
 
 echo "# Richieste di Roberto - 5 Gennaio 2026" > "$OUTPUT"

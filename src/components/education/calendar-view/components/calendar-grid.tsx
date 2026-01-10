@@ -104,14 +104,14 @@ export function CalendarGrid({
                   day.isCurrentMonth
                     ? 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'
                     : 'bg-slate-50 dark:bg-slate-900/50 border-transparent',
-                  isToday && 'ring-2 ring-blue-500'
+                  isToday && 'ring-2 ring-primary'
                 )}
               >
                 <div
                   className={cn(
                     'text-xs font-medium mb-1',
                     isToday
-                      ? 'text-blue-600'
+                      ? 'text-primary'
                       : day.isCurrentMonth
                         ? 'text-slate-700 dark:text-slate-300'
                         : 'text-slate-400'

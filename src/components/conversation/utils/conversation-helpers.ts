@@ -22,7 +22,10 @@ export function getOrCreateUserId(): string | null {
 /**
  * End a conversation and generate summary
  */
-export async function endConversationWithSummary(conversationId: string): Promise<void> {
+export async function endConversationWithSummary(
+  conversationId: string,
+  reason: 'explicit' | 'timeout' | 'system' = 'explicit'
+): Promise<void> {
   const userId = getOrCreateUserId();
   if (!userId) {
     logger.warn('No userId, cannot end conversation');
@@ -33,7 +36,7 @@ export async function endConversationWithSummary(conversationId: string): Promis
     const response = await fetch(`/api/conversations/${conversationId}/end`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, reason: 'explicit' }),
+      body: JSON.stringify({ userId, reason }),
     });
 
     if (!response.ok) {

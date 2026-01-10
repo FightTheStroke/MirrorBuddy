@@ -10,12 +10,6 @@ interface UseToolHandlerProps {
   setIsLoading: (loading: boolean) => void;
   messages: Array<{ role: string; content: string }>;
   addMessage: (message: { role: 'user' | 'assistant'; content: string }) => void;
-  enterFocusMode: (options: {
-    toolType: ToolType;
-    maestroId?: string;
-    interactionMode?: 'voice' | 'chat';
-    initialTool?: ToolState;
-  }) => void;
 }
 
 export function useToolHandler({
@@ -23,7 +17,6 @@ export function useToolHandler({
   setIsLoading,
   messages,
   addMessage,
-  enterFocusMode,
 }: UseToolHandlerProps) {
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
@@ -83,12 +76,7 @@ export function useToolHandler({
             content: toolContent,
           };
 
-          enterFocusMode({
-            toolType: mappedToolType,
-            maestroId: maestro.id,
-            interactionMode: 'chat' as const,
-            initialTool: completedTool,
-          });
+          // Focus mode has been removed
           setActiveTool(null);
         } else {
           setActiveTool(null);
@@ -108,7 +96,7 @@ export function useToolHandler({
         setIsLoading(false);
       }
     },
-    [isLoading, setIsLoading, messages, addMessage, enterFocusMode]
+    [isLoading, setIsLoading, messages, addMessage]
   );
 
   const handleToolRequest = useCallback(

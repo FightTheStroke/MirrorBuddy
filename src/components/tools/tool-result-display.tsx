@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, CheckCircle, XCircle, Code, BarChart2, GitBranch, Calculator, HelpCircle, Layers, Network, FileText, Play } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Code, BarChart2, GitBranch, Calculator, HelpCircle, Layers, Network, FileText, Play, Maximize2, Minimize2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { ChartRenderer } from './chart-renderer';
 import { DiagramRenderer } from './diagram-renderer';
 import { FormulaRenderer } from './formula-renderer';
@@ -13,10 +14,11 @@ import { DemoSandbox } from './demo-sandbox';
 import { LiveMindmap } from './live-mindmap';
 import { cn } from '@/lib/utils';
 import type { ToolCall, ChartRequest, DiagramRequest, FormulaRequest, QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
-import type { SummaryData, DemoData, MindmapNode } from '@/types/tools';
+import type { SummaryData, DemoData, MindmapNode, ToolType } from '@/types/tools';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import toast from '@/components/ui/toast';
 import { logger } from '@/lib/logger';
+import { FUNCTION_NAME_TO_TOOL_TYPE } from '@/components/conversation/constants/tool-constants';
 
 // C-14 FIX: Auto-save utilities now accept toolId for reliable upsert behavior
 function autoSaveMindmap(request: MindmapRequest, toolId?: string): void {
@@ -44,9 +46,14 @@ interface ToolResultDisplayProps {
   className?: string;
   /** Session ID for real-time mindmap modifications (Maestro+Student collaboration) */
   sessionId?: string | null;
+  /** Whether this tool is in fullscreen mode */
+  isFullscreen?: boolean;
+  /** Callback to toggle fullscreen mode */
+  onToggleFullscreen?: () => void;
 }
 
 const toolIcons: Record<string, React.ReactNode> = {
+  // Function names (from API)
   run_code: <Code className="w-4 h-4" />,
   create_chart: <BarChart2 className="w-4 h-4" />,
   create_diagram: <GitBranch className="w-4 h-4" />,
@@ -54,12 +61,27 @@ const toolIcons: Record<string, React.ReactNode> = {
   create_visualization: <BarChart2 className="w-4 h-4" />,
   create_quiz: <HelpCircle className="w-4 h-4" />,
   create_flashcard: <Layers className="w-4 h-4" />,
+  create_flashcards: <Layers className="w-4 h-4" />,
   create_mindmap: <Network className="w-4 h-4" />,
   create_summary: <FileText className="w-4 h-4" />,
   create_demo: <Play className="w-4 h-4" />,
+  create_timeline: <FileText className="w-4 h-4" />,
+  web_search: <FileText className="w-4 h-4" />,
+  // Tool types (mapped)
+  chart: <BarChart2 className="w-4 h-4" />,
+  diagram: <GitBranch className="w-4 h-4" />,
+  formula: <Calculator className="w-4 h-4" />,
+  quiz: <HelpCircle className="w-4 h-4" />,
+  flashcard: <Layers className="w-4 h-4" />,
+  mindmap: <Network className="w-4 h-4" />,
+  summary: <FileText className="w-4 h-4" />,
+  demo: <Play className="w-4 h-4" />,
+  timeline: <FileText className="w-4 h-4" />,
+  search: <FileText className="w-4 h-4" />,
 };
 
 const toolNames: Record<string, string> = {
+  // Function names (from API)
   run_code: 'Code Execution',
   create_chart: 'Chart',
   create_diagram: 'Diagram',
@@ -67,29 +89,72 @@ const toolNames: Record<string, string> = {
   create_visualization: 'Visualization',
   create_quiz: 'Quiz',
   create_flashcard: 'Flashcard',
+  create_flashcards: 'Flashcard',
   create_mindmap: 'Mind Map',
   create_summary: 'Summary',
   create_demo: 'Demo',
+  create_timeline: 'Timeline',
+  web_search: 'Search',
+  // Tool types (mapped)
+  chart: 'Chart',
+  diagram: 'Diagram',
+  formula: 'Formula',
+  quiz: 'Quiz',
+  flashcard: 'Flashcard',
+  mindmap: 'Mind Map',
+  summary: 'Summary',
+  demo: 'Demo',
+  timeline: 'Timeline',
+  search: 'Search',
 };
 
-export function ToolResultDisplay({ toolCall, className, sessionId }: ToolResultDisplayProps) {
-  const icon = toolIcons[toolCall.type] || <Code className="w-4 h-4" />;
-  const name = toolNames[toolCall.type] || toolCall.name;
+export function ToolResultDisplay({ toolCall, className, sessionId, isFullscreen = false, onToggleFullscreen }: ToolResultDisplayProps) {
+  // Map function name to tool type for display
+  const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolCall.type as ToolType;
+  const icon = toolIcons[toolCall.type] || toolIcons[toolType] || <Code className="w-4 h-4" />;
+  const name = toolNames[toolCall.type] || toolNames[toolType] || toolCall.name;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
-      className={cn('space-y-2 w-full', className)}
+      className={cn(
+        'space-y-2 w-full',
+        isFullscreen && 'fixed inset-0 z-50 bg-white dark:bg-slate-950 p-6 overflow-auto',
+        className
+      )}
       role="region"
       aria-label={`Tool result: ${name}`}
     >
       {/* Status header */}
-      <div className="flex items-center gap-2 text-sm">
-        <span className="text-slate-400">{icon}</span>
-        <span className="font-medium text-slate-300">{name}</span>
-        <StatusBadge status={toolCall.status} />
+      <div className={cn(
+        'flex items-center justify-between gap-2 text-sm',
+        isFullscreen && 'sticky top-0 z-10 bg-white dark:bg-slate-950 pb-4 border-b border-slate-200 dark:border-slate-700 mb-4'
+      )}>
+        <div className="flex items-center gap-2">
+          <span className={cn('text-slate-400', isFullscreen && 'text-slate-600 dark:text-slate-300')}>{icon}</span>
+          <span className={cn('font-medium text-slate-300', isFullscreen && 'text-slate-900 dark:text-white text-lg')}>{name}</span>
+          <StatusBadge status={toolCall.status} />
+        </div>
+        {toolCall.status === 'completed' && onToggleFullscreen && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleFullscreen}
+            className={cn(
+              'text-slate-400 hover:text-slate-200',
+              isFullscreen && 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+            )}
+            title={isFullscreen ? 'Riduci' : 'Espandi'}
+          >
+            {isFullscreen ? (
+              <Minimize2 className="w-4 h-4" />
+            ) : (
+              <Maximize2 className="w-4 h-4" />
+            )}
+          </Button>
+        )}
       </div>
 
       {/* Tool-specific content */}
@@ -124,8 +189,15 @@ export function ToolResultDisplay({ toolCall, className, sessionId }: ToolResult
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
+            className={cn(
+              isFullscreen && 'h-full flex flex-col'
+            )}
           >
-            <ToolContent toolCall={toolCall} sessionId={sessionId} />
+            <div className={cn(
+              isFullscreen && 'flex-1 overflow-auto'
+            )}>
+              <ToolContent toolCall={toolCall} sessionId={sessionId} />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -166,42 +238,51 @@ function StatusBadge({ status }: { status: ToolCall['status'] }) {
 }
 
 function ToolContent({ toolCall, sessionId }: { toolCall: ToolCall; sessionId?: string | null }) {
-  switch (toolCall.type) {
+  // Map function name (e.g., 'create_mindmap') to tool type (e.g., 'mindmap')
+  // The API returns function names, but we need tool types for rendering
+  const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolCall.type as ToolType;
+  
+  // For completed tools, use result.data if available, otherwise use arguments
+  const toolData = toolCall.status === 'completed' && toolCall.result?.data 
+    ? toolCall.result.data 
+    : toolCall.arguments;
+
+  switch (toolType) {
     case 'chart':
       return (
         <ChartRenderer
-          request={toolCall.arguments as unknown as ChartRequest}
+          request={toolData as unknown as ChartRequest}
         />
       );
 
     case 'diagram':
       return (
         <DiagramRenderer
-          request={toolCall.arguments as unknown as DiagramRequest}
+          request={toolData as unknown as DiagramRequest}
         />
       );
 
     case 'formula':
       return (
         <FormulaRenderer
-          request={toolCall.arguments as unknown as FormulaRequest}
+          request={toolData as unknown as FormulaRequest}
         />
       );
 
     case 'quiz':
       return (
-        <AutoSaveQuiz request={toolCall.arguments as unknown as QuizRequest} toolId={toolCall.id} />
+        <AutoSaveQuiz request={toolData as unknown as QuizRequest} toolId={toolCall.id} />
       );
 
     case 'flashcard':
       return (
-        <AutoSaveFlashcard request={toolCall.arguments as unknown as FlashcardDeckRequest} toolId={toolCall.id} />
+        <AutoSaveFlashcard request={toolData as unknown as FlashcardDeckRequest} toolId={toolCall.id} />
       );
 
     case 'mindmap':
       return (
         <AutoSaveMindmap
-          request={toolCall.arguments as unknown as MindmapRequest}
+          request={toolData as unknown as MindmapRequest}
           sessionId={sessionId}
           toolId={toolCall.id}
         />
@@ -209,12 +290,12 @@ function ToolContent({ toolCall, sessionId }: { toolCall: ToolCall; sessionId?: 
 
     case 'summary':
       return (
-        <AutoSaveSummary request={toolCall.arguments as unknown as SummaryData} toolId={toolCall.id} />
+        <AutoSaveSummary request={toolData as unknown as SummaryData} toolId={toolCall.id} />
       );
 
     case 'demo':
       return (
-        <AutoSaveDemo request={toolCall.arguments as unknown as DemoData} toolId={toolCall.id} />
+        <AutoSaveDemo request={toolData as unknown as DemoData} toolId={toolCall.id} />
       );
 
     default:
@@ -364,7 +445,7 @@ function AutoSaveSummary({ request, toolId }: { request: SummaryData; toolId?: s
     const mindmapTitle = `Mappa: ${data.topic}`;
     autoSaveMaterial('mindmap', mindmapTitle, { nodes }, { subject: 'general' });
 
-    toast.success('Mappa mentale salvata nell\'archivio!');
+    toast.success('Mappa mentale salvata nello zaino!');
     logger.info('[SummaryTool] Converted to mindmap', { topic: data.topic, nodeCount: nodes.length });
   }, []);
 
@@ -405,7 +486,7 @@ function AutoSaveSummary({ request, toolId }: { request: SummaryData; toolId?: s
     const flashcardName = `Flashcard: ${data.topic}`;
     autoSaveMaterial('flashcard', flashcardName, { cards: limitedCards }, { subject: 'general' });
 
-    toast.success(`${limitedCards.length} flashcard salvate nell'archivio!`);
+    toast.success(`${limitedCards.length} flashcard salvate nello zaino!`);
     logger.info('[SummaryTool] Generated flashcards', { topic: data.topic, cardCount: limitedCards.length });
   }, []);
 

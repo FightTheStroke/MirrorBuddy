@@ -7,7 +7,7 @@
 ## Quick Start
 
 ```bash
-git clone https://github.com/Roberdan/MirrorBuddy.git
+git clone https://github.com/FightTheStroke/MirrorBuddy.git
 cd MirrorBuddy
 npm install
 cp .env.example .env.local
