@@ -15,6 +15,8 @@ const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 // Timeout configuration
 const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes idle timeout
 const _HEARTBEAT_INTERVAL_MS = 30 * 1000; // 30 seconds heartbeat
+const CONNECTION_TIMEOUT_MS = 30 * 1000; // 30 seconds initial connection timeout
+const PING_INTERVAL_MS = 15 * 1000; // 15 seconds ping interval
 
 let wss: WebSocketServer | null = null;
 
@@ -55,6 +57,108 @@ function clearIdleTimer(connectionId: string): void {
   if (conn?.idleTimer) {
     clearTimeout(conn.idleTimer);
     conn.idleTimer = null;
+  }
+}
+
+/**
+ * Start initial connection timeout - closes if backend doesn't connect within 30s
+ */
+function startConnectionTimeout(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
+
+  const timeoutTimer = setTimeout(() => {
+    logger.warn(`Connection ${connectionId} timeout - backend failed to connect within 30s`);
+    if (conn.clientWs.readyState === WebSocket.OPEN) {
+      conn.clientWs.close(4008, 'Connection timeout');
+    }
+    if (conn.backendWs?.readyState === WebSocket.OPEN) {
+      conn.backendWs.close();
+    }
+    connections.delete(connectionId);
+  }, CONNECTION_TIMEOUT_MS);
+
+  (conn as any).connectionTimeoutTimer = timeoutTimer;
+}
+
+/**
+ * Clear connection timeout (called once connection is established)
+ */
+function clearConnectionTimeout(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn) {
+    const timeoutTimer = (conn as any).connectionTimeoutTimer;
+    if (timeoutTimer) {
+      clearTimeout(timeoutTimer);
+      (conn as any).connectionTimeoutTimer = null;
+    }
+  }
+}
+
+/**
+ * Start ping interval - sends ping every 15s to detect stale connections
+ */
+function startPingInterval(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
+
+  const pingTimer = setInterval(() => {
+    if (conn.clientWs.readyState === WebSocket.OPEN) {
+      conn.clientWs.ping();
+
+      // Set up pong timeout - close if no pong within 30s
+      if ((conn as any).pongTimer) {
+        clearTimeout((conn as any).pongTimer);
+      }
+
+      const pongTimer = setTimeout(() => {
+        logger.warn(`Connection ${connectionId} no pong received - closing`);
+        if (conn.clientWs.readyState === WebSocket.OPEN) {
+          conn.clientWs.close(4009, 'Pong timeout');
+        }
+        if (conn.backendWs?.readyState === WebSocket.OPEN) {
+          conn.backendWs.close();
+        }
+        connections.delete(connectionId);
+      }, CONNECTION_TIMEOUT_MS);
+
+      (conn as any).pongTimer = pongTimer;
+    }
+  }, PING_INTERVAL_MS);
+
+  (conn as any).pingTimer = pingTimer;
+}
+
+/**
+ * Handle pong response - clears pong timeout
+ */
+function handlePong(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn) {
+    const pongTimer = (conn as any).pongTimer;
+    if (pongTimer) {
+      clearTimeout(pongTimer);
+      (conn as any).pongTimer = null;
+    }
+  }
+}
+
+/**
+ * Clear ping timer for a connection (on disconnect)
+ */
+function clearPingTimer(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn) {
+    const pingTimer = (conn as any).pingTimer;
+    if (pingTimer) {
+      clearInterval(pingTimer);
+      (conn as any).pingTimer = null;
+    }
+    const pongTimer = (conn as any).pongTimer;
+    if (pongTimer) {
+      clearTimeout(pongTimer);
+      (conn as any).pongTimer = null;
+    }
   }
 }
 
@@ -122,8 +226,13 @@ export function startRealtimeProxy(): void {
     // Start idle timer for this connection
     resetIdleTimer(connectionId);
 
+    // Start connection timeout - close if backend doesn't connect within 30s
+    startConnectionTimeout(connectionId);
+
     backendWs.on('open', () => {
       logger.info(`Backend WebSocket OPEN for ${connectionId}`);
+      clearConnectionTimeout(connectionId);
+      startPingInterval(connectionId);
       clientWs.send(JSON.stringify({ type: 'proxy.ready' }));
       resetIdleTimer(connectionId);
     });
@@ -181,6 +290,8 @@ export function startRealtimeProxy(): void {
     backendWs.on('close', (code: number, reason: Buffer) => {
       logger.debug(`Backend connection closed for ${connectionId}`, { code, reason: reason.toString() });
       clearIdleTimer(connectionId);
+      clearConnectionTimeout(connectionId);
+      clearPingTimer(connectionId);
       if (clientWs.readyState === WebSocket.OPEN) {
         const validCode = (code === 1000 || (code >= 3000 && code <= 4999)) ? code : 1000;
         clientWs.close(validCode, reason.toString());
@@ -192,6 +303,8 @@ export function startRealtimeProxy(): void {
     clientWs.on('close', () => {
       logger.debug(`Client disconnected: ${connectionId}`);
       clearIdleTimer(connectionId);
+      clearConnectionTimeout(connectionId);
+      clearPingTimer(connectionId);
       if (backendWs.readyState === WebSocket.OPEN) {
         backendWs.close();
       }
@@ -206,6 +319,11 @@ export function startRealtimeProxy(): void {
       }
       connections.delete(connectionId);
     });
+
+    // Handle pong response - clears pong timeout
+    clientWs.on('pong', () => {
+      handlePong(connectionId);
+    });
   });
 
   wss.on('error', (error: Error) => {
@@ -216,6 +334,9 @@ export function startRealtimeProxy(): void {
 export function stopRealtimeProxy(): void {
   if (wss) {
     for (const [id, conn] of connections) {
+      clearIdleTimer(id);
+      clearConnectionTimeout(id);
+      clearPingTimer(id);
       conn.clientWs.close();
       conn.backendWs?.close();
       connections.delete(id);

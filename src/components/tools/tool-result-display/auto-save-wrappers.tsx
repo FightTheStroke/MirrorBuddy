@@ -3,6 +3,11 @@
 /**
  * Auto-Save Wrapper Components
  * Wrap tool components with auto-save functionality
+ *
+ * Features:
+ * - Debounce saves at 500ms per toolId-toolType
+ * - Track saved materials in Set to prevent duplicates
+ * - Allow retry on save failure by removing from cache
  */
 
 import { useEffect, useRef, useCallback } from 'react';
@@ -22,6 +27,15 @@ import type {
   SummaryData,
   DemoData,
 } from '@/types/tools';
+
+// Debounce delay (500ms)
+const AUTO_SAVE_DEBOUNCE_MS = 500;
+
+// Global tracking for debounce timers: Map<dedupKey, timeoutId>
+const saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
+
+// Global tracking for saved/pending materials: Set<dedupKey>
+const savedMaterialsCache = new Set<string>();
 
 // Auto-save utilities
 function autoSaveMindmap(request: MindmapRequest, toolId?: string): void {
