@@ -5,7 +5,7 @@
 import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
 import type { ToolType, ToolState } from '@/types/tools';
-import { FUNCTION_NAME_TO_TOOL_TYPE } from './message-handler';
+import { functionNameToToolType } from '@/lib/tools/constants';
 
 const TOOL_PROMPTS: Partial<Record<ToolType, string>> = {
   mindmap: 'Crea una mappa mentale sull\'argomento che stiamo studiando',
@@ -70,7 +70,7 @@ export async function requestTool(
 
   if (data.toolCalls?.length > 0) {
     const toolCall = data.toolCalls[0];
-    const mappedToolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolType;
+    const mappedToolType = functionNameToToolType(toolCall.type) || toolType;
     const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
 
     return {

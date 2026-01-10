@@ -110,6 +110,8 @@ export function PersonalizedSuggestion({ onMaestroSelect }: PersonalizedSuggesti
                 alt={suggestion.suggestedMaestro.name}
                 fill
                 className="object-cover"
+                sizes="48px"
+                priority
               />
             </button>
           </motion.div>

@@ -35,7 +35,7 @@ export class AmbientAudioEngine {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      logger.warn('Audio engine already initialized');
+      logger.debug('Audio engine already initialized');
       return;
     }
 

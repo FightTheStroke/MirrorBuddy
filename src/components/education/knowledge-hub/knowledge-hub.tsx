@@ -23,6 +23,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { SidebarNavigation, type Collection } from './components/sidebar-navigation';
 import { MaterialCard } from './components/material-card';
+import { SimilarMaterialsPanel } from './components/similar-materials-panel';
 import {
   ExplorerView,
   GalleryView,
@@ -105,6 +106,7 @@ export function KnowledgeHub({
   const [selectedMaterialIds, setSelectedMaterialIds] = useState<Set<string>>(new Set());
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [previewMaterial, setPreviewMaterial] = useState<KnowledgeHubMaterial | null>(null);
+  const [similarToolId, setSimilarToolId] = useState<string | null>(null);
 
   // Convert KnowledgeHubMaterial to SearchableMaterial for search
   const searchableMaterials = useMemo<SearchableMaterial[]>(() => {
@@ -179,6 +181,18 @@ export function KnowledgeHub({
     [onOpenMaterial]
   );
 
+  const handleFindSimilar = useCallback((toolId: string) => {
+    setSimilarToolId(toolId);
+  }, []);
+
+  const handleSelectSimilar = useCallback((toolId: string) => {
+    const target = materials.find((m) => (m.toolId ?? m.id) === toolId);
+    if (target) {
+      onOpenMaterial?.(target);
+    }
+    setSimilarToolId(null);
+  }, [materials, onOpenMaterial]);
+
   const handleToggleMaterialSelection = useCallback((id: string) => {
     setSelectedMaterialIds((prev) => {
       const next = new Set(prev);
@@ -213,6 +227,7 @@ export function KnowledgeHub({
     const commonProps = {
       materials: displayedMaterials,
       onSelectMaterial: handleSelectMaterial,
+      onFindSimilar: handleFindSimilar,
       selectedMaterialIds,
       onToggleMaterialSelection: handleToggleMaterialSelection,
     };
@@ -445,6 +460,13 @@ export function KnowledgeHub({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <SimilarMaterialsPanel
+        open={!!similarToolId}
+        toolId={similarToolId ?? undefined}
+        onClose={() => setSimilarToolId(null)}
+        onSelect={handleSelectSimilar}
+      />
     </div>
   );
 }

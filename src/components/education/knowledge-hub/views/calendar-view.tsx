@@ -19,6 +19,7 @@ import type { KnowledgeHubMaterial } from './explorer-view';
 export interface CalendarViewProps {
   materials: KnowledgeHubMaterial[];
   onSelectMaterial: (material: KnowledgeHubMaterial) => void;
+  onFindSimilar?: (toolId: string) => void;
   selectedMaterialIds?: Set<string>;
   onToggleMaterialSelection?: (id: string) => void;
   className?: string;
@@ -28,6 +29,7 @@ export interface CalendarViewProps {
 export function CalendarView({
   materials,
   onSelectMaterial,
+  onFindSimilar,
   selectedMaterialIds = new Set(),
   onToggleMaterialSelection,
   className,
@@ -165,6 +167,11 @@ export function CalendarView({
                     key={material.id}
                     material={toMaterial(material)}
                     onOpen={() => onSelectMaterial(material)}
+                    onFindSimilar={
+                      onFindSimilar
+                        ? () => onFindSimilar(material.toolId ?? material.id)
+                        : undefined
+                    }
                     isSelected={selectedMaterialIds.has(material.id)}
                     onSelect={
                       onToggleMaterialSelection

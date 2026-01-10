@@ -272,6 +272,7 @@ export async function POST(request: NextRequest) {
                   content: toolResult.data as Record<string, unknown>,
                   maestroId,
                   topic: args.topic,
+                  sourceToolId: typeof args.sourceToolId === 'string' ? args.sourceToolId : undefined,
                 });
               } catch (saveError) {
                 logger.warn('Failed to save tool to Material table', {

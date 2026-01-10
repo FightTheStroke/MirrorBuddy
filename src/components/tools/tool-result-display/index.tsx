@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { toolIcons, toolNames } from './constants';
 import { StatusBadge } from './status-badge';
 import { ToolContent } from './tool-content';
-import { FUNCTION_NAME_TO_TOOL_TYPE } from '@/components/conversation/constants/tool-constants';
+import { functionNameToToolType } from '@/lib/tools/constants';
 import type { ToolCall, ToolCallRef } from '@/types';
 import type { ToolType } from '@/types/tools';
 
@@ -38,7 +38,7 @@ export function ToolResultDisplay({
   onToggleFullscreen,
 }: ToolResultDisplayProps) {
   // Map function name to tool type for display
-  const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolCall.type as ToolType;
+  const toolType = functionNameToToolType(toolCall.type) || toolCall.type as ToolType;
   const icon = toolIcons[toolCall.type] || toolIcons[toolType] || <Code className="w-4 h-4" />;
   const name = toolNames[toolCall.type] || toolNames[toolType] || toolCall.name;
 
