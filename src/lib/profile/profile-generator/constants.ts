@@ -3,7 +3,7 @@
  */
 
 import type { ObservationCategory } from '@/types';
-import type { ProfileGenerationOptions } from './types';
+import type { ProfileGenerationOptions } from '../profile-generator/types';
 
 /**
  * Default options for profile generation.
