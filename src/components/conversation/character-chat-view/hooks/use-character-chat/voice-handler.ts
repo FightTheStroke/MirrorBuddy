@@ -4,7 +4,6 @@
 
 import { logger } from '@/lib/logger';
 import type { ConnectionInfo } from '@/lib/hooks/use-voice-session';
-import type { CharacterInfo } from '../../utils/character-utils';
 
 /**
  * Fetch voice connection info from server

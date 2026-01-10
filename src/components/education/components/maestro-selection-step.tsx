@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
 import type { Maestro, Subject } from '@/types';
 
 interface MaestroSelectionStepProps {

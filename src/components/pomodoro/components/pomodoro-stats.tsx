@@ -11,7 +11,7 @@ interface PomodoroStatsProps {
 export function PomodoroStats({
   completedPomodoros,
   totalFocusTime,
-  pomodorosUntilLongBreak,
+  pomodorosUntilLongBreak: _pomodorosUntilLongBreak,
 }: PomodoroStatsProps) {
   if (completedPomodoros === 0) {
     return null;

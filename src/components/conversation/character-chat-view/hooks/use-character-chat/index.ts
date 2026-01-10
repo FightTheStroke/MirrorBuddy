@@ -168,6 +168,7 @@ export function useCharacterChat(
     }
 
     initConversation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [characterId, character.greeting, conversations, createConversation, addMessageToStore]);
 
   // Handle send message

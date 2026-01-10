@@ -108,11 +108,6 @@ export function WelcomeStep({
     nextStep();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleContinue();
-    }
-  };
 
   // ========== VOICE MODE: Melissa auto-starts (default when Azure available) ==========
   if (!useWebSpeechFallback) {

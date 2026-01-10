@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Sparkles, ArrowRight, Volume2, VolumeX } from 'lucide-react';

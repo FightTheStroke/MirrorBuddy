@@ -11,9 +11,6 @@ import { motion } from 'framer-motion';
 import {
   BookOpen,
   Clock,
-  ChevronRight,
-  Lock,
-  CheckCircle2,
   PlayCircle,
   ArrowLeft,
   Loader2,

@@ -1,7 +1,6 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { PomodoroPhase } from '@/lib/hooks/use-pomodoro-timer';
 
 interface PomodoroSettingsProps {
   focusMinutes: number;

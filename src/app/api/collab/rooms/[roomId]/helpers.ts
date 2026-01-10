@@ -14,6 +14,8 @@ import {
   moveNode,
 } from '@/lib/collab/mindmap-room';
 import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
+import type { RoomUser } from '@/lib/collab/mindmap-room/types';
+import type { MindmapNode } from '@/types/tools';
 import { convertExportNodeToToolNode } from '@/lib/collab/mindmap-room/node-converter';
 
 /**
@@ -48,7 +50,7 @@ export function handleJoinAction(roomId: string, user: unknown) {
     };
   }
 
-  const result = joinRoom(roomId, userData as any);
+  const result = joinRoom(roomId, userData as RoomUser);
   if (!result) {
     return {
       success: false,
@@ -146,7 +148,7 @@ export function handleUpdateNodeAction(
     };
   }
 
-  const result = updateNode(roomId, userData.id, String(nodeId), changes as any);
+  const result = updateNode(roomId, userData.id, String(nodeId), changes as Partial<MindmapNode>);
 
   return {
     success: true,

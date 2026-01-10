@@ -5,7 +5,6 @@
  */
 
 import { prisma } from '@/lib/db';
-import type { ToolType } from '@/types/tools';
 import { randomUUID } from 'crypto';
 import {
   materialToSavedTool,

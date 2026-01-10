@@ -89,7 +89,7 @@ export async function POST(
         result = handleLeaveAction(roomId, user);
         logger.info('User left room via API', {
           roomId,
-          userId: (user as any)?.id,
+          userId: (user as { id?: string })?.id,
         });
         break;
 
@@ -122,7 +122,7 @@ export async function POST(
     if (action === 'join') {
       logger.info('User joined room via API', {
         roomId,
-        userId: (user as any)?.id,
+        userId: (user as { id?: string })?.id,
       });
     }
 

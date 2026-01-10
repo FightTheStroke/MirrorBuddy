@@ -3,7 +3,6 @@
  */
 
 import { logger } from '@/lib/logger';
-import { AZURE_SAMPLE_RATE } from './constants';
 
 /**
  * Resume an audio context if suspended
