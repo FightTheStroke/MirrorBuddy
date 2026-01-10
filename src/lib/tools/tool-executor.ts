@@ -128,7 +128,7 @@ export async function executeToolCall(
     broadcastToolEvent({
       id: toolId,
       type: 'tool:error',
-      toolType: toolType as 'mindmap' | 'flashcards' | 'quiz' | 'summary' | 'timeline' | 'diagram',
+      toolType: toolType as 'mindmap' | 'flashcard' | 'quiz' | 'summary' | 'timeline' | 'diagram',
       sessionId: context.sessionId || 'unknown',
       maestroId: context.maestroId || 'unknown',
       timestamp: Date.now(),
@@ -159,7 +159,7 @@ export async function executeToolCall(
       broadcastToolEvent({
         id: toolId,
         type: 'tool:error',
-        toolType: toolType as 'mindmap' | 'flashcards' | 'quiz' | 'summary' | 'timeline' | 'diagram',
+        toolType: toolType as 'mindmap' | 'flashcard' | 'quiz' | 'summary' | 'timeline' | 'diagram',
         sessionId: context.sessionId || 'unknown',
         maestroId: context.maestroId || 'unknown',
         timestamp: Date.now(),
@@ -179,7 +179,7 @@ export async function executeToolCall(
   broadcastToolEvent({
     id: toolId,
     type: 'tool:created',
-    toolType: toolType as 'mindmap' | 'flashcards' | 'quiz' | 'summary' | 'timeline' | 'diagram',
+    toolType: toolType as 'mindmap' | 'flashcard' | 'quiz' | 'summary' | 'timeline' | 'diagram',
     sessionId: context.sessionId || 'unknown',
     maestroId: context.maestroId || 'unknown',
     timestamp: Date.now(),
@@ -198,7 +198,7 @@ export async function executeToolCall(
     broadcastToolEvent({
       id: result.toolId,
       type: 'tool:complete',
-      toolType: result.toolType as 'mindmap' | 'flashcards' | 'quiz' | 'summary' | 'timeline' | 'diagram',
+      toolType: result.toolType as 'mindmap' | 'flashcard' | 'quiz' | 'summary' | 'timeline' | 'diagram',
       sessionId: context.sessionId || 'unknown',
       maestroId: context.maestroId || 'unknown',
       timestamp: Date.now(),
@@ -215,7 +215,7 @@ export async function executeToolCall(
     broadcastToolEvent({
       id: toolId,
       type: 'tool:error',
-      toolType: toolType as 'mindmap' | 'flashcards' | 'quiz' | 'summary' | 'timeline' | 'diagram',
+      toolType: toolType as 'mindmap' | 'flashcard' | 'quiz' | 'summary' | 'timeline' | 'diagram',
       sessionId: context.sessionId || 'unknown',
       maestroId: context.maestroId || 'unknown',
       timestamp: Date.now(),

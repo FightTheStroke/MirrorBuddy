@@ -18,7 +18,7 @@ import type { ToolType } from '@/lib/realtime/tool-events';
 // Tool icons mapping
 export const toolIcons: Record<ToolType, LucideIcon> = {
   mindmap: Network,
-  flashcards: Layers,
+  flashcard: Layers,
   quiz: HelpCircle,
   summary: FileText,
   timeline: Clock,
@@ -35,7 +35,7 @@ export function renderToolIcon(toolType: ToolType, className = 'w-5 h-5'): React
 // Tool display names
 export const toolNames: Record<ToolType, string> = {
   mindmap: 'Mappa Mentale',
-  flashcards: 'Flashcard',
+  flashcard: 'Flashcard',
   quiz: 'Quiz',
   summary: 'Riassunto',
   timeline: 'Linea del Tempo',

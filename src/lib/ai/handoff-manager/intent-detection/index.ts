@@ -16,8 +16,8 @@ export interface DetectedIntent {
 export function detectIntent(message: string): DetectedIntent {
   const lowerMessage = message.toLowerCase();
 
-  // Crisis detection
-  if (/(?:help|aiuto|crisis|disperato|emergency|nessuno|abbandonato)/i.test(lowerMessage)) {
+  // Crisis detection - includes suicidal ideation
+  if (/(?:help|aiuto|crisis|disperato|emergency|nessuno|abbandonato|morire|suicid|farla finita|non ce la faccio|voglio sparire)/i.test(lowerMessage)) {
     return { type: 'crisis', confidence: 0.95 };
   }
 
