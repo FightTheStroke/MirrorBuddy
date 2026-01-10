@@ -17,6 +17,7 @@ import { SummaryTool } from '../summary-tool';
 import { DemoSandbox } from '../demo-sandbox';
 import { LiveMindmap } from '../live-mindmap';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
+import { debouncedAutoSave } from './auto-save-utils';
 import toast from '@/components/ui/toast';
 import { logger } from '@/lib/logger';
 import type {
@@ -28,34 +29,40 @@ import type {
   DemoData,
 } from '@/types/tools';
 
-// Debounce delay (500ms)
-const AUTO_SAVE_DEBOUNCE_MS = 500;
-
-// Global tracking for debounce timers: Map<dedupKey, timeoutId>
-const saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
-
-// Global tracking for saved/pending materials: Set<dedupKey>
-const savedMaterialsCache = new Set<string>();
-
 // Auto-save utilities
 function autoSaveMindmap(request: MindmapRequest, toolId?: string): void {
-  autoSaveMaterial('mindmap', request.title, { nodes: request.nodes }, { subject: 'general', toolId });
+  const dedupKey = `${toolId || 'unknown'}-mindmap`;
+  debouncedAutoSave('mindmap', dedupKey, () =>
+    autoSaveMaterial('mindmap', request.title, { nodes: request.nodes }, { subject: 'general', toolId })
+  );
 }
 
 function autoSaveQuiz(request: QuizRequest, toolId?: string): void {
-  autoSaveMaterial('quiz', request.title, { questions: request.questions }, { subject: request.subject, toolId });
+  const dedupKey = `${toolId || 'unknown'}-quiz`;
+  debouncedAutoSave('quiz', dedupKey, () =>
+    autoSaveMaterial('quiz', request.title, { questions: request.questions }, { subject: request.subject, toolId })
+  );
 }
 
 function autoSaveFlashcards(request: FlashcardDeckRequest, toolId?: string): void {
-  autoSaveMaterial('flashcard', request.name, { cards: request.cards }, { subject: request.subject, toolId });
+  const dedupKey = `${toolId || 'unknown'}-flashcard`;
+  debouncedAutoSave('flashcard', dedupKey, () =>
+    autoSaveMaterial('flashcard', request.name, { cards: request.cards }, { subject: request.subject, toolId })
+  );
 }
 
 function autoSaveSummaryFn(request: SummaryData, toolId?: string): void {
-  autoSaveMaterial('summary', request.topic, { sections: request.sections, length: request.length }, { subject: 'general', toolId });
+  const dedupKey = `${toolId || 'unknown'}-summary`;
+  debouncedAutoSave('summary', dedupKey, () =>
+    autoSaveMaterial('summary', request.topic, { sections: request.sections, length: request.length }, { subject: 'general', toolId })
+  );
 }
 
 function autoSaveDemo(request: DemoData, toolId?: string): void {
-  autoSaveMaterial('demo', request.title, { html: request.html, css: request.css, js: request.js, description: request.description }, { subject: 'general', toolId });
+  const dedupKey = `${toolId || 'unknown'}-demo`;
+  debouncedAutoSave('demo', dedupKey, () =>
+    autoSaveMaterial('demo', request.title, { html: request.html, css: request.css, js: request.js, description: request.description }, { subject: 'general', toolId })
+  );
 }
 
 export function AutoSaveQuiz({ request, toolId }: { request: QuizRequest; toolId?: string }) {
