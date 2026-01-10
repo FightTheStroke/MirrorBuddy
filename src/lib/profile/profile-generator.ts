@@ -13,8 +13,8 @@ import type { MaestroInsightInput, ProfileGenerationOptions } from './types';
 import { DEFAULT_OPTIONS } from './constants';
 import { convertToObservation, generateStrategies, inferLearningStyle } from './utils';
 
-export type { MaestroInsightInput, ProfileGenerationOptions, SynthesisContext } from './types.js';
-export { MELISSA_SYNTHESIS_PROMPT, createSynthesisContext, formatSynthesisPrompt } from './synthesis.js';
+export type { MaestroInsightInput, ProfileGenerationOptions, SynthesisContext } from './types';
+export { MELISSA_SYNTHESIS_PROMPT, createSynthesisContext, formatSynthesisPrompt } from './synthesis';
 
 // ============================================================================
 // PROFILE GENERATION

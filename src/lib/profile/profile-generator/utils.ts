@@ -2,9 +2,9 @@
  * Utility functions for Profile Generator
  */
 
-import type { MaestroInsightInput } from '../profile-generator/types';
+import type { MaestroInsightInput } from './types';
 import type { MaestroObservation, LearningStrategy, LearningStyleProfile, ObservationCategory } from '@/types';
-import { CATEGORY_PRIORITY, STRATEGY_TEMPLATES } from '../profile-generator/constants';
+import { CATEGORY_PRIORITY, STRATEGY_TEMPLATES } from './constants';
 
 /**
  * Converts a MaestroInsightInput to a MaestroObservation.
