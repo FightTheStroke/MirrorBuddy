@@ -15,7 +15,7 @@ import type {
   NotificationPreferences,
 } from '@/lib/scheduler/types';
 import { DEFAULT_SCHEDULER_CONFIG } from '@/lib/scheduler/types';
-
+import type { UseSchedulerOptions, UseSchedulerReturn } from './use-scheduler/types';
 
 export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerReturn {
   const {
@@ -274,7 +274,7 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
 
   // Update preferences
   const updatePreferences = useCallback(
-    async (prefs: Partial<NotificationPreferences>) => {
+    async (prefs: Partial<NotificationPreferences>): Promise<boolean> => {
       try {
         const response = await fetch('/api/scheduler', {
           method: 'PATCH',
@@ -284,7 +284,7 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
 
         if (response.status === 401) {
           setIsAuthenticated(false);
-          return;
+          return false;
         }
 
         if (!response.ok) throw new Error('Failed to update preferences');
@@ -296,8 +296,11 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
           if (!prev) return prev;
           return { ...prev, preferences };
         });
+
+        return true;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to update preferences');
+        return false;
       }
     },
     []
@@ -392,9 +395,6 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
     updateReminder,
     deleteReminder,
     updatePreferences,
-    checkDue,
-    getSessionsForDay,
-    getTodaySessions,
-    getUpcomingReminders,
+    checkForDueItems: checkDue,
   };
 }

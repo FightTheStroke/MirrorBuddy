@@ -121,6 +121,8 @@ export function createBinauralBeatNodes(
 
 import { getBinauralConfig } from './generators/binaural';
 
+export { getBinauralConfig };
+
 // ============================================================================
 // AMBIENT SOUND GENERATORS (Procedural)
 // ============================================================================

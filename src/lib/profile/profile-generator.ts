@@ -9,12 +9,12 @@
  */
 
 import type { StudentInsights } from '@/types';
-import type { MaestroInsightInput, ProfileGenerationOptions } from './types';
-import { DEFAULT_OPTIONS } from './constants';
-import { convertToObservation, generateStrategies, inferLearningStyle } from './utils';
+import type { MaestroInsightInput, ProfileGenerationOptions } from './profile-generator/types';
+import { DEFAULT_OPTIONS } from './profile-generator/constants';
+import { convertToObservation, generateStrategies, inferLearningStyle } from './profile-generator/utils';
 
-export type { MaestroInsightInput, ProfileGenerationOptions, SynthesisContext } from './types';
-export { MELISSA_SYNTHESIS_PROMPT, createSynthesisContext, formatSynthesisPrompt } from './synthesis';
+export type { MaestroInsightInput, ProfileGenerationOptions, SynthesisContext } from './profile-generator/types';
+export { MELISSA_SYNTHESIS_PROMPT, createSynthesisContext, formatSynthesisPrompt } from './profile-generator/synthesis';
 
 // ============================================================================
 // PROFILE GENERATION

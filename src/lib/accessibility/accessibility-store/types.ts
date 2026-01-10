@@ -53,11 +53,14 @@ export interface ADHDSessionConfig {
 // ADHD session statistics
 export interface ADHDSessionStats {
   totalSessions: number;
+  completedSessions: number;
   totalWorkTime: number; // seconds
   totalBreakTime: number;
   currentStreak: number;
   longestStreak: number;
+  totalXPEarned: number;
   lastSessionAt: Date | null;
+  lastSessionDate: string | null;
 }
 
 // Accessibility context

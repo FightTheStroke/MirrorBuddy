@@ -2,9 +2,9 @@
  * Utility functions for StudyKitViewer
  */
 
-import type { StudyKit, QuizData } from '@/types/study-kit';
+import type { StudyKit } from '@/types/study-kit';
 import type { Quiz, Question, Subject } from '@/types/index';
-import type { DemoData } from '@/types/tools';
+import type { DemoData, QuizData, QuizQuestion } from '@/types/tools';
 import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
 
 /**
@@ -65,13 +65,17 @@ export function transformQuizData(quizData: QuizData, studyKit: StudyKit): Quiz 
 
   const subject: Subject = (studyKit.subject && subjectMap[studyKit.subject.toLowerCase()]) || 'computerScience';
 
-  const questions: Question[] = quizData.questions.map((q, index) => ({
+  const questions: Question[] = quizData.questions.map((q: QuizQuestion, index: number) => ({
     id: `q-${index}`,
     text: q.question,
     type: 'multiple_choice' as const,
     options: q.options,
-    correctAnswer: q.correctAnswer,
-    explanation: q.explanation,
+    correctAnswer: q.correctIndex,
+    hints: [],
+    explanation: q.explanation || '',
+    difficulty: 2,
+    subject: subject,
+    topic: studyKit.title,
   }));
 
   return {
@@ -79,6 +83,7 @@ export function transformQuizData(quizData: QuizData, studyKit: StudyKit): Quiz 
     title: studyKit.title,
     subject,
     questions,
-    timeLimit: quizData.timeLimit || undefined,
+    masteryThreshold: 70,
+    xpReward: Math.max(20, questions.length * 10),
   };
 }

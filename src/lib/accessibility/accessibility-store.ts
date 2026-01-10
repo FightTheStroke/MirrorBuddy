@@ -58,6 +58,7 @@ const defaultADHDStats: ADHDSessionStats = {
   currentStreak: 0,
   longestStreak: 0,
   totalXPEarned: 0,
+  lastSessionAt: null,
   lastSessionDate: null,
 };
 
