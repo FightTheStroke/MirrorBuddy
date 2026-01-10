@@ -124,7 +124,7 @@ function initializeContent(type: ToolType): Partial<ToolContent> {
   switch (type) {
     case 'mindmap':
       return { centralTopic: '', nodes: [] };
-    case 'flashcards':
+    case 'flashcard':
       return { cards: [] };
     case 'quiz':
       return { questions: [] };

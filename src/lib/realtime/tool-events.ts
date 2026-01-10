@@ -18,7 +18,7 @@ export type ToolEventType =
 // Tool types supported by the platform
 export type ToolType =
   | 'mindmap'
-  | 'flashcards'
+  | 'flashcard'
   | 'quiz'
   | 'summary'
   | 'timeline'

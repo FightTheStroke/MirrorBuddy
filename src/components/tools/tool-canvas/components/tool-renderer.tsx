@@ -79,7 +79,7 @@ export function ToolRenderer({ tool, onSaveStudentSummary }: ToolRendererProps) 
         />
       );
 
-    case 'flashcards':
+    case 'flashcard':
       return (
         <FlashcardTool
           request={tool.content as FlashcardDeckRequest}
