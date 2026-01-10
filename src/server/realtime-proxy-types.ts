@@ -10,6 +10,9 @@ export interface ProxyConnection {
   maestroId: string;
   lastActivityTime: number;
   idleTimer: NodeJS.Timeout | null;
+  connectionTimeoutTimer?: NodeJS.Timeout | null;
+  pingTimer?: ReturnType<typeof setInterval> | null;
+  pongTimer?: NodeJS.Timeout | null;
 }
 
 export type Provider = 'openai' | 'azure';
