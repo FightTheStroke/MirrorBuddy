@@ -47,4 +47,5 @@ export interface Maestro {
   greeting: string;
   excludeFromGamification?: boolean;  // If true, sessions don't earn XP
   customCallIcon?: string;  // Custom icon component name for call button
+  tools?: string[];  // Available tools; if empty or only 'web_search', hide toolbar
 }

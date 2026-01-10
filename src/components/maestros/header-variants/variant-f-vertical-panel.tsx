@@ -11,6 +11,7 @@
 
 import Image from 'next/image';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
+import { RotaryPhoneIcon, RotaryPhoneOffIcon } from '@/components/ui/rotary-phone-icon';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { AuraRings } from './aura-rings';
@@ -218,10 +219,18 @@ export function HeaderVariantF(props: HeaderVariantProps) {
           )}
           aria-label={isVoiceActive ? 'Termina chiamata' : 'Avvia chiamata'}
         >
-          {isVoiceActive ? (
-            <PhoneOff className="w-7 h-7" />
+          {maestro.customCallIcon === 'RotaryPhone' ? (
+            isVoiceActive ? (
+              <RotaryPhoneOffIcon className="w-7 h-7" />
+            ) : (
+              <RotaryPhoneIcon className="w-7 h-7" />
+            )
           ) : (
-            <Phone className="w-7 h-7" />
+            isVoiceActive ? (
+              <PhoneOff className="w-7 h-7" />
+            ) : (
+              <Phone className="w-7 h-7" />
+            )
           )}
         </Button>
 
