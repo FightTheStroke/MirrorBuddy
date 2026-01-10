@@ -15,33 +15,7 @@ import toast from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import type { StudyKit } from '@/types/study-kit';
 
-/**
- * Simple markdown to HTML parser for basic formatting
- */
-function parseMarkdown(text: string): string {
-  if (!text) return '';
-
-  return text
-    // Escape HTML first
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    // Headers (### → h3, ## → h2, # → h1)
-    .replace(/^### (.+)$/gm, '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="text-xl font-semibold mt-5 mb-2">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-6 mb-3">$1</h1>')
-    // Bold and italic
-    .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // Lists (- item)
-    .replace(/^- (.+)$/gm, '<li class="ml-4">$1</li>')
-    // Numbered lists (1. item)
-    .replace(/^\d+\. (.+)$/gm, '<li class="ml-4 list-decimal">$1</li>')
-    // Line breaks
-    .replace(/\n\n/g, '</p><p class="mb-3">')
-    .replace(/\n/g, '<br/>');
-}
+import { parseMarkdown, buildDemoCode, transformQuizData } from './StudyKitViewer/utils';
 
 // Import renderers from Knowledge Hub
 import { MindmapRenderer } from '@/components/education/knowledge-hub/renderers/mindmap-renderer';
@@ -54,68 +28,6 @@ import type { QuizData, DemoData } from '@/types/tools';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PlayCircle, X } from 'lucide-react';
 
-/**
- * Build HTML code for demo from DemoData with KaTeX support
- */
-import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
-
-function buildDemoCode(demoData: DemoData): string | null {
-  // Use shared HTML builder for consistency - no KaTeX injection (causes rendering issues)
-  return buildDemoHTML({
-    html: demoData.html || '',
-    css: demoData.css || '',
-    js: demoData.js || '',
-    code: ('code' in demoData && typeof demoData.code === 'string') ? demoData.code : undefined,
-  });
-}
-
-/**
- * Transform Study Kit QuizData to interactive Quiz component format
- */
-function transformQuizData(quizData: QuizData, studyKit: StudyKit): QuizType {
-  // Map subject string to Subject type, default to generic
-  const subjectMap: Record<string, Subject> = {
-    'matematica': 'mathematics',
-    'fisica': 'physics',
-    'chimica': 'chemistry',
-    'biologia': 'biology',
-    'storia': 'history',
-    'geografia': 'geography',
-    'italiano': 'italian',
-    'inglese': 'english',
-    'arte': 'art',
-    'musica': 'music',
-    'educazione civica': 'civics',
-    'economia': 'economics',
-    'informatica': 'computerScience',
-    'salute': 'health',
-    'filosofia': 'philosophy',
-  };
-
-  const subject: Subject = (studyKit.subject && subjectMap[studyKit.subject.toLowerCase()]) || 'computerScience';
-
-  const questions: Question[] = quizData.questions.map((q, index) => ({
-    id: `q-${index}`,
-    text: q.question,
-    type: 'multiple_choice' as const,
-    options: q.options,
-    correctAnswer: q.correctIndex,
-    hints: [],
-    explanation: q.explanation || '',
-    difficulty: 3,
-    subject,
-    topic: quizData.topic,
-  }));
-
-  return {
-    id: `quiz-${studyKit.id}`,
-    title: studyKit.title,
-    subject,
-    questions,
-    masteryThreshold: 70,
-    xpReward: questions.length * 10,
-  };
-}
 
 interface StudyKitViewerProps {
   studyKit: StudyKit;
