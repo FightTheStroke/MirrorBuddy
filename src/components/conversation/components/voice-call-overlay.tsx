@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Mic, MicOff, PhoneOff } from 'lucide-react';
+import { RotaryPhoneOffIcon } from '@/components/ui/rotary-phone-icon';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
@@ -328,7 +329,11 @@ export function VoiceCallOverlay({
           size="lg"
           onClick={handleEndCall}
         >
-          <PhoneOff className="w-5 h-5 mr-2" />
+          {'customCallIcon' in character.character && character.character.customCallIcon === 'RotaryPhone' ? (
+            <RotaryPhoneOffIcon className="w-5 h-5 mr-2" />
+          ) : (
+            <PhoneOff className="w-5 h-5 mr-2" />
+          )}
           Termina chiamata
         </Button>
       </div>
