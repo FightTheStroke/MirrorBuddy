@@ -2,8 +2,7 @@
  * Message sending and chat API logic
  */
 
-import { logger } from '@/lib/logger';
-import type { Message, ChatState } from './types';
+import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
 import type { ToolState, ToolType } from '@/types/tools';
 

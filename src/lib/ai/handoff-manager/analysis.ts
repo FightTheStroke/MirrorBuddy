@@ -7,6 +7,7 @@ import type {
   CharacterType,
 } from '@/types';
 import type { MaestroFull } from '@/data/maestri';
+import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
 import { detectIntent } from './intent-detection';
 import type { HandoffContext, HandoffAnalysis } from './types';
 import { INTENT_HANDOFF_MAP, HANDOFF_SIGNAL_PATTERNS } from './patterns';
@@ -57,7 +58,7 @@ export function analyzeHandoff(context: HandoffContext): HandoffAnalysis {
 /**
  * Detects explicit handoff suggestions in AI response
  */
-function detectExplicitHandoff(response: string, currentCharacter: any): HandoffAnalysis {
+function detectExplicitHandoff(response: string, currentCharacter: ActiveCharacter): HandoffAnalysis {
   for (const pattern of HANDOFF_SIGNAL_PATTERNS.maestro_suggestion) {
     if (pattern.test(response) && currentCharacter.type !== 'maestro') {
       return {
@@ -97,7 +98,7 @@ function detectExplicitHandoff(response: string, currentCharacter: any): Handoff
 function checkIntentMismatch(
   intentType: string,
   currentType: CharacterType,
-  profile: ExtendedStudentProfile
+  _profile: ExtendedStudentProfile
 ): HandoffAnalysis {
   const suggestedType = INTENT_HANDOFF_MAP[intentType as keyof typeof INTENT_HANDOFF_MAP];
 
@@ -137,7 +138,7 @@ function detectCrisisSignals(message: string, response: string): HandoffAnalysis
 function checkSubjectChange(
   currentMaestro: MaestroFull,
   newSubject: string,
-  profile: ExtendedStudentProfile
+  _profile: ExtendedStudentProfile
 ): HandoffAnalysis {
   const currentSubject = currentMaestro.subject;
 
@@ -145,7 +146,7 @@ function checkSubjectChange(
     return { shouldHandoff: false, confidence: 0, reason: '' };
   }
 
-  const newMaestri = getMaestriBySubject(newSubject as any);
+  const newMaestri = getMaestriBySubject(newSubject);
   if (newMaestri.length > 0) {
     return {
       shouldHandoff: true,

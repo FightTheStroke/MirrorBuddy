@@ -15,7 +15,6 @@ import type { DiaryEntry } from './teacher-diary';
 import {
   calculateWeeklyData,
   calculateImprovements,
-  type WeeklyData,
 } from './progress-timeline-utils';
 
 interface ProgressTimelineProps {

@@ -6,7 +6,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import type { Quiz, QuizResult, Question, Subject } from '@/types';
+import type { Quiz, QuizResult, Question } from '@/types';
 
 /**
  * Difficulty adjustment result

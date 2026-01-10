@@ -10,7 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FileText, Loader2, AlertCircle, Clock, CheckCircle2, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { getStatusIcon, getStatusText, formatDate } from './study-kit-utils';
+import { getStatusText, formatDate } from './study-kit-utils';
 import type { StudyKit } from '@/types/study-kit';
 
 interface StudyKitListProps {

@@ -10,7 +10,7 @@ import type {
   HelpLevel,
   Subject,
 } from '@/lib/method-progress/types';
-import { calculateLevel, calculateAutonomyScore } from './method-progress-utils';
+import { calculateLevel } from './method-progress-utils';
 
 /**
  * Handle tool creation event

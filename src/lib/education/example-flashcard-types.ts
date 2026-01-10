@@ -3,7 +3,7 @@
  * Type definitions for flashcard sessions and components
  */
 
-import type { FSRSCard, Quality } from './fsrs';
+import type { FSRSCard } from './fsrs';
 
 export interface Flashcard {
   id: string;

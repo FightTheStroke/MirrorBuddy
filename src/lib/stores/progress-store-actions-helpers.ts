@@ -5,8 +5,7 @@
 
 import { logger } from '@/lib/logger';
 import { onLevelUp } from '@/lib/notifications/triggers';
-import { calculateSeasonLevel } from '@/lib/constants/mirrorbucks';
-import type { ProgressState, SessionGrade } from './progress-store-types';
+import type { ProgressState, StudySession } from './progress-store-types';
 import type { SeasonHistory } from '@/types';
 
 /**
@@ -54,9 +53,9 @@ export function createSeasonHistory(state: ProgressState): SeasonHistory {
  * Calculate updated session after XP gain
  */
 export function updateSessionWithMirrorBucks(
-  currentSession: any,
+  currentSession: StudySession | null,
   amount: number
-) {
+): StudySession | null {
   if (!currentSession) return null;
 
   const newMbEarned = (currentSession.mirrorBucksEarned ?? 0) + amount;
@@ -106,8 +105,8 @@ export function getSessionDurationMinutes(startedAt: Date): number {
  * Calculate sessions in current week
  */
 export function countSessionsThisWeek(
-  sessionHistory: any[],
-  newSession: any
+  sessionHistory: StudySession[],
+  newSession: StudySession
 ): number {
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   return [newSession, ...sessionHistory].filter(

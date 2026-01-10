@@ -7,7 +7,6 @@
  * For multi-instance production, replace with Redis-based solution.
  */
 
-import { prisma } from '@/lib/db';
 
 interface RateLimitEntry {
   count: number;

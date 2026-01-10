@@ -17,7 +17,6 @@ import {
   getDefaultSupportTeacher,
 } from '@/data/support-teachers';
 import { getBuddyById, getDefaultBuddy } from '@/data/buddy-profiles';
-import { getMaestroById } from '@/data/maestri';
 
 /**
  * Creates a Coach handoff suggestion

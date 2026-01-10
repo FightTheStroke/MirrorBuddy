@@ -2,7 +2,6 @@
  * Tool request handling logic
  */
 
-import { logger } from '@/lib/logger';
 import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
 import type { ToolType, ToolState } from '@/types/tools';
@@ -31,13 +30,6 @@ export async function requestTool(
   toolState: ToolState;
 }> {
   const toolPrompt = TOOL_PROMPTS[toolType] || `Usa lo strumento ${toolType}`;
-
-  const userMessage: Message = {
-    id: `user-${Date.now()}`,
-    role: 'user',
-    content: toolPrompt,
-    timestamp: new Date(),
-  };
 
   const response = await fetch('/api/chat', {
     method: 'POST',

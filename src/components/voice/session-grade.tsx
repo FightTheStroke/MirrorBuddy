@@ -14,7 +14,6 @@ import {
   generateStrengths,
   generateAreasToImprove,
 } from './helpers/grade-helpers';
-import { GRADE_LABELS } from './components/grade-display';
 import type { Maestro } from '@/types';
 
 interface SessionGradeProps {
@@ -89,7 +88,6 @@ export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, 
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  const gradeInfo = grade ? GRADE_LABELS[grade.score] || GRADE_LABELS[5] : GRADE_LABELS[5];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">

@@ -7,7 +7,6 @@
 import { useCallback, RefObject } from 'react';
 import { logger } from '@/lib/logger';
 import type { MindmapNode } from '../types';
-import { findNodeByLabel } from '../helpers';
 import {
   addNodeToTree,
   expandNodeInTree,

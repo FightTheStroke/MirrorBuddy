@@ -8,7 +8,6 @@ import {
   isTypeEnabled,
   playNotificationSound,
   showBrowserNotification,
-  getNotificationIcon,
 } from './notification-helpers';
 
 export type NotificationType =

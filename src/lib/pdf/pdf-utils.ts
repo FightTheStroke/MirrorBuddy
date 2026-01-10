@@ -3,7 +3,6 @@
  */
 
 import * as pdfjsLib from 'pdfjs-dist';
-import { logger } from '@/lib/logger';
 import { PDFProcessingError } from './pdf-types';
 
 /**

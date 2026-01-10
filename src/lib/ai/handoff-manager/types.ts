@@ -3,11 +3,9 @@
  */
 
 import type {
-  CharacterType,
   ExtendedStudentProfile,
 } from '@/types';
 import type { ActiveCharacter, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
-import type { IntentType } from './intent-detection/types';
 
 export interface HandoffContext {
   message: string;

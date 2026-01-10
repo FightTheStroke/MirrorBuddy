@@ -3,8 +3,6 @@
  */
 
 import type { ToolType, ToolState } from '@/types/tools';
-import type { ConnectionInfo } from '@/lib/hooks/use-voice-session';
-import type { CharacterInfo } from '../../utils/character-utils';
 
 export interface Message {
   id: string;

@@ -9,9 +9,6 @@ import { getActiveProvider } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import {
-  type AnalysisResult,
-  normalizeSubject,
-  getDefaultAnalysis,
   analyzeHomeworkWithAzure,
 } from './helpers';
 

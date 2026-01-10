@@ -13,7 +13,7 @@ export async function getOrCreateParentConversation(
   maestroId: string,
   maestroDisplayName: string,
   studentId: string,
-  studentName: string
+  _studentName: string
 ) {
   if (conversationId) {
     const conversation = await prisma.conversation.findFirst({

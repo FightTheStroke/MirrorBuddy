@@ -2,7 +2,7 @@
  * Type definitions for mindmap import functionality
  */
 
-import type { MindmapData, MindmapNode } from '../mindmap-export';
+import type { MindmapData } from '../mindmap-export';
 
 export type ImportFormat = 'json' | 'markdown' | 'freemind' | 'xmind' | 'text';
 

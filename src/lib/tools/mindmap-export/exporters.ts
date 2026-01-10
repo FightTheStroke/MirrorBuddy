@@ -3,7 +3,7 @@
  */
 
 import type { MindmapData, MindmapNode, ExportResult } from './types';
-import { sanitizeFilename, escapeXML, generateId } from './helpers';
+import { escapeXML, generateId } from './helpers';
 
 /**
  * Export as JSON
