@@ -78,7 +78,7 @@ function startConnectionTimeout(connectionId: string): void {
     connections.delete(connectionId);
   }, CONNECTION_TIMEOUT_MS);
 
-  (conn as any).connectionTimeoutTimer = timeoutTimer;
+  conn.connectionTimeoutTimer = timeoutTimer;
 }
 
 /**
@@ -87,10 +87,10 @@ function startConnectionTimeout(connectionId: string): void {
 function clearConnectionTimeout(connectionId: string): void {
   const conn = connections.get(connectionId);
   if (conn) {
-    const timeoutTimer = (conn as any).connectionTimeoutTimer;
+    const timeoutTimer = conn.connectionTimeoutTimer;
     if (timeoutTimer) {
       clearTimeout(timeoutTimer);
-      (conn as any).connectionTimeoutTimer = null;
+      conn.connectionTimeoutTimer = null;
     }
   }
 }
@@ -107,8 +107,8 @@ function startPingInterval(connectionId: string): void {
       conn.clientWs.ping();
 
       // Set up pong timeout - close if no pong within 30s
-      if ((conn as any).pongTimer) {
-        clearTimeout((conn as any).pongTimer);
+      if (conn.pongTimer) {
+        clearTimeout(conn.pongTimer);
       }
 
       const pongTimer = setTimeout(() => {
@@ -122,11 +122,11 @@ function startPingInterval(connectionId: string): void {
         connections.delete(connectionId);
       }, CONNECTION_TIMEOUT_MS);
 
-      (conn as any).pongTimer = pongTimer;
+      conn.pongTimer = pongTimer;
     }
   }, PING_INTERVAL_MS);
 
-  (conn as any).pingTimer = pingTimer;
+  conn.pingTimer = pingTimer;
 }
 
 /**
@@ -135,10 +135,10 @@ function startPingInterval(connectionId: string): void {
 function handlePong(connectionId: string): void {
   const conn = connections.get(connectionId);
   if (conn) {
-    const pongTimer = (conn as any).pongTimer;
+    const pongTimer = conn.pongTimer;
     if (pongTimer) {
       clearTimeout(pongTimer);
-      (conn as any).pongTimer = null;
+      conn.pongTimer = null;
     }
   }
 }
@@ -149,15 +149,15 @@ function handlePong(connectionId: string): void {
 function clearPingTimer(connectionId: string): void {
   const conn = connections.get(connectionId);
   if (conn) {
-    const pingTimer = (conn as any).pingTimer;
+    const pingTimer = conn.pingTimer;
     if (pingTimer) {
       clearInterval(pingTimer);
-      (conn as any).pingTimer = null;
+      conn.pingTimer = null;
     }
-    const pongTimer = (conn as any).pongTimer;
+    const pongTimer = conn.pongTimer;
     if (pongTimer) {
       clearTimeout(pongTimer);
-      (conn as any).pongTimer = null;
+      conn.pongTimer = null;
     }
   }
 }
