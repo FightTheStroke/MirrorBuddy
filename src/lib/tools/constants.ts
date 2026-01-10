@@ -67,7 +67,13 @@ export function toolRequiresMaestro(type: ToolType): boolean {
  */
 export function functionNameToToolType(functionName: string): ToolType | undefined {
   const tool = getToolByFunctionName(functionName);
-  return tool?.type;
+  if (tool) return tool.type;
+
+  // Handle legacy or alias function names
+  if (functionName === 'open_student_summary') {
+    return 'summary';
+  }
+  return undefined;
 }
 
 // ============================================================================

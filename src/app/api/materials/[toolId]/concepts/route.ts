@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
@@ -24,13 +25,19 @@ export async function GET(
 ): Promise<NextResponse> {
   try {
     const { toolId } = await context.params;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const material = await prisma.material.findUnique({
       where: { toolId },
-      select: { id: true },
+      select: { id: true, userId: true },
     });
 
-    if (!material) {
+    if (!material || material.userId !== userId) {
       return NextResponse.json(
         { error: 'Material not found' },
         { status: 404 }
@@ -78,6 +85,12 @@ export async function POST(
   try {
     const { toolId } = await context.params;
     const body = await request.json();
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const parsed = ConceptLinkSchema.safeParse(body);
     if (!parsed.success) {
@@ -89,10 +102,10 @@ export async function POST(
 
     const material = await prisma.material.findUnique({
       where: { toolId },
-      select: { id: true },
+      select: { id: true, userId: true },
     });
 
-    if (!material) {
+    if (!material || material.userId !== userId) {
       return NextResponse.json(
         { error: 'Material not found' },
         { status: 404 }
@@ -101,7 +114,7 @@ export async function POST(
 
     // Verify concept exists
     const concept = await prisma.concept.findUnique({
-      where: { id: parsed.data.conceptId },
+      where: { id: parsed.data.conceptId, userId },
     });
 
     if (!concept) {
@@ -164,7 +177,12 @@ export async function DELETE(
     const { toolId } = await context.params;
     const { searchParams } = new URL(request.url);
     const conceptId = searchParams.get('conceptId');
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     if (!conceptId) {
       return NextResponse.json(
         { error: 'Missing conceptId query param' },
@@ -174,12 +192,24 @@ export async function DELETE(
 
     const material = await prisma.material.findUnique({
       where: { toolId },
+      select: { id: true, userId: true },
+    });
+
+    if (!material || material.userId !== userId) {
+      return NextResponse.json(
+        { error: 'Material not found' },
+        { status: 404 }
+      );
+    }
+
+    const concept = await prisma.concept.findUnique({
+      where: { id: conceptId, userId },
       select: { id: true },
     });
 
-    if (!material) {
+    if (!concept) {
       return NextResponse.json(
-        { error: 'Material not found' },
+        { error: 'Concept not found' },
         { status: 404 }
       );
     }
@@ -188,7 +218,7 @@ export async function DELETE(
       where: {
         materialId_conceptId: {
           materialId: material.id,
-          conceptId,
+          conceptId: concept.id,
         },
       },
     });

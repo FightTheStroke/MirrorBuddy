@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
 
@@ -26,14 +27,20 @@ export async function GET(
 ): Promise<NextResponse> {
   try {
     const { toolId } = await context.params;
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Find material by toolId
     const material = await prisma.material.findUnique({
       where: { toolId },
-      select: { id: true },
+      select: { id: true, userId: true },
     });
 
-    if (!material) {
+    if (!material || material.userId !== userId) {
       return NextResponse.json(
         { error: 'Material not found' },
         { status: 404 }
@@ -72,6 +79,12 @@ export async function POST(
   try {
     const { toolId } = await context.params;
     const body = await request.json();
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const parsed = EdgeCreateSchema.safeParse(body);
     if (!parsed.success) {
@@ -84,10 +97,10 @@ export async function POST(
     // Find source material
     const fromMaterial = await prisma.material.findUnique({
       where: { toolId },
-      select: { id: true },
+      select: { id: true, userId: true },
     });
 
-    if (!fromMaterial) {
+    if (!fromMaterial || fromMaterial.userId !== userId) {
       return NextResponse.json(
         { error: 'Source material not found' },
         { status: 404 }
@@ -97,10 +110,10 @@ export async function POST(
     // Find target material
     const toMaterial = await prisma.material.findUnique({
       where: { toolId: parsed.data.toId },
-      select: { id: true },
+      select: { id: true, userId: true },
     });
 
-    if (!toMaterial) {
+    if (!toMaterial || toMaterial.userId !== userId) {
       return NextResponse.json(
         { error: 'Target material not found' },
         { status: 404 }
@@ -156,7 +169,12 @@ export async function DELETE(
     const { searchParams } = new URL(request.url);
     const toToolId = searchParams.get('toId');
     const relationType = searchParams.get('relationType');
+    const cookieStore = await cookies();
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     if (!toToolId || !relationType) {
       return NextResponse.json(
         { error: 'Missing toId or relationType query params' },
@@ -166,11 +184,11 @@ export async function DELETE(
 
     // Find both materials
     const [fromMaterial, toMaterial] = await Promise.all([
-      prisma.material.findUnique({ where: { toolId }, select: { id: true } }),
-      prisma.material.findUnique({ where: { toolId: toToolId }, select: { id: true } }),
+      prisma.material.findUnique({ where: { toolId }, select: { id: true, userId: true } }),
+      prisma.material.findUnique({ where: { toolId: toToolId }, select: { id: true, userId: true } }),
     ]);
 
-    if (!fromMaterial || !toMaterial) {
+    if (!fromMaterial || !toMaterial || fromMaterial.userId !== userId || toMaterial.userId !== userId) {
       return NextResponse.json(
         { error: 'Material not found' },
         { status: 404 }

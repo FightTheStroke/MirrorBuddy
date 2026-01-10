@@ -17,7 +17,7 @@ import {
   AutoSaveDemo,
 } from './auto-save-wrappers';
 import { useMaterialContent } from '@/lib/hooks/use-material-content';
-import { FUNCTION_NAME_TO_TOOL_TYPE } from '@/components/conversation/constants/tool-constants';
+import { functionNameToToolType } from '@/lib/tools/constants';
 import type { ToolCall, ToolCallRef, ChartRequest, DiagramRequest, FormulaRequest, QuizRequest, FlashcardDeckRequest, MindmapRequest } from '@/types';
 import type { SummaryData, DemoData, ToolType } from '@/types/tools';
 
@@ -28,7 +28,7 @@ interface ToolContentProps {
 
 export function ToolContent({ toolCall, sessionId }: ToolContentProps) {
   // Map function name to tool type for rendering
-  const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolCall.type as ToolType;
+  const toolType = functionNameToToolType(toolCall.type) || toolCall.type as ToolType;
 
   // Load material content - handles both full ToolCall and lightweight ToolCallRef
   const { data: loadedData, isLoading, error } = useMaterialContent(toolCall);

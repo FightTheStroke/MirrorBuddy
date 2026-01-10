@@ -6,18 +6,6 @@ import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
 import type { ToolState, ToolType, ToolCallRef, ToolCall } from '@/types/tools';
 
-export const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
-  create_mindmap: 'mindmap',
-  create_quiz: 'quiz',
-  create_demo: 'demo',
-  web_search: 'search',
-  create_flashcards: 'flashcard',
-  create_diagram: 'diagram',
-  create_timeline: 'timeline',
-  create_summary: 'summary',
-  open_student_summary: 'summary',
-};
-
 /**
  * Send message to chat API and handle response
  */
@@ -112,13 +100,13 @@ function generateDefaultResponse(toolCalls: Array<{ type?: string }>): string {
 
   const toolNames = toolCalls.map((tc) => tc.type);
 
-  if (toolNames.includes('create_mindmap')) {
+  if (toolNames.includes('mindmap')) {
     return 'Ti sto creando la mappa mentale...';
-  } else if (toolNames.includes('create_quiz')) {
+  } else if (toolNames.includes('quiz')) {
     return 'Ti sto preparando il quiz...';
-  } else if (toolNames.includes('create_flashcards')) {
+  } else if (toolNames.includes('flashcard')) {
     return 'Ti sto creando le flashcard...';
-  } else if (toolNames.includes('create_summary')) {
+  } else if (toolNames.includes('summary')) {
     return 'Ti sto preparando il riassunto...';
   }
 

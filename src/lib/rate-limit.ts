@@ -61,6 +61,16 @@ export function checkRateLimit(
   identifier: string,
   config: RateLimitConfig
 ): RateLimitResult {
+  if (process.env.E2E_TESTS === '1') {
+    const resetTime = Date.now() + config.windowMs;
+    return {
+      success: true,
+      remaining: config.maxRequests,
+      resetTime,
+      limit: config.maxRequests,
+    };
+  }
+
   startCleanup();
 
   const now = Date.now();

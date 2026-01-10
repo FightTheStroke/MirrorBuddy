@@ -190,6 +190,13 @@ export function ArchiveView() {
     setSelectedItem(null);
   }, []);
 
+  const handleNavigateToRelated = useCallback((toolId: string) => {
+    const target = materials.find((item) => item.toolId === toolId);
+    if (target) {
+      setSelectedItem(target);
+    }
+  }, [materials]);
+
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -427,7 +434,11 @@ export function ArchiveView() {
       {/* Material Viewer Modal */}
       <AnimatePresence>
         {selectedItem && (
-          <MaterialViewer item={selectedItem} onClose={handleCloseViewer} />
+          <MaterialViewer
+            item={selectedItem}
+            onClose={handleCloseViewer}
+            onNavigate={handleNavigateToRelated}
+          />
         )}
       </AnimatePresence>
     </div>

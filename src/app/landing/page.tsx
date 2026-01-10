@@ -26,7 +26,14 @@ export default function LandingPage() {
           <div className="text-center">
             {/* Logo */}
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white/10 backdrop-blur-sm mb-8 shadow-2xl shadow-purple-500/25 overflow-hidden">
-              <Image src="/logo-brain.png" alt="MirrorBuddy" width={80} height={80} className="object-contain" />
+              <Image
+                src="/logo-brain.png"
+                alt="MirrorBuddy"
+                width={80}
+                height={80}
+                className="w-full h-auto object-contain"
+                style={{ width: 'auto', height: 'auto' }}
+              />
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
@@ -198,7 +205,7 @@ export default function LandingPage() {
                 href="https://ollama.ai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full text-center py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl transition-colors"
+                className="block w-full text-center py-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded-xl transition-colors"
               >
                 Scarica Ollama
               </a>

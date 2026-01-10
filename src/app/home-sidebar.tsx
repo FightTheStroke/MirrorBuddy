@@ -62,7 +62,8 @@ export function HomeSidebar({
               alt="MirrorBuddy"
               width={36}
               height={36}
-              className="w-full h-full object-cover"
+              className="w-full h-auto object-cover"
+              style={{ width: 'auto', height: 'auto' }}
             />
           </div>
           {open && (
