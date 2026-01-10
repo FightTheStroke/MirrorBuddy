@@ -114,7 +114,7 @@ This plan is split into focused sub-files for token optimization.
 ## SEZIONE B: PR #106 STATUS
 
 **State**: OPEN (NOT MERGING)
-**URL**: https://github.com/Roberdan/ConvergioEdu/pull/106
+**URL**: https://github.com/FightTheStroke/MirrorBuddy/pull/106
 **QA**: FAILED - 6/10 items failed
 **Decision**: Stay on development, do NOT merge
 

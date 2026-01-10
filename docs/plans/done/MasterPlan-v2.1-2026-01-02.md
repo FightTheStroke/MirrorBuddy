@@ -26,12 +26,12 @@ Piano unificato che risolve **6 bug critici** + implementa feature pianificate.
 
 | Bug | Issue | Track | Status |
 |-----|-------|-------|--------|
-| 0.1 Tool Creation | [#97](https://github.com/Roberdan/MirrorBuddy/issues/97) | A | ✅ Fixed |
-| 0.2 Memory Maestri | [#98](https://github.com/Roberdan/MirrorBuddy/issues/98) | B | ✅ Fixed |
-| 0.3 Demo Interattive | [#99](https://github.com/Roberdan/MirrorBuddy/issues/99) | A | ✅ Fixed |
-| 0.4 Gamification | [#100](https://github.com/Roberdan/MirrorBuddy/issues/100) | C | ✅ Fixed |
-| 0.5 Parent Dashboard | [#101](https://github.com/Roberdan/MirrorBuddy/issues/101) | D | ✅ Fixed |
-| 0.6 Layout Full Screen | [#102](https://github.com/Roberdan/MirrorBuddy/issues/102) | D | ✅ Fixed |
+| 0.1 Tool Creation | [#97](https://github.com/FightTheStroke/MirrorBuddy/issues/97) | A | ✅ Fixed |
+| 0.2 Memory Maestri | [#98](https://github.com/FightTheStroke/MirrorBuddy/issues/98) | B | ✅ Fixed |
+| 0.3 Demo Interattive | [#99](https://github.com/FightTheStroke/MirrorBuddy/issues/99) | A | ✅ Fixed |
+| 0.4 Gamification | [#100](https://github.com/FightTheStroke/MirrorBuddy/issues/100) | C | ✅ Fixed |
+| 0.5 Parent Dashboard | [#101](https://github.com/FightTheStroke/MirrorBuddy/issues/101) | D | ✅ Fixed |
+| 0.6 Layout Full Screen | [#102](https://github.com/FightTheStroke/MirrorBuddy/issues/102) | D | ✅ Fixed |
 
 ### Gestione Issues
 
