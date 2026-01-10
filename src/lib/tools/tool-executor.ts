@@ -5,6 +5,7 @@
 // ============================================================================
 
 import { nanoid } from 'nanoid';
+import { z } from 'zod';
 import { broadcastToolEvent } from '@/lib/realtime/tool-events';
 import type { ToolType, ToolExecutionResult, ToolContext } from '@/types/tools';
 
@@ -15,6 +16,36 @@ type ToolHandler = (
   args: Record<string, unknown>,
   context: ToolContext
 ) => Promise<ToolExecutionResult>;
+
+/**
+ * Zod validation schemas for tool arguments
+ * Ensures type safety and graceful error handling for tool inputs
+ */
+const TOOL_SCHEMAS = {
+  create_mindmap: z.object({
+    topic: z.string().min(1, 'Topic is required'),
+    subtopics: z.array(z.string()).optional(),
+    learningStyle: z.string().optional(),
+  }),
+  create_quiz: z.object({
+    topic: z.string().min(1, 'Topic is required'),
+    difficulty: z.enum(['easy', 'medium', 'hard']).optional(),
+    questionCount: z.number().int().min(1).max(50).optional(),
+  }),
+  create_flashcards: z.object({
+    topic: z.string().min(1, 'Topic is required'),
+    cardCount: z.number().int().min(1).max(100).optional(),
+  }),
+  create_demo: z.object({
+    topic: z.string().min(1, 'Topic is required'),
+    demonstrationType: z.string().optional(),
+  }),
+  create_summary: z.object({
+    title: z.string().min(1, 'Title is required'),
+    content: z.string().optional(),
+    length: z.enum(['short', 'medium', 'long']).optional(),
+  }),
+} as const;
 
 /**
  * Registry of tool handlers
@@ -45,6 +76,15 @@ export function getRegisteredHandlers(): Map<string, ToolHandler> {
  */
 export function clearHandlers(): void {
   handlers.clear();
+}
+
+/**
+ * Get validation schema for a tool (if one exists)
+ */
+function getToolSchema(
+  functionName: string
+): z.ZodSchema | undefined {
+  return TOOL_SCHEMAS[functionName as keyof typeof TOOL_SCHEMAS];
 }
 
 /**
@@ -101,6 +141,38 @@ export async function executeToolCall(
       toolType,
       error,
     };
+  }
+
+  // Validate arguments if schema exists
+  const schema = getToolSchema(functionName);
+  if (schema) {
+    const validation = schema.safeParse(args);
+    if (!validation.success) {
+      const validationError = validation.error.issues
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+        .join('; ');
+      const error = `Invalid arguments for ${functionName}: ${validationError}`;
+
+      console.warn(`[Tool Validation] ${error}`);
+
+      // Broadcast error event
+      broadcastToolEvent({
+        id: toolId,
+        type: 'tool:error',
+        toolType: toolType as 'mindmap' | 'flashcards' | 'quiz' | 'summary' | 'timeline' | 'diagram',
+        sessionId: context.sessionId || 'unknown',
+        maestroId: context.maestroId || 'unknown',
+        timestamp: Date.now(),
+        data: { error },
+      });
+
+      return {
+        success: false,
+        toolId,
+        toolType,
+        error,
+      };
+    }
   }
 
   // Broadcast tool started event
