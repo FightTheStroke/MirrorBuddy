@@ -1,7 +1,7 @@
 /**
- * Rotary Phone Icons - Vintage phone with rotary dial
+ * Vintage Phone Icons - Classic handset
  * Custom icons for Conte Mascetti's call button
- * Classic Italian telephone style
+ * Simple, bold design visible at small sizes
  */
 import { type SVGProps } from 'react';
 
@@ -22,37 +22,24 @@ export function RotaryPhoneIcon({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
       {...props}
     >
-      {/* Handset/Cornetta - classic bone shape on top */}
-      <path d="M6 4C6 3 7 2 8 2h8c1 0 2 1 2 2v1c0 1-1 2-2 2h-1v2h-6V7H8C7 7 6 6 6 5V4z" />
-      {/* Earpiece left */}
-      <ellipse cx="7.5" cy="3.5" rx="1" ry="1.5" fill="currentColor" />
-      {/* Mouthpiece right */}
-      <ellipse cx="16.5" cy="3.5" rx="1" ry="1.5" fill="currentColor" />
-
-      {/* Phone body */}
-      <rect x="4" y="9" width="16" height="13" rx="2" />
-
-      {/* Rotary dial circle */}
-      <circle cx="12" cy="15" r="4.5" />
-
-      {/* Dial holes - the number holes */}
-      <circle cx="12" cy="11.5" r="0.6" fill="currentColor" />
-      <circle cx="14.5" cy="12.2" r="0.6" fill="currentColor" />
-      <circle cx="15.8" cy="14.5" r="0.6" fill="currentColor" />
-      <circle cx="14.8" cy="17" r="0.6" fill="currentColor" />
-      <circle cx="12" cy="18.2" r="0.6" fill="currentColor" />
-      <circle cx="9.2" cy="17" r="0.6" fill="currentColor" />
-      <circle cx="8.2" cy="14.5" r="0.6" fill="currentColor" />
-      <circle cx="9.5" cy="12.2" r="0.6" fill="currentColor" />
-
-      {/* Center of dial */}
-      <circle cx="12" cy="15" r="1.5" />
+      {/* Classic vintage handset - chunky retro style */}
+      {/* Earpiece - big round end */}
+      <circle cx="5" cy="5" r="3" fill="currentColor" />
+      {/* Mouthpiece - big round end */}
+      <circle cx="19" cy="19" r="3" fill="currentColor" />
+      {/* Handle connecting them - curved thick bar */}
+      <path
+        d="M7 7 C 10 4, 14 4, 17 7 L 17 17 C 14 20, 10 20, 7 17 Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
     </svg>
   );
 }
@@ -70,40 +57,26 @@ export function RotaryPhoneOffIcon({
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="1.5"
+      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
       {...props}
     >
-      {/* Handset/Cornetta - classic bone shape on top */}
-      <path d="M6 4C6 3 7 2 8 2h8c1 0 2 1 2 2v1c0 1-1 2-2 2h-1v2h-6V7H8C7 7 6 6 6 5V4z" />
-      {/* Earpiece left */}
-      <ellipse cx="7.5" cy="3.5" rx="1" ry="1.5" fill="currentColor" />
-      {/* Mouthpiece right */}
-      <ellipse cx="16.5" cy="3.5" rx="1" ry="1.5" fill="currentColor" />
-
-      {/* Phone body */}
-      <rect x="4" y="9" width="16" height="13" rx="2" />
-
-      {/* Rotary dial circle */}
-      <circle cx="12" cy="15" r="4.5" />
-
-      {/* Dial holes */}
-      <circle cx="12" cy="11.5" r="0.6" fill="currentColor" />
-      <circle cx="14.5" cy="12.2" r="0.6" fill="currentColor" />
-      <circle cx="15.8" cy="14.5" r="0.6" fill="currentColor" />
-      <circle cx="14.8" cy="17" r="0.6" fill="currentColor" />
-      <circle cx="12" cy="18.2" r="0.6" fill="currentColor" />
-      <circle cx="9.2" cy="17" r="0.6" fill="currentColor" />
-      <circle cx="8.2" cy="14.5" r="0.6" fill="currentColor" />
-      <circle cx="9.5" cy="12.2" r="0.6" fill="currentColor" />
-
-      {/* Center of dial */}
-      <circle cx="12" cy="15" r="1.5" />
-
-      {/* Slash through - hang up indicator */}
-      <line x1="3" y1="3" x2="21" y2="21" strokeWidth="2.5" />
+      {/* Classic vintage handset - chunky retro style */}
+      {/* Earpiece */}
+      <circle cx="5" cy="5" r="3" fill="currentColor" />
+      {/* Mouthpiece */}
+      <circle cx="19" cy="19" r="3" fill="currentColor" />
+      {/* Handle */}
+      <path
+        d="M7 7 C 10 4, 14 4, 17 7 L 17 17 C 14 20, 10 20, 7 17 Z"
+        fill="currentColor"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+      {/* Slash through */}
+      <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" strokeWidth="3" />
     </svg>
   );
 }
