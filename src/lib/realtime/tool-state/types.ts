@@ -43,9 +43,9 @@ export interface QuizContent {
 
 export interface SummaryContent {
   sections: Array<{
-    title: string;
+    id: string;
+    heading: string;
     content: string;
-    keyPoints?: string[];
   }>;
 }
 
@@ -59,27 +59,30 @@ export interface TimelineContent {
 }
 
 export interface DiagramContent {
-  nodes: Array<{ id: string; label: string; x: number; y: number }>;
-  edges: Array<{ from: string; to: string }>;
+  type: 'flowchart' | 'sequence' | 'class' | 'er';
+  mermaidCode: string;
 }
 
+// Union type for all tool content
 export type ToolContent =
-  | { type: 'mindmap'; data: MindmapContent }
-  | { type: 'flashcard'; data: FlashcardContent }
-  | { type: 'quiz'; data: QuizContent }
-  | { type: 'summary'; data: SummaryContent }
-  | { type: 'timeline'; data: TimelineContent }
-  | { type: 'diagram'; data: DiagramContent };
+  | MindmapContent
+  | FlashcardContent
+  | QuizContent
+  | SummaryContent
+  | TimelineContent
+  | DiagramContent;
 
+// Tool state structure
 export interface ToolState {
   id: string;
   type: string;
   status: ToolStatus;
+  sessionId: string;
+  maestroId: string;
+  title: string;
   content: ToolContent | null;
-  progress: number; // 0-100
+  progress: number;
   error?: string;
   createdAt: Date;
   updatedAt: Date;
-  maestroId?: string;
-  sessionId?: string;
 }
