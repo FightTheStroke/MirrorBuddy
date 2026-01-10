@@ -2,10 +2,7 @@
  * Types for Profile Generator
  */
 
-import type {
-  StudentInsights,
-  ObservationCategory,
-} from '@/types';
+import type { ObservationCategory } from '@/types';
 
 /**
  * Raw insight collected from a Maestro interaction.

@@ -23,8 +23,7 @@ import { MindmapRenderer } from '@/components/education/knowledge-hub/renderers/
 // Import interactive components
 import { Quiz } from '@/components/education/quiz';
 import { HTMLPreview } from '@/components/education/html-preview';
-import type { Quiz as QuizType, Question, Subject, QuizResult } from '@/types/index';
-import type { QuizData, DemoData } from '@/types/tools';
+import type { QuizResult } from '@/types/index';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PlayCircle, X } from 'lucide-react';
 

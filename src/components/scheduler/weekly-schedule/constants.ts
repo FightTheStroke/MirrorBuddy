@@ -2,8 +2,6 @@
  * Constants for Weekly Schedule
  */
 
-import type { DayOfWeek } from '@/lib/scheduler/types';
-
 export const DAYS_OF_WEEK = [
   { value: 1, label: 'Lunedi' },
   { value: 2, label: 'Martedi' },

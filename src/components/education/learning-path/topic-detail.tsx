@@ -9,7 +9,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  BookOpen,
   MapIcon,
   Layers,
   ClipboardCheck,
@@ -24,7 +23,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import type { LearningPathTopic, TopicStep, TopicStepType } from '@/types';
+import type { LearningPathTopic, TopicStep } from '@/types';
 import { STEP_CONFIG } from './topic-detail/constants';
 
 interface TopicDetailProps {
