@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
+import { RotaryPhoneIcon, RotaryPhoneOffIcon } from '@/components/ui/rotary-phone-icon';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { cn } from '@/lib/utils';
@@ -15,6 +16,7 @@ export interface VoicePanelVariantFCharacter {
   avatar?: string;
   specialty?: string;
   color: string;
+  customCallIcon?: string;
 }
 
 export interface VoicePanelVariantFProps {
@@ -306,10 +308,18 @@ export function VoicePanelVariantF({
           )}
           aria-label={isConnected ? 'Termina chiamata' : 'Avvia chiamata'}
         >
-          {isConnected ? (
-            <PhoneOff className="w-7 h-7" />
+          {character.customCallIcon === 'RotaryPhone' ? (
+            isConnected ? (
+              <RotaryPhoneOffIcon className="w-7 h-7" />
+            ) : (
+              <RotaryPhoneIcon className="w-7 h-7" />
+            )
           ) : (
-            <Phone className="w-7 h-7" />
+            isConnected ? (
+              <PhoneOff className="w-7 h-7" />
+            ) : (
+              <Phone className="w-7 h-7" />
+            )
           )}
         </Button>
 
