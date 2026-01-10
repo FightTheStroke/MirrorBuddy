@@ -27,6 +27,8 @@ export interface SaveToolParams {
   sessionId?: string;
   /** Optional source toolId for auto-linking derived materials (Wave 3) */
   sourceToolId?: string;
+  /** Optional message ID for linking tool to the message that created it */
+  messageId?: string;
 }
 
 export interface SavedTool {
@@ -120,6 +122,7 @@ export async function saveTool(params: SaveToolParams): Promise<SavedTool> {
       maestroId: params.maestroId ?? null,
       conversationId: params.conversationId ?? null,
       sessionId: params.sessionId ?? null,
+      messageId: params.messageId ?? null,
       status: 'active',
     },
   });

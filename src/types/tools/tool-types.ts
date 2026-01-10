@@ -117,3 +117,20 @@ export function toToolCallRef(toolCall: ToolCall): ToolCallRef {
     materialId: toolCall.id, // toolId is used as materialId
   };
 }
+
+/**
+ * Map OpenAI function names to tool types
+ */
+export function functionNameToToolType(functionName: string): ToolType {
+  const map: Record<string, ToolType> = {
+    'create_mindmap': 'mindmap',
+    'create_quiz': 'quiz',
+    'create_flashcards': 'flashcard',
+    'create_demo': 'demo',
+    'web_search': 'search',
+    'create_summary': 'summary',
+    'create_diagram': 'diagram',
+    'create_timeline': 'timeline',
+  };
+  return map[functionName] || (functionName as ToolType);
+}

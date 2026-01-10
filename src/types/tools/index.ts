@@ -14,7 +14,7 @@ export type {
   ToolCallRef,
 } from './tool-types';
 
-export { toToolCallRef } from './tool-types';
+export { toToolCallRef, functionNameToToolType } from './tool-types';
 
 // OpenAI function definitions
 export { CHAT_TOOL_DEFINITIONS } from './tool-schemas';
