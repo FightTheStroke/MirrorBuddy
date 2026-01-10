@@ -11,6 +11,7 @@ import {
   Tag,
   Archive,
   Trash2,
+  Sparkles,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -21,6 +22,7 @@ interface MaterialMenuProps {
   onDuplicate?: (id: string) => void;
   onMove?: (id: string) => void;
   onAddTags?: (id: string) => void;
+  onFindSimilar?: (id: string) => void;
   onArchive?: (id: string) => void;
   onDelete?: (id: string) => void;
   materialId: string;
@@ -34,6 +36,7 @@ export function MaterialMenu({
   onDuplicate,
   onMove,
   onAddTags,
+  onFindSimilar,
   onArchive,
   onDelete,
   materialId,
@@ -108,6 +111,16 @@ export function MaterialMenu({
           >
             <Tag className="w-4 h-4" />
             Aggiungi tag
+          </button>
+        )}
+        {onFindSimilar && (
+          <button
+            onClick={menuAction(onFindSimilar)}
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+            role="menuitem"
+          >
+            <Sparkles className="w-4 h-4" />
+            Trova simili
           </button>
         )}
         {onArchive && (

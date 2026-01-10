@@ -16,6 +16,7 @@ import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
 import { executeToolCall } from '@/lib/tools/tool-executor';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
+import { findSimilarMaterials } from '@/lib/rag/retrieval-service';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
@@ -141,8 +142,42 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // SECURITY: Filter the last user message for safety (Issue #30)
+    // Get last user message for safety filtering and RAG
     const lastUserMessage = messages.filter(m => m.role === 'user').pop();
+
+    // Wave 4: RAG context injection - find relevant materials for the conversation
+    let hasRAG = false;
+    if (userId && lastUserMessage) {
+      try {
+        const relevantMaterials = await findSimilarMaterials({
+          userId,
+          query: lastUserMessage.content,
+          limit: 3,
+          minSimilarity: 0.6,
+        });
+
+        if (relevantMaterials.length > 0) {
+          const ragContext = relevantMaterials
+            .map((m) => `- ${m.content}`)
+            .join('\n');
+          enhancedSystemPrompt = `${enhancedSystemPrompt}\n\n[Materiali rilevanti dello studente]\n${ragContext}`;
+          hasRAG = true;
+          logger.debug('RAG context injected', {
+            userId,
+            materialCount: relevantMaterials.length,
+            topSimilarity: relevantMaterials[0]?.similarity,
+          });
+        }
+      } catch (ragError) {
+        // RAG failure should not block the chat
+        logger.warn('Failed to load RAG context', {
+          userId,
+          error: String(ragError),
+        });
+      }
+    }
+
+    // SECURITY: Filter the last user message for safety (Issue #30)
     if (lastUserMessage) {
       const filterResult = filterInput(lastUserMessage.content);
       if (!filterResult.safe && filterResult.action === 'block') {
@@ -265,6 +300,7 @@ export async function POST(request: NextRequest) {
           toolCalls: toolResults,
           hasTools: true,
           hasMemory,
+          hasRAG,
         });
       }
 
@@ -309,6 +345,7 @@ export async function POST(request: NextRequest) {
         model: result.model,
         usage: result.usage,
         hasMemory,
+        hasRAG,
         maestroId,
         sanitized: sanitized.modified,
       });
