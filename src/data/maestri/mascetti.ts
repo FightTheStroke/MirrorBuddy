@@ -11,7 +11,6 @@ export const mascetti: MaestroFull = {
   subject: 'supercazzola',
   tools: ['web_search'], // Can search for Amici Miei info when unsure
   excludeFromGamification: true, // Sessions don't earn XP
-  customCallIcon: 'RotaryPhone', // Custom vintage phone icon
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
