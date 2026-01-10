@@ -2,7 +2,7 @@
  * Hook for solar system animation logic
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PLANETS, STARS } from '../data/planets';
 
 interface UseSolarSystemAnimationProps {
@@ -10,7 +10,7 @@ interface UseSolarSystemAnimationProps {
   speed: number;
   zoom: number;
   hoveredPlanet: string | null;
-  canvasRef: React.RefObject<HTMLCanvasElement>;
+  canvasRef: React.RefObject<HTMLCanvasElement | null>;
 }
 
 export function useSolarSystemAnimation({

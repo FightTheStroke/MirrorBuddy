@@ -2,7 +2,7 @@
  * Utility functions for Profile Generator
  */
 
-import type { MaestroInsightInput, SynthesisContext } from './types';
+import type { MaestroInsightInput } from './types';
 import type { MaestroObservation, LearningStrategy, LearningStyleProfile, ObservationCategory } from '@/types';
 import { CATEGORY_PRIORITY, STRATEGY_TEMPLATES } from './constants';
 

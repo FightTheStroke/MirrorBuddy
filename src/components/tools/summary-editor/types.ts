@@ -23,5 +23,5 @@ export interface EditState {
   type: 'title' | 'section-title' | 'section-content' | 'point';
   sectionIndex?: number;
   pointIndex?: number;
-  value: string;
+  value?: string;
 }
