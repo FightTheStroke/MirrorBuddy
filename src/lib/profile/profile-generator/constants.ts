@@ -2,7 +2,8 @@
  * Constants for Profile Generator
  */
 
-import type { ObservationCategory, ProfileGenerationOptions } from './types';
+import type { ObservationCategory } from '@/types';
+import type { ProfileGenerationOptions } from './types';
 
 /**
  * Default options for profile generation.

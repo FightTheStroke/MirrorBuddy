@@ -17,7 +17,7 @@ export default function ShowcaseSolarSystemPage() {
   const [selectedPlanet, setSelectedPlanet] = useState<typeof PLANETS[0] | null>(null);
   const [hoveredPlanet, setHoveredPlanet] = useState<string | null>(null);
 
-  const { time } = useSolarSystemAnimation({
+  const { time, setTime } = useSolarSystemAnimation({
     isPlaying,
     speed,
     zoom,

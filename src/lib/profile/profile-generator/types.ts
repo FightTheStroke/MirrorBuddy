@@ -37,8 +37,9 @@ export interface ProfileGenerationOptions {
  * Context for Melissa's profile synthesis.
  */
 export interface SynthesisContext {
-  strengths: string[];
-  areasForGrowth: string[];
-  learningStrategies: string[];
-  insights: MaestroInsightInput[];
+  studentName: string;
+  strengths: MaestroInsightInput[];
+  growthAreas: MaestroInsightInput[];
+  recentSessions: number;
+  totalMinutes: number;
 }
