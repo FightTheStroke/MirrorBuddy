@@ -175,6 +175,9 @@ export function updateToolState(
   state.updatedAt = Date.now();
 
   if (update.chunk) {
+    if (!state.rawChunks) {
+      state.rawChunks = [];
+    }
     state.rawChunks.push(update.chunk);
     state.chunksReceived++;
   }
