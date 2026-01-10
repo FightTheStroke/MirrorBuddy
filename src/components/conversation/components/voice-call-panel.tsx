@@ -206,7 +206,6 @@ export function VoiceCallPanel({
           avatar: (character as unknown as { avatar?: string }).avatar || '/avatars/default.jpg',
           specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
           color: character.color,
-          customCallIcon: 'customCallIcon' in character.character ? (character.character as { customCallIcon?: string }).customCallIcon : undefined,
         }}
         isConnected={isConnected}
         isListening={isListening}

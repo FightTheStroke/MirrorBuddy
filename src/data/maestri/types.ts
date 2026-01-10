@@ -14,7 +14,6 @@ export interface MaestroFull {
   color: string;        // subject-based color
   greeting: string;     // extract first greeting or generate one
   excludeFromGamification?: boolean;  // If true, sessions don't earn XP
-  customCallIcon?: string;  // Custom icon component name for call button
 }
 
 export const SAFETY_GUIDELINES: string = `# Safety and Inclusivity Guidelines for MirrorBuddycation Professori

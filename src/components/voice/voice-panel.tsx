@@ -11,7 +11,6 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Mic, MicOff, PhoneOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { RotaryPhoneOffIcon } from '@/components/ui/rotary-phone-icon';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { cn } from '@/lib/utils';
 
@@ -22,7 +21,6 @@ export interface VoicePanelCharacter {
   avatar?: string;
   specialty?: string;
   color: string;
-  customCallIcon?: string;
 }
 
 export interface VoicePanelProps {
@@ -201,11 +199,7 @@ export function VoicePanel({
           onClick={onEndCall}
           className="rounded-full w-12 h-12 bg-red-500 text-white hover:bg-red-600"
         >
-          {character.customCallIcon === 'RotaryPhone' ? (
-            <RotaryPhoneOffIcon className="w-5 h-5" />
-          ) : (
-            <PhoneOff className="w-5 h-5" />
-          )}
+          <PhoneOff className="w-5 h-5" />
         </Button>
       </div>
 
