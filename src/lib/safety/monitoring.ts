@@ -13,7 +13,7 @@
 
 export { logSafetyEvent } from './monitoring/logging';
 export { getSessionEvents, getEventsByType, getEventsBySeverity, getMetrics } from './monitoring/queries';
-export { getSafetyEventsFromDb, getSafetyStatsFromDb, resolveSafetyEvent } from './monitoring/db-queries';
+// db-queries are server-only, import directly: '@/lib/safety/monitoring/db-queries'
 export {
   logInputBlocked,
   logJailbreakAttempt,

@@ -3,56 +3,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  GraduationCap,
-  Brain,
-  Mic,
-  Gamepad2,
-  Heart,
-  Sparkles,
   ArrowRight,
   Cloud,
   Server,
   CheckCircle2,
 } from 'lucide-react';
-
-const features = [
-  {
-    icon: GraduationCap,
-    title: '17 Professori AI',
-    description:
-      'Impara da figure storiche: Archimede, Leonardo, Galileo, Marie Curie e tanti altri',
-  },
-  {
-    icon: Mic,
-    title: 'Conversazioni Vocali',
-    description:
-      'Parla naturalmente con i tuoi tutor AI, come se fossero nella stanza con te',
-  },
-  {
-    icon: Brain,
-    title: 'Mappe Mentali',
-    description:
-      'Organizza le tue idee visivamente con mappe mentali generate automaticamente',
-  },
-  {
-    icon: Gamepad2,
-    title: 'Gamification',
-    description:
-      'Guadagna XP, sali di livello e mantieni le tue streak di studio',
-  },
-  {
-    icon: Heart,
-    title: 'Accessibilita',
-    description:
-      'Progettato per DSA, ADHD, autismo e paralisi cerebrale con supporto completo',
-  },
-  {
-    icon: Sparkles,
-    title: 'Coach e Buddy',
-    description:
-      'Melissa ti aiuta con i metodi di studio, Mario ti supporta emotivamente',
-  },
-];
+import { LANDING_FEATURES } from './landing-features';
 
 export default function LandingPage() {
   return (
@@ -70,7 +26,14 @@ export default function LandingPage() {
           <div className="text-center">
             {/* Logo */}
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-white/10 backdrop-blur-sm mb-8 shadow-2xl shadow-purple-500/25 overflow-hidden">
-              <Image src="/logo-brain.png" alt="MirrorBuddy" width={80} height={80} className="object-contain" />
+              <Image
+                src="/logo-brain.png"
+                alt="MirrorBuddy"
+                width={80}
+                height={80}
+                className="w-full h-auto object-contain"
+                style={{ width: 'auto', height: 'auto' }}
+              />
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
@@ -126,7 +89,7 @@ export default function LandingPage() {
           </p>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature) => {
+            {LANDING_FEATURES.map((feature) => {
               const Icon = feature.icon;
               return (
                 <div
@@ -242,7 +205,7 @@ export default function LandingPage() {
                 href="https://ollama.ai"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full text-center py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl transition-colors"
+                className="block w-full text-center py-3 bg-green-700 hover:bg-green-800 text-white font-medium rounded-xl transition-colors"
               >
                 Scarica Ollama
               </a>

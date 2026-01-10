@@ -4,7 +4,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { estimateReadingTime } from '../utils/content-extractor';
+import { estimateReadingTime } from '../utils/content-extractor-parsers';
 
 describe('Content Extractor Utils', () => {
   describe('estimateReadingTime', () => {

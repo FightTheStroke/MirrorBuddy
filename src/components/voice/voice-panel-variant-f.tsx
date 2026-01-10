@@ -1,14 +1,5 @@
 'use client';
 
-/**
- * VoicePanel Variant F - Pannello Verticale per Coach/Buddies
- * 
- * Stessa struttura della Variante F ma adattata per coach/buddies.
- * - Contrasto migliorato per accessibilità
- * - Device selector accanto a mute/TTS
- * - TTS fixato
- */
-
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
@@ -17,8 +8,7 @@ import { AudioDeviceSelector } from '@/components/conversation/components/audio-
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-
-const VISUALIZER_BARS = [10, 14, 8, 16, 12, 14, 10];
+import { isHexColor, calculateAuraIntensity } from './voice-panel-utils';
 
 export interface VoicePanelVariantFCharacter {
   name: string;
@@ -43,21 +33,6 @@ export interface VoicePanelVariantFProps {
   onStopTTS: () => void;
   onClearChat?: () => void;
   onClose?: () => void;
-}
-
-function isHexColor(color: string): boolean {
-  return color.startsWith('#');
-}
-
-// Calculate contrast ratio for accessibility (WCAG AA requires 4.5:1 for normal text)
-function getContrastColor(bgColor: string): string {
-  // For colored backgrounds, use white with high opacity for better contrast
-  // If background is very light, use dark text
-  if (bgColor.includes('light') || bgColor.includes('yellow') || bgColor.includes('lime')) {
-    return 'text-slate-900';
-  }
-  // For dark/colored backgrounds, use white with sufficient opacity
-  return 'text-white';
 }
 
 export function VoicePanelVariantF({
@@ -89,7 +64,6 @@ export function VoicePanelVariantF({
             ? 'Connesso'
             : 'Avvio chiamata...';
 
-  // Handle Esc key
   useEffect(() => {
     if (!onClose) return;
     const handleEsc = (e: KeyboardEvent) => {
@@ -101,15 +75,14 @@ export function VoicePanelVariantF({
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
-  // Calculate aura intensity
-  const getAuraIntensity = () => {
-    if (!isConnected) return 0;
-    if (isSpeaking) return outputLevel;
-    if (isListening && !isMuted) return inputLevel;
-    return 0.1;
-  };
-
-  const auraIntensity = getAuraIntensity();
+  const auraIntensity = calculateAuraIntensity({
+    isConnected,
+    isSpeaking,
+    isListening,
+    isMuted,
+    inputLevel,
+    outputLevel,
+  });
 
   // TTS toggle function
   const { updateSettings } = useAccessibilityStore();

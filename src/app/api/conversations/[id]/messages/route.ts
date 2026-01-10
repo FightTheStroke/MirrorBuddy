@@ -8,6 +8,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import type { ToolCall, ToolCallRef } from '@/types/tools';
+
+/**
+ * Convert full ToolCall to lightweight ToolCallRef for DB storage.
+ * Strips result.data to avoid duplicating Material content.
+ */
+function toToolCallRefForStorage(toolCall: ToolCall): ToolCallRef {
+  return {
+    id: toolCall.id,
+    type: toolCall.type,
+    name: toolCall.name,
+    status: toolCall.status,
+    error: toolCall.result?.error,
+    materialId: toolCall.id, // toolId is used as materialId
+  };
+}
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -87,6 +103,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Convert full ToolCalls to lightweight ToolCallRefs for storage
+    // This avoids duplicating content that's already in Material table
+    let toolCallsForStorage: string | null = null;
+    if (data.toolCalls && Array.isArray(data.toolCalls)) {
+      const refs = data.toolCalls.map((tc: ToolCall) => toToolCallRefForStorage(tc));
+      toolCallsForStorage = JSON.stringify(refs);
+    }
+
     // Create message and update conversation
     const [message] = await prisma.$transaction([
       prisma.message.create({
@@ -94,7 +118,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           conversationId,
           role: data.role,
           content: data.content,
-          toolCalls: data.toolCalls ? JSON.stringify(data.toolCalls) : null,
+          toolCalls: toolCallsForStorage,
           tokenCount: data.tokenCount,
         },
       }),

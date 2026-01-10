@@ -90,7 +90,7 @@ describe('Tool State Management', () => {
     it('should initialize correct content structure for flashcards', () => {
       const state = createToolState({
         id: 'tool-fc',
-        type: 'flashcards',
+        type: 'flashcard',
         sessionId: 'session-1',
         maestroId: 'archimede',
         title: 'Flashcards Test',
@@ -315,7 +315,7 @@ describe('Tool State Management', () => {
 
       createToolState({
         id: 'tool-s2',
-        type: 'flashcards',
+        type: 'flashcard',
         sessionId: 'session-other',
         maestroId: 'archimede',
         title: 'Other Session',

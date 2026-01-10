@@ -22,7 +22,7 @@ import { PlayCircle, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { HTMLPreview } from '@/components/education/html-preview';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
+import { generateAccessibilityCSS, buildDemoCode } from './demo-utils';
 import type { BaseRendererProps } from './index';
 
 interface DemoData {
@@ -31,131 +31,10 @@ interface DemoData {
   type?: 'simulation' | 'animation' | 'interactive';
   content?: unknown;
   previewImage?: string;
-  code?: string; // HTML/CSS/JS code for the demo
+  code?: string;
   html?: string;
   css?: string;
   js?: string;
-}
-
-/**
- * C-7 FIX: Generate accessibility CSS based on user settings
- */
-function generateAccessibilityCSS(settings: {
-  dyslexiaFont: boolean;
-  extraLetterSpacing: boolean;
-  increasedLineHeight: boolean;
-  highContrast: boolean;
-  largeText: boolean;
-  fontSize: number;
-  lineSpacing: number;
-  customBackgroundColor: string;
-  customTextColor: string;
-}): string {
-  const rules: string[] = [];
-
-  // Base styles to ensure accessibility overrides work
-  rules.push(`
-    * {
-      font-size: ${settings.fontSize * 100}% !important;
-      line-height: ${settings.lineSpacing * 1.4}em !important;
-    }
-  `);
-
-  // Dyslexia-friendly font
-  if (settings.dyslexiaFont) {
-    rules.push(`
-      @import url('https://fonts.cdnfonts.com/css/opendyslexic');
-      * {
-        font-family: 'OpenDyslexic', sans-serif !important;
-      }
-    `);
-  }
-
-  // Extra letter spacing
-  if (settings.extraLetterSpacing) {
-    rules.push(`
-      * {
-        letter-spacing: 0.05em !important;
-        word-spacing: 0.1em !important;
-      }
-    `);
-  }
-
-  // Increased line height
-  if (settings.increasedLineHeight) {
-    rules.push(`
-      * {
-        line-height: ${Math.max(settings.lineSpacing, 1.8)}em !important;
-      }
-    `);
-  }
-
-  // High contrast mode
-  if (settings.highContrast) {
-    rules.push(`
-      body, html {
-        background-color: #000 !important;
-        color: #fff !important;
-      }
-      * {
-        border-color: #fff !important;
-      }
-      a, a:visited {
-        color: #ffff00 !important;
-      }
-      button, input, select, textarea {
-        background-color: #333 !important;
-        color: #fff !important;
-        border: 2px solid #fff !important;
-      }
-    `);
-  }
-
-  // Large text
-  if (settings.largeText) {
-    rules.push(`
-      * {
-        font-size: ${settings.fontSize * 120}% !important;
-      }
-    `);
-  }
-
-  return rules.join('\n');
-}
-
-/**
- * Build HTML code from separate html/css/js parts or use existing code
- */
-function buildDemoCode(demoData: DemoData, accessibilityCSS: string = ''): string | null {
-  // If we have a direct code property, use shared builder
-  if (demoData.code) {
-    const baseHtml = buildDemoHTML({ html: '', css: '', js: '', code: demoData.code });
-    
-    // Inject only accessibility CSS (no KaTeX - causes rendering issues)
-    if (accessibilityCSS && baseHtml.includes('</head>')) {
-      return baseHtml.replace('</head>', `<style id="accessibility-styles">${accessibilityCSS}</style></head>`);
-    }
-    
-    return baseHtml;
-  }
-
-  // If we have html/css/js parts, use shared builder
-  if (demoData.html || demoData.css || demoData.js) {
-    const baseHtml = buildDemoHTML({
-      html: demoData.html || '',
-      css: demoData.css || '',
-      js: demoData.js || '',
-    });
-    
-    // Inject only accessibility CSS
-    if (accessibilityCSS && baseHtml.includes('</head>')) {
-      return baseHtml.replace('</head>', `<style id="accessibility-styles">${accessibilityCSS}</style></head>`);
-    }
-    
-    return baseHtml;
-  }
-
-  return null;
 }
 
 /**

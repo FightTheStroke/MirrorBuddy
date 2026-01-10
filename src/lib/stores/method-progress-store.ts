@@ -8,18 +8,20 @@ import { create } from 'zustand';
 import { logger } from '@/lib/logger';
 import type {
   MethodProgress,
-  MethodEvent,
-  MindMapProgress,
-  FlashcardProgress,
-  SelfAssessmentProgress,
-  HelpBehavior,
-  MethodTransfer,
   SkillLevel,
   ToolType,
   HelpLevel,
   Subject,
 } from '@/lib/method-progress/types';
-import { DEFAULT_METHOD_PROGRESS, LEVEL_THRESHOLDS } from '@/lib/method-progress/types';
+import { DEFAULT_METHOD_PROGRESS } from '@/lib/method-progress/types';
+import { calculateLevel, calculateAutonomyScore } from './method-progress-utils';
+import {
+  handleToolCreation,
+  handleSelfCorrection,
+  handleHelpRequest,
+  handleProblemSolvedAlone,
+  handleMethodTransfer,
+} from './method-progress-handlers';
 
 interface MethodProgressState extends Omit<MethodProgress, 'userId'> {
   userId: string | null;
@@ -43,35 +45,6 @@ interface MethodProgressState extends Omit<MethodProgress, 'userId'> {
   reset: () => void;
 }
 
-// Calculate skill level from progress percentage
-function calculateLevel(progress: number): SkillLevel {
-  if (progress >= LEVEL_THRESHOLDS.expert) return 'expert';
-  if (progress >= LEVEL_THRESHOLDS.competent) return 'competent';
-  if (progress >= LEVEL_THRESHOLDS.learning) return 'learning';
-  return 'novice';
-}
-
-// Calculate autonomy score from all metrics
-function calculateAutonomyScore(state: {
-  mindMaps: MindMapProgress;
-  flashcards: FlashcardProgress;
-  selfAssessment: SelfAssessmentProgress;
-  helpBehavior: HelpBehavior;
-  methodTransfer: MethodTransfer;
-}): number {
-  const { mindMaps, flashcards, helpBehavior, methodTransfer } = state;
-
-  // Weight different factors
-  const aloneRatio = helpBehavior.solvedAlone / Math.max(1, helpBehavior.questionsAsked + helpBehavior.solvedAlone);
-  const selfCorrectionRatio = helpBehavior.selfCorrections / Math.max(1, helpBehavior.questionsAsked);
-  const toolsAloneRatio = (mindMaps.createdAlone + flashcards.createdAlone) /
-    Math.max(1, mindMaps.createdAlone + mindMaps.createdWithHints + mindMaps.createdWithFullHelp +
-      flashcards.createdAlone + flashcards.createdWithHints);
-  const transferBonus = Math.min(1, methodTransfer.subjectsApplied.length / 5);
-
-  // Weighted average
-  return (aloneRatio * 0.3 + selfCorrectionRatio * 0.2 + toolsAloneRatio * 0.3 + transferBonus * 0.2);
-}
 
 export const useMethodProgressStore = create<MethodProgressState>()(
   (set, get) => ({
@@ -140,176 +113,75 @@ export const useMethodProgressStore = create<MethodProgressState>()(
       },
 
       recordToolCreation: (tool, helpLevel, subject, qualityScore) => {
-        const event: MethodEvent = {
-          type: 'tool_created',
-          tool,
-          helpLevel,
-          subject,
-          qualityScore,
-          timestamp: new Date(),
-        };
-
         set((state) => {
-          const newState = { ...state };
-
-          // Update appropriate skill based on tool type
-          if (tool === 'mind_map') {
-            const mindMaps = { ...state.mindMaps };
-            if (helpLevel === 'none') mindMaps.createdAlone++;
-            else if (helpLevel === 'hints') mindMaps.createdWithHints++;
-            else mindMaps.createdWithFullHelp++;
-
-            if (qualityScore !== undefined) {
-              const total = mindMaps.createdAlone + mindMaps.createdWithHints + mindMaps.createdWithFullHelp;
-              mindMaps.avgQualityScore = (mindMaps.avgQualityScore * (total - 1) + qualityScore) / total;
-            }
-
-            const progress = (mindMaps.createdAlone * 3 + mindMaps.createdWithHints) * 5;
-            mindMaps.level = calculateLevel(Math.min(100, progress));
-            newState.mindMaps = mindMaps;
-          } else if (tool === 'flashcard') {
-            const flashcards = { ...state.flashcards };
-            if (helpLevel === 'none') flashcards.createdAlone++;
-            else flashcards.createdWithHints++;
-
-            const progress = (flashcards.createdAlone * 2 + flashcards.createdWithHints) * 3;
-            flashcards.level = calculateLevel(Math.min(100, progress));
-            newState.flashcards = flashcards;
-          }
-
-          newState.events = [...state.events, event].slice(-100);
+          if (!state.userId) return state;
+          const progressState: MethodProgress = {
+            ...state,
+            userId: state.userId,
+          };
+          const updates = handleToolCreation(progressState, tool, helpLevel, subject, qualityScore);
+          const newState = { ...state, ...updates };
           newState.autonomyScore = calculateAutonomyScore(newState);
-          newState.updatedAt = new Date();
-
           return newState;
         });
-
-        // Sync to server after update
         setTimeout(() => get().syncToServer(), 1000);
       },
 
       recordSelfCorrection: (context, subject) => {
-        const event: MethodEvent = {
-          type: 'self_correction',
-          context,
-          subject,
-          timestamp: new Date(),
-        };
-
         set((state) => {
-          const helpBehavior = { ...state.helpBehavior };
-          helpBehavior.selfCorrections++;
-
-          const progress = (helpBehavior.selfCorrections * 5 + helpBehavior.solvedAlone * 3);
-          helpBehavior.level = calculateLevel(Math.min(100, progress));
-
-          const newState = {
+          if (!state.userId) return state;
+          const progressState: MethodProgress = {
             ...state,
-            helpBehavior,
-            events: [...state.events, event].slice(-100),
-            updatedAt: new Date(),
+            userId: state.userId,
           };
+          const updates = handleSelfCorrection(progressState, context, subject);
+          const newState = { ...state, ...updates };
           newState.autonomyScore = calculateAutonomyScore(newState);
-
           return newState;
         });
-
         setTimeout(() => get().syncToServer(), 1000);
       },
 
       recordHelpRequest: (context, timeElapsedSeconds, subject) => {
-        const event: MethodEvent = {
-          type: 'help_requested',
-          context,
-          timeElapsedSeconds,
-          subject,
-          timestamp: new Date(),
-        };
-
         set((state) => {
-          const helpBehavior = { ...state.helpBehavior };
-          helpBehavior.questionsAsked++;
-
-          // Update average time before asking
-          const total = helpBehavior.questionsAsked;
-          helpBehavior.avgTimeBeforeAsking =
-            (helpBehavior.avgTimeBeforeAsking * (total - 1) + timeElapsedSeconds) / total;
-
-          return {
+          if (!state.userId) return state;
+          const progressState: MethodProgress = {
             ...state,
-            helpBehavior,
-            events: [...state.events, event].slice(-100),
-            updatedAt: new Date(),
+            userId: state.userId,
           };
+          const updates = handleHelpRequest(progressState, context, timeElapsedSeconds, subject);
+          return { ...state, ...updates };
         });
-
         setTimeout(() => get().syncToServer(), 1000);
       },
 
       recordProblemSolvedAlone: (context, subject) => {
-        const event: MethodEvent = {
-          type: 'problem_solved_alone',
-          context,
-          subject,
-          timestamp: new Date(),
-        };
-
         set((state) => {
-          const helpBehavior = { ...state.helpBehavior };
-          helpBehavior.solvedAlone++;
-
-          const progress = (helpBehavior.selfCorrections * 5 + helpBehavior.solvedAlone * 3);
-          helpBehavior.level = calculateLevel(Math.min(100, progress));
-
-          const newState = {
+          if (!state.userId) return state;
+          const progressState: MethodProgress = {
             ...state,
-            helpBehavior,
-            events: [...state.events, event].slice(-100),
-            updatedAt: new Date(),
+            userId: state.userId,
           };
+          const updates = handleProblemSolvedAlone(progressState, context, subject);
+          const newState = { ...state, ...updates };
           newState.autonomyScore = calculateAutonomyScore(newState);
-
           return newState;
         });
-
         setTimeout(() => get().syncToServer(), 1000);
       },
 
       recordMethodTransfer: (fromSubject, toSubject, method) => {
-        const event: MethodEvent = {
-          type: 'method_transferred',
-          fromSubject,
-          toSubject,
-          method,
-          timestamp: new Date(),
-        };
-
         set((state) => {
-          const methodTransfer = { ...state.methodTransfer };
-          methodTransfer.adaptations++;
-
-          if (!methodTransfer.subjectsApplied.includes(toSubject)) {
-            methodTransfer.subjectsApplied = [...methodTransfer.subjectsApplied, toSubject];
-          }
-
-          if (!methodTransfer.successfulMethods.includes(method)) {
-            methodTransfer.successfulMethods = [...methodTransfer.successfulMethods, method];
-          }
-
-          const progress = methodTransfer.subjectsApplied.length * 15 + methodTransfer.adaptations * 5;
-          methodTransfer.level = calculateLevel(Math.min(100, progress));
-
-          const newState = {
+          if (!state.userId) return state;
+          const progressState: MethodProgress = {
             ...state,
-            methodTransfer,
-            events: [...state.events, event].slice(-100),
-            updatedAt: new Date(),
+            userId: state.userId,
           };
+          const updates = handleMethodTransfer(progressState, fromSubject, toSubject, method);
+          const newState = { ...state, ...updates };
           newState.autonomyScore = calculateAutonomyScore(newState);
-
           return newState;
         });
-
         setTimeout(() => get().syncToServer(), 1000);
       },
 

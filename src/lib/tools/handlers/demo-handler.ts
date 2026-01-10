@@ -10,27 +10,7 @@ import { nanoid } from 'nanoid';
 import { chatCompletion } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
 import type { DemoData, ToolExecutionResult } from '@/types/tools';
-
-/**
- * Dangerous patterns to block in JavaScript code
- */
-const DANGEROUS_JS_PATTERNS: Array<{ pattern: RegExp; description: string }> = [
-  { pattern: /document\.cookie/i, description: 'Cookie access' },
-  { pattern: /localStorage/i, description: 'LocalStorage access' },
-  { pattern: /sessionStorage/i, description: 'SessionStorage access' },
-  { pattern: /indexedDB/i, description: 'IndexedDB access' },
-  { pattern: /fetch\s*\(/i, description: 'Network fetch' },
-  { pattern: /XMLHttpRequest/i, description: 'XHR request' },
-  { pattern: /window\.open/i, description: 'Window open' },
-  { pattern: /window\.location/i, description: 'Location manipulation' },
-  { pattern: /eval\s*\(/i, description: 'Eval execution' },
-  { pattern: /Function\s*\(/i, description: 'Function constructor' },
-  { pattern: /new\s+Function/i, description: 'Function constructor' },
-  { pattern: /import\s*\(/i, description: 'Dynamic import' },
-  { pattern: /require\s*\(/i, description: 'CommonJS require' },
-  { pattern: /postMessage/i, description: 'Cross-origin messaging' },
-  { pattern: /navigator\.(geolocation|clipboard|mediaDevices)/i, description: 'Sensitive API access' },
-];
+import { DANGEROUS_JS_PATTERNS } from './demo-handler/constants';
 
 function validateCode(code: string): { safe: boolean; violations: string[] } {
   const violations: string[] = [];

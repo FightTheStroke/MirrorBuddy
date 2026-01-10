@@ -10,7 +10,6 @@
 import type { StateCreator } from 'zustand';
 import type { ExtendedStudentProfile } from '@/types';
 import type { ConversationFlowState, HandoffSuggestion, CharacterConversation } from '../types';
-import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
 
 // ============================================================================
 // HANDOFF STATE
@@ -81,18 +80,24 @@ export const createHandoffSlice: StateCreator<
   },
 
   loadContextualGreeting: async (
-    userId: string,
+    _userId: string,
     characterId: string,
     studentName: string,
     maestroName: string
   ): Promise<string | null> => {
     try {
-      const result = await getGreetingForCharacter(
-        userId,
+      const params = new URLSearchParams({
         characterId,
         studentName,
-        maestroName
-      );
+        maestroName,
+      });
+      const response = await fetch(`/api/greetings/contextual?${params}`);
+
+      if (!response.ok) {
+        return null;
+      }
+
+      const result = await response.json();
       return result?.greeting || null;
     } catch (error) {
       console.error('Failed to load contextual greeting:', error);

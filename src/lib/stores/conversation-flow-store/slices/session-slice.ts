@@ -22,7 +22,6 @@ import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
-import { endConversationWithSummary as generateSummary } from '@/lib/conversation/summary-generator';
 import { loadConversationSummariesFromDB } from '../persistence';
 import { createActiveCharacter, saveCurrentConversation, loadConversationMessages } from '../helpers';
 
@@ -127,7 +126,7 @@ export const createSessionSlice: StateCreator<
     });
   },
 
-  endConversationWithSummary: async (conversationId: string, _userId: string) => {
+  endConversationWithSummary: async (conversationId: string, userId: string) => {
     const state = get();
 
     // Stop inactivity monitoring
@@ -139,21 +138,28 @@ export const createSessionSlice: StateCreator<
       : 0;
 
     try {
-      // Generate summary
-      const result = await generateSummary(conversationId);
+      // Call API to generate summary (server-side operation)
+      const response = await fetch(`/api/conversations/${conversationId}/end`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, reason: 'explicit' }),
+      });
 
-      if (result) {
+      if (response.ok) {
+        const result = await response.json();
         set({
           sessionSummary: {
-            topics: result.topics,
-            summary: result.summary,
+            topics: result.topics || [],
+            summary: result.summary || '',
             duration,
           },
           showRatingModal: true,
         });
+      } else {
+        logger.warn('Failed to generate summary via API', { conversationId });
       }
     } catch (error) {
-      console.error('Failed to generate summary:', error);
+      logger.error('Failed to generate summary:', { error: String(error) });
     }
 
     // Save conversation

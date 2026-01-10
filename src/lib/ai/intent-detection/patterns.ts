@@ -67,6 +67,14 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
     /parlare\s*in\s*pubblico/i,
     /comunicazion/i,
   ],
+  supercazzola: [
+    /supercazzol/i,
+    /antani/i,
+    /mascetti/i,
+    /amici\s*miei/i,
+    /scappellamento/i,
+    /tapioca/i,
+  ],
 };
 
 export const EMOTIONAL_PATTERNS: Record<EmotionalIndicator, RegExp[]> = {

@@ -10,10 +10,10 @@
  */
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
+import { AuraRings } from './aura-rings';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
 import { useEffect } from 'react';
@@ -60,16 +60,6 @@ export function HeaderVariantF(props: HeaderVariantProps) {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
-
-  // Calculate aura intensity based on voice activity
-  const getAuraIntensity = () => {
-    if (!isVoiceActive || !isConnected) return 0;
-    if (isSpeaking) return outputLevel;
-    if (isListening && !isMuted) return inputLevel;
-    return 0.1;
-  };
-
-  const auraIntensity = getAuraIntensity();
 
   // TTS toggle function
   const { updateSettings } = useAccessibilityStore();
@@ -144,65 +134,15 @@ export function HeaderVariantF(props: HeaderVariantProps) {
       {/* Avatar with animated aura - centered */}
       <div className="flex-1 flex items-center justify-center my-4">
         <div className="relative">
-          {/* Animated aura rings - dynamic based on voice */}
-          {isVoiceActive && isConnected && (
-            <>
-              {/* Outer ring */}
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-white/30"
-                animate={{
-                  scale: isSpeaking ? [1, 1.15 + auraIntensity * 0.1, 1] : [1, 1.08, 1],
-                  opacity: [0.2, 0.4 + auraIntensity * 0.3, 0.2],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: isSpeaking ? 0.8 : 2,
-                  ease: 'easeInOut',
-                }}
-                style={{
-                  width: '100px',
-                  height: '100px',
-                  margin: '-10px',
-                }}
-              />
-              {/* Middle ring */}
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-white/40"
-                animate={{
-                  scale: isSpeaking ? [1, 1.12 + auraIntensity * 0.08, 1] : [1, 1.06, 1],
-                  opacity: [0.3, 0.5 + auraIntensity * 0.4, 0.3],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: isSpeaking ? 0.7 : 1.8,
-                  ease: 'easeInOut',
-                }}
-                style={{
-                  width: '90px',
-                  height: '90px',
-                  margin: '-5px',
-                }}
-              />
-              {/* Inner ring */}
-              <motion.div
-                className="absolute inset-0 rounded-full border-2 border-white/50"
-                animate={{
-                  scale: isSpeaking ? [1, 1.08 + auraIntensity * 0.06, 1] : [1, 1.04, 1],
-                  opacity: [0.4, 0.6 + auraIntensity * 0.3, 0.4],
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: isSpeaking ? 0.6 : 1.5,
-                  ease: 'easeInOut',
-                }}
-                style={{
-                  width: '85px',
-                  height: '85px',
-                  margin: '-2.5px',
-                }}
-              />
-            </>
-          )}
+          {/* Animated aura rings */}
+          <AuraRings
+            isVoiceActive={isVoiceActive}
+            isConnected={isConnected}
+            isSpeaking={isSpeaking}
+            isMuted={isMuted}
+            outputLevel={outputLevel}
+            inputLevel={inputLevel}
+          />
 
           {/* Avatar - static, no movement */}
           <div className="relative z-10">
