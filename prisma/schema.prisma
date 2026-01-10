@@ -6,6 +6,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["postgresqlExtensions"]
+  engineType      = "binary"
 }
 
 datasource db {
@@ -1367,4 +1368,3 @@ model MaterialConcept {
   @@index([materialId])
   @@index([conceptId])
 }
-

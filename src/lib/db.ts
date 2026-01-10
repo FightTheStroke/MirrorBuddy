@@ -1,7 +1,7 @@
 // ============================================================================
 // PRISMA CLIENT SINGLETON
 // Prevents multiple instances in development with hot reload
-// Uses @prisma/adapter-pg for Prisma 7 PostgreSQL connection
+// Uses Prisma client with PostgreSQL driver adapter
 // ============================================================================
 
 import 'server-only';
@@ -12,7 +12,6 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-// Create PostgreSQL adapter with connection string
 const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/mirrorbuddy';
 const adapter = new PrismaPg({ connectionString });
 
