@@ -36,6 +36,8 @@ export interface MaterialCardProps {
   onMove?: (id: string) => void;
   /** Callback to add tags */
   onAddTags?: (id: string) => void;
+  /** Callback to find similar materials (Wave 4) */
+  onFindSimilar?: (id: string) => void;
   /** Callback to duplicate material */
   onDuplicate?: (id: string) => void;
   /** Drag start callback for reordering */

@@ -24,6 +24,7 @@ export function MaterialCard({
   onArchive,
   onMove,
   onAddTags,
+  onFindSimilar,
   onDuplicate,
   onDragStart,
   onDragEnd,
@@ -273,6 +274,7 @@ export function MaterialCard({
               onDuplicate={onDuplicate}
               onMove={onMove}
               onAddTags={onAddTags}
+              onFindSimilar={onFindSimilar}
               onArchive={onArchive}
               onDelete={onDelete}
               materialId={material.id}
