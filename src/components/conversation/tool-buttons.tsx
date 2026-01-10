@@ -2,7 +2,7 @@
 
 import { Brain, HelpCircle, Play, Layers, Search, Camera, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useContainerWidth } from './hooks/use-container-width';
 import type { ToolType } from '@/types/tools';
 
 interface ToolButtonsProps {
@@ -27,13 +27,12 @@ const TOOL_BUTTONS: Array<{
 ];
 
 export function ToolButtons({ onToolRequest, disabled, activeToolId }: ToolButtonsProps) {
+  const { containerRef, hideLabels } = useContainerWidth(80, TOOL_BUTTONS.length);
+
   return (
     <div
-      className={cn(
-        'flex gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg',
-        'flex-wrap justify-center', // Wrap on narrow screens
-        'sm:flex-nowrap sm:justify-start' // No wrap on desktop
-      )}
+      ref={containerRef}
+      className="flex flex-wrap gap-1 justify-center items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-full"
     >
       {TOOL_BUTTONS.map(({ type, icon: Icon, label, tooltip }) => (
         <Button
@@ -42,16 +41,12 @@ export function ToolButtons({ onToolRequest, disabled, activeToolId }: ToolButto
           size="sm"
           onClick={() => onToolRequest(type)}
           disabled={disabled || !!activeToolId}
-          className={cn(
-            'h-8 gap-1',
-            'px-1.5 sm:px-2', // Smaller padding on mobile
-            'min-w-[2.5rem] sm:min-w-0' // Consistent min-width on mobile
-          )}
+          className="h-8 flex-shrink-0 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           title={tooltip}
           aria-label={tooltip}
         >
           <Icon className="w-4 h-4 flex-shrink-0" />
-          <span className="hidden sm:inline text-xs">{label}</span>
+          {!hideLabels && <span className="text-xs ml-1.5">{label}</span>}
         </Button>
       ))}
     </div>

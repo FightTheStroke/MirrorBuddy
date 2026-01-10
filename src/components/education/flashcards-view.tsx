@@ -11,9 +11,11 @@ import { DeckEditor } from './flashcards-view/components/deck-editor';
 
 interface FlashcardsViewProps {
   className?: string;
+  initialMaestroId?: string | null;
+  initialMode?: 'voice' | 'chat' | null;
 }
 
-export function FlashcardsView({ className }: FlashcardsViewProps) {
+export function FlashcardsView({ className, initialMaestroId, initialMode }: FlashcardsViewProps) {
   const {
     decks,
     loading,
@@ -34,7 +36,7 @@ export function FlashcardsView({ className }: FlashcardsViewProps) {
     closeStudyModal,
     closeCreateModal,
     saveDecks,
-  } = useFlashcardsView();
+  } = useFlashcardsView({ initialMaestroId, initialMode });
 
   return (
     <div className={cn('space-y-6', className)}>

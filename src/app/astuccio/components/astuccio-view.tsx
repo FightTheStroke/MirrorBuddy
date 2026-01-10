@@ -1,13 +1,6 @@
 'use client';
 
-/**
- * Astuccio View (Pencil Case - School Metaphor)
- * Creative tools hub with ALL 13 educational tools
- * Organized by category: Crea (Create), Carica (Upload), Cerca (Search)
- */
-
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Brain,
   HelpCircle,
@@ -24,21 +17,25 @@ import {
   BookOpen,
   Sparkles,
   Pencil,
+  PencilRuler,
   FolderUp,
   Globe,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ToolCard } from './tool-card';
+import { ToolMaestroSelectionDialog } from '@/components/education/tool-maestro-selection-dialog';
+import { StudyKitView } from '@/components/study-kit/StudyKitView';
 import type { ToolType } from '@/types/tools';
+import type { Maestro } from '@/types';
 import { cn } from '@/lib/utils';
+import { useUIStore } from '@/lib/stores';
+import { PageHeader } from '@/components/ui/page-header';
 
-// Tool definitions organized by category
 interface Tool {
   id: ToolType;
   title: string;
   description: string;
   icon: typeof Brain;
-  color: string;
   route: string;
 }
 
@@ -47,123 +44,37 @@ interface ToolCategory {
   title: string;
   subtitle: string;
   icon: typeof Pencil;
-  color: string;
   tools: Tool[];
 }
 
 const TOOL_CATEGORIES: ToolCategory[] = [
   {
-    id: 'crea',
-    title: 'Crea',
-    subtitle: 'Genera materiali di studio con l\'aiuto dei Maestri',
-    icon: Pencil,
-    color: 'blue',
-    tools: [
-      {
-        id: 'mindmap',
-        title: 'Mappa Mentale',
-        description: 'Visualizza i collegamenti tra concetti con mappe interattive',
-        icon: Brain,
-        color: 'blue',
-        route: '/maestri?tool=mindmap',
-      },
-      {
-        id: 'quiz',
-        title: 'Quiz',
-        description: 'Verifica la tua comprensione con quiz personalizzati',
-        icon: HelpCircle,
-        color: 'green',
-        route: '/maestri?tool=quiz',
-      },
-      {
-        id: 'flashcard',
-        title: 'Flashcard',
-        description: 'Memorizza con flashcard intelligenti e ripetizione spaziata',
-        icon: Layers,
-        color: 'orange',
-        route: '/maestri?tool=flashcard',
-      },
-      {
-        id: 'demo',
-        title: 'Demo Interattiva',
-        description: 'Esplora concetti STEM con simulazioni interattive',
-        icon: Play,
-        color: 'purple',
-        route: '/maestri?tool=demo',
-      },
-      {
-        id: 'summary',
-        title: 'Riassunto',
-        description: 'Genera sintesi chiare e strutturate dei concetti chiave',
-        icon: FileText,
-        color: 'cyan',
-        route: '/maestri?tool=summary',
-      },
-      {
-        id: 'diagram',
-        title: 'Diagramma',
-        description: 'Crea diagrammi di flusso e schemi visivi',
-        icon: GitBranch,
-        color: 'indigo',
-        route: '/maestri?tool=diagram',
-      },
-      {
-        id: 'timeline',
-        title: 'Linea Temporale',
-        description: 'Organizza eventi storici o sequenze in modo visivo',
-        icon: Clock,
-        color: 'amber',
-        route: '/maestri?tool=timeline',
-      },
-      {
-        id: 'formula',
-        title: 'Formula',
-        description: 'Visualizza e comprendi formule matematiche e scientifiche',
-        icon: Calculator,
-        color: 'rose',
-        route: '/maestri?tool=formula',
-      },
-      {
-        id: 'chart',
-        title: 'Grafico',
-        description: 'Crea grafici e visualizzazioni per dati e statistiche',
-        icon: BarChart3,
-        color: 'emerald',
-        route: '/maestri?tool=chart',
-      },
-    ],
-  },
-  {
     id: 'carica',
     title: 'Carica',
     subtitle: 'Importa i tuoi materiali per generare supporti di studio',
     icon: FolderUp,
-    color: 'teal',
     tools: [
-      {
-        id: 'pdf',
-        title: 'Carica PDF',
-        description: 'Carica un documento PDF e genera automaticamente materiali di studio',
-        icon: Upload,
-        color: 'teal',
-        route: '/maestri?tool=pdf&upload=true',
-      },
-      {
-        id: 'webcam',
-        title: 'Scatta Foto',
-        description: 'Fotografa la lavagna o i tuoi appunti per generare materiali',
-        icon: Camera,
-        color: 'pink',
-        route: '/maestri?tool=webcam&capture=true',
-      },
-      {
-        id: 'homework',
-        title: 'Aiuto Compiti',
-        description: 'Carica un esercizio e ricevi assistenza guidata passo-passo',
-        icon: BookOpen,
-        color: 'violet',
-        route: '/maestri?tool=homework',
-      },
+      { id: 'pdf', title: 'Carica PDF', description: 'Carica un documento PDF e genera automaticamente materiali di studio', icon: Upload, route: '/pdf' },
+      { id: 'webcam', title: 'Scatta Foto', description: 'Fotografa la lavagna o i tuoi appunti per generare materiali', icon: Camera, route: '/webcam' },
+      { id: 'homework', title: 'Aiuto Compiti', description: 'Carica un esercizio e ricevi assistenza guidata passo-passo', icon: BookOpen, route: '/homework' },
+      { id: 'study-kit', title: 'Study Kit', description: 'Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz', icon: BookOpen, route: '/study-kit' },
+    ],
+  },
+  {
+    id: 'crea',
+    title: 'Crea',
+    subtitle: 'Genera materiali di studio con l\'aiuto dei Maestri',
+    icon: Pencil,
+    tools: [
+      { id: 'mindmap', title: 'Mappa Mentale', description: 'Visualizza i collegamenti tra concetti con mappe interattive', icon: Brain, route: '/mindmap' },
+      { id: 'quiz', title: 'Quiz', description: 'Verifica la tua comprensione con quiz personalizzati', icon: HelpCircle, route: '/quiz' },
+      { id: 'flashcard', title: 'Flashcard', description: 'Memorizza con flashcard intelligenti e ripetizione spaziata', icon: Layers, route: '/flashcard' },
+      { id: 'demo', title: 'Demo Interattiva', description: 'Esplora concetti STEM con simulazioni interattive', icon: Play, route: '/demo' },
+      { id: 'summary', title: 'Riassunto', description: 'Genera sintesi chiare e strutturate dei concetti chiave', icon: FileText, route: '/summary' },
+      { id: 'diagram', title: 'Diagramma', description: 'Crea diagrammi di flusso e schemi visivi', icon: GitBranch, route: '/diagram' },
+      { id: 'timeline', title: 'Linea Temporale', description: 'Organizza eventi storici o sequenze in modo visivo', icon: Clock, route: '/timeline' },
+      { id: 'formula', title: 'Formula', description: 'Visualizza e comprendi formule matematiche e scientifiche', icon: Calculator, route: '/formula' },
+      { id: 'chart', title: 'Grafico', description: 'Crea grafici e visualizzazioni per dati e statistiche', icon: BarChart3, route: '/chart' },
     ],
   },
   {
@@ -171,258 +82,140 @@ const TOOL_CATEGORIES: ToolCategory[] = [
     title: 'Cerca',
     subtitle: 'Trova risorse e approfondimenti sul web',
     icon: Globe,
-    color: 'sky',
     tools: [
-      {
-        id: 'search',
-        title: 'Ricerca Web',
-        description: 'Cerca informazioni, video e risorse educative sul web',
-        icon: Search,
-        color: 'sky',
-        route: '/maestri?tool=search',
-      },
+      { id: 'search', title: 'Ricerca Web', description: 'Cerca informazioni, video e risorse educative sul web', icon: Search, route: '/search' },
     ],
   },
 ];
 
-// Category header colors
-const CATEGORY_COLORS = {
-  blue: {
-    bg: 'bg-blue-100/50 dark:bg-blue-900/20',
-    border: 'border-blue-200 dark:border-blue-800',
-    icon: 'text-blue-600 dark:text-blue-400',
-    title: 'text-blue-900 dark:text-blue-100',
-    subtitle: 'text-blue-600 dark:text-blue-400',
-  },
-  teal: {
-    bg: 'bg-teal-100/50 dark:bg-teal-900/20',
-    border: 'border-teal-200 dark:border-teal-800',
-    icon: 'text-teal-600 dark:text-teal-400',
-    title: 'text-teal-900 dark:text-teal-100',
-    subtitle: 'text-teal-600 dark:text-teal-400',
-  },
-  sky: {
-    bg: 'bg-sky-100/50 dark:bg-sky-900/20',
-    border: 'border-sky-200 dark:border-sky-800',
-    icon: 'text-sky-600 dark:text-sky-400',
-    title: 'text-sky-900 dark:text-sky-100',
-    subtitle: 'text-sky-600 dark:text-sky-400',
-  },
-};
 
-// Animation variants
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
 const categoryVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.4, 0, 0.2, 1] as const, // easeOut bezier curve
-    },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] as const } },
 };
 
-export function AstuccioView() {
-  const router = useRouter();
+interface AstuccioViewProps {
+  onToolRequest?: (toolType: ToolType, maestro: Maestro) => void;
+}
+
+export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
+  useUIStore(); // Keep store import for potential future use
   const [selectedTool, setSelectedTool] = useState<ToolType | null>(null);
+  const [isMaestroDialogOpen, setIsMaestroDialogOpen] = useState(false);
+  const [pendingToolRoute, setPendingToolRoute] = useState<string | null>(null);
+  const [pendingToolType, setPendingToolType] = useState<ToolType | null>(null);
+  const [showStudyKit, setShowStudyKit] = useState(false);
 
   const handleToolClick = useCallback((route: string, toolId: ToolType) => {
+    // Study Kit doesn't need maestro selection, show directly
+    if (route === '/study-kit') {
+      setShowStudyKit(true);
+      return;
+    }
+
     setSelectedTool(toolId);
-    router.push(route);
-  }, [router]);
+    setPendingToolRoute(route);
+    setPendingToolType(toolId);
+    setIsMaestroDialogOpen(true);
+  }, []);
+
+  const handleMaestroConfirm = useCallback((maestro: Maestro, _mode: 'voice' | 'chat') => {
+    if (pendingToolType && onToolRequest) {
+      onToolRequest(pendingToolType, maestro);
+    }
+    setIsMaestroDialogOpen(false);
+    setSelectedTool(null);
+    setPendingToolRoute(null);
+    setPendingToolType(null);
+  }, [pendingToolType, onToolRequest]);
+
+  const handleMaestroClose = useCallback(() => {
+    setIsMaestroDialogOpen(false);
+    setSelectedTool(null);
+    setPendingToolRoute(null);
+    setPendingToolType(null);
+  }, []);
+
+  // Show Study Kit view if selected
+  if (showStudyKit) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <button
+          onClick={() => setShowStudyKit(false)}
+          className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
+        >
+          ← Torna all&apos;Astuccio
+        </button>
+        <StudyKitView />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-10 text-center"
-        >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Sparkles className="w-10 h-10 text-primary animate-pulse" aria-hidden="true" />
-            <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
-              Il Tuo Astuccio
-            </h1>
-            <Sparkles className="w-10 h-10 text-primary animate-pulse" aria-hidden="true" />
-          </div>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Tutti gli strumenti per studiare meglio.
-            Scegli una categoria e inizia a creare i tuoi materiali.
-          </p>
-        </motion.div>
+    <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <PageHeader icon={PencilRuler} title="Il Tuo Astuccio" />
 
-        {/* Tool Categories */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="space-y-10"
-        >
-          {TOOL_CATEGORIES.map((category) => {
-            const colors = CATEGORY_COLORS[category.color as keyof typeof CATEGORY_COLORS];
-            const CategoryIcon = category.icon;
-
-            return (
-              <motion.section
-                key={category.id}
-                variants={categoryVariants}
-                className="space-y-4"
-                aria-labelledby={`category-${category.id}`}
-              >
-                {/* Category Header */}
-                <div
-                  className={cn(
-                    'flex items-center gap-4 p-4 rounded-xl border',
-                    colors.bg,
-                    colors.border
-                  )}
-                >
-                  <div
-                    className={cn(
-                      'w-12 h-12 rounded-xl flex items-center justify-center',
-                      'bg-white dark:bg-slate-800 shadow-sm'
-                    )}
-                  >
-                    <CategoryIcon className={cn('w-6 h-6', colors.icon)} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h2
-                      id={`category-${category.id}`}
-                      className={cn('text-xl font-bold', colors.title)}
-                    >
-                      {category.title}
-                    </h2>
-                    <p className={cn('text-sm', colors.subtitle)}>
-                      {category.subtitle}
-                    </p>
-                  </div>
-                  <div className="ml-auto">
-                    <span
-                      className={cn(
-                        'text-sm font-medium px-3 py-1 rounded-full',
-                        'bg-white dark:bg-slate-800',
-                        colors.title
-                      )}
-                    >
-                      {category.tools.length} {category.tools.length === 1 ? 'strumento' : 'strumenti'}
-                    </span>
-                  </div>
+      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-10">
+        {TOOL_CATEGORIES.map((category) => {
+          const CategoryIcon = category.icon;
+          return (
+            <motion.section key={category.id} variants={categoryVariants} className="space-y-4">
+              <div className="flex items-center gap-4 p-4 rounded-xl border bg-muted/50 border-border">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-card shadow-sm">
+                  <CategoryIcon className="w-6 h-6 text-muted-foreground" />
                 </div>
-
-                {/* Tools Grid */}
-                <div
-                  className={cn(
-                    'grid gap-4',
-                    category.tools.length === 1
-                      ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
-                      : category.tools.length <= 3
-                        ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
-                  )}
-                >
-                  {category.tools.map((tool, index) => (
-                    <motion.div
-                      key={tool.id}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <ToolCard
-                        title={tool.title}
-                        description={tool.description}
-                        icon={tool.icon}
-                        color={tool.color}
-                        onClick={() => handleToolClick(tool.route, tool.id)}
-                        isActive={selectedTool === tool.id}
-                      />
-                    </motion.div>
-                  ))}
+                <div>
+                  <h2 className="text-xl font-bold text-foreground">{category.title}</h2>
+                  <p className="text-sm text-muted-foreground">{category.subtitle}</p>
                 </div>
-              </motion.section>
-            );
-          })}
-        </motion.div>
+                <div className="ml-auto">
+                  <span className="text-sm font-medium px-3 py-1 rounded-full bg-card border text-foreground">{category.tools.length} strumenti</span>
+                </div>
+              </div>
+              <div className={cn('grid gap-4', category.tools.length === 1 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4' : category.tools.length <= 3 ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4')}>
+                {category.tools.map((tool, index) => (
+                  <motion.div key={tool.route} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: index * 0.05 }}>
+                    <ToolCard title={tool.title} description={tool.description} icon={tool.icon} onClick={() => handleToolClick(tool.route, tool.id)} isActive={selectedTool === tool.id} />
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          );
+        })}
+      </motion.div>
 
-        {/* Info Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="mt-12 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8"
-        >
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center">
-            Come Funziona?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">1</span>
-              </div>
-              <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-                Scegli lo Strumento
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Seleziona lo strumento più adatto al tuo obiettivo di apprendimento
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-green-600 dark:text-green-400">2</span>
-              </div>
-              <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-                Scegli il Maestro
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Ogni maestro ha un approccio unico per aiutarti a imparare
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
-              </div>
-              <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-                Salva nello Zaino
-              </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                I materiali creati vengono salvati nel tuo Zaino per riusarli quando vuoi
-              </p>
-            </div>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="mt-12 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8">
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center">Come Funziona?</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4"><span className="text-2xl font-bold text-blue-600 dark:text-blue-400">1</span></div>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Scegli lo Strumento</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Seleziona lo strumento piu adatto al tuo obiettivo di apprendimento</p>
           </div>
-        </motion.div>
+          <div className="text-center">
+            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4"><span className="text-2xl font-bold text-green-600 dark:text-green-400">2</span></div>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Scegli il Maestro</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Ogni maestro ha un approccio unico per aiutarti a imparare</p>
+          </div>
+          <div className="text-center">
+            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4"><span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span></div>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Salva nello Zaino</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">I materiali creati vengono salvati nel tuo Zaino per riusarli quando vuoi</p>
+          </div>
+        </div>
+      </motion.div>
 
-        {/* Tips Section */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-xl p-6 border border-blue-200 dark:border-blue-800"
-        >
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
-            <Sparkles className="w-5 h-5" aria-hidden="true" />
-            Consiglio per Studiare
-          </h3>
-          <p className="text-sm text-blue-700 dark:text-blue-300">
-            Inizia con una <strong>Mappa Mentale</strong> per avere una visione d&apos;insieme,
-            poi crea delle <strong>Flashcard</strong> per memorizzare i concetti chiave,
-            e infine verifica la tua preparazione con un <strong>Quiz</strong>.
-            Tutti i materiali saranno salvati nel tuo <strong>Zaino</strong>!
-          </p>
-        </motion.div>
-      </div>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+        <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2"><Sparkles className="w-5 h-5" /> Consiglio per Studiare</h3>
+        <p className="text-sm text-blue-700 dark:text-blue-300">Inizia con una <strong>Mappa Mentale</strong> per avere una visione d&apos;insieme, poi crea delle <strong>Flashcard</strong> per memorizzare i concetti chiave, e infine verifica la tua preparazione con un <strong>Quiz</strong>. Tutti i materiali saranno salvati nel tuo <strong>Zaino</strong>!</p>
+      </motion.div>
+
+      <ToolMaestroSelectionDialog isOpen={isMaestroDialogOpen} toolType={selectedTool ?? 'mindmap'} onConfirm={handleMaestroConfirm} onClose={handleMaestroClose} />
     </div>
   );
 }

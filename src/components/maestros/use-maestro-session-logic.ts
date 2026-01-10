@@ -1,19 +1,20 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useProgressStore, useUIStore } from '@/lib/stores';
+import { useProgressStore } from '@/lib/stores';
 import toast from '@/components/ui/toast';
 import { generateAutoEvaluation } from './maestro-session-utils';
 import { MAESTRI_XP } from '@/lib/constants/xp-rewards';
 import { useMaestroVoiceConnection } from './use-maestro-voice-connection';
 import { useMaestroChatHandlers } from './use-maestro-chat-handlers';
 import { logger } from '@/lib/logger';
-import type { Maestro, ChatMessage, ToolCall } from '@/types';
+import type { Maestro, ChatMessage, ToolCall, ToolType } from '@/types';
 
 interface UseMaestroSessionLogicProps {
   maestro: Maestro;
   initialMode: 'voice' | 'chat';
+  requestedToolType?: ToolType;
 }
 
-export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessionLogicProps) {
+export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType }: UseMaestroSessionLogicProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,10 +31,8 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
   const questionCount = useRef(0);
   const previousMessageCountRef = useRef(0);
   const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const processedToolsRef = useRef<Set<string>>(new Set());
 
   const { addXP, endSession } = useProgressStore();
-  const { enterFocusMode } = useUIStore();
 
   const onQuestionAsked = useCallback(() => {
     questionCount.current += 1;
@@ -62,15 +61,43 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     onQuestionAsked,
   });
 
-  // Initialize greeting and pending tool request
+  // Initialize session with contextual greeting based on requested tool
   useEffect(() => {
-    setMessages([{
-      id: 'greeting',
-      role: 'assistant',
-      content: maestro.greeting,
-      timestamp: new Date(),
-    }]);
+    const initialMessages: ChatMessage[] = [];
 
+    // Add contextual initial message if a tool was requested from the astuccio
+    if (requestedToolType) {
+      const contextualGreetings: Record<ToolType, string> = {
+        mindmap: `Ciao! Vedo che vuoi creare una mappa mentale. Su quale argomento vorresti lavorare?`,
+        quiz: `Ciao! Vuoi creare un quiz per verificare le tue conoscenze. Di quale materia o argomento?`,
+        flashcard: `Ciao! Creiamo insieme delle flashcard! Quale argomento vuoi memorizzare?`,
+        summary: `Ciao! Vuoi un riassunto. Di quale testo o argomento?`,
+        demo: `Ciao! Creiamo una demo interattiva! Quale concetto STEM vuoi esplorare?`,
+        search: `Ciao! Cosa vorresti cercare?`,
+        pdf: `Ciao! Sono pronto ad aiutarti. Cosa vuoi caricare?`,
+        webcam: `Ciao! Sono pronto ad aiutarti. Cosa vuoi fotografare?`,
+        homework: `Ciao! Sono pronto ad aiutarti con i compiti. Cosa vuoi caricare?`,
+        diagram: `Ciao! Creiamo un diagramma insieme. Quale concetto vuoi visualizzare?`,
+        timeline: `Ciao! Creiamo una linea temporale. Quale periodo storico o sequenza di eventi vuoi organizzare?`,
+        formula: `Ciao! Vuoi lavorare con le formule. Quale formula matematica o scientifica vuoi esplorare?`,
+        chart: `Ciao! Creiamo un grafico insieme. Quali dati vuoi visualizzare?`,
+        'study-kit': `Ciao! Creiamo materiali di studio completi. Carica un PDF per iniziare!`,
+      };
+
+      const greeting = contextualGreetings[requestedToolType];
+      if (greeting) {
+        initialMessages.push({
+          id: `initial-${Date.now()}`,
+          role: 'assistant',
+          content: greeting,
+          timestamp: new Date(),
+        });
+      }
+    }
+
+    setMessages(initialMessages);
+
+    // Handle legacy pendingToolRequest from sessionStorage (backward compatibility)
     const pendingRequest = sessionStorage.getItem('pendingToolRequest');
     if (pendingRequest) {
       try {
@@ -94,52 +121,10 @@ export function useMaestroSessionLogic({ maestro, initialMode }: UseMaestroSessi
     return () => {
       if (timeoutRef) clearTimeout(timeoutRef);
     };
-  }, [maestro.greeting, maestro.id]);
+  }, [maestro.id, requestedToolType]);
 
-  // Auto-switch to focus mode for completed tools
-  useEffect(() => {
-    const completedTools = toolCalls.filter(
-      (tc) => tc.status === 'completed' && !processedToolsRef.current.has(tc.id)
-    );
-
-    if (completedTools.length === 0) return;
-
-    const toolCall = completedTools[0];
-    processedToolsRef.current.add(toolCall.id);
-
-    const toolTypeMap: Record<string, string> = {
-      create_mindmap: 'mindmap',
-      create_quiz: 'quiz',
-      create_flashcards: 'flashcard',
-      create_summary: 'summary',
-      create_demo: 'demo',
-      create_diagram: 'diagram',
-      create_timeline: 'timeline',
-      web_search: 'search',
-    };
-    const mappedToolType = (toolTypeMap[toolCall.type] || 'mindmap') as import('@/types/tools').ToolType;
-    const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
-
-    // Set focus mode with tool atomically to prevent race condition
-    enterFocusMode({
-      toolType: mappedToolType,
-      maestroId: maestro.id,
-      interactionMode: voiceConnection.isVoiceActive ? 'voice' : 'chat',
-      initialTool: {
-        id: toolCall.id,
-        type: mappedToolType,
-        status: 'completed',
-        progress: 1,
-        content: toolContent,
-        createdAt: new Date(),
-      },
-    });
-
-    logger.debug('[MaestroSession] C-17: Entered focus mode for tool', {
-      toolId: toolCall.id,
-      toolType: mappedToolType,
-    });
-  }, [toolCalls, enterFocusMode, maestro.id, voiceConnection.isVoiceActive]);
+  // Tools are now displayed inline in the chat instead of opening in fullscreen
+  // Removed auto-switch to focus mode - tools remain integrated in the chat interface
 
   const handleEndSession = useCallback(async () => {
     if (voiceConnection.isVoiceActive) {

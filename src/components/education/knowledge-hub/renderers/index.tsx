@@ -130,6 +130,7 @@ export const RENDERER_LABELS: Record<ToolType, string> = {
   webcam: 'Immagine',
   homework: 'Compiti',
   search: 'Ricerca',
+  'study-kit': 'Study Kit',
 };
 
 // Map of tool types to their icons (Lucide icon names)
@@ -147,4 +148,5 @@ export const RENDERER_ICONS: Record<ToolType, string> = {
   webcam: 'image',
   homework: 'book-open',
   search: 'search',
+  'study-kit': 'book-open',
 };

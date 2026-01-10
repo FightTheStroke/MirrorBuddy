@@ -16,6 +16,8 @@ interface MaestroSessionMessagesProps {
   speak: (text: string) => void;
   voiceSessionId?: string | null;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  fullscreenToolId?: string | null;
+  onToggleToolFullscreen?: (toolId: string) => void;
 }
 
 export function MaestroSessionMessages({
@@ -27,10 +29,12 @@ export function MaestroSessionMessages({
   speak,
   voiceSessionId,
   messagesEndRef,
+  fullscreenToolId,
+  onToggleToolFullscreen,
 }: MaestroSessionMessagesProps) {
   return (
     <div
-      className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50"
+      className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-4 bg-slate-50 dark:bg-slate-900/50 min-w-0"
       role="log"
       aria-live="polite"
       aria-label="Messaggi della conversazione"
@@ -55,17 +59,25 @@ export function MaestroSessionMessages({
         )
       ))}
 
-      {/* Tool results inline */}
-      {toolCalls.map((tool) => (
-        <motion.div
-          key={tool.id}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="mb-4"
-        >
-          <ToolResultDisplay toolCall={tool} sessionId={voiceSessionId} />
-        </motion.div>
-      ))}
+      {/* Tool results inline - Skip fullscreen tools, they're rendered separately */}
+      {toolCalls.map((tool) => {
+        if (fullscreenToolId === tool.id) return null;
+        return (
+          <motion.div
+            key={tool.id}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-4"
+          >
+            <ToolResultDisplay 
+              toolCall={tool} 
+              sessionId={voiceSessionId}
+              isFullscreen={false}
+              onToggleFullscreen={onToggleToolFullscreen ? () => onToggleToolFullscreen(tool.id) : undefined}
+            />
+          </motion.div>
+        );
+      })}
 
       {/* Loading indicator */}
       {isLoading && (

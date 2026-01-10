@@ -24,7 +24,7 @@ import React, { type ReactElement } from 'react';
 export async function generateAccessiblePDF(
   request: PDFGeneratorRequest
 ): Promise<{ buffer: Buffer; filename: string; size: number }> {
-  const { kitId, materialId, profile: profileType, format = 'A4' } = request;
+  const { kitId, materialId, profile: profileType, format = 'A4', studyKit } = request;
 
   // Get profile configuration
   const profile = getProfile(profileType);
@@ -33,8 +33,8 @@ export async function generateAccessiblePDF(
     throw new Error(`Unknown DSA profile: ${profileType}`);
   }
 
-  // Extract content from Study Kit
-  const content = await extractStudyKitContent(kitId, materialId);
+  // Extract content from Study Kit - pass studyKit directly if available (server-side)
+  const content = await extractStudyKitContent(studyKit || kitId, materialId);
 
   // Generate PDF buffer
   const pdfElement = React.createElement(PDFDocument, {

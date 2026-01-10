@@ -50,6 +50,23 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
   health: [],
   philosophy: [],
   internationalLaw: [],
+  spanish: [
+    /spagnol/i,
+    /español/i,
+    /spanish/i,
+    /casa\s*di?\s*carta/i,
+    /money\s*heist/i,
+    /alex\s*pina/i,
+    /castellano/i,
+    /reggaeton/i,
+  ],
+  storytelling: [
+    /storytelling/i,
+    /public\s*speaking/i,
+    /presentazion/i,
+    /parlare\s*in\s*pubblico/i,
+    /comunicazion/i,
+  ],
 };
 
 export const EMOTIONAL_PATTERNS: Record<EmotionalIndicator, RegExp[]> = {
@@ -140,6 +157,7 @@ export const TOOL_TYPE_PATTERNS: Record<ToolType, RegExp[]> = {
   pdf: [],
   homework: [],
   webcam: [],
+  'study-kit': [],
 };
 
 export const CRISIS_PATTERNS: RegExp[] = [

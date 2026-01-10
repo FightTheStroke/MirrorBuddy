@@ -237,17 +237,17 @@ git checkout -b MirrorBuddy
 git push -u origin MirrorBuddy
 
 # 2. Create worktrees for parallel development
-git worktree add ../convergioedu-safety MirrorBuddy-safety -b MirrorBuddy-safety
-git worktree add ../convergioedu-storage MirrorBuddy-storage -b MirrorBuddy-storage
-git worktree add ../convergioedu-realtime MirrorBuddy-realtime -b MirrorBuddy-realtime
-git worktree add ../convergioedu-ai MirrorBuddy-ai -b MirrorBuddy-ai
-git worktree add ../convergioedu-ui MirrorBuddy-ui -b MirrorBuddy-ui
+git worktree add ../mirrorbuddy-safety MirrorBuddy-safety -b MirrorBuddy-safety
+git worktree add ../mirrorbuddy-storage MirrorBuddy-storage -b MirrorBuddy-storage
+git worktree add ../mirrorbuddy-realtime MirrorBuddy-realtime -b MirrorBuddy-realtime
+git worktree add ../mirrorbuddy-ai MirrorBuddy-ai -b MirrorBuddy-ai
+git worktree add ../mirrorbuddy-ui MirrorBuddy-ui -b MirrorBuddy-ui
 
 # 3. Each Claude works in their worktree
-# cd ../convergioedu-safety  (CLAUDE 2)
-# cd ../convergioedu-realtime (CLAUDE 3)
-# cd ../convergioedu-ai (CLAUDE 4)
-# cd ../convergioedu-ui (CLAUDE 3 - UI components)
+# cd ../mirrorbuddy-safety  (CLAUDE 2)
+# cd ../mirrorbuddy-realtime (CLAUDE 3)
+# cd ../mirrorbuddy-ai (CLAUDE 4)
+# cd ../mirrorbuddy-ui (CLAUDE 3 - UI components)
 
 # 4. Merge into MirrorBuddy when phase complete
 git checkout MirrorBuddy
@@ -256,7 +256,7 @@ git merge MirrorBuddy-storage
 # etc.
 
 # 5. Cleanup worktrees when done
-git worktree remove ../convergioedu-safety
+git worktree remove ../mirrorbuddy-safety
 ```
 
 ### Worktree File Isolation
@@ -493,8 +493,8 @@ git worktree remove ../convergioedu-safety
 ## CLAUDE 2: SAFETY + STORAGE
 
 ### Worktrees
-- `../convergioedu-safety` (MirrorBuddy-safety)
-- `../convergioedu-storage` (MirrorBuddy-storage)
+- `../mirrorbuddy-safety` (MirrorBuddy-safety)
+- `../mirrorbuddy-storage` (MirrorBuddy-storage)
 
 ### Phase 0: Safety (PRIORITY 1)
 
@@ -578,7 +578,7 @@ Create storage service, webcam improvements, PDF processing as per previous plan
 ## CLAUDE 3: REALTIME + UI
 
 ### Worktree
-- `../convergioedu-realtime` (MirrorBuddy-realtime)
+- `../mirrorbuddy-realtime` (MirrorBuddy-realtime)
 
 ### Phase 1B: Realtime Infrastructure
 
@@ -617,7 +617,7 @@ UI for switching between Melissa, Mario, and Maestri.
 ## CLAUDE 4: AI CHARACTERS
 
 ### Worktree
-- `../convergioedu-ai` (MirrorBuddy-ai)
+- `../mirrorbuddy-ai` (MirrorBuddy-ai)
 
 ### Phase 1C: Characters
 

@@ -80,7 +80,7 @@ export function useSendSessionConfig(
 
     // Get language setting from settings store
     const appearance = useSettingsStore.getState().appearance;
-    const language = appearance?.language || 'it';
+    const userLanguage = appearance?.language || 'it';
 
     // C-1 FIX: Full language names for instructions
     const languageNames: Record<string, string> = {
@@ -90,6 +90,11 @@ export function useSendSessionConfig(
       fr: 'French (Français)',
       de: 'German (Deutsch)',
     };
+
+    // Check if this is a language teacher (English, Spanish, etc.)
+    // Language teachers need bilingual support (Italian + target language)
+    const isLanguageTeacher = maestro.subject === 'english' || maestro.subject === 'spanish';
+    const targetLanguage = maestro.subject === 'english' ? 'en' : maestro.subject === 'spanish' ? 'es' : null;
 
     // FIX: Azure Realtime API expects ISO language codes for transcription
     // NOT full names - the error message clearly shows: 'it', 'en', 'es', etc.
@@ -111,6 +116,12 @@ export function useSendSessionConfig(
       fr: 'MirrorBuddy, professeur, mathématiques, français, histoire, géographie, sciences, art, musique, leçon, devoirs, exercice, explication, question, réponse, correct, incorrect, aide, merci, oui, non, je ne comprends pas, répète',
       de: 'MirrorBuddy, Lehrer, Mathematik, Deutsch, Geschichte, Geographie, Wissenschaft, Kunst, Musik, Lektion, Hausaufgaben, Übung, Erklärung, Frage, Antwort, richtig, falsch, Hilfe, danke, ja, nein, ich verstehe nicht, wiederhole',
     };
+    
+    // Combined prompts for language teachers (Italian + target language)
+    const bilingualPrompts: Record<string, string> = {
+      en: `${transcriptionPrompts.it}, ${transcriptionPrompts.en}, pronunciation, repeat after me, say it, how do you say, what does mean, grammar, vocabulary, phrase, sentence, dialogue, conversation`,
+      es: `${transcriptionPrompts.it}, ${transcriptionPrompts.es}, pronunciación, repite conmigo, cómo se dice, qué significa, gramática, vocabulario, frase, oración, diálogo, conversación, La Casa de Papel, Money Heist, Bella Ciao`,
+    };
 
     // Fetch conversation memory
     let memoryContext = '';
@@ -121,11 +132,33 @@ export function useSendSessionConfig(
       // Continue without memory
     }
 
-    // Build instructions
-    const languageInstruction = `
+    // Build instructions based on teacher type
+    // Language teachers use bilingual mode, others use strict single language
+    const languageInstruction = isLanguageTeacher && targetLanguage
+      ? `
+# BILINGUAL LANGUAGE TEACHING MODE
+You are teaching ${targetLanguage === 'en' ? 'ENGLISH' : 'SPANISH'} to an Italian student.
+
+BILINGUAL RULES:
+- Use ITALIAN for explanations, instructions, and meta-communication
+- Use ${targetLanguage === 'en' ? 'ENGLISH' : 'SPANISH'} for:
+  * Teaching vocabulary and phrases
+  * Pronunciation practice (have student repeat)
+  * Conversations and dialogues
+  * Example sentences
+  * When the student speaks in ${targetLanguage === 'en' ? 'English' : 'Spanish'}
+- The STUDENT may speak in EITHER language - understand both!
+- Encourage the student to practice speaking ${targetLanguage === 'en' ? 'English' : 'Spanish'}
+- Praise attempts: "Great pronunciation!", "¡Muy bien!", "Ottimo!"
+- Gently correct mistakes without shaming
+
+TRANSCRIPTION NOTE: The student may speak Italian OR ${targetLanguage === 'en' ? 'English' : 'Spanish'}.
+Both languages will be transcribed correctly.
+`
+      : `
 # LANGUAGE RULE (CRITICAL!)
-YOU MUST SPEAK ONLY IN ${languageNames[language].toUpperCase()}!
-EVERY word, response, and question MUST be in ${languageNames[language]}.
+YOU MUST SPEAK ONLY IN ${languageNames[userLanguage].toUpperCase()}!
+EVERY word, response, and question MUST be in ${languageNames[userLanguage]}.
 NO exceptions. NO mixing languages.
 `;
 
@@ -173,9 +206,20 @@ Share anecdotes from your "life" and "experiences" as ${maestro.name}.
         },
         input_audio_transcription: {
           model: 'whisper-1',
-          language: transcriptionLanguages[language] || 'it',
-          // Keyword hints to improve transcription accuracy
-          prompt: transcriptionPrompts[language] || transcriptionPrompts.it,
+          // For language teachers: don't specify language (automatic detection)
+          // This allows students to speak both Italian AND the target language
+          // For other teachers: use the user's language setting
+          ...(isLanguageTeacher && targetLanguage
+            ? {
+                // Automatic language detection - don't specify 'language' field
+                // Whisper will detect whether student speaks Italian or target language
+                prompt: bilingualPrompts[targetLanguage] || transcriptionPrompts.it,
+              }
+            : {
+                language: transcriptionLanguages[userLanguage] || 'it',
+                prompt: transcriptionPrompts[userLanguage] || transcriptionPrompts.it,
+              }
+          ),
         },
         turn_detection: {
           type: 'server_vad',

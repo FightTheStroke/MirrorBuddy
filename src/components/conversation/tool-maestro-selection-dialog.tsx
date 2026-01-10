@@ -37,6 +37,7 @@ const TOOL_NAMES: Record<ToolType, string> = {
   webcam: 'Foto',
   pdf: 'PDF',
   homework: 'Compiti',
+  'study-kit': 'Study Kit',
 };
 
 export function ToolMaestroSelectionDialog({

@@ -17,6 +17,7 @@ import {
   Volume2,
   Music,
   Wrench,
+  Settings,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ import { TelemetryDashboard } from '@/components/telemetry';
 import { OnboardingSettings } from '@/components/settings/onboarding-settings';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { PageHeader } from '@/components/ui/page-header';
 
 // Import section components
 import {
@@ -124,39 +126,34 @@ export function SettingsView() {
   }, [updateStudentProfile, updateAppearance, updateAccessibilitySettings]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Impostazioni
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Personalizza la tua esperienza di apprendimento
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={handleUndo}
-            variant="outline"
-            disabled={!hasChanges || isSaving}
-            title="Annulla modifiche"
-          >
-            <Undo2 className="w-4 h-4 mr-2" />
-            Annulla
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={isSaving}
-            className={cn(
-              hasChanges && !isSaving && 'bg-amber-500 hover:bg-amber-600 animate-pulse'
-            )}
-          >
-            <Save className="w-4 h-4 mr-2" />
-            {isSaving ? 'Salvando...' : hasChanges ? 'Salva Modifiche' : 'Salva'}
-          </Button>
-        </div>
-      </div>
+    <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
+      <PageHeader
+        icon={Settings}
+        title="Impostazioni"
+        rightContent={
+          <>
+            <Button
+              onClick={handleUndo}
+              variant="outline"
+              disabled={!hasChanges || isSaving}
+              title="Annulla modifiche"
+            >
+              <Undo2 className="w-4 h-4 mr-2" />
+              Annulla
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              className={cn(
+                hasChanges && !isSaving && 'bg-amber-500 hover:bg-amber-600 animate-pulse'
+              )}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Salvando...' : hasChanges ? 'Salva Modifiche' : 'Salva'}
+            </Button>
+          </>
+        }
+      />
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-700 pb-4">

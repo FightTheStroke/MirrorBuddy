@@ -115,6 +115,7 @@ export interface PDFGeneratorRequest {
   profile: DSAProfile;
   format?: 'A4' | 'Letter';
   studentId?: string;
+  studyKit?: Record<string, unknown>; // Optional: pass studyKit directly to avoid fetch
 }
 
 export interface PDFGeneratorResponse {

@@ -20,6 +20,8 @@ import { ippocrate } from './ippocrate';
 import { feynman } from './feynman';
 import { darwin } from './darwin';
 import { chris } from './chris';
+import { omero } from './omero';
+import { alexPina } from './alex-pina';
 
 export type { MaestroFull } from './types';
 export { SAFETY_GUIDELINES } from './types';
@@ -41,7 +43,9 @@ export const maestri: MaestroFull[] = [
   ippocrate,
   feynman,
   darwin,
-  chris
+  chris,
+  omero,
+  alexPina,
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
@@ -72,8 +76,15 @@ export const SUBJECT_NAMES: Record<string, string> = {
   'italian': 'Italiano',
   'music': 'Musica',
   'english': 'Inglese',
+  'spanish': 'Spagnolo',
   'economics': 'Economia',
   'philosophy': 'Filosofia',
   'civic-education': 'Educazione Civica',
-  'storytelling': 'Storytelling'
+  'storytelling': 'Storytelling',
+  'mathematics': 'Matematica',
+  'biology': 'Biologia',
+  'civics': 'Educazione Civica',
+  'computerScience': 'Informatica',
+  'health': 'Salute',
+  'internationalLaw': 'Diritto Internazionale',
 };
