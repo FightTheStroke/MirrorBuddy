@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { RotaryPhoneIcon, RotaryPhoneOffIcon } from '@/components/ui/rotary-phone-icon';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
 
@@ -93,10 +94,18 @@ export function MaestroSessionHeader({
             configError && !isVoiceActive && 'opacity-50 cursor-not-allowed'
           )}
         >
-          {isVoiceActive ? (
-            <PhoneOff className="w-4 h-4 sm:w-5 sm:h-5" />
+          {maestro.customCallIcon === 'RotaryPhone' ? (
+            isVoiceActive ? (
+              <RotaryPhoneOffIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            ) : (
+              <RotaryPhoneIcon className="w-4 h-4 sm:w-5 sm:h-5" />
+            )
           ) : (
-            <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+            isVoiceActive ? (
+              <PhoneOff className="w-4 h-4 sm:w-5 sm:h-5" />
+            ) : (
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
+            )
           )}
         </Button>
 

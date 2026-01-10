@@ -34,22 +34,13 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
     {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
       name: 'webkit',
       use: { ...devices['Desktop Safari'] },
     },
-    // Mobile viewports
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
+    // Mobile viewports disabled - app optimized for desktop
+    // Re-enable when mobile optimization begins:
+    // { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
+    // { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } },
   ],
 
   webServer: {
