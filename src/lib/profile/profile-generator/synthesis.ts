@@ -2,7 +2,7 @@
  * Synthesis functions for Profile Generator
  */
 
-import type { MaestroInsightInput, SynthesisContext } from '../profile-generator/types';
+import type { MaestroInsightInput, SynthesisContext } from './types';
 
 export const MELISSA_SYNTHESIS_PROMPT = `
 Sei Melissa, coordinatrice del profilo studente in MirrorBuddy.

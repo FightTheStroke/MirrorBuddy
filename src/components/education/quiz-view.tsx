@@ -13,9 +13,10 @@ import type { Quiz as QuizType, QuizResult, Subject, Maestro } from '@/types';
 import { subjectNames, subjectIcons, subjectColors } from '@/data';
 import { cn } from '@/lib/utils';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
+import type { QuizViewProps } from './quiz-view/types';
+import { sampleQuizzes } from './quiz-view/constants';
 
-// Sample quizzes for demonstration
-const sampleQuizzes: QuizType[] = [
+export type { QuizViewProps } from './quiz-view/types';
   {
     id: 'math-basics',
     title: 'Matematica - Le basi',
@@ -139,10 +140,6 @@ const sampleQuizzes: QuizType[] = [
   },
 ];
 
-interface QuizViewProps {
-  initialMaestroId?: string | null;
-  initialMode?: 'voice' | 'chat' | null;
-}
 
 export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   const _router = useRouter();

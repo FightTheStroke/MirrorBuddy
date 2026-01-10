@@ -34,20 +34,11 @@ import { useMaterialsSearch } from './hooks/use-materials-search';
 import { useCollections } from './hooks/use-collections';
 import type { SearchableMaterial } from '@/lib/search/searchable-text';
 
-// ============================================================================
-// Types
-// ============================================================================
+import type { ViewMode, ViewOption, KnowledgeHubProps } from './knowledge-hub/types';
 
-type ViewMode = 'explorer' | 'gallery' | 'timeline' | 'calendar';
+export type { ViewMode, ViewOption, KnowledgeHubProps } from './knowledge-hub/types';
 
-interface ViewOption {
-  id: ViewMode;
-  label: string;
-  icon: React.ReactNode;
-  description: string;
-}
-
-export interface KnowledgeHubProps {
+export interface KnowledgeHubPropsInternal {
   /** Initial materials data */
   materials?: KnowledgeHubMaterial[];
   /** Initial collections data */
