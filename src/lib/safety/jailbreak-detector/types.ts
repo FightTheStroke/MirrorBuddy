@@ -42,12 +42,10 @@ export interface JailbreakDetection {
  * Conversation context for multi-turn detection
  */
 export interface ConversationContext {
-  messages: Array<{
-    role: 'user' | 'assistant';
-    content: string;
-    timestamp: Date;
-  }>;
-  suspiciousPatterns: string[];
-  threatScore: number;
-  lastDetection: JailbreakDetection | null;
+  /** Recent messages (last 10) */
+  recentMessages: string[];
+  /** Number of previous warnings in session */
+  warningCount: number;
+  /** Time since session start (seconds) */
+  sessionDuration: number;
 }
