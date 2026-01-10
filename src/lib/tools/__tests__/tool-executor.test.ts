@@ -150,7 +150,7 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_quiz', mockHandler);
 
-      const result = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
+      const result = await executeToolCall('create_quiz', { topic: 'Test Quiz' }, { sessionId: 'test' });
 
       // Handler's toolId should be preserved
       expect(result.toolId).toBe('handler-provided-id');
@@ -168,7 +168,7 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_demo', mockHandler);
 
-      await executeToolCall('create_demo', { title: 'Test Demo' }, { sessionId: 'test', maestroId: 'galileo' });
+      await executeToolCall('create_demo', { topic: 'Test Demo' }, { sessionId: 'test', maestroId: 'galileo' });
 
       expect(broadcastToolEvent).toHaveBeenCalledWith(
         expect.objectContaining({

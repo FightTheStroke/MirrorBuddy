@@ -99,6 +99,7 @@ const DEFAULT_MAESTRO_BY_SUBJECT: Record<Subject, string> = {
   internationalLaw: 'grozio-diritto', // Fallback will find actual maestro if exists
   spanish: 'alex-pina-spagnolo',
   storytelling: 'chris-storytelling',
+  supercazzola: 'mascetti-supercazzola',
 };
 
 // ============================================================================

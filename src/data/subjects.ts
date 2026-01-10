@@ -24,6 +24,7 @@ export const subjectColors: Record<Subject, string> = {
   philosophy: '#8B5CF6',     // Purple
   internationalLaw: '#0EA5E9', // Sky
   storytelling: '#E63946',   // Red (Chris)
+  supercazzola: '#722F37',   // Wine (Mascetti)
 };
 
 export const subjectNames: Record<Subject, string> = {
@@ -45,6 +46,7 @@ export const subjectNames: Record<Subject, string> = {
   philosophy: 'Filosofia',
   internationalLaw: 'Diritto Internazionale',
   storytelling: 'Storytelling',
+  supercazzola: 'Supercazzola',
 };
 
 export const subjectIcons: Record<Subject, string> = {
@@ -66,6 +68,7 @@ export const subjectIcons: Record<Subject, string> = {
   philosophy: '🤔',
   internationalLaw: '🌐',
   storytelling: '🎤',
+  supercazzola: '🎭',
 };
 
 export const subjectLucideIconNames: Record<Subject, string> = {
@@ -87,4 +90,5 @@ export const subjectLucideIconNames: Record<Subject, string> = {
   philosophy: 'Lightbulb',
   internationalLaw: 'Globe2',
   storytelling: 'Mic',
+  supercazzola: 'Drama',
 };
