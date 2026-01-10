@@ -3,7 +3,7 @@
  */
 
 import type { ToolType } from '@/types/tools';
-import type { GetToolsFilter } from '@/lib/tools/tool-persistence';
+import type { GetToolsFilter } from '@/lib/tools/tool-persistence-utils';
 import { VALID_TOOL_TYPES, VALID_PATCH_ACTIONS, type PatchAction } from './constants';
 
 /**

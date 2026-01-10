@@ -1,6 +1,11 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { formatTime } from '@/lib/hooks/pomodoro-helpers';
+import {
+  requestNotificationPermission,
+  showNotification,
+} from './pomodoro-notification';
 
 export type PomodoroPhase = 'idle' | 'focus' | 'shortBreak' | 'longBreak';
 
@@ -40,33 +45,6 @@ const DEFAULT_SETTINGS: PomodoroSettings = {
   longBreakMinutes: 15,
   pomodorosUntilLongBreak: 4,
 };
-
-function formatTime(seconds: number): string {
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
-async function requestNotificationPermission(): Promise<boolean> {
-  if (!('Notification' in window)) return false;
-  if (Notification.permission === 'granted') return true;
-  if (Notification.permission === 'denied') return false;
-
-  const permission = await Notification.requestPermission();
-  return permission === 'granted';
-}
-
-function showNotification(title: string, body: string) {
-  if (Notification.permission === 'granted') {
-    new Notification(title, {
-      body,
-      icon: '/icons/icon-192.png',
-      badge: '/icons/icon-72.png',
-      tag: 'pomodoro',
-      requireInteraction: true,
-    });
-  }
-}
 
 export function usePomodoroTimer(
   initialSettings?: Partial<PomodoroSettings>,

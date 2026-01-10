@@ -4,9 +4,19 @@
 // ============================================================================
 
 import { logger } from '@/lib/logger';
-import type { AudioMode, AudioLayer } from '@/types';
-import { createAudioNodeForMode } from './generators';
+import type { AudioLayer } from '@/types';
 import type { ActiveLayer } from './types';
+import {
+  createAudioLayer,
+  startAudioLayer,
+  stopAudioLayer,
+} from './engine-layer-ops';
+import {
+  clampVolume,
+  setGainValue,
+  applyDucking,
+  removeDucking,
+} from './engine-volume-ops';
 
 /**
  * Ambient Audio Engine
@@ -30,15 +40,18 @@ export class AmbientAudioEngine {
     }
 
     try {
-      // Create audio context
-      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as typeof window & {
+          webkitAudioContext: typeof AudioContext;
+        }).webkitAudioContext;
       this.audioContext = new AudioContextClass();
-
-      // Create master gain node
       this.masterGainNode = this.audioContext.createGain();
       this.masterGainNode.connect(this.audioContext.destination);
-      this.masterGainNode.gain.setValueAtTime(1.0, this.audioContext.currentTime);
-
+      this.masterGainNode.gain.setValueAtTime(
+        1.0,
+        this.audioContext.currentTime
+      );
       this.isInitialized = true;
       logger.info('Ambient audio engine initialized', {
         sampleRate: this.audioContext.sampleRate,
@@ -74,7 +87,6 @@ export class AmbientAudioEngine {
 
     await this.resume();
 
-    // Remove existing layer if present
     if (this.activeLayers.has(layer.id)) {
       this.removeLayer(layer.id);
     }
@@ -82,69 +94,20 @@ export class AmbientAudioEngine {
     logger.info('Adding audio layer', { layer });
 
     try {
-      // Create gain node for this layer
-      const gainNode = this.audioContext.createGain();
-      gainNode.gain.setValueAtTime(layer.volume, this.audioContext.currentTime);
-      gainNode.connect(this.masterGainNode);
-
-      // Create audio source node based on mode
-      const result = createAudioNodeForMode(this.audioContext, layer.mode);
-      
-      if (!result) {
-        logger.warn('Audio mode not yet implemented', { mode: layer.mode });
-        return;
-      }
-
-      let sourceNode: AudioNode;
-      let oscillators: OscillatorNode[] | undefined;
-
-      // Handle binaural beats (returns object with merger and oscillators)
-      if ('merger' in result && 'oscillators' in result) {
-        sourceNode = result.merger;
-        oscillators = result.oscillators;
-        result.merger.connect(gainNode);
-      } else {
-        // Regular audio nodes (noise generators)
-        sourceNode = result;
-        sourceNode.connect(gainNode);
-      }
-
-      const activeLayer: ActiveLayer = {
-        id: layer.id,
-        mode: layer.mode,
-        gainNode,
-        sourceNode,
-        oscillators,
-        started: false,
-      };
-
+      const activeLayer = createAudioLayer(
+        this.audioContext,
+        this.masterGainNode,
+        layer
+      );
       this.activeLayers.set(layer.id, activeLayer);
 
-      // Start audio sources if enabled
       if (layer.enabled) {
-        this.startLayer(layer.id);
+        startAudioLayer(activeLayer);
       }
     } catch (error) {
       logger.error('Failed to add audio layer', { error, layer });
       throw error;
     }
-  }
-
-  /**
-   * Start playback for a specific layer
-   */
-  private startLayer(layerId: string): void {
-    const layer = this.activeLayers.get(layerId);
-    if (!layer || layer.started) return;
-
-    logger.info('Starting audio layer', { layerId });
-
-    // Start oscillators for binaural beats
-    if (layer.oscillators) {
-      layer.oscillators.forEach((osc) => osc.start());
-    }
-
-    layer.started = true;
   }
 
   /**
@@ -154,30 +117,8 @@ export class AmbientAudioEngine {
     const layer = this.activeLayers.get(layerId);
     if (!layer) return;
 
-    logger.info('Removing audio layer', { layerId });
-
-    try {
-      // Stop oscillators
-      if (layer.oscillators) {
-        layer.oscillators.forEach((osc) => {
-          try {
-            osc.stop();
-          } catch {
-            // Ignore if already stopped
-          }
-        });
-      }
-
-      // Disconnect nodes
-      if (layer.sourceNode) {
-        layer.sourceNode.disconnect();
-      }
-      layer.gainNode.disconnect();
-
-      this.activeLayers.delete(layerId);
-    } catch (error) {
-      logger.error('Error removing audio layer', { error, layerId });
-    }
+    stopAudioLayer(layer);
+    this.activeLayers.delete(layerId);
   }
 
   /**
@@ -187,9 +128,8 @@ export class AmbientAudioEngine {
     const layer = this.activeLayers.get(layerId);
     if (!layer || !this.audioContext) return;
 
-    const clampedVolume = Math.max(0, Math.min(1, volume));
-    layer.gainNode.gain.setValueAtTime(clampedVolume, this.audioContext.currentTime);
-    logger.debug('Layer volume updated', { layerId, volume: clampedVolume });
+    setGainValue(layer.gainNode, volume, this.audioContext);
+    logger.debug('Layer volume updated', { layerId, volume });
   }
 
   /**
@@ -200,9 +140,8 @@ export class AmbientAudioEngine {
     if (!layer) return;
 
     if (enabled && !layer.started) {
-      this.startLayer(layerId);
+      startAudioLayer(layer);
     } else if (!enabled) {
-      // Mute instead of stopping (smoother UX)
       this.setLayerVolume(layerId, 0);
     }
   }
@@ -213,13 +152,13 @@ export class AmbientAudioEngine {
   setMasterVolume(volume: number): void {
     if (!this.masterGainNode || !this.audioContext) return;
 
-    const clampedVolume = Math.max(0, Math.min(1, volume));
+    const clampedVolume = clampVolume(volume);
     this.originalMasterVolume = clampedVolume;
-    
+
     if (!this.isDucked) {
-      this.masterGainNode.gain.setValueAtTime(clampedVolume, this.audioContext.currentTime);
+      setGainValue(this.masterGainNode, clampedVolume, this.audioContext);
     }
-    
+
     logger.debug('Master volume updated', { volume: clampedVolume });
   }
 
@@ -230,15 +169,7 @@ export class AmbientAudioEngine {
     if (!this.masterGainNode || !this.audioContext) return;
 
     this.isDucked = true;
-    const clampedVolume = Math.max(0, Math.min(1, duckedVolume));
-    
-    // Smooth volume reduction over 200ms
-    this.masterGainNode.gain.linearRampToValueAtTime(
-      clampedVolume,
-      this.audioContext.currentTime + 0.2
-    );
-    
-    logger.debug('Audio ducked', { duckedVolume: clampedVolume });
+    applyDucking(this.masterGainNode, this.audioContext, duckedVolume);
   }
 
   /**
@@ -248,14 +179,11 @@ export class AmbientAudioEngine {
     if (!this.masterGainNode || !this.audioContext) return;
 
     this.isDucked = false;
-    
-    // Smooth volume restoration over 200ms
-    this.masterGainNode.gain.linearRampToValueAtTime(
-      this.originalMasterVolume,
-      this.audioContext.currentTime + 0.2
+    removeDucking(
+      this.masterGainNode,
+      this.audioContext,
+      this.originalMasterVolume
     );
-    
-    logger.debug('Audio unducked', { volume: this.originalMasterVolume });
   }
 
   /**
@@ -263,7 +191,6 @@ export class AmbientAudioEngine {
    */
   stopAll(): void {
     logger.info('Stopping all audio layers');
-    
     const layerIds = Array.from(this.activeLayers.keys());
     layerIds.forEach((id) => this.removeLayer(id));
   }
@@ -273,14 +200,13 @@ export class AmbientAudioEngine {
    */
   async destroy(): Promise<void> {
     logger.info('Destroying audio engine');
-    
     this.stopAll();
-    
+
     if (this.audioContext) {
       await this.audioContext.close();
       this.audioContext = null;
     }
-    
+
     this.masterGainNode = null;
     this.isInitialized = false;
   }

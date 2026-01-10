@@ -12,30 +12,20 @@ import {
   getUserTools,
   getToolById,
   deleteTool,
+} from '@/lib/tools/tool-persistence-crud';
+import {
   updateToolRating,
   toggleBookmark,
   incrementViewCount,
   getToolStats,
   type SaveToolParams,
-  type GetToolsFilter,
-} from '@/lib/tools/tool-persistence';
-import type { ToolType } from '@/types/tools';
-
-// Valid tool types for validation
-const VALID_TOOL_TYPES: ToolType[] = [
-  'mindmap',
-  'quiz',
-  'flashcard',
-  'demo',
-  'search',
-  'diagram',
-  'timeline',
-  'summary',
-  'formula',
-  'chart',
-  'webcam',
-  'pdf',
-];
+} from '@/lib/tools/tool-persistence-utils';
+import {
+  buildGetToolsFilter,
+  validateSaveToolInput,
+  validatePatchToolInput,
+  validateDeleteToolInput,
+} from './helpers';
 
 /**
  * GET /api/tools/saved
@@ -63,40 +53,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // If stats=true, return statistics
     if (searchParams.get('stats') === 'true') {
       const stats = await getToolStats(userId);
       return NextResponse.json({ stats });
     }
 
-    // Build filter
-    const filter: GetToolsFilter = {};
-
-    const type = searchParams.get('type');
-    if (type && VALID_TOOL_TYPES.includes(type as ToolType)) {
-      filter.type = type as ToolType;
-    }
-
-    const maestroId = searchParams.get('maestroId');
-    if (maestroId) {
-      filter.maestroId = maestroId;
-    }
-
-    const bookmarked = searchParams.get('bookmarked');
-    if (bookmarked === 'true') {
-      filter.isBookmarked = true;
-    }
-
-    const limit = searchParams.get('limit');
-    if (limit) {
-      filter.limit = Math.min(parseInt(limit, 10), 100);
-    }
-
-    const offset = searchParams.get('offset');
-    if (offset) {
-      filter.offset = parseInt(offset, 10);
-    }
-
+    const filter = buildGetToolsFilter(searchParams);
     const tools = await getUserTools(userId, filter);
 
     return NextResponse.json({
@@ -117,62 +79,37 @@ export async function GET(request: NextRequest) {
  * POST /api/tools/saved
  *
  * Save a new tool.
- *
- * Body:
- * - userId: User ID
- * - type: Tool type
- * - title: Tool title
- * - topic: Optional topic
- * - content: Tool content data
- * - maestroId: Optional maestro ID
- * - conversationId: Optional conversation ID
- * - sessionId: Optional session ID
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, type, title, topic, content, maestroId, conversationId, sessionId } = body;
+    const validation = validateSaveToolInput(body);
 
-    // Validate required fields
-    if (!userId || !type || !title || !content) {
+    if (!validation.valid || !validation.data) {
       return NextResponse.json(
-        {
-          error: 'Missing required fields',
-          required: ['userId', 'type', 'title', 'content'],
-        },
-        { status: 400 }
-      );
-    }
-
-    // Validate tool type
-    if (!VALID_TOOL_TYPES.includes(type as ToolType)) {
-      return NextResponse.json(
-        {
-          error: 'Invalid tool type',
-          validTypes: VALID_TOOL_TYPES,
-        },
+        { error: validation.error || 'Invalid input' },
         { status: 400 }
       );
     }
 
     const params: SaveToolParams = {
-      userId,
-      type,
-      title,
-      topic,
-      content,
-      maestroId,
-      conversationId,
-      sessionId,
+      userId: validation.data.userId,
+      type: validation.data.type,
+      title: validation.data.title,
+      topic: validation.data.topic,
+      content: validation.data.content as Record<string, unknown>,
+      maestroId: validation.data.maestroId,
+      conversationId: validation.data.conversationId,
+      sessionId: validation.data.sessionId,
     };
 
     const tool = await saveTool(params);
 
     logger.info('Tool saved', {
       toolId: tool.id,
-      userId,
-      type,
-      title,
+      userId: validation.data?.userId,
+      type: validation.data?.type,
+      title: validation.data?.title,
     });
 
     return NextResponse.json(
@@ -192,51 +129,25 @@ export async function POST(request: NextRequest) {
  * PATCH /api/tools/saved
  *
  * Update a saved tool (rating, bookmark, view count).
- *
- * Body:
- * - userId: User ID
- * - toolId: Tool ID
- * - action: 'rate' | 'bookmark' | 'view'
- * - rating: Required if action is 'rate' (1-5)
  */
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, toolId, action, rating } = body;
+    const validation = validatePatchToolInput(body);
 
-    // Validate required fields
-    if (!userId || !toolId || !action) {
+    if (!validation.valid || !validation.data) {
       return NextResponse.json(
-        {
-          error: 'Missing required fields',
-          required: ['userId', 'toolId', 'action'],
-        },
+        { error: validation.error || 'Invalid input' },
         { status: 400 }
       );
     }
 
-    // Validate action
-    if (!['rate', 'bookmark', 'view'].includes(action)) {
-      return NextResponse.json(
-        {
-          error: 'Invalid action',
-          validActions: ['rate', 'bookmark', 'view'],
-        },
-        { status: 400 }
-      );
-    }
-
+    const { userId, toolId, action, rating } = validation.data;
     let result;
 
     switch (action) {
       case 'rate':
-        if (typeof rating !== 'number' || rating < 1 || rating > 5) {
-          return NextResponse.json(
-            { error: 'Rating must be a number between 1 and 5' },
-            { status: 400 }
-          );
-        }
-        result = await updateToolRating(toolId, userId, rating);
+        result = await updateToolRating(toolId, userId, rating!);
         break;
 
       case 'bookmark':
@@ -270,26 +181,20 @@ export async function PATCH(request: NextRequest) {
  * DELETE /api/tools/saved
  *
  * Delete a saved tool.
- *
- * Body:
- * - userId: User ID
- * - toolId: Tool ID
  */
 export async function DELETE(request: NextRequest) {
   try {
     const body = await request.json();
-    const { userId, toolId } = body;
+    const validation = validateDeleteToolInput(body);
 
-    if (!userId || !toolId) {
+    if (!validation.valid || !validation.data) {
       return NextResponse.json(
-        {
-          error: 'Missing required fields',
-          required: ['userId', 'toolId'],
-        },
+        { error: validation.error || 'Invalid input' },
         { status: 400 }
       );
     }
 
+    const { userId, toolId } = validation.data;
     const deleted = await deleteTool(toolId, userId);
 
     if (!deleted) {
@@ -300,7 +205,6 @@ export async function DELETE(request: NextRequest) {
     }
 
     logger.info('Tool deleted', { toolId, userId });
-
     return NextResponse.json({ success: true, deleted: true });
   } catch (error) {
     logger.error('Failed to delete tool', { error: String(error) });

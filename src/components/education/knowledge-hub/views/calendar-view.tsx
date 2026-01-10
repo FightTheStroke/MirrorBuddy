@@ -13,7 +13,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { MaterialCard } from '../components/material-card';
-import { toMaterial, getCalendarDays, WEEKDAYS, MONTHS } from './calendar-utils';
+import { toMaterial, getCalendarDays, WEEKDAYS, MONTHS, type CalendarDay } from './calendar-utils';
 import type { KnowledgeHubMaterial } from './explorer-view';
 
 export interface CalendarViewProps {
@@ -160,7 +160,7 @@ export function CalendarView({
                 {selectedDay.date.getDate()} {MONTHS[selectedDay.date.getMonth()]}
               </h3>
               <div className="space-y-3">
-                {selectedDay.materials.map((material) => (
+                {selectedDay.materials.map((material: KnowledgeHubMaterial) => (
                   <MaterialCard
                     key={material.id}
                     material={toMaterial(material)}

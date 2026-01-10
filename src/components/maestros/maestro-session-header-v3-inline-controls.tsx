@@ -12,6 +12,8 @@ import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
+import { InlineAudioVisualizer } from './inline-audio-visualizer';
+import { getVoiceStatusIndicator } from './maestro-header-utils';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
 
@@ -173,69 +175,27 @@ export function MaestroSessionHeaderV3({
           className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700"
         >
           {/* Audio visualizer - compact */}
-          {isConnected && (
-            <div className="flex items-center gap-1 h-6 px-2 bg-slate-200 dark:bg-slate-700 rounded">
-              {VISUALIZER_BAR_OFFSETS.map((offset, i) => {
-                const baseHeight = 4;
-                const variance = 1 + (offset % 3) * 0.15;
-                
-                const getBarStyle = () => {
-                  if (isSpeaking) {
-                    const level = outputLevel * variance;
-                    return {
-                      height: baseHeight + level * 16,
-                      opacity: 0.4 + level * 0.6,
-                    };
-                  }
-                  if (isListening && !isMuted) {
-                    const level = inputLevel * variance;
-                    return {
-                      height: baseHeight + level * 20,
-                      opacity: 0.3 + level * 0.7,
-                    };
-                  }
-                  return { height: baseHeight, opacity: 0.2 };
-                };
-
-                const style = getBarStyle();
-
-                return (
-                  <motion.div
-                    key={i}
-                    initial={false}
-                    animate={{ 
-                      height: style.height,
-                      opacity: style.opacity,
-                      scaleY: isSpeaking || (isListening && !isMuted) ? 1 : 0.8,
-                    }}
-                    transition={{ duration: 0.06, ease: 'easeOut' }}
-                    className={cn(
-                      "w-1 rounded-full",
-                      isSpeaking 
-                        ? "bg-green-500" 
-                        : isListening && !isMuted 
-                          ? "bg-blue-500" 
-                          : "bg-slate-400"
-                    )}
-                  />
-                );
-              })}
-            </div>
-          )}
+          <InlineAudioVisualizer
+            isConnected={isConnected}
+            isSpeaking={isSpeaking}
+            isListening={isListening}
+            isMuted={isMuted}
+            inputLevel={inputLevel}
+            outputLevel={outputLevel}
+            barOffsets={VISUALIZER_BAR_OFFSETS}
+          />
 
           {/* Status indicator */}
           {isConnected && (
             <div className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
               <div className={cn(
                 "w-2 h-2 rounded-full",
-                isSpeaking ? "bg-green-500 animate-pulse" : 
-                isListening && !isMuted ? "bg-blue-500" : 
+                isSpeaking ? "bg-green-500 animate-pulse" :
+                isListening && !isMuted ? "bg-blue-500" :
                 "bg-slate-400"
               )} />
               <span className="hidden sm:inline">
-                {isSpeaking ? `${maestro.name} sta parlando` : 
-                 isListening && !isMuted ? 'In ascolto...' : 
-                 isMuted ? 'Microfono disattivato' : 'Connesso'}
+                {getVoiceStatusIndicator(isSpeaking, isListening, isMuted, maestro.name)}
               </span>
             </div>
           )}

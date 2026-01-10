@@ -14,6 +14,7 @@ import {
   type UseTagsReturn,
   getRandomTagColor,
 } from './tag-types';
+import type { TagItem } from '../components/sidebar-navigation';
 
 /**
  * Hook for managing material tags.

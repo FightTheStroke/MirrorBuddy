@@ -12,7 +12,8 @@
  * Related: #30 Safety Guardrails Issue, S-02 Task
  */
 
-import { containsCrisisKeywords, IT_CONTENT_PATTERNS } from './safety-prompts-core';
+import { containsCrisisKeywords } from './safety-prompts-core';
+import { IT_CONTENT_PATTERNS } from './safety-patterns';
 import {
   PROFANITY_EN,
   PROFANITY_IT,
