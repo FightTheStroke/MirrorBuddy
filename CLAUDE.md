@@ -97,6 +97,26 @@ Skip Thor ONLY for trivial single-file changes.
 - Prisma for all DB operations (`prisma/schema.prisma`)
 - Path aliases: `@/lib/...`, `@/components/...`
 
+## Optimization Health Check (run periodically)
+
+When user asks "check optimization" or at start of long sessions:
+
+```bash
+# 1. Verify .claudeignore is effective
+wc -l .claudeignore  # Should be ~60+ lines
+
+# 2. Check rules are loaded
+ls .claude/rules/    # Should show 4 files
+
+# 3. Verify no large files crept in
+find src -name "*.ts" -o -name "*.tsx" | xargs wc -l | awk '$1 > 300' | head -10
+```
+
+**If issues found**:
+- Large files (>300 lines): Suggest split per ADR 0016
+- Missing rules: Recreate from ADR 0029
+- .claudeignore outdated: Add new generated/test dirs
+
 ## Summary Instructions
 
 **KEEP when compacting**:
