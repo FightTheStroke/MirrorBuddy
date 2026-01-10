@@ -1,6 +1,6 @@
 // ============================================================================
 // CONNECTION MANAGEMENT
-// WebSocket connection and disconnection logic
+// WebSocket connection and disconnection logic with timeout handling
 // ============================================================================
 
 'use client';
@@ -9,6 +9,7 @@ import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import type { Maestro } from '@/types';
 import type { ConnectionInfo, UseVoiceSessionOptions } from './types';
+import { CONNECTION_TIMEOUT_MS } from './constants';
 
 export interface ConnectionRefs {
   wsRef: React.MutableRefObject<WebSocket | null>;
@@ -28,6 +29,7 @@ export interface ConnectionRefs {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
   handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
   sessionIdRef: React.MutableRefObject<string | null>;
+  connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
 }
 
 /**
@@ -120,6 +122,17 @@ export function useConnect(
       const ws = new WebSocket(wsUrl);
       refs.wsRef.current = ws;
 
+      // Set connection timeout - fail if proxy.ready not received
+      refs.connectionTimeoutRef.current = setTimeout(() => {
+        logger.error('[VoiceSession] Connection timeout - proxy.ready not received');
+        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+          ws.close(4000, 'Connection timeout');
+        }
+        setConnectionState('error');
+        options.onStateChange?.('error');
+        options.onError?.(new Error('Timeout connessione: il server non risponde. Riprova.'));
+      }, CONNECTION_TIMEOUT_MS);
+
       ws.onopen = () => {
         logger.debug('[VoiceSession] WebSocket connected to proxy, waiting for proxy.ready...');
       };
@@ -187,6 +200,13 @@ export function useDisconnect(
 ) {
   return useCallback(() => {
     logger.debug('[VoiceSession] Disconnecting...');
+
+    // Clear connection timeout if still pending
+    if (refs.connectionTimeoutRef.current) {
+      clearTimeout(refs.connectionTimeoutRef.current);
+      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
+      refs.connectionTimeoutRef.current = null;
+    }
 
     if (refs.processorRef.current) {
       refs.processorRef.current.disconnect();

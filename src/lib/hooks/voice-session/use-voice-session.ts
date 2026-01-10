@@ -82,6 +82,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const hasActiveResponseRef = useRef(false);
   const handleServerEventRef = useRef<((event: Record<string, unknown>) => void) | null>(null);
   const sessionIdRef = useRef<string | null>(null);
+  const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const [connectionState, setConnectionState] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
 
@@ -182,6 +183,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     isBufferingRef,
     scheduledSourcesRef,
     playbackContextRef,
+    connectionTimeoutRef,
     addTranscript,
     addToolCall,
     updateToolCall,
@@ -227,6 +229,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     hasActiveResponseRef,
     handleServerEventRef,
     sessionIdRef,
+    connectionTimeoutRef,
   };
 
   const connect = useConnect(
