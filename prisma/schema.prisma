@@ -489,6 +489,9 @@ model Material {
   subject     String?
   preview     String?  // Preview text for lists
 
+  // Message reference (optional FK to Message that created this material)
+  messageId   String?
+
   // Migrated from CreatedTool
   topic          String?
   conversationId String?
@@ -519,6 +522,7 @@ model Material {
   @@index([toolType])
   @@index([status])
   @@index([sessionId])
+  @@index([messageId])
   @@index([createdAt])
   @@index([isBookmarked])
   @@index([collectionId])

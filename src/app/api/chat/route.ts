@@ -17,6 +17,8 @@ import { executeToolCall } from '@/lib/tools/tool-executor';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
 import { findSimilarMaterials } from '@/lib/rag/retrieval-service';
+import { saveTool } from '@/lib/tools/tool-persistence';
+import { functionNameToToolType } from '@/types/tools';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
@@ -247,9 +249,11 @@ export async function POST(request: NextRequest) {
 
       // Handle tool calls if present
       if (result.tool_calls && result.tool_calls.length > 0) {
-        const toolResults = [];
+        const toolCallRefs = [];
 
         for (const toolCall of result.tool_calls) {
+          const toolType = functionNameToToolType(toolCall.function.name);
+
           try {
             const args = JSON.parse(toolCall.function.arguments);
             const toolResult = await executeToolCall(
@@ -257,47 +261,59 @@ export async function POST(request: NextRequest) {
               args,
               { maestroId, conversationId: undefined, userId }
             );
-            // Transform to ToolCall interface format expected by ToolResultDisplay
-            toolResults.push({
+
+            if (toolResult.success && toolResult.data) {
+              // Save tool result to Material table (content duplication reduction)
+              try {
+                await saveTool({
+                  userId: userId || 'anonymous',
+                  type: toolType,
+                  title: args.title || args.topic || `${toolType} tool`,
+                  content: toolResult.data as Record<string, unknown>,
+                  maestroId,
+                  topic: args.topic,
+                });
+              } catch (saveError) {
+                logger.warn('Failed to save tool to Material table', {
+                  toolType,
+                  error: String(saveError),
+                });
+              }
+            }
+
+            // Return lightweight ToolCallRef (without result.data)
+            toolCallRefs.push({
               id: toolResult.toolId || toolCall.id,
-              type: toolCall.function.name,
+              type: toolType,
               name: toolCall.function.name,
-              arguments: args,
               status: toolResult.success ? 'completed' : 'error',
-              result: {
-                success: toolResult.success,
-                data: toolResult.data,
-                error: toolResult.error,
-              },
+              error: toolResult.error,
+              materialId: toolResult.toolId,
             });
           } catch (toolError) {
             logger.error('Tool execution failed', {
               toolCall: toolCall.function.name,
               error: String(toolError),
             });
-            const args = JSON.parse(toolCall.function.arguments || '{}');
-            toolResults.push({
+
+            toolCallRefs.push({
               id: toolCall.id,
-              type: toolCall.function.name,
+              type: toolType,
               name: toolCall.function.name,
-              arguments: args,
               status: 'error',
-              result: {
-                success: false,
-                error: toolError instanceof Error ? toolError.message : 'Tool execution failed',
-              },
+              error: toolError instanceof Error ? toolError.message : 'Tool execution failed',
             });
           }
         }
 
-        // Return response with tool results
+        // Return response with lightweight tool call references
         return NextResponse.json({
           content: result.content || '',
           provider: result.provider,
           model: result.model,
           usage: result.usage,
           maestroId,
-          toolCalls: toolResults,
+          toolCalls: toolCallRefs,
           hasTools: true,
           hasMemory,
           hasRAG,

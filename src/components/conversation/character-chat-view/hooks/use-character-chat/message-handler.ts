@@ -4,7 +4,7 @@
 
 import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
-import type { ToolState, ToolType } from '@/types/tools';
+import type { ToolState, ToolType, ToolCallRef, ToolCall } from '@/types/tools';
 
 export const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
   create_mindmap: 'mindmap',
@@ -56,9 +56,39 @@ export async function sendChatMessage(
 
   let toolState: ToolState | null = null;
   if (data.toolCalls && data.toolCalls.length > 0) {
-    const toolCall = data.toolCalls[0];
-    const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || (toolCall.type as ToolType);
-    const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
+    const toolCall = data.toolCalls[0] as ToolCallRef;
+    const toolType = toolCall.type as ToolType;
+
+    // Handle both old format (with result.data) and new format (with materialId)
+    let toolContent = null;
+    const toolCallWithFallback = toolCall as ToolCallRef | (ToolCall & { result: { data: unknown } });
+
+    // Try to get content from result.data (old format with full data)
+    if ('result' in toolCallWithFallback &&
+        typeof toolCallWithFallback.result === 'object' &&
+        toolCallWithFallback.result !== null &&
+        'data' in toolCallWithFallback.result) {
+      toolContent = (toolCallWithFallback.result as { data: unknown }).data;
+    } else if (toolCall.materialId) {
+      // New format: fetch from Material table
+      try {
+        const materialResponse = await fetch(`/api/materials/${toolCall.materialId}`);
+        if (materialResponse.ok) {
+          const data = await materialResponse.json();
+          // Response wraps material in { material: parsed }
+          toolContent = data.material?.content || null;
+        }
+      } catch (error) {
+        console.warn('Failed to fetch material content:', error);
+        // Fall back to empty content, UI will display error
+      }
+    }
+
+    // If no content found, use arguments as fallback
+    if (!toolContent && 'arguments' in toolCallWithFallback) {
+      toolContent = (toolCallWithFallback as ToolCall).arguments || null;
+    }
+
     toolState = {
       id: toolCall.id,
       type: toolType,
