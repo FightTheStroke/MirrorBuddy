@@ -11,12 +11,12 @@ test.describe('Archive View: Material Viewer', () => {
     await request.get('/api/user');
 
     // Navigate to archive view
-    await page.goto('/archive');
+    await page.goto('/archivio');
   });
 
   test('Archive page loads correctly', async ({ page }) => {
     // Check the archive page is accessible (title may include hyphen: MirrorBuddy)
-    await expect(page).toHaveTitle(/MirrorBuddy|Archive|Archivio/i);
+    await expect(page).toHaveTitle(/MirrorBuddy|Archive|Archivio|Zaino/i);
 
     // Look for archive-related content
     const archiveHeading = page.getByRole('heading', { level: 1 });
@@ -31,7 +31,7 @@ test.describe('Archive View: Material Viewer', () => {
     const materialsOrEmpty = page.locator('[data-testid="archive-items"], [data-testid="empty-state"], .archive-list, .empty-archive');
     await expect(materialsOrEmpty.first()).toBeVisible({ timeout: 5000 }).catch(() => {
       // If no specific elements found, that's ok - just check page loaded
-      expect(page.url()).toContain('/archive');
+      expect(page.url()).toMatch(/\/(archivio|supporti)/);
     });
   });
 });

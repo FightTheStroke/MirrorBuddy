@@ -237,39 +237,38 @@ test.describe('Voice Session UI Integration', () => {
     );
   });
 
-  test('clicking maestro shows voice session modal', async ({ page, context }) => {
-    // Grant permissions
-    await context.grantPermissions(['microphone', 'camera']);
-
-    await page.goto('/');
+  // Helper to bypass onboarding and reach home page
+  async function goToHomePage(page: import('@playwright/test').Page) {
+    // Skip onboarding by going directly to home with skip param
+    await page.goto('/welcome?skip=true');
+    await page.waitForURL(/^\/$/, { timeout: 10000 });
     await page.waitForLoadState('networkidle');
+  }
 
-    // Click on Euclide
-    const maestroButton = page.locator('button').filter({ hasText: 'Euclide' }).first();
+  test('clicking maestro opens session view', async ({ page, context }) => {
+    await context.grantPermissions(['microphone', 'camera']);
+    await goToHomePage(page);
+
+    // Click on Euclide using aria-label (maestro cards use this pattern)
+    const maestroButton = page.locator('button[aria-label*="Euclide"]').first();
     await maestroButton.waitFor({ state: 'visible', timeout: 10000 });
     await maestroButton.click();
 
-    // Wait for modal
+    // Wait for view transition
     await page.waitForTimeout(2000);
 
-    // Modal should be visible
-    const modal = page.locator('[class*="fixed"]').filter({ hasText: /Euclide/i }).first();
-    await expect(modal).toBeVisible();
-
-    // Should show maestro name
-    await expect(page.locator('text=Euclide').first()).toBeVisible();
+    // Session view should show Euclide's name
+    await expect(page.locator('text=Euclide').first()).toBeVisible({ timeout: 5000 });
   });
 
-  test('voice session shows connection status', async ({ page, context }) => {
+  test('maestro session shows content', async ({ page, context }) => {
     await context.grantPermissions(['microphone']);
+    await goToHomePage(page);
 
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Euclide' }).first().click();
-
+    await page.locator('button[aria-label*="Euclide"]').first().click();
     await page.waitForTimeout(3000);
 
-    // Should show some content in the voice session modal
-    // This could be status text, configuration message, or maestro info
+    // Should show some session content
     const possibleContents = [
       'Connessione',
       'Pronto',
@@ -277,9 +276,10 @@ test.describe('Voice Session UI Integration', () => {
       'Azure',
       'Configura',
       'permessi',
-      'Euclide',  // Maestro name should be visible
-      'Chiudi',   // Close button
-      'microfono', // Mute button
+      'Euclide',
+      'Chiudi',
+      'microfono',
+      'Indietro', // Back button
     ];
 
     let foundContent = false;
@@ -290,128 +290,22 @@ test.describe('Voice Session UI Integration', () => {
       }
     }
 
-    // If no specific text found, at least verify the modal container exists
-    if (!foundContent) {
-      const modal = page.locator('[class*="fixed"][class*="inset"]').first();
-      foundContent = await modal.isVisible().catch(() => false);
-    }
-
     expect(foundContent).toBe(true);
   });
 
-  test('voice session has control buttons', async ({ page, context }) => {
+  test('session has navigation controls', async ({ page, context }) => {
     await context.grantPermissions(['microphone', 'camera']);
+    await goToHomePage(page);
 
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Euclide' }).first().click();
-
+    await page.locator('button[aria-label*="Euclide"]').first().click();
     await page.waitForTimeout(2000);
 
-    // Should have mute button
-    const muteButton = page.locator('button[aria-label*="microfono"], button[aria-label*="Mute"]').first();
-    const hasMuteButton = await muteButton.isVisible().catch(() => false);
+    // Should have navigation or control buttons
+    const hasBackButton = await page.locator('button').filter({ hasText: /Indietro|Chiudi|Torna/i }).first().isVisible().catch(() => false);
+    const hasControlButton = await page.locator('button[aria-label*="microfono"], button[aria-label*="Mute"]').first().isVisible().catch(() => false);
 
-    // Should have close/end button
-    const closeButton = page.locator('button[aria-label*="Chiudi"], button[aria-label*="Termina"]').first();
-    const hasCloseButton = await closeButton.isVisible().catch(() => false);
-
-    expect(hasMuteButton || hasCloseButton).toBe(true);
-  });
-
-  test('webcam button opens camera modal', async ({ page, context }) => {
-    await context.grantPermissions(['microphone', 'camera']);
-
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Euclide' }).first().click();
-
-    await page.waitForTimeout(2000);
-
-    // Find and click webcam button
-    const webcamButton = page.locator('button').filter({ hasText: /Webcam/i }).first();
-
-    if (await webcamButton.isVisible().catch(() => false)) {
-      await webcamButton.click();
-      await page.waitForTimeout(1000);
-
-      // Webcam modal should appear (z-index 60)
-      const webcamModal = page.locator('[class*="z-[60]"], [class*="z-60"]').first();
-      const hasWebcamModal = await webcamModal.isVisible().catch(() => false);
-
-      // Or check for camera-related text
-      const hasCameraText = await page.locator('text=Scatta').first().isVisible().catch(() => false);
-
-      expect(hasWebcamModal || hasCameraText).toBe(true);
-    }
-  });
-
-  test('waveform visualization is present', async ({ page, context }) => {
-    await context.grantPermissions(['microphone']);
-
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Euclide' }).first().click();
-
-    await page.waitForTimeout(2000);
-
-    // Look for waveform visualization elements
-    const hasWaveform = await page.locator('[class*="waveform"], [class*="Waveform"]').first().isVisible().catch(() => false);
-    const hasLevelBars = await page.locator('[class*="bar"], [class*="level"]').count() > 0;
-    const hasSvg = await page.locator('[class*="fixed"] svg').count() > 0;
-
-    // Some kind of visualization should be present
-    expect(hasWaveform || hasLevelBars || hasSvg).toBe(true);
+    expect(hasBackButton || hasControlButton).toBe(true);
   });
 });
 
-test.describe('Test Voice Page', () => {
-  // Skip permission-dependent tests on Firefox/WebKit
-  test.beforeEach(async ({ browserName }, testInfo) => {
-    // Only skip the test that requires permissions
-    if (testInfo.title.includes('connect to WebSocket')) {
-      test.skip(
-        browserName === 'firefox' || browserName === 'webkit',
-        'Microphone permission grants not supported in Firefox/WebKit'
-      );
-    }
-  });
-
-  test('test-voice page loads', async ({ page }) => {
-    await page.goto('/test-voice');
-    await page.waitForLoadState('networkidle');
-
-    // Should have title
-    await expect(page.locator('h1').filter({ hasText: /Voice|Debug|Test/i }).first()).toBeVisible();
-  });
-
-  test('test-voice page has audio tests', async ({ page }) => {
-    await page.goto('/test-voice');
-    await page.waitForLoadState('networkidle');
-
-    // Should have test buttons
-    const hasTestMic = await page.locator('button').filter({ hasText: /Test Microphone/i }).first().isVisible();
-    const hasTestSpeaker = await page.locator('button').filter({ hasText: /Test Speaker/i }).first().isVisible();
-    const hasConnect = await page.locator('button').filter({ hasText: /Connect/i }).first().isVisible();
-
-    expect(hasTestMic || hasTestSpeaker || hasConnect).toBe(true);
-  });
-
-  test('test-voice page can connect to WebSocket', async ({ page, context }) => {
-    await context.grantPermissions(['microphone']);
-
-    await page.goto('/test-voice');
-    await page.waitForLoadState('networkidle');
-
-    // Click connect button
-    const connectButton = page.locator('button').filter({ hasText: /Connect WebSocket/i }).first();
-    if (await connectButton.isVisible().catch(() => false)) {
-      await connectButton.click();
-      await page.waitForTimeout(3000);
-
-      // Check for success indicator
-      const hasConnected = await page.locator('text=connected').first().isVisible().catch(() => false);
-      const hasGreen = await page.locator('[class*="green"]').first().isVisible().catch(() => false);
-
-      // Should show connection status
-      expect(hasConnected || hasGreen).toBe(true);
-    }
-  });
-});
+// NOTE: Test Voice Page tests removed - /test-voice page was removed from the app

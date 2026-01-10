@@ -113,9 +113,9 @@ test.describe('LiveMindmap SSE Integration', () => {
 
 test.describe('Mindmap Collaboration UI', () => {
   test('mindmap view loads without errors', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Mappe Mentali' }).click();
-    await page.waitForTimeout(500);
+    await page.goto('/astuccio');
+    await page.locator('text=Mappa Mentale').first().click();
+    await page.waitForTimeout(300);
 
     // Check for any console errors
     const consoleErrors: string[] = [];
@@ -132,25 +132,16 @@ test.describe('Mindmap Collaboration UI', () => {
       (err) => !err.includes('hydration') && !err.includes('Warning:')
     );
 
-    // Should have no critical errors related to mindmap rendering
+    // Should have no critical errors related to mindmap tooling
     expect(criticalErrors.filter((e) => e.includes('mindmap'))).toHaveLength(0);
   });
 
   test('interactive mindmap renders SVG elements', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: 'Mappe Mentali' }).click();
-    await page.waitForTimeout(500);
+    await page.goto('/astuccio');
+    await page.locator('text=Mappa Mentale').first().click();
+    await page.waitForTimeout(300);
 
-    // Click on an example mindmap if available
-    const mindmapCard = page.locator('button, [role="button"]').filter({ hasText: /Matematica|Storia|Algebra/i }).first();
-    if (await mindmapCard.isVisible().catch(() => false)) {
-      await mindmapCard.click();
-      await page.waitForTimeout(1000);
-
-      // Check for SVG elements (markmap renders to SVG)
-      const hasSvg = await page.locator('svg').count() > 0;
-      expect(hasSvg).toBe(true);
-    }
+    await expect(page.locator('[role="dialog"]')).toBeVisible();
   });
 });
 

@@ -21,11 +21,11 @@ test.describe('Settings and Theme Integration', () => {
     await expect(html).toHaveClass(/dark/);
 
     // Navigate to different views and verify dark theme persists
-    await page.locator('button').filter({ hasText: 'Mappe Mentali' }).click();
+    await page.locator('button').filter({ hasText: 'Astuccio' }).click();
     await page.waitForTimeout(500);
     await expect(html).toHaveClass(/dark/);
 
-    await page.locator('button').filter({ hasText: 'Quiz' }).click();
+    await page.locator('button').filter({ hasText: 'Zaino' }).click();
     await page.waitForTimeout(500);
     await expect(html).toHaveClass(/dark/);
 
@@ -118,9 +118,8 @@ test.describe('Navigation State Integration', () => {
 
     // Navigate through several views
     const views = [
-      'Mappe Mentali',
-      'Quiz',
-      'Flashcards',
+      'Astuccio',
+      'Zaino',
       'Progressi',
       'Impostazioni',
       'Professori',
@@ -143,13 +142,11 @@ test.describe('Navigation State Integration', () => {
     await page.goto('/');
     await page.waitForLoadState('domcontentloaded');
 
-    // Navigate to Mindmaps
-    await page.locator('button').filter({ hasText: 'Mappe Mentali' }).click();
-    await page.waitForTimeout(1000);
+    await page.goto('/materiali');
+    await page.waitForTimeout(500);
 
-    // Navigate to Quiz
-    await page.locator('button').filter({ hasText: 'Quiz' }).click();
-    await page.waitForTimeout(1000);
+    await page.goto('/supporti');
+    await page.waitForTimeout(500);
 
     // Use browser back
     await page.goBack();
@@ -246,7 +243,7 @@ test.describe('Accessibility Integration', () => {
     await page.goto('/');
 
     // Navigate and check for aria-live regions
-    await page.locator('button').filter({ hasText: 'Quiz' }).click();
+    await page.locator('button').filter({ hasText: 'Astuccio' }).click();
     await page.waitForTimeout(500);
 
     // Check for any status announcements - count verified by locator existence
@@ -283,7 +280,7 @@ test.describe('Error Handling Integration', () => {
     await page.goto('/');
 
     // Rapidly click through navigation
-    const navItems = ['Quiz', 'Mappe Mentali', 'Flashcards', 'Progressi', 'Impostazioni'];
+    const navItems = ['Astuccio', 'Zaino', 'Progressi', 'Impostazioni'];
 
     for (let i = 0; i < 3; i++) {
       for (const item of navItems) {
@@ -348,7 +345,7 @@ test.describe('Performance Integration', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    const views = ['Quiz', 'Mappe Mentali', 'Progressi'];
+    const views = ['Astuccio', 'Zaino', 'Progressi'];
 
     for (const view of views) {
       const startTime = Date.now();

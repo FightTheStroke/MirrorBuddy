@@ -321,7 +321,7 @@ test.describe('Buddy Mirroring System', () => {
 
     // Learning differences should be configurable
     // Navigate to settings to verify accessibility options
-    await page.goto('/settings');
+    await page.locator('button').filter({ hasText: 'Impostazioni' }).click();
 
     // Settings page should load
     await expect(page.locator('main').first()).toBeVisible();

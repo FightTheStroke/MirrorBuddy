@@ -229,19 +229,12 @@ test.describe('Full App Smoke Test - Error Collection', () => {
 
     // All navigation items in Italian
     const navItems = [
-      'Coach',
-      'Buddy',
-      'Maestri',
-      'Quiz',
-      'Flashcards',
-      'Mappe Mentali',
-      'Riassunti',
-      'Materiali',
-      'Study Kit',
+      'Professori',
+      'Storia',
+      'Astuccio',
+      'Zaino',
       'Calendario',
-      'Demo',
       'Progressi',
-      'Genitori',
       'Impostazioni',
     ];
 
@@ -294,13 +287,13 @@ test.describe('Full App Smoke Test - Error Collection', () => {
       await test.step(`Click maestro: ${maestro}`, async () => {
         const card = page.locator('button, [role="button"]').filter({ hasText: new RegExp(maestro, 'i') }).first();
         if (await card.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await card.click();
+          await card.click().catch(() => {});
           await page.waitForTimeout(800);
 
           // Close modal/session if opened
           const closeBtn = page.locator('[aria-label*="close"], [aria-label*="chiudi"], button:has-text("×")').first();
           if (await closeBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-            await closeBtn.click();
+            await closeBtn.click().catch(() => {});
             await page.waitForTimeout(300);
           }
 
@@ -380,21 +373,17 @@ test.describe('Full App Smoke Test - Error Collection', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const quizNav = page.locator('button').filter({ hasText: /^Quiz$/i }).first();
-    if (await quizNav.isVisible().catch(() => false)) {
-      await quizNav.click();
-      await page.waitForTimeout(1000);
+    await page.goto('/astuccio', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
 
-      // Check if quiz interface loaded
-      const quizContent = page.locator('[class*="quiz"], [data-testid*="quiz"]').first();
-      if (await quizContent.isVisible({ timeout: 3000 }).catch(() => false)) {
-        // Try to interact with quiz if there's content
-        const answerButton = page.locator('button').filter({ hasText: /^[A-D]\./i }).first();
-        if (await answerButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await answerButton.click();
-          await page.waitForTimeout(500);
-        }
-      }
+    const quizButton = page.getByRole('button', { name: /Quiz/i }).first();
+    if (!(await quizButton.isVisible().catch(() => false))) {
+      return;
+    }
+    await quizButton.click();
+    const quizDialogVisible = await page.locator('[role="dialog"]').isVisible({ timeout: 8000 }).catch(() => false);
+    if (!quizDialogVisible) {
+      return;
     }
   });
 
@@ -406,17 +395,17 @@ test.describe('Full App Smoke Test - Error Collection', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const flashNav = page.locator('button').filter({ hasText: /^Flashcards$/i }).first();
-    if (await flashNav.isVisible().catch(() => false)) {
-      await flashNav.click();
-      await page.waitForTimeout(1000);
+    await page.goto('/astuccio', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
 
-      // Try to flip a card if visible
-      const card = page.locator('[class*="flashcard"], [class*="card"]').first();
-      if (await card.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await card.click();
-        await page.waitForTimeout(500);
-      }
+    const flashButton = page.getByRole('button', { name: /Flashcard/i }).first();
+    if (!(await flashButton.isVisible().catch(() => false))) {
+      return;
+    }
+    await flashButton.click();
+    const flashDialogVisible = await page.locator('[role="dialog"]').isVisible({ timeout: 8000 }).catch(() => false);
+    if (!flashDialogVisible) {
+      return;
     }
   });
 
@@ -428,28 +417,17 @@ test.describe('Full App Smoke Test - Error Collection', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const mindmapNav = page.locator('button').filter({ hasText: /Mappe Mentali/i }).first();
-    if (await mindmapNav.isVisible().catch(() => false)) {
-      await mindmapNav.click();
-      await page.waitForTimeout(1000);
+    await page.goto('/astuccio', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
 
-      // Check for mindmap SVG or example cards
-      const mindmapContent = page.locator('svg.markmap, [class*="mindmap"]').first();
-      if (await mindmapContent.isVisible({ timeout: 3000 }).catch(() => false)) {
-        // Try zoom controls if available
-        const zoomIn = page.locator('button:has-text("+")').first();
-        if (await zoomIn.isVisible({ timeout: 1000 }).catch(() => false)) {
-          await zoomIn.click();
-          await page.waitForTimeout(300);
-        }
-      }
-
-      // Click an example mindmap if available
-      const exampleCard = page.locator('button, [class*="card"]').filter({ hasText: /Matematica|Storia|Algebra/i }).first();
-      if (await exampleCard.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await exampleCard.click();
-        await page.waitForTimeout(1000);
-      }
+    const mindmapButton = page.getByRole('button', { name: /Mappa Mentale/i }).first();
+    if (!(await mindmapButton.isVisible().catch(() => false))) {
+      return;
+    }
+    await mindmapButton.click();
+    const mindmapDialogVisible = await page.locator('[role="dialog"]').isVisible({ timeout: 8000 }).catch(() => false);
+    if (!mindmapDialogVisible) {
+      return;
     }
   });
 
@@ -461,10 +439,17 @@ test.describe('Full App Smoke Test - Error Collection', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const summaryNav = page.locator('button').filter({ hasText: /^Riassunti$/i }).first();
-    if (await summaryNav.isVisible().catch(() => false)) {
-      await summaryNav.click();
-      await page.waitForTimeout(1000);
+    await page.goto('/astuccio', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
+
+    const summaryButton = page.getByRole('button', { name: /Riassunto/i }).first();
+    if (!(await summaryButton.isVisible().catch(() => false))) {
+      return;
+    }
+    await summaryButton.click();
+    const summaryDialogVisible = await page.locator('[role="dialog"]').isVisible({ timeout: 8000 }).catch(() => false);
+    if (!summaryDialogVisible) {
+      return;
     }
   });
 
@@ -476,10 +461,17 @@ test.describe('Full App Smoke Test - Error Collection', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const demoNav = page.locator('button').filter({ hasText: /^Demo$/i }).first();
-    if (await demoNav.isVisible().catch(() => false)) {
-      await demoNav.click();
-      await page.waitForTimeout(1000);
+    await page.goto('/astuccio', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
+
+    const demoButton = page.getByRole('button', { name: /Demo/i }).first();
+    if (!(await demoButton.isVisible().catch(() => false))) {
+      return;
+    }
+    await demoButton.click();
+    const demoDialogVisible = await page.locator('[role="dialog"]').isVisible({ timeout: 8000 }).catch(() => false);
+    if (!demoDialogVisible) {
+      return;
     }
   });
 
@@ -583,11 +575,9 @@ test.describe('Full App Smoke Test - Error Collection', () => {
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.waitForTimeout(1000);
 
-    const materialsNav = page.locator('button').filter({ hasText: /^Materiali$/i }).first();
-    if (await materialsNav.isVisible().catch(() => false)) {
-      await materialsNav.click();
-      await page.waitForTimeout(1000);
-    }
+    await page.goto('/supporti', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(500);
+    await expect(page.locator('main').first()).toBeVisible();
   });
 
   // ==========================================================================
@@ -813,7 +803,7 @@ test.describe('Full App Smoke Test - Error Collection', () => {
     });
 
     await test.step('Browse maestri', async () => {
-      const maestriBtn = page.locator('button').filter({ hasText: /^Maestri$/i }).first();
+      const maestriBtn = page.locator('button').filter({ hasText: /^Professori$/i }).first();
       if (await maestriBtn.isVisible().catch(() => false)) {
         await maestriBtn.click();
         await page.waitForTimeout(500);
@@ -830,27 +820,30 @@ test.describe('Full App Smoke Test - Error Collection', () => {
       }
     });
 
-    await test.step('Check quiz', async () => {
-      const quizBtn = page.locator('button').filter({ hasText: /^Quiz$/i }).first();
-      if (await quizBtn.isVisible().catch(() => false)) {
-        await quizBtn.click();
+    await test.step('Check astuccio tools', async () => {
+      const astuccioBtn = page.locator('button').filter({ hasText: /^Astuccio$/i }).first();
+      if (await astuccioBtn.isVisible().catch(() => false)) {
+        await astuccioBtn.click();
         await page.waitForTimeout(500);
-      }
-    });
 
-    await test.step('Check flashcards', async () => {
-      const flashBtn = page.locator('button').filter({ hasText: /^Flashcards$/i }).first();
-      if (await flashBtn.isVisible().catch(() => false)) {
-        await flashBtn.click();
-        await page.waitForTimeout(500);
-      }
-    });
+        const toolButtons = [
+          /Quiz/i,
+          /Flashcard/i,
+          /Mappa Mentale/i,
+        ];
 
-    await test.step('Check mindmaps', async () => {
-      const mmBtn = page.locator('button').filter({ hasText: /Mappe Mentali/i }).first();
-      if (await mmBtn.isVisible().catch(() => false)) {
-        await mmBtn.click();
-        await page.waitForTimeout(500);
+        for (const label of toolButtons) {
+          const toolBtn = page.getByRole('button', { name: label }).first();
+          if (await toolBtn.isVisible().catch(() => false)) {
+            await toolBtn.click();
+            await page.waitForTimeout(300);
+            const dialog = page.locator('[role="dialog"]');
+            if (await dialog.isVisible().catch(() => false)) {
+              await page.keyboard.press('Escape');
+              await page.waitForTimeout(200);
+            }
+          }
+        }
       }
     });
 

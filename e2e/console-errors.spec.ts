@@ -47,9 +47,10 @@ test.describe('Console Errors Check', () => {
       }
     });
 
-    await page.goto('/');
-    await page.click('text=Quiz');
-    await page.waitForTimeout(1000);
+    await page.goto('/astuccio');
+    await page.waitForLoadState('networkidle');
+    await page.locator('text=Quiz').first().click();
+    await page.waitForTimeout(500);
 
     expect(errors.length, `Quiz view errors: ${errors.join(', ')}`).toBe(0);
   });
@@ -66,9 +67,10 @@ test.describe('Console Errors Check', () => {
       }
     });
 
-    await page.goto('/');
-    await page.click('text=Flashcards');
-    await page.waitForTimeout(1000);
+    await page.goto('/astuccio');
+    await page.waitForLoadState('networkidle');
+    await page.locator('text=Flashcard').first().click();
+    await page.waitForTimeout(500);
 
     expect(errors.length, `Flashcards view errors: ${errors.join(', ')}`).toBe(0);
   });
@@ -85,9 +87,10 @@ test.describe('Console Errors Check', () => {
       }
     });
 
-    await page.goto('/');
-    await page.click('text=Mappe Mentali');
-    await page.waitForTimeout(1000);
+    await page.goto('/astuccio');
+    await page.waitForLoadState('networkidle');
+    await page.locator('text=Mappa Mentale').first().click();
+    await page.waitForTimeout(500);
 
     expect(errors.length, `Mindmaps view errors: ${errors.join(', ')}`).toBe(0);
   });
@@ -142,9 +145,9 @@ test.describe('Console Errors Check', () => {
       }
     });
 
-    await page.goto('/');
-    await page.click('text=Materiali');
-    await page.waitForTimeout(1000);
+    await page.goto('/materiali');
+    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(500);
 
     expect(errors.length, `Homework view errors: ${errors.join(', ')}`).toBe(0);
   });
@@ -164,12 +167,11 @@ test.describe('Console Errors Check', () => {
     await page.goto('/');
     await page.waitForTimeout(500);
 
-    // Navigate through all views (Compiti renamed to Materiali, Maestri renamed to Professori)
-    const views = ['Quiz', 'Flashcards', 'Mappe Mentali', 'Materiali', 'Progressi', 'Impostazioni', 'Professori'];
+    const views = ['Professori', 'Astuccio', 'Zaino', 'Calendario', 'Progressi', 'Impostazioni'];
 
     for (const view of views) {
       await page.click(`text=${view}`);
-      await page.waitForTimeout(500);
+      await page.waitForTimeout(400);
     }
 
     expect(errors.length, `Navigation errors: ${errors.join(', ')}`).toBe(0);

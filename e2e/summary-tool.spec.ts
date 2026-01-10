@@ -29,9 +29,8 @@ test.describe('Summary Tool - Toolbar Button', () => {
 test.describe('Summary Tool - Archive Filter', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // Navigate to archive/materials
-    await page.locator('button').filter({ hasText: /Materiali|Archivio/i }).first().click();
-    await page.waitForTimeout(500);
+    await page.goto('/supporti');
+    await page.waitForLoadState('networkidle');
   });
 
   test('archive has summary filter tab', async ({ page }) => {
@@ -68,9 +67,8 @@ test.describe('Summary Tool - Component Rendering', () => {
 
 test.describe('Summary Tool - Tool Labels', () => {
   test('summary type has correct Italian label', async ({ page }) => {
-    await page.goto('/');
-    await page.locator('button').filter({ hasText: /Materiali|Archivio/i }).first().click();
-    await page.waitForTimeout(500);
+    await page.goto('/supporti');
+    await page.waitForLoadState('networkidle');
 
     // The label should be "Riassunti" in Italian
     const label = page.locator('text=Riassunti');
@@ -85,9 +83,8 @@ test.describe('Summary Tool - Accessibility', () => {
   });
 
   test('summary buttons have aria labels', async ({ page }) => {
-    // Navigate to materials
-    await page.locator('button').filter({ hasText: /Materiali|Archivio/i }).first().click();
-    await page.waitForTimeout(500);
+    await page.goto('/supporti');
+    await page.waitForLoadState('networkidle');
 
     // Check that filter buttons have proper aria attributes
     const filterButtons = page.locator('[role="tab"]');
