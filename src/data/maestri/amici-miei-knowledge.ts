@@ -1,109 +1,132 @@
 /**
  * Amici Miei Knowledge Base
  * Factual reference for Conte Mascetti character
- * Sources: Wikipedia, IMDB, film reviews
+ * Sources: Wikipedia, georgefiorini.eu, IMDB
  */
 
 export const AMICI_MIEI_KNOWLEDGE = `
 ## I Cinque Amici
 
 1. **Conte Raffaello "Lello" Mascetti** (Ugo Tognazzi)
-   - Nobile decaduto, vive in poverta mantenuto dagli amici
-   - Inventore della "supercazzola"
-   - Moglie: Alice (Milena Vukotic) - donna paziente che sopporta tutto
+   - Nobile decaduto, vive in uno scantinato in "condizioni di estrema indigenza"
+   - Mantenuto dagli amici ma con dignita
+   - Creatore delle supercazzole - l'arte di confondere con elegante nonsenso
+   - Moglie: Alice (Milena Vukotic) - santa donna che sopporta tutto
    - Amante: Titti (Silvia Dionisio) - studentessa 18enne, figlia di un colonnello
+   - In Atto II: colpito da ictus, finisce su sedia a rotelle
+   - In Atto III: paralizzato ma recupera la parola, dopo la morte di Alice
 
 2. **Giorgio Perozzi** (Philippe Noiret)
-   - Giornalista, redattore capo di cronaca
-   - Sposato con figli, ha molte avventure extraconiugali
+   - Giornalista, voce narrante del primo film
+   - Moglie "tremenda", figlio serioso che non lo capisce
+   - Molte avventure extraconiugali
    - MUORE alla fine del primo film (infarto)
    - Ultima battuta: una supercazzola al prete per l'estrema unzione
+   - Appare in Atto II solo nei flashback
 
 3. **Rambaldo Melandri** (Gastone Moschin)
-   - Architetto, impiegato al comune
-   - Mai sposato, cerca disperatamente l'amore
+   - Architetto impiegato al comune
+   - Si innamora facilmente, cerca disperatamente l'amore
    - Disposto ad abbandonare gli amici per una donna
+   - In Atto II: si converte al cattolicesimo per una donna devota
+   - In Atto III: si fa ricoverare nella casa di riposo per stare col Mascetti
 
-4. **Guido Necchi** (Duilio Del Prete)
-   - Gestisce un bar-ristorante con sala biliardo (luogo di ritrovo del gruppo)
+4. **Guido Necchi** (Duilio Del Prete nel I, Renzo Montagnani nel II e III)
+   - Proprietario del bar-ristorante, quartier generale del gruppo
+   - Considerato "l'anima geniale del gruppo"
    - Sposato con Carmen
+   - In Atto II: scopre l'infedelta di Carmen e si vendica dell'amante
 
 5. **Professor Alfeo Sassaroli** (Adolfo Celi)
-   - Chirurgo, dirige una clinica a Pescia
+   - Chirurgo brillante, primario ospedaliero con clinica a Pescia
+   - Annoiato dalla "psicopatica moglie" Donatella
    - Unico entrato nel gruppo in eta adulta
-   - Si unisce quando i quattro finiscono ricoverati nella sua clinica
+   - In Atto III: vende la clinica e compra la casa di riposo
 
 ## I Tre Film
 
 ### Amici Miei (1975) - Regia: Mario Monicelli
-- Ideato da Pietro Germi (morto prima delle riprese)
+- Ideato da Pietro Germi (morto 1974), realizzato da Monicelli
+- Monicelli pretese "un film di Pietro Germi" nei titoli
 - Germi lo immaginava a Bologna, Monicelli lo sposto a Firenze
 - Uscito il 15 agosto 1975
-- Finisce con la morte di Perozzi e il suo funerale
 - 32esimo film piu visto in Italia (10.467.254 spettatori)
+- Finisce con la morte di Perozzi e il suo funerale
 
 ### Amici Miei - Atto II (1982) - Regia: Mario Monicelli
-- Rimasti in 4 dopo la morte di Perozzi
-- Contiene flashback con Perozzi ancora vivo
-- Il Mascetti viene colpito da trombosi, finisce su sedia a rotelle
+- Si apre al cimitero per onorare Perozzi
+- Flashback con l'alluvione di Firenze del 1966
+- Necchi ora interpretato da Renzo Montagnani
+- Scene famose: "Servizio Torre" a Pisa, la vedova al cimitero
+- Sassaroli convince un usuraio di false procedure mediche
+- Finisce con l'ictus del Mascetti
 - Terzo maggiore incasso 1982-83
 
 ### Amici Miei - Atto III (1985) - Regia: Nanni Loy
 - Cambio di regista (non piu Monicelli)
-- Ambientato principalmente in una clinica geriatrica
-- Mascetti e ricoverato, la clinica diventa palcoscenico per le zingarate
+- Ambientato in una casa di riposo di lusso
+- Mascetti recupera la parola dopo l'ictus
+- Zingarata a Lenzi: lo convincono di vendere l'anima al diavolo
+- Messa nera falsa con Sassaroli travestito - Lenzi muore d'infarto
+- Sassaroli compra la casa di riposo
+- Mascetti trova compagnia con una residente
+- Finale: tentano gli schiaffi al treno ma ricevono loro i colpi
+- Mascetti usa una siringa con inchiostro invece degli schiaffi
 
 ## Zingarate Famose
 
-1. **Gli schiaffi al treno** - Stazione Santa Maria Novella, Firenze
-   - Schiaffi ai passeggeri affacciati ai finestrini dei treni in partenza
-   - Binario 16 - scena piu famosa del film
-   - Ispirata a fatti realmente accaduti a Firenze
+### Primo Film
+1. **La supercazzola al vigile** - Mascetti confonde un vigile urbano
+2. **Gli schiaffi al treno** - Stazione Santa Maria Novella, binario 16
+3. **La zingarata del Righi** - Convincono Nicolo Righi (pensionato avido)
+   di far parte di una banda criminale, lo portano in giro simulando
+   conflitti a fuoco. Al funerale del Perozzi gli dicono che fu ucciso
+   come traditore.
+4. **Il funerale del Perozzi** - Chiesa di Santo Spirito, marcia funebre
+   scandita da "bom bom bom"
 
-2. **Il funerale del Perozzi**
-   - Chiesa di Santo Spirito, Firenze
-   - Marcia funebre scandita da "bom bom bom" degli amici
-   - Lazzi e battute anche durante il funerale
+### Secondo Film
+1. **Il Servizio Torre** - Zingarata alla Torre di Pisa
+2. **La vedova al cimitero** - Burla a un vedovo inconsolabile
+3. **L'usuraio dal Sassaroli** - False procedure mediche
 
-3. **La visita al cimitero** (Atto II)
-   - Burla ai danni di un vedovo
+### Terzo Film
+1. **Lenzi e il diavolo** - Messa nera per "ringiovanire"
+2. **Gli schiaffi con l'inchiostro** - Versione finale della zingarata al treno
 
 ## La Supercazzola
 
-### Definizione
-Frase priva di senso logico, composta da parole reali e inventate, esposta in modo veloce, forbito e sicuro per confondere l'interlocutore.
+Frase priva di senso, esposta con sicurezza per confondere l'interlocutore.
 Entrata nel vocabolario Zingarelli nel 2015.
 
-### Vocabolario della Supercazzola
-- **Antani** - parola senza significato, simbolo del nonsenso
+### Vocabolario
+- **Antani** - parola simbolo del nonsenso
 - **Tarapia tapioco** - espressione inventata
 - **Scappellamento a destra/sinistra** - termine tecnico fasullo
 - **Come se fosse** - connettivo tipico
 - **Prematurata/o** - aggettivo inventato
+- **Brematurata** - variante
 - **Per due** - chiusura tipica
 - **Blinda** - parola inventata
 
-### Citazione Completa Tipica
-"Tarapia tapioco come se fosse antani con la supercazzola prematurata con lo scappellamento a destra"
+### Citazioni
+- "Tarapia tapioco, brematurata la supercazzola o scherziamo?!?"
+- "Tarapia tapioco come se fosse antani con la supercazzola prematurata
+   con lo scappellamento a destra"
+- "Endovenosa, sorella? Eccomi pronto, grazie!"
 
-## Relazioni Chiave (IMPORTANTE)
+## Relazioni Chiave
 
-- **Titti NON e la moglie di Mascetti** - e la sua giovane amante
-- **Alice e la moglie di Mascetti** - interpretata da Milena Vukotic
-- **Titti e interpretata da Silvia Dionisio** - NON da Milena Vukotic
-- Il padre di Titti (colonnello in pensione) scopre la relazione e lo dice ad Alice
+- **Titti** = giovane AMANTE del Mascetti (Silvia Dionisio)
+- **Alice** = MOGLIE del Mascetti (Milena Vukotic)
+- Il padre di Titti (colonnello) scopre la relazione e lo dice ad Alice
 - Alice tenta il suicidio col gas (ma il gas e finito)
+- Alice muore prima dell'Atto III
+- **Carmen** = moglie di Necchi (lo tradisce in Atto II)
+- **Donatella** = moglie "psicopatica" del Sassaroli
 
-## Espressioni Toscane Tipiche
+## Tema del Film
 
-- "Deh!" - esclamazione toscana
-- "Bischero" - insulto toscano affettuoso
-- "Ganzo" - bello, figo
-- "Icche tu dici" - cosa dici
-
-## Curiosita
-
-- Il termine "zingarata" e entrato nel lessico comune
-- Siri riconosce la supercazzola e risponde "come se fosse antani"
-- Monicelli incitava gli attori a colpire forte le comparse nella scena degli schiaffi
+"Ma poi e' proprio obbligatorio essere qualcuno?"
+Il film rappresenta la fase finale della commedia all'italiana.
 `;
