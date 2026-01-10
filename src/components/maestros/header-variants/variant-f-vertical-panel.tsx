@@ -10,10 +10,10 @@
  */
 
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
+import { AuraRings } from './aura-rings';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
 import { useEffect } from 'react';
@@ -60,16 +60,6 @@ export function HeaderVariantF(props: HeaderVariantProps) {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
-
-  // Calculate aura intensity based on voice activity
-  const getAuraIntensity = () => {
-    if (!isVoiceActive || !isConnected) return 0;
-    if (isSpeaking) return outputLevel;
-    if (isListening && !isMuted) return inputLevel;
-    return 0.1;
-  };
-
-  const auraIntensity = getAuraIntensity();
 
   // TTS toggle function
   const { updateSettings } = useAccessibilityStore();

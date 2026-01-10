@@ -1,14 +1,16 @@
 // ============================================================================
 // MIRRORBUDDY WEB - DATABASE SCHEMA
-// SQLite for local, PostgreSQL for cloud (same schema works for both)
+// PostgreSQL with pgvector for semantic search
 // ============================================================================
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "sqlite"
+  provider   = "postgresql"
+  extensions = [pgvector(map: "vector")]
 }
 
 // ============================================================================
@@ -1273,9 +1275,9 @@ model ContentEmbedding {
   // The actual text that was embedded
   content     String
 
-  // Vector embedding (stored as JSON for SQLite, will be vector(1536) for PostgreSQL)
-  // For PostgreSQL: change to Unsupported("vector(1536)") and use raw SQL
-  vector      String   // JSON array of 1536 floats
+  // Vector embedding - dual storage for migration
+  vector       String?                          // Legacy: JSON array (for backward compat)
+  vectorNative Unsupported("vector(1536)")?     // Native pgvector for similarity search
 
   // Embedding metadata
   model       String   @default("text-embedding-3-small")

@@ -1,21 +1,20 @@
 // ============================================================================
 // PRISMA CLIENT SINGLETON
 // Prevents multiple instances in development with hot reload
-// Uses libSQL adapter for Prisma 7 with SQLite
+// Uses @prisma/adapter-pg for Prisma 7 PostgreSQL connection
 // ============================================================================
 
+import 'server-only';
 import { PrismaClient } from '@prisma/client';
-import { PrismaLibSql } from '@prisma/adapter-libsql';
-
-// Create Prisma adapter with libSQL config
-// For local SQLite, use file:// URL. For Turso cloud, use libsql:// URL
-const adapter = new PrismaLibSql({
-  url: process.env.DATABASE_URL || 'file:./prisma/dev.db',
-});
+import { PrismaPg } from '@prisma/adapter-pg';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
+
+// Create PostgreSQL adapter with connection string
+const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/mirrorbuddy';
+const adapter = new PrismaPg({ connectionString });
 
 export const prisma =
   globalForPrisma.prisma ??
@@ -33,9 +32,9 @@ if (process.env.NODE_ENV !== 'production') {
  */
 export function isDatabaseNotInitialized(error: unknown): boolean {
   const message = String(error);
-  return message.includes('no such table') ||
-         message.includes('SQLITE_ERROR') ||
-         message.includes('does not exist');
+  return message.includes('does not exist') ||
+         message.includes('relation') ||
+         message.includes('P2021'); // Prisma error code for missing table
 }
 
 /**
@@ -43,7 +42,7 @@ export function isDatabaseNotInitialized(error: unknown): boolean {
  */
 export function getDatabaseErrorMessage(error: unknown): string {
   if (isDatabaseNotInitialized(error)) {
-    return 'Database not initialized. Run: npx prisma db push';
+    return 'Database not initialized. Run: npx prisma migrate deploy';
   }
   return 'Database error';
 }

@@ -6,7 +6,6 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import { VoicePanelVariantF } from '@/components/voice/voice-panel-variant-f';
 import { logger } from '@/lib/logger';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
@@ -62,7 +61,7 @@ export function VoiceCallPanel({
   const [configError, setConfigError] = useState<string | null>(null);
   const hasAttemptedConnection = useRef(false);
   const conversationIdRef = useRef<string | null>(null);
-  const savedMessagesRef = useRef<Set<string>>(new Set());
+  const _savedMessagesRef = useRef<Set<string>>(new Set());
 
   const voiceSession = useVoiceSession({
     onError: (error) => {
