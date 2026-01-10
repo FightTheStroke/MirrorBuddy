@@ -43,7 +43,7 @@ test.describe('C1: Console.log Production Check', () => {
     await page.waitForTimeout(2000); // Wait for async operations
 
     // Navigate through key views to trigger code paths (reduced set for speed)
-    const views = ['Quiz', 'Flashcards', 'Progressi', 'Impostazioni'];
+    const views = ['Astuccio', 'Zaino', 'Progressi', 'Impostazioni'];
     for (const view of views) {
       try {
         await page.locator('button').filter({ hasText: view }).first().click();
@@ -55,10 +55,6 @@ test.describe('C1: Console.log Production Check', () => {
 
     // Critical: No console.log should be present in production
     // Note: In development, some console.log might be acceptable, but we check anyway
-    if (consoleLogs.length > 0) {
-      console.warn('Console.log statements found:', consoleLogs);
-    }
-
     // Filter out HMR/Fast Refresh logs which are expected in development
     const _devLogs = consoleLogs.filter(log =>
       log.includes('[HMR]') ||
@@ -420,40 +416,16 @@ test.describe('Fix #29: Session Grade Display', () => {
 // ============================================================================
 test.describe('Fix #1: Mindmap Labels', () => {
   test('mindmap with long labels renders correctly', async ({ page }) => {
-    await page.goto('/');
-    
-    // Navigate to mindmaps
-    const mindmapButton = page.locator('button, a').filter({ hasText: /Mappe Mentali|Mindmap/i });
-    
-    if (await mindmapButton.count() > 0) {
-      await mindmapButton.first().click();
-      await page.waitForTimeout(1000);
+    await page.goto('/astuccio');
 
-      // Check that mindmap renderer is present (uses MarkMap, not Mermaid - see ADR 0001)
-      const hasMindmap = await page
-        .locator('[class*="mindmap"], [class*="markmap"], svg')
-        .first()
-        .isVisible()
-        .catch(() => false);
-
-      // Mindmap should be renderable
-      expect(hasMindmap || true).toBeTruthy();
-    }
+    const mindmapButton = page.getByRole('button', { name: /Mappa Mentale/i }).first();
+    await expect(mindmapButton).toBeVisible();
+    await mindmapButton.click();
+    await expect(page.locator('[role="dialog"]')).toBeVisible();
   });
 
   test('mindmap labels use markdown string syntax', async ({ page }) => {
-    // This is a code-level check - we verify the renderer exists
-    await page.goto('/');
-    
-    // Check that mindmap component is loaded
-    const hasMindmapView = await page
-      .locator('text=/Mappe Mentali|Mindmap/i')
-      .first()
-      .isVisible()
-      .catch(() => false);
-
-    // Component should exist
-    expect(hasMindmapView || true).toBeTruthy();
+    await page.goto('/astuccio');
+    await expect(page.getByRole('button', { name: /Mappa Mentale/i }).first()).toBeVisible();
   });
 });
-

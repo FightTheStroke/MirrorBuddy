@@ -14,13 +14,13 @@ test.describe('Navigation', () => {
   });
 
   test('sidebar navigation works', async ({ page }) => {
-    // Click on Quiz nav item
-    await page.locator('button').filter({ hasText: 'Quiz' }).click();
-    await expect(page.locator('h1, h2').filter({ hasText: /Quiz/i }).first()).toBeVisible({ timeout: 5000 });
+    // Click on Astuccio nav item
+    await page.locator('button').filter({ hasText: 'Astuccio' }).click();
+    await expect(page.locator('h1, h2').filter({ hasText: /Astuccio/i }).first()).toBeVisible({ timeout: 5000 });
 
-    // Click on Flashcards nav item
-    await page.locator('button').filter({ hasText: 'Flashcards' }).click();
-    await expect(page.locator('h1, h2').filter({ hasText: /Flashcard/i }).first()).toBeVisible({ timeout: 5000 });
+    // Click on Zaino nav item
+    await page.locator('button').filter({ hasText: 'Zaino' }).click();
+    await expect(page.locator('h1, h2').filter({ hasText: /Zaino/i }).first()).toBeVisible({ timeout: 5000 });
 
     // Click on Progressi nav item
     await page.locator('button').filter({ hasText: 'Progressi' }).click();

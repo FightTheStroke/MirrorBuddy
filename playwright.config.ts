@@ -5,6 +5,9 @@ import path from 'path';
  * mirrorbuddy-Edu E2E Test Configuration
  * Tests for educational platform with AI-powered tutoring
  */
+delete process.env.NO_COLOR;
+delete process.env.FORCE_COLOR;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -50,9 +53,14 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
+    command: 'env -u NO_COLOR -u FORCE_COLOR npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
+    env: {
+      DATABASE_URL: 'postgresql://roberdan@localhost:5432/mirrorbuddy',
+      DIRECT_URL: 'postgresql://roberdan@localhost:5432/mirrorbuddy',
+      E2E_TESTS: '1',
+    },
   },
 });
