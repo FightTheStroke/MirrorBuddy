@@ -40,7 +40,8 @@ export const AMICI_MIEI_KNOWLEDGE = `
 5. **Professor Alfeo Sassaroli** (Adolfo Celi)
    - Chirurgo brillante, primario ospedaliero con clinica a Pescia
    - Annoiato dalla "psicopatica moglie" Donatella
-   - Unico entrato nel gruppo in eta adulta
+   - Unico entrato nel gruppo in eta adulta (li conosce dopo un incidente stradale)
+   - Quando Melandri si innamora di sua moglie in clinica, gliela "cede" con cinismo
    - In Atto III: vende la clinica e compra la casa di riposo
 
 ## I Tre Film
@@ -57,8 +58,13 @@ export const AMICI_MIEI_KNOWLEDGE = `
 - Si apre al cimitero per onorare Perozzi
 - Flashback con l'alluvione di Firenze del 1966
 - Necchi ora interpretato da Renzo Montagnani
-- Scene famose: "Servizio Torre" a Pisa, la vedova al cimitero
-- Sassaroli convince un usuraio di false procedure mediche
+- Melandri si innamora di Noemi, donna bigotta
+- Mascetti deve gestire debiti e una figlia rimasta incinta
+- Mascetti ospita Luciano, figlio del Perozzi (serissimo), in cambio di retta mensile
+  che spende puntualmente in vino
+- Zingarata della Torre di Pisa all'usuraio Savino Capogreco
+- Il coro in chiesa: gli amici cantano versi osceni su melodie sacre
+- Concorso di rutto tra Necchi e un cliente del bar
 - Finisce con l'ictus del Mascetti
 - Terzo maggiore incasso 1982-83
 
@@ -110,10 +116,13 @@ Entrata nel vocabolario Zingarelli nel 2015.
 - **Blinda** - parola inventata
 
 ### Citazioni
-- "Tarapia tapioco, brematurata la supercazzola o scherziamo?!?"
+- "Tarapia tapioco! Prematurata la supercazzola, o scherziamo? No, mi permetta,
+   alla fine scappellamento a destra per due!" (al vigile)
 - "Tarapia tapioco come se fosse antani con la supercazzola prematurata
    con lo scappellamento a destra"
 - "Endovenosa, sorella? Eccomi pronto, grazie!"
+- "Sii astuto come un cervo!" - "Che bischerate tu dici? Il cervo non e' astuto,
+   semmai la volpe!"
 
 ## Relazioni Chiave
 
@@ -125,8 +134,66 @@ Entrata nel vocabolario Zingarelli nel 2015.
 - **Carmen** = moglie di Necchi (lo tradisce in Atto II)
 - **Donatella** = moglie "psicopatica" del Sassaroli
 
+## Citazioni Famose
+
+### Perozzi sul Genio
+"Che cos'e' il genio? E' fantasia, intuizione, colpo d'occhio e velocita' d'esecuzione."
+(Giorgio Perozzi spiega il genio mentre prepara una zingarata)
+
+### Mascetti sull'Appartamento
+"L'appartamento? E' un bilocale in condizioni di estrema indigenza. Nell'entrare si
+nota un odore leggermente putrescente che tuttavia non contrasta con lo squallore
+dell'insieme."
+
+### Sulla Vecchiaia
+"La vecchiaia e' una brutta bestia. Non risparmia nessuno."
+
+### Sul Miracolo della Torre
+"E' un miracolo! Si raddrizza!" (Zingarata all'usuraio Capogreco a Pisa)
+
+### Sull'Ospizio
+"Non e' un ospizio, e' un residence per la terza eta'."
+
+## Atto III - Dettagli Aggiuntivi
+
+### Il Finto Volo al Polo Nord
+Gli amici convincono i vecchietti dell'ospizio di essere su un aereo
+diretto al Polo Nord, usando un furgone frigorifero e ventilatori.
+
+### Melandri e Amalia
+Melandri si innamora di Amalia Pecci Bonetti (dalle "due cognomi e gli
+occhi azzurri"), scoprendo pero' che lei ha numerosi amanti nella struttura.
+
+### La Fuga al Mare
+Nel finale, Mascetti fugge dall'ospizio con gli amici per andare al mare.
+Momento di liberta' e amicizia prima della fine.
+
+### L'Ultimo Tentativo al Treno
+Mascetti, sulla sedia a rotelle, usa una siringa piena di inchiostro
+invece degli schiaffi. Ma i passeggeri si vendicano colpendo gli amici.
+
+## Glossario
+
+- **Zingarata**: Burla elaborata, scherzo di gruppo agli ignari
+- **Supercazzola**: Discorso volutamente privo di senso, per confondere
+- **Antani**: Parola inventata, simbolo del nonsenso elegante
+- **Tarapia tapioco**: Espressione senza significato delle supercazzole
+- **Scappellamento**: Termine tecnico fasullo usato nelle supercazzole
+- **Prematurata**: Aggettivo inventato per dare peso al discorso
+
+## Curiosita' Storiche
+
+- Gli scherzi del film si ispirano a una vera compagnia di amici della
+  provincia di Livorno degli anni '30
+- Il Bar Necchi in via dei Renai a Firenze e' ancora meta di pellegrinaggio
+  per i fan della saga
+- "Supercazzola" e' entrata ufficialmente nel vocabolario Zingarelli (2015)
+  per indicare discorso nonsense volto a confondere
+
 ## Tema del Film
 
 "Ma poi e' proprio obbligatorio essere qualcuno?"
 Il film rappresenta la fase finale della commedia all'italiana.
+L'amicizia come rifugio dalla tristezza della vita, le zingarate
+come ribellione al grigiore quotidiano.
 `;
