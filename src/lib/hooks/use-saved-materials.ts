@@ -9,7 +9,7 @@ export { useFlashcardDecks } from './use-saved-materials/hooks/use-flashcard-dec
 export { useHomeworkSessions } from './use-saved-materials/hooks/use-homework-sessions';
 export { useDemos } from './use-saved-materials/hooks/use-demos';
 export { useSavedTools } from './use-saved-materials/hooks/use-saved-tools';
-export { autoSaveMaterial } from './use-saved-materials/utils/auto-save';
+export { autoSaveMaterial, forceSaveMaterial } from './use-saved-materials/utils/auto-save';
 
 export type {
   SavedMaterial,

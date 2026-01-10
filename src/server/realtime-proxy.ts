@@ -10,15 +10,59 @@ import { logger } from '@/lib/logger';
 
 const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 
+// Timeout configuration
+const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes idle timeout
+const HEARTBEAT_INTERVAL_MS = 30 * 1000; // 30 seconds heartbeat
+
 let wss: WebSocketServer | null = null;
 
 interface ProxyConnection {
   clientWs: WebSocket;
   backendWs: WebSocket | null;
   maestroId: string;
+  lastActivityTime: number;
+  idleTimer: NodeJS.Timeout | null;
 }
 
 const connections = new Map<string, ProxyConnection>();
+
+/**
+ * Reset idle timer for a connection - call on any activity
+ */
+function resetIdleTimer(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
+
+  conn.lastActivityTime = Date.now();
+
+  // Clear existing timer
+  if (conn.idleTimer) {
+    clearTimeout(conn.idleTimer);
+  }
+
+  // Set new idle timer
+  conn.idleTimer = setTimeout(() => {
+    logger.info(`Connection ${connectionId} idle timeout - closing`);
+    if (conn.clientWs.readyState === WebSocket.OPEN) {
+      conn.clientWs.close(4001, 'Idle timeout');
+    }
+    if (conn.backendWs?.readyState === WebSocket.OPEN) {
+      conn.backendWs.close();
+    }
+    connections.delete(connectionId);
+  }, IDLE_TIMEOUT_MS);
+}
+
+/**
+ * Clear idle timer for a connection (on disconnect)
+ */
+function clearIdleTimer(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn?.idleTimer) {
+    clearTimeout(conn.idleTimer);
+    conn.idleTimer = null;
+  }
+}
 
 type Provider = 'openai' | 'azure';
 type CharacterType = 'maestro' | 'coach' | 'buddy';
@@ -151,11 +195,17 @@ export function startRealtimeProxy(): void {
       clientWs,
       backendWs,
       maestroId,
+      lastActivityTime: Date.now(),
+      idleTimer: null,
     });
+
+    // Start idle timer for this connection
+    resetIdleTimer(connectionId);
 
     backendWs.on('open', () => {
       logger.info(`Backend WebSocket OPEN for ${connectionId}`);
       clientWs.send(JSON.stringify({ type: 'proxy.ready' }));
+      resetIdleTimer(connectionId);
     });
 
     // Proxy messages from Backend to Client
@@ -173,10 +223,15 @@ export function startRealtimeProxy(): void {
       if (clientWs.readyState === WebSocket.OPEN) {
         clientWs.send(data);
       }
+      // Reset idle timer on backend activity
+      resetIdleTimer(connectionId);
     });
 
     // Proxy messages from Client to Backend
     clientWs.on('message', (data: Buffer) => {
+      // Reset idle timer on client activity
+      resetIdleTimer(connectionId);
+
       if (backendWs.readyState === WebSocket.OPEN) {
         // Convert Buffer to string - Azure requires text messages, not binary
         const msg = data.toString('utf-8');
@@ -205,6 +260,7 @@ export function startRealtimeProxy(): void {
     // Handle backend connection close
     backendWs.on('close', (code: number, reason: Buffer) => {
       logger.debug(`Backend connection closed for ${connectionId}`, { code, reason: reason.toString() });
+      clearIdleTimer(connectionId);
       if (clientWs.readyState === WebSocket.OPEN) {
         const validCode = (code === 1000 || (code >= 3000 && code <= 4999)) ? code : 1000;
         clientWs.close(validCode, reason.toString());
@@ -215,6 +271,7 @@ export function startRealtimeProxy(): void {
     // Handle client disconnection
     clientWs.on('close', () => {
       logger.debug(`Client disconnected: ${connectionId}`);
+      clearIdleTimer(connectionId);
       if (backendWs.readyState === WebSocket.OPEN) {
         backendWs.close();
       }

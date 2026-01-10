@@ -19,6 +19,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   isBufferingRef: React.MutableRefObject<boolean>;
   scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
   playbackContextRef: React.MutableRefObject<AudioContext | null>;
+  connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   addTranscript: (role: 'user' | 'assistant', text: string) => void;
   setListening: (value: boolean) => void;
   setSpeaking: (value: boolean) => void;
@@ -43,6 +44,12 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
     switch (eventType) {
       case 'proxy.ready':
         logger.debug('[VoiceSession] Proxy connected to Azure, sending session config...');
+        // Clear connection timeout - we received proxy.ready successfully
+        if (deps.connectionTimeoutRef.current) {
+          clearTimeout(deps.connectionTimeoutRef.current);
+          // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
+          deps.connectionTimeoutRef.current = null;
+        }
         deps.sendSessionConfig();
         break;
 
