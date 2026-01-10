@@ -207,3 +207,4 @@ export function LearningPathView({
       </div>
     </div>
   );
+}

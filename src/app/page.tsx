@@ -136,6 +136,8 @@ export default function Home() {
           markAsViewed();
           handleViewChange('genitori');
         }}
+        selectedCoach={selectedCoach}
+        selectedBuddy={selectedBuddy}
         debugMenuOpen={debugMenuOpen}
         onDebugMenuToggle={() => setDebugMenuOpen(!debugMenuOpen)}
       />

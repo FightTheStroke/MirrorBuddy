@@ -11,10 +11,9 @@
  */
 
 import { useRef, useCallback, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Wifi, WifiOff, Save, Download, Brain, Layers } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { SummaryEditor } from './summary-editor';
+import { SummaryConnectionStatus } from './components/summary-connection-status';
+import { SummaryActionsBar } from './components/summary-actions-bar';
 import {
   useSummaryModifications,
   type SummaryModificationCallbacks,
@@ -225,26 +224,11 @@ export function LiveSummary({
 
   return (
     <div className={cn('flex flex-col h-full', className)}>
-      {/* Connection Status */}
-      {sessionId && listenForEvents && (
-        <div className="shrink-0 flex items-center gap-2 px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-          {isConnected ? (
-            <>
-              <Wifi className="w-4 h-4 text-green-500" />
-              <span className="text-xs text-green-600 dark:text-green-400">
-                Connesso - modifica vocale attiva
-              </span>
-            </>
-          ) : (
-            <>
-              <WifiOff className="w-4 h-4 text-amber-500" />
-              <span className="text-xs text-amber-600 dark:text-amber-400">
-                Connessione in corso...
-              </span>
-            </>
-          )}
-        </div>
-      )}
+      <SummaryConnectionStatus
+        sessionId={sessionId}
+        listenForEvents={listenForEvents}
+        isConnected={isConnected}
+      />
 
       {/* Editor */}
       <div className="flex-1 overflow-auto p-4">
@@ -257,77 +241,15 @@ export function LiveSummary({
         />
       </div>
 
-      {/* Actions Bar */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="shrink-0 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-3"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          {/* Left Actions */}
-          <div className="flex items-center gap-2">
-            {!isFinalized && !readOnly && (
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleSave}
-                className="gap-2"
-              >
-                <Save className="w-4 h-4" />
-                Salva
-              </Button>
-            )}
-            {isFinalized && (
-              <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-                <Save className="w-4 h-4" />
-                Salvato
-              </span>
-            )}
-          </div>
-
-          {/* Right Actions */}
-          <div className="flex items-center gap-2">
-            {onExportPdf && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onExportPdf(data)}
-                className="gap-2"
-                title="Esporta come PDF"
-              >
-                <Download className="w-4 h-4" />
-                <span className="hidden sm:inline">PDF</span>
-              </Button>
-            )}
-
-            {onConvertToMindmap && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onConvertToMindmap(data)}
-                className="gap-2"
-                title="Converti in mappa mentale"
-              >
-                <Brain className="w-4 h-4" />
-                <span className="hidden sm:inline">Mappa</span>
-              </Button>
-            )}
-
-            {onGenerateFlashcards && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onGenerateFlashcards(data)}
-                className="gap-2"
-                title="Genera flashcard dai punti chiave"
-              >
-                <Layers className="w-4 h-4" />
-                <span className="hidden sm:inline">Flashcard</span>
-              </Button>
-            )}
-          </div>
-        </div>
-      </motion.div>
+      <SummaryActionsBar
+        isFinalized={isFinalized}
+        readOnly={readOnly}
+        data={data}
+        onSave={handleSave}
+        onExportPdf={onExportPdf}
+        onConvertToMindmap={onConvertToMindmap}
+        onGenerateFlashcards={onGenerateFlashcards}
+      />
     </div>
   );
 }

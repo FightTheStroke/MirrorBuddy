@@ -5,7 +5,7 @@ import { Star, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { SessionGrade } from '@/lib/stores';
 
-const GRADE_LABELS: Record<number, { label: string; emoji: string; color: string }> = {
+export const GRADE_LABELS: Record<number, { label: string; emoji: string; color: string }> = {
   10: { label: 'Eccezionale', emoji: '🏆', color: 'from-yellow-400 to-amber-500' },
   9: { label: 'Eccellente', emoji: '🌟', color: 'from-amber-400 to-orange-500' },
   8: { label: 'Ottimo', emoji: '✨', color: 'from-green-400 to-emerald-500' },

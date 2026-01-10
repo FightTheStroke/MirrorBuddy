@@ -2,23 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import {
-  User,
-  Accessibility,
-  Palette,
-  Bell,
-  Shield,
-  Save,
-  Undo2,
-  BarChart3,
-  Users,
-  UserCircle,
-  Bot,
-  Volume2,
-  Music,
-  Wrench,
-  Settings,
-} from 'lucide-react';
+import { Save, Undo2, Settings, UserCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +14,7 @@ import { OnboardingSettings } from '@/components/settings/onboarding-settings';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import { PageHeader } from '@/components/ui/page-header';
+import { SETTINGS_TABS, type SettingsTab } from './settings-tabs';
 
 // Import section components
 import {
@@ -44,23 +29,6 @@ import {
   AIProviderSettings,
   DiagnosticsTab,
 } from './sections';
-
-type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'ambient-audio' | 'notifications' | 'telemetry' | 'privacy' | 'genitori' | 'diagnostics';
-
-const tabs: Array<{ id: SettingsTab; label: string; icon: React.ReactNode }> = [
-  { id: 'profile', label: 'Profilo', icon: <User className="w-5 h-5" /> },
-  { id: 'characters', label: 'Personaggi', icon: <Users className="w-5 h-5" /> },
-  { id: 'accessibility', label: 'Accessibilita', icon: <Accessibility className="w-5 h-5" /> },
-  { id: 'appearance', label: 'Aspetto', icon: <Palette className="w-5 h-5" /> },
-  { id: 'ai', label: 'AI Provider', icon: <Bot className="w-5 h-5" /> },
-  { id: 'audio', label: 'Audio/Video', icon: <Volume2 className="w-5 h-5" /> },
-  { id: 'ambient-audio', label: 'Audio Ambientale', icon: <Music className="w-5 h-5" /> },
-  { id: 'notifications', label: 'Notifiche', icon: <Bell className="w-5 h-5" /> },
-  { id: 'telemetry', label: 'Statistiche', icon: <BarChart3 className="w-5 h-5" /> },
-  { id: 'privacy', label: 'Privacy', icon: <Shield className="w-5 h-5" /> },
-  { id: 'genitori', label: 'Genitori', icon: <UserCircle className="w-5 h-5" /> },
-  { id: 'diagnostics', label: 'Diagnostica', icon: <Wrench className="w-5 h-5" /> },
-];
 
 export function SettingsView() {
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
@@ -157,7 +125,7 @@ export function SettingsView() {
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-700 pb-4">
-        {tabs.map(tab => (
+        {SETTINGS_TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}

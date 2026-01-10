@@ -21,14 +21,14 @@ export {
   type UseCollectionsReturn,
 } from './use-collections';
 
+export { useTags } from './use-tags';
 export {
-  useTags,
   getRandomTagColor,
   TAG_COLORS,
   type TagData,
   type UseTagsOptions,
   type UseTagsReturn,
-} from './use-tags';
+} from './tag-types';
 
 export {
   useSmartCollections,
