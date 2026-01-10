@@ -1,14 +1,14 @@
 # Resume Instructions for Fresh Claude Session
 
 **Created**: 3 Gennaio 2026, 19:00 CET
-**Context**: ConvergioEdu/MirrorBuddy execution plan optimization
+**Context**: MirrorBuddy execution plan optimization
 
 ---
 
 ## Quick Start
 
 ```bash
-cd /Users/roberdan/GitHub/ConvergioEdu
+cd /Users/roberdan/GitHub/MirrorBuddy/ConvergioEdu
 git status
 cat docs/plans/doing/TODAYDocs/TODAY.md
 ```

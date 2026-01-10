@@ -10,11 +10,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/Roberdan/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/Roberdan/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/tests-1945%20passed-brightgreen" alt="Tests: 1945 passed">
   <img src="https://img.shields.io/badge/coverage-80.75%25-brightgreen" alt="Coverage: 80.75%">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
-  <a href="https://github.com/Roberdan/MirrorBuddy/releases"><img src="https://img.shields.io/github/v/release/Roberdan/MirrorBuddy?include_prereleases&label=version" alt="Version"></a>
+  <a href="https://github.com/FightTheStroke/MirrorBuddy/releases"><img src="https://img.shields.io/github/v/release/FightTheStroke/MirrorBuddy?include_prereleases&label=version" alt="Version"></a>
 </p>
 
 <p align="center">
@@ -121,7 +121,7 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 
 ```bash
 # Clone and install
-git clone https://github.com/Roberdan/MirrorBuddy.git
+git clone https://github.com/FightTheStroke/MirrorBuddy.git
 cd MirrorBuddy
 npm install
 

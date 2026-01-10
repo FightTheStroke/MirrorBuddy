@@ -124,7 +124,7 @@ MirrorBuddy is part of a larger vision:
 |---------|-------------|
 | [**convergio-cli**](https://github.com/Roberdan/convergio-cli) | CLI with 50+ specialized AI agents |
 | [**MyMirrorBuddy**](https://github.com/Roberdan/MyMirrorBuddy) | Native macOS/iOS app |
-| [**MirrorBuddy**](https://github.com/Roberdan/MirrorBuddy) | Core framework |
+| [**MirrorBuddy**](https://github.com/FightTheStroke/MirrorBuddy) | This project - AI tutoring platform |
 
 ---
 
