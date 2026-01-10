@@ -6,18 +6,7 @@
 import { logger } from '@/lib/logger';
 import type { AudioMode, AudioLayer } from '@/types';
 import { createAudioNodeForMode } from './generators';
-
-/**
- * Represents an active audio layer with its Web Audio nodes
- */
-interface ActiveLayer {
-  id: string;
-  mode: AudioMode;
-  gainNode: GainNode;
-  sourceNode: AudioNode | null;
-  oscillators?: OscillatorNode[]; // For binaural beats
-  started: boolean;
-}
+import type { ActiveLayer } from './types';
 
 /**
  * Ambient Audio Engine
@@ -299,12 +288,7 @@ export class AmbientAudioEngine {
   /**
    * Get current state
    */
-  getState(): {
-    isInitialized: boolean;
-    contextState: string | null;
-    activeLayerCount: number;
-    isDucked: boolean;
-  } {
+  getState() {
     return {
       isInitialized: this.isInitialized,
       contextState: this.audioContext?.state || null,
@@ -312,17 +296,4 @@ export class AmbientAudioEngine {
       isDucked: this.isDucked,
     };
   }
-}
-
-// Singleton instance
-let engineInstance: AmbientAudioEngine | null = null;
-
-/**
- * Get the singleton audio engine instance
- */
-export function getAudioEngine(): AmbientAudioEngine {
-  if (!engineInstance) {
-    engineInstance = new AmbientAudioEngine();
-  }
-  return engineInstance;
 }

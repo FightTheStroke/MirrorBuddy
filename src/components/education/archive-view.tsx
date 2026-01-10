@@ -22,10 +22,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
-import {
-  getActiveMaterials,
-  deleteMaterial,
-} from '@/lib/storage/materials-db';
+import { getActiveMaterials } from '@/lib/storage/materials-db-utils';
+import { deleteMaterial } from '@/lib/storage/materials-db-crud';
 
 // Import extracted components
 import {

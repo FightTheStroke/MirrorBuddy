@@ -60,7 +60,7 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
       case 'session.updated':
         logger.debug('[VoiceSession] Session configured, ready for conversation');
         logger.debug('[VoiceSession] Full session.updated event', { eventPreview: JSON.stringify(event).slice(0, 500) });
-        // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
+         
         deps.sessionReadyRef.current = true;
         logger.debug('[VoiceSession] Starting audio capture...');
         deps.startAudioCapture();

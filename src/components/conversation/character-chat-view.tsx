@@ -33,7 +33,7 @@ export function CharacterChatView({
 }: CharacterChatViewProps) {
   const character = getCharacterInfo(characterId, characterType);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
-  const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
+  const { speak: _speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
   const {
     messages,

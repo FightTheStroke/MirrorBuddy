@@ -9,17 +9,13 @@ import { logger } from '@/lib/logger';
 import type {
   MethodProgress,
   MethodEvent,
-  MindMapProgress,
-  FlashcardProgress,
-  SelfAssessmentProgress,
-  HelpBehavior,
-  MethodTransfer,
   SkillLevel,
   ToolType,
   HelpLevel,
   Subject,
 } from '@/lib/method-progress/types';
-import { DEFAULT_METHOD_PROGRESS, LEVEL_THRESHOLDS } from '@/lib/method-progress/types';
+import { DEFAULT_METHOD_PROGRESS } from '@/lib/method-progress/types';
+import { calculateLevel, calculateAutonomyScore } from './method-progress-utils';
 
 interface MethodProgressState extends Omit<MethodProgress, 'userId'> {
   userId: string | null;
@@ -43,35 +39,6 @@ interface MethodProgressState extends Omit<MethodProgress, 'userId'> {
   reset: () => void;
 }
 
-// Calculate skill level from progress percentage
-function calculateLevel(progress: number): SkillLevel {
-  if (progress >= LEVEL_THRESHOLDS.expert) return 'expert';
-  if (progress >= LEVEL_THRESHOLDS.competent) return 'competent';
-  if (progress >= LEVEL_THRESHOLDS.learning) return 'learning';
-  return 'novice';
-}
-
-// Calculate autonomy score from all metrics
-function calculateAutonomyScore(state: {
-  mindMaps: MindMapProgress;
-  flashcards: FlashcardProgress;
-  selfAssessment: SelfAssessmentProgress;
-  helpBehavior: HelpBehavior;
-  methodTransfer: MethodTransfer;
-}): number {
-  const { mindMaps, flashcards, helpBehavior, methodTransfer } = state;
-
-  // Weight different factors
-  const aloneRatio = helpBehavior.solvedAlone / Math.max(1, helpBehavior.questionsAsked + helpBehavior.solvedAlone);
-  const selfCorrectionRatio = helpBehavior.selfCorrections / Math.max(1, helpBehavior.questionsAsked);
-  const toolsAloneRatio = (mindMaps.createdAlone + flashcards.createdAlone) /
-    Math.max(1, mindMaps.createdAlone + mindMaps.createdWithHints + mindMaps.createdWithFullHelp +
-      flashcards.createdAlone + flashcards.createdWithHints);
-  const transferBonus = Math.min(1, methodTransfer.subjectsApplied.length / 5);
-
-  // Weighted average
-  return (aloneRatio * 0.3 + selfCorrectionRatio * 0.2 + toolsAloneRatio * 0.3 + transferBonus * 0.2);
-}
 
 export const useMethodProgressStore = create<MethodProgressState>()(
   (set, get) => ({

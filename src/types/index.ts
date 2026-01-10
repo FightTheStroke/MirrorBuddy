@@ -108,6 +108,7 @@ export type {
   ToolEventType,
   ToolCall,
   ToolResult,
+  ToolCallRef,
   // Mindmap
   MindmapNode,
   MindmapData,
@@ -149,6 +150,7 @@ export {
   CHAT_TOOL_DEFINITIONS,
   SUMMARY_STRUCTURE_TEMPLATE,
   createEmptyStudentSummary,
+  toToolCallRef,
 } from './tools';
 
 // Learning Path types

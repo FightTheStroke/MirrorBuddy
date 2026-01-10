@@ -89,3 +89,31 @@ export interface ToolResult {
   data?: unknown;
   renderComponent?: string; // Component name to render
 }
+
+/**
+ * Lightweight tool call reference for database storage.
+ * Avoids duplicating content (stored in Material table).
+ * Use ToolCall for runtime state, ToolCallRef for persistence.
+ */
+export interface ToolCallRef {
+  id: string;              // Same as Material.toolId
+  type: ToolType;          // Tool type for routing
+  name: string;            // Function name (e.g., 'create_mindmap')
+  status: 'pending' | 'running' | 'completed' | 'error';
+  error?: string;          // Error message if status is 'error'
+  materialId?: string;     // FK to Material (if saved)
+}
+
+/**
+ * Convert full ToolCall to lightweight ToolCallRef for DB storage
+ */
+export function toToolCallRef(toolCall: ToolCall): ToolCallRef {
+  return {
+    id: toolCall.id,
+    type: toolCall.type,
+    name: toolCall.name,
+    status: toolCall.status,
+    error: toolCall.result?.error,
+    materialId: toolCall.id, // toolId is used as materialId
+  };
+}

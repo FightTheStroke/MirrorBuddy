@@ -68,7 +68,7 @@ export function useToolHandler({
           const toolCall = data.toolCalls[0];
           const mappedToolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolType;
           const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
-          const completedTool: ToolState = {
+          const _completedTool: ToolState = {
             ...newTool,
             type: mappedToolType,
             status: 'completed',

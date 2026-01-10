@@ -1,10 +1,9 @@
-// ============================================================================
-// API ROUTE: Chat completions
-// Supports: Azure OpenAI, Ollama (local)
-// NEVER: Direct OpenAI API, Anthropic
-// SECURITY: Input/output filtering for child safety (Issue #30)
-// FEATURE: Function calling for tool execution (Issue #39)
-// ============================================================================
+/**
+ * Chat API Route Handler
+ * Supports: Azure OpenAI, Ollama (local)
+ * SECURITY: Input/output filtering for child safety (Issue #30)
+ * FEATURE: Function calling for tool execution (Issue #39)
+ */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
@@ -17,299 +16,12 @@ import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
 import { executeToolCall } from '@/lib/tools/tool-executor';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
-import { getMaestroById } from '@/data';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
-interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-}
-
-interface ChatRequest {
-  messages: ChatMessage[];
-  systemPrompt: string;
-  maestroId: string;
-  enableTools?: boolean; // Optional: enable tool calling (default: true)
-  enableMemory?: boolean; // Optional: enable conversation memory (default: true)
-  requestedTool?: 'mindmap' | 'quiz' | 'flashcard' | 'demo' | 'summary' | 'search'; // Tool context injection
-}
-
-// Tool context to inject into system prompt (Phase 5: Chat API Enhancement)
-// These instructions guide AI to prioritize tool calls when the user specifies a topic
-const TOOL_CONTEXT: Record<string, string> = {
-  mindmap: `
-## MODALITÀ MAPPA MENTALE - GERARCHIA OBBLIGATORIA
-
-SBAGLIATO (mappa piatta - NON fare così):
-nodes: [{"id":"1","label":"A"},{"id":"2","label":"B"},{"id":"3","label":"C"}]
-
-CORRETTO (mappa gerarchica):
-{
-  "title": "La Fotosintesi",
-  "nodes": [
-    {"id":"1","label":"Fase Luminosa"},
-    {"id":"2","label":"Clorofilla","parentId":"1"},
-    {"id":"3","label":"ATP","parentId":"1"},
-    {"id":"4","label":"Fase Oscura"},
-    {"id":"5","label":"Ciclo di Calvin","parentId":"4"},
-    {"id":"6","label":"Glucosio","parentId":"5"}
-  ]
-}
-
-REGOLE OBBLIGATORIE:
-1. Nodi SENZA parentId = rami principali (max 3-5)
-2. Nodi CON parentId = sotto-nodi (DEVONO avere parentId!)
-3. Ogni ramo principale DEVE avere almeno 2 figli
-4. MAI fare mappe piatte dove tutti i nodi sono senza parentId
-
-Se lo studente non ha indicato un argomento, chiedi: "Di cosa vuoi fare la mappa?"`,
-
-  quiz: `
-## MODALITÀ QUIZ
-
-Hai a disposizione il tool "create_quiz" per creare quiz interattivi.
-
-Quando lo studente indica un argomento:
-1. Usa direttamente il tool create_quiz
-2. Il tool genererà automaticamente il quiz interattivo
-
-ESEMPI:
-- "rivoluzione francese" → usa create_quiz(topic:"Rivoluzione Francese", questions:[...])
-- "frazioni" → usa create_quiz(topic:"Le Frazioni", questions:[...])
-
-Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi fare il quiz?"`,
-
-  flashcard: `
-## MODALITÀ FLASHCARD
-
-Hai a disposizione il tool "create_flashcards" per creare set di flashcard.
-
-Quando lo studente indica un argomento:
-1. Usa direttamente il tool create_flashcards
-2. Il tool genererà automaticamente le carte
-
-ESEMPI:
-- "verbi irregolari" → usa create_flashcards(topic:"Verbi Irregolari Inglesi", cards:[...])
-- "capitali europee" → usa create_flashcards(topic:"Capitali Europee", cards:[...])
-
-Se lo studente non ha indicato un argomento, chiedi: "Su cosa vuoi le flashcard?"`,
-
-  demo: '', // Dynamic - built in getDemoContext() below
-
-  summary: `
-## MODALITÀ RIASSUNTO
-
-Hai a disposizione il tool "create_summary" per creare riassunti strutturati.
-
-Quando lo studente indica un argomento:
-1. Usa direttamente il tool create_summary
-2. Il tool genererà automaticamente il riassunto
-
-ESEMPI:
-- "prima guerra mondiale" → usa create_summary(topic:"Prima Guerra Mondiale", sections:[...])
-- "fotosintesi" → usa create_summary(topic:"La Fotosintesi", sections:[...])
-
-Se lo studente non ha indicato un argomento, chiedi: "Cosa vuoi riassumere?"`,
-
-  search: `
-## MODALITÀ RICERCA WEB
-
-Hai a disposizione il tool "web_search" per cercare informazioni sul web.
-
-Quando lo studente vuole fare una ricerca:
-1. Usa direttamente il tool web_search
-2. Raccomanda fonti affidabili come Wikipedia italiana, Treccani e video YouTube educativi
-3. Il tool genererà automaticamente i risultati
-
-ESEMPI:
-- "rinascimento italiano" → usa web_search(query:"Rinascimento italiano Wikipedia", type:"educational")
-- "energie rinnovabili" → usa web_search(query:"Energie rinnovabili Treccani", type:"educational")
-- "fisica quantistica" → usa web_search(query:"Fisica quantistica video educativo YouTube", type:"video")
-
-Se lo studente non ha specificato cosa cercare, chiedi: "Cosa vuoi cercare?"`,
-
-  pdf: `
-## MODALITÀ CARICA PDF
-
-Questa modalità permette allo studente di caricare un documento PDF per analizzarlo insieme.
-
-Quando lo studente apre questa modalità:
-1. Chiedi cosa vuole caricare o studiare
-2. Spiega che può caricare un PDF del libro, appunti, o materiale di studio
-3. Guida la conversazione per capire l'obiettivo: riassumere, estrarre concetti chiave, fare domande sul contenuto
-4. Quando lo studente è pronto, indica che l'interfaccia di upload apparirà
-
-ESEMPI:
-- "voglio studiare il capitolo di storia" → "Perfetto! Carica il PDF del capitolo e lo analizzeremo insieme"
-- "ho bisogno di un riassunto" → "Ottimo! Carica il documento e creerò un riassunto strutturato per te"
-
-Se lo studente non ha specificato, chiedi: "Quale documento vuoi analizzare? Che cosa vorresti fare?"`,
-
-  webcam: `
-## MODALITÀ FOTOCAMERA
-
-Questa modalità permette allo studente di fotografare qualcosa da analizzare insieme.
-
-Quando lo studente apre questa modalità:
-1. Chiedi cosa vuole fotografare
-2. Spiega che può fotografare: compiti scritti, esercizi dal libro, esperimenti, disegni, appunti
-3. Guida la conversazione per capire l'obiettivo: correggere un esercizio, spiegare un passaggio, analizzare un disegno
-4. Quando lo studente è pronto, indica che la fotocamera si aprirà
-
-ESEMPI:
-- "voglio fotografare un esercizio di matematica" → "Ottimo! Scatta la foto e ti aiuto a risolverlo passo per passo"
-- "ho fatto un disegno tecnico" → "Perfetto! Fotografalo e lo analizziamo insieme per migliorarlo"
-
-Se lo studente non ha specificato, chiedi: "Cosa vuoi fotografare? Come posso aiutarti?"`,
-
-  homework: `
-## MODALITÀ COMPITI
-
-Questa modalità permette allo studente di caricare i compiti per ricevere aiuto.
-
-Quando lo studente apre questa modalità:
-1. Chiedi di quale materia sono i compiti e cosa deve fare
-2. Spiega che può caricare foto o PDF dei compiti
-3. Guida la conversazione per capire dove è bloccato o cosa non ha capito
-4. Offri di aiutarlo passo per passo senza dare le risposte direttamente
-5. Quando lo studente è pronto, indica che può caricare i compiti
-
-ESEMPI:
-- "ho problemi con le equazioni" → "Nessun problema! Carica i compiti e li risolviamo insieme, ti spiego ogni passaggio"
-- "non capisco l'analisi logica" → "Tranquillo! Carica la frase e ti guido nell'analisi passo per passo"
-
-IMPORTANTE: Il tuo ruolo è GUIDARE, non risolvere al posto dello studente. Fai domande, dai suggerimenti, verifica la comprensione.
-
-Se lo studente non ha specificato, chiedi: "Di quale materia sono i compiti? Dove ti serve aiuto?"`,
-};
-
-/**
- * Build dynamic demo context based on maestro's teaching style
- * Includes CAPABILITY PALETTE so maestro knows what's technically possible
- * Note: Examples are in English but the Maestro will respond in user's language
- */
-function getDemoContext(maestroId?: string): string {
-  const maestro = maestroId ? getMaestroById(maestroId) : null;
-  const teachingStyle = maestro?.teachingStyle || 'Interactive and engaging';
-  const maestroName = maestro?.name || 'Maestro';
-  
-  return `
-## INTERACTIVE DEMO MODE
-
-You are ${maestroName}. Your style: "${teachingStyle}"
-
-### 🎨 CAPABILITY PALETTE - What you can request:
-
-**VISUAL ELEMENTS available:**
-- Colored blocks/shapes (squares, circles, rectangles)
-- Element grid (e.g., array for multiplication)
-- Timeline (horizontal navigable line)
-- Map/canvas (drawable area)
-- Charts (bar, line, pie)
-- Characters/icons (simple animated figures)
-- Large animated text (numbers, words)
-- Particles (decorative background)
-
-**INTERACTIONS available:**
-- Slider (user drags to change a value)
-- Click on elements (select, activate, reveal)
-- Drag & drop (drag objects)
-- Hover (show info on mouse over)
-- Numeric input (enter values)
-- Buttons (execute action)
-- Navigation (forward/back, zoom)
-
-**ANIMATIONS available:**
-- Elements appearing one by one
-- Smooth movement (objects moving)
-- Growth/shrink (scale)
-- Rotation
-- Pulsation (pulse)
-- Gradual color change
-- Particle/confetti explosion (celebration)
-- State transitions
-
-**FEEDBACK available:**
-- Visual sound (flash, shake on correct/wrong)
-- Animated counter (scrolling numbers)
-- Progress bar
-- Stars/points appearing
-- Success message
-
-### 🎯 HOW TO DESCRIBE YOUR DEMO:
-
-1. **TITLE**: Catchy name
-2. **CONCEPT**: What it teaches (e.g., "multiplication", "water cycle")
-3. **VISUALIZATION**: Describe HOW you want it to look using palette elements
-   - "I want a GRID of colored BLOCKS, 3 rows by 4 columns"
-   - "I want a TIMELINE with 5 clickable POINTS"
-   - "I want PARTICLES that move and group together"
-4. **INTERACTION**: What the student can do using palette interactions
-   - "The student uses a SLIDER to change the number of rows"
-   - "The student CLICKS on blocks to color them"
-   - "The student DRAGS characters onto the map"
-5. **WOW FACTOR**: What makes it memorable
-   - "When they find the answer, colored CONFETTI!"
-   - "Numbers GROW with counter animation"
-
-### 💡 EXAMPLES FOR YOUR STYLE (${maestroName}):
-
-${getStyleExamples(maestroName)}
-
-### ⚠️ IMPORTANT:
-- Use terms from the PALETTE above so I understand what you want
-- Be specific: "5 blocks in a row" is better than "some blocks"
-- Indicate colors if important: "BLUE and RED blocks"
-- Describe animation: "appear ONE BY ONE" vs "appear ALL TOGETHER"
-
-If the student hasn't specified a topic, ask: "What would you like to explore together?"`;
-}
-
-/**
- * Get style-specific examples based on maestro
- */
-function getStyleExamples(maestroName: string | undefined): string {
-  switch (maestroName) {
-    case 'Euclide':
-      return `- "GRID of blocks forming a RECTANGLE. SLIDER for rows and columns. AREA appears as animated LARGE NUMBER. When values change, blocks APPEAR ONE BY ONE."
-- "CIRCLE dividing into SLICES (fractions). CLICK on each slice to COLOR it. Number of colored slices / total appears above."`;
-    
-    case 'Feynman':
-      return `- "Colored PARTICLES BOUNCING in a container. SLIDER for TEMPERATURE. Hotter = FASTER and more CHAOTIC movement. Colors change from BLUE (cold) to RED (hot)!"
-- "BALLOONS that MULTIPLY! Click the button and each balloon DUPLICATES with an animated POP. Count the balloons = multiplication!"`;
-    
-    case 'Erodoto':
-      return `- "Horizontal TIMELINE with 5 POINTS. HOVER on each point to see the event. CLICK to expand the full story. Animated CHARACTER walking along the timeline."
-- "Ancient MAP with changing BORDERS. SLIDER for year (500 BC → 2000 AD). Territories gradually change COLOR. CLICK on a region for info."`;
-    
-    case 'Darwin':
-      return `- "Tree of life that GROWS. Each BRANCH is a species. CLICK on a branch to see characteristics. Species APPEAR one after another following evolution."
-- "Environment with CREATURES that change. SLIDER for time (millions of years). Creatures gradually TRANSFORM. The fittest GLOW."`;
-    
-    case 'Curie':
-      return `- "ATOMS that VIBRATE. Some are STABLE (green), others RADIOACTIVE (glowing). CLICK on a radioactive atom to see animated DECAY. Geiger COUNTER making TIC-TIC."
-- "MOLECULES that COMBINE. DRAG molecules together. If reaction works = light FLASH and visible ENERGY released!"`;
-    
-    case 'Leonardo':
-      return `- "MACHINE with GEARS. CLICK to start it. Gears ROTATE connected. Change the SPEED of one and see effects on others."
-- "DRAWING sheet with PERSPECTIVE. DRAG the vanishing point. Guide lines UPDATE. POSITION objects and see how sizes change."`;
-    
-    case 'Álex Pina':
-      return `- "HEIST PLANNING BOARD with PHASES. CLICK on each phase for Spanish vocabulary. Characters from 'la banda' appear. WORDS appear dramatically one by one."
-- "MUSIC VIDEO with LYRICS. Song plays with KARAOKE style Spanish text. CLICK on words to see meaning. PRONUNCIATION button for each line!"
-- "ESCAPE ROOM style game. SOLVE Spanish puzzles to unlock doors. TIMER adds suspense. Victory = CONFETTI and '¡Bella ciao!'"`;
-    
-    case 'Shakespeare':
-      return `- "STAGE with CHARACTERS. DRAG words to complete the dialogue. Characters SPEAK when complete. Star RATING for pronunciation."
-- "Word TREE that grows. Each BRANCH is a phrasal verb. CLICK to see meaning and example. QUIZ to match meanings!"`;
-    
-    default:
-      return `- "GRID of colored elements. SLIDER to change quantity. Elements APPEAR with animation. CLICK to interact."
-- "Interactive DIAGRAM. HOVER for info. CLICK to expand. SMOOTH transitions between states."
-- "Navigable TIMELINE. DRAG to scroll. Clickable POINTS with informative POPUPS."`;
-  }
-}
+import { ChatRequest } from './types';
+import { TOOL_CONTEXT } from './constants';
+import { getDemoContext } from './helpers';
 
 export async function POST(request: NextRequest) {
   // Rate limiting: 20 requests per minute per IP
@@ -379,8 +91,6 @@ export async function POST(request: NextRequest) {
               budgetLimit: userSettings.budgetLimit,
               usagePercent: Math.round(usageRatio * 100),
             });
-            // Continue with request but add warning header for client to handle
-            // Client can show a warning toast based on this header
           }
         }
       } catch (e) {
@@ -393,10 +103,8 @@ export async function POST(request: NextRequest) {
     let enhancedSystemPrompt = systemPrompt;
     if (requestedTool) {
       // Use dynamic context for demo (includes maestro's teaching style)
-      const toolContext = requestedTool === 'demo' 
-        ? getDemoContext(maestroId) 
-        : TOOL_CONTEXT[requestedTool];
-      
+      const toolContext = requestedTool === 'demo' ? getDemoContext(maestroId) : TOOL_CONTEXT[requestedTool];
+
       if (toolContext) {
         enhancedSystemPrompt = `${systemPrompt}\n\n${toolContext}`;
         logger.debug('Tool context injected', { requestedTool, maestroId });
@@ -421,13 +129,6 @@ export async function POST(request: NextRequest) {
             maestroId,
             keyFactCount: memory.keyFacts.length,
             hasSummary: !!memory.recentSummary,
-          });
-        } else {
-          // Memory enabled but no previous context found
-          logger.info('Memory enabled but no previous context found', {
-            userId,
-            maestroId,
-            enableMemory,
           });
         }
       } catch (memoryError) {
@@ -464,10 +165,6 @@ export async function POST(request: NextRequest) {
     const providerConfig = getActiveProvider(providerPreference);
 
     try {
-      // Call AI with optional tool definitions
-      // Cast to mutable array since chatCompletion expects ToolDefinition[]
-      // #87: Pass user's provider preference to chatCompletion
-
       // Debug logging for tool context
       if (requestedTool) {
         logger.info('Tool mode active', {
@@ -493,7 +190,6 @@ export async function POST(request: NextRequest) {
           };
           const functionName = toolFunctionMap[requestedTool];
           if (functionName) {
-            // Force the specific tool to be called
             return { type: 'function' as const, function: { name: functionName } };
           }
         }
@@ -527,7 +223,6 @@ export async function POST(request: NextRequest) {
               { maestroId, conversationId: undefined, userId }
             );
             // Transform to ToolCall interface format expected by ToolResultDisplay
-            // Note: type uses function name (e.g., 'create_mindmap') to match ToolType in types/index.ts
             toolResults.push({
               id: toolResult.toolId || toolCall.id,
               type: toolCall.function.name,
@@ -619,10 +314,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (providerError) {
       // Provider-specific error handling
-      const errorMessage =
-        providerError instanceof Error
-          ? providerError.message
-          : 'Unknown provider error';
+      const errorMessage = providerError instanceof Error ? providerError.message : 'Unknown provider error';
 
       // Check if it's an Ollama availability issue
       if (errorMessage.includes('Ollama is not running')) {

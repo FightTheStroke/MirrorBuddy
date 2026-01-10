@@ -52,7 +52,7 @@ export function MaestroSessionV2({ maestro, onClose, initialMode = 'voice' }: Ma
     isMuted,
     inputLevel,
     outputLevel,
-    connectionState,
+    connectionState: _connectionState,
     voiceSessionId,
     toggleMute,
     handleVoiceCall,

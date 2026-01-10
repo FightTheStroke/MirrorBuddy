@@ -10,62 +10,15 @@ import { prisma } from '@/lib/db';
 import { generateEmbedding } from './embedding-service';
 import { searchSimilar, type VectorSearchResult } from './vector-store';
 import { cosineSimilarity } from './embedding-service';
+import type {
+  HybridRetrievalResult,
+  HybridSearchOptions,
+  KeywordSearchOptions,
+  KeywordMatch,
+} from './hybrid-types';
 
-/**
- * Result from hybrid retrieval with component scores
- */
-export interface HybridRetrievalResult {
-  id: string;
-  sourceType: string;
-  sourceId: string;
-  chunkIndex: number;
-  content: string;
-  combinedScore: number;
-  semanticScore: number;
-  keywordScore: number;
-  subject: string | null;
-  tags: string[];
-}
-
-/**
- * Options for hybrid search
- */
-export interface HybridSearchOptions {
-  userId: string;
-  query: string;
-  limit?: number;
-  minScore?: number;
-  sourceType?: 'material' | 'flashcard' | 'studykit' | 'message';
-  subject?: string;
-  /** Weight for semantic search (0-1), keyword weight = 1 - semanticWeight */
-  semanticWeight?: number;
-  excludeSourceIds?: string[];
-}
-
-/**
- * Options for keyword search
- */
-interface KeywordSearchOptions {
-  userId: string;
-  keywords: string[];
-  limit: number;
-  sourceType?: string;
-  subject?: string;
-}
-
-/**
- * Result from keyword search
- */
-interface KeywordMatch {
-  id: string;
-  sourceType: string;
-  sourceId: string;
-  chunkIndex: number;
-  content: string;
-  matchCount: number;
-  subject: string | null;
-  tags: string[];
-}
+// Re-export types
+export type { HybridRetrievalResult, HybridSearchOptions } from './hybrid-types';
 
 /**
  * Extract keywords from query for keyword search

@@ -6,7 +6,8 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import Fuse from 'fuse.js';
 import { logger } from '@/lib/logger';
-import { getActiveMaterials, deleteMaterial } from '@/lib/storage/materials-db';
+import { getActiveMaterials } from '@/lib/storage/materials-db-utils';
+import { deleteMaterial } from '@/lib/storage/materials-db-crud';
 import { updateMaterialInteraction } from '@/components/education/archive';
 import type { SortBy, ViewMode, ArchiveItem } from '@/components/education/archive';
 import { DATE_FILTERS, DATE_FILTER_IDS } from '../constants';
@@ -182,6 +183,7 @@ export function useZainoView({
     subjectFilter,
     dateFilter,
     isBookmarked,
+    isPercorsi,
     debouncedQuery,
     sortBy,
   ]);
