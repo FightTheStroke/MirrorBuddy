@@ -49,5 +49,5 @@ Server-side notification system with database persistence.
 ```bash
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=your-key
 VAPID_PRIVATE_KEY=your-key
-VAPID_SUBJECT=mailto:support@convergioedu.com
+VAPID_SUBJECT=mailto:support@mirrorbuddy.org
 ```
