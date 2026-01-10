@@ -8,42 +8,9 @@
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
+import type { MaterialsDB, MaterialMetadata, MaterialFile, MaterialRecord } from './materials-db/types';
 
-// ============================================================================
-// DATABASE SCHEMA
-// ============================================================================
-
-interface MaterialsDB extends DBSchema {
-  files: {
-    key: string;
-    value: {
-      id: string;
-      blob: Blob;
-      thumbnail?: Blob;
-      createdAt: number;
-    };
-  };
-  metadata: {
-    key: string;
-    value: {
-      id: string;
-      filename: string;
-      format: 'image' | 'pdf';
-      mimeType: string;
-      subject?: string;
-      maestroId?: string;
-      size: number;
-      pageCount?: number;
-      createdAt: Date;
-      updatedAt: Date;
-    };
-    indexes: {
-      'by-date': Date;
-      'by-subject': string;
-      'by-format': string;
-    };
-  };
-}
+export type { MaterialsDB, MaterialMetadata, MaterialFile, MaterialRecord } from './materials-db/types';
 
 // ============================================================================
 // DATABASE INITIALIZATION
