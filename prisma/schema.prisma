@@ -40,6 +40,9 @@ model User {
   htmlSnippets      HtmlSnippet[]
   homeworkSessions  HomeworkSession[]
   gamification      UserGamification?
+
+  // Knowledge Graph (Wave 3)
+  concepts          Concept[]
 }
 
 model Profile {
@@ -520,6 +523,11 @@ model Material {
   @@index([isBookmarked])
   @@index([collectionId])
   @@index([sourceStudyKitId])
+
+  // Knowledge Graph (Wave 3)
+  edgesFrom        MaterialEdge[]    @relation("MaterialEdgeFrom")
+  edgesTo          MaterialEdge[]    @relation("MaterialEdgeTo")
+  concepts         MaterialConcept[]
 }
 
 // ============================================================================
@@ -1297,5 +1305,62 @@ model ContentEmbedding {
   @@index([sourceId])
   @@index([subject])
   @@index([createdAt])
+}
+
+// ============================================================================
+// KNOWLEDGE GRAPH (Wave 3)
+// Relationships between materials and concepts
+// ============================================================================
+
+// Edges between materials
+model MaterialEdge {
+  id           String   @id @default(cuid())
+  fromId       String
+  toId         String
+  relationType String   // "derived_from" | "related_to" | "prerequisite" | "extends"
+  weight       Float    @default(1.0)
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  from         Material @relation("MaterialEdgeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to           Material @relation("MaterialEdgeTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId, relationType])
+  @@index([fromId])
+  @@index([toId])
+  @@index([relationType])
+}
+
+// Abstract concepts for semantic organization
+model Concept {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  subject     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materials   MaterialConcept[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([subject])
+}
+
+// Junction table: Material <-> Concept
+model MaterialConcept {
+  materialId String
+  conceptId  String
+  relevance  Float    @default(1.0)
+  createdAt  DateTime @default(now())
+
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  concept    Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  @@id([materialId, conceptId])
+  @@index([materialId])
+  @@index([conceptId])
 }
 
