@@ -7,11 +7,11 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Roberdan/MirrorBuddy"
+    "url": "https://github.com/FightTheStroke/MirrorBuddy"
   },
-  "homepage": "https://github.com/Roberdan/MirrorBuddy",
+  "homepage": "https://github.com/FightTheStroke/MirrorBuddy",
   "bugs": {
-    "url": "https://github.com/Roberdan/MirrorBuddy/issues"
+    "url": "https://github.com/FightTheStroke/MirrorBuddy/issues"
   },
   "keywords": [
     "education",

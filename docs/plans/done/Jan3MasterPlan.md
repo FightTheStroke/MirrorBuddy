@@ -3,7 +3,7 @@
 **Data**: 2026-01-03
 **Branch**: `chore/rebrand-mirrorbuddy`
 **Status**: CLAUDE COMPLETATO - ATTESA ROBERTO
-**PR**: https://github.com/Roberdan/ConvergioEdu/pull/105
+**PR**: https://github.com/FightTheStroke/MirrorBuddy/pull/105
 
 ---
 

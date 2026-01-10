@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: ConvergioEdu API
+  title: MirrorBuddy API
   description: |
-    **ConvergioEdu** - La Scuola Che Vorrei
+    **MirrorBuddy** - La Scuola Che Vorrei
     
     AI-powered educational platform API for students with learning differences.
     
@@ -28,7 +28,7 @@ info:
   contact:
     name: Roberto D'Angelo
     email: roberdan@fightthestroke.org
-    url: https://github.com/Roberdan/ConvergioEdu
+    url: https://github.com/FightTheStroke/MirrorBuddy
   license:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html

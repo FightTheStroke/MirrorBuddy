@@ -1,4 +1,4 @@
--- pgvector Migration for ConvergioEdu RAG System
+-- pgvector Migration for MirrorBuddy RAG System
 -- Run AFTER standard Prisma migrations on PostgreSQL
 -- Requires PostgreSQL 12+ with pgvector extension
 --
