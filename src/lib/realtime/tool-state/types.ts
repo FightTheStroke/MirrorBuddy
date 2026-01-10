@@ -80,9 +80,13 @@ export interface ToolState {
   sessionId: string;
   maestroId: string;
   title: string;
-  content: ToolContent | null;
+  subject?: string;
+  createdAt: number; // Timestamp
+  updatedAt: number; // Timestamp
   progress: number;
+  chunksReceived: number;
+  content: Partial<ToolContent>;
+  rawChunks?: string[];
   error?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  errorMessage?: string;
 }
