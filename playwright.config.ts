@@ -33,14 +33,10 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-    // Mobile viewports disabled - app optimized for desktop
-    // Re-enable when mobile optimization begins:
+    // Other browsers disabled - only testing API/backend, not cross-browser UI
+    // Re-enable if needed:
+    // { name: 'webkit', use: { ...devices['Desktop Safari'] } },
     // { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
-    // { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } },
   ],
 
   webServer: {
