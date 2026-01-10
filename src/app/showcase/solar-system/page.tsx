@@ -1,7 +1,5 @@
 'use client';
 
-'use client';
-
 import { useState, useCallback, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Play, Pause, ZoomIn, ZoomOut, RotateCcw, Globe } from 'lucide-react';
