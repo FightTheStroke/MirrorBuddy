@@ -6,17 +6,7 @@
 
 import { logger } from '@/lib/logger';
 import type { ToolType } from './tool-events';
-import type {
-  ToolStatus,
-  MindmapContent,
-  FlashcardContent,
-  QuizContent,
-  SummaryContent,
-  TimelineContent,
-  DiagramContent,
-  ToolContent,
-  ToolState,
-} from './tool-state/types';
+import type { ToolStatus, ToolContent, ToolState } from './tool-state/types';
 
 export type {
   ToolStatus,

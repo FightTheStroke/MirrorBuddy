@@ -8,7 +8,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Network, X } from 'lucide-react';
+import { Network } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { useToolStream, type ActiveToolState } from '@/lib/hooks/use-tool-stream';
 import { Progress } from '@/components/ui/progress';

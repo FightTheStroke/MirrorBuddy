@@ -328,36 +328,6 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
     }
   }, []);
 
-  // Get sessions for a specific day
-  const getSessionsForDay = useCallback(
-    (dayOfWeek: number): ScheduledSession[] => {
-      if (!schedule) return [];
-      return schedule.weeklyPlan.filter((s) => s.dayOfWeek === dayOfWeek);
-    },
-    [schedule]
-  );
-
-  // Get today's sessions
-  const getTodaySessions = useCallback((): ScheduledSession[] => {
-    return getSessionsForDay(new Date().getDay());
-  }, [getSessionsForDay]);
-
-  // Get upcoming reminders
-  const getUpcomingReminders = useCallback(
-    (hours = 24): CustomReminder[] => {
-      if (!schedule) return [];
-
-      const now = new Date();
-      const cutoff = new Date(now.getTime() + hours * 60 * 60 * 1000);
-
-      return schedule.customReminders.filter((r) => {
-        const dt = new Date(r.datetime);
-        return dt >= now && dt <= cutoff;
-      });
-    },
-    [schedule]
-  );
-
   // Initial fetch
   useEffect(() => {
     if (autoFetch) {

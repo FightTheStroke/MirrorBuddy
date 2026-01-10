@@ -26,7 +26,6 @@ import type {
   StudentInsights,
   MaestroObservation,
   LearningStrategy,
-  ObservationCategory,
 } from '@/types';
 import { CATEGORY_LABELS } from './parent-dashboard/constants';
 

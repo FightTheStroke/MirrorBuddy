@@ -29,7 +29,6 @@ export const toolIcons: Record<ToolType, LucideIcon> = {
 // Helper to render icon (must be used in .tsx files)
 export function renderToolIcon(toolType: ToolType, className = 'w-5 h-5'): React.ReactElement {
   const Icon = toolIcons[toolType];
-  // eslint-disable-next-line react/react-in-jsx-scope
   return React.createElement(Icon, { className });
 }
 
