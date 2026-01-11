@@ -61,9 +61,55 @@ Load with `@docs/claude/<name>.md`:
 **Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator
 **Characters**: buddies | coaches
 
-## LSP (active)
+## LSP (active) - USE IT!
 
-TypeScript LSP installed - provides go-to-definition, find-references, type hints for 1300+ TS files.
+TypeScript LSP installed for 1300+ TS files. **Prefer LSP over grep/glob for code navigation.**
+
+### When to Use LSP
+| Task | LSP Command | Instead of |
+|------|-------------|------------|
+| Find component definition | go-to-definition | Grep "function ComponentName" |
+| Find all usages of hook | find-references | Grep "useMyHook" |
+| Check function signature | hover | Read entire file |
+| Find type definition | go-to-type-definition | Grep "interface/type Name" |
+
+### LSP Saves Tokens
+```
+# BAD: 3 tool calls, ~2000 tokens
+Grep "HomeSidebar" → 17 files
+Read file1.tsx → 200 lines
+Read file2.tsx → 150 lines
+
+# GOOD: 1 LSP call, ~200 tokens
+go-to-definition on HomeSidebar import → exact location
+```
+
+### Parallel Tool Calls
+Always parallelize independent operations:
+- Reading multiple files → single message, multiple Read calls
+- Checking lint + typecheck → single message, multiple Bash calls
+- Searching different patterns → single message, multiple Grep calls
+
+## Skills (slash commands)
+
+| Skill | When to Use |
+|-------|-------------|
+| `/prompt` | Extract F-xx requirements from user request |
+| `/planner` | Create wave/task plan after requirements approved |
+| `/execute {plan_id}` | Run all pending tasks in plan |
+| `/prepare` | Bootstrap new project |
+| `/frontend-design` | Create distinctive UI components |
+
+## Subagents
+
+| Subagent | When to Use |
+|----------|-------------|
+| `Explore` | Open-ended codebase questions ("how does X work?", "where is Y handled?") |
+| `task-executor` | Execute single plan task with DB update |
+| `thor-quality-assurance-guardian` | Validate wave completion before closure |
+| `strategic-planner` | Create complex multi-wave plans |
+
+**Rule**: Use `Explore` for questions, direct tools for known locations.
 
 ## Workflow (MANDATORY for non-trivial tasks)
 
