@@ -1,10 +1,15 @@
 /**
- * Types for Character Router
+ * Types for character routing.
  */
 
-import type { CharacterType, SupportTeacher, BuddyProfile, ExtendedStudentProfile } from '@/types';
+import type {
+  CharacterType,
+  ExtendedStudentProfile,
+} from '@/types';
 import type { MaestroFull } from '@/data/maestri';
-import type { DetectedIntent } from '@/lib/ai/intent-detection';
+import type { SupportTeacher } from '@/types';
+import type { BuddyProfile } from '@/types';
+import type { DetectedIntent } from '../intent-detection';
 
 /**
  * Result of character routing.
@@ -18,25 +23,26 @@ export interface RoutingResult {
   intent: DetectedIntent;
   /** Why this character was selected */
   reason: string;
-  /** Confidence score (0-1) */
-  confidence: number;
+  /** Alternative characters that could also help */
+  alternatives?: Array<{
+    character: MaestroFull | SupportTeacher | BuddyProfile;
+    reason: string;
+  }>;
 }
 
 /**
- * Context for routing decisions.
+ * Student context for routing decisions.
  */
 export interface RoutingContext {
-  /** The student's profile */
-  profile: ExtendedStudentProfile;
-  /** The current message or query */
-  message?: string;
-  /** The subject being discussed */
-  subject?: string;
-  /** Current character (if switching) */
-  currentCharacter?: CharacterType;
-  /** User's preferred coach/buddy */
-  preferences?: {
-    preferredCoachGender?: 'male' | 'female' | 'neutral';
-    preferredBuddyGender?: 'male' | 'female' | 'neutral';
+  /** The student's message to route */
+  message: string;
+  /** The student's profile with preferences */
+  studentProfile: ExtendedStudentProfile;
+  /** Currently active character (for conversation continuity) */
+  currentCharacter?: {
+    type: CharacterType;
+    id: string;
   };
+  /** Whether to prefer continuity over optimal routing */
+  preferContinuity?: boolean;
 }
