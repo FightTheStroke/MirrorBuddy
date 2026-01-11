@@ -13,7 +13,6 @@ import type { Message } from './types';
 import {
   loadMessagesFromServer,
   convertStoreMessages,
-  createGreetingMessage,
 } from './conversation-loader';
 import { createUserMessage, createErrorMessage } from './message-handler';
 import { isStreamingAvailable } from './streaming-handler';
@@ -140,14 +139,12 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
       const newConvId = await createConversation(characterId);
       conversationIdRef.current = newConvId;
 
-      const greetingMessage = createGreetingMessage(character);
-      setMessages([greetingMessage]);
-      await addMessageToStore(newConvId, { role: 'assistant', content: character.greeting });
+      // Greeting is shown in header, not in chat messages
+      setMessages([]);
     }
 
     initConversation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [characterId, character.greeting, conversations, createConversation, addMessageToStore]);
+  }, [characterId, conversations, createConversation]);
 
   // Handle send message
   const handleSend = useCallback(async () => {
