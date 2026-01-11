@@ -17,6 +17,7 @@ export interface ConversationDrawerProps {
   onOpenChange: (open: boolean) => void;
   characterId: string;
   characterType: 'maestro' | 'coach' | 'buddy';
+  characterColor?: string;
   onSelectConversation: (conversationId: string) => void;
   onNewConversation: () => void;
 }

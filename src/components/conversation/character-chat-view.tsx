@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { ToolPanel } from '@/components/tools/tool-panel';
-import { ConversationDrawer } from './conversation-drawer';
+import { ConversationSidebar } from './conversation-drawer';
 import { getCharacterInfo } from './character-chat-view/utils/character-utils';
 import { useCharacterChat } from './character-chat-view/hooks/use-character-chat';
 import { MessagesList } from './character-chat-view/components/messages-list';
@@ -34,10 +34,7 @@ interface CharacterChatViewProps {
   characterType: 'coach' | 'buddy';
 }
 
-export function CharacterChatView({
-  characterId,
-  characterType,
-}: CharacterChatViewProps) {
+export function CharacterChatView({ characterId, characterType }: CharacterChatViewProps) {
   const router = useRouter();
   const character = getCharacterInfo(characterId, characterType);
   const unifiedCharacter = characterInfoToUnified(character, characterId, characterType);
@@ -46,56 +43,21 @@ export function CharacterChatView({
   const { speak: _speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
   const {
-    messages,
-    input,
-    setInput,
-    isLoading,
-    isVoiceActive,
-    isConnected,
-    connectionState,
-    configError,
-    activeTool,
-    setActiveTool,
-    messagesEndRef,
-    handleSend,
-    handleToolRequest,
-    handleVoiceCall,
-    loadConversation,
-    clearChat,
+    messages, input, setInput, isLoading, isVoiceActive, isConnected, connectionState,
+    configError, activeTool, setActiveTool, messagesEndRef, handleSend, handleToolRequest,
+    handleVoiceCall, loadConversation, clearChat,
   } = useCharacterChat(characterId, character);
 
-  const voiceSession = useVoiceSession({
-    onTranscript: () => {},
-  });
-
-  const {
-    isListening,
-    isSpeaking,
-    isMuted,
-    inputLevel,
-    outputLevel,
-    toggleMute,
-    sessionId: voiceSessionId,
-  } = voiceSession;
+  const voiceSession = useVoiceSession({ onTranscript: () => {} });
+  const { isListening, isSpeaking, isMuted, inputLevel, outputLevel, toggleMute, sessionId: voiceSessionId } = voiceSession;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  // Build unified voice state and actions
   const voiceState: VoiceState = {
-    isActive: isVoiceActive,
-    isConnected,
-    isListening,
-    isSpeaking,
-    isMuted,
-    inputLevel,
-    outputLevel,
-    connectionState,
-    configError,
+    isActive: isVoiceActive, isConnected, isListening, isSpeaking, isMuted,
+    inputLevel, outputLevel, connectionState, configError,
   };
 
   const headerActions: HeaderActions = {
@@ -104,15 +66,32 @@ export function CharacterChatView({
     onClearChat: clearChat,
     onClose: () => router.back(),
     onToggleMute: toggleMute,
-    onOpenHistory: () => setIsHistoryOpen(true),
+    onOpenHistory: () => setIsHistoryOpen(!isHistoryOpen),
   };
 
   const hasActiveTool = activeTool && activeTool.status !== 'error';
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-8rem)]">
+    <div className="flex gap-0 h-[calc(100vh-8rem)]">
+      {/* History Sidebar - inline, left side */}
+      <ConversationSidebar
+        open={isHistoryOpen}
+        onOpenChange={setIsHistoryOpen}
+        characterId={characterId}
+        characterType={characterType}
+        characterColor={character.themeColor}
+        onSelectConversation={(conversationId) => {
+          loadConversation(conversationId);
+          setIsHistoryOpen(false);
+        }}
+        onNewConversation={() => {
+          clearChat();
+          setIsHistoryOpen(false);
+        }}
+      />
+
+      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header only when NOT in voice call */}
         {!isVoiceActive && (
           <CharacterHeader
             character={unifiedCharacter}
@@ -122,11 +101,7 @@ export function CharacterChatView({
           />
         )}
 
-        <MessagesList
-          messages={messages}
-          character={character}
-          isLoading={isLoading}
-        />
+        <MessagesList messages={messages} character={character} isLoading={isLoading} />
         <div ref={messagesEndRef} />
 
         <ChatInput
@@ -142,15 +117,12 @@ export function CharacterChatView({
         />
       </div>
 
+      {/* Tool Panel */}
       {hasActiveTool && (
-        <div className="w-[400px] h-full flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="w-[400px] h-full flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 ml-4">
           <ToolPanel
             tool={activeTool}
-            maestro={{
-              name: character.name,
-              avatar: character.avatar || '/avatars/default.jpg',
-              color: character.themeColor,
-            }}
+            maestro={{ name: character.name, avatar: character.avatar || '/avatars/default.jpg', color: character.themeColor }}
             onClose={() => setActiveTool(null)}
             isMinimized={isToolMinimized}
             onToggleMinimize={() => setIsToolMinimized(!isToolMinimized)}
@@ -160,21 +132,7 @@ export function CharacterChatView({
         </div>
       )}
 
-      <ConversationDrawer
-        open={isHistoryOpen}
-        onOpenChange={setIsHistoryOpen}
-        characterId={characterId}
-        characterType={characterType}
-        onSelectConversation={(conversationId) => {
-          loadConversation(conversationId);
-          setIsHistoryOpen(false);
-        }}
-        onNewConversation={() => {
-          clearChat();
-          setIsHistoryOpen(false);
-        }}
-      />
-
+      {/* Voice Panel */}
       <AnimatePresence>
         {isVoiceActive && (
           <CharacterVoicePanel

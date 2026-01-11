@@ -4,6 +4,7 @@
  */
 
 export { ConversationDrawer } from './conversation-drawer';
+export { ConversationSidebar } from './conversation-sidebar';
 export { DrawerSearch } from './drawer-search';
 export { DrawerItem } from './drawer-item';
 export { DrawerList } from './drawer-list';

@@ -18,7 +18,7 @@ import {
   type VoiceState,
   type HeaderActions,
 } from '@/components/character';
-import { ConversationDrawer } from '@/components/conversation/conversation-drawer';
+import { ConversationSidebar } from '@/components/conversation/conversation-drawer';
 
 interface MaestroSessionProps {
   maestro: Maestro;
@@ -39,60 +39,23 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
   const unifiedCharacter = maestroToUnified(maestro);
 
   const {
-    messages,
-    input,
-    setInput,
-    isLoading,
-    toolCalls,
-    isVoiceActive,
-    showWebcam,
-    webcamRequest,
-    configError,
-    sessionEnded,
-    previousMessageCount: previousMessageCountRef,
-    isConnected,
-    isListening,
-    isSpeaking,
-    isMuted,
-    inputLevel,
-    outputLevel,
-    connectionState: _connectionState,
-    voiceSessionId,
-    toggleMute,
-    handleVoiceCall,
-    handleEndSession,
-    handleSubmit,
-    clearChat,
-    handleWebcamCapture,
-    requestTool,
-    handleRequestPhoto,
-    setShowWebcam,
-    setWebcamRequest,
+    messages, input, setInput, isLoading, toolCalls, isVoiceActive, showWebcam, webcamRequest,
+    configError, sessionEnded, previousMessageCount: previousMessageCountRef, isConnected,
+    isListening, isSpeaking, isMuted, inputLevel, outputLevel, connectionState: _connectionState,
+    voiceSessionId, toggleMute, handleVoiceCall, handleEndSession, handleSubmit, clearChat,
+    handleWebcamCapture, requestTool, handleRequestPhoto, setShowWebcam, setWebcamRequest,
   } = useMaestroSessionLogic({ maestro, initialMode, requestedToolType });
 
-  // Build unified voice state and actions
   const voiceState: VoiceState = {
-    isActive: isVoiceActive,
-    isConnected,
-    isListening,
-    isSpeaking,
-    isMuted,
-    inputLevel,
-    outputLevel,
-    connectionState: _connectionState,
-    configError,
+    isActive: isVoiceActive, isConnected, isListening, isSpeaking, isMuted,
+    inputLevel, outputLevel, connectionState: _connectionState, configError,
   };
 
   const headerActions: HeaderActions = {
-    onVoiceCall: handleVoiceCall,
-    onStopTTS: stopTTS,
-    onClearChat: clearChat,
-    onClose,
-    onToggleMute: toggleMute,
-    onOpenHistory: () => setIsHistoryOpen(true),
+    onVoiceCall: handleVoiceCall, onStopTTS: stopTTS, onClearChat: clearChat,
+    onClose, onToggleMute: toggleMute, onOpenHistory: () => setIsHistoryOpen(!isHistoryOpen),
   };
 
-  // Auto-scroll to bottom when new messages are added
   useEffect(() => {
     const currentCount = messages.length + toolCalls.length;
     if (currentCount > previousMessageCountRef.current) {
@@ -101,35 +64,25 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
     previousMessageCountRef.current = currentCount;
   }, [messages.length, toolCalls.length, previousMessageCountRef]);
 
-  // Focus input when not in voice mode
-  useEffect(() => {
-    if (!isVoiceActive) inputRef.current?.focus();
-  }, [isVoiceActive]);
+  useEffect(() => { if (!isVoiceActive) inputRef.current?.focus(); }, [isVoiceActive]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSubmit();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); }
   };
 
   const handleToggleToolFullscreen = (toolId: string) => {
     const newFullscreenId = fullscreenToolId === toolId ? null : toolId;
-    
     if (newFullscreenId !== null) {
-      // Entering fullscreen: save current sidebar state and compress it
       if (sidebarStateBeforeFullscreen.current === null) {
         sidebarStateBeforeFullscreen.current = useUIStore.getState().sidebarOpen;
       }
       setSidebarOpen(false);
     } else {
-      // Exiting fullscreen: restore sidebar state
       if (sidebarStateBeforeFullscreen.current !== null) {
         setSidebarOpen(sidebarStateBeforeFullscreen.current);
         sidebarStateBeforeFullscreen.current = null;
       }
     }
-    
     setFullscreenToolId(newFullscreenId);
   };
 
@@ -138,11 +91,10 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
 
   return (
     <>
-      {/* Fullscreen tool overlay */}
       {isToolFullscreen && fullscreenTool && (
         <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950">
-          <ToolResultDisplay 
-            toolCall={fullscreenTool} 
+          <ToolResultDisplay
+            toolCall={fullscreenTool}
             sessionId={voiceSessionId}
             isFullscreen={true}
             onToggleFullscreen={() => handleToggleToolFullscreen(fullscreenTool.id)}
@@ -150,14 +102,23 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
         </div>
       )}
 
-      {/* Normal chat view */}
       <div className={cn(
-        'flex flex-col sm:flex-row gap-2 sm:gap-4 h-[calc(100vh-8rem)]',
+        'flex gap-0 h-[calc(100vh-8rem)]',
         isToolFullscreen && 'opacity-0 pointer-events-none'
       )}>
+        {/* History Sidebar - inline */}
+        <ConversationSidebar
+          open={isHistoryOpen}
+          onOpenChange={setIsHistoryOpen}
+          characterId={maestro.id}
+          characterType="maestro"
+          characterColor={maestro.color}
+          onSelectConversation={(_conversationId) => { setIsHistoryOpen(false); }}
+          onNewConversation={() => { clearChat(); setIsHistoryOpen(false); }}
+        />
+
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full sm:w-auto">
-          {/* Header only shown when NOT in voice call */}
           {!isVoiceActive && (
             <CharacterHeader
               character={unifiedCharacter}
@@ -171,10 +132,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
             showWebcam={showWebcam}
             webcamRequest={webcamRequest}
             onCapture={handleWebcamCapture}
-            onClose={() => {
-              setShowWebcam(false);
-              setWebcamRequest(null);
-            }}
+            onClose={() => { setShowWebcam(false); setWebcamRequest(null); }}
           />
 
           <MaestroSessionMessages
@@ -207,7 +165,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
           />
         </div>
 
-        {/* Voice Panel - Side by Side on desktop, full width on mobile */}
         <AnimatePresence>
           {isVoiceActive && (
             <CharacterVoicePanel
@@ -219,23 +176,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
           )}
         </AnimatePresence>
       </div>
-
-      {/* Conversation History Drawer */}
-      <ConversationDrawer
-        open={isHistoryOpen}
-        onOpenChange={setIsHistoryOpen}
-        characterId={maestro.id}
-        characterType="maestro"
-        onSelectConversation={(_conversationId) => {
-          // MaestroSession uses different logic - for now just close drawer
-          // Full implementation would need loadConversation in useMaestroSessionLogic
-          setIsHistoryOpen(false);
-        }}
-        onNewConversation={() => {
-          clearChat();
-          setIsHistoryOpen(false);
-        }}
-      />
     </>
   );
 }
