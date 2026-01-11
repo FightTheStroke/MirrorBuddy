@@ -6,7 +6,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { generateEmbedding } from './embedding-service';
+import { generateEmbedding, isEmbeddingConfigured } from './embedding-service';
 import { searchSimilar, storeEmbedding, type VectorSearchResult } from './vector-store';
 import { chunkText } from './semantic-chunker';
 import type {
@@ -36,6 +36,12 @@ export async function findSimilarMaterials(
     subject,
     excludeSourceIds = [],
   } = options;
+
+  // Early exit if embedding service not configured and no pre-computed embedding
+  if (!embedding && !isEmbeddingConfigured()) {
+    logger.debug('[Retrieval] Embedding service not configured, skipping RAG');
+    return [];
+  }
 
   if (!query && !embedding) {
     throw new Error('Either query or embedding must be provided');
@@ -95,6 +101,12 @@ export async function findRelatedConcepts(
     includeStudykits = true,
     excludeSourceIds = [],
   } = options;
+
+  // Early exit if embedding service not configured and no pre-computed embedding
+  if (!embedding && !isEmbeddingConfigured()) {
+    logger.debug('[Retrieval] Embedding service not configured, skipping RAG');
+    return [];
+  }
 
   if (!query && !embedding) {
     throw new Error('Either query or embedding must be provided');
@@ -160,6 +172,16 @@ export async function findRelatedConcepts(
  */
 export async function indexMaterial(input: IndexMaterialInput): Promise<IndexResult> {
   const { userId, sourceType, sourceId, content, subject, tags } = input;
+
+  // Early exit if embedding service not configured
+  if (!isEmbeddingConfigured()) {
+    logger.debug('[Retrieval] Embedding service not configured, skipping indexing');
+    return {
+      chunksIndexed: 0,
+      totalTokens: 0,
+      embeddingIds: [],
+    };
+  }
 
   logger.debug('[Retrieval] Indexing material', {
     userId,

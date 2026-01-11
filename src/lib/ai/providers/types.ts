@@ -32,6 +32,10 @@ export interface ChatCompletionResult {
   };
   tool_calls?: ToolCall[];
   finish_reason?: 'stop' | 'tool_calls' | 'length' | 'content_filter';
+  /** True if Azure content filter blocked the response */
+  contentFiltered?: boolean;
+  /** Which content filter categories were triggered */
+  filteredCategories?: string[];
 }
 
 /**
