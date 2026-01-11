@@ -43,4 +43,5 @@ export interface HeaderActions {
   onClearChat: () => void;
   onClose: () => void;
   onToggleMute?: () => void;
+  onOpenHistory?: () => void;
 }

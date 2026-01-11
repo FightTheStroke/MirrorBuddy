@@ -252,9 +252,26 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
     }
   }, []);
 
+  // Load a specific conversation by ID
+  const loadConversation = useCallback(async (conversationId: string) => {
+    conversationIdRef.current = conversationId;
+    const serverMessages = await loadMessagesFromServer(conversationId);
+    if (serverMessages) {
+      setMessages(serverMessages);
+    }
+  }, []);
+
+  // Clear chat and start a new conversation
+  const clearChat = useCallback(async () => {
+    setMessages([]);
+    const newConvId = await createConversation(characterId);
+    conversationIdRef.current = newConvId;
+  }, [characterId, createConversation]);
+
   return {
     messages, input, setInput, isLoading, isVoiceActive, isConnected, connectionState,
     configError, activeTool, setActiveTool, messagesEndRef, handleSend, handleToolRequest,
     handleVoiceCall, isStreaming, streamingEnabled, streamedContent, cancelStream,
+    loadConversation, clearChat,
   };
 }

@@ -186,6 +186,26 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     setShowWebcam(true);
   }, []);
 
+  // Load a specific conversation by ID from the server
+  const loadConversation = useCallback(async (conversationId: string) => {
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}/messages`);
+      if (res.ok) {
+        const data = await res.json();
+        const loadedMessages: ChatMessage[] = data.map((m: { id: string; role: string; content: string; createdAt: string }) => ({
+          id: m.id,
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+          timestamp: new Date(m.createdAt),
+        }));
+        setMessages(loadedMessages);
+        setSessionEnded(false);
+      }
+    } catch (error) {
+      logger.error('Failed to load conversation', { error, conversationId });
+    }
+  }, []);
+
   return {
     // State
     messages,
@@ -221,5 +241,6 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     handleRequestPhoto,
     setShowWebcam,
     setWebcamRequest,
+    loadConversation,
   };
 }
