@@ -1,5 +1,5 @@
 /**
- * Types for SVG Overview Generator
+ * Type definitions for SVG Overview Generator
  */
 
 /**
@@ -46,5 +46,15 @@ export interface ThemeColors {
   sectionNode: { fill: string; stroke: string; text: string };
   conceptNode: { fill: string; stroke: string; text: string };
   detailNode: { fill: string; stroke: string; text: string };
-  connection: string;
+  line: string;
+}
+
+/**
+ * Position record for node layout
+ */
+export interface NodePosition {
+  node: OverviewNode;
+  x: number;
+  y: number;
+  level: number;
 }

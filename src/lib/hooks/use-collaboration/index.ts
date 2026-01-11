@@ -1,11 +1,11 @@
 /**
- * Collaboration hook - simplified version
- * Uses modular room and node operations
+ * Collaboration hook exports
+ * Main hook and types for real-time mindmap collaboration
  */
 
-export { useCollaboration } from '../use-collaboration';
+export { useCollaboration } from './main';
 export type {
   CollaborationState,
   CollaborationActions,
   UseCollaborationOptions,
-} from '../use-collaboration';
+} from './types';

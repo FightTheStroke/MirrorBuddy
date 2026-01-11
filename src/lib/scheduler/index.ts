@@ -34,23 +34,43 @@ export {
   MELISSA_VOICE_TEMPLATES,
 } from './types';
 
-// Service functions
+// Notification creators
 export {
   createNotification,
   createFlashcardDueNotification,
   createStreakWarningNotification,
   createSessionReminderNotification,
   createSuggestionNotification,
+} from './notifications';
+
+// Entity creators
+export {
   createScheduledSession,
   createCustomReminder,
   createStudySchedule,
+} from './entities';
+
+// Preference checking
+export {
   isQuietHours,
   shouldSkipToday,
   filterNotifications,
+} from './preferences';
+
+// Scheduling logic
+export {
   getNextSessionOccurrence,
+} from './scheduling';
+
+// Analytics and suggestions
+export {
   calculateWeeklySummary,
   generateSuggestions,
+} from './analytics';
+
+// Formatting utilities
+export {
   formatTime,
   formatDate,
   getDayName,
-} from './scheduler-service';
+} from './formatting';
