@@ -9,6 +9,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 11 - Conversation History & Voice Context)
+
+#### Per-Character Conversation Sidebar (ADR 0036)
+
+**What it does**: Each character (Maestri, Coach, Buddy) now has their own conversation history sidebar, replacing the centralized "Storia" page.
+
+**How it works**:
+1. Click the History icon in the character header
+2. Sidebar slides in from the right (same position as voice panel)
+3. Browse, search, and filter past conversations with that specific character
+4. Load any conversation to continue where you left off
+5. Delete conversations with confirmation dialog
+
+**Features**:
+- Search conversations by content
+- Date filters (Today, 7 days, 30 days, All)
+- Date grouping (Oggi, Ieri, Questa settimana, Questo mese, Più vecchie)
+- Multi-select with checkboxes for batch delete
+- Gradient styling matching character theme
+- Mutually exclusive with voice panel
+
+**Why it matters**: Like ChatGPT/Claude, users can quickly access their conversation history without leaving the current context.
+
+**Key Files**:
+- `src/components/conversation/conversation-drawer/conversation-sidebar.tsx`
+- `src/app/api/conversations/search/route.ts`
+- `src/app/api/conversations/batch/route.ts`
+
+#### Voice Session Context Continuity (ADR 0035)
+
+**What it does**: When you load an old conversation and start a voice call, the AI now has full context of the previous messages.
+
+**How it works**:
+1. Load conversation from history sidebar
+2. Start voice call
+3. Messages are injected into the Azure Realtime session
+4. AI continues naturally from where you left off (no greeting)
+
+**Why it matters**: Previously, voice calls started fresh with no context. Now chat and voice are seamlessly connected - you can review old content and continue vocally.
+
+**Technical Details**:
+- Messages passed via `connectionInfo.initialMessages`
+- Injected as `conversation.item.create` after session setup
+- Works with both WebSocket and WebRTC transports
+- Greeting skipped when continuing existing conversation
+
 ### Added (Jan 11 - WebRTC Voice Transport Migration)
 
 #### WebRTC Transport for Azure OpenAI Realtime API
