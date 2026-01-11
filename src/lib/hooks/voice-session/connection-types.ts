@@ -35,4 +35,6 @@ export interface ConnectionRefs {
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
+  /** Messages to inject for conversation continuity */
+  initialMessagesRef: React.MutableRefObject<Array<{ role: 'user' | 'assistant'; content: string }> | null>;
 }

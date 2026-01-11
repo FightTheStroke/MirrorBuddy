@@ -61,6 +61,9 @@ export function useConnect(
       refs.sessionReadyRef.current = false;
       refs.greetingSentRef.current = false;
 
+      // Store initial messages for context continuity
+      refs.initialMessagesRef.current = connectionInfo.initialMessages || null;
+
       // Generate stable session ID for this voice conversation
       refs.sessionIdRef.current = `voice-${maestro.id}-${Date.now()}`;
       logger.debug('[VoiceSession] Session ID generated', { sessionId: refs.sessionIdRef.current });
