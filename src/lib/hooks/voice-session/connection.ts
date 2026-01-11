@@ -94,6 +94,9 @@ export function useConnect(
           const errorMessage = webrtcError instanceof Error ? webrtcError.message : 'WebRTC connection failed';
           logger.warn(`[VoiceSession] WebRTC connection failed (${errorMessage}), falling back to WebSocket`);
 
+          // Update transport ref to websocket for fallback path
+          refs.transportRef.current = 'websocket';
+
           // Reset connection state for fallback
           setConnectionState('connecting');
           options.onStateChange?.('connecting');
