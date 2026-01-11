@@ -98,7 +98,7 @@ export function ProgressView() {
 
   return (
     <div className="space-y-6">
-      <PageHeader icon={Trophy} title="I Tuoi Progressi" />
+      <PageHeader icon={Trophy} title="Progressi" />
 
       <DashboardLayout>
         <DashboardCard>
