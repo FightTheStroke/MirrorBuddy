@@ -7,7 +7,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { X, Phone, PhoneOff, Volume2, VolumeX, History } from 'lucide-react';
+import { X, Phone, Volume2, VolumeX, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { UnifiedCharacter, VoiceState, HeaderActions } from '../types';
@@ -77,31 +77,27 @@ export function CharacterHeader({
 
       {/* Action buttons */}
       <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-        <Button
-          variant={isActive ? 'destructive' : 'ghost'}
-          size="icon"
-          onClick={actions.onVoiceCall}
-          disabled={!!configError && !isActive}
-          aria-label={
-            configError && !isActive
-              ? `Voce non disponibile: ${configError}`
-              : isActive
-                ? 'Termina chiamata'
+        {/* Phone button only visible when NOT in call (voice panel has end call button) */}
+        {!isActive && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={actions.onVoiceCall}
+            disabled={!!configError}
+            aria-label={
+              configError
+                ? `Voce non disponibile: ${configError}`
                 : 'Avvia chiamata vocale'
-          }
-          title={configError && !isActive ? configError : undefined}
-          className={cn(
-            'text-white hover:bg-white/20 transition-all h-8 w-8 sm:h-10 sm:w-10',
-            isActive && 'bg-red-500 hover:bg-red-600 animate-pulse',
-            configError && !isActive && 'opacity-50 cursor-not-allowed'
-          )}
-        >
-          {isActive ? (
-            <PhoneOff className="w-4 h-4 sm:w-5 sm:h-5" />
-          ) : (
+            }
+            title={configError ? configError : undefined}
+            className={cn(
+              'text-white hover:bg-white/20 transition-all h-8 w-8 sm:h-10 sm:w-10',
+              configError && 'opacity-50 cursor-not-allowed'
+            )}
+          >
             <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
-          )}
-        </Button>
+          </Button>
+        )}
 
         <Button
           variant="ghost"
