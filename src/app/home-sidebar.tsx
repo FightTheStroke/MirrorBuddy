@@ -89,21 +89,33 @@ export function HomeSidebar({
           const isChatItem = item.id === 'coach' || item.id === 'buddy';
           const avatarSrc = 'avatar' in item ? item.avatar : null;
 
+          const isActive = currentView === item.id;
+          const isCollapsed = !open;
+
           return (
             <button
               key={item.id}
               onClick={() => onViewChange(item.id)}
               className={cn(
-                'w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
-                currentView === item.id
-                  ? 'bg-accent-themed text-white shadow-lg'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
+                'w-full flex items-center gap-3 rounded-xl transition-all',
+                // Collapsed: center content, minimal padding
+                isCollapsed ? 'justify-center px-2 py-2' : 'px-4 py-3',
+                // Active state: full background only when expanded
+                isActive && !isCollapsed && 'bg-accent-themed text-white shadow-lg',
+                // Inactive state
+                !isActive && 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
                 isChatItem && 'relative'
               )}
-              style={currentView === item.id ? { boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40' } : undefined}
+              style={isActive && !isCollapsed ? { boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40' } : undefined}
             >
               {avatarSrc ? (
-                <div className="relative flex-shrink-0">
+                <div
+                  className={cn(
+                    'relative flex-shrink-0 rounded-full',
+                    // When collapsed and active, add accent ring around avatar
+                    isCollapsed && isActive && 'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900'
+                  )}
+                >
                   <Image
                     src={avatarSrc}
                     alt={item.label}
@@ -114,8 +126,14 @@ export function HomeSidebar({
                   <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-400 border-2 border-white dark:border-slate-900 rounded-full" />
                 </div>
               ) : (
-                <div className="relative flex-shrink-0">
-                  <item.icon className="h-5 w-5" />
+                <div
+                  className={cn(
+                    'relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+                    // When collapsed and active, add accent ring around icon (circular)
+                    isCollapsed && isActive && 'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900 bg-accent-themed/10'
+                  )}
+                >
+                  <item.icon className={cn('h-5 w-5', isCollapsed && isActive && 'text-accent-themed')} />
                 </div>
               )}
               {open && <span className="font-medium">{item.label}</span>}
