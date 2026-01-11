@@ -6,6 +6,18 @@ import { logger } from '@/lib/logger';
 import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
 
+// Patterns that indicate a greeting message (shown in header now)
+const GREETING_PATTERNS = [
+  /^Ehi! Sono \w+\./,
+  /^Ciao! Sono \w+\./,
+  /^Ciao! Mi chiamo \w+/,
+];
+
+function isGreetingMessage(content: string, role: string, isFirst: boolean): boolean {
+  if (role !== 'assistant' || !isFirst) return false;
+  return GREETING_PATTERNS.some((pattern) => pattern.test(content));
+}
+
 /**
  * Load messages from server for existing conversation
  */
@@ -18,16 +30,20 @@ export async function loadMessagesFromServer(
       const convData = await response.json();
       if (convData.messages && convData.messages.length > 0) {
         // Filter out greeting messages - greeting is now shown in header only
-        return convData.messages
-          .filter((m: { id: string }) => m.id !== 'greeting')
-          .map(
-            (m: { id: string; role: string; content: string; createdAt: string }) => ({
-              id: m.id,
-              role: m.role as 'user' | 'assistant',
-              content: m.content,
-              timestamp: new Date(m.createdAt),
-            })
-          );
+        const msgs = convData.messages as Array<{
+          id: string;
+          role: string;
+          content: string;
+          createdAt: string;
+        }>;
+        return msgs
+          .filter((m, idx) => !isGreetingMessage(m.content, m.role, idx === 0))
+          .map((m) => ({
+            id: m.id,
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+            timestamp: new Date(m.createdAt),
+          }));
       }
     }
   } catch (error) {
@@ -44,7 +60,7 @@ export function convertStoreMessages(
 ): Message[] {
   // Filter out greeting messages - greeting is now shown in header only
   return storeMessages
-    .filter((m) => m.id !== 'greeting')
+    .filter((m, idx) => m.id !== 'greeting' && !isGreetingMessage(m.content, m.role, idx === 0))
     .map((m) => ({
       id: m.id,
       role: m.role as 'user' | 'assistant',
