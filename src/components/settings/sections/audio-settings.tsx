@@ -1,6 +1,15 @@
 /**
  * Audio Settings Component
  * Global device preferences for audio and video
+ *
+ * TRANSPORT COMPATIBILITY:
+ * All device selection and testing works with both WebSocket and WebRTC transports.
+ * - Microphone selector uses standard getUserMedia API (transport-independent)
+ * - Output/speaker selection uses system audio APIs (transport-independent)
+ * - Camera preview uses standard getUserMedia API (transport-independent)
+ * - Microphone/speaker/camera tests are local operations, independent of voice transport mode
+ *
+ * Settings apply globally to all voice sessions regardless of transport type.
  */
 
 'use client';
