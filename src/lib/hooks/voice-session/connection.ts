@@ -13,6 +13,7 @@ import { createWebRTCConnection } from './webrtc-connection';
 import { createWebSocketConnection } from './websocket-connection';
 import { handleWebRTCTrack } from './webrtc-handlers';
 import type { ConnectionRefs } from './connection-types';
+import { HEARTBEAT_INTERVAL_MS } from './constants';
 
 // Re-export types for backwards compatibility
 export type { ConnectionRefs } from './connection-types';
@@ -188,5 +189,23 @@ async function connectWebRTC(
   refs.webrtcCleanupRef.current = result.cleanup;
   refs.mediaStreamRef.current = result.mediaStream;
   refs.webrtcDataChannelRef.current = result.dataChannel;
-  logger.debug('[VoiceSession] WebRTC connection established');
+
+  // Start WebRTC keepalive heartbeat to prevent connection timeout
+  if (refs.webrtcHeartbeatRef.current) {
+    clearInterval(refs.webrtcHeartbeatRef.current);
+  }
+  refs.webrtcHeartbeatRef.current = setInterval(() => {
+    const dc = refs.webrtcDataChannelRef.current;
+    if (dc && dc.readyState === 'open') {
+      try {
+        // Send empty ping message to keep connection alive
+        dc.send(JSON.stringify({ type: 'input_audio_buffer.clear' }));
+        logger.debug('[VoiceSession] WebRTC heartbeat sent');
+      } catch {
+        logger.warn('[VoiceSession] WebRTC heartbeat failed');
+      }
+    }
+  }, HEARTBEAT_INTERVAL_MS);
+
+  logger.debug('[VoiceSession] WebRTC connection established with heartbeat');
 }
