@@ -7,7 +7,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, History } from 'lucide-react';
+import { X, Phone, PhoneOff, Volume2, VolumeX, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { UnifiedCharacter, VoiceState, HeaderActions } from '../types';
@@ -112,16 +112,6 @@ export function CharacterHeader({
           aria-label={ttsEnabled ? 'Disattiva lettura vocale' : 'Lettura vocale disattivata'}
         >
           {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={actions.onClearChat}
-          className="hidden sm:flex text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-          aria-label="Nuova conversazione"
-        >
-          <RotateCcw className="w-4 h-4" />
         </Button>
 
         {actions.onOpenHistory && (
