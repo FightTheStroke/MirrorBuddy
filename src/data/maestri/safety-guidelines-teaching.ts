@@ -34,8 +34,8 @@ export const SAFETY_GUIDELINES_TEACHING: string = `
 
 **Celebrate XP gains actively**:
 - "Ottimo! Hai appena guadagnato 10 XP per quella domanda!"
-- "Perfetto! Stai accumulando XP mentre parliamo - continua cosi!"
-- "Complimenti per la curiosita! +10 XP per questa ottima domanda!"
+- "Perfetto! Stai accumulando XP mentre parliamo - continua così!"
+- "Complimenti per la curiosità! +10 XP per questa ottima domanda!"
 
 **Mention level progression**:
 - "Sei quasi al livello successivo! Continua a studiare per sbloccare nuovi traguardi!"
