@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
 import { ToolPanel } from '@/components/tools/tool-panel';
+import { ConversationSidebar } from './conversation-drawer';
 import { getCharacterInfo } from './character-chat-view/utils/character-utils';
 import { useCharacterChat } from './character-chat-view/hooks/use-character-chat';
 import { MessagesList } from './character-chat-view/components/messages-list';
@@ -41,6 +42,7 @@ export function CharacterChatView({
   const character = getCharacterInfo(characterId, characterType);
   const unifiedCharacter = characterInfoToUnified(character, characterId, characterType);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const { speak: _speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
   const {
@@ -58,6 +60,8 @@ export function CharacterChatView({
     handleSend,
     handleToolRequest,
     handleVoiceCall,
+    loadConversation,
+    clearChat,
   } = useCharacterChat(characterId, character);
 
   const voiceSession = useVoiceSession({
@@ -97,25 +101,25 @@ export function CharacterChatView({
   const headerActions: HeaderActions = {
     onVoiceCall: handleVoiceCall,
     onStopTTS: stopTTS,
-    onClearChat: () => {}, // TODO: Add clearChat to hook
+    onClearChat: clearChat,
     onClose: () => router.back(),
     onToggleMute: toggleMute,
+    onOpenHistory: () => setIsHistoryOpen(!isHistoryOpen),
   };
 
   const hasActiveTool = activeTool && activeTool.status !== 'error';
 
   return (
     <div className="flex gap-4 h-[calc(100vh-8rem)]">
+      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Header only when NOT in voice call */}
-        {!isVoiceActive && (
-          <CharacterHeader
-            character={unifiedCharacter}
-            voiceState={voiceState}
-            ttsEnabled={ttsEnabled}
-            actions={headerActions}
-          />
-        )}
+        {/* Header always visible */}
+        <CharacterHeader
+          character={unifiedCharacter}
+          voiceState={voiceState}
+          ttsEnabled={ttsEnabled}
+          actions={headerActions}
+        />
 
         <MessagesList
           messages={messages}
@@ -155,15 +159,32 @@ export function CharacterChatView({
         </div>
       )}
 
+      {/* Right Panel: Voice OR History (mutually exclusive) */}
       <AnimatePresence>
-        {isVoiceActive && (
+        {isVoiceActive ? (
           <CharacterVoicePanel
             character={unifiedCharacter}
             voiceState={voiceState}
             ttsEnabled={ttsEnabled}
             actions={headerActions}
           />
-        )}
+        ) : isHistoryOpen ? (
+          <ConversationSidebar
+            open={isHistoryOpen}
+            onOpenChange={setIsHistoryOpen}
+            characterId={characterId}
+            characterType={characterType}
+            characterColor={character.themeColor}
+            onSelectConversation={(conversationId) => {
+              loadConversation(conversationId);
+              setIsHistoryOpen(false);
+            }}
+            onNewConversation={() => {
+              clearChat();
+              setIsHistoryOpen(false);
+            }}
+          />
+        ) : null}
       </AnimatePresence>
     </div>
   );

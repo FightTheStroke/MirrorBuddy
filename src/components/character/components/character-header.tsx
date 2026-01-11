@@ -7,7 +7,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw } from 'lucide-react';
+import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { UnifiedCharacter, VoiceState, HeaderActions } from '../types';
@@ -123,6 +123,18 @@ export function CharacterHeader({
         >
           <RotateCcw className="w-4 h-4" />
         </Button>
+
+        {actions.onOpenHistory && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={actions.onOpenHistory}
+            className="text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
+            aria-label="Storico conversazioni"
+          >
+            <History className="w-4 h-4" />
+          </Button>
+        )}
 
         <Button
           variant="ghost"
