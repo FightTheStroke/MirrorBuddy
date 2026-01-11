@@ -15,12 +15,9 @@ import {
   convertStoreMessages,
   createGreetingMessage,
 } from './conversation-loader';
-import {
-  sendChatMessage,
-  createUserMessage,
-  createAssistantMessage,
-  createErrorMessage,
-} from './message-handler';
+import { createUserMessage, createErrorMessage } from './message-handler';
+import { isStreamingAvailable } from './streaming-handler';
+import { handleSendMessage } from './send-handler';
 import {
   requestTool,
   createInitialToolState,
@@ -31,10 +28,7 @@ import {
   handleMicrophoneError,
 } from './voice-handler';
 
-export function useCharacterChat(
-  characterId: string,
-  character: CharacterInfo
-) {
+export function useCharacterChat(characterId: string, character: CharacterInfo) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +36,12 @@ export function useCharacterChat(
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
+
+  // Streaming state
+  const [streamingEnabled, setStreamingEnabled] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamedContent, setStreamedContent] = useState('');
+  const streamAbortRef = useRef<AbortController | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasAttemptedConnection = useRef(false);
@@ -57,13 +57,7 @@ export function useCharacterChat(
       if (role === 'user') {
         setMessages((prev) => [
           ...prev,
-          {
-            id: `voice-${Date.now()}`,
-            role: 'user',
-            content: text,
-            timestamp: new Date(),
-            isVoice: true,
-          },
+          { id: `voice-${Date.now()}`, role: 'user', content: text, timestamp: new Date(), isVoice: true },
         ]);
       }
     },
@@ -84,11 +78,16 @@ export function useCharacterChat(
   // Fetch voice connection info
   useEffect(() => {
     fetchVoiceConnectionInfo().then(({ connectionInfo: info, error }) => {
-      if (error) {
-        setConfigError(error);
-      } else if (info) {
-        setConnectionInfo(info);
-      }
+      if (error) setConfigError(error);
+      else if (info) setConnectionInfo(info);
+    });
+  }, []);
+
+  // Check streaming availability
+  useEffect(() => {
+    isStreamingAvailable().then((available) => {
+      setStreamingEnabled(available);
+      if (available) logger.debug('[CharacterChat] Streaming enabled');
     });
   }, []);
 
@@ -111,21 +110,11 @@ export function useCharacterChat(
     };
 
     startConnection();
-  }, [
-    isVoiceActive,
-    connectionInfo,
-    isConnected,
-    connectionState,
-    character,
-    characterId,
-    connect,
-  ]);
+  }, [isVoiceActive, connectionInfo, isConnected, connectionState, character, characterId, connect]);
 
   // Reset connection attempt when voice deactivates
   useEffect(() => {
-    if (!isVoiceActive) {
-      hasAttemptedConnection.current = false;
-    }
+    if (!isVoiceActive) hasAttemptedConnection.current = false;
   }, [isVoiceActive]);
 
   // Auto-scroll to bottom
@@ -143,17 +132,9 @@ export function useCharacterChat(
 
       if (existingConv) {
         conversationIdRef.current = existingConv.id;
-
         const serverMessages = await loadMessagesFromServer(existingConv.id);
-        if (serverMessages) {
-          setMessages(serverMessages);
-          return;
-        }
-
-        if (existingConv.messages.length > 0) {
-          setMessages(convertStoreMessages(existingConv.messages));
-          return;
-        }
+        if (serverMessages) { setMessages(serverMessages); return; }
+        if (existingConv.messages.length > 0) { setMessages(convertStoreMessages(existingConv.messages)); return; }
       }
 
       const newConvId = await createConversation(characterId);
@@ -161,10 +142,7 @@ export function useCharacterChat(
 
       const greetingMessage = createGreetingMessage(character);
       setMessages([greetingMessage]);
-      await addMessageToStore(newConvId, {
-        role: 'assistant',
-        content: character.greeting,
-      });
+      await addMessageToStore(newConvId, { role: 'assistant', content: character.greeting });
     }
 
     initConversation();
@@ -179,42 +157,61 @@ export function useCharacterChat(
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
+    setStreamedContent('');
 
     if (conversationIdRef.current) {
-      addMessageToStore(conversationIdRef.current, {
-        role: 'user',
-        content: userMessage.content,
-      });
+      addMessageToStore(conversationIdRef.current, { role: 'user', content: userMessage.content });
     }
 
-    try {
-      const { responseContent, toolState } = await sendChatMessage(
-        userMessage.content,
-        messages,
-        character,
-        characterId
-      );
+    const abortController = new AbortController();
+    streamAbortRef.current = abortController;
 
-      const assistantMessage = createAssistantMessage(responseContent);
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      if (conversationIdRef.current) {
-        addMessageToStore(conversationIdRef.current, {
-          role: 'assistant',
-          content: assistantMessage.content,
-        });
-      }
-
-      if (toolState) {
-        setActiveTool(toolState);
-      }
-    } catch (error) {
-      logger.error('Chat error', { error });
-      setMessages((prev) => [...prev, createErrorMessage()]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [input, isLoading, messages, character, characterId, addMessageToStore]);
+    await handleSendMessage({
+      content: userMessage.content,
+      messages,
+      character,
+      characterId,
+      streamingEnabled,
+      signal: abortController.signal,
+      callbacks: {
+        onStreamingStart: (id) => {
+          setIsStreaming(true);
+          setMessages((prev) => [...prev, { id, role: 'assistant', content: '', timestamp: new Date() }]);
+        },
+        onStreamingChunk: (id, accumulated) => {
+          setStreamedContent(accumulated);
+          setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, content: accumulated } : m)));
+        },
+        onStreamingComplete: (id, fullResponse) => {
+          setIsStreaming(false);
+          streamAbortRef.current = null;
+          setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, id: `assistant-${Date.now()}`, content: fullResponse } : m)));
+          if (conversationIdRef.current) addMessageToStore(conversationIdRef.current, { role: 'assistant', content: fullResponse });
+          setIsLoading(false);
+        },
+        onStreamingError: (id) => {
+          setIsStreaming(false);
+          streamAbortRef.current = null;
+          setMessages((prev) => [...prev.filter((m) => m.id !== id), createErrorMessage()]);
+          setIsLoading(false);
+        },
+        onStreamingFallback: (id) => {
+          setIsStreaming(false);
+          setMessages((prev) => prev.filter((m) => m.id !== id));
+        },
+        onNonStreamingComplete: (assistantMessage, toolState) => {
+          setMessages((prev) => [...prev, assistantMessage]);
+          if (conversationIdRef.current) addMessageToStore(conversationIdRef.current, { role: 'assistant', content: assistantMessage.content });
+          if (toolState) setActiveTool(toolState);
+          setIsLoading(false);
+        },
+        onError: () => {
+          setMessages((prev) => [...prev, createErrorMessage()]);
+          setIsLoading(false);
+        },
+      },
+    });
+  }, [input, isLoading, messages, character, characterId, addMessageToStore, streamingEnabled]);
 
   // Handle tool request
   const handleToolRequest = useCallback(
@@ -222,24 +219,14 @@ export function useCharacterChat(
       if (isLoading) return;
 
       setIsLoading(true);
-      const newTool = createInitialToolState(toolType);
-      setActiveTool(newTool);
+      setActiveTool(createInitialToolState(toolType));
 
       const userMessage = createUserMessage(`Usa lo strumento ${toolType}`);
       setMessages((prev) => [...prev, userMessage]);
 
       try {
-        const { assistantMessage, toolState } = await requestTool(
-          toolType,
-          messages,
-          character,
-          characterId
-        );
-
-        if (assistantMessage) {
-          setMessages((prev) => [...prev, assistantMessage]);
-        }
-
+        const { assistantMessage, toolState } = await requestTool(toolType, messages, character, characterId);
+        if (assistantMessage) setMessages((prev) => [...prev, assistantMessage]);
         setActiveTool(toolState);
       } catch (error) {
         logger.error('Tool request error', { error });
@@ -254,26 +241,23 @@ export function useCharacterChat(
 
   // Handle voice call toggle
   const handleVoiceCall = useCallback(() => {
-    if (isVoiceActive) {
-      disconnect();
-    }
+    if (isVoiceActive) disconnect();
     setIsVoiceActive((prev) => !prev);
   }, [isVoiceActive, disconnect]);
 
+  // Cancel stream handler
+  const cancelStream = useCallback(() => {
+    if (streamAbortRef.current) {
+      streamAbortRef.current.abort();
+      streamAbortRef.current = null;
+      setIsStreaming(false);
+      setIsLoading(false);
+    }
+  }, []);
+
   return {
-    messages,
-    input,
-    setInput,
-    isLoading,
-    isVoiceActive,
-    isConnected,
-    connectionState,
-    configError,
-    activeTool,
-    setActiveTool,
-    messagesEndRef,
-    handleSend,
-    handleToolRequest,
-    handleVoiceCall,
+    messages, input, setInput, isLoading, isVoiceActive, isConnected, connectionState,
+    configError, activeTool, setActiveTool, messagesEndRef, handleSend, handleToolRequest,
+    handleVoiceCall, isStreaming, streamingEnabled, streamedContent, cancelStream,
   };
 }
