@@ -15,8 +15,22 @@ npm run build        # Production build
 npm run lint         # ESLint
 npm run typecheck    # TypeScript
 npm run test         # Playwright E2E
+npm run test:unit    # Vitest unit tests
 npx prisma generate  # After schema changes
 npx prisma db push   # Sync schema to PostgreSQL
+npx lhci autorun     # Lighthouse CI (performance budgets)
+```
+
+## Docker Deployment
+
+```bash
+# Development with Docker Compose
+docker-compose up -d postgres    # Start database
+docker-compose up -d app         # Start app
+
+# Production build
+docker build -t mirrorbuddy:latest .
+docker run -p 3000:3000 --env-file .env mirrorbuddy:latest
 ```
 
 ## Database Setup (PostgreSQL + pgvector)
@@ -47,6 +61,23 @@ See ADR 0028 for full migration details.
 **Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri/` | RAG `src/lib/rag/` | PDF Generator `src/lib/pdf-generator/`
 
 **PDF Generator** (`src/lib/pdf-generator/`): Accessible PDF export for 7 DSA profiles (dyslexia, dyscalculia, dysgraphia, dysorthography, adhd, dyspraxia, stuttering). Uses @react-pdf/renderer. API: POST `/api/pdf-generator`.
+
+**Observability** (`src/lib/logger/`): Structured JSON logging for production, human-readable for dev. Child loggers with context. See `docs/operations/SLI-SLO.md` for service levels.
+
+**Error Handling** (`src/components/error-boundary.tsx`): React error boundary with structured logging. Wrap critical UI components.
+
+## Operations Documentation
+
+| Document | Purpose |
+|----------|---------|
+| `docs/operations/SLI-SLO.md` | Service level definitions for Voice/Chat/DB |
+| `docs/operations/RUNBOOK.md` | Incident response procedures |
+| `docs/operations/RUNBOOK-PROCEDURES.md` | Maintenance and post-incident |
+| `docs/adr/0037-deferred-production-items.md` | Deferred auth, Redis, IaC rationale |
+
+**Health Endpoints**:
+- `GET /api/health` - Basic health (for load balancers)
+- `GET /api/health/detailed` - Full metrics (for dashboards)
 
 ## Modular Rules (auto-loaded)
 
