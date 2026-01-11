@@ -275,7 +275,7 @@ export function ConversationSidebar({
                                   checked={selectedIds.has(conv.id)}
                                   onChange={() => handleToggleSelect(conv.id)}
                                   onClick={(e) => e.stopPropagation()}
-                                  className="mt-0.5 rounded border-white/30 bg-white/10"
+                                  className="mt-0.5 h-4 w-4 rounded border-2 border-white/50 bg-white/20 checked:bg-white checked:border-white accent-slate-800 cursor-pointer"
                                 />
                                 <div className="flex-1 min-w-0">
                                   <p className="text-xs font-medium truncate">{conv.title || 'Conversazione'}</p>
