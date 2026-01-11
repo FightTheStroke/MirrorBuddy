@@ -1,17 +1,5 @@
 'use client';
 
-/**
- * MaestroSession - Unified conversation layout matching Coach/Buddy pattern
- *
- * Layout identical to CharacterChatView:
- * - Flex layout with chat on left, voice panel on right (side by side)
- * - Header with avatar, name, specialty, voice call button
- * - Messages area with inline tools
- * - Input area with tool buttons at bottom
- * - VoicePanel as sibling when voice active (NOT overlay)
- * - Evaluation inline in chat when session ends
- */
-
 import { useRef, useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useTTS } from '@/components/accessibility';
@@ -238,12 +226,13 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
         onOpenChange={setIsHistoryOpen}
         characterId={maestro.id}
         characterType="maestro"
-        onSelectConversation={(id) => {
-          // TODO: Load selected conversation
+        onSelectConversation={(_conversationId) => {
+          // MaestroSession uses different logic - for now just close drawer
+          // Full implementation would need loadConversation in useMaestroSessionLogic
           setIsHistoryOpen(false);
         }}
         onNewConversation={() => {
-          // TODO: Clear current conversation
+          clearChat();
           setIsHistoryOpen(false);
         }}
       />

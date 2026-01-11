@@ -60,6 +60,8 @@ export function CharacterChatView({
     handleSend,
     handleToolRequest,
     handleVoiceCall,
+    loadConversation,
+    clearChat,
   } = useCharacterChat(characterId, character);
 
   const voiceSession = useVoiceSession({
@@ -99,7 +101,7 @@ export function CharacterChatView({
   const headerActions: HeaderActions = {
     onVoiceCall: handleVoiceCall,
     onStopTTS: stopTTS,
-    onClearChat: () => {}, // TODO: Add clearChat to hook
+    onClearChat: clearChat,
     onClose: () => router.back(),
     onToggleMute: toggleMute,
     onOpenHistory: () => setIsHistoryOpen(true),
@@ -163,12 +165,12 @@ export function CharacterChatView({
         onOpenChange={setIsHistoryOpen}
         characterId={characterId}
         characterType={characterType}
-        onSelectConversation={(id) => {
-          // TODO: Load selected conversation
+        onSelectConversation={(conversationId) => {
+          loadConversation(conversationId);
           setIsHistoryOpen(false);
         }}
         onNewConversation={() => {
-          // TODO: Implement clearChat from hook
+          clearChat();
           setIsHistoryOpen(false);
         }}
       />

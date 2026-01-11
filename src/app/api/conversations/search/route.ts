@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const semantic = searchParams.get('semantic') === 'true';
+    const _semantic = searchParams.get('semantic') === 'true';
 
     // Build where clause
     const where: Record<string, unknown> = {

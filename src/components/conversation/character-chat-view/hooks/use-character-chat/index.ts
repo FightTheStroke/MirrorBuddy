@@ -1,14 +1,9 @@
-/**
- * Use-character-chat hook - main implementation
- */
-
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { useConversationStore } from '@/lib/stores';
 import { useVoiceSession, type ConnectionInfo } from '@/lib/hooks/use-voice-session';
 import type { ToolType, ToolState } from '@/types/tools';
 import type { CharacterInfo } from '../../utils/character-utils';
-import { characterToMaestro } from '../../utils/character-utils';
 import type { Message } from './types';
 import {
   loadMessagesFromServer,
@@ -22,10 +17,7 @@ import {
   createInitialToolState,
   createErrorToolState,
 } from './tool-handler';
-import {
-  fetchVoiceConnectionInfo,
-  handleMicrophoneError,
-} from './voice-handler';
+import { useVoiceEffects } from './voice-effects';
 
 export function useCharacterChat(characterId: string, character: CharacterInfo) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -35,8 +27,6 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const [activeTool, setActiveTool] = useState<ToolState | null>(null);
-
-  // Streaming state
   const [streamingEnabled, setStreamingEnabled] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedContent, setStreamedContent] = useState('');
@@ -64,7 +54,6 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
 
   const { isConnected, connectionState, connect, disconnect } = voiceSession;
 
-  // Reset messages when character changes
   useEffect(() => {
     if (lastCharacterIdRef.current !== null && lastCharacterIdRef.current !== characterId) {
       hasLoadedMessages.current = false;
@@ -74,15 +63,6 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
     lastCharacterIdRef.current = characterId;
   }, [characterId]);
 
-  // Fetch voice connection info
-  useEffect(() => {
-    fetchVoiceConnectionInfo().then(({ connectionInfo: info, error }) => {
-      if (error) setConfigError(error);
-      else if (info) setConnectionInfo(info);
-    });
-  }, []);
-
-  // Check streaming availability
   useEffect(() => {
     isStreamingAvailable().then((available) => {
       setStreamingEnabled(available);
@@ -90,38 +70,21 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
     });
   }, []);
 
-  // Handle voice activation
-  useEffect(() => {
-    const startConnection = async () => {
-      if (!isVoiceActive || hasAttemptedConnection.current) return;
-      if (!connectionInfo || isConnected || connectionState !== 'idle') return;
+  useVoiceEffects({
+    isVoiceActive,
+    connectionInfo,
+    isConnected,
+    connectionState,
+    character,
+    characterId,
+    hasAttemptedConnectionRef: hasAttemptedConnection,
+    setConnectionInfo,
+    setConfigError,
+    connect,
+  });
 
-      hasAttemptedConnection.current = true;
-      setConfigError(null);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
 
-      try {
-        const maestroLike = characterToMaestro(character, characterId);
-        await connect(maestroLike, connectionInfo);
-      } catch (error) {
-        logger.error('Voice connection failed', { error: String(error) });
-        setConfigError(handleMicrophoneError(error));
-      }
-    };
-
-    startConnection();
-  }, [isVoiceActive, connectionInfo, isConnected, connectionState, character, characterId, connect]);
-
-  // Reset connection attempt when voice deactivates
-  useEffect(() => {
-    if (!isVoiceActive) hasAttemptedConnection.current = false;
-  }, [isVoiceActive]);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  // Initialize conversation
   useEffect(() => {
     if (hasLoadedMessages.current) return;
     hasLoadedMessages.current = true;
@@ -138,15 +101,12 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
 
       const newConvId = await createConversation(characterId);
       conversationIdRef.current = newConvId;
-
-      // Greeting is shown in header, not in chat messages
       setMessages([]);
     }
 
     initConversation();
   }, [characterId, conversations, createConversation]);
 
-  // Handle send message
   const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
 
@@ -210,7 +170,6 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
     });
   }, [input, isLoading, messages, character, characterId, addMessageToStore, streamingEnabled]);
 
-  // Handle tool request
   const handleToolRequest = useCallback(
     async (toolType: ToolType) => {
       if (isLoading) return;
@@ -236,25 +195,46 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
     [isLoading, messages, character, characterId]
   );
 
-  // Handle voice call toggle
   const handleVoiceCall = useCallback(() => {
     if (isVoiceActive) disconnect();
     setIsVoiceActive((prev) => !prev);
   }, [isVoiceActive, disconnect]);
 
-  // Cancel stream handler
   const cancelStream = useCallback(() => {
-    if (streamAbortRef.current) {
-      streamAbortRef.current.abort();
-      streamAbortRef.current = null;
-      setIsStreaming(false);
+    if (!streamAbortRef.current) return;
+    streamAbortRef.current.abort();
+    streamAbortRef.current = null;
+    setIsStreaming(false);
+    setIsLoading(false);
+  }, []);
+
+  const loadConversation = useCallback(async (conversationId: string) => {
+    setIsLoading(true);
+    try {
+      const serverMessages = await loadMessagesFromServer(conversationId);
+      if (serverMessages) {
+        conversationIdRef.current = conversationId;
+        setMessages(serverMessages);
+      }
+    } catch (error) {
+      logger.error('Failed to load conversation', { error: String(error) });
+    } finally {
       setIsLoading(false);
     }
   }, []);
+
+  const clearChat = useCallback(async () => {
+    setMessages([]);
+    setInput('');
+    setActiveTool(null);
+    const newConvId = await createConversation(characterId);
+    conversationIdRef.current = newConvId;
+  }, [characterId, createConversation]);
 
   return {
     messages, input, setInput, isLoading, isVoiceActive, isConnected, connectionState,
     configError, activeTool, setActiveTool, messagesEndRef, handleSend, handleToolRequest,
     handleVoiceCall, isStreaming, streamingEnabled, streamedContent, cancelStream,
+    loadConversation, clearChat, currentConversationId: conversationIdRef.current,
   };
 }
