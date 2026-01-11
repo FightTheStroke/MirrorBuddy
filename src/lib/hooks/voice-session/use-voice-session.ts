@@ -51,7 +51,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const playNextChunk = usePlayNextChunk(audioPlaybackRefs, scheduleQueuedChunks, store.setSpeaking, store.setOutputLevel);
   const { startPolling, stopPolling } = useOutputLevelPolling(refs.playbackAnalyserRef, refs.isPlayingRef, store.setOutputLevel);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
   useEffect(() => { refs.playNextChunkRef.current = playNextChunk; }, [playNextChunk]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- intentional ternary
   useEffect(() => { store.isSpeaking ? startPolling() : stopPolling(); }, [store.isSpeaking, startPolling, stopPolling]);
 
   // ============================================================================
@@ -122,6 +124,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     scheduleQueuedChunks,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
   useEffect(() => { refs.handleServerEventRef.current = handleServerEvent; }, [handleServerEvent]);
 
   // ============================================================================
