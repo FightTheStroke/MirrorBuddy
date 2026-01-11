@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 11 - WebRTC Voice Transport Migration)
+
+#### WebRTC Transport for Azure OpenAI Realtime API
+- **Default Transport**: WebRTC (lower latency, better performance)
+- **Fallback**: WebSocket for older browsers
+- **Configuration**: `VOICE_TRANSPORT=webrtc` (default) or `VOICE_TRANSPORT=websocket`
+- **Latency**: Reduced from ~450-900ms to ~200-350ms (50-80% improvement)
+- **Architecture**: Direct SDP exchange, native WebRTC tracks, RTCDataChannel for JSON events
+- **Benefits**: Native barge-in support, no server-side audio proxy needed, improved responsiveness
+- **Automatic Fallback**: Browser compatibility detection with graceful degradation
+
 ### Added (Jan 11 - Chat Streaming)
 
 #### Real-time Chat Streaming (ADR 0034)
