@@ -6,6 +6,7 @@
 
 import { getMaestroById } from '@/data/maestri';
 import { TOOL_CONFIG } from '@/lib/tools/constants';
+import { CATEGORY_LABELS_IT } from './constants';
 
 /**
  * Context information for tool proposal decision-making
@@ -222,18 +223,13 @@ export class ProposalInjector {
 
   /**
    * Get human-readable label for category
+   * Uses centralized constants for i18n support
    *
    * @param category - Category identifier
-   * @returns User-friendly category name
+   * @returns User-friendly category name in Italian
    */
   private categoryLabel(category: string): string {
-    const labels: Record<string, string> = {
-      create: 'Crea',
-      upload: 'Carica',
-      search: 'Ricerca',
-      other: 'Strumenti',
-    };
-    return labels[category] || category;
+    return CATEGORY_LABELS_IT[category] || category;
   }
 }
 

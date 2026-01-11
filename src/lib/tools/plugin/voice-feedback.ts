@@ -134,12 +134,18 @@ export class VoiceFeedbackInjector {
    * Replace template variables in a template string
    * Supports {variableName} syntax with fallback for undefined values
    *
+   * Security: Uses Object.hasOwn to prevent prototype pollution attacks
+   *
    * @param template - Template string with {variableName} placeholders
    * @param variables - Object mapping variable names to values
    * @returns String with variables substituted
    */
   private substituteVariables(template: string, variables: TemplateVariables): string {
     return template.replace(/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/g, (match, key) => {
+      // Security: Prevent prototype pollution by checking own properties only
+      if (!Object.hasOwn(variables, key)) {
+        return match;
+      }
       const value = variables[key];
       return value !== undefined ? String(value) : match;
     });

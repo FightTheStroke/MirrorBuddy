@@ -7,19 +7,21 @@
 import type { ToolResult } from '@/types/tools';
 import { ToolErrorCode } from './types';
 import { VoiceFeedbackInjector } from './voice-feedback';
+import { ERROR_MESSAGES_IT, VOICE_MESSAGES } from './constants';
 
 /**
  * Error message mappings for Italian user feedback
  * Maps ToolErrorCode to user-friendly Italian messages
+ * Uses centralized constants for i18n support
  */
 const ERROR_MESSAGE_MAP: Record<string, string> = {
-  [ToolErrorCode.PLUGIN_NOT_FOUND]: 'Lo strumento non è disponibile.',
-  [ToolErrorCode.VALIDATION_FAILED]: 'I parametri forniti non sono validi.',
-  [ToolErrorCode.PREREQUISITES_NOT_MET]: 'Alcuni requisiti per lo strumento non sono stati soddisfatti.',
-  [ToolErrorCode.PERMISSION_DENIED]: 'Non hai il permesso di utilizzare questo strumento.',
-  [ToolErrorCode.EXECUTION_FAILED]: 'Errore durante l\'esecuzione dello strumento.',
-  [ToolErrorCode.TIMEOUT]: 'L\'esecuzione dello strumento ha impiegato troppo tempo.',
-  [ToolErrorCode.UNKNOWN]: 'Si è verificato un errore sconosciuto.',
+  [ToolErrorCode.PLUGIN_NOT_FOUND]: ERROR_MESSAGES_IT.PLUGIN_NOT_FOUND,
+  [ToolErrorCode.VALIDATION_FAILED]: ERROR_MESSAGES_IT.VALIDATION_FAILED,
+  [ToolErrorCode.PREREQUISITES_NOT_MET]: ERROR_MESSAGES_IT.PREREQUISITES_NOT_MET,
+  [ToolErrorCode.PERMISSION_DENIED]: ERROR_MESSAGES_IT.PERMISSION_DENIED,
+  [ToolErrorCode.EXECUTION_FAILED]: ERROR_MESSAGES_IT.EXECUTION_FAILED,
+  [ToolErrorCode.TIMEOUT]: ERROR_MESSAGES_IT.TIMEOUT,
+  [ToolErrorCode.UNKNOWN]: ERROR_MESSAGES_IT.UNKNOWN,
 };
 
 /**
@@ -54,7 +56,7 @@ export class FeedbackHandler {
     }
 
     // Fallback for unexpected state
-    return 'L\'esecuzione dello strumento è completata.';
+    return VOICE_MESSAGES.EXECUTION_COMPLETED_FALLBACK;
   }
 
   /**

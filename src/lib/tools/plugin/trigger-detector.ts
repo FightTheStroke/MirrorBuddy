@@ -2,9 +2,12 @@
  * Trigger Detection System
  * Detects tool triggers from voice transcripts and matches them to plugins
  * Enables voice-based tool invocation (F-04)
+ *
+ * Security: Implements max transcript length to prevent DoS attacks
  */
 
 import { ToolRegistry } from './registry';
+import { MAX_TRANSCRIPT_LENGTH } from './constants';
 
 /**
  * DetectedTrigger - Result of trigger detection in voice transcript
@@ -37,6 +40,8 @@ export class TriggerDetector {
    * Tokenizes transcript and matches tokens against all plugin triggers
    * Returns matches with confidence scores
    *
+   * Security: Truncates transcripts exceeding MAX_TRANSCRIPT_LENGTH to prevent DoS
+   *
    * @param transcript - The voice transcript to analyze
    * @returns Array of DetectedTrigger objects, highest confidence first
    */
@@ -45,7 +50,12 @@ export class TriggerDetector {
       return [];
     }
 
-    const tokens = this.tokenize(transcript);
+    // Security: Truncate excessively long transcripts to prevent DoS
+    const safeTranscript = transcript.length > MAX_TRANSCRIPT_LENGTH
+      ? transcript.slice(0, MAX_TRANSCRIPT_LENGTH)
+      : transcript;
+
+    const tokens = this.tokenize(safeTranscript);
     const detected: DetectedTrigger[] = [];
 
     // Get all plugins from registry
