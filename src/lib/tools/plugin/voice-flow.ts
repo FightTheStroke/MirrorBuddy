@@ -9,6 +9,7 @@ import { TriggerDetector } from './trigger-detector';
 import { VoiceFeedbackInjector } from './voice-feedback';
 import { ToolRegistry } from './registry';
 import type { ToolResult } from '@/types/tools';
+import { VOICE_FLOW_MESSAGES_IT } from './constants';
 
 /**
  * VoiceToolResult - Result of voice-triggered tool execution
@@ -75,8 +76,7 @@ export class VoiceToolFlow {
       if (!detectedTriggers || detectedTriggers.length === 0) {
         return {
           triggered: false,
-          voiceFeedback:
-            'Non ho riconosciuto una richiesta di strumento. Prova a dire il nome dello strumento.',
+          voiceFeedback: VOICE_FLOW_MESSAGES_IT.NO_TRIGGER_DETECTED,
         };
       }
 
@@ -85,8 +85,7 @@ export class VoiceToolFlow {
       if (!bestMatch) {
         return {
           triggered: false,
-          voiceFeedback:
-            'Non ho riconosciuto una richiesta chiara. Puoi ripetere per favore?',
+          voiceFeedback: VOICE_FLOW_MESSAGES_IT.UNCLEAR_REQUEST,
         };
       }
 
@@ -117,8 +116,7 @@ export class VoiceToolFlow {
 
       return {
         triggered: false,
-        voiceFeedback:
-          'Si è verificato un errore durante l\'esecuzione dello strumento.',
+        voiceFeedback: VOICE_FLOW_MESSAGES_IT.EXECUTION_ERROR,
       };
     }
   }

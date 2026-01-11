@@ -2,53 +2,50 @@
  * Tool Plugin Orchestrator
  * Executes tool plugins with validation, prerequisite checking, and error handling
  * Implements reliable, resilient execution engine (F-06, F-07)
+ * Broadcasts tool events over WebRTC DataChannel for real-time monitoring (F-14)
+ *
+ * Security: Implements execution timeout to prevent indefinite hangs
  */
 
-import { ToolPlugin, ToolCategory, Permission } from './types';
+import { ToolPlugin, ToolCategory } from './types';
 import { ToolRegistry } from './registry';
 import type { ToolResult } from '@/types/tools';
-import type { ChatMessage } from '@/types/conversation';
-import type { StudentProfile } from '@/types/user';
+import { ToolEventType, createToolMessage } from './data-channel-protocol';
+import { DEFAULT_EXECUTION_TIMEOUT } from './constants';
+import { withTimeout, createErrorToolResult } from './orchestrator-helpers';
+import type { EventBroadcaster, ToolExecutionContext } from './orchestrator-types';
 
-/**
- * Enhanced ToolContext with full execution context
- * Extends base ToolContext with additional metadata for prerequisites and handlers
- */
-export interface ToolExecutionContext {
-  // Core identifiers
-  userId: string;
-  sessionId: string;
-  maestroId?: string;
-  conversationId?: string;
-
-  // Conversation context
-  conversationHistory: ChatMessage[];
-
-  // User profile and permissions
-  userProfile: StudentProfile | null;
-
-  // Tool state tracking
-  activeTools: string[];
-
-  // Optional: user's current permissions
-  grantedPermissions?: Permission[];
-}
+// Re-export types for backward compatibility
+export type { EventBroadcaster, ToolExecutionContext } from './orchestrator-types';
 
 /**
  * ToolOrchestrator - Execution engine for tool plugins
  * Manages plugin discovery, validation, execution, and error handling
  * Ensures reliable and resilient tool execution with comprehensive error recovery
+ * Broadcasts real-time tool events for WebRTC DataChannel integration (F-14)
  */
 export class ToolOrchestrator {
   private registry: ToolRegistry;
+  private broadcaster: EventBroadcaster | null = null;
 
   constructor(registry: ToolRegistry) {
     this.registry = registry;
   }
 
   /**
+   * Set the EventBroadcaster for sending tool events
+   * Allows integration with WebRTC DataChannel, SSE, or other backends
+   *
+   * @param broadcaster - The EventBroadcaster instance to use
+   */
+  setBroadcaster(broadcaster: EventBroadcaster): void {
+    this.broadcaster = broadcaster;
+  }
+
+  /**
    * Execute a tool plugin with full validation and error handling
    * Orchestrates: discovery → validation → prerequisites → execution → result
+   * Broadcasts tool lifecycle events for real-time monitoring (F-14)
    *
    * @param toolId - ID of the tool to execute
    * @param args - Arguments passed to the tool handler
@@ -64,80 +61,69 @@ export class ToolOrchestrator {
       // 1. Discover plugin from registry
       const plugin = this.registry.get(toolId);
       if (!plugin) {
-        return this.handleError(
-          new Error(`Tool "${toolId}" not found in registry`),
-          toolId
-        );
+        return createErrorToolResult(toolId, new Error(`Tool "${toolId}" not found in registry`));
       }
 
       // 2. Validate arguments against schema
       try {
         plugin.schema.parse(args);
       } catch (validationError) {
-        return this.handleError(validationError, toolId);
+        return createErrorToolResult(toolId, validationError);
       }
 
       // 3. Check prerequisites
       if (!this.validatePrerequisites(plugin, context)) {
-        return this.handleError(
-          new Error(
-            `Prerequisites not met for tool "${toolId}". ` +
-              `Required: ${plugin.prerequisites.join(', ')}`
-          ),
-          toolId
+        return createErrorToolResult(
+          toolId,
+          new Error(`Prerequisites not met for tool "${toolId}". Required: ${plugin.prerequisites.join(', ')}`)
         );
       }
 
       // 4. Verify permissions (if defined)
-      if (
-        context.grantedPermissions &&
-        plugin.permissions &&
-        plugin.permissions.length > 0
-      ) {
-        const hasRequiredPermissions = plugin.permissions.every(
-          perm => context.grantedPermissions?.includes(perm)
+      if (!this.checkPermissions(plugin, context)) {
+        return createErrorToolResult(
+          toolId,
+          new Error(`Insufficient permissions to execute tool "${toolId}". Required: ${plugin.permissions.join(', ')}`)
         );
-        if (!hasRequiredPermissions) {
-          return this.handleError(
-            new Error(
-              `Insufficient permissions to execute tool "${toolId}". ` +
-                `Required: ${plugin.permissions.join(', ')}`
-            ),
-            toolId
-          );
-        }
       }
 
-      // 5. Execute handler with context
-      const result = await plugin.handler(args, {
+      // 5. Broadcast TOOL_EXECUTING event (F-14)
+      this.broadcastEvent(ToolEventType.TOOL_EXECUTING, toolId, {
         userId: context.userId,
         sessionId: context.sessionId,
-        maestroId: context.maestroId,
-        conversationId: context.conversationId,
       });
+
+      // 6. Execute handler with context and timeout
+      const result = await withTimeout(
+        plugin.handler(args, {
+          userId: context.userId,
+          sessionId: context.sessionId,
+          maestroId: context.maestroId,
+          conversationId: context.conversationId,
+        }),
+        DEFAULT_EXECUTION_TIMEOUT,
+        toolId
+      );
+
+      // 7. Broadcast completion or error event (F-14)
+      this.broadcastCompletionEvent(toolId, result);
 
       return result;
     } catch (error) {
-      return this.handleError(error, toolId);
+      const errorResult = createErrorToolResult(toolId, error);
+      this.broadcastEvent(ToolEventType.TOOL_ERROR, toolId, { error: errorResult.error });
+      return errorResult;
     }
   }
 
   /**
    * Validate that tool prerequisites are met in current context
-   * Checks:
-   * - User is authenticated (userId provided)
-   * - Session exists (sessionId provided)
-   * - Required tools are not already active (prevents recursion)
    *
    * @param plugin - The tool plugin to validate
    * @param context - Execution context
-   * @returns true if all prerequisites are met, false otherwise
+   * @returns true if all prerequisites are met
    */
-  validatePrerequisites(
-    plugin: ToolPlugin,
-    context: ToolExecutionContext
-  ): boolean {
-    // Check basic requirements
+  validatePrerequisites(plugin: ToolPlugin, context: ToolExecutionContext): boolean {
     if (!context.userId) {
       console.warn(`Prerequisite failed: no userId for tool "${plugin.id}"`);
       return false;
@@ -148,20 +134,12 @@ export class ToolOrchestrator {
       return false;
     }
 
-    // Check plugin-specific prerequisites
     if (plugin.prerequisites && plugin.prerequisites.length > 0) {
       for (const prerequisite of plugin.prerequisites) {
-        // Check if prerequisite tool is already active (prevent recursion)
         if (context.activeTools.includes(prerequisite)) {
-          console.warn(
-            `Prerequisite check: "${prerequisite}" is already active for "${plugin.id}"`
-          );
+          console.warn(`Prerequisite check: "${prerequisite}" is already active for "${plugin.id}"`);
           return false;
         }
-
-        // In a full implementation, could check if prerequisite tool is registered
-        // const prereqPlugin = this.registry.get(prerequisite);
-        // if (!prereqPlugin) { return false; }
       }
     }
 
@@ -169,41 +147,7 @@ export class ToolOrchestrator {
   }
 
   /**
-   * Centralized error handler for tool execution failures
-   * Converts errors to standardized ToolResult with clear messaging
-   *
-   * @param error - The error that occurred
-   * @param toolId - ID of the tool that failed
-   * @returns ToolResult indicating failure with error message
-   */
-  private handleError(error: unknown, toolId: string): ToolResult {
-    let errorMessage = 'Unknown error';
-
-    if (error instanceof Error) {
-      errorMessage = error.message;
-    } else if (typeof error === 'string') {
-      errorMessage = error;
-    } else if (typeof error === 'object' && error !== null) {
-      try {
-        errorMessage = JSON.stringify(error);
-      } catch {
-        errorMessage = String(error);
-      }
-    }
-
-    const message = `Tool execution failed for "${toolId}": ${errorMessage}`;
-    console.error(message);
-
-    return {
-      success: false,
-      error: message,
-      output: undefined,
-    };
-  }
-
-  /**
    * Get plugin metadata without executing it
-   * Useful for tool discovery and capability checking
    *
    * @param toolId - ID of the tool
    * @returns The plugin or undefined if not found
@@ -214,13 +158,49 @@ export class ToolOrchestrator {
 
   /**
    * Get all available tools for a given category
-   * Used for tool discovery and UI rendering
    *
    * @param category - The category to filter by
    * @returns Array of available tools in the category
    */
   getToolsByCategory(category: ToolCategory): ToolPlugin[] {
     return this.registry.getByCategory(category);
+  }
+
+  /**
+   * Check if user has required permissions for the plugin
+   */
+  private checkPermissions(plugin: ToolPlugin, context: ToolExecutionContext): boolean {
+    if (!context.grantedPermissions || !plugin.permissions || plugin.permissions.length === 0) {
+      return true;
+    }
+
+    return plugin.permissions.every(perm => context.grantedPermissions?.includes(perm));
+  }
+
+  /**
+   * Broadcast a tool event through the configured EventBroadcaster
+   */
+  private broadcastEvent(
+    type: ToolEventType,
+    toolId: string,
+    payload?: Record<string, unknown>
+  ): void {
+    if (!this.broadcaster) return;
+    this.broadcaster.sendEvent(createToolMessage(type, toolId, payload));
+  }
+
+  /**
+   * Broadcast completion or error event based on result
+   */
+  private broadcastCompletionEvent(toolId: string, result: ToolResult): void {
+    if (result.success) {
+      this.broadcastEvent(ToolEventType.TOOL_COMPLETED, toolId, {
+        success: true,
+        dataSize: result.data ? JSON.stringify(result.data).length : 0,
+      });
+    } else {
+      this.broadcastEvent(ToolEventType.TOOL_ERROR, toolId, { error: result.error });
+    }
   }
 }
 
