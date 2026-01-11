@@ -7,14 +7,12 @@ import React from 'react';
 import { Text, View as _View, StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
 import { operatorColors, wordPartColors as _wordPartColors } from '../profiles';
-
-// Use generic style type compatible with react-pdf
-type PDFStyle = object | object[];
+import { mergeStyles, type StyleInput } from '../utils/style-utils';
 
 interface PDFTextProps {
   children?: React.ReactNode;
   profile: ProfileConfig;
-  style?: PDFStyle;
+  style?: StyleInput;
   render?: (info: { pageNumber: number; totalPages: number }) => string;
 }
 
@@ -153,12 +151,11 @@ function processForDysorthography(text: string): React.ReactNode {
  */
 export function PDFText({ children, profile, style, render }: PDFTextProps) {
   const styles = createTextStyles(profile);
+  const textStyle = mergeStyles(styles.text, style);
 
   // Handle render function for page numbers
   if (render) {
-    const textStyle = style ? [styles.text, style] : styles.text;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return <Text style={textStyle as any} render={render} />;
+    return <Text style={textStyle} render={render} />;
   }
 
   // Get processed content based on profile
@@ -179,10 +176,8 @@ export function PDFText({ children, profile, style, render }: PDFTextProps) {
   // Stuttering profile: add visual cues
   if (profile.options.breathingMarks && typeof content === 'string') {
     const parts = content.split('[pausa]');
-    const stutterStyle = style ? [styles.text, style] : styles.text;
     return (
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      <Text style={stutterStyle as any}>
+      <Text style={textStyle}>
         {parts.map((part, index) => (
           <React.Fragment key={index}>
             {part}
@@ -195,7 +190,5 @@ export function PDFText({ children, profile, style, render }: PDFTextProps) {
     );
   }
 
-  const finalStyle = style ? [styles.text, style] : styles.text;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <Text style={finalStyle as any}>{content}</Text>;
+  return <Text style={textStyle}>{content}</Text>;
 }

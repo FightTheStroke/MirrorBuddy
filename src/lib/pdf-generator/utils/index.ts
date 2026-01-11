@@ -12,3 +12,9 @@ export {
   createProfileStyleSheet,
   getColorScheme,
 } from './style-generator';
+
+export {
+  mergeStyles,
+  toReactPdfStyle,
+  type StyleInput,
+} from './style-utils';
