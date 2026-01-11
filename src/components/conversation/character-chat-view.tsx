@@ -159,16 +159,21 @@ export function CharacterChatView({
         </div>
       )}
 
-      {/* Right Panel: Voice OR History (mutually exclusive) */}
+      {/* Right Panel: Voice Panel */}
       <AnimatePresence>
-        {isVoiceActive ? (
+        {isVoiceActive && (
           <CharacterVoicePanel
             character={unifiedCharacter}
             voiceState={voiceState}
             ttsEnabled={ttsEnabled}
             actions={headerActions}
           />
-        ) : isHistoryOpen ? (
+        )}
+      </AnimatePresence>
+
+      {/* History Sidebar - fixed overlay, can appear alongside voice panel */}
+      <AnimatePresence>
+        {isHistoryOpen && (
           <ConversationSidebar
             open={isHistoryOpen}
             onOpenChange={setIsHistoryOpen}
@@ -184,7 +189,7 @@ export function CharacterChatView({
               setIsHistoryOpen(false);
             }}
           />
-        ) : null}
+        )}
       </AnimatePresence>
     </div>
   );

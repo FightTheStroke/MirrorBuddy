@@ -161,11 +161,11 @@ export function ConversationSidebar({
     <AnimatePresence>
       {open && (
         <motion.div
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 280, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
+          initial={{ x: '100%', opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          exit={{ x: '100%', opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeInOut' }}
-          className="h-full flex-shrink-0 overflow-hidden rounded-2xl"
+          className="fixed right-4 top-24 bottom-24 w-[280px] z-50 overflow-hidden rounded-2xl shadow-2xl"
           style={gradientStyle}
         >
           <div className="w-[280px] h-full flex flex-col text-white p-4">
