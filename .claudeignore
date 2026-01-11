@@ -49,9 +49,16 @@ package-lock.json
 pnpm-lock.yaml
 yarn.lock
 
+# Database files
+*.db
+*.sqlite
+
 # IDE/Editor
 .idea/
 .vscode/
+.cursor/
+.zed/
+.windsurf/
 *.swp
 *.swo
 

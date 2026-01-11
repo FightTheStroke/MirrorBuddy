@@ -3,7 +3,7 @@
 icon: public/logo-brain.png
 
 AI-powered educational platform for students with learning differences.
-17 AI "Maestros", voice, FSRS flashcards, mind maps, quizzes, gamification.
+20 AI "Maestros" with embedded knowledge, voice, FSRS flashcards, mind maps, quizzes, gamification.
 
 ---
 
@@ -16,16 +16,35 @@ npm run lint         # ESLint
 npm run typecheck    # TypeScript
 npm run test         # Playwright E2E
 npx prisma generate  # After schema changes
-npx prisma db push   # Sync schema
+npx prisma db push   # Sync schema to PostgreSQL
 ```
+
+## Database Setup (PostgreSQL + pgvector)
+
+```bash
+# macOS
+brew install postgresql@17
+brew services start postgresql@17
+createdb mirrorbuddy
+psql -d mirrorbuddy -c "CREATE EXTENSION vector;"
+
+# .env
+DATABASE_URL=postgresql://user@localhost:5432/mirrorbuddy
+```
+
+See ADR 0028 for full migration details.
 
 ## Architecture
 
-**AI Providers** (`src/lib/ai/providers.ts`): Azure OpenAI (primary, voice) | Ollama (fallback, text-only)
+**Database** (`prisma/schema.prisma`): PostgreSQL with pgvector for semantic search (ADR 0028).
+
+**AI Providers** (`src/lib/ai/providers.ts`): Azure OpenAI (primary, voice, embeddings) | Ollama (fallback, text-only).
+
+**RAG System** (`src/lib/rag/`): Semantic search for AI conversations (ADR 0033). Components: `embedding-service.ts` | `retrieval-service.ts` | `vector-store.ts` | `semantic-chunker.ts`.
 
 **State** (`src/lib/stores/app-store.ts`): Zustand stores sync via REST APIs (ADR 0015) - NO localStorage for user data.
 
-**Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri-full.ts` | PDF Generator `src/lib/pdf-generator/`
+**Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri/` | RAG `src/lib/rag/` | PDF Generator `src/lib/pdf-generator/`
 
 **PDF Generator** (`src/lib/pdf-generator/`): Accessible PDF export for 7 DSA profiles (dyslexia, dyscalculia, dysgraphia, dysorthography, adhd, dyspraxia, stuttering). Uses @react-pdf/renderer. API: POST `/api/pdf-generator`.
 
@@ -37,7 +56,7 @@ npx prisma db push   # Sync schema
 
 Load with `@docs/claude/<name>.md`:
 
-**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub
+**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub | rag
 **Voice**: voice-api | ambient-audio | onboarding
 **Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator
 **Characters**: buddies | coaches
