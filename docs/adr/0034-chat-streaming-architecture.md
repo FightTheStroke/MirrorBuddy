@@ -196,6 +196,18 @@ Streaming integrates with existing safety systems:
 
 This is by design: tool calls require full response for JSON parsing.
 
+**Automatic Detection**: The client detects tool-intent keywords (mappa, quiz, flashcard, riassunto, etc.) and automatically routes to non-streaming:
+
+```typescript
+const TOOL_KEYWORDS = ['mappa', 'quiz', 'flashcard', 'riassunto', 'crea', 'genera', ...];
+
+if (streamingEnabled && !messageRequiresTool(input)) {
+  // Use streaming
+} else {
+  // Use non-streaming with tool support
+}
+```
+
 ### Voice Integration
 
 **Voice Realtime**: Completely unaffected - uses separate WebSocket system.

@@ -24,6 +24,34 @@ export interface StreamingMessageOptions {
 }
 
 /**
+ * Tool-triggering keywords in Italian
+ * If message contains these, skip streaming and use /api/chat for tool support
+ */
+const TOOL_KEYWORDS = [
+  // Mindmap
+  'mappa', 'mappe', 'schema', 'schemi', 'diagramma',
+  // Quiz
+  'quiz', 'domande', 'verifica', 'test', 'interroga',
+  // Flashcard
+  'flashcard', 'flash card', 'carte', 'schede',
+  // Summary
+  'riassunto', 'riassumi', 'sintesi', 'sintetizza',
+  // Demo
+  'demo', 'dimostra', 'esempio', 'simulazione',
+  // General tool requests
+  'crea', 'genera', 'prepara', 'fammi', 'fai',
+];
+
+/**
+ * Check if message likely requires a tool
+ * Returns true if we should skip streaming and use non-streaming endpoint
+ */
+export function messageRequiresTool(input: string): boolean {
+  const lowerInput = input.toLowerCase();
+  return TOOL_KEYWORDS.some(keyword => lowerInput.includes(keyword));
+}
+
+/**
  * Check if streaming is available
  * Checks server support via feature flag endpoint
  */
