@@ -269,10 +269,17 @@ function createSSEResponse(generator: () => AsyncGenerator<string>): Response {
 
 /**
  * GET endpoint for connection test
+ * Returns streaming availability based on feature flag AND provider support
  */
 export async function GET() {
+  // Check if streaming is enabled AND provider supports it
+  const config = getActiveProvider();
+  const providerSupportsStreaming = config?.provider === 'azure';
+  const streamingAvailable = STREAMING_ENABLED && providerSupportsStreaming;
+
   return NextResponse.json({
-    streaming: STREAMING_ENABLED,
+    streaming: streamingAvailable,
+    provider: config?.provider ?? null,
     endpoint: '/api/chat/stream',
     method: 'POST',
     note: 'Tool calls not supported - use /api/chat for tools',
