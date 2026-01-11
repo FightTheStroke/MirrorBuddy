@@ -17,14 +17,17 @@ export async function loadMessagesFromServer(
     if (response.ok) {
       const convData = await response.json();
       if (convData.messages && convData.messages.length > 0) {
-        return convData.messages.map(
-          (m: { id: string; role: string; content: string; createdAt: string }) => ({
-            id: m.id,
-            role: m.role as 'user' | 'assistant',
-            content: m.content,
-            timestamp: new Date(m.createdAt),
-          })
-        );
+        // Filter out greeting messages - greeting is now shown in header only
+        return convData.messages
+          .filter((m: { id: string }) => m.id !== 'greeting')
+          .map(
+            (m: { id: string; role: string; content: string; createdAt: string }) => ({
+              id: m.id,
+              role: m.role as 'user' | 'assistant',
+              content: m.content,
+              timestamp: new Date(m.createdAt),
+            })
+          );
       }
     }
   } catch (error) {
@@ -39,12 +42,15 @@ export async function loadMessagesFromServer(
 export function convertStoreMessages(
   storeMessages: Array<{ id: string; role: string; content: string; timestamp?: number | string | Date }>
 ): Message[] {
-  return storeMessages.map((m) => ({
-    id: m.id,
-    role: m.role as 'user' | 'assistant',
-    content: m.content,
-    timestamp: m.timestamp instanceof Date ? m.timestamp : new Date(m.timestamp || Date.now()),
-  }));
+  // Filter out greeting messages - greeting is now shown in header only
+  return storeMessages
+    .filter((m) => m.id !== 'greeting')
+    .map((m) => ({
+      id: m.id,
+      role: m.role as 'user' | 'assistant',
+      content: m.content,
+      timestamp: m.timestamp instanceof Date ? m.timestamp : new Date(m.timestamp || Date.now()),
+    }));
 }
 
 /**
