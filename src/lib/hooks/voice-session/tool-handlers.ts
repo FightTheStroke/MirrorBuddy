@@ -22,6 +22,8 @@ export interface ToolHandlerParams {
   maestroRef: React.MutableRefObject<Maestro | null>;
   sessionIdRef: React.MutableRefObject<string | null>;
   wsRef: React.MutableRefObject<WebSocket | null>;
+  transportRef: React.MutableRefObject<'websocket' | 'webrtc'>;
+  webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   addToolCall: (toolCall: {
     id: string;
     type: import('@/types').ToolType;
@@ -34,11 +36,37 @@ export interface ToolHandlerParams {
 }
 
 /**
+ * Send message via appropriate transport (WebSocket or WebRTC)
+ */
+function sendViaTransport(
+  wsRef: React.MutableRefObject<WebSocket | null>,
+  transportRef: React.MutableRefObject<'websocket' | 'webrtc'>,
+  webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
+  message: Record<string, unknown>
+): boolean {
+  const messageStr = JSON.stringify(message);
+
+  if (transportRef.current === 'webrtc') {
+    if (webrtcDataChannelRef.current?.readyState === 'open') {
+      webrtcDataChannelRef.current.send(messageStr);
+      return true;
+    }
+  } else {
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(messageStr);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
  * Handle response.function_call_arguments.done event
  * Executes tool calls from Azure Realtime API
  */
 export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
-  const { event, maestroRef, sessionIdRef, wsRef, addToolCall, updateToolCall, options } = params;
+  const { event, maestroRef, sessionIdRef, wsRef, transportRef, webrtcDataChannelRef, addToolCall, updateToolCall, options } = params;
 
   if (!(event.name && typeof event.name === 'string' && event.arguments && typeof event.arguments === 'string')) {
     return;
@@ -83,17 +111,15 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
       }
 
       // Send function output back to Azure so it can continue the conversation
-      if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({
-          type: 'conversation.item.create',
-          item: {
-            type: 'function_call_output',
-            call_id: callId,
-            output: JSON.stringify(result),
-          },
-        }));
-        wsRef.current.send(JSON.stringify({ type: 'response.create' }));
-      }
+      sendViaTransport(wsRef, transportRef, webrtcDataChannelRef, {
+        type: 'conversation.item.create',
+        item: {
+          type: 'function_call_output',
+          call_id: callId,
+          output: JSON.stringify(result),
+        },
+      });
+      sendViaTransport(wsRef, transportRef, webrtcDataChannelRef, { type: 'response.create' });
       return;
     }
 
@@ -150,33 +176,29 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
       }
 
       // Send function output back to Azure
-      if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current.send(JSON.stringify({
-          type: 'conversation.item.create',
-          item: {
-            type: 'function_call_output',
-            call_id: callId,
-            output: JSON.stringify(result),
-          },
-        }));
-        wsRef.current.send(JSON.stringify({ type: 'response.create' }));
-      }
+      sendViaTransport(wsRef, transportRef, webrtcDataChannelRef, {
+        type: 'conversation.item.create',
+        item: {
+          type: 'function_call_output',
+          call_id: callId,
+          output: JSON.stringify(result),
+        },
+      });
+      sendViaTransport(wsRef, transportRef, webrtcDataChannelRef, { type: 'response.create' });
       return;
     }
 
     // Default handling for other tools (web_search, etc.)
     updateToolCall(toolCall.id, { status: 'completed' });
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'conversation.item.create',
-        item: {
-          type: 'function_call_output',
-          call_id: callId,
-          output: JSON.stringify({ success: true, displayed: true }),
-        },
-      }));
-      wsRef.current.send(JSON.stringify({ type: 'response.create' }));
-    }
+    sendViaTransport(wsRef, transportRef, webrtcDataChannelRef, {
+      type: 'conversation.item.create',
+      item: {
+        type: 'function_call_output',
+        call_id: callId,
+        output: JSON.stringify({ success: true, displayed: true }),
+      },
+    });
+    sendViaTransport(wsRef, transportRef, webrtcDataChannelRef, { type: 'response.create' });
   } catch (error) {
     logger.error('[VoiceSession] Failed to parse/execute tool call', { error });
   }

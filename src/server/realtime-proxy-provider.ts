@@ -8,6 +8,11 @@ import type { ProviderConfig, CharacterType } from './realtime-proxy-types';
 
 /**
  * Get provider configuration for Realtime API
+ *
+ * @deprecated WebSocket proxy is deprecated. Use WebRTC transport instead.
+ * Set VOICE_TRANSPORT=webrtc in environment to enable WebRTC.
+ * This proxy will be removed in a future release.
+ * See: src/lib/hooks/voice-session/ for WebRTC implementation.
  */
 export function getProviderConfig(characterType: CharacterType = 'maestro'): ProviderConfig | null {
   // Priority 1: Azure OpenAI (GDPR compliant, configured for this project)

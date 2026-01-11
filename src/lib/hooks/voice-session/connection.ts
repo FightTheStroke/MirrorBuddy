@@ -1,6 +1,6 @@
 // ============================================================================
 // CONNECTION MANAGEMENT
-// WebSocket connection and disconnection logic with timeout handling
+// WebRTC and WebSocket connection with automatic transport detection
 // ============================================================================
 
 'use client';
@@ -9,31 +9,31 @@ import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import type { Maestro } from '@/types';
 import type { ConnectionInfo, UseVoiceSessionOptions } from './types';
-import { CONNECTION_TIMEOUT_MS } from './constants';
+import { createWebRTCConnection } from './webrtc-connection';
+import { createWebSocketConnection } from './websocket-connection';
+import { handleWebRTCTrack } from './webrtc-handlers';
+import type { ConnectionRefs } from './connection-types';
 
-export interface ConnectionRefs {
-  wsRef: React.MutableRefObject<WebSocket | null>;
-  maestroRef: React.MutableRefObject<Maestro | null>;
-  captureContextRef: React.MutableRefObject<AudioContext | null>;
-  playbackContextRef: React.MutableRefObject<AudioContext | null>;
-  mediaStreamRef: React.MutableRefObject<MediaStream | null>;
-  sourceNodeRef: React.MutableRefObject<MediaStreamAudioSourceNode | null>;
-  processorRef: React.MutableRefObject<ScriptProcessorNode | null>;
-  audioQueueRef: React.MutableRefObject<Int16Array[]>;
-  isPlayingRef: React.MutableRefObject<boolean>;
-  isBufferingRef: React.MutableRefObject<boolean>;
-  nextPlayTimeRef: React.MutableRefObject<number>;
-  scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
-  sessionReadyRef: React.MutableRefObject<boolean>;
-  greetingSentRef: React.MutableRefObject<boolean>;
-  hasActiveResponseRef: React.MutableRefObject<boolean>;
-  handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
-  sessionIdRef: React.MutableRefObject<string | null>;
-  connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
+// Re-export types for backwards compatibility
+export type { ConnectionRefs } from './connection-types';
+export { useDisconnect } from './connection-cleanup';
+
+/**
+ * Check if browser supports WebRTC
+ */
+function isWebRTCSupported(): boolean {
+  if (typeof window === 'undefined') return false;
+  const w = window as Record<string, unknown>;
+  return !!(
+    w.RTCPeerConnection ||
+    w.webkitRTCPeerConnection ||
+    w.mozRTCPeerConnection ||
+    w.msRTCPeerConnection
+  );
 }
 
 /**
- * Connect to Azure Realtime API via WebSocket proxy
+ * Connect to Azure Realtime API via WebRTC or WebSocket
  */
 export function useConnect(
   refs: ConnectionRefs,
@@ -48,7 +48,6 @@ export function useConnect(
   return useCallback(async (maestro: Maestro, connectionInfo: ConnectionInfo) => {
     try {
       logger.debug('[VoiceSession] Connecting to Azure Realtime API...');
-      logger.debug('[VoiceSession] handleServerEventRef.current at connect start', { isSet: refs.handleServerEventRef.current ? 'SET' : 'NULL' });
 
       // Safety: ensure ref is set before proceeding
       if (!refs.handleServerEventRef.current) {
@@ -66,117 +65,53 @@ export function useConnect(
       refs.sessionIdRef.current = `voice-${maestro.id}-${Date.now()}`;
       logger.debug('[VoiceSession] Session ID generated', { sessionId: refs.sessionIdRef.current });
 
-      // Initialize CAPTURE AudioContext (native sample rate)
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      refs.captureContextRef.current = new AudioContextClass();
-      logger.debug(`[VoiceSession] Capture context initialized at ${refs.captureContextRef.current.sampleRate}Hz`);
-
-      if (refs.captureContextRef.current.state === 'suspended') {
-        await refs.captureContextRef.current.resume();
+      // Fetch transport mode from server
+      const tokenResponse = await fetch('/api/realtime/token');
+      if (!tokenResponse.ok) {
+        throw new Error('Failed to get connection info');
       }
+      const tokenData = await tokenResponse.json();
+      let transport = tokenData.transport || 'websocket';
+      logger.debug(`[VoiceSession] Transport mode from server: ${transport}`);
 
-      // Initialize PLAYBACK AudioContext with preferred output device
-      if (initPlaybackContext) {
-        await initPlaybackContext();
-        logger.debug('[VoiceSession] Playback context initialized with preferred output device');
-      }
-
-      // Check if mediaDevices is available (requires HTTPS or localhost)
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error(
-          'Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.'
-        );
-      }
-
-      // Request microphone with preferred device if set
-      const audioConstraints: MediaTrackConstraints = {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-      };
-
-      // Use 'ideal' instead of 'exact' so it falls back to default if device is disconnected
-      if (preferredMicrophoneId) {
-        audioConstraints.deviceId = { ideal: preferredMicrophoneId };
-        logger.debug(`[VoiceSession] Preferred microphone: ${preferredMicrophoneId} (will fallback if unavailable)`);
-      }
-
-      refs.mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
-        audio: audioConstraints,
-      });
-      logger.debug('[VoiceSession] Microphone access granted');
-
-      // Build WebSocket URL
-      let wsUrl: string;
-      if (connectionInfo.provider === 'azure') {
-        const proxyPort = connectionInfo.proxyPort || 3001;
-        const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-        const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const characterType = connectionInfo.characterType || 'maestro';
-        wsUrl = `${protocol}://${host}:${proxyPort}?maestroId=${maestro.id}&characterType=${characterType}`;
-      } else {
-        wsUrl = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17';
-      }
-
-      // Connect WebSocket
-      const ws = new WebSocket(wsUrl);
-      refs.wsRef.current = ws;
-
-      // Set connection timeout - fail if proxy.ready not received
-      refs.connectionTimeoutRef.current = setTimeout(() => {
-        logger.error('[VoiceSession] Connection timeout - proxy.ready not received');
-        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-          ws.close(4000, 'Connection timeout');
+      // Check WebRTC support and fall back if needed
+      if (transport === 'webrtc') {
+        if (!isWebRTCSupported()) {
+          logger.warn('[VoiceSession] WebRTC not supported by browser, falling back to WebSocket');
+          transport = 'websocket';
         }
-        setConnectionState('error');
-        options.onStateChange?.('error');
-        options.onError?.(new Error('Timeout connessione: il server non risponde. Riprova.'));
-      }, CONNECTION_TIMEOUT_MS);
+      }
 
-      ws.onopen = () => {
-        logger.debug('[VoiceSession] WebSocket connected to proxy, waiting for proxy.ready...');
-      };
+      // Store transport mode for use in audio capture
+      refs.transportRef.current = transport;
 
-      ws.onmessage = async (event) => {
+      // Branch based on transport type
+      if (transport === 'webrtc') {
         try {
-          let msgText: string;
-          if (event.data instanceof Blob) {
-            msgText = await event.data.text();
-          } else if (typeof event.data === 'string') {
-            msgText = event.data;
-          } else {
-            logger.debug('[VoiceSession] Received binary data, skipping');
-            return;
-          }
+          await connectWebRTC(maestro, connectionInfo, refs, setConnected, setConnectionState, options, preferredMicrophoneId);
+          return;
+        } catch (webrtcError) {
+          const errorMessage = webrtcError instanceof Error ? webrtcError.message : 'WebRTC connection failed';
+          logger.warn(`[VoiceSession] WebRTC connection failed (${errorMessage}), falling back to WebSocket`);
 
-          const data = JSON.parse(msgText);
-          logger.debug(`[VoiceSession] ws.onmessage received: ${data.type}, handleServerEventRef.current is ${refs.handleServerEventRef.current ? 'SET' : 'NULL'}`);
-
-          // Use REF to always call the LATEST version of handleServerEvent
-          if (refs.handleServerEventRef.current) {
-            refs.handleServerEventRef.current(data);
-          } else {
-            logger.error('[VoiceSession] ❌ handleServerEventRef.current is NULL! Event lost', { eventType: data.type });
-          }
-        } catch (e) {
-          logger.error('[VoiceSession] ws.onmessage parse error', { error: e });
+          // Reset connection state for fallback
+          setConnectionState('connecting');
+          options.onStateChange?.('connecting');
         }
-      };
+      }
 
-      ws.onerror = (event) => {
-        logger.error('[VoiceSession] WebSocket error', { event });
-        setConnectionState('error');
-        options.onStateChange?.('error');
-        options.onError?.(new Error('WebSocket connection failed'));
-      };
-
-      ws.onclose = (event) => {
-        logger.debug('[VoiceSession] WebSocket closed', { code: event.code, reason: event.reason });
-        setConnected(false);
-        if (connectionState !== 'error') {
-          setConnectionState('idle');
-        }
-      };
+      // === WebSocket Transport (primary or fallback) ===
+      await createWebSocketConnection({
+        maestro,
+        connectionInfo,
+        preferredMicrophoneId,
+        initPlaybackContext,
+        refs,
+        setConnected,
+        setConnectionState,
+        connectionState,
+        options,
+      });
 
     } catch (error) {
       const errorMessage = error instanceof Error
@@ -191,66 +126,64 @@ export function useConnect(
 }
 
 /**
- * Disconnect from voice session and clean up all resources
+ * Internal: Connect via WebRTC transport
  */
-export function useDisconnect(
+async function connectWebRTC(
+  maestro: Maestro,
+  connectionInfo: ConnectionInfo,
   refs: ConnectionRefs,
-  reset: () => void,
-  setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void
-) {
-  return useCallback(() => {
-    logger.debug('[VoiceSession] Disconnecting...');
+  setConnected: (value: boolean) => void,
+  setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void,
+  options: UseVoiceSessionOptions,
+  preferredMicrophoneId?: string
+): Promise<void> {
+  logger.debug('[VoiceSession] Using WebRTC transport');
 
-    // Clear connection timeout if still pending
-    if (refs.connectionTimeoutRef.current) {
-      clearTimeout(refs.connectionTimeoutRef.current);
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
-      refs.connectionTimeoutRef.current = null;
-    }
+  const result = await createWebRTCConnection({
+    maestro,
+    connectionInfo,
+    preferredMicrophoneId,
+    onConnectionStateChange: (state) => {
+      logger.debug(`[VoiceSession] WebRTC state: ${state}`);
+      if (state === 'connected') {
+        setConnectionState('connected');
+        setConnected(true);
+        options.onStateChange?.('connected');
+      } else if (state === 'failed' || state === 'disconnected') {
+        setConnectionState('error');
+        options.onStateChange?.('error');
+      }
+    },
+    onError: (error) => {
+      logger.error('[VoiceSession] WebRTC error', { error: error.message });
+      setConnectionState('error');
+      options.onStateChange?.('error');
+      options.onError?.(error);
+    },
+    onDataChannelMessage: (event) => {
+      if (refs.handleServerEventRef.current) {
+        refs.handleServerEventRef.current(event);
+      } else {
+        logger.error('[VoiceSession] handleServerEventRef is NULL, event lost', { eventType: event.type });
+      }
+    },
+    onDataChannelOpen: () => {
+      logger.debug('[VoiceSession] WebRTC data channel open');
+    },
+    onTrack: (event) => handleWebRTCTrack(event, refs),
+  });
 
-    if (refs.processorRef.current) {
-      refs.processorRef.current.disconnect();
-       
-      refs.processorRef.current = null;
-    }
-    if (refs.sourceNodeRef.current) {
-      refs.sourceNodeRef.current.disconnect();
-      refs.sourceNodeRef.current = null;
-    }
-    if (refs.wsRef.current) {
-      refs.wsRef.current.close();
-      refs.wsRef.current = null;
-    }
-    if (refs.mediaStreamRef.current) {
-      refs.mediaStreamRef.current.getTracks().forEach(track => track.stop());
-      refs.mediaStreamRef.current = null;
-    }
-    if (refs.captureContextRef.current) {
-      refs.captureContextRef.current.close();
-      refs.captureContextRef.current = null;
-    }
-    if (refs.playbackContextRef.current) {
-      refs.playbackContextRef.current.close();
-      refs.playbackContextRef.current = null;
-    }
+  // Store cleanup, media stream, and data channel for later use
+  refs.webrtcCleanupRef.current = result.cleanup;
+  refs.mediaStreamRef.current = result.mediaStream;
+  refs.webrtcDataChannelRef.current = result.dataChannel;
+  logger.debug('[VoiceSession] WebRTC connection established');
 
-    refs.audioQueueRef.current = [];
-    refs.isPlayingRef.current = false;
-    refs.isBufferingRef.current = true;
-    refs.nextPlayTimeRef.current = 0;
-
-    // Stop all scheduled audio sources
-    refs.scheduledSourcesRef.current.forEach(source => {
-      try { source.stop(); } catch { /* already stopped */ }
-    });
-    refs.scheduledSourcesRef.current = [];
-
-    refs.sessionReadyRef.current = false;
-    refs.greetingSentRef.current = false;
-    refs.hasActiveResponseRef.current = false;
-    refs.maestroRef.current = null;
-
-    reset();
-    setConnectionState('idle');
-  }, [refs, reset, setConnectionState]);
+  // Send session config via data channel (mirrors WebSocket proxy.ready flow)
+  setTimeout(() => {
+    if (refs.sendSessionConfigRef.current) {
+      logger.debug('[VoiceSession] Calling sendSessionConfig for WebRTC');
+      refs.sendSessionConfigRef.current();
+    }
+  }, 50);
 }
