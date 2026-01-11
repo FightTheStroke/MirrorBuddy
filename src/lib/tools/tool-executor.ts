@@ -53,8 +53,16 @@ const TOOL_SCHEMAS = {
 } as const;
 
 /**
- * Registry of tool handlers (maintained for backward compatibility)
- * New plugins should use ToolRegistry directly
+ * LEGACY: Registry of tool handlers (maintained for backward compatibility only)
+ *
+ * DEPRECATION: This Map is a transitional mechanism and will be removed once all
+ * handlers are migrated to register directly with ToolRegistry.
+ *
+ * See executeToolCall() for how this interacts with the new ToolRegistry system.
+ * Current role: Fallback handler lookup when ToolRegistry doesn't contain a tool.
+ *
+ * Handlers are registered to BOTH this Map and ToolRegistry via registerToolHandler()
+ * to support the transition period. New code should use ToolRegistry directly.
  */
 const handlers = new Map<string, ToolHandler>();
 
@@ -77,7 +85,12 @@ function initializeRegistry(): void {
 
 /**
  * Register a tool handler for a function name
- * Maintains backward compatibility while syncing with ToolRegistry
+ * DUAL REGISTRATION: Stores in both legacy Map and ToolRegistry
+ * Maintains backward compatibility while syncing with the new ToolRegistry system
+ *
+ * DEPRECATION: This function will be replaced with direct ToolRegistry.register() calls.
+ * Currently it serves as a bridge during the transition from Map-based to plugin-based system.
+ *
  * @param functionName - OpenAI function name (e.g., 'create_mindmap')
  * @param handler - Async function that executes the tool
  */
@@ -128,14 +141,18 @@ export function registerToolHandler(
 }
 
 /**
- * Get all registered handlers (for testing)
+ * DEPRECATED: Get all registered handlers from legacy Map
+ * Used only in tests for backward compatibility verification
+ * For production code, use getToolRegistry().getAll() instead
  */
 export function getRegisteredHandlers(): Map<string, ToolHandler> {
   return new Map(handlers);
 }
 
 /**
- * Clear all handlers (for testing)
+ * DEPRECATED: Clear all legacy handlers
+ * Used only in tests for cleanup between test runs
+ * Does not affect ToolRegistry state - call getToolRegistry().clear() separately if needed
  */
 export function clearHandlers(): void {
   handlers.clear();
@@ -171,12 +188,21 @@ function getToolTypeFromFunctionName(functionName: string): ToolType {
 
 /**
  * Execute a tool call
- * Attempts to use ToolOrchestrator; falls back to legacy handler if not registered
- * Maintains all event broadcasting for real-time updates
+ * DUAL EXECUTION PATH:
+ * 1. Primary (NEW): ToolRegistry + ToolOrchestrator (preferred)
+ * 2. Fallback (LEGACY): Direct handler from legacy Map (backward compatibility)
+ *
+ * Execution flow:
+ * - If tool found in ToolRegistry: Execute via ToolOrchestrator (lines 193-270)
+ * - Otherwise: Fall back to legacy handler from Map (lines 272-383)
+ * - If no handler found anywhere: Return error
+ *
+ * All tool events are broadcast via broadcastToolEvent() regardless of execution path.
  *
  * @param functionName - Name of the function to call (from OpenAI tool_calls)
  * @param args - Arguments from the function call
  * @param context - Session context (sessionId, userId, maestroId)
+ * @returns ToolExecutionResult with success status and output data
  */
 export async function executeToolCall(
   functionName: string,
@@ -269,11 +295,13 @@ export async function executeToolCall(
     }
   }
 
-  // Fallback to legacy handler mechanism for backward compatibility
+  // LEGACY FALLBACK PATH: Try to execute via legacy handler Map
+  // This is reached only if tool is NOT in ToolRegistry (primary system)
+  // Maintained for backward compatibility during transition to plugin-based system
   const handler = handlers.get(functionName);
 
   if (!handler) {
-    const error = `Unknown tool: ${functionName}`;
+    const error = `Unknown tool: ${functionName} (not found in ToolRegistry or legacy handlers)`;
 
     // Broadcast error event
     broadcastToolEvent({
@@ -383,17 +411,37 @@ export async function executeToolCall(
 }
 
 /**
- * Check if a tool handler is registered
+ * DEPRECATED: Check if a tool handler is registered in legacy Map
+ * Checks both fallback Map (legacy) and ToolRegistry (new system)
+ * @returns true if tool exists in either legacy Map or ToolRegistry
  */
 export function hasToolHandler(functionName: string): boolean {
-  return handlers.has(functionName);
+  // Check both legacy Map and new ToolRegistry
+  if (handlers.has(functionName)) {
+    return true;
+  }
+  initializeRegistry();
+  return registry ? registry.has(functionName) : false;
 }
 
 /**
- * Get list of registered tool function names
+ * DEPRECATED: Get list of registered tool function names from legacy Map
+ * Returns only handlers in the fallback Map, not ToolRegistry.
+ * Use getToolRegistry().getAll() for the authoritative tool list.
  */
 export function getRegisteredToolNames(): string[] {
-  return Array.from(handlers.keys());
+  // Return from legacy Map for backward compatibility
+  const legacyNames = Array.from(handlers.keys());
+
+  // Supplement with ToolRegistry entries for more complete picture
+  initializeRegistry();
+  if (registry) {
+    const registryNames = registry.getAll().map((plugin) => plugin.id);
+    const allNames = new Set([...legacyNames, ...registryNames]);
+    return Array.from(allNames).sort();
+  }
+
+  return legacyNames;
 }
 
 /**
