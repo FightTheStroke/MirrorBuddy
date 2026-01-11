@@ -69,11 +69,16 @@ describe('tool-executor', () => {
 
   describe('executeToolCall', () => {
     it('should execute registered handler with args', async () => {
+      const validArgs = {
+        title: 'Test Topic',
+        nodes: [{ id: 'node-1', label: 'Root Node' }],
+      };
+
       const mockResult: ToolExecutionResult = {
         success: true,
         toolId: 'test-id',
         toolType: 'mindmap',
-        data: { topic: 'Test Topic', nodes: [] },
+        data: validArgs,
       };
 
       const mockHandler = vi.fn().mockResolvedValue(mockResult);
@@ -87,12 +92,12 @@ describe('tool-executor', () => {
 
       const result = await executeToolCall(
         'create_mindmap',
-        { topic: 'Test Topic', nodes: [] },
+        validArgs,
         context
       );
 
       expect(mockHandler).toHaveBeenCalledWith(
-        { topic: 'Test Topic', nodes: [] },
+        validArgs,
         context
       );
       expect(result.success).toBe(true);
@@ -133,7 +138,15 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_quiz', mockHandler);
 
-      const result = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
+      // Pass all required fields per Zod schema
+      const result = await executeToolCall('create_quiz', {
+        topic: 'Test Quiz',
+        questions: [{
+          question: 'Test question?',
+          options: ['A', 'B', 'C'],
+          correctIndex: 0,
+        }],
+      }, { sessionId: 'test' });
 
       // Executor should fill in a toolId when handler returns empty
       expect(result.toolId).toBeTruthy();
@@ -150,7 +163,15 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_quiz', mockHandler);
 
-      const result = await executeToolCall('create_quiz', { topic: 'Test Quiz' }, { sessionId: 'test' });
+      // Pass all required fields per Zod schema
+      const result = await executeToolCall('create_quiz', {
+        topic: 'Test Quiz',
+        questions: [{
+          question: 'Test question?',
+          options: ['A', 'B', 'C'],
+          correctIndex: 0,
+        }],
+      }, { sessionId: 'test' });
 
       // Handler's toolId should be preserved
       expect(result.toolId).toBe('handler-provided-id');
@@ -168,7 +189,13 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_demo', mockHandler);
 
-      await executeToolCall('create_demo', { topic: 'Test Demo' }, { sessionId: 'test', maestroId: 'galileo' });
+      // Pass all required fields per Zod schema
+      await executeToolCall('create_demo', {
+        title: 'Test Demo',
+        concept: 'Test concept',
+        visualization: 'Test visualization',
+        interaction: 'Test interaction',
+      }, { sessionId: 'test', maestroId: 'galileo' });
 
       expect(broadcastToolEvent).toHaveBeenCalledWith(
         expect.objectContaining({

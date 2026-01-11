@@ -149,7 +149,9 @@ describe('Summary Handler', () => {
       const result = await executeToolCall('open_student_summary', {}, defaultContext);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('Topic is required');
+      // Zod validation error format
+      expect(result.error).toContain('Invalid arguments for open_student_summary');
+      expect(result.error).toContain('topic');
     });
 
     it('passes maestroId from context', async () => {
@@ -186,11 +188,12 @@ describe('Summary Handler', () => {
     it('returns error for missing required fields', async () => {
       const result = await executeToolCall('student_summary_add_comment', {
         sectionId: 'intro',
-        // missing text
+        // missing startOffset, endOffset, text
       }, defaultContext);
 
       expect(result.success).toBe(false);
-      expect(result.error).toContain('required');
+      // Zod validation error format
+      expect(result.error).toContain('Invalid arguments for student_summary_add_comment');
     });
 
     it('passes maestroId from context', async () => {
