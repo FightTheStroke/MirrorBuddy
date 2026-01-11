@@ -144,6 +144,56 @@ Hardcoded in `session-config.ts` - NON modificabili dall'utente:
 }
 ```
 
+## Conversation Context Injection (ADR 0035)
+
+When users load a previous conversation and start voice, the AI now has full context.
+
+### How It Works
+
+1. Chat messages are passed via `connectionInfo.initialMessages` when calling `connect()`
+2. After `session.update` is sent, messages are injected via `conversation.item.create`
+3. Greeting is skipped (`greetingSentRef = true`) to continue naturally
+
+### Code Flow
+
+```
+User loads old conversation → clicks voice →
+  → useCharacterChat/useMaestroSessionLogic passes messages →
+    → useMaestroVoiceConnection formats as initialMessages →
+      → connect() stores in initialMessagesRef →
+        → useSendSessionConfig injects after session.update
+```
+
+### API Message Format
+
+```typescript
+// For each message in history:
+{
+  type: 'conversation.item.create',
+  item: {
+    type: 'message',
+    role: 'user' | 'assistant',
+    content: [{ type: 'input_text', text: messageContent }],
+  },
+}
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `src/lib/hooks/voice-session/types.ts` | `initialMessages` in ConnectionInfo |
+| `src/lib/hooks/voice-session/session-config.ts` | Injection logic after session.update |
+| `src/components/maestros/use-maestro-voice-connection.ts` | Formats messages for Maestri |
+| `src/components/conversation/character-chat-view/hooks/use-character-chat/index.ts` | Formats for Coach/Buddy |
+
+### Limitations
+
+- Very long conversations may need truncation (future optimization)
+- Works with both WebSocket and WebRTC transports
+
+---
+
 ## Preview vs GA API
 
 Azure ha DUE formati con **event names DIVERSI**:
