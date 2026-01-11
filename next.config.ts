@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 import packageJson from './package.json';
 
 const nextConfig: NextConfig = {
+  // Enable standalone output for Docker deployment
+  // Creates .next/standalone with minimal server.js for production
+  output: 'standalone',
   env: {
     APP_VERSION: packageJson.version,
   },
