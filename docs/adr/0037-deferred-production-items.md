@@ -1,145 +1,132 @@
 # ADR 0037: Deferred Production Items
 
-## Status
+| | |
+|---|---|
+| **Status** | Accepted |
+| **Date** | 2025-01-11 |
+| **Deciders** | Roberto Danese |
+| **Technical Story** | Production hardening review |
 
-Accepted
+## Context and Problem Statement
 
-## Date
+During production hardening, several enterprise-grade capabilities were identified as important for scale deployment but not required for closed beta. We need to document what is deferred and why, ensuring clear timeline and risk mitigation.
 
-2025-01-11
+## Decision Drivers
 
-## Context
+- **Beta Phase**: Known users, supervised environment
+- **Resource Focus**: Core educational features over infrastructure
+- **Time to Value**: Ship to beta users faster
+- **Risk Management**: Document known gaps with mitigations
 
-During production hardening review, several items were identified as important for
-enterprise-grade production deployment but are intentionally deferred for this
-release. This ADR documents the rationale and planned timeline for each.
+## Considered Options
 
-## Deferred Items
+1. Implement everything before beta
+2. Defer non-critical items with documentation
+3. Implement partial solutions
+
+## Decision Outcome
+
+**Chosen option**: "Defer non-critical items with documentation"
+
+## Deferred Items Analysis
 
 ### 1. Authentication System
 
-**Current State**: Cookie-based user ID, no authentication.
+```mermaid
+graph LR
+    subgraph "Current (Beta)"
+        A[Cookie ID] --> B[Session]
+    end
 
-**Why Deferred**:
-- MirrorBuddy is currently in closed beta with known users
-- Parent supervision is the primary access control mechanism
-- Adding auth requires significant UX changes (login flows, password recovery)
-- Parent consent flow must be designed carefully for GDPR compliance
+    subgraph "Future (Production)"
+        C[Azure AD B2C] --> D[Parent Account]
+        D --> E[Child Accounts]
+        E --> F[RBAC]
+    end
+```
 
-**Planned Solution**: Azure AD B2C or Auth0 with:
-- Parent account creation and verification
-- Child account under parent supervision
-- Magic link for passwordless access (accessibility)
+| Aspect | Current | Future |
+|--------|---------|--------|
+| Identity | Cookie-based | OAuth 2.0 + OIDC |
+| Parent verification | Manual | ID verification flow |
+| Child consent | Assumed | Dual-consent GDPR flow |
+| Session management | Memory | Redis + JWT |
+
+**Why Deferred**: Beta users are known entities with parent supervision. Adding auth requires significant UX changes and legal review for child data handling.
+
+**Risk Mitigation**: Application not exposed publicly; safety guardrails operate regardless of auth.
 
 **Timeline**: Before public beta launch
 
-**Risk Mitigation**:
-- Application not exposed to public internet during beta
-- Safety guardrails protect content regardless of auth
-
 ### 2. Redis for Rate Limiting
 
-**Current State**: In-memory rate limiting, lost on restart.
+| Aspect | Current | Future |
+|--------|---------|--------|
+| Storage | In-memory | Redis Cluster |
+| Persistence | Lost on restart | Persistent |
+| Scaling | Single instance | Multi-instance |
 
-**Why Deferred**:
-- Single-instance deployment for beta (no scaling needed)
-- Rate limits primarily protect against abuse, not load
-- In-memory is sufficient for current user base
+**Why Deferred**: Single-instance deployment is sufficient for beta scale. In-memory rate limiting protects against abuse; state loss on restart is acceptable.
 
-**Planned Solution**: Redis or Azure Cache with:
-- Distributed rate limiting
-- Session storage
-- Cache for AI responses
+**Risk Mitigation**: Conservative rate limits; safety systems have independent protections.
 
-**Timeline**: Before multi-instance deployment
+**Timeline**: Before horizontal scaling
 
-**Risk Mitigation**:
-- Conservative rate limits set
-- Safety systems have independent limits
-- Restart clears rate limit state (acceptable for beta)
+### 3. Infrastructure as Code
 
-### 3. Infrastructure as Code (Terraform/Bicep)
+| Aspect | Current | Future |
+|--------|---------|--------|
+| Deployment | Docker Compose | Azure Container Apps |
+| Provisioning | Manual | Bicep/Terraform |
+| Secrets | .env files | Azure Key Vault |
 
-**Current State**: Docker Compose for local/staging.
-
-**Why Deferred**:
-- Beta runs on single managed instance
-- IaC complexity not justified until Azure deployment
-- Focus on application hardening first
-
-**Planned Solution**: Bicep templates for:
-- Azure Container Apps or AKS
-- Azure Database for PostgreSQL
-- Azure OpenAI resource provisioning
-- Azure Key Vault for secrets
+**Why Deferred**: Focus on application hardening first. IaC provides diminishing returns for single-environment beta.
 
 **Timeline**: Production deployment milestone
 
 ### 4. Distributed Tracing (OpenTelemetry)
 
-**Current State**: Structured JSON logging.
+| Aspect | Current | Future |
+|--------|---------|--------|
+| Logging | Structured JSON | OTel + Azure Monitor |
+| Tracing | None | Distributed spans |
+| Metrics | Health endpoint | Custom metrics |
 
-**Why Deferred**:
-- Logging sufficient for single-instance debugging
-- OTel requires collector infrastructure
-- Current observability adequate for beta scale
+**Why Deferred**: Structured logging is sufficient for single-service debugging. OTel requires collector infrastructure.
 
-**Planned Solution**: OpenTelemetry with:
-- Azure Monitor / Application Insights
-- Distributed trace correlation
-- Custom metrics for AI latency
-
-**Timeline**: When multi-service architecture needed
-
-### 5. Advanced Monitoring Dashboards
-
-**Current State**: Health endpoint with JSON metrics.
-
-**Why Deferred**:
-- JSON health check queryable by any monitoring tool
-- No dedicated monitoring infrastructure yet
-- Grafana/Azure dashboards require setup time
-
-**Planned Solution**:
-- Azure Monitor workbooks or Grafana dashboards
-- Alert rules for SLO violations
-- Error budget tracking
-
-**Timeline**: With production deployment
-
-## Decision
-
-Defer these items to maintain focus on:
-1. Core educational functionality
-2. Safety systems for minor users
-3. Accessibility compliance
-4. Application stability
+**Timeline**: Multi-service architecture phase
 
 ## Consequences
 
 ### Positive
 
-- Faster iteration on core features
-- Reduced operational complexity during beta
-- Clear roadmap for production hardening
-- Resources focused on user-facing value
+- Faster iteration on educational features
+- Reduced operational complexity
+- Clear production roadmap
 
 ### Negative
 
-- Not suitable for public internet exposure
-- Manual scaling if user base grows
-- Limited observability for complex issues
-- Technical debt to address later
+- Not suitable for public exposure
+- Manual intervention for scaling
+- Limited debugging for complex issues
 
-### Neutral
+### Risks and Mitigations
 
-- Beta users accept these limitations
-- Parent supervision compensates for missing auth
-- Documented plan provides clarity
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| Unauthorized access | Low | High | Network isolation, parent supervision |
+| Rate limit exhaustion | Low | Medium | Conservative limits, restart clears state |
+| Debugging difficulty | Medium | Low | Structured logs, health endpoints |
 
-## References
+## Related ADRs
 
 - [ADR 0015: Database-First Architecture](./0015-database-first-architecture.md)
 - [ADR 0004: Safety Guardrails](./0004-safety-guardrails.md)
-- [ISE Observability Guide](https://microsoft.github.io/code-with-engineering-playbook/observability/)
+
+## References
+
 - [Azure Well-Architected Framework](https://learn.microsoft.com/azure/well-architected/)
+- [ISE Engineering Playbook](https://microsoft.github.io/code-with-engineering-playbook/)
+
+---
+*Version 2.0 | January 2025 | Technical Fellow Review*

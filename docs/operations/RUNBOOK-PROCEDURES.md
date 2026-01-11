@@ -2,123 +2,140 @@
 
 > Supplementary to [RUNBOOK.md](./RUNBOOK.md)
 
+## Recovery Procedures
+
+### Data Recovery Flow
+
+```mermaid
+graph TD
+    A[Data Issue Detected] --> B{Type?}
+    B -->|Corruption| C[Stop Writes]
+    B -->|Accidental Delete| D[Check Soft Delete]
+    B -->|Full Loss| E[Restore Backup]
+
+    C --> F[Backup Current State]
+    F --> G[Restore from Backup]
+    G --> H[Verify Integrity]
+    H --> I[Resume Operations]
+
+    D --> J{Recoverable?}
+    J -->|Yes| K[Undelete]
+    J -->|No| E
+```
+
+### Backup Commands
+
+```bash
+# Create backup
+docker exec mirrorbuddy-db pg_dump -U mirrorbuddy mirrorbuddy | gzip > backup-$(date +%Y%m%d-%H%M).sql.gz
+
+# Verify backup
+gunzip -t backup-*.sql.gz && echo "Backup valid"
+
+# Restore backup
+gunzip -c backup-YYYYMMDD.sql.gz | docker exec -i mirrorbuddy-db psql -U mirrorbuddy mirrorbuddy
+```
+
 ## Deployment Procedures
 
-### INC-007: Deployment Failure
+### Zero-Downtime Deploy
 
-**Symptoms**: New version doesn't start
+```mermaid
+sequenceDiagram
+    participant LB as Load Balancer
+    participant Old as Old Container
+    participant New as New Container
 
-**Diagnosis**:
-```bash
-docker build . 2>&1 | tail -50
-npx prisma migrate status
+    Note over LB,New: Rolling deployment
+    New->>New: Start & health check
+    New->>LB: Register healthy
+    LB->>LB: Drain old connections
+    LB->>Old: Deregister
+    Old->>Old: Graceful shutdown
 ```
 
-**Resolution**:
-1. Rollback: `docker pull [prev-tag] && docker-compose up -d`
-2. Run migrations: `npx prisma migrate deploy`
-3. Redeploy
-
-### INC-008: Certificate/TLS Issues
-
-**Resolution**:
-1. Check expiry: `openssl s_client -connect [domain]:443`
-2. Renew certificates
-3. Verify reverse proxy config
-
-### INC-009: Rate Limiting Triggered
-
-**Symptoms**: 429 errors
-
-**Resolution**:
-1. Identify if attack or legitimate traffic
-2. Adjust rate limits if needed
-3. Add IP to allowlist if false positive
-
----
-
-## Data Recovery
-
-### INC-010: Data Recovery
+### Rollback Procedure
 
 ```bash
-# Stop writes
-docker stop mirrorbuddy-app
+# 1. Identify previous version
+docker images mirrorbuddy --format "{{.Tag}}" | head -5
 
-# Backup current state
-docker exec mirrorbuddy-db pg_dump -U mirrorbuddy mirrorbuddy > backup-$(date +%Y%m%d).sql
+# 2. Roll back
+docker-compose pull mirrorbuddy-app:previous-tag
+docker-compose up -d app
 
-# Restore from backup
-docker exec -i mirrorbuddy-db psql -U mirrorbuddy mirrorbuddy < backup-YYYYMMDD.sql
-
-# Restart
-docker start mirrorbuddy-app
+# 3. Verify
+curl -s localhost:3000/api/health | jq '.version'
 ```
 
----
+## Maintenance Windows
 
-## Post-Incident Process
+### Database Maintenance
 
-### Blameless Post-Mortem Template
+| Task | Frequency | Duration | Impact |
+|------|-----------|----------|--------|
+| VACUUM ANALYZE | Weekly | 5-15 min | None (online) |
+| Index rebuild | Monthly | 10-30 min | Degraded perf |
+| Extension upgrade | Quarterly | 5 min | Brief restart |
+
+### Maintenance Commands
+
+```bash
+# Analyze tables
+docker exec mirrorbuddy-db psql -U mirrorbuddy -c "ANALYZE;"
+
+# Check table bloat
+docker exec mirrorbuddy-db psql -U mirrorbuddy -c \
+  "SELECT relname, n_dead_tup FROM pg_stat_user_tables ORDER BY n_dead_tup DESC LIMIT 5;"
+```
+
+## Post-Incident Template
 
 ```markdown
-# Incident Post-Mortem: [Title]
+# Post-Mortem: [Title]
 
-**Date**: YYYY-MM-DD
-**Severity**: SEV[1-4]
-**Duration**: X hours Y minutes
+**Date**: YYYY-MM-DD | **Severity**: SEV[1-4] | **Duration**: Xh Ym
 
 ## Summary
-[1-2 sentence description]
+[One paragraph description]
 
 ## Impact
-- Users affected: [number/percentage]
+- Users affected: X
 - Features impacted: [list]
+- SLO impact: X% of monthly budget consumed
 
-## Timeline
-- HH:MM - [Event]
+## Timeline (UTC)
+| Time | Event |
+|------|-------|
+| HH:MM | Detection |
+| HH:MM | Response began |
+| HH:MM | Mitigation applied |
+| HH:MM | Resolution confirmed |
 
 ## Root Cause
-[Technical explanation]
+[Technical explanation of what went wrong]
 
 ## Resolution
-[What fixed it]
+[What fixed the issue]
 
-## Action Items
-| Action | Owner | Due Date |
-|--------|-------|----------|
-| [Action] | [Name] | YYYY-MM-DD |
+## Prevention
+| Action | Owner | Due Date | Status |
+|--------|-------|----------|--------|
+| [Action] | [Name] | YYYY-MM-DD | Open |
+
+## Lessons Learned
+- What went well: [list]
+- What to improve: [list]
 ```
+
+## Health Check Schedule
+
+| Check | Frequency | Method |
+|-------|-----------|--------|
+| App health | Every 30s | `/api/health` |
+| DB connectivity | Every 30s | Health endpoint |
+| Backup verification | Weekly | Restore test |
+| Security scan | Monthly | npm audit |
 
 ---
-
-## Maintenance Procedures
-
-### Daily Health Check
-
-```bash
-curl -s https://[domain]/api/health | jq '.status'
-docker stats --no-stream
-```
-
-### Weekly Backup Verification
-
-```bash
-pg_dump -U mirrorbuddy mirrorbuddy | gzip > weekly-backup.sql.gz
-gunzip -t weekly-backup.sql.gz && echo "Backup valid"
-```
-
-### Monthly Security Review
-
-- [ ] Review npm audit results
-- [ ] Check for dependency updates
-- [ ] Review safety system logs
-- [ ] Rotate secrets if needed
-
----
-
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-01 | Initial procedures |
+*Version 2.0 | January 2025 | Technical Fellow Review*

@@ -1,168 +1,141 @@
-# MirrorBuddy SLI/SLO Definitions
+# MirrorBuddy Service Level Objectives
 
-> ISE Engineering Fundamentals: [Service Level Objectives](https://microsoft.github.io/code-with-engineering-playbook/observability/slo/)
+> Reference: [Google SRE Book - SLOs](https://sre.google/sre-book/service-level-objectives/) | [ISE Observability](https://microsoft.github.io/code-with-engineering-playbook/observability/slo/)
 
-## Overview
+## Architecture Context
 
-This document defines Service Level Indicators (SLIs) and Service Level Objectives (SLOs) for MirrorBuddy's critical services.
+```mermaid
+graph TB
+    subgraph "User Layer"
+        U[Student/Parent]
+    end
 
-## Critical Services
+    subgraph "Application Layer"
+        V[Voice API<br/>SLO: 99.5%]
+        C[Chat API<br/>SLO: 99.9%]
+        H[Health API<br/>SLO: 99.99%]
+    end
 
-### 1. Voice API (Azure OpenAI Realtime)
+    subgraph "Data Layer"
+        DB[(PostgreSQL<br/>SLO: 99.95%)]
+        VEC[(pgvector<br/>Semantic Search)]
+    end
 
-**Service**: Real-time voice interaction with AI Maestros
+    subgraph "AI Layer"
+        AZ[Azure OpenAI]
+        OL[Ollama Fallback]
+    end
 
-| SLI | Description | Measurement |
-|-----|-------------|-------------|
-| Availability | % of successful voice session starts | `success_count / total_attempts * 100` |
-| Latency (P50) | Time to first voice response | Median response time |
-| Latency (P99) | Time to first voice response (99th percentile) | 99th percentile response time |
-| Error Rate | % of voice sessions with errors | `error_count / total_sessions * 100` |
-
-**SLOs**:
-
-| Metric | Target | Error Budget (monthly) |
-|--------|--------|------------------------|
-| Availability | 99.5% | 3.6 hours downtime |
-| Latency P50 | < 500ms | - |
-| Latency P99 | < 2000ms | - |
-| Error Rate | < 1% | - |
-
-### 2. Chat API (Text conversations)
-
-**Service**: Text-based AI tutoring conversations
-
-| SLI | Description | Measurement |
-|-----|-------------|-------------|
-| Availability | % of successful chat completions | `success_count / total_requests * 100` |
-| Latency (TTFB) | Time to first byte of streaming response | P50 and P99 |
-| Throughput | Requests per second handled | RPS under normal load |
-
-**SLOs**:
-
-| Metric | Target | Error Budget (monthly) |
-|--------|--------|------------------------|
-| Availability | 99.9% | 43 minutes downtime |
-| Latency P50 | < 300ms TTFB | - |
-| Latency P99 | < 1500ms TTFB | - |
-| Throughput | 100 RPS | - |
-
-### 3. Database (PostgreSQL + pgvector)
-
-**Service**: Primary data store and vector search
-
-| SLI | Description | Measurement |
-|-----|-------------|-------------|
-| Availability | % of successful queries | Query success rate |
-| Query Latency | Time to execute queries | P50 and P99 |
-| Vector Search | Semantic search response time | P50 and P99 |
-
-**SLOs**:
-
-| Metric | Target |
-|--------|--------|
-| Availability | 99.95% |
-| Query Latency P50 | < 50ms |
-| Query Latency P99 | < 200ms |
-| Vector Search P50 | < 100ms |
-| Vector Search P99 | < 500ms |
-
-### 4. Health Endpoint
-
-**Service**: `/api/health` for monitoring
-
-| SLI | Description |
-|-----|-------------|
-| Availability | Always returns within timeout |
-| Response Time | < 100ms for healthy status |
-
-**SLOs**:
-
-| Metric | Target |
-|--------|--------|
-| Availability | 99.99% |
-| Response Time | < 100ms |
-
-## Error Budget Policy
-
-### Calculation
-
-```
-Monthly Error Budget = (1 - SLO) * 30 days * 24 hours * 60 minutes
-
-Example for 99.5% availability:
-(1 - 0.995) * 30 * 24 * 60 = 216 minutes = 3.6 hours
+    U --> V & C
+    V --> AZ
+    C --> AZ
+    AZ -.->|fallback| OL
+    V & C --> DB
+    C --> VEC
 ```
 
-### Actions by Error Budget Status
+## SLI/SLO Definitions
 
-| Budget Consumed | Status | Actions |
-|-----------------|--------|---------|
-| 0-50% | Green | Normal development velocity |
-| 50-75% | Yellow | Increase monitoring, reduce risky deployments |
-| 75-100% | Orange | Focus on reliability, no new features |
-| >100% | Red | All hands on reliability, incident review required |
+### Voice API (Real-time WebSocket)
 
-## Monitoring Implementation
+| SLI | Formula | Target (SLO) | Rationale |
+|-----|---------|--------------|-----------|
+| Availability | `successful_starts / total_attempts` | **99.5%** | WebRTC inherently less reliable than HTTP |
+| Latency P50 | `percentile(ttfv, 50)` | **< 500ms** | Conversational UX threshold |
+| Latency P99 | `percentile(ttfv, 99)` | **< 2000ms** | Maximum tolerable delay |
+| Error Rate | `errors / total_sessions` | **< 1%** | Includes mid-session failures |
 
-### Health Check Endpoint
+**TTFV** = Time To First Voice (WebSocket connect → first audio playback)
 
-The `/api/health` endpoint provides:
-- Database connectivity status
-- AI provider availability
-- Memory usage metrics
-- Overall health status (healthy/degraded/unhealthy)
+### Chat API (HTTP Streaming)
 
-### Metrics to Track
+| SLI | Formula | Target (SLO) | Rationale |
+|-----|---------|--------------|-----------|
+| Availability | `2xx_responses / total_requests` | **99.9%** | Three 9s for HTTP services |
+| TTFB P50 | `percentile(ttfb, 50)` | **< 300ms** | User perception of responsiveness |
+| TTFB P99 | `percentile(ttfb, 99)` | **< 1500ms** | Tail latency budget |
+
+**TTFB** = Time To First Byte (request received → first SSE chunk sent)
+
+### Database (PostgreSQL + pgvector)
+
+| SLI | Formula | Target (SLO) | Rationale |
+|-----|---------|--------------|-----------|
+| Availability | `successful_queries / total_queries` | **99.95%** | Critical dependency |
+| Query P50 | `percentile(query_ms, 50)` | **< 50ms** | Standard OLTP expectation |
+| Query P99 | `percentile(query_ms, 99)` | **< 200ms** | With connection pooling |
+| Vector P99 | `percentile(vector_ms, 99)` | **< 500ms** | Semantic search overhead |
+
+## Error Budget Model
+
+```
+Monthly Error Budget = (1 - SLO) × 30 × 24 × 60 minutes
+
+Voice API (99.5%):  0.005 × 43200 = 216 min = 3.6 hours
+Chat API (99.9%):   0.001 × 43200 = 43.2 min
+Database (99.95%):  0.0005 × 43200 = 21.6 min
+```
+
+### Burn Rate Alerts
+
+| Severity | Condition | Time Window | Action |
+|----------|-----------|-------------|--------|
+| **SEV1** | 14.4× burn rate | 1 hour | Page immediately |
+| **SEV2** | 6× burn rate | 6 hours | Page during business |
+| **SEV3** | 3× burn rate | 24 hours | Ticket for review |
+
+*14.4× = consumes monthly budget in 2 days*
+
+## Decision Matrix
+
+```mermaid
+graph TD
+    A[Error Budget Status] --> B{Budget > 50%?}
+    B -->|Yes| C[Green: Normal velocity]
+    B -->|No| D{Budget > 25%?}
+    D -->|Yes| E[Yellow: Reduce risk]
+    D -->|No| F{Budget > 0%?}
+    F -->|Yes| G[Orange: Reliability focus]
+    F -->|No| H[Red: All hands on deck]
+
+    C --> I[Deploy normally]
+    E --> J[Extra review required]
+    G --> K[No new features]
+    H --> L[Incident mode]
+```
+
+## Measurement Points
 
 ```typescript
-// Example metrics structure
-interface Metrics {
-  // Voice API
-  voice_session_start_total: Counter;
-  voice_session_errors_total: Counter;
-  voice_response_latency_ms: Histogram;
+// Voice API measurement
+const voiceSLI = {
+  availability: successfulStarts / totalAttempts,
+  latencyP50: percentile(ttfvSamples, 0.5),
+  latencyP99: percentile(ttfvSamples, 0.99),
+};
 
-  // Chat API
-  chat_request_total: Counter;
-  chat_error_total: Counter;
-  chat_ttfb_ms: Histogram;
-
-  // Database
-  db_query_total: Counter;
-  db_query_errors_total: Counter;
-  db_query_latency_ms: Histogram;
-}
+// Chat API measurement
+const chatSLI = {
+  availability: responses2xx / totalRequests,
+  ttfbP50: percentile(ttfbSamples, 0.5),
+  ttfbP99: percentile(ttfbSamples, 0.99),
+};
 ```
 
-### Alerting Thresholds
+## Review Schedule
 
-| Alert | Condition | Severity | Response |
-|-------|-----------|----------|----------|
-| VoiceAPIDown | Error rate > 5% for 5min | Critical | Page on-call |
-| HighLatency | P99 > 3s for 10min | Warning | Investigate |
-| ErrorBudgetBurn | >10% budget consumed in 1hr | Warning | Review changes |
-| DatabaseSlow | Query P99 > 500ms | Warning | Check queries |
+| Cadence | Activity | Owner |
+|---------|----------|-------|
+| Daily | Error budget check | On-call |
+| Weekly | SLO compliance review | Tech lead |
+| Monthly | Target adjustment | Engineering manager |
+| Quarterly | Capacity planning | Technical director |
 
-## Dashboards
+## References
 
-Recommended dashboard panels:
+- [ADR 0037: Deferred Production Items](../adr/0037-deferred-production-items.md)
+- [RUNBOOK.md](./RUNBOOK.md) - Incident response procedures
+- [Health Endpoint](../../src/app/api/health/detailed/route.ts) - Implementation
 
-1. **Overview**: Health status, uptime %, error budget remaining
-2. **Voice API**: Session count, latency distribution, error rate
-3. **Chat API**: Request rate, TTFB, streaming completion rate
-4. **Database**: Query rate, latency, connection pool usage
-5. **Infrastructure**: Memory, CPU, disk I/O
-
-## Review Cadence
-
-- **Daily**: Check error budget consumption
-- **Weekly**: Review SLO compliance, incident trends
-- **Monthly**: Full SLO review, adjust targets if needed
-- **Quarterly**: Strategic review, capacity planning
-
-## Version History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-01 | Initial SLI/SLO definitions |
+---
+*Version 2.0 | January 2025 | Technical Fellow Review*
