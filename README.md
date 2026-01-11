@@ -11,8 +11,9 @@
 
 <p align="center">
   <a href="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/E2E%20tests-70%20API-brightgreen" alt="E2E Tests: 70 API">
-  <img src="https://img.shields.io/badge/coverage-80.75%25-brightgreen" alt="Coverage: 80.75%">
+  <img src="https://img.shields.io/badge/tests-2344-brightgreen" alt="Tests: 2344">
+  <img src="https://img.shields.io/badge/e2e-85-blue" alt="E2E: 85">
+  <img src="https://img.shields.io/badge/coverage-55.6%25-yellow" alt="Coverage: 55.6%">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <a href="https://github.com/FightTheStroke/MirrorBuddy/releases"><img src="https://img.shields.io/github/v/release/FightTheStroke/MirrorBuddy?include_prereleases&label=version" alt="Version"></a>
 </p>
