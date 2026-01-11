@@ -100,8 +100,13 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
       setConfigError(null);
 
       try {
+        // Convert messages to format needed for voice context
+        const initialMessages = messages
+          .filter(m => m.role === 'user' || m.role === 'assistant')
+          .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+
         const maestroLike = characterToMaestro(character, characterId);
-        await connect(maestroLike, connectionInfo);
+        await connect(maestroLike, { ...connectionInfo, initialMessages });
       } catch (error) {
         logger.error('Voice connection failed', { error: String(error) });
         setConfigError(handleMicrophoneError(error));
@@ -109,7 +114,7 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
     };
 
     startConnection();
-  }, [isVoiceActive, connectionInfo, isConnected, connectionState, character, characterId, connect]);
+  }, [isVoiceActive, connectionInfo, isConnected, connectionState, character, characterId, connect, messages]);
 
   // Reset connection attempt when voice deactivates
   useEffect(() => {

@@ -47,6 +47,7 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     initialMode,
     onTranscript: onVoiceTranscript,
     onQuestionAsked,
+    currentMessages: messages,
   });
 
   const chatHandlers = useMaestroChatHandlers({

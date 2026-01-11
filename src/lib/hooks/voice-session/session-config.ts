@@ -59,6 +59,8 @@ export function useSendGreeting(
   }, [wsRef, greetingSentRef]);
 }
 
+type InitialMessage = { role: 'user' | 'assistant'; content: string };
+
 /**
  * Send session configuration to Azure Realtime API
  * Supports both WebSocket and WebRTC transports
@@ -71,7 +73,9 @@ export function useSendSessionConfig(
   setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void,
   options: UseVoiceSessionOptions,
   transportRef?: React.MutableRefObject<'websocket' | 'webrtc' | null>,
-  webrtcDataChannelRef?: React.MutableRefObject<RTCDataChannel | null>
+  webrtcDataChannelRef?: React.MutableRefObject<RTCDataChannel | null>,
+  initialMessagesRef?: React.MutableRefObject<InitialMessage[] | null>,
+  greetingSentRef?: React.MutableRefObject<boolean>
 ) {
   return useCallback(async () => {
     const maestro = maestroRef.current;
@@ -164,18 +168,53 @@ export function useSendSessionConfig(
 
     logger.debug('[VoiceSession] Sending session.update, instructions length:', { len: fullInstructions.length });
 
-    // Send via appropriate transport
-    if (isWebRTC && dataChannel) {
-      logger.debug('[VoiceSession] Sending session.update via WebRTC data channel');
-      dataChannel.send(JSON.stringify(sessionConfig));
-    } else if (!isWebRTC && ws) {
-      logger.debug('[VoiceSession] Sending session.update via WebSocket');
-      ws.send(JSON.stringify(sessionConfig));
+    // Helper to send message via correct transport
+    const sendMessage = (msg: Record<string, unknown>) => {
+      const json = JSON.stringify(msg);
+      if (isWebRTC && dataChannel) {
+        dataChannel.send(json);
+      } else if (!isWebRTC && ws) {
+        ws.send(json);
+      }
+    };
+
+    // Send session config
+    logger.debug('[VoiceSession] Sending session.update via ' + (isWebRTC ? 'WebRTC' : 'WebSocket'));
+    sendMessage(sessionConfig);
+
+    // Inject conversation history for context continuity
+    const initialMessages = initialMessagesRef?.current;
+    if (initialMessages && initialMessages.length > 0) {
+      logger.debug('[VoiceSession] Injecting conversation history', { count: initialMessages.length });
+
+      // Send each message as a conversation item
+      for (const msg of initialMessages) {
+        sendMessage({
+          type: 'conversation.item.create',
+          item: {
+            type: 'message',
+            role: msg.role,
+            content: [{ type: 'input_text', text: msg.content }],
+          },
+        });
+      }
+
+      // Mark greeting as sent so we skip it (we're continuing a conversation)
+      if (greetingSentRef) {
+        greetingSentRef.current = true;
+      }
+
+      // Clear the initial messages to avoid re-injection
+      if (initialMessagesRef) {
+        initialMessagesRef.current = null;
+      }
+
+      logger.debug('[VoiceSession] Conversation history injected, greeting skipped');
     }
 
     setConnected(true);
     setCurrentMaestro(maestro);
     setConnectionState('connected');
     options.onStateChange?.('connected');
-  }, [maestroRef, wsRef, setConnected, setCurrentMaestro, setConnectionState, options, transportRef, webrtcDataChannelRef]);
+  }, [maestroRef, wsRef, setConnected, setCurrentMaestro, setConnectionState, options, transportRef, webrtcDataChannelRef, initialMessagesRef, greetingSentRef]);
 }

@@ -39,6 +39,7 @@ export interface VoiceSessionRefs {
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
+  initialMessagesRef: React.MutableRefObject<Array<{ role: 'user' | 'assistant'; content: string }> | null>;
 }
 
 export function useVoiceSessionRefs(): VoiceSessionRefs {
@@ -74,6 +75,7 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     userSpeechEndTimeRef: useRef<number | null>(null),
     firstAudioPlaybackTimeRef: useRef<number | null>(null),
     sendSessionConfigRef: useRef<(() => void) | null>(null),
+    initialMessagesRef: useRef<Array<{ role: 'user' | 'assistant'; content: string }> | null>(null),
   };
 }
 

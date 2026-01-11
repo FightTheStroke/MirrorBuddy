@@ -86,7 +86,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     setConnectionState,
     options,
     refs.transportRef,
-    refs.webrtcDataChannelRef
+    refs.webrtcDataChannelRef,
+    refs.initialMessagesRef,
+    refs.greetingSentRef
   );
 
   // Store sendSessionConfig in ref so it can be called from connection.ts for WebRTC
@@ -158,6 +160,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
     firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
     sendSessionConfigRef: refs.sendSessionConfigRef,
+    initialMessagesRef: refs.initialMessagesRef,
   };
 
   const connect = useConnect(

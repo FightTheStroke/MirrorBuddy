@@ -66,6 +66,7 @@ function createMockRefs(): ConnectionRefs {
     userSpeechEndTimeRef: { current: null },
     firstAudioPlaybackTimeRef: { current: null },
     sendSessionConfigRef: { current: null },
+    initialMessagesRef: { current: null },
   };
 }
 
