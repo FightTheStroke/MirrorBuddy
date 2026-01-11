@@ -18,7 +18,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  */
 function isWebRTCSupported(): boolean {
   if (typeof window === 'undefined') return false;
-  const w = window as Record<string, unknown>;
+  const w = window as unknown as Record<string, unknown>;
   return !!(
     w.RTCPeerConnection ||
     w.webkitRTCPeerConnection ||
@@ -40,7 +40,7 @@ describe('WebRTC Fallback Mechanism (F-11)', () => {
     it('should detect WebRTC support when RTCPeerConnection is available', () => {
       // In browser with WebRTC: should return true
       if (typeof window !== 'undefined') {
-        const w = window as Record<string, unknown>;
+        const w = window as unknown as Record<string, unknown>;
         const hasWebRTC = !!(
           w.RTCPeerConnection ||
           w.webkitRTCPeerConnection ||
@@ -59,7 +59,7 @@ describe('WebRTC Fallback Mechanism (F-11)', () => {
     it('should handle vendor-prefixed RTCPeerConnection', () => {
       // Different browsers use different prefixes
       if (typeof window !== 'undefined') {
-        const w = window as Record<string, unknown>;
+        const w = window as unknown as Record<string, unknown>;
         const support =
           !!(w.RTCPeerConnection) ||          // Chrome, Firefox, Safari
           !!(w.webkitRTCPeerConnection) ||    // Webkit (older Safari)
@@ -320,7 +320,7 @@ describe('WebRTC Fallback Mechanism (F-11)', () => {
     it('should handle WebRTC null pointer gracefully', () => {
       const checkSupport = () => {
         if (typeof window === 'undefined') return false;
-        const w = window as Record<string, unknown>;
+        const w = window as unknown as Record<string, unknown>;
         return !!(
           w.RTCPeerConnection ||
           w.webkitRTCPeerConnection ||
@@ -336,7 +336,7 @@ describe('WebRTC Fallback Mechanism (F-11)', () => {
     it('should handle missing window object (SSR)', () => {
       const isSupported = () => {
         if (typeof window === 'undefined') return false;
-        const w = window as Record<string, unknown>;
+        const w = window as unknown as Record<string, unknown>;
         return !!(
           w.RTCPeerConnection ||
           w.webkitRTCPeerConnection ||
@@ -354,7 +354,7 @@ describe('WebRTC Fallback Mechanism (F-11)', () => {
       const isSupported = () => {
         checkCount.value++;
         if (typeof window === 'undefined') return false;
-        const w = window as Record<string, unknown>;
+        const w = window as unknown as Record<string, unknown>;
         return !!(w.RTCPeerConnection);
       };
 

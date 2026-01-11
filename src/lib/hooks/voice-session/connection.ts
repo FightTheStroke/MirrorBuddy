@@ -23,7 +23,7 @@ export { useDisconnect } from './connection-cleanup';
  */
 function isWebRTCSupported(): boolean {
   if (typeof window === 'undefined') return false;
-  const w = window as Record<string, unknown>;
+  const w = window as unknown as Record<string, unknown>;
   return !!(
     w.RTCPeerConnection ||
     w.webkitRTCPeerConnection ||

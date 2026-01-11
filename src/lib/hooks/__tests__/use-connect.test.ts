@@ -12,7 +12,8 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { ConnectionRefs } from '../voice-session/connection-types';
-import type { Maestro, ConnectionInfo } from '@/types';
+import type { Maestro } from '@/types';
+import type { ConnectionInfo } from '../voice-session/types';
 
 // ============================================================================
 // MOCKS
@@ -21,28 +22,50 @@ import type { Maestro, ConnectionInfo } from '@/types';
 const mockMaestro: Maestro = {
   id: 'galileo',
   name: 'Galileo',
-  subject: 'Physics',
+  subject: 'physics',
   avatar: '/images/maestri/galileo.png',
   color: '#FF6B6B',
   systemPrompt: 'You are Galileo...',
+  specialty: 'astronomy',
+  voice: 'alloy',
+  voiceInstructions: 'Speak as Galileo',
+  teachingStyle: 'socratic',
+  greeting: 'Ciao!',
 };
 
 const _mockConnectionInfo: ConnectionInfo = {
+  provider: 'azure',
   characterType: 'maestro',
 };
 
 function createMockRefs(): ConnectionRefs {
   return {
+    wsRef: { current: null },
     maestroRef: { current: null },
-    sessionIdRef: { current: null },
+    transportRef: { current: 'websocket' },
+    captureContextRef: { current: null },
+    playbackContextRef: { current: null },
+    mediaStreamRef: { current: null },
+    sourceNodeRef: { current: null },
+    processorRef: { current: null },
+    audioQueueRef: { current: [] },
+    isPlayingRef: { current: false },
+    isBufferingRef: { current: false },
+    nextPlayTimeRef: { current: 0 },
+    scheduledSourcesRef: { current: [] },
     sessionReadyRef: { current: false },
     greetingSentRef: { current: false },
+    hasActiveResponseRef: { current: false },
     handleServerEventRef: { current: null },
-    sendSessionConfigRef: { current: null },
+    sessionIdRef: { current: null },
+    connectionTimeoutRef: { current: null },
     webrtcCleanupRef: { current: null },
-    mediaStreamRef: { current: null },
+    remoteAudioStreamRef: { current: null },
+    webrtcAudioElementRef: { current: null },
     webrtcDataChannelRef: { current: null },
-    transportRef: { current: 'websocket' },
+    userSpeechEndTimeRef: { current: null },
+    firstAudioPlaybackTimeRef: { current: null },
+    sendSessionConfigRef: { current: null },
   };
 }
 
@@ -246,7 +269,7 @@ describe('useConnect Hook - WebRTC Support', () => {
   it('should provide WebRTC support detection', () => {
     function isWebRTCSupported(): boolean {
       if (typeof window === 'undefined') return false;
-      const w = window as Record<string, unknown>;
+      const w = window as unknown as Record<string, unknown>;
       return !!(
         w.RTCPeerConnection ||
         w.webkitRTCPeerConnection ||
@@ -262,7 +285,7 @@ describe('useConnect Hook - WebRTC Support', () => {
   it('should handle missing browser APIs gracefully', () => {
     function isWebRTCSupported(): boolean {
       if (typeof window === 'undefined') return false;
-      const w = window as Record<string, unknown>;
+      const w = window as unknown as Record<string, unknown>;
       return !!(
         w.RTCPeerConnection ||
         w.webkitRTCPeerConnection ||
