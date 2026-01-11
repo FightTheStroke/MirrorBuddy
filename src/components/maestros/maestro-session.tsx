@@ -15,16 +15,21 @@
 import { useRef, useEffect, useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useTTS } from '@/components/accessibility';
-import { HeaderVariantF } from './header-variants/variant-f-vertical-panel';
 import { ToolResultDisplay } from '@/components/tools';
 import { useUIStore } from '@/lib/stores';
 import type { Maestro, ToolType } from '@/types';
 import { useMaestroSessionLogic } from './use-maestro-session-logic';
-import { MaestroSessionHeader } from './maestro-session-header';
 import { MaestroSessionMessages } from './maestro-session-messages';
 import { MaestroSessionInput } from './maestro-session-input';
 import { MaestroSessionWebcam } from './maestro-session-webcam';
 import { cn } from '@/lib/utils';
+import {
+  CharacterHeader,
+  CharacterVoicePanel,
+  maestroToUnified,
+  type VoiceState,
+  type HeaderActions,
+} from '@/components/character';
 
 interface MaestroSessionProps {
   maestro: Maestro;
@@ -41,6 +46,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
   const { setSidebarOpen } = useUIStore();
 
   const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
+  const unifiedCharacter = maestroToUnified(maestro);
 
   const {
     messages,
@@ -73,6 +79,27 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
     setShowWebcam,
     setWebcamRequest,
   } = useMaestroSessionLogic({ maestro, initialMode, requestedToolType });
+
+  // Build unified voice state and actions
+  const voiceState: VoiceState = {
+    isActive: isVoiceActive,
+    isConnected,
+    isListening,
+    isSpeaking,
+    isMuted,
+    inputLevel,
+    outputLevel,
+    connectionState: _connectionState,
+    configError,
+  };
+
+  const headerActions: HeaderActions = {
+    onVoiceCall: handleVoiceCall,
+    onStopTTS: stopTTS,
+    onClearChat: clearChat,
+    onClose,
+    onToggleMute: toggleMute,
+  };
 
   // Auto-scroll to bottom when new messages are added
   useEffect(() => {
@@ -139,18 +166,13 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
       )}>
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full sm:w-auto">
-          {/* Header only shown when NOT in voice call - when in call, everything is in Variant F panel */}
+          {/* Header only shown when NOT in voice call */}
           {!isVoiceActive && (
-            <MaestroSessionHeader
-              maestro={maestro}
-              isVoiceActive={isVoiceActive}
-              isConnected={isConnected}
-              configError={configError}
+            <CharacterHeader
+              character={unifiedCharacter}
+              voiceState={voiceState}
               ttsEnabled={ttsEnabled}
-              onVoiceCall={handleVoiceCall}
-              onStopTTS={stopTTS}
-              onClearChat={clearChat}
-              onClose={onClose}
+              actions={headerActions}
             />
           )}
 
@@ -194,28 +216,15 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
           />
         </div>
 
-        {/* Voice Panel - Variant F (Side by Side on desktop, full width on mobile) */}
+        {/* Voice Panel - Side by Side on desktop, full width on mobile */}
         <AnimatePresence>
           {isVoiceActive && (
-            <div className="w-full sm:w-auto sm:flex-shrink-0">
-              <HeaderVariantF
-                maestro={maestro}
-                isVoiceActive={isVoiceActive}
-                isConnected={isConnected}
-                isListening={isListening}
-                isSpeaking={isSpeaking}
-                isMuted={isMuted}
-                inputLevel={inputLevel}
-                outputLevel={outputLevel}
-                configError={configError}
-                ttsEnabled={ttsEnabled}
-                onVoiceCall={handleVoiceCall}
-                onToggleMute={toggleMute}
-                onStopTTS={stopTTS}
-                onClearChat={clearChat}
-                onClose={onClose}
-              />
-            </div>
+            <CharacterVoicePanel
+              character={unifiedCharacter}
+              voiceState={voiceState}
+              ttsEnabled={ttsEnabled}
+              actions={headerActions}
+            />
           )}
         </AnimatePresence>
       </div>

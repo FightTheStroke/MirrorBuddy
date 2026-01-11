@@ -1,16 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
-import { VoicePanelVariantF } from '@/components/voice/voice-panel-variant-f';
 import { ToolPanel } from '@/components/tools/tool-panel';
 import { getCharacterInfo } from './character-chat-view/utils/character-utils';
 import { useCharacterChat } from './character-chat-view/hooks/use-character-chat';
-import { ChatHeader } from './character-chat-view/components/chat-header';
 import { MessagesList } from './character-chat-view/components/messages-list';
 import { ChatInput } from './character-chat-view/components/chat-input';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { useTTS } from '@/components/accessibility';
+import {
+  CharacterHeader,
+  CharacterVoicePanel,
+  characterInfoToUnified,
+  type VoiceState,
+  type HeaderActions,
+} from '@/components/character';
 
 interface CharacterChatViewProps {
   characterId:
@@ -31,7 +37,9 @@ export function CharacterChatView({
   characterId,
   characterType,
 }: CharacterChatViewProps) {
+  const router = useRouter();
   const character = getCharacterInfo(characterId, characterType);
+  const unifiedCharacter = characterInfoToUnified(character, characterId, characterType);
   const [isToolMinimized, setIsToolMinimized] = useState(false);
   const { speak: _speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
@@ -73,18 +81,41 @@ export function CharacterChatView({
     }
   };
 
+  // Build unified voice state and actions
+  const voiceState: VoiceState = {
+    isActive: isVoiceActive,
+    isConnected,
+    isListening,
+    isSpeaking,
+    isMuted,
+    inputLevel,
+    outputLevel,
+    connectionState,
+    configError,
+  };
+
+  const headerActions: HeaderActions = {
+    onVoiceCall: handleVoiceCall,
+    onStopTTS: stopTTS,
+    onClearChat: () => {}, // TODO: Add clearChat to hook
+    onClose: () => router.back(),
+    onToggleMute: toggleMute,
+  };
+
   const hasActiveTool = activeTool && activeTool.status !== 'error';
 
   return (
     <div className="flex gap-4 h-[calc(100vh-8rem)]">
       <div className="flex-1 flex flex-col min-w-0">
-        <ChatHeader
-          character={character}
-          isVoiceActive={isVoiceActive}
-          isConnected={isConnected}
-          configError={configError}
-          onVoiceCall={handleVoiceCall}
-        />
+        {/* Header only when NOT in voice call */}
+        {!isVoiceActive && (
+          <CharacterHeader
+            character={unifiedCharacter}
+            voiceState={voiceState}
+            ttsEnabled={ttsEnabled}
+            actions={headerActions}
+          />
+        )}
 
         <MessagesList
           messages={messages}
@@ -126,25 +157,11 @@ export function CharacterChatView({
 
       <AnimatePresence>
         {isVoiceActive && (
-          <VoicePanelVariantF
-            character={{
-              name: character.name,
-              avatar: character.avatar,
-              specialty: character.role,
-              color: character.color,
-            }}
-            isConnected={isConnected}
-            isListening={isListening}
-            isSpeaking={isSpeaking}
-            isMuted={isMuted}
-            inputLevel={inputLevel}
-            outputLevel={outputLevel}
-            connectionState={connectionState}
-            configError={configError}
+          <CharacterVoicePanel
+            character={unifiedCharacter}
+            voiceState={voiceState}
             ttsEnabled={ttsEnabled}
-            onToggleMute={toggleMute}
-            onEndCall={handleVoiceCall}
-            onStopTTS={stopTTS}
+            actions={headerActions}
           />
         )}
       </AnimatePresence>
