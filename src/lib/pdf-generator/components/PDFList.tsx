@@ -7,15 +7,13 @@ import React from 'react';
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
 import { PDFText } from './PDFText';
-
-// Use generic style type compatible with react-pdf
-type PDFStyle = object | object[];
+import { mergeStyles, toReactPdfStyle, type StyleInput } from '../utils/style-utils';
 
 interface PDFListProps {
   items: string[];
   profile: ProfileConfig;
   ordered?: boolean;
-  style?: PDFStyle;
+  style?: StyleInput;
 }
 
 /**
@@ -101,17 +99,15 @@ export function PDFList({
   // Filter out empty items
   const validItems = items.filter((item) => item && item.trim());
 
-  const listStyle = style ? [styles.list, style] : styles.list;
+  const listStyle = mergeStyles(styles.list, style);
   const itemStyle = profile.options.chunkedText
-    ? [styles.listItem, styles.dyspraxiaItem]
+    ? toReactPdfStyle([styles.listItem, styles.dyspraxiaItem])
     : styles.listItem;
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <View style={listStyle as any}>
+    <View style={listStyle}>
       {validItems.map((item, index) => (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        <View key={index} style={itemStyle as any}>
+        <View key={index} style={itemStyle}>
           {/* Bullet or number */}
           {ordered ? (
             <Text

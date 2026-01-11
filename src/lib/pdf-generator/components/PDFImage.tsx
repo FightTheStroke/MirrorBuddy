@@ -6,9 +6,7 @@
 import React from 'react';
 import { View, Image, Text, StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
-
-// Use generic style type compatible with react-pdf
-type PDFStyle = object | object[];
+import { mergeStyles, toReactPdfStyle, type StyleInput } from '../utils/style-utils';
 
 interface PDFImageProps {
   src: string;
@@ -17,7 +15,7 @@ interface PDFImageProps {
   profile: ProfileConfig;
   width?: number | string;
   height?: number | string;
-  style?: PDFStyle;
+  style?: StyleInput;
 }
 
 /**
@@ -126,23 +124,19 @@ export function PDFImage({
   const hasValidSource = isValidImageSource(src);
 
   // Build image style array
-  const imageStyle: object[] = [styles.image];
-  if (width) imageStyle.push({ width });
-  if (height) imageStyle.push({ height });
+  const imageStyleArray: object[] = [styles.image];
+  if (width) imageStyleArray.push({ width });
+  if (height) imageStyleArray.push({ height });
+  const imageStyle = toReactPdfStyle(imageStyleArray);
 
-  const viewStyle = style ? [containerStyle, style] : containerStyle;
+  const viewStyle = mergeStyles(containerStyle, style);
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <View style={viewStyle as any}>
+    <View style={viewStyle}>
       {/* Image (if valid source) */}
       {hasValidSource && (
         // eslint-disable-next-line jsx-a11y/alt-text
-        <Image
-          src={src}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          style={imageStyle as any}
-        />
+        <Image src={src} style={imageStyle} />
       )}
 
       {/* ALT text - always visible for accessibility */}

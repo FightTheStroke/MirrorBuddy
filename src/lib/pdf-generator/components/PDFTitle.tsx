@@ -6,15 +6,13 @@
 import React from 'react';
 import { Text, StyleSheet, View } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
-
-// Use generic style type compatible with react-pdf
-type PDFStyle = object | object[];
+import { mergeStyles, type StyleInput } from '../utils/style-utils';
 
 interface PDFTitleProps {
   children: React.ReactNode;
   level?: 1 | 2 | 3;
   profile: ProfileConfig;
-  style?: PDFStyle;
+  style?: StyleInput;
 }
 
 /**
@@ -74,15 +72,13 @@ export function PDFTitle({
   style,
 }: PDFTitleProps) {
   const styles = createTitleStyles(level, profile);
-
-  const titleStyle = style ? [styles.title, style] : styles.title;
+  const titleStyle = mergeStyles(styles.title, style);
 
   // ADHD profile: add visual separators for h1 and h2
   if (profile.options.clearSections && level <= 2) {
     return (
       <View>
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        <Text style={titleStyle as any}>{children}</Text>
+        <Text style={titleStyle}>{children}</Text>
         <View style={styles.adhdSeparator} />
       </View>
     );
@@ -93,12 +89,10 @@ export function PDFTitle({
     return (
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View style={styles.dyspraxiaMarker} />
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        <Text style={titleStyle as any}>{children}</Text>
+        <Text style={titleStyle}>{children}</Text>
       </View>
     );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <Text style={titleStyle as any}>{children}</Text>;
+  return <Text style={titleStyle}>{children}</Text>;
 }
