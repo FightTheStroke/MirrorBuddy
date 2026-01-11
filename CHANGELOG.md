@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 11 - Chat Streaming)
+
+#### Real-time Chat Streaming (ADR 0034)
+
+**What it does**: Chat responses now stream in real-time instead of waiting for the full response.
+
+**How it works**:
+1. Student sends a message to a Maestro
+2. Response streams character by character via Server-Sent Events (SSE)
+3. First content appears in ~100-200ms instead of 3-8 seconds
+4. Tool requests (mindmap, quiz, etc.) automatically route to non-streaming endpoint
+
+**Why it matters**: Students with ADHD or anxiety benefit from immediate visual feedback. No more staring at a blank screen wondering if the app is working.
+
+**Technical Details**:
+- **Endpoint**: `POST /api/chat/stream` for streaming, `/api/chat` for tools
+- **Feature flag**: `ENABLE_CHAT_STREAMING=true` (default)
+- **Provider**: Azure OpenAI only (Ollama doesn't support streaming)
+- **Safety**: StreamingSanitizer processes chunks in real-time
+- **Fallback**: Automatic if streaming unavailable
+
+**Key Files**:
+- `src/lib/ai/providers/azure-streaming.ts` - SSE client
+- `src/app/api/chat/stream/route.ts` - Streaming endpoint
+- `src/lib/hooks/use-streaming-chat.ts` - React hook
+- `docs/adr/0034-chat-streaming-architecture.md` - Architecture decision
+
 ### Added (Jan 5 - Progressive Learning Path MVP)
 
 #### Plan 8: Guided Study Paths
