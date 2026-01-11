@@ -262,10 +262,13 @@ export async function POST(request: NextRequest) {
               { maestroId, conversationId: undefined, userId }
             );
 
+            // Material ID to use in toolCallRef (from saved material or fallback to tool result)
+            let materialId: string | undefined;
+
             if (toolResult.success && toolResult.data) {
               // Save tool result to Material table (content duplication reduction)
               try {
-                await saveTool({
+                const savedMaterial = await saveTool({
                   userId: userId || 'anonymous',
                   type: toolType,
                   title: args.title || args.topic || `${toolType} tool`,
@@ -274,6 +277,8 @@ export async function POST(request: NextRequest) {
                   topic: args.topic,
                   sourceToolId: typeof args.sourceToolId === 'string' ? args.sourceToolId : undefined,
                 });
+                // Use the saved material's toolId (fixes ID mismatch bug)
+                materialId = savedMaterial.toolId;
               } catch (saveError) {
                 logger.warn('Failed to save tool to Material table', {
                   toolType,
@@ -284,12 +289,12 @@ export async function POST(request: NextRequest) {
 
             // Return lightweight ToolCallRef (without result.data)
             toolCallRefs.push({
-              id: toolResult.toolId || toolCall.id,
+              id: materialId || toolResult.toolId || toolCall.id,
               type: toolType,
               name: toolCall.function.name,
               status: toolResult.success ? 'completed' : 'error',
               error: toolResult.error,
-              materialId: toolResult.toolId,
+              materialId,
             });
           } catch (toolError) {
             logger.error('Tool execution failed', {
