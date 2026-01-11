@@ -41,6 +41,7 @@ export interface HeaderActions {
   onVoiceCall: () => void;
   onStopTTS: () => void;
   onClearChat: () => void;
+  onOpenHistory?: () => void;
   onClose: () => void;
   onToggleMute?: () => void;
 }

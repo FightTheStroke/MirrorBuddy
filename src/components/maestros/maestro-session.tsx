@@ -30,6 +30,7 @@ import {
   type VoiceState,
   type HeaderActions,
 } from '@/components/character';
+import { ConversationDrawer } from '@/components/conversation/conversation-drawer';
 
 interface MaestroSessionProps {
   maestro: Maestro;
@@ -42,6 +43,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [fullscreenToolId, setFullscreenToolId] = useState<string | null>(null);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const sidebarStateBeforeFullscreen = useRef<boolean | null>(null);
   const { setSidebarOpen } = useUIStore();
 
@@ -99,6 +101,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
     onClearChat: clearChat,
     onClose,
     onToggleMute: toggleMute,
+    onOpenHistory: () => setIsHistoryOpen(true),
   };
 
   // Auto-scroll to bottom when new messages are added
@@ -228,6 +231,22 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
           )}
         </AnimatePresence>
       </div>
+
+      {/* Conversation History Drawer */}
+      <ConversationDrawer
+        open={isHistoryOpen}
+        onOpenChange={setIsHistoryOpen}
+        characterId={maestro.id}
+        characterType="maestro"
+        onSelectConversation={(id) => {
+          // TODO: Load selected conversation
+          setIsHistoryOpen(false);
+        }}
+        onNewConversation={() => {
+          // TODO: Clear current conversation
+          setIsHistoryOpen(false);
+        }}
+      />
     </>
   );
 }

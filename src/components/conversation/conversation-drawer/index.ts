@@ -5,6 +5,9 @@
 
 export { ConversationDrawer } from './conversation-drawer';
 export { DrawerSearch } from './drawer-search';
+export { DrawerItem } from './drawer-item';
+export { DrawerList } from './drawer-list';
+export { DeleteConfirmDialog } from './delete-confirm-dialog';
 export type {
   ConversationDrawerProps,
   ConversationSummary,
