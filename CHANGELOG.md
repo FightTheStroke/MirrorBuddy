@@ -36,6 +36,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/lib/hooks/use-streaming-chat.ts` - React hook
 - `docs/adr/0034-chat-streaming-architecture.md` - Architecture decision
 
+### Added (Jan 10 - Conte Mascetti & Character Overhaul)
+
+#### Conte Mascetti Maestro (PR #119)
+
+**What it does**: Adds the iconic Conte Mascetti from "Amici Miei" as a philosophy/life wisdom maestro.
+
+**Character Features**:
+- Authentic persona with embedded knowledge from all 3 Amici Miei films
+- Famous supercazzole and zingarate references
+- Vintage rotary phone icon for voice calls
+- Italian cultural immersion
+
+**Technical Details**:
+- Character authenticity overhaul across all maestri
+- Embedded knowledge base pattern for character-specific facts
+- System prompts rewritten for consistency
+
+### Added (Jan 8-9 - PostgreSQL & RAG)
+
+#### PostgreSQL Migration (ADR 0028)
+
+**What it does**: Migrates from SQLite to PostgreSQL with pgvector for semantic search.
+
+**Why it matters**: Enables AI-powered semantic search across study materials, finding related content based on meaning, not just keywords.
+
+**Technical Details**:
+- PostgreSQL with pgvector extension for embeddings
+- Binary engine configuration for ARM64 compatibility
+- Schema migration scripts included
+
+#### RAG Semantic Search (ADR 0033)
+
+**What it does**: Retrieval-Augmented Generation for contextual AI responses.
+
+**How it works**:
+1. Student asks question to Maestro
+2. System finds semantically similar materials from their uploaded content
+3. Relevant materials injected into AI context
+4. More personalized, accurate responses
+
+**Technical Details**:
+- Wave 4 implementation: `findSimilarMaterials()` retrieval service
+- Embedding generation via Azure OpenAI
+- Graceful degradation if RAG unavailable
+
+#### Knowledge Graph (Wave 3)
+
+**What it does**: Connects concepts across student's learning materials.
+
+**Technical Details**:
+- Knowledge Graph models and APIs
+- Concept extraction and relationship mapping
+- Foundation for future "connections" feature
+
+### Changed (Jan 7 - E2E Test Optimization)
+
+#### Test Suite Refactor
+
+**Before**: 2410 E2E tests requiring real AI providers
+**After**: 70 focused API tests with mocks
+
+**Why**: E2E tests were slow, flaky, and expensive. New suite runs in CI without AI costs.
+
 ### Added (Jan 5 - Progressive Learning Path MVP)
 
 #### Plan 8: Guided Study Paths
