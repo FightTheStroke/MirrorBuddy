@@ -20,11 +20,14 @@ export interface AudioCaptureRefs {
 }
 
 /**
- * Start capturing audio from microphone and streaming to WebSocket
+ * Start capturing audio from microphone
+ * - In WebSocket mode: streams PCM16 via WebSocket with resampling
+ * - In WebRTC mode: audio sent via media track (no ScriptProcessor, no resampling)
  */
 export function useStartAudioCapture(
   refs: AudioCaptureRefs,
   wsRef: React.MutableRefObject<WebSocket | null>,
+  transportRef: React.MutableRefObject<'websocket' | 'webrtc'>,
   hasActiveResponseRef: React.MutableRefObject<boolean>,
   isMuted: boolean,
   setInputLevel: (value: number) => void
@@ -37,11 +40,24 @@ export function useStartAudioCapture(
 
     const context = refs.captureContextRef.current;
     const nativeSampleRate = context.sampleRate;
-    logger.debug(`[VoiceSession] Starting audio capture at ${nativeSampleRate}Hz, resampling to ${AZURE_SAMPLE_RATE}Hz`);
 
     const source = context.createMediaStreamSource(refs.mediaStreamRef.current);
     // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
     refs.sourceNodeRef.current = source;
+
+    // === WEBRTC MODE: Skip processor, use analyser for input levels only ===
+    if (transportRef.current === 'webrtc') {
+      logger.debug('[VoiceSession] WebRTC mode: skipping ScriptProcessor and resampling (codec handled by RTCPeerConnection)');
+      // Create analyser for input levels only (no audio processing)
+      refs.analyserRef.current = context.createAnalyser();
+      refs.analyserRef.current.fftSize = 256;
+      source.connect(refs.analyserRef.current);
+      logger.debug('[VoiceSession] Audio capture started (WebRTC, input level monitoring only)');
+      return;
+    }
+
+    // === WEBSOCKET MODE: Full audio processing pipeline ===
+    logger.debug(`[VoiceSession] WebSocket mode: capturing at ${nativeSampleRate}Hz, resampling to ${AZURE_SAMPLE_RATE}Hz`);
 
     // Create analyser for input levels
     refs.analyserRef.current = context.createAnalyser();
@@ -53,8 +69,6 @@ export function useStartAudioCapture(
     refs.processorRef.current = processor;
 
     processor.onaudioprocess = (event) => {
-      if (wsRef.current?.readyState !== WebSocket.OPEN) return;
-
       // ALWAYS update input level (even when muted) - for visualization
       const now = performance.now();
       if (now - refs.lastLevelUpdateRef.current > 30 && refs.analyserRef.current) {
@@ -65,6 +79,9 @@ export function useStartAudioCapture(
         // Scale up for better visualization (mic levels are often quiet)
         setInputLevel(Math.min(1, (average / 255) * 2));
       }
+
+      // Send audio via WebSocket if available
+      if (wsRef.current?.readyState !== WebSocket.OPEN) return;
 
       // Don't send audio if muted
       if (isMuted) return;
@@ -91,6 +108,6 @@ export function useStartAudioCapture(
 
     source.connect(processor);
     processor.connect(context.destination);
-    logger.debug('[VoiceSession] Audio capture started');
-  }, [refs, wsRef, hasActiveResponseRef, isMuted, setInputLevel]);
+    logger.debug('[VoiceSession] Audio capture started (WebSocket, full processing)');
+  }, [refs, wsRef, transportRef, hasActiveResponseRef, isMuted, setInputLevel]);
 }
