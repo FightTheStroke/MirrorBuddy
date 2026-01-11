@@ -204,7 +204,7 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
     };
 
   } catch (error) {
-    const webrtcInfo = webrtcSupported ? 'WebRTC supportato' : 'WebRTC non supportato';
+    const webrtcInfo = isWebRTCSupported() ? 'WebRTC supportato' : 'WebRTC non supportato';
     return {
       status: 'error',
       message: 'Voice test fallito',

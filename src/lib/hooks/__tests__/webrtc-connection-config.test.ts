@@ -11,7 +11,8 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import type { WebRTCConnectionConfig, WebRTCConnectionResult } from '../voice-session/webrtc-connection';
-import type { Maestro, ConnectionInfo } from '@/types';
+import type { Maestro } from '@/types';
+import type { ConnectionInfo } from '../voice-session/types';
 
 // ============================================================================
 // TEST DATA
@@ -20,13 +21,19 @@ import type { Maestro, ConnectionInfo } from '@/types';
 const mockMaestro: Maestro = {
   id: 'galileo',
   name: 'Galileo',
-  subject: 'Physics',
+  subject: 'physics',
   avatar: '/images/maestri/galileo.png',
   color: '#FF6B6B',
   systemPrompt: 'You are Galileo...',
+  specialty: 'astronomy',
+  voice: 'alloy',
+  voiceInstructions: 'Speak as Galileo',
+  teachingStyle: 'socratic',
+  greeting: 'Ciao!',
 };
 
 const mockConnectionInfo: ConnectionInfo = {
+  provider: 'azure',
   characterType: 'maestro',
 };
 
