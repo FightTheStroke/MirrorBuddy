@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { GraduationCap, Trophy, Settings, Calendar, Heart, Sparkles, MessageSquare, PencilRuler, Backpack } from 'lucide-react';
+import { GraduationCap, Trophy, Settings, Calendar, Heart, Sparkles, PencilRuler, Backpack } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useProgressStore, useSettingsStore } from '@/lib/stores';
 import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
@@ -15,7 +15,7 @@ import { MaestroSession } from '@/components/maestros/maestro-session';
 import { LazyCalendarView, LazyGenitoriView } from '@/components/education';
 import { ZainoView } from '@/app/supporti/components/zaino-view';
 import { AstuccioView } from '@/app/astuccio/components/astuccio-view';
-import { CharacterChatView, ConversationHistory, ConversationDetail } from '@/components/conversation';
+import { CharacterChatView } from '@/components/conversation';
 import { LazySettingsView } from '@/components/settings';
 import { LazyProgressView } from '@/components/progress';
 import { HomeHeader } from './home-header';
@@ -46,7 +46,6 @@ export default function Home() {
   const [maestroSessionMode, setMaestroSessionMode] = useState<MaestroSessionMode>('voice');
   const [maestroSessionKey, setMaestroSessionKey] = useState(0);
   const [requestedToolType, setRequestedToolType] = useState<ToolType | undefined>(undefined);
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -76,7 +75,6 @@ export default function Home() {
         }
       }
     }
-    if (newView !== 'storia') setSelectedConversationId(null);
     setCurrentView(newView);
   };
 
@@ -102,7 +100,6 @@ export default function Home() {
     { id: 'coach' as const, label: coachInfo.name, icon: Sparkles, isChat: true, avatar: coachInfo.avatar },
     { id: 'buddy' as const, label: buddyInfo.name, icon: Heart, isChat: true, avatar: buddyInfo.avatar },
     { id: 'maestri' as const, label: 'Professori', icon: GraduationCap },
-    { id: 'storia' as const, label: 'Storia', icon: MessageSquare },
     { id: 'astuccio' as const, label: 'Astuccio', icon: PencilRuler },
     { id: 'supporti' as const, label: 'Zaino', icon: Backpack },
     { id: 'calendar' as const, label: 'Calendario', icon: Calendar },
@@ -174,15 +171,6 @@ export default function Home() {
           {currentView === 'progress' && <LazyProgressView />}
           {currentView === 'genitori' && <LazyGenitoriView />}
           {currentView === 'settings' && <LazySettingsView />}
-          {currentView === 'storia' && (
-            <div className="max-w-6xl mx-auto">
-              {selectedConversationId ? (
-                <ConversationDetail conversationId={selectedConversationId} onBack={() => setSelectedConversationId(null)} />
-              ) : (
-                <ConversationHistory onConversationSelect={(id) => setSelectedConversationId(id)} />
-              )}
-            </div>
-          )}
         </motion.div>
       </main>
     </div>
