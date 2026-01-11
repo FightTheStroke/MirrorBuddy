@@ -96,13 +96,22 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
     configError,
   };
 
+  // Handle opening history - close voice first if active
+  const handleOpenHistory = () => {
+    if (isVoiceActive) {
+      // Close voice call first, then open history
+      handleVoiceCall(); // This toggles voice off
+    }
+    setIsHistoryOpen(!isHistoryOpen);
+  };
+
   const headerActions: HeaderActions = {
     onVoiceCall: handleVoiceCall,
     onStopTTS: stopTTS,
     onClearChat: clearChat,
     onClose,
     onToggleMute: toggleMute,
-    onOpenHistory: () => setIsHistoryOpen(!isHistoryOpen),
+    onOpenHistory: handleOpenHistory,
   };
 
   // Auto-scroll to bottom when new messages are added
@@ -218,21 +227,16 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
           />
         </div>
 
-        {/* Right Panel: Voice Panel */}
+        {/* Right Panel: Voice OR History (mutually exclusive, same position) */}
         <AnimatePresence>
-          {isVoiceActive && (
+          {isVoiceActive ? (
             <CharacterVoicePanel
               character={unifiedCharacter}
               voiceState={voiceState}
               ttsEnabled={ttsEnabled}
               actions={headerActions}
             />
-          )}
-        </AnimatePresence>
-
-        {/* History Sidebar - can appear alongside voice panel as overlay */}
-        <AnimatePresence>
-          {isHistoryOpen && (
+          ) : isHistoryOpen ? (
             <ConversationSidebar
               open={isHistoryOpen}
               onOpenChange={setIsHistoryOpen}
@@ -248,7 +252,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
                 setIsHistoryOpen(false);
               }}
             />
-          )}
+          ) : null}
         </AnimatePresence>
       </div>
     </>
