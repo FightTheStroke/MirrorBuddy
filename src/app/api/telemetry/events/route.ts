@@ -38,7 +38,18 @@ export async function POST(request: Request) {
     const cookieStore = await cookies();
     const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
-    const body: EventPayload = await request.json();
+    // Handle empty or malformed JSON body gracefully
+    let body: EventPayload;
+    try {
+      const text = await request.text();
+      if (!text || text.trim() === '') {
+        return NextResponse.json({ stored: 0 });
+      }
+      body = JSON.parse(text);
+    } catch {
+      // Empty body or cancelled request - not an error, just nothing to store
+      return NextResponse.json({ stored: 0 });
+    }
 
     if (!body.events || !Array.isArray(body.events)) {
       return NextResponse.json({ error: 'Invalid events payload' }, { status: 400 });
