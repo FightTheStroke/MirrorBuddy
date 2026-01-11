@@ -218,16 +218,21 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
           />
         </div>
 
-        {/* Right Panel: Voice OR History (mutually exclusive) */}
+        {/* Right Panel: Voice Panel */}
         <AnimatePresence>
-          {isVoiceActive ? (
+          {isVoiceActive && (
             <CharacterVoicePanel
               character={unifiedCharacter}
               voiceState={voiceState}
               ttsEnabled={ttsEnabled}
               actions={headerActions}
             />
-          ) : isHistoryOpen ? (
+          )}
+        </AnimatePresence>
+
+        {/* History Sidebar - can appear alongside voice panel as overlay */}
+        <AnimatePresence>
+          {isHistoryOpen && (
             <ConversationSidebar
               open={isHistoryOpen}
               onOpenChange={setIsHistoryOpen}
@@ -243,7 +248,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
                 setIsHistoryOpen(false);
               }}
             />
-          ) : null}
+          )}
         </AnimatePresence>
       </div>
     </>
