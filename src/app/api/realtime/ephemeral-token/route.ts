@@ -2,7 +2,8 @@
 // API ROUTE: Get ephemeral token for Azure OpenAI Realtime WebRTC
 // Calls Azure REST API to create a session and return ephemeral token
 // SECURITY: API key is NEVER exposed to client
-// TOKEN CACHING: 5-minute buffer, rate-limited to 1 req/sec per IP
+// NOTE: Each request creates a unique session - no caching to prevent
+//       multiple clients sharing the same session (security/privacy issue)
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -23,25 +24,8 @@ interface EphemeralTokenResponse {
   sessionId: string;
 }
 
-// In-memory token cache: deployment -> { token, expiresAt, sessionId }
-interface TokenCacheEntry {
-  token: string;
-  expiresAt: number;
-  sessionId: string;
-}
-const tokenCache = new Map<string, TokenCacheEntry>();
-
 // Per-IP rate limit tracker: clientId -> last request timestamp (ms)
 const rateLimitTracker = new Map<string, number>();
-
-/**
- * Check if cached token is still valid (>300 seconds remaining before expiry)
- */
-function isCachedTokenValid(cacheEntry: TokenCacheEntry): boolean {
-  const nowSeconds = Math.floor(Date.now() / 1000);
-  const secondsRemaining = cacheEntry.expiresAt - nowSeconds;
-  return secondsRemaining > 300; // 5 minutes remaining
-}
 
 /**
  * Check per-IP rate limit: 1 request per second maximum
@@ -88,27 +72,6 @@ export async function POST(request: NextRequest) {
   // Azure OpenAI Realtime configuration (required)
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
   const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
-
-  // Use deployment name as cache key
-  const cacheKey = azureDeployment || 'default';
-
-  // Check for cached token (deployment-level caching)
-  const cachedEntry = tokenCache.get(cacheKey);
-  if (cachedEntry && isCachedTokenValid(cachedEntry)) {
-    logger.info('Returning cached ephemeral token', {
-      clientId,
-      cacheKey,
-      expiresAt: cachedEntry.expiresAt,
-    });
-    return NextResponse.json(
-      {
-        token: cachedEntry.token,
-        expiresAt: cachedEntry.expiresAt,
-        sessionId: cachedEntry.sessionId,
-      },
-      { status: 200 }
-    );
-  }
 
   // Rate limiting: 30 requests per minute per IP (global rate limit)
   const rateLimit = checkRateLimit(
@@ -201,25 +164,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Cache the new token for future requests (expires in ~60 minutes, we return cached if >5min remain)
-    tokenCache.set(cacheKey, {
-      token: client_secret.value,
-      expiresAt: client_secret.expires_at,
-      sessionId: sessionId || '',
-    });
-
-    // Return ephemeral token to client
+    // Return ephemeral token to client (unique session per request)
     const payload: EphemeralTokenResponse = {
       token: client_secret.value,
       expiresAt: client_secret.expires_at,
       sessionId: sessionId || '',
     };
 
-    logger.info('Ephemeral token issued (cached)', {
+    logger.info('Ephemeral token issued (unique session)', {
       clientId,
       sessionId,
       expiresAt: client_secret.expires_at,
-      cacheKey,
     });
 
     return NextResponse.json(payload, { status: 200 });
