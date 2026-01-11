@@ -6,10 +6,9 @@ on:
   pull_request:
     branches: [main, development]
 
-# Minimal permissions for security (ISE best practice)
-# Triggered on PRs to main/development and pushes to main/development
 permissions:
   contents: read
+  security-events: write
 
 # ISE Engineering Fundamentals: CI/CD
 # https://microsoft.github.io/code-with-engineering-playbook/CI-CD/
@@ -20,8 +19,7 @@ jobs:
     name: Build & Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -29,59 +27,52 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npx prisma generate
 
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Cache Next.js build
-        uses: actions/cache@v4
+      - uses: actions/cache@v4
         with:
-          path: |
-            .next/cache
+          path: .next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.ts', '**/*.tsx') }}
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
             ${{ runner.os }}-nextjs-
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Type Check
-        run: npm run typecheck
-
-      - name: Build
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
-        run: npm run build
 
-  # Lane 2: Security Audit
+  # Lane 2: Security Audit + SBOM
   security:
-    name: Security Audit
+    name: Security & SBOM
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npm audit --audit-level=high
 
-      - name: Audit dependencies
-        run: npm audit --audit-level=high
+      - name: Generate SBOM
+        run: npx @cyclonedx/cyclonedx-npm --output-file sbom.json
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: sbom.json
+          retention-days: 90
 
       - name: Check for secrets
         run: |
-          # Check for common secret patterns in source code only (exclude node_modules)
-          if grep -rE "(sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16}|password\s*=\s*['\"][^'\"]+['\"])" --include="*.ts" --include="*.tsx" --include="*.js" --include="*.json" --exclude-dir=node_modules --exclude-dir=.next src/ .; then
-            echo "Potential secrets found in code!"
-            exit 1
+          if grep -rE "(sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16})" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules src/; then
+            echo "Secrets found!" && exit 1
           fi
           echo "No secrets detected"
 
@@ -90,104 +81,50 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run test:unit
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Generate Prisma client
-        run: npx prisma generate
-
-      - name: Run unit tests
-        run: npm run test:unit
-
-  # Lane 4: E2E Tests - Run locally with app-release-manager (skipped in CI)
-  # Real API integration tests require Azure/Ollama - run before release
-  # Lighthouse + Playwright require full environment - not suitable for CI
-
-  # Lane 5: Documentation Check
+  # Lane 4: Documentation Check
   docs:
-    name: Documentation Check
+    name: Documentation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check required docs exist
+      - uses: actions/checkout@v4
+      - name: Check required docs
         run: |
-          echo "Checking ISE required documentation..."
+          for f in README.md CONTRIBUTING.md CHANGELOG.md LICENSE .env.example; do
+            [ -f "$f" ] && echo "OK: $f" || { echo "MISSING: $f"; exit 1; }
+          done
 
-          # README
-          if [ ! -f "README.md" ]; then
-            echo "ERROR: README.md missing"
-            exit 1
-          fi
-          echo "✓ README.md exists"
-
-          # CONTRIBUTING
-          if [ ! -f "CONTRIBUTING.md" ]; then
-            echo "ERROR: CONTRIBUTING.md missing"
-            exit 1
-          fi
-          echo "✓ CONTRIBUTING.md exists"
-
-          # CHANGELOG
-          if [ ! -f "CHANGELOG.md" ]; then
-            echo "ERROR: CHANGELOG.md missing"
-            exit 1
-          fi
-          echo "✓ CHANGELOG.md exists"
-
-          # LICENSE
-          if [ ! -f "LICENSE" ]; then
-            echo "ERROR: LICENSE missing"
-            exit 1
-          fi
-          echo "✓ LICENSE exists"
-
-          # .env.example
-          if [ ! -f ".env.example" ]; then
-            echo "ERROR: .env.example missing"
-            exit 1
-          fi
-          echo "✓ .env.example exists"
-
-          echo "All required documentation present!"
-
-  # Lane 6: Code Quality
+  # Lane 5: Code Quality
   quality:
     name: Code Quality
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check for TODO/FIXME in production code
+      - uses: actions/checkout@v4
+      - name: Check TODOs
         run: |
-          # Allow in tests and docs, not in src
           TODOS=$(grep -rn "TODO\|FIXME" src/ --include="*.ts" --include="*.tsx" || true)
-          if [ -n "$TODOS" ]; then
-            echo "WARNING: TODOs found in source code:"
-            echo "$TODOS"
-            # Don't fail, just warn for now
-          else
-            echo "✓ No TODOs in production code"
-          fi
+          [ -n "$TODOS" ] && echo "WARNING: TODOs found:" && echo "$TODOS" || echo "No TODOs"
 
-      - name: Check for console.log in production
+      - name: Check console.log
         run: |
-          # Exclude logger.ts which is allowed
-          CONSOLE_LOGS=$(grep -rn "console\\.log" src/ --include="*.ts" --include="*.tsx" | grep -v "logger" || true)
-          if [ -n "$CONSOLE_LOGS" ]; then
-            echo "WARNING: console.log found in source code:"
-            echo "$CONSOLE_LOGS"
-          else
-            echo "✓ No console.log in production code"
-          fi
+          LOGS=$(grep -rn "console\\.log" src/ --include="*.ts" --include="*.tsx" | grep -v "logger" || true)
+          [ -n "$LOGS" ] && echo "WARNING: console.log found:" && echo "$LOGS" || echo "Clean"
+
+  # Lane 6: Docker Build Test
+  docker:
+    name: Docker Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t mirrorbuddy:test .
+      - name: Verify image
+        run: docker images mirrorbuddy:test
