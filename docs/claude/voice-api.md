@@ -52,6 +52,26 @@ AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime-mini
 
 3. Test qualità con Maestri prima di produzione
 
+## WebRTC Transport (Recommended)
+
+As of January 2026, MirrorBuddy uses WebRTC for voice by default.
+
+### Configuration
+Set `VOICE_TRANSPORT=webrtc` (default) or `VOICE_TRANSPORT=websocket` for fallback.
+
+### Architecture
+- Client fetches ephemeral token from `/api/realtime/ephemeral-token`
+- Direct SDP exchange with Azure Realtime API
+- Audio via native WebRTC tracks
+- JSON events via RTCDataChannel
+
+### Benefits
+- Lower latency (~200-350ms vs ~450-900ms with WebSocket)
+- Native barge-in support
+- No server-side audio proxy needed
+
+---
+
 ## Trascrizione Audio (input_audio_transcription)
 
 ### Modelli Disponibili nel Realtime API
