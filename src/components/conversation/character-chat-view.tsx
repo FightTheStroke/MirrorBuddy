@@ -98,13 +98,21 @@ export function CharacterChatView({
     configError,
   };
 
+  // Handle opening history - close voice first if active
+  const handleOpenHistory = () => {
+    if (isVoiceActive) {
+      handleVoiceCall(); // This toggles voice off
+    }
+    setIsHistoryOpen(!isHistoryOpen);
+  };
+
   const headerActions: HeaderActions = {
     onVoiceCall: handleVoiceCall,
     onStopTTS: stopTTS,
     onClearChat: clearChat,
     onClose: () => router.back(),
     onToggleMute: toggleMute,
-    onOpenHistory: () => setIsHistoryOpen(!isHistoryOpen),
+    onOpenHistory: handleOpenHistory,
   };
 
   const hasActiveTool = activeTool && activeTool.status !== 'error';
@@ -159,21 +167,16 @@ export function CharacterChatView({
         </div>
       )}
 
-      {/* Right Panel: Voice Panel */}
+      {/* Right Panel: Voice OR History (mutually exclusive, same position) */}
       <AnimatePresence>
-        {isVoiceActive && (
+        {isVoiceActive ? (
           <CharacterVoicePanel
             character={unifiedCharacter}
             voiceState={voiceState}
             ttsEnabled={ttsEnabled}
             actions={headerActions}
           />
-        )}
-      </AnimatePresence>
-
-      {/* History Sidebar - fixed overlay, can appear alongside voice panel */}
-      <AnimatePresence>
-        {isHistoryOpen && (
+        ) : isHistoryOpen ? (
           <ConversationSidebar
             open={isHistoryOpen}
             onOpenChange={setIsHistoryOpen}
@@ -189,7 +192,7 @@ export function CharacterChatView({
               setIsHistoryOpen(false);
             }}
           />
-        )}
+        ) : null}
       </AnimatePresence>
     </div>
   );
