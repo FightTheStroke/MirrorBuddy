@@ -24,6 +24,7 @@ import {
 import {
   isStreamingAvailable,
   sendStreamingMessage,
+  messageRequiresTool,
 } from './streaming-handler';
 import {
   requestTool,
@@ -208,8 +209,10 @@ export function useCharacterChat(
       });
     }
 
-    // Try streaming if enabled
-    if (streamingEnabled) {
+    // Try streaming if enabled AND message doesn't require tools
+    // Tool requests must go through non-streaming endpoint for tool support
+    const needsTool = messageRequiresTool(userMessage.content);
+    if (streamingEnabled && !needsTool) {
       const abortController = new AbortController();
       streamAbortRef.current = abortController;
       setIsStreaming(true);
