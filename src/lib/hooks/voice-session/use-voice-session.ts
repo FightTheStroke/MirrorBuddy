@@ -5,9 +5,8 @@
 
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores';
-import type { Maestro } from '@/types';
 import type { UseVoiceSessionOptions } from './types';
 import { useInitPlaybackContext, useScheduleQueuedChunks, usePlayNextChunk, useOutputLevelPolling } from './audio-playback';
 import { useStartAudioCapture } from './audio-capture';
@@ -15,181 +14,106 @@ import { useSendGreeting, useSendSessionConfig } from './session-config';
 import { useHandleServerEvent } from './event-handlers';
 import { useConnect, useDisconnect } from './connection';
 import { useToggleMute, useSendText, useCancelResponse, useSendWebcamResult } from './actions';
+import { useVoiceSessionRefs, useConnectionState } from './use-voice-session-refs';
 
 export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
-  const {
-    isConnected,
-    isListening,
-    isSpeaking,
-    isMuted,
-    currentMaestro,
-    transcript,
-    toolCalls,
-    inputLevel,
-    outputLevel,
-    setConnected,
-    setListening,
-    setSpeaking,
-    setMuted,
-    setCurrentMaestro,
-    addTranscript,
-    clearTranscript,
-    addToolCall,
-    updateToolCall,
-    clearToolCalls,
-    setInputLevel,
-    setOutputLevel,
-    reset,
-  } = useVoiceSessionStore();
+  const store = useVoiceSessionStore();
+  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled } = useSettingsStore();
 
-  const {
-    preferredMicrophoneId,
-    preferredOutputId,
-    voiceBargeInEnabled,
-  } = useSettingsStore();
-
-  // ============================================================================
-  // REFS
-  // ============================================================================
-
-  const wsRef = useRef<WebSocket | null>(null);
-  const maestroRef = useRef<Maestro | null>(null);
-
-  // Audio contexts
-  const captureContextRef = useRef<AudioContext | null>(null);
-  const playbackContextRef = useRef<AudioContext | null>(null);
-
-  // Capture nodes
-  const mediaStreamRef = useRef<MediaStream | null>(null);
-  const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const processorRef = useRef<ScriptProcessorNode | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-
-  // Playback state
-  const audioQueueRef = useRef<Int16Array[]>([]);
-  const isPlayingRef = useRef(false);
-  const lastLevelUpdateRef = useRef<number>(0);
-  const playNextChunkRef = useRef<(() => void) | null>(null);
-  const nextPlayTimeRef = useRef<number>(0);
-  const scheduledSourcesRef = useRef<AudioBufferSourceNode[]>([]);
-  const isBufferingRef = useRef(true);
-  const playbackAnalyserRef = useRef<AnalyserNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
-
-  // Session state
-  const sessionReadyRef = useRef(false);
-  const greetingSentRef = useRef(false);
-  const hasActiveResponseRef = useRef(false);
-  const handleServerEventRef = useRef<((event: Record<string, unknown>) => void) | null>(null);
-  const sessionIdRef = useRef<string | null>(null);
-  const connectionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-  const [connectionState, setConnectionState] = useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
+  // All refs extracted to separate file for line count management
+  const refs = useVoiceSessionRefs();
+  const [connectionState, setConnectionState] = useConnectionState();
 
   // ============================================================================
   // AUDIO PLAYBACK
   // ============================================================================
 
   const initPlaybackContext = useInitPlaybackContext(
-    playbackContextRef,
-    playbackAnalyserRef,
-    gainNodeRef,
+    refs.playbackContextRef,
+    refs.playbackAnalyserRef,
+    refs.gainNodeRef,
     preferredOutputId
   );
 
   const audioPlaybackRefs = {
-    playbackContextRef,
-    audioQueueRef,
-    isPlayingRef,
-    isBufferingRef,
-    nextPlayTimeRef,
-    scheduledSourcesRef,
-    playNextChunkRef,
-    playbackAnalyserRef,
-    gainNodeRef,
+    playbackContextRef: refs.playbackContextRef,
+    audioQueueRef: refs.audioQueueRef,
+    isPlayingRef: refs.isPlayingRef,
+    isBufferingRef: refs.isBufferingRef,
+    nextPlayTimeRef: refs.nextPlayTimeRef,
+    scheduledSourcesRef: refs.scheduledSourcesRef,
+    playNextChunkRef: refs.playNextChunkRef,
+    playbackAnalyserRef: refs.playbackAnalyserRef,
+    gainNodeRef: refs.gainNodeRef,
   };
 
-  const scheduleQueuedChunks = useScheduleQueuedChunks(audioPlaybackRefs, setSpeaking, setOutputLevel);
-  const playNextChunk = usePlayNextChunk(audioPlaybackRefs, scheduleQueuedChunks, setSpeaking, setOutputLevel);
+  const scheduleQueuedChunks = useScheduleQueuedChunks(audioPlaybackRefs, store.setSpeaking, store.setOutputLevel);
+  const playNextChunk = usePlayNextChunk(audioPlaybackRefs, scheduleQueuedChunks, store.setSpeaking, store.setOutputLevel);
+  const { startPolling, stopPolling } = useOutputLevelPolling(refs.playbackAnalyserRef, refs.isPlayingRef, store.setOutputLevel);
 
-  // Real-time output level polling from playback analyser
-  const { startPolling, stopPolling } = useOutputLevelPolling(
-    playbackAnalyserRef,
-    isPlayingRef,
-    setOutputLevel
-  );
-
-  // Keep ref updated with latest playNextChunk
-  useEffect(() => {
-    playNextChunkRef.current = playNextChunk;
-  }, [playNextChunk]);
-
-  // Start/stop output level polling when speaking state changes
-  useEffect(() => {
-    if (isSpeaking) {
-      startPolling();
-    } else {
-      stopPolling();
-    }
-  }, [isSpeaking, startPolling, stopPolling]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
+  useEffect(() => { refs.playNextChunkRef.current = playNextChunk; }, [playNextChunk]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- intentional ternary
+  useEffect(() => { store.isSpeaking ? startPolling() : stopPolling(); }, [store.isSpeaking, startPolling, stopPolling]);
 
   // ============================================================================
   // AUDIO CAPTURE
   // ============================================================================
 
   const audioCaptureRefs = {
-    captureContextRef,
-    mediaStreamRef,
-    sourceNodeRef,
-    processorRef,
-    analyserRef,
-    lastLevelUpdateRef,
+    captureContextRef: refs.captureContextRef,
+    mediaStreamRef: refs.mediaStreamRef,
+    sourceNodeRef: refs.sourceNodeRef,
+    processorRef: refs.processorRef,
+    analyserRef: refs.analyserRef,
+    lastLevelUpdateRef: refs.lastLevelUpdateRef,
   };
 
   const startAudioCapture = useStartAudioCapture(
-    audioCaptureRefs,
-    wsRef,
-    hasActiveResponseRef,
-    isMuted,
-    setInputLevel
+    audioCaptureRefs, refs.wsRef, refs.transportRef, refs.hasActiveResponseRef, store.isMuted, store.setInputLevel
   );
 
   // ============================================================================
-  // SESSION CONFIGURATION
+  // SESSION & EVENTS
   // ============================================================================
 
-  const sendGreeting = useSendGreeting(wsRef, greetingSentRef);
+  const sendGreeting = useSendGreeting(refs.wsRef, refs.greetingSentRef);
   const sendSessionConfig = useSendSessionConfig(
-    maestroRef,
-    wsRef,
-    setConnected,
-    setCurrentMaestro,
+    refs.maestroRef,
+    refs.wsRef,
+    store.setConnected,
+    store.setCurrentMaestro,
     setConnectionState,
-    options
+    options,
+    refs.transportRef,
+    refs.webrtcDataChannelRef
   );
 
-  // ============================================================================
-  // EVENT HANDLERS
-  // ============================================================================
+  // Store sendSessionConfig in ref so it can be called from connection.ts for WebRTC
+  useEffect(() => { refs.sendSessionConfigRef.current = sendSessionConfig; }, [sendSessionConfig, refs]);
 
-  const eventHandlerDeps = {
-    maestroRef,
-    sessionIdRef,
-    wsRef,
-    hasActiveResponseRef,
-    sessionReadyRef,
-    audioQueueRef,
-    isPlayingRef,
-    isBufferingRef,
-    scheduledSourcesRef,
-    playbackContextRef,
-    connectionTimeoutRef,
-    addTranscript,
-    addToolCall,
-    updateToolCall,
-    setListening,
-    setSpeaking,
-    isSpeaking,
+  const handleServerEvent = useHandleServerEvent({
+    maestroRef: refs.maestroRef,
+    sessionIdRef: refs.sessionIdRef,
+    wsRef: refs.wsRef,
+    transportRef: refs.transportRef,
+    webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    hasActiveResponseRef: refs.hasActiveResponseRef,
+    sessionReadyRef: refs.sessionReadyRef,
+    audioQueueRef: refs.audioQueueRef,
+    isPlayingRef: refs.isPlayingRef,
+    isBufferingRef: refs.isBufferingRef,
+    scheduledSourcesRef: refs.scheduledSourcesRef,
+    playbackContextRef: refs.playbackContextRef,
+    connectionTimeoutRef: refs.connectionTimeoutRef,
+    userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
+    firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
+    addTranscript: store.addTranscript,
+    addToolCall: store.addToolCall,
+    updateToolCall: store.updateToolCall,
+    setListening: store.setListening,
+    setSpeaking: store.setSpeaking,
+    isSpeaking: store.isSpeaking,
     voiceBargeInEnabled,
     options,
     sendSessionConfig,
@@ -198,107 +122,88 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     startAudioCapture,
     playNextChunk,
     scheduleQueuedChunks,
-  };
+  });
 
-  const handleServerEvent = useHandleServerEvent(eventHandlerDeps);
-
-  // Keep ref updated with latest handleServerEvent
-  useEffect(() => {
-    handleServerEventRef.current = handleServerEvent;
-  }, [handleServerEvent]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
+  useEffect(() => { refs.handleServerEventRef.current = handleServerEvent; }, [handleServerEvent]);
 
   // ============================================================================
   // CONNECTION
   // ============================================================================
 
   const connectionRefs = {
-    wsRef,
-    maestroRef,
-    captureContextRef,
-    playbackContextRef,
-    mediaStreamRef,
-    sourceNodeRef,
-    processorRef,
-    audioQueueRef,
-    isPlayingRef,
-    isBufferingRef,
-    nextPlayTimeRef,
-    scheduledSourcesRef,
-    sessionReadyRef,
-    greetingSentRef,
-    hasActiveResponseRef,
-    handleServerEventRef,
-    sessionIdRef,
-    connectionTimeoutRef,
+    wsRef: refs.wsRef,
+    maestroRef: refs.maestroRef,
+    transportRef: refs.transportRef,
+    captureContextRef: refs.captureContextRef,
+    playbackContextRef: refs.playbackContextRef,
+    mediaStreamRef: refs.mediaStreamRef,
+    sourceNodeRef: refs.sourceNodeRef,
+    processorRef: refs.processorRef,
+    audioQueueRef: refs.audioQueueRef,
+    isPlayingRef: refs.isPlayingRef,
+    isBufferingRef: refs.isBufferingRef,
+    nextPlayTimeRef: refs.nextPlayTimeRef,
+    scheduledSourcesRef: refs.scheduledSourcesRef,
+    sessionReadyRef: refs.sessionReadyRef,
+    greetingSentRef: refs.greetingSentRef,
+    hasActiveResponseRef: refs.hasActiveResponseRef,
+    handleServerEventRef: refs.handleServerEventRef,
+    sessionIdRef: refs.sessionIdRef,
+    connectionTimeoutRef: refs.connectionTimeoutRef,
+    webrtcCleanupRef: refs.webrtcCleanupRef,
+    remoteAudioStreamRef: refs.remoteAudioStreamRef,
+    webrtcAudioElementRef: refs.webrtcAudioElementRef,
+    webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
+    firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
+    sendSessionConfigRef: refs.sendSessionConfigRef,
   };
 
   const connect = useConnect(
-    connectionRefs,
-    setConnected,
-    setConnectionState,
-    connectionState,
-    handleServerEvent,
-    preferredMicrophoneId,
-    initPlaybackContext,
-    options
+    connectionRefs, store.setConnected, setConnectionState, connectionState,
+    handleServerEvent, preferredMicrophoneId, initPlaybackContext, options
   );
+  const disconnect = useDisconnect(connectionRefs, store.reset, setConnectionState);
 
-  const disconnect = useDisconnect(connectionRefs, reset, setConnectionState);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      disconnect();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty deps: cleanup should only run on unmount, not when disconnect changes
+  useEffect(() => { return () => { disconnect(); }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ============================================================================
-  // ACTIONS
+  // ACTIONS & RETURN
   // ============================================================================
 
   const actionRefs = {
-    wsRef,
-    hasActiveResponseRef,
-    audioQueueRef,
-    isPlayingRef,
-    isBufferingRef,
-    scheduledSourcesRef,
+    wsRef: refs.wsRef,
+    hasActiveResponseRef: refs.hasActiveResponseRef,
+    audioQueueRef: refs.audioQueueRef,
+    isPlayingRef: refs.isPlayingRef,
+    isBufferingRef: refs.isBufferingRef,
+    scheduledSourcesRef: refs.scheduledSourcesRef,
+    transportRef: refs.transportRef,
+    webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    webrtcAudioElementRef: refs.webrtcAudioElementRef,
   };
 
-  const toggleMute = useToggleMute(isMuted, setMuted);
-  const sendText = useSendText(wsRef, addTranscript);
-  const cancelResponse = useCancelResponse(actionRefs, setSpeaking);
-  const sendWebcamResult = useSendWebcamResult(wsRef);
-
-  // ============================================================================
-  // RETURN
-  // ============================================================================
-
   return {
-    isConnected,
-    isListening,
-    isSpeaking,
-    isMuted,
-    currentMaestro,
-    transcript,
-    toolCalls,
-    inputLevel,
-    outputLevel,
+    isConnected: store.isConnected,
+    isListening: store.isListening,
+    isSpeaking: store.isSpeaking,
+    isMuted: store.isMuted,
+    currentMaestro: store.currentMaestro,
+    transcript: store.transcript,
+    toolCalls: store.toolCalls,
+    inputLevel: store.inputLevel,
+    outputLevel: store.outputLevel,
     connectionState,
-    get inputAnalyser() {
-      return analyserRef.current;
-    },
-    get sessionId() {
-      return sessionIdRef.current;
-    },
+    get inputAnalyser() { return refs.analyserRef.current; },
+    get sessionId() { return refs.sessionIdRef.current; },
     connect,
     disconnect,
-    toggleMute,
-    sendText,
-    cancelResponse,
-    clearTranscript,
-    clearToolCalls,
-    sendWebcamResult,
+    toggleMute: useToggleMute(store.isMuted, store.setMuted),
+    sendText: useSendText(refs.wsRef, refs.transportRef, refs.webrtcDataChannelRef, store.addTranscript),
+    cancelResponse: useCancelResponse(actionRefs, store.setSpeaking),
+    clearTranscript: store.clearTranscript,
+    clearToolCalls: store.clearToolCalls,
+    sendWebcamResult: useSendWebcamResult(refs.wsRef, refs.transportRef, refs.webrtcDataChannelRef),
   };
 }

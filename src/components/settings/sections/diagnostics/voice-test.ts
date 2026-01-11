@@ -1,4 +1,5 @@
 import type { DiagnosticResult } from './types';
+import { isWebRTCSupported, getWebRTCSupportReport } from '@/lib/hooks/voice-session/webrtc-detection';
 
 export async function runVoiceTest(): Promise<DiagnosticResult> {
   // Audio playback setup
@@ -54,6 +55,11 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
   };
 
   try {
+    // 0. Check WebRTC support
+    const webrtcSupported = isWebRTCSupported();
+    // Call getWebRTCSupportReport for availability (could be used for extended diagnostics)
+    getWebRTCSupportReport();
+
     // 1. Check realtime config
     const statusRes = await fetch('/api/provider/status');
     const status = await statusRes.json();
@@ -66,15 +72,21 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
       };
     }
 
-    // 2. Get proxy info
+    // 2. Get proxy info and transport mode
     const tokenRes = await fetch('/api/realtime/token');
     const tokenData = await tokenRes.json();
+
+    // Determine actual transport (WebRTC if supported, otherwise WebSocket)
+    let transportMode = tokenData.transport || 'websocket';
+    if (transportMode === 'webrtc' && !webrtcSupported) {
+      transportMode = 'websocket';
+    }
 
     if (!tokenData.configured || !tokenData.proxyPort) {
       return {
         status: 'error',
         message: 'Voice proxy non configurato',
-        details: 'Verifica che il proxy WebSocket sia in esecuzione',
+        details: `Verifica che il proxy WebSocket sia in esecuzione. Transport: ${transportMode}`,
       };
     }
 
@@ -184,17 +196,19 @@ export async function runVoiceTest(): Promise<DiagnosticResult> {
     });
 
     // Success - audio was played!
+    const webrtcInfo = webrtcSupported ? 'WebRTC supportato' : 'WebRTC non supportato (fallback a WebSocket)';
     return {
       status: 'success',
       message: 'Voice funzionante! Hai sentito la risposta?',
-      details: `Proxy: ${wsUrl}, Audio ricevuto e riprodotto`,
+      details: `Transport: ${transportMode} | ${webrtcInfo} | Proxy: ${wsUrl} | Audio ricevuto e riprodotto`,
     };
 
   } catch (error) {
+    const webrtcInfo = isWebRTCSupported() ? 'WebRTC supportato' : 'WebRTC non supportato';
     return {
       status: 'error',
       message: 'Voice test fallito',
-      details: String(error),
+      details: `${webrtcInfo} | Errore: ${String(error)}`,
     };
   } finally {
     // Cleanup

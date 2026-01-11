@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { base64ToInt16Array } from './audio-utils';
 import { MAX_QUEUE_SIZE } from './constants';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
+import { recordUserSpeechEnd, recordWebSocketFirstAudio } from './latency-utils';
 
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
@@ -20,6 +21,9 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
   playbackContextRef: React.MutableRefObject<AudioContext | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  transportRef: React.MutableRefObject<'websocket' | 'webrtc'>;
+  userSpeechEndTimeRef: React.MutableRefObject<number | null>;
+  firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   addTranscript: (role: 'user' | 'assistant', text: string) => void;
   setListening: (value: boolean) => void;
   setSpeaking: (value: boolean) => void;
@@ -108,6 +112,7 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
 
       case 'input_audio_buffer.speech_stopped':
         logger.debug('[VoiceSession] User speech ended');
+        recordUserSpeechEnd({ userSpeechEndTimeRef: deps.userSpeechEndTimeRef, firstAudioPlaybackTimeRef: deps.firstAudioPlaybackTimeRef });
         deps.setListening(false);
         break;
 
@@ -122,6 +127,12 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
       // AUDIO OUTPUT EVENTS - handle both Preview and GA API formats
       case 'response.output_audio.delta':  // GA API format
       case 'response.audio.delta':         // Preview API format
+        // For WebRTC transport, audio comes via ontrack event, not delta events
+        if (deps.transportRef.current === 'webrtc') {
+          logger.debug('[VoiceSession] Skipping audio.delta processing (WebRTC transport)');
+          break;
+        }
+
         if (event.delta && typeof event.delta === 'string') {
           deps.initPlaybackContext();
 
@@ -136,6 +147,9 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
 
           if (deps.audioQueueRef.current.length === 1) {
             logger.debug(`[VoiceSession] 🔊 First audio chunk (${audioData.length} samples), starting playback...`);
+            if (deps.transportRef.current === 'websocket') {
+              recordWebSocketFirstAudio({ userSpeechEndTimeRef: deps.userSpeechEndTimeRef, firstAudioPlaybackTimeRef: deps.firstAudioPlaybackTimeRef });
+            }
           }
 
           // Start playback or schedule new chunks
