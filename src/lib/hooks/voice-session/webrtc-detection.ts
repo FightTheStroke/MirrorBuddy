@@ -10,7 +10,7 @@
  */
 export function isWebRTCSupported(): boolean {
   // Check if running in browser environment
-  if (typeof window === 'undefined') {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return false;
   }
 
@@ -39,7 +39,7 @@ export function hasRTCPeerConnection(): boolean {
  * @returns true if getUserMedia is supported
  */
 export function hasGetUserMedia(): boolean {
-  if (typeof window === 'undefined') {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') {
     return false;
   }
   return !!navigator.mediaDevices?.getUserMedia;
@@ -56,10 +56,11 @@ export function getWebRTCSupportReport(): {
   getUserMedia: boolean;
   mediaDevices: boolean;
 } {
+  const hasNavigator = typeof navigator !== 'undefined';
   return {
     webrtcSupported: isWebRTCSupported(),
     rtcPeerConnection: hasRTCPeerConnection(),
     getUserMedia: hasGetUserMedia(),
-    mediaDevices: typeof navigator?.mediaDevices !== 'undefined',
+    mediaDevices: hasNavigator && typeof navigator.mediaDevices !== 'undefined',
   };
 }
