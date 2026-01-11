@@ -31,25 +31,31 @@ export function useToggleMute(isMuted: boolean, setMuted: (value: boolean) => vo
 
 /**
  * Send text message to voice session
+ * Supports both WebSocket and WebRTC transports
  */
 export function useSendText(
   wsRef: React.MutableRefObject<WebSocket | null>,
+  transportRef: React.MutableRefObject<'websocket' | 'webrtc'>,
+  webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
   addTranscript: (role: 'user' | 'assistant', text: string) => void
 ) {
   return useCallback((text: string) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify({
-        type: 'conversation.item.create',
-        item: {
-          type: 'message',
-          role: 'user',
-          content: [{ type: 'input_text', text }],
-        },
-      }));
-      wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+    const sent = sendViaTransportAction(wsRef, transportRef, webrtcDataChannelRef, {
+      type: 'conversation.item.create',
+      item: {
+        type: 'message',
+        role: 'user',
+        content: [{ type: 'input_text', text }],
+      },
+    });
+
+    if (sent) {
+      sendViaTransportAction(wsRef, transportRef, webrtcDataChannelRef, { type: 'response.create' });
       addTranscript('user', text);
+    } else {
+      logger.warn('[VoiceSession] Failed to send text - no active transport');
     }
-  }, [wsRef, addTranscript]);
+  }, [wsRef, transportRef, webrtcDataChannelRef, addTranscript]);
 }
 
 /**

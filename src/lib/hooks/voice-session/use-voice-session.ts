@@ -200,7 +200,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     connect,
     disconnect,
     toggleMute: useToggleMute(store.isMuted, store.setMuted),
-    sendText: useSendText(refs.wsRef, store.addTranscript),
+    sendText: useSendText(refs.wsRef, refs.transportRef, refs.webrtcDataChannelRef, store.addTranscript),
     cancelResponse: useCancelResponse(actionRefs, store.setSpeaking),
     clearTranscript: store.clearTranscript,
     clearToolCalls: store.clearToolCalls,
