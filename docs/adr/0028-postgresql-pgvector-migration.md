@@ -153,5 +153,5 @@ npx prisma migrate deploy
 - [pgvector](https://github.com/pgvector/pgvector) - Vector similarity search for PostgreSQL
 - [Prisma PostgreSQL Extensions](https://www.prisma.io/docs/concepts/components/prisma-schema/postgresql-extensions)
 - ADR 0015: Database-First Architecture
-- Plan 9: RAG Semantic Search
+- ADR 0033: RAG Semantic Search Architecture (embedding service, retrieval API)
 - Wave 4: Knowledge Graph implementation

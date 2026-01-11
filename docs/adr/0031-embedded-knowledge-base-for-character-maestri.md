@@ -1,8 +1,8 @@
-# ADR 0031: Embedded Knowledge Base for Character-Based Maestri
+# ADR 0031: Character-Based Maestri with Embedded Knowledge
 
 ## Status
 
-Accepted
+Accepted (Updated 2026-01-10)
 
 ## Date
 
@@ -10,61 +10,92 @@ Accepted
 
 ## Context
 
-Some maestri are based on specific fictional or historical characters (e.g., Conte Mascetti from "Amici Miei", Omero from Greek mythology). These characters require accurate knowledge about their source material to respond correctly to user questions.
+MirrorBuddy's maestri are based on historical or fictional characters. They need:
+1. **Accurate knowledge** about their source material (no hallucinations)
+2. **Authentic character voice** (speak like the real person/character)
+3. **Effective teaching** for DSA students (maintain pedagogical quality)
 
-### Problem
+### The Dual Challenge
 
-LLMs may hallucinate or provide incorrect facts about specific characters, films, or literary works. For example, when asked "Chi è la Titti?" about the Amici Miei films, the LLM might incorrectly state relationships between characters.
+For **non-teaching characters** (e.g., Mascetti): 100% character immersion is fine.
 
-### Options Considered
-
-1. **Web Search Tool**: Give the maestro access to `web_search` tool and instruct it to search before answering
-   - Pros: Always up-to-date, no maintenance
-   - Cons: Adds latency, LLM may not always search, search results may be inconsistent
-
-2. **RAG (Retrieval Augmented Generation)**: Store facts in a vector database and retrieve relevant chunks
-   - Pros: Scalable, can handle large knowledge bases
-   - Cons: Complex infrastructure, overkill for focused character knowledge
-
-3. **Embedded Knowledge Base**: Include factual reference directly in the system prompt
-   - Pros: Fast, reliable, always available, no external dependencies
-   - Cons: Increases prompt size, requires manual curation
+For **teaching maestri** (e.g., Socrate, Shakespeare): Must balance character authenticity with pedagogical effectiveness for students with learning differences.
 
 ## Decision
 
-Use **Embedded Knowledge Base** (Option 3) for character-based maestri.
+Use **Embedded Knowledge Base** with **Character Intensity Dial** pattern.
 
-Create a separate TypeScript file containing the knowledge as a string constant, then import and embed it in the system prompt.
+### Two Character Types
+
+| Type | Example | Tools | Teaching | Character Immersion |
+|------|---------|-------|----------|---------------------|
+| **Amico** | Mascetti | None | No | 100% always |
+| **Maestro** | Socrate, Shakespeare | Yes | Yes | Variable (see dial) |
+
+## Character Intensity Dial
+
+Maestri adjust their character intensity based on context:
+
+### FULL CHARACTER MODE (100% authentic voice)
+Use when:
+- Greeting and introduction
+- Telling historical anecdotes about themselves
+- Motivating the student
+- Student asks about their life/era
+- Light conversation
+
+### REDUCED CHARACTER MODE (clarity priority)
+Use when:
+- Student shows frustration or confusion
+- Explaining complex concepts step-by-step
+- Student has autism profile (needs literal language)
+- Student explicitly asks for clear explanation
+- Tool usage instructions
+
+### OVERRIDE TO DIRECT HELP (mandatory)
+Trigger when:
+- Dyscalculic student stuck on calculation → provide answer, then explain
+- Crisis moment: student says "non capisco niente"
+- Student makes same mistake 3+ times
+- Safety/wellbeing concern
 
 ## Implementation Pattern
 
-### 1. Create Knowledge File
+### 1. Knowledge Base File
 
 ```typescript
 // src/data/maestri/{character}-knowledge.ts
 
+/**
+ * {Character Name} Knowledge Base
+ * Sources: [list verified sources]
+ */
+
 export const CHARACTER_KNOWLEDGE = `
-## Key Facts
+## Biografia
+- Birth, death, key life events
+- Verified facts only
 
-### Characters
-- Character A: description, relationships
-- Character B: description, relationships
+## Opere Principali
+- Major works with brief descriptions
+- Key themes
 
-### Important Events
-- Event 1: what happened, when, who was involved
-- Event 2: ...
+## Citazioni Famose
+- "Quote 1" - context
+- "Quote 2" - context
 
-### Common Questions
-- Q: "Who is X?" A: X is...
-- Q: "What happened in Y?" A: ...
+## Aneddoti
+- Story 1: what happened, significance
+- Story 2: ...
 
-### Critical Corrections
-- X is NOT Y (common misconception)
-- The correct answer is Z
+## Stile Comunicativo
+- How they spoke/wrote
+- Characteristic phrases
+- Voice patterns
 `;
 ```
 
-### 2. Import in Maestro Definition
+### 2. Maestro Definition (Teaching)
 
 ```typescript
 // src/data/maestri/{character}.ts
@@ -72,58 +103,100 @@ export const CHARACTER_KNOWLEDGE = `
 import { CHARACTER_KNOWLEDGE } from './{character}-knowledge';
 
 export const character: MaestroFull = {
-  // ...
-  tools: [], // No tools needed - knowledge is embedded
+  // ... basic config
+  tools: ['quiz', 'flashcards', ...], // Teaching tools
   systemPrompt: `
 You are [Character Name]...
 
+## CHARACTER INTENSITY DIAL
+
+### When to be FULLY in character:
+- Greetings, motivation, historical anecdotes, student asks about your life
+
+### When to REDUCE character for clarity:
+- Complex explanations, student confused, autism profile, explicit request
+
+### When to OVERRIDE and help directly:
+- Student stuck 3+ times, dyscalculia crisis, "non capisco niente"
+
 ## KNOWLEDGE BASE
-
-Use this reference for ALL questions about [source material]:
-
 ${CHARACTER_KNOWLEDGE}
 
-## CRITICAL: Answer from Knowledge Base
-
-When asked about [topic], ALWAYS refer to the KNOWLEDGE BASE above.
-...
+## TEACHING APPROACH
+[Subject-specific pedagogy...]
 `
 };
 ```
 
-### 3. Knowledge Base Guidelines
+### 3. Amico Definition (Non-Teaching)
 
-- **Factual only**: Include only verifiable facts from official sources
-- **Structured**: Use headers, bullet points, tables for easy reference
-- **Critical corrections**: Explicitly list common misconceptions
-- **Relationships**: Clearly state who is who (spouse vs lover, friend vs enemy)
-- **Size limit**: Keep under 150 lines to avoid excessive prompt size
-- **Sources**: Document sources in comments (Wikipedia, official materials)
+```typescript
+// src/data/maestri/{character}.ts (for Amici like Mascetti)
+
+import { CHARACTER_KNOWLEDGE } from './{character}-knowledge';
+
+export const character: MaestroFull = {
+  // ... basic config
+  tools: [], // No teaching tools
+  excludeFromGamification: true, // No XP
+  systemPrompt: `
+You are [Character Name]...
+
+## KNOWLEDGE BASE
+${CHARACTER_KNOWLEDGE}
+
+## BOUNDARIES
+- Only discuss topics within your knowledge base
+- Redirect off-topic questions gracefully
+`
+};
+```
+
+## Knowledge Base Guidelines
+
+- **Max 200 lines** per file (under 250 limit)
+- **Verified sources only**: Wikipedia, academic texts, original works
+- **Structured**: Headers, bullet points for easy LLM reference
+- **Bilingual for language teachers**: Include both IT and target language quotes
+
+## DSA-Specific Considerations
+
+| Character Risk | Mitigation |
+|---------------|------------|
+| Socrate "never answers" | Override after 3 attempts: give answer, then explore why |
+| Shakespeare archaic English | Italian for explanations, theatrical English for examples only |
+| Omero epic density | Short scenes, frequent check-ins for ADHD |
+| Abstract concepts | Always offer visual alternatives for dyscalculia |
+
+## Use Cases
+
+| Maestro | Type | Source Material | Knowledge File |
+|---------|------|-----------------|----------------|
+| Mascetti | Amico | Amici Miei films | `amici-miei-knowledge.ts` ✓ |
+| Omero | Maestro | Iliad, Odyssey | `omero-knowledge.ts` |
+| Shakespeare | Maestro | Plays, Sonnets | `shakespeare-knowledge.ts` |
+| Socrate | Maestro | Platonic Dialogues | `socrate-knowledge.ts` |
+| Manzoni | Maestro | I Promessi Sposi | `manzoni-knowledge.ts` |
+| Álex Pina | Maestro | La Casa de Papel | `alex-pina-knowledge.ts` |
+| Feynman | Maestro | Lectures, Books | `feynman-knowledge.ts` |
+| Euclide | Maestro | Elements | `euclide-knowledge.ts` |
 
 ## Consequences
 
 ### Positive
-
-- **Reliability**: LLM has authoritative facts in context
-- **Speed**: No external API calls for knowledge retrieval
-- **Consistency**: Same facts every time
-- **Offline**: Works without internet access
+- **Reliability**: Verified facts prevent hallucinations
+- **Authenticity**: Characters feel genuine
+- **DSA Safety**: Character intensity adjusts for student needs
+- **Maintainability**: Knowledge separate from behavior
 
 ### Negative
-
-- **Maintenance**: Manual updates if source material changes
-- **Prompt size**: Larger system prompts (mitigated by keeping knowledge focused)
-- **Static**: Cannot answer about events after knowledge was written
-
-## Use Cases
-
-| Maestro | Source Material | Knowledge File |
-|---------|-----------------|----------------|
-| Conte Mascetti | Amici Miei (1975, 1982, 1985) | `amici-miei-knowledge.ts` |
-| Omero | Iliad, Odyssey | `omero-knowledge.ts` (future) |
-| Dante | Divine Comedy | `dante-knowledge.ts` (future) |
+- **Maintenance**: ~18 knowledge files to maintain
+- **Prompt size**: ~200 extra tokens per maestro
+- **Static knowledge**: Cannot answer about post-knowledge events
 
 ## References
 
 - [Amici Miei - Wikipedia](https://it.wikipedia.org/wiki/Amici_miei)
-- [Supercazzola - Wikipedia](https://it.wikipedia.org/wiki/Supercazzola)
+- [Socratic Method](https://en.wikipedia.org/wiki/Socratic_method)
+- ADR 0003: Triangle of Support Architecture
+- ADR 0027: Bilingual Voice Recognition
