@@ -4,7 +4,7 @@
  * Inline conversation history sidebar - matches voice panel styling
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,19 +12,37 @@ import { Plus, Trash2, X, Search, MessageSquare, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ConversationDrawerProps, ConversationSummary, DateFilter } from './types';
 
+type DateGroup = 'oggi' | 'ieri' | 'settimana' | 'mese' | 'vecchie';
+
+const groupLabels: Record<DateGroup, string> = {
+  oggi: 'Oggi',
+  ieri: 'Ieri',
+  settimana: 'Questa settimana',
+  mese: 'Questo mese',
+  vecchie: 'Più vecchie',
+};
+
 function createGradientStyle(color: string) {
   const hex = color.startsWith('#') ? color : '#6366F1';
   return { background: `linear-gradient(180deg, ${hex}, ${hex}dd)` };
 }
 
-function formatDate(date: Date): string {
+function getDateGroup(date: Date): DateGroup {
   const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  if (days === 0) return 'Oggi';
-  if (days === 1) return 'Ieri';
-  if (days < 7) return `${days} giorni fa`;
-  return date.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' });
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const weekAgo = new Date(today);
+  weekAgo.setDate(weekAgo.getDate() - 7);
+  const monthAgo = new Date(today);
+  monthAgo.setMonth(monthAgo.getMonth() - 1);
+
+  const d = new Date(date);
+  if (d >= today) return 'oggi';
+  if (d >= yesterday) return 'ieri';
+  if (d >= weekAgo) return 'settimana';
+  if (d >= monthAgo) return 'mese';
+  return 'vecchie';
 }
 
 export function ConversationSidebar({
@@ -41,6 +59,7 @@ export function ConversationSidebar({
   const [dateFilter, setDateFilter] = useState<DateFilter>('all');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const gradientStyle = createGradientStyle(characterColor);
   const buttonBg = 'bg-white/20 hover:bg-white/30';
@@ -87,23 +106,36 @@ export function ConversationSidebar({
       setSelectedIds(new Set());
       setSearchQuery('');
       setDateFilter('all');
+      setShowDeleteConfirm(false);
     }
   }, [open]);
+
+  const grouped = useMemo(() => {
+    const groups: Record<DateGroup, ConversationSummary[]> = {
+      oggi: [], ieri: [], settimana: [], mese: [], vecchie: [],
+    };
+    conversations.forEach((conv) => {
+      const group = getDateGroup(conv.lastMessageAt || conv.createdAt);
+      groups[group].push(conv);
+    });
+    return groups;
+  }, [conversations]);
 
   const handleToggleSelect = (id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = () => {
     if (selectedIds.size === 0) return;
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = async () => {
     setIsDeleting(true);
     try {
       const res = await fetch('/api/conversations/batch', {
@@ -114,6 +146,7 @@ export function ConversationSidebar({
       if (res.ok) {
         setConversations((prev) => prev.filter((c) => !selectedIds.has(c.id)));
         setSelectedIds(new Set());
+        setShowDeleteConfirm(false);
       }
     } catch (error) {
       console.error('Failed to delete conversations:', error);
@@ -121,6 +154,8 @@ export function ConversationSidebar({
       setIsDeleting(false);
     }
   };
+
+  const groupOrder: DateGroup[] = ['oggi', 'ieri', 'settimana', 'mese', 'vecchie'];
 
   return (
     <AnimatePresence>
@@ -130,10 +165,29 @@ export function ConversationSidebar({
           animate={{ width: 280, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeInOut' }}
-          className="h-full flex-shrink-0 overflow-hidden rounded-2xl mr-4"
+          className="h-full flex-shrink-0 overflow-hidden rounded-2xl"
           style={gradientStyle}
         >
           <div className="w-[280px] h-full flex flex-col text-white p-4">
+            {/* Delete Confirmation */}
+            {showDeleteConfirm && (
+              <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center p-4 rounded-2xl">
+                <div className="bg-slate-800 rounded-xl p-4 max-w-[240px] text-center">
+                  <p className="text-sm mb-3">
+                    Eliminare {selectedIds.size} conversazion{selectedIds.size === 1 ? 'e' : 'i'}?
+                  </p>
+                  <div className="flex gap-2 justify-center">
+                    <Button size="sm" variant="ghost" onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting}>
+                      Annulla
+                    </Button>
+                    <Button size="sm" variant="destructive" onClick={handleDeleteConfirm} disabled={isDeleting}>
+                      {isDeleting ? 'Elimino...' : 'Elimina'}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold">Storico</h3>
@@ -142,8 +196,7 @@ export function ConversationSidebar({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={handleDelete}
-                    disabled={isDeleting}
+                    onClick={handleDeleteClick}
                     className={cn('rounded-full h-7 w-7', 'bg-red-500/50 hover:bg-red-500/70 text-white')}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -197,39 +250,50 @@ export function ConversationSidebar({
                   <p className="text-xs">Nessuna conversazione</p>
                 </div>
               ) : (
-                <div className="space-y-1.5">
-                  {conversations.map((conv) => (
-                    <button
-                      key={conv.id}
-                      onClick={() => onSelectConversation(conv.id)}
-                      className={cn(
-                        'w-full text-left p-2.5 rounded-xl transition-colors group',
-                        selectedIds.has(conv.id) ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'
-                      )}
-                    >
-                      <div className="flex items-start gap-2">
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.has(conv.id)}
-                          onChange={() => handleToggleSelect(conv.id)}
-                          onClick={(e) => e.stopPropagation()}
-                          className="mt-0.5 rounded border-white/30 bg-white/10"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium truncate">
-                            {conv.title || 'Conversazione'}
-                          </p>
-                          {conv.preview && (
-                            <p className="text-[10px] text-white/60 truncate mt-0.5">{conv.preview}</p>
-                          )}
-                          <div className="flex items-center gap-1 mt-1 text-[10px] text-white/50">
-                            <Calendar className="w-2.5 h-2.5" />
-                            {formatDate(conv.lastMessageAt || conv.createdAt)}
-                          </div>
+                <div className="space-y-3">
+                  {groupOrder.map((group) => {
+                    const items = grouped[group];
+                    if (items.length === 0) return null;
+                    return (
+                      <div key={group}>
+                        <h4 className="text-[10px] font-medium text-white/50 uppercase tracking-wider mb-1.5 px-1">
+                          {groupLabels[group]}
+                        </h4>
+                        <div className="space-y-1">
+                          {items.map((conv) => (
+                            <button
+                              key={conv.id}
+                              onClick={() => onSelectConversation(conv.id)}
+                              className={cn(
+                                'w-full text-left p-2 rounded-lg transition-colors',
+                                selectedIds.has(conv.id) ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'
+                              )}
+                            >
+                              <div className="flex items-start gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedIds.has(conv.id)}
+                                  onChange={() => handleToggleSelect(conv.id)}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="mt-0.5 rounded border-white/30 bg-white/10"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-medium truncate">{conv.title || 'Conversazione'}</p>
+                                  {conv.preview && (
+                                    <p className="text-[10px] text-white/60 truncate mt-0.5">{conv.preview}</p>
+                                  )}
+                                  <div className="flex items-center gap-1 mt-1 text-[10px] text-white/50">
+                                    <Calendar className="w-2.5 h-2.5" />
+                                    {conv.messageCount} msg
+                                  </div>
+                                </div>
+                              </div>
+                            </button>
+                          ))}
                         </div>
                       </div>
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
