@@ -77,7 +77,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   // SESSION & EVENTS
   // ============================================================================
 
-  const sendGreeting = useSendGreeting(refs.wsRef, refs.greetingSentRef);
+  const sendGreeting = useSendGreeting(refs.wsRef, refs.greetingSentRef, refs.transportRef, refs.webrtcDataChannelRef);
   const sendSessionConfig = useSendSessionConfig(
     refs.maestroRef,
     refs.wsRef,
@@ -157,6 +157,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     remoteAudioStreamRef: refs.remoteAudioStreamRef,
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    webrtcHeartbeatRef: refs.webrtcHeartbeatRef,
     userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
     firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
     sendSessionConfigRef: refs.sendSessionConfigRef,

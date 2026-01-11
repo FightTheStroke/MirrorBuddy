@@ -23,17 +23,34 @@ import {
 
 /**
  * Send greeting to maestro after session is ready
+ * Supports both WebSocket and WebRTC transports
  */
 export function useSendGreeting(
   wsRef: React.MutableRefObject<WebSocket | null>,
-  greetingSentRef: React.MutableRefObject<boolean>
+  greetingSentRef: React.MutableRefObject<boolean>,
+  transportRef?: React.MutableRefObject<'websocket' | 'webrtc' | null>,
+  webrtcDataChannelRef?: React.MutableRefObject<RTCDataChannel | null>
 ) {
   return useCallback(() => {
     logger.debug('[VoiceSession] sendGreeting called');
-    if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      logger.debug('[VoiceSession] sendGreeting: ws not ready', { readyState: wsRef.current?.readyState });
+
+    const isWebRTC = transportRef?.current === 'webrtc';
+    const dataChannel = webrtcDataChannelRef?.current;
+    const ws = wsRef.current;
+
+    // Check transport availability
+    const webrtcReady = isWebRTC && dataChannel?.readyState === 'open';
+    const websocketReady = !isWebRTC && ws?.readyState === WebSocket.OPEN;
+
+    if (!webrtcReady && !websocketReady) {
+      logger.debug('[VoiceSession] sendGreeting: transport not ready', {
+        transport: isWebRTC ? 'webrtc' : 'websocket',
+        webrtcState: dataChannel?.readyState,
+        wsState: ws?.readyState,
+      });
       return;
     }
+
     if (greetingSentRef.current) {
       logger.debug('[VoiceSession] sendGreeting: already sent, skipping');
       return;
@@ -43,20 +60,28 @@ export function useSendGreeting(
     const studentName = useSettingsStore.getState().studentProfile?.name || null;
     const greetingPrompt = getRandomGreetingPrompt(studentName);
 
-    logger.debug('[VoiceSession] Sending greeting request...');
+    logger.debug('[VoiceSession] Sending greeting request', { transport: isWebRTC ? 'WebRTC' : 'WebSocket' });
 
-    wsRef.current.send(JSON.stringify({
+    const createMsg = JSON.stringify({
       type: 'conversation.item.create',
       item: {
         type: 'message',
         role: 'user',
         content: [{ type: 'input_text', text: greetingPrompt }],
       },
-    }));
-    wsRef.current.send(JSON.stringify({ type: 'response.create' }));
+    });
+    const responseMsg = JSON.stringify({ type: 'response.create' });
+
+    if (isWebRTC && dataChannel) {
+      dataChannel.send(createMsg);
+      dataChannel.send(responseMsg);
+    } else if (ws) {
+      ws.send(createMsg);
+      ws.send(responseMsg);
+    }
 
     logger.debug('[VoiceSession] Greeting request sent');
-  }, [wsRef, greetingSentRef]);
+  }, [wsRef, greetingSentRef, transportRef, webrtcDataChannelRef]);
 }
 
 type InitialMessage = { role: 'user' | 'assistant'; content: string };
@@ -162,7 +187,7 @@ export function useSendSessionConfig(
           interrupt_response: !options.disableBargeIn,
         },
         tools: VOICE_TOOLS,
-        temperature: 0.8,
+        temperature: 0.6,
       },
     };
 

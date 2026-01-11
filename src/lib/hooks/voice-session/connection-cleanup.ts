@@ -20,6 +20,13 @@ export function useDisconnect(
   return useCallback(() => {
     logger.debug('[VoiceSession] Disconnecting...');
 
+    // WebRTC heartbeat cleanup
+    if (refs.webrtcHeartbeatRef.current) {
+      clearInterval(refs.webrtcHeartbeatRef.current);
+      // eslint-disable-next-line react-hooks/immutability -- Intentional ref cleanup
+      refs.webrtcHeartbeatRef.current = null;
+    }
+
     // WebRTC cleanup
     if (refs.webrtcCleanupRef.current) {
       logger.debug('[VoiceSession] Cleaning up WebRTC connection');
