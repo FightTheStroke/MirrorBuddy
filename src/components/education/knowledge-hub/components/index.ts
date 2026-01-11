@@ -28,3 +28,6 @@ export type { StatsPanelProps, MaterialStats } from './stats-panel';
 
 export { MaterialCard } from './material-card';
 export type { MaterialCardProps, Material } from './material-card';
+
+// Knowledge Graph (Wave 3)
+export { RelatedMaterials } from './related-materials';

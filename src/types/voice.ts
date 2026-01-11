@@ -59,3 +59,29 @@ export interface AudioLevels {
   input: number;
   output: number;
 }
+
+/**
+ * Response from Azure ephemeral token endpoint
+ */
+export interface EphemeralTokenResponse {
+  /** Ephemeral token value (ek_...) */
+  token: string;
+  /** Token expiration timestamp (Unix seconds) */
+  expiresAt: number;
+  /** Provider (always 'azure' for now) */
+  provider: 'azure';
+}
+
+/**
+ * Azure session response (internal)
+ */
+export interface AzureRealtimeSessionResponse {
+  object: string;
+  id: string;
+  model: string;
+  client_secret: {
+    value: string;
+    expires_at: number;
+  };
+  // ... other fields optional
+}

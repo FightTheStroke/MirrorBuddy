@@ -12,13 +12,14 @@
 
 export {
   SAFETY_CORE_PROMPT,
-  IT_CONTENT_PATTERNS,
   injectSafetyGuardrails,
   hasSafetyGuardrails,
   containsCrisisKeywords,
   CRISIS_RESPONSE,
   type SafetyInjectionOptions,
-} from './safety-prompts';
+} from './safety-prompts-core';
+
+export { IT_CONTENT_PATTERNS } from './safety-patterns';
 
 export {
   filterInput,
@@ -29,7 +30,7 @@ export {
   type FilterResult,
   type FilterSeverity,
   type FilterAction,
-} from './content-filter';
+} from './content-filter-core';
 
 export {
   sanitizeOutput,
@@ -49,7 +50,7 @@ export {
   type JailbreakCategory,
   type ThreatLevel,
   type ConversationContext,
-} from './jailbreak-detector';
+} from './jailbreak-detector-core';
 
 export {
   checkAgeGate,
@@ -62,7 +63,7 @@ export {
   type TopicSensitivity,
   type ContentTopic,
   type AgeGateResult,
-} from './age-gating';
+} from './age-gating-core';
 
 export {
   logSafetyEvent,
@@ -85,3 +86,6 @@ export {
   type SafetyEvent,
   type SafetyMetrics,
 } from './monitoring';
+
+// Server-only DB functions - import directly when needed:
+// import { getSafetyEventsFromDb, ... } from '@/lib/safety/monitoring/db-queries';

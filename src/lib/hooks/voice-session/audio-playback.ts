@@ -14,18 +14,15 @@ import {
   SCHEDULE_AHEAD_TIME,
   CHUNK_GAP_TOLERANCE,
 } from './constants';
+import type { AudioPlaybackRefs, PollingControls } from './audio-playback-types';
+import {
+  resumeAudioContext,
+  setAudioOutputDevice,
+  createPlaybackAnalyser,
+  createAndConnectGainNode,
+} from './audio-context-init';
 
-export interface AudioPlaybackRefs {
-  playbackContextRef: React.MutableRefObject<AudioContext | null>;
-  audioQueueRef: React.MutableRefObject<Int16Array[]>;
-  isPlayingRef: React.MutableRefObject<boolean>;
-  isBufferingRef: React.MutableRefObject<boolean>;
-  nextPlayTimeRef: React.MutableRefObject<number>;
-  scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
-  playNextChunkRef: React.MutableRefObject<(() => void) | null>;
-  playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>;
-  gainNodeRef: React.MutableRefObject<GainNode | null>;
-}
+export type { AudioPlaybackRefs, PollingControls };
 
 /**
  * Initialize or resume the playback AudioContext at Azure's sample rate (24kHz)
@@ -39,46 +36,20 @@ export function useInitPlaybackContext(
 ) {
   return useCallback(async () => {
     if (playbackContextRef.current) {
-      // Resume if suspended (browser policy requires user interaction)
-      if (playbackContextRef.current.state === 'suspended') {
-        logger.debug('[VoiceSession] 🔊 Resuming suspended AudioContext...');
-        await playbackContextRef.current.resume();
-      }
+      await resumeAudioContext(playbackContextRef.current);
       return { context: playbackContextRef.current, analyser: playbackAnalyserRef.current, gainNode: gainNodeRef.current };
     }
 
     const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    // CRITICAL: Create playback context at 24kHz to match Azure output
     playbackContextRef.current = new AudioContextClass({ sampleRate: AZURE_SAMPLE_RATE });
     logger.debug(`[VoiceSession] 🔊 Playback context created at ${AZURE_SAMPLE_RATE}Hz, state: ${playbackContextRef.current.state}`);
 
-    // Create analyser for real-time output level monitoring
-    playbackAnalyserRef.current = playbackContextRef.current.createAnalyser();
-    playbackAnalyserRef.current.fftSize = 256;
-    playbackAnalyserRef.current.smoothingTimeConstant = 0.3;
-
-    // Create gain node (audio goes through gain -> analyser -> destination)
-    gainNodeRef.current = playbackContextRef.current.createGain();
-    gainNodeRef.current.connect(playbackAnalyserRef.current);
-    playbackAnalyserRef.current.connect(playbackContextRef.current.destination);
-
+    playbackAnalyserRef.current = createPlaybackAnalyser(playbackContextRef.current);
+    gainNodeRef.current = createAndConnectGainNode(playbackContextRef.current, playbackAnalyserRef.current);
     logger.debug('[VoiceSession] 🔊 Playback analyser and gain node created');
 
-    // Set output device if specified (setSinkId API)
-    if (preferredOutputId && 'setSinkId' in playbackContextRef.current) {
-      try {
-        await (playbackContextRef.current as AudioContext & { setSinkId: (id: string) => Promise<void> }).setSinkId(preferredOutputId);
-        logger.debug(`[VoiceSession] 🔊 Audio output set to device: ${preferredOutputId}`);
-      } catch (err) {
-        logger.warn('[VoiceSession] ⚠️ Could not set output device, using default', { err });
-      }
-    }
-
-    // Resume immediately if suspended
-    if (playbackContextRef.current.state === 'suspended') {
-      logger.debug('[VoiceSession] 🔊 Resuming new AudioContext...');
-      await playbackContextRef.current.resume();
-    }
+    await setAudioOutputDevice(playbackContextRef.current, preferredOutputId);
+    await resumeAudioContext(playbackContextRef.current);
 
     return { context: playbackContextRef.current, analyser: playbackAnalyserRef.current, gainNode: gainNodeRef.current };
   }, [playbackContextRef, playbackAnalyserRef, gainNodeRef, preferredOutputId]);
@@ -206,7 +177,7 @@ export function useOutputLevelPolling(
   playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>,
   isPlayingRef: React.MutableRefObject<boolean>,
   setOutputLevel: (value: number) => void
-) {
+): PollingControls {
   const animationFrameRef = useRef<number | null>(null);
   const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const pollLevelRef = useRef<(() => void) | null>(null);

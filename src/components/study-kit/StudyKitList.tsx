@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FileText, Loader2, AlertCircle, Clock, CheckCircle2, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getStatusText, formatDate } from './study-kit-utils';
 import type { StudyKit } from '@/types/study-kit';
 
 interface StudyKitListProps {
@@ -74,7 +75,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIconElement = (status: string) => {
     switch (status) {
       case 'processing':
         return <Loader2 className="w-4 h-4 animate-spin text-blue-600" />;
@@ -85,27 +86,6 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       default:
         return <Clock className="w-4 h-4 text-slate-400" />;
     }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'processing':
-        return 'In elaborazione';
-      case 'ready':
-        return 'Pronto';
-      case 'error':
-        return 'Errore';
-      default:
-        return 'Sconosciuto';
-    }
-  };
-
-  const formatDate = (date: Date | string) => {
-    const d = typeof date === 'string' ? new Date(date) : date;
-    return new Intl.DateTimeFormat('it-IT', {
-      dateStyle: 'short',
-      timeStyle: 'short',
-    }).format(d);
   };
 
   if (isLoading) {
@@ -187,7 +167,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                       {kit.title}
                     </h3>
                     <div className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded text-xs">
-                      {getStatusIcon(kit.status)}
+                      {getStatusIconElement(kit.status)}
                       <span className="text-slate-700 dark:text-slate-300">
                         {getStatusText(kit.status)}
                       </span>

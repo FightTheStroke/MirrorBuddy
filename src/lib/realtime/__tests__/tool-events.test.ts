@@ -221,7 +221,7 @@ describe('Tool Events (SSE Broadcasting)', () => {
       const event: ToolEvent = {
         id: 'update-1',
         type: 'tool:update',
-        toolType: 'flashcards',
+        toolType: 'flashcard',
         sessionId: 'session-types2',
         maestroId: 'dante',
         timestamp: Date.now(),

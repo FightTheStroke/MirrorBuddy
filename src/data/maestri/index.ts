@@ -22,6 +22,7 @@ import { darwin } from './darwin';
 import { chris } from './chris';
 import { omero } from './omero';
 import { alexPina } from './alex-pina';
+import { mascetti } from './mascetti';
 
 export type { MaestroFull } from './types';
 export { SAFETY_GUIDELINES } from './types';
@@ -46,6 +47,7 @@ export const maestri: MaestroFull[] = [
   chris,
   omero,
   alexPina,
+  mascetti,
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
@@ -87,4 +89,5 @@ export const SUBJECT_NAMES: Record<string, string> = {
   'computerScience': 'Informatica',
   'health': 'Salute',
   'internationalLaw': 'Diritto Internazionale',
+  'supercazzola': 'Supercazzola',
 };

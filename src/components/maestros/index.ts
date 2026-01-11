@@ -10,7 +10,7 @@ export { MaestriGrid } from './maestri-grid';
 export { MessageBubble } from './message-bubble';
 export { QuoteRotator } from './quote-rotator';
 export { PersonalizedSuggestion } from './personalized-suggestion';
-export { MaestroSessionHeader } from './maestro-session-header';
+// MaestroSessionHeader removed - use CharacterHeader from @/components/character
 export { MaestroSessionInput } from './maestro-session-input';
 export { MaestroSessionToolButtons } from './maestro-session-tool-buttons';
 export { MaestroSessionMessages } from './maestro-session-messages';

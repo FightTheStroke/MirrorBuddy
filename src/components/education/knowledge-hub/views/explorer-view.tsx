@@ -17,6 +17,7 @@ import type { Collection } from '../components/sidebar-navigation';
 /** Extended material type for Knowledge Hub views */
 export interface KnowledgeHubMaterial {
   id: string;
+  toolId?: string;
   title: string;
   toolType: Material['type'];
   createdAt: Date | string;
@@ -35,6 +36,7 @@ export interface ExplorerViewProps {
   onSelectCollection: (id: string | null) => void;
   onToggleFolder: (id: string) => void;
   onSelectMaterial: (material: KnowledgeHubMaterial) => void;
+  onFindSimilar?: (toolId: string) => void;
   selectedMaterialIds?: Set<string>;
   onToggleMaterialSelection?: (id: string) => void;
   className?: string;
@@ -67,6 +69,7 @@ export function ExplorerView({
   onSelectCollection,
   onToggleFolder,
   onSelectMaterial,
+  onFindSimilar,
   selectedMaterialIds = new Set(),
   onToggleMaterialSelection,
   className,
@@ -189,6 +192,11 @@ export function ExplorerView({
                   <MaterialCard
                     material={toMaterial(material)}
                     onOpen={() => onSelectMaterial(material)}
+                    onFindSimilar={
+                      onFindSimilar
+                        ? () => onFindSimilar(material.toolId ?? material.id)
+                        : undefined
+                    }
                     isSelected={selectedMaterialIds.has(material.id)}
                     onSelect={
                       onToggleMaterialSelection

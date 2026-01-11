@@ -24,7 +24,6 @@ import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
 import { MIN_MESSAGES_FOR_SUMMARY } from '../persistence';
 import { createActiveCharacter, saveCurrentConversation, loadConversationMessages } from '../helpers';
-import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
 
 // ============================================================================
 // CHARACTER STATE
@@ -130,19 +129,22 @@ export const createCharacterSlice: StateCreator<
       // #98: Try to load contextual greeting based on previous conversations
       let greeting = activeCharacter.greeting;
 
-      // userId already retrieved at function start
+      // userId already retrieved at function start - fetch via API
       if (userId) {
         try {
-          const result = await getGreetingForCharacter(
-            userId,
-            character.id,
-            profile.name,
-            activeCharacter.name
-          );
+          const params = new URLSearchParams({
+            characterId: character.id,
+            studentName: profile.name,
+            maestroName: activeCharacter.name,
+          });
+          const response = await fetch(`/api/greetings/contextual?${params}`);
 
-          if (result?.greeting) {
-            greeting = result.greeting;
-            logger.info('Using contextual greeting', { characterId: character.id });
+          if (response.ok) {
+            const result = await response.json();
+            if (result?.greeting) {
+              greeting = result.greeting;
+              logger.info('Using contextual greeting', { characterId: character.id });
+            }
           }
         } catch (error) {
           logger.warn('Failed to load contextual greeting, using default', {

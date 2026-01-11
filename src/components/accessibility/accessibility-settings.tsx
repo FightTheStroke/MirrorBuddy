@@ -2,17 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  X,
-  Settings,
-  Eye,
-  Brain,
-  Hand,
-  Star,
-  TextIcon,
-} from 'lucide-react';
+import { X, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import {
+  ACCESSIBILITY_CATEGORIES,
+  type AccessibilityCategory,
+} from './accessibility-categories';
 import { DyslexiaSettings } from './components/dyslexia-settings';
 import { ADHDSettings } from './components/adhd-settings';
 import { VisualSettings } from './components/visual-settings';
@@ -24,52 +20,12 @@ interface AccessibilitySettingsProps {
   onClose: () => void;
 }
 
-type Category = 'dyslexia' | 'adhd' | 'visual' | 'motor' | 'presets';
-
-const categories: Array<{
-  id: Category;
-  label: string;
-  icon: React.ReactNode;
-  description: string;
-}> = [
-  {
-    id: 'dyslexia',
-    label: 'Dislessia',
-    icon: <TextIcon className="w-5 h-5" />,
-    description: 'Font, spaziatura e supporto TTS',
-  },
-  {
-    id: 'adhd',
-    label: 'ADHD',
-    icon: <Brain className="w-5 h-5" />,
-    description: 'Focus mode, timer e pause',
-  },
-  {
-    id: 'visual',
-    label: 'Visivo',
-    icon: <Eye className="w-5 h-5" />,
-    description: 'Contrasto e dimensioni testo',
-  },
-  {
-    id: 'motor',
-    label: 'Motorio',
-    icon: <Hand className="w-5 h-5" />,
-    description: 'Navigazione da tastiera',
-  },
-  {
-    id: 'presets',
-    label: 'Profili',
-    icon: <Star className="w-5 h-5" />,
-    description: 'Configurazioni rapide',
-  },
-];
-
 export function AccessibilitySettings({
   isOpen,
   onClose,
 }: AccessibilitySettingsProps) {
   const [selectedCategory, setSelectedCategory] =
-    useState<Category>('dyslexia');
+    useState<AccessibilityCategory>('dyslexia');
   const {
     settings,
     resetSettings,
@@ -157,7 +113,7 @@ export function AccessibilitySettings({
               </div>
 
               <ul className="space-y-1">
-                {categories.map((cat) => (
+                {ACCESSIBILITY_CATEGORIES.map((cat) => (
                   <li key={cat.id}>
                     <button
                       onClick={() => setSelectedCategory(cat.id)}
@@ -206,7 +162,7 @@ export function AccessibilitySettings({
                       fontSize: `${20 * (settings.largeText ? 1.2 : 1)}px`,
                     }}
                   >
-                    {categories.find((c) => c.id === selectedCategory)?.label}
+                    {ACCESSIBILITY_CATEGORIES.find((c) => c.id === selectedCategory)?.label}
                   </h3>
                   <p
                     className={cn(
@@ -218,7 +174,7 @@ export function AccessibilitySettings({
                     )}
                   >
                     {
-                      categories.find((c) => c.id === selectedCategory)
+                      ACCESSIBILITY_CATEGORIES.find((c) => c.id === selectedCategory)
                         ?.description
                     }
                   </p>

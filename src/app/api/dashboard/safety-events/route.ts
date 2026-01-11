@@ -10,7 +10,7 @@ import {
   getSafetyEventsFromDb,
   getSafetyStatsFromDb,
   resolveSafetyEvent,
-} from '@/lib/safety/monitoring';
+} from '@/lib/safety/monitoring/db-queries';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/session-auth';
 

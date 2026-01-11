@@ -7,9 +7,9 @@
  */
 
 import { useState, useRef } from 'react';
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { UploadArea } from './components/upload-area';
+import { UploadForm } from './components/upload-form';
+import { UploadProgress } from './components/upload-progress';
 import { cn } from '@/lib/utils';
 
 interface StudyKitUploadProps {
@@ -172,157 +172,32 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
 
   return (
     <div className={cn('space-y-6', className)}>
-      {/* Upload Area */}
-      <div
-        className={cn(
-          'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
-          file ? 'border-primary bg-primary/5' : 'border-slate-300 dark:border-slate-600 hover:border-primary',
-          uploadStatus !== 'idle' && 'pointer-events-none opacity-50'
-        )}
+      <UploadArea
+        file={file}
+        isDisabled={uploadStatus !== 'idle'}
+        onFileSelect={handleFileSelect}
         onDrop={handleDrop}
-        onDragOver={(e) => e.preventDefault()}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf"
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={uploadStatus !== 'idle'}
-          aria-label="Carica file PDF"
-        />
+        onRemove={handleReset}
+      />
 
-        {file ? (
-          <div className="flex items-center justify-center gap-3">
-            <FileText className="w-8 h-8 text-primary" />
-            <div className="text-left">
-              <p className="font-medium text-slate-900 dark:text-white">{file.name}</p>
-              <p className="text-sm text-slate-500">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
-              </p>
-            </div>
-            {uploadStatus === 'idle' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleReset}
-                aria-label="Rimuovi file"
-              >
-                Rimuovi
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <Upload className="w-12 h-12 mx-auto text-slate-400" />
-            <div>
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadStatus !== 'idle'}
-              >
-                Seleziona PDF
-              </Button>
-              <p className="mt-2 text-sm text-slate-500">
-                oppure trascina qui il file (max 10MB)
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Form Fields */}
       {file && uploadStatus === 'idle' && (
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Titolo *
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Es: Rivoluzione Francese"
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              required
-              aria-required="true"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Materia (opzionale)
-            </label>
-            <input
-              id="subject"
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Es: Storia"
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          <Button
-            onClick={handleUpload}
-            disabled={!file || !title || isUploading}
-            className="w-full"
-            size="lg"
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Genera Study Kit
-          </Button>
-        </div>
+        <UploadForm
+          title={title}
+          subject={subject}
+          error={errorMessage}
+          isLoading={isUploading}
+          onTitleChange={setTitle}
+          onSubjectChange={setSubject}
+          onSubmit={handleUpload}
+        />
       )}
 
-      {/* Progress */}
-      {uploadStatus !== 'idle' && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            {uploadStatus === 'success' ? (
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-            ) : uploadStatus === 'error' ? (
-              <AlertCircle className="w-5 h-5 text-red-600" />
-            ) : (
-              <Loader2 className="w-5 h-5 animate-spin text-primary" />
-            )}
-            <p className="text-sm font-medium text-slate-900 dark:text-white">
-              {uploadStatus === 'uploading' && 'Caricamento in corso...'}
-              {uploadStatus === 'processing' && 'Generazione materiali in corso...'}
-              {uploadStatus === 'success' && 'Study Kit generato con successo!'}
-              {uploadStatus === 'error' && 'Errore durante la generazione'}
-            </p>
-          </div>
-
-          {uploadStatus !== 'error' && (
-            <Progress value={uploadProgress} className="h-2" />
-          )}
-
-          {errorMessage && (
-            <p className="text-sm text-red-600 dark:text-red-400">
-              {errorMessage}
-            </p>
-          )}
-
-          {uploadStatus === 'processing' && (
-            <p className="text-xs text-slate-500">
-              Questo processo può richiedere alcuni minuti. Puoi chiudere questa finestra e
-              tornare più tardi.
-            </p>
-          )}
-
-          {(uploadStatus === 'success' || uploadStatus === 'error') && (
-            <Button
-              variant="outline"
-              onClick={handleReset}
-              className="w-full"
-            >
-              Carica un altro PDF
-            </Button>
-          )}
-        </div>
-      )}
+      <UploadProgress
+        status={uploadStatus}
+        progress={uploadProgress}
+        errorMessage={errorMessage}
+        onReset={handleReset}
+      />
     </div>
   );
 }

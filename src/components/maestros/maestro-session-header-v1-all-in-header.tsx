@@ -12,6 +12,8 @@ import { motion } from 'framer-motion';
 import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
+import { AudioVisualizer } from './audio-visualizer';
+import { getStatusText, getMuteStatusText } from './maestro-header-utils';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
 
@@ -52,14 +54,6 @@ export function MaestroSessionHeaderV1({
   onClearChat,
   onClose,
 }: MaestroSessionHeaderV1Props) {
-  const getStatusText = () => {
-    if (configError) return configError;
-    if (isConnected && isSpeaking) return `${maestro.name} sta parlando...`;
-    if (isConnected && isListening) return 'In ascolto...';
-    if (isConnected) return 'Connesso';
-    return 'Avvio chiamata...';
-  };
-
   return (
     <div
       className="flex flex-col gap-2 sm:gap-3 p-2 sm:p-4 rounded-t-2xl text-white"
@@ -115,7 +109,7 @@ export function MaestroSessionHeaderV1({
               "text-xs mt-1",
               configError ? "text-red-200" : "text-white/60"
             )}>
-              {getStatusText()}
+              {getStatusText(configError, isConnected, isSpeaking, isListening, maestro.name)}
             </p>
           )}
         </div>
@@ -194,55 +188,15 @@ export function MaestroSessionHeaderV1({
           className="flex items-center gap-2 sm:gap-3 pt-2 border-t border-white/20"
         >
           {/* Audio visualizer */}
-          {isConnected && (
-            <div className="flex items-center gap-1 h-8 px-2 bg-white/10 rounded-lg">
-              {VISUALIZER_BAR_OFFSETS.map((offset, i) => {
-                const baseHeight = 6;
-                const variance = 1 + (offset % 3) * 0.15;
-                
-                const getBarStyle = () => {
-                  if (isSpeaking) {
-                    const level = outputLevel * variance;
-                    return {
-                      height: baseHeight + level * 20,
-                      opacity: 0.4 + level * 0.6,
-                    };
-                  }
-                  if (isListening && !isMuted) {
-                    const level = inputLevel * variance;
-                    return {
-                      height: baseHeight + level * 24,
-                      opacity: 0.3 + level * 0.7,
-                    };
-                  }
-                  return { height: baseHeight, opacity: 0.2 };
-                };
-
-                const style = getBarStyle();
-
-                return (
-                  <motion.div
-                    key={i}
-                    initial={false}
-                    animate={{ 
-                      height: style.height,
-                      opacity: style.opacity,
-                      scaleY: isSpeaking || (isListening && !isMuted) ? 1 : 0.8,
-                    }}
-                    transition={{ duration: 0.06, ease: 'easeOut' }}
-                    className={cn(
-                      "w-1.5 rounded-full",
-                      isSpeaking 
-                        ? "bg-gradient-to-t from-white/60 to-white" 
-                        : isListening && !isMuted 
-                          ? "bg-gradient-to-t from-white/40 to-white/90" 
-                          : "bg-white/20"
-                    )}
-                  />
-                );
-              })}
-            </div>
-          )}
+          <AudioVisualizer
+            isConnected={isConnected}
+            isSpeaking={isSpeaking}
+            isListening={isListening}
+            isMuted={isMuted}
+            inputLevel={inputLevel}
+            outputLevel={outputLevel}
+            barOffsets={VISUALIZER_BAR_OFFSETS}
+          />
 
           {/* Audio device selector */}
           <AudioDeviceSelector compact />
@@ -282,7 +236,7 @@ export function MaestroSessionHeaderV1({
               aria-live="polite"
               role="status"
             >
-              {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
+              {getMuteStatusText(isMuted)}
             </p>
           )}
         </motion.div>

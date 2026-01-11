@@ -29,52 +29,10 @@ import {
 import { cn } from '@/lib/utils';
 import { getMaestroById, SUBJECT_NAMES } from '@/data/maestri';
 import { getParentSuggestion, getMaestroSubject } from '@/lib/profile/parent-suggestions';
-import type { ObservationCategory } from '@/types';
+import type { DiaryEntry, TeacherDiaryProps } from './teacher-diary/types';
+import { CATEGORY_LABELS } from './teacher-diary/constants';
 
-/**
- * Diary entry from a Maestro's perspective
- */
-export interface DiaryEntry {
-  id: string;
-  maestroId: string;
-  maestroName: string;
-  subject: string;
-  category: ObservationCategory;
-  observation: string;
-  isStrength: boolean;
-  confidence: number;
-  occurrences: number;
-  createdAt: Date;
-  lastSeen: Date;
-}
-
-interface TeacherDiaryProps {
-  entries: DiaryEntry[];
-  studentName: string;
-  isLoading?: boolean;
-  onTalkToMaestro?: (maestroId: string, maestroName: string) => void;
-}
-
-// Italian labels for observation categories
-const CATEGORY_LABELS: Record<ObservationCategory, string> = {
-  logical_reasoning: 'Ragionamento Logico',
-  mathematical_intuition: 'Intuizione Matematica',
-  critical_thinking: 'Pensiero Critico',
-  study_method: 'Metodo di Studio',
-  verbal_expression: 'Espressione Verbale',
-  linguistic_ability: 'Abilita Linguistiche',
-  creativity: 'Creativita',
-  artistic_sensitivity: 'Sensibilita Artistica',
-  scientific_curiosity: 'Curiosita Scientifica',
-  experimental_approach: 'Approccio Sperimentale',
-  spatial_memory: 'Memoria Spaziale',
-  historical_understanding: 'Comprensione Storica',
-  philosophical_depth: 'Profondita Filosofica',
-  physical_awareness: 'Consapevolezza Corporea',
-  environmental_awareness: 'Consapevolezza Ambientale',
-  narrative_skill: 'Abilita Narrative',
-  collaborative_spirit: 'Spirito Collaborativo',
-};
+export type { DiaryEntry, TeacherDiaryProps } from './teacher-diary/types';
 
 /**
  * TeacherDiary - Diario dei Professori

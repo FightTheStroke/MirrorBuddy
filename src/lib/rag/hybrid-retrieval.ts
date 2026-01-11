@@ -10,62 +10,15 @@ import { prisma } from '@/lib/db';
 import { generateEmbedding } from './embedding-service';
 import { searchSimilar, type VectorSearchResult } from './vector-store';
 import { cosineSimilarity } from './embedding-service';
+import type {
+  HybridRetrievalResult,
+  HybridSearchOptions,
+  KeywordSearchOptions,
+  KeywordMatch,
+} from './hybrid-types';
 
-/**
- * Result from hybrid retrieval with component scores
- */
-export interface HybridRetrievalResult {
-  id: string;
-  sourceType: string;
-  sourceId: string;
-  chunkIndex: number;
-  content: string;
-  combinedScore: number;
-  semanticScore: number;
-  keywordScore: number;
-  subject: string | null;
-  tags: string[];
-}
-
-/**
- * Options for hybrid search
- */
-export interface HybridSearchOptions {
-  userId: string;
-  query: string;
-  limit?: number;
-  minScore?: number;
-  sourceType?: 'material' | 'flashcard' | 'studykit' | 'message';
-  subject?: string;
-  /** Weight for semantic search (0-1), keyword weight = 1 - semanticWeight */
-  semanticWeight?: number;
-  excludeSourceIds?: string[];
-}
-
-/**
- * Options for keyword search
- */
-interface KeywordSearchOptions {
-  userId: string;
-  keywords: string[];
-  limit: number;
-  sourceType?: string;
-  subject?: string;
-}
-
-/**
- * Result from keyword search
- */
-interface KeywordMatch {
-  id: string;
-  sourceType: string;
-  sourceId: string;
-  chunkIndex: number;
-  content: string;
-  matchCount: number;
-  subject: string | null;
-  tags: string[];
-}
+// Re-export types
+export type { HybridRetrievalResult, HybridSearchOptions } from './hybrid-types';
 
 /**
  * Extract keywords from query for keyword search
@@ -98,28 +51,33 @@ async function keywordSearch(options: KeywordSearchOptions): Promise<KeywordMatc
     return [];
   }
 
-  // Build WHERE conditions
-  const conditions: string[] = ['userId = ?'];
+  // Build WHERE conditions with PostgreSQL $n placeholders
   const params: (string | number)[] = [userId];
+  let paramIndex = 1;
+  const conditions: string[] = [`"userId" = $${paramIndex++}`];
 
   if (sourceType) {
-    conditions.push('sourceType = ?');
+    conditions.push(`"sourceType" = $${paramIndex++}`);
     params.push(sourceType);
   }
 
   if (subject) {
-    conditions.push('subject = ?');
+    conditions.push(`subject = $${paramIndex++}`);
     params.push(subject);
   }
 
-  // Build keyword LIKE conditions (OR)
-  const keywordConditions = keywords.map(() => 'content LIKE ?');
+  // Build keyword ILIKE conditions (OR) - PostgreSQL uses ILIKE for case-insensitive
+  const keywordConditions = keywords.map(() => `content ILIKE $${paramIndex++}`);
   conditions.push(`(${keywordConditions.join(' OR ')})`);
   keywords.forEach((kw) => params.push(`%${kw}%`));
 
+  // Add limit parameter
+  params.push(limit * 2);
+  const limitParam = paramIndex;
+
   const whereClause = conditions.join(' AND ');
 
-  // Query using raw SQL for SQLite compatibility
+  // Query using raw SQL for PostgreSQL
   type RawEmbedding = {
     id: string;
     sourceType: string;
@@ -131,12 +89,11 @@ async function keywordSearch(options: KeywordSearchOptions): Promise<KeywordMatc
   };
 
   const results = (await prisma.$queryRawUnsafe(
-    `SELECT id, sourceType, sourceId, chunkIndex, content, subject, tags
-     FROM ContentEmbedding
+    `SELECT id, "sourceType", "sourceId", "chunkIndex", content, subject, tags
+     FROM "ContentEmbedding"
      WHERE ${whereClause}
-     LIMIT ?`,
-    ...params,
-    limit * 2 // Fetch more for scoring
+     LIMIT $${limitParam}`,
+    ...params
   )) as RawEmbedding[];
 
   // Calculate match count for each result

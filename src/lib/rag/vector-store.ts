@@ -115,13 +115,16 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
     subject,
   });
 
-  // Build where clause
-  const where: Record<string, unknown> = { userId };
+  // Build where clause - only fetch embeddings with vector data
+  const where: Record<string, unknown> = {
+    userId,
+    vector: { not: null },
+  };
   if (sourceType) where.sourceType = sourceType;
   if (subject) where.subject = subject;
 
   // Fetch candidate embeddings
-  // Note: For large datasets, consider pagination or PostgreSQL pgvector
+  // Note: For large datasets, use PostgreSQL pgvector with vectorNative column
   const embeddings = await prisma.contentEmbedding.findMany({
     where,
     select: {
@@ -140,6 +143,7 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
   const results: VectorSearchResult[] = [];
 
   for (const emb of embeddings) {
+    if (!emb.vector) continue; // Skip if no vector (shouldn't happen with where clause)
     const storedVector = JSON.parse(emb.vector) as number[];
     const similarity = cosineSimilarity(vector, storedVector);
 

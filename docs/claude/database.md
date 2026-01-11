@@ -1,15 +1,55 @@
 # Database
 
-Prisma at `prisma/schema.prisma`.
+PostgreSQL with pgvector at `prisma/schema.prisma`. See ADR 0028 for migration details.
+
+## Setup
+
+```bash
+# macOS
+brew install postgresql@17
+brew services start postgresql@17
+createdb mirrorbuddy
+psql -d mirrorbuddy -c "CREATE EXTENSION vector;"
+
+# .env
+DATABASE_URL=postgresql://user@localhost:5432/mirrorbuddy
+```
 
 ## Key Models
 
-- **User** → Profile, Settings, Progress (1:1)
-- **StudySession** - Learning with XP
-- **FlashcardProgress** - FSRS state
-- **Conversation** → Messages
-- **Learning** - Cross-session insights
-- **Notification** - Server persistence
+| Model | Purpose |
+|-------|---------|
+| **User** | Profile, Settings, Progress (1:1) |
+| **StudySession** | Learning sessions with XP |
+| **FlashcardProgress** | FSRS spaced repetition state |
+| **Conversation** → Messages | Chat history per maestro |
+| **ContentEmbedding** | Vector embeddings for RAG (pgvector) |
+| **MaterialEdge** | Knowledge graph relationships |
+| **Concept** | Extracted concepts from materials |
+
+## Vector Storage (pgvector)
+
+```prisma
+model ContentEmbedding {
+  id           String   @id @default(cuid())
+  userId       String
+  sourceType   String   // "material" | "flashcard" | "message"
+  sourceId     String
+  content      String
+  vectorNative Unsupported("vector(1536)")?  // pgvector native
+  model        String   @default("text-embedding-3-small")
+  dimensions   Int      @default(1536)
+}
+```
+
+Similarity search:
+```sql
+SELECT *, 1 - (vector <=> $1) as similarity
+FROM "ContentEmbedding"
+WHERE "userId" = $2
+ORDER BY vector <=> $1
+LIMIT 10;
+```
 
 ## Data Persistence
 
@@ -19,6 +59,7 @@ Prisma at `prisma/schema.prisma`.
 | Progress | `/api/progress` |
 | Materials | `/api/materials` |
 | Conversations | `/api/conversations` |
+| Embeddings | `/api/materials` (auto-indexed) |
 | Session ID | `sessionStorage` |
 | Device cache | `localStorage` (OK) |
 
@@ -26,6 +67,13 @@ Prisma at `prisma/schema.prisma`.
 
 ```bash
 npx prisma generate  # Generate client
-npx prisma db push   # Sync schema
+npx prisma db push   # Sync schema to PostgreSQL
 npx prisma studio    # GUI browser
+npx prisma migrate   # Create migration
 ```
+
+## References
+
+- ADR 0028: PostgreSQL with pgvector Migration
+- ADR 0033: RAG Semantic Search Architecture
+- `src/lib/rag/` - RAG implementation

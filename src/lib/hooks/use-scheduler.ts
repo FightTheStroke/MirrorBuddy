@@ -15,50 +15,7 @@ import type {
   NotificationPreferences,
 } from '@/lib/scheduler/types';
 import { DEFAULT_SCHEDULER_CONFIG } from '@/lib/scheduler/types';
-
-interface UseSchedulerOptions {
-  /** Enable automatic checking for due items */
-  autoCheck?: boolean;
-  /** Check interval in ms (default: 60000 = 1 minute) */
-  checkInterval?: number;
-  /** Enable auto-fetch on mount (default: true) */
-  autoFetch?: boolean;
-}
-
-interface UseSchedulerReturn {
-  /** User's study schedule */
-  schedule: StudySchedule | null;
-  /** Loading state */
-  isLoading: boolean;
-  /** Error message */
-  error: string | null;
-  /** Whether user is authenticated */
-  isAuthenticated: boolean;
-  /** Fetch schedule from server */
-  fetchSchedule: () => Promise<void>;
-  /** Create a new scheduled session */
-  createSession: (data: Omit<ScheduledSession, 'id' | 'userId'>) => Promise<ScheduledSession | null>;
-  /** Update an existing session */
-  updateSession: (id: string, data: Partial<ScheduledSession>) => Promise<ScheduledSession | null>;
-  /** Delete a session */
-  deleteSession: (id: string) => Promise<boolean>;
-  /** Create a custom reminder */
-  createReminder: (data: Omit<CustomReminder, 'id' | 'userId' | 'createdAt'>) => Promise<CustomReminder | null>;
-  /** Update a reminder */
-  updateReminder: (id: string, data: Partial<CustomReminder>) => Promise<CustomReminder | null>;
-  /** Delete a reminder */
-  deleteReminder: (id: string) => Promise<boolean>;
-  /** Update notification preferences */
-  updatePreferences: (prefs: Partial<NotificationPreferences>) => Promise<void>;
-  /** Manually trigger check for due items */
-  checkDue: () => Promise<{ notificationsCreated: number; types: string[] }>;
-  /** Get sessions for a specific day */
-  getSessionsForDay: (dayOfWeek: number) => ScheduledSession[];
-  /** Get today's sessions */
-  getTodaySessions: () => ScheduledSession[];
-  /** Get upcoming reminders */
-  getUpcomingReminders: (hours?: number) => CustomReminder[];
-}
+import type { UseSchedulerOptions, UseSchedulerReturn } from './use-scheduler/types';
 
 export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerReturn {
   const {
@@ -317,7 +274,7 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
 
   // Update preferences
   const updatePreferences = useCallback(
-    async (prefs: Partial<NotificationPreferences>) => {
+    async (prefs: Partial<NotificationPreferences>): Promise<boolean> => {
       try {
         const response = await fetch('/api/scheduler', {
           method: 'PATCH',
@@ -327,7 +284,7 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
 
         if (response.status === 401) {
           setIsAuthenticated(false);
-          return;
+          return false;
         }
 
         if (!response.ok) throw new Error('Failed to update preferences');
@@ -339,8 +296,11 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
           if (!prev) return prev;
           return { ...prev, preferences };
         });
+
+        return true;
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to update preferences');
+        return false;
       }
     },
     []
@@ -367,36 +327,6 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
       return { notificationsCreated: 0, types: [] };
     }
   }, []);
-
-  // Get sessions for a specific day
-  const getSessionsForDay = useCallback(
-    (dayOfWeek: number): ScheduledSession[] => {
-      if (!schedule) return [];
-      return schedule.weeklyPlan.filter((s) => s.dayOfWeek === dayOfWeek);
-    },
-    [schedule]
-  );
-
-  // Get today's sessions
-  const getTodaySessions = useCallback((): ScheduledSession[] => {
-    return getSessionsForDay(new Date().getDay());
-  }, [getSessionsForDay]);
-
-  // Get upcoming reminders
-  const getUpcomingReminders = useCallback(
-    (hours = 24): CustomReminder[] => {
-      if (!schedule) return [];
-
-      const now = new Date();
-      const cutoff = new Date(now.getTime() + hours * 60 * 60 * 1000);
-
-      return schedule.customReminders.filter((r) => {
-        const dt = new Date(r.datetime);
-        return dt >= now && dt <= cutoff;
-      });
-    },
-    [schedule]
-  );
 
   // Initial fetch
   useEffect(() => {
@@ -435,9 +365,6 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
     updateReminder,
     deleteReminder,
     updatePreferences,
-    checkDue,
-    getSessionsForDay,
-    getTodaySessions,
-    getUpcomingReminders,
+    checkForDueItems: checkDue,
   };
 }

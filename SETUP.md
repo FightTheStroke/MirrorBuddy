@@ -34,7 +34,10 @@ Open http://localhost:3000
 ## Azure OpenAI Setup
 
 1. [Azure Portal](https://portal.azure.com) → Create Azure OpenAI resource
-2. Deploy models: `gpt-4o` (chat) and `gpt-4o-realtime-preview` (voice)
+2. Deploy models:
+   - `gpt-4o` (chat)
+   - `gpt-4o-realtime-preview` (voice)
+   - `text-embedding-ada-002` (RAG semantic search, optional)
 3. Configure `.env.local`:
 
 ```bash
@@ -49,9 +52,22 @@ AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
 AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview
+
+# RAG Embeddings (optional - enables semantic search)
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
 ```
 
 4. Verify: Settings → AI Provider → Diagnostics → Test Connection
+
+**RAG Setup (optional):**
+```bash
+az cognitiveservices account deployment create \
+  --name your-resource --resource-group your-rg \
+  --deployment-name text-embedding-ada-002 \
+  --model-name text-embedding-ada-002 \
+  --model-version 2 --model-format OpenAI \
+  --sku-capacity 10 --sku-name Standard
+```
 
 ---
 
@@ -101,9 +117,18 @@ AZURE_SUBSCRIPTION_ID=your-subscription-id
 
 ## Database Configuration
 
-**Dev (SQLite):** `DATABASE_URL="file:./dev.db"` (default, no setup)
+**PostgreSQL with pgvector (required for RAG):**
+```bash
+# macOS
+brew install postgresql@17
+brew services start postgresql@17
+createdb mirrorbuddy
+psql -d mirrorbuddy -c "CREATE EXTENSION vector;"
+```
 
-**Prod (PostgreSQL):** `DATABASE_URL="postgresql://user:password@localhost:5432/mirrorbuddy"`
+```bash
+DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy"
+```
 
 **Migrations:** `npx prisma generate` | `npx prisma db push` (dev) | `npx prisma migrate dev` (prod) | `npx prisma migrate reset` (deletes data)
 
@@ -120,12 +145,15 @@ AZURE_OPENAI_API_KEY=your-api-key
 AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
 
+# RAG Embeddings (optional)
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
+
 # Ollama (Optional)
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2
 
-# Database
-DATABASE_URL="file:./dev.db"
+# Database (PostgreSQL with pgvector for RAG)
+DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy"
 
 # Application
 NEXT_PUBLIC_APP_URL=http://localhost:3000

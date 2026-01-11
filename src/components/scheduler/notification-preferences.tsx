@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Bell, Volume2, Moon, Clock, MessageCircle, Smartphone, AlertCircle, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { NotificationToggle } from './components/notification-toggle';
 import type { NotificationPreferences as NotificationPrefsType } from '@/lib/scheduler/types';
 import { DEFAULT_NOTIFICATION_PREFERENCES } from '@/lib/scheduler/types';
 import {
@@ -100,87 +101,32 @@ export function NotificationPreferences({
       <CardContent className="space-y-4">
         {/* Main toggles */}
         <div className="space-y-3">
-          {/* Enable/Disable all */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-            <div className="flex items-center gap-3">
-              <Bell className="w-5 h-5 text-slate-500" />
-              <div>
-                <p className="font-medium text-slate-900 dark:text-white">Notifiche</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Abilita tutte le notifiche
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => handleToggle('enabled', !prefs.enabled)}
-              disabled={saving || isLoading}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                prefs.enabled ? 'bg-blue-500' : 'bg-slate-300 dark:bg-slate-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  prefs.enabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
+          <NotificationToggle
+            icon={<Bell className="w-5 h-5 text-slate-500" />}
+            label="Notifiche"
+            description="Abilita tutte le notifiche"
+            isEnabled={prefs.enabled}
+            isDisabled={saving || isLoading}
+            onChange={(value) => handleToggle('enabled', value)}
+          />
 
-          {/* In-app */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-            <div className="flex items-center gap-3">
-              <MessageCircle className="w-5 h-5 text-slate-500" />
-              <div>
-                <p className="font-medium text-slate-900 dark:text-white">In-app</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Mostra notifiche nell&apos;app
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => handleToggle('inAppEnabled', !prefs.inAppEnabled)}
-              disabled={saving || isLoading || !prefs.enabled}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                prefs.inAppEnabled && prefs.enabled
-                  ? 'bg-blue-500'
-                  : 'bg-slate-300 dark:bg-slate-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  prefs.inAppEnabled && prefs.enabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
+          <NotificationToggle
+            icon={<MessageCircle className="w-5 h-5 text-slate-500" />}
+            label="In-app"
+            description="Mostra notifiche nell'app"
+            isEnabled={prefs.inAppEnabled && prefs.enabled}
+            isDisabled={saving || isLoading || !prefs.enabled}
+            onChange={(value) => handleToggle('inAppEnabled', value)}
+          />
 
-          {/* Voice (Melissa) */}
-          <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-            <div className="flex items-center gap-3">
-              <Volume2 className="w-5 h-5 text-slate-500" />
-              <div>
-                <p className="font-medium text-slate-900 dark:text-white">Voce di Melissa</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Melissa legge le notifiche
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => handleToggle('voiceEnabled', !prefs.voiceEnabled)}
-              disabled={saving || isLoading || !prefs.enabled}
-              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                prefs.voiceEnabled && prefs.enabled
-                  ? 'bg-blue-500'
-                  : 'bg-slate-300 dark:bg-slate-600'
-              }`}
-            >
-              <span
-                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                  prefs.voiceEnabled && prefs.enabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </div>
+          <NotificationToggle
+            icon={<Volume2 className="w-5 h-5 text-slate-500" />}
+            label="Voce di Melissa"
+            description="Melissa legge le notifiche"
+            isEnabled={prefs.voiceEnabled && prefs.enabled}
+            isDisabled={saving || isLoading || !prefs.enabled}
+            onChange={(value) => handleToggle('voiceEnabled', value)}
+          />
 
           {/* Push Notifications - Only shown if browser supports Push API */}
           {pushCapability && pushCapability !== 'unsupported' && (

@@ -2,6 +2,10 @@
 // NEXT.JS INSTRUMENTATION
 // Runs when the Next.js server starts
 // Used to initialize WebSocket proxy for Azure Realtime API
+//
+// @deprecated WebSocket proxy is deprecated. Use WebRTC transport instead.
+// Set VOICE_TRANSPORT=webrtc in environment to enable WebRTC.
+// This proxy will be removed in a future release.
 // ============================================================================
 
 export async function register() {

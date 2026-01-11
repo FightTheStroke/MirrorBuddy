@@ -1,6 +1,18 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
-import path from "path";
+
+// PostgreSQL connection URL from environment
+// For local: postgresql://user:pass@localhost:5432/mirrorbuddy
+// For Supabase: postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres
+const databaseUrl = process.env["DATABASE_URL"];
+
+if (!databaseUrl) {
+  console.warn(
+    "⚠️  DATABASE_URL not set. Set it to a PostgreSQL connection string.\n" +
+    "   Local: postgresql://user:pass@localhost:5432/mirrorbuddy\n" +
+    "   Supabase: Get connection string from Project Settings > Database"
+  );
+}
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
@@ -8,6 +20,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"] || `file:${path.join(__dirname, "prisma", "dev.db")}`,
+    url: databaseUrl || "postgresql://localhost:5432/mirrorbuddy",
   },
 });

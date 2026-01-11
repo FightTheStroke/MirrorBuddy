@@ -8,45 +8,13 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  GraduationCap,
-  BookOpen,
-  ArrowRight,
-  ArrowLeft,
-  X,
-} from 'lucide-react';
-import Image from 'next/image';
+import { GraduationCap, BookOpen, ArrowLeft, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { SubjectSelectionStep } from './components/subject-selection-step';
+import { MaestroSelectionStep } from './components/maestro-selection-step';
 import { getMaestriBySubject, getAllSubjects, maestri as allMaestri } from '@/data';
 import type { Subject, Maestro } from '@/types';
 import type { ToolType } from '@/types/tools';
-
-// Italian labels for subjects
-const SUBJECT_LABELS: Record<string, string> = {
-  mathematics: 'Matematica',
-  physics: 'Fisica',
-  chemistry: 'Chimica',
-  biology: 'Biologia',
-  history: 'Storia',
-  geography: 'Geografia',
-  italian: 'Italiano',
-  english: 'Inglese',
-  art: 'Arte',
-  music: 'Musica',
-  civics: 'Educazione Civica',
-  economics: 'Economia',
-  computerScience: 'Informatica',
-  health: 'Salute',
-  philosophy: 'Filosofia',
-  internationalLaw: 'Diritto Internazionale',
-  storytelling: 'Storytelling',
-  astronomy: 'Astronomia',
-  'computer-science': 'Informatica',
-  'civic-education': 'Educazione Civica',
-  science: 'Scienze',
-  'physical-education': 'Educazione Fisica',
-};
 
 // Tool type labels in Italian
 const TOOL_LABELS: Record<ToolType, string> = {
@@ -64,10 +32,6 @@ const TOOL_LABELS: Record<ToolType, string> = {
   pdf: 'PDF',
   homework: 'Compiti',
   'study-kit': 'Study Kit',
-};
-
-const getSubjectLabel = (subject: string): string => {
-  return SUBJECT_LABELS[subject] || subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ');
 };
 
 interface ToolMaestroSelectionDialogProps {
@@ -230,77 +194,22 @@ export function ToolMaestroSelectionDialog({
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-4">
             <AnimatePresence mode="wait">
-              {/* Step 1: Subject Selection */}
               {step === 'subject' && (
-                <motion.div
-                  key="subject"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
-                  <p className="text-slate-600 dark:text-slate-400 mb-4">
-                    Di quale materia vuoi fare {toolLabel.toLowerCase()}?
-                  </p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {allSubjects.map((subject) => (
-                      <button
-                        key={subject}
-                        onClick={() => handleSubjectSelect(subject)}
-                        className={cn(
-                          'p-3 text-sm rounded-lg border-2 transition-all font-medium',
-                          'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700',
-                          'hover:border-accent-themed hover:bg-accent-themed/10'
-                        )}
-                      >
-                        {getSubjectLabel(subject)}
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
+                <SubjectSelectionStep
+                  toolType={toolType}
+                  subjects={allSubjects}
+                  onSubjectSelect={handleSubjectSelect}
+                />
               )}
 
-              {/* Step 2: Maestro Selection */}
               {step === 'maestro' && (
-                <motion.div
-                  key="maestro"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                >
-                  <p className="text-slate-600 dark:text-slate-400 mb-4">
-                    {selectedSubject && availableMaestri.length > 0 ? (
-                      <>Scegli il Professore per <span className="font-semibold text-accent-themed">{getSubjectLabel(selectedSubject)}</span>:</>
-                    ) : (
-                      <>Nessun professore specifico per questa materia. Scegli tra tutti i Professori:</>
-                    )}
-                  </p>
-                  <div className="space-y-2">
-                    {(availableMaestri.length > 0 ? availableMaestri : allMaestri).map((maestro) => (
-                      <button
-                        key={maestro.id}
-                        onClick={() => handleMaestroSelect(maestro)}
-                        className="w-full p-4 flex items-center gap-3 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-accent-themed hover:bg-accent-themed/5 transition-all text-left"
-                      >
-                        <div className="w-12 h-12 rounded-full overflow-hidden shadow-md flex-shrink-0">
-                          <Image
-                            src={maestro.avatar}
-                            alt={maestro.name}
-                            width={48}
-                            height={48}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold">{maestro.name}</p>
-                          <p className="text-sm text-slate-500">{maestro.specialty}</p>
-                        </div>
-                        <ArrowRight className="h-5 w-5 text-accent-themed" />
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
+                <MaestroSelectionStep
+                  selectedSubject={selectedSubject}
+                  availableMaestri={availableMaestri}
+                  allMaestri={allMaestri}
+                  onMaestroSelect={handleMaestroSelect}
+                />
               )}
-
             </AnimatePresence>
           </div>
 

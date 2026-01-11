@@ -31,6 +31,7 @@ function toMaterial(m: KnowledgeHubMaterial): Material {
 export interface GalleryViewProps {
   materials: KnowledgeHubMaterial[];
   onSelectMaterial: (material: KnowledgeHubMaterial) => void;
+  onFindSimilar?: (toolId: string) => void;
   selectedMaterialIds?: Set<string>;
   onToggleMaterialSelection?: (id: string) => void;
   /** Size of gallery cards: 'small' | 'medium' | 'large' */
@@ -53,6 +54,7 @@ const CARD_CLASSES = {
 export function GalleryView({
   materials,
   onSelectMaterial,
+  onFindSimilar,
   selectedMaterialIds = new Set(),
   onToggleMaterialSelection,
   cardSize = 'medium',
@@ -92,6 +94,11 @@ export function GalleryView({
                 <MaterialCard
                   material={toMaterial(material)}
                   onOpen={() => onSelectMaterial(material)}
+                  onFindSimilar={
+                    onFindSimilar
+                      ? () => onFindSimilar(material.toolId ?? material.id)
+                      : undefined
+                  }
                   isSelected={selectedMaterialIds.has(material.id)}
                   onSelect={
                     onToggleMaterialSelection

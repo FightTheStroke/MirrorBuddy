@@ -3,12 +3,13 @@
  * @brief Filter component with toggle switches for multi-select
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TYPE_FILTERS, CHIP_COLORS, DATE_FILTERS } from '../constants';
 import { SUBJECT_LABELS } from '@/components/education/archive';
+import { useFilterDropdown } from './use-filter-dropdown';
 
 interface FilterChipsProps {
   typeFilter: string;
@@ -35,42 +36,8 @@ export function FilterChips({
   getSubjectFilterCount,
   getDateFilterCount,
 }: FilterChipsProps) {
-  const [showMoreTypes, setShowMoreTypes] = useState(false);
   const [showSubjects, setShowSubjects] = useState(true);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
-  const moreTypesRef = useRef<HTMLDivElement>(null);
-
-  const updateDropdownPosition = useCallback(() => {
-    if (moreTypesRef.current) {
-      const rect = moreTypesRef.current.getBoundingClientRect();
-      setDropdownPosition({ top: rect.bottom + 4, left: rect.left });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (showMoreTypes) {
-      updateDropdownPosition();
-      window.addEventListener('resize', updateDropdownPosition);
-      window.addEventListener('scroll', updateDropdownPosition, true);
-    }
-    return () => {
-      window.removeEventListener('resize', updateDropdownPosition);
-      window.removeEventListener('scroll', updateDropdownPosition, true);
-    };
-  }, [showMoreTypes, updateDropdownPosition]);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (moreTypesRef.current && !moreTypesRef.current.contains(event.target as Node)) {
-        setShowMoreTypes(false);
-      }
-    }
-
-    if (showMoreTypes) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showMoreTypes]);
+  const { showMoreTypes, setShowMoreTypes, dropdownPosition, moreTypesRef } = useFilterDropdown();
 
   const visibleTypes = TYPE_FILTERS.slice(0, 5).filter(f => getTypeFilterCount(f.id) > 0);
   const moreTypes = TYPE_FILTERS.slice(5)

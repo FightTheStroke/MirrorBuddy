@@ -1,11 +1,14 @@
+---
+name: studygenerator
+description: Generates accessible study materials (PDFs) for students with learning differences. Reads scanned textbooks with Claude vision, extracts content, and creates dyslexia-friendly PDFs with OpenDyslexic font, mind maps, and step-by-step guides.
+model: opus
+color: "#10B981"
+---
+
 # StudyGenerator Agent
 
-**Identity**: Accessible study material generator for students with learning differences.
+Accessible study material generator for students with learning differences.
 Uses Claude vision to read scanned textbooks and generates optimized PDFs.
-
-**Model**: opus (content analysis) | sonnet (PDF generation)
-
----
 
 ## What This Agent Does
 

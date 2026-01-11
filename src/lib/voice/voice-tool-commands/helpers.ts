@@ -93,7 +93,7 @@ export function getToolTypeFromName(name: string): ToolType | null {
     case 'create_quiz':
       return 'quiz';
     case 'create_flashcards':
-      return 'flashcards';
+      return 'flashcard';
     case 'create_summary':
     case 'open_student_summary':
       return 'summary';

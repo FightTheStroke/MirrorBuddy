@@ -1,115 +1,38 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import {
-  Send,
-  X,
-  Mic,
-  Volume2,
-  VolumeX,
-  Loader2,
-  User,
-  Copy,
-  Check,
-  RotateCcw,
-} from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { useConversationStore } from '@/lib/stores';
-import { useSettingsStore } from '@/lib/stores/settings-store';
 import { logger } from '@/lib/logger';
-import { useTTS } from '@/components/accessibility';
-import type { Maestro, ChatMessage, ToolCall } from '@/types';
+import type { ToolCall } from '@/types';
 import { ToolResultDisplay } from '@/components/tools';
-
-interface ChatSessionProps {
-  maestro: Maestro;
-  onClose: () => void;
-  onSwitchToVoice?: () => void;
-}
+import { useChatSession } from './hooks';
+import { ChatHeader } from './chat-header';
+import { ChatFooter } from './chat-footer';
+import { MessageBubble } from './message-bubble';
+import { MessageLoading } from './message-loading';
+import type { ChatSessionProps } from './types';
 
 export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const {
+    messages,
+    setMessages,
+    input,
+    setInput,
+    isLoading,
+    setIsLoading,
+    messagesEndRef,
+    inputRef,
+    conversationIdRef,
+    copiedId,
+    setCopiedId,
+    settings,
+    speak,
+    ttsEnabled,
+    addMessageToStore,
+  } = useChatSession(maestro);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
-  const conversationIdRef = useRef<string | null>(null);
-
-  const { settings } = useAccessibilityStore();
-  const { speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
-  const { createConversation, addMessage: addMessageToStore } = useConversationStore();
-  const { studentProfile } = useSettingsStore();
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: settings.reducedMotion ? 'auto' : 'smooth' });
-  }, [messages, settings.reducedMotion]);
-
-  // Focus input on mount
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  // Create conversation and add greeting message on mount
-  useEffect(() => {
-    async function initConversation() {
-      // Create conversation for this maestro
-      const convId = await createConversation(maestro.id);
-      conversationIdRef.current = convId;
-
-      // Try to get contextual greeting based on previous conversations
-      let greetingText = maestro.greeting;
-      try {
-        const studentName = studentProfile?.name || 'Studente';
-        const response = await fetch(
-          `/api/conversations/greeting?characterId=${maestro.id}&studentName=${encodeURIComponent(studentName)}&maestroName=${encodeURIComponent(maestro.name)}`
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          if (data.hasContext && data.greeting) {
-            greetingText = data.greeting;
-            logger.info('Contextual greeting loaded', {
-              maestroId: maestro.id,
-              topics: data.topics,
-            });
-          }
-        }
-      } catch (error) {
-        // Fall back to static greeting on error
-        logger.debug('Failed to load contextual greeting, using default', {
-          error: String(error),
-        });
-      }
-
-      // Add greeting message
-      const greetingMessage: ChatMessage = {
-        id: 'greeting',
-        role: 'assistant',
-        content: greetingText,
-        timestamp: new Date(),
-      };
-      setMessages([greetingMessage]);
-
-      // Persist greeting to database
-      await addMessageToStore(convId, {
-        role: 'assistant',
-        content: greetingText,
-      });
-
-      if (settings.ttsAutoRead) {
-        speak(greetingText);
-      }
-    }
-
-    initConversation();
-  }, [maestro.id, maestro.name, maestro.greeting, settings.ttsAutoRead, studentProfile?.name, speak, createConversation, addMessageToStore]);
+  const [toolCalls, setToolCalls] = React.useState<ToolCall[]>([]);
 
   // Handle Escape key to close modal
   useEffect(() => {
@@ -126,9 +49,9 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage: ChatMessage = {
+    const userMessage = {
       id: `user-${Date.now()}`,
-      role: 'user',
+      role: 'user' as const,
       content: input.trim(),
       timestamp: new Date(),
     };
@@ -137,7 +60,6 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
     setInput('');
     setIsLoading(true);
 
-    // Persist user message to database
     if (conversationIdRef.current) {
       addMessageToStore(conversationIdRef.current, {
         role: 'user',
@@ -146,7 +68,6 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
     }
 
     try {
-      // Call chat API with memory enabled (ADR 0021)
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -167,9 +88,9 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
 
       const data = await response.json();
 
-      const assistantMessage: ChatMessage = {
+      const assistantMessage = {
         id: `assistant-${Date.now()}`,
-        role: 'assistant',
+        role: 'assistant' as const,
         content: data.content,
         timestamp: new Date(),
         tokens: data.usage?.total_tokens,
@@ -177,7 +98,6 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      // Persist assistant message to database
       if (conversationIdRef.current) {
         addMessageToStore(conversationIdRef.current, {
           role: 'assistant',
@@ -185,26 +105,23 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
         });
       }
 
-      // Handle tool calls if any
       if (data.toolCalls) {
         setToolCalls((prev) => [...prev, ...data.toolCalls]);
       }
 
-      // Read response aloud if TTS auto-read is enabled
       if (settings.ttsAutoRead) {
         speak(data.content);
       }
     } catch (error) {
       logger.error('Chat error', { error: String(error) });
-      const errorMessage: ChatMessage = {
+      const errorMessage = {
         id: `error-${Date.now()}`,
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Mi scuso, si è verificato un errore. Riprova.',
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
 
-      // Persist error message to database
       if (conversationIdRef.current) {
         addMessageToStore(conversationIdRef.current, {
           role: 'assistant',
@@ -231,25 +148,21 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
   };
 
   const clearChat = async () => {
-    // Create new conversation
-    const newConvId = await createConversation(maestro.id);
-    conversationIdRef.current = newConvId;
-
-    // Reset messages with greeting
-    const greetingMessage: ChatMessage = {
+    const greetingMessage = {
       id: 'greeting',
-      role: 'assistant',
+      role: 'assistant' as const,
       content: maestro.greeting,
       timestamp: new Date(),
     };
     setMessages([greetingMessage]);
     setToolCalls([]);
 
-    // Persist greeting to new conversation
-    await addMessageToStore(newConvId, {
-      role: 'assistant',
-      content: maestro.greeting,
-    });
+    if (conversationIdRef.current) {
+      await addMessageToStore(conversationIdRef.current, {
+        role: 'assistant',
+        content: maestro.greeting,
+      });
+    }
   };
 
   return (
@@ -275,117 +188,16 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
         aria-modal="true"
         aria-labelledby="chat-title"
       >
-        {/* Header */}
-        <header
-          className={cn(
-            'flex items-center justify-between px-4 py-3 border-b',
-            settings.highContrast
-              ? 'border-yellow-400 bg-black'
-              : 'border-slate-200 dark:border-slate-700'
-          )}
-          style={{ backgroundColor: `${maestro.color}10` }}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full overflow-hidden"
-              style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
-            >
-              <Image
-                src={maestro.avatar}
-                alt={maestro.name}
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div>
-              <h2
-                id="chat-title"
-                className={cn(
-                  'font-semibold',
-                  settings.highContrast ? 'text-yellow-400' : 'text-slate-900 dark:text-white',
-                  settings.dyslexiaFont && 'tracking-wide'
-                )}
-              >
-                {maestro.name}
-              </h2>
-              <p
-                className={cn(
-                  'text-xs',
-                  settings.highContrast ? 'text-gray-400' : 'text-slate-500'
-                )}
-              >
-                {maestro.specialty}
-              </p>
-            </div>
-          </div>
+        <ChatHeader
+          maestro={maestro}
+          highContrast={settings.highContrast}
+          dyslexiaFont={settings.dyslexiaFont}
+          ttsEnabled={ttsEnabled}
+          onClose={onClose}
+          onClearChat={clearChat}
+          onSwitchToVoice={onSwitchToVoice}
+        />
 
-          <div className="flex items-center gap-2">
-            {/* TTS toggle */}
-            <button
-              onClick={() => (ttsEnabled ? stopTTS() : null)}
-              className={cn(
-                'p-2 rounded-lg transition-colors',
-                settings.highContrast
-                  ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                  : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700'
-              )}
-              title={ttsEnabled ? 'TTS attivo' : 'TTS disattivo'}
-            >
-              {ttsEnabled ? (
-                <Volume2 className="w-4 h-4" />
-              ) : (
-                <VolumeX className="w-4 h-4" />
-              )}
-            </button>
-
-            {/* Switch to voice */}
-            {onSwitchToVoice && (
-              <button
-                onClick={onSwitchToVoice}
-                className={cn(
-                  'p-2 rounded-lg transition-colors',
-                  settings.highContrast
-                    ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                    : 'bg-accent-themed text-white hover:brightness-110'
-                )}
-                title="Passa alla modalità voce"
-              >
-                <Mic className="w-4 h-4" />
-              </button>
-            )}
-
-            {/* Clear chat */}
-            <button
-              onClick={clearChat}
-              className={cn(
-                'p-2 rounded-lg transition-colors',
-                settings.highContrast
-                  ? 'text-yellow-400 hover:bg-yellow-400/20'
-                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-              )}
-              title="Nuova conversazione"
-            >
-              <RotateCcw className="w-4 h-4" />
-            </button>
-
-            {/* Close */}
-            <button
-              onClick={onClose}
-              className={cn(
-                'p-2 rounded-lg transition-colors',
-                settings.highContrast
-                  ? 'text-yellow-400 hover:bg-yellow-400/20'
-                  : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
-              )}
-              title="Chiudi"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </header>
-
-        {/* Messages */}
         <main
           className={cn(
             'flex-1 overflow-y-auto p-4 space-y-4',
@@ -395,88 +207,19 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
         >
           <AnimatePresence mode="popLayout">
             {messages.map((message) => (
-              <motion.div
+              <MessageBubble
                 key={message.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className={cn(
-                  'flex gap-3',
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                )}
-              >
-                {/* Avatar for assistant */}
-                {message.role === 'assistant' && (
-                  <div
-                    className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
-                    style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
-                  >
-                    <Image
-                      src={maestro.avatar}
-                      alt={maestro.name}
-                      width={32}
-                      height={32}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-
-                {/* Message bubble */}
-                <div
-                  className={cn(
-                    'max-w-[80%] rounded-2xl px-4 py-3 relative group',
-                    message.role === 'user'
-                      ? settings.highContrast
-                        ? 'bg-yellow-400 text-black'
-                        : 'bg-accent-themed text-white'
-                      : settings.highContrast
-                        ? 'bg-gray-900 text-white border border-gray-700'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white',
-                    settings.dyslexiaFont && 'tracking-wide'
-                  )}
-                  style={{
-                    lineHeight: settings.lineSpacing,
-                  }}
-                >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
-
-                  {/* Copy button */}
-                  <button
-                    onClick={() => copyMessage(message.content, message.id)}
-                    className={cn(
-                      'absolute -right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded-full transition-opacity',
-                      settings.highContrast
-                        ? 'bg-yellow-400 text-black'
-                        : 'bg-white dark:bg-slate-700 shadow-md'
-                    )}
-                    title="Copia messaggio"
-                  >
-                    {copiedId === message.id ? (
-                      <Check className="w-3 h-3 text-green-500" />
-                    ) : (
-                      <Copy className="w-3 h-3" />
-                    )}
-                  </button>
-                </div>
-
-                {/* Avatar for user */}
-                {message.role === 'user' && (
-                  <div
-                    className={cn(
-                      'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
-                      settings.highContrast
-                        ? 'bg-yellow-400 text-black'
-                        : 'bg-accent-themed text-white'
-                    )}
-                  >
-                    <User className="w-4 h-4" />
-                  </div>
-                )}
-              </motion.div>
+                message={message}
+                maestro={maestro}
+                copiedId={copiedId}
+                onCopy={copyMessage}
+                highContrast={settings.highContrast}
+                dyslexiaFont={settings.dyslexiaFont}
+                lineSpacing={settings.lineSpacing}
+              />
             ))}
           </AnimatePresence>
 
-          {/* Tool calls */}
           {toolCalls.length > 0 && (
             <div className="space-y-3">
               {toolCalls.map((toolCall) => (
@@ -485,111 +228,23 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
             </div>
           )}
 
-          {/* Loading indicator */}
-          {isLoading && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex gap-3"
-            >
-              <div
-                className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
-                style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
-              >
-                <Image
-                  src={maestro.avatar}
-                  alt={maestro.name}
-                  width={32}
-                  height={32}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div
-                className={cn(
-                  'rounded-2xl px-4 py-3 flex items-center gap-2',
-                  settings.highContrast
-                    ? 'bg-gray-900 border border-gray-700'
-                    : 'bg-slate-100 dark:bg-slate-800'
-                )}
-              >
-                <Loader2
-                  className={cn(
-                    'w-4 h-4 animate-spin',
-                    settings.highContrast ? 'text-yellow-400' : 'text-blue-500'
-                  )}
-                />
-                <span
-                  className={cn(
-                    'text-sm',
-                    settings.highContrast ? 'text-gray-400' : 'text-slate-500'
-                  )}
-                >
-                  {maestro.name} sta pensando...
-                </span>
-              </div>
-            </motion.div>
-          )}
+          {isLoading && <MessageLoading maestro={maestro} highContrast={settings.highContrast} />}
 
           <div ref={messagesEndRef} />
         </main>
 
-        {/* Input */}
-        <footer
-          className={cn(
-            'border-t p-4',
-            settings.highContrast
-              ? 'border-yellow-400 bg-black'
-              : 'border-slate-200 dark:border-slate-700'
-          )}
-        >
-          <form onSubmit={handleSubmit} className="flex gap-3">
-            <textarea
-              ref={inputRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Scrivi un messaggio..."
-              rows={1}
-              className={cn(
-                'flex-1 resize-none rounded-xl px-4 py-3 focus:outline-none focus:ring-2',
-                settings.highContrast
-                  ? 'bg-gray-900 text-white border-2 border-yellow-400 focus:ring-yellow-400'
-                  : 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-blue-500',
-                settings.dyslexiaFont && 'tracking-wide'
-              )}
-              style={{
-                lineHeight: settings.lineSpacing,
-              }}
-              disabled={isLoading}
-              aria-label="Messaggio"
-            />
-
-            <button
-              type="submit"
-              disabled={!input.trim() || isLoading}
-              className={cn(
-                'px-4 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
-                settings.highContrast
-                  ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-                  : 'bg-accent-themed text-white hover:brightness-110'
-              )}
-              style={{ backgroundColor: input.trim() ? maestro.color : undefined }}
-              aria-label="Invia messaggio"
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </form>
-
-          {/* Hint */}
-          <p
-            className={cn(
-              'text-xs mt-2 text-center',
-              settings.highContrast ? 'text-gray-500' : 'text-slate-400'
-            )}
-          >
-            Premi Invio per inviare, Shift+Invio per andare a capo
-          </p>
-        </footer>
+        <ChatFooter
+          input={input}
+          onInputChange={setInput}
+          onSubmit={handleSubmit}
+          onKeyDown={handleKeyDown}
+          isLoading={isLoading}
+          inputRef={inputRef}
+          highContrast={settings.highContrast}
+          dyslexiaFont={settings.dyslexiaFont}
+          lineSpacing={settings.lineSpacing}
+          maestroColor={maestro.color}
+        />
       </motion.div>
     </motion.div>
   );

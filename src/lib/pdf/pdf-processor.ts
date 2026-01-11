@@ -10,6 +10,17 @@
 
 import * as pdfjsLib from 'pdfjs-dist';
 import { logger } from '@/lib/logger';
+import {
+  ProcessedPage,
+  ProcessedPDF,
+  PDFProcessingError,
+  PDFProcessOptions,
+} from './pdf-types';
+import { isPDF, getPDFInfo, resizeImageToThumbnail } from './pdf-utils';
+
+export { isPDF, getPDFInfo };
+export type { ProcessedPage, ProcessedPDF, PDFProcessOptions };
+export { PDFProcessingError };
 
 // Configure pdf.js worker
 // The worker is loaded from CDN for optimal bundle size
@@ -28,97 +39,6 @@ export const MAX_PDF_PAGES = 5;
  * 2.0 gives good quality without excessive file size
  */
 export const DEFAULT_SCALE = 2.0;
-
-/**
- * Result of processing a single PDF page
- */
-export interface ProcessedPage {
-  pageNumber: number;
-  imageData: string; // Base64 data URL
-  width: number;
-  height: number;
-}
-
-/**
- * Result of processing an entire PDF
- */
-export interface ProcessedPDF {
-  totalPages: number;
-  processedPages: number;
-  pages: ProcessedPage[];
-  truncated: boolean; // True if totalPages > MAX_PDF_PAGES
-  filename: string;
-}
-
-/**
- * PDF processing error
- */
-export class PDFProcessingError extends Error {
-  constructor(
-    message: string,
-    public readonly code: 'LOAD_FAILED' | 'RENDER_FAILED' | 'ENCRYPTED' | 'INVALID' | 'TOO_LARGE',
-    public readonly cause?: Error
-  ) {
-    super(message);
-    this.name = 'PDFProcessingError';
-  }
-}
-
-/**
- * Options for PDF processing
- */
-export interface PDFProcessOptions {
-  /** Rendering scale (default: 2.0) */
-  scale?: number;
-  /** Maximum pages to process (default: MAX_PDF_PAGES) */
-  maxPages?: number;
-  /** Specific page numbers to process (1-indexed) */
-  pageNumbers?: number[];
-  /** Image format (default: 'image/jpeg') */
-  format?: 'image/jpeg' | 'image/png';
-  /** JPEG quality (default: 0.9) */
-  quality?: number;
-}
-
-/**
- * Check if a file is a PDF
- */
-export function isPDF(file: File): boolean {
-  return (
-    file.type === 'application/pdf' ||
-    file.name.toLowerCase().endsWith('.pdf')
-  );
-}
-
-/**
- * Get PDF metadata without full processing
- */
-export async function getPDFInfo(
-  file: File
-): Promise<{ numPages: number; filename: string }> {
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-    return {
-      numPages: pdf.numPages,
-      filename: file.name,
-    };
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('password')) {
-      throw new PDFProcessingError(
-        'Il PDF è protetto da password. Rimuovi la protezione e riprova.',
-        'ENCRYPTED',
-        error
-      );
-    }
-    throw new PDFProcessingError(
-      'Impossibile leggere il PDF. Il file potrebbe essere danneggiato.',
-      'LOAD_FAILED',
-      error instanceof Error ? error : undefined
-    );
-  }
-}
 
 /**
  * Process a PDF file and convert pages to images
@@ -256,29 +176,5 @@ export async function generatePDFThumbnail(
   }
 
   const page = result.pages[0];
-
-  // Resize if needed
-  if (page.width > thumbnailWidth) {
-    const canvas = document.createElement('canvas');
-    const scale = thumbnailWidth / page.width;
-    canvas.width = thumbnailWidth;
-    canvas.height = page.height * scale;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      return page.imageData;
-    }
-
-    const img = new Image();
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = reject;
-      img.src = page.imageData;
-    });
-
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL('image/jpeg', 0.8);
-  }
-
-  return page.imageData;
+  return resizeImageToThumbnail(page.imageData, page.width, thumbnailWidth);
 }

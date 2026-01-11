@@ -4,6 +4,7 @@
 // Part of Session Summary & Unified Archive feature
 // ============================================================================
 
+import 'server-only';
 import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
 import { getLastConversationSummary } from './summary-generator';

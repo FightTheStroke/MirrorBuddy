@@ -5,45 +5,12 @@
 // Issue #22: Materials Archive - Storage (IndexedDB)
 // ============================================================================
 
-import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import { openDB, IDBPDatabase } from 'idb';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
+import type { MaterialsDB, MaterialMetadata, MaterialFile } from './materials-db/types';
 
-// ============================================================================
-// DATABASE SCHEMA
-// ============================================================================
-
-interface MaterialsDB extends DBSchema {
-  files: {
-    key: string;
-    value: {
-      id: string;
-      blob: Blob;
-      thumbnail?: Blob;
-      createdAt: number;
-    };
-  };
-  metadata: {
-    key: string;
-    value: {
-      id: string;
-      filename: string;
-      format: 'image' | 'pdf';
-      mimeType: string;
-      subject?: string;
-      maestroId?: string;
-      size: number;
-      pageCount?: number;
-      createdAt: Date;
-      updatedAt: Date;
-    };
-    indexes: {
-      'by-date': Date;
-      'by-subject': string;
-      'by-format': string;
-    };
-  };
-}
+export type { MaterialsDB, MaterialMetadata, MaterialFile };
 
 // ============================================================================
 // DATABASE INITIALIZATION
@@ -342,8 +309,7 @@ async function generateThumbnail(blob: Blob, maxSize = 200): Promise<Blob> {
 // TYPES EXPORT
 // ============================================================================
 
-export type MaterialMetadata = MaterialsDB['metadata']['value'];
-export type MaterialFile = MaterialsDB['files']['value'];
+// MaterialMetadata and MaterialFile are exported from ./materials-db/types
 
 // ============================================================================
 // UNIFIED MATERIAL RECORD (for Archive View)

@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePomodoroTimer, PomodoroPhase } from '@/lib/hooks/use-pomodoro-timer';
+import { PomodoroSettings } from './components/pomodoro-settings';
+import { PomodoroStats } from './components/pomodoro-stats';
 import { cn } from '@/lib/utils';
 
 interface PomodoroTimerProps {
@@ -143,65 +145,16 @@ export function PomodoroTimer({ onPomodoroComplete, compact = false, className }
 
       <AnimatePresence mode="wait">
         {showSettings ? (
-          <motion.div
+          <PomodoroSettings
             key="settings"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="space-y-4"
-          >
-            <div>
-              <label className="text-sm text-white/70 block mb-2">
-                Focus (minuti)
-              </label>
-              <input
-                type="range"
-                min="5"
-                max="60"
-                step="5"
-                value={timer.settings.focusMinutes}
-                onChange={(e) => timer.updateSettings({ focusMinutes: Number(e.target.value) })}
-                className="w-full accent-red-500"
-              />
-              <div className="text-right text-sm text-white/50">{timer.settings.focusMinutes} min</div>
-            </div>
-
-            <div>
-              <label className="text-sm text-white/70 block mb-2">
-                Pausa breve (minuti)
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="15"
-                step="1"
-                value={timer.settings.shortBreakMinutes}
-                onChange={(e) => timer.updateSettings({ shortBreakMinutes: Number(e.target.value) })}
-                className="w-full accent-green-500"
-              />
-              <div className="text-right text-sm text-white/50">{timer.settings.shortBreakMinutes} min</div>
-            </div>
-
-            <div>
-              <label className="text-sm text-white/70 block mb-2">
-                Pausa lunga (minuti)
-              </label>
-              <input
-                type="range"
-                min="10"
-                max="30"
-                step="5"
-                value={timer.settings.longBreakMinutes}
-                onChange={(e) => timer.updateSettings({ longBreakMinutes: Number(e.target.value) })}
-                className="w-full accent-blue-500"
-              />
-              <div className="text-right text-sm text-white/50">{timer.settings.longBreakMinutes} min</div>
-            </div>
-
-            <p className="text-xs text-white/40 text-center pt-2">
-              Pausa lunga ogni {timer.settings.pomodorosUntilLongBreak} pomodori
-            </p>
-          </motion.div>
+            focusMinutes={timer.settings.focusMinutes}
+            shortBreakMinutes={timer.settings.shortBreakMinutes}
+            longBreakMinutes={timer.settings.longBreakMinutes}
+            pomodorosUntilLongBreak={timer.settings.pomodorosUntilLongBreak}
+            onFocusChange={(m) => timer.updateSettings({ focusMinutes: m })}
+            onShortBreakChange={(m) => timer.updateSettings({ shortBreakMinutes: m })}
+            onLongBreakChange={(m) => timer.updateSettings({ longBreakMinutes: m })}
+          />
         ) : (
           <motion.div
             key="timer"
@@ -322,17 +275,11 @@ export function PomodoroTimer({ onPomodoroComplete, compact = false, className }
             </div>
 
             {/* Stats */}
-            {timer.completedPomodoros > 0 && (
-              <div className="mt-6 pt-4 border-t border-white/10 text-center">
-                <p className="text-sm text-white/50">
-                  Oggi: <span className="text-white font-medium">{timer.completedPomodoros} pomodori</span>
-                  {' '}&middot;{' '}
-                  <span className="text-white font-medium">
-                    {Math.floor(timer.totalFocusTime / 60)} min di focus
-                  </span>
-                </p>
-              </div>
-            )}
+            <PomodoroStats
+              completedPomodoros={timer.completedPomodoros}
+              totalFocusTime={timer.totalFocusTime}
+              pomodorosUntilLongBreak={timer.settings.pomodorosUntilLongBreak}
+            />
           </motion.div>
         )}
       </AnimatePresence>

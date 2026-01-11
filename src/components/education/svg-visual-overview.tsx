@@ -10,9 +10,9 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
-import { Download, RefreshCw, Sun, Moon, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { SVGOverviewToolbar } from './components/svg-overview-toolbar';
 import {
   generateOverviewSVG,
   generateMermaidCode,
@@ -223,77 +223,15 @@ export function SVGVisualOverview({
     >
       {/* Toolbar */}
       {showToolbar && (
-        <div
-          className={cn(
-            'px-4 py-2 border-b flex items-center justify-between',
-            theme === 'dark'
-              ? 'border-slate-700 bg-slate-800/50'
-              : 'border-slate-200 bg-slate-50'
-          )}
-        >
-          <h3
-            className={cn(
-              'text-sm font-medium',
-              theme === 'dark' ? 'text-slate-200' : 'text-slate-800'
-            )}
-          >
-            {title}
-          </h3>
-          <div className="flex items-center gap-2">
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              className={cn(
-                'p-1.5 rounded-md transition-colors',
-                theme === 'dark'
-                  ? 'hover:bg-slate-700 text-slate-400'
-                  : 'hover:bg-slate-200 text-slate-600'
-              )}
-              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-            >
-              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-            {/* Layout toggle */}
-            <button
-              onClick={toggleLayout}
-              className={cn(
-                'p-1.5 rounded-md transition-colors',
-                theme === 'dark'
-                  ? 'hover:bg-slate-700 text-slate-400'
-                  : 'hover:bg-slate-200 text-slate-600'
-              )}
-              aria-label={`Switch to ${currentLayout === 'radial' ? 'tree' : 'radial'} layout`}
-            >
-              <RefreshCw className="w-4 h-4" />
-            </button>
-            {/* Export SVG */}
-            <button
-              onClick={handleExportSVG}
-              className={cn(
-                'p-1.5 rounded-md transition-colors',
-                theme === 'dark'
-                  ? 'hover:bg-slate-700 text-slate-400'
-                  : 'hover:bg-slate-200 text-slate-600'
-              )}
-              aria-label="Export as SVG"
-            >
-              <Download className="w-4 h-4" />
-            </button>
-            {/* Export PNG */}
-            <button
-              onClick={handleExportPNG}
-              className={cn(
-                'p-1.5 rounded-md transition-colors',
-                theme === 'dark'
-                  ? 'hover:bg-slate-700 text-slate-400'
-                  : 'hover:bg-slate-200 text-slate-600'
-              )}
-              aria-label="Export as PNG"
-            >
-              <Share2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        <SVGOverviewToolbar
+          title={title}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onToggleLayout={toggleLayout}
+          currentLayout={currentLayout}
+          onExportSVG={handleExportSVG}
+          onExportPNG={handleExportPNG}
+        />
       )}
 
       {/* Diagram container */}

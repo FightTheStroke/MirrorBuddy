@@ -480,8 +480,8 @@ test.describe('Tools Integration: Full Flow', () => {
           nodes: [{ id: 'n1', label: 'a² + b² = c²', parentId: null }],
         },
         maestroId,
-        sessionId,
         subject: 'mathematics',
+        // Note: sessionId removed - it's a FK to StudySession table
       },
     });
     expect(persistResponse.ok()).toBeTruthy();

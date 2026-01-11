@@ -34,56 +34,8 @@ import {
 import { AccessibilityTab } from '@/components/settings/sections';
 import type { StudentInsights, ObservationCategory } from '@/types';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-
-const DEMO_USER_ID = 'demo-student-1';
-
-interface ConsentStatus {
-  hasProfile: boolean;
-  parentConsent: boolean;
-  studentConsent: boolean;
-  consentDate?: string;
-  deletionRequested?: string;
-}
-
-interface ProfileMeta {
-  confidenceScore: number;
-  lastUpdated: string;
-  sessionCount: number;
-}
-
-interface LearningEntry {
-  id: string;
-  maestroId: string;
-  subject: string;
-  category: string;
-  insight: string;
-  confidence: number;
-  occurrences: number;
-  createdAt: string;
-  lastSeen: string;
-}
-
-type PageState = 'loading' | 'no-profile' | 'needs-consent' | 'ready' | 'error' | 'deletion-pending';
-
-const MAESTRO_NAMES: Record<string, string> = {
-  leonardo: 'Leonardo',
-  galileo: 'Galileo',
-  curie: 'Marie Curie',
-  cicerone: 'Cicerone',
-  lovelace: 'Ada Lovelace',
-  smith: 'Adam Smith',
-  shakespeare: 'Shakespeare',
-  humboldt: 'Humboldt',
-  erodoto: 'Erodoto',
-  manzoni: 'Manzoni',
-  euclide: 'Euclide',
-  mozart: 'Mozart',
-  socrate: 'Socrate',
-  ippocrate: 'Ippocrate',
-  feynman: 'Feynman',
-  darwin: 'Darwin',
-  chris: 'Chris',
-};
+import type { ConsentStatus, ProfileMeta, LearningEntry, PageState } from './genitori-view/types';
+import { DEMO_USER_ID, MAESTRO_NAMES } from './genitori-view/constants';
 
 export function GenitoriView() {
   const [pageState, setPageState] = useState<PageState>('loading');

@@ -1,25 +1,21 @@
-// ============================================================================
-// API ROUTE: Collaboration Room Operations
-// Get, join, leave, and close specific collaboration rooms
-// Part of Phase 8: Multi-User Collaboration
-// ============================================================================
+/**
+ * API ROUTE: Collaboration Room Operations
+ * Get, join, leave, and close specific collaboration rooms
+ * Part of Phase 8: Multi-User Collaboration
+ */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { getRoom, getRoomState, closeRoom } from '@/lib/collab/mindmap-room';
 import {
-  getRoom,
-  getRoomState,
-  joinRoom,
-  leaveRoom,
-  closeRoom,
-  addNode,
-  updateNode,
-  deleteNode,
-  moveNode,
-} from '@/lib/collab/mindmap-room';
-import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
-import type { MindmapNode as _MindmapNode } from '@/types/tools';
-import { convertExportNodeToToolNode } from '@/lib/collab/mindmap-room/node-converter';
+  validateRoomExists,
+  handleJoinAction,
+  handleLeaveAction,
+  handleAddNodeAction,
+  handleUpdateNodeAction,
+  handleDeleteNodeAction,
+  handleMoveNodeAction,
+} from './helpers';
 
 interface RouteParams {
   params: Promise<{ roomId: string }>;
@@ -74,140 +70,63 @@ export async function POST(
   const { roomId } = await params;
 
   try {
+    const validation = validateRoomExists(roomId);
+    if (!validation.valid) {
+      return validation.response;
+    }
+
     const body = await request.json();
     const { action, user, nodeId, node, parentId, changes, newParentId } = body;
 
-    // Validate room exists
-    const room = getRoom(roomId);
-    if (!room) {
-      return NextResponse.json(
-        { error: 'Room not found' },
-        { status: 404 }
-      );
-    }
+    let result;
 
     switch (action) {
-      case 'join': {
-        if (!user || !user.id || !user.name) {
-          return NextResponse.json(
-            { error: 'user with id and name is required' },
-            { status: 400 }
-          );
-        }
+      case 'join':
+        result = handleJoinAction(roomId, user);
+        break;
 
-        const result = joinRoom(roomId, user);
-        if (!result) {
-          return NextResponse.json(
-            { error: 'Failed to join room' },
-            { status: 500 }
-          );
-        }
-
-        const state = getRoomState(roomId);
-
-        logger.info('User joined room via API', {
-          roomId,
-          userId: user.id,
-        });
-
-        return NextResponse.json({
-          success: true,
-          participant: result.participant,
-          mindmap: state?.mindmap,
-          participants: state?.participants,
-          version: state?.version,
-        });
-      }
-
-      case 'leave': {
-        if (!user?.id) {
-          return NextResponse.json(
-            { error: 'user.id is required' },
-            { status: 400 }
-          );
-        }
-
-        leaveRoom(roomId, user.id);
-
+      case 'leave':
+        result = handleLeaveAction(roomId, user);
         logger.info('User left room via API', {
           roomId,
-          userId: user.id,
+          userId: (user as { id?: string })?.id,
         });
+        break;
 
-        return NextResponse.json({ success: true });
-      }
+      case 'add_node':
+        result = handleAddNodeAction(roomId, user, node, parentId);
+        break;
 
-      case 'add_node': {
-        if (!user?.id || !node || !parentId) {
-          return NextResponse.json(
-            { error: 'user.id, node, and parentId are required' },
-            { status: 400 }
-          );
-        }
+      case 'update_node':
+        result = handleUpdateNodeAction(roomId, user, nodeId, changes);
+        break;
 
-        const toolNode = convertExportNodeToToolNode(node as ExportNode);
-        const result = addNode(roomId, user.id, toolNode, parentId);
+      case 'delete_node':
+        result = handleDeleteNodeAction(roomId, user, nodeId);
+        break;
 
-        return NextResponse.json({
-          success: result.success,
-          version: result.version,
-        });
-      }
-
-      case 'update_node': {
-        if (!user?.id || !nodeId || !changes) {
-          return NextResponse.json(
-            { error: 'user.id, nodeId, and changes are required' },
-            { status: 400 }
-          );
-        }
-
-        const result = updateNode(roomId, user.id, nodeId, changes);
-
-        return NextResponse.json({
-          success: result.success,
-          version: result.version,
-        });
-      }
-
-      case 'delete_node': {
-        if (!user?.id || !nodeId) {
-          return NextResponse.json(
-            { error: 'user.id and nodeId are required' },
-            { status: 400 }
-          );
-        }
-
-        const result = deleteNode(roomId, user.id, nodeId);
-
-        return NextResponse.json({
-          success: result.success,
-          version: result.version,
-        });
-      }
-
-      case 'move_node': {
-        if (!user?.id || !nodeId || !newParentId) {
-          return NextResponse.json(
-            { error: 'user.id, nodeId, and newParentId are required' },
-            { status: 400 }
-          );
-        }
-
-        const result = moveNode(roomId, user.id, nodeId, newParentId);
-
-        return NextResponse.json({
-          success: result.success,
-          version: result.version,
-        });
-      }
+      case 'move_node':
+        result = handleMoveNodeAction(roomId, user, nodeId, newParentId);
+        break;
 
       default:
         return NextResponse.json(
-          { error: 'Invalid action', validActions: ['join', 'leave', 'add_node', 'update_node', 'delete_node', 'move_node'] },
+          {
+            error: 'Invalid action',
+            validActions: ['join', 'leave', 'add_node', 'update_node', 'delete_node', 'move_node'],
+          },
           { status: 400 }
         );
     }
+
+    if (action === 'join') {
+      logger.info('User joined room via API', {
+        roomId,
+        userId: (user as { id?: string })?.id,
+      });
+    }
+
+    return result.response;
   } catch (error) {
     logger.error('Failed to perform room action', {
       roomId,
@@ -249,10 +168,9 @@ export async function DELETE(
       );
     }
 
-    // Check if user is a participant (first participant is considered host)
     const participants = Array.from(room.participants.values());
     const isHost = participants.length > 0 && participants[0].id === userId;
-    
+
     if (!isHost) {
       return NextResponse.json(
         { error: 'Only host can close room' },

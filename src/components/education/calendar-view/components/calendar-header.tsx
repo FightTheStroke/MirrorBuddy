@@ -17,7 +17,7 @@ export function CalendarHeader({ onAddClick, activeTab }: CalendarHeaderProps) {
   return (
     <PageHeader
       icon={Calendar}
-      title="Calendario Scolastico"
+      title="Calendario"
       rightContent={
         <Button
           onClick={onAddClick}

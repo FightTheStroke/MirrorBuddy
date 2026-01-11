@@ -3,7 +3,8 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useTags, TAG_COLORS, getRandomTagColor, type TagData } from '../use-tags';
+import { useTags } from '../use-tags';
+import { TAG_COLORS, getRandomTagColor, type TagData } from '../tag-types';
 
 const createMockTag = (overrides: Partial<TagData> = {}): TagData => ({
   id: `tag-${Date.now()}-${Math.random()}`,

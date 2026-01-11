@@ -4,7 +4,8 @@ All under `/src/app/api/`:
 
 | Route | Purpose |
 |-------|---------|
-| `/chat` | Chat completions with safety filtering |
+| `/chat` | Chat completions with safety filtering and tool support |
+| `/chat/stream` | SSE streaming chat (no tools, Azure only) - ADR 0034 |
 | `/conversations/[id]` | Session management |
 | `/realtime/token` | Azure voice token |
 | `/progress` | XP, levels, gamification |
@@ -28,6 +29,9 @@ AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime
 # Ollama (local text-only)
 OLLAMA_URL=http://localhost:11434
 OLLAMA_MODEL=llama3.2
+
+# Feature Flags
+ENABLE_CHAT_STREAMING=true  # SSE streaming for chat (default: true)
 
 # Database
 DATABASE_URL=file:./prisma/dev.db

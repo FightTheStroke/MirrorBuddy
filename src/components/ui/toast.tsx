@@ -181,6 +181,7 @@ export function ToastContainer() {
     <div
       aria-live="polite"
       aria-label="Notifiche"
+      role="status"
       className="pointer-events-none fixed top-0 right-0 z-[100] flex max-h-screen w-full flex-col gap-2 p-4 sm:max-w-sm"
     >
       <AnimatePresence mode="popLayout">

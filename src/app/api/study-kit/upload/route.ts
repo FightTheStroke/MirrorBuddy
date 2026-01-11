@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
-import { processStudyKit } from '@/lib/tools/handlers/study-kit-handler';
+import { processStudyKit } from '@/lib/tools/handlers/study-kit-generators';
 import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
 
 export const runtime = 'nodejs';

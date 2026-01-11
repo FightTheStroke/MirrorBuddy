@@ -14,7 +14,7 @@ interface MaestroCardProps {
   index?: number;
 }
 
-export function MaestroCard({ maestro, onSelect, isSelected = false }: MaestroCardProps) {
+export function MaestroCard({ maestro, onSelect, isSelected = false, index }: MaestroCardProps) {
   return (
     <button
       onClick={() => onSelect(maestro)}
@@ -44,6 +44,7 @@ export function MaestroCard({ maestro, onSelect, isSelected = false }: MaestroCa
             width={56}
             height={56}
             className="w-full h-full object-cover"
+            priority={index === 0}
           />
         </div>
 

@@ -9,7 +9,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff, Settings2 } from 'lucide-react';
+import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { cn } from '@/lib/utils';

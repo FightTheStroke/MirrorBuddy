@@ -11,7 +11,6 @@ import type {
   Rating,
   Maestro,
 } from '@/types';
-import { useUIStore } from '@/lib/stores';
 import { getUserId } from '../utils/user-id';
 import { fsrs5Schedule } from '../utils/fsrs';
 
@@ -44,7 +43,7 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
   }, [initialMaestroId, initialMode]);
 
   const handleMaestroConfirm = useCallback(
-    (maestro: Maestro, mode: 'voice' | 'chat') => {
+    (_maestro: Maestro, _mode: 'voice' | 'chat') => {
       setShowMaestroDialog(false);
       // Focus mode has been removed
     },

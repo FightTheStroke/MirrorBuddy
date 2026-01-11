@@ -107,6 +107,7 @@ describe('Audio Generators', () => {
     });
 
     it('returns null for non-binaural modes', () => {
+      // @ts-expect-error - Testing invalid input type
       const config = getBinauralConfig('white_noise');
       expect(config).toBeNull();
     });

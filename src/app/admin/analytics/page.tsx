@@ -13,92 +13,18 @@ import {
   ShieldAlert,
   Timer,
   ArrowLeft,
-  TrendingUp,
-  TrendingDown,
 } from 'lucide-react';
 import Link from 'next/link';
+import { StatCard } from './components/stat-card';
+import { DailyChart } from './components/daily-chart';
+import type {
+  TokenUsageData,
+  VoiceMetricsData,
+  FsrsStatsData,
+  RateLimitsData,
+  SafetyEventsData,
+} from './types';
 
-interface TokenUsageData {
-  period: { days: number; startDate: string };
-  summary: {
-    totalTokens: number;
-    totalCalls: number;
-    avgTokensPerCall: number;
-    estimatedCostUsd: number;
-  };
-  byAction: Record<string, { count: number; totalTokens: number }>;
-  dailyUsage: Record<string, number>;
-}
-
-interface VoiceMetricsData {
-  period: { days: number; startDate: string };
-  voice: {
-    totalSessions: number;
-    totalMinutes: number;
-    avgSessionMinutes: number;
-  };
-  tts: {
-    totalGenerations: number;
-    totalCharacters: number;
-    avgCharactersPerGeneration: number;
-  };
-  realtime: {
-    totalSessions: number;
-    totalMinutes: number;
-  };
-  dailySessions: Record<string, number>;
-}
-
-interface FsrsStatsData {
-  period: { days: number; startDate: string };
-  summary: {
-    totalCards: number;
-    totalReviews: number;
-    correctReviews: number;
-    accuracy: number;
-    avgDifficulty: number;
-    cardsDueToday: number;
-  };
-  stateDistribution: Record<string, number>;
-  dailyReviews: Record<string, number>;
-}
-
-interface RateLimitsData {
-  period: { days: number; startDate: string };
-  summary: {
-    totalEvents: number;
-    uniqueUsers: number;
-    uniqueIps: number;
-  };
-  byEndpoint: Record<string, number>;
-  dailyEvents: Record<string, number>;
-  recentEvents: Array<{
-    id: string;
-    endpoint: string;
-    limit: number;
-    window: number;
-    timestamp: string;
-  }>;
-}
-
-interface SafetyEventsData {
-  period: { days: number; startDate: string };
-  summary: {
-    totalEvents: number;
-    unresolvedCount: number;
-    criticalCount: number;
-  };
-  bySeverity: Record<string, number>;
-  byType: Record<string, number>;
-  dailyEvents: Record<string, number>;
-  recentEvents: Array<{
-    id: string;
-    type: string;
-    severity: string;
-    timestamp: string;
-    resolved: boolean;
-  }>;
-}
 
 type DashboardData = {
   tokenUsage: TokenUsageData | null;
@@ -108,89 +34,6 @@ type DashboardData = {
   safetyEvents: SafetyEventsData | null;
 };
 
-function StatCard({
-  title,
-  value,
-  subValue,
-  icon: Icon,
-  trend,
-  trendValue,
-  color = 'indigo',
-}: {
-  title: string;
-  value: string | number;
-  subValue?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  trend?: 'up' | 'down' | 'neutral';
-  trendValue?: string;
-  color?: 'indigo' | 'green' | 'amber' | 'red' | 'blue';
-}) {
-  const colorClasses = {
-    indigo: 'from-indigo-500 to-purple-600',
-    green: 'from-green-500 to-emerald-600',
-    amber: 'from-amber-500 to-orange-600',
-    red: 'from-red-500 to-rose-600',
-    blue: 'from-blue-500 to-cyan-600',
-  };
-
-  return (
-    <Card className="overflow-hidden">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{title}</p>
-            <p className="text-2xl font-bold mt-1 text-slate-900 dark:text-slate-100">{value}</p>
-            {subValue && (
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{subValue}</p>
-            )}
-            {trend && trendValue && (
-              <div className={`flex items-center gap-1 mt-2 text-xs ${
-                trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-slate-500'
-              }`}>
-                {trend === 'up' && <TrendingUp className="h-3 w-3" />}
-                {trend === 'down' && <TrendingDown className="h-3 w-3" />}
-                <span>{trendValue}</span>
-              </div>
-            )}
-          </div>
-          <div className={`p-3 rounded-xl bg-gradient-to-br ${colorClasses[color]} shadow-lg`}>
-            <Icon className="h-6 w-6 text-white" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function DailyChart({
-  data,
-  label,
-  color = 'indigo',
-}: {
-  data: Record<string, number>;
-  label: string;
-  color?: string;
-}) {
-  const entries = Object.entries(data).sort((a, b) => a[0].localeCompare(b[0])).slice(-7);
-  const maxValue = Math.max(...entries.map(([_, v]) => v), 1);
-
-  return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-400">{label}</p>
-      <div className="flex items-end gap-1 h-20">
-        {entries.map(([day, value]) => (
-          <div key={day} className="flex-1 flex flex-col items-center gap-1">
-            <div
-              className={`w-full bg-${color}-500 rounded-t transition-all`}
-              style={{ height: `${(value / maxValue) * 100}%`, minHeight: value > 0 ? '4px' : '0' }}
-            />
-            <span className="text-[10px] text-slate-400">{day.slice(-2)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function AdminAnalyticsPage() {
   const [initialLoading, setInitialLoading] = useState(true);

@@ -60,8 +60,8 @@ export function ZainoView({
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-8 max-w-7xl">
-          <PageHeader icon={Backpack} title="Il Tuo Zaino" />
+        <div className="container mx-auto px-4 max-w-7xl">
+          <PageHeader icon={Backpack} title="Zaino" />
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-red-700 dark:text-red-300 mb-2">
@@ -82,8 +82,8 @@ export function ZainoView({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <PageHeader icon={Backpack} title="Il Tuo Zaino" />
+      <div className="container mx-auto px-4 max-w-7xl">
+        <PageHeader icon={Backpack} title="Zaino" />
 
         <div className="mb-6">
           <SearchControls

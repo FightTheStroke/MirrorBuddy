@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { useUIStore } from '@/lib/stores';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 import type { Maestro } from '@/types';
 import { useMindmapsView } from './mindmaps-view/hooks/use-mindmaps-view';
@@ -65,7 +64,7 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
   } = useMindmapsView();
 
   const handleMaestroConfirm = useCallback(
-    (maestro: Maestro, mode: 'voice' | 'chat') => {
+    (_maestro: Maestro, _mode: 'voice' | 'chat') => {
       setShowMaestroDialog(false);
       // Focus mode has been removed, close dialog only
     },

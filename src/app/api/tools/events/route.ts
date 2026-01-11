@@ -26,7 +26,7 @@ const VALID_EVENT_TYPES: ToolEventType[] = [
 // Validate tool type
 const VALID_TOOL_TYPES: ToolType[] = [
   'mindmap',
-  'flashcards',
+  'flashcard',
   'quiz',
   'summary',
   'timeline',

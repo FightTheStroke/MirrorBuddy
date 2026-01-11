@@ -38,15 +38,21 @@ export function MaestroSessionInput({
   onRequestPhoto,
   onEndSession,
 }: MaestroSessionInputProps) {
+  // Hide toolbar if maestro has no tools or only internal tools like web_search
+  const visibleTools = (maestro.tools || []).filter(t => t !== 'web_search');
+  const hasVisibleTools = visibleTools.length > 0 || !maestro.tools;
+
   return (
     <div className="p-2 sm:p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-b-2xl">
-      {/* Tool buttons */}
-      <MaestroSessionToolButtons
-        isLoading={isLoading}
-        sessionEnded={sessionEnded}
-        onRequestTool={onRequestTool}
-        onRequestPhoto={onRequestPhoto}
-      />
+      {/* Tool buttons - hidden for maestri with no visible tools */}
+      {hasVisibleTools && (
+        <MaestroSessionToolButtons
+          isLoading={isLoading}
+          sessionEnded={sessionEnded}
+          onRequestTool={onRequestTool}
+          onRequestPhoto={onRequestPhoto}
+        />
+      )}
 
       <div className="flex gap-2 sm:gap-3">
         <textarea

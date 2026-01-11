@@ -5,7 +5,7 @@
 
 import { useEffect, useCallback, useMemo } from 'react';
 import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
-import { getAudioEngine } from '@/lib/audio/engine';
+import { getAudioEngine } from '@/lib/audio';
 import { logger } from '@/lib/logger';
 import type { AudioMode, AudioPreset } from '@/types';
 

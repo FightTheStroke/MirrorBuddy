@@ -9,7 +9,7 @@
 
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { X, Phone, PhoneOff } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { Maestro } from '@/types';
@@ -29,7 +29,7 @@ export function MaestroSessionHeaderProposal2({
   isConnected,
   configError,
   onVoiceCall,
-  onClose,
+  onClose: _onClose,
 }: MaestroSessionHeaderProposal2Props) {
   return (
     <div

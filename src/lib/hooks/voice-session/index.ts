@@ -4,4 +4,10 @@
 // ============================================================================
 
 export { useVoiceSession } from './use-voice-session';
+export {
+  isWebRTCSupported,
+  hasRTCPeerConnection,
+  hasGetUserMedia,
+  getWebRTCSupportReport,
+} from './webrtc-detection';
 export type { UseVoiceSessionOptions, ConnectionInfo, ConversationMemory } from './types';

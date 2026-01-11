@@ -1,6 +1,5 @@
 /**
  * API Route: Materials
- *
  * Persists tool outputs (mindmaps, quizzes, flashcards, etc.) to database.
  * Part of T-20: Persist tools to database + API.
  */
@@ -11,62 +10,8 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { generateSearchableText } from '@/lib/search/searchable-text';
 import type { ToolType } from '@/types/tools';
-
-// Material types for storage (maps from ToolType actions to stored types)
-type MaterialType =
-  | 'mindmap'
-  | 'quiz'
-  | 'flashcard'
-  | 'demo'
-  | 'webcam'
-  | 'pdf'
-  | 'search'
-  | 'diagram'
-  | 'timeline'
-  | 'summary'
-  | 'formula'
-  | 'chart';
-
-// Valid material types
-const VALID_MATERIAL_TYPES: MaterialType[] = [
-  'mindmap',
-  'quiz',
-  'flashcard',
-  'demo',
-  'webcam',
-  'pdf',
-  'search',
-  'diagram',
-  'timeline',
-  'summary',
-  'formula',
-  'chart',
-];
-
-interface CreateMaterialRequest {
-  toolId: string;
-  toolType: MaterialType;
-  title: string;
-  content: Record<string, unknown>;
-  maestroId?: string;
-  sessionId?: string;
-  subject?: string;
-  preview?: string;
-  collectionId?: string;
-  tagIds?: string[];
-}
-
-interface UpdateMaterialRequest {
-  title?: string;
-  content?: Record<string, unknown>;
-  status?: 'active' | 'archived' | 'deleted';
-  // User interaction (Issue #37 - Archive features)
-  userRating?: number;
-  isBookmarked?: boolean;
-  // Collection and tags
-  collectionId?: string | null;
-  tagIds?: string[];
-}
+import { CreateMaterialRequest, UpdateMaterialRequest, MaterialType } from './types';
+import { VALID_MATERIAL_TYPES } from './constants';
 
 /**
  * GET /api/materials
@@ -74,7 +19,6 @@ interface UpdateMaterialRequest {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Auth check - prefer cookie, fallback to query param for backwards compatibility
     const cookieStore = await cookies();
     const cookieUserId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
@@ -88,13 +32,9 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0', 10);
 
     if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Build where clause with filters
     const collectionId = searchParams.get('collectionId');
     const tagId = searchParams.get('tagId');
     const search = searchParams.get('search');
@@ -114,7 +54,6 @@ export async function GET(request: NextRequest) {
       where.subject = subject;
     }
     if (search) {
-      // Full-text search on searchableText and title
       where.OR = [
         { searchableText: { contains: search, mode: 'insensitive' } },
         { title: { contains: search, mode: 'insensitive' } },
@@ -128,20 +67,13 @@ export async function GET(request: NextRequest) {
         take: Math.min(limit, 100),
         skip: offset,
         include: {
-          collection: {
-            select: { id: true, name: true, color: true },
-          },
-          tags: {
-            include: {
-              tag: { select: { id: true, name: true, color: true } },
-            },
-          },
+          collection: { select: { id: true, name: true, color: true } },
+          tags: { include: { tag: { select: { id: true, name: true, color: true } } } },
         },
       }),
       prisma.material.count({ where }),
     ]);
 
-    // Parse JSON content and flatten tags
     const parsed = materials.map((m) => ({
       ...m,
       content: JSON.parse(m.content as string),
@@ -156,10 +88,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Failed to fetch materials', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Failed to fetch materials' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to fetch materials' }, { status: 500 });
   }
 }
 
@@ -169,7 +98,6 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    // Auth check - prefer cookie, fallback to body for backwards compatibility
     const cookieStore = await cookies();
     const cookieUserId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
@@ -177,7 +105,6 @@ export async function POST(request: NextRequest) {
     const userId = cookieUserId || body.userId;
     const { toolId, toolType, title, content, maestroId, sessionId, subject, preview, collectionId, tagIds } = body;
 
-    // Validate required fields
     if (!userId || !toolId || !toolType || !title || !content) {
       return NextResponse.json(
         {
@@ -188,7 +115,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate tool type
     if (!VALID_MATERIAL_TYPES.includes(toolType)) {
       return NextResponse.json(
         {
@@ -199,16 +125,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for duplicate toolId (upsert behavior)
     const existing = await prisma.material.findUnique({
       where: { toolId },
     });
 
-    // Generate searchable text for full-text search
     const searchableText = generateSearchableText(toolType as ToolType, content);
 
     if (existing) {
-      // Update existing material
       const updated = await prisma.material.update({
         where: { toolId },
         data: {
@@ -232,7 +155,6 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Create new material with optional collection and tags
     const material = await prisma.material.create({
       data: {
         userId,
@@ -246,11 +168,12 @@ export async function POST(request: NextRequest) {
         subject,
         preview,
         collectionId,
-        ...(tagIds && tagIds.length > 0 && {
-          tags: {
-            create: tagIds.map(tagId => ({ tagId })),
-          },
-        }),
+        ...(tagIds &&
+          tagIds.length > 0 && {
+            tags: {
+              create: tagIds.map(tagId => ({ tagId })),
+            },
+          }),
       },
       include: {
         collection: { select: { id: true, name: true, color: true } },
@@ -271,10 +194,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Failed to create material', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Failed to create material' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create material' }, { status: 500 });
   }
 }
 
@@ -288,10 +208,7 @@ export async function PATCH(request: NextRequest) {
     const { toolId, title, content, status, userRating, isBookmarked, collectionId, tagIds } = body;
 
     if (!toolId) {
-      return NextResponse.json(
-        { error: 'Missing toolId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing toolId' }, { status: 400 });
     }
 
     const existing = await prisma.material.findUnique({
@@ -299,38 +216,30 @@ export async function PATCH(request: NextRequest) {
     });
 
     if (!existing) {
-      return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Material not found' }, { status: 404 });
     }
 
     const updateData: Record<string, unknown> = {};
     if (title) updateData.title = title;
     if (content) {
       updateData.content = JSON.stringify(content);
-      // Regenerate searchable text when content changes
       updateData.searchableText = generateSearchableText(
         existing.toolType as ToolType,
         content
       );
     }
     if (status) updateData.status = status;
-    // User interaction fields (Issue #37)
     if (typeof userRating === 'number' && userRating >= 1 && userRating <= 5) {
       updateData.userRating = userRating;
     }
     if (typeof isBookmarked === 'boolean') {
       updateData.isBookmarked = isBookmarked;
     }
-    // Collection update (null = remove from collection)
     if (collectionId !== undefined) {
       updateData.collectionId = collectionId;
     }
 
-    // Handle tag updates if provided
     if (tagIds !== undefined) {
-      // Delete existing tags and create new ones in a transaction
       await prisma.$transaction([
         prisma.materialTag.deleteMany({ where: { materialId: existing.id } }),
         ...tagIds.map(tagId =>
@@ -360,10 +269,7 @@ export async function PATCH(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Failed to update material', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Failed to update material' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update material' }, { status: 500 });
   }
 }
 
@@ -377,10 +283,7 @@ export async function DELETE(request: NextRequest) {
     const toolId = searchParams.get('toolId');
 
     if (!toolId) {
-      return NextResponse.json(
-        { error: 'Missing toolId parameter' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing toolId parameter' }, { status: 400 });
     }
 
     const existing = await prisma.material.findUnique({
@@ -388,13 +291,9 @@ export async function DELETE(request: NextRequest) {
     });
 
     if (!existing) {
-      return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Material not found' }, { status: 404 });
     }
 
-    // Soft delete
     await prisma.material.update({
       where: { toolId },
       data: { status: 'deleted' },
@@ -408,9 +307,6 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Failed to delete material', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Failed to delete material' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete material' }, { status: 500 });
   }
 }

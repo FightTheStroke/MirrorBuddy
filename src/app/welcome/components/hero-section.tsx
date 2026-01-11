@@ -34,6 +34,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
           width={300}
           height={80}
           className="mx-auto"
+          style={{ width: 'auto', height: 'auto' }}
           priority
         />
       </motion.div>

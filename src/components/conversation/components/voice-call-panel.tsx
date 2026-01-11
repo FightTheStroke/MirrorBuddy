@@ -6,8 +6,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { VoicePanelVariantF } from '@/components/voice/voice-panel-variant-f';
+import { CharacterVoicePanel, type VoiceState, type HeaderActions, type UnifiedCharacter } from '@/components/character';
 import { logger } from '@/lib/logger';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
 import type { Maestro } from '@/types';
@@ -31,7 +30,7 @@ function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
   return {
     id: character.id,
     name: character.name,
-    subject: 'mathematics', // Placeholder for coach/buddy
+    subject: 'mathematics',
     specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
     voice: character.voice || 'alloy',
     voiceInstructions: character.voiceInstructions || '',
@@ -41,6 +40,19 @@ function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
     systemPrompt: character.systemPrompt,
     greeting: character.greeting,
   } as Maestro;
+}
+
+function activeCharacterToUnified(character: ActiveCharacter): UnifiedCharacter {
+  return {
+    id: character.id,
+    name: character.name,
+    type: character.type === 'coach' ? 'coach' : 'buddy',
+    specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
+    greeting: character.greeting,
+    avatar: (character as unknown as { avatar?: string }).avatar || '/avatars/default.jpg',
+    color: character.color,
+    badge: character.type === 'coach' ? 'Coach' : 'Amico',
+  };
 }
 
 interface VoiceCallPanelProps {
@@ -62,7 +74,7 @@ export function VoiceCallPanel({
   const [configError, setConfigError] = useState<string | null>(null);
   const hasAttemptedConnection = useRef(false);
   const conversationIdRef = useRef<string | null>(null);
-  const savedMessagesRef = useRef<Set<string>>(new Set());
+  const _savedMessagesRef = useRef<Set<string>>(new Set());
 
   const voiceSession = useVoiceSession({
     onError: (error) => {
@@ -198,29 +210,35 @@ export function VoiceCallPanel({
     onEnd();
   }, [disconnect, onEnd]);
 
-  // Show panel even when connecting
+  // Build unified character and voice state
+  const unifiedCharacter = activeCharacterToUnified(character);
+
+  const voiceState: VoiceState = {
+    isActive: true,
+    isConnected,
+    isListening,
+    isSpeaking,
+    isMuted,
+    inputLevel,
+    outputLevel,
+    connectionState,
+    configError,
+  };
+
+  const headerActions: HeaderActions = {
+    onVoiceCall: handleEndCall,
+    onStopTTS,
+    onClearChat: () => {},
+    onClose: handleEndCall,
+    onToggleMute: toggleMute,
+  };
+
   return (
-    <div className="w-64 sm:w-72 flex-shrink-0 h-full">
-      <VoicePanelVariantF
-        character={{
-          name: character.name,
-          avatar: (character as unknown as { avatar?: string }).avatar || '/avatars/default.jpg',
-          specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
-          color: character.color,
-        }}
-        isConnected={isConnected}
-        isListening={isListening}
-        isSpeaking={isSpeaking}
-        isMuted={isMuted}
-        inputLevel={inputLevel}
-        outputLevel={outputLevel}
-        connectionState={connectionState}
-        configError={configError}
-        ttsEnabled={ttsEnabled}
-        onToggleMute={toggleMute}
-        onEndCall={handleEndCall}
-        onStopTTS={onStopTTS}
-      />
-    </div>
+    <CharacterVoicePanel
+      character={unifiedCharacter}
+      voiceState={voiceState}
+      ttsEnabled={ttsEnabled}
+      actions={headerActions}
+    />
   );
 }

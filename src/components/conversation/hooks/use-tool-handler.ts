@@ -3,7 +3,8 @@ import { logger } from '@/lib/logger';
 import { getMaestroById } from '@/data/maestri';
 import type { MaestroFull } from '@/data/maestri';
 import type { ToolType, ToolState } from '@/types/tools';
-import { FUNCTION_NAME_TO_TOOL_TYPE, TOOL_PROMPTS } from '../constants/tool-constants';
+import { TOOL_PROMPTS } from '../constants/tool-constants';
+import { functionNameToToolType } from '@/lib/tools/constants';
 
 interface UseToolHandlerProps {
   isLoading: boolean;
@@ -66,9 +67,9 @@ export function useToolHandler({
 
         if (data.toolCalls?.length > 0) {
           const toolCall = data.toolCalls[0];
-          const mappedToolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolType;
+          const mappedToolType = functionNameToToolType(toolCall.type) || toolType;
           const toolContent = toolCall.result?.data || toolCall.result || toolCall.arguments;
-          const completedTool: ToolState = {
+          const _completedTool: ToolState = {
             ...newTool,
             type: mappedToolType,
             status: 'completed',
@@ -140,4 +141,3 @@ export function useToolHandler({
     handleToolRequest,
   };
 }
-
