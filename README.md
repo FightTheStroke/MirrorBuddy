@@ -145,9 +145,11 @@ Open http://localhost:3000 and start learning.
 
 ## Architecture
 
-**Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (primary, chat+voice) / Ollama (fallback, text) → Prisma ORM (SQLite/PostgreSQL)
+**Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Ollama (fallback, text) → Prisma ORM → PostgreSQL + pgvector
 
-**Key Decision (ADR 0015):** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.
+**Key Decisions:**
+- **ADR 0015:** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.
+- **ADR 0033:** RAG (Retrieval-Augmented Generation) using Azure OpenAI embeddings + pgvector for semantic search of user materials.
 
 **→ Full architecture & diagram: [ARCHITECTURE.md](ARCHITECTURE.md)**
 
@@ -161,9 +163,10 @@ Open http://localhost:3000 and start learning.
 | Language | TypeScript 5 (strict mode) |
 | Styling | Tailwind CSS 4 |
 | State | Zustand |
-| Voice | Azure OpenAI Realtime API |
+| AI | Azure OpenAI (chat, voice, embeddings) |
+| RAG | pgvector (semantic search) |
 | Mind Maps | MarkMap |
-| Database | Prisma + SQLite/PostgreSQL |
+| Database | Prisma + PostgreSQL + pgvector |
 | Testing | Playwright E2E (API-focused) + Vitest unit |
 
 ---
