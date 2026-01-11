@@ -54,13 +54,21 @@ export class WebRTCConnection {
 
   async connect(): Promise<WebRTCConnectionResult> {
     try {
+      logger.debug('[WebRTC] Step 1: Getting ephemeral token...');
       const token = await this.getEphemeralToken();
+      logger.debug('[WebRTC] Step 2: Got token, getting user media...');
       this.mediaStream = await this.getUserMedia();
+      logger.debug('[WebRTC] Step 3: Got media, creating peer connection...');
       this.peerConnection = this.createPeerConnection();
+      logger.debug('[WebRTC] Step 4: Adding audio tracks...');
       this.addAudioTracks();
+      logger.debug('[WebRTC] Step 5: Creating offer...');
       const offer = await this.createOffer();
+      logger.debug('[WebRTC] Step 6: Exchanging SDP with Azure...');
       await this.exchangeSDP(token, offer);
+      logger.debug('[WebRTC] Step 7: Waiting for connection...');
       await this.waitForConnection();
+      logger.debug('[WebRTC] Step 8: Connection established!');
       return {
         peerConnection: this.peerConnection,
         mediaStream: this.mediaStream,
@@ -178,12 +186,14 @@ export class WebRTCConnection {
   }
 
   private async exchangeSDP(token: string, offer: RTCSessionDescriptionInit): Promise<void> {
-    // Use internal API to get Azure endpoint (keeps endpoint server-side only)
+    // Use internal API to get Azure WebRTC endpoint (regional endpoint)
+    logger.debug('[WebRTC] SDP: Fetching Azure config...');
     const configResponse = await fetch('/api/realtime/token');
     if (!configResponse.ok) throw new Error('Failed to get Azure config');
-    const { endpoint } = await configResponse.json();
-    const url = `${endpoint}/openai/v1/realtime/calls?webrtcfilter=on`;
-    const response = await fetch(url, {
+    const { webrtcEndpoint } = await configResponse.json();
+    if (!webrtcEndpoint) throw new Error('WebRTC endpoint not configured');
+    logger.debug('[WebRTC] SDP: Sending offer to Azure...', { url: webrtcEndpoint });
+    const response = await fetch(webrtcEndpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/sdp',
@@ -191,11 +201,18 @@ export class WebRTCConnection {
       },
       body: offer.sdp,
     });
-    if (!response.ok) throw new Error(`SDP exchange failed: ${response.statusText}`);
+    logger.debug('[WebRTC] SDP: Response status', { status: response.status, ok: response.ok });
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error('[WebRTC] SDP exchange failed', { status: response.status, error: errorText });
+      throw new Error(`SDP exchange failed: ${response.status} - ${errorText}`);
+    }
     const answerSDP = await response.text();
+    logger.debug('[WebRTC] SDP: Got answer, setting remote description...');
     const answer: AzureSDPResponse = { sdp: answerSDP, type: 'answer' };
     if (!this.peerConnection) throw new Error('PeerConnection not initialized');
     await this.peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+    logger.debug('[WebRTC] SDP: Remote description set successfully');
   }
 
   private async waitForConnection(): Promise<void> {
@@ -205,8 +222,22 @@ export class WebRTCConnection {
         return;
       }
       const pc = this.peerConnection;
-      this.connectionTimeout = setTimeout(() => reject(new Error('Connection timeout')), CONNECTION_TIMEOUT_MS);
+      logger.debug('[WebRTC] Waiting for connection...', {
+        currentState: pc.connectionState,
+        iceState: pc.iceConnectionState
+      });
+      this.connectionTimeout = setTimeout(() => {
+        logger.error('[WebRTC] Connection timeout', {
+          state: pc.connectionState,
+          iceState: pc.iceConnectionState
+        });
+        reject(new Error('Connection timeout'));
+      }, CONNECTION_TIMEOUT_MS);
       const checkConnection = () => {
+        logger.debug('[WebRTC] Connection state changed', {
+          state: pc.connectionState,
+          iceState: pc.iceConnectionState
+        });
         if (pc.connectionState === 'connected') {
           if (this.connectionTimeout) clearTimeout(this.connectionTimeout);
           this.connectionTimeout = null;

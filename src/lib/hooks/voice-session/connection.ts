@@ -169,6 +169,11 @@ async function connectWebRTC(
     },
     onDataChannelOpen: () => {
       logger.debug('[VoiceSession] WebRTC data channel open');
+      // Send session config now that data channel is ready
+      if (refs.sendSessionConfigRef.current) {
+        logger.debug('[VoiceSession] Sending session config via data channel');
+        refs.sendSessionConfigRef.current();
+      }
     },
     onTrack: (event) => handleWebRTCTrack(event, refs),
   });
@@ -178,12 +183,4 @@ async function connectWebRTC(
   refs.mediaStreamRef.current = result.mediaStream;
   refs.webrtcDataChannelRef.current = result.dataChannel;
   logger.debug('[VoiceSession] WebRTC connection established');
-
-  // Send session config via data channel (mirrors WebSocket proxy.ready flow)
-  setTimeout(() => {
-    if (refs.sendSessionConfigRef.current) {
-      logger.debug('[VoiceSession] Calling sendSessionConfig for WebRTC');
-      refs.sendSessionConfigRef.current();
-    }
-  }, 50);
 }

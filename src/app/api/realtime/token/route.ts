@@ -45,16 +45,20 @@ export async function GET(request: NextRequest) {
   // Transport mode: webrtc or websocket (from env, defaults to webrtc)
   const transport = (process.env.VOICE_TRANSPORT || 'webrtc') as 'webrtc' | 'websocket';
 
+  // Azure region for WebRTC endpoint (e.g., 'swedencentral', 'eastus2')
+  const azureRegion = process.env.AZURE_OPENAI_REALTIME_REGION || 'swedencentral';
+
   // Return connection info based on transport mode
   // SECURITY: apiKey is NEVER included - stays server-side
   return NextResponse.json({
     provider: 'azure',
     transport,
-    // WebRTC mode: client uses ephemeral token + endpoint for direct Azure connection
+    // WebRTC mode: client uses ephemeral token + regional endpoint for direct Azure connection
     // WebSocket mode: client connects to local proxy
     ...(transport === 'webrtc'
       ? {
-          endpoint: azureEndpoint.replace(/\/$/, ''), // Remove trailing slash
+          endpoint: azureEndpoint.replace(/\/$/, ''), // For session creation
+          webrtcEndpoint: `https://${azureRegion}.realtimeapi-preview.ai.azure.com/v1/realtimertc`,
           deployment: azureDeployment,
         }
       : {
