@@ -25,7 +25,7 @@ export function PageHeader({ icon: Icon, title, rightContent, className }: PageH
     >
       <div className={cn(
         'flex items-center',
-        rightContent ? 'justify-between' : 'justify-center'
+        rightContent ? 'justify-between' : 'justify-start'
       )}>
         <div className="flex items-center gap-3">
           <Icon className="w-8 h-8 text-primary" aria-hidden="true" />
