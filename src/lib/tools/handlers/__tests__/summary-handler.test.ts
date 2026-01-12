@@ -27,12 +27,168 @@ interface CommentResultData {
   createdAt: Date;
 }
 
+// Type for create_summary result data
+interface SummaryResultData {
+  topic: string;
+  sections: Array<{
+    title: string;
+    content: string;
+    keyPoints?: string[];
+  }>;
+  length?: 'short' | 'medium' | 'long';
+}
+
 // Register handlers
 beforeAll(async () => {
   await import('../summary-handler');
 });
 
 describe('Summary Handler', () => {
+  describe('create_summary', () => {
+    const defaultContext = { sessionId: 'test-session', maestroId: 'test-maestro' };
+
+    it('creates summary with valid sections', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          topic: 'La Fotosintesi',
+          sections: [
+            {
+              title: 'Introduzione',
+              content: 'La fotosintesi è un processo biochimico',
+              keyPoints: ['Avviene nelle foglie', 'Richiede luce solare'],
+            },
+          ],
+        },
+        defaultContext
+      );
+      const data = result.data as SummaryResultData;
+
+      expect(result.success).toBe(true);
+      expect(result.toolType).toBe('summary');
+      expect(data.topic).toBe('La Fotosintesi');
+      expect(data.sections).toHaveLength(1);
+      expect(data.sections[0].title).toBe('Introduzione');
+    });
+
+    it('trims whitespace from topic and sections', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          topic: '  La Fotosintesi  ',
+          sections: [
+            {
+              title: '  Introduzione  ',
+              content: '  Contenuto  ',
+              keyPoints: ['  Punto 1  ', '  Punto 2  '],
+            },
+          ],
+        },
+        defaultContext
+      );
+      const data = result.data as SummaryResultData;
+
+      expect(data.topic).toBe('La Fotosintesi');
+      expect(data.sections[0].title).toBe('Introduzione');
+      expect(data.sections[0].content).toBe('Contenuto');
+      expect(data.sections[0].keyPoints).toEqual(['Punto 1', 'Punto 2']);
+    });
+
+    it('includes length parameter when provided', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          topic: 'Test',
+          sections: [{ title: 'S1', content: 'C1' }],
+          length: 'short',
+        },
+        defaultContext
+      );
+      const data = result.data as SummaryResultData;
+
+      expect(data.length).toBe('short');
+    });
+
+    it('returns error for missing topic', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          sections: [{ title: 'S1', content: 'C1' }],
+        },
+        defaultContext
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('topic');
+    });
+
+    it('returns error for invalid sections', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          topic: 'Test',
+          sections: [{ title: 'Only title' }],
+        },
+        defaultContext
+      );
+
+      expect(result.success).toBe(false);
+      // Zod validation catches missing content
+      expect(result.error).toContain('content');
+    });
+
+    it('returns error for empty sections array', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          topic: 'Test',
+          sections: [],
+        },
+        defaultContext
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('At least one section is required');
+    });
+
+    it('returns error for non-array keyPoints', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          topic: 'Test',
+          sections: [{ title: 'S1', content: 'C1', keyPoints: 'not-an-array' }],
+        },
+        defaultContext
+      );
+
+      expect(result.success).toBe(false);
+      // Zod validation catches invalid keyPoints type
+      expect(result.error).toContain('keyPoints');
+    });
+
+    it('handles multiple sections correctly', async () => {
+      const result = await executeToolCall(
+        'create_summary',
+        {
+          topic: 'La Rivoluzione Francese',
+          sections: [
+            { title: 'Cause', content: 'Le cause della rivoluzione...' },
+            { title: 'Eventi', content: 'Gli eventi principali...', keyPoints: ['1789', '1792'] },
+            { title: 'Conseguenze', content: 'Le conseguenze...' },
+          ],
+          length: 'long',
+        },
+        defaultContext
+      );
+      const data = result.data as SummaryResultData;
+
+      expect(result.success).toBe(true);
+      expect(data.sections).toHaveLength(3);
+      expect(data.sections[1].keyPoints).toEqual(['1789', '1792']);
+      expect(data.length).toBe('long');
+    });
+  });
+
   describe('validateSections', () => {
     it('returns invalid for empty sections array', () => {
       const result = validateSections([]);

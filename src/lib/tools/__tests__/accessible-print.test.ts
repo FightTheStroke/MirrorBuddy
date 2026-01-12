@@ -308,5 +308,165 @@ describe('accessible-print', () => {
       expect(html).toContain('<article');
       expect(html).toContain('<header');
     });
+
+    it('renders generic content for unknown content types', () => {
+      const html = generateAccessibleHtml({
+        ...baseOptions,
+        contentType: 'formula' as const,
+        content: 'E = mc²',
+      });
+
+      expect(html).toContain('E = mc²');
+      expect(html).toContain('Formula');
+    });
+
+    it('renders search content type correctly', () => {
+      const html = generateAccessibleHtml({
+        ...baseOptions,
+        contentType: 'search' as const,
+        content: ['Result 1', 'Result 2'],
+      });
+
+      expect(html).toContain('Result 1');
+      expect(html).toContain('Result 2');
+      expect(html).toContain('Ricerca');
+    });
+
+    it('renders demo content type correctly', () => {
+      const html = generateAccessibleHtml({
+        ...baseOptions,
+        contentType: 'demo' as const,
+        content: { title: 'Demo Title', description: 'Demo content' },
+      });
+
+      expect(html).toContain('Demo');
+    });
+
+    it('renders chart content type correctly', () => {
+      const html = generateAccessibleHtml({
+        ...baseOptions,
+        contentType: 'chart' as const,
+        content: { title: 'Chart Data', values: [1, 2, 3] },
+      });
+
+      expect(html).toContain('Grafico');
+    });
+
+    it('shows high contrast and line height indicators', () => {
+      const html = generateAccessibleHtml({
+        ...baseOptions,
+        accessibility: {
+          highContrast: true,
+          increasedLineHeight: true,
+        },
+      });
+
+      expect(html).toContain('Alto contrasto');
+      expect(html).toContain('Interlinea aumentata');
+    });
+
+    it('handles flashcards as direct array', () => {
+      const html = generateAccessibleHtml({
+        ...baseOptions,
+        contentType: 'flashcard',
+        content: [
+          { front: 'Q1', back: 'A1' },
+          { front: 'Q2', back: 'A2' },
+        ],
+      });
+
+      expect(html).toContain('Q1');
+      expect(html).toContain('A1');
+    });
+  });
+});
+
+// Import helpers for testing
+import { escapeHtml, sanitizeFilename } from '../accessible-print/helpers';
+
+describe('accessible-print helpers', () => {
+  describe('escapeHtml', () => {
+    it('should escape HTML special characters', () => {
+      const result = escapeHtml('<script>alert("xss")</script>');
+
+      expect(result).not.toContain('<script>');
+      expect(result).toContain('&lt;script&gt;');
+      expect(result).toContain('&quot;');
+    });
+
+    it('should escape ampersands', () => {
+      const result = escapeHtml('Tom & Jerry');
+
+      expect(result).toBe('Tom &amp; Jerry');
+    });
+
+    it('should escape angle brackets', () => {
+      const result = escapeHtml('a > b < c');
+
+      expect(result).toBe('a &gt; b &lt; c');
+    });
+
+    it('should escape double quotes', () => {
+      const result = escapeHtml('He said "hello"');
+
+      expect(result).toContain('&quot;');
+    });
+
+    it('should escape single quotes', () => {
+      const result = escapeHtml("It's fine");
+
+      expect(result).toContain('&#039;');
+    });
+
+    it('should handle empty string', () => {
+      const result = escapeHtml('');
+
+      expect(result).toBe('');
+    });
+
+    it('should handle text without special characters', () => {
+      const result = escapeHtml('Hello World');
+
+      expect(result).toBe('Hello World');
+    });
+  });
+
+  describe('sanitizeFilename', () => {
+    it('should remove invalid filename characters', () => {
+      const result = sanitizeFilename('file<>:"/\\|?*.txt');
+
+      expect(result).toBe('file.txt');
+    });
+
+    it('should replace spaces with underscores', () => {
+      const result = sanitizeFilename('my file name.pdf');
+
+      expect(result).toBe('my_file_name.pdf');
+    });
+
+    it('should collapse multiple spaces to single underscore', () => {
+      const result = sanitizeFilename('file   with   spaces.txt');
+
+      expect(result).toBe('file_with_spaces.txt');
+    });
+
+    it('should truncate long filenames to 100 characters', () => {
+      const longName = 'a'.repeat(150);
+      const result = sanitizeFilename(longName);
+
+      expect(result).toHaveLength(100);
+    });
+
+    it('should handle empty string', () => {
+      const result = sanitizeFilename('');
+
+      expect(result).toBe('');
+    });
+
+    it('should handle normal filenames', () => {
+      const result = sanitizeFilename('document.pdf');
+
+      expect(result).toBe('document.pdf');
+    });
   });
 });
