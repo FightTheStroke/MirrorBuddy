@@ -213,6 +213,30 @@ describe('Content Filter (Input)', () => {
     });
   });
 
+  describe('PII Detection', () => {
+    it('should warn for email addresses', () => {
+      const result = filterInput('La mia email è test@example.com');
+      expect(result.safe).toBe(true); // Allowed but with warning
+      expect(result.category).toBe('pii');
+      expect(result.action).toBe('warn');
+    });
+
+    it('should warn for phone numbers', () => {
+      const result = filterInput('Chiamami al 333-1234567');
+      expect(result.safe).toBe(true);
+      expect(result.category).toBe('pii');
+    });
+  });
+
+  describe('Severe Content Patterns', () => {
+    it('should block severe explicit content patterns', () => {
+      const result = filterInput('violenza sessuale');
+      expect(result.safe).toBe(false);
+      expect(result.category).toBe('explicit');
+      expect(result.action).toBe('block');
+    });
+  });
+
   describe('isInputBlocked helper', () => {
     it('should return true for blocked content', () => {
       expect(isInputBlocked('Come fare una bomba')).toBe(true);

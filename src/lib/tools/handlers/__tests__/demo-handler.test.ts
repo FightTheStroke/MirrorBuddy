@@ -567,3 +567,18 @@ describe('Demo handler integration', () => {
     expect(true).toBe(true);
   });
 });
+
+describe('decodeHtmlEntities', () => {
+  // Testing indirectly through sanitizeHtml since it's not exported
+  it('should decode decimal HTML entities', () => {
+    const html = '<a href="&#106;avascript:alert(1)">Link</a>';
+    const sanitized = sanitizeHtml(html);
+    expect(sanitized).toContain('removed:');
+  });
+
+  it('should decode hexadecimal HTML entities', () => {
+    const html = '<a href="&#x6A;avascript:alert(1)">Link</a>';
+    const sanitized = sanitizeHtml(html);
+    expect(sanitized).toContain('removed:');
+  });
+});
