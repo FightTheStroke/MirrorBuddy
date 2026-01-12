@@ -1,0 +1,88 @@
+# MirrorBuddy Docker Compose Configuration
+# Development and production deployment
+# ISE Engineering Fundamentals: https://microsoft.github.io/code-with-engineering-playbook/
+
+services:
+  # =============================================================================
+  # PostgreSQL with pgvector for semantic search
+  # =============================================================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: mirrorbuddy-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mirrorbuddy}
+      # SECURITY: No default password - must be set via environment variable
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${POSTGRES_DB:-mirrorbuddy}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mirrorbuddy}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # =============================================================================
+  # MirrorBuddy Application
+  # =============================================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mirrorbuddy-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mirrorbuddy}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-mirrorbuddy}
+      # Azure OpenAI (required for production)
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
+      AZURE_OPENAI_API_KEY: ${AZURE_OPENAI_API_KEY}
+      AZURE_OPENAI_CHAT_DEPLOYMENT: ${AZURE_OPENAI_CHAT_DEPLOYMENT:-gpt-4o}
+      AZURE_OPENAI_API_VERSION: ${AZURE_OPENAI_API_VERSION:-2024-08-01-preview}
+      # Voice (optional)
+      AZURE_OPENAI_REALTIME_ENDPOINT: ${AZURE_OPENAI_REALTIME_ENDPOINT}
+      AZURE_OPENAI_REALTIME_API_KEY: ${AZURE_OPENAI_REALTIME_API_KEY}
+      AZURE_OPENAI_REALTIME_DEPLOYMENT: ${AZURE_OPENAI_REALTIME_DEPLOYMENT}
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # =============================================================================
+  # Ollama (Local AI fallback - optional)
+  # =============================================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: mirrorbuddy-ollama
+    profiles:
+      - local-ai
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  postgres_data:
+  ollama_data:
+
+networks:
+  default:
+    name: mirrorbuddy-network
