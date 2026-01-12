@@ -22,6 +22,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   playbackContextRef: React.MutableRefObject<AudioContext | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   transportRef: React.MutableRefObject<'websocket' | 'webrtc'>;
+  webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   addTranscript: (role: 'user' | 'assistant', text: string) => void;
@@ -85,18 +86,30 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
         // AUTO-INTERRUPT: If maestro is speaking, stop them (barge-in)
         if (deps.options.disableBargeIn) {
           logger.debug('[VoiceSession] Barge-in disabled (onboarding mode) - ignoring speech');
-        } else if (deps.voiceBargeInEnabled && deps.hasActiveResponseRef.current && deps.wsRef.current?.readyState === WebSocket.OPEN) {
-          logger.debug('[VoiceSession] Barge-in detected - interrupting assistant (hasActiveResponse=true)');
-          deps.wsRef.current.send(JSON.stringify({ type: 'response.cancel' }));
-          deps.hasActiveResponseRef.current = false;
-          deps.audioQueueRef.current = [];
-          deps.isPlayingRef.current = false;
-          deps.isBufferingRef.current = true;
-          deps.scheduledSourcesRef.current.forEach(source => {
-            try { source.stop(); } catch { /* already stopped */ }
-          });
-          deps.scheduledSourcesRef.current = [];
-          deps.setSpeaking(false);
+        } else if (deps.voiceBargeInEnabled && deps.hasActiveResponseRef.current) {
+          // Check transport-specific channel availability
+          const isWebRTC = deps.transportRef.current === 'webrtc';
+          const webrtcReady = isWebRTC && deps.webrtcDataChannelRef.current?.readyState === 'open';
+          const websocketReady = !isWebRTC && deps.wsRef.current?.readyState === WebSocket.OPEN;
+
+          if (webrtcReady || websocketReady) {
+            logger.debug('[VoiceSession] Barge-in detected - interrupting assistant', { transport: isWebRTC ? 'webrtc' : 'websocket' });
+            const cancelMsg = JSON.stringify({ type: 'response.cancel' });
+            if (isWebRTC && deps.webrtcDataChannelRef.current) {
+              deps.webrtcDataChannelRef.current.send(cancelMsg);
+            } else if (deps.wsRef.current) {
+              deps.wsRef.current.send(cancelMsg);
+            }
+            deps.hasActiveResponseRef.current = false;
+            deps.audioQueueRef.current = [];
+            deps.isPlayingRef.current = false;
+            deps.isBufferingRef.current = true;
+            deps.scheduledSourcesRef.current.forEach(source => {
+              try { source.stop(); } catch { /* already stopped */ }
+            });
+            deps.scheduledSourcesRef.current = [];
+            deps.setSpeaking(false);
+          }
         } else if (deps.voiceBargeInEnabled && deps.isSpeaking) {
           logger.debug('[VoiceSession] Clearing local audio queue (response already done)');
           deps.audioQueueRef.current = [];

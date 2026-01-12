@@ -305,8 +305,9 @@ describe('Summary Handler', () => {
       const result = await executeToolCall('open_student_summary', {}, defaultContext);
 
       expect(result.success).toBe(false);
-      // Zod validation error format
-      expect(result.error).toContain('Invalid arguments for open_student_summary');
+      // ToolOrchestrator validation error format
+      expect(result.error).toContain('Tool execution failed');
+      expect(result.error).toContain('open_student_summary');
       expect(result.error).toContain('topic');
     });
 
@@ -348,8 +349,9 @@ describe('Summary Handler', () => {
       }, defaultContext);
 
       expect(result.success).toBe(false);
-      // Zod validation error format
-      expect(result.error).toContain('Invalid arguments for student_summary_add_comment');
+      // ToolOrchestrator validation error format
+      expect(result.error).toContain('Tool execution failed');
+      expect(result.error).toContain('student_summary_add_comment');
     });
 
     it('passes maestroId from context', async () => {

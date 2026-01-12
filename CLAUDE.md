@@ -79,6 +79,35 @@ See ADR 0028 for full migration details.
 - `GET /api/health` - Basic health (for load balancers)
 - `GET /api/health/detailed` - Full metrics (for dashboards)
 
+## Tool Plugin System
+
+**Location**: `src/lib/tools/plugin/` - Scalable tool registration and execution engine.
+
+**Key Classes**:
+- `ToolRegistry` - Singleton registry for plugin management (register, get, getByTrigger, getByCategory)
+- `ToolOrchestrator` - Execution engine with validation, prerequisite checking, error handling
+- `ToolPlugin` interface - Defines plugin structure: id, name, category, schema, handler, voice config, permissions
+
+**Tool Categories**: CREATION, EDUCATIONAL, NAVIGATION, ASSESSMENT, UTILITY
+
+**Permissions**: READ_CONVERSATION, READ_PROFILE, WRITE_CONTENT, VOICE_OUTPUT, FILE_ACCESS
+
+**Quick Usage**:
+```typescript
+// Register plugin
+const registry = ToolRegistry.getInstance();
+registry.register(myTool);
+
+// Execute tool
+const orchestrator = new ToolOrchestrator(eventBroadcaster);
+const result = await orchestrator.executeTool(toolId, args, context);
+
+// Find by trigger
+const tools = registry.getByTrigger('create mindmap');
+```
+
+See `@docs/claude/tool-plugins.md` for full documentation.
+
 ## Modular Rules (auto-loaded)
 
 `.claude/rules/`: accessibility.md | api-patterns.md | maestri.md

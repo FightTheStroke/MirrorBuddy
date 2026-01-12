@@ -55,6 +55,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Works with both WebSocket and WebRTC transports
 - Greeting skipped when continuing existing conversation
 
+### Added (Jan 11 - Tool Plugin System)
+
+#### Scalable Tool Plugin Architecture (ADR 0037)
+
+**What it does**: Provides a flexible, discoverable plugin system for extending MirrorBuddy with custom tools.
+
+**Key Components**:
+- **ToolRegistry**: Singleton registry managing plugin registration, discovery, and filtering
+- **ToolOrchestrator**: Execution engine with validation, prerequisite checking, permission verification
+- **ToolPlugin Interface**: Standardized plugin definition with metadata, schema, handler, voice integration
+- **Voice Tool Flow**: Integrates voice transcripts → trigger detection → tool execution → voice feedback
+- **DataChannel Broadcasting**: Real-time tool event delivery via WebRTC DataChannel with SSE fallback
+
+**Features**:
+- Zod schema validation for plugin inputs
+- Permission-based access control (READ_CONVERSATION, READ_PROFILE, WRITE_CONTENT, VOICE_OUTPUT, FILE_ACCESS)
+- Trigger-based voice activation with confidence scoring
+- Dynamic voice prompts with template variable substitution
+- Dual-path event broadcasting (DataChannel primary, SSE fallback)
+- Comprehensive JSDoc documentation for all interfaces and classes
+
+**Technical Details**:
+- Location: `src/lib/tools/plugin/`
+- Files: types.ts, registry.ts, orchestrator.ts, trigger-detector.ts, voice-feedback.ts, data-channel-protocol.ts
+- `@docs/claude/tool-plugins.md` - Reference guide
+- `@docs/claude/tool-architecture.md` - System architecture diagram (Mermaid)
+
+**Benefits**:
+- Modular tool management without monolithic code
+- Voice-first tool integration for students
+- Type-safe plugin definition and execution
+- Real-time tool event monitoring via WebRTC
+- Graceful degradation with SSE fallback for older browsers
+
 ### Added (Jan 11 - WebRTC Voice Transport Migration)
 
 #### WebRTC Transport for Azure OpenAI Realtime API
