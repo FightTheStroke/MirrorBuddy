@@ -89,7 +89,7 @@ export function HomeworkHelp({
     setIsDriveModalOpen(false);
 
     // Download the file from Google Drive
-    const downloadResponse = await fetch(`/api/google-drive/files/${driveFile.id}/download`);
+    const downloadResponse = await fetch(`/api/google-drive/files/${driveFile.id}/download?userId=${userId}`);
 
     if (!downloadResponse.ok) {
       setPdfError('Impossibile scaricare il file da Google Drive');
@@ -108,7 +108,7 @@ export function HomeworkHelp({
     } as unknown as React.ChangeEvent<HTMLInputElement>;
 
     handleFileSelect(syntheticEvent);
-  }, [handleFileSelect, setPdfError]);
+  }, [handleFileSelect, setPdfError, userId]);
 
   if (!homework) {
     return (

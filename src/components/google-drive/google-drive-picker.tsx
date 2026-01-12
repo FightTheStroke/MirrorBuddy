@@ -179,8 +179,34 @@ export function GoogleDrivePicker({
         </form>
       </div>
 
+      {/* Drive sections */}
+      <div className="flex items-center gap-2 px-4 py-2 border-b bg-slate-50 dark:bg-slate-900">
+        <button
+          onClick={() => navigateToFolder('root')}
+          className={cn(
+            'px-3 py-1 text-sm rounded-full transition-colors',
+            breadcrumbs[0]?.id === 'root'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+          )}
+        >
+          Il mio Drive
+        </button>
+        <button
+          onClick={() => navigateToFolder('shared')}
+          className={cn(
+            'px-3 py-1 text-sm rounded-full transition-colors',
+            breadcrumbs[0]?.id === 'shared'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
+          )}
+        >
+          Condivisi con me
+        </button>
+      </div>
+
       {/* Breadcrumbs */}
-      <div className="flex items-center gap-1 px-4 py-2 text-sm overflow-x-auto border-b bg-slate-50 dark:bg-slate-900">
+      <div className="flex items-center gap-1 px-4 py-2 text-sm overflow-x-auto border-b">
         {breadcrumbs.map((crumb, index) => (
           <div key={crumb.id} className="flex items-center">
             {index > 0 && <ChevronRight className="w-4 h-4 mx-1 text-muted-foreground" />}
@@ -232,7 +258,7 @@ export function GoogleDrivePicker({
                   <div className="font-medium truncate">{file.name}</div>
                   <div className="text-xs text-muted-foreground flex gap-2">
                     {file.modifiedAt && (
-                      <span>{file.modifiedAt.toLocaleDateString('it-IT')}</span>
+                      <span>{new Date(file.modifiedAt).toLocaleDateString('it-IT')}</span>
                     )}
                     {file.size && <span>{formatSize(file.size)}</span>}
                   </div>

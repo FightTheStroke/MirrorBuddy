@@ -28,14 +28,14 @@ export async function GET(request: NextRequest) {
   // Handle OAuth errors from Google
   if (error) {
     console.error('[Google OAuth] Error from Google:', error);
-    const errorUrl = new URL('/settings', baseUrl);
+    const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', error);
     return NextResponse.redirect(errorUrl.toString());
   }
 
   // Validate required params
   if (!code || !stateParam) {
-    const errorUrl = new URL('/settings', baseUrl);
+    const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', 'missing_params');
     return NextResponse.redirect(errorUrl.toString());
   }
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   // Decode and validate state
   const state = decodeState(stateParam);
   if (!state || !state.userId) {
-    const errorUrl = new URL('/settings', baseUrl);
+    const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', 'invalid_state');
     return NextResponse.redirect(errorUrl.toString());
   }
@@ -65,14 +65,14 @@ export async function GET(request: NextRequest) {
     await saveGoogleAccount(state.userId, tokens, profile);
 
     // Redirect to success
-    const returnUrl = state.returnUrl || '/settings';
+    const returnUrl = state.returnUrl || '/';
     const successUrl = new URL(returnUrl, baseUrl);
     successUrl.searchParams.set('google_connected', 'true');
     return NextResponse.redirect(successUrl.toString());
 
   } catch (err) {
     console.error('[Google OAuth] Callback error:', err);
-    const errorUrl = new URL('/settings', baseUrl);
+    const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', 'callback_failed');
     return NextResponse.redirect(errorUrl.toString());
   }
