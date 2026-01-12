@@ -10,8 +10,9 @@
 
 import { test, expect } from '@playwright/test';
 
-// Test user ID (same as used in app)
-const TEST_USER_ID = 'user-61fc0a4d-9109-4b87-8482-80ec1e67d49d';
+// Test user ID - configure via E2E_TEST_USER_ID env var or use default
+// Default is a known test user in the development database
+const TEST_USER_ID = process.env.E2E_TEST_USER_ID || 'user-61fc0a4d-9109-4b87-8482-80ec1e67d49d';
 
 const IGNORE_ERRORS = [
   /ResizeObserver loop/i,

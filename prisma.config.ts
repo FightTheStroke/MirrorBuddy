@@ -7,7 +7,8 @@ import { defineConfig } from "prisma/config";
 //
 // Note: A dummy URL is used for schema-only operations (prisma generate, validate)
 // Real DATABASE_URL is required for migrations and runtime queries
-const databaseUrl = process.env.DATABASE_URL || 'postgresql://placeholder:placeholder@localhost:5432/placeholder';
+// WARNING: This placeholder is intentionally invalid - DO NOT use for actual connections
+const databaseUrl = process.env.DATABASE_URL || 'postgresql://INVALID_CREDENTIALS:INVALID_CREDENTIALS@localhost:5432/schema_only';
 
 export default defineConfig({
   schema: "prisma/schema.prisma",

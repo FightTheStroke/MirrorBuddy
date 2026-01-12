@@ -40,12 +40,13 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'env -u NO_COLOR -u FORCE_COLOR npm run dev',
+    // Using delete process.env above to clear NO_COLOR/FORCE_COLOR (line 8-9)
+    command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      // DATABASE_URL must be set in environment - no hardcoded fallbacks
+      // DATABASE_URL is optional - if not set, Prisma uses placeholder for schema-only
       ...(process.env.DATABASE_URL && { DATABASE_URL: process.env.DATABASE_URL }),
       ...(process.env.DIRECT_URL && { DIRECT_URL: process.env.DIRECT_URL }),
       E2E_TESTS: '1',
