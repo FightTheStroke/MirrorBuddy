@@ -9,6 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 12 - Google Drive Integration)
+
+#### Google Drive File Import (ADR 0040)
+
+**What it does**: Users can now import study materials directly from Google Drive instead of only uploading from local filesystem.
+
+**How it works**:
+1. Connect Google account in Settings > Integrations
+2. In Study Kit or Homework Help, choose "Da Google Drive"
+3. Browse folders, search files, select the one you need
+4. File is downloaded and processed as if uploaded locally
+
+**Features**:
+- Server-side OAuth 2.0 flow (secure, no tokens in browser)
+- Read-only access (minimal scope, `drive.readonly`)
+- Folder navigation with breadcrumbs
+- File search functionality
+- Avatar and account info display
+- One-click disconnect in settings
+- Works with Study Kit (PDFs) and Homework Help (images/PDFs)
+
+**Why it matters**: Many students, especially on Chromebooks or in Google Workspace schools, store materials in Google Drive. Direct import eliminates download-then-upload friction.
+
+**Key Files**:
+- `src/lib/google/` - OAuth and Drive API clients
+- `src/components/google-drive/` - React components (picker, card, unified picker)
+- `src/app/api/auth/google/` - OAuth routes
+- `src/app/api/google-drive/` - Drive API routes
+- `prisma/schema.prisma` - GoogleAccount model
+
 ### Added (Jan 11 - Conversation History & Voice Context)
 
 #### Per-Character Conversation Sidebar (ADR 0036)
