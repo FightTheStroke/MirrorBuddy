@@ -63,6 +63,7 @@ function createMockRefs(): ConnectionRefs {
     remoteAudioStreamRef: { current: null },
     webrtcAudioElementRef: { current: null },
     webrtcDataChannelRef: { current: null },
+    webrtcHeartbeatRef: { current: null },
     userSpeechEndTimeRef: { current: null },
     firstAudioPlaybackTimeRef: { current: null },
     sendSessionConfigRef: { current: null },
