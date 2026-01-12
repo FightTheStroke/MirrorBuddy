@@ -10,7 +10,7 @@ import {
   CATEGORY_TO_MAESTRO,
   getParentSuggestion,
   getMaestroSubject,
-  type ParentSuggestion,
+  type ParentSuggestion as _ParentSuggestion,
 } from '../parent-suggestions';
 import type { ObservationCategory } from '@/types';
 
@@ -78,7 +78,7 @@ describe('Parent Suggestions', () => {
     });
 
     it('should have non-empty subject strings', () => {
-      for (const [maestro, subject] of Object.entries(MAESTRO_SUBJECTS)) {
+      for (const [_maestro, subject] of Object.entries(MAESTRO_SUBJECTS)) {
         expect(subject).toBeDefined();
         expect(typeof subject).toBe('string');
         expect(subject.length).toBeGreaterThan(0);

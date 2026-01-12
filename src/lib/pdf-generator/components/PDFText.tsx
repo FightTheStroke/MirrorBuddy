@@ -7,7 +7,7 @@ import React from 'react';
 import { Text, View as _View, StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
 import { operatorColors, wordPartColors as _wordPartColors } from '../profiles';
-import { mergeStyles, type StyleInput } from '../utils/style-utils';
+import { mergeStyles, sanitizeNumber, type StyleInput } from '../utils/style-utils';
 
 interface PDFTextProps {
   children?: React.ReactNode;
@@ -18,21 +18,27 @@ interface PDFTextProps {
 
 /**
  * Create text styles based on profile
+ * Uses sanitizeNumber to prevent PDF rendering errors
  */
 function createTextStyles(profile: ProfileConfig) {
+  const fontSize = sanitizeNumber(profile.fontSize, 14);
+  const lineHeight = sanitizeNumber(profile.lineHeight, 1.5);
+  const letterSpacing = sanitizeNumber(profile.letterSpacing, 0);
+  const paragraphSpacing = sanitizeNumber(profile.paragraphSpacing, 20);
+
   return StyleSheet.create({
     text: {
-      fontFamily: profile.fontFamily,
-      fontSize: profile.fontSize,
-      lineHeight: profile.lineHeight,
-      color: profile.textColor,
-      letterSpacing: profile.letterSpacing,
-      marginBottom: profile.paragraphSpacing / 2,
+      fontFamily: profile.fontFamily || 'Helvetica',
+      fontSize,
+      lineHeight,
+      color: profile.textColor || '#1e293b',
+      letterSpacing,
+      marginBottom: sanitizeNumber(paragraphSpacing / 2, 10),
     },
     // Stuttering: add breathing marks (visual pause indicators)
     breathingMark: {
       color: '#94a3b8',
-      fontSize: profile.fontSize * 0.8,
+      fontSize: sanitizeNumber(fontSize * 0.8, 11),
     },
     // ADHD: highlight key terms
     keyTerm: {
@@ -41,7 +47,7 @@ function createTextStyles(profile: ProfileConfig) {
     },
     // Dyscalculia: number styling
     number: {
-      fontSize: profile.fontSize * 1.2,
+      fontSize: sanitizeNumber(fontSize * 1.2, 17),
       fontWeight: 'bold',
     },
   });

@@ -5,34 +5,43 @@
 
 import { StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig, PDFStyles } from '../types';
+import { sanitizeNumber } from './style-utils';
 
 /**
  * Generate complete PDF styles from a profile configuration
+ * Uses sanitizeNumber to prevent PDF rendering errors
  */
 export function generateStyles(
   profile: ProfileConfig,
   format: 'A4' | 'Letter' = 'A4'
 ): PDFStyles {
+  const fontSize = sanitizeNumber(profile.fontSize, 14);
+  const headingScale = sanitizeNumber(profile.headingScale, 1.3);
+  const paragraphSpacing = sanitizeNumber(profile.paragraphSpacing, 20);
+  const lineHeight = sanitizeNumber(profile.lineHeight, 1.5);
+  const letterSpacing = sanitizeNumber(profile.letterSpacing, 0);
+  const wordSpacing = sanitizeNumber(profile.wordSpacing, 0);
+
   return {
     page: {
       size: format === 'Letter' ? 'LETTER' : 'A4',
       orientation: 'portrait',
-      backgroundColor: profile.backgroundColor,
+      backgroundColor: profile.backgroundColor || '#ffffff',
       padding: calculatePadding(profile),
     },
     header: {
-      fontSize: profile.fontSize * profile.headingScale,
-      color: profile.textColor,
+      fontSize: sanitizeNumber(fontSize * headingScale, 18),
+      color: profile.textColor || '#1e293b',
       borderBottom: true,
-      marginBottom: profile.paragraphSpacing,
+      marginBottom: paragraphSpacing,
     },
     content: {
-      fontFamily: profile.fontFamily,
-      fontSize: profile.fontSize,
-      lineHeight: profile.lineHeight,
-      color: profile.textColor,
-      letterSpacing: profile.letterSpacing,
-      wordSpacing: profile.wordSpacing,
+      fontFamily: profile.fontFamily || 'Helvetica',
+      fontSize,
+      lineHeight,
+      color: profile.textColor || '#1e293b',
+      letterSpacing,
+      wordSpacing,
     },
     footer: {
       fontSize: 10,
@@ -56,69 +65,79 @@ function calculatePadding(profile: ProfileConfig): number {
 
 /**
  * Create react-pdf StyleSheet from profile
+ * Uses sanitizeNumber to prevent PDF rendering errors
  */
 export function createProfileStyleSheet(profile: ProfileConfig) {
+  const fontSize = sanitizeNumber(profile.fontSize, 14);
+  const headingScale = sanitizeNumber(profile.headingScale, 1.3);
+  const paragraphSpacing = sanitizeNumber(profile.paragraphSpacing, 20);
+  const lineHeight = sanitizeNumber(profile.lineHeight, 1.5);
+  const letterSpacing = sanitizeNumber(profile.letterSpacing, 0);
+  const textColor = profile.textColor || '#1e293b';
+  const fontFamily = profile.fontFamily || 'Helvetica';
+  const backgroundColor = profile.backgroundColor || '#ffffff';
+
   return StyleSheet.create({
     page: {
       flexDirection: 'column',
-      backgroundColor: profile.backgroundColor,
+      backgroundColor,
       padding: calculatePadding(profile),
-      fontFamily: profile.fontFamily,
-      fontSize: profile.fontSize,
-      lineHeight: profile.lineHeight,
-      color: profile.textColor,
+      fontFamily,
+      fontSize,
+      lineHeight,
+      color: textColor,
     },
     header: {
-      marginBottom: profile.paragraphSpacing,
+      marginBottom: paragraphSpacing,
       paddingBottom: 16,
       borderBottomWidth: 1,
       borderBottomColor: '#e2e8f0',
       borderBottomStyle: 'solid',
     },
     title: {
-      fontSize: profile.fontSize * profile.headingScale * 1.4,
+      fontSize: sanitizeNumber(fontSize * headingScale * 1.4, 25),
       fontWeight: 'bold',
-      color: profile.textColor,
+      color: textColor,
       marginBottom: 8,
-      letterSpacing: profile.letterSpacing,
+      letterSpacing,
     },
     h2: {
-      fontSize: profile.fontSize * profile.headingScale * 1.2,
+      fontSize: sanitizeNumber(fontSize * headingScale * 1.2, 22),
       fontWeight: 'bold',
-      color: profile.textColor,
+      color: textColor,
       marginTop: 16,
       marginBottom: 12,
-      letterSpacing: profile.letterSpacing,
+      letterSpacing,
     },
     h3: {
-      fontSize: profile.fontSize * profile.headingScale,
+      fontSize: sanitizeNumber(fontSize * headingScale, 18),
       fontWeight: 'bold',
-      color: profile.textColor,
+      color: textColor,
       marginTop: 12,
       marginBottom: 8,
-      letterSpacing: profile.letterSpacing,
+      letterSpacing,
     },
     paragraph: {
-      fontFamily: profile.fontFamily,
-      fontSize: profile.fontSize,
-      lineHeight: profile.lineHeight,
-      color: profile.textColor,
-      letterSpacing: profile.letterSpacing,
-      marginBottom: profile.paragraphSpacing / 2,
+      fontFamily,
+      fontSize,
+      lineHeight,
+      color: textColor,
+      letterSpacing,
+      marginBottom: sanitizeNumber(paragraphSpacing / 2, 10),
       textAlign: 'justify',
     },
     list: {
       marginLeft: 16,
-      marginBottom: profile.paragraphSpacing / 2,
+      marginBottom: sanitizeNumber(paragraphSpacing / 2, 10),
     },
     listItem: {
       flexDirection: 'row',
-      marginBottom: profile.paragraphSpacing / 4,
+      marginBottom: sanitizeNumber(paragraphSpacing / 4, 5),
     },
     bullet: {
       width: 20,
-      fontSize: profile.fontSize,
-      color: profile.options.dyslexiaFont ? '#3b82f6' : profile.textColor,
+      fontSize,
+      color: profile.options.dyslexiaFont ? '#3b82f6' : textColor,
     },
     quote: {
       borderLeftWidth: 3,
@@ -135,14 +154,14 @@ export function createProfileStyleSheet(profile: ProfileConfig) {
       maxWidth: '90%',
     },
     imageCaption: {
-      fontSize: profile.fontSize * 0.85,
+      fontSize: sanitizeNumber(fontSize * 0.85, 12),
       color: '#64748b',
       textAlign: 'center',
       marginTop: 8,
       fontStyle: 'italic',
     },
     altText: {
-      fontSize: profile.fontSize * 0.8,
+      fontSize: sanitizeNumber(fontSize * 0.8, 11),
       color: '#475569',
       backgroundColor: '#f1f5f9',
       padding: 8,
@@ -164,7 +183,7 @@ export function createProfileStyleSheet(profile: ProfileConfig) {
     },
     // Profile-specific styles
     adhdSection: {
-      marginBottom: profile.paragraphSpacing * 1.5,
+      marginBottom: sanitizeNumber(paragraphSpacing * 1.5, 30),
       paddingBottom: 16,
       borderBottomWidth: 1,
       borderBottomColor: '#e2e8f0',
@@ -176,13 +195,13 @@ export function createProfileStyleSheet(profile: ProfileConfig) {
       borderRadius: 2,
     },
     dyscalculiaNumber: {
-      fontSize: profile.fontSize * 1.3,
+      fontSize: sanitizeNumber(fontSize * 1.3, 18),
       fontWeight: 'bold',
       color: '#1e40af',
     },
     breathingMark: {
       color: '#94a3b8',
-      fontSize: profile.fontSize * 0.75,
+      fontSize: sanitizeNumber(fontSize * 0.75, 11),
     },
   });
 }
