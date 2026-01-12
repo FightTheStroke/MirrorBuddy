@@ -104,6 +104,12 @@ export class WebRTCConnection {
     };
     pc.ontrack = (event) => this.config.onTrack?.(event);
     pc.ondatachannel = (event) => this.attachDataChannel(event.channel);
+
+    // Create data channel for sending commands to Azure (client-initiated)
+    const dc = pc.createDataChannel('oai-events', { ordered: true });
+    this.attachDataChannel(dc);
+    logger.debug('[WebRTC] Data channel created (client-initiated)');
+
     return pc;
   }
 

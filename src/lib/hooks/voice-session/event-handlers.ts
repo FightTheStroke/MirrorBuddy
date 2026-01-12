@@ -11,6 +11,7 @@ import { base64ToInt16Array } from './audio-utils';
 import { MAX_QUEUE_SIZE } from './constants';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd, recordWebSocketFirstAudio } from './latency-utils';
+import { handleErrorEvent } from './error-handler';
 
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
@@ -216,48 +217,9 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
         logger.debug('[VoiceSession] Response cancelled by client - hasActiveResponse = false');
         break;
 
-      case 'error': {
-        const errorObj = event.error as { message?: string; code?: string; type?: string; error?: string } | string | undefined;
-
-        let errorMessage: string;
-        if (typeof errorObj === 'string') {
-          errorMessage = errorObj;
-        } else if (errorObj && typeof errorObj === 'object') {
-          errorMessage = errorObj.message || errorObj.error || errorObj.code || errorObj.type || '';
-          if (!errorMessage && Object.keys(errorObj).length > 0) {
-            try {
-              errorMessage = `Server error: ${JSON.stringify(errorObj)}`;
-            } catch {
-              errorMessage = 'Unknown server error (unparseable)';
-            }
-          }
-        } else {
-          errorMessage = '';
-        }
-
-        // Suppress benign race condition errors
-        const isCancelRaceCondition = errorMessage.toLowerCase().includes('cancel') &&
-          (errorMessage.toLowerCase().includes('no active response') ||
-           errorMessage.toLowerCase().includes('not found'));
-
-        if (isCancelRaceCondition) {
-          logger.debug('[VoiceSession] Cancel race condition (benign)', { message: errorMessage });
-          break;
-        }
-
-        if (!errorMessage) {
-          errorMessage = 'Errore di connessione al server vocale';
-        }
-
-        const hasDetails = errorObj && typeof errorObj === 'object' && Object.keys(errorObj).length > 0;
-        if (hasDetails) {
-          logger.error('[VoiceSession] Server error', { message: errorMessage, details: errorObj });
-        } else {
-          logger.warn('[VoiceSession] Server error', { message: errorMessage });
-        }
-        deps.options.onError?.(new Error(errorMessage));
+      case 'error':
+        handleErrorEvent(event as { error?: unknown }, deps.options);
         break;
-      }
 
       case 'response.function_call_arguments.done':
         handleToolCall({ event, ...deps });
