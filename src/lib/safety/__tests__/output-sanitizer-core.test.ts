@@ -137,7 +137,7 @@ describe('Output Sanitizer Core', () => {
       });
 
       it('should redact passwords in output', () => {
-        const text = 'La tua password: SuperSecret123!';
+        const text = 'La tua password: TestPass1234';
         const result = sanitizeOutput(text);
 
         expect(result.categories).toContain('pii_disclosure');
