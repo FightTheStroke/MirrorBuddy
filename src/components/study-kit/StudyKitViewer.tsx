@@ -7,8 +7,8 @@
  */
 
 import { useState, useMemo } from 'react';
-import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2, Printer, Route, Loader2, Accessibility } from 'lucide-react';
-import { ExportPDFModal } from './ExportPDFModal';
+import { FileText, MapIcon, FlaskConical, ClipboardList, Download, Trash2, Printer, Route, Loader2 } from 'lucide-react';
+// ExportPDFModal removed - PDF download is now direct
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import toast from '@/components/ui/toast';
@@ -41,7 +41,6 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
   const [isGeneratingPath, setIsGeneratingPath] = useState(false);
   const [generatedPathId, setGeneratedPathId] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
-  const [showPDFExport, setShowPDFExport] = useState(false);
 
   // Parse markdown summary once
   const parsedSummary = useMemo(
@@ -97,21 +96,72 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
     }
   };
 
-  const handleDownload = () => {
-    // Create a downloadable markdown file with the summary
-    const content = `# ${studyKit.title}\n\n${studyKit.subject ? `**Materia:** ${studyKit.subject}\n\n` : ''}${studyKit.summary || 'Nessun riassunto disponibile'}`;
-    const blob = new Blob([content], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${studyKit.title.replace(/\s+/g, '-')}.md`;
-    a.click();
-    URL.revokeObjectURL(url);
+  // Download PDF directly with default profile
+  const handleDownloadPDF = async () => {
+    try {
+      const response = await fetch('/api/pdf-generator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kitId: studyKit.id,
+          profile: 'dyslexia', // Default profile for accessibility
+          format: 'A4',
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Export failed' }));
+        throw new Error(error.error || 'Export failed');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${studyKit.title.replace(/\s+/g, '-')}_DSA.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('PDF scaricato');
+    } catch (error) {
+      console.error('PDF download failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Errore durante il download');
+    }
   };
 
-  const handlePrint = () => {
-    // Open print dialog - users can save as PDF from here
-    window.print();
+  // Print PDF directly
+  const handlePrint = async () => {
+    try {
+      const response = await fetch('/api/pdf-generator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          kitId: studyKit.id,
+          profile: 'dyslexia',
+          format: 'A4',
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Print failed' }));
+        throw new Error(error.error || 'Print failed');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+
+      // Open PDF in new window and print
+      const printWindow = window.open(url, '_blank');
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      }
+    } catch (error) {
+      console.error('Print failed:', error);
+      toast.error(error instanceof Error ? error.message : 'Errore durante la stampa');
+    }
   };
 
   const handleGeneratePath = async () => {
@@ -204,31 +254,20 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
           <Button
             variant="outline"
             size="sm"
-            onClick={handleDownload}
-            aria-label="Scarica Markdown"
-            title="Scarica come Markdown"
-            className="no-print"
-          >
-            <Download className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">MD</span>
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowPDFExport(true)}
-            aria-label="Esporta PDF accessibile per DSA"
-            title="Esporta PDF accessibile per DSA"
+            onClick={handleDownloadPDF}
+            aria-label="Scarica PDF accessibile"
+            title="Scarica PDF accessibile per DSA"
             className="no-print gap-1"
           >
-            <Accessibility className="w-4 h-4" />
-            <span className="hidden sm:inline">PDF DSA</span>
+            <Download className="w-4 h-4" />
+            <span className="hidden sm:inline">PDF</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
             onClick={handlePrint}
-            aria-label="Stampa o salva come PDF"
-            title="Stampa o salva come PDF"
+            aria-label="Stampa PDF"
+            title="Stampa PDF accessibile"
             className="no-print"
           >
             <Printer className="w-4 h-4 mr-1" />
@@ -403,13 +442,6 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* PDF Export Modal */}
-      <ExportPDFModal
-        studyKit={studyKit}
-        isOpen={showPDFExport}
-        onClose={() => setShowPDFExport(false)}
-      />
     </div>
   );
 }
