@@ -11,7 +11,7 @@ import { ToolRegistry } from '@/lib/tools/plugin/registry';
 import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
 import type { ToolType, ToolExecutionResult, ToolContext } from '@/types/tools';
 import type { ToolPlugin } from '@/lib/tools/plugin/types';
-import { ToolCategory, Permission } from '@/lib/tools/plugin/types';
+import { ToolCategory } from '@/lib/tools/plugin/types';
 
 /**
  * Tool handler function signature
@@ -151,7 +151,7 @@ export function registerToolHandler(
   // Also register with ToolRegistry if initialized
   initializeRegistry();
   if (registry && orchestrator) {
-    const toolType = getToolTypeFromFunctionName(functionName);
+    const _toolType = getToolTypeFromFunctionName(functionName);
     const schema = getToolSchema(functionName);
 
     try {

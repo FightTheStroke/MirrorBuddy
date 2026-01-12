@@ -4,9 +4,9 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { quickRoute, getCharacterGreeting, getCharacterSystemPrompt, suggestCharacterSwitch } from '../convenience';
-import type { ExtendedStudentProfile, BuddyProfile } from '@/types';
+import type { ExtendedStudentProfile, BuddyProfile as _BuddyProfile } from '@/types';
 import type { RoutingResult } from '../types';
-import type { MaestroFull } from '@/data/maestri';
+import type { MaestroFull as _MaestroFull } from '@/data/maestri';
 
 // Test helper to create mock RoutingResult without full intent object
 const mockRoutingResult = (partial: {

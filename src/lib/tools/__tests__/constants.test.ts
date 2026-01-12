@@ -24,7 +24,7 @@ describe('Tool Constants', () => {
     });
 
     it('should have valid structure for each tool', () => {
-      Object.entries(TOOL_CONFIG).forEach(([key, config]) => {
+      Object.entries(TOOL_CONFIG).forEach(([_key, config]) => {
         expect(config.type).toBeDefined();
         expect(config.functionName).toBeDefined();
         expect(config.route).toBeDefined();

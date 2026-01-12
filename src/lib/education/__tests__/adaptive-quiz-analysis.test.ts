@@ -3,7 +3,7 @@
 // Comprehensive unit tests for quiz performance analysis and difficulty adjustment
 // ============================================================================
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type { Quiz, QuizResult, Question } from '@/types';
 import {
   analyzeQuizPerformance,
