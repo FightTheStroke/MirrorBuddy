@@ -14,6 +14,7 @@ import {
   renderDiagram,
   renderGenericContent,
 } from '../renderers';
+import type { SummaryData, TimelineData } from '@/types/tools/tool-data-types';
 
 describe('Renderers', () => {
   describe('renderMindmap', () => {
@@ -164,9 +165,9 @@ describe('Renderers', () => {
     it('should handle sections without content', () => {
       const data = {
         topic: 'Topic',
-        sections: [{ title: 'Empty' }],
+        sections: [{ title: 'Empty', content: '' }],
       };
-      const result = renderSummary(data);
+      const result = renderSummary(data as SummaryData);
 
       expect(result).toContain('Empty');
     });
@@ -243,9 +244,9 @@ describe('Renderers', () => {
     it('should handle events without date', () => {
       const data = {
         topic: 'Events',
-        events: [{ title: 'No Date Event' }],
+        events: [{ date: '', title: 'No Date Event' }],
       };
-      const result = renderTimeline(data);
+      const result = renderTimeline(data as TimelineData);
 
       expect(result).toContain('No Date Event');
       expect(result).toContain('timeline-date');

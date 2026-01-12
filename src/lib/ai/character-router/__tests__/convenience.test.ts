@@ -4,8 +4,17 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { quickRoute, getCharacterGreeting, getCharacterSystemPrompt, suggestCharacterSwitch } from '../convenience';
-import type { ExtendedStudentProfile } from '@/types';
+import type { ExtendedStudentProfile, BuddyProfile } from '@/types';
 import type { RoutingResult } from '../types';
+import type { MaestroFull } from '@/data/maestri';
+
+// Test helper to create mock RoutingResult without full intent object
+const mockRoutingResult = (partial: {
+  character: unknown;
+  characterType: string;
+  confidence: number;
+  reason: string;
+}) => partial as unknown as RoutingResult;
 
 // Mock dependencies
 vi.mock('@/lib/safety', () => ({
@@ -81,7 +90,7 @@ describe('character router convenience', () => {
 
   describe('getCharacterGreeting', () => {
     it('should return maestro greeting', () => {
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: {
           id: 'maestro-1',
           name: 'Galileo',
@@ -92,7 +101,7 @@ describe('character router convenience', () => {
         characterType: 'maestro',
         confidence: 0.9,
         reason: 'test',
-      };
+      });
 
       const greeting = getCharacterGreeting(result, createProfile());
 
@@ -100,7 +109,7 @@ describe('character router convenience', () => {
     });
 
     it('should return coach greeting', () => {
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: {
           id: 'coach-1',
           name: 'Coach Elena',
@@ -110,7 +119,7 @@ describe('character router convenience', () => {
         characterType: 'coach',
         confidence: 0.9,
         reason: 'test',
-      };
+      });
 
       const greeting = getCharacterGreeting(result, createProfile());
 
@@ -119,7 +128,7 @@ describe('character router convenience', () => {
 
     it('should return buddy greeting using profile', () => {
       const profile = createProfile();
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: {
           id: 'buddy-1',
           name: 'Max',
@@ -129,7 +138,7 @@ describe('character router convenience', () => {
         characterType: 'buddy',
         confidence: 0.9,
         reason: 'test',
-      };
+      });
 
       const greeting = getCharacterGreeting(result, profile);
 
@@ -137,12 +146,12 @@ describe('character router convenience', () => {
     });
 
     it('should return default greeting for unknown type', () => {
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: { id: 'unknown', name: 'Unknown' },
-        characterType: 'unknown' as 'maestro',
+        characterType: 'unknown',
         confidence: 0.5,
         reason: 'test',
-      };
+      });
 
       const greeting = getCharacterGreeting(result, createProfile());
 
@@ -152,7 +161,7 @@ describe('character router convenience', () => {
 
   describe('getCharacterSystemPrompt', () => {
     it('should inject safety into maestro prompt', () => {
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: {
           id: 'maestro-1',
           name: 'Galileo',
@@ -163,7 +172,7 @@ describe('character router convenience', () => {
         characterType: 'maestro',
         confidence: 0.9,
         reason: 'test',
-      };
+      });
 
       const prompt = getCharacterSystemPrompt(result, createProfile());
 
@@ -171,7 +180,7 @@ describe('character router convenience', () => {
     });
 
     it('should return coach system prompt directly', () => {
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: {
           id: 'coach-1',
           name: 'Coach',
@@ -181,7 +190,7 @@ describe('character router convenience', () => {
         characterType: 'coach',
         confidence: 0.9,
         reason: 'test',
-      };
+      });
 
       const prompt = getCharacterSystemPrompt(result, createProfile());
 
@@ -190,7 +199,7 @@ describe('character router convenience', () => {
 
     it('should get buddy system prompt using profile', () => {
       const profile = createProfile();
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: {
           id: 'buddy-1',
           name: 'Max',
@@ -200,7 +209,7 @@ describe('character router convenience', () => {
         characterType: 'buddy',
         confidence: 0.9,
         reason: 'test',
-      };
+      });
 
       const prompt = getCharacterSystemPrompt(result, profile);
 
@@ -208,12 +217,12 @@ describe('character router convenience', () => {
     });
 
     it('should return empty string for unknown type', () => {
-      const result: RoutingResult = {
+      const result = mockRoutingResult({
         character: { id: 'unknown', name: 'Unknown' },
-        characterType: 'unknown' as 'maestro',
+        characterType: 'unknown',
         confidence: 0.5,
         reason: 'test',
-      };
+      });
 
       const prompt = getCharacterSystemPrompt(result, createProfile());
 

@@ -13,6 +13,10 @@ import {
   MASTERY_THRESHOLD,
 } from '../adaptive-quiz-analysis';
 
+// Test helper to create mock Question objects without all required fields
+const mockQuestion = (partial: { id: string; text: string; topic: string; difficulty: number; options: string[]; correctIndex: number }) =>
+  partial as unknown as Question;
+
 // Mock logger
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -35,20 +39,25 @@ describe('Adaptive Quiz Analysis', () => {
   });
 
   describe('analyzeQuizPerformance', () => {
-    const mockQuiz: Quiz = {
+    // Mock quiz with partial Question objects (cast via helper)
+    const mockQuiz = {
       id: 'quiz-1',
       title: 'Test Quiz',
       topic: 'Math',
       questions: [
-        { id: 'q1', text: 'Q1', topic: 'algebra', difficulty: 3, options: [], correctIndex: 0 },
-        { id: 'q2', text: 'Q2', topic: 'algebra', difficulty: 3, options: [], correctIndex: 0 },
-        { id: 'q3', text: 'Q3', topic: 'geometry', difficulty: 3, options: [], correctIndex: 0 },
-        { id: 'q4', text: 'Q4', topic: 'geometry', difficulty: 3, options: [], correctIndex: 0 },
+        mockQuestion({ id: 'q1', text: 'Q1', topic: 'algebra', difficulty: 3, options: [], correctIndex: 0 }),
+        mockQuestion({ id: 'q2', text: 'Q2', topic: 'algebra', difficulty: 3, options: [], correctIndex: 0 }),
+        mockQuestion({ id: 'q3', text: 'Q3', topic: 'geometry', difficulty: 3, options: [], correctIndex: 0 }),
+        mockQuestion({ id: 'q4', text: 'Q4', topic: 'geometry', difficulty: 3, options: [], correctIndex: 0 }),
       ],
-    };
+    } as unknown as Quiz;
+
+    // Helper to create mock QuizResult with partial fields
+    const mockResult = (score: number) =>
+      ({ quizId: 'quiz-1', score, completedAt: new Date() } as unknown as QuizResult);
 
     it('should identify needs review for low score', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 40, completedAt: new Date().toISOString() };
+      const result = mockResult(40);
       const questionResults = [
         { questionId: 'q1', correct: false, timeSpent: 10 },
         { questionId: 'q2', correct: true, timeSpent: 15 },
@@ -63,7 +72,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should not need review for high score', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 85, completedAt: new Date().toISOString() };
+      const result = mockResult(85);
       const questionResults = [
         { questionId: 'q1', correct: true, timeSpent: 10 },
         { questionId: 'q2', correct: true, timeSpent: 15 },
@@ -78,7 +87,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should identify weak topics', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 50, completedAt: new Date().toISOString() };
+      const result = mockResult(50);
       const questionResults = [
         { questionId: 'q1', correct: false, timeSpent: 10 },
         { questionId: 'q2', correct: false, timeSpent: 15 },
@@ -93,7 +102,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should identify strong topics', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 75, completedAt: new Date().toISOString() };
+      const result = mockResult(75);
       const questionResults = [
         { questionId: 'q1', correct: true, timeSpent: 10 },
         { questionId: 'q2', correct: true, timeSpent: 15 },
@@ -107,7 +116,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should calculate average time per question', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 75, completedAt: new Date().toISOString() };
+      const result = mockResult(75);
       const questionResults = [
         { questionId: 'q1', correct: true, timeSpent: 10 },
         { questionId: 'q2', correct: true, timeSpent: 20 },
@@ -121,7 +130,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should handle empty question results', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 0, completedAt: new Date().toISOString() };
+      const result = mockResult(0);
       const questionResults: { questionId: string; correct: boolean; timeSpent: number }[] = [];
 
       const analysis = analyzeQuizPerformance(mockQuiz, result, questionResults);
@@ -130,17 +139,17 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should detect difficulty too easy', () => {
-      const easyQuiz: Quiz = {
+      const easyQuiz = {
         id: 'quiz-1',
         title: 'Easy Quiz',
         topic: 'Math',
         questions: [
-          { id: 'q1', text: 'Q1', topic: 'algebra', difficulty: 1, options: [], correctIndex: 0 },
-          { id: 'q2', text: 'Q2', topic: 'algebra', difficulty: 2, options: [], correctIndex: 0 },
+          mockQuestion({ id: 'q1', text: 'Q1', topic: 'algebra', difficulty: 1, options: [], correctIndex: 0 }),
+          mockQuestion({ id: 'q2', text: 'Q2', topic: 'algebra', difficulty: 2, options: [], correctIndex: 0 }),
         ],
-      };
+      } as unknown as Quiz;
 
-      const result: QuizResult = { quizId: 'quiz-1', score: 90, completedAt: new Date().toISOString() };
+      const result = mockResult(90);
       const questionResults = [
         { questionId: 'q1', correct: true, timeSpent: 5 },
         { questionId: 'q2', correct: true, timeSpent: 5 },
@@ -152,17 +161,17 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should detect difficulty too hard', () => {
-      const hardQuiz: Quiz = {
+      const hardQuiz = {
         id: 'quiz-1',
         title: 'Hard Quiz',
         topic: 'Math',
         questions: [
-          { id: 'q1', text: 'Q1', topic: 'algebra', difficulty: 4, options: [], correctIndex: 0 },
-          { id: 'q2', text: 'Q2', topic: 'algebra', difficulty: 5, options: [], correctIndex: 0 },
+          mockQuestion({ id: 'q1', text: 'Q1', topic: 'algebra', difficulty: 4, options: [], correctIndex: 0 }),
+          mockQuestion({ id: 'q2', text: 'Q2', topic: 'algebra', difficulty: 5, options: [], correctIndex: 0 }),
         ],
-      };
+      } as unknown as Quiz;
 
-      const result: QuizResult = { quizId: 'quiz-1', score: 30, completedAt: new Date().toISOString() };
+      const result = mockResult(30);
       const questionResults = [
         { questionId: 'q1', correct: false, timeSpent: 60 },
         { questionId: 'q2', correct: false, timeSpent: 60 },
@@ -174,7 +183,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should detect appropriate difficulty', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 70, completedAt: new Date().toISOString() };
+      const result = mockResult(70);
       const questionResults = [
         { questionId: 'q1', correct: true, timeSpent: 15 },
         { questionId: 'q2', correct: true, timeSpent: 15 },
@@ -188,7 +197,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should skip unknown question IDs', () => {
-      const result: QuizResult = { quizId: 'quiz-1', score: 50, completedAt: new Date().toISOString() };
+      const result = mockResult(50);
       const questionResults = [
         { questionId: 'unknown-1', correct: true, timeSpent: 10 },
         { questionId: 'q1', correct: true, timeSpent: 10 },
@@ -202,11 +211,12 @@ describe('Adaptive Quiz Analysis', () => {
   });
 
   describe('calculateDifficultyAdjustment', () => {
+    // Helper to create mock QuizResult array
+    const mockResults = (...scores: number[]) =>
+      scores.map((score, i) => ({ quizId: `q${i + 1}`, score, completedAt: new Date() } as unknown as QuizResult));
+
     it('should return no change with insufficient data', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 80, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 85, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(80, 85);
 
       const adjustment = calculateDifficultyAdjustment(3, recentResults);
 
@@ -217,11 +227,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should increase difficulty for high scores', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 90, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 85, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 92, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(90, 85, 92);
 
       const adjustment = calculateDifficultyAdjustment(3, recentResults);
 
@@ -231,11 +237,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should decrease difficulty for low scores', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 40, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 35, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 45, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(40, 35, 45);
 
       const adjustment = calculateDifficultyAdjustment(3, recentResults);
 
@@ -245,11 +247,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should not exceed max difficulty of 5', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 95, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 100, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 98, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(95, 100, 98);
 
       const adjustment = calculateDifficultyAdjustment(5, recentResults);
 
@@ -257,11 +255,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should not go below min difficulty of 1', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 10, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 15, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 20, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(10, 15, 20);
 
       const adjustment = calculateDifficultyAdjustment(1, recentResults);
 
@@ -269,11 +263,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should increase slightly for improving trend', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 60, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 68, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 75, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(60, 68, 75);
 
       const adjustment = calculateDifficultyAdjustment(3, recentResults);
 
@@ -282,11 +272,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should decrease slightly for declining trend', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 75, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 68, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 60, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(75, 68, 60);
 
       const adjustment = calculateDifficultyAdjustment(3, recentResults);
 
@@ -295,11 +281,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should maintain difficulty for appropriate scores', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 70, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 72, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 71, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(70, 72, 71);
 
       const adjustment = calculateDifficultyAdjustment(3, recentResults);
 
@@ -308,13 +290,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should use custom window size', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 50, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 55, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 90, completedAt: new Date().toISOString() },
-        { quizId: 'q4', score: 95, completedAt: new Date().toISOString() },
-        { quizId: 'q5', score: 100, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(50, 55, 90, 95, 100);
 
       // With window of 3, should only consider last 3 (90, 95, 100)
       const adjustment = calculateDifficultyAdjustment(3, recentResults, 3);
@@ -323,11 +299,7 @@ describe('Adaptive Quiz Analysis', () => {
     });
 
     it('should round difficulty to nearest 0.5', () => {
-      const recentResults: QuizResult[] = [
-        { quizId: 'q1', score: 85, completedAt: new Date().toISOString() },
-        { quizId: 'q2', score: 82, completedAt: new Date().toISOString() },
-        { quizId: 'q3', score: 80, completedAt: new Date().toISOString() },
-      ];
+      const recentResults = mockResults(85, 82, 80);
 
       const adjustment = calculateDifficultyAdjustment(3, recentResults);
 
@@ -337,12 +309,12 @@ describe('Adaptive Quiz Analysis', () => {
   });
 
   describe('selectQuestionsForDifficulty', () => {
-    const mockQuestions: Question[] = [
-      { id: 'q1', text: 'Easy', topic: 'math', difficulty: 1, options: [], correctIndex: 0 },
-      { id: 'q2', text: 'Medium', topic: 'math', difficulty: 3, options: [], correctIndex: 0 },
-      { id: 'q3', text: 'Hard', topic: 'math', difficulty: 5, options: [], correctIndex: 0 },
-      { id: 'q4', text: 'Easy2', topic: 'math', difficulty: 2, options: [], correctIndex: 0 },
-      { id: 'q5', text: 'Hard2', topic: 'math', difficulty: 4, options: [], correctIndex: 0 },
+    const mockQuestions = [
+      mockQuestion({ id: 'q1', text: 'Easy', topic: 'math', difficulty: 1, options: [], correctIndex: 0 }),
+      mockQuestion({ id: 'q2', text: 'Medium', topic: 'math', difficulty: 3, options: [], correctIndex: 0 }),
+      mockQuestion({ id: 'q3', text: 'Hard', topic: 'math', difficulty: 5, options: [], correctIndex: 0 }),
+      mockQuestion({ id: 'q4', text: 'Easy2', topic: 'math', difficulty: 2, options: [], correctIndex: 0 }),
+      mockQuestion({ id: 'q5', text: 'Hard2', topic: 'math', difficulty: 4, options: [], correctIndex: 0 }),
     ];
 
     it('should select questions closest to target difficulty', () => {

@@ -148,7 +148,7 @@ describe('Summary Export Utils', () => {
     it('should handle sections without content', () => {
       const summary: SummaryData = {
         ...baseSummary,
-        sections: [{ title: 'Title Only', keyPoints: [] }],
+        sections: [{ title: 'Title Only', content: '', keyPoints: [] }],
       };
 
       const html = generateSummaryHtml(summary);
