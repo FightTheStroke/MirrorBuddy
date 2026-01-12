@@ -31,7 +31,6 @@ export function useDisconnect(
     if (refs.webrtcCleanupRef.current) {
       logger.debug('[VoiceSession] Cleaning up WebRTC connection');
       refs.webrtcCleanupRef.current();
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref cleanup
       refs.webrtcCleanupRef.current = null;
     }
 

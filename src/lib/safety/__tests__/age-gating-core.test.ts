@@ -22,8 +22,6 @@ import {
   filterForAge,
   getLanguageGuidance,
   getAgeGatePrompt,
-  type AgeBracket,
-  type ContentTopic,
 } from '../age-gating-core';
 
 describe('Age Gating Core', () => {

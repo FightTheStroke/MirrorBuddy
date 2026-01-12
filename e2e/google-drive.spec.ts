@@ -251,7 +251,7 @@ test.describe('Google Drive Connection Flow', () => {
 
   test('OAuth initiation redirects to Google', async ({ page }) => {
     // Test that the OAuth URL is generated correctly
-    const response = await page.goto(`/api/auth/google?userId=${TEST_USER_ID}&returnUrl=/`);
+    await page.goto(`/api/auth/google?userId=${TEST_USER_ID}&returnUrl=/`);
 
     // Should redirect to Google OAuth
     const url = page.url();
