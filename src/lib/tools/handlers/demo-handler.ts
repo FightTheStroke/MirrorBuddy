@@ -45,12 +45,12 @@ function sanitizeHtml(html: string): string {
   do {
     previousLength = sanitized.length;
     // Remove complete script tags with content
-    // Pattern: <script...>content</script> with optional whitespace in closing tag
-    sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '');
+    // Pattern: <script...>content</script...> handles malformed closing tags like </script foo>
+    sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script[^>]*>/gi, '');
     // Remove unclosed script tags AND everything after (fail-safe)
     sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*$/gi, '');
-    // Remove self-closing script tags
-    sanitized = sanitized.replace(/<script\b[^>]*\/>/gi, '');
+    // Remove orphaned closing script tags (handles </script>, </script foo>, etc.)
+    sanitized = sanitized.replace(/<\/script[^>]*>/gi, '');
   } while (sanitized.length < previousLength);
 
   // 3. Final safety check: remove any remaining <script substring
