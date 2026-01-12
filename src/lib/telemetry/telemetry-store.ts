@@ -205,6 +205,8 @@ export const useTelemetryStore = create<TelemetryState>()(
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ events: eventsToSend }),
+            credentials: 'same-origin',
+            mode: 'same-origin',
           });
         } catch (error) {
           // On failure, add events back to queue
@@ -226,7 +228,10 @@ export const useTelemetryStore = create<TelemetryState>()(
       // Fetch usage stats from server
       fetchUsageStats: async () => {
         try {
-          const response = await fetch('/api/telemetry/stats');
+          const response = await fetch('/api/telemetry/stats', {
+            credentials: 'same-origin',
+            mode: 'same-origin',
+          });
 
           if (response.ok) {
             const stats = await response.json();
