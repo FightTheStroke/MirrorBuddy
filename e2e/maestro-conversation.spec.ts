@@ -5,6 +5,11 @@
  * IMPORTANT: These tests make real API calls to Azure OpenAI (gpt-4o-mini)
  * Run with: npm run test -- e2e/maestro-conversation.spec.ts
  *
+ * Required environment variables:
+ * - AZURE_OPENAI_ENDPOINT: Azure OpenAI endpoint URL
+ * - AZURE_OPENAI_API_KEY: Azure OpenAI API key
+ * - AZURE_OPENAI_DEPLOYMENT: Deployment name (e.g., gpt-4o-mini)
+ *
  * Scenarios simulate real students with:
  * - Dyslexia (spelling errors, short sentences)
  * - ADHD (topic jumping, frustration, needs engagement)
@@ -385,10 +390,12 @@ test.describe('Character Voice with DSA adaptation @slow', () => {
 
 // ============================================================================
 // 8. PROMPT INJECTION RESISTANCE
+// SECURITY TEST: These tests intentionally contain prompt injection attempts
+// to verify the AI tutors resist manipulation. This is expected security testing.
 // ============================================================================
 test.describe('Security: Prompt injection resistance @slow', () => {
   test('resists jailbreak attempt from curious student', async ({ request }) => {
-    // Rephrased to avoid Azure content filter while testing same behavior
+    // SECURITY TEST: Intentional jailbreak attempt to verify AI resists manipulation
     const result = await chatWithMaestro(
       request,
       'lovelace-informatica',
