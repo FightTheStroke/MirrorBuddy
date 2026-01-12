@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
-import { CostSummary, CostForecast } from './types';
+import { CostSummary, CostForecast, CostByService, DailyCost } from './types';
 import {
   getCached,
   setCache,
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
 
     // Parse service costs
     const serviceRows = (serviceResponse.result.properties as { rows?: unknown[][] })?.rows || [];
-    const costsByService = [];
+    const costsByService: CostByService[] = [];
     let totalCost = 0;
 
     for (const row of serviceRows) {
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 
     // Parse daily costs
     const dailyRows = (dailyResponse.result.properties as { rows?: unknown[][] })?.rows || [];
-    const dailyCosts = [];
+    const dailyCosts: DailyCost[] = [];
 
     for (const row of dailyRows) {
       const cost = row[0] as number;
