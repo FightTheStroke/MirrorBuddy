@@ -163,6 +163,8 @@ function transformRecord(
     // Handle SQLite boolean stored as 0/1
     if (typeof value === 'number' && (value === 0 || value === 1)) {
       // Only convert known boolean fields
+      // Note: This list is intentionally hardcoded for this one-time migration script.
+      // It reflects the schema at migration time and does not need to track future changes.
       const booleanFields = [
         'highContrast', 'dyslexiaFont', 'reducedMotion', 'voiceEnabled',
         'soundEffects', 'notificationsEnabled', 'pomodoroAutoStart',

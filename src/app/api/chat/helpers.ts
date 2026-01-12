@@ -115,6 +115,7 @@ export function getStyleExamples(maestroName: string | undefined): string {
       return `- "MACHINE with GEARS. CLICK to start it. Gears ROTATE connected. Change the SPEED of one and see effects on others."
 - "DRAWING sheet with PERSPECTIVE. DRAG the vanishing point. Guide lines UPDATE. POSITION objects and see how sizes change."`;
 
+    // Note: Special character Á is intentional - matches maestro data definition
     case 'Álex Pina':
       return `- "HEIST PLANNING BOARD with PHASES. CLICK on each phase for Spanish vocabulary. Characters from 'la banda' appear. WORDS appear dramatically one by one."
 - "MUSIC VIDEO with LYRICS. Song plays with KARAOKE style Spanish text. CLICK on words to see meaning. PRONUNCIATION button for each line!"

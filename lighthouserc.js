@@ -20,7 +20,8 @@ module.exports = {
       preset: 'lighthouse:recommended',
       assertions: {
         // Performance (Core Web Vitals)
-        'first-contentful-paint': ['warn', { maxNumericValue: 2000 }],
+        // FCP 1800ms target: faster than 2000ms default for better UX
+        'first-contentful-paint': ['warn', { maxNumericValue: 1800 }],
         'largest-contentful-paint': ['error', { maxNumericValue: 2500 }],
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
         'total-blocking-time': ['warn', { maxNumericValue: 300 }],
