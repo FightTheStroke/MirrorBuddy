@@ -179,6 +179,8 @@ function getToolTypeFromFunctionName(functionName: string): ToolType {
     create_diagram: 'diagram',
     create_timeline: 'timeline',
     create_summary: 'summary',
+    open_student_summary: 'summary',
+    student_summary_add_comment: 'summary',
     create_formula: 'formula',
     create_chart: 'chart',
   };
