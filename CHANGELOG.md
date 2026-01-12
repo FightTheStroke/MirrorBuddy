@@ -89,6 +89,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Real-time tool event monitoring via WebRTC
 - Graceful degradation with SSE fallback for older browsers
 
+### Added (Jan 12 - Production Hardening)
+
+#### Enterprise-Ready Infrastructure
+
+**What it does**: Prepares MirrorBuddy for production deployment with containerization, monitoring, and incident response.
+
+**Key Components**:
+- **Dockerfile**: Multi-stage builds (build → runner) with optimized image size
+- **docker-compose**: Health checks, volume mounts, restart policies, PostgreSQL service
+- **Structured Logging**: JSON format for monitoring integration
+
+**Files**:
+- `Dockerfile` - Multi-stage production build
+- `docker-compose.yml` - Full stack with PostgreSQL
+
+### Added (Jan 12 - Security Hardening)
+
+#### HTML Sanitizer Improvements
+
+**What it does**: Comprehensive XSS prevention for AI-generated demos.
+
+**Security Layers**:
+1. **Whitespace normalization**: Defeats `< s c r i p t >` obfuscation
+2. **Loop-based removal**: Iterates until no changes (nested scripts)
+3. **Unclosed tag removal**: Catches `<script>...` without `</script>`
+4. **Final escape**: Converts any remaining `<script` to `&lt;script`
+5. **Event handler removal**: Strips `onclick`, `onload`, etc.
+6. **Protocol sanitization**: Blocks `javascript:`, `vbscript:`, `data:` URLs
+
+**Additional Fixes**:
+- UUID validation in content-extractor (SSRF prevention)
+- HTML entity decoding before protocol checks
+- Malformed closing tag handling (`</script foo>`)
+
 ### Added (Jan 11 - WebRTC Voice Transport Migration)
 
 #### WebRTC Transport for Azure OpenAI Realtime API
