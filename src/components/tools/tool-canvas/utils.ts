@@ -7,8 +7,9 @@ export function getUserId(): string {
   if (typeof window === 'undefined') return 'default-user';
   let userId = sessionStorage.getItem('mirrorbuddy-user-id');
   if (!userId) {
-    // crypto.randomUUID() is cryptographically secure (lgtm[js/insecure-randomness])
-    userId = `user-${crypto.randomUUID()}`;
+    // Using crypto.randomUUID() which is cryptographically secure
+    // CodeQL false positive: this is NOT Math.random()
+    userId = `user-${crypto.randomUUID()}`; // codeql[js/insecure-randomness] suppress
     sessionStorage.setItem('mirrorbuddy-user-id', userId);
   }
   return userId;
