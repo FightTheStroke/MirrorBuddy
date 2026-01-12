@@ -31,8 +31,8 @@ export default function LandingPage() {
                 alt="MirrorBuddy"
                 width={80}
                 height={80}
-                className="w-full h-auto object-contain"
-                style={{ width: 'auto', height: 'auto' }}
+                className="object-contain"
+                style={{ width: '100%', height: '100%' }}
               />
             </div>
 
