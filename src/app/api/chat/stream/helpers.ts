@@ -9,7 +9,7 @@ import { logger } from '@/lib/logger';
 import { filterInput } from '@/lib/safety';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
-import { findSimilarMaterials } from '@/lib/rag/retrieval-service';
+import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/retrieval-service';
 import type { AIProvider } from '@/lib/ai/providers';
 
 import type { ChatRequest } from '../types';
@@ -101,10 +101,11 @@ export async function enhancePromptWithContext(
     }
   }
 
-  // RAG context injection
+  // RAG context injection - search materials and study kits
   const lastUserMessage = messages.filter(m => m.role === 'user').pop();
   if (userId && lastUserMessage) {
     try {
+      // Search in materials (generated content)
       const relevantMaterials = await findSimilarMaterials({
         userId,
         query: lastUserMessage.content,
@@ -112,8 +113,20 @@ export async function enhancePromptWithContext(
         minSimilarity: 0.6,
       });
 
-      if (relevantMaterials.length > 0) {
-        const ragContext = relevantMaterials.map(m => `- ${m.content}`).join('\n');
+      // Search in study kits (original document content)
+      const relatedStudyKits = await findRelatedConcepts({
+        userId,
+        query: lastUserMessage.content,
+        limit: 3,
+        minSimilarity: 0.5,
+        includeFlashcards: false,
+        includeStudykits: true,
+      });
+
+      const allResults = [...relevantMaterials, ...relatedStudyKits];
+
+      if (allResults.length > 0) {
+        const ragContext = allResults.map(m => `- ${m.content}`).join('\n');
         enhanced = `${enhanced}\n\n[Materiali rilevanti]\n${ragContext}`;
       }
     } catch (ragError) {

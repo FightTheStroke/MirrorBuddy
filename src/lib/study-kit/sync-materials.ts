@@ -8,6 +8,7 @@
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { generateSearchableText } from '@/lib/search/searchable-text';
+import { indexMaterial } from '@/lib/rag/retrieval-service';
 import type { ToolType } from '@/types/tools';
 
 interface StudyKitData {
@@ -18,6 +19,7 @@ interface StudyKitData {
   mindmap?: string | null;
   demo?: string | null;
   quiz?: string | null;
+  originalText?: string | null;
 }
 
 /**
@@ -165,4 +167,43 @@ export async function deleteMaterialsFromStudyKit(
   });
 
   return result.count;
+}
+
+/**
+ * Index Study Kit original text for RAG retrieval.
+ * This enables AI to access the full document content during conversations.
+ */
+export async function indexStudyKitContent(
+  userId: string,
+  studyKit: StudyKitData
+): Promise<{ chunksIndexed: number }> {
+  if (!studyKit.originalText) {
+    logger.debug('No original text to index', { studyKitId: studyKit.id });
+    return { chunksIndexed: 0 };
+  }
+
+  try {
+    const result = await indexMaterial({
+      userId,
+      sourceType: 'studykit',
+      sourceId: studyKit.id,
+      content: studyKit.originalText,
+      subject: studyKit.subject || undefined,
+      tags: ['study-kit', studyKit.title],
+    });
+
+    logger.info('Indexed Study Kit content for RAG', {
+      studyKitId: studyKit.id,
+      chunksIndexed: result.chunksIndexed,
+      totalTokens: result.totalTokens,
+    });
+
+    return { chunksIndexed: result.chunksIndexed };
+  } catch (error) {
+    logger.error('Failed to index Study Kit content', {
+      studyKitId: studyKit.id,
+      error: String(error),
+    });
+    return { chunksIndexed: 0 };
+  }
 }

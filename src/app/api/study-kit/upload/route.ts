@@ -11,7 +11,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { processStudyKit } from '@/lib/tools/handlers/study-kit-generators';
-import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
+import { saveMaterialsFromStudyKit, indexStudyKitContent } from '@/lib/study-kit/sync-materials';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for processing
@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
             mindmap: result.mindmap ? JSON.stringify(result.mindmap) : null,
             demo: result.demo ? JSON.stringify(result.demo) : null,
             quiz: result.quiz ? JSON.stringify(result.quiz) : null,
+            originalText: result.originalText,
             pageCount: result.pageCount,
             wordCount: result.wordCount,
           },
@@ -110,6 +111,12 @@ export async function POST(request: NextRequest) {
 
         // Sync materials to archive (Phase 1 - T-02)
         await saveMaterialsFromStudyKit(userId, updatedKit);
+
+        // Index original text for RAG retrieval
+        await indexStudyKitContent(userId, {
+          ...updatedKit,
+          originalText: result.originalText,
+        });
 
         logger.info('Study kit processing complete', { studyKitId: studyKit.id });
       } catch (error) {
