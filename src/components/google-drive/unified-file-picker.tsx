@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { GoogleDrivePicker } from './google-drive-picker';
+import { useGooglePicker, type GooglePickerDocument } from './use-google-picker';
 import type { DriveFileUI } from '@/lib/google';
 
 type FileSource = 'local' | 'google-drive';
@@ -43,6 +44,7 @@ interface UnifiedFilePickerProps {
   description?: string;
   className?: string;
   disabled?: boolean;
+  useNativePicker?: boolean; // Use native Google Picker API instead of custom UI
 }
 
 export function UnifiedFilePicker({
@@ -55,12 +57,44 @@ export function UnifiedFilePicker({
   description,
   className,
   disabled = false,
+  useNativePicker = false,
 }: UnifiedFilePickerProps) {
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handler for native Google Picker selection
+  const handleNativePickerSelect = useCallback((docs: GooglePickerDocument[]) => {
+    if (docs.length === 0) return;
+    const doc = docs[0];
+    setError(null);
+    const selected: SelectedFile = {
+      source: 'google-drive',
+      driveFile: {
+        id: doc.id,
+        name: doc.name,
+        mimeType: doc.mimeType,
+        size: doc.sizeBytes,
+        modifiedAt: doc.lastEditedUtc ? new Date(doc.lastEditedUtc) : new Date(),
+        isFolder: false,
+      },
+      name: doc.name,
+      size: doc.sizeBytes,
+      mimeType: doc.mimeType,
+    };
+    setSelectedFile(selected);
+    onFileSelect(selected);
+  }, [onFileSelect]);
+
+  // Native Google Picker hook
+  const { openPicker, isLoading: isPickerLoading, isReady: isPickerReady } = useGooglePicker({
+    userId,
+    onSelect: handleNativePickerSelect,
+    mimeTypes: acceptedMimeTypes,
+    multiSelect: false,
+  });
 
   // Handle local file selection
   const handleLocalFileSelect = useCallback((files: FileList | null) => {
@@ -216,11 +250,17 @@ export function UnifiedFilePicker({
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setIsDriveModalOpen(true)}
-                  disabled={disabled}
+                  onClick={() => {
+                    if (useNativePicker && isPickerReady) {
+                      openPicker();
+                    } else {
+                      setIsDriveModalOpen(true);
+                    }
+                  }}
+                  disabled={disabled || (useNativePicker && isPickerLoading)}
                 >
                   <Cloud className="w-4 h-4 mr-2" />
-                  Da Google Drive
+                  {isPickerLoading ? 'Caricamento...' : 'Da Google Drive'}
                 </Button>
               </div>
 
