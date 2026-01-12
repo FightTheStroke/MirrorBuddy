@@ -5,6 +5,7 @@ import {
   getRegisteredHandlers,
   clearHandlers,
 } from '../tool-executor';
+import { ToolRegistry } from '../plugin/registry';
 import type { ToolExecutionResult, ToolContext } from '@/types/tools';
 
 // Mock nanoid with a function that generates unique IDs
@@ -18,6 +19,8 @@ describe('tool-executor', () => {
 
   beforeEach(() => {
     clearHandlers();
+    // Clear the ToolRegistry singleton to ensure test isolation
+    ToolRegistry.getInstance().clear();
     vi.clearAllMocks();
     // Reset and configure nanoid mock to return unique IDs
     idCounter = 0;
@@ -26,6 +29,7 @@ describe('tool-executor', () => {
 
   afterEach(() => {
     clearHandlers();
+    ToolRegistry.getInstance().clear();
   });
 
   describe('registerToolHandler', () => {

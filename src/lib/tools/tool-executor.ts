@@ -240,12 +240,18 @@ export async function executeToolCall(
 
       // Convert orchestrator result to ToolExecutionResult
       // Errors are broadcast through ToolOrchestrator's EventBroadcaster
+      // Note: Legacy handlers return ToolExecutionResult with data property,
+      // while plugin handlers may return ToolResult with output property
       if (result.success) {
+        // Respect handler's toolId if provided, otherwise use generated one
+        // Legacy handlers return ToolExecutionResult with toolId, cast safely
+        const resultAny = result as unknown as Record<string, unknown>;
+        const handlerToolId = resultAny.toolId as string | undefined;
         return {
           success: true,
-          toolId,
+          toolId: handlerToolId || toolId,
           toolType,
-          data: result.output,
+          data: result.data ?? result.output,
         };
       } else {
         return {
