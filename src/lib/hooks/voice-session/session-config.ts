@@ -130,6 +130,15 @@ export function useSendSessionConfig(
     const isLanguageTeacher = maestro.subject === 'english' || maestro.subject === 'spanish';
     const targetLanguage = maestro.subject === 'english' ? 'en' : maestro.subject === 'spanish' ? 'es' : null;
 
+    // Debug logging for language configuration
+    logger.info('[VoiceSession] Language config', {
+      maestroId: maestro.id,
+      maestroSubject: maestro.subject,
+      userLanguage,
+      isLanguageTeacher,
+      targetLanguage,
+    });
+
     // Fetch conversation memory
     let memoryContext = '';
     try {

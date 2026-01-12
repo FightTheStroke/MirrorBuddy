@@ -65,12 +65,20 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
       case 'session.updated':
         logger.debug('[VoiceSession] Session configured, ready for conversation');
         logger.debug('[VoiceSession] Full session.updated event', { eventPreview: JSON.stringify(event).slice(0, 500) });
-         
+
         deps.sessionReadyRef.current = true;
         logger.debug('[VoiceSession] Starting audio capture...');
         deps.startAudioCapture();
-        logger.debug('[VoiceSession] Will send greeting in 300ms...');
-        setTimeout(() => deps.sendGreeting(), 300);
+
+        // Schedule multiple greeting attempts with increasing delays
+        // sendGreeting() has internal guard (greetingSentRef) - only first success sends
+        logger.debug('[VoiceSession] Scheduling greeting attempts...');
+        [300, 600, 1000, 1500, 2000].forEach((delay, i) => {
+          setTimeout(() => {
+            logger.debug(`[VoiceSession] Greeting attempt ${i + 1}/5`);
+            deps.sendGreeting();
+          }, delay);
+        });
         break;
 
       case 'response.created':
@@ -131,9 +139,11 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
 
       case 'conversation.item.input_audio_transcription.completed':
         if (event.transcript && typeof event.transcript === 'string') {
-          logger.debug('[VoiceSession] User transcript', { transcript: event.transcript });
+          logger.info('[VoiceSession] User transcript received', { transcript: event.transcript.substring(0, 100) });
           deps.addTranscript('user', event.transcript);
           deps.options.onTranscript?.('user', event.transcript);
+        } else {
+          logger.warn('[VoiceSession] User transcription completed but no transcript', { event: JSON.stringify(event).slice(0, 200) });
         }
         break;
 
@@ -188,9 +198,11 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
       case 'response.output_audio_transcript.done':  // GA API format
       case 'response.audio_transcript.done':         // Preview API format
         if (event.transcript && typeof event.transcript === 'string') {
-          logger.debug('[VoiceSession] AI transcript', { transcript: event.transcript });
+          logger.info('[VoiceSession] AI transcript received', { transcript: event.transcript.substring(0, 100) });
           deps.addTranscript('assistant', event.transcript);
           deps.options.onTranscript?.('assistant', event.transcript);
+        } else {
+          logger.warn('[VoiceSession] AI transcript.done but no transcript', { event: JSON.stringify(event).slice(0, 200) });
         }
         break;
 
