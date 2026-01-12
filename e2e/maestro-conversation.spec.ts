@@ -28,7 +28,7 @@ async function chatWithMaestro(
   if (!prompt) {
     const maestriResponse = await request.get('/api/maestri');
     const maestri = await maestriResponse.json();
-    const maestro = maestri.find((m: { id: string }) => m.id.includes(maestroId));
+    const maestro = maestri.find((m: { id: string }) => m.id === maestroId);
     prompt = maestro?.systemPrompt || '';
   }
 

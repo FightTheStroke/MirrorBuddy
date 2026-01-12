@@ -28,6 +28,35 @@ let wss: WebSocketServer | null = null;
 const connections = new Map<string, ProxyConnection>();
 
 /**
+ * Clean up all timers and delete a connection from the map
+ * MUST be called before deleting to prevent timer leaks
+ */
+function cleanupConnection(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
+
+  // Clear all timers before deletion
+  if (conn.idleTimer) {
+    clearTimeout(conn.idleTimer);
+    conn.idleTimer = null;
+  }
+  if (conn.connectionTimeoutTimer) {
+    clearTimeout(conn.connectionTimeoutTimer);
+    conn.connectionTimeoutTimer = null;
+  }
+  if (conn.pingTimer) {
+    clearInterval(conn.pingTimer);
+    conn.pingTimer = null;
+  }
+  if (conn.pongTimer) {
+    clearTimeout(conn.pongTimer);
+    conn.pongTimer = null;
+  }
+
+  connections.delete(connectionId);
+}
+
+/**
  * Reset idle timer for a connection - call on any activity
  */
 function resetIdleTimer(connectionId: string): void {
@@ -50,7 +79,7 @@ function resetIdleTimer(connectionId: string): void {
     if (conn.backendWs?.readyState === WebSocket.OPEN) {
       conn.backendWs.close();
     }
-    connections.delete(connectionId);
+    cleanupConnection(connectionId);
   }, IDLE_TIMEOUT_MS);
 }
 
@@ -80,7 +109,7 @@ function startConnectionTimeout(connectionId: string): void {
     if (conn.backendWs?.readyState === WebSocket.OPEN) {
       conn.backendWs.close();
     }
-    connections.delete(connectionId);
+    cleanupConnection(connectionId);
   }, CONNECTION_TIMEOUT_MS);
 
   conn.connectionTimeoutTimer = timeoutTimer;
@@ -124,7 +153,7 @@ function startPingInterval(connectionId: string): void {
         if (conn.backendWs?.readyState === WebSocket.OPEN) {
           conn.backendWs.close();
         }
-        connections.delete(connectionId);
+        cleanupConnection(connectionId);
       }, CONNECTION_TIMEOUT_MS);
 
       conn.pongTimer = pongTimer;
@@ -322,7 +351,7 @@ export function startRealtimeProxy(): void {
       if (backendWs.readyState === WebSocket.OPEN) {
         backendWs.close();
       }
-      connections.delete(connectionId);
+      cleanupConnection(connectionId);
     });
 
     // Handle pong response - clears pong timeout
