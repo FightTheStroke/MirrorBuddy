@@ -18,6 +18,27 @@ import type {
 const DRIVE_API_BASE = 'https://www.googleapis.com/drive/v3';
 
 /**
+ * Validate that a Google Drive file ID is well-formed.
+ * Drive IDs are alphanumeric with hyphens and underscores.
+ * This prevents SSRF attacks via malicious fileId values.
+ */
+function isValidDriveId(id: string): boolean {
+  // Google Drive IDs are alphanumeric with hyphens/underscores, typically 25-44 chars
+  // Root and special IDs like 'shared' are also valid
+  if (id === 'root' || id === 'shared') return true;
+  return /^[a-zA-Z0-9_-]{10,100}$/.test(id);
+}
+
+/**
+ * Escape a search query for use in Google Drive API queries.
+ * Must escape both backslashes and single quotes to prevent injection.
+ */
+function escapeQueryString(query: string): string {
+  // Escape backslashes first, then single quotes
+  return query.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+}
+
+/**
  * List files in a folder or root
  */
 export async function listDriveFiles(
@@ -38,6 +59,12 @@ export async function listDriveFiles(
     pageToken,
     mimeTypes = ALL_SUPPORTED_MIME_TYPES,
   } = options;
+
+  // Validate folderId to prevent injection attacks
+  if (!isValidDriveId(folderId)) {
+    console.error('[Drive Client] Invalid folder ID format:', folderId);
+    return null;
+  }
 
   // Build query for folder and supported file types
   const queryParts: string[] = ['trashed = false'];
@@ -112,7 +139,7 @@ export async function searchDriveFiles(
 
   // Build search query
   const queryParts = [
-    `name contains '${query.replace(/'/g, "\\'")}'`,
+    `name contains '${escapeQueryString(query)}'`,
     'trashed = false',
   ];
 
@@ -160,6 +187,12 @@ export async function getDriveFile(
   userId: string,
   fileId: string
 ): Promise<DriveFile | null> {
+  // Validate fileId to prevent SSRF attacks
+  if (!isValidDriveId(fileId)) {
+    console.error('[Drive Client] Invalid file ID format:', fileId);
+    return null;
+  }
+
   const accessToken = await getValidAccessToken(userId);
   if (!accessToken) return null;
 
@@ -247,6 +280,12 @@ export async function getDriveFolderPath(
   userId: string,
   folderId: string
 ): Promise<{ id: string; name: string }[]> {
+  // Validate folderId to prevent injection attacks
+  if (!isValidDriveId(folderId)) {
+    console.error('[Drive Client] Invalid folder ID format:', folderId);
+    return [];
+  }
+
   // Special case for shared files
   if (folderId === 'shared') {
     return [{ id: 'shared', name: 'Condivisi con me' }];
