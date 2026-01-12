@@ -5,6 +5,16 @@
 
 import type { ExtractedContent, ContentSection, ContentImage } from '../types';
 
+// UUID v4 pattern for validation (prevents SSRF by ensuring kitId is a valid UUID)
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Validate that a kitId is a valid UUID to prevent SSRF attacks
+ */
+function isValidKitId(kitId: string): boolean {
+  return UUID_PATTERN.test(kitId);
+}
+
 /**
  * Extract content from a Study Kit for PDF generation
  * Can accept either kitId (for client-side) or studyKit object (for server-side)
@@ -17,11 +27,16 @@ export async function extractStudyKitContent(
 
   // If it's a string, it's a kitId - fetch from API (client-side)
   if (typeof kitIdOrStudyKit === 'string') {
-    const baseUrl = typeof window !== 'undefined' 
-      ? window.location.origin 
+    // Security: Validate kitId is a UUID to prevent SSRF attacks
+    if (!isValidKitId(kitIdOrStudyKit)) {
+      throw new Error('Invalid kit ID format');
+    }
+
+    const baseUrl = typeof window !== 'undefined'
+      ? window.location.origin
       : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    
-    const url = `${baseUrl}/api/study-kit/${kitIdOrStudyKit}`;
+
+    const url = `${baseUrl}/api/study-kit/${encodeURIComponent(kitIdOrStudyKit)}`;
     const response = await fetch(url);
 
   if (!response.ok) {
