@@ -40,10 +40,14 @@ export async function listDriveFiles(
   } = options;
 
   // Build query for folder and supported file types
-  const queryParts = [
-    `'${folderId}' in parents`,
-    'trashed = false',
-  ];
+  const queryParts: string[] = ['trashed = false'];
+
+  // Special handling for shared files view
+  if (folderId === 'shared') {
+    queryParts.push('sharedWithMe = true');
+  } else {
+    queryParts.push(`'${folderId}' in parents`);
+  }
 
   // Add MIME type filter (include folders for navigation + supported types)
   const mimeTypeQuery = [
@@ -243,6 +247,11 @@ export async function getDriveFolderPath(
   userId: string,
   folderId: string
 ): Promise<{ id: string; name: string }[]> {
+  // Special case for shared files
+  if (folderId === 'shared') {
+    return [{ id: 'shared', name: 'Condivisi con me' }];
+  }
+
   const accessToken = await getValidAccessToken(userId);
   if (!accessToken) return [];
 
@@ -260,7 +269,7 @@ export async function getDriveFolderPath(
   }
 
   // Add root
-  path.unshift({ id: 'root', name: 'My Drive' });
+  path.unshift({ id: 'root', name: 'Il mio Drive' });
 
   return path;
 }

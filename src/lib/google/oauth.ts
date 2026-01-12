@@ -206,6 +206,13 @@ export async function saveGoogleAccount(
   const scopes = tokens.scope.split(' ');
   const expiresAt = new Date(Date.now() + tokens.expires_in * 1000);
 
+  // Ensure user exists before creating GoogleAccount (foreign key constraint)
+  await prisma.user.upsert({
+    where: { id: userId },
+    create: { id: userId },
+    update: {},
+  });
+
   await prisma.googleAccount.upsert({
     where: { userId },
     create: {

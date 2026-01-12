@@ -106,8 +106,9 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
       // If Google Drive file, download it first
       if (selectedDriveFile?.source === 'google-drive' && selectedDriveFile.driveFile) {
         setUploadProgress(20);
+        const userId = getUserId();
         const downloadResponse = await fetch(
-          `/api/google-drive/files/${selectedDriveFile.driveFile.id}/download`
+          `/api/google-drive/files/${selectedDriveFile.driveFile.id}/download?userId=${userId}`
         );
 
         if (!downloadResponse.ok) {
