@@ -34,10 +34,16 @@ function sanitizeHtml(html: string): string {
 
   let sanitized = html;
 
-  // 1. Remove <script> tags and their content (including nested and unclosed)
-  sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
-  // Also remove unclosed script tags (malformed HTML)
-  sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*/gi, '');
+  // 1. Remove <script> tags - apply iteratively to handle nested/malformed tags
+  // Pattern handles: <script>, <SCRIPT>, <script >, <script/>, <scr ipt>, etc.
+  let previousLength: number;
+  do {
+    previousLength = sanitized.length;
+    // Remove script tags with content
+    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*>[\s\S]*?<\/s\s*c\s*r\s*i\s*p\s*t\s*>/gi, '');
+    // Remove self-closing and unclosed script tags
+    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*\/?>/gi, '');
+  } while (sanitized.length < previousLength); // Keep looping until no more matches
 
   // 2. Remove event handlers (onclick, onload, onerror, onmouseover, etc.)
   // Replace with data-removed-* to track what was removed
@@ -62,9 +68,10 @@ function sanitizeHtml(html: string): string {
   }
 
   // Also handle direct (non-encoded) dangerous protocols
+  // Use more robust pattern that handles whitespace/newlines between characters
   sanitized = sanitized
-    .replace(/javascript\s*:/gi, 'removed:')
-    .replace(/vbscript\s*:/gi, 'removed:')
+    .replace(/j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:')
+    .replace(/v\s*b\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:')
     .replace(/href\s*=\s*["']data:[^"']*["']/gi, 'href="removed:"');
 
   return sanitized;
