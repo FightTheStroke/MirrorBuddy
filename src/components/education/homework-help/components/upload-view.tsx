@@ -36,6 +36,8 @@ interface UploadViewProps {
   onFileClick: () => void;
   onWebcamCapture: (imageData: string) => void;
   onWebcamClose: () => void;
+  onGoogleDriveClick?: () => void;
+  isGoogleDriveConnected?: boolean;
 }
 
 export function UploadView({
@@ -56,6 +58,8 @@ export function UploadView({
   onFileClick,
   onWebcamCapture,
   onWebcamClose,
+  onGoogleDriveClick,
+  isGoogleDriveConnected,
 }: UploadViewProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -136,6 +140,8 @@ export function UploadView({
             isUploading={isUploading}
             onWebcamClick={onWebcamClick}
             onFileClick={onFileClick}
+            onGoogleDriveClick={onGoogleDriveClick}
+            isGoogleDriveConnected={isGoogleDriveConnected}
           />
         </div>
 
