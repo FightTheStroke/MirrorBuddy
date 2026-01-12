@@ -4,7 +4,7 @@ import { defineConfig } from "prisma/config";
 // PostgreSQL connection URL from environment
 // For local: postgresql://user:pass@localhost:5432/mirrorbuddy
 // For Supabase: postgresql://postgres:[PASSWORD]@db.[PROJECT].supabase.co:5432/postgres
-const databaseUrl = process.env["DATABASE_URL"];
+const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
   console.warn(
