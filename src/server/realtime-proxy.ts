@@ -19,7 +19,6 @@ const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 
 // Timeout configuration
 const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes idle timeout
-const _HEARTBEAT_INTERVAL_MS = 30 * 1000; // 30 seconds heartbeat
 const CONNECTION_TIMEOUT_MS = 30 * 1000; // 30 seconds initial connection timeout
 const PING_INTERVAL_MS = 15 * 1000; // 15 seconds ping interval
 

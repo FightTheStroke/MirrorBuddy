@@ -7,10 +7,11 @@ import { defineConfig } from "prisma/config";
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  console.warn(
-    "⚠️  DATABASE_URL not set. Set it to a PostgreSQL connection string.\n" +
-    "   Local: postgresql://user:pass@localhost:5432/mirrorbuddy\n" +
-    "   Supabase: Get connection string from Project Settings > Database"
+  throw new Error(
+    "DATABASE_URL environment variable is required.\n" +
+    "Set it to a PostgreSQL connection string:\n" +
+    "  Local: postgresql://user:pass@localhost:5432/mirrorbuddy\n" +
+    "  Supabase: Get connection string from Project Settings > Database"
   );
 }
 
@@ -20,6 +21,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: databaseUrl || "postgresql://localhost:5432/mirrorbuddy",
+    url: databaseUrl,
   },
 });

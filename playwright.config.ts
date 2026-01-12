@@ -45,8 +45,9 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      DATABASE_URL: process.env.DATABASE_URL ?? 'postgresql://localhost:5432/mirrorbuddy',
-      DIRECT_URL: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? 'postgresql://localhost:5432/mirrorbuddy',
+      // DATABASE_URL must be set in environment - no hardcoded fallbacks
+      ...(process.env.DATABASE_URL && { DATABASE_URL: process.env.DATABASE_URL }),
+      ...(process.env.DIRECT_URL && { DIRECT_URL: process.env.DIRECT_URL }),
       E2E_TESTS: '1',
     },
   },
