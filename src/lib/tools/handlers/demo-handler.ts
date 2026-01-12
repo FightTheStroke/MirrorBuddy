@@ -39,10 +39,12 @@ function sanitizeHtml(html: string): string {
   let previousLength: number;
   do {
     previousLength = sanitized.length;
-    // Remove script tags with content
+    // Remove script tags with content (closed tags)
     sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*>[\s\S]*?<\/s\s*c\s*r\s*i\s*p\s*t\s*>/gi, '');
-    // Remove self-closing and unclosed script tags
-    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*\/?>/gi, '');
+    // Remove unclosed script tags AND their trailing content (to end of string)
+    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*>[\s\S]*$/gi, '');
+    // Remove self-closing script tags
+    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*\/>/gi, '');
   } while (sanitized.length < previousLength); // Keep looping until no more matches
 
   // 2. Remove event handlers (onclick, onload, onerror, onmouseover, etc.)
