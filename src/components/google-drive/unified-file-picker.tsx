@@ -57,7 +57,7 @@ export function UnifiedFilePicker({
   description,
   className,
   disabled = false,
-  useNativePicker = false,
+  useNativePicker = true, // Native Google Picker enabled by default
 }: UnifiedFilePickerProps) {
   const [isDriveModalOpen, setIsDriveModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
