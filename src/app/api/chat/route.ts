@@ -265,11 +265,12 @@ export async function POST(request: NextRequest) {
             // Material ID to use in toolCallRef (from saved material or fallback to tool result)
             let materialId: string | undefined;
 
-            if (toolResult.success && toolResult.data) {
+            if (toolResult.success && toolResult.data && userId) {
               // Save tool result to Material table (content duplication reduction)
+              // Skip saving for unauthenticated users to avoid database constraint violations
               try {
                 const savedMaterial = await saveTool({
-                  userId: userId || 'anonymous',
+                  userId,
                   type: toolType,
                   title: args.title || args.topic || `${toolType} tool`,
                   content: toolResult.data as Record<string, unknown>,

@@ -45,10 +45,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: ChatRequest = await request.json();
-    const { messages, systemPrompt, maestroId, enableMemory = true } = body;
+    const { messages, systemPrompt, maestroId, enableMemory = true, enableTools } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+    }
+
+    // Streaming does not support tool calls - warn if requested
+    if (enableTools) {
+      logger.debug('Tool calls requested but not supported in streaming mode', { maestroId });
     }
 
     const userId = await getUserId();

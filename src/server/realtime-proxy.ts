@@ -323,26 +323,20 @@ export function startRealtimeProxy(): void {
     // Handle backend connection close
     backendWs.on('close', (code: number, reason: Buffer) => {
       logger.debug(`Backend connection closed for ${connectionId}`, { code, reason: reason.toString() });
-      clearIdleTimer(connectionId);
-      clearConnectionTimeout(connectionId);
-      clearPingTimer(connectionId);
       if (clientWs.readyState === WebSocket.OPEN) {
         const validCode = (code === 1000 || (code >= 3000 && code <= 4999)) ? code : 1000;
         clientWs.close(validCode, reason.toString());
       }
-      connections.delete(connectionId);
+      cleanupConnection(connectionId);
     });
 
     // Handle client disconnection
     clientWs.on('close', () => {
       logger.debug(`Client disconnected: ${connectionId}`);
-      clearIdleTimer(connectionId);
-      clearConnectionTimeout(connectionId);
-      clearPingTimer(connectionId);
       if (backendWs.readyState === WebSocket.OPEN) {
         backendWs.close();
       }
-      connections.delete(connectionId);
+      cleanupConnection(connectionId);
     });
 
     // Handle client errors
