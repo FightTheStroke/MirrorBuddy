@@ -16,9 +16,9 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 // Mock pdf-parse with class-based mock
-let mockGetText: ReturnType<typeof vi.fn>;
-let mockGetInfo: ReturnType<typeof vi.fn>;
-let mockDestroy: ReturnType<typeof vi.fn>;
+let mockGetText = vi.fn();
+let mockGetInfo = vi.fn();
+let mockDestroy = vi.fn();
 
 vi.mock('pdf-parse', () => {
   // These will be set in beforeEach
@@ -415,9 +415,9 @@ describe('Study Kit Handler', () => {
       expect(result.title).toBe('Test Title');
       expect(result.summary).toBe('Generated summary');
       expect(result.mindmap).toBeDefined();
-      expect(result.mindmap.nodes).toHaveLength(1);
+      expect(result.mindmap!.nodes).toHaveLength(1);
       expect(result.quiz).toBeDefined();
-      expect(result.quiz.topic).toBe('Quiz');
+      expect(result.quiz!.topic).toBe('Quiz');
       expect(result.status).toBe('ready');
       expect(result.pageCount).toBe(10);
     });

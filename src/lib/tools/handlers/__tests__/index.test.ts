@@ -99,7 +99,7 @@ describe('tools/handlers index exports', () => {
 
     it('should validate mermaid code', () => {
       const valid = 'graph TD\n  A --> B';
-      const result = validateMermaidCode(valid);
+      const result = validateMermaidCode(valid, 'flowchart');
       expect(result.valid).toBe(true);
     });
   });

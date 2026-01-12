@@ -47,6 +47,7 @@ describe('Study Kit Generators', () => {
   describe('generateSummary', () => {
     it('should generate a summary from text', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: 'This is a well-structured summary of the document.',
         model: 'test-model',
       });
@@ -65,6 +66,7 @@ describe('Study Kit Generators', () => {
 
     it('should include subject when provided', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: 'Math summary content',
         model: 'test-model',
       });
@@ -84,6 +86,7 @@ describe('Study Kit Generators', () => {
 
     it('should trim whitespace from response', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: '  Summary with whitespace  \n',
         model: 'test-model',
       });
@@ -96,6 +99,7 @@ describe('Study Kit Generators', () => {
     it('should truncate long text in prompt', async () => {
       const longText = 'a'.repeat(10000);
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: 'Summary',
         model: 'test-model',
       });
@@ -117,6 +121,7 @@ describe('Study Kit Generators', () => {
   describe('generateMindmap', () => {
     it('should generate a mindmap from text', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({
           title: 'Test Mindmap',
           nodes: [
@@ -137,6 +142,7 @@ describe('Study Kit Generators', () => {
 
     it('should convert numeric IDs to strings', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({
           title: 'Mindmap',
           nodes: [
@@ -154,6 +160,7 @@ describe('Study Kit Generators', () => {
 
     it('should handle JSON wrapped in text', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: 'Here is the mindmap: {"title":"Map","nodes":[{"id":"1","label":"A"}]} as requested',
         model: 'test-model',
       });
@@ -165,6 +172,7 @@ describe('Study Kit Generators', () => {
 
     it('should throw error when JSON parsing fails', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: 'No JSON here',
         model: 'test-model',
       });
@@ -174,6 +182,7 @@ describe('Study Kit Generators', () => {
 
     it('should throw error for invalid mindmap structure', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({ invalid: 'structure' }),
         model: 'test-model',
       });
@@ -192,6 +201,7 @@ describe('Study Kit Generators', () => {
 
     it('should generate demo for STEM subjects', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({
           title: 'Math Demo',
           description: 'Interactive demo',
@@ -211,6 +221,7 @@ describe('Study Kit Generators', () => {
 
     it('should recognize various STEM subject names', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({ title: 'Demo' }),
         model: 'test-model',
       });
@@ -226,6 +237,7 @@ describe('Study Kit Generators', () => {
 
     it('should return null when JSON parsing fails', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: 'Invalid response',
         model: 'test-model',
       });
@@ -237,6 +249,7 @@ describe('Study Kit Generators', () => {
 
     it('should handle malformed JSON gracefully', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: '{"title":"Demo","broken json',
         model: 'test-model',
       });
@@ -248,6 +261,7 @@ describe('Study Kit Generators', () => {
 
     it('should use title as fallback when not in response', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({ description: 'No title provided' }),
         model: 'test-model',
       });
@@ -261,6 +275,7 @@ describe('Study Kit Generators', () => {
   describe('generateQuiz', () => {
     it('should generate a quiz from text', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({
           topic: 'Test Topic',
           questions: [
@@ -284,6 +299,7 @@ describe('Study Kit Generators', () => {
 
     it('should handle questions without explanation', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({
           topic: 'Topic',
           questions: [
@@ -300,6 +316,7 @@ describe('Study Kit Generators', () => {
 
     it('should throw error when JSON parsing fails', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: 'Not valid JSON',
         model: 'test-model',
       });
@@ -309,6 +326,7 @@ describe('Study Kit Generators', () => {
 
     it('should throw error for invalid quiz structure', async () => {
       mockChatCompletion.mockResolvedValue({
+        provider: 'azure',
         content: JSON.stringify({ noTopic: true }),
         model: 'test-model',
       });
@@ -329,12 +347,14 @@ describe('Study Kit Generators', () => {
       // For non-STEM (no subject), generateDemo returns null without calling chatCompletion
       // So we only need 3 mocks: summary, mindmap, quiz
       mockChatCompletion
-        .mockResolvedValueOnce({ content: 'Generated summary', model: 'test' })
+        .mockResolvedValueOnce({ provider: 'azure', content: 'Generated summary', model: 'test' })
         .mockResolvedValueOnce({
+          provider: 'azure',
           content: JSON.stringify({ title: 'Mindmap', nodes: [{ id: '1', label: 'A' }] }),
           model: 'test',
         })
         .mockResolvedValueOnce({
+          provider: 'azure',
           content: JSON.stringify({
             topic: 'Quiz',
             questions: [{ question: 'Q', options: ['A', 'B'], correctIndex: 0 }],
@@ -350,8 +370,8 @@ describe('Study Kit Generators', () => {
 
       expect(result.title).toBe('Test Document');
       expect(result.summary).toBe('Generated summary');
-      expect(result.mindmap.title).toBe('Mindmap');
-      expect(result.quiz.topic).toBe('Quiz');
+      expect(result.mindmap!.title).toBe('Mindmap');
+      expect(result.quiz!.topic).toBe('Quiz');
       expect(result.status).toBe('ready');
       expect(result.pageCount).toBe(3);
     });
@@ -378,12 +398,14 @@ describe('Study Kit Generators', () => {
 
       // No subject = non-STEM = no demo chatCompletion call
       mockChatCompletion
-        .mockResolvedValueOnce({ content: 'Summary', model: 'test' })
+        .mockResolvedValueOnce({ provider: 'azure', content: 'Summary', model: 'test' })
         .mockResolvedValueOnce({
+          provider: 'azure',
           content: JSON.stringify({ title: 'Map', nodes: [] }),
           model: 'test',
         })
         .mockResolvedValueOnce({
+          provider: 'azure',
           content: JSON.stringify({ topic: 'Q', questions: [] }),
           model: 'test',
         });
@@ -400,16 +422,19 @@ describe('Study Kit Generators', () => {
       });
 
       mockChatCompletion
-        .mockResolvedValueOnce({ content: 'Summary', model: 'test' })
+        .mockResolvedValueOnce({ provider: 'azure', content: 'Summary', model: 'test' })
         .mockResolvedValueOnce({
+          provider: 'azure',
           content: JSON.stringify({ title: 'Map', nodes: [] }),
           model: 'test',
         })
         .mockResolvedValueOnce({
+          provider: 'azure',
           content: JSON.stringify({ title: 'Demo', html: '<div></div>', css: '', js: '' }),
           model: 'test',
         })
         .mockResolvedValueOnce({
+          provider: 'azure',
           content: JSON.stringify({ topic: 'Q', questions: [] }),
           model: 'test',
         });

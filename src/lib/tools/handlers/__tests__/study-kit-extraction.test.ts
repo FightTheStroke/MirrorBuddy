@@ -8,9 +8,9 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { extractTextFromPDF } from '../study-kit-extraction';
 
 // Mock pdf-parse with class-based mock
-let mockGetText: ReturnType<typeof vi.fn>;
-let mockGetInfo: ReturnType<typeof vi.fn>;
-let mockDestroy: ReturnType<typeof vi.fn>;
+let mockGetText = vi.fn();
+let mockGetInfo = vi.fn();
+let mockDestroy = vi.fn();
 
 vi.mock('pdf-parse', () => ({
   PDFParse: class MockPDFParse {

@@ -18,7 +18,7 @@ describe('Style Utils', () => {
     it('should merge two style objects into array', () => {
       const baseStyle = { fontSize: 12 };
       const additionalStyle = { color: 'red' };
-      const result = mergeStyles(baseStyle, additionalStyle) as unknown[];
+      const result = mergeStyles(baseStyle, additionalStyle) as unknown as unknown[];
 
       expect(result).toEqual([baseStyle, additionalStyle]);
     });
@@ -26,7 +26,7 @@ describe('Style Utils', () => {
     it('should handle array base style', () => {
       const baseStyle = [{ fontSize: 12 }, { color: 'blue' }];
       const additionalStyle = { fontWeight: 'bold' };
-      const result = mergeStyles(baseStyle, additionalStyle) as unknown[];
+      const result = mergeStyles(baseStyle, additionalStyle) as unknown as unknown[];
 
       // Arrays should be flattened
       expect(result).toHaveLength(3);
@@ -35,7 +35,7 @@ describe('Style Utils', () => {
     it('should handle array additional style', () => {
       const baseStyle = { fontSize: 12 };
       const additionalStyle = [{ color: 'red' }, { fontWeight: 'bold' }];
-      const result = mergeStyles(baseStyle, additionalStyle) as unknown[];
+      const result = mergeStyles(baseStyle, additionalStyle) as unknown as unknown[];
 
       expect(result).toHaveLength(3);
     });
@@ -43,7 +43,7 @@ describe('Style Utils', () => {
     it('should handle both arrays', () => {
       const baseStyle = [{ fontSize: 12 }, { padding: 10 }];
       const additionalStyle = [{ color: 'red' }, { margin: 5 }];
-      const result = mergeStyles(baseStyle, additionalStyle) as unknown[];
+      const result = mergeStyles(baseStyle, additionalStyle) as unknown as unknown[];
 
       expect(result).toHaveLength(4);
     });

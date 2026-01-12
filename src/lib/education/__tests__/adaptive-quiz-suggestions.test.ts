@@ -7,6 +7,20 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Subject } from '@/types';
 import type { QuizAnalysis } from '../adaptive-quiz-analysis';
 
+// Helper to create mock QuizAnalysis with extended test-only fields
+// The test uses additional fields not in the production interface
+const mockAnalysis = (partial: {
+  percentageCorrect: number;
+  totalQuestions: number;
+  correctAnswers: number;
+  averageResponseTime: number;
+  needsReview: boolean;
+  weakTopics: string[];
+  strongTopics: string[];
+  difficultyTrend: string;
+  suggestedNextDifficulty: string;
+}) => partial as unknown as QuizAnalysis;
+
 // Mock logger
 vi.mock('@/lib/logger', () => ({
   logger: {
@@ -41,10 +55,10 @@ describe('Adaptive Quiz Suggestions', () => {
 
   describe('generateReviewSuggestions', () => {
     const mockUserId = 'user-123';
-    const mockSubject: Subject = 'matematica';
+    const mockSubject: Subject = 'mathematics';
 
     it('should return empty array when needsReview is false', async () => {
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 85,
         totalQuestions: 10,
         correctAnswers: 8.5,
@@ -54,7 +68,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: ['algebra'],
         difficultyTrend: 'stable',
         suggestedNextDifficulty: 'intermediate',
-      };
+      });
 
       const result = await generateReviewSuggestions(
         mockUserId,
@@ -67,7 +81,7 @@ describe('Adaptive Quiz Suggestions', () => {
     });
 
     it('should return empty array when weakTopics is empty', async () => {
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 55,
         totalQuestions: 10,
         correctAnswers: 5.5,
@@ -77,7 +91,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: [],
         difficultyTrend: 'declining',
         suggestedNextDifficulty: 'easy',
-      };
+      });
 
       const result = await generateReviewSuggestions(
         mockUserId,
@@ -104,7 +118,7 @@ describe('Adaptive Quiz Suggestions', () => {
         },
       ]);
 
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 45,
         totalQuestions: 10,
         correctAnswers: 4.5,
@@ -114,7 +128,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: [],
         difficultyTrend: 'declining',
         suggestedNextDifficulty: 'easy',
-      };
+      });
 
       const result = await generateReviewSuggestions(
         mockUserId,
@@ -124,7 +138,7 @@ describe('Adaptive Quiz Suggestions', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].topic).toBe('frazioni');
-      expect(result[0].subject).toBe('matematica');
+      expect(result[0].subject).toBe('mathematics');
       expect(result[0].materials).toHaveLength(2);
       expect(result[0].priority).toBe(1); // Has materials
       expect(result[0].reason).toContain('meno del');
@@ -133,7 +147,7 @@ describe('Adaptive Quiz Suggestions', () => {
     it('should handle multiple weak topics', async () => {
       mockHybridSearch.mockResolvedValue([]);
 
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 30,
         totalQuestions: 10,
         correctAnswers: 3,
@@ -143,7 +157,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: [],
         difficultyTrend: 'declining',
         suggestedNextDifficulty: 'easy',
-      };
+      });
 
       const result = await generateReviewSuggestions(
         mockUserId,
@@ -162,7 +176,7 @@ describe('Adaptive Quiz Suggestions', () => {
     it('should set priority 2 when no materials found', async () => {
       mockHybridSearch.mockResolvedValue([]);
 
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 50,
         totalQuestions: 10,
         correctAnswers: 5,
@@ -172,7 +186,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: [],
         difficultyTrend: 'declining',
         suggestedNextDifficulty: 'easy',
-      };
+      });
 
       const result = await generateReviewSuggestions(
         mockUserId,
@@ -187,7 +201,7 @@ describe('Adaptive Quiz Suggestions', () => {
     it('should handle search errors gracefully', async () => {
       mockHybridSearch.mockRejectedValue(new Error('Search failed'));
 
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 40,
         totalQuestions: 10,
         correctAnswers: 4,
@@ -197,7 +211,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: [],
         difficultyTrend: 'declining',
         suggestedNextDifficulty: 'easy',
-      };
+      });
 
       const result = await generateReviewSuggestions(
         mockUserId,
@@ -223,7 +237,7 @@ describe('Adaptive Quiz Suggestions', () => {
         ]);
       });
 
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 40,
         totalQuestions: 10,
         correctAnswers: 4,
@@ -233,7 +247,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: [],
         difficultyTrend: 'declining',
         suggestedNextDifficulty: 'easy',
-      };
+      });
 
       const result = await generateReviewSuggestions(
         mockUserId,
@@ -248,7 +262,7 @@ describe('Adaptive Quiz Suggestions', () => {
     it('should call hybridSearch with correct parameters', async () => {
       mockHybridSearch.mockResolvedValue([]);
 
-      const analysis: QuizAnalysis = {
+      const analysis = mockAnalysis({
         percentageCorrect: 50,
         totalQuestions: 10,
         correctAnswers: 5,
@@ -258,7 +272,7 @@ describe('Adaptive Quiz Suggestions', () => {
         strongTopics: [],
         difficultyTrend: 'declining',
         suggestedNextDifficulty: 'easy',
-      };
+      });
 
       await generateReviewSuggestions(mockUserId, analysis, mockSubject);
 
@@ -267,7 +281,7 @@ describe('Adaptive Quiz Suggestions', () => {
         query: 'geometria',
         limit: 5,
         sourceType: 'material',
-        subject: 'matematica',
+        subject: 'mathematics',
         minScore: 0.4,
       });
     });
@@ -275,7 +289,7 @@ describe('Adaptive Quiz Suggestions', () => {
 
   describe('checkSeenConcepts', () => {
     const mockUserId = 'user-456';
-    const mockSubject: Subject = 'scienze';
+    const mockSubject: Subject = 'biology';
 
     it('should return map with null for unseen concepts', async () => {
       mockHybridSearch.mockResolvedValue([]);

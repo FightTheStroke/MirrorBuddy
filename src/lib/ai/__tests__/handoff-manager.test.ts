@@ -301,7 +301,7 @@ describe('Handoff Manager', () => {
     it('should use preferred coach when specified', () => {
       const profileWithPreference = {
         ...defaultProfile,
-        preferredCoach: 'melissa',
+        preferredCoach: 'melissa' as const,
       };
 
       const suggestion = createCoachSuggestion(profileWithPreference);
@@ -313,7 +313,8 @@ describe('Handoff Manager', () => {
     it('should fallback to default when preferred coach not found', () => {
       const profileWithInvalidPreference = {
         ...defaultProfile,
-        preferredCoach: 'non_existent_coach',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        preferredCoach: 'non_existent_coach' as any,
       };
 
       const suggestion = createCoachSuggestion(profileWithInvalidPreference);
@@ -337,7 +338,7 @@ describe('Handoff Manager', () => {
     it('should use preferred buddy when specified', () => {
       const profileWithPreference = {
         ...defaultProfile,
-        preferredBuddy: 'mario',
+        preferredBuddy: 'mario' as const,
       };
 
       const suggestion = createBuddySuggestion(profileWithPreference);
@@ -349,7 +350,8 @@ describe('Handoff Manager', () => {
     it('should fallback to default when preferred buddy not found', () => {
       const profileWithInvalidPreference = {
         ...defaultProfile,
-        preferredBuddy: 'non_existent_buddy',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        preferredBuddy: 'non_existent_buddy' as any,
       };
 
       const suggestion = createBuddySuggestion(profileWithInvalidPreference);
