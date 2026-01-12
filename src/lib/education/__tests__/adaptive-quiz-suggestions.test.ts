@@ -313,7 +313,7 @@ describe('Adaptive Quiz Suggestions', () => {
       const seenConcept = result.get('fotosintesi');
       expect(seenConcept).not.toBeNull();
       expect(seenConcept?.concept).toBe('fotosintesi');
-      expect(seenConcept?.subject).toBe('scienze');
+      expect(seenConcept?.subject).toBe('biology');
       expect(seenConcept?.masteryLevel).toBe(95);
       expect(seenConcept?.timesReviewed).toBe(1);
     });
@@ -368,7 +368,7 @@ describe('Adaptive Quiz Suggestions', () => {
         userId: 'user-456',
         query: 'test_concept',
         limit: 1,
-        subject: 'scienze',
+        subject: 'biology',
         minScore: 0.7,
       });
     });
