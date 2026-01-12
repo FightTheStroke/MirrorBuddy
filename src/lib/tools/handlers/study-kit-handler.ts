@@ -364,6 +364,7 @@ export async function processStudyKit(
       subject,
       pageCount,
       wordCount,
+      originalText: text,
     };
   } catch (error) {
     logger.error('Failed to process study kit', { error });
