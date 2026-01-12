@@ -1,4 +1,4 @@
-# ADR 0035: Tool Plugin Architecture
+# ADR 0037: Tool Plugin Architecture
 
 **Status:** Accepted
 
