@@ -10,6 +10,7 @@ import {
   CATEGORY_TO_MAESTRO,
   getParentSuggestion,
   getMaestroSubject,
+  type ParentSuggestion as _ParentSuggestion,
 } from '../parent-suggestions';
 import type { ObservationCategory } from '@/types';
 
