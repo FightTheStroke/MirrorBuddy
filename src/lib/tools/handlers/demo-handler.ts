@@ -34,31 +34,40 @@ function sanitizeHtml(html: string): string {
 
   let sanitized = html;
 
-  // 1. Remove <script> tags - apply iteratively to handle nested/malformed tags
-  // Pattern handles: <script>, <SCRIPT>, <script >, <script/>, <scr ipt>, etc.
+  // 1. Normalize: collapse whitespace within potential script tags to defeat obfuscation
+  // e.g., "< s c r i p t >" -> "<script>"
+  sanitized = sanitized.replace(/<[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t/gi, '<script');
+  sanitized = sanitized.replace(/<[\s]*\/[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t/gi, '</script');
+
+  // 2. Remove <script> tags - apply iteratively to handle nested/recursive injection
+  // Pattern handles variations like <script>, <SCRIPT>, <script attr>, etc.
   let previousLength: number;
   do {
     previousLength = sanitized.length;
-    // Remove script tags with content (closed tags)
-    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*>[\s\S]*?<\/s\s*c\s*r\s*i\s*p\s*t\s*>/gi, '');
-    // Remove unclosed script tags AND their trailing content (to end of string)
-    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*>[\s\S]*$/gi, '');
+    // Remove complete script tags with content
+    // Pattern: <script...>content</script> with optional whitespace in closing tag
+    sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, '');
+    // Remove unclosed script tags AND everything after (fail-safe)
+    sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*$/gi, '');
     // Remove self-closing script tags
-    sanitized = sanitized.replace(/<s\s*c\s*r\s*i\s*p\s*t\b[^>]*\/>/gi, '');
-  } while (sanitized.length < previousLength); // Keep looping until no more matches
+    sanitized = sanitized.replace(/<script\b[^>]*\/>/gi, '');
+  } while (sanitized.length < previousLength);
 
-  // 2. Remove event handlers (onclick, onload, onerror, onmouseover, etc.)
-  // Replace with data-removed-* to track what was removed
+  // 3. Final safety check: remove any remaining <script substring
+  // This catches any edge cases the patterns above may have missed
+  sanitized = sanitized.replace(/<script/gi, '&lt;script');
+
+  // 4. Remove event handlers (onclick, onload, onerror, onmouseover, etc.)
   sanitized = sanitized.replace(
     /\s+on(\w+)\s*=\s*["'][^"']*["']/gi,
     (_, eventName) => ` data-removed-${eventName}`
   );
 
-  // 3. Remove dangerous URL protocols
+  // 5. Remove dangerous URL protocols
   // First decode HTML entities to catch encoded protocols
   const hrefMatch = sanitized.match(/href\s*=\s*["']([^"']*)["']/gi);
   if (hrefMatch) {
-    hrefMatch.forEach(match => {
+    for (const match of hrefMatch) {
       const decoded = decodeHtmlEntities(match);
       const decodedLower = decoded.toLowerCase();
       if (decodedLower.includes('javascript:') ||
@@ -66,11 +75,10 @@ function sanitizeHtml(html: string): string {
           decodedLower.includes('data:')) {
         sanitized = sanitized.replace(match, 'href="removed:"');
       }
-    });
+    }
   }
 
-  // Also handle direct (non-encoded) dangerous protocols
-  // Use more robust pattern that handles whitespace/newlines between characters
+  // Handle direct (non-encoded) dangerous protocols with whitespace
   sanitized = sanitized
     .replace(/j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:')
     .replace(/v\s*b\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:')
