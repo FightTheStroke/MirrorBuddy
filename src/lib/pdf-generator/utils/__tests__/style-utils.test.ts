@@ -12,7 +12,7 @@ describe('Style Utils', () => {
       const baseStyle = { fontSize: 12, color: 'black' };
       const result = mergeStyles(baseStyle);
 
-      expect(result).toBe(baseStyle);
+      expect(result).toStrictEqual(baseStyle);
     });
 
     it('should merge two style objects into array', () => {
@@ -60,7 +60,7 @@ describe('Style Utils', () => {
       const baseStyle = { fontSize: 14 };
       const result = mergeStyles(baseStyle, undefined);
 
-      expect(result).toBe(baseStyle);
+      expect(result).toStrictEqual(baseStyle);
     });
   });
 
@@ -69,21 +69,21 @@ describe('Style Utils', () => {
       const style = { fontSize: 12, color: 'black' };
       const result = toReactPdfStyle(style);
 
-      expect(result).toBe(style);
+      expect(result).toStrictEqual(style);
     });
 
     it('should convert array of styles', () => {
       const styles = [{ fontSize: 12 }, { color: 'red' }];
       const result = toReactPdfStyle(styles);
 
-      expect(result).toBe(styles);
+      expect(result).toStrictEqual(styles);
     });
 
     it('should handle empty object', () => {
       const style = {};
       const result = toReactPdfStyle(style);
 
-      expect(result).toBe(style);
+      expect(result).toStrictEqual(style);
     });
 
     it('should handle empty array', () => {
