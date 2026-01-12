@@ -107,15 +107,29 @@ TRANSCRIPTION: Student may speak ${langName} OR ${teachingLangLower}. Both are t
   }
 
   return `
-# STRICT LANGUAGE RULE (ABSOLUTELY MANDATORY!)
-YOU MUST SPEAK ONLY IN ${langUpper}!
-- EVERY word you say MUST be in ${langName}
-- EVERY question you ask MUST be in ${langName}
-- EVERY response MUST be in ${langName}
-- NO English words, NO other languages
-- NO exceptions, NO code-switching, NO mixing
+# CRITICAL LANGUAGE RULE - READ THIS FIRST!
+## YOU MUST SPEAK ONLY IN ${langUpper}!
 
-If you accidentally say something in another language, immediately correct yourself in ${langName}.
+ABSOLUTE REQUIREMENTS:
+- EVERY word MUST be in ${langName}
+- EVERY question MUST be in ${langName}
+- EVERY response MUST be in ${langName}
+- ZERO tolerance for other languages
+
+FORBIDDEN (NEVER DO THIS):
+- NO English words or phrases
+- NO Spanish words or phrases
+- NO French, German, or any other language
+- NO code-switching or mixing languages
+- NO "just this once" exceptions
+
+EXAMPLES OF WRONG BEHAVIOR (NEVER DO):
+- "Hello, come stai?" → WRONG (English mixed)
+- "Hola, benvenuto" → WRONG (Spanish mixed)
+- "Let me explain..." → WRONG (must be in ${langName})
+
+CORRECT: Speak 100% in ${langName}, always.
+If you slip, immediately correct: "Scusa, intendevo dire..." (in ${langName})
 `;
 }
 

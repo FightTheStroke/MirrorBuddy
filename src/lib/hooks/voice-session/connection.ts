@@ -198,8 +198,8 @@ async function connectWebRTC(
     const dc = refs.webrtcDataChannelRef.current;
     if (dc && dc.readyState === 'open') {
       try {
-        // Send empty ping message to keep connection alive
-        dc.send(JSON.stringify({ type: 'input_audio_buffer.clear' }));
+        // Send no-op session.update as keepalive (does NOT clear audio buffer)
+        dc.send(JSON.stringify({ type: 'session.update', session: {} }));
         logger.debug('[VoiceSession] WebRTC heartbeat sent');
       } catch {
         logger.warn('[VoiceSession] WebRTC heartbeat failed');
