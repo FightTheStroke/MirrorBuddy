@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Budget limit exceeded',
-          message: `Hai raggiunto il limite di budget di $${userSettings.budgetLimit.toFixed(2)}.`,
+          message: `You have reached your budget limit of $${userSettings.budgetLimit.toFixed(2)}.`,
           fallback: '/api/chat',
         },
         { status: 402 }
@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: sanitized })}\n\n`));
               }
             } else if (chunk.type === 'content_filter') {
-              const msg = 'Mi dispiace, non posso rispondere a questa domanda.';
+              const msg = 'I cannot respond to this request due to content filtering.';
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: msg, filtered: true })}\n\n`));
             } else if (chunk.type === 'usage' && chunk.usage) {
               totalTokens = chunk.usage.total_tokens;

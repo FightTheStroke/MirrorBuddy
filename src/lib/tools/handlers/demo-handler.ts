@@ -11,6 +11,8 @@ import { chatCompletion } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
 import type { DemoData, ToolExecutionResult } from '@/types/tools';
 import { DANGEROUS_JS_PATTERNS } from './demo-handler/constants';
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
 function validateCode(code: string): { safe: boolean; violations: string[] } {
   const violations: string[] = [];
@@ -22,69 +24,25 @@ function validateCode(code: string): { safe: boolean; violations: string[] } {
   return { safe: violations.length === 0, violations };
 }
 
-function decodeHtmlEntities(str: string): string {
-  // Decode numeric HTML entities (&#106; or &#x6A;)
-  return str
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
-}
+// Create DOMPurify instance for server-side sanitization
+const window = new JSDOM('').window;
+const purify = DOMPurify(window);
 
+// Configure DOMPurify to be strict about XSS prevention
+const PURIFY_CONFIG = {
+  FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+  ALLOW_DATA_ATTR: false,
+  USE_PROFILES: { html: true },
+};
+
+/**
+ * Sanitize HTML using DOMPurify - battle-tested XSS prevention
+ * Removes script tags, event handlers, and dangerous protocols
+ */
 function sanitizeHtml(html: string): string {
   if (!html) return '';
-
-  let sanitized = html;
-
-  // 1. Normalize: collapse whitespace within potential script tags to defeat obfuscation
-  // e.g., "< s c r i p t >" -> "<script>"
-  sanitized = sanitized.replace(/<[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t/gi, '<script');
-  sanitized = sanitized.replace(/<[\s]*\/[\s]*s[\s]*c[\s]*r[\s]*i[\s]*p[\s]*t/gi, '</script');
-
-  // 2. Remove <script> tags - apply iteratively to handle nested/recursive injection
-  // Pattern handles variations like <script>, <SCRIPT>, <script attr>, etc.
-  // SAFETY: Loop continues until no changes + line below escapes ANY remaining <script
-  let previousLength: number;
-  do {
-    previousLength = sanitized.length;
-    // Remove complete script tags with content (codeql[js/incomplete-sanitization] false positive: see loop + final escape below)
-    sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script[^>]*>/gi, '');
-    // Remove unclosed script tags AND everything after (fail-safe)
-    sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*$/gi, '');
-    // Remove orphaned closing script tags (handles </script>, </script foo>, etc.)
-    sanitized = sanitized.replace(/<\/script[^>]*>/gi, '');
-  } while (sanitized.length < previousLength);
-
-  // 3. ABSOLUTE SAFETY: escape any remaining <script substring to &lt;script
-  // This is the definitive defense - even if loop missed something, this catches it
-  sanitized = sanitized.replace(/<script/gi, '&lt;script');
-
-  // 4. Remove event handlers (onclick, onload, onerror, onmouseover, etc.)
-  sanitized = sanitized.replace(
-    /\s+on(\w+)\s*=\s*["'][^"']*["']/gi,
-    (_, eventName) => ` data-removed-${eventName}`
-  );
-
-  // 5. Remove dangerous URL protocols
-  // First decode HTML entities to catch encoded protocols
-  const hrefMatch = sanitized.match(/href\s*=\s*["']([^"']*)["']/gi);
-  if (hrefMatch) {
-    for (const match of hrefMatch) {
-      const decoded = decodeHtmlEntities(match);
-      const decodedLower = decoded.toLowerCase();
-      if (decodedLower.includes('javascript:') ||
-          decodedLower.includes('vbscript:') ||
-          decodedLower.includes('data:')) {
-        sanitized = sanitized.replace(match, 'href="removed:"');
-      }
-    }
-  }
-
-  // Handle direct (non-encoded) dangerous protocols with whitespace
-  sanitized = sanitized
-    .replace(/j\s*a\s*v\s*a\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:')
-    .replace(/v\s*b\s*s\s*c\s*r\s*i\s*p\s*t\s*:/gi, 'removed:')
-    .replace(/href\s*=\s*["']data:[^"']*["']/gi, 'href="removed:"');
-
-  return sanitized;
+  return purify.sanitize(html, PURIFY_CONFIG);
 }
 
 /**
