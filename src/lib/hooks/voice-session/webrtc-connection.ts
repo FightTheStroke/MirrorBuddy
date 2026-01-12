@@ -38,6 +38,7 @@ export class WebRTCConnection {
       this.mediaStream = await this.getUserMedia();
       this.peerConnection = this.createPeerConnection();
       this.addAudioTracks();
+      this.createDataChannel(); // Must be BEFORE offer per Azure docs
       const offer = await this.createOffer();
       await this.exchangeSDP(token, offer);
       await this.waitForConnection();
@@ -103,14 +104,20 @@ export class WebRTCConnection {
       if (!event.candidate) logger.debug('[WebRTC] ICE gathering complete');
     };
     pc.ontrack = (event) => this.config.onTrack?.(event);
-    pc.ondatachannel = (event) => this.attachDataChannel(event.channel);
-
-    // Create data channel for sending commands to Azure (client-initiated)
-    const dc = pc.createDataChannel('oai-events', { ordered: true });
-    this.attachDataChannel(dc);
-    logger.debug('[WebRTC] Data channel created (client-initiated)');
+    // Note: Data channel is client-initiated, not server-initiated for Azure WebRTC
 
     return pc;
+  }
+
+  /**
+   * Create data channel with label 'realtime-channel' per Azure docs
+   * Must be called BEFORE createOffer()
+   */
+  private createDataChannel(): void {
+    if (!this.peerConnection) throw new Error('PeerConnection not initialized');
+    logger.debug('[WebRTC] Creating data channel with label "realtime-channel"');
+    const channel = this.peerConnection.createDataChannel('realtime-channel');
+    this.attachDataChannel(channel);
   }
 
   private attachDataChannel(channel: RTCDataChannel): void {
