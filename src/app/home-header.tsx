@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { PomodoroHeaderWidget } from '@/components/pomodoro';
 import { AmbientAudioHeaderWidget } from '@/components/ambient-audio';
+import { CalculatorHeaderWidget } from '@/components/calculator';
 
 interface HomeHeaderProps {
   sidebarOpen: boolean;
@@ -104,8 +105,9 @@ export function HomeHeader({
         )}
       </div>
 
-      {/* Right section: ambient audio + pomodoro + notifications + version */}
+      {/* Right section: calculator + ambient audio + pomodoro + notifications + version */}
       <div className="flex items-center gap-3">
+        <CalculatorHeaderWidget />
         <AmbientAudioHeaderWidget />
         <PomodoroHeaderWidget />
         <NotificationBell />

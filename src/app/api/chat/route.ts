@@ -16,7 +16,7 @@ import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
 import { executeToolCall } from '@/lib/tools/tool-executor';
 import { loadPreviousContext } from '@/lib/conversation/memory-loader';
 import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
-import { findSimilarMaterials } from '@/lib/rag/retrieval-service';
+import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/retrieval-service';
 import { saveTool } from '@/lib/tools/tool-persistence';
 import { functionNameToToolType } from '@/types/tools';
 // Import handlers to register them
@@ -147,10 +147,11 @@ export async function POST(request: NextRequest) {
     // Get last user message for safety filtering and RAG
     const lastUserMessage = messages.filter(m => m.role === 'user').pop();
 
-    // Wave 4: RAG context injection - find relevant materials for the conversation
+    // Wave 4: RAG context injection - find relevant materials and study kits
     let hasRAG = false;
     if (userId && lastUserMessage) {
       try {
+        // Search in materials (generated content)
         const relevantMaterials = await findSimilarMaterials({
           userId,
           query: lastUserMessage.content,
@@ -158,8 +159,20 @@ export async function POST(request: NextRequest) {
           minSimilarity: 0.6,
         });
 
-        if (relevantMaterials.length > 0) {
-          const ragContext = relevantMaterials
+        // Search in study kits (original document content)
+        const relatedStudyKits = await findRelatedConcepts({
+          userId,
+          query: lastUserMessage.content,
+          limit: 3,
+          minSimilarity: 0.5,
+          includeFlashcards: false,
+          includeStudykits: true,
+        });
+
+        const allResults = [...relevantMaterials, ...relatedStudyKits];
+
+        if (allResults.length > 0) {
+          const ragContext = allResults
             .map((m) => `- ${m.content}`)
             .join('\n');
           enhancedSystemPrompt = `${enhancedSystemPrompt}\n\n[Materiali rilevanti dello studente]\n${ragContext}`;
@@ -167,7 +180,8 @@ export async function POST(request: NextRequest) {
           logger.debug('RAG context injected', {
             userId,
             materialCount: relevantMaterials.length,
-            topSimilarity: relevantMaterials[0]?.similarity,
+            studyKitCount: relatedStudyKits.length,
+            topSimilarity: allResults[0]?.similarity,
           });
         }
       } catch (ragError) {
