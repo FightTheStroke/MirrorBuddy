@@ -260,8 +260,8 @@ async function main() {
     if (totalErrors === 0 && totalMigrated === totalSource - totalSkipped) {
       console.log('\n✅ Migration completed successfully!');
       console.log('\nNext steps:');
-      console.log('  1. Run pgvector migration: psql $DATABASE_URL -f prisma/migrations/pgvector/001_enable_pgvector.sql');
-      console.log('  2. Verify data: SELECT COUNT(*) FROM "User";');
+      console.log('  1. Verify data: SELECT COUNT(*) FROM "User";');
+      console.log('  2. Run prisma migrate: npx prisma migrate deploy');
     } else {
       console.log('\n⚠️  Migration completed with some issues');
     }
