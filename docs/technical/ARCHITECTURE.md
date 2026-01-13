@@ -46,7 +46,7 @@ flowchart TB
 
     subgraph Data["Data Layer"]
         Prisma[(Prisma ORM)]
-        DB[(SQLite/PostgreSQL)]
+        DB[(PostgreSQL + pgvector)]
     end
 
     UI --> Stores
@@ -76,7 +76,7 @@ MirrorBuddy is a Next.js 14 application providing AI tutoring for K-12 students 
 | Frontend | Next.js 14, React 18, TypeScript |
 | Styling | Tailwind CSS, Radix UI |
 | State | Zustand (no persist, API-synced) |
-| Database | Prisma + SQLite (dev) / PostgreSQL (prod) |
+| Database | Prisma + PostgreSQL + pgvector (ADR 0028) |
 | AI | Azure OpenAI (primary), Ollama (fallback) |
 | Voice | Azure Realtime API (WebRTC) |
 | Audio | Web Audio API (procedural generation) |
