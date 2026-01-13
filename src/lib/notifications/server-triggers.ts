@@ -78,7 +78,7 @@ export const serverNotifications = {
       userId,
       type: 'level_up',
       title: `Livello ${newLevel} raggiunto!`,
-      message: `Sei diventato "${title}". Continua cosi per salire ancora!`,
+      message: `Sei diventato "${title}". Continua così per salire ancora!`,
       actionUrl: '/progressi',
       metadata: { level: newLevel, title },
     });
@@ -92,7 +92,7 @@ export const serverNotifications = {
     if (!milestones.includes(days)) return;
 
     const messages: Record<number, string> = {
-      3: 'Ottimo inizio! Continua cosi!',
+      3: 'Ottimo inizio! Continua così!',
       7: 'Una settimana intera! Sei fantastico!',
       14: 'Due settimane di studio! Incredibile!',
       30: 'Un mese di impegno costante! Sei un campione!',

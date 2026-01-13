@@ -221,10 +221,10 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
             </div>
             <p className="text-center text-sm text-slate-500 mt-2">
               {(usageStats?.engagementScore ?? 0) >= 70
-                ? 'Ottimo! Continua cosi!'
+                ? 'Ottimo! Continua così!'
                 : (usageStats?.engagementScore ?? 0) >= 40
                   ? 'Buon inizio, puoi migliorare!'
-                  : 'Studia di piu per aumentare il punteggio'}
+                  : 'Studia di più per aumentare il punteggio'}
             </p>
           </CardContent>
         </Card>
