@@ -231,6 +231,7 @@ function getToolTypeFromFunctionName(functionName: string): ToolType {
     student_summary_add_comment: 'summary',
     create_formula: 'formula',
     create_chart: 'chart',
+    create_calculator: 'calculator',
   };
   return mapping[functionName] || 'mindmap';
 }

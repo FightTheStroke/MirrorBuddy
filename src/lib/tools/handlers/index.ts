@@ -13,6 +13,7 @@ import './summary-handler';
 import './diagram-handler';
 import './timeline-handler';
 import './archive-handler';
+import './calculator-handler';
 
 // Re-export utilities for testing
 export { generateMarkdownFromNodes } from './mindmap-handler';
@@ -23,3 +24,4 @@ export { validateCards } from './flashcard-handler';
 export { validateSections } from './summary-handler';
 export { validateMermaidCode } from './diagram-handler';
 export { validateEvents } from './timeline-handler';
+export { validateExpression, generateSteps } from './calculator-handler';

@@ -11,6 +11,7 @@ export const TOOL_PROMPTS: Record<ToolType, string> = {
   timeline: 'Crea una linea del tempo',
   summary: 'Crea un riassunto',
   formula: 'Mostra la formula',
+  calculator: 'Calcola questa espressione',
   chart: 'Crea un grafico',
   pdf: 'Analizza il PDF',
   homework: 'Aiutami con i compiti',
