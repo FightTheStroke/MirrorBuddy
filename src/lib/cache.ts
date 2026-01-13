@@ -111,4 +111,8 @@ export const CACHE_TTL = {
   SETTINGS: 5 * 60 * 1000,
   /** Session data: 1 minute (changes frequently) */
   SESSION: 1 * 60 * 1000,
+  /** Achievement definitions: 1 hour (static data) */
+  ACHIEVEMENTS: 60 * 60 * 1000,
+  /** Version info: 1 hour (static per deployment) */
+  VERSION: 60 * 60 * 1000,
 } as const;
