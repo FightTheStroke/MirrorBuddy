@@ -38,10 +38,11 @@ export async function POST(request: NextRequest) {
       where.subject = subject;
     }
 
-    // Search in title and topic
+    // Search in title and searchableText (SQLite fallback)
+    // Note: PostgreSQL full-text search uses searchableTextVector derived from searchableText
     const orConditions = query ? [
       { title: { contains: query, mode: 'insensitive' as const } },
-      { topic: { contains: query, mode: 'insensitive' as const } },
+      { searchableText: { contains: query, mode: 'insensitive' as const } },
     ] : undefined;
 
     const materials = await prisma.material.findMany({
