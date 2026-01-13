@@ -135,6 +135,12 @@ export type {
   // Timeline
   TimelineEvent,
   TimelineData,
+  // Calculator
+  CalculatorMode,
+  CalculatorRequest,
+  CalculatorStep,
+  CalculatorData,
+  CalculatorEventType,
   // Tool requests
   QuizRequest,
   FlashcardDeckRequest,
