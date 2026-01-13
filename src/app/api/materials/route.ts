@@ -112,19 +112,26 @@ export async function GET(request: NextRequest) {
       const total = Number(countResult[0]?.count || 0);
 
       // Fetch collections and tags for the materials
+      // Skip unnecessary queries if no materials found
       const materialIds = materials.map(m => m.id);
-      const collections = await prisma.collection.findMany({
-        where: { id: { in: materials.map(m => m.collectionId).filter(Boolean) as string[] } },
-        select: { id: true, name: true, color: true },
-      });
-      const materialTags = await prisma.materialTag.findMany({
-        where: { materialId: { in: materialIds } },
-        include: { tag: { select: { id: true, name: true, color: true } } },
-      });
+      const collectionIds = materials.map(m => m.collectionId).filter(Boolean) as string[];
+
+      const collections = collectionIds.length > 0
+        ? await prisma.collection.findMany({
+            where: { id: { in: collectionIds } },
+            select: { id: true, name: true, color: true },
+          })
+        : [];
+      const materialTags = materialIds.length > 0
+        ? await prisma.materialTag.findMany({
+            where: { materialId: { in: materialIds } },
+            include: { tag: { select: { id: true, name: true, color: true } } },
+          })
+        : [];
 
       // Build collection and tag maps
       const collectionMap = new Map(collections.map(c => [c.id, c]));
-      const tagsMap = new Map<string, Array<{ id: string; name: string; color: string }>>();
+      const tagsMap = new Map<string, Array<{ id: string; name: string; color: string | null }>>();
       for (const mt of materialTags) {
         if (!tagsMap.has(mt.materialId)) {
           tagsMap.set(mt.materialId, []);
