@@ -141,6 +141,7 @@ npm run dev
 Open http://localhost:3000 and start learning.
 
 **→ See full setup guide: [SETUP.md](SETUP.md)**
+**→ Having issues? Check: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
 
 ---
 
@@ -222,6 +223,7 @@ print(f'Last 7 days: \${result.total_cost:.2f}')
 |----------|-------------|
 | [FEATURES.md](FEATURES.md) | Comprehensive feature documentation |
 | [SETUP.md](SETUP.md) | Installation and configuration guide |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture details |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [CLAUDE.md](CLAUDE.md) | Developer quick reference |
