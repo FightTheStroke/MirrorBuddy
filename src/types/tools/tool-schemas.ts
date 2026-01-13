@@ -366,7 +366,7 @@ NON scrivere codice HTML/CSS/JS - descrivi solo l'idea creativa!`,
   {
     type: 'function' as const,
     function: {
-      name: 'calculator',
+      name: 'create_calculator',
       description: 'Calcola espressioni matematiche. Usa quando lo studente ha bisogno di risolvere calcoli, verificare operazioni, o fare matematica rapida.',
       parameters: {
         type: 'object',
