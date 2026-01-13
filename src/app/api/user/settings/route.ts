@@ -7,29 +7,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { getOrCompute, del, CACHE_TTL } from '@/lib/cache';
-
-// #92: Zod schema for settings validation
-const SettingsUpdateSchema = z.object({
-  theme: z.enum(['light', 'dark', 'system']).optional(),
-  language: z.string().max(10).optional(),
-  accentColor: z.string().max(20).optional(),
-  provider: z.enum(['azure', 'ollama']).optional(),  // #89: Only valid providers
-  model: z.string().max(50).optional(),
-  budgetLimit: z.number().min(0).max(10000).optional(),
-  totalSpent: z.number().min(0).optional(),  // #88: Now accepted
-  // Accessibility
-  fontSize: z.enum(['small', 'medium', 'large', 'extra-large']).optional(),
-  highContrast: z.boolean().optional(),
-  dyslexiaFont: z.boolean().optional(),
-  reducedMotion: z.boolean().optional(),
-  voiceEnabled: z.boolean().optional(),
-  simplifiedLanguage: z.boolean().optional(),
-  adhdMode: z.boolean().optional(),
-}).strict();  // Reject unknown fields
+import { SettingsUpdateSchema } from '@/lib/validation/schemas/user';
 
 export async function GET() {
   try {

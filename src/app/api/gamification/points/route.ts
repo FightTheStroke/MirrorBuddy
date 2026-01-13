@@ -9,6 +9,8 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { awardPoints, getOrCreateGamification, checkAchievements } from '@/lib/gamification/db';
 import { logger } from '@/lib/logger';
+import { validateJsonRequest } from '@/lib/validation/middleware';
+import { AwardPointsRequestSchema } from '@/lib/validation/schemas/gamification';
 
 export async function GET() {
   try {
@@ -55,15 +57,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { points, reason, sourceId, sourceType } = body;
-
-    if (!points || !reason) {
-      return NextResponse.json(
-        { error: 'Missing required fields: points, reason' },
-        { status: 400 }
-      );
+    // Validate request body
+    const validation = await validateJsonRequest(request, AwardPointsRequestSchema);
+    if (!validation.success) {
+      return validation.response;
     }
+
+    const { points, reason, sourceId, sourceType } = validation.data;
 
     const result = await awardPoints(userId, points, reason, sourceId, sourceType);
 

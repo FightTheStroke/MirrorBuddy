@@ -7,15 +7,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
-
-// Zod schema for update validation
-const UpdateTagSchema = z.object({
-  name: z.string().min(1).max(50).transform(s => s.toLowerCase().trim()).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).nullable().optional(),
-});
+import { UpdateTagSchema } from '@/lib/validation/schemas/organization';
 
 type RouteParams = { params: Promise<{ id: string }> };
 

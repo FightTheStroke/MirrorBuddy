@@ -8,6 +8,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import {
+  SessionsGetQuerySchema,
+  SessionsPostSchema,
+  SessionsPatchSchema,
+} from '@/lib/validation/schemas/progress';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,8 +24,26 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const maestroId = searchParams.get('maestroId');
+    const rawLimit = searchParams.get('limit');
+    const rawMaestroId = searchParams.get('maestroId');
+
+    // Validate query parameters
+    const validation = SessionsGetQuerySchema.safeParse({
+      limit: rawLimit ? parseInt(rawLimit) : undefined,
+      maestroId: rawMaestroId || undefined,
+    });
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid query parameters',
+          details: validation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
+    }
+
+    const { limit, maestroId } = validation.data;
 
     const sessions = await prisma.studySession.findMany({
       where: {
@@ -50,14 +73,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const body = await request.json();
 
-    if (!data.maestroId || !data.subject) {
+    // Validate request body
+    const validation = SessionsPostSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'maestroId and subject are required' },
+        {
+          error: 'Invalid session data',
+          details: validation.error.issues.map(i => i.message),
+        },
         { status: 400 }
       );
     }
+
+    const data = validation.data;
 
     const session = await prisma.studySession.create({
       data: {
@@ -87,14 +117,21 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const body = await request.json();
 
-    if (!data.id) {
+    // Validate request body
+    const validation = SessionsPatchSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Session id is required' },
+        {
+          error: 'Invalid session update data',
+          details: validation.error.issues.map(i => i.message),
+        },
         { status: 400 }
       );
     }
+
+    const data = validation.data;
 
     // Verify session belongs to user
     const existingSession = await prisma.studySession.findFirst({

@@ -11,6 +11,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { StudyKit } from '@/types/study-kit';
+import { ListStudyKitsQuerySchema } from '@/lib/validation/schemas/study-kit';
 
 /**
  * GET /api/study-kit
@@ -29,16 +30,23 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Get query params
+    // Get and validate query params
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const subject = searchParams.get('subject');
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const offset = parseInt(searchParams.get('offset') || '0', 10);
+    const queryParams = Object.fromEntries(searchParams.entries());
+
+    const validation = ListStudyKitsQuerySchema.safeParse(queryParams);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid query parameters', details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const { status, subject, limit = 50, offset = 0 } = validation.data;
 
     // Build where clause
     const where: Record<string, unknown> = { userId };
-    if (status && ['processing', 'ready', 'error'].includes(status)) {
+    if (status) {
       where.status = status;
     }
     if (subject) {
@@ -50,7 +58,7 @@ export async function GET(request: NextRequest) {
       prisma.studyKit.findMany({
         where,
         orderBy: { createdAt: 'desc' },
-        take: Math.min(limit, 100),
+        take: limit,
         skip: offset,
       }),
       prisma.studyKit.count({ where }),
