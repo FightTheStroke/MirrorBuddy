@@ -4,11 +4,15 @@ import { cn } from '@/lib/utils';
 
 interface SkeletonProps {
   className?: string;
+  'aria-label'?: string;
 }
 
-export function Skeleton({ className }: SkeletonProps) {
+export function Skeleton({ className, 'aria-label': ariaLabel }: SkeletonProps) {
+  // Base skeleton is presentational only - ARIA attributes should be on containers
+  // to avoid redundant announcements when nested
   return (
     <div
+      aria-hidden="true"
       className={cn(
         'animate-pulse rounded-md bg-slate-200 dark:bg-slate-700',
         className
@@ -18,8 +22,13 @@ export function Skeleton({ className }: SkeletonProps) {
 }
 
 export function ViewSkeleton() {
+  // role="status" implies aria-live="polite" - no need for aria-busy
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div
+      className="space-y-6 animate-in fade-in duration-300"
+      role="status"
+      aria-label="Caricamento pagina in corso"
+    >
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />
@@ -37,8 +46,13 @@ export function ViewSkeleton() {
 }
 
 export function SessionSkeleton() {
+  // role="status" implies aria-live="polite" - no need for aria-busy
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      role="status"
+      aria-label="Caricamento sessione in corso"
+    >
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 w-full max-w-2xl mx-4 shadow-2xl">
         <div className="flex items-center justify-center gap-4 mb-6">
           <Skeleton className="h-16 w-16 rounded-full" />
