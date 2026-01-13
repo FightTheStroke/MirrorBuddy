@@ -204,10 +204,17 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'All notifications marked as read' });
     }
 
-    // notificationIds is guaranteed to exist by schema validation
+    // notificationIds is guaranteed to exist by schema validation when markAllRead is false
+    if (!notificationIds || notificationIds.length === 0) {
+      return NextResponse.json(
+        { error: 'notificationIds required when markAllRead is false' },
+        { status: 400 }
+      );
+    }
+
     await prisma.notification.updateMany({
       where: {
-        id: { in: notificationIds! },
+        id: { in: notificationIds },
         userId, // Ensure user owns these notifications
       },
       data: { read: true },

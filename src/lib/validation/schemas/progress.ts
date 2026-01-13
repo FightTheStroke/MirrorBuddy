@@ -6,7 +6,6 @@ import { z } from 'zod';
 import {
   MaestroId,
   NonNegativeInt,
-  PositiveInt,
   IsoDateString,
   NonEmptyString,
   OptionalString,
