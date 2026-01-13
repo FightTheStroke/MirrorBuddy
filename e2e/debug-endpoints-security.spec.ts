@@ -67,7 +67,7 @@ test.describe('Debug Endpoints: Development Access', () => {
 test.describe('Debug Endpoints: Security Implementation', () => {
   test('endpoints have production protection code in place', async ({ request }) => {
     // This test verifies that the endpoints exist and respond correctly
-    // The actual NODE_ENV check returns 403 in production, which is tested manually
+    // The actual NODE_ENV check returns 404 in production (to hide endpoint existence)
     // Here we verify the endpoints are functional and have the protection implemented
 
     const configResponse = await request.get('/api/debug/config');
