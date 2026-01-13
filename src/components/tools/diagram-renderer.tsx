@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import mermaid from 'mermaid';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { DiagramRequest } from '@/types';
+// Using default import to enable typeof on the ref
+import mermaidAPI from 'mermaid';
 
-// Initialize Mermaid
-mermaid.initialize({
+// Mermaid configuration
+const MERMAID_CONFIG = {
   startOnLoad: false,
   theme: 'dark',
   themeVariables: {
@@ -37,7 +38,7 @@ mermaid.initialize({
     noteMargin: 10,
     messageMargin: 35,
   },
-});
+} as const;
 
 interface DiagramRendererProps {
   request: DiagramRequest;
@@ -48,6 +49,9 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const mermaidRef = useRef<typeof mermaidAPI | null>(null);
+  const loadingPromiseRef = useRef<Promise<typeof mermaidAPI> | null>(null);
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -56,6 +60,18 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       try {
         setError(null);
         setRendered(false);
+        setIsLoading(true);
+
+        // Lazy load mermaid library with race condition protection
+        if (!mermaidRef.current) {
+          if (!loadingPromiseRef.current) {
+            loadingPromiseRef.current = import('mermaid').then((module) => {
+              module.default.initialize(MERMAID_CONFIG);
+              return module.default;
+            });
+          }
+          mermaidRef.current = await loadingPromiseRef.current;
+        }
 
         // Clear previous content
         containerRef.current.innerHTML = '';
@@ -64,7 +80,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         const id = `mermaid-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
 
         // Render diagram
-        const { svg } = await mermaid.render(id, request.code);
+        const { svg } = await mermaidRef.current.render(id, request.code);
 
         if (containerRef.current) {
           containerRef.current.innerHTML = svg;
@@ -74,6 +90,8 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         const errorMsg = err instanceof Error ? err.message : String(err);
         setError(errorMsg);
         logger.error('Mermaid render error', { error: String(err) });
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -107,7 +125,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
             ref={containerRef}
             className={cn(
               'flex justify-center items-center min-h-[200px]',
-              !rendered && 'animate-pulse bg-slate-700/50 rounded-lg'
+              (isLoading || !rendered) && 'animate-pulse bg-slate-700/50 rounded-lg'
             )}
           />
         )}
