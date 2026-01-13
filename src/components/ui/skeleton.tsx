@@ -8,11 +8,11 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ className, 'aria-label': ariaLabel }: SkeletonProps) {
+  // Base skeleton is presentational only - ARIA attributes should be on containers
+  // to avoid redundant announcements when nested
   return (
     <div
-      role="status"
-      aria-busy="true"
-      aria-label={ariaLabel || 'Caricamento in corso'}
+      aria-hidden="true"
       className={cn(
         'animate-pulse rounded-md bg-slate-200 dark:bg-slate-700',
         className
@@ -22,11 +22,11 @@ export function Skeleton({ className, 'aria-label': ariaLabel }: SkeletonProps) 
 }
 
 export function ViewSkeleton() {
+  // role="status" implies aria-live="polite" - no need for aria-busy
   return (
     <div
       className="space-y-6 animate-in fade-in duration-300"
       role="status"
-      aria-busy="true"
       aria-label="Caricamento pagina in corso"
     >
       <div className="flex items-center justify-between">
@@ -46,11 +46,11 @@ export function ViewSkeleton() {
 }
 
 export function SessionSkeleton() {
+  // role="status" implies aria-live="polite" - no need for aria-busy
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       role="status"
-      aria-busy="true"
       aria-label="Caricamento sessione in corso"
     >
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 w-full max-w-2xl mx-4 shadow-2xl">
