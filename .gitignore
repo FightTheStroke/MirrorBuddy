@@ -72,5 +72,3 @@ __pycache__/
 
 # Auto Claude data directory
 .auto-claude/
-verification-report.txt
-*.report.txt
