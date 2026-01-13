@@ -6,7 +6,9 @@
  */
 
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { FileText, BookmarkCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { TOOL_ICONS, TOOL_LABELS, type FilterType } from './constants';
 
 interface EmptyStateProps {
@@ -14,6 +16,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ filter }: EmptyStateProps) {
+  const router = useRouter();
   const Icon = filter === 'all'
     ? FileText
     : filter === 'bookmarked'
@@ -37,10 +40,16 @@ export function EmptyState({ filter }: EmptyStateProps) {
       <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
         Nessun {label} salvato
       </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md">
+      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mb-4">
         I materiali creati durante le tue sessioni di studio appariranno qui.
         Inizia una conversazione con un Professore per creare nuovi contenuti!
       </p>
+      <Button
+        onClick={() => router.push('/')}
+        className="bg-primary hover:bg-primary/90 text-white"
+      >
+        Inizia una Conversazione
+      </Button>
     </motion.div>
   );
 }
