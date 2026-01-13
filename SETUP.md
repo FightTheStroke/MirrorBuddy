@@ -176,6 +176,8 @@ npm run test         # Run Playwright E2E tests
 
 ## Troubleshooting
 
+**Quick Fixes:**
+
 **Voice Not Working:** Verify Azure Realtime credentials, check deployment name, ensure `gpt-4o-realtime-preview` in region, check mic permissions, Settings → Diagnostics.
 
 **Build Errors:** `rm -rf .next node_modules package-lock.json && npm install && npx prisma generate && npm run build`
@@ -183,6 +185,8 @@ npm run test         # Run Playwright E2E tests
 **Ollama Failed:** Verify `ollama serve` running, check `OLLAMA_URL`, test `curl http://localhost:11434/api/tags`, ensure `ollama pull llama3.2`.
 
 **Database Errors:** `npx prisma generate && npx prisma db push` (or `npx prisma migrate reset` if needed)
+
+**→ For detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
 
 ---
 
@@ -204,4 +208,4 @@ CMD ["npm", "start"]
 
 ---
 
-**See also:** [FEATURES.md](FEATURES.md) | [ARCHITECTURE.md](ARCHITECTURE.md) | [CONTRIBUTING.md](CONTRIBUTING.md)
+**See also:** [FEATURES.md](FEATURES.md) | [ARCHITECTURE.md](ARCHITECTURE.md) | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | [CONTRIBUTING.md](CONTRIBUTING.md)
