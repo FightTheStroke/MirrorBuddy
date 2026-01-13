@@ -16,6 +16,7 @@ Reference files with `@docs/claude/filename.md` in conversation.
 | `coaches.md` | 5 Learning Coaches definitions |
 | `conversation-memory.md` | Memory injection, context management |
 | `database.md` | Prisma schema, models, relations |
+| `gamification.md` | XP, MirrorBucks, achievements, seasons |
 | `knowledge-hub.md` | Materials, collections, search |
 | `learning-path.md` | Progressive learning paths, topic analysis |
 | `mirrorbuddy.md` | Triangle of Support, character routing |
