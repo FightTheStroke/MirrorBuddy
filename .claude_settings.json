@@ -1,0 +1,39 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Read(./**)",
+      "Write(./**)",
+      "Edit(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Read(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Write(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Edit(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Glob(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Grep(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Read(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/.auto-claude/specs/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Write(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/.auto-claude/specs/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Edit(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/worktrees/tasks/008-create-troubleshooting-md-for-common-development-i/.auto-claude/specs/008-create-troubleshooting-md-for-common-development-i/**)",
+      "Read(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/**)",
+      "Write(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/**)",
+      "Edit(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/**)",
+      "Glob(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/**)",
+      "Grep(/Users/roberdan/GitHub/MirrorBuddy/.auto-claude/**)",
+      "Bash(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__context7__resolve-library-id(*)",
+      "mcp__context7__get-library-docs(*)",
+      "mcp__graphiti-memory__search_nodes(*)",
+      "mcp__graphiti-memory__search_facts(*)",
+      "mcp__graphiti-memory__add_episode(*)",
+      "mcp__graphiti-memory__get_episodes(*)",
+      "mcp__graphiti-memory__get_entity_edge(*)"
+    ]
+  }
+}
