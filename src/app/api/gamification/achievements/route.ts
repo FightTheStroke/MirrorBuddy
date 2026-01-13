@@ -9,7 +9,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { getOrCreateGamification, checkAchievements } from '@/lib/gamification/db';
 import { logger } from '@/lib/logger';
-import { getOrCompute, CACHE_TTL } from '@/lib/cache';
+import { getOrCompute, CACHE_TTL, getCacheControlHeader } from '@/lib/cache';
 
 export async function GET() {
   try {
@@ -62,12 +62,24 @@ export async function GET() {
       a => !a.isSecret || a.unlocked
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       achievements: visibleAchievements,
       totalUnlocked: achievements.filter(a => a.unlocked).length,
       totalAchievements: allAchievements.length,
     });
+
+    // Add Cache-Control header with stale-while-revalidate
+    response.headers.set(
+      'Cache-Control',
+      getCacheControlHeader({
+        ttl: 60000, // 1 minute cache
+        visibility: 'private', // User-specific data
+        staleWhileRevalidate: 300000, // 5 minutes stale-while-revalidate
+      })
+    );
+
+    return response;
   } catch (error) {
     logger.error('Failed to get achievements', { error: String(error) });
     return NextResponse.json(
