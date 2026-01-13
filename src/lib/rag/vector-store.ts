@@ -140,7 +140,16 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
   const results: VectorSearchResult[] = [];
 
   for (const emb of embeddings) {
-    if (!emb.vector) continue;
+    // Skip embeddings with null vectors
+    if (!emb.vector) {
+      logger.warn('[VectorStore] Skipping embedding with null vector', {
+        id: emb.id,
+        sourceType: emb.sourceType,
+        sourceId: emb.sourceId,
+      });
+      continue;
+    }
+
     const storedVector = JSON.parse(emb.vector) as number[];
     const similarity = cosineSimilarity(vector, storedVector);
 
