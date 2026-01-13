@@ -147,7 +147,9 @@ export async function PATCH(request: NextRequest) {
 
     switch (action) {
       case 'rate':
-        result = await updateToolRating(toolId, userId, rating!);
+        // rating is guaranteed by validatePatchToolInput when action is 'rate'
+        // but TypeScript doesn't understand this discriminated union
+        result = await updateToolRating(toolId, userId, rating ?? 0);
         break;
 
       case 'bookmark':

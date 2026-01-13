@@ -17,8 +17,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { validateRequest, formatValidationErrors } from '@/lib/validation/middleware';
+import { ProfileConsentSchema, ProfileDeleteQuerySchema, ProfileQuerySchema } from '@/lib/validation/schemas/profile';
 import {
-  validateConsentInput,
   upsertConsentProfile,
   logConsentAction,
   markProfileForDeletion,
@@ -38,14 +39,17 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const queryParams = Object.fromEntries(searchParams.entries());
 
-    if (!userId) {
+    const validation = validateRequest(ProfileQuerySchema, queryParams);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'userId is required' },
+        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
         { status: 400 }
       );
     }
+
+    const { userId } = validation.data;
 
     const profile = await prisma.studentInsightProfile.findUnique({
       where: { userId },
@@ -101,16 +105,24 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const validation = validateConsentInput(body);
 
-    if (!validation.valid || !validation.data) {
+    const validation = validateRequest(ProfileConsentSchema, body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: validation.error || 'Invalid input' },
+        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
         { status: 400 }
       );
     }
 
     const { userId, parentConsent, studentConsent, consentGivenBy } = validation.data;
+
+    if (parentConsent === undefined && studentConsent === undefined) {
+      return NextResponse.json(
+        { error: 'At least one consent type (parentConsent or studentConsent) is required' },
+        { status: 400 }
+      );
+    }
+
     const profile = await upsertConsentProfile(userId, parentConsent, studentConsent);
 
     await logConsentAction(
@@ -160,15 +172,18 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const immediate = searchParams.get('immediate') === 'true';
+    const queryParams = Object.fromEntries(searchParams.entries());
 
-    if (!userId) {
+    const validation = validateRequest(ProfileDeleteQuerySchema, queryParams);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'userId is required' },
+        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
         { status: 400 }
       );
     }
+
+    const { userId, immediate: immediateParam } = validation.data;
+    const immediate = immediateParam === 'true';
 
     const profile = await prisma.studentInsightProfile.findUnique({
       where: { userId },

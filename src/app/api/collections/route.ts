@@ -7,21 +7,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { z } from 'zod';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
-
-// Zod schemas for input validation
-const CreateCollectionSchema = z.object({
-  name: z.string().min(1).max(100),
-  description: z.string().max(500).optional(),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
-  icon: z.string().max(50).optional(),
-  parentId: z.string().cuid().optional(),
-  sortOrder: z.number().int().min(0).optional(),
-});
-
-// Query params are simple booleans/strings, validated inline
+import { CreateCollectionSchema } from '@/lib/validation/schemas/organization';
 
 /**
  * GET /api/collections

@@ -6,55 +6,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { z } from 'zod';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { serverNotifications } from '@/lib/notifications/server-triggers';
-
-// #92: Zod schema for progress validation
-const ProgressUpdateSchema = z.object({
-  xp: z.number().int().min(0).max(10000000).optional(), // Backward compatibility
-  mirrorBucks: z.number().int().min(0).max(10000000).optional(),
-  level: z.number().int().min(1).max(100).optional(),
-  // Season system
-  seasonMirrorBucks: z.number().int().min(0).max(10000000).optional(),
-  seasonLevel: z.number().int().min(1).max(100).optional(),
-  allTimeLevel: z.number().int().min(1).max(100).optional(),
-  currentSeason: z.object({
-    name: z.enum(['Autunno', 'Inverno', 'Primavera', 'Estate']),
-    startDate: z.string().datetime().or(z.date()),
-    endDate: z.string().datetime().or(z.date()),
-    icon: z.string(),
-  }).optional(),
-  seasonHistory: z.array(z.object({
-    season: z.enum(['Autunno', 'Inverno', 'Primavera', 'Estate']),
-    year: z.number().int(),
-    mirrorBucksEarned: z.number().int(),
-    levelReached: z.number().int(),
-    achievementsUnlocked: z.number().int(),
-    studyMinutes: z.number().int(),
-  })).optional(),
-  // Other fields
-  totalStudyMinutes: z.number().int().min(0).max(100000).optional(),
-  questionsAsked: z.number().int().min(0).max(100000).optional(),
-  sessionsThisWeek: z.number().int().min(0).max(1000).optional(),
-  streak: z.object({
-    current: z.number().int().min(0).max(10000).optional(),
-    longest: z.number().int().min(0).max(10000).optional(),
-    lastStudyDate: z.string().datetime().or(z.date()).optional(),
-  }).optional(),
-  achievements: z.array(z.object({
-    id: z.string(),
-    name: z.string().max(100),
-    description: z.string().max(500).optional(),
-    unlockedAt: z.string().datetime().or(z.date()).optional(),
-  })).max(100).optional(),
-  masteries: z.array(z.object({
-    subject: z.string().max(50),
-    level: z.number().int().min(0).max(100),
-    xp: z.number().int().min(0).optional(),
-  })).max(50).optional(),
-}).strict();
+import { ProgressUpdateSchema } from '@/lib/validation/schemas/progress';
 
 export async function GET() {
   try {

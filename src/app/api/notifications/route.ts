@@ -11,6 +11,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import {
+  GetNotificationsQuerySchema,
+  CreateNotificationSchema,
+  UpdateNotificationsSchema,
+  DeleteNotificationsQuerySchema,
+} from '@/lib/validation/schemas/notifications';
 
 /**
  * GET /api/notifications
@@ -26,13 +32,27 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const unreadOnly = searchParams.get('unreadOnly') === 'true';
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+    // Validate query parameters
+    const queryValidation = GetNotificationsQuerySchema.safeParse({
+      userId: searchParams.get('userId'),
+      unreadOnly: searchParams.get('unreadOnly'),
+      limit: searchParams.get('limit'),
+    });
+
+    if (!queryValidation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid query parameters',
+          details: queryValidation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
     }
+
+    const { userId, unreadOnly: unreadOnlyParam, limit: limitParam } = queryValidation.data;
+    const unreadOnly = unreadOnlyParam === 'true';
+    const limit = limitParam ? parseInt(limitParam, 10) : 50;
 
     const notifications = await prisma.notification.findMany({
       where: {
@@ -96,14 +116,20 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { userId, type, title, message, actionUrl, metadata, scheduledFor, expiresAt } = body;
 
-    if (!userId || !type || !title || !message) {
+    // Validate request body
+    const validation = CreateNotificationSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'userId, type, title, and message are required' },
+        {
+          error: 'Invalid notification data',
+          details: validation.error.issues.map(i => i.message),
+        },
         { status: 400 }
       );
     }
+
+    const { userId, type, title, message, actionUrl, metadata, scheduledFor, expiresAt, priority, relatedId, melissaVoice } = validation.data;
 
     const notification = await prisma.notification.create({
       data: {
@@ -111,11 +137,14 @@ export async function POST(request: NextRequest) {
         type,
         title,
         message,
-        actionUrl,
-        metadata: metadata ? JSON.stringify(metadata) : undefined,
+        actionUrl: actionUrl ?? null,
+        metadata: metadata ? JSON.stringify(metadata) : null,
         scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined,
         sentAt: scheduledFor ? undefined : new Date(),
         expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+        priority: priority ?? null,
+        relatedId: relatedId ?? null,
+        melissaVoice: melissaVoice ?? null,
       },
     });
 
@@ -151,11 +180,20 @@ export async function PATCH(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { userId, notificationIds, markAllRead } = body;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+    // Validate request body
+    const validation = UpdateNotificationsSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid update data',
+          details: validation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
     }
+
+    const { userId, notificationIds, markAllRead } = validation.data;
 
     if (markAllRead) {
       await prisma.notification.updateMany({
@@ -166,9 +204,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'All notifications marked as read' });
     }
 
-    if (!notificationIds || !Array.isArray(notificationIds)) {
+    // notificationIds is guaranteed to exist by schema validation when markAllRead is false
+    if (!notificationIds || notificationIds.length === 0) {
       return NextResponse.json(
-        { error: 'notificationIds array is required when not using markAllRead' },
+        { error: 'notificationIds required when markAllRead is false' },
         { status: 400 }
       );
     }
@@ -202,13 +241,26 @@ export async function DELETE(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const notificationId = searchParams.get('id');
-    const dismissAll = searchParams.get('dismissAll') === 'true';
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+    // Validate query parameters
+    const queryValidation = DeleteNotificationsQuerySchema.safeParse({
+      userId: searchParams.get('userId'),
+      id: searchParams.get('id'),
+      dismissAll: searchParams.get('dismissAll'),
+    });
+
+    if (!queryValidation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid query parameters',
+          details: queryValidation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
     }
+
+    const { userId, id: notificationId, dismissAll: dismissAllParam } = queryValidation.data;
+    const dismissAll = dismissAllParam === 'true';
 
     if (dismissAll) {
       // Soft delete - mark as dismissed
