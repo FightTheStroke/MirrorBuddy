@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { ConversationCreateSchema } from '@/lib/validation/schemas/conversations';
 import type { Conversation, Message } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
@@ -95,14 +96,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const body = await request.json();
 
-    if (!data.maestroId) {
+    // #92: Validate with Zod before processing
+    const validation = ConversationCreateSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'maestroId is required' },
+        {
+          error: 'Invalid conversation data',
+          details: validation.error.issues.map(i => i.message),
+        },
         { status: 400 }
       );
     }
+
+    const data = validation.data;
 
     const conversation = await prisma.conversation.create({
       data: {
