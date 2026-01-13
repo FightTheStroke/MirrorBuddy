@@ -45,7 +45,7 @@ Seasons reset quarterly aligned with Italian school trimesters.
 | Streak (3 days) | 100 MB | |
 | Streak (7 days) | 250 MB | |
 | Streak (30 days) | 1000 MB | |
-| Level milestones | 500 MB | Levels 10, 50, 100 |
+| Level milestones | 500–10000 MB | 500 MB (Lv 10), 2500 MB (Lv 50), 10000 MB (Lv 100) |
 | Exploration | 200 MB | Try all tools/maestri |
 | Time-based | 150 MB | Study hours, time of day |
 | **Daily/Weekly** | | |
@@ -60,9 +60,9 @@ Seasons reset quarterly aligned with Italian school trimesters.
 import { calculateSeasonLevel } from '@/lib/constants/mirrorbucks';
 
 const level = calculateSeasonLevel(mirrorBucks);
-// Level 1-10: 100 MB increments (100, 200, 300...)
-// Level 11-30: 50 MB increments
-// Level 31-100: Progressive curve (exponential growth)
+// Client-side: Progressive curve (100 MB increments L1-10, exponential L31+)
+// Server-side (db.ts awardPoints): Simplified 1000 MB per level
+// Note: Check db.ts for authoritative server-side calculation
 ```
 
 ### Legacy XP Levels (1-11 all-time)
@@ -98,10 +98,12 @@ interface Achievement {
   name: string;
   description: string;
   icon: string; // Emoji
-  category: 'onboarding' | 'streak' | 'xp' | 'exploration' | 'time' | 'mastery' | 'social';
+  category: 'onboarding' | 'streak' | 'xp' | 'exploration' | 'time' | 'mastery' | 'social' | 'study';
   requirement: number;
   xpReward: number; // Legacy
   mirrorBucksReward: number;
+  unlockedAt?: Date;
+  condition?: (state: Record<string, unknown>) => boolean;
 }
 ```
 
@@ -229,7 +231,8 @@ const result = await awardPoints(
 import { updateStreak } from '@/lib/gamification/db';
 
 const streak = await updateStreak(userId, 25);
-// Returns: { currentStreak, longestStreak, todayMinutes, goalMetToday }
+// Returns full Prisma Streak record including:
+// currentStreak, longestStreak, todayMinutes, goalMetToday, id, gamificationId, lastActivityAt, dailyGoalMinutes
 ```
 
 ### Get Progression
@@ -238,7 +241,11 @@ const streak = await updateStreak(userId, 25);
 import { getProgression } from '@/lib/gamification/db';
 
 const progress = await getProgression(userId);
-// Returns: { level, tier, totalPoints, seasonPoints, mirrorBucks, currentSeason, pointsToNextLevel, progressPercent, streak }
+// Returns: {
+//   level, tier, totalPoints, seasonPoints, mirrorBucks, currentSeason,
+//   pointsToNextLevel, progressPercent,
+//   streak: { current, longest, todayMinutes, goalMinutes, goalMet }
+// }
 ```
 
 ## Tiers
@@ -364,22 +371,22 @@ const mbEarned = MIRRORBUCKS_BY_FLASHCARD_RATING[rating]; // 'again' | 'hard' | 
 addMirrorBucks(mbEarned, `Flashcard reviewed: ${rating}`);
 ```
 
-### Session XP
+### Session MirrorBucks
 
 ```typescript
 import { MIRRORBUCKS_REWARDS } from '@/lib/constants/mirrorbucks';
 
 // Time-based
-const minuteXP = durationMinutes * MIRRORBUCKS_REWARDS.MAESTRI_PER_MINUTE;
+const minuteMB = durationMinutes * MIRRORBUCKS_REWARDS.MAESTRI_PER_MINUTE;
 
 // Question-based
-const questionXP = questionsAsked * MIRRORBUCKS_REWARDS.MAESTRI_PER_QUESTION;
+const questionMB = questionsAsked * MIRRORBUCKS_REWARDS.MAESTRI_PER_QUESTION;
 
 // Capped total
-const sessionXP = Math.min(
-  minuteXP + questionXP,
+const sessionMB = Math.min(
+  minuteMB + questionMB,
   MIRRORBUCKS_REWARDS.MAESTRI_MAX_PER_SESSION
 );
 
-addMirrorBucks(sessionXP, 'Session completed');
+addMirrorBucks(sessionMB, 'Session completed');
 ```
