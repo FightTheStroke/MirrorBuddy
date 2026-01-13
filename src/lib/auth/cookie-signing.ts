@@ -57,15 +57,15 @@ function getSessionSecret(): string {
 
   if (!secret) {
     throw new CookieSigningError(
-      'SESSION_SECRET environment variable is not set. Generate one with: openssl rand -base64 32',
+      'SESSION_SECRET environment variable is not set. Generate one with: openssl rand -hex 32',
       'MISSING_SECRET'
     );
   }
 
   if (secret.length < 32) {
     throw new CookieSigningError(
-      'SESSION_SECRET must be at least 32 characters for security. Generate one with: openssl rand -base64 32',
-      'MISSING_SECRET'
+      'SESSION_SECRET must be at least 32 characters for security. Generate one with: openssl rand -hex 32',
+      'INVALID_SECRET'
     );
   }
 
