@@ -7,6 +7,11 @@ import { NextResponse } from 'next/server';
 import { isAzureConfigured, getActiveProvider, getRealtimeProvider } from '@/lib/ai/providers';
 
 export async function GET() {
+  // Only in development
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ error: 'Debug logging disabled in production' }, { status: 403 });
+  }
+
   // Chat provider config check
   const chatProvider = getActiveProvider();
   const realtimeProvider = getRealtimeProvider();
