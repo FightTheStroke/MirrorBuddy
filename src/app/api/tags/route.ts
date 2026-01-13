@@ -7,15 +7,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { z } from 'zod';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
-
-// Zod schemas for input validation
-const CreateTagSchema = z.object({
-  name: z.string().min(1).max(50).transform(s => s.toLowerCase().trim()),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
-});
+import { CreateTagSchema } from '@/lib/validation/schemas/organization';
 
 /**
  * GET /api/tags
