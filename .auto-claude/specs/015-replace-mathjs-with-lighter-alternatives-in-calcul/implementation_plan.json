@@ -1,0 +1,378 @@
+{
+  "feature": "Replace mathjs with lighter alternatives in Calculator",
+  "workflow_type": "investigation",
+  "workflow_rationale": "The spec assumes calculator components exist and use mathjs, but investigation reveals these components don't exist and mathjs is not a dependency. This requires investigation to determine whether calculator functionality is needed, and if so, how to implement it correctly from scratch using lightweight alternatives.",
+  "phases": [
+    {
+      "id": "phase-1-investigation",
+      "name": "Investigation - Document Current State",
+      "type": "investigation",
+      "description": "Investigate and document the actual state of calculator functionality in the codebase, determine why Euclide lists Calculator as a tool, and recommend next steps",
+      "depends_on": [],
+      "parallel_safe": true,
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "description": "Document investigation findings in INVESTIGATION.md",
+          "service": "frontend",
+          "files_to_modify": [],
+          "files_to_create": [
+            ".auto-claude/specs/015-replace-mathjs-with-lighter-alternatives-in-calcul/INVESTIGATION.md"
+          ],
+          "patterns_from": [],
+          "verification": {
+            "type": "manual",
+            "instructions": "Review INVESTIGATION.md for comprehensive findings including: (1) Confirmation calculator components don't exist, (2) mathjs not a dependency, (3) Euclide mentions Calculator but not implemented, (4) Recommended next steps"
+          },
+          "status": "completed",
+          "expected_output": "INVESTIGATION.md document with: findings summary, codebase search results, dependency analysis, Euclide tool analysis, recommendations for next steps",
+          "notes": "Created comprehensive INVESTIGATION.md (463 lines) documenting: (1) Confirmation calculator components don't exist, (2) mathjs not in dependencies, (3) Calculator listed in Euclide's tools but not implemented, (4) Four recommended options with technical proposal for implementation using expr-eval. Key finding: Spec is misspecified - this is a new feature, not a refactoring task.",
+          "completed_at": "2026-01-13T07:35:00.000Z",
+          "updated_at": "2026-01-13T07:33:20.127329+00:00"
+        },
+        {
+          "id": "subtask-1-2",
+          "description": "Analyze whether Calculator tool is needed based on Euclide's profile and educational requirements",
+          "service": "frontend",
+          "files_to_modify": [],
+          "files_to_create": [],
+          "patterns_from": [
+            "src/data/maestri/euclide.ts",
+            "src/types/tools/tool-types.ts"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Add findings to INVESTIGATION.md with decision on whether Calculator tool should be implemented"
+          },
+          "status": "pending",
+          "expected_output": "Analysis section in INVESTIGATION.md with recommendation: build Calculator tool, close spec, or update spec",
+          "notes": "Must determine if Calculator is a planned feature or just placeholder in Euclide's tools array"
+        }
+      ]
+    },
+    {
+      "id": "phase-2-decision",
+      "name": "Decision - Propose Implementation Approach",
+      "type": "implementation",
+      "description": "Based on investigation findings, propose the correct approach: build Calculator tool with lightweight library, update spec, or close as invalid",
+      "depends_on": [
+        "phase-1-investigation"
+      ],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "description": "Create technical proposal for Calculator tool using expr-eval or math-expression-evaluator",
+          "service": "frontend",
+          "files_to_modify": [],
+          "files_to_create": [
+            ".auto-claude/specs/015-replace-mathjs-with-lighter-alternatives-in-calcul/PROPOSAL.md"
+          ],
+          "patterns_from": [
+            "src/lib/tools/handlers/quiz-handler.ts",
+            "src/components/tools/formula-renderer.tsx"
+          ],
+          "verification": {
+            "type": "manual",
+            "instructions": "Review PROPOSAL.md for: library comparison (expr-eval vs math-expression-evaluator vs native), architecture design, integration plan with existing tool system"
+          },
+          "status": "pending",
+          "expected_output": "PROPOSAL.md with: library recommendation, bundle size impact, API design, integration approach, example usage",
+          "notes": "Proposal should be BLOCKED until Phase 1 completes and confirms Calculator tool is needed"
+        }
+      ]
+    },
+    {
+      "id": "phase-3-implementation",
+      "name": "Implementation - Build Calculator Tool (Conditional)",
+      "type": "implementation",
+      "description": "Implement Calculator tool using lightweight expression evaluator if approved in Phase 2",
+      "depends_on": [
+        "phase-2-decision"
+      ],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "description": "Add calculator tool type to ToolType union and create type definitions",
+          "service": "frontend",
+          "files_to_modify": [
+            "src/types/tools/tool-types.ts"
+          ],
+          "files_to_create": [
+            "src/types/tools/calculator-types.ts"
+          ],
+          "patterns_from": [
+            "src/types/tools/tool-request-types.ts"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck",
+            "expected": "No type errors"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - This phase should only proceed if Phase 2 approves building Calculator tool. Add 'calculator' to ToolType union."
+        },
+        {
+          "id": "subtask-3-2",
+          "description": "Install lightweight expression evaluator library (expr-eval recommended)",
+          "service": "frontend",
+          "files_to_modify": [
+            "package.json"
+          ],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "command",
+            "command": "npm list expr-eval",
+            "expected": "expr-eval installed and version shown"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - Only install if Phase 2 approves. Use 'npm install expr-eval' for ~12KB alternative to mathjs (~170KB)"
+        },
+        {
+          "id": "subtask-3-3",
+          "description": "Create calculator handler with expression evaluation",
+          "service": "frontend",
+          "files_to_modify": [
+            "src/lib/tools/handlers/index.ts"
+          ],
+          "files_to_create": [
+            "src/lib/tools/handlers/calculator-handler.ts"
+          ],
+          "patterns_from": [
+            "src/lib/tools/handlers/quiz-handler.ts",
+            "src/lib/tools/handlers/formula-handler.ts"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && npm run lint",
+            "expected": "No errors"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - Handler should evaluate math expressions safely, support constants (pi, e), trig functions (sin, cos, tan), and basic operations"
+        },
+        {
+          "id": "subtask-3-4",
+          "description": "Create calculator renderer component",
+          "service": "frontend",
+          "files_to_modify": [],
+          "files_to_create": [
+            "src/components/tools/calculator-renderer.tsx"
+          ],
+          "patterns_from": [
+            "src/components/tools/formula-renderer.tsx",
+            "src/components/tools/quiz-tool.tsx"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck",
+            "expected": "No type errors"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - Create simple and scientific calculator UI modes. Use accessibility features from dyscalculia.ts for number display."
+        },
+        {
+          "id": "subtask-3-5",
+          "description": "Add calculator tool schema to CHAT_TOOL_DEFINITIONS",
+          "service": "frontend",
+          "files_to_modify": [
+            "src/types/tools/tool-schemas.ts"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "src/types/tools/tool-schemas.ts"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck",
+            "expected": "No type errors"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - Add function schema for create_calculator or evaluate_expression tool call"
+        },
+        {
+          "id": "subtask-3-6",
+          "description": "Integrate calculator renderer in tool-result-display.tsx",
+          "service": "frontend",
+          "files_to_modify": [
+            "src/components/tools/tool-result-display.tsx"
+          ],
+          "files_to_create": [],
+          "patterns_from": [
+            "src/components/tools/tool-result-display.tsx"
+          ],
+          "verification": {
+            "type": "command",
+            "command": "npm run build",
+            "expected": "Build succeeds"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - Add case for 'calculator' tool type in ToolContent component"
+        }
+      ]
+    },
+    {
+      "id": "phase-4-testing",
+      "name": "Testing - Verify Calculator Tool (Conditional)",
+      "type": "implementation",
+      "description": "Test calculator functionality with Euclide maestro and verify bundle size reduction vs hypothetical mathjs implementation",
+      "depends_on": [
+        "phase-3-implementation"
+      ],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-4-1",
+          "description": "Verify calculator tool works with basic expressions",
+          "service": "frontend",
+          "files_to_modify": [],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "manual",
+            "instructions": "Test expressions: '2+2', '5*10', 'sqrt(16)', 'sin(pi/2)', 'e^2' all evaluate correctly"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - Manual testing with Euclide in conversation mode"
+        },
+        {
+          "id": "subtask-4-2",
+          "description": "Verify bundle size impact and document savings vs mathjs",
+          "service": "frontend",
+          "files_to_modify": [],
+          "files_to_create": [
+            ".auto-claude/specs/015-replace-mathjs-with-lighter-alternatives-in-calcul/BUNDLE_ANALYSIS.md"
+          ],
+          "patterns_from": [],
+          "verification": {
+            "type": "command",
+            "command": "npm run build",
+            "expected": "Build succeeds and bundle size documented"
+          },
+          "status": "pending",
+          "notes": "BLOCKED - Compare actual bundle size with expr-eval (~12KB) vs hypothetical mathjs (~170KB) for ~158KB savings"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_phases": 4,
+    "total_subtasks": 10,
+    "services_involved": [
+      "frontend"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 1,
+      "parallel_groups": [],
+      "recommended_workers": 1,
+      "speedup_estimate": "Sequential execution required - investigation informs decision which informs implementation"
+    },
+    "startup_command": "npm run dev"
+  },
+  "verification_strategy": {
+    "risk_level": "medium",
+    "skip_validation": false,
+    "test_creation_phase": "conditional",
+    "test_types_required": [
+      "manual",
+      "integration"
+    ],
+    "security_scanning_required": false,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "INVESTIGATION.md clearly documents that calculator components don't exist",
+      "Decision made on whether to build Calculator tool or close/update spec",
+      "If building: Calculator tool works with lightweight library (expr-eval or similar)",
+      "If building: Bundle size significantly reduced vs mathjs (~150KB+ savings)",
+      "If building: All existing tests pass",
+      "Spec updated to reflect actual implementation or marked as closed/blocked"
+    ],
+    "verification_steps": [
+      {
+        "name": "Investigation Review",
+        "command": "cat .auto-claude/specs/015-replace-mathjs-with-lighter-alternatives-in-calcul/INVESTIGATION.md",
+        "expected_outcome": "Document exists with clear findings and recommendations",
+        "type": "manual",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Type Check",
+        "command": "npm run typecheck",
+        "expected_outcome": "No type errors",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Build Verification",
+        "command": "npm run build",
+        "expected_outcome": "Build succeeds",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Lint Check",
+        "command": "npm run lint",
+        "expected_outcome": "No linting errors",
+        "type": "test",
+        "required": true,
+        "blocking": false
+      }
+    ],
+    "reasoning": "Medium risk because this is an investigation that may lead to new feature development. The spec is misspecified, so investigation phase is critical to determine correct action. Implementation phase (if needed) is conditional on Phase 2 approval."
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": false,
+      "commands": [],
+      "minimum_coverage": null,
+      "notes": "Investigation phase doesn't require unit tests. If implementation phase proceeds, add tests for calculator-handler.ts"
+    },
+    "integration_tests": {
+      "required": false,
+      "commands": [],
+      "services_to_test": [],
+      "notes": "Integration tests only needed if Calculator tool is built in Phase 3"
+    },
+    "e2e_tests": {
+      "required": false,
+      "commands": [],
+      "flows": [],
+      "notes": "E2E tests only needed if Calculator tool is built and integrated with Euclide maestro"
+    },
+    "browser_verification": {
+      "required": false,
+      "pages": [],
+      "notes": "Browser verification only needed if Calculator renderer component is built"
+    },
+    "manual_verification": {
+      "required": true,
+      "checks": [
+        "Review INVESTIGATION.md for completeness and accuracy",
+        "Verify calculator components (calculator-scientific.tsx, calculator-simple.tsx) do not exist",
+        "Verify mathjs is not in package.json dependencies",
+        "Verify Calculator is mentioned in Euclide's tools but not implemented",
+        "If Phase 3 proceeds: Test calculator with expressions like '2+2', 'sqrt(16)', 'sin(pi/2)'",
+        "If Phase 3 proceeds: Verify bundle size reduction is significant (~150KB+ savings)"
+      ]
+    }
+  },
+  "qa_signoff": null,
+  "notes": {
+    "spec_issue": "The original spec assumes calculator components exist and use mathjs, but investigation reveals this is incorrect. The spec is from ideation and is pending detailed specification.",
+    "conditional_implementation": "Phases 3-4 are CONDITIONAL and should only proceed if Phase 2 investigation determines Calculator tool is needed and approved for implementation.",
+    "blocking_dependencies": "Each phase blocks the next. Investigation must complete before decision, decision before implementation.",
+    "alternative_outcomes": [
+      "Outcome A: Build Calculator tool with expr-eval (Phase 3-4 proceed)",
+      "Outcome B: Close spec as invalid/premature (implementation phases skipped)",
+      "Outcome C: Update spec to reflect future work (implementation phases deferred)"
+    ]
+  },
+  "status": "in_progress",
+  "planStatus": "in_progress",
+  "updated_at": "2026-01-13T07:30:11.426Z",
+  "last_updated": "2026-01-13T07:33:20.127342+00:00"
+}
