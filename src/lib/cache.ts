@@ -149,20 +149,26 @@ export interface CacheControlOptions {
 export function getCacheControlHeader(options: CacheControlOptions): string {
   const { ttl, visibility = 'public', cdnTtl, staleWhileRevalidate } = options;
 
-  // Validate TTL is positive
-  if (ttl <= 0) {
+  // Validate TTL is a positive finite number
+  if (!Number.isFinite(ttl) || ttl <= 0) {
     return 'no-store';
   }
 
   const maxAgeSeconds = Math.floor(ttl / 1000);
   const parts = [visibility, `max-age=${maxAgeSeconds}`];
 
-  if (cdnTtl !== undefined) {
+  // Only add s-maxage if cdnTtl is a valid positive number
+  if (cdnTtl !== undefined && Number.isFinite(cdnTtl) && cdnTtl > 0) {
     const cdnSeconds = Math.floor(cdnTtl / 1000);
     parts.push(`s-maxage=${cdnSeconds}`);
   }
 
-  if (staleWhileRevalidate !== undefined) {
+  // Only add stale-while-revalidate if value is valid positive number
+  if (
+    staleWhileRevalidate !== undefined &&
+    Number.isFinite(staleWhileRevalidate) &&
+    staleWhileRevalidate > 0
+  ) {
     const swrSeconds = Math.floor(staleWhileRevalidate / 1000);
     parts.push(`stale-while-revalidate=${swrSeconds}`);
   }

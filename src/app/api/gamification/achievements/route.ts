@@ -70,12 +70,13 @@ export async function GET() {
     });
 
     // Add Cache-Control header with stale-while-revalidate
+    // Using shorter stale-while-revalidate for user-specific achievement data
     response.headers.set(
       'Cache-Control',
       getCacheControlHeader({
         ttl: 60000, // 1 minute cache
         visibility: 'private', // User-specific data
-        staleWhileRevalidate: 300000, // 5 minutes stale-while-revalidate
+        staleWhileRevalidate: 60000, // 1 minute stale-while-revalidate to limit outdated unlock statuses
       })
     );
 
