@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState, type RefObject } from 'react';
-import { Markmap } from 'markmap-view';
+import type { Markmap } from 'markmap-view';
 import { Transformer } from 'markmap-lib';
 import { logger } from '@/lib/logger';
 import type { AccessibilitySettings } from '@/lib/accessibility/accessibility-store';
@@ -118,7 +118,10 @@ export function useMarkmapRender({
           markmapRef.current.destroy();
         }
 
-        markmapRef.current = Markmap.create(svgRef.current, {
+        // Lazy-load markmap-view
+        const { Markmap: MarkmapClass } = await import('markmap-view');
+
+        markmapRef.current = MarkmapClass.create(svgRef.current, {
           autoFit: true,
           duration: 300,
           maxWidth: 280,

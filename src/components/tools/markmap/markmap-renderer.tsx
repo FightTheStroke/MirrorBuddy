@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Markmap } from 'markmap-view';
+import type { Markmap } from 'markmap-view';
 import { Printer, Download, ZoomIn, ZoomOut, Accessibility, RotateCcw, Maximize, Minimize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
