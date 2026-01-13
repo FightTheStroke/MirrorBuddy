@@ -40,6 +40,25 @@ const nextConfig: NextConfig = {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
           },
+          {
+            // Content Security Policy - Defense against XSS, clickjacking, code injection
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' cdn.jsdelivr.net cdnjs.cloudflare.com",
+              "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
+              "font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
+              "img-src 'self' data: blob: https:",
+              "media-src 'self' data: blob:",
+              "connect-src 'self' https://*.openai.azure.com wss://*.openai.azure.com http://localhost:11434",
+              "worker-src 'self' blob:",
+              "frame-src 'self'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+              "frame-ancestors 'none'",
+            ].join('; '),
+          },
         ],
       },
       {
