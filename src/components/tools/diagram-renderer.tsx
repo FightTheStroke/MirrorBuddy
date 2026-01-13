@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { DiagramRequest } from '@/types';
-import type mermaidAPI from 'mermaid';
+// Using default import to enable typeof on the ref
+import mermaidAPI from 'mermaid';
 
 // Mermaid configuration
 const MERMAID_CONFIG = {
@@ -50,6 +51,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
   const [rendered, setRendered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const mermaidRef = useRef<typeof mermaidAPI | null>(null);
+  const loadingPromiseRef = useRef<Promise<typeof mermaidAPI> | null>(null);
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -60,11 +62,15 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         setRendered(false);
         setIsLoading(true);
 
-        // Lazy load mermaid library
+        // Lazy load mermaid library with race condition protection
         if (!mermaidRef.current) {
-          const mermaidModule = await import('mermaid');
-          mermaidRef.current = mermaidModule.default;
-          mermaidRef.current.initialize(MERMAID_CONFIG);
+          if (!loadingPromiseRef.current) {
+            loadingPromiseRef.current = import('mermaid').then((module) => {
+              module.default.initialize(MERMAID_CONFIG);
+              return module.default;
+            });
+          }
+          mermaidRef.current = await loadingPromiseRef.current;
         }
 
         // Clear previous content
