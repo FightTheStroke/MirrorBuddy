@@ -111,4 +111,67 @@ export const CACHE_TTL = {
   SETTINGS: 5 * 60 * 1000,
   /** Session data: 1 minute (changes frequently) */
   SESSION: 1 * 60 * 1000,
+  /** Achievement definitions: 1 hour (static data) */
+  ACHIEVEMENTS: 60 * 60 * 1000,
+  /** Version info: 1 hour (static per deployment) */
+  VERSION: 60 * 60 * 1000,
 } as const;
+
+// ============================================================================
+// HTTP CACHE-CONTROL HEADERS
+// ============================================================================
+
+export interface CacheControlOptions {
+  /** Time-to-live in milliseconds */
+  ttl: number;
+  /** Whether cache is public (CDN cacheable) or private (browser only) */
+  visibility?: 'public' | 'private';
+  /** CDN/shared cache TTL in milliseconds (defaults to same as ttl) */
+  cdnTtl?: number;
+  /** Stale-while-revalidate time in milliseconds */
+  staleWhileRevalidate?: number;
+}
+
+/**
+ * Generate Cache-Control header value for HTTP responses
+ * Converts millisecond TTLs to seconds for HTTP headers
+ *
+ * @example
+ * // Static data with CDN caching
+ * getCacheControlHeader({ ttl: 3600000, cdnTtl: 3600000 })
+ * // Returns: "public, max-age=3600, s-maxage=3600"
+ *
+ * @example
+ * // Data with stale-while-revalidate
+ * getCacheControlHeader({ ttl: 60000, staleWhileRevalidate: 300000 })
+ * // Returns: "public, max-age=60, stale-while-revalidate=300"
+ */
+export function getCacheControlHeader(options: CacheControlOptions): string {
+  const { ttl, visibility = 'public', cdnTtl, staleWhileRevalidate } = options;
+
+  // Validate TTL is a positive finite number
+  if (!Number.isFinite(ttl) || ttl <= 0) {
+    return 'no-store';
+  }
+
+  const maxAgeSeconds = Math.floor(ttl / 1000);
+  const parts = [visibility, `max-age=${maxAgeSeconds}`];
+
+  // Only add s-maxage if cdnTtl is a valid positive number
+  if (cdnTtl !== undefined && Number.isFinite(cdnTtl) && cdnTtl > 0) {
+    const cdnSeconds = Math.floor(cdnTtl / 1000);
+    parts.push(`s-maxage=${cdnSeconds}`);
+  }
+
+  // Only add stale-while-revalidate if value is valid positive number
+  if (
+    staleWhileRevalidate !== undefined &&
+    Number.isFinite(staleWhileRevalidate) &&
+    staleWhileRevalidate > 0
+  ) {
+    const swrSeconds = Math.floor(staleWhileRevalidate / 1000);
+    parts.push(`stale-while-revalidate=${swrSeconds}`);
+  }
+
+  return parts.join(', ');
+}

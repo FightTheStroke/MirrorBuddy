@@ -1,6 +1,7 @@
 /**
  * API Route: Gamification Achievements
  * GET /api/gamification/achievements - Get user achievements
+ * WAVE 3: Added caching for achievement definitions
  */
 
 import { NextResponse } from 'next/server';
@@ -8,6 +9,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { getOrCreateGamification, checkAchievements } from '@/lib/gamification/db';
 import { logger } from '@/lib/logger';
+import { getOrCompute, CACHE_TTL, getCacheControlHeader } from '@/lib/cache';
 
 export async function GET() {
   try {
@@ -23,10 +25,15 @@ export async function GET() {
 
     const gamification = await getOrCreateGamification(userId);
 
-    // Get all achievements with unlock status
-    const allAchievements = await prisma.achievement.findMany({
-      orderBy: [{ category: 'asc' }, { tier: 'asc' }],
-    });
+    // Get all achievements with unlock status (cached - static data)
+    const allAchievements = await getOrCompute(
+      'achievements:definitions',
+      () =>
+        prisma.achievement.findMany({
+          orderBy: [{ category: 'asc' }, { tier: 'asc' }],
+        }),
+      { ttl: CACHE_TTL.ACHIEVEMENTS }
+    );
 
     const userAchievementMap = new Map(
       gamification.achievements.map(ua => [ua.achievementId, ua])
@@ -55,12 +62,25 @@ export async function GET() {
       a => !a.isSecret || a.unlocked
     );
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       achievements: visibleAchievements,
       totalUnlocked: achievements.filter(a => a.unlocked).length,
       totalAchievements: allAchievements.length,
     });
+
+    // Add Cache-Control header with stale-while-revalidate
+    // Using shorter stale-while-revalidate for user-specific achievement data
+    response.headers.set(
+      'Cache-Control',
+      getCacheControlHeader({
+        ttl: 60000, // 1 minute cache
+        visibility: 'private', // User-specific data
+        staleWhileRevalidate: 60000, // 1 minute stale-while-revalidate to limit outdated unlock statuses
+      })
+    );
+
+    return response;
   } catch (error) {
     logger.error('Failed to get achievements', { error: String(error) });
     return NextResponse.json(
