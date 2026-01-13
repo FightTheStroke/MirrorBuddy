@@ -13,6 +13,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rate-limit';
+import { validateRequest, formatValidationErrors } from '@/lib/validation/middleware';
+import { ProfileGenerateSchema } from '@/lib/validation/schemas/profile';
 import {
   generateStudentProfile,
   type MaestroInsightInput,
@@ -43,15 +45,23 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { userId, forceRegenerate = false } = body;
 
-    if (!userId) {
+    const validation = validateRequest(ProfileGenerateSchema, body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'userId is required' },
+        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
         { status: 400 }
       );
     }
 
+<<<<<<< HEAD
+||||||| parent of 2a70a69 (auto-claude: subtask-4-1 - Create and apply validation schemas for /api/profile/* routes)
+    // Check if recent profile exists and forceRegenerate is false
+=======
+    const { userId, forceRegenerate = false } = validation.data;
+
+    // Check if recent profile exists and forceRegenerate is false
+>>>>>>> 2a70a69 (auto-claude: subtask-4-1 - Create and apply validation schemas for /api/profile/* routes)
     if (!forceRegenerate) {
       const existingProfile = await prisma.studentInsightProfile.findUnique({
         where: { userId },

@@ -39,13 +39,13 @@ export const VALIDATION_LIMITS = {
 /**
  * Non-empty string with max length
  */
-export const NonEmptyString = (maxLength = VALIDATION_LIMITS.SHORT_STRING_MAX) =>
+export const NonEmptyString = (maxLength: number = VALIDATION_LIMITS.SHORT_STRING_MAX) =>
   z.string().min(1, 'String cannot be empty').max(maxLength);
 
 /**
  * Optional string with max length
  */
-export const OptionalString = (maxLength = VALIDATION_LIMITS.SHORT_STRING_MAX) =>
+export const OptionalString = (maxLength: number = VALIDATION_LIMITS.SHORT_STRING_MAX) =>
   z.string().max(maxLength).optional();
 
 /**
@@ -183,7 +183,7 @@ export function createArraySchema<T extends z.ZodTypeAny>(
  */
 export function createOptionalArraySchema<T extends z.ZodTypeAny>(
   itemSchema: T,
-  maxItems = VALIDATION_LIMITS.SMALL_ARRAY_MAX
+  maxItems: number = VALIDATION_LIMITS.SMALL_ARRAY_MAX
 ) {
   return z.array(itemSchema).max(maxItems).optional();
 }

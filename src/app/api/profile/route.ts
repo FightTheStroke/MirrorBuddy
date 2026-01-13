@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { validateRequest, formatValidationErrors } from '@/lib/validation/middleware';
+import { ProfileQuerySchema, ProfileCreateUpdateSchema } from '@/lib/validation/schemas/profile';
 import type { StudentInsights, MaestroObservation, LearningStrategy, LearningStyleProfile } from '@/types';
 
 /**
@@ -29,14 +31,17 @@ export async function GET(request: NextRequest) {
   try {
     // Get userId from query params (in production, this would come from auth)
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const queryParams = Object.fromEntries(searchParams.entries());
 
-    if (!userId) {
+    const validation = validateRequest(ProfileQuerySchema, queryParams);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'userId is required' },
+        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
         { status: 400 }
       );
     }
+
+    const { userId } = validation.data;
 
     // Fetch profile from database
     const profile = await prisma.studentInsightProfile.findUnique({
@@ -126,14 +131,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { userId, studentName, insights } = body;
 
-    if (!userId || !studentName) {
+    const validation = validateRequest(ProfileCreateUpdateSchema, body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'userId and studentName are required' },
+        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
         { status: 400 }
       );
     }
+
+    const { userId, studentName, insights } = validation.data;
 
     // Upsert the profile
     const profile = await prisma.studentInsightProfile.upsert({
