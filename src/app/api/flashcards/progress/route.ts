@@ -8,6 +8,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import {
+  FlashcardProgressGetQuerySchema,
+  FlashcardProgressPostSchema,
+} from '@/lib/validation/schemas/progress';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,12 +23,30 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const deckId = searchParams.get('deckId');
-    const dueOnly = searchParams.get('due') === 'true';
+    const rawDeckId = searchParams.get('deckId');
+    const rawDue = searchParams.get('due');
+
+    // Validate query parameters
+    const validation = FlashcardProgressGetQuerySchema.safeParse({
+      deckId: rawDeckId || undefined,
+      due: rawDue || undefined,
+    });
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: 'Invalid query parameters',
+          details: validation.error.issues.map(i => i.message),
+        },
+        { status: 400 }
+      );
+    }
+
+    const { deckId, due } = validation.data;
 
     const where: Record<string, unknown> = { userId };
     if (deckId) where.deckId = deckId;
-    if (dueOnly) {
+    if (due === 'true') {
       where.nextReview = { lte: new Date() };
     }
 
@@ -52,14 +74,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No user' }, { status: 401 });
     }
 
-    const data = await request.json();
+    const body = await request.json();
 
-    if (!data.cardId) {
+    // Validate request body
+    const validation = FlashcardProgressPostSchema.safeParse(body);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'cardId is required' },
+        {
+          error: 'Invalid flashcard progress data',
+          details: validation.error.issues.map(i => i.message),
+        },
         { status: 400 }
       );
     }
+
+    const data = validation.data;
 
     // Upsert flashcard progress
     const progress = await prisma.flashcardProgress.upsert({
