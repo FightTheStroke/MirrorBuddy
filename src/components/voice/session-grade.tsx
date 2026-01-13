@@ -42,12 +42,12 @@ export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, 
           setGrade(aiGrade);
           gradeCurrentSession(aiGrade);
         } else {
-          // Generate automatic grade based on metrics
+          // Generate automatic grade based on metrics (deterministic)
           const baseScore = Math.min(10, Math.max(1,
             5 + // Base score
             Math.min(2, questionsAsked * 0.5) + // Questions bonus
             Math.min(2, sessionDuration * 0.1) + // Duration bonus
-            Math.random() * 1 // Variability
+            Math.min(0.5, (questionsAsked + sessionDuration) * 0.02) // Engagement bonus
           ));
 
           const autoGrade: SessionGrade = {
@@ -67,7 +67,7 @@ export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, 
           score: 7,
           feedback: 'Buona sessione di studio!',
           strengths: ['Impegno costante'],
-          areasToImprove: ['Continua cosi!'],
+          areasToImprove: ['Continua così!'],
         });
       } finally {
         setIsGenerating(false);
