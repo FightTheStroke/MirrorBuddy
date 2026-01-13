@@ -40,7 +40,7 @@
 import { injectSafetyGuardrails } from '@/lib/safety';
 
 // For a Maestro (historical tutor)
-const safePrompt = injectSafetyGuardrails(archimedePrompt, {
+const safePrompt = injectSafetyGuardrails(maestroPrompt, {
   role: 'maestro'
 });
 
@@ -382,6 +382,8 @@ export async function POST(req: Request) {
   }
 
   // Layer 4: Jailbreak detection
+  // Note: conversationHistory, warningCount, sessionDuration, and characterId
+  // should be loaded from your session store using the sessionId above.
   const context = buildContext(conversationHistory, warningCount, sessionDuration);
   const jailbreak = detectJailbreak(message, context);
   if (jailbreak.detected && jailbreak.action === 'block') {
