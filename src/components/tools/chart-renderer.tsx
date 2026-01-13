@@ -3,35 +3,26 @@
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  ScatterChart,
+  Scatter,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
   Tooltip,
   Legend,
-  Filler,
-} from 'chart.js';
-import { Line, Bar, Pie, Scatter, Doughnut } from 'react-chartjs-2';
+  ResponsiveContainer,
+} from 'recharts';
 import { cn } from '@/lib/utils';
 import type { ChartRequest } from '@/types';
-
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
 
 interface ChartRendererProps {
   request: ChartRequest;
@@ -39,77 +30,185 @@ interface ChartRendererProps {
 }
 
 const defaultColors = [
-  'rgba(59, 130, 246, 0.8)',   // Blue
-  'rgba(16, 185, 129, 0.8)',   // Green
-  'rgba(239, 68, 68, 0.8)',    // Red
-  'rgba(245, 158, 11, 0.8)',   // Amber
-  'rgba(139, 92, 246, 0.8)',   // Purple
-  'rgba(236, 72, 153, 0.8)',   // Pink
-  'rgba(6, 182, 212, 0.8)',    // Cyan
-  'rgba(249, 115, 22, 0.8)',   // Orange
+  '#3b82f6', // Blue
+  '#10b981', // Green
+  '#ef4444', // Red
+  '#f59e0b', // Amber
+  '#8b5cf6', // Purple
+  '#ec4899', // Pink
+  '#06b6d4', // Cyan
+  '#f97316', // Orange
 ];
 
 export function ChartRenderer({ request, className }: ChartRendererProps) {
+  // Transform data for Recharts format
   const chartData = useMemo(() => {
-    return {
-      labels: request.data.labels,
-      datasets: request.data.datasets.map((ds, index) => ({
-        label: ds.label,
-        data: ds.data,
-        backgroundColor: ds.color || defaultColors[index % defaultColors.length],
-        borderColor: ds.color || defaultColors[index % defaultColors.length],
-        borderWidth: 2,
-        fill: request.type === 'area',
-        tension: 0.4,
-      })),
-    };
+    if (request.type === 'pie') {
+      // Pie charts need a different data structure
+      return request.data.labels.map((label, index) => ({
+        name: label,
+        value: request.data.datasets[0]?.data[index] || 0,
+      }));
+    }
+
+    // For line, bar, area, scatter charts
+    return request.data.labels.map((label, index) => {
+      const point: Record<string, string | number> = { name: label };
+      request.data.datasets.forEach((dataset) => {
+        point[dataset.label] = dataset.data[index] || 0;
+      });
+      return point;
+    });
   }, [request]);
 
-  const options = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-        labels: {
-          color: 'rgb(148, 163, 184)', // slate-400
-          font: { size: 12 },
-        },
-      },
-      title: {
-        display: !!request.title,
-        text: request.title,
-        color: 'rgb(226, 232, 240)', // slate-200
-        font: { size: 16, weight: 'bold' as const },
-      },
-    },
-    scales: request.type !== 'pie' ? {
-      x: {
-        grid: { color: 'rgba(71, 85, 105, 0.3)' }, // slate-600
-        ticks: { color: 'rgb(148, 163, 184)' },
-      },
-      y: {
-        grid: { color: 'rgba(71, 85, 105, 0.3)' },
-        ticks: { color: 'rgb(148, 163, 184)' },
-      },
-    } : undefined,
-  }), [request.title, request.type]);
+  const renderChart = () => {
+    const commonProps = {
+      data: chartData,
+      margin: { top: 5, right: 30, left: 20, bottom: 5 },
+    };
 
-  const ChartComponent = useMemo(() => {
     switch (request.type) {
       case 'line':
+        return (
+          <LineChart {...commonProps} aria-label={request.title || 'Grafico a linee'}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
+            <YAxis stroke="#94a3b8" fontSize={12} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#fff',
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            {request.data.datasets.map((dataset, index) => (
+              <Line
+                key={dataset.label}
+                type="monotone"
+                dataKey={dataset.label}
+                stroke={dataset.color || defaultColors[index % defaultColors.length]}
+                strokeWidth={2}
+                dot={{ fill: dataset.color || defaultColors[index % defaultColors.length] }}
+              />
+            ))}
+          </LineChart>
+        );
+
       case 'area':
-        return Line;
+        return (
+          <AreaChart {...commonProps} aria-label={request.title || 'Grafico ad area'}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
+            <YAxis stroke="#94a3b8" fontSize={12} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#fff',
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            {request.data.datasets.map((dataset, index) => (
+              <Area
+                key={dataset.label}
+                type="monotone"
+                dataKey={dataset.label}
+                stroke={dataset.color || defaultColors[index % defaultColors.length]}
+                fill={dataset.color || defaultColors[index % defaultColors.length]}
+                fillOpacity={0.6}
+              />
+            ))}
+          </AreaChart>
+        );
+
       case 'bar':
-        return Bar;
-      case 'pie':
-        return Pie;
+        return (
+          <BarChart {...commonProps} aria-label={request.title || 'Grafico a barre'}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
+            <YAxis stroke="#94a3b8" fontSize={12} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#fff',
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            {request.data.datasets.map((dataset, index) => (
+              <Bar
+                key={dataset.label}
+                dataKey={dataset.label}
+                fill={dataset.color || defaultColors[index % defaultColors.length]}
+                radius={[8, 8, 0, 0]}
+              />
+            ))}
+          </BarChart>
+        );
+
       case 'scatter':
-        return Scatter;
+        return (
+          <ScatterChart {...commonProps} aria-label={request.title || 'Grafico a dispersione'}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
+            <YAxis stroke="#94a3b8" fontSize={12} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#fff',
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            {request.data.datasets.map((dataset, index) => (
+              <Scatter
+                key={dataset.label}
+                name={dataset.label}
+                dataKey={dataset.label}
+                fill={dataset.color || defaultColors[index % defaultColors.length]}
+              />
+            ))}
+          </ScatterChart>
+        );
+
+      case 'pie':
+        return (
+          <PieChart aria-label={request.title || 'Grafico a torta'}>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {chartData.map((_, index) => (
+                <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#fff',
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+          </PieChart>
+        );
+
       default:
-        return Line;
+        return null;
     }
-  }, [request.type]);
+  };
 
   return (
     <motion.div
@@ -120,45 +219,47 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
         className
       )}
     >
-      <ChartComponent data={chartData} options={options} />
+      {request.title && (
+        <h3 className="text-lg font-bold text-slate-200 mb-4">{request.title}</h3>
+      )}
+
+      <ResponsiveContainer width="100%" height={300}>
+        {renderChart()}
+      </ResponsiveContainer>
+
+      {/* Accessible table for screen readers */}
+      <table className="sr-only" aria-label={`Dati ${request.title || 'grafico'}`}>
+        <thead>
+          <tr>
+            <th>Etichetta</th>
+            {request.data.datasets.map((dataset) => (
+              <th key={dataset.label}>{dataset.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {request.data.labels.map((label, index) => (
+            <tr key={label}>
+              <td>{label}</td>
+              {request.data.datasets.map((dataset) => (
+                <td key={`${label}-${dataset.label}`}>{dataset.data[index]}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </motion.div>
   );
 }
 
-// Doughnut variant for pie charts
+// Doughnut variant for pie charts (now using Recharts PieChart with innerRadius)
 export function DoughnutRenderer({ request, className }: ChartRendererProps) {
   const chartData = useMemo(() => {
-    return {
-      labels: request.data.labels,
-      datasets: request.data.datasets.map((ds, _index) => ({
-        label: ds.label,
-        data: ds.data,
-        backgroundColor: request.data.labels.map((_, i) => defaultColors[i % defaultColors.length]),
-        borderColor: 'rgb(30, 41, 59)', // slate-800
-        borderWidth: 2,
-      })),
-    };
+    return request.data.labels.map((label, index) => ({
+      name: label,
+      value: request.data.datasets[0]?.data[index] || 0,
+    }));
   }, [request]);
-
-  const options = useMemo(() => ({
-    responsive: true,
-    maintainAspectRatio: true,
-    plugins: {
-      legend: {
-        position: 'right' as const,
-        labels: {
-          color: 'rgb(148, 163, 184)',
-          font: { size: 12 },
-        },
-      },
-      title: {
-        display: !!request.title,
-        text: request.title,
-        color: 'rgb(226, 232, 240)',
-        font: { size: 16, weight: 'bold' as const },
-      },
-    },
-  }), [request.title]);
 
   return (
     <motion.div
@@ -169,7 +270,56 @@ export function DoughnutRenderer({ request, className }: ChartRendererProps) {
         className
       )}
     >
-      <Doughnut data={chartData} options={options} />
+      {request.title && (
+        <h3 className="text-lg font-bold text-slate-200 mb-4">{request.title}</h3>
+      )}
+
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart aria-label={request.title || 'Grafico a ciambella'}>
+          <Pie
+            data={chartData}
+            cx="50%"
+            cy="50%"
+            innerRadius={60}
+            outerRadius={100}
+            labelLine={false}
+            label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
+            fill="#8884d8"
+            dataKey="value"
+          >
+            {chartData.map((_, index) => (
+              <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
+            ))}
+          </Pie>
+          <Tooltip
+            contentStyle={{
+              backgroundColor: '#1e293b',
+              border: 'none',
+              borderRadius: '8px',
+              color: '#fff',
+            }}
+          />
+          <Legend wrapperStyle={{ fontSize: '12px' }} />
+        </PieChart>
+      </ResponsiveContainer>
+
+      {/* Accessible table for screen readers */}
+      <table className="sr-only" aria-label={`Dati ${request.title || 'grafico'}`}>
+        <thead>
+          <tr>
+            <th>Etichetta</th>
+            <th>Valore</th>
+          </tr>
+        </thead>
+        <tbody>
+          {request.data.labels.map((label, index) => (
+            <tr key={label}>
+              <td>{label}</td>
+              <td>{request.data.datasets[0]?.data[index]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </motion.div>
   );
 }
