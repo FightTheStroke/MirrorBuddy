@@ -82,7 +82,7 @@ export function Slider({
       <div className="relative h-2 w-full grow overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800 cursor-pointer">
         {/* Filled track */}
         <div
-          className="absolute h-full bg-purple-500"
+          className="absolute h-full bg-accent-themed"
           style={{ width: `${percentage}%` }}
         />
       </div>
@@ -90,7 +90,7 @@ export function Slider({
       {/* Thumb */}
       <div
         className={cn(
-          'absolute block h-5 w-5 rounded-full border-2 border-purple-500 bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2 disabled:pointer-events-none dark:border-purple-400 dark:bg-slate-950 dark:ring-offset-slate-950 dark:focus-visible:ring-slate-300',
+          'absolute block h-5 w-5 rounded-full border-2 border-accent-themed bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed focus-visible:ring-offset-2 disabled:pointer-events-none dark:bg-slate-950 dark:ring-offset-slate-950',
           isDragging && 'scale-110'
         )}
         style={{ left: `calc(${percentage}% - 10px)` }}
