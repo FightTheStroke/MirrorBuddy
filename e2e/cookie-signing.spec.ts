@@ -82,7 +82,7 @@ test.describe('Signed Cookie Authentication', () => {
     // First create a valid user with signed cookie
     const userResponse = await request.get('/api/user');
     expect(userResponse.ok()).toBeTruthy();
-    const user = await userResponse.json();
+    const _user = await userResponse.json();
 
     // Get the signed cookie value
     const cookies = await context.cookies();
@@ -162,7 +162,7 @@ test.describe('Signed Cookie Authentication', () => {
     // Create a user through normal flow first to get a real user ID
     const userResponse = await request.get('/api/user');
     expect(userResponse.ok()).toBeTruthy();
-    const user = await userResponse.json();
+    const _user = await userResponse.json();
 
     // Extract just the user ID (without signature) to simulate legacy cookie
     const cookies = await context.cookies();
