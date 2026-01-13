@@ -36,8 +36,11 @@ vi.mock('@/components/tools/summary-renderer', () => ({
 }));
 
 vi.mock('@/components/tools/chart-renderer', () => ({
-  ChartRenderer: ({ request }: { request: { title: string } }) => (
+  ChartRenderer: ({ request }: { request: { title?: string } }) => (
     <div data-testid="chart-renderer">{request.title}</div>
+  ),
+  DoughnutRenderer: ({ request }: { request: { title?: string } }) => (
+    <div data-testid="doughnut-renderer">{request.title}</div>
   ),
 }));
 
