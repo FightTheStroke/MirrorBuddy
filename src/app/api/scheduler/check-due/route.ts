@@ -163,8 +163,6 @@ export async function POST(request: Request) {
 
     // 2. Check for upcoming scheduled sessions
     const currentDayOfWeek = now.getDay();
-    // currentTime is kept for potential future logging/debugging
-    const _currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     if (schedule?.sessions) {
       for (const session of schedule.sessions) {

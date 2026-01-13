@@ -16,7 +16,7 @@ import { createHmac, timingSafeEqual } from 'crypto';
 export class CookieSigningError extends Error {
   constructor(
     message: string,
-    public readonly code: 'MISSING_SECRET' | 'INVALID_FORMAT' | 'VERIFICATION_FAILED',
+    public readonly code: 'MISSING_SECRET' | 'INVALID_SECRET' | 'INVALID_FORMAT' | 'VERIFICATION_FAILED',
     public readonly cause?: Error
   ) {
     super(message);
