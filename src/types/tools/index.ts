@@ -47,6 +47,12 @@ export type {
   // Timeline
   TimelineEvent,
   TimelineData,
+  // Calculator
+  CalculatorMode,
+  CalculatorRequest,
+  CalculatorStep,
+  CalculatorData,
+  CalculatorEventType,
 } from './tool-data-types';
 
 export {
