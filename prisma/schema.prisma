@@ -543,8 +543,13 @@ model Material {
   isBookmarked Boolean  @default(false)
   viewCount    Int      @default(0)
 
-  // Full-text search (ADR 0022 - Knowledge Hub)
-  searchableText String?  // Pre-computed searchable content for Fuse.js
+  // Full-text search (ADR 0022 - Knowledge Hub, Issue #19)
+  // PostgreSQL: Uses tsvector column (searchableTextVector) with GIN index for fast full-text search
+  //             Queries use websearch_to_tsquery() with ts_rank() for relevance sorting
+  //             Migration: prisma/migrations/fulltext/001_enable_fulltext_search.sql
+  // SQLite:     Falls back to ILIKE '%query%' pattern matching (slower but compatible)
+  // See: src/lib/db/database-utils.ts for database detection
+  searchableText String?  // Pre-computed searchable content (title + preview + subject + tags)
 
   // Organization (ADR 0022 - Knowledge Hub)
   collectionId String?
