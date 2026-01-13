@@ -2327,13 +2327,801 @@ npm run dev
 
 ## Environment Configuration
 
-*Coming soon in next subtask*
+### Understanding .env Files
+
+#### Problem: Changes to `.env` not working or being ignored
+
+**Cause:** Wrong file name or file not loaded by Next.js
+
+**Solution:**
+
+MirrorBuddy uses **`.env.local`** (NOT `.env`) for local development:
+
+| File | Purpose | Should I Edit? |
+|------|---------|----------------|
+| `.env.example` | Template with all variables documented | ❌ No - This is the template |
+| `.env.local` | **Your actual config** (gitignored) | ✅ YES - Edit this file |
+| `.env` | Not used in MirrorBuddy | ❌ Don't create this |
+| `.env.production` | Deployment-specific (optional) | Only for custom deployments |
+
+**Setup:**
+1. Copy template to create your config:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Fill in your values:
+   ```bash
+   # Open in editor
+   nano .env.local
+   # or
+   code .env.local
+   ```
+
+3. **ALWAYS restart dev server after changes:**
+   ```bash
+   # Stop with Ctrl+C, then:
+   npm run dev
+   ```
+
+**Common mistakes:**
+- ❌ Editing `.env.example` instead of `.env.local`
+- ❌ Creating `.env` instead of `.env.local`
+- ❌ Forgetting to restart server after changes
+- ❌ Committing `.env.local` to git (it's automatically ignored)
+
+---
+
+### Complete Configuration Reference
+
+Below is every environment variable MirrorBuddy uses. See [`.env.example`](.env.example) for detailed comments and examples.
+
+#### Required Variables (Minimum)
+
+**For Azure OpenAI (Recommended):**
+```bash
+# Chat functionality
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
+AZURE_OPENAI_API_KEY=your-api-key
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
+
+# Voice functionality (if using voice features)
+AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
+AZURE_OPENAI_REALTIME_API_KEY=your-api-key
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
+
+# Database
+DATABASE_URL="file:./prisma/dev.db"
+```
+
+**For Ollama (100% local, no cloud, text only):**
+```bash
+# Ollama server (no Azure needed)
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
+
+# Database
+DATABASE_URL="file:./prisma/dev.db"
+```
+
+**Note:** If BOTH Azure and Ollama are configured, Azure takes priority. Ollama is used as fallback.
+
+#### Optional Variables
+
+**RAG Embeddings (for Knowledge Hub search):**
+```bash
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+```
+
+**Cost Optimization (mini model for non-critical features):**
+```bash
+AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-4o-mini-realtime
+```
+
+**Azure Cost Tracking (for Settings page cost display):**
+```bash
+AZURE_TENANT_ID=your-tenant-id
+AZURE_CLIENT_ID=your-service-principal-client-id
+AZURE_CLIENT_SECRET=your-service-principal-secret
+AZURE_SUBSCRIPTION_ID=your-subscription-id
+```
+
+**Google OAuth (for Calendar/Classroom sync):**
+```bash
+GOOGLE_CLIENT_ID=your-web-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-web-client-secret
+```
+
+**PostgreSQL (for production):**
+```bash
+DATABASE_URL="postgresql://user:password@host:5432/mirrorbuddy?sslmode=require"
+```
+
+---
+
+### Configuration by Use Case
+
+#### Local Development (Simplest)
+
+**SQLite + Ollama (100% free, no cloud):**
+```bash
+# .env.local
+OLLAMA_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
+DATABASE_URL="file:./prisma/dev.db"
+```
+
+**Limitations:**
+- ❌ No voice features
+- ✅ All text features work
+- ✅ 100% local and private
+
+**Setup:**
+```bash
+# Install and start Ollama
+brew install ollama
+ollama serve
+
+# Pull model (in another terminal)
+ollama pull llama3.2
+
+# Start MirrorBuddy
+cp .env.example .env.local
+# Edit .env.local with above values
+npm run dev
+```
+
+---
+
+#### Local Development (Full Features)
+
+**SQLite + Azure OpenAI (voice + text):**
+```bash
+# .env.local
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
+AZURE_OPENAI_API_KEY=your-api-key
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
+
+AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
+AZURE_OPENAI_REALTIME_API_KEY=your-api-key
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
+
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+
+DATABASE_URL="file:./prisma/dev.db"
+```
+
+**Features:**
+- ✅ Voice onboarding
+- ✅ Ambient audio conversations
+- ✅ All text features
+- ✅ RAG search in Knowledge Hub
+
+**Cost:** ~$5-20/month for development testing
+
+---
+
+#### Production Deployment
+
+**PostgreSQL + Azure OpenAI + Cost Tracking:**
+```bash
+# .env.local (or Vercel environment variables)
+
+# Azure OpenAI
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
+AZURE_OPENAI_API_KEY=your-api-key
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_API_VERSION=2024-08-01-preview
+
+# Voice (with cost optimization)
+AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
+AZURE_OPENAI_REALTIME_API_KEY=your-api-key
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
+AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-4o-mini-realtime
+
+# RAG
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+
+# Database (production PostgreSQL)
+DATABASE_URL="postgresql://user:password@host:5432/mirrorbuddy?sslmode=require"
+
+# Cost tracking (optional)
+AZURE_TENANT_ID=your-tenant-id
+AZURE_CLIENT_ID=your-service-principal-client-id
+AZURE_CLIENT_SECRET=your-service-principal-secret
+AZURE_SUBSCRIPTION_ID=your-subscription-id
+
+# Google integration (optional)
+GOOGLE_CLIENT_ID=your-web-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-web-client-secret
+```
+
+**Deployment platforms:**
+- **Vercel:** Add variables in Project Settings → Environment Variables
+- **Docker:** Pass via `--env-file .env.local` or `-e` flags
+- **Other:** Ensure variables are available to Node.js process
+
+---
+
+### Testing Your Configuration
+
+#### Quick Verification
+
+```bash
+# 1. Check .env.local exists and has values
+cat .env.local
+
+# 2. Verify variables are loaded
+node -e "require('dotenv').config({path:'.env.local'}); console.log({
+  azureEndpoint: process.env.AZURE_OPENAI_ENDPOINT,
+  ollamaUrl: process.env.OLLAMA_URL,
+  database: process.env.DATABASE_URL
+})"
+
+# 3. Test database connection
+npx prisma db push
+
+# 4. Start dev server
+npm run dev
+```
+
+#### In-App Diagnostics
+
+1. **Start the app:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Navigate to Settings:**
+   ```
+   http://localhost:3000/settings
+   ```
+
+3. **Check "AI Provider" section:**
+   - Shows active provider (Azure OpenAI or Ollama)
+   - Connection status
+   - Available features
+   - Voice availability
+
+4. **Run diagnostics:**
+   - Click "Test Connection" button
+   - Should show green checkmarks for configured services
+
+#### Manual API Tests
+
+**Test Azure OpenAI:**
+```bash
+curl https://your-resource.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview \
+  -H "api-key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "messages": [{"role": "user", "content": "Hello"}],
+    "max_tokens": 50
+  }'
+```
+
+**Test Ollama:**
+```bash
+curl http://localhost:11434/api/generate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "llama3.2",
+    "prompt": "Hello",
+    "stream": false
+  }'
+```
+
+**Test Database:**
+```bash
+# SQLite
+sqlite3 prisma/dev.db "SELECT 1"
+
+# PostgreSQL
+psql $DATABASE_URL -c "SELECT 1"
+```
+
+---
+
+### Common Configuration Mistakes
+
+| Mistake | Symptom | Fix |
+|---------|---------|-----|
+| **Wrong file name** | Variables ignored | Use `.env.local`, not `.env` |
+| **Missing `https://`** | "Invalid URL" | Add `https://` to Azure endpoint |
+| **Extra `/` at end** | "404 Not Found" | Remove trailing slash from endpoint |
+| **Wrong deployment name** | "Deployment not found" | Match Azure Portal deployment name exactly |
+| **Not restarting server** | Changes not applied | Always restart: `npm run dev` |
+| **Wrong API version** | "Invalid api-version" | Use `2024-08-01-preview` |
+| **Using OpenAI key** | "Unauthorized" | Use Azure OpenAI key, not OpenAI.com key |
+| **Quotes in URL** | Parse error | Use quotes around entire URL: `DATABASE_URL="postgresql://..."` |
+| **Special chars in password** | Connection failed | URL-encode password: `@` → `%40`, `#` → `%23` |
+| **SQLite path relative** | "Database not found" | Use `file:./prisma/dev.db` (relative to project root) |
+
+---
+
+### Security Best Practices
+
+**DO:**
+- ✅ Keep `.env.local` out of git (automatically ignored)
+- ✅ Use different keys for dev/staging/production
+- ✅ Rotate API keys periodically
+- ✅ Use Azure RBAC to limit key permissions
+- ✅ Store production secrets in platform secrets (Vercel, Azure Key Vault, etc.)
+
+**DON'T:**
+- ❌ Commit `.env.local` to git
+- ❌ Share `.env.local` via email/Slack
+- ❌ Use production keys in development
+- ❌ Hardcode keys in source code
+- ❌ Screenshot or log `.env.local` contents
+
+**If keys are compromised:**
+1. **Immediately rotate in Azure Portal:**
+   - Azure Portal → Your OpenAI Resource → Keys and Endpoint
+   - Click "Regenerate Key 1" (or Key 2 if using that)
+
+2. **Update `.env.local`:**
+   ```bash
+   AZURE_OPENAI_API_KEY=new-regenerated-key
+   ```
+
+3. **Update production environment:**
+   - Vercel: Project Settings → Environment Variables
+   - Docker: Update secrets/env file
+
+---
+
+### Related Documentation
+
+- **Template with full documentation:** [`.env.example`](.env.example)
+- **Setup guide:** [`SETUP.md`](SETUP.md)
+- **Azure OpenAI setup:** [`SETUP.md`](SETUP.md) → "Azure OpenAI Configuration"
+- **Ollama setup:** [`SETUP.md`](SETUP.md) → "Ollama Setup (Local)"
 
 ---
 
 ## Getting Help
 
-*Coming soon in next subtask*
+### Before Asking for Help
+
+**Try these steps first:**
+
+1. **Search this troubleshooting guide:**
+   - Use `Ctrl+F` / `Cmd+F` to search for error messages
+   - Check [Quick Diagnosis](#quick-diagnosis) table
+
+2. **Check existing documentation:**
+   - [`README.md`](README.md) - Project overview
+   - [`SETUP.md`](SETUP.md) - Installation and setup guide
+   - [`CONTRIBUTING.md`](CONTRIBUTING.md) - Development guidelines
+   - [`docs/claude/`](docs/claude/) - Feature-specific documentation
+   - [`docs/technical/`](docs/technical/) - Technical deep dives
+
+3. **Run verification commands:**
+   ```bash
+   npm run lint
+   npm run typecheck
+   npm run build
+   ```
+
+4. **Check in-app diagnostics:**
+   - Settings → AI Provider → Diagnostics
+   - Settings → Database → Connection Status
+
+5. **Search existing issues:**
+   - [GitHub Issues](https://github.com/FightTheStroke/MirrorBuddy/issues)
+   - Someone may have already encountered your problem
+
+---
+
+### Reporting Bugs
+
+Found a bug? Please help us fix it by providing detailed information.
+
+#### Where to Report
+
+**GitHub Issues (Preferred):**
+- Open a new issue: https://github.com/FightTheStroke/MirrorBuddy/issues/new
+- Choose appropriate template: Bug Report or Feature Request
+
+**Email (Alternative):**
+- Contact: **roberdan@fightthestroke.org**
+- Subject line: `[MirrorBuddy] Bug: Brief description`
+
+#### What to Include
+
+**Essential Information:**
+
+1. **Environment:**
+   ```bash
+   # Run this command and include output:
+   node -v && npm -v
+   # Example output:
+   # v18.17.0
+   # 9.6.7
+   ```
+
+2. **Operating System:**
+   - Example: macOS 13.4 / Ubuntu 22.04 / Windows 11
+
+3. **Configuration:**
+   - Are you using Azure OpenAI or Ollama?
+   - SQLite or PostgreSQL?
+   - Any custom configuration?
+   - **DO NOT include actual API keys or secrets!**
+
+4. **Steps to Reproduce:**
+   ```
+   1. Go to '...'
+   2. Click on '...'
+   3. See error
+   ```
+
+5. **Expected Behavior:**
+   - What should happen?
+
+6. **Actual Behavior:**
+   - What actually happens?
+
+7. **Error Messages:**
+   - **Browser console errors:** (Open DevTools with F12)
+     ```
+     Error: Cannot find module '@prisma/client'
+         at require (internal/modules/cjs/loader.js:883:19)
+     ```
+
+   - **Server/terminal errors:**
+     ```bash
+     # Copy error messages from terminal
+     npm run dev
+     ```
+
+8. **Screenshots (if relevant):**
+   - Visual bugs or UI issues
+   - ⚠️ **Redact any sensitive information** (API keys, personal data)
+
+#### Example Bug Report
+
+**Good Example:**
+```markdown
+**Bug:** Voice button doesn't appear in MirrorBuddy chat
+
+**Environment:**
+- Node.js: v18.17.0
+- OS: macOS 13.4
+- Config: Azure OpenAI with Realtime API
+
+**Steps to Reproduce:**
+1. Start dev server: `npm run dev`
+2. Navigate to http://localhost:3000
+3. Open MirrorBuddy chat
+4. Look for microphone button
+
+**Expected:** Microphone button should be visible in chat input
+
+**Actual:** No microphone button appears
+
+**Console Errors:**
+```
+Warning: AZURE_OPENAI_REALTIME_DEPLOYMENT not configured
+Voice features disabled
+```
+
+**Additional Context:**
+I have set AZURE_OPENAI_REALTIME_DEPLOYMENT in .env.local but button still doesn't appear
+```
+
+**Bad Example:**
+```markdown
+Voice doesn't work. Help!
+```
+
+---
+
+### Requesting Features
+
+Have an idea? We'd love to hear it!
+
+#### Before Requesting
+
+1. **Check if it already exists:**
+   - Search [existing issues](https://github.com/FightTheStroke/MirrorBuddy/issues?q=is%3Aissue+label%3Aenhancement)
+   - Check [`README.md`](README.md) features list
+
+2. **Consider the project scope:**
+   - MirrorBuddy focuses on **education for students with learning differences**
+   - Features should align with accessibility and inclusion goals
+
+#### How to Request
+
+**GitHub Issues (Preferred):**
+1. Open a new issue: https://github.com/FightTheStroke/MirrorBuddy/issues/new
+2. Use "Feature Request" template
+3. Add `enhancement` label
+
+**Email:**
+- Contact: **roberdan@fightthestroke.org**
+- Subject: `[MirrorBuddy] Feature Request: Brief description`
+
+#### What to Include
+
+1. **Problem Statement:**
+   - What problem does this solve?
+   - Who benefits from this feature?
+
+2. **Proposed Solution:**
+   - How should it work?
+   - What should the UI look like?
+
+3. **Use Case:**
+   - Real-world scenario where this helps
+
+4. **Accessibility Considerations:**
+   - How does this work for users with:
+     - Dyslexia, dyscalculia, dysgraphia?
+     - Motor challenges (dyspraxia)?
+     - Screen readers?
+     - Keyboard-only navigation?
+
+5. **Alternatives Considered:**
+   - Are there existing features that partially solve this?
+   - Any workarounds?
+
+#### Example Feature Request
+
+```markdown
+**Feature:** Export study session summaries as PDF
+
+**Problem:**
+Students want to share their study progress with parents/teachers, but currently can only view it in-app.
+
+**Proposed Solution:**
+- Add "Export PDF" button in session summary page
+- PDF should include: session duration, topics covered, quiz results, AI feedback
+- Follow same accessible PDF format as existing PDF generator (7 DSA profiles)
+
+**Use Case:**
+A dyslexic student completes a study session and wants to show their parent what they learned. They click "Export PDF" and share the PDF via email.
+
+**Accessibility:**
+- Use @react-pdf/renderer (already in project)
+- Support all 7 DSA profiles (dyslexia, dyscalculia, etc.)
+- Include alt text for images
+- Proper heading hierarchy
+
+**Alternatives:**
+- Screenshot (not accessible)
+- Copy/paste text (loses formatting)
+```
+
+---
+
+### Getting Support
+
+#### Community Support
+
+**GitHub Discussions:**
+- Ask questions: https://github.com/FightTheStroke/MirrorBuddy/discussions
+- Share tips and tricks
+- Connect with other developers
+
+**GitHub Issues:**
+- Report bugs
+- Track feature requests
+- See what's being worked on
+
+#### Direct Support
+
+**Email:** roberdan@fightthestroke.org
+
+**Response Time:**
+- Bug reports: 1-3 business days
+- Feature requests: 1 week
+- General questions: 3-5 business days
+
+**When emailing, include:**
+- Clear subject line: `[MirrorBuddy] Type: Brief description`
+- Your environment (Node.js version, OS, config)
+- Steps to reproduce (for bugs)
+- What you've already tried
+
+---
+
+### Contributing
+
+Want to fix a bug or add a feature yourself? Amazing!
+
+**Start here:**
+1. Read [`CONTRIBUTING.md`](CONTRIBUTING.md) - Development guidelines
+2. Read [`docs/EXECUTION-CHECKLIST.md`](docs/EXECUTION-CHECKLIST.md) - Required for all PRs
+3. Fork the repository
+4. Make your changes
+5. Submit a Pull Request
+
+**Important:**
+- ⚠️ **All PRs MUST follow the [Execution Checklist](docs/EXECUTION-CHECKLIST.md)**
+- PRs without completed checklist will be rejected
+- Create execution plan BEFORE implementing
+- Get plan approval from maintainer
+
+**Quick Start:**
+```bash
+# Fork and clone
+git clone https://github.com/YOUR-USERNAME/MirrorBuddy.git
+cd MirrorBuddy
+
+# Install dependencies
+npm install
+
+# Set up environment
+cp .env.example .env.local
+# Edit .env.local with your values
+
+# Start dev server
+npm run dev
+
+# Make changes...
+
+# Verify before committing
+npm run lint && npm run typecheck && npm run build
+```
+
+---
+
+### Project Information
+
+**Repository:**
+- GitHub: https://github.com/FightTheStroke/MirrorBuddy
+- License: MIT
+
+**Organization:**
+- FightTheStroke: https://fightthestroke.org
+- Mission: Supporting children with hemiplegia and learning differences
+
+**Contact:**
+- Lead Developer: Roberto D'Antonio
+- Email: roberdan@fightthestroke.org
+
+**Acknowledgments:**
+This project was born for inclusion. Every contribution helps make education more accessible for students with learning differences.
+
+---
+
+### Frequently Asked Questions
+
+#### "Can I use MirrorBuddy without Azure OpenAI?"
+
+**Yes!** Use Ollama for 100% free, local, text-only mode:
+```bash
+brew install ollama
+ollama serve
+ollama pull llama3.2
+```
+
+**Limitations:** No voice features (onboarding, ambient audio)
+
+**See:** [SETUP.md](SETUP.md) → "Ollama Setup"
+
+---
+
+#### "How much does Azure OpenAI cost?"
+
+**Development:** ~$5-20/month for testing
+
+**Production:** Depends on usage
+- Chat (gpt-4o): ~$0.01 per conversation
+- Voice (gpt-realtime-mini): ~$0.03-0.05 per minute
+- Voice (gpt-realtime): ~$0.30 per minute
+
+**Cost optimization:**
+- Use `gpt-realtime-mini` for tutoring (90% cheaper)
+- Use `gpt-realtime` only for MirrorBuddy (emotional support)
+- Monitor costs in Settings → AI Provider
+
+**See:** [docs/claude/voice-api.md](docs/claude/voice-api.md) → "Modelli Disponibili"
+
+---
+
+#### "Can I deploy MirrorBuddy for free?"
+
+**Yes!** Here are free options:
+
+1. **Vercel (Recommended):**
+   - Free tier: Unlimited hobby projects
+   - HTTPS included
+   - Easy GitHub integration
+   - Add environment variables in dashboard
+
+2. **Netlify:**
+   - Free tier available
+   - Similar to Vercel
+
+3. **Self-hosted:**
+   - Use SQLite database (free)
+   - Use Ollama (free)
+   - Deploy on your own server
+
+**Costs you might have:**
+- Azure OpenAI API usage (if using voice)
+- PostgreSQL hosting (if not using SQLite)
+
+**See:** [SETUP.md](SETUP.md) → "Deployment"
+
+---
+
+#### "Is my data private?"
+
+**Yes, with caveats:**
+
+**Local development:**
+- Data stored in local database (SQLite)
+- API calls go to Azure OpenAI or local Ollama
+
+**Azure OpenAI:**
+- Microsoft processes API requests
+- No data used for model training
+- See: [Azure OpenAI data privacy](https://learn.microsoft.com/en-us/legal/cognitive-services/openai/data-privacy)
+
+**Ollama (100% local):**
+- ✅ All data stays on your machine
+- ✅ No internet required after model download
+- ✅ Complete privacy
+
+**See:** [SETUP.md](SETUP.md) → "Privacy & Data"
+
+---
+
+#### "How do I update MirrorBuddy?"
+
+```bash
+# 1. Backup your database (if using SQLite)
+cp prisma/dev.db prisma/dev.db.backup
+
+# 2. Pull latest changes
+git pull origin main
+
+# 3. Update dependencies
+npm install
+
+# 4. Update database schema
+npx prisma generate
+npx prisma db push
+
+# 5. Restart dev server
+npm run dev
+```
+
+**See:** [CONTRIBUTING.md](CONTRIBUTING.md) → "Updating Your Fork"
+
+---
+
+#### "Where can I find more documentation?"
+
+**Start here:**
+- [`README.md`](README.md) - Project overview
+- [`SETUP.md`](SETUP.md) - Setup guide
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) - Development guide
+- This file (`TROUBLESHOOTING.md`) - Problem solving
+
+**Feature documentation:**
+- [`docs/claude/`](docs/claude/) - Feature-specific docs
+  - `voice-api.md` - Voice configuration
+  - `ambient-audio.md` - Ambient audio system
+  - `learning-path.md` - Learning paths
+  - `pdf-generator.md` - PDF export
+  - And more...
+
+**Technical deep dives:**
+- [`docs/technical/`](docs/technical/)
+  - `AZURE_REALTIME_API.md` - Realtime API reference
+  - Database schemas, architecture, etc.
+
+**Can't find what you need?**
+- Search issues: https://github.com/FightTheStroke/MirrorBuddy/issues
+- Ask in discussions: https://github.com/FightTheStroke/MirrorBuddy/discussions
+- Email: roberdan@fightthestroke.org
 
 ---
 
