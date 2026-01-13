@@ -45,6 +45,7 @@ const TYPE_LABELS: Record<ToolType | 'all', string> = {
   diagram: 'Diagrammi',
   timeline: 'Timeline',
   formula: 'Formule',
+  calculator: 'Calcolatrici',
   chart: 'Grafici',
   pdf: 'PDF',
   webcam: 'Immagini',

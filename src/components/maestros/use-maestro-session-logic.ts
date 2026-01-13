@@ -81,6 +81,7 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
         diagram: `Ciao! Creiamo un diagramma insieme. Quale concetto vuoi visualizzare?`,
         timeline: `Ciao! Creiamo una linea temporale. Quale periodo storico o sequenza di eventi vuoi organizzare?`,
         formula: `Ciao! Vuoi lavorare con le formule. Quale formula matematica o scientifica vuoi esplorare?`,
+        calculator: `Ciao! Vuoi fare dei calcoli? Dimmi l'espressione matematica da calcolare!`,
         chart: `Ciao! Creiamo un grafico insieme. Quali dati vuoi visualizzare?`,
         'study-kit': `Ciao! Creiamo materiali di studio completi. Carica un PDF per iniziare!`,
       };

@@ -32,6 +32,7 @@ const TOOL_NAMES: Record<ToolType, string> = {
   diagram: 'Diagramma',
   timeline: 'Linea del Tempo',
   formula: 'Formula',
+  calculator: 'Calcolatrice',
   chart: 'Grafico',
   search: 'Ricerca',
   webcam: 'Foto',

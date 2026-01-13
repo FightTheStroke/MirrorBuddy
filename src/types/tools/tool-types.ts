@@ -19,7 +19,8 @@ export type ToolType =
   | 'webcam'       // Foto da webcam
   | 'pdf'          // PDF caricato
   | 'homework'     // Compiti con metodo maieutico
-  | 'study-kit';   // Bulk PDF processing with study materials
+  | 'study-kit'    // Bulk PDF processing with study materials
+  | 'calculator';  // Calcolatrice scientifica con supporto dyscalculia
 
 /**
  * Tool state for real-time UI updates
