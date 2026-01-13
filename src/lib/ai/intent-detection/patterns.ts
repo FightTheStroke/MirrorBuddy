@@ -161,6 +161,10 @@ export const TOOL_TYPE_PATTERNS: Record<ToolType, RegExp[]> = {
   timeline: [],
   summary: [],
   formula: [],
+  calculator: [
+    /\b(calcol[ao]|calcolatrice)\b/i,
+    /\b(quanto\s+fa)\b/i,
+  ],
   chart: [],
   pdf: [],
   homework: [],

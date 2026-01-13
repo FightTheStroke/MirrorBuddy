@@ -19,7 +19,21 @@ import type { SummaryData, DemoData, MindmapNode, ToolType } from '@/types/tools
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import toast from '@/components/ui/toast';
 import { logger } from '@/lib/logger';
-import { FUNCTION_NAME_TO_TOOL_TYPE } from '@/components/conversation/constants/tool-constants';
+// Function name to tool type mapping (inline to avoid circular dependencies)
+const FUNCTION_NAME_TO_TOOL_TYPE: Record<string, ToolType> = {
+  create_mindmap: 'mindmap',
+  create_quiz: 'quiz',
+  create_flashcard: 'flashcard',
+  create_flashcards: 'flashcard',
+  create_summary: 'summary',
+  create_demo: 'demo',
+  create_diagram: 'diagram',
+  create_timeline: 'timeline',
+  show_formula: 'formula',
+  create_chart: 'chart',
+  create_calculator: 'calculator',
+  web_search: 'search',
+};
 
 // C-14 FIX: Auto-save utilities now accept toolId for reliable upsert behavior
 function autoSaveMindmap(request: MindmapRequest, toolId?: string): void {

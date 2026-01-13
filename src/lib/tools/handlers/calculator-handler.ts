@@ -61,7 +61,7 @@ function generateSteps(expression: string, result: number): CalculatorStep[] {
     });
 
     return steps;
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -76,7 +76,7 @@ registerToolHandler('create_calculator', async (args): Promise<ToolExecutionResu
     // Will be used when simple mode is implemented
     showSteps = true,
     description
-  } = args as CalculatorRequest;
+  } = args as unknown as CalculatorRequest;
 
   // Validate expression
   const validation = validateExpression(expression);
