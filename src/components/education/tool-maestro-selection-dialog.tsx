@@ -185,7 +185,7 @@ export function ToolMaestroSelectionDialog({
             </div>
             <button
               onClick={handleClose}
-              className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
               aria-label="Chiudi"
             >
               <X className="h-5 w-5" />

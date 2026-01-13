@@ -88,7 +88,7 @@ export function SessionRatingModal({
           </h2>
           <button
             onClick={handleSkip}
-            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700"
             aria-label="Chiudi"
           >
             <X className="h-5 w-5" />

@@ -118,7 +118,7 @@ export function ViewMindmapModal({
                 </DropdownMenu>
                 <button
                   onClick={onClose}
-                  className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   <X className="w-5 h-5" />
                 </button>
