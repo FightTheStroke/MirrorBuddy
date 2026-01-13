@@ -69,6 +69,7 @@ backend/.env.*
 # Python
 __pycache__/
 *.pyc
+<<<<<<< HEAD
 
 # Auto Claude data directory
 .auto-claude/
@@ -80,3 +81,9 @@ __pycache__/
 .worktrees/
 .security-key
 logs/security/
+||||||| parent of 278c67f (auto-claude: subtask-4-1 - Verify HTTP Cache-Control headers are present on all endpoints)
+=======
+
+# Auto Claude data directory
+.auto-claude/
+>>>>>>> 278c67f (auto-claude: subtask-4-1 - Verify HTTP Cache-Control headers are present on all endpoints)
