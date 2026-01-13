@@ -8,7 +8,7 @@ Complete accessibility utilities for adapting content to 7 learning difference p
 |---------|---------|-----------------|--------------|
 | Dyslexia | Dislessia | MILD, MODERATE, SEVERE | OpenDyslexic font, syllabification, cream background, increased spacing |
 | Dyscalculia | Discalculia | MILD, MODERATE, SEVERE | Color-coded numbers, place value blocks, visual math, no timers |
-| ADHD | DOP/ADHD | MILD, MODERATE, SEVERE | Shorter sessions (10-20 min), limited bullets (3-7), breaks, gamification |
+| ADHD | ADHD/DDAI | MILD, MODERATE, SEVERE | Shorter sessions (10-20 min), limited bullets (3-7), breaks, gamification |
 | Cerebral Palsy | Paralisi cerebrale | MILD, MODERATE, SEVERE | Extended timeouts (2x-3x), voice input, frequent breaks |
 | Autism | Autismo | MILD, MODERATE, SEVERE | Literal language, clear structure, topic warnings, reduced motion |
 | Visual Impairment | Disabilità visiva | boolean | High contrast, TTS, large text, screen reader support |
@@ -99,12 +99,12 @@ const profile: AccessibilityProfile = {
   // ...other fields
 };
 
-// Format numbers with colors
+// Format numbers with colors (displayed left-to-right: thousands, hundreds, tens, units)
 const coloredNum = formatNumberColored(1234, true);
-// <span style="color: #3b82f6">4</span>
-// <span style="color: #10b981">3</span>
-// <span style="color: #ef4444">2</span>
-// <span style="color: #f59e0b">1</span>
+// <span style="color: #f59e0b">1</span>  // thousands (orange)
+// <span style="color: #ef4444">2</span>  // hundreds (red)
+// <span style="color: #10b981">3</span>  // tens (green)
+// <span style="color: #3b82f6">4</span>  // units (blue)
 
 // Show visual blocks
 const blocks = generatePlaceValueBlocks(123);
@@ -361,12 +361,20 @@ enum OutputMethod {
 
 ### 1. Database (Prisma)
 
-User profiles stored in `users` table with `accessibilityProfile` JSON field:
+Accessibility settings are stored in a dedicated `AccessibilitySettings` table with a 1:1 relation to `User`:
 
 ```prisma
 model User {
-  accessibilityProfile Json? // Stores full AccessibilityProfile
+  id            String                @id @default(cuid())
   // ...other fields
+  accessibility AccessibilitySettings?
+}
+
+model AccessibilitySettings {
+  id        String @id @default(cuid())
+  user      User   @relation(fields: [userId], references: [id])
+  userId    String @unique
+  // Accessibility configuration fields per-profile
 }
 ```
 
@@ -407,7 +415,7 @@ PDFs use similar adaptations in `src/lib/pdf-generator/profiles/index.ts`:
 
 - Dyslexia profile: Large font (18pt), 1.8x line height, cream background
 - ADHD profile: Distraction-free, clear sections, progress indicators
-- See `@docs/claude/pdf-generator.md` for full details
+- See `docs/claude/pdf-generator.md` for full details
 
 ### 5. AI Maestros
 
@@ -439,20 +447,20 @@ if (shouldUseVoiceInput(userProfile)) {
 
 ## Testing
 
-Run 100+ unit tests:
+Run accessibility unit tests:
 
 ```bash
 # Run all accessibility tests
 npx vitest run src/lib/education/__tests__/accessibility.test.ts
 
-# Test breakdown:
-# - Dyslexia: 10 functions × ~3 tests each = 30 tests
-# - Dyscalculia: 6 functions × ~4 tests each = 24 tests
-# - ADHD: 7 functions × ~4 tests each = 28 tests
-# - Cerebral Palsy: 5 functions × ~3 tests each = 15 tests
-# - Autism: 6 functions × ~3 tests each = 18 tests
-# - Core: 3 functions × ~5 tests each = 15 tests
-# Total: 130+ tests with 100% coverage
+# Coverage areas:
+# - Dyslexia utilities (font, spacing, syllabification)
+# - Dyscalculia utilities (number formatting, place values)
+# - ADHD utilities (session duration, bullet limits, gamification)
+# - Cerebral Palsy / motor utilities (timeouts, voice input)
+# - Autism utilities (metaphors, structure, transitions)
+# - Core accessibility utilities (CSS generation, content adaptation)
+# See test file for exact counts and coverage
 ```
 
 ## WCAG 2.1 AA Compliance
@@ -486,10 +494,10 @@ Prepared for but not yet implemented:
 
 ## Related Documentation
 
-- **PDF Generator**: `@docs/claude/pdf-generator.md` - Accessible PDF export
-- **Voice API**: `@docs/claude/voice-api.md` - Speech input/output
-- **Tools**: `@docs/claude/tools.md` - Educational tool adaptations
-- **Database**: `@docs/claude/database.md` - Profile storage
+- **PDF Generator**: `docs/claude/pdf-generator.md` - Accessible PDF export
+- **Voice API**: `docs/claude/voice-api.md` - Speech input/output
+- **Tools**: `docs/claude/tools.md` - Educational tool adaptations
+- **Database**: `docs/claude/database.md` - Profile storage
 
 ## Source Files
 
