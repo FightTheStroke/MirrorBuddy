@@ -1,0 +1,25 @@
+{
+  "active": true,
+  "spec": "011-add-content-security-policy-csp-header",
+  "state": "building",
+  "subtasks": {
+    "completed": 1,
+    "total": 3,
+    "in_progress": 1,
+    "failed": 0
+  },
+  "phase": {
+    "current": "Verify CSP Functionality",
+    "id": null,
+    "total": 2
+  },
+  "workers": {
+    "active": 0,
+    "max": 1
+  },
+  "session": {
+    "number": 3,
+    "started_at": "2026-01-13T08:23:57.483189"
+  },
+  "last_update": "2026-01-13T08:30:11.383548"
+}
