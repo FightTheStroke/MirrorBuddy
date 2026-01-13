@@ -1250,13 +1250,1078 @@ Our test-voice page includes device selection:
 
 ## Build & Development Issues
 
-*Coming soon in next subtask*
+### Dependency Problems
+
+#### Problem: `npm install` fails with conflicts or errors
+
+**Cause:** Package version conflicts, corrupted cache, or platform-specific issues
+
+**Solution:**
+
+1. **Clean install (most common fix):**
+   ```bash
+   # Delete everything and start fresh
+   rm -rf node_modules package-lock.json
+   npm cache clean --force
+   npm install
+   ```
+
+2. **Check Node.js version:**
+   ```bash
+   node -v  # Should be >= 18.0.0
+   npm -v   # Should be >= 8.0.0
+   ```
+
+   If outdated:
+   ```bash
+   # Update Node.js via nvm (recommended)
+   nvm install 18
+   nvm use 18
+
+   # Or via Homebrew (macOS)
+   brew upgrade node
+   ```
+
+3. **Platform-specific issues:**
+   ```bash
+   # macOS: If sharp or other native modules fail
+   brew install vips
+
+   # Linux: Missing build tools
+   sudo apt-get install build-essential python3
+
+   # Windows: Use Node.js installer, not WSL npm
+   ```
+
+4. **Peer dependency warnings:**
+   ```bash
+   # Usually safe to ignore, but if breaking:
+   npm install --legacy-peer-deps
+   ```
+
+#### Problem: "Cannot find module '@prisma/client'"
+
+**Cause:** Prisma Client not generated after schema changes
+
+**Solution:**
+```bash
+# Generate Prisma Client
+npx prisma generate
+
+# If still fails, regenerate everything
+rm -rf node_modules/.prisma node_modules/@prisma
+npm install
+npx prisma generate
+```
+
+**When to regenerate:**
+- After pulling schema changes from git
+- After modifying `prisma/schema.prisma`
+- After switching branches
+- If seeing "Type 'PrismaClient' is not defined"
+
+#### Problem: "Module not found" after installing new package
+
+**Cause:** Next.js dev server not aware of new dependencies
+
+**Solution:**
+```bash
+# Restart dev server
+# Press Ctrl+C to stop
+npm run dev
+
+# Or use reboot script (kills port 3000 processes first)
+npm run reboot
+```
+
+---
+
+### Build Errors
+
+#### Problem: `npm run build` fails with TypeScript errors
+
+**Cause:** Type errors in code, outdated type definitions, or incorrect tsconfig
+
+**Solution:**
+
+1. **Check for actual type errors:**
+   ```bash
+   # Run type checker to see all errors
+   npm run typecheck
+
+   # Fix reported errors in code
+   ```
+
+2. **Common type error fixes:**
+   ```typescript
+   // ❌ Wrong: Implicit any
+   function process(data) { }
+
+   // ✅ Correct: Explicit types
+   function process(data: UserData): void { }
+
+   // ❌ Wrong: Unsafe property access
+   const name = user.profile.name;
+
+   // ✅ Correct: Optional chaining
+   const name = user?.profile?.name;
+   ```
+
+3. **Update type definitions:**
+   ```bash
+   # Update all @types packages
+   npm update @types/node @types/react @types/react-dom
+   ```
+
+4. **Clear TypeScript cache:**
+   ```bash
+   # Remove build cache
+   rm -rf .next
+   npm run build
+   ```
+
+5. **Check tsconfig.json is correct:**
+   ```json
+   {
+     "compilerOptions": {
+       "strict": true,
+       "skipLibCheck": true,  // Skip type checking of .d.ts files
+       "forceConsistentCasingInFileNames": true
+     }
+   }
+   ```
+
+#### Problem: Build fails with "JavaScript heap out of memory"
+
+**Cause:** Large build requires more memory than default Node.js limit
+
+**Solution:**
+```bash
+# Increase Node.js memory limit
+export NODE_OPTIONS="--max-old-space-size=4096"
+npm run build
+
+# Or add to package.json scripts
+{
+  "scripts": {
+    "build": "NODE_OPTIONS='--max-old-space-size=4096' next build"
+  }
+}
+```
+
+#### Problem: "Error: ENOSPC: System limit for number of file watchers reached"
+
+**Cause:** Linux system limit on file watchers (common in Docker/WSL)
+
+**Solution:**
+```bash
+# Increase limit temporarily
+sudo sysctl -w fs.inotify.max_user_watches=524288
+
+# Make permanent
+echo "fs.inotify.max_user_watches=524288" | sudo tee -a /etc/sysctl.conf
+sudo sysctl -p
+```
+
+#### Problem: Build succeeds but app crashes on startup
+
+**Cause:** Runtime environment missing required variables or dependencies
+
+**Solution:**
+
+1. **Check environment variables:**
+   ```bash
+   # Ensure .env.local exists and has required vars
+   cat .env.local
+
+   # Required for production:
+   DATABASE_URL="..."
+   AZURE_OPENAI_ENDPOINT="..."
+   AZURE_OPENAI_API_KEY="..."
+   ```
+
+2. **Check server logs:**
+   ```bash
+   npm run build
+   npm start
+   # Look for error messages in console
+   ```
+
+3. **Verify Prisma is ready:**
+   ```bash
+   npx prisma generate
+   npx prisma db push  # Or migrate deploy for production
+   npm start
+   ```
+
+---
+
+### Cache Issues
+
+#### Problem: Changes not appearing in browser after editing code
+
+**Cause:** Stale Next.js cache or browser cache
+
+**Solution:**
+
+1. **Clear Next.js build cache:**
+   ```bash
+   rm -rf .next
+   npm run dev
+   ```
+
+2. **Hard refresh browser:**
+   - Chrome/Edge: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+   - Safari: `Cmd+Option+R`
+   - Firefox: `Ctrl+F5`
+
+3. **Disable browser cache in DevTools:**
+   - Chrome DevTools → Network tab → "Disable cache" checkbox
+   - Keep DevTools open while developing
+
+4. **Clear Service Worker (if using PWA features):**
+   ```bash
+   # In browser console
+   navigator.serviceWorker.getRegistrations().then(registrations => {
+     registrations.forEach(r => r.unregister());
+   });
+   ```
+
+#### Problem: "Module build failed" after switching branches
+
+**Cause:** Cached modules from different branch
+
+**Solution:**
+```bash
+# Nuclear option: Clear everything
+rm -rf .next node_modules package-lock.json
+npm install
+npx prisma generate
+npm run dev
+```
+
+#### Problem: Hot reload not working (changes require manual refresh)
+
+**Cause:** File watcher not detecting changes or WSL2 issue
+
+**Solution:**
+
+1. **Check file watcher:**
+   ```bash
+   # In another terminal
+   lsof | grep node  # macOS/Linux
+
+   # Should show file watches on your project directory
+   ```
+
+2. **WSL2 specific fix:**
+   ```bash
+   # In WSL .bashrc or .zshrc
+   export CHOKIDAR_USEPOLLING=true
+
+   # Restart terminal and dev server
+   npm run dev
+   ```
+
+3. **Reduce watched files (if project is huge):**
+   ```js
+   // next.config.js
+   module.exports = {
+     webpack: (config) => {
+       config.watchOptions = {
+         poll: 1000,
+         aggregateTimeout: 300,
+       };
+       return config;
+     },
+   };
+   ```
+
+---
+
+### TypeScript Errors
+
+#### Problem: "Cannot find module" for internal imports
+
+**Cause:** Path aliases not configured or tsconfig not loaded
+
+**Solution:**
+
+1. **Check tsconfig.json has path aliases:**
+   ```json
+   {
+     "compilerOptions": {
+       "baseUrl": ".",
+       "paths": {
+         "@/*": ["./src/*"],
+         "@/components/*": ["./src/components/*"],
+         "@/lib/*": ["./src/lib/*"]
+       }
+     }
+   }
+   ```
+
+2. **Restart TypeScript server in VSCode:**
+   - `Cmd+Shift+P` → "TypeScript: Restart TS Server"
+
+3. **Check import path is correct:**
+   ```typescript
+   // ✅ Correct
+   import { Button } from "@/components/ui/button";
+
+   // ❌ Wrong
+   import { Button } from "components/ui/button";
+   import { Button } from "src/components/ui/button";
+   ```
+
+#### Problem: "Type 'X' is not assignable to type 'Y'"
+
+**Cause:** Type mismatch, often from API changes or Prisma schema changes
+
+**Solution:**
+
+1. **Check Prisma types are up to date:**
+   ```bash
+   npx prisma generate
+   npm run typecheck
+   ```
+
+2. **Use type assertions carefully:**
+   ```typescript
+   // ❌ Avoid: Unsafe type assertion
+   const user = data as User;
+
+   // ✅ Better: Type guard
+   function isUser(data: unknown): data is User {
+     return typeof data === 'object' && data !== null && 'id' in data;
+   }
+   if (isUser(data)) {
+     // data is User here
+   }
+
+   // ✅ Best: Zod schema validation
+   import { z } from 'zod';
+   const UserSchema = z.object({ id: z.string(), name: z.string() });
+   const user = UserSchema.parse(data);
+   ```
+
+3. **Check for Prisma relation type issues:**
+   ```typescript
+   // If error: "Type 'User' is not assignable..."
+   // After changing Prisma schema:
+   npx prisma generate
+   # Restart TypeScript server in editor
+   ```
+
+#### Problem: "Property 'X' does not exist on type 'Y'"
+
+**Cause:** Type definitions out of sync with actual data structure
+
+**Solution:**
+
+1. **Update type definitions:**
+   ```typescript
+   // In src/types/index.ts
+   export interface User {
+     id: string;
+     name: string;
+     email: string;
+     // Add missing property
+     avatarUrl?: string;  // ← Add this
+   }
+   ```
+
+2. **Check Prisma schema matches:**
+   ```prisma
+   // prisma/schema.prisma
+   model User {
+     id        String  @id
+     name      String
+     email     String
+     avatarUrl String? // ← Ensure this exists if using it
+   }
+   ```
+
+   Then regenerate:
+   ```bash
+   npx prisma generate
+   ```
+
+3. **Use optional chaining if property might not exist:**
+   ```typescript
+   // Instead of: user.profile.avatarUrl
+   const avatar = user.profile?.avatarUrl ?? '/default-avatar.png';
+   ```
+
+---
+
+### Linting Issues
+
+#### Problem: ESLint errors blocking development
+
+**Cause:** Code style violations or incorrect ESLint config
+
+**Solution:**
+
+1. **Auto-fix most issues:**
+   ```bash
+   npm run lint -- --fix
+   ```
+
+2. **Check ESLint config:**
+   ```bash
+   # Verify eslint.config.js exists
+   cat eslint.config.js
+   ```
+
+3. **Ignore specific rules (use sparingly):**
+   ```typescript
+   // Disable for one line
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   const data: any = response;
+
+   // Disable for file
+   /* eslint-disable @typescript-eslint/no-explicit-any */
+   ```
+
+4. **Common fixes:**
+   ```typescript
+   // Error: "React must be in scope"
+   // ✅ Fix: Not needed in Next.js 13+ (auto-imported)
+
+   // Error: "'X' is assigned but never used"
+   // ✅ Fix: Remove unused variable or prefix with _
+   const _unusedVar = value;
+
+   // Error: "Missing return type on function"
+   // ✅ Fix: Add explicit return type
+   function getData(): Promise<User[]> { }
+   ```
+
+---
+
+### Port Already in Use
+
+#### Problem: "Port 3000 is already in use"
+
+**Cause:** Previous dev server still running or another app using port
+
+**Solution:**
+
+1. **Use reboot script (kills port 3000 processes):**
+   ```bash
+   npm run reboot
+   ```
+
+2. **Manual kill:**
+   ```bash
+   # macOS/Linux
+   lsof -ti:3000 | xargs kill -9
+
+   # Windows
+   netstat -ano | findstr :3000
+   taskkill /PID <PID> /F
+   ```
+
+3. **Change port:**
+   ```bash
+   # Temporary
+   PORT=3001 npm run dev
+
+   # Or in package.json
+   {
+     "scripts": {
+       "dev": "next dev -p 3001"
+     }
+   }
+   ```
+
+---
+
+### Debugging Checklist
+
+1. **Start with clean slate:**
+   ```bash
+   rm -rf .next node_modules package-lock.json
+   npm install
+   npx prisma generate
+   npm run typecheck
+   npm run build
+   ```
+
+2. **Check all verifications pass:**
+   ```bash
+   npm run lint
+   npm run typecheck
+   npm run build
+   # npm run test  # If tests exist
+   ```
+
+3. **Verify environment:**
+   ```bash
+   node -v  # >= 18
+   npm -v   # >= 8
+   cat .env.local  # Has required vars
+   ```
+
+4. **Check logs for specific errors:**
+   ```bash
+   # Build logs
+   npm run build 2>&1 | tee build.log
+
+   # Dev server logs
+   npm run dev 2>&1 | tee dev.log
+   ```
+
+5. **Test in production mode:**
+   ```bash
+   npm run build
+   npm start
+   # Check for runtime errors
+   ```
+
+---
+
+### Common Error Messages
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `"Cannot find module '@prisma/client'"` | Prisma not generated | `npx prisma generate` |
+| `"Module not found: Can't resolve '@/lib/...'"` | Path alias issue | Check `tsconfig.json` paths, restart TS server |
+| `"JavaScript heap out of memory"` | Large build | `NODE_OPTIONS='--max-old-space-size=4096' npm run build` |
+| `"Port 3000 already in use"` | Server already running | `npm run reboot` or `lsof -ti:3000 | xargs kill -9` |
+| `"Type error: Property 'X' does not exist"` | Type definition outdated | Update types in `src/types/index.ts` |
+| `"ENOSPC: System limit for file watchers"` | Linux/WSL limit | `sudo sysctl -w fs.inotify.max_user_watches=524288` |
+| `"Module build failed: UnhandledSchemeError"` | Webpack config issue | Clear `.next` cache, restart |
+| `"digital envelope routines::unsupported"` | Node.js version mismatch | Use Node.js 18+ or set `NODE_OPTIONS='--openssl-legacy-provider'` |
+
+---
+
+### Related Documentation
+
+- **Setup guide:** `SETUP.md`
+- **Project structure:** `ARCHITECTURE.md`
+- **Contributing:** `CONTRIBUTING.md`
+- **Package scripts:** `package.json`
 
 ---
 
 ## Ollama Issues
 
-*Coming soon in next subtask*
+### Installation & Setup
+
+#### Problem: "ollama: command not found"
+
+**Cause:** Ollama not installed or not in PATH
+
+**Solution:**
+
+1. **Install Ollama:**
+   ```bash
+   # macOS (Homebrew)
+   brew install ollama
+
+   # Linux
+   curl -fsSL https://ollama.com/install.sh | sh
+
+   # Windows
+   # Download from https://ollama.com/download/windows
+   ```
+
+2. **Verify installation:**
+   ```bash
+   ollama --version
+   # Should show: ollama version 0.x.x
+   ```
+
+3. **Check PATH (if command not found after install):**
+   ```bash
+   # Add to ~/.bashrc or ~/.zshrc
+   export PATH="$PATH:/usr/local/bin"
+
+   # Reload shell
+   source ~/.bashrc  # or source ~/.zshrc
+   ```
+
+#### Problem: Ollama installed but won't start
+
+**Cause:** Port conflict, permission issues, or service not enabled
+
+**Solution:**
+
+1. **Start Ollama service:**
+   ```bash
+   # macOS/Linux: Start manually
+   ollama serve
+
+   # macOS: Start as background service
+   brew services start ollama
+
+   # Linux: Enable systemd service
+   sudo systemctl enable ollama
+   sudo systemctl start ollama
+   ```
+
+2. **Check if running:**
+   ```bash
+   # Should show process
+   ps aux | grep ollama
+
+   # Test endpoint
+   curl http://localhost:11434/api/tags
+   ```
+
+3. **Check for port conflicts:**
+   ```bash
+   # See what's using port 11434
+   lsof -i :11434
+
+   # If another service is using it, stop it or change Ollama port
+   OLLAMA_HOST=0.0.0.0:11435 ollama serve
+   ```
+
+4. **Check logs:**
+   ```bash
+   # macOS (Homebrew service)
+   tail -f ~/Library/Logs/Ollama/server.log
+
+   # Linux (systemd)
+   sudo journalctl -u ollama -f
+   ```
+
+---
+
+### Connection Issues
+
+#### Problem: "Connection refused" or "Failed to connect to Ollama"
+
+**Cause:** Ollama not running or wrong URL configuration
+
+**Solution:**
+
+1. **Verify Ollama is running:**
+   ```bash
+   # Check service status
+   brew services list | grep ollama  # macOS
+   sudo systemctl status ollama      # Linux
+
+   # Start if not running
+   ollama serve
+   ```
+
+2. **Test connection manually:**
+   ```bash
+   # Should return JSON list of models
+   curl http://localhost:11434/api/tags
+
+   # If fails, Ollama isn't running or listening on different port
+   ```
+
+3. **Check `.env.local` configuration:**
+   ```bash
+   # Should be exactly this for local Ollama
+   OLLAMA_URL=http://localhost:11434
+   OLLAMA_MODEL=llama3.2
+   ```
+
+   **Common mistakes:**
+   - ❌ `OLLAMA_URL=localhost:11434` (missing `http://`)
+   - ❌ `OLLAMA_URL=http://127.0.0.1:11434` (use `localhost` for consistency)
+   - ❌ `OLLAMA_URL=https://localhost:11434` (should be `http`, not `https`)
+
+4. **Restart dev server after changing `.env.local`:**
+   ```bash
+   # Stop (Ctrl+C) and restart
+   npm run dev
+   ```
+
+5. **Check firewall (if remote Ollama):**
+   ```bash
+   # macOS: Allow Ollama through firewall
+   # System Settings → Network → Firewall → Options
+
+   # Linux: Open port 11434
+   sudo ufw allow 11434
+   ```
+
+#### Problem: Connection works but requests timeout
+
+**Cause:** Model too large for available memory or CPU too slow
+
+**Solution:**
+
+1. **Check system resources:**
+   ```bash
+   # Monitor while making request
+   # macOS
+   top -o MEM
+
+   # Linux
+   htop
+
+   # Look for ollama process using high CPU/RAM
+   ```
+
+2. **Use smaller model:**
+   ```bash
+   # Current model size
+   ollama list
+
+   # Try smaller alternatives:
+   ollama pull llama3.2:1b      # ~1GB  (fastest, lowest quality)
+   ollama pull llama3.2         # ~2GB  (recommended balance)
+   ollama pull llama3.2:8b      # ~4.5GB (slower, better quality)
+   ```
+
+3. **Update `.env.local` to smaller model:**
+   ```bash
+   OLLAMA_MODEL=llama3.2:1b  # Or llama3.2
+   ```
+
+4. **Increase timeout in code** (if needed):
+   ```typescript
+   // In src/lib/ai/providers.ts
+   const response = await fetch(ollamaUrl, {
+     // ...
+     signal: AbortSignal.timeout(60000), // 60 seconds (default: 30)
+   });
+   ```
+
+---
+
+### Model Management
+
+#### Problem: "Model not found" or "model 'llama3.2' not found"
+
+**Cause:** Model not downloaded locally
+
+**Solution:**
+
+1. **List available models:**
+   ```bash
+   ollama list
+   # Shows all downloaded models
+   ```
+
+2. **Pull required model:**
+   ```bash
+   # Default recommended model
+   ollama pull llama3.2
+
+   # Or specific size variant
+   ollama pull llama3.2:1b   # Smallest, fastest
+   ollama pull llama3.2:3b   # Medium
+   ollama pull llama3.2:8b   # Larger, better quality
+   ```
+
+3. **Verify model name matches `.env.local`:**
+   ```bash
+   # Check what's in config
+   cat .env.local | grep OLLAMA_MODEL
+
+   # Must match exactly what ollama list shows
+   # Example: if ollama list shows "llama3.2:latest"
+   OLLAMA_MODEL=llama3.2:latest
+   ```
+
+4. **Download time:**
+   - `llama3.2:1b` (~1GB): 2-5 minutes
+   - `llama3.2` (~2GB): 5-10 minutes
+   - `llama3.2:8b` (~4.5GB): 15-30 minutes
+
+   **Monitor progress:**
+   ```bash
+   ollama pull llama3.2
+   # Shows download progress: █████░░░░░  45%
+   ```
+
+#### Problem: Model download fails or is stuck
+
+**Cause:** Network issues, disk space, or corrupted download
+
+**Solution:**
+
+1. **Check disk space:**
+   ```bash
+   df -h
+   # Ensure at least 5-10GB free for models
+   ```
+
+2. **Check network:**
+   ```bash
+   # Test connectivity to Ollama registry
+   curl -I https://registry.ollama.ai
+   ```
+
+3. **Delete and re-download:**
+   ```bash
+   # Remove model
+   ollama rm llama3.2
+
+   # Clear cache (if needed)
+   rm -rf ~/.ollama/models/*
+
+   # Re-download
+   ollama pull llama3.2
+   ```
+
+4. **Try different mirror/CDN:**
+   ```bash
+   # Set custom registry (if available)
+   export OLLAMA_MODELS=/path/to/custom/location
+   ollama pull llama3.2
+   ```
+
+#### Choosing the Right Model
+
+| Model | Size | RAM Needed | Speed | Quality | Use Case |
+|-------|------|------------|-------|---------|----------|
+| `llama3.2:1b` | ~1GB | 2-4GB | ⚡ Fastest | ⭐ Basic | Testing, demos |
+| `llama3.2` (default) | ~2GB | 4-8GB | ⚡⚡ Fast | ⭐⭐⭐ Good | **Recommended for MirrorBuddy** |
+| `llama3.2:3b` | ~3GB | 6-10GB | ⚡⚡ Medium | ⭐⭐⭐⭐ Better | More nuanced responses |
+| `llama3.2:8b` | ~4.5GB | 8-16GB | 🐌 Slow | ⭐⭐⭐⭐⭐ Best | High quality, production |
+
+**For MirrorBuddy development:**
+- Use `llama3.2` (2GB) - best balance of speed and quality
+- Avoid `1b` variant - too low quality for educational content
+- Use `8b` only if you have good hardware (16GB+ RAM, dedicated GPU)
+
+---
+
+### Performance Issues
+
+#### Problem: Ollama responses are very slow
+
+**Cause:** Model too large, no GPU acceleration, or insufficient RAM
+
+**Solution:**
+
+1. **Check if GPU is being used:**
+   ```bash
+   # macOS (Metal)
+   ollama pull llama3.2
+   # Should show: "using Metal" during inference
+
+   # Linux with NVIDIA GPU
+   nvidia-smi
+   # Should show ollama process using GPU
+
+   # If no GPU detected, Ollama falls back to CPU (much slower)
+   ```
+
+2. **Use smaller model:**
+   ```bash
+   # Switch to faster model
+   ollama pull llama3.2:1b
+
+   # Update .env.local
+   OLLAMA_MODEL=llama3.2:1b
+   ```
+
+3. **Check available RAM:**
+   ```bash
+   # macOS
+   vm_stat | perl -ne '/page size of (\d+)/ and $size=$1; /Pages\s+([^:]+)[^\d]+(\d+)/ and printf("%-16s % 16.2f MB\n", "$1:", $2 * $size / 1048576);'
+
+   # Linux
+   free -h
+   ```
+
+   **RAM requirements:**
+   - Model size + 2GB overhead minimum
+   - Example: llama3.2 (2GB) needs 4-6GB available RAM
+
+4. **Close other applications:**
+   - Free up RAM by closing browsers, IDEs, etc.
+   - Ollama performance degrades significantly with memory pressure
+
+5. **Consider switching to Azure OpenAI:**
+   - Much faster than local Ollama without GPU
+   - Required for voice features anyway
+   - See [SETUP.md](SETUP.md) → "Azure OpenAI Setup"
+
+#### Problem: First request is slow, then faster
+
+**Cause:** Normal behavior - model loading takes time
+
+**Solution:**
+This is expected:
+- **First request:** 5-30 seconds (loading model into memory)
+- **Subsequent requests:** 2-5 seconds (model already loaded)
+
+**Keep Ollama warm:**
+```bash
+# Send periodic requests to keep model in memory
+# Or use larger RAM to avoid model eviction
+```
+
+---
+
+### Limitations & Differences from Azure OpenAI
+
+#### Ollama vs Azure OpenAI
+
+| Feature | Ollama | Azure OpenAI |
+|---------|--------|--------------|
+| **Voice** | ❌ Not supported | ✅ Full support |
+| **Cost** | Free | Pay-per-use |
+| **Speed** | Slow (CPU) to Medium (GPU) | Fast |
+| **Quality** | Good to Very Good | Excellent |
+| **Onboarding** | ❌ No voice | ✅ Voice tutorial |
+| **Setup** | Easy (local) | Requires Azure account |
+| **Privacy** | ✅ Fully local | Cloud-based |
+| **Offline** | ✅ Works offline | ❌ Requires internet |
+
+#### Features Not Available with Ollama
+
+**Voice Features:**
+- ❌ Voice onboarding tutorial
+- ❌ Ambient audio conversations
+- ❌ Voice commands
+
+**Workaround:** Use Showcase Mode for full UI experience without API calls:
+```bash
+# Navigate to showcase mode
+http://localhost:3000/showcase
+# Or enable in Settings → "Modalità Showcase"
+```
+
+**Text Features Still Work:**
+- ✅ Maestri chat (text only)
+- ✅ Knowledge Hub
+- ✅ Flashcards, Quizzes
+- ✅ Mind maps
+- ✅ Learning paths
+
+#### Problem: Maestri responses lack personality compared to Azure
+
+**Cause:** Smaller model, less training data, simpler prompt handling
+
+**Solution:**
+
+1. **Use larger model:**
+   ```bash
+   ollama pull llama3.2:8b
+   OLLAMA_MODEL=llama3.2:8b
+   ```
+
+2. **Accept the trade-off:**
+   - Ollama: Free, private, but less personality
+   - Azure: Better quality, voice, but costs money
+
+3. **For production, use Azure OpenAI** (recommended)
+
+---
+
+### Configuration & Environment
+
+#### Problem: `.env.local` changes not taking effect
+
+**Cause:** Dev server caches environment variables
+
+**Solution:**
+```bash
+# Always restart after changing .env.local
+# Press Ctrl+C to stop
+npm run dev
+```
+
+#### Problem: Can't tell if using Ollama or Azure OpenAI
+
+**Cause:** Not clear which provider is active
+
+**Solution:**
+
+1. **Check Settings → AI Provider → Diagnostics:**
+   - Shows active provider (Azure OpenAI or Ollama)
+   - Connection status
+   - Model being used
+
+2. **Check browser console:**
+   - Look for log messages indicating provider
+   - Example: "Using Ollama at http://localhost:11434"
+
+3. **Check `.env.local` priority:**
+   ```bash
+   # If BOTH are configured, Azure OpenAI takes priority
+   AZURE_OPENAI_ENDPOINT=...  # ← Used first
+   OLLAMA_URL=...             # ← Fallback if Azure fails
+
+   # To force Ollama, comment out Azure:
+   # AZURE_OPENAI_ENDPOINT=...
+   OLLAMA_URL=http://localhost:11434
+   ```
+
+---
+
+### Common Error Messages
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `"ollama: command not found"` | Ollama not installed | Install: `brew install ollama` or `curl -fsSL https://ollama.com/install.sh \| sh` |
+| `"Connection refused at localhost:11434"` | Ollama not running | Start: `ollama serve` or `brew services start ollama` |
+| `"Model 'llama3.2' not found"` | Model not pulled | Pull: `ollama pull llama3.2` |
+| `"Out of memory"` | Model too large for RAM | Use smaller model: `ollama pull llama3.2:1b` |
+| `"Request timeout"` | Model loading or inference slow | Wait for first request (up to 30s), use smaller model |
+| `"Failed to load model"` | Corrupted download or disk full | Delete and re-pull: `ollama rm llama3.2 && ollama pull llama3.2` |
+| `"Port 11434 already in use"` | Another service using port | Find and stop: `lsof -ti:11434 \| xargs kill -9` |
+
+---
+
+### Debugging Checklist
+
+1. **Verify Ollama is installed and running:**
+   ```bash
+   ollama --version
+   ollama list
+   curl http://localhost:11434/api/tags
+   ```
+
+2. **Check model is downloaded:**
+   ```bash
+   ollama list
+   # Should show llama3.2 or your configured model
+   ```
+
+3. **Test model directly:**
+   ```bash
+   ollama run llama3.2 "Hello, how are you?"
+   # Should get response from model
+   ```
+
+4. **Verify environment variables:**
+   ```bash
+   cat .env.local | grep OLLAMA
+   # Should show:
+   # OLLAMA_URL=http://localhost:11434
+   # OLLAMA_MODEL=llama3.2
+   ```
+
+5. **Check MirrorBuddy connection:**
+   - Go to Settings → AI Provider → Diagnostics
+   - Click "Test Connection"
+   - Should show "Connected to Ollama"
+
+6. **Monitor Ollama logs:**
+   ```bash
+   # macOS
+   tail -f ~/Library/Logs/Ollama/server.log
+
+   # Linux
+   sudo journalctl -u ollama -f
+
+   # Manual run (shows logs in terminal)
+   ollama serve
+   ```
+
+---
+
+### Related Documentation
+
+- **Setup guide:** `SETUP.md` → "Ollama Setup (Local)"
+- **AI providers:** `src/lib/ai/providers.ts`
+- **Ollama docs:** https://ollama.com/docs
+- **Model library:** https://ollama.com/library
 
 ---
 
