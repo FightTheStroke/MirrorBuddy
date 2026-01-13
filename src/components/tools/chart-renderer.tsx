@@ -40,6 +40,16 @@ const defaultColors = [
   '#f97316', // Orange
 ];
 
+// Common style configurations for chart components
+const tooltipStyle = {
+  backgroundColor: '#1e293b',
+  border: 'none',
+  borderRadius: '8px',
+  color: '#fff',
+};
+
+const legendStyle = { fontSize: '12px' };
+
 export function ChartRenderer({ request, className }: ChartRendererProps) {
   // Transform data for Recharts format
   const chartData = useMemo(() => {
@@ -74,15 +84,8 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1e293b',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#fff',
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
               <Line
                 key={dataset.label}
@@ -102,15 +105,8 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1e293b',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#fff',
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
               <Area
                 key={dataset.label}
@@ -130,15 +126,8 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1e293b',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#fff',
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
               <Bar
                 key={dataset.label}
@@ -159,15 +148,8 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1e293b',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#fff',
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
               <Scatter
                 key={dataset.label}
@@ -196,15 +178,8 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
                 <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1e293b',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#fff',
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Legend wrapperStyle={legendStyle} />
           </PieChart>
         );
 
@@ -226,15 +201,8 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
                 <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
               ))}
             </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#1e293b',
-                border: 'none',
-                borderRadius: '8px',
-                color: '#fff',
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: '12px' }} />
+            <Tooltip contentStyle={tooltipStyle} />
+            <Legend wrapperStyle={legendStyle} />
           </PieChart>
         );
 
@@ -324,15 +292,8 @@ export function DoughnutRenderer({ request, className }: ChartRendererProps) {
               <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
             ))}
           </Pie>
-          <Tooltip
-            contentStyle={{
-              backgroundColor: '#1e293b',
-              border: 'none',
-              borderRadius: '8px',
-              color: '#fff',
-            }}
-          />
-          <Legend wrapperStyle={{ fontSize: '12px' }} />
+          <Tooltip contentStyle={tooltipStyle} />
+          <Legend wrapperStyle={legendStyle} />
         </PieChart>
       </ResponsiveContainer>
 
