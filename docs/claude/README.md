@@ -23,6 +23,7 @@ Reference files with `@docs/claude/filename.md` in conversation.
 | `onboarding.md` | Voice onboarding with Melissa |
 | `parent-dashboard.md` | GDPR consent, parent-professor chat |
 | `pomodoro.md` | Timer phases, XP rewards |
+| `safety.md` | 5-layer child protection, content filtering |
 | `session-summaries.md` | Session summary generation |
 | `summary-tool.md` | Summary tool, export formats |
 | `tools.md` | Tool execution, mindmap/quiz/flashcard |
