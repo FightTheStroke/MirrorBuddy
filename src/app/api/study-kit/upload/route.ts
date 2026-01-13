@@ -10,8 +10,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+<<<<<<< HEAD
 import { processStudyKit } from '@/lib/tools/handlers/study-kit-generators';
 import { saveMaterialsFromStudyKit, indexStudyKitContent } from '@/lib/study-kit/sync-materials';
+||||||| parent of a518ab2 (auto-claude: subtask-4-4 - Create and apply validation schemas for /api/study-kit routes)
+import { processStudyKit } from '@/lib/tools/handlers/study-kit-handler';
+import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
+=======
+import { processStudyKit } from '@/lib/tools/handlers/study-kit-handler';
+import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
+import { UploadStudyKitSchema } from '@/lib/validation/schemas/study-kit';
+>>>>>>> a518ab2 (auto-claude: subtask-4-4 - Create and apply validation schemas for /api/study-kit routes)
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for processing
@@ -36,12 +45,13 @@ export async function POST(request: NextRequest) {
     // Parse form data
     const formData = await request.formData();
     const file = formData.get('file') as File | null;
-    const title = formData.get('title') as string | null;
-    const subject = formData.get('subject') as string | null;
+    const titleRaw = formData.get('title') as string | null;
+    const subjectRaw = formData.get('subject') as string | null;
 
-    if (!file || !title) {
+    // Validate required file
+    if (!file) {
       return NextResponse.json(
-        { error: 'Missing required fields: file, title' },
+        { error: 'Missing required field: file' },
         { status: 400 }
       );
     }
@@ -63,6 +73,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate title and subject using schema
+    const validation = UploadStudyKitSchema.safeParse({
+      title: titleRaw,
+      subject: subjectRaw || undefined,
+    });
+
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: 'Invalid input', details: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const { title, subject } = validation.data;
+
     logger.info('Processing study kit upload', {
       userId,
       filename: file.name,
@@ -81,7 +106,7 @@ export async function POST(request: NextRequest) {
         userId,
         sourceFile: file.name,
         title,
-        subject: subject || undefined,
+        subject,
         status: 'processing',
       },
     });
@@ -90,7 +115,7 @@ export async function POST(request: NextRequest) {
     // Wrapped in async IIFE to ensure all errors (sync and async) are caught
     (async () => {
       try {
-        const result = await processStudyKit(buffer, title, subject || undefined, (step, progress) => {
+        const result = await processStudyKit(buffer, title, subject, (step, progress) => {
           logger.debug('Study kit progress', { studyKitId: studyKit.id, step, progress });
         });
 
