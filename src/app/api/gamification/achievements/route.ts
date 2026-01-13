@@ -1,6 +1,7 @@
 /**
  * API Route: Gamification Achievements
  * GET /api/gamification/achievements - Get user achievements
+ * WAVE 3: Added caching for achievement definitions
  */
 
 import { NextResponse } from 'next/server';
@@ -8,6 +9,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { getOrCreateGamification, checkAchievements } from '@/lib/gamification/db';
 import { logger } from '@/lib/logger';
+import { getOrCompute, CACHE_TTL } from '@/lib/cache';
 
 export async function GET() {
   try {
@@ -23,10 +25,15 @@ export async function GET() {
 
     const gamification = await getOrCreateGamification(userId);
 
-    // Get all achievements with unlock status
-    const allAchievements = await prisma.achievement.findMany({
-      orderBy: [{ category: 'asc' }, { tier: 'asc' }],
-    });
+    // Get all achievements with unlock status (cached - static data)
+    const allAchievements = await getOrCompute(
+      'achievements:definitions',
+      () =>
+        prisma.achievement.findMany({
+          orderBy: [{ category: 'asc' }, { tier: 'asc' }],
+        }),
+      { ttl: CACHE_TTL.ACHIEVEMENTS }
+    );
 
     const userAchievementMap = new Map(
       gamification.achievements.map(ua => [ua.achievementId, ua])
