@@ -826,7 +826,425 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
 
 ## Voice Session Issues
 
-*Coming soon in next subtask*
+### HTTPS Requirement (Critical for Production)
+
+#### Problem: Microphone doesn't work on mobile or non-localhost
+
+**Cause:** `navigator.mediaDevices.getUserMedia()` requires **secure context** (HTTPS)
+
+**Browser Security Rules:**
+- ✅ `localhost:3000` / `127.0.0.1:3000` → Works (localhost exempt)
+- ✅ `https://your-domain.com` → Works
+- ❌ `http://192.168.x.x:3000` → **Blocked** (insecure IP)
+- ❌ `http://your-domain.com` → **Blocked** (insecure HTTP)
+
+**Solution for Development:**
+
+1. **Option 1: Use localhost on device browser** (desktop only)
+   ```bash
+   npm run dev
+   # Open http://localhost:3000 in same machine
+   ```
+
+2. **Option 2: HTTPS tunnel** (for mobile testing)
+   ```bash
+   # Using Cloudflare Tunnel (recommended)
+   cloudflared tunnel --url http://localhost:3000
+
+   # Or using ngrok
+   ngrok http 3000
+   ```
+
+3. **Option 3: Local HTTPS with mkcert**
+   ```bash
+   # Install mkcert
+   brew install mkcert
+   mkcert -install
+
+   # Generate cert for local IP
+   mkcert localhost 192.168.1.100 127.0.0.1
+
+   # Use in Next.js (requires custom server)
+   ```
+
+**Solution for Production:**
+- Deploy with HTTPS (Vercel, Netlify, etc. handle this automatically)
+- Ensure WebSocket proxy also uses `wss://` (not `ws://`)
+
+**Reference:** See `docs/claude/voice-api.md` → "Requisito HTTPS per Microfono"
+
+---
+
+### Microphone Permissions
+
+#### Problem: "Permission denied" or microphone button does nothing
+
+**Cause:** Browser blocked microphone access
+
+**Solution:**
+
+1. **Check browser permissions:**
+   - **Chrome:** `chrome://settings/content/microphone`
+   - **Safari:** Preferences → Websites → Microphone
+   - **Firefox:** `about:preferences#privacy` → Permissions → Microphone
+
+2. **Reset site permissions:**
+   ```
+   Chrome: Click 🔒 in address bar → Site settings → Microphone → Allow
+   Safari: Safari → Settings for This Website → Microphone → Allow
+   ```
+
+3. **Test microphone works:**
+   ```bash
+   # Navigate to test page
+   http://localhost:3000/test-voice
+
+   # Should see microphone icon and be able to click it
+   ```
+
+4. **Common mistakes:**
+   - Using HTTP on non-localhost (see HTTPS section above)
+   - Denying permission on first request (must reset in browser settings)
+   - Using incorrect device (select right mic in device picker)
+
+#### Problem: "NotFoundError: Requested device not found"
+
+**Cause:** No microphone connected or wrong device ID
+
+**Solution:**
+
+1. **List available devices:**
+   ```typescript
+   navigator.mediaDevices.enumerateDevices()
+     .then(devices => {
+       const mics = devices.filter(d => d.kind === 'audioinput');
+       console.log('Microphones:', mics);
+     });
+   ```
+
+2. **Use device selector:**
+   - Our test-voice page has a device dropdown
+   - Select correct microphone from list
+   - Setting is saved to localStorage
+
+3. **Check system settings:**
+   - macOS: System Settings → Sound → Input
+   - Windows: Settings → System → Sound → Input
+
+---
+
+### Audio Format Issues
+
+#### Problem: Voice connects but audio is distorted/choppy
+
+**Cause:** Wrong sample rate or audio format
+
+**Critical Requirements:**
+- **Sample rate:** 24000 Hz (24kHz) - **MUST match Azure API**
+- **Format:** PCM16 (16-bit linear PCM)
+- **Channels:** Mono (1 channel)
+
+**Solution:**
+
+1. **Verify AudioContext sample rate:**
+   ```typescript
+   // CORRECT - forces 24kHz
+   const audioContext = new AudioContext({ sampleRate: 24000 });
+   console.log('Sample rate:', audioContext.sampleRate); // Must be 24000
+
+   // WRONG - uses browser default (often 48kHz)
+   const audioContext = new AudioContext();
+   ```
+
+2. **Our implementation** (in `use-voice-session.ts`):
+   ```typescript
+   // Line ~300-310
+   audioContextRef.current = new AudioContext({ sampleRate: 24000 });
+   ```
+
+3. **If you modify voice code:**
+   - ALWAYS create AudioContext with `{ sampleRate: 24000 }`
+   - NEVER use default sample rate
+   - Check `audioContext.sampleRate` in console if issues persist
+
+**Reference:** See `docs/technical/AZURE_REALTIME_API.md` → "Audio Format" and "Resampling 48kHz → 24kHz"
+
+#### Problem: User speaks but audio never reaches Azure
+
+**Cause:** Microphone capturing at wrong sample rate or format
+
+**Solution:**
+
+1. **Check capture format in use-voice-session.ts:**
+   ```typescript
+   // MediaRecorder setup (line ~400-420)
+   const mediaRecorder = new MediaRecorder(stream, {
+     mimeType: 'audio/webm;codecs=opus', // Browser captures here
+   });
+
+   // Then resampled to 24kHz PCM16 for Azure
+   ```
+
+2. **Verify resampling works:**
+   - Check console for "Resampling audio" messages
+   - Should see downsampling from 48kHz → 24kHz
+   - No warnings about unsupported format
+
+3. **Test with test-voice page:**
+   ```bash
+   npm run dev
+   # Go to /test-voice
+   # Enable "Show Debug Logs"
+   # Speak and watch console for audio data flow
+   ```
+
+---
+
+### WebSocket Connection Issues
+
+#### Problem: "WebSocket connection failed" or "Connection closed unexpectedly"
+
+**Cause:** Proxy not running, wrong URL, or network issues
+
+**Solution:**
+
+1. **Verify proxy is running:**
+   ```bash
+   # Dev server starts proxy automatically on port 3001
+   npm run dev
+
+   # You should see:
+   # "Realtime proxy listening on ws://localhost:3001"
+   ```
+
+2. **Check WebSocket URL format:**
+   ```typescript
+   // CORRECT (development)
+   ws://localhost:3001
+
+   // CORRECT (production with HTTPS)
+   wss://your-domain.com/api/realtime-proxy
+
+   // WRONG
+   http://localhost:3001  // Not a WebSocket URL
+   ws://localhost:3000    // Wrong port (3000 is Next.js, not proxy)
+   ```
+
+3. **Inspect WebSocket in browser:**
+   - Chrome DevTools → Network → WS tab
+   - Should see connection to `ws://localhost:3001`
+   - Check "Messages" tab to see events flowing
+
+4. **Check proxy logs:**
+   ```bash
+   # Terminal running npm run dev shows proxy logs
+   # Look for:
+   # "Client connected"
+   # "Azure connected"
+   # "Error:" messages
+   ```
+
+#### Problem: WebSocket connects but no events received
+
+**Cause:** Event names mismatch (Preview vs GA API) or session.update failed
+
+**Solution:**
+
+1. **Check which API version you're using:**
+   ```bash
+   # Look at your deployment name in .env.local
+   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime  # GA API
+   # or
+   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview  # Preview API
+   ```
+
+2. **Event name differences** (see [Azure OpenAI Issues](#preview-vs-ga-api-critical) above):
+
+   | Event Type | Preview API | GA API |
+   |------------|-------------|--------|
+   | Audio chunk | `response.audio.delta` | `response.output_audio.delta` |
+   | Transcript | `response.audio_transcript.delta` | `response.output_audio_transcript.delta` |
+
+3. **Our code handles both** (in `use-voice-session.ts:575-616`):
+   ```typescript
+   switch (event.type) {
+     case 'response.output_audio.delta':  // GA API
+     case 'response.audio.delta':         // Preview API
+       playAudio(event.delta);
+       break;
+   }
+   ```
+
+4. **If you modify event handlers:**
+   - ALWAYS add both event name cases
+   - Test with your actual deployment
+   - Check `docs/technical/AZURE_REALTIME_API.md` → "CRITICAL: Preview vs GA API"
+
+#### Problem: Connection works initially but closes after 5-10 seconds
+
+**Cause:** Missing session.update or invalid session config
+
+**Solution:**
+
+1. **Ensure session.update is sent after connection:**
+   ```typescript
+   // In use-voice-session.ts (line ~515-538)
+   ws.onopen = () => {
+     // MUST send session.update immediately
+     ws.send(JSON.stringify({
+       type: 'session.update',
+       session: {
+         voice: 'alloy',
+         instructions: '...',
+         input_audio_format: 'pcm16',
+         turn_detection: { type: 'server_vad', ... }
+       }
+     }));
+   };
+   ```
+
+2. **Check session config format:**
+   - Preview API: `voice` is flat in `session`
+   - GA API: format may differ (see Azure docs)
+   - Our proxy auto-detects (`src/server/realtime-proxy.ts:61`)
+
+3. **Verify in WebSocket messages:**
+   - Network → WS → Messages tab
+   - Look for `session.update` message sent
+   - Look for `session.updated` response from Azure
+
+---
+
+### Audio Echo / Feedback Loop
+
+#### Problem: Audio plays back through microphone causing echo
+
+**Cause:** System audio routing captures speaker output as microphone input
+
+**Solution:**
+
+1. **Use headphones** (simplest solution)
+   - Prevents speaker output from being captured by mic
+   - Recommended for all voice testing
+
+2. **Check system audio settings:**
+   - macOS: Ensure "Use ambient noise reduction" is OFF
+   - Windows: Disable "Listen to this device"
+
+3. **Disable barge-in during onboarding** (if echo persists):
+   ```typescript
+   // In voice session config
+   disableBargeIn: true  // Prevents auto-interruption
+   ```
+
+4. **For MirrorBuddy conversation:**
+   - Code already handles this (`src/components/ambient-audio/onboarding-modal.tsx`)
+   - Onboarding uses `disableBargeIn: true`
+   - Normal sessions use barge-in for natural conversation
+
+**Reference:** See `docs/technical/AZURE_REALTIME_API.md` → "Barge-in (Auto-Interruption)"
+
+---
+
+### Device Selection
+
+#### Problem: Want to use external microphone or specific speaker
+
+**Solution:**
+
+Our test-voice page includes device selection:
+
+1. **Navigate to test page:**
+   ```bash
+   npm run dev
+   # Go to http://localhost:3000/test-voice
+   ```
+
+2. **Select devices:**
+   - **Microphone dropdown:** Choose input device
+   - **Speaker dropdown:** Choose output device
+   - Selections saved to localStorage
+
+3. **Implementation reference:**
+   - Code in `src/app/test-voice/page.tsx`
+   - Uses `enumerateDevices()` API
+   - Creates MediaStreamAudioSourceNode with specific device
+
+4. **Troubleshooting device issues:**
+   ```typescript
+   // List all devices in console
+   navigator.mediaDevices.enumerateDevices().then(devices => {
+     console.log(devices.filter(d => d.kind === 'audioinput'));  // Mics
+     console.log(devices.filter(d => d.kind === 'audiooutput')); // Speakers
+   });
+   ```
+
+**Reference:** See `docs/technical/AZURE_REALTIME_API.md` → "Device Selection (Microphone and Speaker)"
+
+---
+
+### Common Error Messages
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `"NotAllowedError: Permission denied"` | Mic permission denied | Reset in browser settings (see [Microphone Permissions](#microphone-permissions)) |
+| `"NotSupportedError: secure context"` | Using HTTP on non-localhost | Use HTTPS or localhost (see [HTTPS Requirement](#https-requirement-critical-for-production)) |
+| `"NotFoundError: Device not found"` | Microphone not connected | Check system settings, plug in mic |
+| `"WebSocket connection failed"` | Proxy not running | Ensure `npm run dev` is running |
+| `"Invalid value: 'gpt-4o-transcribe'"` | Wrong transcription model | Use `whisper-1` only (see [Azure OpenAI Issues](#voice-realtime-api-configuration)) |
+| `"Session update failed"` | Wrong session format | Check Preview vs GA format (see above) |
+| `AudioContext.createMediaStreamSource: NotFoundError` | No audio track in stream | Check microphone constraints |
+
+---
+
+### Debugging Checklist
+
+1. **Test with test-voice page first:**
+   ```bash
+   npm run dev
+   # Navigate to http://localhost:3000/test-voice
+   # Follow on-screen instructions
+   ```
+
+2. **Check browser console:**
+   - Look for WebSocket connection messages
+   - Check for "Permission denied" or HTTPS warnings
+   - Verify sample rate: should log "24000"
+
+3. **Inspect WebSocket traffic:**
+   - Chrome DevTools → Network → WS tab
+   - Click connection → Messages
+   - Verify `session.update` sent and `session.updated` received
+   - Check for audio.delta events when speaking
+
+4. **Check proxy logs:**
+   - Terminal running `npm run dev`
+   - Look for "Client connected" and "Azure connected"
+   - Check for error messages from Azure
+
+5. **Verify environment variables:**
+   ```bash
+   node -e "require('dotenv').config({path:'.env.local'}); console.log({
+     endpoint: process.env.AZURE_OPENAI_REALTIME_ENDPOINT,
+     deployment: process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT,
+     hasKey: !!process.env.AZURE_OPENAI_REALTIME_API_KEY
+   })"
+   ```
+
+6. **Test microphone in browser:**
+   - Go to https://mictests.com
+   - Verify microphone works in browser
+   - If fails, it's a system/browser issue, not MirrorBuddy
+
+---
+
+### Related Documentation
+
+- **Full API reference:** `docs/technical/AZURE_REALTIME_API.md`
+- **Voice configuration:** `docs/claude/voice-api.md`
+- **Test page implementation:** `src/app/test-voice/page.tsx`
+- **Voice hook:** `src/lib/hooks/use-voice-session.ts`
+- **WebSocket proxy:** `src/server/realtime-proxy.ts`
 
 ---
 
