@@ -7,48 +7,19 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
-import type { Maestro, MaestroVoice, Subject } from '@/types';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { CharacterAvatar } from './character-avatar';
 import { CharacterRoleBadge } from './character-role-badge';
 import { AudioDeviceSelector } from './audio-device-selector';
-import { CHARACTER_AVATARS } from './constants';
+import {
+  getUserId,
+  activeCharacterToMaestro,
+} from './voice-call-helpers';
 
-// C-2 FIX: Helper to get userId from cookie or sessionStorage
-function getUserId(): string | null {
-  if (typeof window === 'undefined') return null;
-  const cookieMatch = document.cookie.match(/mirrorbuddy-user-id=([^;]+)/);
-  if (cookieMatch) return cookieMatch[1];
-  return sessionStorage.getItem('mirrorbuddy-user-id');
-}
-
-/**
- * Voice connection info from /api/realtime/token
- */
 interface VoiceConnectionInfo {
   provider: 'azure';
   proxyPort: number;
   configured: boolean;
-}
-
-/**
- * Convert ActiveCharacter to Maestro-compatible interface for voice session.
- * Coach and Buddy have all the required voice fields.
- */
-function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
-  return {
-    id: character.id,
-    name: character.name,
-    subject: 'methodology' as Subject, // Coaches/buddies aren't subject-specific
-    specialty: character.type === 'coach' ? 'Metodo di studio' : 'Supporto emotivo',
-    voice: (character.voice || 'alloy') as MaestroVoice,
-    voiceInstructions: character.voiceInstructions || '',
-    teachingStyle: character.type === 'coach' ? 'scaffolding' : 'peer-support',
-    avatar: CHARACTER_AVATARS[character.id] || '/avatars/default.jpg',
-    color: character.color,
-    systemPrompt: character.systemPrompt,
-    greeting: character.greeting,
-  };
 }
 
 interface VoiceCallOverlayProps {

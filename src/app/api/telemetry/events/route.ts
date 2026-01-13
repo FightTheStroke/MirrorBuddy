@@ -9,6 +9,18 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { TelemetryCategory } from '@/lib/telemetry/types';
 
+// CORS headers for telemetry endpoint
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+};
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return NextResponse.json({}, { headers: corsHeaders });
+}
+
 const VALID_CATEGORIES: TelemetryCategory[] = [
   'navigation',
   'education',
@@ -38,10 +50,21 @@ export async function POST(request: Request) {
     const cookieStore = await cookies();
     const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
-    const body: EventPayload = await request.json();
+    // Handle empty or malformed JSON body gracefully
+    let body: EventPayload;
+    try {
+      const text = await request.text();
+      if (!text || text.trim() === '') {
+        return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
+      }
+      body = JSON.parse(text);
+    } catch {
+      // Empty body or cancelled request - not an error, just nothing to store
+      return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
+    }
 
     if (!body.events || !Array.isArray(body.events)) {
-      return NextResponse.json({ error: 'Invalid events payload' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid events payload' }, { status: 400, headers: corsHeaders });
     }
 
     // Validate and filter events
@@ -56,7 +79,7 @@ export async function POST(request: Request) {
     });
 
     if (validEvents.length === 0) {
-      return NextResponse.json({ stored: 0 });
+      return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
     }
 
     // Filter out already existing events (avoid duplicates on retry)
@@ -70,7 +93,7 @@ export async function POST(request: Request) {
     const newEvents = validEvents.filter((e) => !existingIdSet.has(e.id));
 
     if (newEvents.length === 0) {
-      return NextResponse.json({ stored: 0 });
+      return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
     }
 
     // Store events in database
@@ -88,12 +111,12 @@ export async function POST(request: Request) {
       })),
     });
 
-    return NextResponse.json({ stored: created.count });
+    return NextResponse.json({ stored: created.count }, { headers: corsHeaders });
   } catch (error) {
     logger.error('Telemetry events POST error', { error: String(error) });
     return NextResponse.json(
       { error: 'Failed to store telemetry events' },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

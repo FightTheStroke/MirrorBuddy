@@ -25,6 +25,9 @@ export interface StudyKit {
   demo?: DemoData;
   quiz?: QuizData;
 
+  // Original PDF content for RAG context
+  originalText?: string;
+
   // Processing status
   status: StudyKitStatus;
   errorMessage?: string;

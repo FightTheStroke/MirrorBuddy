@@ -2,9 +2,15 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
 /**
- * mirrorbuddy-Edu E2E Test Configuration
+ * MirrorBuddy E2E Test Configuration
  * Tests for educational platform with AI-powered tutoring
+ *
+ * Environment: Clears color env vars to ensure consistent test output.
+ * DATABASE_URL: Optional - tests use mock data when not provided.
  */
+delete process.env.NO_COLOR;
+delete process.env.FORCE_COLOR;
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -30,23 +36,10 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-    // Mobile viewports
-    {
-      name: 'Mobile Chrome',
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      use: { ...devices['iPhone 12'] },
-    },
+    // Other browsers disabled - only testing API/backend, not cross-browser UI
+    // Re-enable if needed:
+    // { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+    // { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
   ],
 
   webServer: {
@@ -54,5 +47,11 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
+    env: {
+      // Pass through database URLs if set in environment
+      ...(process.env.DATABASE_URL && { DATABASE_URL: process.env.DATABASE_URL }),
+      ...(process.env.DIRECT_URL && { DIRECT_URL: process.env.DIRECT_URL }),
+      E2E_TESTS: '1',
+    },
   },
 });

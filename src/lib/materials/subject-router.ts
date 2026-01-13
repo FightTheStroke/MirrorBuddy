@@ -158,6 +158,7 @@ const TYPED_SUBJECT_MAP: Record<Subject, string> = {
   internationalLaw: 'cesare',
   spanish: 'alex-pina',
   storytelling: 'chris',
+  supercazzola: 'mascetti',
 };
 
 /**

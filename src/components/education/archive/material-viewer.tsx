@@ -17,6 +17,7 @@ import { TOOL_ICONS, TOOL_LABELS } from './constants';
 import { formatDate } from './utils';
 import type { ArchiveItem } from './types';
 import type { PrintableContentType } from '@/lib/tools/accessible-print';
+import { RelatedMaterials } from '@/components/education/knowledge-hub/components/related-materials';
 import {
   getRendererImport,
   hasRenderer,
@@ -27,9 +28,10 @@ import {
 interface MaterialViewerProps {
   item: ArchiveItem;
   onClose: () => void;
+  onNavigate?: (toolId: string) => void;
 }
 
-export function MaterialViewer({ item, onClose }: MaterialViewerProps) {
+export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProps) {
   const Icon = TOOL_ICONS[item.toolType];
   const label = TOOL_LABELS[item.toolType];
 
@@ -190,6 +192,12 @@ export function MaterialViewer({ item, onClose }: MaterialViewerProps) {
         {/* Content */}
         <div className="p-6 overflow-auto max-h-[calc(90vh-80px)]">
           {renderContent()}
+
+          <RelatedMaterials
+            materialToolId={item.toolId}
+            onNavigate={onNavigate}
+            className="mt-6"
+          />
         </div>
       </motion.div>
     </motion.div>

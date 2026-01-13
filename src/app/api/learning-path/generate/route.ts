@@ -24,10 +24,13 @@ interface GenerateRequest {
 export async function POST(request: NextRequest) {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('userId')?.value;
+    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Unauthorized - userId cookie not found' },
+        { status: 401 }
+      );
     }
 
     const body: GenerateRequest = await request.json();

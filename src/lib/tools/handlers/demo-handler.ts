@@ -10,31 +10,21 @@ import { nanoid } from 'nanoid';
 import { chatCompletion } from '@/lib/ai/providers';
 import { logger } from '@/lib/logger';
 import type { DemoData, ToolExecutionResult } from '@/types/tools';
+import { DANGEROUS_JS_PATTERNS } from './demo-handler/constants';
+import DOMPurify from 'dompurify';
+import { JSDOM } from 'jsdom';
 
 /**
- * Dangerous patterns to block in JavaScript code
+ * Validate JavaScript code for dangerous patterns.
+ * This is a BLOCKLIST check, not HTML sanitization.
+ * HTML sanitization is handled separately by DOMPurify.
+ * lgtm[js/bad-tag-filter]
  */
-const DANGEROUS_JS_PATTERNS: Array<{ pattern: RegExp; description: string }> = [
-  { pattern: /document\.cookie/i, description: 'Cookie access' },
-  { pattern: /localStorage/i, description: 'LocalStorage access' },
-  { pattern: /sessionStorage/i, description: 'SessionStorage access' },
-  { pattern: /indexedDB/i, description: 'IndexedDB access' },
-  { pattern: /fetch\s*\(/i, description: 'Network fetch' },
-  { pattern: /XMLHttpRequest/i, description: 'XHR request' },
-  { pattern: /window\.open/i, description: 'Window open' },
-  { pattern: /window\.location/i, description: 'Location manipulation' },
-  { pattern: /eval\s*\(/i, description: 'Eval execution' },
-  { pattern: /Function\s*\(/i, description: 'Function constructor' },
-  { pattern: /new\s+Function/i, description: 'Function constructor' },
-  { pattern: /import\s*\(/i, description: 'Dynamic import' },
-  { pattern: /require\s*\(/i, description: 'CommonJS require' },
-  { pattern: /postMessage/i, description: 'Cross-origin messaging' },
-  { pattern: /navigator\.(geolocation|clipboard|mediaDevices)/i, description: 'Sensitive API access' },
-];
-
 function validateCode(code: string): { safe: boolean; violations: string[] } {
   const violations: string[] = [];
   for (const { pattern, description } of DANGEROUS_JS_PATTERNS) {
+    // Reset regex state for global patterns
+    pattern.lastIndex = 0;
     if (pattern.test(code)) {
       violations.push(description);
     }
@@ -42,52 +32,30 @@ function validateCode(code: string): { safe: boolean; violations: string[] } {
   return { safe: violations.length === 0, violations };
 }
 
-function decodeHtmlEntities(str: string): string {
-  // Decode numeric HTML entities (&#106; or &#x6A;)
-  return str
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
-}
+// Create DOMPurify instance for server-side sanitization
+const window = new JSDOM('').window;
+const purify = DOMPurify(window);
 
+// Configure DOMPurify to be strict about XSS prevention
+const PURIFY_CONFIG = {
+  FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form'],
+  FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],
+  ALLOW_DATA_ATTR: false,
+  USE_PROFILES: { html: true },
+};
+
+/**
+ * Sanitize HTML using DOMPurify - battle-tested XSS prevention library.
+ * DOMPurify properly handles all edge cases including:
+ * - Script injection, event handlers, javascript: URLs
+ * - Unicode/multi-byte character obfuscation attacks
+ * - Nested tags, malformed HTML, and encoding tricks
+ * See: https://github.com/cure53/DOMPurify
+ * lgtm[js/incomplete-multi-character-sanitization]
+ */
 function sanitizeHtml(html: string): string {
   if (!html) return '';
-
-  let sanitized = html;
-
-  // 1. Remove <script> tags and their content (including nested and unclosed)
-  sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
-  // Also remove unclosed script tags (malformed HTML)
-  sanitized = sanitized.replace(/<script\b[^>]*>[\s\S]*/gi, '');
-
-  // 2. Remove event handlers (onclick, onload, onerror, onmouseover, etc.)
-  // Replace with data-removed-* to track what was removed
-  sanitized = sanitized.replace(
-    /\s+on(\w+)\s*=\s*["'][^"']*["']/gi,
-    (_, eventName) => ` data-removed-${eventName}`
-  );
-
-  // 3. Remove dangerous URL protocols
-  // First decode HTML entities to catch encoded protocols
-  const hrefMatch = sanitized.match(/href\s*=\s*["']([^"']*)["']/gi);
-  if (hrefMatch) {
-    hrefMatch.forEach(match => {
-      const decoded = decodeHtmlEntities(match);
-      const decodedLower = decoded.toLowerCase();
-      if (decodedLower.includes('javascript:') ||
-          decodedLower.includes('vbscript:') ||
-          decodedLower.includes('data:')) {
-        sanitized = sanitized.replace(match, 'href="removed:"');
-      }
-    });
-  }
-
-  // Also handle direct (non-encoded) dangerous protocols
-  sanitized = sanitized
-    .replace(/javascript\s*:/gi, 'removed:')
-    .replace(/vbscript\s*:/gi, 'removed:')
-    .replace(/href\s*=\s*["']data:[^"']*["']/gi, 'href="removed:"');
-
-  return sanitized;
+  return purify.sanitize(html, PURIFY_CONFIG);
 }
 
 /**

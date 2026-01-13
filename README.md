@@ -11,8 +11,9 @@
 
 <p align="center">
   <a href="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/tests-1945%20passed-brightgreen" alt="Tests: 1945 passed">
-  <img src="https://img.shields.io/badge/coverage-80.75%25-brightgreen" alt="Coverage: 80.75%">
+  <img src="https://img.shields.io/badge/tests-3144-brightgreen" alt="Tests: 3144">
+  <img src="https://img.shields.io/badge/e2e-85-blue" alt="E2E: 85">
+  <img src="https://img.shields.io/badge/coverage-80%25-brightgreen" alt="Coverage: 80%">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <a href="https://github.com/FightTheStroke/MirrorBuddy/releases"><img src="https://img.shields.io/github/v/release/FightTheStroke/MirrorBuddy?include_prereleases&label=version" alt="Version"></a>
 </p>
@@ -145,9 +146,11 @@ Open http://localhost:3000 and start learning.
 
 ## Architecture
 
-**Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (primary, chat+voice) / Ollama (fallback, text) → Prisma ORM (SQLite/PostgreSQL)
+**Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Ollama (fallback, text) → Prisma ORM → PostgreSQL + pgvector
 
-**Key Decision (ADR 0015):** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.
+**Key Decisions:**
+- **ADR 0015:** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.
+- **ADR 0033:** RAG (Retrieval-Augmented Generation) using Azure OpenAI embeddings + pgvector for semantic search of user materials.
 
 **→ Full architecture & diagram: [ARCHITECTURE.md](ARCHITECTURE.md)**
 
@@ -161,10 +164,11 @@ Open http://localhost:3000 and start learning.
 | Language | TypeScript 5 (strict mode) |
 | Styling | Tailwind CSS 4 |
 | State | Zustand |
-| Voice | Azure OpenAI Realtime API |
+| AI | Azure OpenAI (chat, voice, embeddings) |
+| RAG | pgvector (semantic search) |
 | Mind Maps | MarkMap |
-| Database | Prisma + SQLite/PostgreSQL |
-| Testing | Playwright E2E |
+| Database | Prisma + PostgreSQL + pgvector |
+| Testing | Playwright E2E (API-focused) + Vitest unit |
 
 ---
 

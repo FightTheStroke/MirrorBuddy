@@ -5,29 +5,13 @@
 
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
-
-// Season calculation
-function getCurrentSeason(): string {
-  const now = new Date();
-  const quarter = Math.ceil((now.getMonth() + 1) / 3);
-  return `${now.getFullYear()}-Q${quarter}`;
-}
-
-// Level calculation: 1000 MirrorBucks per level, max 100 per season
-function calculateLevel(points: number): number {
-  return Math.min(100, Math.floor(points / 1000) + 1);
-}
-
-// Tier based on level
-function calculateTier(level: number): string {
-  if (level >= 90) return 'leggenda';
-  if (level >= 75) return 'maestro';
-  if (level >= 60) return 'esperto';
-  if (level >= 45) return 'avanzato';
-  if (level >= 30) return 'intermedio';
-  if (level >= 15) return 'apprendista';
-  return 'principiante';
-}
+import {
+  getCurrentSeason,
+  calculateLevel,
+  calculateTier,
+  calculateStreakMultiplier,
+  checkAchievementRequirement,
+} from './gamification-helpers';
 
 /**
  * Get or create user gamification record
@@ -87,10 +71,7 @@ export async function awardPoints(
   const streak = gamification.streak;
 
   // Calculate multiplier based on streak
-  let multiplier = 1.0;
-  if (streak && streak.currentStreak >= 7) multiplier = 1.5;
-  else if (streak && streak.currentStreak >= 3) multiplier = 1.25;
-  else if (streak && streak.currentStreak >= 1) multiplier = 1.1;
+  const multiplier = streak ? calculateStreakMultiplier(streak.currentStreak) : 1.0;
 
   const finalPoints = Math.round(points * multiplier);
   const newTotal = gamification.totalPoints + finalPoints;
@@ -209,23 +190,11 @@ export async function checkAchievements(userId: string) {
 
   for (const achievement of lockedAchievements) {
     const requirement = JSON.parse(achievement.requirement);
-    let shouldUnlock = false;
-
-    // Check different achievement types
-    switch (requirement.type) {
-      case 'total_points':
-        shouldUnlock = gamification.totalPoints >= requirement.value;
-        break;
-      case 'level':
-        shouldUnlock = gamification.level >= requirement.value;
-        break;
-      case 'streak':
-        shouldUnlock = (gamification.streak?.currentStreak || 0) >= requirement.value;
-        break;
-      case 'first_session':
-        shouldUnlock = gamification.totalPoints > 0;
-        break;
-    }
+    const shouldUnlock = checkAchievementRequirement(requirement, {
+      totalPoints: gamification.totalPoints,
+      level: gamification.level,
+      currentStreak: gamification.streak?.currentStreak || 0,
+    });
 
     if (shouldUnlock) {
       await prisma.userAchievement.create({

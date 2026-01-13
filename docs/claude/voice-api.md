@@ -52,6 +52,26 @@ AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime-mini
 
 3. Test qualità con Maestri prima di produzione
 
+## WebRTC Transport (Recommended)
+
+As of January 2026, MirrorBuddy uses WebRTC for voice by default.
+
+### Configuration
+Set `VOICE_TRANSPORT=webrtc` (default) or `VOICE_TRANSPORT=websocket` for fallback.
+
+### Architecture
+- Client fetches ephemeral token from `/api/realtime/ephemeral-token`
+- Direct SDP exchange with Azure Realtime API
+- Audio via native WebRTC tracks
+- JSON events via RTCDataChannel
+
+### Benefits
+- Lower latency (~200-350ms vs ~450-900ms with WebSocket)
+- Native barge-in support
+- No server-side audio proxy needed
+
+---
+
 ## Trascrizione Audio (input_audio_transcription)
 
 ### Modelli Disponibili nel Realtime API
@@ -123,6 +143,56 @@ Hardcoded in `session-config.ts` - NON modificabili dall'utente:
   temperature: 0.8,
 }
 ```
+
+## Conversation Context Injection (ADR 0035)
+
+When users load a previous conversation and start voice, the AI now has full context.
+
+### How It Works
+
+1. Chat messages are passed via `connectionInfo.initialMessages` when calling `connect()`
+2. After `session.update` is sent, messages are injected via `conversation.item.create`
+3. Greeting is skipped (`greetingSentRef = true`) to continue naturally
+
+### Code Flow
+
+```
+User loads old conversation → clicks voice →
+  → useCharacterChat/useMaestroSessionLogic passes messages →
+    → useMaestroVoiceConnection formats as initialMessages →
+      → connect() stores in initialMessagesRef →
+        → useSendSessionConfig injects after session.update
+```
+
+### API Message Format
+
+```typescript
+// For each message in history:
+{
+  type: 'conversation.item.create',
+  item: {
+    type: 'message',
+    role: 'user' | 'assistant',
+    content: [{ type: 'input_text', text: messageContent }],
+  },
+}
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `src/lib/hooks/voice-session/types.ts` | `initialMessages` in ConnectionInfo |
+| `src/lib/hooks/voice-session/session-config.ts` | Injection logic after session.update |
+| `src/components/maestros/use-maestro-voice-connection.ts` | Formats messages for Maestri |
+| `src/components/conversation/character-chat-view/hooks/use-character-chat/index.ts` | Formats for Coach/Buddy |
+
+### Limitations
+
+- Very long conversations may need truncation (future optimization)
+- Works with both WebSocket and WebRTC transports
+
+---
 
 ## Preview vs GA API
 

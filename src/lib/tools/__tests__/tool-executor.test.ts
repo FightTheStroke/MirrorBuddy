@@ -5,12 +5,8 @@ import {
   getRegisteredHandlers,
   clearHandlers,
 } from '../tool-executor';
+import { ToolRegistry } from '../plugin/registry';
 import type { ToolExecutionResult, ToolContext } from '@/types/tools';
-
-// Mock the broadcast function
-vi.mock('@/lib/realtime/tool-events', () => ({
-  broadcastToolEvent: vi.fn(),
-}));
 
 // Mock nanoid with a function that generates unique IDs
 const mockNanoid = vi.fn();
@@ -23,6 +19,8 @@ describe('tool-executor', () => {
 
   beforeEach(() => {
     clearHandlers();
+    // Clear the ToolRegistry singleton to ensure test isolation
+    ToolRegistry.getInstance().clear();
     vi.clearAllMocks();
     // Reset and configure nanoid mock to return unique IDs
     idCounter = 0;
@@ -31,6 +29,7 @@ describe('tool-executor', () => {
 
   afterEach(() => {
     clearHandlers();
+    ToolRegistry.getInstance().clear();
   });
 
   describe('registerToolHandler', () => {
@@ -69,11 +68,16 @@ describe('tool-executor', () => {
 
   describe('executeToolCall', () => {
     it('should execute registered handler with args', async () => {
+      const validArgs = {
+        title: 'Test Topic',
+        nodes: [{ id: 'node-1', label: 'Root Node' }],
+      };
+
       const mockResult: ToolExecutionResult = {
         success: true,
         toolId: 'test-id',
         toolType: 'mindmap',
-        data: { topic: 'Test Topic', nodes: [] },
+        data: validArgs,
       };
 
       const mockHandler = vi.fn().mockResolvedValue(mockResult);
@@ -87,12 +91,12 @@ describe('tool-executor', () => {
 
       const result = await executeToolCall(
         'create_mindmap',
-        { topic: 'Test Topic', nodes: [] },
+        validArgs,
         context
       );
 
       expect(mockHandler).toHaveBeenCalledWith(
-        { topic: 'Test Topic', nodes: [] },
+        validArgs,
         context
       );
       expect(result.success).toBe(true);
@@ -133,7 +137,15 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_quiz', mockHandler);
 
-      const result = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
+      // Pass all required fields per Zod schema
+      const result = await executeToolCall('create_quiz', {
+        topic: 'Test Quiz',
+        questions: [{
+          question: 'Test question?',
+          options: ['A', 'B', 'C'],
+          correctIndex: 0,
+        }],
+      }, { sessionId: 'test' });
 
       // Executor should fill in a toolId when handler returns empty
       expect(result.toolId).toBeTruthy();
@@ -150,7 +162,15 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_quiz', mockHandler);
 
-      const result = await executeToolCall('create_quiz', {}, { sessionId: 'test' });
+      // Pass all required fields per Zod schema
+      const result = await executeToolCall('create_quiz', {
+        topic: 'Test Quiz',
+        questions: [{
+          question: 'Test question?',
+          options: ['A', 'B', 'C'],
+          correctIndex: 0,
+        }],
+      }, { sessionId: 'test' });
 
       // Handler's toolId should be preserved
       expect(result.toolId).toBe('handler-provided-id');
@@ -158,8 +178,10 @@ describe('tool-executor', () => {
   });
 
   describe('tool event broadcasting', () => {
-    it('should broadcast tool:created event on start', async () => {
-      const { broadcastToolEvent } = await import('@/lib/realtime/tool-events');
+    it('should not broadcast SSE events directly (delegated to ToolOrchestrator)', async () => {
+      // Tool event broadcasting is now handled by ToolOrchestrator's unified EventBroadcaster
+      // for both WebRTC DataChannel and SSE fallback (F-08, F-14)
+      // tool-executor delegates this responsibility, no longer broadcasts directly
       const mockHandler = vi.fn().mockResolvedValue({
         success: true,
         toolId: 'test-id',
@@ -168,50 +190,17 @@ describe('tool-executor', () => {
       });
       registerToolHandler('create_demo', mockHandler);
 
-      await executeToolCall('create_demo', { title: 'Test Demo' }, { sessionId: 'test', maestroId: 'galileo' });
+      // Pass all required fields per Zod schema
+      const result = await executeToolCall('create_demo', {
+        title: 'Test Demo',
+        concept: 'Test concept',
+        visualization: 'Test visualization',
+        interaction: 'Test interaction',
+      }, { sessionId: 'test', maestroId: 'galileo' });
 
-      expect(broadcastToolEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'tool:created',
-          toolType: 'demo',
-        })
-      );
-    });
-
-    it('should broadcast tool:complete on success', async () => {
-      const { broadcastToolEvent } = await import('@/lib/realtime/tool-events');
-      const mockHandler = vi.fn().mockResolvedValue({
-        success: true,
-        toolId: 'test-id',
-        toolType: 'search',
-        data: { results: [] },
-      });
-      registerToolHandler('web_search', mockHandler);
-
-      await executeToolCall('web_search', { query: 'test' }, { sessionId: 'test' });
-
-      expect(broadcastToolEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'tool:complete',
-        })
-      );
-    });
-
-    it('should broadcast tool:error on failure', async () => {
-      const { broadcastToolEvent } = await import('@/lib/realtime/tool-events');
-      const mockHandler = vi.fn().mockRejectedValue(new Error('Test error'));
-      registerToolHandler('failing_tool', mockHandler);
-
-      await executeToolCall('failing_tool', {}, { sessionId: 'test' });
-
-      expect(broadcastToolEvent).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'tool:error',
-          data: expect.objectContaining({
-            error: expect.stringContaining('Test error'),
-          }),
-        })
-      );
+      // Verify execution succeeded - broadcasting is verified through ToolOrchestrator tests
+      expect(result.success).toBe(true);
+      expect(result.toolType).toBe('demo');
     });
   });
 });

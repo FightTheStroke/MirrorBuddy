@@ -2,96 +2,197 @@
 // REALTIME WEBSOCKET PROXY SERVER
 // Proxies WebSocket connections to OpenAI or Azure OpenAI Realtime API
 // API Key stays server-side - NEVER exposed to client
+//
+// @deprecated WebSocket proxy is deprecated. Use WebRTC transport instead.
+// Set VOICE_TRANSPORT=webrtc in environment to enable WebRTC.
+// This proxy will be removed in a future release.
+// See: src/lib/hooks/voice-session/ for WebRTC implementation.
 // ============================================================================
 
 import { WebSocketServer, WebSocket } from 'ws';
 import { IncomingMessage } from 'http';
 import { logger } from '@/lib/logger';
+import { getProviderConfig } from './realtime-proxy-provider';
+import type { ProxyConnection, CharacterType } from './realtime-proxy-types';
 
 const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 
-let wss: WebSocketServer | null = null;
+// Timeout configuration
+const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes idle timeout
+const CONNECTION_TIMEOUT_MS = 30 * 1000; // 30 seconds initial connection timeout
+const PING_INTERVAL_MS = 15 * 1000; // 15 seconds ping interval
 
-interface ProxyConnection {
-  clientWs: WebSocket;
-  backendWs: WebSocket | null;
-  maestroId: string;
-}
+let wss: WebSocketServer | null = null;
 
 const connections = new Map<string, ProxyConnection>();
 
-type Provider = 'openai' | 'azure';
-type CharacterType = 'maestro' | 'coach' | 'buddy';
+/**
+ * Clean up all timers and delete a connection from the map
+ * MUST be called before deleting to prevent timer leaks
+ */
+function cleanupConnection(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
 
-interface ProviderConfig {
-  provider: Provider;
-  wsUrl: string;
-  headers: Record<string, string>;
-}
-
-function getProviderConfig(characterType: CharacterType = 'maestro'): ProviderConfig | null {
-  // Priority 1: Azure OpenAI (GDPR compliant, configured for this project)
-  const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
-  const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
-  const azureDeploymentPremium = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
-  const azureDeploymentMini = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI;
-
-  // Cost optimization: Use mini model by default, premium only for MirrorBuddy
-  // MirrorBuddy (buddy type) needs premium model for emotional detection quality
-  const usePremium = characterType === 'buddy';
-  const azureDeployment = usePremium ? azureDeploymentPremium : (azureDeploymentMini || azureDeploymentPremium);
-
-  if (azureEndpoint && azureApiKey && azureDeployment) {
-    const normalized = azureEndpoint
-      .replace(/^https:\/\//, 'wss://')
-      .replace(/^http:\/\//, 'ws://');
-    const url = new URL(normalized);
-
-    // Log which deployment is being used
-    const modelTier = usePremium ? 'PREMIUM' : 'MINI';
-    logger.debug(`Using ${modelTier} deployment: ${azureDeployment} for characterType: ${characterType}`);
-
-    // =========================================================================
-    // AZURE REALTIME API: Preview vs GA
-    // =========================================================================
-    // CRITICAL: Azure has TWO different API formats that use different:
-    //   1. URL paths
-    //   2. Query parameters
-    //   3. Event names (response.audio.delta vs response.output_audio.delta)
-    //
-    // Preview API (gpt-4o-realtime-preview):
-    //   - Path: /openai/realtime
-    //   - Events: response.audio.delta, response.audio_transcript.delta
-    //
-    // GA API (gpt-realtime):
-    //   - Path: /openai/v1/realtime
-    //   - Events: response.output_audio.delta, response.output_audio_transcript.delta
-    //
-    // See: docs/AZURE_REALTIME_API.md for full documentation
-    // =========================================================================
-    const isPreviewModel = azureDeployment.includes('4o') || azureDeployment.includes('preview');
-
-    if (isPreviewModel) {
-      // Preview API format: /openai/realtime with api-version and deployment
-      url.pathname = '/openai/realtime';
-      url.searchParams.set('api-version', '2025-04-01-preview');
-      url.searchParams.set('deployment', azureDeployment);
-      url.searchParams.set('api-key', azureApiKey);
-    } else {
-      // GA API format: /openai/v1/realtime with model
-      url.pathname = '/openai/v1/realtime';
-      url.searchParams.set('model', azureDeployment);
-      url.searchParams.set('api-key', azureApiKey);
-    }
-
-    return {
-      provider: 'azure',
-      wsUrl: url.toString(),
-      headers: {}, // No headers needed - api-key is in URL
-    };
+  // Clear all timers before deletion
+  if (conn.idleTimer) {
+    clearTimeout(conn.idleTimer);
+    conn.idleTimer = null;
+  }
+  if (conn.connectionTimeoutTimer) {
+    clearTimeout(conn.connectionTimeoutTimer);
+    conn.connectionTimeoutTimer = null;
+  }
+  if (conn.pingTimer) {
+    clearInterval(conn.pingTimer);
+    conn.pingTimer = null;
+  }
+  if (conn.pongTimer) {
+    clearTimeout(conn.pongTimer);
+    conn.pongTimer = null;
   }
 
-  return null;
+  connections.delete(connectionId);
+}
+
+/**
+ * Reset idle timer for a connection - call on any activity
+ */
+function resetIdleTimer(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
+
+  conn.lastActivityTime = Date.now();
+
+  // Clear existing timer
+  if (conn.idleTimer) {
+    clearTimeout(conn.idleTimer);
+  }
+
+  // Set new idle timer
+  conn.idleTimer = setTimeout(() => {
+    logger.info(`Connection ${connectionId} idle timeout - closing`);
+    if (conn.clientWs.readyState === WebSocket.OPEN) {
+      conn.clientWs.close(4001, 'Idle timeout');
+    }
+    if (conn.backendWs?.readyState === WebSocket.OPEN) {
+      conn.backendWs.close();
+    }
+    cleanupConnection(connectionId);
+  }, IDLE_TIMEOUT_MS);
+}
+
+/**
+ * Clear idle timer for a connection (on disconnect)
+ */
+function clearIdleTimer(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn?.idleTimer) {
+    clearTimeout(conn.idleTimer);
+    conn.idleTimer = null;
+  }
+}
+
+/**
+ * Start initial connection timeout - closes if backend doesn't connect within 30s
+ */
+function startConnectionTimeout(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
+
+  const timeoutTimer = setTimeout(() => {
+    logger.warn(`Connection ${connectionId} timeout - backend failed to connect within 30s`);
+    if (conn.clientWs.readyState === WebSocket.OPEN) {
+      conn.clientWs.close(4008, 'Connection timeout');
+    }
+    if (conn.backendWs?.readyState === WebSocket.OPEN) {
+      conn.backendWs.close();
+    }
+    cleanupConnection(connectionId);
+  }, CONNECTION_TIMEOUT_MS);
+
+  conn.connectionTimeoutTimer = timeoutTimer;
+}
+
+/**
+ * Clear connection timeout (called once connection is established)
+ */
+function clearConnectionTimeout(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn) {
+    const timeoutTimer = conn.connectionTimeoutTimer;
+    if (timeoutTimer) {
+      clearTimeout(timeoutTimer);
+      conn.connectionTimeoutTimer = null;
+    }
+  }
+}
+
+/**
+ * Start ping interval - sends ping every 15s to detect stale connections
+ */
+function startPingInterval(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (!conn) return;
+
+  const pingTimer = setInterval(() => {
+    if (conn.clientWs.readyState === WebSocket.OPEN) {
+      conn.clientWs.ping();
+
+      // Set up pong timeout - close if no pong within 30s
+      if (conn.pongTimer) {
+        clearTimeout(conn.pongTimer);
+      }
+
+      const pongTimer = setTimeout(() => {
+        logger.warn(`Connection ${connectionId} no pong received - closing`);
+        if (conn.clientWs.readyState === WebSocket.OPEN) {
+          conn.clientWs.close(4009, 'Pong timeout');
+        }
+        if (conn.backendWs?.readyState === WebSocket.OPEN) {
+          conn.backendWs.close();
+        }
+        cleanupConnection(connectionId);
+      }, CONNECTION_TIMEOUT_MS);
+
+      conn.pongTimer = pongTimer;
+    }
+  }, PING_INTERVAL_MS);
+
+  conn.pingTimer = pingTimer;
+}
+
+/**
+ * Handle pong response - clears pong timeout
+ */
+function handlePong(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn) {
+    const pongTimer = conn.pongTimer;
+    if (pongTimer) {
+      clearTimeout(pongTimer);
+      conn.pongTimer = null;
+    }
+  }
+}
+
+/**
+ * Clear ping timer for a connection (on disconnect)
+ */
+function clearPingTimer(connectionId: string): void {
+  const conn = connections.get(connectionId);
+  if (conn) {
+    const pingTimer = conn.pingTimer;
+    if (pingTimer) {
+      clearInterval(pingTimer);
+      conn.pingTimer = null;
+    }
+    const pongTimer = conn.pongTimer;
+    if (pongTimer) {
+      clearTimeout(pongTimer);
+      conn.pongTimer = null;
+    }
+  }
 }
 
 export function startRealtimeProxy(): void {
@@ -151,11 +252,22 @@ export function startRealtimeProxy(): void {
       clientWs,
       backendWs,
       maestroId,
+      lastActivityTime: Date.now(),
+      idleTimer: null,
     });
+
+    // Start idle timer for this connection
+    resetIdleTimer(connectionId);
+
+    // Start connection timeout - close if backend doesn't connect within 30s
+    startConnectionTimeout(connectionId);
 
     backendWs.on('open', () => {
       logger.info(`Backend WebSocket OPEN for ${connectionId}`);
+      clearConnectionTimeout(connectionId);
+      startPingInterval(connectionId);
       clientWs.send(JSON.stringify({ type: 'proxy.ready' }));
+      resetIdleTimer(connectionId);
     });
 
     // Proxy messages from Backend to Client
@@ -173,10 +285,15 @@ export function startRealtimeProxy(): void {
       if (clientWs.readyState === WebSocket.OPEN) {
         clientWs.send(data);
       }
+      // Reset idle timer on backend activity
+      resetIdleTimer(connectionId);
     });
 
     // Proxy messages from Client to Backend
     clientWs.on('message', (data: Buffer) => {
+      // Reset idle timer on client activity
+      resetIdleTimer(connectionId);
+
       if (backendWs.readyState === WebSocket.OPEN) {
         // Convert Buffer to string - Azure requires text messages, not binary
         const msg = data.toString('utf-8');
@@ -209,7 +326,7 @@ export function startRealtimeProxy(): void {
         const validCode = (code === 1000 || (code >= 3000 && code <= 4999)) ? code : 1000;
         clientWs.close(validCode, reason.toString());
       }
-      connections.delete(connectionId);
+      cleanupConnection(connectionId);
     });
 
     // Handle client disconnection
@@ -218,7 +335,7 @@ export function startRealtimeProxy(): void {
       if (backendWs.readyState === WebSocket.OPEN) {
         backendWs.close();
       }
-      connections.delete(connectionId);
+      cleanupConnection(connectionId);
     });
 
     // Handle client errors
@@ -227,7 +344,12 @@ export function startRealtimeProxy(): void {
       if (backendWs.readyState === WebSocket.OPEN) {
         backendWs.close();
       }
-      connections.delete(connectionId);
+      cleanupConnection(connectionId);
+    });
+
+    // Handle pong response - clears pong timeout
+    clientWs.on('pong', () => {
+      handlePong(connectionId);
     });
   });
 
@@ -239,6 +361,9 @@ export function startRealtimeProxy(): void {
 export function stopRealtimeProxy(): void {
   if (wss) {
     for (const [id, conn] of connections) {
+      clearIdleTimer(id);
+      clearConnectionTimeout(id);
+      clearPingTimer(id);
       conn.clientWs.close();
       conn.backendWs?.close();
       connections.delete(id);

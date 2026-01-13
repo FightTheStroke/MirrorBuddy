@@ -96,7 +96,14 @@ export default function ShowcaseLayout({
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/showcase" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl overflow-hidden">
-              <Image src="/logo-brain.png" alt="MirrorBuddy" width={40} height={40} className="object-contain" />
+              <Image
+                src="/logo-brain.png"
+                alt="MirrorBuddy"
+                width={40}
+                height={40}
+                className="object-contain"
+                style={{ width: '100%', height: '100%' }}
+              />
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">MirrorBuddy</h1>

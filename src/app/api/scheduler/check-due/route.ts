@@ -1,77 +1,23 @@
-// ============================================================================
-// CHECK DUE API
-// Checks for due flashcards and upcoming sessions, creates notifications
-// This endpoint is called periodically by the client (Issue #27)
-// ============================================================================
+/**
+ * CHECK DUE API
+ * Checks for due flashcards and upcoming sessions, creates notifications
+ * This endpoint is called periodically by the client (Issue #27)
+ */
 
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-import {
-  MELISSA_VOICE_TEMPLATES,
-  type NotificationPreferences,
-  DEFAULT_NOTIFICATION_PREFERENCES,
-} from '@/lib/scheduler/types';
+import { type NotificationPreferences, DEFAULT_NOTIFICATION_PREFERENCES } from '@/lib/scheduler/types';
 import { sendPushToUser, isPushConfigured } from '@/lib/push/send';
+import { getUserId, parseTime, isQuietHours, getMelissaVoice } from './helpers';
 
-// Helper to get userId from cookies (consistent with other APIs)
-async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get('mirrorbuddy-user-id')?.value || null;
-}
-
-/**
- * Parse time string (e.g., "16:00") to hours and minutes
- */
-function parseTime(time: string): { hours: number; minutes: number } {
-  const [hours, minutes] = time.split(':').map(Number);
-  return { hours, minutes };
-}
-
-/**
- * Check if current time is within quiet hours
- */
-function isQuietHours(prefs: NotificationPreferences): boolean {
-  if (!prefs.quietHoursStart || !prefs.quietHoursEnd) return false;
-
-  const now = new Date();
-  const currentHours = now.getHours();
-  const currentMinutes = now.getMinutes();
-  const currentTime = currentHours * 60 + currentMinutes;
-
-  const start = parseTime(prefs.quietHoursStart);
-  const end = parseTime(prefs.quietHoursEnd);
-  const startTime = start.hours * 60 + start.minutes;
-  const endTime = end.hours * 60 + end.minutes;
-
-  // Handle overnight quiet hours (e.g., 22:00 to 07:00)
-  if (startTime > endTime) {
-    return currentTime >= startTime || currentTime <= endTime;
-  }
-
-  return currentTime >= startTime && currentTime <= endTime;
-}
-
-/**
- * Get a random Melissa voice template
- */
-function getMelissaVoice(type: keyof typeof MELISSA_VOICE_TEMPLATES, data: Record<string, unknown>): string {
-  const templates = MELISSA_VOICE_TEMPLATES[type];
-  const template = templates[Math.floor(Math.random() * templates.length)];
-
-  // Replace placeholders with data
-  return template.replace(/\{(\w+)\}/g, (_, key) => String(data[key] ?? ''));
-}
-
-// POST - Check for due items and create notifications
 export async function POST(request: Request) {
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`scheduler-check:${clientId}`, {
     ...RATE_LIMITS.GENERAL,
-    maxRequests: 30, // Allow more frequent checks
-    windowMs: 60000, // Per minute
+    maxRequests: 30,
+    windowMs: 60000,
   });
 
   if (!rateLimit.success) {
@@ -84,7 +30,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
-    // Get user's schedule and preferences
     const schedule = await prisma.studySchedule.findUnique({
       where: { userId },
       include: {
@@ -97,7 +42,6 @@ export async function POST(request: Request) {
       ? JSON.parse(schedule.preferences)
       : DEFAULT_NOTIFICATION_PREFERENCES;
 
-    // Skip if notifications disabled or quiet hours
     if (!preferences.enabled || isQuietHours(preferences)) {
       return NextResponse.json({
         checked: true,
@@ -109,18 +53,16 @@ export async function POST(request: Request) {
     const now = new Date();
     const notificationsCreated: string[] = [];
 
-    // 1. Check for due flashcards
+    // Check for due flashcards
     const dueFlashcards = await prisma.flashcardProgress.findMany({
       where: {
         userId,
         nextReview: { lte: now },
-        state: { not: 'new' }, // Only cards that have been reviewed before
+        state: { not: 'new' },
       },
     });
 
     if (dueFlashcards.length >= 3) {
-      // Only notify if 3+ cards are due
-      // Check if we already sent a flashcard notification recently
       const recentFlashcardNotif = await prisma.notification.findFirst({
         where: {
           userId,
@@ -147,11 +89,10 @@ export async function POST(request: Request) {
             priority: 'medium',
             melissaVoice,
             sentAt: now,
-            expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000), // Expires in 24h
+            expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
           },
         });
 
-        // Send push notification (ADR-0014)
         if (isPushConfigured()) {
           await sendPushToUser(userId, {
             title: flashcardTitle,
@@ -166,29 +107,25 @@ export async function POST(request: Request) {
       }
     }
 
-    // 2. Check for upcoming scheduled sessions
+    // Check for upcoming scheduled sessions
     const currentDayOfWeek = now.getDay();
-    // currentTime is kept for potential future logging/debugging
-    const _currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 
     if (schedule?.sessions) {
       for (const session of schedule.sessions) {
         if (session.dayOfWeek !== currentDayOfWeek) continue;
 
-        // Check if session is coming up within reminder offset
         const sessionTime = parseTime(session.time);
         const sessionMinutes = sessionTime.hours * 60 + sessionTime.minutes;
         const nowMinutes = now.getHours() * 60 + now.getMinutes();
         const minutesUntil = sessionMinutes - nowMinutes;
 
         if (minutesUntil > 0 && minutesUntil <= session.reminderOffset) {
-          // Check if we already sent this reminder
           const recentSessionNotif = await prisma.notification.findFirst({
             where: {
               userId,
               type: 'scheduled_session',
               relatedId: session.id,
-              createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) }, // Within last hour
+              createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) },
             },
           });
 
@@ -213,18 +150,17 @@ export async function POST(request: Request) {
                 relatedId: session.id,
                 melissaVoice,
                 sentAt: now,
-                expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000), // Expires in 2h
+                expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000),
               },
             });
 
-            // Send push notification (ADR-0014)
             if (isPushConfigured()) {
               await sendPushToUser(userId, {
                 title: sessionTitle,
                 body: sessionMessage,
                 url: sessionUrl,
                 tag: `session_${session.id}`,
-                requireInteraction: true, // High priority - keep visible
+                requireInteraction: true,
               });
             }
 
@@ -235,15 +171,13 @@ export async function POST(request: Request) {
       }
     }
 
-    // 3. Check for custom reminders
+    // Check for custom reminders
     if (schedule?.reminders) {
       for (const reminder of schedule.reminders) {
         const reminderTime = new Date(reminder.datetime);
         const diffMinutes = (reminderTime.getTime() - now.getTime()) / (60 * 1000);
 
-        // Fire reminder if it's within the next 5 minutes
         if (diffMinutes >= 0 && diffMinutes <= 5) {
-          // Check if already fired
           const recentReminderNotif = await prisma.notification.findFirst({
             where: {
               userId,
@@ -271,7 +205,6 @@ export async function POST(request: Request) {
               },
             });
 
-            // Send push notification (ADR-0014)
             if (isPushConfigured()) {
               await sendPushToUser(userId, {
                 title: reminderTitle,
@@ -283,7 +216,6 @@ export async function POST(request: Request) {
 
             notificationsCreated.push('custom_reminder');
 
-            // Handle non-repeating reminders
             if (reminder.repeat === 'none') {
               await prisma.customReminder.update({
                 where: { id: reminder.id },
@@ -297,7 +229,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Check streak at risk
+    // Check streak at risk
     const progress = await prisma.progress.findUnique({
       where: { userId },
     });
@@ -318,12 +250,11 @@ export async function POST(request: Request) {
           lastStudyDate.getFullYear() === now.getFullYear();
 
         if (!isToday) {
-          // No study today - streak at risk!
           const recentStreakNotif = await prisma.notification.findFirst({
             where: {
               userId,
               type: 'streak',
-              createdAt: { gte: new Date(now.getTime() - 4 * 60 * 60 * 1000) }, // Within 4 hours
+              createdAt: { gte: new Date(now.getTime() - 4 * 60 * 60 * 1000) },
             },
           });
 
@@ -343,18 +274,17 @@ export async function POST(request: Request) {
                 priority: 'high',
                 melissaVoice,
                 sentAt: now,
-                expiresAt: new Date(now.getTime() + 3 * 60 * 60 * 1000), // Expires in 3h
+                expiresAt: new Date(now.getTime() + 3 * 60 * 60 * 1000),
               },
             });
 
-            // Send push notification (ADR-0014)
             if (isPushConfigured()) {
               await sendPushToUser(userId, {
                 title: streakTitle,
                 body: streakMessage,
                 url: '/maestri',
                 tag: 'streak_warning',
-                requireInteraction: true, // High priority - keep visible
+                requireInteraction: true,
               });
             }
 

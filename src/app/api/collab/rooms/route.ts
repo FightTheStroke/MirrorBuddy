@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
       success: true,
       room: {
         roomId: room.id,
+        mindmapId: toolRoot.id,
         participantCount: room.participants.size,
         version: room.version,
         createdAt: room.createdAt,
