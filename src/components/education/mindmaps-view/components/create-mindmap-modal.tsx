@@ -70,7 +70,7 @@ export function CreateMindmapModal({
               <h3 className="text-xl font-bold">Crea Nuova Mappa Mentale</h3>
               <button
                 onClick={onClose}
-                className="h-11 w-11 inline-flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
               </button>
