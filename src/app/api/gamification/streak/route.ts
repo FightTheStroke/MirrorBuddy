@@ -8,6 +8,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { getOrCreateGamification, updateStreak } from '@/lib/gamification/db';
 import { logger } from '@/lib/logger';
+import { validateJsonRequest } from '@/lib/validation/middleware';
+import { UpdateStreakRequestSchema } from '@/lib/validation/schemas/gamification';
 
 export async function GET() {
   try {
@@ -47,8 +49,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const minutesStudied = body.minutes || 0;
+    // Validate request body
+    const validation = await validateJsonRequest(request, UpdateStreakRequestSchema);
+    if (!validation.success) {
+      return validation.response;
+    }
+
+    const { minutes: minutesStudied } = validation.data;
 
     const updated = await updateStreak(userId, minutesStudied);
 
