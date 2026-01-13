@@ -44,9 +44,10 @@
             "type": "manual",
             "instructions": "Add findings to INVESTIGATION.md with decision on whether Calculator tool should be implemented"
           },
-          "status": "pending",
+          "status": "completed",
           "expected_output": "Analysis section in INVESTIGATION.md with recommendation: build Calculator tool, close spec, or update spec",
-          "notes": "Must determine if Calculator is a planned feature or just placeholder in Euclide's tools array"
+          "notes": "Added comprehensive educational needs analysis section to INVESTIGATION.md (218 lines). Key findings: Calculator tool is CRITICALLY NEEDED based on Euclide's profile and educational requirements. Analysis includes: (1) Evidence from Euclide's pedagogical approach - Calculator explicitly required (line 74: 'Allow calculator for computation while teaching concepts'), (2) Dyscalculia support marked as CRITICAL priority - Calculator features directly address these needs with color-coded steps and visual blocks, (3) Resolution of pedagogical paradox - Calculator is a teaching tool for visual learning, not a computation shortcut, (4) Educational requirements analysis with 3 detailed use cases, (5) Decision matrix comparing with/without Calculator (12 vs 3 points in favor of Calculator), (6) Alignment with MirrorBuddy values and WCAG 2.1 AA accessibility mandate. Conclusion: YES - Calculator is critically needed. Recommendation: Proceed with high-priority implementation.",
+          "updated_at": "2026-01-13T07:36:11.405600+00:00"
         }
       ]
     },
@@ -76,9 +77,10 @@
             "type": "manual",
             "instructions": "Review PROPOSAL.md for: library comparison (expr-eval vs math-expression-evaluator vs native), architecture design, integration plan with existing tool system"
           },
-          "status": "pending",
+          "status": "completed",
           "expected_output": "PROPOSAL.md with: library recommendation, bundle size impact, API design, integration approach, example usage",
-          "notes": "Proposal should be BLOCKED until Phase 1 completes and confirms Calculator tool is needed"
+          "notes": "Created comprehensive technical proposal (PROPOSAL.md, 1076 lines) covering: (1) Library comparison with decision matrix - expr-eval (12KB) recommended over math-expression-evaluator (8KB), native parser, and mathjs (170KB), (2) Complete architecture design including type definitions (calculator-types.ts), handler (calculator-handler.ts), renderer (calculator-renderer.tsx), and schema integration, (3) Integration plan with existing tool system following quiz-handler.ts and formula-renderer.tsx patterns, (4) Dyscalculia accessibility integration leveraging existing dyscalculia.ts utilities (formatNumberColored, generatePlaceValueBlocks, formatFractionVisual), (5) Security considerations with expression validation and function whitelisting, (6) Bundle size analysis showing 93% savings vs mathjs (20KB total vs 178KB), (7) 2-3 day implementation roadmap with 4 phases, (8) Risk assessment and success metrics, (9) Recommendation: Proceed with expr-eval implementation. Proposal follows project patterns and is ready for stakeholder review.",
+          "updated_at": "2026-01-13T07:41:50.817686+00:00"
         }
       ]
     },
@@ -373,6 +375,6 @@
   },
   "status": "in_progress",
   "planStatus": "in_progress",
-  "updated_at": "2026-01-13T07:30:11.426Z",
-  "last_updated": "2026-01-13T07:33:20.127342+00:00"
+  "updated_at": "2026-01-13T07:42:16.829Z",
+  "last_updated": "2026-01-13T07:41:50.817696+00:00"
 }
