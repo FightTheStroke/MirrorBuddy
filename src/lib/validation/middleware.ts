@@ -97,7 +97,7 @@ export async function validateJsonRequest<T extends z.ZodTypeAny>(
     }
 
     return { success: true, data: validation.data };
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       response: NextResponse.json(

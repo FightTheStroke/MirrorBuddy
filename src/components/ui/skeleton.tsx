@@ -7,7 +7,7 @@ interface SkeletonProps {
   'aria-label'?: string;
 }
 
-export function Skeleton({ className, 'aria-label': ariaLabel }: SkeletonProps) {
+export function Skeleton({ className, 'aria-label': _ariaLabel }: SkeletonProps) {
   // Base skeleton is presentational only - ARIA attributes should be on containers
   // to avoid redundant announcements when nested
   return (
