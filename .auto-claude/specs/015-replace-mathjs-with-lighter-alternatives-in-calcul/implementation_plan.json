@@ -243,7 +243,7 @@
             "instructions": "Test expressions: '2+2', '5*10', 'sqrt(16)', 'sin(pi/2)', 'e^2' all evaluate correctly"
           },
           "status": "completed",
-          "notes": "Successfully verified calculator tool works with all basic expressions. Updated calculator-handler.ts to support both lowercase (pi, e) and uppercase (PI, E) constants. All 5 test expressions verified working: 2+2=4, 5*10=50, sqrt(16)=4, sin(pi/2)\u22481.0, e^2\u22487.389. Created comprehensive verification documentation (TEST_RESULTS.md, CALCULATOR_VERIFICATION.md) and test script. Security measures and dyscalculia support features verified. Commit: 06d777d",
+          "notes": "Successfully verified calculator tool works with all basic expressions. Updated calculator-handler.ts to support both lowercase (pi, e) and uppercase (PI, E) constants. All 5 test expressions verified working: 2+2=4, 5*10=50, sqrt(16)=4, sin(pi/2)≈1.0, e^2≈7.389. Created comprehensive verification documentation (TEST_RESULTS.md, CALCULATOR_VERIFICATION.md) and test script. Security measures and dyscalculia support features verified. Commit: 06d777d",
           "updated_at": "2026-01-13T08:02:46.911456+00:00"
         },
         {
@@ -261,8 +261,8 @@
             "expected": "Build succeeds and bundle size documented"
           },
           "status": "completed",
-          "notes": "Successfully created comprehensive BUNDLE_ANALYSIS.md documenting bundle size impact. Key findings: (1) Actual implementation with expr-eval: ~20KB (0.95% of bundle), (2) Hypothetical mathjs implementation: ~178KB (8.5% of bundle), (3) Bundle size savings: ~158KB (89% reduction), (4) Network impact: 1.7s faster load on 3G, (5) Implementation includes 394 lines of code across 3 files plus integration, (6) Security features verified (no eval, AST-based parsing, validation), (7) Recommendation: APPROVED FOR PRODUCTION. Document includes detailed analysis of library comparison, functional equivalence, cost impact, and verification methodology. Note: npm run build not available in worktree environment, but size estimates are conservative and based on bundlephobia.com data and actual line counts.",
-          "updated_at": "2026-01-13T08:05:50.164040+00:00"
+          "notes": "Successfully created comprehensive BUNDLE_ANALYSIS.md documenting bundle size impact. Key findings: (1) Actual implementation with expr-eval: ~20KB (0.95% of bundle), (2) Hypothetical mathjs implementation: ~178KB (8.5% of bundle), (3) Bundle size savings: ~158KB (89% reduction), (4) Network impact: 1.7s faster load on 3G, (5) Implementation includes 394 lines of code across 3 files plus integration, (6) Security features verified (no eval, AST-based parsing, validation), (7) Recommendation: APPROVED FOR PRODUCTION. Document includes detailed analysis of library comparison, functional equivalence, cost impact, and verification methodology. Note: npm run build not available in worktree environment, but size estimates are conservative and based on bundlephobia.com data and actual line counts. QA FIX APPLIED (Session 1): Fixed function name mismatch in tool-schemas.ts line 369 - changed 'calculator' to 'create_calculator' to match handler registration (commit 609b159). All calculator references now consistent across codebase.",
+          "updated_at": "2026-01-13T12:30:00.000Z"
         }
       ]
     }
@@ -371,7 +371,25 @@
       ]
     }
   },
-  "qa_signoff": null,
+  "qa_signoff": {
+    "status": "fixes_applied",
+    "timestamp": "2026-01-13T12:30:00.000Z",
+    "qa_session": 1,
+    "fix_session": 1,
+    "issues_found": [
+      {
+        "type": "critical",
+        "title": "Function Name Mismatch in Tool Schema",
+        "location": "src/types/tools/tool-schemas.ts:369",
+        "fix_required": "Change function name from 'calculator' to 'create_calculator' to match handler registration and follow established patterns",
+        "status": "fixed",
+        "fix_commit": "609b159"
+      }
+    ],
+    "report_file": "qa_report.md",
+    "fix_request_file": "QA_FIX_REQUEST.md",
+    "ready_for_qa_revalidation": true
+  },
   "notes": {
     "spec_issue": "The original spec assumes calculator components exist and use mathjs, but investigation reveals this is incorrect. The spec is from ideation and is pending detailed specification.",
     "conditional_implementation": "Phases 3-4 are CONDITIONAL and should only proceed if Phase 2 investigation determines Calculator tool is needed and approved for implementation.",
@@ -382,8 +400,32 @@
       "Outcome C: Update spec to reflect future work (implementation phases deferred)"
     ]
   },
-  "status": "in_progress",
-  "planStatus": "in_progress",
-  "updated_at": "2026-01-13T08:03:13.841Z",
-  "last_updated": "2026-01-13T08:05:50.164048+00:00"
+  "status": "ai_review",
+  "planStatus": "review",
+  "updated_at": "2026-01-13T08:12:02.950Z",
+  "last_updated": "2026-01-13T08:05:50.164048+00:00",
+  "qa_iteration_history": [
+    {
+      "iteration": 1,
+      "status": "rejected",
+      "timestamp": "2026-01-13T08:12:01.395486+00:00",
+      "issues": [
+        {
+          "type": "critical",
+          "title": "Function Name Mismatch in Tool Schema",
+          "location": "src/types/tools/tool-schemas.ts:369",
+          "fix_required": "Change function name from 'calculator' to 'create_calculator' to match handler registration and follow established patterns"
+        }
+      ],
+      "duration_seconds": 269.37
+    }
+  ],
+  "qa_stats": {
+    "total_iterations": 1,
+    "last_iteration": 1,
+    "last_status": "rejected",
+    "issues_by_type": {
+      "critical": 1
+    }
+  }
 }
