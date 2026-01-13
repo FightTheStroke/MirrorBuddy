@@ -1,24 +1,16 @@
-/**
- * SCHEDULER API
- * Study scheduling with notifications for proactive learning (Issue #27)
- */
+// ============================================================================
+// SCHEDULER API
+// Study scheduling with notifications for proactive learning (Issue #27)
+// ============================================================================
 
 import { NextResponse } from 'next/server';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { DEFAULT_NOTIFICATION_PREFERENCES, type NotificationPreferences } from '@/lib/scheduler/types';
-import {
-  getUserId,
-  createScheduleSessionData,
-  createReminderData,
-  updateSessionData,
-  updateReminderData,
-} from './helpers';
 
-/**
- * GET - Get user's study schedule
- */
+// GET - Get user's study schedule
 export async function GET(request: Request) {
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
@@ -28,11 +20,13 @@ export async function GET(request: Request) {
   }
 
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
+    // Get or create schedule
     let schedule = await prisma.studySchedule.findUnique({
       where: { userId },
       include: {
@@ -48,6 +42,7 @@ export async function GET(request: Request) {
     });
 
     if (!schedule) {
+      // Create default schedule
       schedule = await prisma.studySchedule.create({
         data: {
           userId,
@@ -60,6 +55,7 @@ export async function GET(request: Request) {
       });
     }
 
+    // Parse preferences
     const preferences = JSON.parse(schedule.preferences || '{}') as NotificationPreferences;
 
     return NextResponse.json({
@@ -76,9 +72,7 @@ export async function GET(request: Request) {
   }
 }
 
-/**
- * POST - Create a new scheduled session or reminder
- */
+// POST - Create a new scheduled session or reminder
 export async function POST(request: Request) {
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
@@ -88,15 +82,20 @@ export async function POST(request: Request) {
   }
 
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
-    const body = await request.json() as { type: string; [key: string]: unknown };
+    const body = await request.json();
     const { type, ...data } = body;
 
-    let schedule = await prisma.studySchedule.findUnique({ where: { userId } });
+    // Ensure schedule exists
+    let schedule = await prisma.studySchedule.findUnique({
+      where: { userId },
+    });
+
     if (!schedule) {
       schedule = await prisma.studySchedule.create({
         data: {
@@ -107,12 +106,20 @@ export async function POST(request: Request) {
     }
 
     if (type === 'session') {
-      const sessionData = createScheduleSessionData(data);
+      // Create scheduled session
       const session = await prisma.scheduledSession.create({
         data: {
           userId,
           scheduleId: schedule.id,
-          ...sessionData,
+          dayOfWeek: data.dayOfWeek,
+          time: data.time,
+          duration: data.duration || 30,
+          subject: data.subject,
+          maestroId: data.maestroId,
+          topic: data.topic,
+          active: true,
+          reminderOffset: data.reminderOffset || 5,
+          repeat: data.repeat || 'weekly',
         },
       });
 
@@ -121,12 +128,17 @@ export async function POST(request: Request) {
     }
 
     if (type === 'reminder') {
-      const reminderData = createReminderData(data);
+      // Create custom reminder
       const reminder = await prisma.customReminder.create({
         data: {
           userId,
           scheduleId: schedule.id,
-          ...reminderData,
+          datetime: new Date(data.datetime),
+          message: data.message,
+          subject: data.subject,
+          maestroId: data.maestroId,
+          repeat: data.repeat || 'none',
+          active: true,
         },
       });
 
@@ -134,19 +146,14 @@ export async function POST(request: Request) {
       return NextResponse.json(reminder, { status: 201 });
     }
 
-    return NextResponse.json(
-      { error: 'Invalid type. Must be "session" or "reminder"' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Invalid type. Must be "session" or "reminder"' }, { status: 400 });
   } catch (error) {
     logger.error('Scheduler POST error', { error: String(error) });
     return NextResponse.json({ error: 'Failed to create schedule item' }, { status: 500 });
   }
 }
 
-/**
- * PATCH - Update preferences or schedule item
- */
+// PATCH - Update preferences or schedule item
 export async function PATCH(request: Request) {
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
@@ -156,15 +163,17 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
-    const body = await request.json() as { type: string; id?: string; [key: string]: unknown };
+    const body = await request.json();
     const { type, id, ...data } = body;
 
     if (type === 'preferences') {
+      // Update notification preferences
       const schedule = await prisma.studySchedule.upsert({
         where: { userId },
         create: {
@@ -183,20 +192,37 @@ export async function PATCH(request: Request) {
     }
 
     if (type === 'session' && id) {
-      const updateData = updateSessionData(data);
+      // Update session
       const session = await prisma.scheduledSession.update({
         where: { id, userId },
-        data: updateData,
+        data: {
+          dayOfWeek: data.dayOfWeek,
+          time: data.time,
+          duration: data.duration,
+          subject: data.subject,
+          maestroId: data.maestroId,
+          topic: data.topic,
+          active: data.active,
+          reminderOffset: data.reminderOffset,
+          repeat: data.repeat,
+        },
       });
 
       return NextResponse.json(session);
     }
 
     if (type === 'reminder' && id) {
-      const updateData = updateReminderData(data);
+      // Update reminder
       const reminder = await prisma.customReminder.update({
         where: { id, userId },
-        data: updateData,
+        data: {
+          datetime: data.datetime ? new Date(data.datetime) : undefined,
+          message: data.message,
+          subject: data.subject,
+          maestroId: data.maestroId,
+          repeat: data.repeat,
+          active: data.active,
+        },
       });
 
       return NextResponse.json(reminder);
@@ -209,9 +235,7 @@ export async function PATCH(request: Request) {
   }
 }
 
-/**
- * DELETE - Delete a session or reminder
- */
+// DELETE - Delete a session or reminder
 export async function DELETE(request: Request) {
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
@@ -221,10 +245,11 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');

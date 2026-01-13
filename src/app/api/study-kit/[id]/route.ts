@@ -7,11 +7,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { StudyKit } from '@/types/study-kit';
 import { deleteMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 /**
  * GET /api/study-kit/[id]
@@ -23,15 +23,11 @@ export async function GET(
 ) {
   try {
     // Auth check
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const { id } = await params;
 
@@ -97,15 +93,11 @@ export async function DELETE(
 ) {
   try {
     // Auth check
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const { id } = await params;
 

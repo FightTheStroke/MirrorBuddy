@@ -5,8 +5,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { logger } from '@/lib/logger';
 import { generateSearchableText } from '@/lib/search/searchable-text';
 import { isPostgreSQL } from '@/lib/db/database-utils';
@@ -21,21 +21,19 @@ import { VALID_MATERIAL_TYPES } from './constants';
  */
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const cookieUserId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    // Auth check
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
+    }
+    const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-    const queryUserId = searchParams.get('userId');
-    const userId = cookieUserId || queryUserId;
 
     const toolType = searchParams.get('toolType');
     const status = searchParams.get('status') || 'active';
     const limit = parseInt(searchParams.get('limit') || '50', 10);
     const offset = parseInt(searchParams.get('offset') || '0', 10);
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const collectionId = searchParams.get('collectionId');
     const tagId = searchParams.get('tagId');
@@ -215,18 +213,21 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const cookieUserId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    // Auth check
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
+    }
+    const userId = auth.userId!;
 
-    const body: CreateMaterialRequest & { userId?: string } = await request.json();
-    const userId = cookieUserId || body.userId;
+    const body: CreateMaterialRequest = await request.json();
     const { toolId, toolType, title, content, maestroId, sessionId, subject, preview, collectionId, tagIds } = body;
 
-    if (!userId || !toolId || !toolType || !title || !content) {
+    if (!toolId || !toolType || !title || !content) {
       return NextResponse.json(
         {
           error: 'Missing required fields',
-          required: ['userId', 'toolId', 'toolType', 'title', 'content'],
+          required: ['toolId', 'toolType', 'title', 'content'],
         },
         { status: 400 }
       );

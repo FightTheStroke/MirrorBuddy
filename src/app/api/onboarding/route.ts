@@ -8,10 +8,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { z } from 'zod';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { cookies } from 'next/headers';
 
 // Zod schema for input validation
 const OnboardingDataSchema = z.object({
@@ -43,16 +44,15 @@ interface OnboardingData {
  */
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
       return NextResponse.json({
         hasExistingData: false,
         data: null,
         onboardingState: null,
       });
     }
+    const userId = auth.userId!;
 
     // Fetch user with profile and onboarding state
     const user = await prisma.user.findUnique({

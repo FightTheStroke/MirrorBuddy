@@ -5,18 +5,17 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
@@ -47,12 +46,11 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const data = await request.json();
 
@@ -111,12 +109,11 @@ export async function POST(request: NextRequest) {
 // DELETE: Remove a learning
 export async function DELETE(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');

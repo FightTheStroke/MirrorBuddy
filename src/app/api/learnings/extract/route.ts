@@ -4,20 +4,19 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { extractLearnings } from '@/lib/ai/summarize';
 import type { Message } from '@prisma/client';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const data = await request.json();
 

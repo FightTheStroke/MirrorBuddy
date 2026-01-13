@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { z } from 'zod';
 import { loadPreviousContext, formatRelativeDate } from '@/lib/conversation/memory-loader';
 import { logger } from '@/lib/logger';
@@ -29,16 +29,15 @@ const MemoryQuerySchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     // 1. Auth check - verify user cookie
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
       logger.warn('Memory API: Unauthorized access attempt');
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: auth.error },
         { status: 401 }
       );
     }
+    const userId = auth.userId!;
 
     // 2. Input validation with Zod
     const { searchParams } = new URL(request.url);
