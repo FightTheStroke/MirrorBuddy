@@ -23,7 +23,12 @@ export function Skeleton({ className, 'aria-label': ariaLabel }: SkeletonProps) 
 
 export function ViewSkeleton() {
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div
+      className="space-y-6 animate-in fade-in duration-300"
+      role="status"
+      aria-busy="true"
+      aria-label="Caricamento pagina in corso"
+    >
       <div className="flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-48" />
