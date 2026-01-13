@@ -47,7 +47,12 @@ export function ViewSkeleton() {
 
 export function SessionSkeleton() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      role="status"
+      aria-busy="true"
+      aria-label="Caricamento sessione in corso"
+    >
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 w-full max-w-2xl mx-4 shadow-2xl">
         <div className="flex items-center justify-center gap-4 mb-6">
           <Skeleton className="h-16 w-16 rounded-full" />
