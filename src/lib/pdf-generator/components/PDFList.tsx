@@ -7,45 +7,49 @@ import React from 'react';
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import type { ProfileConfig } from '../types';
 import { PDFText } from './PDFText';
-
-// Use generic style type compatible with react-pdf
-type PDFStyle = object | object[];
+import { mergeStyles, toReactPdfStyle, sanitizeNumber, type StyleInput } from '../utils/style-utils';
 
 interface PDFListProps {
   items: string[];
   profile: ProfileConfig;
   ordered?: boolean;
-  style?: PDFStyle;
+  style?: StyleInput;
 }
 
 /**
  * Create list styles based on profile
+ * Uses sanitizeNumber to prevent PDF rendering errors
  */
 function createListStyles(profile: ProfileConfig) {
+  const fontSize = sanitizeNumber(profile.fontSize, 14);
+  const lineHeight = sanitizeNumber(profile.lineHeight, 1.5);
+  const letterSpacing = sanitizeNumber(profile.letterSpacing, 0);
+  const paragraphSpacing = sanitizeNumber(profile.paragraphSpacing, 20);
+
   return StyleSheet.create({
     list: {
       marginLeft: 16,
-      marginBottom: profile.paragraphSpacing,
+      marginBottom: paragraphSpacing,
     },
     listItem: {
       flexDirection: 'row',
-      marginBottom: profile.paragraphSpacing / 3,
+      marginBottom: sanitizeNumber(paragraphSpacing / 3, 7),
     },
     bullet: {
       width: 20,
-      fontSize: profile.fontSize,
-      color: profile.textColor,
+      fontSize,
+      color: profile.textColor || '#1e293b',
     },
     // Dyslexia: larger, more visible bullets
     largeBullet: {
       width: 24,
-      fontSize: profile.fontSize * 1.2,
+      fontSize: sanitizeNumber(fontSize * 1.2, 17),
       color: '#3b82f6',
     },
     // ADHD: numbered items with clear visual separation
     adhdNumber: {
       width: 28,
-      fontSize: profile.fontSize,
+      fontSize,
       fontWeight: 'bold',
       color: '#1e40af',
       backgroundColor: '#dbeafe',
@@ -55,11 +59,11 @@ function createListStyles(profile: ProfileConfig) {
     },
     itemContent: {
       flex: 1,
-      fontFamily: profile.fontFamily,
-      fontSize: profile.fontSize,
-      lineHeight: profile.lineHeight,
-      color: profile.textColor,
-      letterSpacing: profile.letterSpacing,
+      fontFamily: profile.fontFamily || 'Helvetica',
+      fontSize,
+      lineHeight,
+      color: profile.textColor || '#1e293b',
+      letterSpacing,
     },
     // Dyspraxia: chunked items with visual breaks
     dyspraxiaItem: {
@@ -101,17 +105,15 @@ export function PDFList({
   // Filter out empty items
   const validItems = items.filter((item) => item && item.trim());
 
-  const listStyle = style ? [styles.list, style] : styles.list;
+  const listStyle = mergeStyles(styles.list, style);
   const itemStyle = profile.options.chunkedText
-    ? [styles.listItem, styles.dyspraxiaItem]
+    ? toReactPdfStyle([styles.listItem, styles.dyspraxiaItem])
     : styles.listItem;
 
   return (
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    <View style={listStyle as any}>
+    <View style={listStyle}>
       {validItems.map((item, index) => (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        <View key={index} style={itemStyle as any}>
+        <View key={index} style={itemStyle}>
           {/* Bullet or number */}
           {ordered ? (
             <Text

@@ -1,14 +1,17 @@
 // ============================================================================
 // MIRRORBUDDY WEB - DATABASE SCHEMA
-// SQLite for local, PostgreSQL for cloud (same schema works for both)
+// PostgreSQL with pgvector for semantic search
 // ============================================================================
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+  engineType      = "binary"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider   = "postgresql"
+  extensions = [pgvector(map: "vector")]
 }
 
 // ============================================================================
@@ -38,6 +41,12 @@ model User {
   htmlSnippets      HtmlSnippet[]
   homeworkSessions  HomeworkSession[]
   gamification      UserGamification?
+
+  // Knowledge Graph (Wave 3)
+  concepts          Concept[]
+
+  // Google Drive Integration (ADR 0038)
+  googleAccount     GoogleAccount?
 }
 
 model Profile {
@@ -100,6 +109,41 @@ model Settings {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+// ============================================================================
+// GOOGLE ACCOUNT (OAuth + Google Drive Integration - ADR 0038)
+// ============================================================================
+
+model GoogleAccount {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Google profile info
+  googleId     String   @unique  // Google's user ID
+  email        String
+  displayName  String?
+  avatarUrl    String?
+
+  // OAuth tokens (encrypted at rest via application layer)
+  accessToken  String   // Current access token
+  refreshToken String?  // For token refresh (long-lived)
+  tokenType    String   @default("Bearer")
+  expiresAt    DateTime // When access token expires
+
+  // Scopes granted by user
+  scopes       String   @default("[]") // JSON array of granted scopes
+
+  // Connection status
+  isConnected  Boolean  @default(true)
+  lastUsedAt   DateTime @default(now())
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([googleId])
 }
 
 // ============================================================================
@@ -484,6 +528,9 @@ model Material {
   subject     String?
   preview     String?  // Preview text for lists
 
+  // Message reference (optional FK to Message that created this material)
+  messageId   String?
+
   // Migrated from CreatedTool
   topic          String?
   conversationId String?
@@ -514,10 +561,16 @@ model Material {
   @@index([toolType])
   @@index([status])
   @@index([sessionId])
+  @@index([messageId])
   @@index([createdAt])
   @@index([isBookmarked])
   @@index([collectionId])
   @@index([sourceStudyKitId])
+
+  // Knowledge Graph (Wave 3)
+  edgesFrom        MaterialEdge[]    @relation("MaterialEdgeFrom")
+  edgesTo          MaterialEdge[]    @relation("MaterialEdgeTo")
+  concepts         MaterialConcept[]
 }
 
 // ============================================================================
@@ -942,6 +995,9 @@ model StudyKit {
   demo        String?  // DemoData JSON
   quiz        String?  // QuizData JSON
 
+  // Original PDF content for RAG context
+  originalText String? @db.Text  // Full extracted text from PDF
+
   // Processing status
   status      String   @default("processing") // processing | ready | error
   errorMessage String?
@@ -1273,9 +1329,9 @@ model ContentEmbedding {
   // The actual text that was embedded
   content     String
 
-  // Vector embedding (stored as JSON for SQLite, will be vector(1536) for PostgreSQL)
-  // For PostgreSQL: change to Unsupported("vector(1536)") and use raw SQL
-  vector      String   // JSON array of 1536 floats
+  // Vector embedding - dual storage for migration
+  vector       String?                          // Legacy: JSON array (for backward compat)
+  vectorNative Unsupported("vector(1536)")?     // Native pgvector for similarity search
 
   // Embedding metadata
   model       String   @default("text-embedding-3-small")
@@ -1297,3 +1353,59 @@ model ContentEmbedding {
   @@index([createdAt])
 }
 
+// ============================================================================
+// KNOWLEDGE GRAPH (Wave 3)
+// Relationships between materials and concepts
+// ============================================================================
+
+// Edges between materials
+model MaterialEdge {
+  id           String   @id @default(cuid())
+  fromId       String
+  toId         String
+  relationType String   // "derived_from" | "related_to" | "prerequisite" | "extends"
+  weight       Float    @default(1.0)
+  metadata     Json?
+  createdAt    DateTime @default(now())
+
+  from         Material @relation("MaterialEdgeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to           Material @relation("MaterialEdgeTo", fields: [toId], references: [id], onDelete: Cascade)
+
+  @@unique([fromId, toId, relationType])
+  @@index([fromId])
+  @@index([toId])
+  @@index([relationType])
+}
+
+// Abstract concepts for semantic organization
+model Concept {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  subject     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materials   MaterialConcept[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([subject])
+}
+
+// Junction table: Material <-> Concept
+model MaterialConcept {
+  materialId String
+  conceptId  String
+  relevance  Float    @default(1.0)
+  createdAt  DateTime @default(now())
+
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  concept    Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+
+  @@id([materialId, conceptId])
+  @@index([materialId])
+  @@index([conceptId])
+}

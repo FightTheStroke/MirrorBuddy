@@ -4,12 +4,14 @@
  * StudyKitUpload Component
  * Upload PDF and track processing progress
  * Wave 2: Study Kit Generator
+ * ADR 0038: Google Drive Integration support
  */
 
-import { useState, useRef } from 'react';
-import { Upload, FileText, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { useState, useRef, useCallback } from 'react';
+import { UploadForm } from './components/upload-form';
+import { UploadProgress } from './components/upload-progress';
+import { UnifiedFilePicker, type SelectedFile } from '@/components/google-drive';
+import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
 import { cn } from '@/lib/utils';
 
 interface StudyKitUploadProps {
@@ -19,6 +21,7 @@ interface StudyKitUploadProps {
 
 export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadProps) {
   const [file, setFile] = useState<File | null>(null);
+  const [selectedDriveFile, setSelectedDriveFile] = useState<SelectedFile | null>(null);
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
   const [isUploading, setIsUploading] = useState(false);
@@ -26,47 +29,31 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'processing' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [_studyKitId, setStudyKitId] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const pollIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      // Validate file type
-      if (!selectedFile.type.includes('pdf')) {
-        setErrorMessage('Solo file PDF sono supportati');
-        return;
-      }
-
-      // Validate file size (max 10MB)
-      const MAX_SIZE = 10 * 1024 * 1024;
-      if (selectedFile.size > MAX_SIZE) {
-        setErrorMessage('Il file deve essere inferiore a 10MB');
-        return;
-      }
-
-      setFile(selectedFile);
-      setErrorMessage('');
-
-      // Auto-fill title from filename
-      if (!title) {
-        const name = selectedFile.name.replace('.pdf', '');
-        setTitle(name);
-      }
+  const handleFileSelect = useCallback((selected: SelectedFile) => {
+    // Validate file type
+    if (!selected.mimeType.includes('pdf')) {
+      setErrorMessage('Solo file PDF sono supportati');
+      return;
     }
-  };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    const droppedFile = e.dataTransfer.files[0];
-    if (droppedFile) {
-      // Create a synthetic event for handleFileSelect
-      const syntheticEvent = {
-        target: { files: [droppedFile] },
-      } as unknown as React.ChangeEvent<HTMLInputElement>;
-      handleFileSelect(syntheticEvent);
+    setErrorMessage('');
+
+    if (selected.source === 'local' && selected.file) {
+      setFile(selected.file);
+      setSelectedDriveFile(null);
+    } else if (selected.source === 'google-drive' && selected.driveFile) {
+      setFile(null);
+      setSelectedDriveFile(selected);
     }
-  };
+
+    // Auto-fill title from filename
+    if (!title) {
+      const name = selected.name.replace('.pdf', '');
+      setTitle(name);
+    }
+  }, [title]);
 
   const pollStatus = async (id: string) => {
     try {
@@ -103,7 +90,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
   };
 
   const handleUpload = async () => {
-    if (!file || !title) {
+    if ((!file && !selectedDriveFile) || !title) {
       setErrorMessage('File e titolo sono richiesti');
       return;
     }
@@ -114,16 +101,40 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
     setErrorMessage('');
 
     try {
+      let uploadFile: File;
+
+      // If Google Drive file, download it first
+      if (selectedDriveFile?.source === 'google-drive' && selectedDriveFile.driveFile) {
+        setUploadProgress(20);
+        const userId = getUserId();
+        const downloadResponse = await fetch(
+          `/api/google-drive/files/${selectedDriveFile.driveFile.id}/download?userId=${userId}`
+        );
+
+        if (!downloadResponse.ok) {
+          throw new Error('Impossibile scaricare il file da Google Drive');
+        }
+
+        const blob = await downloadResponse.blob();
+        uploadFile = new File([blob], selectedDriveFile.name, {
+          type: selectedDriveFile.mimeType,
+        });
+      } else if (file) {
+        uploadFile = file;
+      } else {
+        throw new Error('Nessun file selezionato');
+      }
+
       // Create form data
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', uploadFile);
       formData.append('title', title);
       if (subject) {
         formData.append('subject', subject);
       }
 
       // Upload
-      setUploadProgress(30);
+      setUploadProgress(40);
       const response = await fetch('/api/study-kit/upload', {
         method: 'POST',
         body: formData,
@@ -154,6 +165,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
 
   const handleReset = () => {
     setFile(null);
+    setSelectedDriveFile(null);
     setTitle('');
     setSubject('');
     setIsUploading(false);
@@ -165,164 +177,43 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
       clearInterval(pollIntervalRef.current);
       pollIntervalRef.current = null;
     }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
   };
+
+  const hasFile = file !== null || selectedDriveFile !== null;
 
   return (
     <div className={cn('space-y-6', className)}>
-      {/* Upload Area */}
-      <div
-        className={cn(
-          'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
-          file ? 'border-primary bg-primary/5' : 'border-slate-300 dark:border-slate-600 hover:border-primary',
-          uploadStatus !== 'idle' && 'pointer-events-none opacity-50'
-        )}
-        onDrop={handleDrop}
-        onDragOver={(e) => e.preventDefault()}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
+      {uploadStatus === 'idle' && (
+        <UnifiedFilePicker
+          userId={getUserId()}
+          onFileSelect={handleFileSelect}
           accept=".pdf"
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={uploadStatus !== 'idle'}
-          aria-label="Carica file PDF"
+          acceptedMimeTypes={['application/pdf']}
+          maxSizeMB={10}
+          label="Carica il tuo PDF"
+          description="Seleziona un file PDF dal computer o da Google Drive per generare il tuo Study Kit"
+          disabled={isUploading}
         />
-
-        {file ? (
-          <div className="flex items-center justify-center gap-3">
-            <FileText className="w-8 h-8 text-primary" />
-            <div className="text-left">
-              <p className="font-medium text-slate-900 dark:text-white">{file.name}</p>
-              <p className="text-sm text-slate-500">
-                {(file.size / 1024 / 1024).toFixed(2)} MB
-              </p>
-            </div>
-            {uploadStatus === 'idle' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleReset}
-                aria-label="Rimuovi file"
-              >
-                Rimuovi
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <Upload className="w-12 h-12 mx-auto text-slate-400" />
-            <div>
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadStatus !== 'idle'}
-              >
-                Seleziona PDF
-              </Button>
-              <p className="mt-2 text-sm text-slate-500">
-                oppure trascina qui il file (max 10MB)
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Form Fields */}
-      {file && uploadStatus === 'idle' && (
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Titolo *
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Es: Rivoluzione Francese"
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              required
-              aria-required="true"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="subject" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Materia (opzionale)
-            </label>
-            <input
-              id="subject"
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Es: Storia"
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-
-          <Button
-            onClick={handleUpload}
-            disabled={!file || !title || isUploading}
-            className="w-full"
-            size="lg"
-          >
-            <Upload className="w-4 h-4 mr-2" />
-            Genera Study Kit
-          </Button>
-        </div>
       )}
 
-      {/* Progress */}
-      {uploadStatus !== 'idle' && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            {uploadStatus === 'success' ? (
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-            ) : uploadStatus === 'error' ? (
-              <AlertCircle className="w-5 h-5 text-red-600" />
-            ) : (
-              <Loader2 className="w-5 h-5 animate-spin text-primary" />
-            )}
-            <p className="text-sm font-medium text-slate-900 dark:text-white">
-              {uploadStatus === 'uploading' && 'Caricamento in corso...'}
-              {uploadStatus === 'processing' && 'Generazione materiali in corso...'}
-              {uploadStatus === 'success' && 'Study Kit generato con successo!'}
-              {uploadStatus === 'error' && 'Errore durante la generazione'}
-            </p>
-          </div>
-
-          {uploadStatus !== 'error' && (
-            <Progress value={uploadProgress} className="h-2" />
-          )}
-
-          {errorMessage && (
-            <p className="text-sm text-red-600 dark:text-red-400">
-              {errorMessage}
-            </p>
-          )}
-
-          {uploadStatus === 'processing' && (
-            <p className="text-xs text-slate-500">
-              Questo processo può richiedere alcuni minuti. Puoi chiudere questa finestra e
-              tornare più tardi.
-            </p>
-          )}
-
-          {(uploadStatus === 'success' || uploadStatus === 'error') && (
-            <Button
-              variant="outline"
-              onClick={handleReset}
-              className="w-full"
-            >
-              Carica un altro PDF
-            </Button>
-          )}
-        </div>
+      {hasFile && uploadStatus === 'idle' && (
+        <UploadForm
+          title={title}
+          subject={subject}
+          error={errorMessage}
+          isLoading={isUploading}
+          onTitleChange={setTitle}
+          onSubjectChange={setSubject}
+          onSubmit={handleUpload}
+        />
       )}
+
+      <UploadProgress
+        status={uploadStatus}
+        progress={uploadProgress}
+        errorMessage={errorMessage}
+        onReset={handleReset}
+      />
     </div>
   );
 }

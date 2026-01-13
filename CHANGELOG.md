@@ -9,6 +9,251 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 12 - Google Drive Integration)
+
+#### Google Drive File Import (ADR 0040)
+
+**What it does**: Users can now import study materials directly from Google Drive instead of only uploading from local filesystem.
+
+**How it works**:
+1. Connect Google account in Settings > Integrations
+2. In Study Kit or Homework Help, choose "Da Google Drive"
+3. Browse folders, search files, select the one you need
+4. File is downloaded and processed as if uploaded locally
+
+**Features**:
+- Server-side OAuth 2.0 flow (secure, no tokens in browser)
+- Read-only access (minimal scope, `drive.readonly`)
+- Folder navigation with breadcrumbs
+- File search functionality
+- Avatar and account info display
+- One-click disconnect in settings
+- Works with Study Kit (PDFs) and Homework Help (images/PDFs)
+
+**Why it matters**: Many students, especially on Chromebooks or in Google Workspace schools, store materials in Google Drive. Direct import eliminates download-then-upload friction.
+
+**Key Files**:
+- `src/lib/google/` - OAuth and Drive API clients
+- `src/components/google-drive/` - React components (picker, card, unified picker)
+- `src/app/api/auth/google/` - OAuth routes
+- `src/app/api/google-drive/` - Drive API routes
+- `prisma/schema.prisma` - GoogleAccount model
+
+### Added (Jan 11 - Conversation History & Voice Context)
+
+#### Per-Character Conversation Sidebar (ADR 0036)
+
+**What it does**: Each character (Maestri, Coach, Buddy) now has their own conversation history sidebar, replacing the centralized "Storia" page.
+
+**How it works**:
+1. Click the History icon in the character header
+2. Sidebar slides in from the right (same position as voice panel)
+3. Browse, search, and filter past conversations with that specific character
+4. Load any conversation to continue where you left off
+5. Delete conversations with confirmation dialog
+
+**Features**:
+- Search conversations by content
+- Date filters (Today, 7 days, 30 days, All)
+- Date grouping (Oggi, Ieri, Questa settimana, Questo mese, Più vecchie)
+- Multi-select with checkboxes for batch delete
+- Gradient styling matching character theme
+- Mutually exclusive with voice panel
+
+**Why it matters**: Like ChatGPT/Claude, users can quickly access their conversation history without leaving the current context.
+
+**Key Files**:
+- `src/components/conversation/conversation-drawer/conversation-sidebar.tsx`
+- `src/app/api/conversations/search/route.ts`
+- `src/app/api/conversations/batch/route.ts`
+
+#### Voice Session Context Continuity (ADR 0035)
+
+**What it does**: When you load an old conversation and start a voice call, the AI now has full context of the previous messages.
+
+**How it works**:
+1. Load conversation from history sidebar
+2. Start voice call
+3. Messages are injected into the Azure Realtime session
+4. AI continues naturally from where you left off (no greeting)
+
+**Why it matters**: Previously, voice calls started fresh with no context. Now chat and voice are seamlessly connected - you can review old content and continue vocally.
+
+**Technical Details**:
+- Messages passed via `connectionInfo.initialMessages`
+- Injected as `conversation.item.create` after session setup
+- Works with both WebSocket and WebRTC transports
+- Greeting skipped when continuing existing conversation
+
+### Added (Jan 11 - Tool Plugin System)
+
+#### Scalable Tool Plugin Architecture (ADR 0037)
+
+**What it does**: Provides a flexible, discoverable plugin system for extending MirrorBuddy with custom tools.
+
+**Key Components**:
+- **ToolRegistry**: Singleton registry managing plugin registration, discovery, and filtering
+- **ToolOrchestrator**: Execution engine with validation, prerequisite checking, permission verification
+- **ToolPlugin Interface**: Standardized plugin definition with metadata, schema, handler, voice integration
+- **Voice Tool Flow**: Integrates voice transcripts → trigger detection → tool execution → voice feedback
+- **DataChannel Broadcasting**: Real-time tool event delivery via WebRTC DataChannel with SSE fallback
+
+**Features**:
+- Zod schema validation for plugin inputs
+- Permission-based access control (READ_CONVERSATION, READ_PROFILE, WRITE_CONTENT, VOICE_OUTPUT, FILE_ACCESS)
+- Trigger-based voice activation with confidence scoring
+- Dynamic voice prompts with template variable substitution
+- Dual-path event broadcasting (DataChannel primary, SSE fallback)
+- Comprehensive JSDoc documentation for all interfaces and classes
+
+**Technical Details**:
+- Location: `src/lib/tools/plugin/`
+- Files: types.ts, registry.ts, orchestrator.ts, trigger-detector.ts, voice-feedback.ts, data-channel-protocol.ts
+- `@docs/claude/tool-plugins.md` - Reference guide
+- `@docs/claude/tool-architecture.md` - System architecture diagram (Mermaid)
+
+**Benefits**:
+- Modular tool management without monolithic code
+- Voice-first tool integration for students
+- Type-safe plugin definition and execution
+- Real-time tool event monitoring via WebRTC
+- Graceful degradation with SSE fallback for older browsers
+
+### Added (Jan 12 - Production Hardening)
+
+#### Enterprise-Ready Infrastructure
+
+**What it does**: Prepares MirrorBuddy for production deployment with containerization, monitoring, and incident response.
+
+**Key Components**:
+- **Dockerfile**: Multi-stage builds (build → runner) with optimized image size
+- **docker-compose**: Health checks, volume mounts, restart policies, PostgreSQL service
+- **Structured Logging**: JSON format for monitoring integration
+
+**Files**:
+- `Dockerfile` - Multi-stage production build
+- `docker-compose.yml` - Full stack with PostgreSQL
+
+### Added (Jan 12 - Security Hardening)
+
+#### HTML Sanitizer Improvements
+
+**What it does**: Comprehensive XSS prevention for AI-generated demos.
+
+**Security Layers**:
+1. **Whitespace normalization**: Defeats `< s c r i p t >` obfuscation
+2. **Loop-based removal**: Iterates until no changes (nested scripts)
+3. **Unclosed tag removal**: Catches `<script>...` without `</script>`
+4. **Final escape**: Converts any remaining `<script` to `&lt;script`
+5. **Event handler removal**: Strips `onclick`, `onload`, etc.
+6. **Protocol sanitization**: Blocks `javascript:`, `vbscript:`, `data:` URLs
+
+**Additional Fixes**:
+- UUID validation in content-extractor (SSRF prevention)
+- HTML entity decoding before protocol checks
+- Malformed closing tag handling (`</script foo>`)
+
+### Added (Jan 11 - WebRTC Voice Transport Migration)
+
+#### WebRTC Transport for Azure OpenAI Realtime API
+- **Default Transport**: WebRTC (lower latency, better performance)
+- **Fallback**: WebSocket for older browsers
+- **Configuration**: `VOICE_TRANSPORT=webrtc` (default) or `VOICE_TRANSPORT=websocket`
+- **Latency**: Reduced from ~450-900ms to ~200-350ms (50-80% improvement)
+- **Architecture**: Direct SDP exchange, native WebRTC tracks, RTCDataChannel for JSON events
+- **Benefits**: Native barge-in support, no server-side audio proxy needed, improved responsiveness
+- **Automatic Fallback**: Browser compatibility detection with graceful degradation
+
+### Added (Jan 11 - Chat Streaming)
+
+#### Real-time Chat Streaming (ADR 0034)
+
+**What it does**: Chat responses now stream in real-time instead of waiting for the full response.
+
+**How it works**:
+1. Student sends a message to a Maestro
+2. Response streams character by character via Server-Sent Events (SSE)
+3. First content appears in ~100-200ms instead of 3-8 seconds
+4. Tool requests (mindmap, quiz, etc.) automatically route to non-streaming endpoint
+
+**Why it matters**: Students with ADHD or anxiety benefit from immediate visual feedback. No more staring at a blank screen wondering if the app is working.
+
+**Technical Details**:
+- **Endpoint**: `POST /api/chat/stream` for streaming, `/api/chat` for tools
+- **Feature flag**: `ENABLE_CHAT_STREAMING=true` (default)
+- **Provider**: Azure OpenAI only (Ollama doesn't support streaming)
+- **Safety**: StreamingSanitizer processes chunks in real-time
+- **Fallback**: Automatic if streaming unavailable
+
+**Key Files**:
+- `src/lib/ai/providers/azure-streaming.ts` - SSE client
+- `src/app/api/chat/stream/route.ts` - Streaming endpoint
+- `src/lib/hooks/use-streaming-chat.ts` - React hook
+- `docs/adr/0034-chat-streaming-architecture.md` - Architecture decision
+
+### Added (Jan 10 - Conte Mascetti & Character Overhaul)
+
+#### Conte Mascetti Maestro (PR #119)
+
+**What it does**: Adds the iconic Conte Mascetti from "Amici Miei" as a philosophy/life wisdom maestro.
+
+**Character Features**:
+- Authentic persona with embedded knowledge from all 3 Amici Miei films
+- Famous supercazzole and zingarate references
+- Vintage rotary phone icon for voice calls
+- Italian cultural immersion
+
+**Technical Details**:
+- Character authenticity overhaul across all maestri
+- Embedded knowledge base pattern for character-specific facts
+- System prompts rewritten for consistency
+
+### Added (Jan 8-9 - PostgreSQL & RAG)
+
+#### PostgreSQL Migration (ADR 0028)
+
+**What it does**: Migrates from SQLite to PostgreSQL with pgvector for semantic search.
+
+**Why it matters**: Enables AI-powered semantic search across study materials, finding related content based on meaning, not just keywords.
+
+**Technical Details**:
+- PostgreSQL with pgvector extension for embeddings
+- Binary engine configuration for ARM64 compatibility
+- Schema migration scripts included
+
+#### RAG Semantic Search (ADR 0033)
+
+**What it does**: Retrieval-Augmented Generation for contextual AI responses.
+
+**How it works**:
+1. Student asks question to Maestro
+2. System finds semantically similar materials from their uploaded content
+3. Relevant materials injected into AI context
+4. More personalized, accurate responses
+
+**Technical Details**:
+- Wave 4 implementation: `findSimilarMaterials()` retrieval service
+- Embedding generation via Azure OpenAI
+- Graceful degradation if RAG unavailable
+
+#### Knowledge Graph (Wave 3)
+
+**What it does**: Connects concepts across student's learning materials.
+
+**Technical Details**:
+- Knowledge Graph models and APIs
+- Concept extraction and relationship mapping
+- Foundation for future "connections" feature
+
+### Changed (Jan 7 - E2E Test Optimization)
+
+#### Test Suite Refactor
+
+**Before**: 2410 E2E tests requiring real AI providers
+**After**: 70 focused API tests with mocks
+
+**Why**: E2E tests were slow, flaky, and expensive. New suite runs in CI without AI costs.
+
 ### Added (Jan 5 - Progressive Learning Path MVP)
 
 #### Plan 8: Guided Study Paths

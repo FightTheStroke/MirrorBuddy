@@ -22,10 +22,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
-import {
-  getActiveMaterials,
-  deleteMaterial,
-} from '@/lib/storage/materials-db';
+import { getActiveMaterials } from '@/lib/storage/materials-db-utils';
+import { deleteMaterial } from '@/lib/storage/materials-db-crud';
 
 // Import extracted components
 import {
@@ -191,6 +189,13 @@ export function ArchiveView() {
   const handleCloseViewer = useCallback(() => {
     setSelectedItem(null);
   }, []);
+
+  const handleNavigateToRelated = useCallback((toolId: string) => {
+    const target = materials.find((item) => item.toolId === toolId);
+    if (target) {
+      setSelectedItem(target);
+    }
+  }, [materials]);
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -429,7 +434,11 @@ export function ArchiveView() {
       {/* Material Viewer Modal */}
       <AnimatePresence>
         {selectedItem && (
-          <MaterialViewer item={selectedItem} onClose={handleCloseViewer} />
+          <MaterialViewer
+            item={selectedItem}
+            onClose={handleCloseViewer}
+            onNavigate={handleNavigateToRelated}
+          />
         )}
       </AnimatePresence>
     </div>

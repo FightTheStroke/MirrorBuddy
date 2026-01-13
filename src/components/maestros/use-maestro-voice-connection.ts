@@ -8,6 +8,8 @@ interface UseMaestroVoiceConnectionProps {
   initialMode: 'voice' | 'chat';
   onTranscript: (message: ChatMessage) => void;
   onQuestionAsked: () => void;
+  /** Current messages to provide context when starting voice */
+  currentMessages?: ChatMessage[];
 }
 
 export function useMaestroVoiceConnection({
@@ -15,6 +17,7 @@ export function useMaestroVoiceConnection({
   initialMode,
   onTranscript,
   onQuestionAsked,
+  currentMessages = [],
 }: UseMaestroVoiceConnectionProps) {
   const [isVoiceActive, setIsVoiceActive] = useState(initialMode === 'voice');
   const [configError, setConfigError] = useState<string | null>(null);
@@ -108,7 +111,12 @@ export function useMaestroVoiceConnection({
     const startVoice = async () => {
       setConfigError(null);
       try {
-        await connect(maestro, connectionInfo);
+        // Convert messages to format needed for voice context
+        const initialMessages = currentMessages
+          .filter(m => m.role === 'user' || m.role === 'assistant')
+          .map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+
+        await connect(maestro, { ...connectionInfo, initialMessages });
       } catch (error) {
         logger.error('Voice connection failed', { error: String(error) });
         if (error instanceof DOMException && error.name === 'NotAllowedError') {
@@ -121,7 +129,7 @@ export function useMaestroVoiceConnection({
     };
 
     startVoice();
-  }, [isVoiceActive, connectionInfo, connectionState, maestro, connect]);
+  }, [isVoiceActive, connectionInfo, connectionState, maestro, connect, currentMessages]);
 
   const handleVoiceCall = useCallback(() => {
     if (isVoiceActive) disconnect();

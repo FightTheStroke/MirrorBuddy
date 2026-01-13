@@ -30,7 +30,8 @@ export type Subject =
   | 'health'
   | 'philosophy'
   | 'internationalLaw'
-  | 'storytelling';
+  | 'storytelling'
+  | 'supercazzola';
 
 export interface Maestro {
   id: string;
@@ -44,4 +45,6 @@ export interface Maestro {
   color: string;
   systemPrompt: string;
   greeting: string;
+  excludeFromGamification?: boolean;  // If true, sessions don't earn XP
+  tools?: string[];  // Available tools; if empty or only 'web_search', hide toolbar
 }

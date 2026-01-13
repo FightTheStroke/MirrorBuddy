@@ -21,6 +21,8 @@ export interface ConnectionInfo {
   wsUrl?: string;
   token?: string;
   characterType?: 'maestro' | 'coach' | 'buddy';
+  /** Previous messages to inject into voice session for context continuity */
+  initialMessages?: Array<{ role: 'user' | 'assistant'; content: string }>;
 }
 
 export interface ConversationMemory {

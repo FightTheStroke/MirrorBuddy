@@ -57,9 +57,36 @@ export async function azureChatCompletion(
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    logger.error(`[Azure Chat] Error ${response.status}`, { error });
-    throw new Error(`Azure OpenAI error (${response.status}): ${error}`);
+    const errorText = await response.text();
+    logger.error(`[Azure Chat] Error ${response.status}`, { error: errorText });
+
+    // Handle Azure content filter (400 with content_filter code)
+    if (response.status === 400) {
+      try {
+        const errorData = JSON.parse(errorText);
+        if (errorData.error?.code === 'content_filter') {
+          const filterResult = errorData.error?.innererror?.content_filter_result;
+          const triggeredFilters = filterResult
+            ? Object.entries(filterResult)
+                .filter(([, v]) => (v as { filtered: boolean }).filtered)
+                .map(([k]) => k)
+            : [];
+          logger.warn('[Azure Chat] Content filter triggered', { filters: triggeredFilters });
+          return {
+            content: 'Mi dispiace, non posso rispondere a questa domanda. Posso aiutarti con altro?',
+            provider: 'azure' as const,
+            model: config.model,
+            finish_reason: 'content_filter' as const,
+            contentFiltered: true,
+            filteredCategories: triggeredFilters,
+          };
+        }
+      } catch {
+        // Not a JSON error, fall through to throw
+      }
+    }
+
+    throw new Error(`Azure OpenAI error (${response.status}): ${errorText}`);
   }
 
   const data = await response.json();

@@ -42,13 +42,29 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Return proxy WebSocket URL - client connects here, NOT directly to Azure
-  // API key is used server-side only in the proxy (see instrumentation.ts)
+  // Transport mode: webrtc or websocket (from env, defaults to webrtc)
+  const transport = (process.env.VOICE_TRANSPORT || 'webrtc') as 'webrtc' | 'websocket';
+
+  // Azure region for WebRTC endpoint (e.g., 'swedencentral', 'eastus2')
+  const azureRegion = process.env.AZURE_OPENAI_REALTIME_REGION || 'swedencentral';
+
+  // Return connection info based on transport mode
+  // SECURITY: apiKey is NEVER included - stays server-side
   return NextResponse.json({
     provider: 'azure',
-    proxyPort: WS_PROXY_PORT,
+    transport,
+    // WebRTC mode: client uses ephemeral token + regional endpoint for direct Azure connection
+    // WebSocket mode: client connects to local proxy
+    ...(transport === 'webrtc'
+      ? {
+          endpoint: azureEndpoint.replace(/\/$/, ''), // For session creation
+          webrtcEndpoint: `https://${azureRegion}.realtimeapi-preview.ai.azure.com/v1/realtimertc`,
+          deployment: azureDeployment,
+        }
+      : {
+          proxyPort: WS_PROXY_PORT,
+        }),
     configured: true,
-    // SECURITY: apiKey is NOT included - stays server-side
   });
 }
 

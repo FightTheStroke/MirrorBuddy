@@ -1,5 +1,11 @@
+/**
+ * Safety Event Logging
+ *
+ * Client-safe event logging with in-memory buffer.
+ * DB persistence happens via API when available.
+ */
+
 import { logger } from '@/lib/logger';
-import { prisma } from '@/lib/db';
 import type { SafetyEvent, SafetyEventType, EventSeverity } from './types';
 import { anonymizeId } from './utils';
 import { checkViolationPattern } from './violation-tracker';
@@ -8,6 +14,30 @@ import { generateEventId } from './utils';
 
 const eventBuffer: SafetyEvent[] = [];
 const MAX_BUFFER_SIZE = 1000;
+
+/**
+ * Persist safety event to database via API
+ * Non-blocking - fires and forgets
+ */
+async function persistSafetyEventToApi(event: SafetyEvent): Promise<void> {
+  if (typeof window === 'undefined') return; // Server-side, handled differently
+
+  try {
+    await fetch('/api/safety/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: event.type,
+        severity: event.severity,
+        sessionId: event.sessionId,
+        userId: event.userId,
+        category: event.category,
+      }),
+    });
+  } catch {
+    // Non-critical - event is already in memory buffer
+  }
+}
 
 export function logSafetyEvent(
   type: SafetyEventType,
@@ -46,26 +76,10 @@ export function logSafetyEvent(
     checkViolationPattern(event.userId, event);
   }
 
-  persistSafetyEventToDb(event).catch(err => {
-    console.error('Failed to persist safety event:', err);
-  });
+  // Persist via API (non-blocking)
+  persistSafetyEventToApi(event).catch(() => {});
 
   return event;
 }
 
-async function persistSafetyEventToDb(event: SafetyEvent): Promise<void> {
-  await prisma.safetyEvent.create({
-    data: {
-      userId: event.userId ?? null,
-      type: event.type,
-      severity: event.severity,
-      conversationId: event.sessionId ?? null,
-      resolvedBy: null,
-      resolvedAt: null,
-      resolution: null,
-    },
-  });
-}
-
 export { eventBuffer };
-

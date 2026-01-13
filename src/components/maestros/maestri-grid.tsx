@@ -4,6 +4,7 @@ import { useState } from 'react';
 import {
   Search,
   Filter,
+  GraduationCap,
   Ruler,
   Atom,
   FlaskConical,
@@ -21,10 +22,11 @@ import {
   Lightbulb,
   Globe2,
   Mic,
+  Drama,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { MaestroCard } from './maestro-card';
-import { PersonalizedSuggestion } from './personalized-suggestion';
+import { PageHeader } from '@/components/ui/page-header';
 import { maestri, subjectNames, subjectColors, getAllSubjects } from '@/data';
 import { cn } from '@/lib/utils';
 import type { Maestro, Subject } from '@/types';
@@ -49,6 +51,7 @@ const subjectLucideIcons: Record<Subject, LucideIcon> = {
   philosophy: Lightbulb,
   internationalLaw: Globe2,
   storytelling: Mic,
+  supercazzola: Drama,
 };
 
 type SessionMode = 'voice' | 'chat';
@@ -87,8 +90,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
 
   return (
     <div className="space-y-4">
-      {/* Dynamic Hero */}
-      <PersonalizedSuggestion onMaestroSelect={handleSelect} />
+      <PageHeader icon={GraduationCap} title="Professori" />
 
       {/* Search + Filters */}
       <div className="flex flex-wrap items-center gap-2">

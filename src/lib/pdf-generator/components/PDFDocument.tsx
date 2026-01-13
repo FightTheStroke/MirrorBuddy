@@ -16,6 +16,7 @@ import { PDFTitle } from './PDFTitle';
 import { PDFText } from './PDFText';
 import { PDFList } from './PDFList';
 import { PDFImage } from './PDFImage';
+import { sanitizeNumber } from '../utils/style-utils';
 
 // Register default fonts
 Font.register({
@@ -35,17 +36,23 @@ interface PDFDocumentProps {
 
 /**
  * Create dynamic styles based on profile configuration
+ * Uses sanitizeNumber to prevent PDF rendering errors from extreme values
  */
 function createStyles(profile: ProfileConfig, _format: 'A4' | 'Letter') {
+  // Sanitize all numeric profile values
+  const fontSize = sanitizeNumber(profile.fontSize, 14);
+  const lineHeight = sanitizeNumber(profile.lineHeight, 1.5);
+  const paragraphSpacing = sanitizeNumber(profile.paragraphSpacing, 20);
+
   return StyleSheet.create({
     page: {
       flexDirection: 'column',
-      backgroundColor: profile.backgroundColor,
+      backgroundColor: profile.backgroundColor || '#ffffff',
       padding: 40,
-      fontFamily: profile.fontFamily,
-      fontSize: profile.fontSize,
-      lineHeight: profile.lineHeight,
-      color: profile.textColor,
+      fontFamily: profile.fontFamily || 'Helvetica',
+      fontSize,
+      lineHeight,
+      color: profile.textColor || '#1e293b',
     },
     header: {
       marginBottom: 24,
@@ -55,7 +62,7 @@ function createStyles(profile: ProfileConfig, _format: 'A4' | 'Letter') {
       borderBottomStyle: 'solid',
     },
     subject: {
-      fontSize: profile.fontSize * 0.8,
+      fontSize: sanitizeNumber(fontSize * 0.8, 11),
       color: '#64748b',
       marginBottom: 8,
     },
@@ -63,7 +70,7 @@ function createStyles(profile: ProfileConfig, _format: 'A4' | 'Letter') {
       flex: 1,
     },
     section: {
-      marginBottom: profile.paragraphSpacing,
+      marginBottom: paragraphSpacing,
     },
     footer: {
       position: 'absolute',

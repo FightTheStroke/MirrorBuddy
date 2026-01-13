@@ -16,6 +16,11 @@ node_modules/
 coverage/
 playwright-report/
 test-results/
+e2e/
+testingcase/
+
+# Runtime
+logs/
 
 # Generated
 *.generated.ts
@@ -44,9 +49,16 @@ package-lock.json
 pnpm-lock.yaml
 yarn.lock
 
+# Database files
+*.db
+*.sqlite
+
 # IDE/Editor
 .idea/
 .vscode/
+.cursor/
+.zed/
+.windsurf/
 *.swp
 *.swo
 

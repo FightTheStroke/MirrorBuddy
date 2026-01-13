@@ -6,87 +6,23 @@
 
 import { logger } from '@/lib/logger';
 import type { ToolType } from './tool-events';
+import type { ToolStatus, ToolContent, ToolState } from './tool-state/types';
 
-// Tool creation status
-export type ToolStatus =
-  | 'initializing'   // Tool just started
-  | 'building'       // Actively being built
-  | 'paused'         // Temporarily paused
-  | 'completed'      // Successfully finished
-  | 'error'          // Failed with error
-  | 'cancelled';     // User cancelled
+export type {
+  ToolStatus,
+  MindmapContent,
+  FlashcardContent,
+  QuizContent,
+  SummaryContent,
+  TimelineContent,
+  DiagramContent,
+  ToolContent,
+  ToolState,
+} from './tool-state/types';
 
-// Base content types for different tools
-export interface MindmapContent {
-  centralTopic: string;
-  nodes: Array<{
-    id: string;
-    label: string;
-    parentId: string | null;
-    color?: string;
-  }>;
-}
-
-export interface FlashcardContent {
-  cards: Array<{
-    id: string;
-    front: string;
-    back: string;
-    hint?: string;
-  }>;
-}
-
-export interface QuizContent {
-  questions: Array<{
-    id: string;
-    question: string;
-    options: string[];
-    correctIndex: number;
-    explanation?: string;
-  }>;
-}
-
-export interface SummaryContent {
-  sections: Array<{
-    id: string;
-    heading: string;
-    content: string;
-  }>;
-}
-
-export interface TimelineContent {
-  events: Array<{
-    id: string;
-    date: string;
-    title: string;
-    description: string;
-  }>;
-}
-
-export interface DiagramContent {
-  type: 'flowchart' | 'sequence' | 'class' | 'er';
-  mermaidCode: string;
-}
-
-// Union type for all tool content
-export type ToolContent =
-  | MindmapContent
-  | FlashcardContent
-  | QuizContent
-  | SummaryContent
-  | TimelineContent
-  | DiagramContent;
-
-// Tool state structure
-export interface ToolState {
-  id: string;
+// Tool state structure (extends base ToolState with ToolType)
+export interface TypedToolState extends Omit<ToolState, 'type'> {
   type: ToolType;
-  status: ToolStatus;
-  sessionId: string;
-  maestroId: string;
-
-  // Metadata
-  title: string;
   subject?: string;
   createdAt: number;
   updatedAt: number;
@@ -188,7 +124,7 @@ function initializeContent(type: ToolType): Partial<ToolContent> {
   switch (type) {
     case 'mindmap':
       return { centralTopic: '', nodes: [] };
-    case 'flashcards':
+    case 'flashcard':
       return { cards: [] };
     case 'quiz':
       return { questions: [] };
@@ -229,6 +165,9 @@ export function updateToolState(
   state.updatedAt = Date.now();
 
   if (update.chunk) {
+    if (!state.rawChunks) {
+      state.rawChunks = [];
+    }
     state.rawChunks.push(update.chunk);
     state.chunksReceived++;
   }
