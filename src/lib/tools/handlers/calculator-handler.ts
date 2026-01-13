@@ -92,9 +92,11 @@ registerToolHandler('create_calculator', async (args): Promise<ToolExecutionResu
     // Create parser and evaluate
     const parser = new Parser();
 
-    // Add custom constants
+    // Add custom constants (support both uppercase and lowercase)
     parser.consts.PI = Math.PI;
+    parser.consts.pi = Math.PI;
     parser.consts.E = Math.E;
+    parser.consts.e = Math.E;
 
     const result = parser.evaluate(expression.trim());
 
