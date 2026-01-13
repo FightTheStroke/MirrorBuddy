@@ -2,6 +2,7 @@
 
 All under `/src/app/api/`:
 
+<<<<<<< HEAD
 | Route | Purpose |
 |-------|---------|
 | `/chat` | Chat completions with safety filtering and tool support |
@@ -15,6 +16,117 @@ All under `/src/app/api/`:
 | `/parent-professor` | Parent chat |
 | `/user/settings` | User preferences |
 | `/materials` | Study materials CRUD |
+||||||| parent of 1f5a178 (auto-claude: subtask-5-2 - Update API routes documentation)
+| Route | Purpose |
+|-------|---------|
+| `/chat` | Chat completions with safety filtering |
+| `/conversations/[id]` | Session management |
+| `/realtime/token` | Azure voice token |
+| `/progress` | XP, levels, gamification |
+| `/flashcards/progress` | FSRS updates |
+| `/notifications` | CRUD |
+| `/profile` | Student insights (GDPR) |
+| `/parent-professor` | Parent chat |
+| `/user/settings` | User preferences |
+| `/materials` | Study materials CRUD |
+=======
+## Input Validation
+
+**All API routes are protected by Zod validation schemas.** See `@docs/claude/validation.md` for comprehensive documentation.
+
+Validation features:
+- Type safety and format validation
+- Payload size limits (prevents DoS)
+- Strict mode (rejects extra fields)
+- Detailed error messages (400 status)
+- Enum validation for all domain types
+
+## Route Reference
+
+| Route | Purpose | Validation Schema |
+|-------|---------|-------------------|
+| `/chat` | Chat completions with safety filtering | `ChatRequestSchema` |
+| `/conversations` | Session management | `CreateConversationSchema` |
+| `/conversations/[id]` | Conversation CRUD | - |
+| `/realtime/token` | Azure voice token | - |
+| `/progress` | XP, levels, gamification | `ProgressUpdateSchema` |
+| `/progress/sessions` | Study session tracking | `SessionsPostSchema` |
+| `/flashcards/progress` | FSRS updates | `FlashcardProgressPostSchema` |
+| `/notifications` | CRUD | `NotificationSchema` |
+| `/scheduler` | Study scheduling | `SchedulerSchema` |
+| `/profile` | Student insights (GDPR) | `GenerateProfileRequestSchema` |
+| `/parent-professor` | Parent chat | `ParentChatSchema` |
+| `/user/settings` | User preferences | `SettingsUpdateSchema` |
+| `/materials` | Study materials CRUD | `CreateMaterialSchema`, `UpdateMaterialSchema` |
+| `/learning-path` | Learning path management | `CreateLearningPathSchema` |
+| `/tools/*` | Educational tools | `CreateToolSchema`, `SaveToolSchema` |
+| `/gamification/*` | Points, achievements, streaks | `AwardPointsRequestSchema`, `UpdateStreakRequestSchema` |
+| `/tags` | Tag management | `CreateTagSchema`, `UpdateTagSchema` |
+| `/collections` | Collection management | `CreateCollectionSchema`, `UpdateCollectionSchema` |
+| `/study-kit` | Study kit management | `ListStudyKitsQuerySchema`, `UploadStudyKitSchema` |
+
+## Validation Usage
+
+### In API Routes
+
+```typescript
+import { validateJsonRequest } from '@/lib/validation';
+import { ChatRequestSchema } from '@/lib/validation/schemas/chat';
+
+export async function POST(request: NextRequest) {
+  // Validate request body
+  const validation = await validateJsonRequest(request, ChatRequestSchema);
+
+  if (!validation.success) {
+    return validation.response; // Returns 400 with error details
+  }
+
+  const { messages, maestroId, systemPrompt } = validation.data;
+
+  // Process validated data...
+}
+```
+
+### Query Parameter Validation
+
+```typescript
+import { validateQuery, createValidationErrorResponse } from '@/lib/validation';
+import { ListStudyKitsQuerySchema } from '@/lib/validation/schemas/study-kit';
+
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams;
+  const validation = validateQuery(searchParams, ListStudyKitsQuerySchema);
+
+  if (!validation.success) {
+    return createValidationErrorResponse(validation.error);
+  }
+
+  const { status, subject, limit, offset } = validation.data;
+
+  // Process validated query params...
+}
+```
+
+## Error Response Format
+
+All validation errors return HTTP 400 with structured format:
+
+```json
+{
+  "error": "Invalid request data",
+  "details": [
+    {
+      "field": "messages.0.content",
+      "message": "Message content cannot be empty"
+    },
+    {
+      "field": "maestroId",
+      "message": "Invalid enum value. Expected 'socrates' | 'leo' | ..."
+    }
+  ]
+}
+```
+>>>>>>> 1f5a178 (auto-claude: subtask-5-2 - Update API routes documentation)
 
 ## Environment
 
