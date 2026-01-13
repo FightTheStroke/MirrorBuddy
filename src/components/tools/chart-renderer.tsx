@@ -70,7 +70,7 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
     switch (request.type) {
       case 'line':
         return (
-          <LineChart {...commonProps} aria-label={request.title || 'Grafico a linee'}>
+          <LineChart {...commonProps} aria-label={request.title || 'Line chart'}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
@@ -98,7 +98,7 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
 
       case 'area':
         return (
-          <AreaChart {...commonProps} aria-label={request.title || 'Grafico ad area'}>
+          <AreaChart {...commonProps} aria-label={request.title || 'Area chart'}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
@@ -126,7 +126,7 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
 
       case 'bar':
         return (
-          <BarChart {...commonProps} aria-label={request.title || 'Grafico a barre'}>
+          <BarChart {...commonProps} aria-label={request.title || 'Bar chart'}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
@@ -151,8 +151,11 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
         );
 
       case 'scatter':
+        // Note: Scatter chart uses category labels on X-axis (from request.data.labels)
+        // with dataset values plotted as Y coordinates. For true XY scatter plots,
+        // use numeric labels or modify the data transformation.
         return (
-          <ScatterChart {...commonProps} aria-label={request.title || 'Grafico a dispersione'}>
+          <ScatterChart {...commonProps} aria-label={request.title || 'Scatter chart'}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
             <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
             <YAxis stroke="#94a3b8" fontSize={12} />
@@ -178,7 +181,7 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
 
       case 'pie':
         return (
-          <PieChart aria-label={request.title || 'Grafico a torta'}>
+          <PieChart aria-label={request.title || 'Pie chart'}>
             <Pie
               data={chartData}
               cx="50%"
@@ -207,7 +210,7 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
 
       case 'doughnut':
         return (
-          <PieChart aria-label={request.title || 'Grafico a ciambella'}>
+          <PieChart aria-label={request.title || 'Doughnut chart'}>
             <Pie
               data={chartData}
               cx="50%"
@@ -258,10 +261,10 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
       </ResponsiveContainer>
 
       {/* Accessible table for screen readers */}
-      <table className="sr-only" aria-label={`Dati ${request.title || 'grafico'}`}>
+      <table className="sr-only" aria-label={`Data for ${request.title || 'chart'}`}>
         <thead>
           <tr>
-            <th>Etichetta</th>
+            <th>Label</th>
             {request.data.datasets.map((dataset) => (
               <th key={dataset.label}>{dataset.label}</th>
             ))}
@@ -305,7 +308,7 @@ export function DoughnutRenderer({ request, className }: ChartRendererProps) {
       )}
 
       <ResponsiveContainer width="100%" height={300}>
-        <PieChart aria-label={request.title || 'Grafico a ciambella'}>
+        <PieChart aria-label={request.title || 'Doughnut chart'}>
           <Pie
             data={chartData}
             cx="50%"
@@ -334,11 +337,11 @@ export function DoughnutRenderer({ request, className }: ChartRendererProps) {
       </ResponsiveContainer>
 
       {/* Accessible table for screen readers */}
-      <table className="sr-only" aria-label={`Dati ${request.title || 'grafico'}`}>
+      <table className="sr-only" aria-label={`Data for ${request.title || 'chart'}`}>
         <thead>
           <tr>
-            <th>Etichetta</th>
-            <th>Valore</th>
+            <th>Label</th>
+            <th>Value</th>
           </tr>
         </thead>
         <tbody>
