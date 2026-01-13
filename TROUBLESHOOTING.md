@@ -275,7 +275,552 @@
 
 ## Database Issues
 
-*Coming soon in next subtask*
+### Connection & Setup
+
+#### Problem: "Database connection failed" or "Can't reach database server"
+
+**Cause:** PostgreSQL not running or wrong connection string
+
+**Solution:**
+
+1. **Check if PostgreSQL is running:**
+   ```bash
+   # macOS (Homebrew)
+   brew services list
+   brew services start postgresql@15
+
+   # Linux (systemd)
+   sudo systemctl status postgresql
+   sudo systemctl start postgresql
+
+   # Docker
+   docker ps | grep postgres
+   docker start mirrorbuddy-postgres
+   ```
+
+2. **Verify connection string format:**
+   ```bash
+   # .env.local
+   # PostgreSQL (production)
+   DATABASE_URL="postgresql://username:password@localhost:5432/mirrorbuddy"
+
+   # SQLite (development - default)
+   DATABASE_URL="file:./dev.db"
+   ```
+
+3. **Test connection manually:**
+   ```bash
+   # PostgreSQL
+   psql -U username -d mirrorbuddy -h localhost
+
+   # If using Docker
+   docker exec -it mirrorbuddy-postgres psql -U mirrorbuddy
+   ```
+
+4. **Common connection string mistakes:**
+   - Missing `postgresql://` prefix (not `postgres://`)
+   - Wrong port (default: 5432)
+   - Database name doesn't exist (create with `createdb mirrorbuddy`)
+   - Password contains special chars (URL-encode: `@` → `%40`, `#` → `%23`)
+   - Using quotes around the entire URL in `.env.local` (correct: `DATABASE_URL="postgresql://..."`)
+
+#### Problem: "Error: P1001: Can't reach database server at `localhost:5432`"
+
+**Cause:** PostgreSQL listening on different port or interface
+
+**Solution:**
+1. Check PostgreSQL config:
+   ```bash
+   # Find config file
+   psql -U postgres -c "SHOW config_file"
+
+   # Check listen_addresses and port
+   grep "listen_addresses" /opt/homebrew/var/postgresql@15/postgresql.conf
+   grep "^port" /opt/homebrew/var/postgresql@15/postgresql.conf
+   ```
+
+2. Update connection string:
+   ```bash
+   DATABASE_URL="postgresql://user:pass@127.0.0.1:5433/mirrorbuddy"  # If on port 5433
+   ```
+
+3. Ensure PostgreSQL accepts local connections:
+   ```bash
+   # Check pg_hba.conf allows local connections
+   # Should have: local   all   all   trust
+   cat /opt/homebrew/var/postgresql@15/pg_hba.conf
+   ```
+
+---
+
+### pgvector Extension
+
+#### Problem: "pgvector extension not found" or "type `vector` does not exist"
+
+**Cause:** pgvector extension not installed in PostgreSQL
+
+**Solution:**
+
+1. **Install pgvector:**
+   ```bash
+   # macOS (Homebrew)
+   brew install pgvector
+
+   # Ubuntu/Debian
+   sudo apt-get install postgresql-15-pgvector
+
+   # From source
+   git clone https://github.com/pgvector/pgvector.git
+   cd pgvector
+   make
+   sudo make install
+   ```
+
+2. **Enable extension in database:**
+   ```sql
+   -- Connect to your database
+   psql -U username -d mirrorbuddy
+
+   -- Enable extension
+   CREATE EXTENSION IF NOT EXISTS vector;
+
+   -- Verify installation
+   SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';
+   ```
+
+3. **Run migrations:**
+   ```bash
+   npx prisma db push
+   # Or for production
+   npx prisma migrate deploy
+   ```
+
+#### Problem: pgvector installed but still getting "type `vector` does not exist"
+
+**Cause:** Extension installed but not enabled in your specific database
+
+**Solution:**
+1. Enable extension in the correct database:
+   ```bash
+   # List databases
+   psql -U username -c "\l"
+
+   # Connect to MirrorBuddy database specifically
+   psql -U username -d mirrorbuddy -c "CREATE EXTENSION IF NOT EXISTS vector;"
+   ```
+
+2. Verify extension is in correct database:
+   ```bash
+   psql -U username -d mirrorbuddy -c "SELECT extname FROM pg_extension WHERE extname = 'vector';"
+   ```
+
+#### Understanding pgvector Usage
+
+**When is pgvector needed?**
+- **PostgreSQL mode:** Required for RAG (Knowledge Hub) vector search
+- **SQLite mode:** Not needed - uses JavaScript cosine similarity
+
+**How MirrorBuddy detects pgvector:**
+```typescript
+// Automatic detection in src/lib/rag/pgvector-utils.ts
+if (DATABASE_URL.startsWith('postgresql://')) {
+  // Check if pgvector extension exists
+  // If available: Use native vector search (fast)
+  // If not available: Fall back to JSON vectors + JS similarity (slower)
+}
+```
+
+**Check pgvector status:**
+- Go to Settings → AI Provider → Diagnostics
+- Look for "pgvector Status" section
+- Should show: `available: true`, `version: 0.7.0`, `indexType: ivfflat/hnsw`
+
+---
+
+### SQLite vs PostgreSQL
+
+#### When to Use Each
+
+| Aspect | SQLite | PostgreSQL |
+|--------|--------|------------|
+| **Use Case** | Development, small deployments | Production, multiple users |
+| **Setup** | Zero config | Requires server |
+| **Performance** | Fast for single user | Scales with load |
+| **Vector Search** | JS fallback (slower) | Native pgvector (fast) |
+| **Migrations** | `db push` | `migrate deploy` |
+| **Backup** | Copy `.db` file | `pg_dump` |
+| **Max Size** | ~281 TB (practical: few GB) | Unlimited |
+
+#### Switching from SQLite to PostgreSQL
+
+**Steps:**
+1. **Export data from SQLite:**
+   ```bash
+   # Option 1: Use Prisma's built-in migration
+   npx prisma migrate diff \
+     --from-schema-datasource prisma/schema.prisma \
+     --to-schema-datamodel prisma/schema.prisma \
+     --script > migration.sql
+   ```
+
+2. **Update `prisma/schema.prisma`:**
+   ```prisma
+   datasource db {
+     provider = "postgresql"  // Change from "sqlite"
+   }
+   ```
+
+3. **Update `.env.local`:**
+   ```bash
+   DATABASE_URL="postgresql://username:password@localhost:5432/mirrorbuddy"
+   ```
+
+4. **Create PostgreSQL database:**
+   ```bash
+   createdb mirrorbuddy
+   ```
+
+5. **Run migrations:**
+   ```bash
+   npx prisma generate
+   npx prisma db push  # Or: npx prisma migrate deploy
+   ```
+
+6. **Install pgvector (optional but recommended):**
+   ```bash
+   brew install pgvector
+   psql -d mirrorbuddy -c "CREATE EXTENSION vector;"
+   ```
+
+**⚠️ Data Loss Warning:** SQLite → PostgreSQL migration doesn't preserve data. For production, export data first:
+```bash
+# Export all data as JSON
+npx prisma studio  # Manually export tables
+# OR write custom script to copy data
+```
+
+#### Switching from PostgreSQL to SQLite (e.g., for testing)
+
+**Steps:**
+1. Update `prisma/schema.prisma`:
+   ```prisma
+   datasource db {
+     provider = "sqlite"
+   }
+   ```
+
+2. Update `.env.local`:
+   ```bash
+   DATABASE_URL="file:./dev.db"
+   ```
+
+3. Run migrations:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+---
+
+### Prisma Migrations
+
+#### Problem: "Prisma schema out of sync" or "Error: @prisma/client did not initialize yet"
+
+**Cause:** Database schema doesn't match `prisma/schema.prisma`
+
+**Solution:**
+1. **Regenerate Prisma Client:**
+   ```bash
+   npx prisma generate
+   ```
+
+2. **Push schema changes to database:**
+   ```bash
+   # Development (SQLite or PostgreSQL)
+   npx prisma db push
+
+   # Production (PostgreSQL only - creates migration history)
+   npx prisma migrate deploy
+   ```
+
+3. **Restart dev server:**
+   ```bash
+   npm run dev
+   ```
+
+#### Problem: "Migration failed" or "P3006: Migration `20240101_init` failed to apply"
+
+**Cause:** Database state conflicts with migration
+
+**Solution:**
+
+**Option 1: Reset database (⚠️ DELETES ALL DATA):**
+```bash
+npx prisma migrate reset
+# Drops database, recreates, runs all migrations
+```
+
+**Option 2: Resolve migration manually:**
+```bash
+# Mark migration as applied (if already partially applied)
+npx prisma migrate resolve --applied 20240101_init
+
+# OR mark as rolled back
+npx prisma migrate resolve --rolled-back 20240101_init
+
+# Then deploy again
+npx prisma migrate deploy
+```
+
+**Option 3: Fresh start (development only):**
+```bash
+# SQLite: Delete database file
+rm prisma/dev.db
+npx prisma db push
+
+# PostgreSQL: Drop and recreate database
+dropdb mirrorbuddy
+createdb mirrorbuddy
+npx prisma db push
+```
+
+#### Understanding Migration Commands
+
+| Command | Use Case | Safety | When to Use |
+|---------|----------|--------|-------------|
+| `prisma generate` | Update Prisma Client | ✅ Safe | After schema changes, always run first |
+| `prisma db push` | Sync schema to DB | ⚠️ No history | Development, prototyping |
+| `prisma migrate dev` | Create migration | ⚠️ Can prompt reset | Development, before commit |
+| `prisma migrate deploy` | Apply migrations | ✅ Production-safe | Production, CI/CD |
+| `prisma migrate reset` | Drop & recreate DB | ❌ DELETES DATA | Development only |
+| `prisma db seed` | Load seed data | ✅ Safe | After reset or fresh DB |
+
+**Workflow:**
+```bash
+# 1. Edit prisma/schema.prisma
+# 2. Generate client
+npx prisma generate
+
+# 3. Push to database
+# Development:
+npx prisma db push
+
+# Production:
+npx prisma migrate dev --name add_new_field
+npx prisma migrate deploy
+```
+
+#### Problem: "Column does not exist" after adding field to schema
+
+**Cause:** Schema updated but database not synced
+
+**Solution:**
+```bash
+# Quick fix (development)
+npx prisma db push
+
+# Proper fix (production)
+npx prisma migrate dev --name add_column_name
+git add prisma/migrations
+git commit -m "Add column to schema"
+```
+
+---
+
+### Performance & Optimization
+
+#### Problem: Slow queries or database timeouts
+
+**Cause:** Missing indexes or inefficient queries
+
+**Solution:**
+
+1. **Check query performance:**
+   ```bash
+   # Enable query logging in .env.local
+   DATABASE_URL="postgresql://...?connection_limit=10&pool_timeout=20"
+   ```
+
+2. **Add indexes for common queries:**
+   ```prisma
+   // In prisma/schema.prisma
+   model StudySession {
+     id        String   @id
+     userId    String
+     startedAt DateTime
+
+     @@index([userId])           // ✅ Existing
+     @@index([startedAt])        // ✅ Existing
+     @@index([userId, startedAt]) // Add if querying both together
+   }
+   ```
+
+3. **Optimize pgvector search:**
+   ```sql
+   -- Check if vector index exists
+   SELECT indexname FROM pg_indexes WHERE tablename = 'ContentEmbedding';
+
+   -- Create HNSW index (faster than IVFFlat for accuracy)
+   CREATE INDEX IF NOT EXISTS embedding_hnsw_idx
+   ON "ContentEmbedding"
+   USING hnsw (embedding vector_cosine_ops);
+   ```
+
+4. **Connection pool settings:**
+   ```bash
+   # .env.local
+   DATABASE_URL="postgresql://user:pass@localhost:5432/mirrorbuddy?connection_limit=10"
+   ```
+
+#### pgvector Search Performance
+
+**Symptoms:**
+- Knowledge Hub slow to search
+- RAG queries timeout
+- High CPU usage during vector search
+
+**Solutions:**
+
+1. **Ensure proper index type:**
+   ```sql
+   -- HNSW (recommended): Better accuracy, faster queries
+   CREATE INDEX embedding_hnsw_idx ON "ContentEmbedding"
+   USING hnsw (embedding vector_cosine_ops);
+
+   -- IVFFlat: Lower memory, good for large datasets
+   CREATE INDEX embedding_ivfflat_idx ON "ContentEmbedding"
+   USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+   ```
+
+2. **Check index is being used:**
+   ```sql
+   EXPLAIN ANALYZE
+   SELECT * FROM search_similar_embeddings(
+     'user_id',
+     '[0.1,0.2,...]'::vector(1536),
+     10,
+     0.5,
+     NULL,
+     NULL
+   );
+   -- Should show "Index Scan using embedding_hnsw_idx"
+   ```
+
+3. **Tune search parameters:**
+   ```typescript
+   // In Knowledge Hub code
+   const results = await searchEmbeddings({
+     userId,
+     vector,
+     limit: 5,          // Reduce if slow
+     minSimilarity: 0.7, // Increase to filter more
+   });
+   ```
+
+---
+
+### Docker PostgreSQL Setup
+
+#### Running PostgreSQL in Docker
+
+**Quick start:**
+```bash
+# Create docker-compose.yml
+cat > docker-compose.yml <<EOF
+version: '3.8'
+services:
+  postgres:
+    image: pgvector/pgvector:pg15
+    container_name: mirrorbuddy-postgres
+    environment:
+      POSTGRES_USER: mirrorbuddy
+      POSTGRES_PASSWORD: mirrorbuddy
+      POSTGRES_DB: mirrorbuddy
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+EOF
+
+# Start
+docker-compose up -d
+
+# Connection string
+DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
+```
+
+**Benefits:**
+- ✅ pgvector pre-installed
+- ✅ Isolated from system PostgreSQL
+- ✅ Easy to reset: `docker-compose down -v`
+- ✅ Consistent across team members
+
+---
+
+### Common Error Messages
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `P1001: Can't reach database server` | PostgreSQL not running | `brew services start postgresql` |
+| `P1003: Database does not exist` | Database not created | `createdb mirrorbuddy` |
+| `P3006: Migration failed` | Schema conflict | `npx prisma migrate reset` (dev only) |
+| `P2002: Unique constraint failed` | Duplicate key | Check for existing data, adjust seed |
+| `type "vector" does not exist` | pgvector not installed/enabled | `CREATE EXTENSION vector;` |
+| `relation "ContentEmbedding" does not exist` | Table not created | `npx prisma db push` |
+| `@prisma/client did not initialize` | Client not generated | `npx prisma generate` |
+| `Error: ECONNREFUSED ::1:5432` | PostgreSQL listening on IPv4 only | Use `127.0.0.1` instead of `localhost` |
+
+---
+
+### Debugging Checklist
+
+1. **Verify database is running:**
+   ```bash
+   # PostgreSQL
+   pg_isready -h localhost -p 5432
+
+   # SQLite
+   ls -lh prisma/dev.db  # Should exist
+   ```
+
+2. **Test connection:**
+   ```bash
+   # PostgreSQL
+   psql $DATABASE_URL -c "SELECT 1"
+
+   # SQLite
+   sqlite3 prisma/dev.db "SELECT 1"
+   ```
+
+3. **Check Prisma Client:**
+   ```bash
+   npx prisma -v
+   npx prisma validate
+   ```
+
+4. **Regenerate everything:**
+   ```bash
+   rm -rf node_modules/.prisma
+   npx prisma generate
+   npx prisma db push
+   ```
+
+5. **Check pgvector status (PostgreSQL only):**
+   ```bash
+   psql $DATABASE_URL -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"
+   ```
+
+---
+
+### Related Documentation
+
+- **Setup guide:** `SETUP.md` → "Database Configuration"
+- **Schema reference:** `prisma/schema.prisma`
+- **pgvector utilities:** `src/lib/rag/pgvector-utils.ts`
+- **Prisma docs:** https://www.prisma.io/docs
 
 ---
 
