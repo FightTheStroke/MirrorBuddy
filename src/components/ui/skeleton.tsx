@@ -4,11 +4,15 @@ import { cn } from '@/lib/utils';
 
 interface SkeletonProps {
   className?: string;
+  'aria-label'?: string;
 }
 
-export function Skeleton({ className }: SkeletonProps) {
+export function Skeleton({ className, 'aria-label': ariaLabel }: SkeletonProps) {
   return (
     <div
+      role="status"
+      aria-busy="true"
+      aria-label={ariaLabel || 'Caricamento in corso'}
       className={cn(
         'animate-pulse rounded-md bg-slate-200 dark:bg-slate-700',
         className
