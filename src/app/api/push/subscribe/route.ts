@@ -26,11 +26,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
+    const authResult = await validateAuth();
+    if (!authResult.authenticated) {
+      return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
-    const userId = auth.userId!;
+    const userId = authResult.userId!;
 
     const body: SubscriptionBody = await request.json();
     const { endpoint, p256dh, auth, userAgent } = body;
@@ -100,11 +100,11 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
+    const authResult = await validateAuth();
+    if (!authResult.authenticated) {
+      return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
-    const userId = auth.userId!;
+    const userId = authResult.userId!;
 
     const body = await request.json();
     const { endpoint } = body;
@@ -154,11 +154,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
+    const authResult = await validateAuth();
+    if (!authResult.authenticated) {
+      return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
-    const userId = auth.userId!;
+    const userId = authResult.userId!;
 
     const subscriptions = await prisma.pushSubscription.findMany({
       where: { userId },
