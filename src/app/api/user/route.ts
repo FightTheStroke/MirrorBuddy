@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { signCookieValue } from '@/lib/auth/cookie-signing';
 
 export async function GET() {
   try {
@@ -24,8 +25,9 @@ export async function GET() {
         },
       });
 
-      // Set cookie (1 year expiry)
-      cookieStore.set('mirrorbuddy-user-id', user.id, {
+      // Set cookie (1 year expiry) with cryptographic signature
+      const signedCookie = signCookieValue(user.id);
+      cookieStore.set('mirrorbuddy-user-id', signedCookie.signed, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -57,7 +59,8 @@ export async function GET() {
         },
       });
 
-      cookieStore.set('mirrorbuddy-user-id', user.id, {
+      const signedCookie = signCookieValue(user.id);
+      cookieStore.set('mirrorbuddy-user-id', signedCookie.signed, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
