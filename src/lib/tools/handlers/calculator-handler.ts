@@ -72,7 +72,8 @@ function generateSteps(expression: string, result: number): CalculatorStep[] {
 registerToolHandler('create_calculator', async (args): Promise<ToolExecutionResult> => {
   const {
     expression,
-    mode = 'scientific',
+    // Note: mode is currently unused as we only support scientific mode
+    // Will be used when simple mode is implemented
     showSteps = true,
     description
   } = args as CalculatorRequest;
