@@ -1,0 +1,147 @@
+=== AUTO-BUILD PROGRESS ===
+
+Project: MirrorBuddy
+Task: Replace mathjs with lighter alternatives in Calculator
+Spec ID: 015-replace-mathjs-with-lighter-alternatives-in-calcul
+Started: 2026-01-13
+
+Workflow Type: investigation
+Rationale: The spec assumes calculator components exist and use mathjs, but investigation reveals these components don't exist and mathjs is not a dependency. This requires investigation to determine whether calculator functionality is needed, and if so, how to implement it correctly from scratch using lightweight alternatives.
+
+Session 1 (Planner):
+- Created implementation_plan.json
+- Created project_index.json
+- Created context.json
+- Created init.sh
+- Phases: 4
+- Total subtasks: 10
+- Created build-progress.txt
+
+Phase Summary:
+
+Phase 1 - Investigation - Document Current State (2 subtasks)
+  - Document investigation findings in INVESTIGATION.md
+  - Analyze whether Calculator tool is needed based on Euclide's profile and educational requirements
+  - Status: pending
+  - Depends on: None
+  - Parallel safe: Yes
+
+Phase 2 - Decision - Propose Implementation Approach (1 subtask)
+  - Create technical proposal for Calculator tool using expr-eval or math-expression-evaluator
+  - Status: pending
+  - Depends on: phase-1-investigation
+  - Parallel safe: No
+  - BLOCKED until Phase 1 completes
+
+Phase 3 - Implementation - Build Calculator Tool (Conditional) (6 subtasks)
+  - Add calculator tool type to ToolType union and create type definitions
+  - Install lightweight expression evaluator library (expr-eval recommended)
+  - Create calculator handler with expression evaluation
+  - Create calculator renderer component
+  - Add calculator tool schema to CHAT_TOOL_DEFINITIONS
+  - Integrate calculator renderer in tool-result-display.tsx
+  - Status: pending (CONDITIONAL)
+  - Depends on: phase-2-decision
+  - Parallel safe: No
+  - BLOCKED until Phase 2 approves building Calculator tool
+
+Phase 4 - Testing - Verify Calculator Tool (Conditional) (2 subtasks)
+  - Verify calculator tool works with basic expressions
+  - Verify bundle size impact and document savings vs mathjs
+  - Status: pending (CONDITIONAL)
+  - Depends on: phase-3-implementation
+  - Parallel safe: No
+  - BLOCKED until Phase 3 completes
+
+Services Involved:
+- frontend: Next.js/React/TypeScript application
+
+Investigation Findings (Pre-Planning):
+- Calculator components (calculator-scientific.tsx, calculator-simple.tsx) DO NOT EXIST
+- mathjs is NOT a dependency in package.json
+- No calculator tool type in src/types/tools/tool-types.ts
+- No calculator handler in src/lib/tools/handlers/
+- Euclide maestro lists "Calculator" in tools array but not implemented
+- Spec is from ideation and states "pending detailed specification"
+
+Recommended Lightweight Alternatives (if Calculator is built):
+1. expr-eval (~12KB minified) - full expression evaluation
+2. math-expression-evaluator (~8KB minified) - basic evaluation
+3. Native JavaScript Math + custom parser (0KB) - for simple cases
+
+Bundle Size Impact (hypothetical):
+- mathjs: ~170KB minified
+- expr-eval: ~12KB minified
+- Savings: ~158KB (~93% reduction)
+
+Parallelism Analysis:
+- Max parallel phases: 1 (sequential workflow)
+- Recommended workers: 1
+- Speedup estimate: Sequential execution required - investigation informs decision which informs implementation
+
+Alternative Outcomes:
+- Outcome A: Build Calculator tool with expr-eval (Phase 3-4 proceed)
+- Outcome B: Close spec as invalid/premature (implementation phases skipped)
+- Outcome C: Update spec to reflect future work (implementation phases deferred)
+
+=== STARTUP COMMAND ===
+
+To continue building this spec, run:
+
+  npm run dev
+
+Or to start the investigation phase:
+
+  ./.auto-claude/specs/015-replace-mathjs-with-lighter-alternatives-in-calcul/init.sh
+
+=== IMPORTANT NOTES ===
+
+1. SPEC MISSPECIFICATION: The original spec assumes calculator components exist and use mathjs, but this is incorrect. The calculator functionality does not exist in the codebase.
+
+2. INVESTIGATION REQUIRED: Phase 1 (Investigation) is CRITICAL and must complete before any implementation decisions are made.
+
+3. CONDITIONAL IMPLEMENTATION: Phases 3-4 are CONDITIONAL and should ONLY proceed if:
+   - Phase 1 confirms Calculator tool is needed for Euclide
+   - Phase 2 proposal is reviewed and approved
+   - Decision is made to build (not close/defer the spec)
+
+4. NO CODE CHANGES YET: Planning phase complete. No source code has been modified. All spec files are gitignored and managed locally.
+
+=== END SESSION 1 ===
+
+Session 2 (Implementation - Phase 1):
+- Date: 2026-01-13
+- Worker: Coder Agent
+- Phase: Investigation - Document Current State
+
+COMPLETED: subtask-1-1 (prior to this session)
+- Created INVESTIGATION.md (463 lines)
+- Documented: Calculator components don't exist, mathjs not a dependency
+- Key finding: Spec is misspecified - this is a new feature, not refactoring
+- Recommended 4 options with technical proposal using expr-eval
+
+COMPLETED: subtask-1-2
+- Added Educational Needs Analysis section to INVESTIGATION.md (218 lines)
+- Analyzed Euclide's profile and pedagogical requirements
+- Key findings:
+  * Calculator explicitly required in Euclide's approach (line 74)
+  * CRITICAL for dyscalculia support (color-coded steps, visual blocks)
+  * Resolved pedagogical paradox: Calculator as teaching tool vs computation aid
+  * Educational requirements analysis with 3 use cases
+  * Decision matrix: 12 points (with Calculator) vs 3 points (without)
+  * Alignment with WCAG 2.1 AA accessibility mandate
+- DECISION: Calculator is CRITICALLY NEEDED
+- RECOMMENDATION: Proceed with high-priority implementation
+
+Phase 1 Status: ✅ COMPLETE
+- All investigation subtasks completed
+- Clear recommendation: Build Calculator tool
+- Ready for Phase 2: Decision - Propose Implementation Approach
+
+Next Steps:
+1. Stakeholder review of INVESTIGATION.md findings
+2. Decision on whether to proceed with Calculator implementation
+3. If approved: Begin Phase 2 (Create technical proposal)
+4. If not approved: Close/defer spec per investigation recommendations
+
+=== END SESSION 2 ===
