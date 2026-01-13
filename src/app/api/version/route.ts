@@ -6,6 +6,7 @@
 import { NextResponse } from 'next/server';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { getCacheControlHeader, CACHE_TTL } from '@/lib/cache';
 
 // Cache version in memory
 let cachedVersion: string = '';
@@ -35,10 +36,20 @@ export async function GET() {
   const version = getVersion();
   const buildTime = process.env.BUILD_TIME || new Date().toISOString();
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     version,
     buildTime,
     name: 'MirrorBuddy Web',
     environment: process.env.NODE_ENV || 'development',
   });
+
+  // Add HTTP Cache-Control headers for static version data
+  const cacheControl = getCacheControlHeader({
+    ttl: CACHE_TTL.VERSION,
+    visibility: 'public',
+    cdnTtl: CACHE_TTL.VERSION,
+  });
+  response.headers.set('Cache-Control', cacheControl);
+
+  return response;
 }
