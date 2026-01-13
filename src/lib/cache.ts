@@ -149,6 +149,11 @@ export interface CacheControlOptions {
 export function getCacheControlHeader(options: CacheControlOptions): string {
   const { ttl, visibility = 'public', cdnTtl, staleWhileRevalidate } = options;
 
+  // Validate TTL is positive
+  if (ttl <= 0) {
+    return 'no-store';
+  }
+
   const maxAgeSeconds = Math.floor(ttl / 1000);
   const parts = [visibility, `max-age=${maxAgeSeconds}`];
 
