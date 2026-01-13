@@ -26,7 +26,7 @@ export const CreateMaterialSchema = z.object({
   toolId: z.string().min(1).max(255),
   toolType: z.enum(MATERIAL_TYPES),
   title: z.string().min(1).max(500),
-  content: z.record(z.unknown()),
+  content: z.record(z.string(), z.unknown()),
   maestroId: z.string().max(100).optional(),
   sessionId: z.string().max(100).optional(),
   subject: z.string().max(200).optional(),
@@ -41,7 +41,7 @@ export const CreateMaterialSchema = z.object({
 export const UpdateMaterialSchema = z.object({
   toolId: z.string().min(1).max(255),
   title: z.string().min(1).max(500).optional(),
-  content: z.record(z.unknown()).optional(),
+  content: z.record(z.string(), z.unknown()).optional(),
   status: z.enum(['active', 'archived', 'deleted']).optional(),
   userRating: z.number().int().min(1).max(5).optional(),
   isBookmarked: z.boolean().optional(),

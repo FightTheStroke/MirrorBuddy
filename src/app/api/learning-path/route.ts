@@ -90,25 +90,14 @@ export async function POST(request: NextRequest) {
         status: 'ready',
         visualOverview,
         topics: {
-          create: topics.map(
-            (
-              topic: {
-                title: string;
-                description: string;
-                keyConcepts: string[];
-                difficulty: string;
-                order: number;
-              },
-              index: number
-            ) => ({
-              order: topic.order || index + 1,
-              title: topic.title,
-              description: topic.description || '',
-              keyConcepts: JSON.stringify(topic.keyConcepts || []),
-              difficulty: topic.difficulty || 'intermediate',
-              status: index === 0 ? 'unlocked' : 'locked',
-            })
-          ),
+          create: topics.map((topic, index) => ({
+            order: topic.order || index + 1,
+            title: topic.title,
+            description: topic.description || '',
+            keyConcepts: JSON.stringify(topic.keyConcepts || []),
+            difficulty: topic.difficulty || 'intermediate',
+            status: index === 0 ? 'unlocked' : 'locked',
+          })),
         },
       },
       include: {

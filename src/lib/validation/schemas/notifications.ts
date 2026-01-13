@@ -67,7 +67,7 @@ export const CreateNotificationSchema = z.object({
   title: NonEmptyString(VALIDATION_LIMITS.SHORT_STRING_MAX),
   message: NonEmptyString(VALIDATION_LIMITS.LONG_STRING_MAX),
   actionUrl: OptionalString(VALIDATION_LIMITS.MEDIUM_STRING_MAX),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
   scheduledFor: IsoDateString.optional(),
   expiresAt: IsoDateString.optional(),
   priority: NotificationPriority.optional(),

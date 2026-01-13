@@ -10,17 +10,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
-<<<<<<< HEAD
 import { processStudyKit } from '@/lib/tools/handlers/study-kit-generators';
 import { saveMaterialsFromStudyKit, indexStudyKitContent } from '@/lib/study-kit/sync-materials';
-||||||| parent of a518ab2 (auto-claude: subtask-4-4 - Create and apply validation schemas for /api/study-kit routes)
-import { processStudyKit } from '@/lib/tools/handlers/study-kit-handler';
-import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
-=======
-import { processStudyKit } from '@/lib/tools/handlers/study-kit-handler';
-import { saveMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
 import { UploadStudyKitSchema } from '@/lib/validation/schemas/study-kit';
->>>>>>> a518ab2 (auto-claude: subtask-4-4 - Create and apply validation schemas for /api/study-kit routes)
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes for processing

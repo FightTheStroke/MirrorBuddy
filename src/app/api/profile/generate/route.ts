@@ -54,14 +54,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-<<<<<<< HEAD
-||||||| parent of 2a70a69 (auto-claude: subtask-4-1 - Create and apply validation schemas for /api/profile/* routes)
-    // Check if recent profile exists and forceRegenerate is false
-=======
     const { userId, forceRegenerate = false } = validation.data;
 
     // Check if recent profile exists and forceRegenerate is false
->>>>>>> 2a70a69 (auto-claude: subtask-4-1 - Create and apply validation schemas for /api/profile/* routes)
     if (!forceRegenerate) {
       const existingProfile = await prisma.studentInsightProfile.findUnique({
         where: { userId },

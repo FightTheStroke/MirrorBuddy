@@ -69,7 +69,7 @@ export const CreateToolSchema = z.object({
   toolType: ToolTypeEnum,
   title: NonEmptyString(VALIDATION_LIMITS.MEDIUM_STRING_MAX),
   subject: OptionalString(VALIDATION_LIMITS.SHORT_STRING_MAX),
-  content: z.record(z.unknown()),
+  content: z.record(z.string(), z.unknown()),
 }).strict();
 
 // ============================================================================
@@ -85,7 +85,7 @@ export const SaveToolSchema = z.object({
   type: ToolTypeEnum,
   title: NonEmptyString(VALIDATION_LIMITS.MEDIUM_STRING_MAX),
   topic: OptionalString(VALIDATION_LIMITS.MEDIUM_STRING_MAX),
-  content: z.record(z.unknown()),
+  content: z.record(z.string(), z.unknown()),
   maestroId: OptionalString(VALIDATION_LIMITS.SHORT_STRING_MAX),
   conversationId: OptionalString(VALIDATION_LIMITS.SHORT_STRING_MAX),
   sessionId: OptionalString(VALIDATION_LIMITS.SHORT_STRING_MAX),
