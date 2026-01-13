@@ -1,6 +1,5 @@
 import { useEffect, useCallback, useState, type RefObject } from 'react';
 import type { Markmap } from 'markmap-view';
-import { Transformer } from 'markmap-lib';
 import { logger } from '@/lib/logger';
 import type { AccessibilitySettings } from '@/lib/accessibility/accessibility-store';
 import type { MindmapNode } from '../types';
@@ -10,8 +9,6 @@ import {
   detectNodeFormat,
   type FlatNode,
 } from '@/lib/tools/mindmap-utils';
-
-const transformer = new Transformer();
 
 interface UseMarkmapRenderProps {
   svgRef: RefObject<SVGSVGElement | null> | RefObject<SVGSVGElement>;
@@ -100,6 +97,10 @@ export function useMarkmapRender({
 
         // Clear previous content
         svgRef.current.innerHTML = '';
+
+        // Lazy-load markmap-lib
+        const { Transformer } = await import('markmap-lib');
+        const transformer = new Transformer();
 
         // Get markdown and transform to markmap data
         const content = getMarkdownContent();
