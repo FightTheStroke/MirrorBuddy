@@ -231,7 +231,7 @@ test.describe('Cookie Security Properties', () => {
 
     // Verify security flags
     expect(setCookie).toContain('HttpOnly');
-    expect(setCookie).toContain('SameSite=Lax');
+    expect(setCookie.toLowerCase()).toContain('samesite=lax');
     expect(setCookie).toContain('Path=/');
     expect(setCookie).toContain('Max-Age=');
   });
