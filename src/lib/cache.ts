@@ -116,3 +116,51 @@ export const CACHE_TTL = {
   /** Version info: 1 hour (static per deployment) */
   VERSION: 60 * 60 * 1000,
 } as const;
+
+// ============================================================================
+// HTTP CACHE-CONTROL HEADERS
+// ============================================================================
+
+export interface CacheControlOptions {
+  /** Time-to-live in milliseconds */
+  ttl: number;
+  /** Whether cache is public (CDN cacheable) or private (browser only) */
+  visibility?: 'public' | 'private';
+  /** CDN/shared cache TTL in milliseconds (defaults to same as ttl) */
+  cdnTtl?: number;
+  /** Stale-while-revalidate time in milliseconds */
+  staleWhileRevalidate?: number;
+}
+
+/**
+ * Generate Cache-Control header value for HTTP responses
+ * Converts millisecond TTLs to seconds for HTTP headers
+ *
+ * @example
+ * // Static data with CDN caching
+ * getCacheControlHeader({ ttl: 3600000, cdnTtl: 3600000 })
+ * // Returns: "public, max-age=3600, s-maxage=3600"
+ *
+ * @example
+ * // Data with stale-while-revalidate
+ * getCacheControlHeader({ ttl: 60000, staleWhileRevalidate: 300000 })
+ * // Returns: "public, max-age=60, stale-while-revalidate=300"
+ */
+export function getCacheControlHeader(options: CacheControlOptions): string {
+  const { ttl, visibility = 'public', cdnTtl, staleWhileRevalidate } = options;
+
+  const maxAgeSeconds = Math.floor(ttl / 1000);
+  const parts = [visibility, `max-age=${maxAgeSeconds}`];
+
+  if (cdnTtl !== undefined) {
+    const cdnSeconds = Math.floor(cdnTtl / 1000);
+    parts.push(`s-maxage=${cdnSeconds}`);
+  }
+
+  if (staleWhileRevalidate !== undefined) {
+    const swrSeconds = Math.floor(staleWhileRevalidate / 1000);
+    parts.push(`stale-while-revalidate=${swrSeconds}`);
+  }
+
+  return parts.join(', ');
+}
