@@ -69,7 +69,7 @@ export interface DiagramRequest {
  * Request to create a chart
  */
 export interface ChartRequest {
-  type: 'line' | 'bar' | 'pie' | 'scatter' | 'area';
+  type: 'line' | 'bar' | 'pie' | 'doughnut' | 'scatter' | 'area';
   title: string;
   data: {
     labels: string[];

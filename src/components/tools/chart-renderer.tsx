@@ -43,8 +43,8 @@ const defaultColors = [
 export function ChartRenderer({ request, className }: ChartRendererProps) {
   // Transform data for Recharts format
   const chartData = useMemo(() => {
-    if (request.type === 'pie') {
-      // Pie charts need a different data structure
+    if (request.type === 'pie' || request.type === 'doughnut') {
+      // Pie and doughnut charts need a different data structure
       return request.data.labels.map((label, index) => ({
         name: label,
         value: request.data.datasets[0]?.data[index] || 0,
@@ -186,6 +186,36 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
               labelLine={false}
               label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
               outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {chartData.map((_, index) => (
+                <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: '#1e293b',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#fff',
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: '12px' }} />
+          </PieChart>
+        );
+
+      case 'doughnut':
+        return (
+          <PieChart aria-label={request.title || 'Grafico a ciambella'}>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={100}
+              labelLine={false}
+              label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
               fill="#8884d8"
               dataKey="value"
             >
