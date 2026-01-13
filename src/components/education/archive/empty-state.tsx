@@ -46,7 +46,6 @@ export function EmptyState({ filter }: EmptyStateProps) {
       </p>
       <Button
         onClick={() => router.push('/')}
-        className="bg-primary hover:bg-primary/90 text-white"
       >
         Inizia una Conversazione
       </Button>
