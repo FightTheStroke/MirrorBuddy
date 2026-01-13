@@ -108,7 +108,7 @@ export function InactivityWarningDialog({
 
               <button
                 onClick={handleClose}
-                className="flex-shrink-0 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                className="flex-shrink-0 inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                 aria-label="Chiudi avviso"
               >
                 <X className="w-5 h-5 text-slate-500" />
