@@ -2,8 +2,11 @@ import { defineConfig, devices } from '@playwright/test';
 import path from 'path';
 
 /**
- * mirrorbuddy-Edu E2E Test Configuration
+ * MirrorBuddy E2E Test Configuration
  * Tests for educational platform with AI-powered tutoring
+ *
+ * Environment: Clears color env vars to ensure consistent test output.
+ * DATABASE_URL: Optional - tests use mock data when not provided.
  */
 delete process.env.NO_COLOR;
 delete process.env.FORCE_COLOR;
@@ -40,13 +43,12 @@ export default defineConfig({
   ],
 
   webServer: {
-    // Using delete process.env above to clear NO_COLOR/FORCE_COLOR (line 8-9)
     command: 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      // DATABASE_URL is optional - if not set, Prisma uses placeholder for schema-only
+      // Pass through database URLs if set in environment
       ...(process.env.DATABASE_URL && { DATABASE_URL: process.env.DATABASE_URL }),
       ...(process.env.DIRECT_URL && { DIRECT_URL: process.env.DIRECT_URL }),
       E2E_TESTS: '1',

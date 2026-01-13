@@ -25,6 +25,7 @@ import '@/lib/tools/handlers';
 import { ChatRequest } from './types';
 import { TOOL_CONTEXT } from './constants';
 import { getDemoContext } from './helpers';
+import { TOKEN_COST_PER_UNIT } from './stream/helpers';
 
 export async function POST(request: NextRequest) {
   // Rate limiting: 20 requests per minute per IP
@@ -354,8 +355,8 @@ export async function POST(request: NextRequest) {
       // Update budget tracking if usage data is available (WAVE 3: Token budget enforcement)
       if (userId && userSettings && result.usage) {
         try {
-          // Rough cost estimation: $0.000002 per token for GPT-4o (adjust as needed)
-          const estimatedCost = (result.usage.total_tokens || 0) * 0.000002;
+          // Use shared constant for token cost (see stream/helpers.ts for pricing details)
+          const estimatedCost = (result.usage.total_tokens || 0) * TOKEN_COST_PER_UNIT;
           await prisma.settings.update({
             where: { userId },
             data: {

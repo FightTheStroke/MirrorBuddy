@@ -18,7 +18,7 @@ import type { ChatRequest } from '../types';
  * Cost per token for budget tracking (GPT-4o-mini pricing)
  * $0.15/1M input + $0.60/1M output ≈ $0.002/1K average
  */
-const TOKEN_COST_PER_UNIT = 0.000002;
+export const TOKEN_COST_PER_UNIT = 0.000002;
 
 /**
  * User settings for budget and provider

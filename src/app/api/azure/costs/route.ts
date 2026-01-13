@@ -122,8 +122,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to query costs' }, { status: 500 });
     }
 
-    // Parse service costs
-    const serviceRows = (serviceResponse.result.properties as { rows?: unknown[][] })?.rows || [];
+    // Parse service costs with explicit typing
+    const serviceRows: unknown[][] = (serviceResponse.result.properties as { rows?: unknown[][] })?.rows || [];
     const costsByService: CostByService[] = [];
     let totalCost = 0;
 
@@ -137,8 +137,8 @@ export async function GET(request: NextRequest) {
 
     costsByService.sort((a, b) => b.cost - a.cost);
 
-    // Parse daily costs
-    const dailyRows = (dailyResponse.result.properties as { rows?: unknown[][] })?.rows || [];
+    // Parse daily costs with explicit typing
+    const dailyRows: unknown[][] = (dailyResponse.result.properties as { rows?: unknown[][] })?.rows || [];
     const dailyCosts: DailyCost[] = [];
 
     for (const row of dailyRows) {
