@@ -5,18 +5,17 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     const settings = await prisma.settings.findUnique({
       where: { userId },
@@ -38,12 +37,11 @@ export async function GET() {
 
 export async function POST(_request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     // Upsert settings with consent timestamp
     const settings = await prisma.settings.upsert({

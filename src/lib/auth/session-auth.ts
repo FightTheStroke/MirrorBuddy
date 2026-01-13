@@ -2,11 +2,13 @@
 // SESSION AUTHENTICATION HELPER
 // Reusable auth checks for API endpoints
 // Created for issues #83, #84, #85, #86
+// Updated for #013: Cryptographically signed session cookies
 // ============================================================================
 
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
 
 export interface AuthResult {
   authenticated: boolean;
@@ -17,20 +19,48 @@ export interface AuthResult {
 /**
  * Validate user authentication from cookie
  * Use this at the start of any protected API endpoint
+ *
+ * Supports both signed cookies (new) and unsigned cookies (legacy).
+ * Signed cookies use HMAC-SHA256 for tamper protection.
  */
 export async function validateAuth(): Promise<AuthResult> {
   try {
     const cookieStore = await cookies();
     // Check new cookie first, fallback to legacy cookie for existing users
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value
+    const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value
       || cookieStore.get('convergio-user-id')?.value;
 
-    if (!userId) {
+    if (!cookieValue) {
       return {
         authenticated: false,
         userId: null,
         error: 'No authentication cookie',
       };
+    }
+
+    let userId: string;
+
+    // Verify signed cookies, allow legacy unsigned cookies for backward compatibility
+    if (isSignedCookie(cookieValue)) {
+      const verification = verifyCookieValue(cookieValue);
+
+      if (!verification.valid) {
+        logger.warn('Cookie signature verification failed', {
+          error: verification.error,
+        });
+        return {
+          authenticated: false,
+          userId: null,
+          error: 'Invalid cookie signature',
+        };
+      }
+
+      userId = verification.value!;
+      logger.debug('Signed cookie verified', { userId });
+    } else {
+      // Legacy unsigned cookie - allow for backward compatibility
+      userId = cookieValue;
+      logger.debug('Legacy unsigned cookie accepted', { userId });
     }
 
     // Verify user exists in database

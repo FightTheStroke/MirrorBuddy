@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import {
@@ -42,15 +42,14 @@ import type { DSAProfile, PDFGeneratorRequest } from '@/lib/pdf-generator/types'
 export async function POST(request: NextRequest) {
   try {
     // Auth check
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
       return NextResponse.json(
-        { success: false, error: 'Unauthorized' },
+        { success: false, error: auth.error },
         { status: 401 }
       );
     }
+    const userId = auth.userId!;
 
     // Parse request body
     const body = await request.json();

@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { validateAuth } from '@/lib/auth/session-auth';
 
 /**
  * GET /api/user/data - Export all user data (GDPR portability)
@@ -15,12 +16,11 @@ import { logger } from '@/lib/logger';
  */
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     // Fetch all user data from database
     const user = await prisma.user.findUnique({
@@ -90,12 +90,11 @@ export async function GET() {
  */
 export async function DELETE() {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
       return NextResponse.json({ success: true, message: 'No user data to delete' });
     }
+    const userId = auth.userId!;
 
     // Delete user and all related data (cascades configured in schema)
     await prisma.user.delete({
@@ -105,6 +104,7 @@ export async function DELETE() {
     });
 
     // Clear the user cookie
+    const cookieStore = await cookies();
     cookieStore.delete('mirrorbuddy-user-id');
 
     return NextResponse.json({

@@ -4,18 +4,17 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { logger } from '@/lib/logger';
 import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
       return NextResponse.json({ greeting: null, hasContext: false });
     }
+    const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
     const characterId = searchParams.get('characterId');

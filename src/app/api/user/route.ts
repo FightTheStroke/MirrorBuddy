@@ -7,13 +7,14 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { isSignedCookie, verifyCookieValue, signCookieValue } from '@/lib/auth/cookie-signing';
 
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
 
-    if (!userId) {
+    if (!cookieValue) {
       // Create new user for local mode
       const user = await prisma.user.create({
         data: {},
@@ -24,8 +25,9 @@ export async function GET() {
         },
       });
 
-      // Set cookie (1 year expiry)
-      cookieStore.set('mirrorbuddy-user-id', user.id, {
+      // Set cookie (1 year expiry) with cryptographic signature
+      const signedCookie = signCookieValue(user.id);
+      cookieStore.set('mirrorbuddy-user-id', signedCookie.signed, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -34,6 +36,47 @@ export async function GET() {
       });
 
       return NextResponse.json(user);
+    }
+
+    // Extract userId from signed or unsigned cookie
+    let userId: string;
+
+    if (isSignedCookie(cookieValue)) {
+      const verification = verifyCookieValue(cookieValue);
+
+      if (!verification.valid) {
+        // Invalid signature - treat as no cookie, create new user
+        logger.warn('Invalid cookie signature, creating new user', {
+          error: verification.error,
+        });
+
+        const user = await prisma.user.create({
+          data: {},
+          include: {
+            profile: true,
+            settings: true,
+            progress: true,
+          },
+        });
+
+        const signedCookie = signCookieValue(user.id);
+        cookieStore.set('mirrorbuddy-user-id', signedCookie.signed, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 365,
+          path: '/',
+        });
+
+        return NextResponse.json(user);
+      }
+
+      userId = verification.value!;
+      logger.debug('Signed cookie verified', { userId });
+    } else {
+      // Legacy unsigned cookie (backward compatibility)
+      userId = cookieValue;
+      logger.debug('Legacy unsigned cookie accepted', { userId });
     }
 
     // Get existing user
@@ -57,7 +100,8 @@ export async function GET() {
         },
       });
 
-      cookieStore.set('mirrorbuddy-user-id', user.id, {
+      const signedCookie = signCookieValue(user.id);
+      cookieStore.set('mirrorbuddy-user-id', signedCookie.signed, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',

@@ -19,6 +19,7 @@ import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
 import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/retrieval-service';
 import { saveTool } from '@/lib/tools/tool-persistence';
 import { functionNameToToolType } from '@/types/tools';
+import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
@@ -49,8 +50,26 @@ export async function POST(request: NextRequest) {
     }
 
     // Get userId from cookie for memory injection and provider preference
+    // Extract userId from signed cookies (or legacy unsigned cookies)
     const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
+    let userId: string | undefined;
+
+    if (cookieValue) {
+      if (isSignedCookie(cookieValue)) {
+        const verification = verifyCookieValue(cookieValue);
+        if (verification.valid) {
+          userId = verification.value;
+        } else {
+          logger.warn('Invalid signed cookie in /api/chat', {
+            error: verification.error,
+          });
+        }
+      } else {
+        // Legacy unsigned cookie
+        userId = cookieValue;
+      }
+    }
 
     // #87: Get user's provider preference and budget from settings
     let providerPreference: AIProvider | 'auto' | undefined;

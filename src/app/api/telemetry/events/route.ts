@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { TelemetryCategory } from '@/lib/telemetry/types';
@@ -47,8 +47,8 @@ interface EventPayload {
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
+    const userId = auth.authenticated ? auth.userId : null;
 
     // Handle empty or malformed JSON body gracefully
     let body: EventPayload;

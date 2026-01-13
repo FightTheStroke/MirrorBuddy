@@ -4,16 +4,10 @@
 // ============================================================================
 
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-
-// Helper to get userId from cookies (consistent with other APIs)
-async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get('mirrorbuddy-user-id')?.value || null;
-}
 
 interface SubscriptionBody {
   endpoint: string;
@@ -32,10 +26,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const authResult = await validateAuth();
+    if (!authResult.authenticated) {
+      return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
+    const userId = authResult.userId!;
 
     const body: SubscriptionBody = await request.json();
     const { endpoint, p256dh, auth, userAgent } = body;
@@ -105,10 +100,11 @@ export async function DELETE(request: Request) {
   }
 
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const authResult = await validateAuth();
+    if (!authResult.authenticated) {
+      return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
+    const userId = authResult.userId!;
 
     const body = await request.json();
     const { endpoint } = body;
@@ -158,10 +154,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+    const authResult = await validateAuth();
+    if (!authResult.authenticated) {
+      return NextResponse.json({ error: authResult.error }, { status: 401 });
     }
+    const userId = authResult.userId!;
 
     const subscriptions = await prisma.pushSubscription.findMany({
       where: { userId },

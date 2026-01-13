@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { validateAuth } from '@/lib/auth/session-auth';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { ToolCall, ToolCallRef } from '@/types/tools';
@@ -31,13 +31,13 @@ interface RouteParams {
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id: conversationId } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     // Verify conversation ownership
     const conversation = await prisma.conversation.findFirst({
@@ -74,13 +74,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id: conversationId } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'No user' }, { status: 401 });
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
 
     // Verify conversation ownership
     const conversation = await prisma.conversation.findFirst({
