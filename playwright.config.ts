@@ -35,6 +35,17 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      // Exclude cookie-signing tests from main project (they have their own project)
+      testIgnore: '**/cookie-signing.spec.ts',
+    },
+    {
+      // Cookie-signing tests need to run without storage state to test fresh cookies
+      name: 'cookie-signing',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: undefined, // Don't use storage state - start fresh
+      },
+      testMatch: '**/cookie-signing.spec.ts',
     },
     // Other browsers disabled - only testing API/backend, not cross-browser UI
     // Re-enable if needed:
@@ -52,6 +63,8 @@ export default defineConfig({
       ...(process.env.DATABASE_URL && { DATABASE_URL: process.env.DATABASE_URL }),
       ...(process.env.DIRECT_URL && { DIRECT_URL: process.env.DIRECT_URL }),
       E2E_TESTS: '1',
+      // Session secret for cookie signing (required for cookie-signing.spec.ts)
+      SESSION_SECRET: process.env.SESSION_SECRET || 'e2e-test-session-secret-32-characters-min',
     },
   },
 });

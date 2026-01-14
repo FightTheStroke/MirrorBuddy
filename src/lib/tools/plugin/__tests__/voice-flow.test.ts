@@ -210,4 +210,24 @@ describe('VoiceToolFlow Integration Tests', () => {
       expect(result.voiceFeedback).toBeDefined();
     });
   });
+
+  describe('createVoiceToolFlow factory', () => {
+    it('should create VoiceToolFlow with registry dependencies', async () => {
+      // Import the factory function
+      const { createVoiceToolFlow } = await import('../voice-flow');
+
+      // Reset singleton and get fresh instance
+      (ToolRegistry as unknown as { instance: ToolRegistry | null })['instance'] = null;
+      const factoryRegistry = ToolRegistry.getInstance();
+      factoryRegistry.register(mockPlugin);
+
+      const flow = createVoiceToolFlow(factoryRegistry);
+
+      expect(flow).toBeInstanceOf(VoiceToolFlow);
+
+      // Verify it can process transcripts
+      const result = await flow.processTranscript('create summary', mockContext);
+      expect(result.triggered).toBe(true);
+    });
+  });
 });

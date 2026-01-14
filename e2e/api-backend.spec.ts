@@ -117,10 +117,8 @@ test.describe('Backend API: Progress & Gamification', () => {
     await request.get('/api/user');
 
     const session = {
-      maestroId: 'prof-matematica',
-      subject: 'Matematica',
-      xpEarned: 50,
-      questionsAsked: 5,
+      maestroId: 'pythagoras',
+      subject: 'Mathematics',
     };
 
     const response = await request.post('/api/progress/sessions', {
@@ -130,7 +128,7 @@ test.describe('Backend API: Progress & Gamification', () => {
 
     const data = await response.json();
     expect(data.id).toBeDefined();
-    expect(data.maestroId).toBe('prof-matematica');
+    expect(data.maestroId).toBe('pythagoras');
   });
 
   test('GET /api/progress/sessions - retrieves sessions', async ({ request }) => {
