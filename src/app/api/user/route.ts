@@ -15,9 +15,13 @@ export async function GET() {
     const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
 
     if (!cookieValue) {
-      // Create new user for local mode
+      // Create new user for local mode with related records
       const user = await prisma.user.create({
-        data: {},
+        data: {
+          profile: { create: {} },
+          settings: { create: {} },
+          progress: { create: {} },
+        },
         include: {
           profile: true,
           settings: true,
@@ -40,6 +44,7 @@ export async function GET() {
 
     // Extract userId from signed or unsigned cookie
     let userId: string;
+    let needsCookieUpgrade = false;
 
     if (isSignedCookie(cookieValue)) {
       const verification = verifyCookieValue(cookieValue);
@@ -51,7 +56,11 @@ export async function GET() {
         });
 
         const user = await prisma.user.create({
-          data: {},
+          data: {
+            profile: { create: {} },
+            settings: { create: {} },
+            progress: { create: {} },
+          },
           include: {
             profile: true,
             settings: true,
@@ -74,9 +83,10 @@ export async function GET() {
       userId = verification.value!;
       logger.debug('Signed cookie verified', { userId });
     } else {
-      // Legacy unsigned cookie (backward compatibility)
+      // Legacy unsigned cookie - accept but mark for upgrade
       userId = cookieValue;
-      logger.debug('Legacy unsigned cookie accepted', { userId });
+      needsCookieUpgrade = true;
+      logger.debug('Legacy unsigned cookie, will upgrade', { userId });
     }
 
     // Get existing user
@@ -90,9 +100,13 @@ export async function GET() {
     });
 
     if (!user) {
-      // Cookie exists but user deleted, create new
+      // Cookie exists but user deleted, create new with related records
       user = await prisma.user.create({
-        data: {},
+        data: {
+          profile: { create: {} },
+          settings: { create: {} },
+          progress: { create: {} },
+        },
         include: {
           profile: true,
           settings: true,
@@ -108,6 +122,24 @@ export async function GET() {
         maxAge: 60 * 60 * 24 * 365,
         path: '/',
       });
+    } else if (needsCookieUpgrade) {
+      // Upgrade legacy unsigned cookie to signed cookie
+      try {
+        const signedCookie = signCookieValue(user.id);
+        cookieStore.set('mirrorbuddy-user-id', signedCookie.signed, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 60 * 60 * 24 * 365,
+          path: '/',
+        });
+        logger.debug('Legacy cookie upgraded to signed', { userId: user.id });
+      } catch (upgradeError) {
+        // If signing fails (e.g., no SESSION_SECRET), continue without upgrade
+        logger.warn('Cookie upgrade failed, continuing with unsigned', {
+          error: String(upgradeError),
+        });
+      }
     }
 
     return NextResponse.json(user);

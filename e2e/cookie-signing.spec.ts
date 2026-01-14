@@ -6,6 +6,23 @@
 
 import { test, expect } from '@playwright/test';
 
+/**
+ * Helper to extract cookie value from Set-Cookie header
+ */
+function extractCookieValue(setCookieHeader: string | undefined, cookieName: string): string | null {
+  if (!setCookieHeader) return null;
+  const cookies = setCookieHeader.split(', ');
+  for (const cookie of cookies) {
+    if (cookie.startsWith(`${cookieName}=`)) {
+      const valueEnd = cookie.indexOf(';');
+      return valueEnd > 0
+        ? cookie.substring(cookieName.length + 1, valueEnd)
+        : cookie.substring(cookieName.length + 1);
+    }
+  }
+  return null;
+}
+
 test.describe('Signed Cookie Authentication', () => {
   test('GET /api/user - sets signed cookie for new user', async ({ request }) => {
     const response = await request.get('/api/user');
@@ -14,21 +31,19 @@ test.describe('Signed Cookie Authentication', () => {
     const data = await response.json();
     expect(data.id).toBeDefined();
 
-    // Check that cookie is set
-    const headers = response.headers();
-    const setCookie = headers['set-cookie'];
+    // Check Set-Cookie header for signed cookie
+    const setCookie = response.headers()['set-cookie'];
     expect(setCookie).toBeDefined();
+
+    const cookieValue = extractCookieValue(setCookie, 'mirrorbuddy-user-id');
+    expect(cookieValue).not.toBeNull();
 
     // Verify cookie contains signature (format: value.signature)
     // Signature is 64-char hex string after the last dot
-    const cookieMatch = setCookie?.match(/mirrorbuddy-user-id=([^;]+)/);
-    expect(cookieMatch).toBeDefined();
-
-    const cookieValue = cookieMatch![1];
-    const lastDotIndex = cookieValue.lastIndexOf('.');
+    const lastDotIndex = cookieValue!.lastIndexOf('.');
     expect(lastDotIndex).toBeGreaterThan(-1);
 
-    const signature = cookieValue.substring(lastDotIndex + 1);
+    const signature = cookieValue!.substring(lastDotIndex + 1);
     // HMAC-SHA256 hex signature is 64 characters
     expect(signature).toHaveLength(64);
     expect(signature).toMatch(/^[0-9a-f]+$/);
@@ -84,15 +99,16 @@ test.describe('Signed Cookie Authentication', () => {
     expect(userResponse.ok()).toBeTruthy();
     const _user = await userResponse.json();
 
-    // Get the signed cookie value
-    const cookies = await context.cookies();
-    const userCookie = cookies.find(c => c.name === 'mirrorbuddy-user-id');
-    expect(userCookie).toBeDefined();
+    // Get the signed cookie value from response headers
+    const setCookie = userResponse.headers()['set-cookie'];
+    expect(setCookie).toBeDefined();
 
-    const originalValue = userCookie!.value;
-    const lastDotIndex = originalValue.lastIndexOf('.');
-    const value = originalValue.substring(0, lastDotIndex);
-    const signature = originalValue.substring(lastDotIndex + 1);
+    const originalValue = extractCookieValue(setCookie, 'mirrorbuddy-user-id');
+    expect(originalValue).not.toBeNull();
+
+    const lastDotIndex = originalValue!.lastIndexOf('.');
+    const value = originalValue!.substring(0, lastDotIndex);
+    const signature = originalValue!.substring(lastDotIndex + 1);
 
     // Tamper with the signature (flip one character)
     const tamperedSignature = signature.substring(0, signature.length - 1) +
@@ -127,14 +143,15 @@ test.describe('Signed Cookie Authentication', () => {
     const userResponse = await request.get('/api/user');
     expect(userResponse.ok()).toBeTruthy();
 
-    // Get the signed cookie
-    const cookies = await context.cookies();
-    const userCookie = cookies.find(c => c.name === 'mirrorbuddy-user-id');
-    expect(userCookie).toBeDefined();
+    // Get the signed cookie from response headers
+    const setCookie = userResponse.headers()['set-cookie'];
+    expect(setCookie).toBeDefined();
 
-    const originalValue = userCookie!.value;
-    const lastDotIndex = originalValue.lastIndexOf('.');
-    const signature = originalValue.substring(lastDotIndex + 1);
+    const originalValue = extractCookieValue(setCookie, 'mirrorbuddy-user-id');
+    expect(originalValue).not.toBeNull();
+
+    const lastDotIndex = originalValue!.lastIndexOf('.');
+    const signature = originalValue!.substring(lastDotIndex + 1);
 
     // Tamper with the value part (keep signature the same)
     const tamperedValue = `fake-user-id.${signature}`;
@@ -165,13 +182,14 @@ test.describe('Signed Cookie Authentication', () => {
     const _user = await userResponse.json();
 
     // Extract just the user ID (without signature) to simulate legacy cookie
-    const cookies = await context.cookies();
-    const userCookie = cookies.find(c => c.name === 'mirrorbuddy-user-id');
-    expect(userCookie).toBeDefined();
+    const setCookie = userResponse.headers()['set-cookie'];
+    expect(setCookie).toBeDefined();
 
-    const signedValue = userCookie!.value;
-    const lastDotIndex = signedValue.lastIndexOf('.');
-    const unsignedUserId = signedValue.substring(0, lastDotIndex);
+    const signedValue = extractCookieValue(setCookie, 'mirrorbuddy-user-id');
+    expect(signedValue).not.toBeNull();
+
+    const lastDotIndex = signedValue!.lastIndexOf('.');
+    const unsignedUserId = signedValue!.substring(0, lastDotIndex);
 
     // Set legacy unsigned cookie (just the UUID without signature)
     await context.clearCookies();
@@ -201,22 +219,23 @@ test.describe('Signed Cookie Authentication', () => {
     expect(updated.theme).toBe('light');
   });
 
-  test('Missing cookie - creates new user', async ({ request, context }) => {
-    // Clear any existing cookies
-    await context.clearCookies();
-
-    // Request without cookie should create new user
+  test('Missing cookie - creates new user', async ({ request }) => {
+    // Request without pre-existing cookie should create new user
+    // Note: The request fixture starts fresh without cookies from storage state
+    // when we don't use the context fixture
     const response = await request.get('/api/user');
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     expect(data.id).toBeDefined();
 
-    // Should set signed cookie
-    const headers = response.headers();
-    const setCookie = headers['set-cookie'];
+    // Should set signed cookie in response headers
+    const setCookie = response.headers()['set-cookie'];
     expect(setCookie).toBeDefined();
-    expect(setCookie).toContain('mirrorbuddy-user-id=');
+
+    const cookieValue = extractCookieValue(setCookie, 'mirrorbuddy-user-id');
+    expect(cookieValue).not.toBeNull();
+    expect(cookieValue).toContain('.');
   });
 });
 
@@ -225,25 +244,30 @@ test.describe('Cookie Security Properties', () => {
     const response = await request.get('/api/user');
     expect(response.ok()).toBeTruthy();
 
-    const headers = response.headers();
-    const setCookie = headers['set-cookie'];
+    // Check cookie security flags from Set-Cookie header
+    const setCookie = response.headers()['set-cookie'];
     expect(setCookie).toBeDefined();
 
-    // Verify security flags
+    // Verify security flags in Set-Cookie header
     expect(setCookie).toContain('HttpOnly');
-    expect(setCookie.toLowerCase()).toContain('samesite=lax');
+    expect(setCookie).toMatch(/SameSite=Lax/i);
     expect(setCookie).toContain('Path=/');
-    expect(setCookie).toContain('Max-Age=');
+    // Max-Age should be set (365 days = 31536000 seconds)
+    expect(setCookie).toMatch(/Max-Age=\d+/);
   });
 
   test('Signature format is consistent', async ({ request }) => {
-    // Create multiple users and verify signature format consistency
+    // Create user and verify signature format consistency
     const response1 = await request.get('/api/user');
-    const headers1 = response1.headers();
-    const cookie1 = headers1['set-cookie']?.match(/mirrorbuddy-user-id=([^;]+)/)?.[1];
+    expect(response1.ok()).toBeTruthy();
 
-    expect(cookie1).toBeDefined();
-    const sig1 = cookie1!.split('.').pop();
+    const setCookie = response1.headers()['set-cookie'];
+    expect(setCookie).toBeDefined();
+
+    const cookieValue = extractCookieValue(setCookie, 'mirrorbuddy-user-id');
+    expect(cookieValue).not.toBeNull();
+
+    const sig1 = cookieValue!.split('.').pop();
     expect(sig1).toHaveLength(64);
     expect(sig1).toMatch(/^[0-9a-f]+$/);
   });

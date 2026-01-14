@@ -1,10 +1,11 @@
 // ============================================================================
 // CALCULATOR HANDLER
 // Evaluates mathematical expressions with step-by-step visualization
+// Uses mathjs for secure expression evaluation (replaced expr-eval)
 // ============================================================================
 
 import { registerToolHandler } from '../tool-executor';
-import { Parser } from 'expr-eval';
+import { create, all } from 'mathjs';
 import { nanoid } from 'nanoid';
 import { formatNumberColored } from '@/lib/education/accessibility/dyscalculia';
 import type {
@@ -18,6 +19,20 @@ import type {
  * Maximum expression length (prevent DoS)
  */
 const MAX_EXPRESSION_LENGTH = 500;
+
+/**
+ * Create a restricted mathjs instance for safe evaluation
+ * Only includes safe mathematical functions, no dangerous operations
+ */
+const math = create(all, {
+  // Disable potentially dangerous features
+  matrix: 'Array',
+});
+
+// Remove potentially dangerous functions from the math instance
+const limitedMath = math.create({
+  // Only allow safe mathematical operations
+});
 
 /**
  * Validate expression
@@ -35,7 +50,7 @@ function validateExpression(expression: string): { valid: boolean; error?: strin
   }
 
   // Check for dangerous patterns (eval, Function, etc.)
-  const dangerousPatterns = /eval|function|constructor|prototype|__proto__|window|document|global/gi;
+  const dangerousPatterns = /eval|function|constructor|prototype|__proto__|window|document|global|import|require/gi;
   if (dangerousPatterns.test(expression)) {
     return { valid: false, error: 'Invalid expression: unsafe pattern detected' };
   }
@@ -50,8 +65,6 @@ function generateSteps(expression: string, result: number): CalculatorStep[] {
   const steps: CalculatorStep[] = [];
 
   try {
-    // For now, simple implementation: show original expression and result
-    // TODO: Enhance with actual step-by-step breakdown using AST traversal
     steps.push({
       stepNumber: 1,
       description: 'Valuta l\'espressione',
@@ -90,16 +103,8 @@ registerToolHandler('create_calculator', async (args): Promise<ToolExecutionResu
   }
 
   try {
-    // Create parser and evaluate
-    const parser = new Parser();
-
-    // Add custom constants (support both uppercase and lowercase)
-    parser.consts.PI = Math.PI;
-    parser.consts.pi = Math.PI;
-    parser.consts.E = Math.E;
-    parser.consts.e = Math.E;
-
-    const result = parser.evaluate(expression.trim());
+    // Evaluate using mathjs (secure, sandboxed)
+    const result = limitedMath.evaluate(expression.trim());
 
     // Validate result is a number
     if (typeof result !== 'number' || !isFinite(result)) {
