@@ -262,9 +262,18 @@ function ToolContent({ toolCall, sessionId }: { toolCall: ToolCall; sessionId?: 
   const toolType = FUNCTION_NAME_TO_TOOL_TYPE[toolCall.type] || toolCall.type as ToolType;
   
   // For completed tools, use result.data if available, otherwise use arguments
-  const toolData = toolCall.status === 'completed' && toolCall.result?.data 
-    ? toolCall.result.data 
+  const toolData = toolCall.status === 'completed' && toolCall.result?.data
+    ? toolCall.result.data
     : toolCall.arguments;
+
+  // Guard against undefined toolData
+  if (!toolData) {
+    return (
+      <div className="p-4 rounded-xl bg-slate-800 border border-slate-700">
+        <p className="text-sm text-slate-400">Caricamento dati...</p>
+      </div>
+    );
+  }
 
   switch (toolType) {
     case 'chart':
