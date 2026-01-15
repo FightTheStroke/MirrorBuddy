@@ -13,6 +13,7 @@ import {
   getGoogleUserProfile,
   saveGoogleAccount,
 } from '@/lib/google';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
 
   // Handle OAuth errors from Google
   if (error) {
-    console.error('[Google OAuth] Error from Google:', error);
+    logger.error('Google OAuth error from provider', { error });
     const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', error);
     return NextResponse.redirect(errorUrl.toString());
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(successUrl.toString());
 
   } catch (err) {
-    console.error('[Google OAuth] Callback error:', err);
+    logger.error('Google OAuth callback failed', { error: err });
     const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', 'callback_failed');
     return NextResponse.redirect(errorUrl.toString());

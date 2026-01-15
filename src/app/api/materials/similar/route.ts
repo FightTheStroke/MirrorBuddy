@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { cosineSimilarity } from '@/lib/rag/embedding-service';
+import { logger } from '@/lib/logger';
 
 async function getUserId(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -143,7 +144,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ similar });
   } catch (error) {
-    console.error('Failed to find similar materials:', error);
+    logger.error('Failed to find similar materials', { error });
     return NextResponse.json(
       { error: 'Failed to find similar materials' },
       { status: 500 }

@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const EdgeCreateSchema = z.object({
   toId: z.string().min(1),
@@ -60,7 +61,7 @@ export async function GET(
 
     return NextResponse.json({ edges });
   } catch (error) {
-    console.error('Failed to fetch edges:', error);
+    logger.error('Failed to fetch edges', { error, toolId: (await context.params).toolId });
     return NextResponse.json(
       { error: 'Failed to fetch edges' },
       { status: 500 }
@@ -148,7 +149,7 @@ export async function POST(
       );
     }
 
-    console.error('Failed to create edge:', error);
+    logger.error('Failed to create edge', { error, toolId: (await context.params).toolId });
     return NextResponse.json(
       { error: 'Failed to create edge' },
       { status: 500 }
@@ -207,7 +208,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to delete edge:', error);
+    logger.error('Failed to delete edge', { error, toolId: (await context.params).toolId });
     return NextResponse.json(
       { error: 'Failed to delete edge' },
       { status: 500 }

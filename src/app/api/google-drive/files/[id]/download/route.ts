@@ -11,6 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { downloadDriveFile } from '@/lib/google';
+import { logger } from '@/lib/logger';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -59,7 +60,7 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('[Google Drive Download] Error:', error);
+    logger.error('Google Drive download failed', { error, fileId, userId });
     return NextResponse.json(
       { error: 'Failed to download file' },
       { status: 500 }

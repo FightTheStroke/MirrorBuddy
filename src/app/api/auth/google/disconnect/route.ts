@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { disconnectGoogleAccount } from '@/lib/google';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
 
   } catch (error) {
-    console.error('[Google Disconnect] Error:', error);
+    logger.error('Google disconnect failed', { error });
     return NextResponse.json(
       { error: 'Failed to disconnect' },
       { status: 500 }

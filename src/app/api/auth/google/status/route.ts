@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import type { GoogleConnectionStatus } from '@/lib/google';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(status);
 
   } catch (error) {
-    console.error('[Google Status] Error:', error);
+    logger.error('Google status check failed', { error, userId });
     return NextResponse.json(
       { error: 'Failed to get status' },
       { status: 500 }

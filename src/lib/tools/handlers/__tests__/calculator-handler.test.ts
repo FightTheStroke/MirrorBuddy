@@ -3,7 +3,7 @@
  * Verifies mathjs-based expression evaluation and security measures
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { validateExpression, generateSteps } from '../calculator-handler';
 
 // Mock the tool executor to test the handler
