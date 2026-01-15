@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { ParentProfessorChat } from '@/components/profile/parent-professor-chat';
 import { useParentDashboard } from './hooks/use-parent-dashboard';
 import { exportProfile } from './utils/export-utils';
+import { logger } from '@/lib/logger';
 import { Header } from './components/header';
 import { LoadingView } from './components/loading-view';
 import { ErrorView } from './components/error-view';
@@ -54,7 +55,7 @@ export default function ParentDashboardPage() {
       try {
         await exportProfile(format);
       } catch (err) {
-        console.error('Export failed:', err);
+        logger.error('Export failed', { error: err, format });
       } finally {
         setIsExporting(false);
       }

@@ -19,6 +19,7 @@ import {
   getDriveFolderPath,
   toDriveFileUI,
 } from '@/lib/google';
+import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -65,7 +66,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[Google Drive Files] Error:', error);
+    logger.error('Google Drive files list failed', { error, userId, folderId, search });
     return NextResponse.json(
       { error: 'Failed to list files' },
       { status: 500 }

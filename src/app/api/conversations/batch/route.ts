@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 
 export async function DELETE(request: NextRequest) {
   try {
@@ -22,7 +23,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ deleted: result.count });
   } catch (error) {
-    console.error('Failed to delete conversations:', error);
+    logger.error('Failed to delete conversations', { error });
     return NextResponse.json({ error: 'Failed to delete conversations' }, { status: 500 });
   }
 }

@@ -252,7 +252,7 @@ describe('VoiceFeedbackInjector', () => {
     });
 
     it('should handle plugins without triggers', () => {
-      const noTriggerPlugin: ToolPlugin = {
+      const _noTriggerPlugin: ToolPlugin = {
         ...mockPlugin,
         id: 'no_trigger_tool',
         triggers: [],

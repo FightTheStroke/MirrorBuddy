@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 async function getUserId(): Promise<string | null> {
   const cookieStore = await cookies();
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       })),
     });
   } catch (error) {
-    console.error('Failed to fetch concepts:', error);
+    logger.error('Failed to fetch concepts', { error });
     return NextResponse.json(
       { error: 'Failed to fetch concepts' },
       { status: 500 }
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    console.error('Failed to create concept:', error);
+    logger.error('Failed to create concept', { error });
     return NextResponse.json(
       { error: 'Failed to create concept' },
       { status: 500 }

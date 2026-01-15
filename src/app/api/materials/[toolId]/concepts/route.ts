@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const ConceptLinkSchema = z.object({
   conceptId: z.string().min(1),
@@ -66,7 +67,7 @@ export async function GET(
       })),
     });
   } catch (error) {
-    console.error('Failed to fetch concepts:', error);
+    logger.error('Failed to fetch concepts', { error, toolId: (await context.params).toolId });
     return NextResponse.json(
       { error: 'Failed to fetch concepts' },
       { status: 500 }
@@ -157,7 +158,7 @@ export async function POST(
       { status: 201 }
     );
   } catch (error) {
-    console.error('Failed to link concept:', error);
+    logger.error('Failed to link concept', { error, toolId: (await context.params).toolId });
     return NextResponse.json(
       { error: 'Failed to link concept' },
       { status: 500 }
@@ -225,7 +226,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Failed to unlink concept:', error);
+    logger.error('Failed to unlink concept', { error, toolId: (await context.params).toolId });
     return NextResponse.json(
       { error: 'Failed to unlink concept' },
       { status: 500 }

@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { StudentInsights } from '@/types';
 import type { DiaryEntry } from '@/components/profile/teacher-diary';
+import { logger } from '@/lib/logger';
 
 const DEMO_USER_ID = 'demo-student-1';
 
@@ -68,7 +69,7 @@ export function useParentDashboard() {
         setDiaryEntries(data.entries || []);
       }
     } catch (err) {
-      console.error('Failed to fetch diary entries:', err);
+      logger.error('Failed to fetch diary entries', { error: err });
     } finally {
       setIsDiaryLoading(false);
     }
