@@ -14,6 +14,13 @@ import { createWebSocketConnection } from './websocket-connection';
 import { handleWebRTCTrack } from './webrtc-handlers';
 import type { ConnectionRefs } from './connection-types';
 import { HEARTBEAT_INTERVAL_MS } from './constants';
+import { probeTransports } from './transport-probe';
+import {
+  selectBestTransport,
+  loadCachedSelection,
+  cacheProbeResults,
+  isTransportError,
+} from './transport-selector';
 
 // Re-export types for backwards compatibility
 export type { ConnectionRefs } from './connection-types';
@@ -53,6 +60,7 @@ export function useConnect(
       // Safety: ensure ref is set before proceeding
       if (!refs.handleServerEventRef.current) {
         logger.warn('[VoiceSession] handleServerEventRef not set, setting now...');
+        // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation for callback
         refs.handleServerEventRef.current = handleServerEvent;
       }
 
@@ -69,22 +77,61 @@ export function useConnect(
       refs.sessionIdRef.current = `voice-${maestro.id}-${Date.now()}`;
       logger.debug('[VoiceSession] Session ID generated', { sessionId: refs.sessionIdRef.current });
 
-      // Fetch transport mode from server
-      const tokenResponse = await fetch('/api/realtime/token');
-      if (!tokenResponse.ok) {
-        throw new Error('Failed to get connection info');
-      }
-      const tokenData = await tokenResponse.json();
-      let transport = tokenData.transport || 'websocket';
-      logger.debug(`[VoiceSession] Transport mode from server: ${transport}`);
+      // === Adaptive Transport Selection (F-01 to F-05) ===
+      let transport: 'webrtc' | 'websocket' = 'websocket';
 
-      // Check WebRTC support and fall back if needed
-      if (transport === 'webrtc') {
-        if (!isWebRTCSupported()) {
-          logger.warn('[VoiceSession] WebRTC not supported by browser, falling back to WebSocket');
-          transport = 'websocket';
+      // Check if WebRTC is supported
+      const webrtcSupported = isWebRTCSupported();
+      if (!webrtcSupported) {
+        logger.warn('[VoiceSession] WebRTC not supported, using WebSocket only');
+        transport = 'websocket';
+      } else {
+        // Try to use cached transport selection (F-05)
+        const cachedSelection = loadCachedSelection();
+
+        if (cachedSelection) {
+          transport = cachedSelection.transport;
+          logger.info('[VoiceSession] Using cached transport', {
+            transport,
+            confidence: cachedSelection.confidence,
+            reason: cachedSelection.reason,
+          });
+        } else {
+          // Run transport probes (F-01, F-02, F-03)
+          logger.info('[VoiceSession] Running transport probes...');
+          options.onStateChange?.('connecting'); // Update UI to show probing
+
+          try {
+            const probeResults = await probeTransports();
+            const selection = selectBestTransport(probeResults);
+
+            if (isTransportError(selection)) {
+              logger.error('[VoiceSession] Both transports unavailable', {
+                webrtcError: selection.webrtcError,
+                websocketError: selection.websocketError,
+              });
+              // Try WebSocket anyway as last resort
+              transport = 'websocket';
+            } else {
+              transport = selection.transport;
+              // Cache the successful selection (F-05)
+              cacheProbeResults(probeResults, selection);
+              logger.info('[VoiceSession] Transport selected via probe', {
+                transport: selection.transport,
+                confidence: selection.confidence,
+                reason: selection.reason,
+              });
+            }
+          } catch (probeError) {
+            logger.warn('[VoiceSession] Probe failed, defaulting to WebSocket', {
+              error: probeError instanceof Error ? probeError.message : 'Unknown',
+            });
+            transport = 'websocket';
+          }
         }
       }
+
+      logger.debug(`[VoiceSession] Final transport: ${transport}`);
 
       // Store transport mode for use in audio capture
       refs.transportRef.current = transport;

@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { Mic, MicOff, PhoneOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
+import { TransportStatusIndicator } from '@/components/voice/components/TransportStatusIndicator';
 import { cn } from '@/lib/utils';
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
@@ -33,6 +34,8 @@ export interface VoicePanelProps {
   outputLevel?: number;
   connectionState: string;
   configError: string | null;
+  /** Current transport (webrtc or websocket) */
+  transport?: 'webrtc' | 'websocket';
   onToggleMute: () => void;
   onEndCall: () => void;
 }
@@ -51,6 +54,7 @@ export function VoicePanel({
   outputLevel = 0,
   connectionState,
   configError,
+  transport,
   onToggleMute,
   onEndCall,
 }: VoicePanelProps) {
@@ -121,6 +125,17 @@ export function VoicePanel({
           {getStatusText()}
         </p>
       </div>
+
+      {/* Transport indicator */}
+      {isConnected && transport && (
+        <TransportStatusIndicator
+          transport={transport}
+          isConnected={isConnected}
+          isProbing={connectionState === 'connecting'}
+          compact
+          className="mt-1"
+        />
+      )}
 
       {isConnected && (
         <div className="flex items-center gap-1.5 h-10 px-2">
