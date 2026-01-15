@@ -10,4 +10,6 @@ export {
   hasGetUserMedia,
   getWebRTCSupportReport,
 } from './webrtc-detection';
+export { probeTransports } from './transport-probe';
 export type { UseVoiceSessionOptions, ConnectionInfo, ConversationMemory } from './types';
+export type { ProbeResult, ProbeResults } from './transport-probe';

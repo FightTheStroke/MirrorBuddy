@@ -126,6 +126,58 @@ connect-src 'self'
 - [ ] 50% beta (opt-in feature flag)
 - [ ] 100% production
 
+## Adaptive Transport Selection
+
+The system automatically probes both transports at startup and selects the best one based on latency and availability.
+
+### Probe Flow
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  Check Cache    │────▶│  Run Probes     │────▶│  Select Best    │
+│  (localStorage) │     │  (parallel)     │     │  Transport      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │
+   Cache valid?            WebRTC probe            Latency < 500ms?
+   (< 24h old)             WebSocket probe         → WebRTC
+        │                       │                  Else → WebSocket
+        ▼                       ▼                       │
+   Use cached               Store results              ▼
+   transport                in cache               Connect
+```
+
+### Selection Criteria
+| Condition | Selected Transport |
+|-----------|-------------------|
+| WebRTC latency < 500ms AND success | WebRTC (high confidence) |
+| WebRTC failed OR latency >= 500ms, WebSocket success | WebSocket (medium confidence) |
+| Both failed | Error state |
+
+### Runtime Monitoring
+- **TransportMonitor**: Tracks connection quality metrics (failures, latency)
+- **Auto-switch**: Triggers re-probe after 3 consecutive failures or latency spike
+- **Network events**: Re-probes on online/offline network changes
+- **Cache invalidation**: 24h TTL, invalidated on degradation or network change
+
+### File Structure
+```
+src/lib/hooks/voice-session/
+├── transport-probe.ts      # WebRTC & WebSocket probes
+├── transport-selector.ts   # Selection logic + cache
+├── transport-monitor.ts    # Quality tracking
+├── transport-switcher.ts   # Auto-switch logic
+└── connection.ts           # Integration point
+
+src/components/voice/
+└── components/TransportStatusIndicator.tsx  # UI indicator
+```
+
+### UI Integration
+The `TransportStatusIndicator` component shows the current transport status:
+- **WebRTC (Direct)**: Green, Radio icon
+- **WebSocket (Proxy)**: Blue, Globe icon
+- **Probing**: Yellow, animated Loader icon
+- **Offline**: Gray, WifiOff icon
+
 ## Rollback Plan
 If WebRTC introduces critical issues:
 1. Disable feature flag immediately
