@@ -60,6 +60,34 @@ export async function POST(req: NextRequest) {
 - Fallback: All modern browsers via WebSocket
 - Detection: `RTCPeerConnection` availability + feature testing
 
+### CSP Requirements (CRITICAL)
+Content-Security-Policy must include these endpoints in `connect-src`:
+
+**WebRTC Transport:**
+```
+connect-src 'self'
+  https://*.openai.azure.com
+  wss://*.openai.azure.com
+  https://*.realtimeapi-preview.ai.azure.com;
+```
+
+**WebSocket Fallback (local proxy):**
+```
+connect-src 'self'
+  ws://localhost:*
+  wss://localhost:*;
+```
+
+**Why this matters:**
+- Azure WebRTC uses a **separate regional endpoint** (`{region}.realtimeapi-preview.ai.azure.com`)
+- This endpoint is different from the main Azure OpenAI endpoint (`*.openai.azure.com`)
+- Without this CSP entry, browsers silently block the SDP exchange
+- Safari is particularly strict about CSP violations
+
+**Environment Variables:**
+- `AZURE_OPENAI_REALTIME_REGION`: Must match your Azure resource region (default: `swedencentral`)
+- `VOICE_TRANSPORT`: Set to `websocket` to force WebSocket fallback
+
 ### Audio Pipeline
 **WebRTC Path**:
 - Browser captures audio (MediaStreamAudioSource)
