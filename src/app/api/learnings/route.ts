@@ -23,18 +23,40 @@ export async function GET(request: NextRequest) {
     const subject = searchParams.get('subject');
     const minConfidence = parseFloat(searchParams.get('minConfidence') || '0');
 
-    const learnings = await prisma.learning.findMany({
-      where: {
-        userId,
-        ...(category && { category }),
-        ...(maestroId && { maestroId }),
-        ...(subject && { subject }),
-        confidence: { gte: minConfidence },
-      },
-      orderBy: { confidence: 'desc' },
-    });
+    // Pagination parameters (defaults: page 1, limit 50, max 200)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const limit = Math.min(200, Math.max(1, parseInt(searchParams.get('limit') || '50', 10)));
+    const skip = (page - 1) * limit;
 
-    return NextResponse.json(learnings);
+    const whereClause = {
+      userId,
+      ...(category && { category }),
+      ...(maestroId && { maestroId }),
+      ...(subject && { subject }),
+      confidence: { gte: minConfidence },
+    };
+
+    // Get total count and paginated results in parallel
+    const [total, learnings] = await Promise.all([
+      prisma.learning.count({ where: whereClause }),
+      prisma.learning.findMany({
+        where: whereClause,
+        orderBy: { confidence: 'desc' },
+        skip,
+        take: limit,
+      }),
+    ]);
+
+    return NextResponse.json({
+      learnings,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+      },
+    });
   } catch (error) {
     logger.error('Learnings GET error', { error: String(error) });
     return NextResponse.json(

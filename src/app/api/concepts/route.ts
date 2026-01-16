@@ -22,7 +22,7 @@ const ConceptCreateSchema = z.object({
 
 /**
  * GET /api/concepts
- * Get all concepts for the current user
+ * Get all concepts for the current user with pagination
  */
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
@@ -34,18 +34,31 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const { searchParams } = new URL(request.url);
     const subject = searchParams.get('subject');
 
-    const concepts = await prisma.concept.findMany({
-      where: {
-        userId,
-        ...(subject ? { subject } : {}),
-      },
-      include: {
-        _count: {
-          select: { materials: true },
+    // Pagination parameters (defaults: page 1, limit 50, max 200)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const limit = Math.min(200, Math.max(1, parseInt(searchParams.get('limit') || '50', 10)));
+    const skip = (page - 1) * limit;
+
+    const whereClause = {
+      userId,
+      ...(subject ? { subject } : {}),
+    };
+
+    // Get total count and paginated results in parallel
+    const [total, concepts] = await Promise.all([
+      prisma.concept.count({ where: whereClause }),
+      prisma.concept.findMany({
+        where: whereClause,
+        include: {
+          _count: {
+            select: { materials: true },
+          },
         },
-      },
-      orderBy: { name: 'asc' },
-    });
+        orderBy: { name: 'asc' },
+        skip,
+        take: limit,
+      }),
+    ]);
 
     return NextResponse.json({
       concepts: concepts.map((c) => ({
@@ -57,6 +70,13 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         createdAt: c.createdAt,
         updatedAt: c.updatedAt,
       })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page * limit < total,
+      },
     });
   } catch (error) {
     logger.error('Failed to fetch concepts', { error });
