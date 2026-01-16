@@ -2,7 +2,7 @@
 
 import { Progress } from '@/components/ui/progress';
 
-interface QuizHeaderProps {
+export interface QuizHeaderProps {
   currentIndex: number;
   totalQuestions: number;
   correctCount: number;

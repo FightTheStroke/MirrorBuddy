@@ -7,13 +7,6 @@
 
 import { logger } from '@/lib/logger';
 import { ProbeResults, ProbeResult } from './transport-probe';
-import {
-  cacheProbeResults,
-  loadCachedSelection,
-  invalidateCache,
-  isCacheValid,
-  getCacheInfo,
-} from './transport-cache';
 
 // Re-export cache functions for backwards compatibility
 export {

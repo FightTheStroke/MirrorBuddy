@@ -44,5 +44,5 @@ export interface UseSchedulerReturn {
   /** Update notification preferences */
   updatePreferences: (prefs: Partial<NotificationPreferences>) => Promise<boolean>;
   /** Check for due items and create notifications */
-  checkForDueItems: () => Promise<void>;
+  checkForDueItems: () => Promise<{ notificationsCreated: number; types: string[] }>;
 }

@@ -97,7 +97,13 @@ export async function POST(request: NextRequest) {
     }
 
     const { conversation, isNew } = convResult;
-    let messages: Array<{ role: string; content: string }> = convResult.messages || [];
+    if (!conversation) {
+      return NextResponse.json(
+        { error: 'Failed to create conversation' },
+        { status: 500 }
+      );
+    }
+    const messages: Array<{ role: string; content: string }> = convResult.messages || [];
 
     // Add greeting if new conversation
     if (isNew) {

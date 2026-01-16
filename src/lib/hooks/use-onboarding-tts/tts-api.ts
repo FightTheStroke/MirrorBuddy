@@ -16,7 +16,7 @@ export async function speakViaOpenAI(
   textToSpeak: string,
   voice: TTSVoice,
   abortSignal?: AbortSignal
-): Promise<{ audio: Audio; audioUrl: string } | null> {
+): Promise<{ audio: HTMLAudioElement; audioUrl: string } | null> {
   try {
     const response = await fetch('/api/tts', {
       method: 'POST',
@@ -50,7 +50,7 @@ export async function speakViaOpenAI(
 /**
  * Play audio with promise resolution when complete
  */
-export function playAudio(audio: Audio): Promise<boolean> {
+export function playAudio(audio: HTMLAudioElement): Promise<boolean> {
   return new Promise((resolve) => {
     audio.onended = () => {
       resolve(true);

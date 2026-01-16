@@ -6,16 +6,16 @@ import { TeacherDiary, type DiaryEntry } from './teacher-diary';
 import { ProgressTimeline } from './progress-timeline';
 import { ParentProfessorChat } from './parent-professor-chat';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   RefreshCw, FileJson, FileText, AlertCircle,
   BookOpen, User, TrendingUp, Users, Accessibility,
+  Loader2, Trash2,
 } from 'lucide-react';
 import { AccessibilityTab } from '@/components/settings/sections';
 import type { StudentInsights, ObservationCategory } from '@/types';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import type { ConsentStatus, ProfileMeta, LearningEntry, PageState } from './genitori-view/types';
+import type { ProfileMeta, PageState, LearningEntry } from './genitori-view/types';
 import { DEMO_USER_ID, MAESTRO_NAMES } from './genitori-view/constants';
 import {
   fetchConsentStatus, fetchProfile, generateProfile, giveConsent,
@@ -29,7 +29,7 @@ export function GenitoriView() {
   const [pageState, setPageState] = useState<PageState>('loading');
   const [insights, setInsights] = useState<StudentInsights | null>(null);
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
-  const [meta, setMeta] = useState<ProfileMeta | null>(null);
+  const [meta, _setMeta] = useState<ProfileMeta | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isExporting, setIsExporting] = useState(false);

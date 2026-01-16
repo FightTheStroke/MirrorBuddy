@@ -14,14 +14,10 @@
 // Re-export core safety module
 export {
   SAFETY_CORE_PROMPT,
-  SafetyInjectionOptions,
   injectSafetyGuardrails,
   hasSafetyGuardrails,
 } from './safety-core';
+export type { SafetyInjectionOptions } from './safety-core';
 
-// Re-export patterns and crisis utilities
-export {
-  IT_CONTENT_PATTERNS,
-  containsCrisisKeywords,
-  CRISIS_RESPONSE,
-} from './safety-core';
+// Note: IT_CONTENT_PATTERNS, containsCrisisKeywords, CRISIS_RESPONSE
+// are exported from content-filter.ts, not from safety-prompts modules

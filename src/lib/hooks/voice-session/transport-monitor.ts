@@ -10,7 +10,6 @@ import { invalidateCache } from './transport-selector';
 import {
   calculateAverageLatency,
   isLatencySpike,
-  appendToHistory,
 } from './transport-monitor-helpers';
 
 /**

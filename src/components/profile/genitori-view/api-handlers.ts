@@ -3,7 +3,7 @@
  * Extracted from genitori-view.tsx
  */
 
-import type { ConsentStatus, ProfileMeta, LearningEntry } from './types';
+import type { ConsentStatus } from './types';
 import type { StudentInsights } from '@/types';
 import { DEMO_USER_ID } from './constants';
 

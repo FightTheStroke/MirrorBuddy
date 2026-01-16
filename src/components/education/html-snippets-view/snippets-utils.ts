@@ -6,7 +6,7 @@ export function getMaestroName(maestroId?: string): string | null {
   return maestro?.displayName || null;
 }
 
-export function handleOpenInNewTab(code: string, title: string): void {
+export function handleOpenInNewTab(code: string, _title: string): void {
   const blob = new Blob([code], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   window.open(url, '_blank');

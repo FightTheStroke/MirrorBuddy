@@ -5,9 +5,17 @@ import { X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DAYS_OF_WEEK, SUBJECTS, TIME_OPTIONS } from './constants';
 import { DURATION_OPTIONS } from './duration-options';
-import type { DayOfWeek, ScheduledSession } from '@/lib/scheduler/types';
+import type { DayOfWeek } from '@/lib/scheduler/types';
 
-const INITIAL_FORM = {
+export interface SessionFormData {
+  dayOfWeek: DayOfWeek;
+  time: string;
+  duration: number;
+  subject: string;
+  topic?: string;
+}
+
+const INITIAL_FORM: SessionFormData = {
   dayOfWeek: 1 as DayOfWeek,
   time: '16:00',
   duration: 30,
@@ -17,11 +25,11 @@ const INITIAL_FORM = {
 interface SessionFormProps {
   showForm: boolean;
   editingId: string | null;
-  formData: any;
+  formData: SessionFormData;
   submitting: boolean;
   onSubmit: () => void;
   onCancel: () => void;
-  onFormChange: (data: any) => void;
+  onFormChange: (data: SessionFormData) => void;
 }
 
 export function SessionForm({

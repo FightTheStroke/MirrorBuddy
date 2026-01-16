@@ -5,12 +5,19 @@
 
 'use client';
 
+import type {
+  StudySchedule,
+  ScheduledSession,
+  CustomReminder,
+  NotificationPreferences,
+} from '@/lib/scheduler/types';
+
 /**
  * Setup function for periodic check interval
  * Returns cleanup function
  */
 export function setupPeriodicChecking(
-  checkDue: () => Promise<void>,
+  checkDue: () => Promise<unknown>,
   checkInterval: number
 ): () => void {
   const timer = setInterval(checkDue, checkInterval);
@@ -21,9 +28,9 @@ export function setupPeriodicChecking(
  * Update local schedule state after API operation
  */
 export function updateScheduleState(
-  prevSchedule: any,
-  updater: (schedule: any) => any
-): any {
+  prevSchedule: StudySchedule | null,
+  updater: (schedule: StudySchedule) => StudySchedule
+): StudySchedule | null {
   if (!prevSchedule) return prevSchedule;
   return updater(prevSchedule);
 }
@@ -31,7 +38,10 @@ export function updateScheduleState(
 /**
  * Update schedule with new session
  */
-export function addSessionToSchedule(prevSchedule: any, session: any): any {
+export function addSessionToSchedule(
+  prevSchedule: StudySchedule | null,
+  session: ScheduledSession
+): StudySchedule | null {
   return updateScheduleState(prevSchedule, (schedule) => ({
     ...schedule,
     weeklyPlan: [...schedule.weeklyPlan, session],
@@ -42,13 +52,13 @@ export function addSessionToSchedule(prevSchedule: any, session: any): any {
  * Update schedule session by ID
  */
 export function updateSessionInSchedule(
-  prevSchedule: any,
+  prevSchedule: StudySchedule | null,
   sessionId: string,
-  session: any
-): any {
+  session: ScheduledSession
+): StudySchedule | null {
   return updateScheduleState(prevSchedule, (schedule) => ({
     ...schedule,
-    weeklyPlan: schedule.weeklyPlan.map((s: any) =>
+    weeklyPlan: schedule.weeklyPlan.map((s) =>
       s.id === sessionId ? session : s
     ),
   }));
@@ -58,19 +68,22 @@ export function updateSessionInSchedule(
  * Remove session from schedule
  */
 export function removeSessionFromSchedule(
-  prevSchedule: any,
+  prevSchedule: StudySchedule | null,
   sessionId: string
-): any {
+): StudySchedule | null {
   return updateScheduleState(prevSchedule, (schedule) => ({
     ...schedule,
-    weeklyPlan: schedule.weeklyPlan.filter((s: any) => s.id !== sessionId),
+    weeklyPlan: schedule.weeklyPlan.filter((s) => s.id !== sessionId),
   }));
 }
 
 /**
  * Add reminder to schedule
  */
-export function addReminderToSchedule(prevSchedule: any, reminder: any): any {
+export function addReminderToSchedule(
+  prevSchedule: StudySchedule | null,
+  reminder: CustomReminder
+): StudySchedule | null {
   return updateScheduleState(prevSchedule, (schedule) => ({
     ...schedule,
     customReminders: [...schedule.customReminders, reminder],
@@ -81,13 +94,13 @@ export function addReminderToSchedule(prevSchedule: any, reminder: any): any {
  * Update reminder by ID
  */
 export function updateReminderInSchedule(
-  prevSchedule: any,
+  prevSchedule: StudySchedule | null,
   reminderId: string,
-  reminder: any
-): any {
+  reminder: CustomReminder
+): StudySchedule | null {
   return updateScheduleState(prevSchedule, (schedule) => ({
     ...schedule,
-    customReminders: schedule.customReminders.map((r: any) =>
+    customReminders: schedule.customReminders.map((r) =>
       r.id === reminderId ? reminder : r
     ),
   }));
@@ -97,13 +110,13 @@ export function updateReminderInSchedule(
  * Remove reminder from schedule
  */
 export function removeReminderFromSchedule(
-  prevSchedule: any,
+  prevSchedule: StudySchedule | null,
   reminderId: string
-): any {
+): StudySchedule | null {
   return updateScheduleState(prevSchedule, (schedule) => ({
     ...schedule,
     customReminders: schedule.customReminders.filter(
-      (r: any) => r.id !== reminderId
+      (r) => r.id !== reminderId
     ),
   }));
 }
@@ -112,9 +125,9 @@ export function removeReminderFromSchedule(
  * Update preferences in schedule
  */
 export function updatePreferencesInSchedule(
-  prevSchedule: any,
-  preferences: any
-): any {
+  prevSchedule: StudySchedule | null,
+  preferences: NotificationPreferences
+): StudySchedule | null {
   return updateScheduleState(prevSchedule, (schedule) => ({
     ...schedule,
     preferences,
