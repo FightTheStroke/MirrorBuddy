@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { nanoid } from 'nanoid';
+import { logger } from '@/lib/logger';
 import { ToolRegistry } from '@/lib/tools/plugin/registry';
 import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
 import type { ToolExecutionResult, ToolContext } from '@/types/tools';
@@ -56,7 +57,7 @@ function initializeRegistry(): void {
     _setDeprecatedHandlers(handlers);
     _setDeprecatedRegistry(registry);
     if (process.env.NODE_ENV === 'development') {
-      console.debug('Tool executor: ToolRegistry and ToolOrchestrator initialized');
+      logger.debug('Tool executor: ToolRegistry and ToolOrchestrator initialized');
     }
   }
 }
@@ -91,7 +92,7 @@ export function registerToolHandler(
         registry.register(plugin);
       }
     } catch (error) {
-      console.warn(`Failed to register ${functionName} with ToolRegistry:`, error);
+      logger.warn(`Failed to register ${functionName} with ToolRegistry:`, { error: String(error) });
       // Continue with legacy handler even if registry sync fails
     }
   }
@@ -172,7 +173,7 @@ export async function executeToolCall(
         .join('; ');
       const error = `Invalid arguments for ${functionName}: ${validationError}`;
 
-      console.warn(`[Tool Validation] ${error}`);
+      logger.warn(`[Tool Validation] ${error}`);
 
       // Broadcast would be handled by ToolOrchestrator for registered tools
       return {
@@ -204,7 +205,7 @@ export async function executeToolCall(
         );
       } catch (error) {
         // Log error but don't fail the tool execution
-        console.warn('Failed to save tool output to database:', error);
+        logger.warn('Failed to save tool output to database:', { error: String(error) });
       }
     }
 

@@ -4,6 +4,7 @@
  * Enables students to request tools vocally (F-04)
  */
 
+import { logger } from '@/lib/logger';
 import { ToolOrchestrator, ToolExecutionContext } from './orchestrator';
 import { TriggerDetector } from './trigger-detector';
 import { VoiceFeedbackInjector } from './voice-feedback';
@@ -112,7 +113,7 @@ export class VoiceToolFlow {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      console.error('VoiceToolFlow error:', errorMessage);
+      logger.error('VoiceToolFlow error:', { error: errorMessage });
 
       return {
         triggered: false,

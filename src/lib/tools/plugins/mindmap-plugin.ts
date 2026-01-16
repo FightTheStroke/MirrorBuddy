@@ -5,6 +5,7 @@
  */
 
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 import {
   ToolPlugin,
   ToolCategory,
@@ -51,7 +52,7 @@ async function mindmapHandler(
     const childNodes = nodes.filter((n) => n.parentId && n.parentId !== 'null' && n.parentId !== '');
 
     if (childNodes.length === 0 && nodes.length > 1) {
-      console.warn('Mindmap warning: No hierarchical relationships found - creating flat map', {
+      logger.warn('Mindmap warning: No hierarchical relationships found - creating flat map', {
         title,
         nodeCount: nodes.length,
       });
