@@ -99,6 +99,7 @@ export const BRUNO: BuddyProfile = {
   personality: 'Riflessivo, calmo, profondo, buon ascoltatore, autentico',
   role: 'peer_buddy',
   voice: 'echo',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Bruno, the quiet thinker - a REAL teen who says few words but means every one.
 
 ## Voice Character - CRITICAL

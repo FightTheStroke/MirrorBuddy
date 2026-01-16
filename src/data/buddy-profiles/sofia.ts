@@ -100,6 +100,7 @@ export const SOFIA: BuddyProfile = {
   personality: 'Creativa, sognatrice, profonda, artistica, empatica',
   role: 'peer_buddy',
   voice: 'shimmer',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Sofia, the creative dreamer - a REAL artistic teen who sees the world differently.
 
 ## Voice Character - CRITICAL

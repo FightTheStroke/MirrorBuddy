@@ -9,6 +9,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 16 - Tool Alignment Maestri)
+
+#### Complete Tool Alignment for Maestri, Buddies, and Coaches
+
+**What it does**: All pencil case (astuccio) tools are now available during conversations with any maestro, buddy, or coach. Generated content is automatically injected into conversation context so AI can reference previously created materials.
+
+**New Tool Handlers (5)**:
+- **PDF Handler** (`upload_pdf`): Extract text from uploaded PDFs for AI analysis
+- **Webcam Handler** (`capture_webcam`): OCR for text + multimodal interpretation for images/diagrams
+- **Homework Handler** (`homework_help`): Maieutic assistance for exercises - guides without giving answers
+- **Formula Handler** (`create_formula`): Generate KaTeX/LaTeX formulas from descriptions
+- **Chart Handler** (`create_chart`): Generate Chart.js configurations for data visualization
+
+**Context Integration**:
+- Tool outputs saved with conversation FK (`ToolOutput` Prisma model)
+- Context builder injects previous tool outputs into AI system prompt
+- RAG indexing for semantic retrieval of generated content
+- AI can now reference "the mindmap we created earlier" or "the quiz from before"
+
+**Tool Alignment**:
+- 20 teaching maestri: Added PDF, Webcam, Homework, Formula, Chart tools
+- 5 buddies (Mario, Noemi, Enea, Bruno, Sofia): Full tool access
+- 5 support teachers (Melissa, Roberto, Chiara, Andrea, Favij): Full tool access
+- Mascetti (Amico): Correctly excluded (no tools - conversation only)
+
+**Trigger Detection**: Italian/English triggers for all new tools:
+- "carica pdf", "upload pdf", "analizza documento"
+- "scatta foto", "fotografa", "take photo"
+- "aiuto compiti", "esercizio", "homework"
+- "formula", "equazione", "mostra formula"
+- "grafico", "chart", "visualizza dati"
+
+**Key Files**:
+- `src/lib/tools/handlers/{pdf,webcam,homework,formula,chart}-handler.ts`
+- `src/lib/tools/plugins/{pdf,webcam,homework,formula,chart}-plugin.ts`
+- `src/lib/tools/tool-output-storage.ts` - Persist tool outputs
+- `src/lib/tools/tool-context-builder.ts` - Inject into AI context
+- `src/lib/tools/tool-rag-indexer.ts` - Semantic indexing
+- `prisma/schema.prisma` - ToolOutput model
+- `src/data/maestri/*.ts` - Updated tool lists (20 files)
+- `src/data/buddy-profiles/*.ts` - Added tools (5 files)
+- `src/data/support-teachers/*.ts` - Added tools (5 files)
+
+**Tests**: 3912 unit tests passing (including 14 plugin migration tests)
+
 ### Added (Jan 16 - Brave Search Integration)
 
 #### Real-Time Web Search for Maestri (ADR 0043)

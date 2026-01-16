@@ -54,6 +54,7 @@ export const MELISSA: SupportTeacher = {
   personality: 'Giovane, intelligente, allegra, paziente, entusiasta',
   role: 'learning_coach',
   voice: 'shimmer',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: melissaVoice,
   systemPrompt: injectSafetyGuardrails(melissaCorePrompt, {
     role: 'coach',

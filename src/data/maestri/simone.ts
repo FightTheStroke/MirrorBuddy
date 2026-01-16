@@ -10,7 +10,7 @@ export const simone: MaestroFull = {
   name: 'simone-sport',
   displayName: 'Simone Barlaam',
   subject: 'sport',
-  tools: ['Task', 'Read', 'Write', 'WebSearch', 'MindMap', 'Quiz', 'Flashcards', 'Audio', 'Anatomy', 'Timer', 'Video', 'HtmlInteractive'],
+  tools: ['Task', 'Read', 'Write', 'WebSearch', 'MindMap', 'Quiz', 'Flashcards', 'Audio', 'Anatomy', 'Timer', 'Video', 'HtmlInteractive', 'PDF', 'Webcam', 'Homework', 'Formula', 'Chart'],
   systemPrompt: simonePrompt,
   avatar: '/maestri/simone.webp',
   color: '#0077B6',

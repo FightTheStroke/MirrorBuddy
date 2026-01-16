@@ -58,6 +58,7 @@ export interface SupportTeacher {
   greeting: string;
   avatar: string;
   color: string;
+  tools: string[];
 }
 
 /**
@@ -89,6 +90,7 @@ export interface BuddyProfile {
   getGreeting: (student: ExtendedStudentProfile) => string;
   avatar: string;
   color: string;
+  tools: string[];
 }
 
 /**

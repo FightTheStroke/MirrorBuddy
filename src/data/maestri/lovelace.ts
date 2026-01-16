@@ -10,7 +10,7 @@ export const lovelace: MaestroFull = {
   name: 'lovelace-informatica',
   displayName: 'Ada Lovelace',
   subject: 'computer-science',
-  tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Sandbox","Flowchart","Debug","Robot","Video","HtmlInteractive"],
+  tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Sandbox","Flowchart","Debug","Robot","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
   systemPrompt: lovelacePrompt,
   avatar: '/maestri/lovelace.webp',
   color: '#06B6D4', // Cyan - tech/modern

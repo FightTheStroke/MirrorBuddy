@@ -25,6 +25,11 @@ export const alexPina: MaestroFull = {
     'Pronunciation',
     'Video',
     'HtmlInteractive',
+    'PDF',
+    'Webcam',
+    'Homework',
+    'Formula',
+    'Chart',
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io

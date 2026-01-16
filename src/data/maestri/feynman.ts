@@ -9,7 +9,7 @@ export const feynman: MaestroFull =   {
     name: 'feynman-fisica',
     displayName: 'Richard Feynman',
     subject: 'physics',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Formula","Simulator","Video","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Formula","Simulator","Video","HtmlInteractive","PDF","Webcam","Homework","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
