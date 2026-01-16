@@ -179,7 +179,7 @@ export function useSendSessionConfig(
           item: {
             type: 'message',
             role: msg.role,
-            content: [{ type: 'text', text: msg.content }],
+            content: [{ type: 'input_text', text: msg.content }],
           },
         });
       }
