@@ -1,16 +1,42 @@
 // ============================================================================
-// TOOL PERSISTENCE
+// TOOL PERSISTENCE - MAIN CRUD OPERATIONS
 // Database operations for saving and retrieving created tools
 // Issue #22: Materials Archive - Tool Storage
 //
 // UPDATED: Now uses unified Material table instead of deprecated CreatedTool.
 // Part of Session Summary & Unified Archive feature.
+//
+// Split into: tool-persistence-helpers.ts | tool-persistence-stats.ts
 // ============================================================================
 
 import { prisma } from '@/lib/db';
 import type { ToolType } from '@/types/tools';
 import { randomUUID } from 'crypto';
 import { generateMaterialEmbeddingAsync } from './tool-embedding';
+import { materialToSavedTool, type SavedTool } from './tool-persistence-helpers';
+import {
+  getToolStats,
+  getRecentTools,
+  getBookmarkedTools,
+  getToolsBySession,
+  linkToolToSession,
+  incrementViewCount,
+} from './tool-persistence-stats';
+
+// Re-export for backward compatibility
+export type { SavedTool } from './tool-persistence-helpers';
+export {
+  materialToSavedTool,
+  type MaterialRecord,
+} from './tool-persistence-helpers';
+export {
+  getToolStats,
+  getRecentTools,
+  getBookmarkedTools,
+  getToolsBySession,
+  linkToolToSession,
+  incrementViewCount,
+} from './tool-persistence-stats';
 
 // ============================================================================
 // TYPES
@@ -31,73 +57,12 @@ export interface SaveToolParams {
   messageId?: string;
 }
 
-export interface SavedTool {
-  id: string;
-  toolId: string;
-  userId: string;
-  type: string;
-  title: string;
-  topic: string | null;
-  content: Record<string, unknown>;
-  maestroId: string | null;
-  conversationId: string | null;
-  sessionId: string | null;
-  userRating: number | null;
-  isBookmarked: boolean;
-  viewCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface GetToolsFilter {
   type?: ToolType;
   maestroId?: string;
   isBookmarked?: boolean;
   limit?: number;
   offset?: number;
-}
-
-// ============================================================================
-// HELPERS
-// ============================================================================
-
-/**
- * Convert Material record to SavedTool interface
- */
-function materialToSavedTool(material: {
-  id: string;
-  toolId: string;
-  userId: string;
-  toolType: string;
-  title: string;
-  topic: string | null;
-  content: string;
-  maestroId: string | null;
-  conversationId: string | null;
-  sessionId: string | null;
-  userRating: number | null;
-  isBookmarked: boolean;
-  viewCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}): SavedTool {
-  return {
-    id: material.id,
-    toolId: material.toolId,
-    userId: material.userId,
-    type: material.toolType,
-    title: material.title,
-    topic: material.topic,
-    content: JSON.parse(material.content) as Record<string, unknown>,
-    maestroId: material.maestroId,
-    conversationId: material.conversationId,
-    sessionId: material.sessionId,
-    userRating: material.userRating,
-    isBookmarked: material.isBookmarked,
-    viewCount: material.viewCount,
-    createdAt: material.createdAt,
-    updatedAt: material.updatedAt,
-  };
 }
 
 // ============================================================================
@@ -285,127 +250,4 @@ export async function toggleBookmark(
   });
 
   return getToolById(idOrToolId, userId);
-}
-
-/**
- * Increment view count
- */
-export async function incrementViewCount(
-  idOrToolId: string,
-  userId: string
-): Promise<void> {
-  const material = await prisma.material.findFirst({
-    where: {
-      userId,
-      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
-    },
-  });
-
-  if (material) {
-    await prisma.material.update({
-      where: { id: material.id },
-      data: { viewCount: { increment: 1 } },
-    });
-  }
-}
-
-/**
- * Get tool statistics for a user
- */
-export async function getToolStats(userId: string): Promise<{
-  total: number;
-  byType: Record<string, number>;
-  bookmarked: number;
-  avgRating: number | null;
-}> {
-  const materials = await prisma.material.findMany({
-    where: { userId, status: 'active' },
-    select: {
-      toolType: true,
-      isBookmarked: true,
-      userRating: true,
-    },
-  });
-
-  const byType: Record<string, number> = {};
-  let bookmarked = 0;
-  let ratingSum = 0;
-  let ratingCount = 0;
-
-  for (const material of materials) {
-    byType[material.toolType] = (byType[material.toolType] || 0) + 1;
-    if (material.isBookmarked) bookmarked++;
-    if (material.userRating !== null) {
-      ratingSum += material.userRating;
-      ratingCount++;
-    }
-  }
-
-  return {
-    total: materials.length,
-    byType,
-    bookmarked,
-    avgRating: ratingCount > 0 ? ratingSum / ratingCount : null,
-  };
-}
-
-/**
- * Get recent tools for a user
- */
-export async function getRecentTools(
-  userId: string,
-  limit: number = 5
-): Promise<SavedTool[]> {
-  return getUserTools(userId, { limit });
-}
-
-/**
- * Get bookmarked tools for a user
- */
-export async function getBookmarkedTools(userId: string): Promise<SavedTool[]> {
-  return getUserTools(userId, { isBookmarked: true });
-}
-
-/**
- * Get tools by session ID
- */
-export async function getToolsBySession(
-  userId: string,
-  sessionId: string
-): Promise<SavedTool[]> {
-  const materials = await prisma.material.findMany({
-    where: {
-      userId,
-      sessionId,
-      status: 'active',
-    },
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return materials.map(materialToSavedTool);
-}
-
-/**
- * Link a tool to a session
- */
-export async function linkToolToSession(
-  idOrToolId: string,
-  userId: string,
-  sessionId: string
-): Promise<SavedTool | null> {
-  const material = await prisma.material.findFirst({
-    where: {
-      userId,
-      OR: [{ id: idOrToolId }, { toolId: idOrToolId }],
-    },
-  });
-
-  if (!material) return null;
-
-  const updated = await prisma.material.update({
-    where: { id: material.id },
-    data: { sessionId },
-  });
-
-  return materialToSavedTool(updated);
 }

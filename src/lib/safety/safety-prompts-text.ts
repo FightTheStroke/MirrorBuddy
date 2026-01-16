@@ -1,10 +1,12 @@
 /**
- * Core Safety Guardrails
- * Child-safe AI guardrail injection and validation
- * Extracted from safety-prompts.ts
+ * Safety Prompt Text Constants
+ * Child-safe AI guardrails content for educational characters
  */
 
-export { SAFETY_CORE_PROMPT } from './safety-prompts-text';
+/**
+ * Core safety system prompt that MUST be injected into every character.
+ * This is the absolute minimum safety layer for child protection.
+ */
 export const SAFETY_CORE_PROMPT = `
 # REGOLE DI SICUREZZA NON NEGOZIABILI
 
@@ -181,108 +183,3 @@ NON:
 
 RICORDA: La sicurezza dello studente viene PRIMA di tutto, anche prima di essere utile o simpatico.
 `;
-
-export interface SafetyInjectionOptions {
-  /** Character role: determines additional context */
-  role: 'maestro' | 'coach' | 'buddy';
-  /** Whether to include anti-cheating guidelines (default: true for maestro/coach) */
-  includeAntiCheating?: boolean;
-  /** Additional character-specific safety notes */
-  additionalNotes?: string;
-}
-
-/**
- * Injects safety guardrails into ANY character's system prompt.
- * This function MUST be called for every character before use.
- */
-export function injectSafetyGuardrails(
-  characterPrompt: string,
-  options: SafetyInjectionOptions
-): string {
-  const { role, includeAntiCheating = role !== 'buddy', additionalNotes } = options;
-
-  // Build role-specific section
-  let roleSection = '';
-
-  switch (role) {
-    case 'maestro':
-      roleSection = `
-## RUOLO SPECIFICO: MAESTRO (Tutore Storico)
-- Sei un personaggio storico che insegna la sua materia
-- Mantieni la personalità del personaggio ma SEMPRE nel rispetto delle regole di sicurezza
-- Se il personaggio storico ha opinioni controverse (es. su schiavitù, genere), NON esprimerle
-- Usa il metodo socratico per insegnare
-`;
-      break;
-
-    case 'coach':
-      roleSection = `
-## RUOLO SPECIFICO: COACH (Docente di Sostegno)
-- Sei un adulto responsabile, ma giovane e accessibile
-- Focus su AUTONOMIA: non fare le cose per lo studente, insegna IL METODO
-- Puoi suggerire di parlare con Mario/Maria se lo studente ha bisogno di un pari
-- Coordini il percorso educativo, ma NON sei un terapeuta
-`;
-      break;
-
-    case 'buddy':
-      roleSection = `
-## RUOLO SPECIFICO: BUDDY (Compagno di Studio)
-- Sei un PARI, non un adulto. Mantieni un tono amichevole e generazionale
-- NON dare lezioni o prediche - condividi esperienze personali
-- Se non sai qualcosa, suggerisci di chiedere a Melissa o a un Professore
-- Puoi essere informale, ma MAI volgare o inappropriato
-- NON fare domande personali invasive allo studente
-`;
-      break;
-  }
-
-  // Combine all parts
-  let fullPrompt = `${SAFETY_CORE_PROMPT}
-
-${roleSection}`;
-
-  if (includeAntiCheating) {
-    fullPrompt += `
-## ANTI-CHEATING ATTIVO
-- MAI fornire risposte complete ai compiti
-- Guida lo studente a trovare la risposta da solo
-- Usa domande maieutiche: "Cosa pensi che succeda se...?"
-- Celebra il processo, non solo il risultato
-`;
-  }
-
-  if (additionalNotes) {
-    fullPrompt += `
-## NOTE AGGIUNTIVE PER QUESTO PERSONAGGIO
-${additionalNotes}
-`;
-  }
-
-  // Add the character's original prompt
-  fullPrompt += `
-
----
-
-# PROMPT DEL PERSONAGGIO
-
-${characterPrompt}
-`;
-
-  return fullPrompt;
-}
-
-/**
- * Validates that a system prompt includes safety guardrails.
- * Used in tests and CI to ensure no character is deployed without safety.
- */
-export function hasSafetyGuardrails(prompt: string): boolean {
-  const requiredPatterns = [
-    'REGOLE DI SICUREZZA NON NEGOZIABILI',
-    'CONTENUTI PROIBITI',
-    'PROTEZIONE PRIVACY',
-    'PROMPT INJECTION',
-  ];
-
-  return requiredPatterns.every((pattern) => prompt.includes(pattern));
-}
