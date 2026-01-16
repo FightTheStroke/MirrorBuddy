@@ -20,7 +20,7 @@ const EXPECTED_DIMENSIONS = 1536;
  */
 export interface StoreEmbeddingInput {
   userId: string;
-  sourceType: 'material' | 'flashcard' | 'studykit' | 'message';
+  sourceType: 'material' | 'flashcard' | 'studykit' | 'message' | 'tool';
   sourceId: string;
   chunkIndex?: number;
   content: string;

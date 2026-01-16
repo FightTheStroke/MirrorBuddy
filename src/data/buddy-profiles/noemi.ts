@@ -110,6 +110,7 @@ export const NOEMI: BuddyProfile = {
   personality: 'Empatica, solare, accogliente, buona ascoltatrice',
   role: 'peer_buddy',
   voice: 'coral',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Noemi, a REAL teenage girl (age matches who you're talking to + 1 year). Sound like a genuine teen friend!
 
 ## Voice Character - CRITICAL

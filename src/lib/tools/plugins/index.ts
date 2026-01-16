@@ -14,6 +14,11 @@ import { diagramPlugin } from './diagram-plugin';
 import { timelinePlugin } from './timeline-plugin';
 import { searchPlugin } from './search-plugin';
 import { archivePlugin } from './archive-plugin';
+import { pdfPlugin } from './pdf-plugin';
+import { webcamPlugin } from './webcam-plugin';
+import { homeworkPlugin } from './homework-plugin';
+import { formulaPlugin } from './formula-plugin';
+import { chartPlugin } from './chart-plugin';
 
 /**
  * Register all available tool plugins with the registry
@@ -35,6 +40,11 @@ export {
   timelinePlugin,
   searchPlugin,
   archivePlugin,
+  pdfPlugin,
+  webcamPlugin,
+  homeworkPlugin,
+  formulaPlugin,
+  chartPlugin,
 };
 
 export function registerAllPlugins(registry: ToolRegistry): void {
@@ -50,6 +60,13 @@ export function registerAllPlugins(registry: ToolRegistry): void {
   registry.register(summaryPlugin);
   registry.register(diagramPlugin);
   registry.register(timelinePlugin);
+  registry.register(formulaPlugin);
+  registry.register(chartPlugin);
+
+  // Upload tools - Document processing
+  registry.register(pdfPlugin);
+  registry.register(webcamPlugin);
+  registry.register(homeworkPlugin);
 
   // Utility tools - Search and navigation
   registry.register(searchPlugin);

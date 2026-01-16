@@ -9,7 +9,7 @@ export const leonardo: MaestroFull = {
     name: 'leonardo-arte',
     displayName: 'Leonardo da Vinci',
     subject: 'art',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Canvas","Gallery","ColorPalette","Video","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Canvas","Gallery","ColorPalette","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

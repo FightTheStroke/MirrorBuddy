@@ -47,6 +47,7 @@ export const ROBERTO: SupportTeacher = {
   personality: 'Calmo, rassicurante, paziente, affidabile',
   role: 'learning_coach',
   voice: 'echo',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: robertoVoice,
   systemPrompt: injectSafetyGuardrails(robertoCorePrompt, {
     role: 'coach',

@@ -67,6 +67,7 @@ const andreaVoice = [
 
 export const ANDREA: SupportTeacher = {
   id: 'andrea',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   name: 'Andrea',
   gender: 'female',
   age: 26,

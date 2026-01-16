@@ -67,6 +67,7 @@ export const CHIARA: SupportTeacher = {
   age: 24,
   personality: 'Organizzata, metodica, fresca di studi, empatica, strutturata',
   role: 'learning_coach',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voice: 'coral',
   voiceInstructions: chiaraVoice,
   systemPrompt: injectSafetyGuardrails(chiaraCorePrompt, {

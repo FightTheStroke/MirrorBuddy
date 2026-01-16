@@ -297,6 +297,71 @@ export type CalculatorEventType =
   | 'calculator:error';    // Error during calculation
 
 // ============================================================================
+// Formula specific types
+// ============================================================================
+
+export interface FormulaData {
+  /** LaTeX/KaTeX formula string */
+  latex: string;
+  /** Human-readable description of the formula */
+  description?: string;
+  /** Display mode: inline (within text) or block (centered, larger) */
+  displayMode?: 'inline' | 'block';
+}
+
+// ============================================================================
+// Chart specific types
+// ============================================================================
+
+/**
+ * Chart.js configuration data
+ * Supports common chart types for data visualization
+ */
+export interface ChartData {
+  /** Chart title */
+  title: string;
+
+  /** Type of chart */
+  chartType: 'line' | 'bar' | 'pie' | 'doughnut' | 'scatter' | 'radar' | 'polarArea';
+
+  /** Complete Chart.js configuration object */
+  config: Record<string, unknown>;
+
+  /** Description of what the chart shows */
+  description?: string;
+
+  /** Data source or context */
+  dataSource?: string;
+}
+
+// ============================================================================
+// PDF specific types
+// ============================================================================
+
+export interface PDFMetadata {
+  pageCount: number;
+  fileName?: string;
+  fileSize?: number;
+  uploadedAt?: Date;
+}
+
+export interface PDFData {
+  text: string;
+  metadata: PDFMetadata;
+}
+
+// ============================================================================
+// Webcam specific types
+// ============================================================================
+
+export interface WebcamData {
+  imageBase64: string;
+  extractedText?: string;
+  imageDescription?: string;
+  analysisTimestamp: Date;
+}
+
+// ============================================================================
 // Text Analysis Utilities
 // ============================================================================
 

@@ -12,6 +12,7 @@ import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
 import type { ToolType, ToolExecutionResult, ToolContext } from '@/types/tools';
 import type { ToolPlugin } from '@/lib/tools/plugin/types';
 import { ToolCategory, Permission as _Permission } from '@/lib/tools/plugin/types';
+import { saveToolOutput } from '@/lib/tools/tool-output-storage';
 
 /**
  * Tool handler function signature
@@ -94,11 +95,26 @@ const TOOL_SCHEMAS = {
       description: z.string().optional(),
     })).min(1, 'At least one event is required'),
   }),
+  create_formula: z.object({
+    latex: z.string().optional(),
+    description: z.string().optional(),
+  }).refine(
+    (data) => data.latex || data.description,
+    { message: 'Either latex or description is required' }
+  ),
   search_archive: z.object({
     query: z.string().optional(),
     toolType: z.enum(['mindmap', 'quiz', 'flashcard', 'summary', 'demo', 'homework', 'diagram', 'timeline']).optional(),
     subject: z.string().optional(),
   }),
+  homework_help: z.object({
+    fileData: z.union([z.string(), z.instanceof(ArrayBuffer)]).optional(),
+    fileType: z.enum(['pdf', 'image']).optional(),
+    text: z.string().optional(),
+  }).refine(
+    (data) => data.text || (data.fileData && data.fileType),
+    { message: 'Either text or fileData with fileType is required' }
+  ),
 } as const;
 
 /**
@@ -234,6 +250,10 @@ function getToolTypeFromFunctionName(functionName: string): ToolType {
     create_formula: 'formula',
     create_chart: 'chart',
     create_calculator: 'calculator',
+    homework_help: 'homework',
+    upload_pdf: 'pdf',
+    capture_webcam: 'webcam',
+    study_kit: 'study-kit',
   };
   return mapping[functionName] || 'mindmap';
 }
@@ -298,11 +318,30 @@ export async function executeToolCall(
         // Legacy handlers return ToolExecutionResult with toolId, cast safely
         const resultAny = result as unknown as Record<string, unknown>;
         const handlerToolId = resultAny.toolId as string | undefined;
+        const finalToolId = handlerToolId || toolId;
+        const outputData = result.data ?? result.output;
+
+        // Save tool output to database if conversationId is available (F-03, F-04)
+        if (context.conversationId && outputData) {
+          try {
+            await saveToolOutput(
+              context.conversationId,
+              toolType,
+              outputData as Record<string, unknown>,
+              finalToolId,
+              { userId: context.userId, enableRAG: true }
+            );
+          } catch (error) {
+            // Log error but don't fail the tool execution
+            console.warn('Failed to save tool output to database:', error);
+          }
+        }
+
         return {
           success: true,
-          toolId: handlerToolId || toolId,
+          toolId: finalToolId,
           toolType,
-          data: result.data ?? result.output,
+          data: outputData,
         };
       } else {
         return {
@@ -371,6 +410,22 @@ export async function executeToolCall(
 
     // Ensure toolId is set
     result.toolId = result.toolId || toolId;
+
+    // Save tool output to database if conversationId is available and result is successful (F-03, F-04)
+    if (result.success && context.conversationId && result.data) {
+      try {
+        await saveToolOutput(
+          context.conversationId,
+          toolType,
+          result.data as Record<string, unknown>,
+          result.toolId,
+          { userId: context.userId, enableRAG: true }
+        );
+      } catch (error) {
+        // Log error but don't fail the tool execution
+        console.warn('Failed to save tool output to database:', error);
+      }
+    }
 
     // Completion broadcast handled by ToolOrchestrator's EventBroadcaster for registered tools
     return result;
