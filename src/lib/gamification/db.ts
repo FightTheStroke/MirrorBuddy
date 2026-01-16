@@ -181,13 +181,14 @@ export async function updateStreak(userId: string, minutesStudied: number) {
  */
 export async function checkAchievements(userId: string) {
   const gamification = await getOrCreateGamification(userId);
-  const unlockedAchievements: string[] = [];
 
   // Get all achievements not yet unlocked by user
   const allAchievements = await prisma.achievement.findMany();
-  const userAchievementIds = gamification.achievements.map(ua => ua.achievementId);
-  const lockedAchievements = allAchievements.filter(a => !userAchievementIds.includes(a.id));
+  const userAchievementIds = new Set(gamification.achievements.map(ua => ua.achievementId));
+  const lockedAchievements = allAchievements.filter(a => !userAchievementIds.has(a.id));
 
+  // Collect achievements to unlock (single pass check)
+  const toUnlock: Array<{ achievement: typeof allAchievements[0] }> = [];
   for (const achievement of lockedAchievements) {
     const requirement = JSON.parse(achievement.requirement);
     const shouldUnlock = checkAchievementRequirement(requirement, {
@@ -195,25 +196,37 @@ export async function checkAchievements(userId: string) {
       level: gamification.level,
       currentStreak: gamification.streak?.currentStreak || 0,
     });
-
     if (shouldUnlock) {
-      await prisma.userAchievement.create({
+      toUnlock.push({ achievement });
+    }
+  }
+
+  if (toUnlock.length === 0) {
+    return [];
+  }
+
+  // Batch create all userAchievements in a single transaction (N+1 fix)
+  await prisma.$transaction(
+    toUnlock.map(({ achievement }) =>
+      prisma.userAchievement.create({
         data: {
           gamificationId: gamification.id,
           achievementId: achievement.id,
           progress: 100,
         },
-      });
+      })
+    )
+  );
 
-      // Award bonus points for achievement
-      if (achievement.points > 0) {
-        await awardPoints(userId, achievement.points, 'achievement_bonus', achievement.id, 'Achievement');
-      }
-
-      unlockedAchievements.push(achievement.code);
-      logger.info('Achievement unlocked', { userId, achievement: achievement.code });
-    }
+  // Calculate total bonus points and award once (avoid N calls to awardPoints)
+  const totalBonusPoints = toUnlock.reduce((sum, { achievement }) => sum + achievement.points, 0);
+  if (totalBonusPoints > 0) {
+    const achievementIds = toUnlock.map(({ achievement }) => achievement.id).join(',');
+    await awardPoints(userId, totalBonusPoints, 'achievement_bonus', achievementIds, 'Achievement');
   }
+
+  const unlockedAchievements = toUnlock.map(({ achievement }) => achievement.code);
+  logger.info('Achievements unlocked', { userId, achievements: unlockedAchievements, bonusPoints: totalBonusPoints });
 
   return unlockedAchievements;
 }

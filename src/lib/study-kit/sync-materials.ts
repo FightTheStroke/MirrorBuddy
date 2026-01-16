@@ -111,34 +111,33 @@ export async function saveMaterialsFromStudyKit(
     return { created: 0, updated: 0 };
   }
 
-  let created = 0;
-  let updated = 0;
+  // Get existing toolIds in a single query to track created vs updated
+  const existingToolIds = new Set(
+    (await prisma.material.findMany({
+      where: { toolId: { in: materials.map(m => m.toolId) } },
+      select: { toolId: true },
+    })).map(m => m.toolId)
+  );
 
-  // Upsert each material
-  for (const material of materials) {
-    const existing = await prisma.material.findUnique({
-      where: { toolId: material.toolId },
-    });
-
-    if (existing) {
-      await prisma.material.update({
+  // Batch upsert all materials in a single transaction (N+1 fix)
+  await prisma.$transaction(
+    materials.map((material) =>
+      prisma.material.upsert({
         where: { toolId: material.toolId },
-        data: {
+        create: material,
+        update: {
           title: material.title,
           content: material.content,
           searchableText: material.searchableText,
           preview: material.preview,
           updatedAt: new Date(),
         },
-      });
-      updated++;
-    } else {
-      await prisma.material.create({
-        data: material,
-      });
-      created++;
-    }
-  }
+      })
+    )
+  );
+
+  const created = materials.filter(m => !existingToolIds.has(m.toolId)).length;
+  const updated = materials.filter(m => existingToolIds.has(m.toolId)).length;
 
   logger.info('Synced Study Kit materials', {
     studyKitId: studyKit.id,
