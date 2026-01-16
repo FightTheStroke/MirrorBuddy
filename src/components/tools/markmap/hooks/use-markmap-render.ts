@@ -75,7 +75,10 @@ export function useMarkmapRender({
 
   // Render mindmap
   useEffect(() => {
+    let cancelled = false;
+
     const renderMindmap = async () => {
+      if (cancelled) return;
       if (!svgRef.current || !containerRef.current) return;
 
       // FIX BUG 16: Check container dimensions before rendering to prevent SVGLength error
@@ -83,7 +86,9 @@ export function useMarkmapRender({
       const rect = container.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) {
         // Container not yet laid out, wait for next frame
-        requestAnimationFrame(() => renderMindmap());
+        requestAnimationFrame(() => {
+          if (!cancelled) renderMindmap();
+        });
         return;
       }
 
@@ -91,15 +96,27 @@ export function useMarkmapRender({
         setError(null);
         setRendered(false);
 
+        // CRITICAL: Destroy existing markmap BEFORE clearing SVG
+        // This ensures proper cleanup of event listeners and internal state
+        if (markmapRef.current) {
+          markmapRef.current.destroy();
+          markmapRef.current = null;
+        }
+
+        // Now clear SVG content
+        svgRef.current.innerHTML = '';
+
+        // Check if cancelled after async operations
+        if (cancelled) return;
+
         // Set explicit dimensions on SVG to prevent SVGLength error
         svgRef.current.setAttribute('width', String(rect.width));
         svgRef.current.setAttribute('height', String(rect.height - 60)); // Account for toolbar
 
-        // Clear previous content
-        svgRef.current.innerHTML = '';
-
         // Lazy-load markmap-lib
         const { Transformer } = await import('markmap-lib');
+        if (cancelled) return;
+
         const transformer = new Transformer();
 
         // Get markdown and transform to markmap data
@@ -114,13 +131,9 @@ export function useMarkmapRender({
         // Determine colors based on accessibility settings
         const isHighContrast = settings.highContrast || accessibilityMode;
 
-        // Create or update markmap
-        if (markmapRef.current) {
-          markmapRef.current.destroy();
-        }
-
         // Lazy-load markmap-view
         const { Markmap: MarkmapClass } = await import('markmap-view');
+        if (cancelled) return;
 
         markmapRef.current = MarkmapClass.create(svgRef.current, {
           autoFit: true,
@@ -219,6 +232,18 @@ export function useMarkmapRender({
     };
 
     renderMindmap();
+
+    // Cleanup function - critical for React StrictMode and preventing double renders
+    return () => {
+      cancelled = true;
+      if (markmapRef.current) {
+        markmapRef.current.destroy();
+        markmapRef.current = null;
+      }
+      if (svgRef.current) {
+        svgRef.current.innerHTML = '';
+      }
+    };
   }, [
     markdown,
     nodes,
