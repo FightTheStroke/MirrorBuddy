@@ -48,13 +48,14 @@ describe('search-handler', () => {
         json: async () => mockWikiResponse,
       });
 
-      const results = await performWebSearch('teorema di pitagora');
+      const { results, source } = await performWebSearch('teorema di pitagora');
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('it.wikipedia.org'));
 
       // Should have Wikipedia results + Treccani
       expect(results.length).toBe(3);
+      expect(source).toBe('wikipedia');
 
       // Check Wikipedia results
       expect(results[0].type).toBe('web');
@@ -74,11 +75,12 @@ describe('search-handler', () => {
     it('should return only Treccani when Wikipedia API fails', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      const results = await performWebSearch('matematica');
+      const { results, source } = await performWebSearch('matematica');
 
       // Should still have Treccani as fallback
       expect(results.length).toBe(1);
       expect(results[0].url).toContain('treccani.it');
+      expect(source).toBe('wikipedia');
     });
 
     it('should return only Treccani when Wikipedia returns no results', async () => {
@@ -87,10 +89,11 @@ describe('search-handler', () => {
         json: async () => ({ query: { search: [] } }),
       });
 
-      const results = await performWebSearch('xyznonexistent123');
+      const { results, source } = await performWebSearch('xyznonexistent123');
 
       expect(results.length).toBe(1);
       expect(results[0].url).toContain('treccani.it');
+      expect(source).toBe('wikipedia');
     });
 
     it('should handle Wikipedia API returning non-OK status', async () => {
@@ -99,11 +102,12 @@ describe('search-handler', () => {
         status: 500,
       });
 
-      const results = await performWebSearch('test');
+      const { results, source } = await performWebSearch('test');
 
       // Should still have Treccani
       expect(results.length).toBe(1);
       expect(results[0].url).toContain('treccani.it');
+      expect(source).toBe('wikipedia');
     });
 
     it('should properly encode special characters in URLs', async () => {
@@ -124,7 +128,7 @@ describe('search-handler', () => {
         json: async () => mockWikiResponse,
       });
 
-      const results = await performWebSearch('C++');
+      const { results } = await performWebSearch('C++');
 
       // Check URL is properly encoded
       const wikiResult = results.find((r) => r.title.includes('C++'));
@@ -147,7 +151,7 @@ describe('search-handler', () => {
         json: async () => mockWikiResponse,
       });
 
-      const results = await performWebSearch('test');
+      const { results } = await performWebSearch('test');
 
       // 3 Wikipedia + 1 Treccani
       expect(results.length).toBe(4);

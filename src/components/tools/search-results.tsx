@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { ExternalLink, Youtube, Globe } from 'lucide-react';
+import { ExternalLink, Youtube, Globe, Info } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface SearchResult {
@@ -17,11 +17,12 @@ interface SearchResultsProps {
   data: {
     query: string;
     results: SearchResult[];
+    searchSource?: 'brave' | 'wikipedia';
   };
 }
 
 export function SearchResults({ data }: SearchResultsProps) {
-  const { query, results } = data;
+  const { query, results, searchSource } = data;
 
   if (!results || results.length === 0) {
     return (
@@ -33,9 +34,17 @@ export function SearchResults({ data }: SearchResultsProps) {
 
   return (
     <div className="space-y-4 p-4">
-      <p className="text-sm text-slate-500 dark:text-slate-400">
-        {results.length} risultati per &quot;{query}&quot;
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          {results.length} risultati per &quot;{query}&quot;
+        </p>
+        {searchSource === 'wikipedia' && (
+          <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full">
+            <Info className="w-3 h-3" />
+            <span>Solo Wikipedia</span>
+          </div>
+        )}
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {results.map((result, index) => (

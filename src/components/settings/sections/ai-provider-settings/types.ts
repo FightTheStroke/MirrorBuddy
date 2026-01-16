@@ -33,5 +33,11 @@ export interface DetailedProviderStatus {
     model: string;
     envVars: EnvVarStatus[];
   };
+  services?: {
+    braveSearch: {
+      configured: boolean;
+      fallback: string;
+    };
+  };
 }
 

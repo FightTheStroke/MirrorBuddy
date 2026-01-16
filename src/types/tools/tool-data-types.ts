@@ -66,6 +66,8 @@ export interface SearchData {
   query: string;
   searchType: 'web' | 'youtube' | 'all';
   results: SearchResult[];
+  /** Source used for web search: 'brave' (real-time) or 'wikipedia' (fallback) */
+  searchSource?: 'brave' | 'wikipedia';
 }
 
 // ============================================================================
