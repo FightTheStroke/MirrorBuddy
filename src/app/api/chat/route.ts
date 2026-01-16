@@ -33,6 +33,11 @@ import { TOOL_CONTEXT } from './constants';
 import { getDemoContext } from './helpers';
 import { TOKEN_COST_PER_UNIT } from './stream/helpers';
 
+// Ethical Design Hardening imports
+import { assessResponseTransparency, type TransparencyContext } from '@/lib/ai/transparency';
+import { recordContentFiltered } from '@/lib/safety/audit';
+import { normalizeUnicode } from '@/lib/safety/versioning';
+
 export async function POST(request: NextRequest) {
   // Rate limiting: 20 requests per minute per IP
   const clientId = getClientIdentifier(request);
@@ -179,6 +184,8 @@ export async function POST(request: NextRequest) {
 
     // Wave 4: RAG context injection - find relevant materials and study kits
     let hasRAG = false;
+    // Store RAG results for transparency assessment (Ethical Design Hardening F-09)
+    let ragResultsForTransparency: Array<{ content: string; similarity: number; sourceType?: string }> = [];
     if (userId && lastUserMessage) {
       try {
         // Search in materials (generated content)
@@ -200,6 +207,13 @@ export async function POST(request: NextRequest) {
         });
 
         const allResults = [...relevantMaterials, ...relatedStudyKits];
+
+        // Store for transparency assessment (Ethical Design Hardening F-09)
+        ragResultsForTransparency = allResults.map((r) => ({
+          content: r.content,
+          similarity: r.similarity,
+          sourceType: 'material',
+        }));
 
         if (allResults.length > 0) {
           const ragContext = allResults
@@ -251,8 +265,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // SECURITY: Filter the last user message for safety (Issue #30)
+    // SECURITY: Normalize unicode and filter the last user message for safety (Issue #30)
     if (lastUserMessage) {
+      // Ethical Design Hardening F-17: Normalize unicode to prevent homoglyph attacks
+      const { normalized, wasModified } = normalizeUnicode(lastUserMessage.content);
+      if (wasModified) {
+        logger.debug('Unicode normalized in user input', { clientId });
+        lastUserMessage.content = normalized;
+      }
+
       const filterResult = filterInput(lastUserMessage.content);
       if (!filterResult.safe && filterResult.action === 'block') {
         logger.warn('Content blocked by safety filter', {
@@ -260,6 +281,14 @@ export async function POST(request: NextRequest) {
           category: filterResult.category,
           severity: filterResult.severity,
         });
+
+        // Ethical Design Hardening F-07: Record to audit trail
+        recordContentFiltered(filterResult.category || 'unknown', {
+          userId,
+          maestroId,
+          actionTaken: 'blocked',
+        });
+
         return NextResponse.json({
           content: filterResult.suggestedResponse,
           provider: 'safety_filter',
@@ -409,6 +438,16 @@ export async function POST(request: NextRequest) {
         });
       }
 
+      // Ethical Design Hardening F-09: Assess response transparency
+      const transparencyContext: TransparencyContext = {
+        response: sanitized.text,
+        query: lastUserMessage?.content || '',
+        ragResults: ragResultsForTransparency,
+        usedKnowledgeBase: !!maestroId,
+        maestroId,
+      };
+      const transparency = assessResponseTransparency(transparencyContext);
+
       // Update budget tracking if usage data is available (WAVE 3: Token budget enforcement)
       if (userId && userSettings && result.usage) {
         try {
@@ -443,6 +482,13 @@ export async function POST(request: NextRequest) {
         hasRAG,
         maestroId,
         sanitized: sanitized.modified,
+        // Ethical Design Hardening F-09: Transparency metadata
+        transparency: {
+          confidence: transparency.confidence,
+          citations: transparency.citations,
+          hasHallucinations: transparency.hallucinationRisk.indicators.length > 0,
+          needsCitation: transparency.hallucinationRisk.indicators.some((h: { type: string }) => h.type === 'factual_claim'),
+        },
       });
     } catch (providerError) {
       // Provider-specific error handling

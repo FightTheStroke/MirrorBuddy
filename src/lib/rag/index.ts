@@ -63,3 +63,13 @@ export {
   type HybridRetrievalResult,
   type HybridSearchOptions,
 } from './hybrid-retrieval';
+
+// Privacy-aware embeddings (Ethical Design Hardening F-04)
+export {
+  generatePrivacyAwareEmbedding,
+  generatePrivacyAwareEmbeddings,
+  requiresAnonymization,
+  anonymizeConversationForRAG,
+  type PrivacyAwareEmbeddingResult,
+  type PrivacyEmbeddingOptions,
+} from './privacy-aware-embedding';
