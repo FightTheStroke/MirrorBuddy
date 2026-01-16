@@ -76,6 +76,8 @@ export function useMarkmapRender({
   // Render mindmap
   useEffect(() => {
     let cancelled = false;
+    // Capture ref value for cleanup (React hooks/exhaustive-deps rule)
+    const svgElement = svgRef.current;
 
     const renderMindmap = async () => {
       if (cancelled) return;
@@ -240,8 +242,8 @@ export function useMarkmapRender({
         markmapRef.current.destroy();
         markmapRef.current = null;
       }
-      if (svgRef.current) {
-        svgRef.current.innerHTML = '';
+      if (svgElement) {
+        svgElement.innerHTML = '';
       }
     };
   }, [

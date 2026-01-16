@@ -38,7 +38,10 @@ export function useMarkmapRenderer({
   const [rendered, setRendered] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     const renderMindmap = async () => {
+      if (cancelled) return;
       if (!svgRef.current || !containerRef.current) return;
 
       // FIX BUG 16: Check container dimensions before rendering to prevent SVGLength error
@@ -46,7 +49,9 @@ export function useMarkmapRenderer({
       const rect = container.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) {
         // Container not yet laid out, wait for next frame
-        requestAnimationFrame(() => renderMindmap());
+        requestAnimationFrame(() => {
+          if (!cancelled) renderMindmap();
+        });
         return;
       }
 
@@ -54,12 +59,21 @@ export function useMarkmapRenderer({
         setError(null);
         setRendered(false);
 
+        // CRITICAL: Destroy existing markmap BEFORE clearing SVG
+        // This ensures proper cleanup of event listeners and internal state
+        if (markmapRef.current) {
+          markmapRef.current.destroy();
+          markmapRef.current = null;
+        }
+
+        // Now clear SVG content
+        svgRef.current.innerHTML = '';
+
+        if (cancelled) return;
+
         // Set explicit dimensions on SVG to prevent SVGLength error
         svgRef.current.setAttribute('width', String(rect.width));
         svgRef.current.setAttribute('height', String(rect.height - 60)); // Account for toolbar
-
-        // Clear previous content
-        svgRef.current.innerHTML = '';
 
         // Get markdown from nodes
         const content = nodesToMarkdown(nodes, title);
@@ -74,10 +88,7 @@ export function useMarkmapRenderer({
         // Determine colors based on accessibility settings
         const isHighContrast = settings.highContrast || accessibilityMode;
 
-        // Create or update markmap
-        if (markmapRef.current) {
-          markmapRef.current.destroy();
-        }
+        if (cancelled) return;
 
         markmapRef.current = Markmap.create(
           svgRef.current,
@@ -164,6 +175,18 @@ export function useMarkmapRenderer({
     };
 
     renderMindmap();
+
+    // Cleanup function - critical for React StrictMode and preventing double renders
+    return () => {
+      cancelled = true;
+      if (markmapRef.current) {
+        markmapRef.current.destroy();
+        markmapRef.current = null;
+      }
+      if (svgRef.current) {
+        svgRef.current.innerHTML = '';
+      }
+    };
   }, [
     nodes,
     title,
