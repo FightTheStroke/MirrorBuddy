@@ -1,13 +1,19 @@
+/**
+ * Adaptive Difficulty Client - Browser-side signal detection and submission
+ */
+
 import { logger } from '@/lib/logger';
 import type { AdaptiveSignalInput, AdaptiveSignalSource } from '@/types';
 
-const QUESTION_PATTERN = /\?|perche|come|quando|dove|spiega|puoi\s+mostrare/i;
+// Patterns handle both accented and non-accented versions
+const QUESTION_PATTERN = /\?|perch[eé]|come|quando|dove|spiega|puoi\s+mostrare/i;
 const REPEAT_PATTERNS = [
   /non\s+ho\s+capito/i,
-  /ripeti/i,
+  /ripet[ei]/i, // matches ripeti, ripete, ripetere
   /di\s+nuovo/i,
   /puoi\s+spiegare\s+ancora/i,
-  /non\s+mi\s+e\s+chiaro/i,
+  /non\s+mi\s+[eè]\s+chiaro/i,
+  /non\s+capisco/i,
 ];
 const FRUSTRATION_PATTERNS = [
   /non\s+ce\s+la\s+faccio/i,
@@ -15,6 +21,8 @@ const FRUSTRATION_PATTERNS = [
   /mi\s+stresso/i,
   /odio/i,
   /non\s+ci\s+riesco/i,
+  /[eè]\s+troppo\s+difficile/i,
+  /non\s+ne\s+posso\s+pi[uù]/i,
 ];
 
 export function buildSignalsFromText(
@@ -41,19 +49,67 @@ export function buildSignalsFromText(
   return signals;
 }
 
-export async function sendAdaptiveSignals(signals: AdaptiveSignalInput[]): Promise<void> {
-  if (signals.length === 0) return;
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1000;
 
-  try {
-    const response = await fetch('/api/adaptive/signals', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ signals }),
-    });
-    if (!response.ok) {
-      logger.debug('[AdaptiveDifficulty] Signal post failed', { status: response.status });
+async function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function sendAdaptiveSignals(
+  signals: AdaptiveSignalInput[],
+  options: { retries?: number } = {}
+): Promise<boolean> {
+  if (signals.length === 0) return true;
+
+  const maxRetries = options.retries ?? MAX_RETRIES;
+  let attempt = 0;
+
+  while (attempt <= maxRetries) {
+    try {
+      const response = await fetch('/api/adaptive/signals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signals }),
+      });
+
+      if (response.ok) {
+        return true;
+      }
+
+      // Non-retryable errors (client errors)
+      if (response.status >= 400 && response.status < 500) {
+        logger.warn('[AdaptiveDifficulty] Signal rejected by server', {
+          status: response.status,
+          signalCount: signals.length,
+        });
+        return false;
+      }
+
+      // Server error - retry
+      logger.debug('[AdaptiveDifficulty] Server error, will retry', {
+        status: response.status,
+        attempt: attempt + 1,
+        maxRetries,
+      });
+    } catch (error) {
+      // Network error - retry
+      logger.debug('[AdaptiveDifficulty] Network error, will retry', {
+        error: String(error),
+        attempt: attempt + 1,
+        maxRetries,
+      });
     }
-  } catch (error) {
-    logger.error('[AdaptiveDifficulty] Failed to send signals', { error: String(error) });
+
+    attempt++;
+    if (attempt <= maxRetries) {
+      await delay(RETRY_DELAY_MS * attempt);
+    }
   }
+
+  logger.error('[AdaptiveDifficulty] Failed to send signals after retries', {
+    signalCount: signals.length,
+    attempts: maxRetries + 1,
+  });
+  return false;
 }

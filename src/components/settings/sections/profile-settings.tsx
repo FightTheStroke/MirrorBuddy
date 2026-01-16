@@ -29,7 +29,7 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
     { value: 'primary', label: 'Scuola Primaria (6-10 anni)' },
     { value: 'middle', label: 'Scuola Media (11-13 anni)' },
     { value: 'high', label: 'Scuola Superiore (14-18 anni)' },
-    { value: 'university', label: 'Universita' },
+    { value: 'university', label: 'Università' },
     { value: 'adult', label: 'Formazione Continua' },
   ];
 
@@ -48,7 +48,7 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
     {
       value: 'balanced',
       label: 'Bilanciata',
-      description: 'Adatta ritmo e difficolta mantenendo stabilita',
+      description: 'Adatta ritmo e difficoltà mantenendo stabilità',
     },
     {
       value: 'automatic',
@@ -153,19 +153,19 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
             <h5 className="text-sm font-medium mb-2">Esempio di feedback:</h5>
             <p className="text-sm text-slate-600 dark:text-slate-400 italic">
               {profile.teachingStyle === 'super_encouraging' && (
-                '"Fantastico! Stai andando benissimo! Ogni errore e un passo verso il successo!"'
+                '"Fantastico! Stai andando benissimo! Ogni errore è un passo verso il successo!"'
               )}
               {profile.teachingStyle === 'encouraging' && (
                 '"Ottimo lavoro! Hai quasi ragione, prova a pensare un attimo..."'
               )}
               {(profile.teachingStyle === 'balanced' || !profile.teachingStyle) && (
-                '"Buon tentativo. C\'e un errore qui - ripassa il concetto e riprova."'
+                '"Buon tentativo. C\'è un errore qui - ripassa il concetto e riprova."'
               )}
               {profile.teachingStyle === 'strict' && (
                 '"Sbagliato. Hai saltato un passaggio fondamentale. Torna indietro e rifai."'
               )}
               {profile.teachingStyle === 'brutal' && (
-                '"No. Completamente sbagliato. Devi studiare di piu, non ci siamo proprio."'
+                '"No. Completamente sbagliato. Devi studiare di più, non ci siamo proprio."'
               )}
             </p>
           </div>
@@ -177,12 +177,12 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Gauge className="w-5 h-5 text-emerald-500" />
-            Difficolta Adattiva
+            Difficoltà Adattiva
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-slate-500">
-            I professori adattano difficolta e spiegazioni in base a segnali come domande,
+            I professori adattano difficoltà e spiegazioni in base a segnali come domande,
             tempi di risposta e bisogno di ripetizioni.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -215,7 +215,7 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Rivedi l&apos;introduzione a MirrorBuddy e scopri tutte le funzionalita disponibili.
+            Rivedi l&apos;introduzione a MirrorBuddy e scopri tutte le funzionalità disponibili.
           </p>
           <Button
             variant="outline"
