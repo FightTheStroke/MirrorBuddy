@@ -59,11 +59,30 @@ check_listeners() {
 
     for file in $add_listener_files; do
         if ! file_contains "$file" "removeEventListener"; then
-            # Exclude test files and type definitions
-            if [[ ! "$file" =~ \.test\. ]] && [[ ! "$file" =~ \.d\.ts ]]; then
-                echo -e "${YELLOW}  ⚠ $file has addEventListener without removeEventListener${NC}"
-                listener_warnings=$((listener_warnings + 1))
+            # Exclude known acceptable patterns:
+            # - Test files and type definitions
+            # - Audio generators (ScriptProcessorNode cleanup via disconnect)
+            # - Code generators (emit code with addEventListener, not actual listeners)
+            # - SSE/stream routes (cleanup via abort signal)
+            # - Global singletons (client-error-logger)
+            if [[ "$file" =~ \.test\. ]] || [[ "$file" =~ \.d\.ts ]]; then
+                continue
             fi
+            if [[ "$file" =~ audio/generators ]]; then
+                continue  # ScriptProcessorNode cleanup via disconnect()
+            fi
+            if [[ "$file" =~ demo-.*\.ts ]] || [[ "$file" =~ code-generator ]]; then
+                continue  # Code generators emit JS, not real listeners
+            fi
+            if [[ "$file" =~ /api/.*/route\.ts ]] && file_contains "$file" "abort"; then
+                continue  # API routes with abort signal cleanup
+            fi
+            if [[ "$file" =~ client-error-logger ]]; then
+                continue  # Intentional global singleton
+            fi
+
+            echo -e "${YELLOW}  ⚠ $file has addEventListener without removeEventListener${NC}"
+            listener_warnings=$((listener_warnings + 1))
         fi
     done
 
