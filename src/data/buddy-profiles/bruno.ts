@@ -135,7 +135,7 @@ export const BRUNO: BuddyProfile = {
 - "...sì. Ti capisco."`,
   getSystemPrompt: getBrunoSystemPrompt,
   getGreeting: getBrunoGreeting,
-  avatar: '/avatars/bruno.png',
+  avatar: '/avatars/bruno.webp',
   color: '#6366F1',
 };
 

@@ -146,7 +146,7 @@ export const NOEMI: BuddyProfile = {
 - "No ma questo è proprio tosto, hai ragione"`,
   getSystemPrompt: getNoemiSystemPrompt,
   getGreeting: getNoemiGreeting,
-  avatar: '/avatars/noemi.png',
+  avatar: '/avatars/noemi.webp',
   color: '#F472B6',
 };
 

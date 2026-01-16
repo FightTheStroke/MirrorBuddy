@@ -28,7 +28,7 @@ export const COACHES = [
   {
     id: 'roberto' as const,
     name: 'Roberto',
-    avatar: '/avatars/roberto.png',
+    avatar: '/avatars/roberto.webp',
     description: 'Giovane, calmo, rassicurante, paziente, affidabile',
     tagline: 'Calmo e rassicurante',
     color: 'from-blue-500 to-indigo-500',
@@ -39,7 +39,7 @@ export const COACHES = [
   {
     id: 'chiara' as const,
     name: 'Chiara',
-    avatar: '/avatars/chiara.png',
+    avatar: '/avatars/chiara.webp',
     description: 'Organizzata, metodica, fresca di studi, empatica',
     tagline: 'Appena laureata, ti capisce',
     color: 'from-violet-500 to-purple-500',
@@ -50,7 +50,7 @@ export const COACHES = [
   {
     id: 'andrea' as const,
     name: 'Andrea',
-    avatar: '/avatars/andrea.png',
+    avatar: '/avatars/andrea.webp',
     description: 'Sportiva, energica, pratica, motivazionale',
     tagline: 'Energia e pause attive',
     color: 'from-orange-500 to-amber-500',
@@ -86,7 +86,7 @@ export const BUDDIES = [
   {
     id: 'noemi' as const,
     name: 'Noemi',
-    avatar: '/avatars/noemi.png',
+    avatar: '/avatars/noemi.webp',
     description: 'Empatica, solare, accogliente, buona ascoltatrice',
     tagline: 'La tua amica che ti ascolta',
     color: 'from-purple-500 to-violet-500',
@@ -97,7 +97,7 @@ export const BUDDIES = [
   {
     id: 'enea' as const,
     name: 'Enea',
-    avatar: '/avatars/enea.png',
+    avatar: '/avatars/enea.webp',
     description: 'Allegro, positivo, spiritoso, energico',
     tagline: 'Ti tira su il morale',
     color: 'from-amber-500 to-yellow-500',
@@ -108,7 +108,7 @@ export const BUDDIES = [
   {
     id: 'bruno' as const,
     name: 'Bruno',
-    avatar: '/avatars/bruno.png',
+    avatar: '/avatars/bruno.webp',
     description: 'Riflessivo, calmo, profondo, buon ascoltatore',
     tagline: 'Ti ascolta davvero',
     color: 'from-indigo-500 to-blue-500',
@@ -119,7 +119,7 @@ export const BUDDIES = [
   {
     id: 'sofia' as const,
     name: 'Sofia',
-    avatar: '/avatars/sofia.png',
+    avatar: '/avatars/sofia.webp',
     description: 'Creativa, sognatrice, profonda, artistica',
     tagline: 'Vede le cose diversamente',
     color: 'from-pink-500 to-fuchsia-500',

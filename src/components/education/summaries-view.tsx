@@ -1,26 +1,10 @@
 'use client';
 
-/**
- * Summaries View Component
- * Displays saved summaries from the archive
- * Issue #70: Real-time summary tool
- */
-
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  FileText,
-  X,
-  Download,
-  Brain,
-  Layers,
-  Loader2,
-  MessageSquare,
-  Trash2,
-} from 'lucide-react';
+import { FileText, Loader2, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SummaryRenderer } from '@/components/tools/summary-renderer';
+import { Card, CardContent } from '@/components/ui/card';
 import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
 import { cn } from '@/lib/utils';
 import { useSavedTools, autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
@@ -32,6 +16,8 @@ import {
 import { toast } from '@/components/ui/toast';
 import type { SummaryData } from '@/types/tools';
 import type { Maestro } from '@/types';
+import { SummaryCard } from './summaries-view/summary-card';
+import { SummaryModal } from './summaries-view/summary-modal';
 
 interface SummariesViewProps {
   className?: string;
@@ -39,15 +25,17 @@ interface SummariesViewProps {
   initialMode?: 'voice' | 'chat' | null;
 }
 
+interface SelectedSummary {
+  id: string;
+  title: string;
+  data: SummaryData;
+  createdAt: Date;
+}
+
 export function SummariesView({ className, initialMaestroId, initialMode }: SummariesViewProps) {
   const { tools, loading, deleteTool } = useSavedTools('summary');
   const initialProcessed = useRef(false);
-  const [selectedSummary, setSelectedSummary] = useState<{
-    id: string;
-    title: string;
-    data: SummaryData;
-    createdAt: Date;
-  } | null>(null);
+  const [selectedSummary, setSelectedSummary] = useState<SelectedSummary | null>(null);
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
 
   // Auto-open maestro dialog when coming from Astuccio with parameters
@@ -61,13 +49,10 @@ export function SummariesView({ className, initialMaestroId, initialMode }: Summ
     }
   }, [initialMaestroId, initialMode]);
 
-  // Handle maestro selection (focus mode has been removed)
   const handleMaestroConfirm = useCallback((_maestro: Maestro, _mode: 'voice' | 'chat') => {
     setShowMaestroDialog(false);
-    // Focus mode has been removed
   }, []);
 
-  // Handle delete
   const handleDelete = useCallback(async (id: string) => {
     await deleteTool(id);
     if (selectedSummary?.id === id) {
@@ -75,13 +60,10 @@ export function SummariesView({ className, initialMaestroId, initialMode }: Summ
     }
   }, [deleteTool, selectedSummary]);
 
-  // Handle PDF export
   const handleExportPdf = useCallback((data: SummaryData) => {
     exportSummaryToPdf(data);
   }, []);
 
-  // Handle convert to mindmap
-  // BUG 29 FIX: Replace alert with toast notification
   const handleConvertToMindmap = useCallback(async (data: SummaryData) => {
     const result = convertSummaryToMindmap(data);
     const saved = await autoSaveMaterial('mindmap', result.topic, { nodes: result.nodes });
@@ -92,8 +74,6 @@ export function SummariesView({ className, initialMaestroId, initialMode }: Summ
     }
   }, []);
 
-  // Handle generate flashcards
-  // BUG 29 FIX: Replace alert with toast notification
   const handleGenerateFlashcards = useCallback(async (data: SummaryData) => {
     const result = generateFlashcardsFromSummary(data);
     const saved = await autoSaveMaterial('flashcard', result.topic, { cards: result.cards });
@@ -170,66 +150,23 @@ export function SummariesView({ className, initialMaestroId, initialMode }: Summ
           {tools.map((tool) => {
             const summaryData = tool.content as unknown as SummaryData;
             return (
-              <Card
+              <SummaryCard
                 key={tool.toolId}
-                className="cursor-pointer hover:shadow-lg transition-shadow group"
+                tool={tool}
                 onClick={() => setSelectedSummary({
                   id: tool.toolId,
                   title: tool.title || summaryData.topic || 'Riassunto',
                   data: summaryData,
                   createdAt: new Date(tool.createdAt),
                 })}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-base">
-                          {tool.title || summaryData.topic || 'Riassunto'}
-                        </CardTitle>
-                        <p className="text-xs text-slate-500">
-                          {new Date(tool.createdAt).toLocaleDateString('it-IT')}
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDelete(tool.toolId);
-                      }}
-                      className="p-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-1.5">
-                    {summaryData.sections?.slice(0, 3).map((section, i) => (
-                      <span
-                        key={i}
-                        className="px-2 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
-                      >
-                        {section.title}
-                      </span>
-                    ))}
-                    {(summaryData.sections?.length || 0) > 3 && (
-                      <span className="px-2 py-1 text-xs rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">
-                        +{(summaryData.sections?.length || 0) - 3}
-                      </span>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                onDelete={handleDelete}
+              />
             );
           })}
         </div>
       )}
 
-      {/* View summary modal */}
+      {/* Summary modal */}
       <AnimatePresence>
         {selectedSummary && (
           <motion.div
@@ -239,59 +176,14 @@ export function SummariesView({ className, initialMaestroId, initialMode }: Summ
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
             onClick={() => setSelectedSummary(null)}
           >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
-            >
-              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-                <div className="flex items-center gap-3">
-                  <FileText className="w-6 h-6 text-emerald-600" />
-                  <h3 className="text-xl font-bold">{selectedSummary.title}</h3>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleExportPdf(selectedSummary.data)}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleConvertToMindmap(selectedSummary.data)}
-                  >
-                    <Brain className="w-4 h-4 mr-2" />
-                    Mappa
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleGenerateFlashcards(selectedSummary.data)}
-                  >
-                    <Layers className="w-4 h-4 mr-2" />
-                    Flashcard
-                  </Button>
-                  <button
-                    onClick={() => setSelectedSummary(null)}
-                    className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-              <div className="flex-1 overflow-auto">
-                <SummaryRenderer
-                  title={selectedSummary.data.topic}
-                  sections={selectedSummary.data.sections}
-                  length={selectedSummary.data.length}
-                />
-              </div>
-            </motion.div>
+            <SummaryModal
+              title={selectedSummary.title}
+              data={selectedSummary.data}
+              onClose={() => setSelectedSummary(null)}
+              onExportPdf={handleExportPdf}
+              onConvertToMindmap={handleConvertToMindmap}
+              onGenerateFlashcards={handleGenerateFlashcards}
+            />
           </motion.div>
         )}
       </AnimatePresence>

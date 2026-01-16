@@ -1,32 +1,14 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Calendar,
-  Plus,
-  Trash2,
-  Edit2,
-  Clock,
-  BookOpen,
-  X,
-  Check,
-} from 'lucide-react';
+import { Calendar, Plus, Trash2, Edit2, Clock, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { ScheduledSession, DayOfWeek } from '@/lib/scheduler/types';
 import { maestri } from '@/data/maestri';
 import { DAYS_OF_WEEK, SUBJECTS, TIME_OPTIONS } from './weekly-schedule/constants';
-
-const DURATION_OPTIONS = [
-  { value: 15, label: '15 min' },
-  { value: 30, label: '30 min' },
-  { value: 45, label: '45 min' },
-  { value: 60, label: '1 ora' },
-  { value: 90, label: '1h 30m' },
-  { value: 120, label: '2 ore' },
-];
+import { SessionForm, INITIAL_FORM } from './weekly-schedule/session-form';
 
 interface WeeklyScheduleProps {
   sessions: ScheduledSession[];

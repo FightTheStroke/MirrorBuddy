@@ -14,14 +14,14 @@ import type {
 
 const CHARACTER_AVATARS: Record<string, string> = {
   mario: '/avatars/mario.jpg',
-  noemi: '/avatars/noemi.png',
-  enea: '/avatars/enea.png',
-  bruno: '/avatars/bruno.png',
-  sofia: '/avatars/sofia.png',
+  noemi: '/avatars/noemi.webp',
+  enea: '/avatars/enea.webp',
+  bruno: '/avatars/bruno.webp',
+  sofia: '/avatars/sofia.webp',
   melissa: '/avatars/melissa.jpg',
-  roberto: '/avatars/roberto.png',
-  chiara: '/avatars/chiara.png',
-  andrea: '/avatars/andrea.png',
+  roberto: '/avatars/roberto.webp',
+  chiara: '/avatars/chiara.webp',
+  andrea: '/avatars/andrea.webp',
   favij: '/avatars/favij.jpg',
 };
 

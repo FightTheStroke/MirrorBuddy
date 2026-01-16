@@ -23,7 +23,7 @@ const mockMaestro: Maestro = {
   id: 'galileo',
   name: 'Galileo',
   subject: 'physics',
-  avatar: '/images/maestri/galileo.png',
+  avatar: '/maestri/galileo.webp',
   color: '#FF6B6B',
   systemPrompt: 'You are Galileo...',
   specialty: 'astronomy',

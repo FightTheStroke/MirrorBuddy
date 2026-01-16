@@ -7,6 +7,11 @@
 
 import { logger } from '@/lib/logger';
 import { invalidateCache } from './transport-selector';
+import {
+  calculateAverageLatency,
+  isLatencySpike,
+  appendToHistory,
+} from './transport-monitor-helpers';
 
 /**
  * Connection quality metrics
@@ -131,7 +136,7 @@ export class TransportMonitor {
     this.metrics.avgLatencyMs = this.calculateAvgLatency();
 
     // Check for latency spike
-    if (this.isLatencySpike(latencyMs)) {
+    if (this.isLatencySpikeDetected(latencyMs)) {
       this.metrics.latencySpikes++;
       logger.warn('[TransportMonitor] Latency spike detected', {
         latencyMs,
@@ -254,24 +259,16 @@ export class TransportMonitor {
   // ============================================================================
 
   private calculateAvgLatency(): number {
-    if (this.latencyHistory.length === 0) return 0;
-    const sum = this.latencyHistory.reduce((a, b) => a + b, 0);
-    return sum / this.latencyHistory.length;
+    return calculateAverageLatency(this.latencyHistory);
   }
 
-  private isLatencySpike(latencyMs: number): boolean {
-    // Need some history first
-    if (this.latencyHistory.length < 3) return false;
-
-    // Check if latency exceeds absolute threshold
-    if (latencyMs > this.config.latencySpikeThresholdMs) return true;
-
-    // Check if latency exceeds multiplier of average
-    const avgWithoutCurrent = this.latencyHistory
-      .slice(0, -1)
-      .reduce((a, b) => a + b, 0) / (this.latencyHistory.length - 1);
-
-    return latencyMs > avgWithoutCurrent * this.config.latencySpikeMultiplier;
+  private isLatencySpikeDetected(latencyMs: number): boolean {
+    return isLatencySpike(
+      latencyMs,
+      this.latencyHistory,
+      this.config.latencySpikeThresholdMs,
+      this.config.latencySpikeMultiplier
+    );
   }
 
   private emitDegradation(reason: DegradationEvent['reason']): void {
@@ -312,28 +309,5 @@ export class TransportMonitor {
   };
 }
 
-// ============================================================================
-// Singleton Instance
-// ============================================================================
-
-let monitorInstance: TransportMonitor | null = null;
-
-/**
- * Get the singleton TransportMonitor instance
- */
-export function getTransportMonitor(): TransportMonitor {
-  if (!monitorInstance) {
-    monitorInstance = new TransportMonitor();
-  }
-  return monitorInstance;
-}
-
-/**
- * Reset the singleton instance (for testing)
- */
-export function resetTransportMonitor(): void {
-  if (monitorInstance) {
-    monitorInstance.destroy();
-    monitorInstance = null;
-  }
-}
+// Re-export singleton functions
+export { getTransportMonitor, resetTransportMonitor } from './transport-monitor-singleton';

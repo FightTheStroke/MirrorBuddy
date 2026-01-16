@@ -82,7 +82,7 @@ export const ANDREA: SupportTeacher = {
   }),
   greeting:
     'Ehi! Sono Andrea. Studiare è come allenarsi: con il metodo giusto, ce la fai! Pronto/a a partire?',
-  avatar: '/avatars/andrea.png',
+  avatar: '/avatars/andrea.webp',
   color: '#F97316',
 };
 

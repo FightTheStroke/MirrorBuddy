@@ -22,12 +22,10 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type {
-  StudentInsights,
-  MaestroObservation,
-  LearningStrategy,
-} from '@/types';
+import type { StudentInsights } from '@/types';
 import { CATEGORY_LABELS } from './parent-dashboard/constants';
+import { ObservationCard } from './parent-dashboard/observation-card';
+import { StrategyCard } from './parent-dashboard/strategy-card';
 
 // Learning channel icons and labels
 const CHANNEL_CONFIG = {
@@ -307,113 +305,3 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
   );
 }
 
-// Observation card component
-function ObservationCard({
-  observation,
-  isStrength,
-  showPriority = false,
-  priorityLevel = 'medium',
-}: {
-  observation: MaestroObservation;
-  isStrength: boolean;
-  showPriority?: boolean;
-  priorityLevel?: 'high' | 'medium' | 'low';
-}) {
-  const priorityConfig = {
-    high: {
-      label: 'Priorita Alta',
-      className: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800',
-    },
-    medium: {
-      label: 'Priorita Media',
-      className: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800',
-    },
-    low: {
-      label: 'Priorita Bassa',
-      className: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800',
-    },
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        'p-3 rounded-lg border',
-        isStrength
-          ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800'
-          : 'bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800',
-        showPriority && priorityLevel === 'high' && 'ring-2 ring-red-300 dark:ring-red-700'
-      )}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className={cn(
-              'text-xs font-medium px-2 py-0.5 rounded-full',
-              isStrength
-                ? 'bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200'
-                : 'bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200'
-            )}>
-              {CATEGORY_LABELS[observation.category]}
-            </span>
-            {showPriority && !isStrength && (
-              <span className={cn(
-                'text-xs font-medium px-2 py-0.5 rounded-full border',
-                priorityConfig[priorityLevel].className
-              )}>
-                {priorityConfig[priorityLevel].label}
-              </span>
-            )}
-          </div>
-          <p className="text-sm mt-2 text-slate-700 dark:text-slate-300">
-            {observation.observation}
-          </p>
-        </div>
-      </div>
-      <p className="text-xs text-slate-500 mt-2">
-        Osservato da {observation.maestroName}
-      </p>
-    </motion.div>
-  );
-}
-
-// Strategy card component
-function StrategyCard({ strategy }: { strategy: LearningStrategy }) {
-  const priorityColors = {
-    high: 'border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/10',
-    medium: 'border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/10',
-    low: 'border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/10',
-  };
-
-  const priorityLabels = {
-    high: 'Priorita Alta',
-    medium: 'Priorita Media',
-    low: 'Priorita Bassa',
-  };
-
-  return (
-    <div className={cn('p-4 rounded-lg border', priorityColors[strategy.priority])}>
-      <div className="flex items-start justify-between gap-2 mb-2">
-        <h4 className="font-medium text-slate-900 dark:text-white">{strategy.title}</h4>
-        <span className="text-xs text-slate-500">{priorityLabels[strategy.priority]}</span>
-      </div>
-      <p className="text-sm text-slate-600 dark:text-slate-400">{strategy.description}</p>
-      {strategy.forAreas.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-3">
-          {strategy.forAreas.map((area) => (
-            <span
-              key={area}
-              className="text-xs px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300"
-            >
-              {CATEGORY_LABELS[area]}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// Export index
-export { ParentDashboard as default };

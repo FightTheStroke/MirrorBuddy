@@ -21,6 +21,7 @@ import {
   createPlaybackAnalyser,
   createAndConnectGainNode,
 } from './audio-context-init';
+import { calculateAverageLevel, shouldUpdateLevel } from './audio-polling-helpers';
 
 export type { AudioPlaybackRefs, PollingControls };
 
@@ -193,33 +194,16 @@ export function useOutputLevelPolling(
     }
 
     // Throttle to ~30fps (33ms) - sufficient for audio visualization
-    const now = performance.now();
-    if (now - lastUpdateRef.current < 33) {
+    if (!shouldUpdateLevel(lastUpdateRef)) {
       animationFrameRef.current = requestAnimationFrame(() => {
         if (pollLevelRef.current) pollLevelRef.current();
       });
       return;
     }
-    lastUpdateRef.current = now;
 
-    // Initialize data array if needed
-    if (!dataArrayRef.current || dataArrayRef.current.length !== analyser.frequencyBinCount) {
-      dataArrayRef.current = new Uint8Array(analyser.frequencyBinCount);
-    }
-
-    // Get frequency data from analyser
-    analyser.getByteFrequencyData(dataArrayRef.current);
-
-    // Calculate average level
-    let sum = 0;
-    for (let i = 0; i < dataArrayRef.current.length; i++) {
-      sum += dataArrayRef.current[i];
-    }
-    const average = sum / dataArrayRef.current.length;
-
-    // Scale and set output level (0-1 range)
-    // Multiply by 2 for better visualization sensitivity
-    setOutputLevel(Math.min(1, (average / 255) * 2.5));
+    // Calculate and set output level
+    const level = calculateAverageLevel(analyser);
+    setOutputLevel(level);
 
     // Continue polling
     animationFrameRef.current = requestAnimationFrame(() => {

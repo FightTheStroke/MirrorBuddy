@@ -2,12 +2,13 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, Lightbulb, ArrowRight, Trophy, RotateCcw } from 'lucide-react';
+import { CheckCircle, XCircle, Lightbulb, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { Quiz as QuizType, QuizResult } from '@/types';
+import { QuizHeader } from './quiz/quiz-header';
+import { QuizCompletion } from './quiz/quiz-completion';
 
 interface QuizProps {
   quiz: QuizType;
@@ -25,7 +26,6 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
   const [isComplete, setIsComplete] = useState(false);
   const startTimeRef = useRef(0);
 
-  // Set start time on mount (avoid impure Date.now() during render)
   useEffect(() => {
     startTimeRef.current = Date.now();
   }, []);
@@ -41,9 +41,7 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
   const handleSubmit = useCallback(() => {
     if (selectedAnswer === null) return;
     setShowResult(true);
-
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
-    if (isCorrect) {
+    if (selectedAnswer === currentQuestion.correctAnswer) {
       setCorrectCount(prev => prev + 1);
     }
   }, [selectedAnswer, currentQuestion.correctAnswer]);
@@ -55,11 +53,9 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
       setShowResult(false);
       setShowHint(false);
     } else {
-      // Quiz complete
       const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
       const score = Math.round((correctCount / quiz.questions.length) * 100);
       const xpEarned = Math.round(quiz.xpReward * (score / 100) * (1 - hintsUsed * 0.1));
-
       const result: QuizResult = {
         quizId: quiz.id,
         score,
@@ -70,7 +66,6 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
         xpEarned: Math.max(0, xpEarned),
         completedAt: new Date(),
       };
-
       setIsComplete(true);
       onComplete(result);
     }
@@ -87,62 +82,26 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
 
   if (isComplete) {
     const score = Math.round((correctCount / quiz.questions.length) * 100);
-    const passed = score >= quiz.masteryThreshold;
-
     return (
-      <Card className="w-full">
-        <CardContent className="p-6 sm:p-8 text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-          >
-            <div className={cn(
-              'w-24 h-24 mx-auto rounded-full flex items-center justify-center mb-6',
-              passed ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'
-            )}>
-              <Trophy className="w-12 h-12" />
-            </div>
-          </motion.div>
-
-          <h2 className="text-2xl font-bold mb-2">
-            {passed ? 'Ottimo lavoro!' : 'Continua a esercitarti!'}
-          </h2>
-          <p className="text-slate-600 dark:text-slate-400 mb-6">
-            Hai risposto correttamente a {correctCount} domande su {quiz.questions.length}
-          </p>
-
-          <div className="text-5xl font-bold mb-6" style={{ color: passed ? '#22c55e' : '#f59e0b' }}>
-            {score}%
-          </div>
-
-          <div className="flex justify-center gap-4">
-            <Button variant="outline" onClick={onClose}>
-              <RotateCcw className="w-4 h-4 mr-2" />
-              Riprova
-            </Button>
-            <Button onClick={onClose}>
-              Continua
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <QuizCompletion
+        score={score}
+        correctCount={correctCount}
+        totalQuestions={quiz.questions.length}
+        masteryThreshold={quiz.masteryThreshold}
+        onRetry={onClose}
+        onClose={onClose}
+      />
     );
   }
 
   return (
     <Card className="w-full">
-      <CardHeader className="px-4 sm:px-6">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-slate-500">
-            Domanda {currentIndex + 1} di {quiz.questions.length}
-          </span>
-          <span className="text-sm font-medium text-blue-600">
-            {correctCount} corrette
-          </span>
-        </div>
-        <Progress value={progress} className="h-2" />
-      </CardHeader>
+      <QuizHeader
+        currentIndex={currentIndex}
+        totalQuestions={quiz.questions.length}
+        correctCount={correctCount}
+        progress={progress}
+      />
 
       <CardContent className="p-4 sm:p-6">
         <AnimatePresence mode="wait">
@@ -155,6 +114,7 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
           >
             <h3 className="text-xl font-semibold mb-6">{currentQuestion.text}</h3>
 
+            {/* Answer options */}
             <div className="space-y-3 mb-6">
               {currentQuestion.options?.map((option, index) => (
                 <motion.button
@@ -213,7 +173,7 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
               </div>
             )}
 
-            {/* Explanation (after answer) */}
+            {/* Explanation */}
             {showResult && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}

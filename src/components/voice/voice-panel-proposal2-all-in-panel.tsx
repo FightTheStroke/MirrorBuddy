@@ -1,21 +1,18 @@
 'use client';
 
-/**
- * PROPOSTA 2: Tutto nella barra della chiamata vocale
- * 
- * Tutti i controlli audio (visualizzatore, mute, device selector, TTS, clear, close)
- * sono consolidati nel VoicePanel laterale quando la chiamata è attiva.
- * Mantiene il layout side-by-side ma con tutti i controlli nel pannello laterale.
- */
-
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Mic, MicOff, PhoneOff, Volume2, VolumeX, RotateCcw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { cn } from '@/lib/utils';
+import { VisualizerBar } from './voice-panel-proposal2/visualizer-bar';
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
+
+function isHexColor(color: string): boolean {
+  return color.startsWith('#');
+}
 
 export interface VoicePanelProposal2Character {
   name: string;
@@ -63,6 +60,14 @@ export function VoicePanelProposal2({
   onClearChat,
   onClose,
 }: VoicePanelProposal2Props) {
+  const backgroundStyle = isHexColor(character.color)
+    ? { background: `linear-gradient(to bottom, ${character.color}, ${character.color}dd)` }
+    : undefined;
+
+  const backgroundClass = !isHexColor(character.color)
+    ? `bg-gradient-to-b ${character.color}`
+    : '';
+
   const getStatusText = () => {
     if (configError) return configError;
     if (connectionState === 'connecting') return 'Connessione...';
@@ -71,14 +76,6 @@ export function VoicePanelProposal2({
     if (isConnected) return 'Connesso';
     return 'Avvio chiamata...';
   };
-
-  const backgroundStyle = isHexColor(character.color)
-    ? { background: `linear-gradient(to bottom, ${character.color}, ${character.color}dd)` }
-    : undefined;
-
-  const backgroundClass = !isHexColor(character.color)
-    ? `bg-gradient-to-b ${character.color}`
-    : '';
 
   return (
     <motion.div
@@ -136,52 +133,18 @@ export function VoicePanelProposal2({
         {/* Audio visualizer */}
         {isConnected && (
           <div className="flex items-center gap-1.5 h-10 px-2">
-            {VISUALIZER_BAR_OFFSETS.map((offset, i) => {
-              const baseHeight = 8;
-              
-              const getBarStyle = () => {
-                const variance = 1 + (offset % 3) * 0.15;
-                
-                if (isSpeaking) {
-                  const level = outputLevel * variance;
-                  return {
-                    height: baseHeight + level * 28,
-                    opacity: 0.4 + level * 0.6,
-                  };
-                }
-                if (isListening && !isMuted) {
-                  const level = inputLevel * variance;
-                  return {
-                    height: baseHeight + level * 32,
-                    opacity: 0.3 + level * 0.7,
-                  };
-                }
-                return { height: baseHeight, opacity: 0.2 };
-              };
-
-              const style = getBarStyle();
-
-              return (
-                <motion.div
-                  key={i}
-                  initial={false}
-                  animate={{ 
-                    height: style.height,
-                    opacity: style.opacity,
-                    scaleY: isSpeaking || (isListening && !isMuted) ? 1 : 0.8,
-                  }}
-                  transition={{ duration: 0.06, ease: 'easeOut' }}
-                  className={cn(
-                    "w-2 rounded-full",
-                    isSpeaking 
-                      ? "bg-gradient-to-t from-white/60 to-white" 
-                      : isListening && !isMuted 
-                        ? "bg-gradient-to-t from-white/40 to-white/90" 
-                        : "bg-white/20"
-                  )}
-                />
-              );
-            })}
+            {VISUALIZER_BAR_OFFSETS.map((offset, i) => (
+              <VisualizerBar
+                key={i}
+                offset={offset}
+                isSpeaking={isSpeaking}
+                isListening={isListening}
+                isMuted={isMuted}
+                inputLevel={inputLevel}
+                outputLevel={outputLevel}
+                index={i}
+              />
+            ))}
           </div>
         )}
       </div>

@@ -16,6 +16,27 @@ import type {
 } from '@/lib/scheduler/types';
 import { DEFAULT_SCHEDULER_CONFIG } from '@/lib/scheduler/types';
 import type { UseSchedulerOptions, UseSchedulerReturn } from './use-scheduler/types';
+import {
+  fetchScheduleAPI,
+  createSessionAPI,
+  updateSessionAPI,
+  deleteSessionAPI,
+  createReminderAPI,
+  updateReminderAPI,
+  deleteReminderAPI,
+  updatePreferencesAPI,
+  checkDueItemsAPI,
+} from './use-scheduler/scheduler-api';
+import {
+  setupPeriodicChecking,
+  addSessionToSchedule,
+  updateSessionInSchedule,
+  removeSessionFromSchedule,
+  addReminderToSchedule,
+  updateReminderInSchedule,
+  removeReminderFromSchedule,
+  updatePreferencesInSchedule,
+} from './use-scheduler/scheduler-effects';
 
 export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerReturn {
   const {
@@ -37,22 +58,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
     setError(null);
 
     try {
-      const response = await fetch('/api/scheduler');
-
-      if (response.status === 401) {
-        setIsAuthenticated(false);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch schedule');
-      }
-
-      const data = await response.json();
+      const data = await fetchScheduleAPI();
       setSchedule(data);
       setIsAuthenticated(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch schedule');
+      const message = err instanceof Error ? err.message : 'Failed to fetch schedule';
+      if (message === 'UNAUTHORIZED') {
+        setIsAuthenticated(false);
+      } else {
+        setError(message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -62,33 +77,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const createSession = useCallback(
     async (data: Omit<ScheduledSession, 'id' | 'userId'>): Promise<ScheduledSession | null> => {
       try {
-        const response = await fetch('/api/scheduler', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'session', ...data }),
-        });
-
-        if (response.status === 401) {
-          setIsAuthenticated(false);
-          return null;
-        }
-
-        if (!response.ok) throw new Error('Failed to create session');
-
-        const session = await response.json();
-
-        // Update local state
-        setSchedule((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            weeklyPlan: [...prev.weeklyPlan, session],
-          };
-        });
-
+        const session = await createSessionAPI(data);
+        setSchedule((prev) => addSessionToSchedule(prev, session));
         return session;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to create session');
+        const message = err instanceof Error ? err.message : 'Failed to create session';
+        if (message === 'UNAUTHORIZED') {
+          setIsAuthenticated(false);
+        } else {
+          setError(message);
+        }
         return null;
       }
     },
@@ -99,33 +97,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const updateSession = useCallback(
     async (id: string, data: Partial<ScheduledSession>): Promise<ScheduledSession | null> => {
       try {
-        const response = await fetch('/api/scheduler', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'session', id, ...data }),
-        });
-
-        if (response.status === 401) {
-          setIsAuthenticated(false);
-          return null;
-        }
-
-        if (!response.ok) throw new Error('Failed to update session');
-
-        const session = await response.json();
-
-        // Update local state
-        setSchedule((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            weeklyPlan: prev.weeklyPlan.map((s) => (s.id === id ? session : s)),
-          };
-        });
-
+        const session = await updateSessionAPI(id, data);
+        setSchedule((prev) => updateSessionInSchedule(prev, id, session));
         return session;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to update session');
+        const message = err instanceof Error ? err.message : 'Failed to update session';
+        if (message === 'UNAUTHORIZED') {
+          setIsAuthenticated(false);
+        } else {
+          setError(message);
+        }
         return null;
       }
     },
@@ -136,29 +117,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const deleteSession = useCallback(
     async (id: string): Promise<boolean> => {
       try {
-        const response = await fetch(`/api/scheduler?type=session&id=${id}`, {
-          method: 'DELETE',
-        });
-
-        if (response.status === 401) {
-          setIsAuthenticated(false);
-          return false;
-        }
-
-        if (!response.ok) throw new Error('Failed to delete session');
-
-        // Update local state
-        setSchedule((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            weeklyPlan: prev.weeklyPlan.filter((s) => s.id !== id),
-          };
-        });
-
+        await deleteSessionAPI(id);
+        setSchedule((prev) => removeSessionFromSchedule(prev, id));
         return true;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to delete session');
+        const message = err instanceof Error ? err.message : 'Failed to delete session';
+        if (message === 'UNAUTHORIZED') {
+          setIsAuthenticated(false);
+        } else {
+          setError(message);
+        }
         return false;
       }
     },
@@ -169,33 +137,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const createReminder = useCallback(
     async (data: Omit<CustomReminder, 'id' | 'userId' | 'createdAt'>): Promise<CustomReminder | null> => {
       try {
-        const response = await fetch('/api/scheduler', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'reminder', ...data }),
-        });
-
-        if (response.status === 401) {
-          setIsAuthenticated(false);
-          return null;
-        }
-
-        if (!response.ok) throw new Error('Failed to create reminder');
-
-        const reminder = await response.json();
-
-        // Update local state
-        setSchedule((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            customReminders: [...prev.customReminders, reminder],
-          };
-        });
-
+        const reminder = await createReminderAPI(data);
+        setSchedule((prev) => addReminderToSchedule(prev, reminder));
         return reminder;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to create reminder');
+        const message = err instanceof Error ? err.message : 'Failed to create reminder';
+        if (message === 'UNAUTHORIZED') {
+          setIsAuthenticated(false);
+        } else {
+          setError(message);
+        }
         return null;
       }
     },
@@ -206,33 +157,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const updateReminder = useCallback(
     async (id: string, data: Partial<CustomReminder>): Promise<CustomReminder | null> => {
       try {
-        const response = await fetch('/api/scheduler', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'reminder', id, ...data }),
-        });
-
-        if (response.status === 401) {
-          setIsAuthenticated(false);
-          return null;
-        }
-
-        if (!response.ok) throw new Error('Failed to update reminder');
-
-        const reminder = await response.json();
-
-        // Update local state
-        setSchedule((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            customReminders: prev.customReminders.map((r) => (r.id === id ? reminder : r)),
-          };
-        });
-
+        const reminder = await updateReminderAPI(id, data);
+        setSchedule((prev) => updateReminderInSchedule(prev, id, reminder));
         return reminder;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to update reminder');
+        const message = err instanceof Error ? err.message : 'Failed to update reminder';
+        if (message === 'UNAUTHORIZED') {
+          setIsAuthenticated(false);
+        } else {
+          setError(message);
+        }
         return null;
       }
     },
@@ -243,29 +177,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const deleteReminder = useCallback(
     async (id: string): Promise<boolean> => {
       try {
-        const response = await fetch(`/api/scheduler?type=reminder&id=${id}`, {
-          method: 'DELETE',
-        });
-
-        if (response.status === 401) {
-          setIsAuthenticated(false);
-          return false;
-        }
-
-        if (!response.ok) throw new Error('Failed to delete reminder');
-
-        // Update local state
-        setSchedule((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            customReminders: prev.customReminders.filter((r) => r.id !== id),
-          };
-        });
-
+        await deleteReminderAPI(id);
+        setSchedule((prev) => removeReminderFromSchedule(prev, id));
         return true;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to delete reminder');
+        const message = err instanceof Error ? err.message : 'Failed to delete reminder';
+        if (message === 'UNAUTHORIZED') {
+          setIsAuthenticated(false);
+        } else {
+          setError(message);
+        }
         return false;
       }
     },
@@ -276,30 +197,16 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const updatePreferences = useCallback(
     async (prefs: Partial<NotificationPreferences>): Promise<boolean> => {
       try {
-        const response = await fetch('/api/scheduler', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'preferences', ...prefs }),
-        });
-
-        if (response.status === 401) {
-          setIsAuthenticated(false);
-          return false;
-        }
-
-        if (!response.ok) throw new Error('Failed to update preferences');
-
-        const { preferences } = await response.json();
-
-        // Update local state
-        setSchedule((prev) => {
-          if (!prev) return prev;
-          return { ...prev, preferences };
-        });
-
+        const preferences = await updatePreferencesAPI(prefs);
+        setSchedule((prev) => updatePreferencesInSchedule(prev, preferences));
         return true;
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to update preferences');
+        const message = err instanceof Error ? err.message : 'Failed to update preferences';
+        if (message === 'UNAUTHORIZED') {
+          setIsAuthenticated(false);
+        } else {
+          setError(message);
+        }
         return false;
       }
     },
@@ -309,21 +216,12 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   // Check for due items
   const checkDue = useCallback(async () => {
     try {
-      const response = await fetch('/api/scheduler/check-due', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: '{}',
-      });
-
-      if (response.status === 401) {
+      return await checkDueItemsAPI();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to check due items';
+      if (message === 'UNAUTHORIZED') {
         setIsAuthenticated(false);
-        return { notificationsCreated: 0, types: [] };
       }
-
-      if (!response.ok) throw new Error('Failed to check due items');
-
-      return await response.json();
-    } catch {
       return { notificationsCreated: 0, types: [] };
     }
   }, []);
@@ -342,14 +240,11 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
     // Initial check
     checkDue();
 
-    // Setup interval
+    // Setup interval with helper
+    const cleanup = setupPeriodicChecking(checkDue, checkInterval);
     checkIntervalRef.current = setInterval(checkDue, checkInterval);
 
-    return () => {
-      if (checkIntervalRef.current) {
-        clearInterval(checkIntervalRef.current);
-      }
-    };
+    return cleanup;
   }, [autoCheck, isAuthenticated, checkInterval, checkDue]);
 
   return {

@@ -55,7 +55,7 @@ export const ROBERTO: SupportTeacher = {
       'Roberto è il coach alternativo (opzione maschile). Calma utile per studenti ansiosi. Focus su metodo e autonomia.',
   }),
   greeting: 'Ciao! Sono Roberto. Dimmi pure cosa stai studiando, ci lavoriamo insieme.',
-  avatar: '/avatars/roberto.png',
+  avatar: '/avatars/roberto.webp',
   color: '#3B82F6',
 };
 

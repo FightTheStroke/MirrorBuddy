@@ -135,7 +135,7 @@ export const ENEA: BuddyProfile = {
 - "No ma sul serio - sei forte, eh"`,
   getSystemPrompt: getEneaSystemPrompt,
   getGreeting: getEneaGreeting,
-  avatar: '/avatars/enea.png',
+  avatar: '/avatars/enea.webp',
   color: '#F59E0B',
 };
 

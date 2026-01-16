@@ -72,7 +72,7 @@ export function DiaryEntryCard({
               <div className="relative flex-shrink-0">
                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md">
                   <Image
-                    src={maestro?.avatar || `/maestri/${entry.maestroId}.png`}
+                    src={maestro?.avatar || `/maestri/${entry.maestroId}.webp`}
                     alt={maestro?.displayName || entry.maestroName}
                     width={48}
                     height={48}

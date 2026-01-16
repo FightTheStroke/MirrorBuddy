@@ -191,7 +191,7 @@ export function ParentProfessorChat({
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-md">
                     <Image
-                      src={maestro?.avatar || `/maestri/${maestroId}.png`}
+                      src={maestro?.avatar || `/maestri/${maestroId}.webp`}
                       alt={maestroName}
                       width={48}
                       height={48}

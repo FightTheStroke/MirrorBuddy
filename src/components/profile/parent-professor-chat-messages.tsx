@@ -74,7 +74,7 @@ export function ChatMessages({
             {message.role === 'assistant' && (
               <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                 <Image
-                  src={maestro?.avatar || `/maestri/${maestroId}.png`}
+                  src={maestro?.avatar || `/maestri/${maestroId}.webp`}
                   alt={maestroName}
                   width={32}
                   height={32}
@@ -113,7 +113,7 @@ export function ChatMessages({
         <div className="flex gap-3 justify-start">
           <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
             <Image
-              src={maestro?.avatar || `/maestri/${maestroId}.png`}
+              src={maestro?.avatar || `/maestri/${maestroId}.webp`}
               alt={maestroName}
               width={32}
               height={32}

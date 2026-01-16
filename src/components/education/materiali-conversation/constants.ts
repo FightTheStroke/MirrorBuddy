@@ -9,7 +9,7 @@ import type { Character } from './types';
 export const DEFAULT_MELISSA: Character = {
   id: 'melissa',
   name: 'Melissa',
-  avatar: '/images/characters/melissa.png',
+  avatar: '/avatars/melissa.jpg',
   color: '#EC4899',
   role: 'learning_coach',
   greeting: 'Ciao! Sono Melissa, la tua coach di studio. Come posso aiutarti oggi?',

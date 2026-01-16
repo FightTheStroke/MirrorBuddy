@@ -9,6 +9,12 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { DEFAULT_NOTIFICATION_PREFERENCES, type NotificationPreferences } from '@/lib/scheduler/types';
+import {
+  createScheduleSessionData,
+  createReminderData,
+  updateSessionData,
+  updateReminderData,
+} from './helpers';
 
 // GET - Get user's study schedule
 export async function GET(request: Request) {
@@ -107,19 +113,12 @@ export async function POST(request: Request) {
 
     if (type === 'session') {
       // Create scheduled session
+      const sessionData = createScheduleSessionData(data);
       const session = await prisma.scheduledSession.create({
         data: {
           userId,
           scheduleId: schedule.id,
-          dayOfWeek: data.dayOfWeek,
-          time: data.time,
-          duration: data.duration || 30,
-          subject: data.subject,
-          maestroId: data.maestroId,
-          topic: data.topic,
-          active: true,
-          reminderOffset: data.reminderOffset || 5,
-          repeat: data.repeat || 'weekly',
+          ...sessionData,
         },
       });
 
@@ -129,16 +128,12 @@ export async function POST(request: Request) {
 
     if (type === 'reminder') {
       // Create custom reminder
+      const reminderData = createReminderData(data);
       const reminder = await prisma.customReminder.create({
         data: {
           userId,
           scheduleId: schedule.id,
-          datetime: new Date(data.datetime),
-          message: data.message,
-          subject: data.subject,
-          maestroId: data.maestroId,
-          repeat: data.repeat || 'none',
-          active: true,
+          ...reminderData,
         },
       });
 
@@ -193,19 +188,10 @@ export async function PATCH(request: Request) {
 
     if (type === 'session' && id) {
       // Update session
+      const sessionData = updateSessionData(data);
       const session = await prisma.scheduledSession.update({
         where: { id, userId },
-        data: {
-          dayOfWeek: data.dayOfWeek,
-          time: data.time,
-          duration: data.duration,
-          subject: data.subject,
-          maestroId: data.maestroId,
-          topic: data.topic,
-          active: data.active,
-          reminderOffset: data.reminderOffset,
-          repeat: data.repeat,
-        },
+        data: sessionData,
       });
 
       return NextResponse.json(session);
@@ -213,16 +199,10 @@ export async function PATCH(request: Request) {
 
     if (type === 'reminder' && id) {
       // Update reminder
+      const reminderData = updateReminderData(data);
       const reminder = await prisma.customReminder.update({
         where: { id, userId },
-        data: {
-          datetime: data.datetime ? new Date(data.datetime) : undefined,
-          message: data.message,
-          subject: data.subject,
-          maestroId: data.maestroId,
-          repeat: data.repeat,
-          active: data.active,
-        },
+        data: reminderData,
       });
 
       return NextResponse.json(reminder);

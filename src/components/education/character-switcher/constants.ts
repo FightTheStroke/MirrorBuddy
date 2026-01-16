@@ -4,7 +4,7 @@ export const SUPPORT_CHARACTERS: Character[] = [
   {
     id: 'melissa',
     name: 'Melissa',
-    avatar: '/images/characters/melissa.png',
+    avatar: '/avatars/melissa.jpg',
     color: '#EC4899',
     role: 'learning_coach',
     description: 'Coach di studio, guida maieutica',
@@ -19,7 +19,7 @@ Rispondi SEMPRE in italiano.`,
   {
     id: 'mario',
     name: 'Mario',
-    avatar: '/images/characters/mario.png',
+    avatar: '/avatars/mario.jpg',
     color: '#3B82F6',
     role: 'buddy',
     description: 'Compagno di studio, supporto emotivo',

@@ -9,6 +9,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { logger } from '@/lib/logger';
+import { speakViaOpenAI, playAudio } from './use-onboarding-tts/tts-api';
 
 type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
 
@@ -84,63 +85,28 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
 
         abortControllerRef.current = new AbortController();
 
-        const response = await fetch('/api/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: textToSpeak, voice }),
-          signal: abortControllerRef.current.signal,
-        });
+        const result = await speakViaOpenAI(textToSpeak, voice, abortControllerRef.current.signal);
 
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          if (errorData.fallback) {
-            // Fallback to Web Speech
-            return false;
-          }
-          throw new Error(errorData.error || 'TTS failed');
+        if (!result) {
+          // Fallback to Web Speech or failed
+          setState((prev) => ({ ...prev, isLoading: false }));
+          return false;
         }
 
-        const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-
-        const audio = new Audio(audioUrl);
+        const { audio, audioUrl } = result;
         audioRef.current = audio;
 
-        return new Promise((resolve) => {
-          audio.onended = () => {
-            URL.revokeObjectURL(audioUrl);
-            setState((prev) => ({ ...prev, isPlaying: false }));
-            resolve(true);
-          };
+        const success = await playAudio(audio);
 
-          audio.onerror = () => {
-            URL.revokeObjectURL(audioUrl);
-            setState((prev) => ({
-              ...prev,
-              isPlaying: false,
-              error: 'Audio playback error',
-            }));
-            resolve(false);
-          };
+        // Clean up
+        URL.revokeObjectURL(audioUrl);
+        setState((prev) => ({ ...prev, isPlaying: false }));
 
-          audio.oncanplaythrough = () => {
-            setState((prev) => ({ ...prev, isLoading: false, isPlaying: true }));
-            audio.play().catch(() => {
-              // Autoplay blocked - user interaction required
-              setState((prev) => ({
-                ...prev,
-                isPlaying: false,
-                error: 'Autoplay blocked',
-              }));
-              resolve(false);
-            });
-          };
-        });
+        return success;
       } catch (error) {
         if ((error as Error).name === 'AbortError') {
           return true; // Intentionally stopped
         }
-        logger.error('[OnboardingTTS] OpenAI error', { error });
         setState((prev) => ({ ...prev, isLoading: false }));
         return false; // Fallback to Web Speech
       }
@@ -148,58 +114,6 @@ export function useOnboardingTTS(options: UseOnboardingTTSOptions = {}) {
     [voice]
   );
 
-  /**
-   * Speak text using Web Speech API (DEPRECATED - BUG 1 FIX)
-   * Kept for reference but no longer used to avoid voice switching
-   */
-  const _speakWebSpeech = useCallback((textToSpeak: string) => {
-    if (!window.speechSynthesis) {
-      setState((prev) => ({
-        ...prev,
-        error: 'Speech synthesis not supported',
-      }));
-      return;
-    }
-
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.lang = 'it-IT';
-    utterance.rate = 1.0;
-    utterance.pitch = 1.1; // Slightly higher for a younger voice
-    utterance.volume = 1.0;
-
-    // Try to find a female Italian voice
-    const voices = window.speechSynthesis.getVoices();
-    const italianFemale = voices.find(
-      (v) => v.lang.startsWith('it') && v.name.toLowerCase().includes('female')
-    );
-    const italian = voices.find((v) => v.lang.startsWith('it'));
-    if (italianFemale) {
-      utterance.voice = italianFemale;
-    } else if (italian) {
-      utterance.voice = italian;
-    }
-
-    utterance.onstart = () => {
-      setState((prev) => ({ ...prev, isPlaying: true, isLoading: false }));
-    };
-
-    utterance.onend = () => {
-      setState((prev) => ({ ...prev, isPlaying: false }));
-      speechRef.current = null;
-    };
-
-    utterance.onerror = () => {
-      setState((prev) => ({
-        ...prev,
-        isPlaying: false,
-        error: 'Web Speech error',
-      }));
-      speechRef.current = null;
-    };
-
-    speechRef.current = utterance;
-    window.speechSynthesis.speak(utterance);
-  }, []);
 
 
   /**
