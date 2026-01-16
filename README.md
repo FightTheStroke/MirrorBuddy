@@ -119,6 +119,41 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 
 ---
 
+## Safety & Privacy by Design
+
+MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft.com/en-us/security/blog/2025/01/13/the-ethical-design-hacker-6-mindsets-for-secure-ux-in-ai/) security mindsets, designed specifically for protecting children with learning differences.
+
+### Privacy Protection (GDPR Compliant)
+| Feature | Protection |
+|---------|------------|
+| **PII Detection** | Auto-detects Italian fiscal codes, names, emails, phones |
+| **Anonymization** | Replaces sensitive data before AI processing |
+| **Data Retention** | Configurable TTL (365d conversations, 730d progress) |
+| **Right to Erasure** | GDPR Article 17 deletion with audit trail |
+
+### AI Transparency
+| Indicator | Meaning |
+|-----------|---------|
+| 🟢 Green | High confidence, knowledge-base backed |
+| 🟡 Yellow | Medium confidence, partial sources |
+| 🟠 Orange | Low confidence, AI-generated |
+| 🔴 Red | Hallucination risk detected |
+
+### Child Safety
+- **Content Filtering**: Age-appropriate responses with Italian messaging
+- **Jailbreak Detection**: Pattern matching for prompt injection attempts
+- **Session Throttling**: Gradual escalation from warnings to timeouts
+- **Audit Trail**: Anonymized logging for safety monitoring
+
+### Security Hardening
+- **Unicode Normalization**: Prevents Cyrillic/Greek homoglyph attacks
+- **Configuration Versioning**: Rollback safety settings with history
+- **Knowledge Base Auditing**: Content validation before embedding
+
+**→ Technical details: [docs/adr/0042-ethical-design-hardening.md](docs/adr/0042-ethical-design-hardening.md)**
+
+---
+
 ## Quick Start
 
 ```bash
