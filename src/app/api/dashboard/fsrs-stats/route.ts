@@ -23,6 +23,9 @@ export async function GET(request: Request) {
     startDate.setDate(startDate.getDate() - days);
 
     const userId = auth.userId;
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID required' }, { status: 401 });
+    }
 
     // Get flashcard review data - FILTERED BY USER
     const [totalCards, reviews, cardsByState] = await Promise.all([
@@ -50,7 +53,7 @@ export async function GET(request: Request) {
       prisma.flashcardProgress.groupBy({
         by: ['state'],
         where: { userId },
-        _count: true,
+        _count: { _all: true },
       }),
     ]);
 
@@ -73,7 +76,7 @@ export async function GET(request: Request) {
     // State distribution
     const stateDistribution: Record<string, number> = {};
     for (const state of cardsByState) {
-      stateDistribution[state.state] = state._count;
+      stateDistribution[state.state] = state._count._all ?? 0;
     }
 
     // Daily reviews
@@ -83,10 +86,11 @@ export async function GET(request: Request) {
       dailyReviews[day] = (dailyReviews[day] || 0) + 1;
     }
 
-    // Cards due today
+    // Cards due today for this user
     const now = new Date();
     const cardsDueToday = await prisma.flashcardProgress.count({
       where: {
+        userId,
         nextReview: { lte: now },
       },
     });
