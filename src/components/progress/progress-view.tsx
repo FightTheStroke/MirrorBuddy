@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import {
   Trophy,
@@ -11,12 +12,35 @@ import {
   Calendar,
   Zap,
   Coins,
+  Loader2,
 } from 'lucide-react';
 import { useProgressStore } from '@/lib/stores';
 import { AnalyticsDashboard, DashboardLayout, DashboardCard, StatCard } from '@/components/dashboard';
-import { TimeStudyChart } from '@/components/dashboard/time-study-chart';
-import { MaestroUsageChart } from '@/components/dashboard/maestro-usage-chart';
 import { AchievementsPanel } from '@/components/gamification/achievements-panel';
+
+// Lazy load Recharts-based components (reduces initial bundle ~200KB)
+const TimeStudyChart = dynamic(
+  () => import('@/components/dashboard/time-study-chart').then(m => m.TimeStudyChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg">
+        <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+      </div>
+    )
+  }
+);
+const MaestroUsageChart = dynamic(
+  () => import('@/components/dashboard/maestro-usage-chart').then(m => m.MaestroUsageChart),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] flex items-center justify-center bg-slate-100 dark:bg-slate-800 rounded-lg">
+        <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+      </div>
+    )
+  }
+);
 import { SeasonBanner } from '@/components/gamification/season-banner';
 import { cn } from '@/lib/utils';
 import { PageHeader } from '@/components/ui/page-header';

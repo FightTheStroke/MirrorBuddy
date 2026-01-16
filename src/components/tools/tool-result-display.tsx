@@ -1,12 +1,25 @@
 'use client';
 
 import { useEffect, useRef, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, CheckCircle, XCircle, Code, BarChart2, GitBranch, Calculator, HelpCircle, Layers, Network, FileText, Play, Maximize2, Minimize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ChartRenderer } from './chart-renderer';
 import { DiagramRenderer } from './diagram-renderer';
 import { FormulaRenderer } from './formula-renderer';
+
+// Lazy load Recharts-based ChartRenderer (reduces initial bundle ~200KB)
+const ChartRenderer = dynamic(
+  () => import('./chart-renderer').then(m => m.ChartRenderer),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] flex items-center justify-center bg-slate-800/50 rounded-xl border border-slate-700">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    )
+  }
+);
 import { CalculatorRenderer } from './calculator-renderer';
 import { QuizTool } from './quiz-tool';
 import { FlashcardTool } from './flashcard-tool';
