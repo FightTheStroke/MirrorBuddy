@@ -1,0 +1,212 @@
+// ============================================================================
+// USER & PROFILE DOMAIN
+// Core user identity, settings, and accessibility preferences
+// ============================================================================
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile       Profile?
+  settings      Settings?
+  progress      Progress?
+  sessions          StudySession[]
+  flashcards        FlashcardProgress[]
+  quizResults       QuizResult[]
+  conversations     Conversation[]
+  learnings         Learning[]
+  pushSubscriptions PushSubscription[]
+
+  // Issue #64: Consolidated localStorage data
+  accessibility     AccessibilitySettings?
+  onboarding        OnboardingState?
+  pomodoroStats     PomodoroStats?
+  calendarEvents    CalendarEvent[]
+  htmlSnippets      HtmlSnippet[]
+  homeworkSessions  HomeworkSession[]
+  gamification      UserGamification?
+
+  // Knowledge Graph (Wave 3)
+  concepts          Concept[]
+
+  // Google Drive Integration (ADR 0038)
+  googleAccount     GoogleAccount?
+}
+
+model Profile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name          String?
+  age           Int?
+  schoolYear    Int?
+  schoolLevel   String   @default("superiore")
+  gradeLevel    String?
+  learningGoals String   @default("[]")
+
+  // Character preferences (coach and buddy selection)
+  preferredCoach String?  // melissa, roberto, chiara, andrea, favij
+  preferredBuddy String?  // mario, noemi, enea, bruno, sofia
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Settings {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Appearance
+  theme         String  @default("system")
+  language      String  @default("it")
+  accentColor   String  @default("blue")
+
+  // Accessibility
+  fontSize           String  @default("medium")
+  highContrast       Boolean @default(false)
+  dyslexiaFont       Boolean @default(false)
+  reducedMotion      Boolean @default(false)
+  voiceEnabled       Boolean @default(true)
+  simplifiedLanguage Boolean @default(false)
+  adhdMode           Boolean @default(false)
+
+  // AI Provider
+  provider      String  @default("azure")
+  model         String  @default("gpt-4o")
+  budgetLimit   Float   @default(50.0)
+  totalSpent    Float   @default(0.0)
+  adaptiveDifficultyMode String @default("balanced")
+
+  // Parent Mode Consent (Issue #63)
+  parentChatConsentAt DateTime?
+
+  // Parent Dashboard (Issue #64)
+  parentDashboardLastViewed DateTime?
+
+  // Azure Cost Configuration
+  azureCostConfig String?  // JSON: {token_cost, audio_cost, etc.}
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model GoogleAccount {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Google profile info
+  googleId     String   @unique
+  email        String
+  displayName  String?
+  avatarUrl    String?
+
+  // OAuth tokens (encrypted at rest via application layer)
+  accessToken  String
+  refreshToken String?
+  tokenType    String   @default("Bearer")
+  expiresAt    DateTime
+
+  // Scopes granted by user
+  scopes       String   @default("[]")
+
+  // Connection status
+  isConnected  Boolean  @default(true)
+  lastUsedAt   DateTime @default(now())
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+  @@index([googleId])
+}
+
+model AccessibilitySettings {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Dyslexia support
+  dyslexiaFont        Boolean @default(false)
+  extraLetterSpacing  Boolean @default(false)
+  increasedLineHeight Boolean @default(false)
+
+  // Visual support
+  highContrast   Boolean @default(false)
+  largeText      Boolean @default(false)
+  reducedMotion  Boolean @default(false)
+
+  // Text-to-Speech
+  ttsEnabled  Boolean @default(false)
+  ttsSpeed    Float   @default(1.0)
+  ttsAutoRead Boolean @default(false)
+
+  // ADHD support
+  adhdMode           Boolean @default(false)
+  distractionFreeMode Boolean @default(false)
+  breakReminders     Boolean @default(false)
+
+  // General accessibility
+  lineSpacing        Float   @default(1.0)
+  fontSize           Float   @default(1.0)
+  colorBlindMode     Boolean @default(false)
+  keyboardNavigation Boolean @default(true)
+
+  // Custom colors
+  customBackgroundColor String @default("#ffffff")
+  customTextColor       String @default("#000000")
+
+  // ADHD Session Config (JSON)
+  adhdConfig String @default("{}")
+  adhdStats  String @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model OnboardingState {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Flow state
+  hasCompletedOnboarding Boolean  @default(false)
+  onboardingCompletedAt  DateTime?
+  currentStep            String   @default("welcome")
+  isReplayMode           Boolean  @default(false)
+  isVoiceMuted           Boolean  @default(false)
+
+  // Collected data (JSON)
+  data String @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model PomodoroStats {
+  id        String @id @default(cuid())
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Persistent stats
+  completedPomodoros Int @default(0)
+  totalFocusTime     Int @default(0)
+  todayPomodoros     Int @default(0)
+  todayFocusMinutes  Int @default(0)
+  lastActiveDate     String @default("")
+
+  // Settings (JSON)
+  settings String @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}

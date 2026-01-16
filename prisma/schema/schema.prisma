@@ -1,0 +1,15 @@
+// ============================================================================
+// MIRRORBUDDY - DATABASE SCHEMA (Base Configuration)
+// PostgreSQL with pgvector for semantic search
+// ============================================================================
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+  engineType      = "binary"
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [pgvector(map: "vector")]
+}

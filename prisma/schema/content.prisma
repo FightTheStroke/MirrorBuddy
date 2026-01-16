@@ -1,0 +1,193 @@
+// ============================================================================
+// CONTENT DOMAIN
+// Materials, collections, tags, and study kits
+// ============================================================================
+
+model Material {
+  id          String   @id @default(cuid())
+  userId      String
+  toolId      String   @unique
+  toolType    String
+  title       String
+  content     String
+
+  // Context
+  maestroId   String?
+  sessionId   String?
+  session     StudySession? @relation(fields: [sessionId], references: [id])
+  subject     String?
+  preview     String?
+
+  // Message reference
+  messageId   String?
+
+  // Migrated from CreatedTool
+  topic          String?
+  conversationId String?
+
+  // Status
+  status      String   @default("active")
+
+  // User interaction
+  userRating   Int?
+  isBookmarked Boolean  @default(false)
+  viewCount    Int      @default(0)
+
+  // Full-text search (ADR 0022)
+  searchableText String?
+
+  // Organization (ADR 0022)
+  collectionId String?
+  collection   Collection? @relation(fields: [collectionId], references: [id])
+  tags         MaterialTag[]
+
+  // Study Kit integration
+  sourceStudyKitId String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([toolType])
+  @@index([status])
+  @@index([sessionId])
+  @@index([messageId])
+  @@index([createdAt])
+  @@index([isBookmarked])
+  @@index([collectionId])
+  @@index([sourceStudyKitId])
+  @@index([userId, status])
+
+  // Knowledge Graph (Wave 3)
+  edgesFrom        MaterialEdge[]    @relation("MaterialEdgeFrom")
+  edgesTo          MaterialEdge[]    @relation("MaterialEdgeTo")
+  concepts         MaterialConcept[]
+}
+
+model Collection {
+  id          String       @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  color       String?
+  icon        String?
+  parentId    String?
+  parent      Collection?  @relation("CollectionTree", fields: [parentId], references: [id])
+  children    Collection[] @relation("CollectionTree")
+  materials   Material[]
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([userId, name, parentId])
+  @@index([userId])
+  @@index([parentId])
+}
+
+model Tag {
+  id        String        @id @default(cuid())
+  userId    String
+  name      String
+  color     String?
+  materials MaterialTag[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model MaterialTag {
+  id         String   @id @default(cuid())
+  materialId String
+  tagId      String
+  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([materialId, tagId])
+  @@index([materialId])
+  @@index([tagId])
+}
+
+// DEPRECATED: Use Material table instead
+model CreatedTool {
+  id             String   @id @default(cuid())
+  userId         String
+
+  type           String
+  title          String
+  topic          String?
+  content        String   @default("{}")
+
+  maestroId      String?
+  conversationId String?
+  sessionId      String?
+
+  userRating     Int?
+  isBookmarked   Boolean  @default(false)
+  viewCount      Int      @default(0)
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([isBookmarked])
+}
+
+model HtmlSnippet {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  snippetId String   @unique
+  html      String
+  css       String?
+  js        String?
+  title     String?
+  subject   String?
+  maestroId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([snippetId])
+}
+
+model StudyKit {
+  id          String   @id @default(cuid())
+  userId      String
+  sourceFile  String
+  title       String
+
+  // Generated materials (JSON strings)
+  summary     String?
+  mindmap     String?
+  demo        String?
+  quiz        String?
+
+  // Original PDF content for RAG context
+  originalText String? @db.Text
+
+  // Processing status
+  status      String   @default("processing")
+  errorMessage String?
+
+  // Metadata
+  subject     String?
+  pageCount   Int?
+  wordCount   Int?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  learningPaths LearningPath[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}

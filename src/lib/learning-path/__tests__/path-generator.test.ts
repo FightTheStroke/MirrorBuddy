@@ -35,6 +35,8 @@ vi.mock('@/lib/db', () => ({
     },
     learningPathTopic: {
       create: vi.fn(),
+      createMany: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }));
@@ -219,24 +221,46 @@ describe('path-generator', () => {
         completedAt: null,
       });
 
-      // @ts-expect-error - mock doesn't include all Prisma client properties
-      vi.mocked(prisma.learningPathTopic.create).mockImplementation(async (args) => ({
-        id: `topic-${args.data.order}`,
-        pathId: args.data.pathId as string,
-        order: args.data.order as number,
-        title: args.data.title as string,
-        description: args.data.description as string,
-        keyConcepts: args.data.keyConcepts as string,
-        difficulty: args.data.difficulty as string,
-        status: args.data.status as string,
-        estimatedMinutes: args.data.estimatedMinutes as number,
-        relatedMaterials: args.data.relatedMaterials as string,
-        quizScore: null,
-        startedAt: null,
-        completedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }));
+      // Mock createMany (batch insert)
+      vi.mocked(prisma.learningPathTopic.createMany).mockResolvedValue({ count: 2 });
+
+      // Mock findMany to return created topics
+      vi.mocked(prisma.learningPathTopic.findMany).mockResolvedValue([
+        {
+          id: 'topic-1',
+          pathId: 'path-123',
+          order: 0,
+          title: 'Repubblica Romana',
+          description: 'Description for Repubblica Romana',
+          keyConcepts: JSON.stringify(['concept1', 'concept2']),
+          difficulty: 'basic',
+          status: 'unlocked',
+          estimatedMinutes: 10,
+          relatedMaterials: JSON.stringify([]),
+          quizScore: null,
+          startedAt: null,
+          completedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'topic-2',
+          pathId: 'path-123',
+          order: 1,
+          title: 'Impero Romano',
+          description: 'Description for Impero Romano',
+          keyConcepts: JSON.stringify(['concept1', 'concept2']),
+          difficulty: 'intermediate',
+          status: 'locked',
+          estimatedMinutes: 10,
+          relatedMaterials: JSON.stringify([]),
+          quizScore: null,
+          startedAt: null,
+          completedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
 
       const result = await createLearningPath('user-1', mockAnalysis, mockTopicsWithRelations);
 
@@ -269,23 +293,43 @@ describe('path-generator', () => {
         completedAt: null,
       });
 
-      vi.mocked(prisma.learningPathTopic.create).mockResolvedValue({
-        id: 'topic-1',
-        pathId: 'path-456',
-        order: 1,
-        title: 'Topic',
-        description: 'Desc',
-        keyConcepts: '[]',
-        difficulty: 'basic',
-        status: 'unlocked',
-        estimatedMinutes: 10,
-        relatedMaterials: '[]',
-        quizScore: null,
-        startedAt: null,
-        completedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.learningPathTopic.createMany).mockResolvedValue({ count: 2 });
+      vi.mocked(prisma.learningPathTopic.findMany).mockResolvedValue([
+        {
+          id: 'topic-1',
+          pathId: 'path-456',
+          order: 0,
+          title: 'Repubblica Romana',
+          description: 'Description',
+          keyConcepts: '[]',
+          difficulty: 'basic',
+          status: 'unlocked',
+          estimatedMinutes: 10,
+          relatedMaterials: '[]',
+          quizScore: null,
+          startedAt: null,
+          completedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'topic-2',
+          pathId: 'path-456',
+          order: 1,
+          title: 'Impero Romano',
+          description: 'Description',
+          keyConcepts: '[]',
+          difficulty: 'intermediate',
+          status: 'locked',
+          estimatedMinutes: 10,
+          relatedMaterials: '[]',
+          quizScore: null,
+          startedAt: null,
+          completedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
 
       const result = await createLearningPath('user-1', mockAnalysis, mockTopicsWithRelations);
 
@@ -311,23 +355,43 @@ describe('path-generator', () => {
         completedAt: null,
       });
 
-      vi.mocked(prisma.learningPathTopic.create).mockResolvedValue({
-        id: 'topic-1',
-        pathId: 'path-789',
-        order: 1,
-        title: 'Topic',
-        description: 'Desc',
-        keyConcepts: '[]',
-        difficulty: 'basic',
-        status: 'unlocked',
-        estimatedMinutes: 10,
-        relatedMaterials: '[]',
-        quizScore: null,
-        startedAt: null,
-        completedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      vi.mocked(prisma.learningPathTopic.createMany).mockResolvedValue({ count: 2 });
+      vi.mocked(prisma.learningPathTopic.findMany).mockResolvedValue([
+        {
+          id: 'topic-1',
+          pathId: 'path-789',
+          order: 0,
+          title: 'Repubblica Romana',
+          description: 'Description',
+          keyConcepts: '[]',
+          difficulty: 'basic',
+          status: 'unlocked',
+          estimatedMinutes: 10,
+          relatedMaterials: '[]',
+          quizScore: null,
+          startedAt: null,
+          completedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 'topic-2',
+          pathId: 'path-789',
+          order: 1,
+          title: 'Impero Romano',
+          description: 'Description',
+          keyConcepts: '[]',
+          difficulty: 'intermediate',
+          status: 'locked',
+          estimatedMinutes: 10,
+          relatedMaterials: '[]',
+          quizScore: null,
+          startedAt: null,
+          completedAt: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
 
       const result = await createLearningPath(
         'user-1',

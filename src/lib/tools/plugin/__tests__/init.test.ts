@@ -6,6 +6,17 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { initializeToolRegistry } from '../init';
 import { ToolRegistry } from '../registry';
+import { logger } from '@/lib/logger';
+
+// Mock logger
+vi.mock('@/lib/logger', () => ({
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  },
+}));
 
 describe('initializeToolRegistry', () => {
   const originalNodeEnv = process.env.NODE_ENV;
@@ -36,22 +47,20 @@ describe('initializeToolRegistry', () => {
 
   it('should log debug message in development mode', () => {
     vi.stubEnv('NODE_ENV', 'development');
-    const consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
 
     initializeToolRegistry();
 
-    expect(consoleSpy).toHaveBeenCalledWith('ToolRegistry initialized');
+    expect(logger.debug).toHaveBeenCalledWith('ToolRegistry initialized');
   });
 
   it('should not log in production mode', () => {
     // Reset singleton FIRST before changing env
     (ToolRegistry as unknown as { instance: ToolRegistry | null })['instance'] = null;
     vi.stubEnv('NODE_ENV', 'production');
-    const consoleSpy = vi.spyOn(console, 'debug').mockImplementation(() => {});
 
     initializeToolRegistry();
 
-    expect(consoleSpy).not.toHaveBeenCalled();
+    expect(logger.debug).not.toHaveBeenCalled();
   });
 
   it('should export as default', async () => {
