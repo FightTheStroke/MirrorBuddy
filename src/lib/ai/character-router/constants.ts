@@ -28,4 +28,5 @@ export const DEFAULT_MAESTRO_BY_SUBJECT: Record<Subject, string> = {
   spanish: 'alex-pina-spagnolo',
   storytelling: 'chris-storytelling',
   supercazzola: 'mascetti-supercazzola',
+  sport: 'simone-sport',
 };

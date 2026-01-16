@@ -75,6 +75,15 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
     /scappellamento/i,
     /tapioca/i,
   ],
+  sport: [
+    /\bsport\b/i,
+    /\bnuot[oa]|nuotar/i,
+    /\batletic/i,
+    /\bparalimpic/i,
+    /\bmovimento/i,
+    /\ballenament/i,
+    /\besercizi/i,
+  ],
 };
 
 export const EMOTIONAL_PATTERNS: Record<EmotionalIndicator, RegExp[]> = {

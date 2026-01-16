@@ -23,6 +23,7 @@ import {
   Globe2,
   Mic,
   Drama,
+  Waves,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { MaestroCard } from './maestro-card';
@@ -52,6 +53,7 @@ const subjectLucideIcons: Record<Subject, LucideIcon> = {
   internationalLaw: Globe2,
   storytelling: Mic,
   supercazzola: Drama,
+  sport: Waves,
 };
 
 type SessionMode = 'voice' | 'chat';

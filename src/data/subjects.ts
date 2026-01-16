@@ -25,6 +25,7 @@ export const subjectColors: Record<Subject, string> = {
   internationalLaw: '#0EA5E9', // Sky
   storytelling: '#E63946',   // Red (Chris)
   supercazzola: '#722F37',   // Wine (Mascetti)
+  sport: '#0077B6',          // Ocean Blue (Simone)
 };
 
 export const subjectNames: Record<Subject, string> = {
@@ -47,6 +48,7 @@ export const subjectNames: Record<Subject, string> = {
   internationalLaw: 'Diritto Internazionale',
   storytelling: 'Storytelling',
   supercazzola: 'Supercazzola',
+  sport: 'Sport',
 };
 
 export const subjectIcons: Record<Subject, string> = {
@@ -69,6 +71,7 @@ export const subjectIcons: Record<Subject, string> = {
   internationalLaw: '🌐',
   storytelling: '🎤',
   supercazzola: '🎭',
+  sport: '🏊',
 };
 
 export const subjectLucideIconNames: Record<Subject, string> = {
@@ -91,4 +94,5 @@ export const subjectLucideIconNames: Record<Subject, string> = {
   internationalLaw: 'Globe2',
   storytelling: 'Mic',
   supercazzola: 'Drama',
+  sport: 'Waves',
 };

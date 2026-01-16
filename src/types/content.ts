@@ -31,7 +31,8 @@ export type Subject =
   | 'philosophy'
   | 'internationalLaw'
   | 'storytelling'
-  | 'supercazzola';
+  | 'supercazzola'
+  | 'sport';
 
 export interface Maestro {
   id: string;
