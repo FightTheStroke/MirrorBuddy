@@ -11,6 +11,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed (Jan 16 - Performance & N+1 Patterns)
 
+#### Memory Leaks (P0)
+- **rate-limit.ts**: Fixed interval never cleared - added `unref()` and `stopCleanup()` export
+- **event-handlers.ts**: Fixed setTimeout leaks - track greeting timeouts in `greetingTimeoutsRef`
+- **connection-cleanup.ts**: Clear greeting timeouts array on disconnect
+
+#### API Pagination
+- **flashcards/progress**: Added `page`/`limit` params with pagination metadata
+- **tags**: Added pagination (default 100, max 500)
+- **collections**: Added pagination with same pattern
+
+#### React Performance
+- **maestri-grid.tsx**: Added `useMemo` for filteredMaestri, `useCallback` for handleSelect
+- **subject-mastery.tsx**: Added `useMemo` for sortedMasteries and topSubjects
+
+#### Database Indexes
+- Added index on `StudySession.maestroId`
+- Added indexes on `Notification.type` and `Notification.priority`
+
+#### Voice Session
+- Added `RECONNECT_BACKOFF` config with exponential backoff in `constants.ts`
+
 #### Database Performance Optimization
 - **N+1 Query Resolution**: Fixed 3 critical N+1 patterns using `$transaction` and batch operations
   - `learning-persistence.ts`: Batch findMany + createMany instead of loop queries
