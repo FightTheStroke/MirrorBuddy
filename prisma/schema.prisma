@@ -251,6 +251,7 @@ model FlashcardProgress {
   @@unique([userId, cardId])
   @@index([userId])
   @@index([nextReview])
+  @@index([userId, nextReview]) // Composite: "cards due for user" queries
 }
 
 model QuizResult {
@@ -484,6 +485,7 @@ model TelemetryEvent {
   @@index([timestamp])
   @@index([category])
   @@index([action])
+  @@index([userId, timestamp]) // Composite: "user analytics in time range" queries
 }
 
 // ============================================================================
@@ -576,6 +578,7 @@ model Material {
   @@index([isBookmarked])
   @@index([collectionId])
   @@index([sourceStudyKitId])
+  @@index([userId, status]) // Composite: "active materials for user" queries
 
   // Knowledge Graph (Wave 3)
   edgesFrom        MaterialEdge[]    @relation("MaterialEdgeFrom")
