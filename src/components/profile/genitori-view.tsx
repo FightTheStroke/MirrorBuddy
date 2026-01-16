@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { ParentDashboard } from './parent-dashboard';
 import { TeacherDiary, type DiaryEntry } from './teacher-diary';
 import { ProgressTimeline } from './progress-timeline';
@@ -74,7 +75,7 @@ export function GenitoriView() {
         setDiaryEntries(entries);
       }
     } catch (err) {
-      console.error('Failed to fetch diary entries:', err);
+      logger.error('Failed to fetch diary entries', { error: String(err) });
     } finally {
       setIsDiaryLoading(false);
     }

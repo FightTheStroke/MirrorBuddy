@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import type { RateLimitConfig } from './rate-limit';
 
 /**
@@ -26,7 +27,7 @@ export async function logRateLimitEvent(
       },
     });
   } catch (error) {
-    console.error('Failed to log rate limit event:', error);
+    logger.error('Failed to log rate limit event:', { error: String(error) });
   }
 }
 

@@ -2,6 +2,7 @@
  * Message sending and chat API logic
  */
 
+import { logger } from '@/lib/logger';
 import type { Message } from './types';
 import type { CharacterInfo } from '../../utils/character-utils';
 import type { ToolState, ToolType, ToolCallRef, ToolCall } from '@/types/tools';
@@ -67,7 +68,7 @@ export async function sendChatMessage(
           toolContent = data.material?.content || null;
         }
       } catch (error) {
-        console.warn('Failed to fetch material content:', error);
+        logger.warn('Failed to fetch material content', { error: String(error) });
         // Fall back to empty content, UI will display error
       }
     }

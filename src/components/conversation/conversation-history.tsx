@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { MessageSquare } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { getAllMaestri } from '@/data/maestri';
 import type { MaestroFull } from '@/data/maestri';
 import { ConversationHistoryItem } from './conversation-history-item';
@@ -69,7 +70,7 @@ export function ConversationHistory({ onConversationSelect }: ConversationHistor
       setConversations(data.items || []);
       setPagination(data.pagination);
     } catch (error) {
-      console.error('Error fetching conversations:', error);
+      logger.error('Error fetching conversations', { error: String(error) });
       setConversations([]);
     } finally {
       setLoading(false);

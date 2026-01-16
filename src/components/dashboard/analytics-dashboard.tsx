@@ -7,6 +7,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import { motion } from 'framer-motion';
 import {
   Clock,
@@ -67,7 +68,7 @@ export function AnalyticsDashboard() {
         setAzureCosts({ ...data, configured: false, totalCost: 0, currency: 'USD', costsByService: [], dailyCosts: [] });
       }
     } catch (error) {
-      console.error('Failed to fetch analytics:', error);
+      logger.error('Failed to fetch analytics', { error: String(error) });
     } finally {
       setLoading(false);
     }
