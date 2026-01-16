@@ -13,6 +13,20 @@ export async function getUserId(): Promise<string | null> {
 }
 
 /**
+ * Extract preferences data and merge with defaults
+ */
+export function extractPreferencesData(data: Record<string, unknown>) {
+  return {
+    enabledNotifications: data.enabledNotifications,
+    quietHoursStart: data.quietHoursStart,
+    quietHoursEnd: data.quietHoursEnd,
+    minIntervalMinutes: data.minIntervalMinutes,
+    streakWarningTime: data.streakWarningTime,
+    ...data,
+  };
+}
+
+/**
  * Extract and validate session creation data
  */
 export function createScheduleSessionData(data: Record<string, unknown>) {

@@ -126,133 +126,18 @@ export function WeeklySchedule({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Session Form */}
-        <AnimatePresence>
-          {showForm && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="overflow-hidden"
-            >
-              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 space-y-4">
-                <h4 className="font-medium text-slate-900 dark:text-white">
-                  {editingId ? 'Modifica sessione' : 'Nuova sessione di studio'}
-                </h4>
-
-                {/* Day & Time */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
-                      Giorno
-                    </label>
-                    <select
-                      value={formData.dayOfWeek}
-                      onChange={(e) => setFormData({ ...formData, dayOfWeek: Number(e.target.value) as DayOfWeek })}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                    >
-                      {DAYS_OF_WEEK.map((day) => (
-                        <option key={day.value} value={day.value}>
-                          {day.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
-                      Orario
-                    </label>
-                    <select
-                      value={formData.time}
-                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                    >
-                      {TIME_OPTIONS.map((time) => (
-                        <option key={time} value={time}>
-                          {time}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Duration & Subject */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
-                      Durata
-                    </label>
-                    <select
-                      value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: Number(e.target.value) })}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                    >
-                      {DURATION_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
-                      Materia
-                    </label>
-                    <select
-                      value={formData.subject}
-                      onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                    >
-                      {SUBJECTS.map((subj) => (
-                        <option key={subj.value} value={subj.value}>
-                          {subj.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Optional Topic */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">
-                    Argomento (opzionale)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.topic || ''}
-                    onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                    placeholder="Es: Teorema di Pitagora"
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
-                  />
-                </div>
-
-                {/* Actions */}
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      setShowForm(false);
-                      setEditingId(null);
-                    }}
-                    disabled={submitting}
-                  >
-                    <X className="w-4 h-4 mr-1" />
-                    Annulla
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleSubmit}
-                    disabled={submitting}
-                  >
-                    <Check className="w-4 h-4 mr-1" />
-                    {submitting ? 'Salvataggio...' : editingId ? 'Salva' : 'Aggiungi'}
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        <SessionForm
+          showForm={showForm}
+          editingId={editingId}
+          formData={formData}
+          submitting={submitting}
+          onSubmit={handleSubmit}
+          onCancel={() => {
+            setShowForm(false);
+            setEditingId(null);
+          }}
+          onFormChange={setFormData}
+        />
 
         {/* Weekly Grid */}
         <div className="space-y-3">
