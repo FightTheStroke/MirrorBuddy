@@ -122,14 +122,25 @@ async function searchWithWikipedia(query: string): Promise<SearchResult[]> {
   return results;
 }
 
-/** Perform web search using Brave (if configured) or Wikipedia fallback. */
-async function performWebSearch(query: string): Promise<SearchResult[]> {
-  // Try Brave Search first (real-time web results)
-  let results = await searchWithBrave(query);
+interface WebSearchResult {
+  results: SearchResult[];
+  source: 'brave' | 'wikipedia';
+}
 
-  // Fallback to Wikipedia if Brave not configured or failed
-  if (!results) {
+/** Perform web search using Brave (if configured) or Wikipedia fallback. */
+async function performWebSearch(query: string): Promise<WebSearchResult> {
+  // Try Brave Search first (real-time web results)
+  const braveResults = await searchWithBrave(query);
+
+  let results: SearchResult[];
+  let source: 'brave' | 'wikipedia';
+
+  if (braveResults) {
+    results = braveResults;
+    source = 'brave';
+  } else {
     results = await searchWithWikipedia(query);
+    source = 'wikipedia';
   }
 
   // Always add Treccani link as authoritative Italian source
@@ -140,7 +151,7 @@ async function performWebSearch(query: string): Promise<SearchResult[]> {
     description: 'Enciclopedia Italiana - fonte autorevole per approfondimenti',
   });
 
-  return results;
+  return { results, source };
 }
 
 /** Generate YouTube educational search links. */
@@ -181,10 +192,13 @@ registerToolHandler('web_search', async (args): Promise<ToolExecutionResult> => 
   }
 
   let results: SearchResult[] = [];
+  let searchSource: 'brave' | 'wikipedia' | undefined;
 
   try {
     if (type === 'web' || type === 'all') {
-      results = results.concat(await performWebSearch(trimmedQuery));
+      const webSearch = await performWebSearch(trimmedQuery);
+      results = results.concat(webSearch.results);
+      searchSource = webSearch.source;
     }
     if (type === 'youtube' || type === 'all') {
       results = results.concat(await performYouTubeSearch(trimmedQuery));
@@ -198,7 +212,7 @@ registerToolHandler('web_search', async (args): Promise<ToolExecutionResult> => 
     };
   }
 
-  const data: SearchData = { query: trimmedQuery, searchType: type, results };
+  const data: SearchData = { query: trimmedQuery, searchType: type, results, searchSource };
 
   return { success: true, toolId: nanoid(), toolType: 'search', data };
 });

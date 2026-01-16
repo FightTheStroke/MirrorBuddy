@@ -46,10 +46,12 @@ async function handleSearchPlugin(
 
     // Perform searches based on type
     const results: Array<{ type: string; title: string; url: string; description?: string }> = [];
+    let searchSource: 'brave' | 'wikipedia' | undefined;
 
     if (type === 'web' || type === 'all') {
-      const webResults = await performWebSearch(query);
-      results.push(...webResults);
+      const webSearch = await performWebSearch(query);
+      results.push(...webSearch.results);
+      searchSource = webSearch.source;
     }
 
     if (type === 'youtube' || type === 'all') {
@@ -70,6 +72,7 @@ async function handleSearchPlugin(
       query: query.trim(),
       searchType: type,
       results,
+      searchSource,
       resultCount: results.length,
       createdAt: new Date().toISOString(),
     });

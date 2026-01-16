@@ -115,7 +115,7 @@ export function ToolPanel({
         return <DemoSandbox data={demoData} />;
       }
       case 'search': {
-        const searchData = tool.content as { query: string; results: Array<{ type: 'web' | 'youtube'; title: string; url: string; description?: string; thumbnail?: string; duration?: string }> };
+        const searchData = tool.content as { query: string; results: Array<{ type: 'web' | 'youtube'; title: string; url: string; description?: string; thumbnail?: string; duration?: string }>; searchSource?: 'brave' | 'wikipedia' };
         return <SearchResults data={searchData} />;
       }
       case 'summary': {

@@ -60,12 +60,13 @@ describe('Search Handler', () => {
           }),
       });
 
-      const results = await performWebSearch('matematica');
+      const { results, source } = await performWebSearch('matematica');
 
       expect(results).toHaveLength(2); // Wikipedia result + Treccani link
       expect(results[0].type).toBe('web');
       expect(results[0].title).toContain('Matematica - Wikipedia');
       expect(results[0].url).toContain('wikipedia.org');
+      expect(source).toBe('wikipedia');
     });
 
     it('should strip HTML tags from snippets', async () => {
@@ -85,7 +86,7 @@ describe('Search Handler', () => {
           }),
       });
 
-      const results = await performWebSearch('test');
+      const { results } = await performWebSearch('test');
 
       expect(results[0].description).toBe('bold text here');
     });
@@ -99,7 +100,7 @@ describe('Search Handler', () => {
           }),
       });
 
-      const results = await performWebSearch('fisica');
+      const { results } = await performWebSearch('fisica');
 
       const treccaniResult = results.find((r) => r.url.includes('treccani.it'));
       expect(treccaniResult).toBeDefined();
@@ -112,7 +113,7 @@ describe('Search Handler', () => {
         json: () => Promise.resolve({}),
       });
 
-      const results = await performWebSearch('test');
+      const { results } = await performWebSearch('test');
 
       // Should still return Treccani link
       expect(results).toHaveLength(1);
@@ -122,7 +123,7 @@ describe('Search Handler', () => {
     it('should handle fetch failure gracefully', async () => {
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
-      const results = await performWebSearch('test');
+      const { results } = await performWebSearch('test');
 
       // Should still return Treccani link
       expect(results).toHaveLength(1);
@@ -135,7 +136,7 @@ describe('Search Handler', () => {
         status: 500,
       });
 
-      const results = await performWebSearch('test');
+      const { results } = await performWebSearch('test');
 
       // Should still return Treccani link
       expect(results).toHaveLength(1);
@@ -158,7 +159,7 @@ describe('Search Handler', () => {
           }),
       });
 
-      const results = await performWebSearch('C++');
+      const { results } = await performWebSearch('C++');
 
       expect(results[0].url).toContain('C%2B%2B');
     });
