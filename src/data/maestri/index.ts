@@ -23,6 +23,7 @@ import { chris } from './chris';
 import { omero } from './omero';
 import { alexPina } from './alex-pina';
 import { mascetti } from './mascetti';
+import { simone } from './simone';
 
 export type { MaestroFull } from './types';
 export { SAFETY_GUIDELINES } from './types';
@@ -48,6 +49,7 @@ export const maestri: MaestroFull[] = [
   omero,
   alexPina,
   mascetti,
+  simone,
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
@@ -90,4 +92,5 @@ export const SUBJECT_NAMES: Record<string, string> = {
   'health': 'Salute',
   'internationalLaw': 'Diritto Internazionale',
   'supercazzola': 'Supercazzola',
+  'sport': 'Sport',
 };
