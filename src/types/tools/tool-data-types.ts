@@ -29,6 +29,7 @@ export interface QuizQuestion {
   options: string[];
   correctIndex: number;
   explanation?: string;
+  difficulty?: 1 | 2 | 3 | 4 | 5;
 }
 
 export interface QuizData {

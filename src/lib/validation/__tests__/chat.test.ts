@@ -90,6 +90,7 @@ describe('Chat Validation Schemas', () => {
         'pdf',
         'webcam',
         'homework',
+        'study-kit',
       ];
 
       validTools.forEach(tool => {

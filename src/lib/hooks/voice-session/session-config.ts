@@ -87,6 +87,18 @@ export function useSendSessionConfig(
       // Continue without memory
     }
 
+    let adaptiveInstruction = '';
+    try {
+      const subjectParam = maestro.subject ? `subject=${encodeURIComponent(maestro.subject)}` : '';
+      const response = await fetch(`/api/adaptive/context?${subjectParam}&source=voice`);
+      if (response.ok) {
+        const data = await response.json();
+        adaptiveInstruction = data.instruction ? `\n${data.instruction}\n` : '';
+      }
+    } catch (error) {
+      logger.warn('[VoiceSession] Adaptive context unavailable', { error: String(error) });
+    }
+
     // Build instructions
     const languageInstruction = buildLanguageInstruction(isLanguageTeacher, targetLanguage, userLanguage);
     const characterInstruction = buildCharacterInstruction(maestro.name);
@@ -103,7 +115,7 @@ export function useSendSessionConfig(
       : '';
 
     const fullInstructions = languageInstruction + characterInstruction + memoryContext +
-      truncatedSystemPrompt + voicePersonality + TOOL_USAGE_INSTRUCTIONS;
+      adaptiveInstruction + truncatedSystemPrompt + voicePersonality + TOOL_USAGE_INSTRUCTIONS;
 
     logger.debug(`[VoiceSession] Instructions length: ${fullInstructions.length} chars`);
 

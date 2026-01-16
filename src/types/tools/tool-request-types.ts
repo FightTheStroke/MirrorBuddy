@@ -11,6 +11,7 @@ import type { QuestionType } from '../education';
 export interface QuizRequest {
   title: string;
   subject: Subject;
+  difficulty?: 1 | 2 | 3 | 4 | 5;
   questions: Array<{
     text: string;
     type: QuestionType;
@@ -18,7 +19,7 @@ export interface QuizRequest {
     correctAnswer: string | number;
     hints: string[];
     explanation: string;
-    difficulty: 1 | 2 | 3 | 4 | 5;
+    difficulty?: 1 | 2 | 3 | 4 | 5;
     topic: string;
   }>;
   masteryThreshold?: number;

@@ -7,6 +7,11 @@ import type { Quiz, Question, Subject } from '@/types/index';
 import type { DemoData, QuizData, QuizQuestion } from '@/types/tools';
 import { buildDemoHTML } from '@/lib/tools/demo-html-builder';
 
+const normalizeDifficulty = (value?: number): Question['difficulty'] => {
+  const rounded = Math.round(value ?? 2);
+  return Math.min(5, Math.max(1, rounded)) as Question['difficulty'];
+};
+
 /**
  * Simple markdown to HTML parser for basic formatting
  */
@@ -44,7 +49,11 @@ export function buildDemoCode(demoData: DemoData): string | null {
 /**
  * Transform Study Kit QuizData to interactive Quiz component format
  */
-export function transformQuizData(quizData: QuizData, studyKit: StudyKit): Quiz {
+export function transformQuizData(
+  quizData: QuizData,
+  studyKit: StudyKit,
+  difficultyOverride?: number
+): Quiz {
   const subjectMap: Record<string, Subject> = {
     'matematica': 'mathematics',
     'fisica': 'physics',
@@ -64,6 +73,7 @@ export function transformQuizData(quizData: QuizData, studyKit: StudyKit): Quiz 
   };
 
   const subject: Subject = (studyKit.subject && subjectMap[studyKit.subject.toLowerCase()]) || 'computerScience';
+  const fallbackDifficulty = normalizeDifficulty(difficultyOverride ?? 2);
 
   const questions: Question[] = quizData.questions.map((q: QuizQuestion, index: number) => ({
     id: `q-${index}`,
@@ -73,7 +83,7 @@ export function transformQuizData(quizData: QuizData, studyKit: StudyKit): Quiz 
     correctAnswer: q.correctIndex,
     hints: [],
     explanation: q.explanation || '',
-    difficulty: 2,
+    difficulty: q.difficulty ?? fallbackDifficulty,
     subject: subject,
     topic: studyKit.title,
   }));

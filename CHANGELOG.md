@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 15 - Adaptive Difficulty Engine)
+
+**What it does**: Multi-signal adaptive difficulty (chat/voice/quiz/flashcard) with prerequisite-aware pacing and pragmatic overrides for study-kit/homework.
+
+**Modes**: Manuale, Guidata, Bilanciata (default), Automatica.
+
+**Key Files**:
+- `src/lib/education/adaptive-difficulty.ts`
+- `src/app/api/adaptive/*`
+- `src/components/settings/sections/profile-settings.tsx`
+- `docs/adr/0041-adaptive-difficulty-engine.md`
+
 ### Added (Jan 12 - Google Drive Integration)
 
 #### Google Drive File Import (ADR 0040)

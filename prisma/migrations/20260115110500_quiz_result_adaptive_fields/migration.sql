@@ -1,0 +1,3 @@
+ALTER TABLE "QuizResult" ADD COLUMN "topic" TEXT;
+ALTER TABLE "QuizResult" ADD COLUMN "avgDifficulty" DOUBLE PRECISION;
+ALTER TABLE "QuizResult" ADD COLUMN "source" TEXT;
