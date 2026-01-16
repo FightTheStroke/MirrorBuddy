@@ -30,6 +30,18 @@ interface DeleteRequestBody {
  * Deletes all personal data for the authenticated user.
  * This is irreversible and complies with GDPR Art. 17.
  */
+interface DeleteResult {
+  success: boolean;
+  deletedData: {
+    conversations: number;
+    messages: number;
+    materials: number;
+    progress: number;
+    settings: number;
+  };
+  message: string;
+}
+
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<DeleteResult | { error: string }>> {

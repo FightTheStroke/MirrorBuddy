@@ -39,10 +39,6 @@ export interface VoicePanelProposal2Props {
   onClose: () => void;
 }
 
-function isHexColor(color: string): boolean {
-  return color.startsWith('#');
-}
-
 export function VoicePanelProposal2({
   character,
   isConnected,

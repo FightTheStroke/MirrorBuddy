@@ -3,7 +3,7 @@
 // Database record conversion and transformation utilities
 // ============================================================================
 
-import type { ToolType } from '@/types/tools';
+// Types are used by consumers of this module
 
 /**
  * Material record from database

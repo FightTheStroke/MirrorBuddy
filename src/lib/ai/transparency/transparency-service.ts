@@ -8,7 +8,6 @@
 
 import { logger } from '@/lib/logger';
 import {
-  ConfidenceAssessment,
   ResponseSourceType,
   ResponseTransparencyMetadata,
   SourceCitation,

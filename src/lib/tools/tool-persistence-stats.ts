@@ -4,7 +4,6 @@
 // ============================================================================
 
 import { prisma } from '@/lib/db';
-import type { ToolType } from '@/types/tools';
 import { materialToSavedTool, type SavedTool } from './tool-persistence-helpers';
 
 /**

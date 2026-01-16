@@ -4,7 +4,7 @@
  * Extracted from safety-prompts.ts
  */
 
-export { SAFETY_CORE_PROMPT } from './safety-prompts-text';
+// Core safety prompt - defined inline
 export const SAFETY_CORE_PROMPT = `
 # REGOLE DI SICUREZZA NON NEGOZIABILI
 

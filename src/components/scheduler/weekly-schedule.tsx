@@ -7,8 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { ScheduledSession, DayOfWeek } from '@/lib/scheduler/types';
 import { maestri } from '@/data/maestri';
-import { DAYS_OF_WEEK, SUBJECTS, TIME_OPTIONS } from './weekly-schedule/constants';
-import { SessionForm, INITIAL_FORM } from './weekly-schedule/session-form';
+import { DAYS_OF_WEEK, SUBJECTS } from './weekly-schedule/constants';
+import { SessionForm } from './weekly-schedule/session-form';
 
 interface WeeklyScheduleProps {
   sessions: ScheduledSession[];

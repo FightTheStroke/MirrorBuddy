@@ -12,7 +12,8 @@
  * Related: #30 Safety Guardrails Issue, S-02 Task
  */
 
-import { containsCrisisKeywords, IT_CONTENT_PATTERNS } from './safety-prompts';
+import { containsCrisisKeywords } from './safety-prompts-core';
+import { IT_CONTENT_PATTERNS } from './safety-patterns';
 
 /**
  * Severity levels for content filtering
@@ -293,7 +294,7 @@ export function filterInput(text: string): FilterResult {
 
   // Check for severe Italian patterns from safety-prompts
   const severePatterns = IT_CONTENT_PATTERNS.severe;
-  if (severePatterns.some((pattern) => normalized.includes(pattern))) {
+  if (severePatterns.some((pattern: string) => normalized.includes(pattern))) {
     return {
       safe: false,
       severity: 'high',

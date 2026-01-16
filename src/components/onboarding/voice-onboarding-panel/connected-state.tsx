@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
-import { Phone, PhoneOff, Mic, MicOff, Check, Circle } from 'lucide-react';
+import { PhoneOff, Mic, MicOff, Check, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { VoiceTranscriptEntry } from '@/lib/stores/onboarding-store';

@@ -136,7 +136,7 @@ export function HTMLSnippetsView() {
               <SnippetCard
                 key={demo.id}
                 demo={demo}
-                maestroName={getMaestroName(demo.maestroId)}
+                maestroName={getMaestroName(demo.maestroId) ?? undefined}
                 onPreview={setPreviewSnippet}
                 onOpenInNewTab={() => handleOpenInNewTab(demo.code, demo.title)}
                 onDelete={deleteDemo}

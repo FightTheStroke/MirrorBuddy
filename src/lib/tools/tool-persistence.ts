@@ -14,14 +14,6 @@ import type { ToolType } from '@/types/tools';
 import { randomUUID } from 'crypto';
 import { generateMaterialEmbeddingAsync } from './tool-embedding';
 import { materialToSavedTool, type SavedTool } from './tool-persistence-helpers';
-import {
-  getToolStats,
-  getRecentTools,
-  getBookmarkedTools,
-  getToolsBySession,
-  linkToolToSession,
-  incrementViewCount,
-} from './tool-persistence-stats';
 
 // Re-export for backward compatibility
 export type { SavedTool } from './tool-persistence-helpers';

@@ -1,7 +1,6 @@
 'use client';
 
 import { Smartphone, AlertCircle, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   getPushCapabilityMessage,
   type PushCapabilityStatus,

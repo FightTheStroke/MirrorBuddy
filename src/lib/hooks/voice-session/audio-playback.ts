@@ -180,7 +180,7 @@ export function useOutputLevelPolling(
   setOutputLevel: (value: number) => void
 ): PollingControls {
   const animationFrameRef = useRef<number | null>(null);
-  const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
+  const _dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const pollLevelRef = useRef<(() => void) | null>(null);
   const lastUpdateRef = useRef<number>(0);
 

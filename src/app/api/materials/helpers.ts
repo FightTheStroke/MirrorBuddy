@@ -2,7 +2,8 @@
  * Materials API helpers
  */
 
-import { prisma, Prisma } from '@/lib/db';
+import { prisma } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 import { isPostgreSQL } from '@/lib/db/database-utils';
 import { generateSearchableText } from '@/lib/search/searchable-text';
 import type { ToolType } from '@/types/tools';

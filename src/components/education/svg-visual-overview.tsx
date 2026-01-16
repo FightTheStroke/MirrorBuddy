@@ -45,37 +45,44 @@ export function SVGVisualOverview({
 
   const overviewData = externalData ?? parseTextToOverview(title, content, subject);
 
-  // Render diagram
-  const renderDiagram = useCallback(async () => {
-    if (!containerRef.current) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    const result = await renderSVGDiagram(containerRef.current, overviewData, {
-      theme,
-      layout: currentLayout,
-      useMermaid,
-      width: containerRef.current.clientWidth || 800,
-      height: 600,
-    });
-
-    if (result.error) {
-      setError(result.error);
-      if (!useMermaid) {
-        logger.info('[SVGVisualOverview] Falling back to Mermaid');
-        setUseMermaid(true);
-      }
-    } else {
-      setSvgContent(result.svg);
-    }
-    setIsLoading(false);
-  }, [overviewData, theme, currentLayout, useMermaid]);
-
-  // Re-render when dependencies change
+  // Render diagram when dependencies change
   useEffect(() => {
+    let cancelled = false;
+
+    async function renderDiagram() {
+      if (!containerRef.current) return;
+
+      setIsLoading(true);
+      setError(null);
+
+      const result = await renderSVGDiagram(containerRef.current, overviewData, {
+        theme,
+        layout: currentLayout,
+        useMermaid,
+        width: containerRef.current.clientWidth || 800,
+        height: 600,
+      });
+
+      if (cancelled) return;
+
+      if (result.error) {
+        setError(result.error);
+        if (!useMermaid) {
+          logger.info('[SVGVisualOverview] Falling back to Mermaid');
+          setUseMermaid(true);
+        }
+      } else {
+        setSvgContent(result.svg);
+      }
+      setIsLoading(false);
+    }
+
     renderDiagram();
-  }, [renderDiagram]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [overviewData, theme, currentLayout, useMermaid]);
 
   // Export handlers
   const handleExportSVG = useCallback(() => {

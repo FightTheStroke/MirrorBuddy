@@ -31,7 +31,13 @@ export function ErrorState({ error, onRetry }: { error: string | null; onRetry: 
   );
 }
 
-export function NoProfileState({ onGenerate, isGenerating, error }: any) {
+interface NoProfileStateProps {
+  onGenerate: () => void;
+  isGenerating: boolean;
+  error: string | null;
+}
+
+export function NoProfileState({ onGenerate, isGenerating, error }: NoProfileStateProps) {
   return (
     <Card>
       <CardHeader>
