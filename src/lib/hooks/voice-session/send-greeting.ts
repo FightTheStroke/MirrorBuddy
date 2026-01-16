@@ -56,7 +56,7 @@ export function useSendGreeting(
       item: {
         type: 'message',
         role: 'user',
-        content: [{ type: 'input_text', text: greetingPrompt }],
+        content: [{ type: 'text', text: greetingPrompt }],
       },
     });
     const responseMsg = JSON.stringify({ type: 'response.create' });
