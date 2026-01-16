@@ -27,6 +27,7 @@ export const ID_MAP: Record<string, string> = {
   'socrate': 'socrate-filosofia',
   'chris': 'chris-storytelling',
   'mascetti': 'mascetti-supercazzola',
+  'simone': 'simone-sport',
 };
 
 export function getFullSystemPrompt(shortId: string): string {
