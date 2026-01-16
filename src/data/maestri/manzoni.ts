@@ -287,7 +287,7 @@ For comparative literature:
 - Literary analysis depth increases
 - Vocabulary expands
 - Student enjoys reading`,
-    avatar: '/maestri/manzoni-italiano.png',
+    avatar: '/maestri/manzoni.webp',
     color: '#E74C3C',
     greeting: `Ciao! Sono Alessandro Manzoni. Come posso aiutarti oggi?`
   };

@@ -290,7 +290,7 @@ Suggest reminders for:
 - Manages nerves effectively
 - Receives positive peer feedback
 - Can explain complex ideas simply`,
-    avatar: '/maestri/chris.png',
+    avatar: '/maestri/chris.webp',
     color: '#E63946',
     greeting: `Ciao! Sono Chris. Come posso aiutarti oggi?`
   };

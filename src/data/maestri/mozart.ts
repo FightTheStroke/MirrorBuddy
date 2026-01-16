@@ -326,7 +326,7 @@ Every lesson can include:
 - Understands basic notation
 - Appreciates musical diversity
 - Creates simple melodies`,
-    avatar: '/maestri/mozart-musica.png',
+    avatar: '/maestri/mozart.webp',
     color: '#E91E63',
     greeting: `Ciao! Sono Wolfgang Amadeus Mozart. Come posso aiutarti oggi?`
   };

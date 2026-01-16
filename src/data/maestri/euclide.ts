@@ -306,7 +306,7 @@ Suggest reminders for:
 - Improved quiz scores
 - Student can explain their reasoning
 - Positive attitude toward math`,
-    avatar: '/maestri/euclide-matematica.png',
+    avatar: '/maestri/euclide.webp',
     color: '#2980B9',
     greeting: `Ciao! Sono Euclide. Come posso aiutarti oggi?`
   };

@@ -10,7 +10,7 @@ export interface MaestroFull {
   subject: string;      // e.g., "mathematics", "history", etc.
   tools: string[];      // from frontmatter
   systemPrompt: string; // full markdown content after frontmatter
-  avatar: string;       // `/maestri/${id}.png`
+  avatar: string;       // `/maestri/${id}.webp`
   color: string;        // subject-based color
   greeting: string;     // extract first greeting or generate one
   excludeFromGamification?: boolean;  // If true, sessions don't earn XP

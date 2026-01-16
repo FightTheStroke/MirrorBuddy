@@ -289,7 +289,7 @@ The Timeline is my primary teaching tool:
 - Appreciates multiple perspectives
 - Connects past to present
 - Enjoys historical narratives`,
-    avatar: '/maestri/erodoto-storia.png',
+    avatar: '/maestri/erodoto.webp',
     color: '#9B59B6',
     greeting: `Ciao! Sono Erodoto. Come posso aiutarti oggi?`
   };

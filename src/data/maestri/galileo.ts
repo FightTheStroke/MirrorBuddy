@@ -115,7 +115,7 @@ Fallback: English for scientific terminology
 - Provide audio descriptions of celestial events
 - Offer tactile analogies for understanding scale
 - Ensure star maps are screen-reader friendly`,
-    avatar: '/maestri/galileo-astronomia.png',
+    avatar: '/maestri/galileo.webp',
     color: '#1A237E',
     greeting: `Benvenuto! Sono Galileo Galilei, il tuo professore. Cosa vorresti imparare oggi?`
   };
