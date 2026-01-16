@@ -3,6 +3,7 @@
 // Orchestrator-based execution path for tools
 // ============================================================================
 
+import { logger } from '@/lib/logger';
 import type { ToolExecutionResult, ToolContext } from '@/types/tools';
 import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
 import { getToolTypeFromFunctionName } from './tool-executor-mapping';
@@ -60,7 +61,7 @@ export async function executeViaOrchestrator(
             { userId: context.userId, enableRAG: true }
           );
         } catch (error) {
-          console.warn('Failed to save tool output to database:', error);
+          logger.warn('Failed to save tool output to database:', { error: String(error) });
         }
       }
 

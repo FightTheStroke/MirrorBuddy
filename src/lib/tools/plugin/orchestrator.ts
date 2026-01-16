@@ -7,6 +7,7 @@
  * Security: Implements execution timeout to prevent indefinite hangs
  */
 
+import { logger } from '@/lib/logger';
 import { ToolPlugin, ToolCategory } from './types';
 import { ToolRegistry } from './registry';
 import type { ToolResult } from '@/types/tools';
@@ -125,19 +126,19 @@ export class ToolOrchestrator {
    */
   validatePrerequisites(plugin: ToolPlugin, context: ToolExecutionContext): boolean {
     if (!context.userId) {
-      console.warn(`Prerequisite failed: no userId for tool "${plugin.id}"`);
+      logger.warn(`Prerequisite failed: no userId for tool "${plugin.id}"`);
       return false;
     }
 
     if (!context.sessionId) {
-      console.warn(`Prerequisite failed: no sessionId for tool "${plugin.id}"`);
+      logger.warn(`Prerequisite failed: no sessionId for tool "${plugin.id}"`);
       return false;
     }
 
     if (plugin.prerequisites && plugin.prerequisites.length > 0) {
       for (const prerequisite of plugin.prerequisites) {
         if (context.activeTools.includes(prerequisite)) {
-          console.warn(`Prerequisite check: "${prerequisite}" is already active for "${plugin.id}"`);
+          logger.warn(`Prerequisite check: "${prerequisite}" is already active for "${plugin.id}"`);
           return false;
         }
       }

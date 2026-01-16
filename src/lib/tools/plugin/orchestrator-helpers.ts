@@ -6,6 +6,7 @@
  * Security: Implements execution timeout to prevent indefinite hangs
  */
 
+import { logger } from '@/lib/logger';
 import type { ToolResult } from '@/types/tools';
 
 /**
@@ -77,7 +78,7 @@ export function extractErrorMessage(error: unknown): string {
 export function createErrorToolResult(toolId: string, error: unknown): ToolResult {
   const errorMessage = extractErrorMessage(error);
   const message = `Tool execution failed for "${toolId}": ${errorMessage}`;
-  console.error(message);
+  logger.error(message);
 
   return {
     success: false,

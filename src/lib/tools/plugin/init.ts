@@ -4,6 +4,7 @@
  * Part of scalable plugin architecture (F-05)
  */
 
+import { logger } from '@/lib/logger';
 import { ToolRegistry } from './registry';
 
 /**
@@ -14,7 +15,7 @@ import { ToolRegistry } from './registry';
 export function initializeToolRegistry(): ToolRegistry {
   const registry = ToolRegistry.getInstance();
   if (process.env.NODE_ENV === 'development') {
-    console.debug('ToolRegistry initialized');
+    logger.debug('ToolRegistry initialized');
   }
   return registry;
 }
