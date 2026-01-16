@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Fixed (Jan 16 - Performance & N+1 Patterns)
+
+#### Database Performance Optimization
+- **N+1 Query Resolution**: Fixed 3 critical N+1 patterns using `$transaction` and batch operations
+  - `learning-persistence.ts`: Batch findMany + createMany instead of loop queries
+  - `materials/bulk/route.ts`: Transaction with upsert for tag assignments
+  - `path-generator.ts`: createMany for learning path topics
+- **Performance Scripts**: Added automated performance validation (`npm run pre-release` Phase 4)
+  - EventSource cleanup validation
+  - Event listener leak detection
+  - N+1 pattern detection (heuristic-based)
+  - Bundle size monitoring
+  - Lazy loading verification
+
 ### Added (Jan 16 - Tool Alignment Maestri)
 
 #### Complete Tool Alignment for Maestri, Buddies, and Coaches
