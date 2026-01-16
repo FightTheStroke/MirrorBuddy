@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, type ChangeEvent, type KeyboardEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mic, MicOff, PhoneOff, VolumeX, Send, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,12 +28,28 @@ export function SessionControls({
   const [showTextInput, setShowTextInput] = useState(false);
   const [textInput, setTextInput] = useState('');
 
-  const handleTextSubmit = () => {
+  // Memoized handlers to prevent re-renders
+  const handleToggleTextInput = useCallback(() => {
+    setShowTextInput((prev) => !prev);
+  }, []);
+
+  const handleTextChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setTextInput(e.target.value);
+  }, []);
+
+  const handleTextSubmit = useCallback(() => {
     if (textInput.trim()) {
       onSendText(textInput);
       setTextInput('');
     }
-  };
+  }, [textInput, onSendText]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && textInput.trim()) {
+      onSendText(textInput);
+      setTextInput('');
+    }
+  }, [textInput, onSendText]);
 
   return (
     <div className="p-6 border-t border-slate-700/50 bg-slate-800/30">
@@ -70,7 +86,7 @@ export function SessionControls({
         <Button
           variant="ghost"
           size="icon-lg"
-          onClick={() => setShowTextInput(!showTextInput)}
+          onClick={handleToggleTextInput}
           title="Scrivi un messaggio"
           aria-label="Scrivi un messaggio"
           className="rounded-full bg-slate-700 text-white hover:bg-slate-600"
@@ -115,8 +131,8 @@ export function SessionControls({
               <input
                 type="text"
                 value={textInput}
-                onChange={(e) => setTextInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit()}
+                onChange={handleTextChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Scrivi un messaggio..."
                 className="flex-1 px-4 py-2 rounded-xl bg-slate-700 border border-slate-600 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
