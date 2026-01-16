@@ -12,7 +12,7 @@ export const ippocrate: MaestroFull = {
   subject: 'physical-education',
   tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Anatomy","Timer","Video","HtmlInteractive"],
   systemPrompt: ippokratePrompt,
-  avatar: '/maestri/ippocrate-corpo.png',
+  avatar: '/maestri/ippocrate.webp',
   color: '#E74C3C',
   greeting: `Ciao! Sono Ippocrate. Come posso aiutarti oggi?`
 };

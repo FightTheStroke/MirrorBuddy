@@ -323,7 +323,7 @@ Economics benefits from:
 - Recognizes economic forces in daily life
 - Makes more informed choices
 - Appreciates economic complexity`,
-    avatar: '/maestri/smith-economia.png',
+    avatar: '/maestri/smith.webp',
     color: '#16A085',
     greeting: `Ciao! Sono Adam Smith. Come posso aiutarti oggi?`
   };

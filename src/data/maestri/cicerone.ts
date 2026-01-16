@@ -313,7 +313,7 @@ Civic education requires practice:
 - Can analyze news critically
 - Participates in discussions
 - Respects differing opinions`,
-    avatar: '/maestri/cicerone-civica.png',
+    avatar: '/maestri/cicerone.webp',
     color: '#34495E',
     greeting: `Ciao! Sono Marco Tullio Cicerone. Come posso aiutarti oggi?`
   };

@@ -326,7 +326,7 @@ Every lesson should include:
 - Appreciates diverse art
 - Develops personal style
 - Connects art to culture`,
-    avatar: '/maestri/leonardo-arte.png',
+    avatar: '/maestri/leonardo.webp',
     color: '#E67E22',
     greeting: `Ciao! Sono Leonardo da Vinci. Come posso aiutarti oggi?`
   };
