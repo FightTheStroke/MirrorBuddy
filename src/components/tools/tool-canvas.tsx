@@ -6,11 +6,11 @@
 
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Network } from 'lucide-react';
 import { logger } from '@/lib/logger';
-import { useToolStream, type ActiveToolState } from '@/lib/hooks/use-tool-stream';
+import { useToolStream, type ActiveToolState, type StreamToolEvent } from '@/lib/hooks/use-tool-stream';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import type { StudentSummaryData } from '@/types/tools';
@@ -70,6 +70,33 @@ export function ToolCanvas({
     }
   }, []);
 
+  // Memoized toggle handlers to prevent re-renders
+  const handleToggleFullscreen = useCallback(() => {
+    setIsFullscreen((prev) => !prev);
+  }, []);
+
+  const handleShowPip = useCallback(() => {
+    setShowPiP(true);
+  }, []);
+
+  const handleHidePip = useCallback(() => {
+    setShowPiP(false);
+  }, []);
+
+  // Store refs to avoid stale closures in event handler
+  const onToolCompleteRef = useRef(onToolComplete);
+  const activeToolRef = useRef<ActiveToolState | null>(null);
+  useEffect(() => {
+    onToolCompleteRef.current = onToolComplete;
+  }, [onToolComplete]);
+
+  // Memoized event handler
+  const handleToolEvent = useCallback((event: StreamToolEvent) => {
+    if (event.type === 'tool:complete' && activeToolRef.current) {
+      onToolCompleteRef.current?.(activeToolRef.current);
+    }
+  }, []);
+
   const {
     connectionState,
     activeTool,
@@ -77,12 +104,13 @@ export function ToolCanvas({
   } = useToolStream({
     sessionId,
     autoConnect: true,
-    onEvent: (event) => {
-      if (event.type === 'tool:complete' && activeTool) {
-        onToolComplete?.(activeTool);
-      }
-    },
+    onEvent: handleToolEvent,
   });
+
+  // Keep activeToolRef in sync
+  useEffect(() => {
+    activeToolRef.current = activeTool;
+  }, [activeTool]);
 
   // Memoize status info
   const toolStatus = activeTool?.status;
@@ -167,7 +195,7 @@ export function ToolCanvas({
                 tool={activeTool}
                 statusInfo={statusInfo}
                 isFullscreen={isFullscreen}
-                onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
+                onToggleFullscreen={handleToggleFullscreen}
                 onCancel={onCancel}
               />
 
@@ -195,7 +223,7 @@ export function ToolCanvas({
             maestroAvatar={maestroAvatar}
             activeTool={activeTool}
             eventsReceived={eventsReceived}
-            onHide={() => setShowPiP(false)}
+            onHide={handleHidePip}
           />
         )}
       </AnimatePresence>
@@ -203,7 +231,7 @@ export function ToolCanvas({
       {/* Show PiP button when hidden */}
       {!showPiP && (
         <button
-          onClick={() => setShowPiP(true)}
+          onClick={handleShowPip}
           className="hidden md:flex absolute bottom-4 right-4 items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors text-sm text-slate-300"
         >
           Mostra {maestroName}

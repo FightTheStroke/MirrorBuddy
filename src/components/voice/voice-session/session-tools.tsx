@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Brain, BookOpen, Search, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,13 @@ export function SessionTools({
   onClearToolCalls,
   onTriggerTool,
 }: SessionToolsProps) {
+  // Memoized handlers to prevent re-renders
+  const handleWebcam = useCallback(() => onTriggerTool('capture_homework'), [onTriggerTool]);
+  const handleMindmap = useCallback(() => onTriggerTool('mindmap'), [onTriggerTool]);
+  const handleQuiz = useCallback(() => onTriggerTool('quiz'), [onTriggerTool]);
+  const handleFlashcard = useCallback(() => onTriggerTool('flashcard'), [onTriggerTool]);
+  const handleSearch = useCallback(() => onTriggerTool('search'), [onTriggerTool]);
+
   return (
     <>
       {toolCalls.length > 0 && (
@@ -54,7 +62,7 @@ export function SessionTools({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onTriggerTool('capture_homework')}
+            onClick={handleWebcam}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
             title="Mostra compiti via webcam"
           >
@@ -64,7 +72,7 @@ export function SessionTools({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onTriggerTool('mindmap')}
+            onClick={handleMindmap}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
             title="Crea mappa mentale"
           >
@@ -74,7 +82,7 @@ export function SessionTools({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onTriggerTool('quiz')}
+            onClick={handleQuiz}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
             title="Crea quiz"
           >
@@ -84,7 +92,7 @@ export function SessionTools({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onTriggerTool('flashcard')}
+            onClick={handleFlashcard}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
             title="Crea flashcard"
           >
@@ -94,7 +102,7 @@ export function SessionTools({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => onTriggerTool('search')}
+            onClick={handleSearch}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
             title="Cerca sul web"
           >
