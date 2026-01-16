@@ -43,3 +43,30 @@ export const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
  * Heartbeat interval - ping to detect dead connections
  */
 export const HEARTBEAT_INTERVAL_MS = 30000; // 30 seconds
+
+// ============================================================================
+// RECONNECTION BACKOFF CONFIGURATION
+// Exponential backoff for voice session reconnection attempts
+// ============================================================================
+
+export const RECONNECT_BACKOFF = {
+  /** Initial delay before first retry (ms) */
+  baseDelay: 100,
+  /** Maximum delay cap (ms) */
+  maxDelay: 30000,
+  /** Maximum number of retry attempts */
+  maxRetries: 5,
+  /** Jitter factor (±10%) to prevent thundering herd */
+  jitterFactor: 0.1,
+} as const;
+
+/**
+ * Calculate backoff delay with jitter
+ * Formula: min(maxDelay, baseDelay * 2^attempt) * (1 ± jitter)
+ */
+export function calculateBackoffDelay(attempt: number): number {
+  const { baseDelay, maxDelay, jitterFactor } = RECONNECT_BACKOFF;
+  const exponentialDelay = Math.min(maxDelay, baseDelay * Math.pow(2, attempt));
+  const jitter = 1 + (Math.random() * 2 - 1) * jitterFactor;
+  return Math.round(exponentialDelay * jitter);
+}

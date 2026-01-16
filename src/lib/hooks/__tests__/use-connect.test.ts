@@ -59,6 +59,7 @@ function createMockRefs(): ConnectionRefs {
     handleServerEventRef: { current: null },
     sessionIdRef: { current: null },
     connectionTimeoutRef: { current: null },
+    greetingTimeoutsRef: { current: [] },
     webrtcCleanupRef: { current: null },
     remoteAudioStreamRef: { current: null },
     webrtcAudioElementRef: { current: null },

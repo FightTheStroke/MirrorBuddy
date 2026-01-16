@@ -25,6 +25,11 @@ export async function GET(request: NextRequest) {
     const rawDeckId = searchParams.get('deckId');
     const rawDue = searchParams.get('due');
 
+    // Pagination params (defaults: page=1, limit=100, max=500)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const limit = Math.min(500, Math.max(1, parseInt(searchParams.get('limit') || '100', 10)));
+    const skip = (page - 1) * limit;
+
     // Validate query parameters
     const validation = FlashcardProgressGetQuerySchema.safeParse({
       deckId: rawDeckId || undefined,
@@ -49,12 +54,20 @@ export async function GET(request: NextRequest) {
       where.nextReview = { lte: new Date() };
     }
 
-    const progress = await prisma.flashcardProgress.findMany({
-      where,
-      orderBy: { nextReview: 'asc' },
-    });
+    const [progress, total] = await Promise.all([
+      prisma.flashcardProgress.findMany({
+        where,
+        orderBy: { nextReview: 'asc' },
+        skip,
+        take: limit,
+      }),
+      prisma.flashcardProgress.count({ where }),
+    ]);
 
-    return NextResponse.json(progress);
+    return NextResponse.json({
+      data: progress,
+      pagination: { total, page, limit, hasNext: skip + progress.length < total },
+    });
   } catch (error) {
     logger.error('Flashcard progress GET error', { error: String(error) });
     return NextResponse.json(

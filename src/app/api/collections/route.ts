@@ -32,35 +32,52 @@ export async function GET(request: NextRequest) {
     const parentId = searchParams.get('parentId') || undefined;
     const includeChildren = searchParams.get('includeChildren') === 'true';
 
-    // 3. Fetch collections
-    const collections = await prisma.collection.findMany({
-      where: {
-        userId,
-        ...(parentId ? { parentId } : { parentId: null }),
-      },
-      orderBy: [
-        { sortOrder: 'asc' },
-        { name: 'asc' },
-      ],
-      include: {
-        ...(includeChildren && {
-          children: {
-            orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+    // 3. Pagination params (defaults: page=1, limit=100, max=500)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const limit = Math.min(500, Math.max(1, parseInt(searchParams.get('limit') || '100', 10)));
+    const skip = (page - 1) * limit;
+
+    // 4. Fetch collections
+    const where = {
+      userId,
+      ...(parentId ? { parentId } : { parentId: null }),
+    };
+
+    const [collections, total] = await Promise.all([
+      prisma.collection.findMany({
+        where,
+        orderBy: [
+          { sortOrder: 'asc' },
+          { name: 'asc' },
+        ],
+        skip,
+        take: limit,
+        include: {
+          ...(includeChildren && {
+            children: {
+              orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+            },
+          }),
+          _count: {
+            select: { materials: true },
           },
-        }),
-        _count: {
-          select: { materials: true },
         },
-      },
-    });
+      }),
+      prisma.collection.count({ where }),
+    ]);
 
     logger.info('Collections GET', {
       userId,
       count: collections.length,
+      page,
+      total,
       parentId: parentId ?? 'root',
     });
 
-    return NextResponse.json(collections);
+    return NextResponse.json({
+      data: collections,
+      pagination: { total, page, limit, hasNext: skip + collections.length < total },
+    });
   } catch (error) {
     logger.error('Collections GET error', { error: String(error) });
 

@@ -22,6 +22,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
   playbackContextRef: React.MutableRefObject<AudioContext | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
   transportRef: React.MutableRefObject<'websocket' | 'webrtc'>;
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
@@ -73,9 +74,10 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
 
         // Schedule multiple greeting attempts with increasing delays
         // sendGreeting() has internal guard (greetingSentRef) - only first success sends
+        // Store timeout IDs for cleanup on unmount
         logger.debug('[VoiceSession] Scheduling greeting attempts...');
-        [300, 600, 1000, 1500, 2000].forEach((delay, i) => {
-          setTimeout(() => {
+        deps.greetingTimeoutsRef.current = [300, 600, 1000, 1500, 2000].map((delay, i) => {
+          return setTimeout(() => {
             logger.debug(`[VoiceSession] Greeting attempt ${i + 1}/5`);
             deps.sendGreeting();
           }, delay);

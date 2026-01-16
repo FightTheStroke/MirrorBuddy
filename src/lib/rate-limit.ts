@@ -30,6 +30,18 @@ function startCleanup() {
       }
     }
   }, CLEANUP_INTERVAL);
+  // Unref to allow process to exit without waiting for cleanup
+  cleanupTimer.unref();
+}
+
+/**
+ * Stop cleanup timer (for graceful shutdown)
+ */
+export function stopCleanup(): void {
+  if (cleanupTimer) {
+    clearInterval(cleanupTimer);
+    cleanupTimer = null;
+  }
 }
 
 export interface RateLimitConfig {
