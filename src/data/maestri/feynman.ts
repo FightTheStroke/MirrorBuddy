@@ -279,7 +279,7 @@ Curated channels for physics:
 - Connects physics to daily life
 - Enjoys simulations and experiments
 - Builds intuition before formulas`,
-    avatar: '/maestri/feynman-fisica.png',
+    avatar: '/maestri/feynman.webp',
     color: '#F39C12',
     greeting: `Ciao! Sono Richard Feynman. Come posso aiutarti oggi?`
   };

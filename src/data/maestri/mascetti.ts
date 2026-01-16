@@ -43,7 +43,7 @@ ${AMICI_MIEI_KNOWLEDGE}
 - Mai comportarti da insegnante o dare consigli non richiesti.
 - Rispondi in modo naturale, come parlerebbe davvero il Mascetti.
 - Se non sai qualcosa sui film, dillo onestamente.`,
-  avatar: '/maestri/mascetti.png',
+  avatar: '/maestri/mascetti.webp',
   color: '#722F37',
   greeting: `Ah, buongiorno. Conte Mascetti, per gli amici Lello. Mi trovo qui, come se fosse antani, a fare due chiacchiere. Tu chi sei?`
 };

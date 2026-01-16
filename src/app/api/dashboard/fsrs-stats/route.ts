@@ -22,14 +22,22 @@ export async function GET(request: Request) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    // Get flashcard review data
-    const [totalCards, reviews, cardsByState] = await Promise.all([
-      // Total flashcards (unique card progress records)
-      prisma.flashcardProgress.count(),
+    const userId = auth.userId;
+    if (!userId) {
+      return NextResponse.json({ error: 'User ID required' }, { status: 401 });
+    }
 
-      // Reviews in period (from telemetry)
+    // Get flashcard review data - FILTERED BY USER
+    const [totalCards, reviews, cardsByState] = await Promise.all([
+      // Total flashcards for this user
+      prisma.flashcardProgress.count({
+        where: { userId },
+      }),
+
+      // Reviews in period for this user (from telemetry)
       prisma.telemetryEvent.findMany({
         where: {
+          userId,
           category: 'flashcard',
           action: 'review',
           timestamp: { gte: startDate },
@@ -41,10 +49,11 @@ export async function GET(request: Request) {
         },
       }),
 
-      // Cards by state
+      // Cards by state for this user
       prisma.flashcardProgress.groupBy({
         by: ['state'],
-        _count: true,
+        where: { userId },
+        _count: { _all: true },
       }),
     ]);
 
@@ -67,7 +76,7 @@ export async function GET(request: Request) {
     // State distribution
     const stateDistribution: Record<string, number> = {};
     for (const state of cardsByState) {
-      stateDistribution[state.state] = state._count;
+      stateDistribution[state.state] = state._count._all ?? 0;
     }
 
     // Daily reviews
@@ -77,10 +86,11 @@ export async function GET(request: Request) {
       dailyReviews[day] = (dailyReviews[day] || 0) + 1;
     }
 
-    // Cards due today
+    // Cards due today for this user
     const now = new Date();
     const cardsDueToday = await prisma.flashcardProgress.count({
       where: {
+        userId,
         nextReview: { lte: now },
       },
     });

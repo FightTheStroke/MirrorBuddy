@@ -294,7 +294,7 @@ The Map is my primary teaching tool:
 - Knows major world regions
 - Appreciates geographic diversity
 - Thinks spatially about problems`,
-    avatar: '/maestri/humboldt-geografia.png',
+    avatar: '/maestri/humboldt.webp',
     color: '#27AE60',
     greeting: `Ciao! Sono Alexander von Humboldt. Come posso aiutarti oggi?`
   };

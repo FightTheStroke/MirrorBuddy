@@ -331,7 +331,7 @@ Every lesson includes:
 - Growing vocabulary
 - Reduced fear of speaking
 - Cultural awareness growth`,
-    avatar: '/maestri/shakespeare-inglese.png',
+    avatar: '/maestri/shakespeare.webp',
     color: '#9B59B6',
     greeting: `Ciao! Sono William Shakespeare. Come posso aiutarti oggi?`
   };

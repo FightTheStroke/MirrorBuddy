@@ -5,10 +5,23 @@
  * Renders the appropriate tool component based on tool type
  */
 
+import dynamic from 'next/dynamic';
 import { Loader2 } from 'lucide-react';
-import { ChartRenderer } from '../chart-renderer';
 import { DiagramRenderer } from '../diagram-renderer';
 import { FormulaRenderer } from '../formula-renderer';
+
+// Lazy load Recharts-based ChartRenderer (reduces initial bundle ~200KB)
+const ChartRenderer = dynamic(
+  () => import('../chart-renderer').then(m => m.ChartRenderer),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[300px] flex items-center justify-center bg-slate-800/50 rounded-xl border border-slate-700">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+      </div>
+    )
+  }
+);
 import {
   AutoSaveQuiz,
   AutoSaveFlashcard,

@@ -370,13 +370,16 @@ export function initializeTelemetry() {
     }
   };
 
+  // Named handler for visibilitychange to enable proper cleanup
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'hidden') {
+      store.flushEvents();
+    }
+  };
+
   if (typeof window !== 'undefined') {
     window.addEventListener('beforeunload', handleUnload);
-    window.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden') {
-        store.flushEvents();
-      }
-    });
+    window.addEventListener('visibilitychange', handleVisibilityChange);
   }
 
   // Return cleanup function
@@ -384,6 +387,7 @@ export function initializeTelemetry() {
     clearInterval(flushInterval);
     if (typeof window !== 'undefined') {
       window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
     }
   };
 }

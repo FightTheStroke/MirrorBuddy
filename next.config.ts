@@ -11,6 +11,46 @@ const nextConfig: NextConfig = {
   // C-18 FIX: External packages that should not be bundled by Next.js
   // pdf-parse uses pdfjs-dist which has native dependencies
   serverExternalPackages: ['pdf-parse'],
+
+  // Bundle optimization: Tree-shake large packages
+  // Reduces bundle size by only importing used components
+  experimental: {
+    optimizePackageImports: [
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-collapsible',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-hover-card',
+      '@radix-ui/react-label',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-progress',
+      '@radix-ui/react-scroll-area',
+      '@radix-ui/react-select',
+      '@radix-ui/react-slider',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-switch',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-toast',
+      '@radix-ui/react-tooltip',
+      'lucide-react',
+      'framer-motion',
+      'date-fns',
+    ],
+  },
+
+  // Image optimization settings
+  images: {
+    // Enable modern formats for smaller sizes
+    formats: ['image/avif', 'image/webp'],
+    // Device sizes for responsive images
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
+    // Image sizes for fixed-size images
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
+    // Minimize browser memory usage
+    minimumCacheTTL: 60 * 60 * 24, // 24 hours
+  },
   // Add security headers for proper permissions handling
   async headers() {
     const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';

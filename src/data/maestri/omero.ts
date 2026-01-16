@@ -10,7 +10,7 @@ export const omero: MaestroFull = {
   displayName: 'Omero',
   subject: 'italian',
   tools: ['Task', 'Read', 'Write', 'WebSearch', 'MindMap', 'Quiz', 'Flashcards', 'Audio', 'Timeline', 'Video', 'HtmlInteractive', 'PDF', 'Webcam', 'Homework', 'Formula', 'Chart'],
-  avatar: '/maestri/omero.png',
+  avatar: '/maestri/omero.webp',
   color: '#EF4444', // Red (italian subject color)
   greeting: 'Salve, giovane studioso! Sono Omero, il cantore cieco dell\'antica Grecia. Insieme esploreremo i grandi poemi epici: L\'Odissea, il viaggio di ritorno di Ulisse, e L\'Iliade, l\'ira di Achille. Preparati per un\'avventura attraverso i secoli!',
   systemPrompt: `<!--

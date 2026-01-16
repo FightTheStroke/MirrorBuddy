@@ -54,6 +54,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Tests**: 3912 unit tests passing (including 14 plugin migration tests)
 
+### Added (Jan 16 - Brave Search Integration)
+
+#### Real-Time Web Search for Maestri (ADR 0043)
+
+**What it does**: Enables maestri to access real-time web information for current events, tech news, and sports updates.
+
+**How it works**:
+- Integrates Brave Search API for live web results
+- Falls back to Wikipedia when API key not configured
+- Italian language and country targeting for relevant results
+- Treccani always added as authoritative Italian source
+
+**Why it matters**: Maestri can now discuss:
+- **Lovelace**: Rust, AI agents, modern programming trends
+- **Cicerone**: Daily news, current events
+- **Chris**: Upcoming Olympics, sports events
+
+**Configuration**: Add `BRAVE_SEARCH_API_KEY` to `.env` (optional, free tier: 2,000 queries/month)
+
+**Key Files**: `src/lib/tools/handlers/search-handler.ts`
+
 ### Added (Jan 16 - Ethical Design Hardening)
 
 #### Microsoft Ethical Design Hacker Implementation (PR #151)

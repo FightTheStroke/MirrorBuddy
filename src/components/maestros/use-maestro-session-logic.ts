@@ -208,6 +208,13 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     }
   }, []);
 
+  // Wrap webcam capture to also close the modal after processing
+  const handleWebcamCaptureWithClose = useCallback((imageData: string) => {
+    chatHandlers.handleWebcamCapture(imageData);
+    setShowWebcam(false);
+    setWebcamRequest(null);
+  }, [chatHandlers]);
+
   return {
     // State
     messages,
@@ -238,7 +245,7 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     handleEndSession,
     handleSubmit: chatHandlers.handleSubmit,
     clearChat: clearChatWithReset,
-    handleWebcamCapture: chatHandlers.handleWebcamCapture,
+    handleWebcamCapture: handleWebcamCaptureWithClose,
     requestTool: chatHandlers.requestTool,
     handleRequestPhoto,
     setShowWebcam,

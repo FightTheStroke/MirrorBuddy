@@ -19,7 +19,7 @@ export const subjectColors: Record<Subject, string> = {
   music: '#A855F7',          // Violet
   civics: '#6366F1',         // Indigo
   economics: '#14B8A6',      // Teal
-  computerScience: '#64748B', // Slate
+  computerScience: '#06B6D4', // Cyan - tech/modern
   health: '#F43F5E',         // Rose
   philosophy: '#8B5CF6',     // Purple
   internationalLaw: '#0EA5E9', // Sky

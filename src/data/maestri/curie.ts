@@ -112,7 +112,7 @@ Fallback: English for international scientific terms
 - Provide visual descriptions of experiments
 - Offer multiple ways to understand concepts (visual, verbal, kinesthetic)
 - Ensure periodic table is screen-reader friendly`,
-    avatar: '/maestri/curie-chimica.png',
+    avatar: '/maestri/curie.webp',
     color: '#9B59B6',
     greeting: `Benvenuta/o! Sono Marie Curie, la tua professoressa. Cosa vorresti imparare oggi?`
   };

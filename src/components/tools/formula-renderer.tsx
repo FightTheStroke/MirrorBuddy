@@ -2,11 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import katex from 'katex';
-import 'katex/dist/katex.min.css';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { FormulaRequest } from '@/types';
+
+// Lazy load KaTeX CSS - only loaded once
+let katexCssLoaded = false;
+const loadKatexCss = () => {
+  if (katexCssLoaded || typeof document === 'undefined') return;
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
+  link.crossOrigin = 'anonymous';
+  document.head.appendChild(link);
+  katexCssLoaded = true;
+};
 
 interface FormulaRendererProps {
   request: FormulaRequest;
@@ -25,20 +35,28 @@ export function FormulaRenderer({
   useEffect(() => {
     if (!containerRef.current) return;
 
-    try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- Clear error before retry render
-      setError(null);
-      katex.render(request.latex, containerRef.current, {
-        displayMode,
-        throwOnError: false,
-        errorColor: '#ef4444',
-        trust: true,
-        strict: false,
-      });
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
-      setError(errorMsg);
-    }
+    // Load KaTeX dynamically
+    const renderFormula = async () => {
+      try {
+        setError(null);
+        loadKatexCss();
+        const katex = (await import('katex')).default;
+        if (containerRef.current) {
+          katex.render(request.latex, containerRef.current, {
+            displayMode,
+            throwOnError: false,
+            errorColor: '#ef4444',
+            trust: true,
+            strict: false,
+          });
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err);
+        setError(errorMsg);
+      }
+    };
+
+    renderFormula();
   }, [request.latex, displayMode]);
 
   return (
@@ -84,15 +102,23 @@ export function InlineFormula({ latex, className }: InlineFormulaProps) {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    try {
-      katex.render(latex, containerRef.current, {
-        displayMode: false,
-        throwOnError: false,
-        errorColor: '#ef4444',
-      });
-    } catch (err) {
-      logger.error('KaTeX error', { error: String(err) });
-    }
+    const renderInlineFormula = async () => {
+      try {
+        loadKatexCss();
+        const katex = (await import('katex')).default;
+        if (containerRef.current) {
+          katex.render(latex, containerRef.current, {
+            displayMode: false,
+            throwOnError: false,
+            errorColor: '#ef4444',
+          });
+        }
+      } catch (err) {
+        logger.error('KaTeX error', { error: String(err) });
+      }
+    };
+
+    renderInlineFormula();
   }, [latex]);
 
   return (

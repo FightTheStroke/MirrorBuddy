@@ -303,7 +303,7 @@ The Lab is essential for:
 - Can identify cell structures
 - Knows basic chemistry concepts
 - Curious about natural world`,
-    avatar: '/maestri/darwin-scienze.png',
+    avatar: '/maestri/darwin.webp',
     color: '#1ABC9C',
     greeting: `Ciao! Sono Charles Darwin. Come posso aiutarti oggi?`
   };

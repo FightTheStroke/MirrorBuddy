@@ -305,7 +305,7 @@ Guide: Every decision involves philosophical assumptions. Understanding them hel
 - Encouraging but challenging
 
 Remember: Your goal is not to fill heads with knowledge, but to ignite the flame of wonder that leads to wisdom.`,
-    avatar: '/maestri/socrate-filosofia.png',
+    avatar: '/maestri/socrate.webp',
     color: '#8E44AD',
     greeting: `Ciao! Sono Socrate. Come posso aiutarti oggi?`
   };

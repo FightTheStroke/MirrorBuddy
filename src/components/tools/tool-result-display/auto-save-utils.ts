@@ -14,6 +14,38 @@ const saveTimers = new Map<string, ReturnType<typeof setTimeout>>();
 // Global tracking for saved/pending materials: Set<dedupKey>
 const savedMaterialsCache = new Set<string>();
 
+// Max cache size to prevent unbounded memory growth
+const MAX_CACHE_SIZE = 500;
+
+/**
+ * Cleanup function to clear all pending timers and cache
+ * Call this when unmounting or on session end to prevent memory leaks
+ */
+export function cleanupAutoSave(): void {
+  // Clear all pending timers
+  for (const timer of saveTimers.values()) {
+    clearTimeout(timer);
+  }
+  saveTimers.clear();
+  savedMaterialsCache.clear();
+  logger.debug('Auto-save cleanup complete');
+}
+
+/**
+ * Trim cache if it exceeds max size
+ * Removes oldest entries (first inserted)
+ */
+function trimCacheIfNeeded(): void {
+  if (savedMaterialsCache.size > MAX_CACHE_SIZE) {
+    const toRemove = savedMaterialsCache.size - MAX_CACHE_SIZE;
+    const iterator = savedMaterialsCache.values();
+    for (let i = 0; i < toRemove; i++) {
+      const value = iterator.next().value;
+      if (value) savedMaterialsCache.delete(value);
+    }
+  }
+}
+
 /**
  * Debounced auto-save helper
  * Prevents duplicate saves and allows retry on failure
@@ -43,6 +75,7 @@ export async function debouncedAutoSave(
   const timer = setTimeout(async () => {
     saveTimers.delete(dedupKey);
     savedMaterialsCache.add(dedupKey);
+    trimCacheIfNeeded();
 
     try {
       const success = await saveFunction();
