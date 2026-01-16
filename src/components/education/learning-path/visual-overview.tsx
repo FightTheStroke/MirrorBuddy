@@ -40,6 +40,8 @@ export function VisualOverview({
 
   useEffect(() => {
     let cancelled = false;
+    // Store click handlers for proper cleanup (prevent memory leak)
+    const clickHandlers: Array<{ node: Element; handler: () => void }> = [];
 
     const renderDiagram = async () => {
       if (!containerRef.current) return;
@@ -78,7 +80,10 @@ export function VisualOverview({
                 const topic = topics[index];
                 if (topic && topic.status !== 'locked') {
                   node.classList.add('cursor-pointer', 'hover:opacity-80');
-                  node.addEventListener('click', () => onTopicClick(topic.id));
+                  const handler = () => onTopicClick(topic.id);
+                  node.addEventListener('click', handler);
+                  // Store reference for cleanup
+                  clickHandlers.push({ node, handler });
                 }
               });
             }
@@ -97,6 +102,10 @@ export function VisualOverview({
 
     return () => {
       cancelled = true;
+      // Clean up click handlers to prevent memory leak
+      for (const { node, handler } of clickHandlers) {
+        node.removeEventListener('click', handler);
+      }
     };
   }, [topics, compact, onTopicClick]);
 
