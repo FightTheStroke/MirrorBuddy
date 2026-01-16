@@ -10,6 +10,7 @@ import { FileText, MapIcon, FlaskConical, ClipboardList, PlayCircle } from 'luci
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import type { StudyKit } from '@/types/study-kit';
 import type { QuizResult } from '@/types/index';
 
@@ -85,7 +86,7 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
       }),
     }).catch(() => undefined);
   }, [transformedQuiz, studyKit.title]);
-  const handleQuizClose = useCallback(() => console.log('Quiz closed'), []);
+  const handleQuizClose = useCallback(() => logger.debug('Quiz closed'), []);
 
   const onDeleteClick = useCallback(() => handleDelete({ studyKit, setIsDeleting, onDelete }), [studyKit, onDelete]);
   const onDownloadPDF = useCallback(() => handleDownloadPDF({ studyKit }), [studyKit]);

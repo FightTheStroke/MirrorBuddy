@@ -13,6 +13,7 @@ import { UploadProgress } from './components/upload-progress';
 import { UnifiedFilePicker, type SelectedFile } from '@/components/google-drive';
 import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 
 interface StudyKitUploadProps {
   onUploadComplete?: (studyKitId: string) => void;
@@ -85,7 +86,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
       }
       // If still processing, continue polling
     } catch (error) {
-      console.error('Failed to poll status', error);
+      logger.error('Failed to poll status', { error: String(error) });
     }
   };
 

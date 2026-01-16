@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { FileText, Loader2, AlertCircle, Clock, CheckCircle2, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import { getStatusText, formatDate } from './study-kit-utils';
 import type { StudyKit } from '@/types/study-kit';
 
@@ -43,7 +44,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       setStudyKits(data.studyKits);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load');
-      console.error('Failed to load study kits', err);
+      logger.error('Failed to load study kits', { error: String(err) });
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +71,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       // Remove from local state
       setStudyKits(prev => prev.filter(kit => kit.id !== kitId));
     } catch (err) {
-      console.error('Failed to delete study kit', err);
+      logger.error('Failed to delete study kit', { error: String(err) });
       alert('Errore durante l\'eliminazione. Riprova.');
     }
   };

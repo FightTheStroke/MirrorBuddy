@@ -4,6 +4,7 @@
  */
 
 import toast from '@/components/ui/toast';
+import { logger } from '@/lib/logger';
 import type { StudyKit } from '@/types/study-kit';
 
 interface DeleteHandlerParams {
@@ -36,7 +37,7 @@ export async function handleDelete({
 
     onDelete?.();
   } catch (error) {
-    console.error('Failed to delete study kit', error);
+    logger.error('Failed to delete study kit', { error: String(error) });
     alert('Errore durante l\'eliminazione');
   } finally {
     setIsDeleting(false);
@@ -78,7 +79,7 @@ export async function handleDownloadPDF({ studyKit }: PDFHandlerParams): Promise
     URL.revokeObjectURL(url);
     toast.success('PDF scaricato');
   } catch (error) {
-    console.error('PDF download failed:', error);
+    logger.error('PDF download failed', { error: String(error) });
     toast.error(error instanceof Error ? error.message : 'Errore durante il download');
   }
 }
@@ -113,7 +114,7 @@ export async function handlePrint({ studyKit }: PDFHandlerParams): Promise<void>
       };
     }
   } catch (error) {
-    console.error('Print failed:', error);
+    logger.error('Print failed', { error: String(error) });
     toast.error(error instanceof Error ? error.message : 'Errore durante la stampa');
   }
 }
@@ -155,7 +156,7 @@ export async function handleGeneratePath({
       onGeneratePath?.(pathId);
     }
   } catch (error) {
-    console.error('Failed to generate learning path', error);
+    logger.error('Failed to generate learning path', { error: String(error) });
     toast.error('Errore durante la generazione del percorso');
   } finally {
     setIsGeneratingPath(false);

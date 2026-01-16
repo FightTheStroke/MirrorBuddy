@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { X, Download, Loader2, FileText, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { logger } from '@/lib/logger';
 import toast from '@/components/ui/toast';
 import { DSA_PROFILES, type DSAProfile } from './dsa-profiles';
 import type { StudyKit } from '@/types/study-kit';
@@ -74,7 +75,7 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
 
       onClose();
     } catch (error) {
-      console.error('PDF export failed:', error);
+      logger.error('PDF export failed', { error: String(error) });
       toast.error(error instanceof Error ? error.message : 'Errore durante l\'esportazione');
     } finally {
       setIsExporting(false);
