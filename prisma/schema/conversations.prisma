@@ -1,0 +1,73 @@
+// ============================================================================
+// CONVERSATIONS DOMAIN
+// AI conversations, messages, and tool outputs
+// ============================================================================
+
+model Conversation {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  maestroId    String
+  title        String?
+
+  // Summary system
+  summary      String?
+  keyFacts     String?
+  topics       String    @default("[]")
+
+  // Message management
+  messageCount Int       @default(0)
+  messages     Message[]
+  toolOutputs  ToolOutput[]
+
+  // Status
+  isActive     Boolean   @default(true)
+  lastMessageAt DateTime?
+
+  // Parent Mode (Issue #63)
+  isParentMode Boolean   @default(false)
+  studentId    String?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([maestroId])
+  @@index([updatedAt])
+  @@index([isParentMode])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  role           String
+  content        String
+
+  // Optional metadata
+  toolCalls      String?
+  tokenCount     Int?
+
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([createdAt])
+}
+
+model ToolOutput {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  toolType       String
+  toolId         String?
+  data           String
+
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([toolType])
+  @@index([createdAt])
+}

@@ -11,7 +11,7 @@ import { defineConfig } from "prisma/config";
 const databaseUrl = process.env.DATABASE_URL || 'postgresql://INVALID_CREDENTIALS:INVALID_CREDENTIALS@localhost:5432/schema_only';
 
 export default defineConfig({
-  schema: "prisma/schema.prisma",
+  schema: "prisma/schema",
   migrations: {
     path: "prisma/migrations",
   },

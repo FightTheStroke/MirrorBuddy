@@ -1,0 +1,153 @@
+// ============================================================================
+// SCHEDULING DOMAIN
+// Notifications, push subscriptions, study schedules, and calendar
+// ============================================================================
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+
+  type        String
+  title       String
+  message     String
+  actionUrl   String?
+  metadata    String?
+
+  // Scheduler-specific fields (Issue #27)
+  priority     String?
+  relatedId    String?
+  melissaVoice String?
+
+  read        Boolean  @default(false)
+  dismissed   Boolean  @default(false)
+
+  // Scheduling for future notifications
+  scheduledFor DateTime?
+  sentAt       DateTime?
+
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime?
+
+  @@index([userId])
+  @@index([type])
+  @@index([priority])
+  @@index([read])
+  @@index([createdAt])
+  @@index([scheduledFor])
+}
+
+model PushSubscription {
+  id        String    @id @default(cuid())
+  userId    String
+  endpoint  String    @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model StudySchedule {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+
+  // Notification preferences (JSON)
+  preferences String   @default("{}")
+
+  sessions    ScheduledSession[]
+  reminders   CustomReminder[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model ScheduledSession {
+  id            String   @id @default(cuid())
+  userId        String
+  scheduleId    String
+  schedule      StudySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  // Session details
+  dayOfWeek     Int
+  time          String
+  duration      Int      @default(30)
+  subject       String
+  maestroId     String?
+  topic         String?
+
+  // Scheduling options
+  active        Boolean  @default(true)
+  reminderOffset Int     @default(5)
+  repeat        String   @default("weekly")
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([scheduleId])
+  @@index([dayOfWeek])
+  @@index([active])
+}
+
+model CustomReminder {
+  id            String   @id @default(cuid())
+  userId        String
+  scheduleId    String
+  schedule      StudySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  // Reminder details
+  datetime      DateTime
+  message       String
+  subject       String?
+  maestroId     String?
+
+  // Scheduling options
+  repeat        String   @default("none")
+  active        Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId])
+  @@index([scheduleId])
+  @@index([datetime])
+  @@index([active])
+}
+
+model CalendarEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  subject     String?
+  maestroId   String?
+
+  // Timing
+  date        DateTime
+  startTime   String?
+  endTime     String?
+  duration    Int?
+  allDay      Boolean  @default(false)
+
+  // Recurrence
+  recurring   Boolean  @default(false)
+  recurrence  String?
+
+  // Status
+  completed   Boolean  @default(false)
+  reminded    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([date])
+}
