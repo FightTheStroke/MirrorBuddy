@@ -101,6 +101,12 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Store handler references for proper cleanup
+  const handlersRef = useRef<{
+    connected: ((e: Event) => void) | null;
+    message: ((e: MessageEvent) => void) | null;
+    error: (() => void) | null;
+  }>({ connected: null, message: null, error: null });
 
   // Store callbacks in refs to avoid stale closures
   const onEventRef = useRef(onEvent);
@@ -131,12 +137,14 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
       case 'tool:update':
         setActiveTool((prev) => {
           if (!prev || prev.id !== event.id) return prev;
+          // Cap chunks array to prevent unbounded growth (keep last 200)
+          const newChunks = event.data.chunk
+            ? [...prev.chunks, event.data.chunk].slice(-200)
+            : prev.chunks;
           return {
             ...prev,
             progress: event.data.progress ?? prev.progress,
-            chunks: event.data.chunk
-              ? [...prev.chunks, event.data.chunk]
-              : prev.chunks,
+            chunks: newChunks,
             content: event.data.content ?? prev.content,
           };
         });
@@ -177,6 +185,22 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     }
   }, []);
 
+  // Clean up EventSource listeners
+  const cleanupEventSource = useCallback((es: EventSource | null) => {
+    if (!es) return;
+    const handlers = handlersRef.current;
+    if (handlers.connected) {
+      es.removeEventListener('connected', handlers.connected);
+    }
+    if (handlers.message) {
+      es.removeEventListener('message', handlers.message);
+    }
+    if (handlers.error) {
+      es.removeEventListener('error', handlers.error);
+    }
+    es.close();
+  }, []);
+
   // Disconnect from SSE
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -184,33 +208,23 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
       reconnectTimeoutRef.current = null;
     }
 
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-    }
+    cleanupEventSource(eventSourceRef.current);
+    eventSourceRef.current = null;
+    handlersRef.current = { connected: null, message: null, error: null };
 
     setConnectionState('disconnected');
     setClientId(null);
     logger.info('Disconnected from tool stream');
-  }, []);
+  }, [cleanupEventSource]);
 
-  // Connect to SSE
-  const connect = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-    }
-
-    setConnectionState('connecting');
-    logger.info('Connecting to tool stream', { sessionId });
-
-    const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
+  // Set up EventSource with handlers
+  const setupEventSource = useCallback((url: string): EventSource => {
     const eventSource = new EventSource(url);
-    eventSourceRef.current = eventSource;
 
-    // Handle connection open
-    eventSource.addEventListener('connected', (e) => {
+    // Create handlers and store references for cleanup
+    const connectedHandler = (e: Event) => {
       try {
-        const data = JSON.parse(e.data);
+        const data = JSON.parse((e as MessageEvent).data);
         setClientId(data.clientId);
         setConnectionState('connected');
         reconnectAttemptsRef.current = 0;
@@ -218,12 +232,10 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
       } catch {
         logger.warn('Failed to parse connected event');
       }
-    });
+    };
 
-    // Handle tool events
-    eventSource.onmessage = (e) => {
+    const messageHandler = (e: MessageEvent) => {
       if (e.data.startsWith(':')) return; // Ignore heartbeats
-
       try {
         const event: StreamToolEvent = JSON.parse(e.data);
         setEventsReceived((prev) => prev + 1);
@@ -234,11 +246,10 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
       }
     };
 
-    // Handle errors - close current eventSource via ref to avoid stale closure
-    eventSource.onerror = function handleError() {
+    const errorHandler = () => {
       logger.warn('Tool stream error');
-      // Close via ref to ensure we close the current EventSource, not a stale one
-      eventSourceRef.current?.close();
+      // Clean up current EventSource properly
+      cleanupEventSource(eventSourceRef.current);
       eventSourceRef.current = null;
 
       if (reconnectAttemptsRef.current < maxReconnectAttempts) {
@@ -249,32 +260,43 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
           logger.info('Reconnecting to tool stream', {
             attempt: reconnectAttemptsRef.current,
           });
-          // Create new connection instead of recursive call
           const newUrl = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
-          const newEventSource = new EventSource(newUrl);
+          const newEventSource = setupEventSource(newUrl);
           eventSourceRef.current = newEventSource;
-
-          // Re-attach handlers (simplified for reconnect)
-          newEventSource.addEventListener('connected', (evt) => {
-            try {
-              const data = JSON.parse(evt.data);
-              setClientId(data.clientId);
-              setConnectionState('connected');
-              reconnectAttemptsRef.current = 0;
-            } catch {
-              // Ignore parse errors
-            }
-          });
-
-          newEventSource.onmessage = eventSource.onmessage;
-          newEventSource.onerror = handleError;
         }, reconnectDelayMs * reconnectAttemptsRef.current);
       } else {
         setConnectionState('error');
         onErrorRef.current?.(new Error('Max reconnect attempts reached'));
       }
     };
-  }, [sessionId, maxReconnectAttempts, reconnectDelayMs, processToolEvent]);
+
+    // Store handler references for cleanup
+    handlersRef.current = {
+      connected: connectedHandler,
+      message: messageHandler,
+      error: errorHandler,
+    };
+
+    // Attach handlers
+    eventSource.addEventListener('connected', connectedHandler);
+    eventSource.addEventListener('message', messageHandler);
+    eventSource.addEventListener('error', errorHandler);
+
+    return eventSource;
+  }, [sessionId, maxReconnectAttempts, reconnectDelayMs, processToolEvent, cleanupEventSource]);
+
+  // Connect to SSE
+  const connect = useCallback(() => {
+    // Clean up existing connection properly
+    cleanupEventSource(eventSourceRef.current);
+    eventSourceRef.current = null;
+
+    setConnectionState('connecting');
+    logger.info('Connecting to tool stream', { sessionId });
+
+    const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
+    eventSourceRef.current = setupEventSource(url);
+  }, [sessionId, cleanupEventSource, setupEventSource]);
 
   // Auto-connect on mount
   useEffect(() => {
