@@ -28,6 +28,7 @@ export interface ConnectionRefs {
   handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
   sessionIdRef: React.MutableRefObject<string | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
   webrtcCleanupRef: React.MutableRefObject<(() => void) | null>;
   remoteAudioStreamRef: React.MutableRefObject<MediaStream | null>;
   webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;

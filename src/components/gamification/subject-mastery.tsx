@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Star, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,8 +30,11 @@ const tierColors: Record<MasteryTier, string> = {
 };
 
 export function SubjectMasteryList({ masteries, className }: SubjectMasteryListProps) {
-  // Sort by percentage descending
-  const sortedMasteries = [...masteries].sort((a, b) => b.percentage - a.percentage);
+  // Memoize sorted masteries to avoid re-sorting on every render
+  const sortedMasteries = useMemo(
+    () => [...masteries].sort((a, b) => b.percentage - a.percentage),
+    [masteries]
+  );
 
   return (
     <Card className={className}>
@@ -130,10 +134,11 @@ interface CompactMasteryProps {
 }
 
 export function CompactMastery({ masteries, className }: CompactMasteryProps) {
-  // Show top 3 subjects
-  const topSubjects = [...masteries]
-    .sort((a, b) => b.percentage - a.percentage)
-    .slice(0, 3);
+  // Memoize top 3 subjects to avoid re-sorting on every render
+  const topSubjects = useMemo(
+    () => [...masteries].sort((a, b) => b.percentage - a.percentage).slice(0, 3),
+    [masteries]
+  );
 
   return (
     <div className={cn('flex gap-3', className)}>

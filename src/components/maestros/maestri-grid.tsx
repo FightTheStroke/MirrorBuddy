@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   Search,
   Filter,
@@ -68,27 +68,30 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
 
   const subjects = getAllSubjects();
 
-  // Filter and sort maestri alphabetically by name
-  const filteredMaestri = maestri
-    .filter((m) => {
-      const matchesSearch =
-        m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        subjectNames[m.subject].toLowerCase().includes(searchQuery.toLowerCase());
+  // Memoize filtered and sorted maestri to avoid recalculation on every render
+  const filteredMaestri = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return maestri
+      .filter((m) => {
+        const matchesSearch =
+          m.name.toLowerCase().includes(query) ||
+          m.specialty.toLowerCase().includes(query) ||
+          subjectNames[m.subject].toLowerCase().includes(query);
 
-      const matchesSubject =
-        selectedSubject === 'all' || m.subject === selectedSubject;
+        const matchesSubject =
+          selectedSubject === 'all' || m.subject === selectedSubject;
 
-      return matchesSearch && matchesSubject;
-    })
-    .sort((a, b) => a.name.localeCompare(b.name, 'it'));
+        return matchesSearch && matchesSubject;
+      })
+      .sort((a, b) => a.name.localeCompare(b.name, 'it'));
+  }, [searchQuery, selectedSubject]);
 
-  // Click on professore goes directly to voice
-  const handleSelect = (maestro: Maestro) => {
+  // Memoize click handler
+  const handleSelect = useCallback((maestro: Maestro) => {
     if (onMaestroSelect) {
       onMaestroSelect(maestro, 'voice');
     }
-  };
+  }, [onMaestroSelect]);
 
   return (
     <div className="space-y-4">

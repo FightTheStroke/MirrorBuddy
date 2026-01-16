@@ -51,6 +51,12 @@ export function useDisconnect(
       refs.connectionTimeoutRef.current = null;
     }
 
+    // Clear greeting timeouts to prevent state updates on unmounted component
+    if (refs.greetingTimeoutsRef.current.length > 0) {
+      refs.greetingTimeoutsRef.current.forEach(clearTimeout);
+      refs.greetingTimeoutsRef.current = [];
+    }
+
     // Audio nodes cleanup
     if (refs.processorRef.current) {
       refs.processorRef.current.disconnect();

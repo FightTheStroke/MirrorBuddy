@@ -217,6 +217,7 @@ model StudySession {
   materials        Material[]
 
   @@index([userId])
+  @@index([maestroId])
   @@index([startedAt])
   @@index([conversationId])
 }
@@ -476,6 +477,8 @@ model Notification {
   expiresAt   DateTime? // Auto-delete after expiry
 
   @@index([userId])
+  @@index([type])
+  @@index([priority])
   @@index([read])
   @@index([createdAt])
   @@index([scheduledFor])

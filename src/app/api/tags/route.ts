@@ -15,8 +15,9 @@ import { CreateTagSchema } from '@/lib/validation/schemas/organization';
  * GET /api/tags
  *
  * Returns all tags for the current user with material counts.
+ * Supports pagination via ?page=1&limit=100 (max 500)
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     // 1. Auth check
     const cookieStore = await cookies();
@@ -26,20 +27,35 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // 2. Fetch tags with counts
-    const tags = await prisma.tag.findMany({
-      where: { userId },
-      orderBy: { name: 'asc' },
-      include: {
-        _count: {
-          select: { materials: true },
+    // 2. Pagination params (defaults: page=1, limit=100, max=500)
+    const { searchParams } = new URL(request.url);
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+    const limit = Math.min(500, Math.max(1, parseInt(searchParams.get('limit') || '100', 10)));
+    const skip = (page - 1) * limit;
+
+    // 3. Fetch tags with counts
+    const where = { userId };
+    const [tags, total] = await Promise.all([
+      prisma.tag.findMany({
+        where,
+        orderBy: { name: 'asc' },
+        skip,
+        take: limit,
+        include: {
+          _count: {
+            select: { materials: true },
+          },
         },
-      },
+      }),
+      prisma.tag.count({ where }),
+    ]);
+
+    logger.info('Tags GET', { userId, count: tags.length, page, total });
+
+    return NextResponse.json({
+      data: tags,
+      pagination: { total, page, limit, hasNext: skip + tags.length < total },
     });
-
-    logger.info('Tags GET', { userId, count: tags.length });
-
-    return NextResponse.json(tags);
   } catch (error) {
     logger.error('Tags GET error', { error: String(error) });
 

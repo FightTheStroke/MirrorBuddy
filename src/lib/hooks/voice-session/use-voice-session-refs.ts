@@ -32,6 +32,7 @@ export interface VoiceSessionRefs {
   handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
   sessionIdRef: React.MutableRefObject<string | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
   webrtcCleanupRef: React.MutableRefObject<(() => void) | null>;
   remoteAudioStreamRef: React.MutableRefObject<MediaStream | null>;
   webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;
@@ -69,6 +70,7 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     handleServerEventRef: useRef<((event: Record<string, unknown>) => void) | null>(null),
     sessionIdRef: useRef<string | null>(null),
     connectionTimeoutRef: useRef<NodeJS.Timeout | null>(null),
+    greetingTimeoutsRef: useRef<NodeJS.Timeout[]>([]),
     webrtcCleanupRef: useRef<(() => void) | null>(null),
     remoteAudioStreamRef: useRef<MediaStream | null>(null),
     webrtcAudioElementRef: useRef<HTMLAudioElement | null>(null),
