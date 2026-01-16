@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useProviderSettings } from './ai-provider-settings/hooks/use-provider-settings';
@@ -113,6 +113,49 @@ export function AIProviderSettings() {
               </p>
               <p className="text-xs text-slate-500">
                 Configura: AZURE_OPENAI_REALTIME_ENDPOINT, AZURE_OPENAI_REALTIME_API_KEY, AZURE_OPENAI_REALTIME_DEPLOYMENT
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Search className="w-5 h-5 text-blue-500" />
+            Ricerca Web
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {providerStatus?.services?.braveSearch?.configured ? (
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-3 h-3 rounded-full bg-green-500" />
+                <span className="font-medium text-green-700 dark:text-green-300">
+                  Ricerca Web attiva
+                </span>
+              </div>
+              <p className="text-sm text-green-600 dark:text-green-400">
+                Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.
+              </p>
+            </div>
+          ) : (
+            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-3 h-3 rounded-full bg-amber-500" />
+                <span className="font-medium text-amber-700 dark:text-amber-300">
+                  Ricerca Web limitata
+                </span>
+              </div>
+              <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">
+                I maestri usano Wikipedia come fonte. Per notizie e informazioni aggiornate, configura Brave Search.
+              </p>
+              <p className="text-xs text-slate-500">
+                Ottieni una API key gratuita su{' '}
+                <a href="https://brave.com/search/api/" target="_blank" rel="noopener noreferrer" className="underline">
+                  brave.com/search/api
+                </a>
+                {' '}e aggiungi: BRAVE_SEARCH_API_KEY
               </p>
             </div>
           )}

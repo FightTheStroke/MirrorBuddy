@@ -265,9 +265,15 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
         setConnectionState('reconnecting');
         reconnectAttemptsRef.current++;
 
+        // Exponential backoff with jitter: base * 2^attempt + random(0-500ms)
+        const exponentialDelay = reconnectDelayMs * Math.pow(2, reconnectAttemptsRef.current - 1);
+        const jitter = Math.random() * 500;
+        const delay = Math.min(exponentialDelay + jitter, 30000); // Cap at 30 seconds
+
         reconnectTimeoutRef.current = setTimeout(() => {
           logger.info('Reconnecting to tool stream', {
             attempt: reconnectAttemptsRef.current,
+            delayMs: Math.round(delay),
           });
           const newUrl = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
           // Use ref to avoid circular dependency
@@ -275,7 +281,7 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
           if (setupFn) {
             eventSourceRef.current = setupFn(newUrl);
           }
-        }, reconnectDelayMs * reconnectAttemptsRef.current);
+        }, delay);
       } else {
         setConnectionState('error');
         onErrorRef.current?.(new Error('Max reconnect attempts reached'));

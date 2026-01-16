@@ -27,6 +27,12 @@ interface ProviderStatus {
     model: string;
     envVars: EnvVarStatus[];
   };
+  services: {
+    braveSearch: {
+      configured: boolean;
+      fallback: string;
+    };
+  };
 }
 
 function maskValue(value: string | undefined): string | undefined {
@@ -46,8 +52,10 @@ export async function GET() {
 
   const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
   const ollamaModel = process.env.OLLAMA_MODEL || 'llama3.2';
+  const braveSearchApiKey = process.env.BRAVE_SEARCH_API_KEY;
 
   const azureConfigured = !!(azureEndpoint && azureApiKey);
+  const braveSearchConfigured = !!braveSearchApiKey;
   const azureRealtimeConfigured = !!(azureRealtimeEndpoint && azureRealtimeApiKey && azureRealtimeDeployment);
 
   // Determine active provider
@@ -129,6 +137,12 @@ export async function GET() {
           displayValue: ollamaModel
         },
       ],
+    },
+    services: {
+      braveSearch: {
+        configured: braveSearchConfigured,
+        fallback: braveSearchConfigured ? 'none' : 'wikipedia',
+      },
     },
   };
 
