@@ -45,7 +45,7 @@ export function useSendText(
       item: {
         type: 'message',
         role: 'user',
-        content: [{ type: 'text', text }],
+        content: [{ type: 'input_text', text }],
       },
     });
 
@@ -150,7 +150,7 @@ export function useSendWebcamResult(
         item: {
           type: 'message',
           role: 'user',
-          content: [{ type: 'text', text: 'Ho scattato una foto. Chiedimi di descriverti cosa vedo.' }],
+          content: [{ type: 'input_text', text: 'Ho scattato una foto. Chiedimi di descriverti cosa vedo.' }],
         },
       });
     } else {
