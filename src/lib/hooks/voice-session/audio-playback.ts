@@ -181,6 +181,7 @@ export function useOutputLevelPolling(
   const animationFrameRef = useRef<number | null>(null);
   const dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const pollLevelRef = useRef<(() => void) | null>(null);
+  const lastUpdateRef = useRef<number>(0);
 
   const pollLevel = useCallback(() => {
     const analyser = playbackAnalyserRef.current;
@@ -190,6 +191,16 @@ export function useOutputLevelPolling(
       animationFrameRef.current = null;
       return;
     }
+
+    // Throttle to ~30fps (33ms) - sufficient for audio visualization
+    const now = performance.now();
+    if (now - lastUpdateRef.current < 33) {
+      animationFrameRef.current = requestAnimationFrame(() => {
+        if (pollLevelRef.current) pollLevelRef.current();
+      });
+      return;
+    }
+    lastUpdateRef.current = now;
 
     // Initialize data array if needed
     if (!dataArrayRef.current || dataArrayRef.current.length !== analyser.frequencyBinCount) {
