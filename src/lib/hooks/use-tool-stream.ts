@@ -107,12 +107,18 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     message: ((e: MessageEvent) => void) | null;
     error: (() => void) | null;
   }>({ connected: null, message: null, error: null });
+  // Ref for setupEventSource to avoid circular dependency in useCallback
+  const setupEventSourceRef = useRef<((url: string) => EventSource) | null>(null);
+  // Track mounted state to avoid setState on unmount
+  const isMountedRef = useRef(true);
 
   // Store callbacks in refs to avoid stale closures
   const onEventRef = useRef(onEvent);
   const onErrorRef = useRef(onError);
-  onEventRef.current = onEvent;
-  onErrorRef.current = onError;
+  useEffect(() => {
+    onEventRef.current = onEvent;
+    onErrorRef.current = onError;
+  }, [onEvent, onError]);
 
   // Handle tool event - defined first so it can be used in connect
   const processToolEvent = useCallback((event: StreamToolEvent) => {
@@ -212,8 +218,11 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     eventSourceRef.current = null;
     handlersRef.current = { connected: null, message: null, error: null };
 
-    setConnectionState('disconnected');
-    setClientId(null);
+    // Only update state if still mounted
+    if (isMountedRef.current) {
+      setConnectionState('disconnected');
+      setClientId(null);
+    }
     logger.info('Disconnected from tool stream');
   }, [cleanupEventSource]);
 
@@ -261,8 +270,11 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
             attempt: reconnectAttemptsRef.current,
           });
           const newUrl = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
-          const newEventSource = setupEventSource(newUrl);
-          eventSourceRef.current = newEventSource;
+          // Use ref to avoid circular dependency
+          const setupFn = setupEventSourceRef.current;
+          if (setupFn) {
+            eventSourceRef.current = setupFn(newUrl);
+          }
         }, reconnectDelayMs * reconnectAttemptsRef.current);
       } else {
         setConnectionState('error');
@@ -285,6 +297,11 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
     return eventSource;
   }, [sessionId, maxReconnectAttempts, reconnectDelayMs, processToolEvent, cleanupEventSource]);
 
+  // Update ref for recursive calls - must be in useEffect
+  useEffect(() => {
+    setupEventSourceRef.current = setupEventSource;
+  }, [setupEventSource]);
+
   // Connect to SSE
   const connect = useCallback(() => {
     // Clean up existing connection properly
@@ -300,11 +317,14 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
 
   // Auto-connect on mount
   useEffect(() => {
+    isMountedRef.current = true;
     if (autoConnect && sessionId) {
-      connect();
+      // Defer connection to avoid synchronous setState in effect
+      queueMicrotask(connect);
     }
 
     return () => {
+      isMountedRef.current = false;
       disconnect();
     };
   }, [autoConnect, sessionId, connect, disconnect]);
