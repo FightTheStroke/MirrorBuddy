@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/lib/realtime/tool-events';
+import { processStreamToolEvent } from './use-tool-stream/tool-event-processor';
 
 // Event received from SSE stream
 export interface StreamToolEvent {
@@ -123,72 +124,7 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
   // Handle tool event - defined first so it can be used in connect
   const processToolEvent = useCallback((event: StreamToolEvent) => {
     setToolHistory((prev) => [...prev, event].slice(-50)); // Keep last 50
-
-    switch (event.type) {
-      case 'tool:created':
-        setActiveTool({
-          id: event.id,
-          type: event.toolType,
-          maestroId: event.maestroId,
-          title: event.data.title || 'Untitled',
-          subject: event.data.subject,
-          progress: 0,
-          chunks: [],
-          content: null,
-          status: 'building',
-          startedAt: event.timestamp,
-        });
-        break;
-
-      case 'tool:update':
-        setActiveTool((prev) => {
-          if (!prev || prev.id !== event.id) return prev;
-          // Cap chunks array to prevent unbounded growth (keep last 200)
-          const newChunks = event.data.chunk
-            ? [...prev.chunks, event.data.chunk].slice(-200)
-            : prev.chunks;
-          return {
-            ...prev,
-            progress: event.data.progress ?? prev.progress,
-            chunks: newChunks,
-            content: event.data.content ?? prev.content,
-          };
-        });
-        break;
-
-      case 'tool:complete':
-        setActiveTool((prev) => {
-          if (!prev || prev.id !== event.id) return prev;
-          return {
-            ...prev,
-            status: 'completed',
-            progress: 100,
-            content: event.data.content ?? prev.content,
-          };
-        });
-        break;
-
-      case 'tool:error':
-        setActiveTool((prev) => {
-          if (!prev || prev.id !== event.id) return prev;
-          return {
-            ...prev,
-            status: 'error',
-            errorMessage: event.data.error,
-          };
-        });
-        break;
-
-      case 'tool:cancelled':
-        setActiveTool((prev) => {
-          if (!prev || prev.id !== event.id) return prev;
-          return {
-            ...prev,
-            status: 'cancelled',
-          };
-        });
-        break;
-    }
+    setActiveTool((prev) => processStreamToolEvent(event, prev));
   }, []);
 
   // Clean up EventSource listeners
@@ -257,7 +193,6 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
 
     const errorHandler = () => {
       logger.warn('Tool stream error');
-      // Clean up current EventSource properly
       cleanupEventSource(eventSourceRef.current);
       eventSourceRef.current = null;
 
@@ -265,10 +200,9 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
         setConnectionState('reconnecting');
         reconnectAttemptsRef.current++;
 
-        // Exponential backoff with jitter: base * 2^attempt + random(0-500ms)
         const exponentialDelay = reconnectDelayMs * Math.pow(2, reconnectAttemptsRef.current - 1);
         const jitter = Math.random() * 500;
-        const delay = Math.min(exponentialDelay + jitter, 30000); // Cap at 30 seconds
+        const delay = Math.min(exponentialDelay + jitter, 30000);
 
         reconnectTimeoutRef.current = setTimeout(() => {
           logger.info('Reconnecting to tool stream', {
@@ -276,7 +210,6 @@ export function useToolStream(options: UseToolStreamOptions): UseToolStreamResul
             delayMs: Math.round(delay),
           });
           const newUrl = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
-          // Use ref to avoid circular dependency
           const setupFn = setupEventSourceRef.current;
           if (setupFn) {
             eventSourceRef.current = setupFn(newUrl);

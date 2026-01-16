@@ -10,54 +10,11 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import {
-  MELISSA_VOICE_TEMPLATES,
   type NotificationPreferences,
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from '@/lib/scheduler/types';
 import { sendPushToUser, isPushConfigured } from '@/lib/push/send';
-
-/**
- * Parse time string (e.g., "16:00") to hours and minutes
- */
-function parseTime(time: string): { hours: number; minutes: number } {
-  const [hours, minutes] = time.split(':').map(Number);
-  return { hours, minutes };
-}
-
-/**
- * Check if current time is within quiet hours
- */
-function isQuietHours(prefs: NotificationPreferences): boolean {
-  if (!prefs.quietHoursStart || !prefs.quietHoursEnd) return false;
-
-  const now = new Date();
-  const currentHours = now.getHours();
-  const currentMinutes = now.getMinutes();
-  const currentTime = currentHours * 60 + currentMinutes;
-
-  const start = parseTime(prefs.quietHoursStart);
-  const end = parseTime(prefs.quietHoursEnd);
-  const startTime = start.hours * 60 + start.minutes;
-  const endTime = end.hours * 60 + end.minutes;
-
-  // Handle overnight quiet hours (e.g., 22:00 to 07:00)
-  if (startTime > endTime) {
-    return currentTime >= startTime || currentTime <= endTime;
-  }
-
-  return currentTime >= startTime && currentTime <= endTime;
-}
-
-/**
- * Get a random Melissa voice template
- */
-function getMelissaVoice(type: keyof typeof MELISSA_VOICE_TEMPLATES, data: Record<string, unknown>): string {
-  const templates = MELISSA_VOICE_TEMPLATES[type];
-  const template = templates[Math.floor(Math.random() * templates.length)];
-
-  // Replace placeholders with data
-  return template.replace(/\{(\w+)\}/g, (_, key) => String(data[key] ?? ''));
-}
+import { parseTime, isQuietHours, getMelissaVoice } from './helpers';
 
 // POST - Check for due items and create notifications
 export async function POST(request: Request) {

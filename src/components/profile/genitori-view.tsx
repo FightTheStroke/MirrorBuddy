@@ -1,13 +1,5 @@
 'use client';
 
-/**
- * GenitoriView Component
- * Inline view for Parent Dashboard (no page wrapper)
- * Integrates with main app layout sidebar
- *
- * Uses separate accessibility settings for parent context
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import { ParentDashboard } from './parent-dashboard';
 import { TeacherDiary, type DiaryEntry } from './teacher-diary';
@@ -17,25 +9,21 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
-  Loader2,
-  AlertCircle,
-  RefreshCw,
-  FileJson,
-  FileText,
-  Shield,
-  UserCheck,
-  Trash2,
-  BookOpen,
-  User,
-  TrendingUp,
-  Users,
-  Accessibility,
+  RefreshCw, FileJson, FileText, AlertCircle,
+  BookOpen, User, TrendingUp, Users, Accessibility,
 } from 'lucide-react';
 import { AccessibilityTab } from '@/components/settings/sections';
 import type { StudentInsights, ObservationCategory } from '@/types';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import type { ConsentStatus, ProfileMeta, LearningEntry, PageState } from './genitori-view/types';
 import { DEMO_USER_ID, MAESTRO_NAMES } from './genitori-view/constants';
+import {
+  fetchConsentStatus, fetchProfile, generateProfile, giveConsent,
+  exportProfile, requestDeletion,
+} from './genitori-view/api-handlers';
+import {
+  LoadingState, ErrorState, NoProfileState, NeedsConsentState, DeletionPendingState,
+} from './genitori-view/state-pages';
 
 export function GenitoriView() {
   const [pageState, setPageState] = useState<PageState>('loading');
@@ -63,16 +51,6 @@ export function GenitoriView() {
     if (!maestroId) return 'Professore';
     return MAESTRO_NAMES[maestroId.toLowerCase()] || maestroId;
   };
-
-  const fetchConsentStatus = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/profile/consent?userId=${DEMO_USER_ID}`);
-      const data = await response.json();
-      return data.success ? (data.data as ConsentStatus) : null;
-    } catch {
-      return null;
-    }
-  }, []);
 
   const fetchDiaryEntries = useCallback(async () => {
     setIsDiaryLoading(true);
@@ -102,30 +80,16 @@ export function GenitoriView() {
     }
   }, []);
 
-  const fetchProfile = useCallback(async () => {
+  const handleFetchProfile = useCallback(async () => {
     try {
-      const response = await fetch(`/api/profile?userId=${DEMO_USER_ID}`);
-      const data = await response.json();
-      if (response.ok && data.success) {
-        const profileData = data.data;
-        profileData.lastUpdated = new Date(profileData.lastUpdated);
-        profileData.strengths = profileData.strengths.map((s: { createdAt: string }) => ({
-          ...s,
-          createdAt: new Date(s.createdAt),
-        }));
-        profileData.growthAreas = profileData.growthAreas.map((g: { createdAt: string }) => ({
-          ...g,
-          createdAt: new Date(g.createdAt),
-        }));
+      const profileData = await fetchProfile();
+      if (profileData) {
         setInsights(profileData);
-        setMeta(data.meta);
         return true;
       }
-      if (response.status === 403 && data.requiresConsent) return 'needs-consent';
-      if (response.status === 404) return 'no-profile';
-      throw new Error(data.error || 'Failed to fetch profile');
-    } catch (err) {
-      throw err;
+      return false;
+    } catch {
+      return false;
     }
   }, []);
 
@@ -147,30 +111,24 @@ export function GenitoriView() {
           setPageState('needs-consent');
           return;
         }
-        const [result] = await Promise.all([fetchProfile(), fetchDiaryEntries()]);
-        if (result === 'needs-consent') setPageState('needs-consent');
-        else if (result === 'no-profile') setPageState('no-profile');
-        else setPageState('ready');
+        const result = await handleFetchProfile();
+        await fetchDiaryEntries();
+        setPageState(result ? 'ready' : 'error');
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
         setPageState('error');
       }
     };
     load();
-  }, [fetchConsentStatus, fetchProfile, fetchDiaryEntries]);
+  }, [handleFetchProfile, fetchDiaryEntries]);
 
   const handleGenerateProfile = async () => {
     setIsGenerating(true);
     setError(null);
     try {
-      const response = await fetch('/api/profile/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: DEMO_USER_ID, forceRegenerate: true }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || data.error || 'Failed to generate profile');
-      await Promise.all([fetchProfile(), fetchDiaryEntries()]);
+      await generateProfile();
+      await handleFetchProfile();
+      await fetchDiaryEntries();
       setPageState('ready');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate profile');
@@ -179,40 +137,24 @@ export function GenitoriView() {
     }
   };
 
-  const handleGiveConsent = async () => {
+  const handleGiveConsentClick = async () => {
     try {
-      const response = await fetch('/api/profile/consent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: DEMO_USER_ID, parentConsent: true, studentConsent: true }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        const consent = await fetchConsentStatus();
-        if (consent?.parentConsent) {
-          const [result] = await Promise.all([fetchProfile(), fetchDiaryEntries()]);
-          if (result === true) setPageState('ready');
-        }
+      await giveConsent();
+      const consent = await fetchConsentStatus();
+      if (consent?.parentConsent) {
+        const result = await handleFetchProfile();
+        await fetchDiaryEntries();
+        if (result) setPageState('ready');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to record consent');
     }
   };
 
-  const handleExport = async (format: 'json' | 'pdf') => {
+  const handleExportClick = async (format: 'json' | 'pdf') => {
     setIsExporting(true);
     try {
-      const response = await fetch(`/api/profile/export?userId=${DEMO_USER_ID}&format=${format}`);
-      if (!response.ok) throw new Error('Export failed');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `profilo-${format === 'json' ? 'dati.json' : 'report.html'}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      await exportProfile(format);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Export failed');
     } finally {
@@ -220,12 +162,11 @@ export function GenitoriView() {
     }
   };
 
-  const handleRequestDeletion = async () => {
+  const handleRequestDeletionClick = async () => {
     if (!confirm('Sei sicuro di voler richiedere la cancellazione dei dati?')) return;
     try {
-      const response = await fetch(`/api/profile/consent?userId=${DEMO_USER_ID}`, { method: 'DELETE' });
-      const data = await response.json();
-      if (data.success) setPageState('deletion-pending');
+      await requestDeletion();
+      setPageState('deletion-pending');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to request deletion');
     }
@@ -252,94 +193,24 @@ export function GenitoriView() {
 
       {/* Content based on state */}
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-        {pageState === 'loading' && (
-          <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
-            <Loader2 className="h-8 w-8 animate-spin text-accent-themed" />
-            <p className="text-slate-600 dark:text-slate-400">Caricamento profilo...</p>
-          </div>
-        )}
-
-        {pageState === 'error' && (
-          <div className="flex flex-col items-center gap-4 text-center py-8">
-            <AlertCircle className="h-12 w-12 text-red-500" />
-            <div>
-              <h3 className="font-semibold text-lg">Errore</h3>
-              <p className="text-slate-600 dark:text-slate-400 mt-1">{error}</p>
-            </div>
-            <Button onClick={() => window.location.reload()}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Riprova
-            </Button>
-          </div>
-        )}
-
+        {pageState === 'loading' && <LoadingState />}
+        {pageState === 'error' && <ErrorState error={error} onRetry={() => window.location.reload()} />}
         {pageState === 'no-profile' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserCheck className="h-5 w-5 text-accent-themed" />
-                Nessun Profilo Disponibile
-              </CardTitle>
-              <CardDescription>
-                Per creare il profilo, e necessario prima interagire con i Professori.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button onClick={handleGenerateProfile} disabled={isGenerating}>
-                {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-                Genera Profilo
-              </Button>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-            </CardContent>
-          </Card>
+          <NoProfileState onGenerate={handleGenerateProfile} isGenerating={isGenerating} error={error} />
         )}
-
-        {pageState === 'needs-consent' && (
-          <Card>
-            <CardHeader className="text-center pb-2">
-              <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4">
-                <Shield className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
-              </div>
-              <CardTitle>Consenso per il Dashboard Genitori</CardTitle>
-              <CardDescription>
-                Per visualizzare le osservazioni dei Professori, abbiamo bisogno del tuo consenso.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button onClick={handleGiveConsent} className="w-full">
-                <Shield className="h-4 w-4 mr-2" />
-                Acconsento alla Visualizzazione
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {pageState === 'deletion-pending' && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-amber-600">
-                <Trash2 className="h-5 w-5" />
-                Cancellazione Richiesta
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-slate-600 dark:text-slate-400">
-                I dati verranno eliminati entro 30 giorni, come previsto dal GDPR.
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        {pageState === 'needs-consent' && <NeedsConsentState onConsent={handleGiveConsentClick} />}
+        {pageState === 'deletion-pending' && <DeletionPendingState />}
 
         {pageState === 'ready' && (
           <>
             {/* Action Bar */}
             <div className="flex items-center justify-between gap-3 mb-6">
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => handleExport('json')} disabled={isExporting}>
+                <Button variant="outline" size="sm" onClick={() => handleExportClick('json')} disabled={isExporting}>
                   <FileJson className="h-4 w-4 mr-2" />
                   JSON
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => handleExport('pdf')} disabled={isExporting}>
+                <Button variant="outline" size="sm" onClick={() => handleExportClick('pdf')} disabled={isExporting}>
                   <FileText className="h-4 w-4 mr-2" />
                   Report
                 </Button>
@@ -349,7 +220,7 @@ export function GenitoriView() {
                   {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
                   Aggiorna
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleRequestDeletion} className="text-red-500 hover:text-red-700">
+                <Button variant="ghost" size="sm" onClick={handleRequestDeletionClick} className="text-red-500 hover:text-red-700">
                   <Trash2 className="h-4 w-4 mr-2" />
                   Cancella
                 </Button>

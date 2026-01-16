@@ -9,11 +9,10 @@ import { prisma } from '@/lib/db';
 import { validateAuth } from '@/lib/auth/session-auth';
 import { logger } from '@/lib/logger';
 import { generateSearchableText } from '@/lib/search/searchable-text';
-import { isPostgreSQL } from '@/lib/db/database-utils';
-import { Prisma } from '@prisma/client';
 import type { ToolType } from '@/types/tools';
-import { CreateMaterialRequest, UpdateMaterialRequest, MaterialType } from './types';
+import { CreateMaterialRequest, UpdateMaterialRequest } from './types';
 import { VALID_MATERIAL_TYPES } from './constants';
+import { getMaterialsList, buildUpdateData, updateMaterialTags } from './helpers';
 
 /**
  * GET /api/materials
@@ -29,178 +28,18 @@ export async function GET(request: NextRequest) {
     const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-
-    const toolType = searchParams.get('toolType');
-    const status = searchParams.get('status') || 'active';
-    const limit = parseInt(searchParams.get('limit') || '50', 10);
-    const offset = parseInt(searchParams.get('offset') || '0', 10);
-
-    const collectionId = searchParams.get('collectionId');
-    const tagId = searchParams.get('tagId');
-    const search = searchParams.get('search');
-    const subject = searchParams.get('subject');
-
-    // PostgreSQL full-text search optimization
-    if (search && isPostgreSQL()) {
-      // Build WHERE conditions for raw SQL query
-      const conditions: Prisma.Sql[] = [
-        Prisma.sql`m."userId" = ${userId}`,
-        Prisma.sql`m.status = ${status}`,
-        Prisma.sql`m."searchableTextVector" @@ websearch_to_tsquery('english', ${search})`,
-      ];
-
-      if (toolType && VALID_MATERIAL_TYPES.includes(toolType as MaterialType)) {
-        conditions.push(Prisma.sql`m."toolType" = ${toolType}`);
-      }
-      if (collectionId) {
-        conditions.push(Prisma.sql`m."collectionId" = ${collectionId}`);
-      }
-      if (subject) {
-        conditions.push(Prisma.sql`m.subject = ${subject}`);
-      }
-
-      const whereClause = Prisma.join(conditions, ' AND ');
-
-      // Execute full-text search query with ranking
-      const materials = await prisma.$queryRaw<Array<{
-        id: string;
-        userId: string;
-        toolId: string;
-        toolType: string;
-        title: string;
-        content: string;
-        searchableText: string | null;
-        maestroId: string | null;
-        sessionId: string | null;
-        subject: string | null;
-        preview: string | null;
-        status: string;
-        userRating: number | null;
-        isBookmarked: boolean;
-        viewCount: number;
-        collectionId: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        rank: number;
-      }>>`
-        SELECT
-          m.*,
-          ts_rank(m."searchableTextVector", websearch_to_tsquery('english', ${search})) as rank
-        FROM "Material" m
-        WHERE ${whereClause}
-        ${tagId ? Prisma.sql`AND EXISTS (
-          SELECT 1 FROM "MaterialTag" mt
-          WHERE mt."materialId" = m.id AND mt."tagId" = ${tagId}
-        )` : Prisma.empty}
-        ORDER BY rank DESC, m."createdAt" DESC
-        LIMIT ${Math.min(limit, 100)}
-        OFFSET ${offset}
-      `;
-
-      // Get count for pagination
-      const countResult = await prisma.$queryRaw<Array<{ count: bigint }>>`
-        SELECT COUNT(*) as count
-        FROM "Material" m
-        WHERE ${whereClause}
-        ${tagId ? Prisma.sql`AND EXISTS (
-          SELECT 1 FROM "MaterialTag" mt
-          WHERE mt."materialId" = m.id AND mt."tagId" = ${tagId}
-        )` : Prisma.empty}
-      `;
-      const total = Number(countResult[0]?.count || 0);
-
-      // Fetch collections and tags for the materials
-      // Skip unnecessary queries if no materials found
-      const materialIds = materials.map(m => m.id);
-      const collectionIds = materials.map(m => m.collectionId).filter(Boolean) as string[];
-
-      const collections = collectionIds.length > 0
-        ? await prisma.collection.findMany({
-            where: { id: { in: collectionIds } },
-            select: { id: true, name: true, color: true },
-          })
-        : [];
-      const materialTags = materialIds.length > 0
-        ? await prisma.materialTag.findMany({
-            where: { materialId: { in: materialIds } },
-            include: { tag: { select: { id: true, name: true, color: true } } },
-          })
-        : [];
-
-      // Build collection and tag maps
-      const collectionMap = new Map(collections.map(c => [c.id, c]));
-      const tagsMap = new Map<string, Array<{ id: string; name: string; color: string | null }>>();
-      for (const mt of materialTags) {
-        if (!tagsMap.has(mt.materialId)) {
-          tagsMap.set(mt.materialId, []);
-        }
-        tagsMap.get(mt.materialId)?.push(mt.tag);
-      }
-
-      // Parse and format results
-      const parsed = materials.map((m) => ({
-        ...m,
-        content: JSON.parse(m.content),
-        collection: m.collectionId ? collectionMap.get(m.collectionId) || null : null,
-        tags: tagsMap.get(m.id) || [],
-      }));
-
-      return NextResponse.json({
-        materials: parsed,
-        total,
-        limit,
-        offset,
-      });
-    }
-
-    // SQLite fallback or non-search queries - use standard Prisma ORM
-    const where: Record<string, unknown> = { userId, status };
-    if (toolType && VALID_MATERIAL_TYPES.includes(toolType as MaterialType)) {
-      where.toolType = toolType;
-    }
-    if (collectionId) {
-      where.collectionId = collectionId;
-    }
-    if (tagId) {
-      where.tags = { some: { tagId } };
-    }
-    if (subject) {
-      where.subject = subject;
-    }
-    if (search) {
-      // SQLite fallback - case-insensitive LIKE search
-      where.OR = [
-        { searchableText: { contains: search, mode: 'insensitive' } },
-        { title: { contains: search, mode: 'insensitive' } },
-      ];
-    }
-
-    const [materials, total] = await Promise.all([
-      prisma.material.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
-        take: Math.min(limit, 100),
-        skip: offset,
-        include: {
-          collection: { select: { id: true, name: true, color: true } },
-          tags: { include: { tag: { select: { id: true, name: true, color: true } } } },
-        },
-      }),
-      prisma.material.count({ where }),
-    ]);
-
-    const parsed = materials.map((m) => ({
-      ...m,
-      content: JSON.parse(m.content as string),
-      tags: m.tags.map((mt) => mt.tag),
-    }));
-
-    return NextResponse.json({
-      materials: parsed,
-      total,
-      limit,
-      offset,
+    const result = await getMaterialsList(userId, {
+      toolType: searchParams.get('toolType') || undefined,
+      status: searchParams.get('status') || 'active',
+      limit: parseInt(searchParams.get('limit') || '50', 10),
+      offset: parseInt(searchParams.get('offset') || '0', 10),
+      collectionId: searchParams.get('collectionId') || undefined,
+      tagId: searchParams.get('tagId') || undefined,
+      search: searchParams.get('search') || undefined,
+      subject: searchParams.get('subject') || undefined,
     });
+
+    return NextResponse.json(result);
   } catch (error) {
     logger.error('Failed to fetch materials', { error: String(error) });
     return NextResponse.json({ error: 'Failed to fetch materials' }, { status: 500 });
@@ -337,34 +176,8 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Material not found' }, { status: 404 });
     }
 
-    const updateData: Record<string, unknown> = {};
-    if (title) updateData.title = title;
-    if (content) {
-      updateData.content = JSON.stringify(content);
-      updateData.searchableText = generateSearchableText(
-        existing.toolType as ToolType,
-        content
-      );
-    }
-    if (status) updateData.status = status;
-    if (typeof userRating === 'number' && userRating >= 1 && userRating <= 5) {
-      updateData.userRating = userRating;
-    }
-    if (typeof isBookmarked === 'boolean') {
-      updateData.isBookmarked = isBookmarked;
-    }
-    if (collectionId !== undefined) {
-      updateData.collectionId = collectionId;
-    }
-
-    if (tagIds !== undefined) {
-      await prisma.$transaction([
-        prisma.materialTag.deleteMany({ where: { materialId: existing.id } }),
-        ...tagIds.map(tagId =>
-          prisma.materialTag.create({ data: { materialId: existing.id, tagId } })
-        ),
-      ]);
-    }
+    const updateData = buildUpdateData(existing, { title, content, status, userRating, isBookmarked, collectionId });
+    await updateMaterialTags(existing.id, tagIds);
 
     const updated = await prisma.material.update({
       where: { toolId },

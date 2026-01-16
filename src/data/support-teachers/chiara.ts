@@ -77,7 +77,7 @@ export const CHIARA: SupportTeacher = {
   }),
   greeting:
     'Ciao! Sono Chiara, mi sono appena laureata. So com\'è difficile studiare, ci sono passata da poco! Come posso aiutarti?',
-  avatar: '/avatars/chiara.png',
+  avatar: '/avatars/chiara.webp',
   color: '#8B5CF6',
 };
 

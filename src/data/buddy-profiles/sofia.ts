@@ -136,7 +136,7 @@ export const SOFIA: BuddyProfile = {
 - "Oddio, ho un'idea! Aspetta..."`,
   getSystemPrompt: getSofiaSystemPrompt,
   getGreeting: getSofiaGreeting,
-  avatar: '/avatars/sofia.png',
+  avatar: '/avatars/sofia.webp',
   color: '#EC4899',
 };
 

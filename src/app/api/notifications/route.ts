@@ -8,7 +8,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import {
@@ -17,6 +16,13 @@ import {
   UpdateNotificationsSchema,
   DeleteNotificationsQuerySchema,
 } from '@/lib/validation/schemas/notifications';
+import {
+  getNotifications,
+  getUnreadCount,
+  createNotification,
+  markNotificationsAsRead,
+  dismissNotifications,
+} from './helpers';
 
 /**
  * GET /api/notifications
@@ -54,45 +60,13 @@ export async function GET(request: NextRequest) {
     const unreadOnly = unreadOnlyParam === 'true';
     const limit = limitParam ? parseInt(limitParam, 10) : 50;
 
-    const notifications = await prisma.notification.findMany({
-      where: {
-        userId,
-        dismissed: false,
-        ...(unreadOnly && { read: false }),
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } },
-        ],
-      },
-      orderBy: { createdAt: 'desc' },
-      take: Math.min(limit, 100),
-    });
-
-    const unreadCount = await prisma.notification.count({
-      where: {
-        userId,
-        read: false,
-        dismissed: false,
-        OR: [
-          { expiresAt: null },
-          { expiresAt: { gt: new Date() } },
-        ],
-      },
-    });
+    const notifications = await getNotifications(userId, unreadOnly, limit);
+    const unreadCount = await getUnreadCount(userId);
 
     return NextResponse.json({
       success: true,
       data: {
-        notifications: notifications.map((n) => ({
-          id: n.id,
-          type: n.type,
-          title: n.title,
-          message: n.message,
-          actionUrl: n.actionUrl,
-          metadata: n.metadata ? JSON.parse(n.metadata) : undefined,
-          read: n.read,
-          createdAt: n.createdAt,
-        })),
+        notifications,
         unreadCount,
       },
     });
@@ -131,21 +105,17 @@ export async function POST(request: NextRequest) {
 
     const { userId, type, title, message, actionUrl, metadata, scheduledFor, expiresAt, priority, relatedId, melissaVoice } = validation.data;
 
-    const notification = await prisma.notification.create({
-      data: {
-        userId,
-        type,
-        title,
-        message,
-        actionUrl: actionUrl ?? null,
-        metadata: metadata ? JSON.stringify(metadata) : null,
-        scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined,
-        sentAt: scheduledFor ? undefined : new Date(),
-        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
-        priority: priority ?? null,
-        relatedId: relatedId ?? null,
-        melissaVoice: melissaVoice ?? null,
-      },
+    const notification = await createNotification(userId, {
+      type,
+      title,
+      message,
+      actionUrl,
+      metadata,
+      scheduledFor,
+      expiresAt,
+      priority,
+      relatedId,
+      melissaVoice,
     });
 
     logger.info('Notification created', { userId, type, notificationId: notification.id });
@@ -196,11 +166,7 @@ export async function PATCH(request: NextRequest) {
     const { userId, notificationIds, markAllRead } = validation.data;
 
     if (markAllRead) {
-      await prisma.notification.updateMany({
-        where: { userId, read: false },
-        data: { read: true },
-      });
-
+      await markNotificationsAsRead(userId);
       return NextResponse.json({ success: true, message: 'All notifications marked as read' });
     }
 
@@ -212,14 +178,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    await prisma.notification.updateMany({
-      where: {
-        id: { in: notificationIds },
-        userId, // Ensure user owns these notifications
-      },
-      data: { read: true },
-    });
-
+    await markNotificationsAsRead(userId, notificationIds);
     return NextResponse.json({ success: true, message: 'Notifications marked as read' });
   } catch (error) {
     logger.error('Update notifications error', { error: String(error) });
@@ -263,24 +222,12 @@ export async function DELETE(request: NextRequest) {
     const dismissAll = dismissAllParam === 'true';
 
     if (dismissAll) {
-      // Soft delete - mark as dismissed
-      await prisma.notification.updateMany({
-        where: { userId },
-        data: { dismissed: true },
-      });
-
+      await dismissNotifications(userId);
       return NextResponse.json({ success: true, message: 'All notifications dismissed' });
     }
 
     if (notificationId) {
-      await prisma.notification.updateMany({
-        where: {
-          id: notificationId,
-          userId, // Ensure user owns this notification
-        },
-        data: { dismissed: true },
-      });
-
+      await dismissNotifications(userId, notificationId);
       return NextResponse.json({ success: true, message: 'Notification dismissed' });
     }
 

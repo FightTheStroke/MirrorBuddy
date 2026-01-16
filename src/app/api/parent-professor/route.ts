@@ -15,16 +15,14 @@ import {
 } from '@/lib/ai/parent-mode';
 import { filterInput, sanitizeOutput } from '@/lib/safety';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-
-interface ParentChatRequest {
-  maestroId: string;
-  studentId: string;
-  studentName: string;
-  message: string;
-  conversationId?: string; // Continue existing conversation
-  maestroSystemPrompt: string;
-  maestroDisplayName: string;
-}
+import {
+  getOrCreateParentConversation,
+  addConversationMessage,
+  updateConversationMetadata,
+  getStudentLearnings,
+  formatConversationResponse,
+} from './helpers';
+import type { ParentChatRequest } from './types';
 
 export async function POST(request: NextRequest) {
   // Rate limiting
@@ -72,14 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch learnings for the student
-    const learnings = await prisma.learning.findMany({
-      where: {
-        userId: studentId,
-        ...(maestroId !== 'all' && { maestroId }),
-      },
-      orderBy: { confidence: 'desc' },
-      take: 50,
-    });
+    const learnings = await getStudentLearnings(studentId, maestroId);
 
     // Generate parent mode system prompt
     const parentModePrompt = generateParentModePrompt(
@@ -88,74 +79,39 @@ export async function POST(request: NextRequest) {
       studentName
     );
 
-    let conversation;
-    let messages: Array<{ role: string; content: string }> = [];
+    // Get or create conversation
+    const convResult = await getOrCreateParentConversation(
+      conversationId,
+      userId,
+      maestroId,
+      maestroDisplayName,
+      studentId,
+      studentName
+    );
 
-    if (conversationId) {
-      // Continue existing conversation
-      conversation = await prisma.conversation.findFirst({
-        where: {
-          id: conversationId,
-          userId,
-          isParentMode: true,
-        },
-        include: {
-          messages: {
-            orderBy: { createdAt: 'asc' },
-          },
-        },
-      });
+    if (!convResult.success) {
+      return NextResponse.json(
+        { error: 'Conversation not found' },
+        { status: 404 }
+      );
+    }
 
-      if (!conversation) {
-        return NextResponse.json(
-          { error: 'Conversation not found' },
-          { status: 404 }
-        );
-      }
+    const { conversation, isNew } = convResult;
+    let messages: Array<{ role: string; content: string }> = convResult.messages || [];
 
-      // Build message history
-      messages = conversation.messages.map((m) => ({
-        role: m.role as 'user' | 'assistant' | 'system',
-        content: m.content,
-      }));
-    } else {
-      // Create new parent mode conversation
-      conversation = await prisma.conversation.create({
-        data: {
-          userId,
-          maestroId,
-          title: `Conversazione con ${maestroDisplayName} (Genitore)`,
-          isParentMode: true,
-          studentId,
-        },
-      });
-
-      // Add greeting as first assistant message
+    // Add greeting if new conversation
+    if (isNew) {
       const greeting = getParentModeGreeting(
         maestroDisplayName,
         studentName,
         learnings.length > 0
       );
-
-      await prisma.message.create({
-        data: {
-          conversationId: conversation.id,
-          role: 'assistant',
-          content: greeting,
-        },
-      });
-
+      await addConversationMessage(conversation.id, 'assistant', greeting);
       messages.push({ role: 'assistant', content: greeting });
     }
 
     // Add user message to database
-    await prisma.message.create({
-      data: {
-        conversationId: conversation.id,
-        role: 'user',
-        content: message,
-      },
-    });
+    await addConversationMessage(conversation.id, 'user', message);
 
     // Add to messages for AI call
     messages.push({ role: 'user', content: message });
@@ -179,22 +135,10 @@ export async function POST(request: NextRequest) {
     const sanitized = sanitizeOutput(result.content);
 
     // Save assistant response to database
-    await prisma.message.create({
-      data: {
-        conversationId: conversation.id,
-        role: 'assistant',
-        content: sanitized.text,
-      },
-    });
+    await addConversationMessage(conversation.id, 'assistant', sanitized.text);
 
     // Update conversation metadata
-    await prisma.conversation.update({
-      where: { id: conversation.id },
-      data: {
-        messageCount: { increment: 2 },
-        lastMessageAt: new Date(),
-      },
-    });
+    await updateConversationMetadata(conversation.id, 2);
 
     logger.info('Parent-professor conversation', {
       conversationId: conversation.id,
@@ -248,18 +192,7 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(
-      conversations.map((c) => ({
-        id: c.id,
-        maestroId: c.maestroId,
-        studentId: c.studentId,
-        title: c.title,
-        messageCount: c.messageCount,
-        lastMessage: c.messages[0]?.content?.slice(0, 100),
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      }))
-    );
+    return NextResponse.json(conversations.map(formatConversationResponse));
   } catch (error) {
     logger.error('Parent conversations GET error', { error: String(error) });
     return NextResponse.json(

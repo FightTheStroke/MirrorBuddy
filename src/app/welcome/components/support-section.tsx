@@ -26,14 +26,14 @@ const SUPPORT_TEAM: SupportMember[] = [
     name: 'Roberto',
     role: 'coach',
     description: 'Coach che ti guida verso l\'autonomia',
-    avatar: '/avatars/roberto.png',
+    avatar: '/avatars/roberto.webp',
   },
   {
     id: 'enea',
     name: 'Enea',
     role: 'buddy',
     description: 'Compagno allegro che sa tirare su il morale',
-    avatar: '/avatars/enea.png',
+    avatar: '/avatars/enea.webp',
   },
   {
     id: 'mario',

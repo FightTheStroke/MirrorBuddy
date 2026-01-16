@@ -20,7 +20,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'Euclide',
     subject: 'Matematica',
     tagline: 'Il padre della geometria',
-    avatar: '/maestri/euclide.png',
+    avatar: '/maestri/euclide.webp',
     color: 'from-blue-400 to-cyan-500',
   },
   {
@@ -28,7 +28,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'Richard Feynman',
     subject: 'Fisica',
     tagline: 'Premio Nobel, professore di chiarezza',
-    avatar: '/maestri/feynman.png',
+    avatar: '/maestri/feynman.webp',
     color: 'from-cyan-400 to-blue-500',
   },
   {
@@ -36,7 +36,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'Marie Curie',
     subject: 'Chimica',
     tagline: 'Due premi Nobel, pioniera della scienza',
-    avatar: '/maestri/curie.png',
+    avatar: '/maestri/curie.webp',
     color: 'from-purple-400 to-pink-500',
   },
   {
@@ -44,7 +44,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'Charles Darwin',
     subject: 'Scienze',
     tagline: 'Rivoluzionò la biologia',
-    avatar: '/maestri/darwin.png',
+    avatar: '/maestri/darwin.webp',
     color: 'from-green-400 to-emerald-500',
   },
   {
@@ -52,7 +52,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'Leonardo da Vinci',
     subject: 'Arte',
     tagline: 'Genio del Rinascimento',
-    avatar: '/maestri/leonardo.png',
+    avatar: '/maestri/leonardo.webp',
     color: 'from-indigo-400 to-purple-500',
   },
   {
@@ -60,7 +60,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'William Shakespeare',
     subject: 'Inglese',
     tagline: 'Il più grande drammaturgo',
-    avatar: '/maestri/shakespeare.png',
+    avatar: '/maestri/shakespeare.webp',
     color: 'from-emerald-400 to-teal-500',
   },
   {
@@ -68,7 +68,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'Socrate',
     subject: 'Filosofia',
     tagline: 'Il padre della filosofia occidentale',
-    avatar: '/maestri/socrate.png',
+    avatar: '/maestri/socrate.webp',
     color: 'from-amber-400 to-orange-500',
   },
   {
@@ -76,7 +76,7 @@ const FEATURED_MAESTRI: MaestroShowcase[] = [
     name: 'Erodoto',
     subject: 'Storia',
     tagline: 'Il padre della storia',
-    avatar: '/maestri/erodoto.png',
+    avatar: '/maestri/erodoto.webp',
     color: 'from-orange-400 to-red-500',
   },
 ];

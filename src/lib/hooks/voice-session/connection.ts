@@ -21,24 +21,11 @@ import {
   cacheProbeResults,
   isTransportError,
 } from './transport-selector';
+import { isWebRTCSupported } from './webrtc-support';
 
 // Re-export types for backwards compatibility
 export type { ConnectionRefs } from './connection-types';
 export { useDisconnect } from './connection-cleanup';
-
-/**
- * Check if browser supports WebRTC
- */
-function isWebRTCSupported(): boolean {
-  if (typeof window === 'undefined') return false;
-  const w = window as unknown as Record<string, unknown>;
-  return !!(
-    w.RTCPeerConnection ||
-    w.webkitRTCPeerConnection ||
-    w.mozRTCPeerConnection ||
-    w.msRTCPeerConnection
-  );
-}
 
 /**
  * Connect to Azure Realtime API via WebRTC or WebSocket
