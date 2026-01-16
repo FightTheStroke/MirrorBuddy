@@ -2,7 +2,7 @@
 
 ## Status
 
-Proposed
+Accepted (Implemented 2026-01-16)
 
 ## Context
 
@@ -144,6 +144,29 @@ const response = await fetch('https://api.hume.ai/v0/batch/jobs', {
 - Run client-side for low latency
 - **Estimated impact**: +30% detection accuracy
 - **Dependencies**: Labeled training data, ML expertise
+
+## Implementation
+
+All three phases implemented in `src/lib/education/frustration-detection/`:
+
+### Phase 1: i18n Text Detection
+- **Module**: `patterns/` - Supports IT, EN, ES, FR, DE languages
+- **Module**: `tracker.ts` - Repeated attempts with fuzzy matching, trend tracking
+- **Key**: Unicode-aware filler counting, weighted locale detection
+
+### Phase 2: Azure Speech Timing
+- **Module**: `azure-timing/` - Parses Azure NBest word timings
+- **Features**: Pause detection (micro/short/medium/long/sigh), hesitation score
+- **Key**: Speech rate estimation, confidence tracking
+
+### Phase 3: Client-side Prosody
+- **Module**: `prosody/` - Web Audio API pitch detection (autocorrelation)
+- **Module**: `classifier.ts` - Unified classifier combining all signals
+- **Features**: RMS volume, pitch variance, emotional inference, real-time monitor
+
+### Test Coverage
+- **69 unit tests** across 5 test files
+- Tests cover: locale detection, pattern matching, pause categorization, pitch detection
 
 ## Consequences
 
