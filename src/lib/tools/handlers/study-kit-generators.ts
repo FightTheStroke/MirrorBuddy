@@ -9,6 +9,13 @@ import { logger } from '@/lib/logger';
 import type { MindmapData, QuizData, DemoData } from '@/types/tools';
 import type { StudyKit } from '@/types/study-kit';
 import { extractTextFromPDF } from './study-kit-extraction';
+import { buildAdaptiveInstruction, getAdaptiveContextForUser } from '@/lib/education/adaptive-difficulty';
+
+const normalizeDifficulty = (value?: number): 1 | 2 | 3 | 4 | 5 | undefined => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return undefined;
+  const rounded = Math.round(value);
+  return Math.min(5, Math.max(1, rounded)) as 1 | 2 | 3 | 4 | 5;
+};
 
 /**
  * Generate summary from text using AI
@@ -16,12 +23,15 @@ import { extractTextFromPDF } from './study-kit-extraction';
 export async function generateSummary(
   text: string,
   title: string,
-  subject?: string
+  subject?: string,
+  adaptiveInstruction?: string
 ): Promise<string> {
+  const adaptiveBlock = adaptiveInstruction ? `\n${adaptiveInstruction}\n` : '';
   const prompt = `Sei un tutor educativo. Crea un riassunto chiaro e strutturato del seguente documento.
 
 Titolo: ${title}
 ${subject ? `Materia: ${subject}` : ''}
+${adaptiveBlock}
 
 DOCUMENTO:
 ${text.substring(0, 8000)} ${text.length > 8000 ? '...' : ''}
@@ -47,12 +57,15 @@ Crea un riassunto in italiano di massimo 500 parole che:
 export async function generateMindmap(
   text: string,
   title: string,
-  subject?: string
+  subject?: string,
+  adaptiveInstruction?: string
 ): Promise<MindmapData> {
+  const adaptiveBlock = adaptiveInstruction ? `\n${adaptiveInstruction}\n` : '';
   const prompt = `Sei un tutor educativo. Crea una mappa mentale ben strutturata del seguente documento.
 
 Titolo: ${title}
 ${subject ? `Materia: ${subject}` : ''}
+${adaptiveBlock}
 
 DOCUMENTO:
 ${text.substring(0, 8000)} ${text.length > 8000 ? '...' : ''}
@@ -229,21 +242,24 @@ Rispondi SOLO con JSON valido (no markdown, no commenti):
 export async function generateQuiz(
   text: string,
   title: string,
-  subject?: string
+  subject?: string,
+  adaptiveInstruction?: string
 ): Promise<QuizData> {
+  const adaptiveBlock = adaptiveInstruction ? `\n${adaptiveInstruction}\n` : '';
   const prompt = `Sei un tutor educativo. Crea un quiz con 5 domande a risposta multipla sul seguente documento.
 
 Titolo: ${title}
 ${subject ? `Materia: ${subject}` : ''}
+${adaptiveBlock}
 
 DOCUMENTO:
 ${text.substring(0, 8000)} ${text.length > 8000 ? '...' : ''}
 
-Crea 5 domande con:
-- 4 opzioni ciascuna
-- Una sola risposta corretta
-- Spiegazione della risposta corretta
-- Difficoltà crescente
+  Crea 5 domande con:
+  - 4 opzioni ciascuna
+  - Una sola risposta corretta
+  - Spiegazione della risposta corretta
+  - Difficoltà crescente (indica difficulty 1-5 per ogni domanda)
 
 Rispondi SOLO con JSON valido:
 {
@@ -253,7 +269,8 @@ Rispondi SOLO con JSON valido:
       "question": "Testo domanda?",
       "options": ["A", "B", "C", "D"],
       "correctIndex": 0,
-      "explanation": "Spiegazione"
+      "explanation": "Spiegazione",
+      "difficulty": 3
     }
   ]
 }`;
@@ -284,11 +301,13 @@ Rispondi SOLO con JSON valido:
       options: string[];
       correctIndex: number;
       explanation?: string;
+      difficulty?: number;
     }>).map((q) => ({
       question: String(q.question),
       options: q.options.map((o) => String(o)),
       correctIndex: Number(q.correctIndex),
       explanation: q.explanation ? String(q.explanation) : undefined,
+      difficulty: normalizeDifficulty(typeof q.difficulty === 'number' ? Number(q.difficulty) : undefined),
     })),
   };
 }
@@ -300,9 +319,24 @@ export async function processStudyKit(
   pdfBuffer: Buffer,
   title: string,
   subject?: string,
-  onProgress?: (step: string, progress: number) => void
+  onProgress?: (step: string, progress: number) => void,
+  userId?: string
 ): Promise<Omit<StudyKit, 'id' | 'userId' | 'createdAt' | 'updatedAt'>> {
   try {
+    let adaptiveInstruction: string | undefined;
+    if (userId) {
+      try {
+        const context = await getAdaptiveContextForUser(userId, {
+          subject,
+          baselineDifficulty: 3,
+          pragmatic: true,
+        });
+        adaptiveInstruction = buildAdaptiveInstruction(context);
+      } catch (error) {
+        logger.warn('Adaptive context unavailable for study kit', { error: String(error) });
+      }
+    }
+
     // Step 1: Extract text from PDF
     onProgress?.('parsing', 0.1);
     const { text, pageCount } = await extractTextFromPDF(pdfBuffer);
@@ -312,12 +346,12 @@ export async function processStudyKit(
 
     // Step 2: Generate summary
     onProgress?.('generating_summary', 0.25);
-    const summary = await generateSummary(text, title, subject);
+    const summary = await generateSummary(text, title, subject, adaptiveInstruction);
     logger.info('Generated summary');
 
     // Step 3: Generate mindmap
     onProgress?.('generating_mindmap', 0.45);
-    const mindmap = await generateMindmap(text, title, subject);
+    const mindmap = await generateMindmap(text, title, subject, adaptiveInstruction);
     logger.info('Generated mindmap');
 
     // Step 4: Generate demo (optional for STEM)
@@ -329,7 +363,7 @@ export async function processStudyKit(
 
     // Step 5: Generate quiz
     onProgress?.('generating_quiz', 0.85);
-    const quiz = await generateQuiz(text, title, subject);
+    const quiz = await generateQuiz(text, title, subject, adaptiveInstruction);
     logger.info('Generated quiz');
 
     onProgress?.('complete', 1.0);

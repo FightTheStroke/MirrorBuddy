@@ -2,6 +2,8 @@
  * Settings Store Types
  */
 
+import type { AdaptiveDifficultyMode } from '@/types';
+
 export type Theme = 'light' | 'dark' | 'system';
 
 export type AIProvider = 'azure' | 'ollama';
@@ -55,4 +57,5 @@ export interface ExtendedStudentProfile {
 // Provider preference for manual selection
 export type ProviderPreference = 'azure' | 'ollama' | 'auto';
 
+export type { AdaptiveDifficultyMode };
 export type { AppearanceSettings };

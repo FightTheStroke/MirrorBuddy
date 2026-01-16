@@ -13,5 +13,5 @@ export interface ChatRequest {
   maestroId: string;
   enableTools?: boolean; // Optional: enable tool calling (default: true)
   enableMemory?: boolean; // Optional: enable conversation memory (default: true)
-  requestedTool?: 'mindmap' | 'quiz' | 'flashcard' | 'demo' | 'summary' | 'search'; // Tool context injection
+  requestedTool?: 'mindmap' | 'quiz' | 'flashcard' | 'demo' | 'summary' | 'search' | 'pdf' | 'webcam' | 'homework' | 'study-kit'; // Tool context injection
 }

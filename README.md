@@ -102,6 +102,7 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 - **🗺️ Mind Maps** — Auto-generated, interactive visualizations with voice commands
 - **🎴 FSRS Flashcards** — Spaced repetition backed by cognitive science
 - **📝 Quizzes** — Adaptive assessments with instant feedback
+- **⚖️ Adaptive Difficulty** — Multi-signal difficulty tuning (chat/voice/quiz/flashcard)
 - **📸 Homework Help** — Photo capture + AI-powered step-by-step guidance (no direct answers)
 - **🎮 Gamification** — XP, levels, badges, streaks, leaderboards
 - **⏱️ Pomodoro Timer** — ADHD-friendly focus sessions

@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       try {
         const result = await processStudyKit(buffer, title, subject, (step, progress) => {
           logger.debug('Study kit progress', { studyKitId: studyKit.id, step, progress });
-        });
+        }, userId);
 
         // Update study kit with generated materials
         const updatedKit = await prisma.studyKit.update({

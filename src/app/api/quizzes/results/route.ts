@@ -9,6 +9,8 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { QuizResult } from '@prisma/client';
 import { validateAuth } from '@/lib/auth/session-auth';
+import { recordAdaptiveSignal } from '@/lib/education/adaptive-difficulty';
+import type { AdaptiveSignalSource } from '@/types';
 
 export async function GET(request: NextRequest) {
   try {
@@ -67,18 +69,43 @@ export async function POST(request: NextRequest) {
     }
 
     const percentage = (data.score / data.totalQuestions) * 100;
+    const allowedSources: AdaptiveSignalSource[] = [
+      'chat',
+      'voice',
+      'quiz',
+      'flashcard',
+      'summary',
+      'study-kit',
+    ];
+    const source = allowedSources.includes(data.source)
+      ? data.source
+      : 'quiz';
 
     const result = await prisma.quizResult.create({
       data: {
         userId,
         quizId: data.quizId,
         subject: data.subject,
+        topic: data.topic,
         score: data.score,
         totalQuestions: data.totalQuestions,
         percentage,
+        avgDifficulty: data.avgDifficulty,
+        source,
         answers: JSON.stringify(data.answers || []),
       },
     });
+
+    if (data.subject) {
+      await recordAdaptiveSignal(userId, {
+        type: 'quiz_result',
+        source,
+        subject: data.subject,
+        topic: data.topic,
+        value: Math.round(percentage),
+        baselineDifficulty: data.avgDifficulty,
+      });
+    }
 
     return NextResponse.json({
       ...result,

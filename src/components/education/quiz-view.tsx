@@ -67,6 +67,23 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   });
 
   const handleQuizComplete = (result: QuizResult) => {
+    if (selectedQuiz) {
+      const avgDifficulty =
+        selectedQuiz.questions.reduce((sum, q) => sum + (q.difficulty || 3), 0) / selectedQuiz.questions.length;
+      fetch('/api/quizzes/results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          quizId: result.quizId,
+          score: result.correctAnswers,
+          totalQuestions: result.totalQuestions,
+          subject: selectedQuiz.subject,
+          topic: selectedQuiz.title,
+          avgDifficulty,
+          source: 'quiz',
+        }),
+      }).catch(() => undefined);
+    }
     addXP(result.xpEarned);
     setCompletedQuizzes(prev => [...prev, result.quizId]);
     setSelectedQuiz(null);

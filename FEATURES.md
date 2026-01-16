@@ -68,6 +68,14 @@ Talk to your Maestro naturally through voice conversation.
 
 ---
 
+## Adaptive Difficulty
+
+**Features:** Multi-signal adaptation (chat/voice/quiz/flashcard), prerequisite-aware pacing, pragmatic override for homework/study-kit.
+
+**Modes (Settings):** Manuale (solo suggerimenti) | Guidata | Bilanciata (default) | Automatica.
+
+---
+
 ## Homework Help
 
 **Features:** Photo capture via webcam, countdown timer (0/3/5/10s), AI analysis, step-by-step guidance (no direct answers), works offline.

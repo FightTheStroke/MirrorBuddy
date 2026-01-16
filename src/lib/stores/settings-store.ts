@@ -11,9 +11,10 @@ import {
   type ExtendedStudentProfile,
   type ProviderPreference,
   type AppearanceSettings,
+  type AdaptiveDifficultyMode,
 } from './settings-types';
 
-export type { TeachingStyle, LearningDifference, ExtendedStudentProfile, ProviderPreference };
+export type { TeachingStyle, LearningDifference, ExtendedStudentProfile, ProviderPreference, AdaptiveDifficultyMode };
 
 // === STORE ===
 
@@ -29,6 +30,7 @@ interface SettingsState {
   preferredMicrophoneId: string; // Empty string = system default
   preferredOutputId: string; // Empty string = system default (speakers)
   preferredCameraId: string; // Empty string = system default
+  adaptiveDifficultyMode: AdaptiveDifficultyMode;
   // Voice settings (Azure Realtime API)
   voiceVadThreshold: number; // VAD sensitivity (0.3-0.7, default 0.4)
   voiceSilenceDuration: number; // Silence before turn ends (300-800ms, default 400)
@@ -48,6 +50,7 @@ interface SettingsState {
   setPreferredMicrophone: (microphoneId: string) => void;
   setPreferredOutput: (outputId: string) => void;
   setPreferredCamera: (cameraId: string) => void;
+  setAdaptiveDifficultyMode: (mode: AdaptiveDifficultyMode) => void;
   // Voice settings actions
   setVoiceVadThreshold: (threshold: number) => void;
   setVoiceSilenceDuration: (duration: number) => void;
@@ -92,6 +95,7 @@ export const useSettingsStore = create<SettingsState>()(
       preferredMicrophoneId: '', // Empty = system default
       preferredOutputId: '', // Empty = system default (speakers)
       preferredCameraId: '', // Empty = system default
+      adaptiveDifficultyMode: 'balanced',
       // Voice settings defaults
       voiceVadThreshold: 0.4, // Balanced sensitivity
       voiceSilenceDuration: 400, // Fast turn-taking
@@ -123,6 +127,8 @@ export const useSettingsStore = create<SettingsState>()(
         set({ preferredOutputId, pendingSync: true }),
       setPreferredCamera: (preferredCameraId) =>
         set({ preferredCameraId, pendingSync: true }),
+      setAdaptiveDifficultyMode: (adaptiveDifficultyMode) =>
+        set({ adaptiveDifficultyMode, pendingSync: true }),
       // Voice settings setters with validation
       setVoiceVadThreshold: (threshold) =>
         set({ voiceVadThreshold: Math.max(0.3, Math.min(0.7, threshold)), pendingSync: true }),
@@ -146,6 +152,7 @@ export const useSettingsStore = create<SettingsState>()(
               model: state.model,
               budgetLimit: state.budgetLimit,
               totalSpent: state.totalSpent,  // #88: Now persisted
+              adaptiveDifficultyMode: state.adaptiveDifficultyMode,
               language: state.appearance.language,
               accentColor: state.appearance.accentColor,
             }),
@@ -197,6 +204,7 @@ export const useSettingsStore = create<SettingsState>()(
               model: settings.model ?? state.model,
               budgetLimit: settings.budgetLimit ?? state.budgetLimit,
               totalSpent: settings.totalSpent ?? state.totalSpent,  // #88: Load from server
+              adaptiveDifficultyMode: settings.adaptiveDifficultyMode ?? state.adaptiveDifficultyMode,
               appearance: {
                 ...state.appearance,
                 language: settings.language ?? state.appearance.language,

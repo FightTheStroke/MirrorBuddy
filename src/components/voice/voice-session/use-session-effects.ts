@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react';
 import { useProgressStore, useUIStore } from '@/lib/stores';
 import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
 import { logger } from '@/lib/logger';
-import type { Maestro, ToolCall } from '@/types';
+import { buildSignalsFromText, sendAdaptiveSignals } from '@/lib/education/adaptive-difficulty-client';
+import type { AdaptiveSignalInput, Maestro, ToolCall } from '@/types';
 
 interface UseSessionEffectsProps {
   maestro: Maestro;
@@ -24,6 +25,8 @@ export function useSessionEffects({
   const conversationIdRef = useRef<string | null>(null);
   const savedMessagesRef = useRef<Set<string>>(new Set());
   const processedToolsRef = useRef<Set<string>>(new Set());
+  const processedTranscriptRef = useRef<number>(0);
+  const lastAssistantAtRef = useRef<number | null>(null);
 
   const { currentSession, startSession } = useProgressStore();
   useUIStore(); // Keep store import for potential future use
@@ -119,6 +122,42 @@ export function useSessionEffects({
 
     saveNewMessages();
   }, [transcript]);
+
+  // Capture adaptive signals from voice transcript
+  useEffect(() => {
+    if (transcript.length <= processedTranscriptRef.current) return;
+
+    const newEntries = transcript.slice(processedTranscriptRef.current);
+    processedTranscriptRef.current = transcript.length;
+
+    const signals: AdaptiveSignalInput[] = [];
+    for (const entry of newEntries) {
+      if (entry.role === 'assistant') {
+        lastAssistantAtRef.current = Date.now();
+        continue;
+      }
+
+      if (entry.role === 'user') {
+        const responseTimeMs = lastAssistantAtRef.current
+          ? Date.now() - lastAssistantAtRef.current
+          : undefined;
+        const textSignals = buildSignalsFromText(entry.content, 'voice', maestro.subject);
+        signals.push(...textSignals);
+        if (responseTimeMs !== undefined) {
+          signals.push({
+            type: 'response_time_ms',
+            source: 'voice',
+            subject: maestro.subject,
+            responseTimeMs,
+          });
+        }
+      }
+    }
+
+    if (signals.length > 0) {
+      sendAdaptiveSignals(signals);
+    }
+  }, [transcript, maestro.subject]);
 
   // Auto-pause ambient audio during voice session
   const ambientPlaybackState = useAmbientAudioStore((s) => s.playbackState);

@@ -20,6 +20,11 @@ import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/retrieval-s
 import { saveTool } from '@/lib/tools/tool-persistence';
 import { functionNameToToolType } from '@/types/tools';
 import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
+import { getMaestroById } from '@/data/maestri';
+import {
+  buildAdaptiveInstruction,
+  getAdaptiveContextForUser,
+} from '@/lib/education/adaptive-difficulty';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
@@ -73,12 +78,17 @@ export async function POST(request: NextRequest) {
 
     // #87: Get user's provider preference and budget from settings
     let providerPreference: AIProvider | 'auto' | undefined;
-    let userSettings: { provider: string; budgetLimit: number; totalSpent: number } | null = null;
+    let userSettings: {
+      provider: string;
+      budgetLimit: number;
+      totalSpent: number;
+      adaptiveDifficultyMode?: string | null;
+    } | null = null;
     if (userId) {
       try {
         userSettings = await prisma.settings.findUnique({
           where: { userId },
-          select: { provider: true, budgetLimit: true, totalSpent: true },
+          select: { provider: true, budgetLimit: true, totalSpent: true, adaptiveDifficultyMode: true },
         });
         if (userSettings?.provider && (userSettings.provider === 'azure' || userSettings.provider === 'ollama')) {
           providerPreference = userSettings.provider;
@@ -210,6 +220,34 @@ export async function POST(request: NextRequest) {
           userId,
           error: String(ragError),
         });
+      }
+    }
+
+    // Adaptive difficulty context (signals + mastery)
+    if (userId) {
+      try {
+        const maestro = maestroId ? getMaestroById(maestroId) : undefined;
+        const pragmatic =
+          requestedTool === 'summary' ||
+          requestedTool === 'homework' ||
+          requestedTool === 'pdf' ||
+          requestedTool === 'webcam' ||
+          requestedTool === 'study-kit';
+        const adaptiveContext = await getAdaptiveContextForUser(userId, {
+          subject: maestro?.subject,
+          baselineDifficulty: 3,
+          pragmatic,
+          modeOverride: (userSettings?.adaptiveDifficultyMode as
+            | 'manual'
+            | 'guided'
+            | 'balanced'
+            | 'automatic'
+            | undefined),
+        });
+        const adaptiveInstruction = buildAdaptiveInstruction(adaptiveContext);
+        enhancedSystemPrompt = `${enhancedSystemPrompt}\n\n${adaptiveInstruction}`;
+      } catch (error) {
+        logger.warn('Failed to load adaptive difficulty context', { error: String(error) });
       }
     }
 
