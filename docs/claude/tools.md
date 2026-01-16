@@ -10,9 +10,47 @@ Maestri can create interactive educational tools during conversations.
 | Quiz | `create_quiz` | Multiple choice assessment |
 | Flashcards | `create_flashcards` | FSRS-compatible spaced repetition |
 | Demo | `create_demo` | Interactive HTML/JS simulations |
-| Search | `web_search` | Educational web/YouTube search |
+| Search | `web_search` | Real-time web search (Brave API) + YouTube |
 | Student Summary | `open_student_summary` | Student writes summary with maieutic guidance |
 | Summary (AI) | `create_summary` | AI-generated summary (legacy) |
+
+## Web Search (ADR 0043)
+
+Enables maestri to access real-time web information for current events, tech news, sports.
+
+### Search Providers (Priority Order)
+
+1. **Brave Search API** (if `BRAVE_SEARCH_API_KEY` configured)
+   - Real-time web results
+   - Italian language targeting
+   - 5 results per query
+
+2. **Wikipedia** (fallback when Brave not configured)
+   - Italian Wikipedia API
+   - Static/historical content
+
+3. **Treccani** (always added)
+   - Authoritative Italian source link
+
+4. **YouTube** (always added)
+   - Educational video search links
+
+### Configuration
+
+```bash
+# .env (optional - works without it using Wikipedia fallback)
+BRAVE_SEARCH_API_KEY=your-api-key
+
+# Get key at: https://brave.com/search/api/
+# Free tier: 2,000 queries/month
+```
+
+### Usage
+
+Maestri automatically trigger web search when discussing current topics:
+- **Lovelace**: "Cerca le ultime novità su Rust" → Brave Search
+- **Cicerone**: "Quali sono le notizie di oggi?" → Brave Search
+- **Chris**: "Quando sono le prossime Olimpiadi?" → Brave Search
 
 ## Architecture
 
