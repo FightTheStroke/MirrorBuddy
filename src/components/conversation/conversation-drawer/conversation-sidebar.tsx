@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { logger } from '@/lib/logger';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,7 +94,7 @@ export function ConversationSidebar({
         })));
       }
     } catch (error) {
-      console.error('Failed to fetch conversations:', error);
+      logger.error('Failed to fetch conversations', { error: String(error) });
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +150,7 @@ export function ConversationSidebar({
         setShowDeleteConfirm(false);
       }
     } catch (error) {
-      console.error('Failed to delete conversations:', error);
+      logger.error('Failed to delete conversations', { error: String(error) });
     } finally {
       setIsDeleting(false);
     }

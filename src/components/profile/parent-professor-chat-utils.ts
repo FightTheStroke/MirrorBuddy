@@ -2,6 +2,8 @@
  * Utility functions for parent-professor chat
  */
 
+import { logger } from '@/lib/logger';
+
 interface Message {
   id: string;
   role: 'user' | 'assistant';
@@ -62,7 +64,7 @@ export async function initializeChatHistory(
 
     return { conversationId, messages, hasConsented };
   } catch (err) {
-    console.error('Failed to initialize chat:', err);
+    logger.error('Failed to initialize chat', { error: String(err) });
     return { conversationId: null, messages: [], hasConsented: false };
   }
 }
@@ -74,7 +76,7 @@ export async function saveConsent(): Promise<void> {
   try {
     await fetch('/api/parent-professor/consent', { method: 'POST' });
   } catch (err) {
-    console.error('Failed to save consent:', err);
+    logger.error('Failed to save consent', { error: String(err) });
   }
 }
 

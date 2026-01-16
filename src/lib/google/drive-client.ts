@@ -6,6 +6,7 @@
  * Handles file listing, search, and download.
  */
 
+import { logger } from '@/lib/logger';
 import { getValidAccessToken } from './oauth';
 import { ALL_SUPPORTED_MIME_TYPES } from './config';
 import type {
@@ -68,7 +69,7 @@ export async function listDriveFiles(
 
   // Validate folderId to prevent injection attacks
   if (!isValidDriveId(folderId)) {
-    console.error('[Drive Client] Invalid folder ID format:', folderId);
+    logger.error('[Drive Client] Invalid folder ID format:', { folderId });
     return null;
   }
 
@@ -115,7 +116,7 @@ export async function listDriveFiles(
   });
 
   if (!response.ok) {
-    console.error('[Drive Client] List files failed:', await response.text());
+    logger.error('[Drive Client] List files failed:', { responseText: await response.text() });
     return null;
   }
 
@@ -179,7 +180,7 @@ export async function searchDriveFiles(
   });
 
   if (!response.ok) {
-    console.error('[Drive Client] Search failed:', await response.text());
+    logger.error('[Drive Client] Search failed:', { responseText: await response.text() });
     return null;
   }
 
@@ -197,7 +198,7 @@ export async function getDriveFile(
   // SECURITY: Validate fileId to prevent SSRF attacks
   // Only alphanumeric IDs with hyphens/underscores are allowed
   if (!isValidDriveId(fileId)) {
-    console.error('[Drive Client] Invalid file ID format:', fileId);
+    logger.error('[Drive Client] Invalid file ID format:', { fileId });
     return null;
   }
 
@@ -218,7 +219,7 @@ export async function getDriveFile(
   });
 
   if (!response.ok) {
-    console.error('[Drive Client] Get file failed:', await response.text());
+    logger.error('[Drive Client] Get file failed:', { responseText: await response.text() });
     return null;
   }
 
@@ -262,7 +263,7 @@ export async function downloadDriveFile(
   });
 
   if (!response.ok) {
-    console.error('[Drive Client] Download failed:', await response.text());
+    logger.error('[Drive Client] Download failed:', { responseText: await response.text() });
     return null;
   }
 
@@ -293,7 +294,7 @@ export async function getDriveFolderPath(
 ): Promise<{ id: string; name: string }[]> {
   // Validate folderId to prevent injection attacks
   if (!isValidDriveId(folderId)) {
-    console.error('[Drive Client] Invalid folder ID format:', folderId);
+    logger.error('[Drive Client] Invalid folder ID format:', { folderId });
     return [];
   }
 

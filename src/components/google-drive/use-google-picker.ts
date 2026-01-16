@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { logger } from '@/lib/logger';
 import toast from '@/components/ui/toast';
 
 // Google Picker types
@@ -108,7 +109,7 @@ export function useGooglePicker({
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.gapi && window.google?.picker) {
-      console.log('[GooglePicker] API already loaded');
+      logger.debug('[GooglePicker] API already loaded');
       setIsReady(true);
       return;
     }
@@ -116,24 +117,24 @@ export function useGooglePicker({
     // Check if script already exists
     const existingScript = document.querySelector(`script[src="${PICKER_API_URL}"]`);
     if (existingScript) {
-      console.log('[GooglePicker] Script tag exists, waiting for load');
+      logger.debug('[GooglePicker] Script tag exists, waiting for load');
       return;
     }
 
-    console.log('[GooglePicker] Loading Google API script');
+    logger.debug('[GooglePicker] Loading Google API script');
     const script = document.createElement('script');
     script.src = PICKER_API_URL;
     script.async = true;
     script.defer = true;
     script.onload = () => {
-      console.log('[GooglePicker] Script loaded, loading picker module');
+      logger.debug('[GooglePicker] Script loaded, loading picker module');
       window.gapi.load('picker', () => {
-        console.log('[GooglePicker] Picker module ready');
+        logger.debug('[GooglePicker] Picker module ready');
         setIsReady(true);
       });
     };
     script.onerror = () => {
-      console.error('[GooglePicker] Failed to load script');
+      logger.error('[GooglePicker] Failed to load script');
       setError('Failed to load Google Picker API');
     };
     document.body.appendChild(script);
@@ -144,10 +145,10 @@ export function useGooglePicker({
   }, []);
 
   const openPicker = useCallback(async () => {
-    console.log('[GooglePicker] openPicker called, isReady:', isReady);
+    logger.debug('[GooglePicker] openPicker called, isReady:', { isReady });
     if (!isReady || !window.google?.picker) {
       const msg = 'Google Picker not ready';
-      console.warn('[GooglePicker]', msg);
+      logger.warn('[GooglePicker] Google Picker not ready');
       setError(msg);
       toast.error('Google Picker non pronto. Riprova tra qualche secondo.');
       return;
@@ -158,12 +159,12 @@ export function useGooglePicker({
 
     try {
       // Get access token from our API
-      console.log('[GooglePicker] Fetching access token for user:', userId);
+      logger.debug('[GooglePicker] Fetching access token for user:', { userId });
       const tokenResponse = await fetch(`/api/auth/google/token?userId=${userId}`);
       if (!tokenResponse.ok) {
         const data = await tokenResponse.json();
         const errorMsg = data.error || 'Failed to get access token';
-        console.error('[GooglePicker] Token error:', errorMsg);
+        logger.error('[GooglePicker] Token error:', { error: errorMsg });
         if (errorMsg.includes('Not connected')) {
           toast.error('Devi prima connettere Google Drive nelle Impostazioni.');
         } else {
@@ -172,20 +173,20 @@ export function useGooglePicker({
         throw new Error(errorMsg);
       }
       const { accessToken } = await tokenResponse.json();
-      console.log('[GooglePicker] Got access token');
+      logger.debug('[GooglePicker] Got access token');
 
       // Get client ID from environment
       const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
       if (!clientId) {
         const msg = 'Google Client ID not configured';
-        console.error('[GooglePicker]', msg);
+        logger.error('[GooglePicker] Google Client ID not configured');
         toast.error('Configurazione Google mancante');
         throw new Error(msg);
       }
 
       // Extract app ID from client ID (format: xxx.apps.googleusercontent.com)
       const appId = clientId.split('.')[0];
-      console.log('[GooglePicker] Building picker with appId:', appId);
+      logger.debug('[GooglePicker] Building picker with appId:', { appId });
 
       // Create view for files
       const docsView = new window.google.picker.DocsView()
@@ -199,7 +200,7 @@ export function useGooglePicker({
         .setOAuthToken(accessToken)
         .addView(docsView)
         .setCallback((data: GooglePickerResponse) => {
-          console.log('[GooglePicker] Callback received:', data.action);
+          logger.debug('[GooglePicker] Callback received:', { action: data.action });
           if (data.action === window.google.picker.Action.PICKED && data.docs) {
             onSelect(data.docs);
           }
@@ -217,11 +218,11 @@ export function useGooglePicker({
 
       const picker = builder.build();
       pickerRef.current = picker;
-      console.log('[GooglePicker] Opening picker');
+      logger.debug('[GooglePicker] Opening picker');
       picker.setVisible(true);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to open picker';
-      console.error('[GooglePicker] Error:', errorMsg);
+      logger.error('[GooglePicker] Error:', { error: errorMsg });
       setError(errorMsg);
     } finally {
       setIsLoading(false);

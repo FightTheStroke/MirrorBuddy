@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 import type { GoogleConnectionStatus, DriveFileUI, DriveBreadcrumb } from '@/lib/google';
 
 interface UseGoogleDriveOptions {
@@ -65,7 +66,7 @@ export function useGoogleDrive({ userId }: UseGoogleDriveOptions): UseGoogleDriv
         setConnectionStatus(status);
       }
     } catch (err) {
-      console.error('[useGoogleDrive] Failed to get status:', err);
+      logger.error('[useGoogleDrive] Failed to get status:', { error: String(err) });
     } finally {
       setIsLoading(false);
     }
@@ -116,7 +117,7 @@ export function useGoogleDrive({ userId }: UseGoogleDriveOptions): UseGoogleDriv
         setBreadcrumbs([]);
       }
     } catch (err) {
-      console.error('[useGoogleDrive] Failed to disconnect:', err);
+      logger.error('[useGoogleDrive] Failed to disconnect:', { error: String(err) });
     }
   }, [userId]);
 

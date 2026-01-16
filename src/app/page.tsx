@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { logger } from '@/lib/logger';
 import { motion } from 'framer-motion';
 import { GraduationCap, Trophy, Settings, Calendar, Heart, Sparkles, PencilRuler, Backpack } from 'lucide-react';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
@@ -70,7 +71,7 @@ export default function Home() {
           try {
             await endConversationWithSummary(characterConvo.conversationId, userId);
           } catch (error) {
-            console.error('Failed to close conversation:', error);
+            logger.error('Failed to close conversation', { error: String(error) });
           }
         }
       }
