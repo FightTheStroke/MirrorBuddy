@@ -2,6 +2,7 @@
  * GDPR Delete My Data helpers
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 
@@ -20,8 +21,7 @@ export async function executeUserDataDeletion(userId: string) {
     settings: 0,
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await prisma.$transaction(async (tx: any) => {
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     // 1. Delete messages (child of conversations)
     const msgResult = await tx.message.deleteMany({
       where: { conversation: { userId } },
