@@ -100,37 +100,20 @@ Performance checks are automated in `npm run pre-release` (Phase 4).
 ```
 
 ### Memory Safety
-- [ ] EventSource: ALL have `.close()` in cleanup
-- [ ] Event Listeners: ALL have `removeEventListener` in useEffect cleanup
-- [ ] Telemetry: Flush timeout cleared on unmount
-- [ ] SVG listeners: Removed on component unmount
-
-**Verification command:**
-```bash
-# Check for EventSource without cleanup
-grep -rl "new EventSource" src/ --include="*.ts" | xargs -I{} sh -c 'grep -L "\.close()" "{}"'
-# Should return nothing
-```
+- [ ] EventSource with `.close()` cleanup
+- [ ] Event listeners with `removeEventListener`
+- [ ] Telemetry flush timeout cleared on unmount
 
 ### Database Performance
-- [ ] No N+1 queries (use `$transaction` for batch operations)
-- [ ] Pagination on list endpoints (max 200 items)
-- [ ] Composite indexes for frequent queries (see ADR-0044)
-
-**Verification command:**
-```bash
-# Check for loop + await prisma without $transaction
-grep -rl "for.*await.*prisma" src/ --include="*.ts"
-# Review each match for N+1 patterns
-```
+- [ ] No N+1 queries (use `$transaction`)
+- [ ] Pagination on list endpoints (max 200)
+- [ ] Composite indexes (ADR-0044)
 
 ### React Performance
-- [ ] Large components use `React.memo`
-- [ ] Event handlers wrapped in `useCallback`
-- [ ] Expensive computations in `useMemo`
-- [ ] No inline handlers in frequently re-rendered components
+- [ ] `React.memo` for large components
+- [ ] `useCallback`/`useMemo` where needed
 
-**Reference:** ADR-0044 documents all performance optimizations applied.
+**Reference:** ADR-0044 for all performance patterns.
 
 ---
 
@@ -247,58 +230,17 @@ https://microsoft.github.io/code-with-engineering-playbook/
 
 ---
 
-## CRITICAL LEARNINGS (2026-01-03 Post-Mortem)
+## CRITICAL LEARNINGS
 
-> **32 bugs shipped despite "all tests passing". Here's why and how to prevent it.**
+See `mirrorbuddy-hardening-checks.md` for post-mortem learnings (2026-01-03).
 
-### Learning 1: FALSE COMPLETION PATTERN
-
-**What happened**: Plans in `docs/plans/done/` marked "✅ COMPLETED" in header, but:
-- Internal tasks still `[ ]` unchecked
-- `MasterPlan-v2.1` claimed bugs 0.1-0.6 fixed → ALL 6 still broken
-- `ManualTests-Sprint` in done/ → ZERO tests actually executed (all "⬜ Non testato")
-
-**Mandatory Check Before Release**:
+**Quick validation**:
 ```bash
-# Verify plan files have no unchecked items
+# Plan completion check
 for f in docs/plans/done/*.md; do
   unchecked=$(grep -c '\[ \]' "$f" 2>/dev/null || echo 0)
-  if [ "$unchecked" -gt 0 ]; then
-    echo "BLOCKED: $f has $unchecked unchecked items but is in done/"
-  fi
+  [ "$unchecked" -gt 0 ] && echo "BLOCKED: $f has $unchecked unchecked items"
 done
 ```
-
-### Learning 2: SMOKE TEST DECEPTION
-
-**What happened**: 130 E2E tests PASSED. 32 real bugs existed.
-- Tests verified "page loads without crash" ✓
-- Tests did NOT verify "feature actually works" ✗
-
-**Bad test (reject)**:
-```javascript
-await page.click('text=Mappe Mentali');
-await page.waitForTimeout(1000);
-// No assertion!
-```
-
-**Good test (require)**:
-```javascript
-await page.click('text=Mappe Mentali');
-await expect(page.locator('.mindmap-container svg')).toBeVisible();
-await expect(page.locator('.mindmap-node')).toHaveCount.greaterThan(1);
-```
-
-### Learning 3: PROOF OR BLOCK
-
-**What counts as proof**:
-- Actual test output (not "tests passed")
-- Screenshots showing feature working
-- `grep` output showing code exists
-
-**What does NOT count**:
-- "I fixed it" (show the test)
-- "Tests pass" (show the output)
-- "✅ COMPLETED" header (check internal `[ ]`)
 
 **RULE: No proof = BLOCKED.**

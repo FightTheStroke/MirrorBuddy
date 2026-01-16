@@ -172,6 +172,21 @@ echo -e "${BLUE}   Phase 4: $((PHASE4_TIME - PHASE3_TIME))s${NC}"
 echo ""
 
 # =============================================================================
+# PHASE 5: FILE SIZE VALIDATION (warning only)
+# =============================================================================
+echo -e "${BLUE}[PHASE 5] File size validation...${NC}"
+
+if [ -f "./scripts/check-file-size.sh" ]; then
+    ./scripts/check-file-size.sh || true  # Non-blocking, just report
+else
+    echo -e "${YELLOW}⚠ check-file-size.sh not found, skipping${NC}"
+fi
+
+PHASE5_TIME=$(date +%s)
+echo -e "${BLUE}   Phase 5: $((PHASE5_TIME - PHASE4_TIME))s${NC}"
+echo ""
+
+# =============================================================================
 # SUMMARY
 # =============================================================================
 END_TIME=$(date +%s)
@@ -184,6 +199,7 @@ echo " Phase 1 (instant):   $((PHASE1_TIME - START_TIME))s"
 echo " Phase 2 (parallel):  $((PHASE2_TIME - PHASE1_TIME))s"
 echo " Phase 3 (build):     $((PHASE3_TIME - PHASE2_TIME))s"
 echo " Phase 4 (perf):      $((PHASE4_TIME - PHASE3_TIME))s"
+echo " Phase 5 (size):      $((PHASE5_TIME - PHASE4_TIME))s"
 echo " ─────────────────────────"
 echo " Total:               ${TOTAL}s"
 echo "=========================================="
