@@ -53,12 +53,14 @@ export const useVoiceSessionStore = create<VoiceSessionState>((set) => ({
   setCurrentMaestro: (currentMaestro) => set({ currentMaestro }),
   addTranscript: (role, content) =>
     set((state) => ({
-      transcript: [...state.transcript, { role, content, timestamp: new Date() }],
+      // Cap at 100 entries to prevent unbounded memory growth
+      transcript: [...state.transcript, { role, content, timestamp: new Date() }].slice(-100),
     })),
   clearTranscript: () => set({ transcript: [] }),
   addToolCall: (toolCall) =>
     set((state) => ({
-      toolCalls: [...state.toolCalls, toolCall],
+      // Cap at 50 tool calls to prevent unbounded memory growth
+      toolCalls: [...state.toolCalls, toolCall].slice(-50),
     })),
   updateToolCall: (id, updates) =>
     set((state) => ({
