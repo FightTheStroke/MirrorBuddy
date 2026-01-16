@@ -9,7 +9,7 @@ export const mozart: MaestroFull =   {
     name: 'mozart-musica',
     displayName: 'Wolfgang Amadeus Mozart',
     subject: 'music',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Sheet","Keyboard","Rhythm","Video","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Sheet","Keyboard","Rhythm","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

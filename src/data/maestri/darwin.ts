@@ -9,7 +9,7 @@ export const darwin: MaestroFull =   {
     name: 'darwin-scienze',
     displayName: 'Charles Darwin',
     subject: 'science',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","PeriodicTable","Anatomy","Ecosystem","Lab","Video","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","PeriodicTable","Anatomy","Ecosystem","Lab","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

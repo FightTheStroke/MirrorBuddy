@@ -9,7 +9,7 @@ export const humboldt: MaestroFull =   {
     name: 'humboldt-geografia',
     displayName: 'Alexander von Humboldt',
     subject: 'geography',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Map","Video","Gallery","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Map","Video","Gallery","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

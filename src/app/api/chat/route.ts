@@ -21,6 +21,7 @@ import { saveTool } from '@/lib/tools/tool-persistence';
 import { functionNameToToolType } from '@/types/tools';
 import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
 import { getMaestroById } from '@/data/maestri';
+import { buildToolContext } from '@/lib/tools/tool-context-builder';
 import {
   buildAdaptiveInstruction,
   getAdaptiveContextForUser,
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body: ChatRequest = await request.json();
-    const { messages, systemPrompt, maestroId, enableTools = true, enableMemory = true, requestedTool } = body;
+    const { messages, systemPrompt, maestroId, conversationId, enableTools = true, enableMemory = true, requestedTool } = body;
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
@@ -175,6 +176,30 @@ export async function POST(request: NextRequest) {
           userId,
           maestroId,
           error: String(memoryError),
+        });
+      }
+    }
+
+    // Inject tool context (T2-02: generated content from this conversation)
+    let hasToolContext = false;
+    if (userId && conversationId) {
+      try {
+        const toolContext = await buildToolContext(userId, conversationId);
+        if (toolContext.toolCount > 0) {
+          enhancedSystemPrompt = `${enhancedSystemPrompt}\n\n${toolContext.formattedContext}`;
+          hasToolContext = true;
+          logger.debug('Tool context injected', {
+            conversationId,
+            toolCount: toolContext.toolCount,
+            types: toolContext.types,
+          });
+        }
+      } catch (toolContextError) {
+        // Tool context loading failure should not block the chat
+        logger.warn('Failed to load tool context', {
+          userId,
+          conversationId,
+          error: String(toolContextError),
         });
       }
     }
@@ -360,7 +385,7 @@ export async function POST(request: NextRequest) {
             const toolResult = await executeToolCall(
               toolCall.function.name,
               args,
-              { maestroId, conversationId: undefined, userId }
+              { maestroId, conversationId, userId }
             );
 
             // Material ID to use in toolCallRef (from saved material or fallback to tool result)
@@ -376,6 +401,7 @@ export async function POST(request: NextRequest) {
                   title: args.title || args.topic || `${toolType} tool`,
                   content: toolResult.data as Record<string, unknown>,
                   maestroId,
+                  conversationId,
                   topic: args.topic,
                   sourceToolId: typeof args.sourceToolId === 'string' ? args.sourceToolId : undefined,
                 });
@@ -424,6 +450,7 @@ export async function POST(request: NextRequest) {
           toolCalls: toolCallRefs,
           hasTools: true,
           hasMemory,
+          hasToolContext,
           hasRAG,
         });
       }
@@ -479,6 +506,7 @@ export async function POST(request: NextRequest) {
         model: result.model,
         usage: result.usage,
         hasMemory,
+        hasToolContext,
         hasRAG,
         maestroId,
         sanitized: sanitized.modified,

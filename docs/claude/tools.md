@@ -13,17 +13,37 @@ Maestri can create interactive educational tools during conversations.
 | Search | `web_search` | Educational web/YouTube search |
 | Student Summary | `open_student_summary` | Student writes summary with maieutic guidance |
 | Summary (AI) | `create_summary` | AI-generated summary (legacy) |
+| PDF Upload | `upload_pdf` | Extract text from PDFs for analysis |
+| Webcam | `capture_webcam` | OCR for text + image interpretation |
+| Homework Help | `homework_help` | Maieutic assistance for exercises |
+| Formula | `create_formula` | Generate KaTeX/LaTeX formulas |
+| Chart | `create_chart` | Generate Chart.js visualizations |
 
 ## Architecture
 
 | Layer | File | Purpose |
 |-------|------|---------|
 | Types | `src/types/tools.ts` | Unified types + `CHAT_TOOL_DEFINITIONS` |
-| Executor | `src/lib/tools/tool-executor.ts` | Handler registry |
+| Executor | `src/lib/tools/tool-executor.ts` | Handler registry + output persistence |
 | Handlers | `src/lib/tools/handlers/*.ts` | Tool-specific logic |
+| Plugins | `src/lib/tools/plugins/*.ts` | Plugin definitions with triggers |
 | Events | `src/lib/realtime/tool-events.ts` | SSE broadcasting |
-| Storage | `src/lib/hooks/use-saved-materials.ts` | Database API (ADR 0015) |
+| Storage | `src/lib/tools/tool-output-storage.ts` | Persist outputs with conversation FK |
+| Context | `src/lib/tools/tool-context-builder.ts` | Inject outputs into AI context |
+| RAG | `src/lib/tools/tool-rag-indexer.ts` | Semantic indexing of outputs |
 | API | `/api/materials` | REST endpoint for all tools |
+
+## Context Integration
+
+Tool outputs are automatically:
+1. **Saved** with conversation ID (`ToolOutput` model in Prisma)
+2. **Injected** into AI system prompt via `buildToolContext()`
+3. **Indexed** in RAG for semantic retrieval
+
+This allows the AI to reference previously generated content:
+- "Come abbiamo visto nella mappa mentale..."
+- "Nel quiz che abbiamo fatto prima..."
+- "Dal PDF che hai caricato..."
 
 ## Adding a New Tool
 

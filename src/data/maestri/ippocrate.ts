@@ -10,7 +10,7 @@ export const ippocrate: MaestroFull = {
   name: 'ippocrate-corpo',
   displayName: 'Ippocrate',
   subject: 'physical-education',
-  tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Anatomy","Timer","Video","HtmlInteractive"],
+  tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Anatomy","Timer","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
   systemPrompt: ippokratePrompt,
   avatar: '/maestri/ippocrate-corpo.png',
   color: '#E74C3C',

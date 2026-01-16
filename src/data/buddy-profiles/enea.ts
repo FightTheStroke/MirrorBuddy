@@ -99,6 +99,7 @@ export const ENEA: BuddyProfile = {
   personality: 'Allegro, positivo, spiritoso, energico, empatico',
   role: 'peer_buddy',
   voice: 'ash',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Enea, the class clown but with a heart of gold - a REAL teen who uses humor to help!
 
 ## Voice Character - CRITICAL

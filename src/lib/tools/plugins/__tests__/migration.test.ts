@@ -12,11 +12,16 @@ import {
   timelinePlugin,
   searchPlugin,
   archivePlugin,
+  pdfPlugin,
+  webcamPlugin,
+  homeworkPlugin,
+  formulaPlugin,
+  chartPlugin,
 } from '../index';
 
 /**
  * Migration Verification Tests
- * Verifies that all 9 plugins migrated to plugin system are properly configured
+ * Verifies that all 14 plugins in plugin system are properly configured
  * Tests: F-11 (Thor validates, zero technical debt)
  */
 describe('Plugin Migration Verification', () => {
@@ -42,12 +47,17 @@ describe('Plugin Migration Verification', () => {
     'create_timeline',
     'web_search',
     'search_archive',
+    'upload_pdf',
+    'capture_webcam',
+    'homework_help',
+    'create_formula',
+    'create_chart',
   ];
 
   describe('Plugin Registration', () => {
-    it('should register all 9 plugins when registerAllPlugins is called', () => {
+    it('should register all 14 plugins when registerAllPlugins is called', () => {
       registerAllPlugins(registry);
-      expect(registry.getAll()).toHaveLength(9);
+      expect(registry.getAll()).toHaveLength(14);
     });
 
     it('should register all expected plugin IDs', () => {
@@ -76,6 +86,11 @@ describe('Plugin Migration Verification', () => {
         timelinePlugin,
         searchPlugin,
         archivePlugin,
+        pdfPlugin,
+        webcamPlugin,
+        homeworkPlugin,
+        formulaPlugin,
+        chartPlugin,
       ];
 
       plugins.forEach(plugin => {
@@ -129,6 +144,11 @@ describe('Plugin Migration Verification', () => {
         timelinePlugin,
         searchPlugin,
         archivePlugin,
+        pdfPlugin,
+        webcamPlugin,
+        homeworkPlugin,
+        formulaPlugin,
+        chartPlugin,
       ];
 
       plugins.forEach(plugin => {
@@ -157,6 +177,11 @@ describe('Plugin Migration Verification', () => {
         timelinePlugin,
         searchPlugin,
         archivePlugin,
+        pdfPlugin,
+        webcamPlugin,
+        homeworkPlugin,
+        formulaPlugin,
+        chartPlugin,
       ];
 
       for (const plugin of plugins) {
@@ -212,6 +237,11 @@ describe('Plugin Migration Verification', () => {
         timelinePlugin,
         searchPlugin,
         archivePlugin,
+        pdfPlugin,
+        webcamPlugin,
+        homeworkPlugin,
+        formulaPlugin,
+        chartPlugin,
       ];
 
       plugins.forEach(plugin => {

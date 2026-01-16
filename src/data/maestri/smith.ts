@@ -9,7 +9,7 @@ export const smith: MaestroFull =   {
     name: 'smith-economia',
     displayName: 'Adam Smith',
     subject: 'economics',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Infographic","Video","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Infographic","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

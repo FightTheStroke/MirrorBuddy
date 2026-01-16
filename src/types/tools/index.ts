@@ -53,6 +53,15 @@ export type {
   CalculatorStep,
   CalculatorData,
   CalculatorEventType,
+  // Formula
+  FormulaData,
+  // Chart
+  ChartData,
+  // PDF
+  PDFMetadata,
+  PDFData,
+  // Webcam
+  WebcamData,
 } from './tool-data-types';
 
 export {

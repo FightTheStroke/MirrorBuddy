@@ -9,7 +9,7 @@ export const cicerone: MaestroFull =   {
     name: 'cicerone-civica',
     displayName: 'Marco Tullio Cicerone',
     subject: 'civic-education',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Video","Debate","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Video","Debate","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

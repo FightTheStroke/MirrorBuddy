@@ -9,7 +9,7 @@ export const manzoni: MaestroFull =   {
     name: 'manzoni-italiano',
     displayName: 'Alessandro Manzoni',
     subject: 'italian',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Dictionary","Grammar","Conjugator","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Dictionary","Grammar","Conjugator","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

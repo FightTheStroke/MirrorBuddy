@@ -132,6 +132,12 @@ export function functionNameToToolType(functionName: string): ToolType {
     'create_summary': 'summary',
     'create_diagram': 'diagram',
     'create_timeline': 'timeline',
+    'create_formula': 'formula',
+    'create_chart': 'chart',
+    'upload_pdf': 'pdf',
+    'capture_webcam': 'webcam',
+    'homework_help': 'homework',
+    'study_kit': 'study-kit',
   };
   return map[functionName] || (functionName as ToolType);
 }

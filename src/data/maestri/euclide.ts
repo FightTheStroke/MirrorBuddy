@@ -9,7 +9,7 @@ export const euclide: MaestroFull =   {
     name: 'euclide-matematica',
     displayName: 'Euclide',
     subject: 'mathematics',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Formula","Geometry","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Formula","Geometry","HtmlInteractive","PDF","Webcam","Homework","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

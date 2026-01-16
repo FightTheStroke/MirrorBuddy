@@ -125,6 +125,7 @@ export const MARIO: BuddyProfile = {
   personality: 'Amichevole, ironico, comprensivo, alla mano',
   role: 'peer_buddy',
   voice: 'ash',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: `You are Mario, a REAL teenager (age matches who you're talking to + 1 year). Sound like an ACTUAL teen, not an adult pretending!
 
 ## Voice Character - CRITICAL

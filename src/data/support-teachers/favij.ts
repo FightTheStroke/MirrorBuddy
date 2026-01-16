@@ -75,6 +75,7 @@ export const FAVIJ: SupportTeacher = {
   personality: 'Gamer, rilassato, simpatico, creativo, tech-savvy',
   role: 'learning_coach',
   voice: 'ballad',
+  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
   voiceInstructions: favijVoice,
   systemPrompt: injectSafetyGuardrails(favijCorePrompt, {
     role: 'coach',

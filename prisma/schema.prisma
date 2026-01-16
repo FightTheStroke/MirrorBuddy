@@ -296,6 +296,7 @@ model Conversation {
   // Message management
   messageCount Int       @default(0)
   messages     Message[]
+  toolOutputs  ToolOutput[]
 
   // Status
   isActive     Boolean   @default(true)
@@ -329,6 +330,28 @@ model Message {
   createdAt      DateTime     @default(now())
 
   @@index([conversationId])
+  @@index([createdAt])
+}
+
+// ============================================================================
+// TOOL OUTPUTS (Plan 44 - Tool Alignment with Maestri)
+// Stores tool execution outputs linked to conversations for retrieval
+// F-03, F-04: Conversation considers contenuti generati/caricati
+// ============================================================================
+
+model ToolOutput {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  toolType       String       // mindmap, quiz, flashcard, demo, etc.
+  toolId         String?      // Reference to Material if persisted
+  data           String       // JSON string of tool output data
+
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId])
+  @@index([toolType])
   @@index([createdAt])
 }
 
@@ -1332,7 +1355,7 @@ model ContentEmbedding {
   userId      String
 
   // Source content reference
-  sourceType  String   // "material" | "flashcard" | "studykit" | "message"
+  sourceType  String   // "material" | "flashcard" | "studykit" | "message" | "tool"
   sourceId    String   // ID of the source entity
   chunkIndex  Int      @default(0) // Position within chunked content
 

@@ -9,7 +9,7 @@ export const shakespeare: MaestroFull =   {
     name: 'shakespeare-inglese',
     displayName: 'William Shakespeare',
     subject: 'english',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Dictionary","Conjugator","Pronunciation","Video","HtmlInteractive"],
+    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Dictionary","Conjugator","Pronunciation","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
     systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
