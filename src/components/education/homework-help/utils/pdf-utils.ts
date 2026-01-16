@@ -3,6 +3,7 @@
  * @brief PDF processing utilities
  */
 
+import { logger } from '@/lib/logger';
 import * as pdfjs from 'pdfjs-dist';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
@@ -84,7 +85,7 @@ export async function processPdfFile(
       error,
     };
   } catch (error) {
-    console.error('PDF processing error:', error);
+    logger.error('PDF processing error', { error: String(error) });
     return {
       pages: [],
       totalPages: 0,

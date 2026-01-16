@@ -7,6 +7,7 @@
  * - Contextual greeting generation
  */
 
+import { logger } from '@/lib/logger';
 import type { StateCreator } from 'zustand';
 import type { ExtendedStudentProfile } from '@/types';
 import type { ConversationFlowState, HandoffSuggestion, CharacterConversation } from '../types';
@@ -100,7 +101,7 @@ export const createHandoffSlice: StateCreator<
       const result = await response.json();
       return result?.greeting || null;
     } catch (error) {
-      console.error('Failed to load contextual greeting:', error);
+      logger.error('Failed to load contextual greeting', { error: String(error) });
       return null;
     }
   },

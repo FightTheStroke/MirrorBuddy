@@ -6,6 +6,7 @@
  * Handles authorization URL generation, token exchange, and refresh.
  */
 
+import { logger } from '@/lib/logger';
 import { prisma } from '@/lib/db';
 import {
   GOOGLE_OAUTH_ENDPOINTS,
@@ -63,7 +64,7 @@ export async function exchangeCodeForTokens(
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('[Google OAuth] Token exchange failed:', error);
+    logger.error('[Google OAuth] Token exchange failed', { error });
     return null;
   }
 
@@ -94,7 +95,7 @@ export async function refreshAccessToken(
 
   if (!response.ok) {
     const error = await response.text();
-    console.error('[Google OAuth] Token refresh failed:', error);
+    logger.error('[Google OAuth] Token refresh failed', { error });
     return null;
   }
 
@@ -114,7 +115,7 @@ export async function getGoogleUserProfile(
   });
 
   if (!response.ok) {
-    console.error('[Google OAuth] Failed to get user profile');
+    logger.error('[Google OAuth] Failed to get user profile');
     return null;
   }
 

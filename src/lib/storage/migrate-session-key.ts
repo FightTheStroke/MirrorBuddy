@@ -3,6 +3,8 @@
 // Migrates old 'convergio-user-id' to new 'mirrorbuddy-user-id'
 // ============================================================================
 
+import { logger } from '@/lib/logger';
+
 /**
  * Migrate sessionStorage key from old branding to new
  * Call this once on app initialization (e.g., in layout.tsx useEffect)
@@ -18,7 +20,7 @@ export function migrateSessionStorageKey(): void {
     if (oldValue && !sessionStorage.getItem(newKey)) {
       sessionStorage.setItem(newKey, oldValue);
       sessionStorage.removeItem(oldKey);
-      console.log('[Migration] Session key migrated to mirrorbuddy-user-id');
+      logger.info('[Migration] Session key migrated to mirrorbuddy-user-id');
     }
   } catch {
     // sessionStorage may not be available (SSR, private browsing)
