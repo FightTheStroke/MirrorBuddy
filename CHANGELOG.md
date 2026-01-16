@@ -9,6 +9,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 16 - Ethical Design Hardening)
+
+#### Microsoft Ethical Design Hacker Implementation (PR #151)
+
+**What it does**: Implements Microsoft's "Ethical Design Hacker: Six Mindsets for Secure UX in AI" security patterns, specifically adapted for protecting children with learning differences.
+
+**How it works**: A comprehensive 4-wave implementation covering privacy, transparency, safety, and security:
+
+**Wave 1 - Privacy Infrastructure**:
+- PII detection for Italian fiscal codes, names, emails, phone numbers
+- Content anonymization with pseudonymization support
+- GDPR-compliant data retention (365d conversations, 730d progress)
+- Right to Erasure implementation (Article 17)
+
+**Wave 2 - AI Response Transparency**:
+- Confidence scoring with visual indicators (green/yellow/orange/red)
+- Hallucination risk detection with Italian-language warnings
+- Source attribution (knowledge base, RAG, AI-generated)
+- Child-friendly UI with encouraging messaging
+
+**Wave 3 - Safety Monitoring**:
+- Anonymized audit trail logging
+- Knowledge base safety auditing before embedding
+- Configuration versioning with rollback support
+- Jailbreak attempt flagging and review workflow
+
+**Wave 4 - Security Hardening**:
+- Unicode homoglyph attack prevention (Cyrillic, Greek, Arabic lookalikes)
+- Session throttling with escalation (warning → cooldown → timeout)
+- Privacy-aware RAG embeddings
+- Safety event monitoring dashboard
+
+**Why it matters**: Children with learning differences deserve AI tools built with their safety as the foundation. This implementation ensures:
+- Personal data is protected before AI processing
+- AI responses are transparent about confidence levels
+- Suspicious activity is logged and flagged
+- Parents and educators can trust the platform
+
+**Key Files**:
+- `src/lib/privacy/` - Anonymization, PII detection, data retention
+- `src/lib/ai/transparency/` - Confidence scoring, hallucination detection
+- `src/lib/safety/` - Audit trail, versioning, unicode normalization
+- `src/components/ui/safety/` - Safety indicators, transparency badges
+- `docs/adr/0042-ethical-design-hardening.md` - Architecture decision record
+
+**Tests**: 95 unit tests covering all safety-critical functionality
+
 ### Added (Jan 15 - Adaptive Difficulty Engine)
 
 **What it does**: Multi-signal adaptive difficulty (chat/voice/quiz/flashcard) with prerequisite-aware pacing and pragmatic overrides for study-kit/homework.
