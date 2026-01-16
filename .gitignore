@@ -74,3 +74,7 @@ __pycache__/
 
 # Auto Claude data directory
 .auto-claude/
+
+# Claude process artifacts
+.verification/
+@docs/
