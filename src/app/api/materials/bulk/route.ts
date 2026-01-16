@@ -142,18 +142,22 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Create MaterialTag entries (skip duplicates)
+        // Create MaterialTag entries using transaction for batch insert
         const tagData = materialIds.flatMap(materialId =>
           tagIds.map(tagId => ({ materialId, tagId }))
         );
-        // Use createMany without skipDuplicates and catch unique constraint errors
-        for (const entry of tagData) {
-          try {
-            await prisma.materialTag.create({ data: entry });
-          } catch {
-            // Skip duplicates silently
-          }
-        }
+        // Use createMany with skipDuplicates via raw upsert pattern
+        await prisma.$transaction(
+          tagData.map((entry) =>
+            prisma.materialTag.upsert({
+              where: {
+                materialId_tagId: { materialId: entry.materialId, tagId: entry.tagId },
+              },
+              update: {}, // No update needed - just skip if exists
+              create: entry,
+            })
+          )
+        );
         result = { affected: materialIds.length, operation: 'tags added' };
         break;
 

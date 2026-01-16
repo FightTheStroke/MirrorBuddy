@@ -9,6 +9,7 @@ import type { Learning } from './summary-types';
 
 /**
  * Save learnings to database
+ * Uses $transaction for batch operations to avoid N+1 queries
  */
 export async function saveLearnings(
   userId: string,
@@ -18,39 +19,69 @@ export async function saveLearnings(
 ): Promise<void> {
   if (learnings.length === 0) return;
 
+  // Batch fetch existing learnings in a single query
+  const existingLearnings = await prisma.learning.findMany({
+    where: {
+      userId,
+      OR: learnings.map((l) => ({
+        category: l.category,
+        insight: l.insight,
+      })),
+    },
+  });
+
+  // Create a map for quick lookup
+  const existingMap = new Map(
+    existingLearnings.map((e) => [`${e.category}:${e.insight}`, e])
+  );
+
+  // Separate into updates and creates
+  const updates: Array<{ id: string; confidence: number; occurrences: number }> = [];
+  const creates: Array<{
+    userId: string;
+    maestroId: string;
+    subject: string | undefined;
+    category: string;
+    insight: string;
+    confidence: number;
+  }> = [];
+
   for (const learning of learnings) {
-    // Check if similar learning already exists
-    const existing = await prisma.learning.findFirst({
-      where: {
-        userId,
-        category: learning.category,
-        insight: learning.insight,
-      },
-    });
+    const key = `${learning.category}:${learning.insight}`;
+    const existing = existingMap.get(key);
 
     if (existing) {
-      // Update existing - increase confidence and occurrences
-      await prisma.learning.update({
-        where: { id: existing.id },
-        data: {
-          confidence: Math.min(1, existing.confidence + learning.confidence * 0.1),
-          occurrences: existing.occurrences + 1,
-        },
+      updates.push({
+        id: existing.id,
+        confidence: Math.min(1, existing.confidence + learning.confidence * 0.1),
+        occurrences: existing.occurrences + 1,
       });
     } else {
-      // Create new learning
-      await prisma.learning.create({
-        data: {
-          userId,
-          maestroId,
-          subject: userSchoolLevel,
-          category: learning.category,
-          insight: learning.insight,
-          confidence: learning.confidence,
-        },
+      creates.push({
+        userId,
+        maestroId,
+        subject: userSchoolLevel,
+        category: learning.category,
+        insight: learning.insight,
+        confidence: learning.confidence,
       });
     }
   }
+
+  // Execute all operations in a single transaction
+  await prisma.$transaction([
+    // Batch updates
+    ...updates.map((u) =>
+      prisma.learning.update({
+        where: { id: u.id },
+        data: { confidence: u.confidence, occurrences: u.occurrences },
+      })
+    ),
+    // Batch create
+    ...(creates.length > 0
+      ? [prisma.learning.createMany({ data: creates })]
+      : []),
+  ]);
 
   logger.info('Learnings saved', { userId, count: learnings.length });
 }
