@@ -4,6 +4,13 @@
  *
  * Manages data lifecycle, retention policies, and scheduled cleanup
  * for GDPR compliance (Art. 5 - storage limitation principle).
+ *
+ * NOTE: Full implementation requires schema migration to add:
+ * - UserPrivacyPreferences model
+ * - markedForDeletion field on Conversation
+ * - Embedding model
+ *
+ * Current implementation provides stubbed functions that return defaults.
  */
 
 import { prisma } from '@/lib/db';
@@ -18,156 +25,54 @@ const log = logger.child({ module: 'data-retention' });
 /**
  * Get effective retention policy for a user
  * Returns user's custom policy if set, otherwise default
+ *
+ * TODO: Implement when UserPrivacyPreferences schema is added
  */
 export async function getEffectiveRetentionPolicy(
-  userId: string
+  _userId: string
 ): Promise<DataRetentionPolicy> {
-  try {
-    const prefs = await prisma.userPrivacyPreferences.findUnique({
-      where: { userId },
-    });
-
-    if (prefs?.customRetention) {
-      return {
-        ...DEFAULT_RETENTION_POLICY,
-        ...(prefs.customRetention as Partial<DataRetentionPolicy>),
-      };
-    }
-
-    return DEFAULT_RETENTION_POLICY;
-  } catch {
-    // Table might not exist yet, return default
-    return DEFAULT_RETENTION_POLICY;
-  }
+  // Return default until schema supports custom preferences
+  return DEFAULT_RETENTION_POLICY;
 }
 
 /**
  * Mark data for deletion based on retention policy
  * Does not immediately delete - marks for cleanup job
+ *
+ * TODO: Implement when markedForDeletion field is added to schema
  */
 export async function markExpiredDataForDeletion(
   userId: string
 ): Promise<{ conversations: number; embeddings: number }> {
-  const policy = await getEffectiveRetentionPolicy(userId);
-  const now = new Date();
+  log.debug('markExpiredDataForDeletion called - awaiting schema migration', {
+    userId: userId.slice(0, 8),
+  });
 
-  // Calculate cutoff dates
-  const conversationCutoff = new Date(
-    now.getTime() - policy.conversationTTLDays * 24 * 60 * 60 * 1000
-  );
-  const embeddingsCutoff = new Date(
-    now.getTime() - policy.embeddingsTTLDays * 24 * 60 * 60 * 1000
-  );
-
-  let conversationsMarked = 0;
-  let embeddingsMarked = 0;
-
-  try {
-    // Mark old conversations
-    const convResult = await prisma.conversation.updateMany({
-      where: {
-        userId,
-        createdAt: { lt: conversationCutoff },
-        markedForDeletion: false,
-      },
-      data: {
-        markedForDeletion: true,
-        deletionScheduledAt: now,
-      },
-    });
-    conversationsMarked = convResult.count;
-
-    // Mark old embeddings
-    const embResult = await prisma.embedding.updateMany({
-      where: {
-        userId,
-        createdAt: { lt: embeddingsCutoff },
-        markedForDeletion: false,
-      },
-      data: {
-        markedForDeletion: true,
-        deletionScheduledAt: now,
-      },
-    });
-    embeddingsMarked = embResult.count;
-
-    log.info('Marked expired data for deletion', {
-      userId: userId.slice(0, 8),
-      conversationsMarked,
-      embeddingsMarked,
-    });
-  } catch (error) {
-    // Tables might not have these columns yet
-    log.debug('Retention marking skipped - schema update needed', { error });
-  }
-
+  // Return zeros until schema supports marking
   return {
-    conversations: conversationsMarked,
-    embeddings: embeddingsMarked,
+    conversations: 0,
+    embeddings: 0,
   };
 }
 
 /**
  * Execute scheduled deletions (run by cleanup job)
  * Only deletes data that has been marked for > 30 days (grace period)
+ *
+ * TODO: Implement when markedForDeletion field is added to schema
  */
 export async function executeScheduledDeletions(): Promise<{
   deletedConversations: number;
   deletedEmbeddings: number;
   deletedMessages: number;
 }> {
-  const gracePeriodDays = 30;
-  const cutoff = new Date(
-    Date.now() - gracePeriodDays * 24 * 60 * 60 * 1000
-  );
+  log.debug('executeScheduledDeletions called - awaiting schema migration');
 
-  let deletedConversations = 0;
-  let deletedEmbeddings = 0;
-  let deletedMessages = 0;
-
-  try {
-    // Delete messages from marked conversations first
-    const msgResult = await prisma.message.deleteMany({
-      where: {
-        conversation: {
-          markedForDeletion: true,
-          deletionScheduledAt: { lt: cutoff },
-        },
-      },
-    });
-    deletedMessages = msgResult.count;
-
-    // Delete marked conversations
-    const convResult = await prisma.conversation.deleteMany({
-      where: {
-        markedForDeletion: true,
-        deletionScheduledAt: { lt: cutoff },
-      },
-    });
-    deletedConversations = convResult.count;
-
-    // Delete marked embeddings
-    const embResult = await prisma.embedding.deleteMany({
-      where: {
-        markedForDeletion: true,
-        deletionScheduledAt: { lt: cutoff },
-      },
-    });
-    deletedEmbeddings = embResult.count;
-
-    log.info('Executed scheduled deletions', {
-      deletedConversations,
-      deletedEmbeddings,
-      deletedMessages,
-    });
-  } catch (error) {
-    log.error('Failed to execute scheduled deletions', { error });
-  }
-
+  // Return zeros until schema supports scheduled deletion
   return {
-    deletedConversations,
-    deletedEmbeddings,
-    deletedMessages,
+    deletedConversations: 0,
+    deletedEmbeddings: 0,
+    deletedMessages: 0,
   };
 }
 
@@ -186,31 +91,22 @@ export async function getUserRetentionStatus(userId: string): Promise<{
   const policy = await getEffectiveRetentionPolicy(userId);
 
   try {
-    const [
-      totalConversations,
-      markedForDeletion,
-      oldestConversation,
-      totalEmbeddings,
-    ] = await Promise.all([
+    const [totalConversations, oldestConversation] = await Promise.all([
       prisma.conversation.count({ where: { userId } }),
-      prisma.conversation.count({
-        where: { userId, markedForDeletion: true },
-      }),
       prisma.conversation.findFirst({
         where: { userId },
         orderBy: { createdAt: 'asc' },
         select: { createdAt: true },
       }),
-      prisma.embedding.count({ where: { userId } }),
     ]);
 
     return {
       policy,
       dataStats: {
         totalConversations,
-        markedForDeletion,
+        markedForDeletion: 0, // Not tracked until schema migration
         oldestConversation: oldestConversation?.createdAt || null,
-        totalEmbeddings,
+        totalEmbeddings: 0, // Not tracked until schema migration
       },
     };
   } catch {
@@ -228,28 +124,17 @@ export async function getUserRetentionStatus(userId: string): Promise<{
 
 /**
  * Update user's retention preferences
+ *
+ * TODO: Implement when UserPrivacyPreferences schema is added
  */
 export async function updateUserRetentionPolicy(
   userId: string,
   customPolicy: Partial<DataRetentionPolicy>
 ): Promise<void> {
-  await prisma.userPrivacyPreferences.upsert({
-    where: { userId },
-    create: {
-      userId,
-      pseudonymizedMode: false,
-      customRetention: customPolicy,
-      consentedAt: new Date(),
-      updatedAt: new Date(),
-    },
-    update: {
-      customRetention: customPolicy,
-      updatedAt: new Date(),
-    },
-  });
-
-  log.info('Updated user retention policy', {
+  log.info('updateUserRetentionPolicy called - awaiting schema migration', {
     userId: userId.slice(0, 8),
     policy: customPolicy,
   });
+
+  // No-op until schema supports custom preferences
 }

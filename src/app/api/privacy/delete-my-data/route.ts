@@ -25,10 +25,9 @@ interface DeleteResult {
   deletedData: {
     conversations: number;
     messages: number;
-    flashcards: number;
-    studyProgress: number;
-    embeddings: number;
-    preferences: number;
+    materials: number;
+    progress: number;
+    settings: number;
   };
   message: string;
 }
@@ -71,7 +70,7 @@ export async function POST(
     const result = await executeUserDataDeletion(userId);
 
     // Log the deletion for audit (without PII)
-    await logDeletionAudit(userId, body.reason);
+    logDeletionAudit(userId, body.reason);
 
     // Clear the user cookie
     cookieStore.delete('userId');
@@ -129,15 +128,15 @@ export async function GET(
 
 /**
  * Execute complete user data deletion
+ * Uses only models that exist in the current schema
  */
 async function executeUserDataDeletion(userId: string): Promise<DeleteResult> {
   const deletedData = {
     conversations: 0,
     messages: 0,
-    flashcards: 0,
-    studyProgress: 0,
-    embeddings: 0,
-    preferences: 0,
+    materials: 0,
+    progress: 0,
+    settings: 0,
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -154,55 +153,71 @@ async function executeUserDataDeletion(userId: string): Promise<DeleteResult> {
     });
     deletedData.conversations = convResult.count;
 
-    // 3. Delete flashcard reviews (child of flashcards)
-    await tx.flashcardReview.deleteMany({
-      where: { flashcard: { userId } },
-    });
-
-    // 4. Delete flashcards
-    const fcResult = await tx.flashcard.deleteMany({
+    // 3. Delete materials (learning resources)
+    const matResult = await tx.material.deleteMany({
       where: { userId },
     });
-    deletedData.flashcards = fcResult.count;
+    deletedData.materials = matResult.count;
 
-    // 5. Delete study progress
-    const progressResult = await tx.studyProgress.deleteMany({
+    // 4. Delete progress records
+    const progressResult = await tx.progress.deleteMany({
       where: { userId },
     });
-    deletedData.studyProgress = progressResult.count;
+    deletedData.progress = progressResult.count;
 
-    // 6. Delete embeddings/vectors
-    const embResult = await tx.embedding.deleteMany({
+    // 5. Delete flashcard progress
+    await tx.flashcardProgress.deleteMany({
+      where: { userId },
+    }).catch(() => { /* May not exist */ });
+
+    // 6. Delete quiz results
+    await tx.quizResult.deleteMany({
+      where: { userId },
+    }).catch(() => { /* May not exist */ });
+
+    // 7. Delete study sessions
+    await tx.studySession.deleteMany({
+      where: { userId },
+    }).catch(() => { /* May not exist */ });
+
+    // 8. Delete settings
+    const settingsResult = await tx.settings.deleteMany({
       where: { userId },
     });
-    deletedData.embeddings = embResult.count;
-
-    // 7. Delete user preferences
-    const prefResult = await tx.userPreferences.deleteMany({
-      where: { userId },
-    });
-    deletedData.preferences = prefResult.count;
-
-    // 8. Delete privacy preferences
-    await tx.userPrivacyPreferences.deleteMany({
-      where: { userId },
-    }).catch(() => {
-      // Table might not exist
-    });
+    deletedData.settings = settingsResult.count;
 
     // 9. Delete accessibility settings
     await tx.accessibilitySettings.deleteMany({
       where: { userId },
-    }).catch(() => {
-      // Table might not exist
-    });
+    }).catch(() => { /* May not exist */ });
 
-    // 10. Delete study sessions
-    await tx.studySession.deleteMany({
+    // 10. Delete notifications
+    await tx.notification.deleteMany({
       where: { userId },
-    }).catch(() => {
-      // Table might not exist
-    });
+    }).catch(() => { /* May not exist */ });
+
+    // 11. Delete telemetry events
+    await tx.telemetryEvent.deleteMany({
+      where: { userId },
+    }).catch(() => { /* May not exist */ });
+
+    // 12. Delete parent notes
+    await tx.parentNote.deleteMany({
+      where: { userId },
+    }).catch(() => { /* May not exist */ });
+
+    // 13. Delete collections and tags
+    await tx.materialTag.deleteMany({
+      where: { material: { userId } },
+    }).catch(() => { /* May not exist */ });
+
+    await tx.collection.deleteMany({
+      where: { userId },
+    }).catch(() => { /* May not exist */ });
+
+    await tx.tag.deleteMany({
+      where: { userId },
+    }).catch(() => { /* May not exist */ });
   });
 
   return {
@@ -217,56 +232,31 @@ async function executeUserDataDeletion(userId: string): Promise<DeleteResult> {
  * Get summary of user data (for preview before deletion)
  */
 async function getUserDataSummary(userId: string) {
-  const [
-    conversations,
-    messages,
-    flashcards,
-    studyProgress,
-    embeddings,
-  ] = await Promise.all([
+  const [conversations, messages, materials, progress] = await Promise.all([
     prisma.conversation.count({ where: { userId } }),
     prisma.message.count({ where: { conversation: { userId } } }),
-    prisma.flashcard.count({ where: { userId } }),
-    prisma.studyProgress.count({ where: { userId } }),
-    prisma.embedding.count({ where: { userId } }).catch(() => 0),
+    prisma.material.count({ where: { userId } }),
+    prisma.progress.count({ where: { userId } }),
   ]);
 
   return {
     conversations,
     messages,
-    flashcards,
-    studyProgress,
-    embeddings,
-    estimatedDataPoints: conversations + messages + flashcards + studyProgress,
+    materials,
+    progress,
+    estimatedDataPoints: conversations + messages + materials + progress,
   };
 }
 
 /**
  * Log deletion for audit trail (GDPR compliance)
- * Stores only anonymized info about the deletion event
+ * Logs to file since AuditLog model doesn't exist in schema yet
  */
-async function logDeletionAudit(
-  userId: string,
-  reason?: string
-): Promise<void> {
-  try {
-    await prisma.auditLog.create({
-      data: {
-        action: 'GDPR_DATA_DELETION',
-        entityType: 'user',
-        entityId: userId.slice(0, 8) + '***', // Anonymized
-        metadata: {
-          reason: reason || 'user_request',
-          timestamp: new Date().toISOString(),
-        },
-      },
-    });
-  } catch {
-    // Audit log table might not exist, log to file instead
-    log.info('GDPR deletion audit', {
-      action: 'GDPR_DATA_DELETION',
-      anonymizedUserId: userId.slice(0, 8),
-      reason: reason || 'user_request',
-    });
-  }
+function logDeletionAudit(userId: string, reason?: string): void {
+  log.info('GDPR deletion audit', {
+    action: 'GDPR_DATA_DELETION',
+    anonymizedUserId: userId.slice(0, 8) + '***',
+    reason: reason || 'user_request',
+    timestamp: new Date().toISOString(),
+  });
 }

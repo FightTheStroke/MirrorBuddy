@@ -110,7 +110,7 @@ describe('transparency-service', () => {
   describe('getTransparencyDisplayConfig', () => {
     it('should return display config with badge color', () => {
       const config = getTransparencyDisplayConfig({
-        primarySource: 'maestro_knowledge',
+        primarySource: 'knowledge_base',
         citations: [],
         confidence: { level: 'high', score: 0.9, factors: [], explanation: '' },
         hallucinationRisk: { level: 'low', indicators: [], score: 0.1 },

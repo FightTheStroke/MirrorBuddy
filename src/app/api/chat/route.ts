@@ -286,7 +286,6 @@ export async function POST(request: NextRequest) {
         recordContentFiltered(filterResult.category || 'unknown', {
           userId,
           maestroId,
-          confidence: filterResult.confidence,
           actionTaken: 'blocked',
         });
 
@@ -441,14 +440,13 @@ export async function POST(request: NextRequest) {
 
       // Ethical Design Hardening F-09: Assess response transparency
       const transparencyContext: TransparencyContext = {
+        response: sanitized.text,
         query: lastUserMessage?.content || '',
         ragResults: ragResultsForTransparency,
+        usedKnowledgeBase: !!maestroId,
         maestroId,
       };
-      const transparency = assessResponseTransparency(
-        sanitized.text,
-        transparencyContext
-      );
+      const transparency = assessResponseTransparency(transparencyContext);
 
       // Update budget tracking if usage data is available (WAVE 3: Token budget enforcement)
       if (userId && userSettings && result.usage) {
@@ -487,9 +485,9 @@ export async function POST(request: NextRequest) {
         // Ethical Design Hardening F-09: Transparency metadata
         transparency: {
           confidence: transparency.confidence,
-          sourcesUsed: transparency.sourcesUsed,
-          hasHallucinations: transparency.hallucinations.length > 0,
-          needsCitation: transparency.hallucinations.some(h => h.type === 'unsupported_claim'),
+          citations: transparency.citations,
+          hasHallucinations: transparency.hallucinationRisk.indicators.length > 0,
+          needsCitation: transparency.hallucinationRisk.indicators.some((h: { type: string }) => h.type === 'factual_claim'),
         },
       });
     } catch (providerError) {
