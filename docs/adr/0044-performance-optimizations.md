@@ -129,3 +129,4 @@ npm run build     # Successful
 - `d9d70ae` perf(db): add composite indexes
 - `17f8134` perf(react): add memoization for inline handlers
 - `d4ab7d9` perf(voice): optimize reconnection and audio level updates
+- `4e12bff` perf: fix memory leaks and optimize performance (P0 memory leaks, API pagination, React useMemo, DB indexes)
