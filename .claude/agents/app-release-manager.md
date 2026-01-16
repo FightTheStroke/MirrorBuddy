@@ -85,6 +85,55 @@ Required test suites:
 
 ---
 
+## PHASE 2.5: PERFORMANCE VALIDATION (P0)
+
+Performance checks are automated in `npm run pre-release` (Phase 4).
+
+### Bundle Size (ADR-0044)
+- [ ] No route > 500KB initial JS
+- [ ] All avatar images in WebP format (60% smaller than PNG)
+- [ ] Heavy dependencies lazy-loaded (KaTeX, Recharts)
+
+**Verification command:**
+```bash
+./scripts/perf-check.sh
+```
+
+### Memory Safety
+- [ ] EventSource: ALL have `.close()` in cleanup
+- [ ] Event Listeners: ALL have `removeEventListener` in useEffect cleanup
+- [ ] Telemetry: Flush timeout cleared on unmount
+- [ ] SVG listeners: Removed on component unmount
+
+**Verification command:**
+```bash
+# Check for EventSource without cleanup
+grep -rl "new EventSource" src/ --include="*.ts" | xargs -I{} sh -c 'grep -L "\.close()" "{}"'
+# Should return nothing
+```
+
+### Database Performance
+- [ ] No N+1 queries (use `$transaction` for batch operations)
+- [ ] Pagination on list endpoints (max 200 items)
+- [ ] Composite indexes for frequent queries (see ADR-0044)
+
+**Verification command:**
+```bash
+# Check for loop + await prisma without $transaction
+grep -rl "for.*await.*prisma" src/ --include="*.ts"
+# Review each match for N+1 patterns
+```
+
+### React Performance
+- [ ] Large components use `React.memo`
+- [ ] Event handlers wrapped in `useCallback`
+- [ ] Expensive computations in `useMemo`
+- [ ] No inline handlers in frequently re-rendered components
+
+**Reference:** ADR-0044 documents all performance optimizations applied.
+
+---
+
 ## PHASE 3: EDUCATION-SPECIFIC VALIDATION (P0)
 
 Manual verification required:

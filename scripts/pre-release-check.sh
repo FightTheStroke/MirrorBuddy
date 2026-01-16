@@ -154,6 +154,24 @@ echo -e "${BLUE}   Phase 3: $((PHASE3_TIME - PHASE2_TIME))s${NC}"
 echo ""
 
 # =============================================================================
+# PHASE 4: PERFORMANCE VALIDATION
+# =============================================================================
+echo -e "${BLUE}[PHASE 4] Performance validation...${NC}"
+
+if [ -f "./scripts/perf-check.sh" ]; then
+    if ! ./scripts/perf-check.sh; then
+        echo -e "${RED}✗ Performance checks failed${NC}"
+        exit 1
+    fi
+else
+    echo -e "${YELLOW}⚠ perf-check.sh not found, skipping${NC}"
+fi
+
+PHASE4_TIME=$(date +%s)
+echo -e "${BLUE}   Phase 4: $((PHASE4_TIME - PHASE3_TIME))s${NC}"
+echo ""
+
+# =============================================================================
 # SUMMARY
 # =============================================================================
 END_TIME=$(date +%s)
@@ -165,6 +183,7 @@ echo ""
 echo " Phase 1 (instant):   $((PHASE1_TIME - START_TIME))s"
 echo " Phase 2 (parallel):  $((PHASE2_TIME - PHASE1_TIME))s"
 echo " Phase 3 (build):     $((PHASE3_TIME - PHASE2_TIME))s"
+echo " Phase 4 (perf):      $((PHASE4_TIME - PHASE3_TIME))s"
 echo " ─────────────────────────"
 echo " Total:               ${TOTAL}s"
 echo "=========================================="
