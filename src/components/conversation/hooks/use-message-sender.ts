@@ -8,6 +8,7 @@ import { useCallback, useRef, useEffect } from 'react';
 import { analyzeHandoff } from '@/lib/ai/handoff-manager';
 import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
+import { buildSignalsFromText, sendAdaptiveSignals } from '@/lib/education/adaptive-difficulty-client';
 import { getOrCreateUserId } from '../utils/conversation-helpers';
 import type { ExtendedStudentProfile, Subject } from '@/types';
 import type { ActiveCharacter, FlowMessage } from '@/lib/stores/conversation-flow-store';
@@ -80,6 +81,24 @@ export function useMessageSender({
 
   const sendMessage = useCallback(async (userMessage: string) => {
     if (!activeCharacter) return;
+
+    const subject = (activeCharacter.character as { subject?: string }).subject;
+    const lastAssistantMessage = [...messages].reverse().find((m) => m.role === 'assistant');
+    const responseTimeMs = lastAssistantMessage
+      ? Date.now() - lastAssistantMessage.timestamp.getTime()
+      : undefined;
+    const signals = buildSignalsFromText(userMessage, 'chat', subject);
+    if (responseTimeMs !== undefined) {
+      signals.push({
+        type: 'response_time_ms',
+        source: 'chat',
+        subject,
+        responseTimeMs,
+      });
+    }
+    if (signals.length > 0) {
+      sendAdaptiveSignals(signals);
+    }
 
     // Reset inactivity timer
     const userId = getOrCreateUserId();

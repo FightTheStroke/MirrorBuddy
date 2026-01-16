@@ -39,7 +39,14 @@ export function SettingsView() {
   const [hasChanges, setHasChanges] = useState(false);
   const initialStateRef = useRef<{ settings: ReturnType<typeof useSettingsStore.getState>; accessibility: ReturnType<typeof useAccessibilityStore.getState>['settings'] } | null>(null);
 
-  const { studentProfile, updateStudentProfile, appearance, updateAppearance } = useSettingsStore();
+  const {
+    studentProfile,
+    updateStudentProfile,
+    appearance,
+    updateAppearance,
+    adaptiveDifficultyMode,
+    setAdaptiveDifficultyMode,
+  } = useSettingsStore();
   const { settings: accessibilitySettings, updateSettings: updateAccessibilitySettings } = useAccessibilityStore();
 
   // Store initial state on mount for undo capability
@@ -60,14 +67,16 @@ export function SettingsView() {
     const changed = JSON.stringify({
       profile: currentSettings.studentProfile,
       appearance: currentSettings.appearance,
+      adaptiveDifficultyMode: currentSettings.adaptiveDifficultyMode,
       accessibility: currentAccessibility,
     }) !== JSON.stringify({
       profile: initialStateRef.current.settings.studentProfile,
       appearance: initialStateRef.current.settings.appearance,
+      adaptiveDifficultyMode: initialStateRef.current.settings.adaptiveDifficultyMode,
       accessibility: initialStateRef.current.accessibility,
     });
     setHasChanges(changed);
-  }, [studentProfile, appearance, accessibilitySettings]);
+  }, [studentProfile, appearance, accessibilitySettings, adaptiveDifficultyMode]);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
@@ -91,9 +100,10 @@ export function SettingsView() {
     if (!initialStateRef.current) return;
     updateStudentProfile(initialStateRef.current.settings.studentProfile);
     updateAppearance(initialStateRef.current.settings.appearance);
+    setAdaptiveDifficultyMode(initialStateRef.current.settings.adaptiveDifficultyMode);
     updateAccessibilitySettings(initialStateRef.current.accessibility);
     setHasChanges(false);
-  }, [updateStudentProfile, updateAppearance, updateAccessibilitySettings]);
+  }, [updateStudentProfile, updateAppearance, updateAccessibilitySettings, setAdaptiveDifficultyMode]);
 
   return (
     <div className="container mx-auto px-4 max-w-7xl space-y-6">

@@ -97,6 +97,7 @@ model Settings {
   model         String  @default("gpt-4o")
   budgetLimit   Float   @default(50.0)
   totalSpent    Float   @default(0.0)
+  adaptiveDifficultyMode String @default("balanced")
 
   // Parent Mode Consent (Issue #63)
   parentChatConsentAt DateTime?  // When parent consented to chat with professors
@@ -179,6 +180,7 @@ model Progress {
   // Complex data as JSON
   achievements      String    @default("[]")
   masteries         String    @default("[]")
+  adaptiveProfile   String    @default("{}")
 
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -258,9 +260,12 @@ model QuizResult {
 
   quizId         String
   subject        String?
+  topic          String?
   score          Int
   totalQuestions Int
   percentage     Float
+  avgDifficulty  Float?
+  source         String?
 
   // Detailed answers as JSON
   answers        String   @default("[]")

@@ -36,11 +36,13 @@ const TOOL_SCHEMAS = {
   }),
   create_quiz: z.object({
     topic: z.string().min(1, 'Topic is required'),
+    difficulty: z.number().min(1).max(5).optional(),
     questions: z.array(z.object({
       question: z.string(),
       options: z.array(z.string()),
       correctIndex: z.number(),
       explanation: z.string().optional(),
+      difficulty: z.number().min(1).max(5).optional(),
     })).min(1, 'At least one question is required'),
   }),
   create_flashcards: z.object({

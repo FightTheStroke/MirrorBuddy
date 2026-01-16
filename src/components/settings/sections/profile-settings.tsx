@@ -1,11 +1,12 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { User, RotateCcw } from 'lucide-react';
+import { Gauge, RotateCcw, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import type { TeachingStyle } from '@/lib/stores';
+import { useSettingsStore } from '@/lib/stores';
 import { TEACHING_STYLES } from '../constants';
 
 // Profile Settings
@@ -21,6 +22,7 @@ interface ProfileSettingsProps {
 
 export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
   const router = useRouter();
+  const { adaptiveDifficultyMode, setAdaptiveDifficultyMode } = useSettingsStore();
 
   const gradeLevels = [
     { value: '', label: 'Seleziona...' },
@@ -32,6 +34,28 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
   ];
 
   const currentStyle = TEACHING_STYLES.find(s => s.value === (profile.teachingStyle || 'balanced'));
+  const adaptiveModes = [
+    {
+      value: 'manual',
+      label: 'Manuale',
+      description: 'Solo suggerimenti, il professore chiede conferma',
+    },
+    {
+      value: 'guided',
+      label: 'Guidata',
+      description: 'Piccoli aggiustamenti con avvisi chiari',
+    },
+    {
+      value: 'balanced',
+      label: 'Bilanciata',
+      description: 'Adatta ritmo e difficolta mantenendo stabilita',
+    },
+    {
+      value: 'automatic',
+      label: 'Automatica',
+      description: 'Adattamento completo in tempo reale',
+    },
+  ] as const;
 
   return (
     <div className="space-y-6">
@@ -144,6 +168,39 @@ export function ProfileSettings({ profile, onUpdate }: ProfileSettingsProps) {
                 '"No. Completamente sbagliato. Devi studiare di piu, non ci siamo proprio."'
               )}
             </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Adaptive Difficulty Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Gauge className="w-5 h-5 text-emerald-500" />
+            Difficolta Adattiva
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-slate-500">
+            I professori adattano difficolta e spiegazioni in base a segnali come domande,
+            tempi di risposta e bisogno di ripetizioni.
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {adaptiveModes.map((mode) => (
+              <button
+                key={mode.value}
+                onClick={() => setAdaptiveDifficultyMode(mode.value)}
+                className={cn(
+                  'p-3 rounded-xl border-2 text-left transition-all',
+                  adaptiveDifficultyMode === mode.value
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                )}
+              >
+                <div className="font-medium">{mode.label}</div>
+                <div className="text-xs text-slate-500 mt-1">{mode.description}</div>
+              </button>
+            ))}
           </div>
         </CardContent>
       </Card>

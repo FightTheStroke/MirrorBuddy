@@ -43,6 +43,7 @@ export const RequestedToolType = z.enum([
   'pdf',
   'webcam',
   'homework',
+  'study-kit',
 ]);
 
 // ============================================================================

@@ -13,6 +13,7 @@ import type {
 } from '@/types';
 import { getUserId } from '../utils/user-id';
 import { fsrs5Schedule } from '../utils/fsrs';
+import { sendAdaptiveSignals } from '@/lib/education/adaptive-difficulty-client';
 
 interface UseFlashcardsViewOptions {
   initialMaestroId?: string | null;
@@ -140,6 +141,15 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
       setSelectedDeck(
         updatedDecks.find((d) => d.id === selectedDeck.id) || null
       );
+
+      sendAdaptiveSignals([
+        {
+          type: 'flashcard_rating',
+          source: 'flashcard',
+          subject: selectedDeck.subject,
+          rating,
+        },
+      ]);
     },
     [selectedDeck, decks, saveDecks]
   );
@@ -210,4 +220,3 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
     saveDecks,
   };
 }
-

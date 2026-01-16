@@ -66,6 +66,14 @@ Azure OpenAI primary (chat + voice), Ollama fallback (text-only).
 
 User Action → UI Component → Zustand Store (optimistic) → API Route → AI Provider/Database → Response → Zustand Store (final) → UI re-render
 
+### Adaptive Difficulty (ADR 0041)
+
+Adaptive difficulty calibrates learning to stay “challenging but achievable.” Signals from
+chat/voice/quiz/flashcards are stored in `Progress.adaptiveProfile`, and instructions are injected
+into chat/voice prompts and Study Kit generation.
+
+**Flow:** `signals → /api/adaptive/signals → adaptive profile → /api/adaptive/context → prompt/tool generation`
+
 ---
 
 ## Tech Stack

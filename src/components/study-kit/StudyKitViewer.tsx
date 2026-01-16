@@ -5,7 +5,7 @@
  * Display generated study materials (summary, mindmap, demo, quiz)
  */
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { FileText, MapIcon, FlaskConical, ClipboardList, PlayCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -34,12 +34,57 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
   const [isGeneratingPath, setIsGeneratingPath] = useState(false);
   const [generatedPathId, setGeneratedPathId] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
+  const [adaptiveDifficulty, setAdaptiveDifficulty] = useState<number | null>(null);
 
   const parsedSummary = useMemo(() => parseMarkdown(studyKit.summary || ''), [studyKit.summary]);
   const demoCode = useMemo(() => studyKit.demo ? buildDemoCode(studyKit.demo) : null, [studyKit.demo]);
-  const transformedQuiz = useMemo(() => studyKit.quiz ? transformQuizData(studyKit.quiz, studyKit) : null, [studyKit]);
+  const baseQuiz = useMemo(() => studyKit.quiz ? transformQuizData(studyKit.quiz, studyKit) : null, [studyKit]);
+  const transformedQuiz = useMemo(
+    () => studyKit.quiz ? transformQuizData(studyKit.quiz, studyKit, adaptiveDifficulty ?? undefined) : null,
+    [studyKit, adaptiveDifficulty]
+  );
 
-  const handleQuizComplete = useCallback((result: QuizResult) => console.log('Quiz completed:', result), []);
+  useEffect(() => {
+    if (!baseQuiz?.subject) return;
+    let isActive = true;
+    const params = new URLSearchParams();
+    params.set('subject', baseQuiz.subject);
+    params.set('pragmatic', 'true');
+    params.set('source', 'study-kit');
+    fetch(`/api/adaptive/context?${params.toString()}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isActive) return;
+        const target = data?.context?.targetDifficulty;
+        if (typeof target === 'number') {
+          setAdaptiveDifficulty(target);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      isActive = false;
+    };
+  }, [baseQuiz?.subject]);
+
+  const handleQuizComplete = useCallback((result: QuizResult) => {
+    if (!transformedQuiz) return;
+    const avgDifficulty =
+      transformedQuiz.questions.reduce((sum, q) => sum + q.difficulty, 0) / transformedQuiz.questions.length;
+
+    fetch('/api/quizzes/results', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quizId: result.quizId,
+        score: result.correctAnswers,
+        totalQuestions: result.totalQuestions,
+        subject: transformedQuiz.subject,
+        topic: studyKit.title,
+        avgDifficulty,
+        source: 'study-kit',
+      }),
+    }).catch(() => undefined);
+  }, [transformedQuiz, studyKit.title]);
   const handleQuizClose = useCallback(() => console.log('Quiz closed'), []);
 
   const onDeleteClick = useCallback(() => handleDelete({ studyKit, setIsDeleting, onDelete }), [studyKit, onDelete]);

@@ -27,6 +27,13 @@ export const AiProvider = z.enum(['azure', 'ollama']);
  */
 export const FontSize = z.enum(['small', 'medium', 'large', 'extra-large']);
 
+export const AdaptiveDifficultyMode = z.enum([
+  'manual',
+  'guided',
+  'balanced',
+  'automatic',
+]);
+
 // ============================================================================
 // Profile update schema
 // ============================================================================
@@ -66,6 +73,7 @@ export const SettingsUpdateSchema = z.object({
   model: OptionalString(50),
   budgetLimit: z.number().min(0).max(10000).optional(),
   totalSpent: z.number().min(0).optional(),
+  adaptiveDifficultyMode: AdaptiveDifficultyMode.optional(),
 
   // Accessibility
   fontSize: FontSize.optional(),
@@ -83,5 +91,6 @@ export const SettingsUpdateSchema = z.object({
 
 export type AiProvider = z.infer<typeof AiProvider>;
 export type FontSize = z.infer<typeof FontSize>;
+export type AdaptiveDifficultyMode = z.infer<typeof AdaptiveDifficultyMode>;
 export type ProfileUpdateInput = z.infer<typeof ProfileUpdateSchema>;
 export type SettingsUpdateInput = z.infer<typeof SettingsUpdateSchema>;

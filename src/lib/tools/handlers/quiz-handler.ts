@@ -7,6 +7,12 @@ import { registerToolHandler } from '../tool-executor';
 import { nanoid } from 'nanoid';
 import type { QuizData, QuizQuestion, ToolExecutionResult } from '@/types/tools';
 
+const normalizeDifficulty = (value?: number): QuizQuestion['difficulty'] => {
+  if (typeof value !== 'number' || Number.isNaN(value)) return undefined;
+  const rounded = Math.round(value);
+  return Math.min(5, Math.max(1, rounded)) as QuizQuestion['difficulty'];
+};
+
 /**
  * Validate quiz questions structure
  */
@@ -60,6 +66,7 @@ registerToolHandler('create_quiz', async (args): Promise<ToolExecutionResult> =>
       options: string[];
       correctIndex: number;
       explanation?: string;
+      difficulty?: number;
     }>;
   };
 
@@ -90,6 +97,7 @@ registerToolHandler('create_quiz', async (args): Promise<ToolExecutionResult> =>
     options: q.options.map((o) => o.trim()),
     correctIndex: q.correctIndex,
     explanation: q.explanation?.trim(),
+    difficulty: normalizeDifficulty(q.difficulty),
   }));
 
   const data: QuizData = {

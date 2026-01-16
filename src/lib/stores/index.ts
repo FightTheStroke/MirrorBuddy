@@ -21,6 +21,7 @@ export type {
   LearningDifference,
   ExtendedStudentProfile,
   ProviderPreference,
+  AdaptiveDifficultyMode,
 } from './settings-store';
 
 export type { SessionGrade } from './progress-store';

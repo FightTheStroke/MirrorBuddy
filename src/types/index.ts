@@ -159,6 +159,15 @@ export {
   toToolCallRef,
 } from './tools';
 
+export type {
+  AdaptiveDifficultyMode,
+  AdaptiveSignalType,
+  AdaptiveSignalSource,
+  AdaptiveSignalInput,
+  AdaptiveProfile,
+  AdaptiveContext,
+} from './adaptive-difficulty';
+
 // Learning Path types
 export type {
   TopicStatus,

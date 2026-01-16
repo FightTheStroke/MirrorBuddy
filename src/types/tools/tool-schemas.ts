@@ -65,6 +65,12 @@ REGOLE:
             type: 'string',
             description: 'Argomento del quiz',
           },
+          difficulty: {
+            type: 'number',
+            description: 'Difficolta generale (1-5)',
+            minimum: 1,
+            maximum: 5,
+          },
           questions: {
             type: 'array',
             description: 'Domande del quiz',
@@ -84,6 +90,12 @@ REGOLE:
                 explanation: {
                   type: 'string',
                   description: 'Spiegazione della risposta corretta',
+                },
+                difficulty: {
+                  type: 'number',
+                  description: 'Difficolta domanda (1-5)',
+                  minimum: 1,
+                  maximum: 5,
                 },
               },
               required: ['question', 'options', 'correctIndex'],
