@@ -22,14 +22,19 @@ export async function GET(request: Request) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    // Get flashcard review data
-    const [totalCards, reviews, cardsByState] = await Promise.all([
-      // Total flashcards (unique card progress records)
-      prisma.flashcardProgress.count(),
+    const userId = auth.userId;
 
-      // Reviews in period (from telemetry)
+    // Get flashcard review data - FILTERED BY USER
+    const [totalCards, reviews, cardsByState] = await Promise.all([
+      // Total flashcards for this user
+      prisma.flashcardProgress.count({
+        where: { userId },
+      }),
+
+      // Reviews in period for this user (from telemetry)
       prisma.telemetryEvent.findMany({
         where: {
+          userId,
           category: 'flashcard',
           action: 'review',
           timestamp: { gte: startDate },
@@ -41,9 +46,10 @@ export async function GET(request: Request) {
         },
       }),
 
-      // Cards by state
+      // Cards by state for this user
       prisma.flashcardProgress.groupBy({
         by: ['state'],
+        where: { userId },
         _count: true,
       }),
     ]);

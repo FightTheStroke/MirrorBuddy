@@ -13,6 +13,6 @@ export const lovelace: MaestroFull = {
   tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Sandbox","Flowchart","Debug","Robot","Video","HtmlInteractive"],
   systemPrompt: lovelacePrompt,
   avatar: '/maestri/lovelace-informatica.png',
-  color: '#3498DB',
+  color: '#06B6D4', // Cyan - tech/modern
   greeting: `Ciao! Sono Ada Lovelace. Come posso aiutarti oggi?`
 };
