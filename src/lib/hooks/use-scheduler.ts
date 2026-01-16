@@ -49,14 +49,11 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
-
   const checkIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch schedule from server (userId is read from cookies on server)
   const fetchSchedule = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
     try {
       const data = await fetchScheduleAPI();
       setSchedule(data);
@@ -73,7 +70,6 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
     }
   }, []);
 
-  // Create a new session
   const createSession = useCallback(
     async (data: Omit<ScheduledSession, 'id' | 'userId'>): Promise<ScheduledSession | null> => {
       try {
@@ -82,18 +78,14 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
         return session;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to create session';
-        if (message === 'UNAUTHORIZED') {
-          setIsAuthenticated(false);
-        } else {
-          setError(message);
-        }
+        if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
+        else setError(message);
         return null;
       }
     },
     []
   );
 
-  // Update a session
   const updateSession = useCallback(
     async (id: string, data: Partial<ScheduledSession>): Promise<ScheduledSession | null> => {
       try {
@@ -102,18 +94,14 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
         return session;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to update session';
-        if (message === 'UNAUTHORIZED') {
-          setIsAuthenticated(false);
-        } else {
-          setError(message);
-        }
+        if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
+        else setError(message);
         return null;
       }
     },
     []
   );
 
-  // Delete a session
   const deleteSession = useCallback(
     async (id: string): Promise<boolean> => {
       try {
@@ -122,18 +110,14 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
         return true;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to delete session';
-        if (message === 'UNAUTHORIZED') {
-          setIsAuthenticated(false);
-        } else {
-          setError(message);
-        }
+        if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
+        else setError(message);
         return false;
       }
     },
     []
   );
 
-  // Create a reminder
   const createReminder = useCallback(
     async (data: Omit<CustomReminder, 'id' | 'userId' | 'createdAt'>): Promise<CustomReminder | null> => {
       try {
@@ -142,18 +126,14 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
         return reminder;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to create reminder';
-        if (message === 'UNAUTHORIZED') {
-          setIsAuthenticated(false);
-        } else {
-          setError(message);
-        }
+        if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
+        else setError(message);
         return null;
       }
     },
     []
   );
 
-  // Update a reminder
   const updateReminder = useCallback(
     async (id: string, data: Partial<CustomReminder>): Promise<CustomReminder | null> => {
       try {
@@ -162,18 +142,14 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
         return reminder;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to update reminder';
-        if (message === 'UNAUTHORIZED') {
-          setIsAuthenticated(false);
-        } else {
-          setError(message);
-        }
+        if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
+        else setError(message);
         return null;
       }
     },
     []
   );
 
-  // Delete a reminder
   const deleteReminder = useCallback(
     async (id: string): Promise<boolean> => {
       try {
@@ -182,18 +158,14 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
         return true;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to delete reminder';
-        if (message === 'UNAUTHORIZED') {
-          setIsAuthenticated(false);
-        } else {
-          setError(message);
-        }
+        if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
+        else setError(message);
         return false;
       }
     },
     []
   );
 
-  // Update preferences
   const updatePreferences = useCallback(
     async (prefs: Partial<NotificationPreferences>): Promise<boolean> => {
       try {
@@ -202,26 +174,20 @@ export function useScheduler(options: UseSchedulerOptions = {}): UseSchedulerRet
         return true;
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to update preferences';
-        if (message === 'UNAUTHORIZED') {
-          setIsAuthenticated(false);
-        } else {
-          setError(message);
-        }
+        if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
+        else setError(message);
         return false;
       }
     },
     []
   );
 
-  // Check for due items
   const checkDue = useCallback(async () => {
     try {
       return await checkDueItemsAPI();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to check due items';
-      if (message === 'UNAUTHORIZED') {
-        setIsAuthenticated(false);
-      }
+      if (message === 'UNAUTHORIZED') setIsAuthenticated(false);
       return { notificationsCreated: 0, types: [] };
     }
   }, []);
