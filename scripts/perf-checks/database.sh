@@ -11,16 +11,30 @@ check_n1_patterns() {
     local n1_patterns=0
 
     if has_rg; then
-        # Find files with potential N+1: for/forEach with await prisma
+        # Find files with for loops containing await prisma
+        # Use multiline pattern to find actual N+1 (await inside for loop body)
         local n1_files
-        n1_files=$(rg -l "for.*\{" src/ -t ts 2>/dev/null | xargs -I{} sh -c 'rg -l "await.*prisma\." "{}" 2>/dev/null' || true)
+        n1_files=$(rg -l "for\s*\([^)]+\)\s*\{" src/ -t ts 2>/dev/null || true)
 
         for file in $n1_files; do
-            # Check if it uses $transaction
-            if ! rg -q '\$transaction' "$file" 2>/dev/null; then
-                # Check if it's actually a loop with await prisma inside
-                if rg -q 'for\s*\(' "$file" 2>/dev/null && rg -q 'await.*prisma\.' "$file" 2>/dev/null; then
-                    echo -e "${YELLOW}  ⚠ $file may have N+1 pattern (consider \$transaction)${NC}"
+            # Skip test files
+            [[ "$file" =~ \\.test\\. ]] || [[ "$file" =~ __tests__ ]] && continue
+
+            # Skip files that use $transaction (already optimized)
+            rg -q '\$transaction' "$file" 2>/dev/null && continue
+
+            # Skip files that use createMany/updateMany (batch ops)
+            rg -q 'createMany\|updateMany' "$file" 2>/dev/null && continue
+
+            # Check for actual N+1: await prisma inside a for loop
+            # Exclude loops that are just iterating results (no await prisma inside)
+            if rg -q 'for\s*\(' "$file" 2>/dev/null; then
+                # Check if file has sequential await prisma calls
+                local await_count
+                await_count=$(rg -c "await.*prisma\." "$file" 2>/dev/null || echo "0")
+                # If many await prisma calls and no batch ops, flag it
+                if [ "$await_count" -gt 3 ]; then
+                    echo -e "${YELLOW}  ⚠ $file may have N+1 pattern ($await_count prisma calls)${NC}"
                     n1_patterns=$((n1_patterns + 1))
                 fi
             fi

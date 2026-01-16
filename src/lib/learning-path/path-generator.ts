@@ -178,16 +178,10 @@ export async function createLearningPath(
     },
   });
 
-  // Create topics
-  const generatedTopics: GeneratedTopic[] = [];
-
-  for (const topicAnalysis of topicsWithRelations) {
+  // Prepare topic data for batch creation
+  const topicData = topicsWithRelations.map((topicAnalysis) => {
     const order = analysisResult.suggestedOrder.indexOf(topicAnalysis.id) + 1 || topicAnalysis.order;
-
-    // First topic is unlocked, rest are locked
     const status = order === 1 ? 'unlocked' : 'locked';
-
-    // Serialize related materials
     const relatedMaterials = JSON.stringify(
       topicAnalysis.relatedMaterials.map((m) => ({
         id: m.id,
@@ -197,32 +191,43 @@ export async function createLearningPath(
       }))
     );
 
-    const topic = await prisma.learningPathTopic.create({
-      data: {
-        pathId: path.id,
-        order,
-        title: topicAnalysis.title,
-        description: topicAnalysis.description,
-        keyConcepts: JSON.stringify(topicAnalysis.keyConcepts),
-        difficulty: topicAnalysis.estimatedDifficulty,
-        status,
-        estimatedMinutes: 10, // Default, can be customized
-        relatedMaterials,
-      },
-    });
+    return {
+      pathId: path.id,
+      order,
+      title: topicAnalysis.title,
+      description: topicAnalysis.description,
+      keyConcepts: JSON.stringify(topicAnalysis.keyConcepts),
+      difficulty: topicAnalysis.estimatedDifficulty,
+      status,
+      estimatedMinutes: 10,
+      relatedMaterials,
+    };
+  });
 
-    generatedTopics.push({
+  // Batch create all topics in a single transaction
+  await prisma.learningPathTopic.createMany({ data: topicData });
+
+  // Fetch created topics to get IDs
+  const createdTopics = await prisma.learningPathTopic.findMany({
+    where: { pathId: path.id },
+    orderBy: { order: 'asc' },
+  });
+
+  // Build generated topics with actual IDs
+  const generatedTopics: GeneratedTopic[] = createdTopics.map((topic) => {
+    const analysis = topicsWithRelations.find((t) => t.title === topic.title);
+    return {
       id: topic.id,
       title: topic.title,
       description: topic.description,
-      keyConcepts: topicAnalysis.keyConcepts,
-      difficulty: topicAnalysis.estimatedDifficulty,
+      keyConcepts: analysis?.keyConcepts || [],
+      difficulty: topic.difficulty as 'basic' | 'intermediate' | 'advanced',
       order: topic.order,
-      status: status as 'locked' | 'unlocked',
+      status: topic.status as 'locked' | 'unlocked',
       estimatedMinutes: topic.estimatedMinutes,
-      relatedMaterials,
-    });
-  }
+      relatedMaterials: topic.relatedMaterials,
+    };
+  });
 
   logger.info('Learning path created', {
     pathId: path.id,
