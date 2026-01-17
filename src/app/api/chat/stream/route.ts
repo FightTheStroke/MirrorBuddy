@@ -13,6 +13,7 @@ import { azureStreamingCompletion, getActiveProvider } from '@/lib/ai/providers'
 import { getRequestLogger, getRequestId } from '@/lib/tracing';
 import { checkRateLimitAsync, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { StreamingSanitizer } from '@/lib/safety';
+import { requireCSRF } from '@/lib/security/csrf';
 
 import type { ChatRequest } from '../types';
 import {
@@ -29,6 +30,13 @@ import {
 const STREAMING_ENABLED = process.env.ENABLE_CHAT_STREAMING !== 'false';
 
 export async function POST(request: NextRequest) {
+  // CSRF validation (double-submit cookie pattern)
+  if (!requireCSRF(request)) {
+    const response = NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
+  }
+
   if (!STREAMING_ENABLED) {
     const response = NextResponse.json(
       { error: 'Streaming is disabled', fallback: '/api/chat' },

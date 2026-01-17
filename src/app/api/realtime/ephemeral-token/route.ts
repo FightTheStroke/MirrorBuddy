@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimitAsync, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
+import { requireCSRF } from '@/lib/security/csrf';
 
 interface AzureSessionResponse {
   client_secret: {
@@ -51,6 +52,11 @@ function checkPerIPRateLimit(clientId: string): boolean {
 }
 
 export async function POST(request: NextRequest) {
+  // CSRF validation (double-submit cookie pattern)
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+  }
+
   // Get client identifier for rate limiting and caching
   const clientId = getClientIdentifier(request);
 

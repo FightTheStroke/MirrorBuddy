@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies as getCookies } from "next/headers";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import {
   executeUserDataDeletion,
   getUserDataSummary,
@@ -44,6 +45,16 @@ interface DeleteResult {
 export async function POST(
   request: NextRequest,
 ): Promise<NextResponse<DeleteResult | { error: string }>> {
+  // CSRF validation (double-submit cookie pattern)
+  if (!requireCSRF(request)) {
+    const response = NextResponse.json(
+      { error: "Invalid CSRF token" },
+      { status: 403 },
+    );
+    response.headers.set("X-Request-ID", getRequestId(request));
+    return response;
+  }
+
   const log = getRequestLogger(request);
   const auth = await validateAuth();
 

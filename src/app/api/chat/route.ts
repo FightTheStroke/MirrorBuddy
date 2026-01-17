@@ -18,6 +18,8 @@ import { normalizeUnicode } from '@/lib/safety/versioning';
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
+import { requireCSRF } from '@/lib/security/csrf';
+
 import { ChatRequest } from './types';
 import { TOOL_CONTEXT } from './constants';
 import { getDemoContext } from './helpers';
@@ -27,6 +29,11 @@ import { buildAllContexts } from './context-builders';
 import { processToolCalls, buildToolChoice } from './tool-handler';
 
 export async function POST(request: NextRequest) {
+  // CSRF validation (double-submit cookie pattern)
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+  }
+
   const log = getRequestLogger(request);
   const clientId = getClientIdentifier(request);
   const rateLimit = await checkRateLimitAsync(`chat:${clientId}`, RATE_LIMITS.CHAT);

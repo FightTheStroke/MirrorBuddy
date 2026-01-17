@@ -17,6 +17,7 @@ import {
 } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/session-auth';
+import { requireCSRF } from '@/lib/security/csrf';
 
 // OpenAI TTS voices
 type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
@@ -119,6 +120,11 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
  * Returns audio/mpeg stream.
  */
 export async function POST(request: NextRequest) {
+  // CSRF validation (double-submit cookie pattern)
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+  }
+
   // Rate limit check (before auth to prevent DDoS on auth lookup)
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`tts:${clientId}`, RATE_LIMITS.TTS);
