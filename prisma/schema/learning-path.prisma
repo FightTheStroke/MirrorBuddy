@@ -4,7 +4,7 @@
 // ============================================================================
 
 model LearningPath {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   userId      String
   title       String
   description String?
@@ -15,13 +15,13 @@ model LearningPath {
   sourceStudyKit   StudyKit? @relation(fields: [sourceStudyKitId], references: [id])
 
   // Progress tracking
-  totalTopics       Int    @default(0)
-  completedTopics   Int    @default(0)
-  progressPercent   Float  @default(0)
-  estimatedMinutes  Int    @default(0)
+  totalTopics      Int   @default(0)
+  completedTopics  Int   @default(0)
+  progressPercent  Float @default(0)
+  estimatedMinutes Int   @default(0)
 
   // Status: generating | ready | in_progress | completed
-  status      String   @default("generating")
+  status String @default("generating")
 
   // Visual overview (Mermaid diagram)
   visualOverview String?
@@ -31,7 +31,7 @@ model LearningPath {
   completedAt DateTime?
 
   // Relations
-  topics      LearningPathTopic[]
+  topics LearningPathTopic[]
 
   @@index([userId])
   @@index([status])
@@ -41,24 +41,24 @@ model LearningPath {
 }
 
 model LearningPathTopic {
-  id          String   @id @default(cuid())
-  pathId      String
-  path        LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  id     String       @id @default(cuid())
+  pathId String
+  path   LearningPath @relation(fields: [pathId], references: [id], onDelete: Cascade)
 
   order       Int
   title       String
   description String
-  keyConcepts String   @default("[]")
-  difficulty  String   @default("intermediate")
+  keyConcepts String @default("[]")
+  difficulty  String @default("intermediate")
 
   // Status: locked | unlocked | in_progress | completed
-  status      String   @default("locked")
+  status String @default("locked")
 
   // Time estimates
   estimatedMinutes Int @default(10)
 
   // Quiz performance
-  quizScore   Int?
+  quizScore Int?
 
   // Related materials from user's library
   relatedMaterials String @default("[]")
@@ -67,12 +67,12 @@ model LearningPathTopic {
   startedAt   DateTime?
   completedAt DateTime?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  steps       TopicStep[]
-  attempts    TopicAttempt[]
+  steps    TopicStep[]
+  attempts TopicAttempt[]
 
   @@index([pathId])
   @@index([order])
@@ -80,21 +80,21 @@ model LearningPathTopic {
 }
 
 model TopicStep {
-  id          String   @id @default(cuid())
-  topicId     String
-  topic       LearningPathTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  id      String            @id @default(cuid())
+  topicId String
+  topic   LearningPathTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
-  order       Int
-  type        String
-  title       String
-  content     String   @default("{}")
+  order   Int
+  type    String
+  title   String
+  content String @default("{}")
 
   // Completion status
-  isCompleted Boolean  @default(false)
+  isCompleted Boolean   @default(false)
   completedAt DateTime?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([topicId])
   @@index([order])
@@ -102,29 +102,29 @@ model TopicStep {
 }
 
 model TopicAttempt {
-  id          String   @id @default(cuid())
-  topicId     String
-  topic       LearningPathTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  userId      String
+  id      String            @id @default(cuid())
+  topicId String
+  topic   LearningPathTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  userId  String
 
   // Attempt type: quiz | study | review
-  type        String   @default("quiz")
+  type String @default("quiz")
 
   // Quiz results
-  score       Int?
+  score          Int?
   totalQuestions Int?
   correctAnswers Int?
-  passed      Boolean  @default(false)
+  passed         Boolean @default(false)
 
   // Time tracking
-  startedAt   DateTime @default(now())
-  completedAt DateTime?
+  startedAt       DateTime  @default(now())
+  completedAt     DateTime?
   durationSeconds Int?
 
   // Answers (JSON array for quiz attempts)
-  answers     String?
+  answers String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([topicId])
   @@index([userId])

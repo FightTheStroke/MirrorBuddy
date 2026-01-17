@@ -1,0 +1,27 @@
+// ============================================================================
+// PRIVACY & DATA RETENTION DOMAIN
+// User privacy preferences, consent tracking, and data retention policies
+// ============================================================================
+
+model UserPrivacyPreferences {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// Opt-in to pseudonymized learning mode
+  pseudonymizedMode Boolean @default(false)
+
+  /// Custom retention policy overrides (JSON: Partial<DataRetentionPolicy>)
+  /// Structure: { conversationTTLDays?, embeddingsTTLDays?, progressTTLDays?, flashcardTTLDays?, autoDelete? }
+  customRetention String?
+
+  /// Consent timestamp for privacy preferences
+  consentedAt DateTime @default(now())
+
+  /// Last updated timestamp
+  updatedAt DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

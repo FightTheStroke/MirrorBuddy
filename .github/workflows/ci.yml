@@ -88,7 +88,26 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx prisma generate
-      - run: npm run test:unit
+
+      - name: Run unit tests with coverage
+        run: npm run test:unit -- --coverage
+
+      - name: Check coverage thresholds
+        run: |
+          if [ -f coverage/coverage-final.json ]; then
+            echo "✓ Coverage report generated - thresholds enforced by Vitest"
+          else
+            echo "✗ Coverage report not found"
+            exit 1
+          fi
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
 
   # Lane 4: Documentation Check
   docs:
@@ -102,23 +121,88 @@ jobs:
             [ -f "$f" ] && echo "OK: $f" || { echo "MISSING: $f"; exit 1; }
           done
 
-  # Lane 5: Code Quality
+  # Lane 5: Code Quality (BLOCKING)
   quality:
     name: Code Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check TODOs
-        run: |
-          TODOS=$(grep -rn "TODO\|FIXME" src/ --include="*.ts" --include="*.tsx" || true)
-          [ -n "$TODOS" ] && echo "WARNING: TODOs found:" && echo "$TODOS" || echo "No TODOs"
 
-      - name: Check console.log
+      - name: Check for forbidden TODOs in critical areas
         run: |
-          LOGS=$(grep -rn "console\\.log" src/ --include="*.ts" --include="*.tsx" | grep -v "logger" || true)
-          [ -n "$LOGS" ] && echo "WARNING: console.log found:" && echo "$LOGS" || echo "Clean"
+          # Block TODOs in privacy/security/safety (critical paths)
+          # Use word boundaries to avoid matching words like "METODO" (Italian for "method")
+          CRITICAL=$(find src/lib/privacy src/lib/safety src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -nE '\bTODO\b|\bFIXME\b' {} + 2>/dev/null || true)
+          if [ -n "$CRITICAL" ]; then
+            echo "BLOCKING: TODOs found in critical areas:"
+            echo "$CRITICAL"
+            exit 1
+          fi
+          echo "No critical TODOs"
 
-  # Lane 6: Docker Build Test
+      - name: Check console.log (fail on any)
+        run: |
+          # Exclude: test files, comments (JSDoc, inline), setup files
+          LOGS=$(find src/ \( -name "*.ts" -o -name "*.tsx" \) ! -path "*/__tests__/*" ! -path "*/test/*" ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "setup.ts" -exec grep -n "console\.log" {} + 2>/dev/null | grep -v "logger" | grep -v " \* " | grep -v "//" || true)
+          if [ -n "$LOGS" ]; then
+            echo "BLOCKING: console.log found (use logger instead):"
+            echo "$LOGS"
+            exit 1
+          fi
+          echo "Clean - no console.log"
+
+      - name: Check for circular imports (F-11)
+        run: |
+          # Known baseline: 32 circular dependencies (pre-existing, tracked for reduction)
+          # Note: Count varies slightly between local (29) and CI (32) due to madge version/environment
+          BASELINE=32
+          npx madge --circular --extensions ts,tsx src/ > circular.txt 2>&1 || true
+          if grep -q "Found .* circular" circular.txt; then
+            COUNT=$(grep -oE "Found ([0-9]+)" circular.txt | grep -oE "[0-9]+")
+            echo "Found $COUNT circular dependencies (baseline: $BASELINE)"
+            cat circular.txt
+            if [ "$COUNT" -gt "$BASELINE" ]; then
+              echo "BLOCKING: New circular dependencies introduced! ($COUNT > $BASELINE)"
+              exit 1
+            else
+              echo "WARNING: $COUNT circular dependencies exist (baseline: $BASELINE)"
+              echo "Goal: Reduce to 0 over time"
+            fi
+          else
+            echo "No circular imports detected"
+          fi
+
+  # Lane 6: E2E Tests (Playwright) - BLOCKING
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx prisma generate
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E tests
+        run: npm run test
+        env:
+          CI: true
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Lane 7: Docker Build Test
   docker:
     name: Docker Build
     runs-on: ubuntu-latest
@@ -128,3 +212,85 @@ jobs:
         run: docker build -t mirrorbuddy:test .
       - name: Verify image
         run: docker images mirrorbuddy:test
+
+  # Lane 8: Performance (F-10)
+  performance:
+    name: Performance Budgets
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npx prisma generate
+
+      - name: Build for analysis
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          ANALYZE: true
+
+      - name: Check bundle sizes
+        run: |
+          # Check for large chunks (>500KB is warning, >1MB is error)
+          LARGE_CHUNKS=$(find .next/static/chunks -name "*.js" -size +1M 2>/dev/null | head -5)
+          if [ -n "$LARGE_CHUNKS" ]; then
+            echo "ERROR: Chunks over 1MB found:"
+            for chunk in $LARGE_CHUNKS; do
+              du -h "$chunk"
+            done
+            exit 1
+          fi
+
+          # Warn for chunks >500KB
+          WARN_CHUNKS=$(find .next/static/chunks -name "*.js" -size +500k 2>/dev/null | head -5)
+          if [ -n "$WARN_CHUNKS" ]; then
+            echo "WARNING: Chunks over 500KB found:"
+            for chunk in $WARN_CHUNKS; do
+              du -h "$chunk"
+            done
+          fi
+
+          # Report total size
+          TOTAL=$(du -sh .next/static/chunks 2>/dev/null | cut -f1)
+          echo "Total chunks size: $TOTAL"
+
+      - name: Generate bundle report
+        run: |
+          mkdir -p bundle-report
+          echo "# Bundle Analysis Report" > bundle-report/report.md
+          echo "" >> bundle-report/report.md
+          echo "Generated: $(date -u)" >> bundle-report/report.md
+          echo "" >> bundle-report/report.md
+          echo "## Chunk Sizes" >> bundle-report/report.md
+          echo '```' >> bundle-report/report.md
+          find .next/static/chunks -name "*.js" -exec du -h {} \; | sort -rh | head -20 >> bundle-report/report.md
+          echo '```' >> bundle-report/report.md
+          echo "" >> bundle-report/report.md
+          echo "## Total Size" >> bundle-report/report.md
+          du -sh .next/static/chunks >> bundle-report/report.md
+
+      - name: Upload bundle report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-report
+          path: bundle-report/
+          retention-days: 30
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.14.x
+          lhci autorun || echo "Lighthouse completed with warnings"
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Upload Lighthouse report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
+          retention-days: 30
