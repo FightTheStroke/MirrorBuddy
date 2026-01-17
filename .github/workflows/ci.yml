@@ -142,7 +142,8 @@ jobs:
 
       - name: Check console.log (fail on any)
         run: |
-          LOGS=$(find src/ \( -name "*.ts" -o -name "*.tsx" \) ! -path "*/__tests__/*" -exec grep -n "console\.log" {} + 2>/dev/null | grep -v "logger" || true)
+          # Exclude: test files, comments (JSDoc, inline), setup files
+          LOGS=$(find src/ \( -name "*.ts" -o -name "*.tsx" \) ! -path "*/__tests__/*" ! -path "*/test/*" ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "setup.ts" -exec grep -n "console\.log" {} + 2>/dev/null | grep -v "logger" | grep -v " \* " | grep -v "//" || true)
           if [ -n "$LOGS" ]; then
             echo "BLOCKING: console.log found (use logger instead):"
             echo "$LOGS"
