@@ -12,8 +12,21 @@ import type {
   TelemetryConfig,
 } from './types';
 import type { TelemetryState } from './telemetry-store/types';
+import { generateSessionId, isSameDay } from './telemetry-store/helpers';
 
 export type { TelemetryState } from './telemetry-store/types';
+
+// Re-export tracking functions
+export {
+  trackPageView,
+  trackFeatureUsage,
+  trackMaestroInteraction,
+  trackError,
+  trackPerformance,
+} from './telemetry-store/track-functions';
+
+// Re-export initialization
+export { initializeTelemetry } from './telemetry-store/initialize';
 
 // ============================================================================
 // DEFAULT CONFIG
@@ -27,27 +40,6 @@ const DEFAULT_CONFIG: TelemetryConfig = {
   maxQueueSize: 100,      // Max 100 events in queue
   excludeCategories: [],
 };
-
-// ============================================================================
-// HELPERS
-// ============================================================================
-
-function generateSessionId(): string {
-  // Use nanoid for cryptographically secure random strings
-  return `sess_${Date.now()}_${nanoid(7)}`;
-}
-
-function isSameDay(date1: Date | string | null, date2: Date): boolean {
-  if (!date1) return false;
-  // Handle string dates from JSON serialization
-  const d1 = typeof date1 === 'string' ? new Date(date1) : date1;
-  if (isNaN(d1.getTime())) return false;
-  return (
-    d1.getFullYear() === date2.getFullYear() &&
-    d1.getMonth() === date2.getMonth() &&
-    d1.getDate() === date2.getDate()
-  );
-}
 
 // ============================================================================
 // STORE
@@ -289,105 +281,3 @@ export const useTelemetryStore = create<TelemetryState>()(
       },
     })
 );
-
-// ============================================================================
-// HOOKS & UTILITIES
-// ============================================================================
-
-/**
- * Track a page view event.
- */
-export function trackPageView(pageName: string, metadata?: Record<string, string | number | boolean>) {
-  useTelemetryStore.getState().trackEvent('navigation', 'page_view', pageName, undefined, metadata);
-}
-
-/**
- * Track a feature usage event.
- */
-export function trackFeatureUsage(feature: string, action: string, value?: number) {
-  useTelemetryStore.getState().trackEvent('education', action, feature, value);
-}
-
-/**
- * Track a maestro interaction.
- */
-export function trackMaestroInteraction(maestroId: string, action: string, durationSeconds?: number) {
-  useTelemetryStore.getState().trackEvent('maestro', action, maestroId, durationSeconds);
-}
-
-/**
- * Track an error.
- */
-export function trackError(errorType: string, errorMessage: string, metadata?: Record<string, string | number | boolean>) {
-  useTelemetryStore.getState().trackEvent('error', errorType, errorMessage, undefined, metadata);
-}
-
-/**
- * Track performance metric.
- */
-export function trackPerformance(metricName: string, valueMs: number, metadata?: Record<string, string | number | boolean>) {
-  useTelemetryStore.getState().trackEvent('performance', metricName, undefined, valueMs, metadata);
-}
-
-/**
- * Initialize telemetry on app start.
- */
-export function initializeTelemetry() {
-  // Skip telemetry in test/E2E environment (navigator.webdriver is set by Playwright, Selenium, etc.)
-  if (typeof navigator !== 'undefined' && navigator.webdriver) {
-    return () => {}; // Return no-op cleanup function
-  }
-
-  const store = useTelemetryStore.getState();
-
-  // Start session
-  store.startSession();
-
-  // Set up auto-flush interval
-  const flushInterval = setInterval(() => {
-    store.flushEvents();
-  }, store.config.flushIntervalMs);
-
-  // Flush on page unload
-  const handleUnload = () => {
-    const state = useTelemetryStore.getState();
-
-    // Track session end event
-    if (state.sessionStartedAt) {
-      const durationSeconds = Math.round(
-        (Date.now() - state.sessionStartedAt.getTime()) / 1000
-      );
-      state.trackEvent('navigation', 'session_ended', undefined, durationSeconds);
-    }
-
-    // Use sendBeacon for reliable delivery on unload (fetch() gets aborted)
-    const events = state.eventQueue;
-    if (events.length > 0) {
-      navigator.sendBeacon(
-        '/api/telemetry/events',
-        new Blob([JSON.stringify({ events })], { type: 'application/json' })
-      );
-    }
-  };
-
-  // Named handler for visibilitychange to enable proper cleanup
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'hidden') {
-      store.flushEvents();
-    }
-  };
-
-  if (typeof window !== 'undefined') {
-    window.addEventListener('beforeunload', handleUnload);
-    window.addEventListener('visibilitychange', handleVisibilityChange);
-  }
-
-  // Return cleanup function
-  return () => {
-    clearInterval(flushInterval);
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('beforeunload', handleUnload);
-      window.removeEventListener('visibilitychange', handleVisibilityChange);
-    }
-  };
-}
