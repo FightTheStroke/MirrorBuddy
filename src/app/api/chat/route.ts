@@ -6,41 +6,27 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { chatCompletion, getActiveProvider, type AIProvider } from '@/lib/ai/providers';
-import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { filterInput, sanitizeOutput } from '@/lib/safety';
 import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
-import { executeToolCall } from '@/lib/tools/tool-executor';
-import { loadPreviousContext } from '@/lib/conversation/memory-loader';
-import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
-import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/retrieval-service';
-import { saveTool } from '@/lib/tools/tool-persistence';
-import { functionNameToToolType } from '@/types/tools';
-import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
-import { getMaestroById } from '@/data/maestri';
-import { buildToolContext } from '@/lib/tools/tool-context-builder';
-import {
-  buildAdaptiveInstruction,
-  getAdaptiveContextForUser,
-} from '@/lib/education/adaptive-difficulty';
+import { assessResponseTransparency, type TransparencyContext } from '@/lib/ai/transparency';
+import { recordContentFiltered } from '@/lib/safety/audit';
+import { normalizeUnicode } from '@/lib/safety/versioning';
+
 // Import handlers to register them
 import '@/lib/tools/handlers';
 
 import { ChatRequest } from './types';
 import { TOOL_CONTEXT } from './constants';
 import { getDemoContext } from './helpers';
-import { TOKEN_COST_PER_UNIT } from './stream/helpers';
-
-// Ethical Design Hardening imports
-import { assessResponseTransparency, type TransparencyContext } from '@/lib/ai/transparency';
-import { recordContentFiltered } from '@/lib/safety/audit';
-import { normalizeUnicode } from '@/lib/safety/versioning';
+import { extractUserId } from './auth-handler';
+import { loadUserSettings, checkBudgetLimit, checkBudgetWarning, updateBudget } from './budget-handler';
+import { buildAllContexts } from './context-builders';
+import { processToolCalls, buildToolChoice } from './tool-handler';
 
 export async function POST(request: NextRequest) {
-  // Rate limiting: 20 requests per minute per IP
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`chat:${clientId}`, RATE_LIMITS.CHAT);
 
@@ -54,245 +40,54 @@ export async function POST(request: NextRequest) {
     const { messages, systemPrompt, maestroId, conversationId, enableTools = true, enableMemory = true, requestedTool } = body;
 
     if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json(
-        { error: 'Messages array is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
     }
 
-    // Get userId from cookie for memory injection and provider preference
-    // Extract userId from signed cookies (or legacy unsigned cookies)
-    const cookieStore = await cookies();
-    const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
-    let userId: string | undefined;
+    // Authentication
+    const userId = await extractUserId();
 
-    if (cookieValue) {
-      if (isSignedCookie(cookieValue)) {
-        const verification = verifyCookieValue(cookieValue);
-        if (verification.valid) {
-          userId = verification.value;
-        } else {
-          logger.warn('Invalid signed cookie in /api/chat', {
-            error: verification.error,
-          });
-        }
-      } else {
-        // Legacy unsigned cookie
-        userId = cookieValue;
-      }
-    }
-
-    // #87: Get user's provider preference and budget from settings
+    // Load user settings and check budget
     let providerPreference: AIProvider | 'auto' | undefined;
-    let userSettings: {
-      provider: string;
-      budgetLimit: number;
-      totalSpent: number;
-      adaptiveDifficultyMode?: string | null;
-    } | null = null;
-    if (userId) {
-      try {
-        userSettings = await prisma.settings.findUnique({
-          where: { userId },
-          select: { provider: true, budgetLimit: true, totalSpent: true, adaptiveDifficultyMode: true },
-        });
-        if (userSettings?.provider && (userSettings.provider === 'azure' || userSettings.provider === 'ollama')) {
-          providerPreference = userSettings.provider;
-        }
+    const userSettings = userId ? await loadUserSettings(userId) : null;
 
-        // Check budget limit (WAVE 3: Token budget enforcement)
-        if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
-          logger.warn('Budget limit exceeded', {
-            userId,
-            totalSpent: userSettings.totalSpent,
-            budgetLimit: userSettings.budgetLimit,
-          });
-          return NextResponse.json(
-            {
-              error: 'Budget limit exceeded',
-              message: `Hai raggiunto il limite di budget di $${userSettings.budgetLimit.toFixed(2)}. Puoi aumentarlo nelle impostazioni.`,
-              totalSpent: userSettings.totalSpent,
-              budgetLimit: userSettings.budgetLimit,
-              settingsUrl: '/settings',
-            },
-            { status: 402 }
-          );
-        }
+    if (userSettings?.provider && (userSettings.provider === 'azure' || userSettings.provider === 'ollama')) {
+      providerPreference = userSettings.provider;
+    }
 
-        // Budget warning threshold (80% usage)
-        const BUDGET_WARNING_THRESHOLD = 0.8;
-        if (userSettings && userSettings.budgetLimit > 0) {
-          const usageRatio = userSettings.totalSpent / userSettings.budgetLimit;
-          if (usageRatio >= BUDGET_WARNING_THRESHOLD && usageRatio < 1) {
-            logger.info('Budget warning threshold reached', {
-              userId,
-              totalSpent: userSettings.totalSpent,
-              budgetLimit: userSettings.budgetLimit,
-              usagePercent: Math.round(usageRatio * 100),
-            });
-          }
-        }
-      } catch (e) {
-        // Settings lookup failure should not block chat
-        logger.debug('Failed to load provider preference', { error: String(e) });
-      }
+    if (userSettings) {
+      const budgetError = checkBudgetLimit(userId!, userSettings);
+      if (budgetError) return budgetError;
+      checkBudgetWarning(userId!, userSettings);
     }
 
     // Build enhanced system prompt with tool context
     let enhancedSystemPrompt = systemPrompt;
     if (requestedTool) {
-      // Use dynamic context for demo (includes maestro's teaching style)
       const toolContext = requestedTool === 'demo' ? getDemoContext(maestroId) : TOOL_CONTEXT[requestedTool];
-
       if (toolContext) {
         enhancedSystemPrompt = `${systemPrompt}\n\n${toolContext}`;
         logger.debug('Tool context injected', { requestedTool, maestroId });
       }
     }
 
-    // Inject conversation memory if enabled and user is authenticated (ADR 0021)
-    let hasMemory = false;
-    if (enableMemory && userId && maestroId) {
-      try {
-        const memory = await loadPreviousContext(userId, maestroId);
-        if (memory.recentSummary || memory.keyFacts.length > 0) {
-          enhancedSystemPrompt = enhanceSystemPrompt({
-            basePrompt: enhancedSystemPrompt,
-            memory,
-            safetyOptions: {
-              role: 'maestro',
-            },
-          });
-          hasMemory = true;
-          logger.debug('Conversation memory injected', {
-            maestroId,
-            keyFactCount: memory.keyFacts.length,
-            hasSummary: !!memory.recentSummary,
-          });
-        }
-      } catch (memoryError) {
-        // Memory loading failure should not block the chat
-        logger.warn('Failed to load conversation memory', {
-          userId,
-          maestroId,
-          error: String(memoryError),
-        });
-      }
-    }
-
-    // Inject tool context (T2-02: generated content from this conversation)
-    let hasToolContext = false;
-    if (userId && conversationId) {
-      try {
-        const toolContext = await buildToolContext(userId, conversationId);
-        if (toolContext.toolCount > 0) {
-          enhancedSystemPrompt = `${enhancedSystemPrompt}\n\n${toolContext.formattedContext}`;
-          hasToolContext = true;
-          logger.debug('Tool context injected', {
-            conversationId,
-            toolCount: toolContext.toolCount,
-            types: toolContext.types,
-          });
-        }
-      } catch (toolContextError) {
-        // Tool context loading failure should not block the chat
-        logger.warn('Failed to load tool context', {
-          userId,
-          conversationId,
-          error: String(toolContextError),
-        });
-      }
-    }
-
     // Get last user message for safety filtering and RAG
     const lastUserMessage = messages.filter(m => m.role === 'user').pop();
 
-    // Wave 4: RAG context injection - find relevant materials and study kits
-    let hasRAG = false;
-    // Store RAG results for transparency assessment (Ethical Design Hardening F-09)
-    let ragResultsForTransparency: Array<{ content: string; similarity: number; sourceType?: string }> = [];
-    if (userId && lastUserMessage) {
-      try {
-        // Search in materials (generated content)
-        const relevantMaterials = await findSimilarMaterials({
-          userId,
-          query: lastUserMessage.content,
-          limit: 3,
-          minSimilarity: 0.6,
-        });
+    // Build all contexts (memory, tool, RAG, adaptive)
+    const contexts = await buildAllContexts({
+      systemPrompt: enhancedSystemPrompt,
+      userId,
+      maestroId,
+      conversationId,
+      enableMemory,
+      lastUserMessage: lastUserMessage?.content,
+      adaptiveDifficultyMode: userSettings?.adaptiveDifficultyMode,
+      requestedTool,
+    });
+    enhancedSystemPrompt = contexts.enhancedPrompt;
 
-        // Search in study kits (original document content)
-        const relatedStudyKits = await findRelatedConcepts({
-          userId,
-          query: lastUserMessage.content,
-          limit: 3,
-          minSimilarity: 0.5,
-          includeFlashcards: false,
-          includeStudykits: true,
-        });
-
-        const allResults = [...relevantMaterials, ...relatedStudyKits];
-
-        // Store for transparency assessment (Ethical Design Hardening F-09)
-        ragResultsForTransparency = allResults.map((r) => ({
-          content: r.content,
-          similarity: r.similarity,
-          sourceType: 'material',
-        }));
-
-        if (allResults.length > 0) {
-          const ragContext = allResults
-            .map((m) => `- ${m.content}`)
-            .join('\n');
-          enhancedSystemPrompt = `${enhancedSystemPrompt}\n\n[Materiali rilevanti dello studente]\n${ragContext}`;
-          hasRAG = true;
-          logger.debug('RAG context injected', {
-            userId,
-            materialCount: relevantMaterials.length,
-            studyKitCount: relatedStudyKits.length,
-            topSimilarity: allResults[0]?.similarity,
-          });
-        }
-      } catch (ragError) {
-        // RAG failure should not block the chat
-        logger.warn('Failed to load RAG context', {
-          userId,
-          error: String(ragError),
-        });
-      }
-    }
-
-    // Adaptive difficulty context (signals + mastery)
-    if (userId) {
-      try {
-        const maestro = maestroId ? getMaestroById(maestroId) : undefined;
-        const pragmatic =
-          requestedTool === 'summary' ||
-          requestedTool === 'homework' ||
-          requestedTool === 'pdf' ||
-          requestedTool === 'webcam' ||
-          requestedTool === 'study-kit';
-        const adaptiveContext = await getAdaptiveContextForUser(userId, {
-          subject: maestro?.subject,
-          baselineDifficulty: 3,
-          pragmatic,
-          modeOverride: (userSettings?.adaptiveDifficultyMode as
-            | 'manual'
-            | 'guided'
-            | 'balanced'
-            | 'automatic'
-            | undefined),
-        });
-        const adaptiveInstruction = buildAdaptiveInstruction(adaptiveContext);
-        enhancedSystemPrompt = `${enhancedSystemPrompt}\n\n${adaptiveInstruction}`;
-      } catch (error) {
-        logger.warn('Failed to load adaptive difficulty context', { error: String(error) });
-      }
-    }
-
-    // SECURITY: Normalize unicode and filter the last user message for safety (Issue #30)
+    // SECURITY: Normalize unicode and filter input
     if (lastUserMessage) {
-      // Ethical Design Hardening F-17: Normalize unicode to prevent homoglyph attacks
       const { normalized, wasModified } = normalizeUnicode(lastUserMessage.content);
       if (wasModified) {
         logger.debug('Unicode normalized in user input', { clientId });
@@ -306,14 +101,11 @@ export async function POST(request: NextRequest) {
           category: filterResult.category,
           severity: filterResult.severity,
         });
-
-        // Ethical Design Hardening F-07: Record to audit trail
         recordContentFiltered(filterResult.category || 'unknown', {
           userId,
           maestroId,
           actionTaken: 'blocked',
         });
-
         return NextResponse.json({
           content: filterResult.suggestedResponse,
           provider: 'safety_filter',
@@ -324,11 +116,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // #87: Get active provider info for response (pass preference for consistency)
     const providerConfig = getActiveProvider(providerPreference);
 
     try {
-      // Debug logging for tool context
       if (requestedTool) {
         logger.info('Tool mode active', {
           requestedTool,
@@ -338,34 +128,14 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Force tool call when a specific tool is requested
-      const toolChoiceForRequest = (() => {
-        if (!enableTools) return 'none' as const;
-        if (requestedTool) {
-          // Map requestedTool to function name
-          const toolFunctionMap: Record<string, string> = {
-            mindmap: 'create_mindmap',
-            quiz: 'create_quiz',
-            flashcard: 'create_flashcards',
-            demo: 'create_demo',
-            summary: 'create_summary',
-            search: 'web_search',
-          };
-          const functionName = toolFunctionMap[requestedTool];
-          if (functionName) {
-            return { type: 'function' as const, function: { name: functionName } };
-          }
-        }
-        return 'auto' as const;
-      })();
+      const toolChoice = buildToolChoice(enableTools, requestedTool);
 
       const result = await chatCompletion(messages, enhancedSystemPrompt, {
         tools: enableTools ? ([...CHAT_TOOL_DEFINITIONS] as typeof CHAT_TOOL_DEFINITIONS[number][]) : undefined,
-        tool_choice: toolChoiceForRequest,
+        tool_choice: toolChoice,
         providerPreference,
       });
 
-      // Debug: Log if we got tool calls back
       logger.debug('Chat response', {
         hasToolCalls: !!(result.tool_calls && result.tool_calls.length > 0),
         toolCallCount: result.tool_calls?.length || 0,
@@ -373,74 +143,14 @@ export async function POST(request: NextRequest) {
         contentLength: result.content?.length || 0,
       });
 
-      // Handle tool calls if present
+      // Handle tool calls
       if (result.tool_calls && result.tool_calls.length > 0) {
-        const toolCallRefs = [];
+        const toolCallRefs = await processToolCalls(result.tool_calls, {
+          maestroId,
+          conversationId,
+          userId,
+        });
 
-        for (const toolCall of result.tool_calls) {
-          const toolType = functionNameToToolType(toolCall.function.name);
-
-          try {
-            const args = JSON.parse(toolCall.function.arguments);
-            const toolResult = await executeToolCall(
-              toolCall.function.name,
-              args,
-              { maestroId, conversationId, userId }
-            );
-
-            // Material ID to use in toolCallRef (from saved material or fallback to tool result)
-            let materialId: string | undefined;
-
-            if (toolResult.success && toolResult.data && userId) {
-              // Save tool result to Material table (content duplication reduction)
-              // Skip saving for unauthenticated users to avoid database constraint violations
-              try {
-                const savedMaterial = await saveTool({
-                  userId,
-                  type: toolType,
-                  title: args.title || args.topic || `${toolType} tool`,
-                  content: toolResult.data as Record<string, unknown>,
-                  maestroId,
-                  conversationId,
-                  topic: args.topic,
-                  sourceToolId: typeof args.sourceToolId === 'string' ? args.sourceToolId : undefined,
-                });
-                // Use the saved material's toolId (fixes ID mismatch bug)
-                materialId = savedMaterial.toolId;
-              } catch (saveError) {
-                logger.warn('Failed to save tool to Material table', {
-                  toolType,
-                  error: String(saveError),
-                });
-              }
-            }
-
-            // Return lightweight ToolCallRef (without result.data)
-            toolCallRefs.push({
-              id: materialId || toolResult.toolId || toolCall.id,
-              type: toolType,
-              name: toolCall.function.name,
-              status: toolResult.success ? 'completed' : 'error',
-              error: toolResult.error,
-              materialId,
-            });
-          } catch (toolError) {
-            logger.error('Tool execution failed', {
-              toolCall: toolCall.function.name,
-              error: String(toolError),
-            });
-
-            toolCallRefs.push({
-              id: toolCall.id,
-              type: toolType,
-              name: toolCall.function.name,
-              status: 'error',
-              error: toolError instanceof Error ? toolError.message : 'Tool execution failed',
-            });
-          }
-        }
-
-        // Return response with lightweight tool call references
         return NextResponse.json({
           content: result.content || '',
           provider: result.provider,
@@ -449,13 +159,13 @@ export async function POST(request: NextRequest) {
           maestroId,
           toolCalls: toolCallRefs,
           hasTools: true,
-          hasMemory,
-          hasToolContext,
-          hasRAG,
+          hasMemory: contexts.hasMemory,
+          hasToolContext: contexts.hasToolContext,
+          hasRAG: contexts.hasRAG,
         });
       }
 
-      // SECURITY: Sanitize AI output before returning (Issue #30)
+      // Sanitize output
       const sanitized = sanitizeOutput(result.content);
       if (sanitized.modified) {
         logger.warn('Output sanitized', {
@@ -465,39 +175,19 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Ethical Design Hardening F-09: Assess response transparency
+      // Transparency assessment
       const transparencyContext: TransparencyContext = {
         response: sanitized.text,
         query: lastUserMessage?.content || '',
-        ragResults: ragResultsForTransparency,
+        ragResults: contexts.ragResultsForTransparency,
         usedKnowledgeBase: !!maestroId,
         maestroId,
       };
       const transparency = assessResponseTransparency(transparencyContext);
 
-      // Update budget tracking if usage data is available (WAVE 3: Token budget enforcement)
+      // Update budget
       if (userId && userSettings && result.usage) {
-        try {
-          // Use shared constant for token cost (see stream/helpers.ts for pricing details)
-          const estimatedCost = (result.usage.total_tokens || 0) * TOKEN_COST_PER_UNIT;
-          await prisma.settings.update({
-            where: { userId },
-            data: {
-              totalSpent: {
-                increment: estimatedCost,
-              },
-            },
-          });
-          logger.debug('Budget updated', {
-            userId,
-            tokensUsed: result.usage.total_tokens,
-            estimatedCost,
-            newTotal: userSettings.totalSpent + estimatedCost,
-          });
-        } catch (e) {
-          // Budget update failure should not block the response
-          logger.warn('Failed to update budget', { userId, error: String(e) });
-        }
+        await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
       }
 
       return NextResponse.json({
@@ -505,12 +195,11 @@ export async function POST(request: NextRequest) {
         provider: result.provider,
         model: result.model,
         usage: result.usage,
-        hasMemory,
-        hasToolContext,
-        hasRAG,
+        hasMemory: contexts.hasMemory,
+        hasToolContext: contexts.hasToolContext,
+        hasRAG: contexts.hasRAG,
         maestroId,
         sanitized: sanitized.modified,
-        // Ethical Design Hardening F-09: Transparency metadata
         transparency: {
           confidence: transparency.confidence,
           citations: transparency.citations,
@@ -519,10 +208,8 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (providerError) {
-      // Provider-specific error handling
       const errorMessage = providerError instanceof Error ? providerError.message : 'Unknown provider error';
 
-      // Check if it's an Ollama availability issue
       if (errorMessage.includes('Ollama is not running')) {
         return NextResponse.json(
           {
@@ -536,38 +223,22 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json(
-        {
-          error: 'Chat request failed',
-          message: errorMessage,
-          provider: providerConfig?.provider ?? 'unknown',
-        },
+        { error: 'Chat request failed', message: errorMessage, provider: providerConfig?.provider ?? 'unknown' },
         { status: 500 }
       );
     }
   } catch (error) {
     logger.error('Chat API error', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// GET endpoint to check provider status
 export async function GET() {
   const provider = getActiveProvider();
 
   if (!provider) {
-    return NextResponse.json({
-      available: false,
-      provider: null,
-      message: 'No AI provider configured',
-    });
+    return NextResponse.json({ available: false, provider: null, message: 'No AI provider configured' });
   }
 
-  return NextResponse.json({
-    available: true,
-    provider: provider.provider,
-    model: provider.model,
-  });
+  return NextResponse.json({ available: true, provider: provider.provider, model: provider.model });
 }
