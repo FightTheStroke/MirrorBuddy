@@ -4,6 +4,7 @@
  */
 
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
 import { generateEmbedding, isEmbeddingConfigured } from '@/lib/rag/embedding-service';
 
 /**
@@ -57,7 +58,7 @@ export async function generateMaterialEmbeddingAsync(
       },
     });
   } catch (error) {
-    console.warn('Failed to generate embedding for material', {
+    logger.warn('Failed to generate embedding for material', {
       materialId,
       error: error instanceof Error ? error.message : 'Unknown error',
     });

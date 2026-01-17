@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
 
@@ -60,8 +61,8 @@ export function DemoSandbox(props: DemoSandboxProps) {
           allow={getDemoAllowPermissions()}
           style={{ minHeight: '400px', width: '100%', height: '100%' }}
           onLoad={() => {
-            // Scripts execute automatically via srcDoc - just log for debugging
-            console.debug('[DemoSandbox] iframe loaded');
+            // Scripts execute automatically via srcDoc
+            logger.debug('DemoSandbox iframe loaded');
           }}
         />
       </div>

@@ -9,6 +9,7 @@
 
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { cn } from '@/lib/utils';
 
 interface RendererErrorBoundaryProps {
@@ -41,7 +42,12 @@ export class RendererErrorBoundary extends Component<
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
     // Log error for debugging
-    console.error('Renderer error:', error, errorInfo);
+    logger.error('Renderer error', {
+      materialType: this.props.materialType,
+      errorName: error.name,
+      errorMessage: error.message,
+      componentStack: errorInfo.componentStack,
+    }, error);
   }
 
   handleReset = (): void => {

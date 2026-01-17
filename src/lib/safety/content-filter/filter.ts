@@ -131,12 +131,12 @@ export function filterInput(text: string): FilterResult {
     };
   }
 
-  // LOW: PII detection (warning only, don't block)
+  // F-16: PII detection now blocks (safe: false)
   if (matchesPatterns(text, PII_PATTERNS)) {
     return {
-      safe: true, // Allow but warn
-      severity: 'low',
-      action: 'warn',
+      safe: false, // F-16: Block PII for privacy protection
+      severity: 'medium',
+      action: 'block',
       reason: 'PII detected in input',
       category: 'pii',
       suggestedResponse: SAFE_RESPONSES.pii,
@@ -184,4 +184,41 @@ export function filterMessages(messages: string[]): FilterResult[] {
  */
 export function hasBlockedMessage(messages: string[]): boolean {
   return messages.some((msg) => isInputBlocked(msg));
+}
+
+/**
+ * F-16: Redact PII from text before processing
+ * Replaces detected PII patterns with placeholder text
+ *
+ * @param text - The input text that may contain PII
+ * @returns Text with PII redacted
+ *
+ * @example
+ * redactPII("Call me at 333-123-4567"); // "Call me at [PHONE]"
+ * redactPII("Email: test@example.com"); // "Email: [EMAIL]"
+ */
+export function redactPII(text: string): string {
+  let redacted = text;
+
+  // Email addresses
+  redacted = redacted.replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[EMAIL]');
+
+  // Italian phone numbers
+  redacted = redacted.replace(/\+39\s*\d{10}/g, '[PHONE]');
+  redacted = redacted.replace(/\b3\d{2}[\s.-]?\d{3}[\s.-]?\d{4}\b/g, '[PHONE]');
+  redacted = redacted.replace(/\b0\d{1,3}[\s.-]?\d{6,8}\b/g, '[PHONE]');
+
+  // Italian addresses
+  redacted = redacted.replace(/via\s+[a-z]+\s+\d+/gi, '[ADDRESS]');
+  redacted = redacted.replace(/piazza\s+[a-z]+\s+\d*/gi, '[ADDRESS]');
+
+  return redacted;
+}
+
+/**
+ * F-16: Check if text contains PII without blocking
+ * Useful for logging or metrics without triggering the full filter
+ */
+export function containsPII(text: string): boolean {
+  return matchesPatterns(text, PII_PATTERNS);
 }

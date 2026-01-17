@@ -9,6 +9,7 @@ import {
   Check,
   X,
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
@@ -114,8 +115,8 @@ export function HTMLPreview({
           allow={getDemoAllowPermissions()}
           style={{ width: '100%', height: '100%', minHeight: '400px' }}
           onLoad={() => {
-            // Scripts execute automatically via srcDoc - just log for debugging
-            console.debug('[HtmlPreview] iframe loaded');
+            // Scripts execute automatically via srcDoc
+            logger.debug('HtmlPreview iframe loaded');
           }}
         />
       </div>

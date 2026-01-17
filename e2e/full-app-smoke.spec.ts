@@ -20,6 +20,7 @@ const IGNORE_ERRORS = [
   /hydrat/i,
   /WebSocket/i,
   /realtime.*token/i,
+  /Content Security Policy/i, // CSP inline script warnings during dev
 ];
 
 test.describe('Smoke Test', () => {

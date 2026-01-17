@@ -1,11 +1,17 @@
 /**
- * MIRRORBUDDY - Simple In-Memory Rate Limiter
+ * MIRRORBUDDY - Rate Limiter with Redis Support
  *
- * Lightweight rate limiting for API routes without external dependencies.
- * Suitable for MVP/single-instance deployments.
+ * Uses Upstash Redis when UPSTASH_REDIS_REST_URL is configured,
+ * falls back to in-memory for local development.
  *
- * For multi-instance production, replace with Redis-based solution.
+ * Multi-instance safe when Redis is configured.
  */
+
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "rate-limit" });
 
 interface RateLimitEntry {
   count: number;
@@ -15,7 +21,48 @@ interface RateLimitEntry {
 // In-memory store (cleared on server restart)
 const store = new Map<string, RateLimitEntry>();
 
-// Cleanup old entries every 5 minutes
+// Check if Redis rate limiting is available
+function isRedisConfigured(): boolean {
+  return !!(
+    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  );
+}
+
+// Lazy-init Redis client - one per config
+const redisLimiters = new Map<string, Ratelimit>();
+
+function getRedisRatelimit(maxRequests: number, windowMs: number): Ratelimit {
+  const key = `${maxRequests}:${windowMs}`;
+  let limiter = redisLimiters.get(key);
+
+  if (!limiter) {
+    const redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    });
+
+    limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(maxRequests, `${windowMs}ms`),
+      analytics: false,
+      prefix: "mirrorbuddy:ratelimit",
+    });
+
+    redisLimiters.set(key, limiter);
+    log.info("Redis rate limiter initialized", { maxRequests, windowMs });
+  }
+
+  return limiter;
+}
+
+/**
+ * Get the current rate limit mode
+ */
+export function getRateLimitMode(): "redis" | "memory" {
+  return isRedisConfigured() ? "redis" : "memory";
+}
+
+// Cleanup old entries every 5 minutes (memory mode only)
 const CLEANUP_INTERVAL = 5 * 60 * 1000;
 let cleanupTimer: NodeJS.Timeout | null = null;
 
@@ -29,7 +76,6 @@ function startCleanup() {
       }
     }
   }, CLEANUP_INTERVAL);
-  // Unref to allow process to exit without waiting for cleanup
   cleanupTimer.unref();
 }
 
@@ -48,7 +94,74 @@ export type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
 import type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
 
 /**
+ * Memory-based rate limit check
+ */
+function checkMemoryRateLimit(
+  identifier: string,
+  config: RateLimitConfig
+): RateLimitResult {
+  startCleanup();
+
+  const now = Date.now();
+  const entry = store.get(identifier);
+
+  if (!entry || entry.resetTime < now) {
+    const resetTime = now + config.windowMs;
+    store.set(identifier, { count: 1, resetTime });
+    return {
+      success: true,
+      remaining: config.maxRequests - 1,
+      resetTime,
+      limit: config.maxRequests,
+    };
+  }
+
+  if (entry.count >= config.maxRequests) {
+    return {
+      success: false,
+      remaining: 0,
+      resetTime: entry.resetTime,
+      limit: config.maxRequests,
+    };
+  }
+
+  entry.count++;
+  return {
+    success: true,
+    remaining: config.maxRequests - entry.count,
+    resetTime: entry.resetTime,
+    limit: config.maxRequests,
+  };
+}
+
+/**
+ * Redis-based rate limit check (async)
+ */
+async function checkRedisRateLimitAsync(
+  identifier: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult> {
+  try {
+    const limiter = getRedisRatelimit(config.maxRequests, config.windowMs);
+    const result = await limiter.limit(identifier);
+
+    return {
+      success: result.success,
+      remaining: result.remaining,
+      resetTime: result.reset,
+      limit: result.limit,
+    };
+  } catch (error) {
+    log.error("Redis rate limit error, falling back to memory", { error });
+    return checkMemoryRateLimit(identifier, config);
+  }
+}
+
+/**
  * Check rate limit for a given identifier (usually IP or userId)
+ *
+ * Uses Redis when configured (multi-instance safe),
+ * falls back to in-memory for local development.
  *
  * @param identifier - Unique identifier for rate limiting (IP, userId, etc.)
  * @param config - Rate limit configuration
@@ -56,7 +169,7 @@ import type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
  */
 export function checkRateLimit(
   identifier: string,
-  config: RateLimitConfig,
+  config: RateLimitConfig
 ): RateLimitResult {
   if (process.env.E2E_TESTS === "1") {
     const resetTime = Date.now() + config.windowMs;
@@ -68,42 +181,37 @@ export function checkRateLimit(
     };
   }
 
-  startCleanup();
+  // Use memory-based for sync compatibility
+  // For async Redis support, use checkRateLimitAsync
+  return checkMemoryRateLimit(identifier, config);
+}
 
-  const now = Date.now();
-  const key = identifier;
-  const entry = store.get(key);
-
-  // First request or window expired
-  if (!entry || entry.resetTime < now) {
-    const resetTime = now + config.windowMs;
-    store.set(key, { count: 1, resetTime });
+/**
+ * Async rate limit check - uses Redis when available
+ *
+ * @param identifier - Unique identifier for rate limiting
+ * @param config - Rate limit configuration
+ * @returns Rate limit result with remaining quota
+ */
+export async function checkRateLimitAsync(
+  identifier: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult> {
+  if (process.env.E2E_TESTS === "1") {
+    const resetTime = Date.now() + config.windowMs;
     return {
       success: true,
-      remaining: config.maxRequests - 1,
+      remaining: config.maxRequests,
       resetTime,
       limit: config.maxRequests,
     };
   }
 
-  // Within window, check count
-  if (entry.count >= config.maxRequests) {
-    return {
-      success: false,
-      remaining: 0,
-      resetTime: entry.resetTime,
-      limit: config.maxRequests,
-    };
+  if (isRedisConfigured()) {
+    return checkRedisRateLimitAsync(identifier, config);
   }
 
-  // Increment and allow
-  entry.count++;
-  return {
-    success: true,
-    remaining: config.maxRequests - entry.count,
-    resetTime: entry.resetTime,
-    limit: config.maxRequests,
-  };
+  return checkMemoryRateLimit(identifier, config);
 }
 
 /**

@@ -3,6 +3,37 @@
 // User privacy preferences, consent tracking, and data retention policies
 // ============================================================================
 
+// COPPA Compliance (16 CFR Part 312)
+// Tracks parental consent for users under 13
+model CoppaConsent {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // User's age at time of consent request
+  ageAtConsent Int
+
+  // Consent status
+  parentEmail           String? // Parent's email for verification
+  verificationCode      String? // One-time verification code
+  verificationSentAt    DateTime?
+  verificationExpiresAt DateTime?
+  consentGranted        Boolean   @default(false)
+  consentGrantedAt      DateTime?
+  consentDeniedAt       DateTime?
+
+  // Audit trail
+  parentIpAddress String? // IP of parent when granting consent
+  verificationMethod String @default("email") // email, in_person, phone
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([parentEmail])
+  @@index([verificationCode])
+}
+
 model UserPrivacyPreferences {
   id     String @id @default(cuid())
   userId String @unique

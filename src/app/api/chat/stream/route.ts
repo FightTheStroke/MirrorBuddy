@@ -22,6 +22,7 @@ import {
   checkInputSafety,
   updateBudget,
   createSSEResponse,
+  MidStreamBudgetTracker,
 } from './helpers';
 
 /** Feature flag for streaming - can be disabled via env var */
@@ -110,13 +111,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create streaming response
+    // Create streaming response with mid-stream budget tracking (F-13)
     const sanitizer = new StreamingSanitizer();
     const encoder = new TextEncoder();
+    const budgetTracker = userId && userSettings
+      ? new MidStreamBudgetTracker(userSettings.budgetLimit, userSettings.totalSpent, userId)
+      : null;
 
     const stream = new ReadableStream({
       async start(controller) {
         let totalTokens = 0;
+        let budgetExceededMidStream = false;
 
         try {
           const generator = azureStreamingCompletion(
@@ -128,6 +133,17 @@ export async function POST(request: NextRequest) {
 
           for await (const chunk of generator) {
             if (chunk.type === 'content' && chunk.content) {
+              // Mid-stream budget check (F-13)
+              if (budgetTracker && budgetTracker.trackChunk(chunk.content)) {
+                budgetExceededMidStream = true;
+                const budgetMsg = '\n\n[Budget limit reached. Response truncated.]';
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({
+                  content: budgetMsg,
+                  budgetExceeded: true,
+                })}\n\n`));
+                break;
+              }
+
               const sanitized = sanitizer.processChunk(chunk.content);
               if (sanitized) {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: sanitized })}\n\n`));
@@ -143,15 +159,21 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          const remaining = sanitizer.flush();
-          if (remaining) {
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: remaining })}\n\n`));
+          if (!budgetExceededMidStream) {
+            const remaining = sanitizer.flush();
+            if (remaining) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ content: remaining })}\n\n`));
+            }
           }
 
           controller.enqueue(encoder.encode('data: [DONE]\n\n'));
 
-          if (userId && userSettings && totalTokens > 0) {
-            await updateBudget(userId, totalTokens);
+          // Update budget: use actual tokens if available, else estimated
+          if (userId && userSettings) {
+            const tokensToCharge = totalTokens > 0 ? totalTokens : budgetTracker?.getEstimatedTokens() ?? 0;
+            if (tokensToCharge > 0) {
+              await updateBudget(userId, tokensToCharge);
+            }
           }
         } catch (error) {
           if ((error as Error).name !== 'AbortError') {

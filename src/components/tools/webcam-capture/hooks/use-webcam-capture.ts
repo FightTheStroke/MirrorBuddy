@@ -118,7 +118,7 @@ export function useWebcamCapture({
         
         // Log error with safe serialization
         try {
-          logger.error('Camera error', { 
+          logger.error('Camera error', {
             error: errorMessage,
             errorName,
             errorType,
@@ -127,8 +127,7 @@ export function useWebcamCapture({
             hasGetUserMedia: !!navigator.mediaDevices?.getUserMedia,
           });
         } catch (_logErr) {
-          // If logging fails, at least log the basic error
-          console.error('Camera error (logging failed):', errorMessage, errorName);
+          // If logging fails, silently continue
         }
 
         if (

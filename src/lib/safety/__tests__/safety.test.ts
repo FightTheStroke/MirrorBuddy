@@ -214,17 +214,19 @@ describe('Content Filter (Input)', () => {
   });
 
   describe('PII Detection', () => {
-    it('should warn for email addresses', () => {
+    // F-16: PII now blocks instead of warns
+    it('should block for email addresses', () => {
       const result = filterInput('La mia email è test@example.com');
-      expect(result.safe).toBe(true); // Allowed but with warning
+      expect(result.safe).toBe(false); // F-16: Now blocked for privacy
       expect(result.category).toBe('pii');
-      expect(result.action).toBe('warn');
+      expect(result.action).toBe('block');
     });
 
-    it('should warn for phone numbers', () => {
+    it('should block for phone numbers', () => {
       const result = filterInput('Chiamami al 333-1234567');
-      expect(result.safe).toBe(true);
+      expect(result.safe).toBe(false); // F-16: Now blocked for privacy
       expect(result.category).toBe('pii');
+      expect(result.action).toBe('block');
     });
   });
 

@@ -65,6 +65,8 @@ export default defineConfig({
       E2E_TESTS: '1',
       // Session secret for cookie signing (required for cookie-signing.spec.ts)
       SESSION_SECRET: process.env.SESSION_SECRET || 'e2e-test-session-secret-32-characters-min',
+      // CRON_SECRET for data-retention tests (ensures 401 when missing auth header)
+      CRON_SECRET: 'e2e-test-cron-secret',
     },
   },
 });

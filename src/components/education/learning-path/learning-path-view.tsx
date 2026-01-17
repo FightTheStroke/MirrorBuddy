@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Loader2,
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -88,7 +89,11 @@ export function LearningPathView({
       setPath(data.path);
       onTopicSelect?.(topicId);
     } catch (err) {
-      console.error('Failed to start topic', err);
+      logger.error('Failed to start topic', {
+        topicId,
+        pathId,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   };
 

@@ -38,30 +38,33 @@ export async function validateAuth(): Promise<AuthResult> {
       };
     }
 
-    let userId: string;
-
-    // Verify signed cookies, allow legacy unsigned cookies for backward compatibility
-    if (isSignedCookie(cookieValue)) {
-      const verification = verifyCookieValue(cookieValue);
-
-      if (!verification.valid) {
-        logger.warn('Cookie signature verification failed', {
-          error: verification.error,
-        });
-        return {
-          authenticated: false,
-          userId: null,
-          error: 'Invalid cookie signature',
-        };
-      }
-
-      userId = verification.value!;
-      logger.debug('Signed cookie verified', { userId });
-    } else {
-      // Legacy unsigned cookie - allow for backward compatibility
-      userId = cookieValue;
-      logger.debug('Legacy unsigned cookie accepted', { userId });
+    // Only accept signed cookies - unsigned cookies are rejected for security
+    if (!isSignedCookie(cookieValue)) {
+      logger.warn('Unsigned cookie rejected', {
+        hint: 'Cookie must be cryptographically signed',
+      });
+      return {
+        authenticated: false,
+        userId: null,
+        error: 'Invalid cookie format',
+      };
     }
+
+    const verification = verifyCookieValue(cookieValue);
+
+    if (!verification.valid) {
+      logger.warn('Cookie signature verification failed', {
+        error: verification.error,
+      });
+      return {
+        authenticated: false,
+        userId: null,
+        error: 'Invalid cookie signature',
+      };
+    }
+
+    const userId = verification.value!;
+    logger.debug('Signed cookie verified', { userId });
 
     // Verify user exists in database
     const user = await prisma.user.findUnique({
@@ -143,29 +146,5 @@ export async function validateSessionOwnership(
   }
 }
 
-/**
- * Simple rate limiting by IP (in-memory, resets on restart)
- * For production, use Redis or similar
- */
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-export function checkRateLimit(
-  key: string,
-  maxRequests: number = 100,
-  windowMs: number = 60000
-): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const entry = rateLimitMap.get(key);
-
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(key, { count: 1, resetAt: now + windowMs });
-    return { allowed: true, remaining: maxRequests - 1 };
-  }
-
-  if (entry.count >= maxRequests) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  entry.count++;
-  return { allowed: true, remaining: maxRequests - entry.count };
-}
+// Rate limiting is in @/lib/rate-limit with Redis support
+// Import directly from there for full functionality

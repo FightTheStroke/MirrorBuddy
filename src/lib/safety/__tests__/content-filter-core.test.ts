@@ -3,7 +3,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { filterInput, filterMessages, hasBlockedMessage } from '../content-filter-core';
+import {
+  filterInput,
+  filterMessages,
+  hasBlockedMessage,
+  redactPII,
+  containsPII,
+} from '../content-filter-core';
 
 describe('content-filter-core', () => {
   describe('filterInput edge cases', () => {
@@ -63,6 +69,86 @@ describe('content-filter-core', () => {
     it('should return false for empty array', () => {
       const result = hasBlockedMessage([]);
       expect(result).toBe(false);
+    });
+  });
+
+  // F-16: PII Detection Tests
+  describe('PII detection (F-16)', () => {
+    describe('filterInput with PII', () => {
+      it('should block input containing email addresses', () => {
+        const result = filterInput('Contact me at test@example.com');
+        expect(result.safe).toBe(false);
+        expect(result.action).toBe('block');
+        expect(result.category).toBe('pii');
+      });
+
+      it('should block input containing Italian mobile numbers', () => {
+        const result = filterInput('Chiamami al 333-123-4567');
+        expect(result.safe).toBe(false);
+        expect(result.action).toBe('block');
+      });
+
+      it('should block input containing Italian addresses', () => {
+        const result = filterInput('Abito in via Roma 42');
+        expect(result.safe).toBe(false);
+        expect(result.action).toBe('block');
+      });
+    });
+
+    describe('redactPII', () => {
+      it('should redact email addresses', () => {
+        const result = redactPII('Contact me at test@example.com please');
+        expect(result).toBe('Contact me at [EMAIL] please');
+      });
+
+      it('should redact Italian mobile numbers (333 format)', () => {
+        const result = redactPII('Chiamami al 333-123-4567');
+        expect(result).toBe('Chiamami al [PHONE]');
+      });
+
+      it('should redact Italian mobile numbers with +39 prefix', () => {
+        const result = redactPII('Il mio numero è +39 3331234567');
+        expect(result).toBe('Il mio numero è [PHONE]');
+      });
+
+      it('should redact Italian landline numbers', () => {
+        const result = redactPII('Ufficio: 02-12345678');
+        expect(result).toBe('Ufficio: [PHONE]');
+      });
+
+      it('should redact Italian addresses (via)', () => {
+        const result = redactPII('Abito in via Roma 42');
+        expect(result).toBe('Abito in [ADDRESS]');
+      });
+
+      it('should redact Italian addresses (piazza)', () => {
+        const result = redactPII('Ci vediamo in piazza Duomo 1');
+        expect(result).toBe('Ci vediamo in [ADDRESS]');
+      });
+
+      it('should redact multiple PII types', () => {
+        const result = redactPII('Email: a@b.com, Tel: 333-111-2222');
+        expect(result).toBe('Email: [EMAIL], Tel: [PHONE]');
+      });
+
+      it('should return unchanged text without PII', () => {
+        const text = 'Ciao, come stai oggi?';
+        expect(redactPII(text)).toBe(text);
+      });
+    });
+
+    describe('containsPII', () => {
+      it('should return true for email addresses', () => {
+        expect(containsPII('Contact test@example.com')).toBe(true);
+      });
+
+      it('should return true for phone numbers', () => {
+        expect(containsPII('Call 333-123-4567')).toBe(true);
+      });
+
+      it('should return false for text without PII', () => {
+        expect(containsPII('Hello, how are you?')).toBe(false);
+      });
     });
   });
 });

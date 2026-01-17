@@ -175,10 +175,11 @@ function buildHTMLFromParts(html: string, css: string, js: string): string {
         try {
           ${js}
         } catch (error) {
+          // eslint-disable-next-line no-console
           console.error('Demo script error:', error);
           const errorDiv = document.createElement('div');
           errorDiv.style.cssText = 'position:fixed;top:10px;right:10px;background:#ef4444;color:white;padding:8px 12px;border-radius:4px;font-size:12px;z-index:9999;';
-          errorDiv.textContent = 'Errore nello script: ' + error.message;
+          errorDiv.textContent = 'Errore nello script: ' + (error instanceof Error ? error.message : String(error));
           document.body.appendChild(errorDiv);
           setTimeout(() => errorDiv.remove(), 5000);
         }

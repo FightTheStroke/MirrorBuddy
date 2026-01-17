@@ -12,6 +12,7 @@
 import { prisma } from '@/lib/db';
 import type { ToolType } from '@/types/tools';
 import { randomUUID } from 'crypto';
+import { logger } from '@/lib/logger';
 import { generateMaterialEmbeddingAsync } from './tool-embedding';
 import { materialToSavedTool, type SavedTool } from './tool-persistence-helpers';
 
@@ -104,7 +105,7 @@ export async function saveTool(params: SaveToolParams): Promise<SavedTool> {
       }
     } catch {
       // Non-blocking: log but don't fail the save
-      console.warn('Failed to create derived_from edge', {
+      logger.warn('Failed to create derived_from edge', {
         sourceToolId: params.sourceToolId,
         newToolId: toolId,
       });
