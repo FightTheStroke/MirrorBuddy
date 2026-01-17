@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 17 - Production Hardening Plan 46)
+
+#### W1: P0 Security & Privacy Blockers
+- **Content Security Policy (F-01)**: Strict CSP headers in `middleware.ts` with nonces for inline scripts
+- **CSRF Protection (F-02)**: Cookie signing with HMAC-SHA256 in `src/lib/auth/cookie-signing.ts`
+- **COPPA Compliance (F-03)**: Under-13 consent flow with parent verification in `prisma/schema/privacy.prisma`
+- **PII Blocking (F-04)**: Italian fiscal code, phone, email detection in `src/lib/privacy/pii-detector.ts`
+- **pgvector Security (F-05)**: Content sanitization before embedding, no raw user input in vectors
+- **Rate Limiting (F-06)**: Token bucket algorithm with 60 req/min default in `src/lib/rate-limit.ts`
+
+#### W2: P1 Critical Infrastructure
+- **Budget Enforcement (F-07)**: Hard stop when Azure spending exceeds user-defined limit
+- **Integration Tests (F-08)**: Database integration tests with Prisma transactions
+- **Error Boundaries (F-09)**: React error boundaries with structured logging in `src/components/error-boundary.tsx`
+- **Health Endpoints (F-10)**: `/api/health` (basic) and `/api/health/detailed` (metrics) for monitoring
+- **Structured Logging (F-11)**: JSON logging for production, human-readable for dev in `src/lib/logger/`
+- **SLI/SLO Documentation (F-12)**: Service level definitions in `docs/operations/SLI-SLO.md`
+- **Runbook (F-13)**: Incident response procedures in `docs/operations/RUNBOOK.md`
+
+#### W3: P2 Code Quality Improvements
+- **Request Tracing (F-21)**: Request ID generation for distributed tracing in `src/lib/tracing/`
+- **Console.log Cleanup (F-22)**: Migrated 11 files from console.log to structured logger
+- **localStorage Audit (F-23)**: Verified ADR 0015 compliance - no user data in localStorage
+- **Empty Catch Blocks (F-24)**: Fixed 13 catch blocks in 4 files with proper error handling
+- **ESLint Warnings (F-25)**: Resolved all ESLint warnings with proper type assertions
+- **Admin Role (F-26)**: UserRole enum (USER/ADMIN) and `requireAdmin()` middleware in `src/lib/auth/`
+- **Circular Dependencies (F-27)**: Verified 0 circular dependencies with madge (1867 files)
+
 ### Added (Jan 17 - Release Gate 10/10)
 
 - **Release gate**: Added `npm run release:gate` to enforce full P0 checks in one command.
