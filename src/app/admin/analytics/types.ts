@@ -83,3 +83,99 @@ export interface SafetyEventsData {
     resolved: boolean;
   }>;
 }
+
+/**
+ * Session metrics data from REAL API responses.
+ * Cost and token data are actual values, not estimates.
+ */
+export interface SessionMetricsData {
+  period: { days: number; startDate: string };
+  summary: {
+    totalSessions: number;
+    totalTurns: number;
+    avgTurnsPerSession: number;
+    avgLatencyMs: number;
+  };
+  tokens: {
+    totalIn: number;
+    totalOut: number;
+    total: number;
+  };
+  cost: {
+    totalEur: number;
+    avgPerSession: number;
+    p95PerSession: number;
+    voiceMinutes: number;
+    thresholds: {
+      textWarn: number;
+      textLimit: number;
+      voiceWarn: number;
+      voiceLimit: number;
+    };
+    pricing: {
+      textPer1kTokens: number;
+      voicePerMin: number;
+    };
+  };
+  safety: {
+    totalRefusals: number;
+    correctRefusals: number;
+    refusalAccuracy: number;
+    jailbreakAttempts: number;
+    stuckLoops: number;
+    severityDistribution: Record<string, number>;
+  };
+  outcomes: Record<string, number>;
+  dailyBreakdown: Record<
+    string,
+    { sessions: number; cost: number; tokens: number }
+  >;
+}
+
+/**
+ * External services API usage metrics.
+ * Monitors Azure OpenAI, Google Drive, Brave Search quotas.
+ */
+export interface ExternalServicesData {
+  summary: {
+    totalServices: number;
+    hasAlerts: boolean;
+    criticalCount: number;
+    warningCount: number;
+    alertDetails: Array<{
+      service: string;
+      metric: string;
+      usagePercent: number;
+      status: string;
+    }>;
+  };
+  byService: Record<
+    string,
+    Array<{
+      metric: string;
+      current: number;
+      limit: number;
+      usagePercent: number;
+      status: string;
+      period: string;
+    }>
+  >;
+  quotas: {
+    azureOpenAI: {
+      chatTpm: number;
+      chatRpm: number;
+      embeddingTpm: number;
+      ttsRpm: number;
+      warnThreshold: number;
+    };
+    googleDrive: {
+      queriesPerMin: number;
+      dailyQueries: number;
+      warnThreshold: number;
+    };
+    braveSearch: {
+      monthlyQueries: number;
+      warnThreshold: number;
+    };
+  };
+}

@@ -41,3 +41,17 @@ export type {
   UsageData,
   CostStatus,
 } from "./cost-tracking-service";
+
+// External service usage and quota tracking
+export {
+  recordExternalApiCall,
+  getAzureOpenAIUsage,
+  getGoogleDriveUsage,
+  getBraveSearchUsage,
+  getAllExternalServiceUsage,
+  getServiceAlerts,
+  generateExternalServiceMetrics,
+  EXTERNAL_SERVICE_QUOTAS,
+} from "./external-service-metrics";
+
+export type { ExternalServiceUsage } from "./external-service-metrics";

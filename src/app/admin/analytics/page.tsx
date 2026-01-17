@@ -17,8 +17,10 @@ import {
   Mic,
   Brain,
   ShieldAlert,
-  Timer,
   ArrowLeft,
+  Euro,
+  Activity,
+  Cloud,
 } from "lucide-react";
 import Link from "next/link";
 import { StatCard } from "./components/stat-card";
@@ -29,6 +31,8 @@ import type {
   FsrsStatsData,
   RateLimitsData,
   SafetyEventsData,
+  SessionMetricsData,
+  ExternalServicesData,
 } from "./types";
 
 type DashboardData = {
@@ -37,19 +41,22 @@ type DashboardData = {
   fsrsStats: FsrsStatsData | null;
   rateLimits: RateLimitsData | null;
   safetyEvents: SafetyEventsData | null;
+  sessionMetrics: SessionMetricsData | null;
+  externalServices: ExternalServicesData | null;
 };
 
 export default function AdminAnalyticsPage() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [accessDenied, setAccessDenied] = useState(false);
   const [data, setData] = useState<DashboardData>({
     tokenUsage: null,
     voiceMetrics: null,
     fsrsStats: null,
     rateLimits: null,
     safetyEvents: null,
+    sessionMetrics: null,
+    externalServices: null,
   });
 
   const fetchData = useCallback(async (isRefresh = false) => {
@@ -59,23 +66,41 @@ export default function AdminAnalyticsPage() {
     setError(null);
 
     try {
-      const [tokenRes, voiceRes, fsrsRes, rateRes, safetyRes] =
-        await Promise.all([
-          fetch("/api/dashboard/token-usage?days=7"),
-          fetch("/api/dashboard/voice-metrics?days=7"),
-          fetch("/api/dashboard/fsrs-stats?days=7"),
-          fetch("/api/dashboard/rate-limits?days=7"),
-          fetch("/api/dashboard/safety-events?days=7"),
-        ]);
+      const [
+        tokenRes,
+        voiceRes,
+        fsrsRes,
+        rateRes,
+        safetyRes,
+        sessionRes,
+        extServRes,
+      ] = await Promise.all([
+        fetch("/api/dashboard/token-usage?days=7"),
+        fetch("/api/dashboard/voice-metrics?days=7"),
+        fetch("/api/dashboard/fsrs-stats?days=7"),
+        fetch("/api/dashboard/rate-limits?days=7"),
+        fetch("/api/dashboard/safety-events?days=7"),
+        fetch("/api/dashboard/session-metrics?days=7"),
+        fetch("/api/dashboard/external-services"),
+      ]);
 
-      const [tokenData, voiceData, fsrsData, rateData, safetyData] =
-        await Promise.all([
-          tokenRes.ok ? tokenRes.json() : null,
-          voiceRes.ok ? voiceRes.json() : null,
-          fsrsRes.ok ? fsrsRes.json() : null,
-          rateRes.ok ? rateRes.json() : null,
-          safetyRes.ok ? safetyRes.json() : null,
-        ]);
+      const [
+        tokenData,
+        voiceData,
+        fsrsData,
+        rateData,
+        safetyData,
+        sessionData,
+        extServData,
+      ] = await Promise.all([
+        tokenRes.ok ? tokenRes.json() : null,
+        voiceRes.ok ? voiceRes.json() : null,
+        fsrsRes.ok ? fsrsRes.json() : null,
+        rateRes.ok ? rateRes.json() : null,
+        safetyRes.ok ? safetyRes.json() : null,
+        sessionRes.ok ? sessionRes.json() : null,
+        extServRes.ok ? extServRes.json() : null,
+      ]);
 
       setData({
         tokenUsage: tokenData,
@@ -83,6 +108,8 @@ export default function AdminAnalyticsPage() {
         fsrsStats: fsrsData,
         rateLimits: rateData,
         safetyEvents: safetyData,
+        sessionMetrics: sessionData,
+        externalServices: extServData,
       });
     } catch (err) {
       setError(
@@ -94,25 +121,8 @@ export default function AdminAnalyticsPage() {
     }
   }, []);
 
-  // Check admin access on mount
   useEffect(() => {
-    const checkAdminAccess = async () => {
-      try {
-        const res = await fetch("/api/dashboard/rate-limits");
-        if (res.status === 403) {
-          setAccessDenied(true);
-          setInitialLoading(false);
-          return;
-        }
-        // If access check passes, proceed with data fetch
-        await fetchData();
-      } catch (err) {
-        // Network error - try to proceed anyway
-        await fetchData();
-      }
-    };
-
-    checkAdminAccess();
+    fetchData();
   }, [fetchData]);
 
   const formatNumber = (n: number) => {
@@ -120,27 +130,6 @@ export default function AdminAnalyticsPage() {
     if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
     return n.toString();
   };
-
-  // Check admin access first
-  if (accessDenied) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <ShieldAlert className="h-12 w-12 text-red-500" />
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Access Denied
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 text-center max-w-md">
-            You do not have admin privileges required to view system analytics.
-            Please contact an administrator.
-          </p>
-          <Link href="/">
-            <Button className="mt-4">Return to Home</Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   if (initialLoading) {
     return (
@@ -197,18 +186,25 @@ export default function AdminAnalyticsPage() {
         )}
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <StatCard
-            title="Total AI Tokens"
-            value={formatNumber(data.tokenUsage?.summary.totalTokens ?? 0)}
-            subValue={`$${data.tokenUsage?.summary.estimatedCostUsd.toFixed(2) ?? "0.00"} estimated`}
-            icon={Coins}
+            title="Session Cost (REAL)"
+            value={`€${data.sessionMetrics?.cost.totalEur.toFixed(2) ?? "0.00"}`}
+            subValue={`€${data.sessionMetrics?.cost.avgPerSession.toFixed(3) ?? "0.000"} avg/session`}
+            icon={Euro}
+            color="green"
+          />
+          <StatCard
+            title="Total Sessions"
+            value={data.sessionMetrics?.summary.totalSessions ?? 0}
+            subValue={`${data.sessionMetrics?.summary.avgTurnsPerSession ?? 0} avg turns`}
+            icon={Activity}
             color="indigo"
           />
           <StatCard
-            title="Voice Sessions"
-            value={data.voiceMetrics?.voice.totalSessions ?? 0}
-            subValue={`${data.voiceMetrics?.voice.totalMinutes.toFixed(1) ?? "0"} min total`}
+            title="Voice Minutes"
+            value={data.sessionMetrics?.cost.voiceMinutes?.toFixed(1) ?? "0"}
+            subValue={`€${((data.sessionMetrics?.cost.voiceMinutes ?? 0) * (data.sessionMetrics?.cost.pricing.voicePerMin ?? 0.04)).toFixed(2)} cost`}
             icon={Mic}
             color="green"
           />
@@ -220,10 +216,10 @@ export default function AdminAnalyticsPage() {
             color="blue"
           />
           <StatCard
-            title="Rate Limit Events"
-            value={data.rateLimits?.summary.totalEvents ?? 0}
-            subValue={`${data.rateLimits?.summary.uniqueIps ?? 0} unique IPs`}
-            icon={Timer}
+            title="Safety Refusals"
+            value={data.sessionMetrics?.safety.totalRefusals ?? 0}
+            subValue={`${data.sessionMetrics?.safety.refusalAccuracy ?? 100}% correct`}
+            icon={ShieldAlert}
             color="amber"
           />
         </div>
@@ -259,6 +255,81 @@ export default function AdminAnalyticsPage() {
 
         {/* Detailed Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Session Metrics (REAL data) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Euro className="h-5 w-5 text-emerald-500" />
+                Session Cost Metrics (REAL)
+              </CardTitle>
+              <CardDescription>
+                Actual costs from Azure OpenAI API responses
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                  <p className="text-2xl font-bold text-emerald-600">
+                    €{data.sessionMetrics?.cost.totalEur.toFixed(2) ?? "0.00"}
+                  </p>
+                  <p className="text-xs text-slate-500">Total Cost</p>
+                </div>
+                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                  <p className="text-2xl font-bold text-blue-600">
+                    €
+                    {data.sessionMetrics?.cost.p95PerSession.toFixed(3) ??
+                      "0.000"}
+                  </p>
+                  <p className="text-xs text-slate-500">P95 per Session</p>
+                </div>
+                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                  <p className="text-2xl font-bold text-indigo-600">
+                    {formatNumber(data.sessionMetrics?.tokens.total ?? 0)}
+                  </p>
+                  <p className="text-xs text-slate-500">Total Tokens</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  Session Outcomes
+                </p>
+                {data.sessionMetrics?.outcomes &&
+                  Object.entries(data.sessionMetrics.outcomes).map(
+                    ([outcome, count]) => (
+                      <div
+                        key={outcome}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <span
+                          className={`capitalize ${
+                            outcome === "success"
+                              ? "text-green-600"
+                              : outcome === "dropped"
+                                ? "text-amber-600"
+                                : outcome === "stuck_loop"
+                                  ? "text-red-600"
+                                  : "text-slate-600"
+                          }`}
+                        >
+                          {outcome.replace("_", " ")}
+                        </span>
+                        <span className="font-mono">{count}</span>
+                      </div>
+                    ),
+                  )}
+              </div>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-xs text-slate-500">
+                  Pricing: €
+                  {data.sessionMetrics?.cost.pricing.textPer1kTokens ?? 0.002}
+                  /1K tokens • €
+                  {data.sessionMetrics?.cost.pricing.voicePerMin ?? 0.04}/min
+                  voice
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Token Usage */}
           <Card>
             <CardHeader>
@@ -505,6 +576,111 @@ export default function AdminAnalyticsPage() {
                     ))}
                   </div>
                 )}
+            </CardContent>
+          </Card>
+
+          {/* External Services Quota Monitoring */}
+          <Card
+            className={
+              data.externalServices?.summary.hasAlerts
+                ? "border-amber-200 dark:border-amber-800"
+                : ""
+            }
+          >
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Cloud className="h-5 w-5 text-purple-500" />
+                External Services
+                {data.externalServices?.summary.hasAlerts && (
+                  <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">
+                    {data.externalServices.summary.criticalCount +
+                      data.externalServices.summary.warningCount}{" "}
+                    alerts
+                  </span>
+                )}
+              </CardTitle>
+              <CardDescription>
+                API usage quotas for Azure OpenAI, Google Drive, Brave Search
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {data.externalServices?.summary.alertDetails &&
+                data.externalServices.summary.alertDetails.length > 0 && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg space-y-2">
+                    <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                      Quota Alerts
+                    </p>
+                    {data.externalServices.summary.alertDetails.map(
+                      (alert, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between text-xs"
+                        >
+                          <span className="text-amber-700 dark:text-amber-300">
+                            {alert.service}: {alert.metric}
+                          </span>
+                          <span
+                            className={`px-2 py-0.5 rounded-full ${
+                              alert.status === "critical" ||
+                              alert.status === "exceeded"
+                                ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300"
+                                : "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300"
+                            }`}
+                          >
+                            {alert.usagePercent.toFixed(1)}%
+                          </span>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                )}
+              {data.externalServices?.byService &&
+                Object.entries(data.externalServices.byService).map(
+                  ([service, metrics]) => (
+                    <div key={service} className="space-y-2">
+                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {service}
+                      </p>
+                      {metrics.map((m, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${
+                                m.status === "exceeded"
+                                  ? "bg-red-500"
+                                  : m.status === "critical"
+                                    ? "bg-red-400"
+                                    : m.status === "warning"
+                                      ? "bg-amber-400"
+                                      : "bg-green-400"
+                              }`}
+                              style={{
+                                width: `${Math.min(m.usagePercent, 100)}%`,
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs text-slate-500 w-24 text-right">
+                            {m.metric}
+                          </span>
+                          <span className="text-xs font-mono w-16 text-right">
+                            {m.usagePercent.toFixed(1)}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ),
+                )}
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                <p className="text-xs text-slate-500">
+                  Quotas: Azure{" "}
+                  {data.externalServices?.quotas.azureOpenAI.chatTpm.toLocaleString()}{" "}
+                  TPM • Drive{" "}
+                  {data.externalServices?.quotas.googleDrive.queriesPerMin.toLocaleString()}
+                  /min • Brave{" "}
+                  {data.externalServices?.quotas.braveSearch.monthlyQueries.toLocaleString()}
+                  /month
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
