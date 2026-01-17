@@ -59,7 +59,7 @@ Every student in MirrorBuddy has access to three types of AI support:
               v             v             v
         +-----------+ +-----------+ +-----------+
         |   COACH   | |   BUDDY   | |  MAESTRI  |
-        |  (5 AI)   | |  (5 AI)   | |  (16 AI)  |
+        |  (5 AI)   | |  (5 AI)   | |  (20 AI)  |
         |           | |           | |           |
         |  Method   | |   Peer    | |  Content  |
         |  Support  | |  Support  | |  Experts  |
@@ -68,7 +68,7 @@ Every student in MirrorBuddy has access to three types of AI support:
 
 | Type | Characters | Relationship | Goal |
 |------|------------|--------------|------|
-| **Maestri** | 16 historical figures | Mentor (vertical) | Teach subjects with passion |
+| **Maestri** | 20 historical figures | Mentor (vertical) | Teach subjects with passion |
 | **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij | Learning coach (vertical) | Develop METHOD and autonomy |
 | **Buddies** | Mario, Noemi, Enea, Bruno, Sofia | Peer friend (horizontal) | Emotional support, shared struggles |
 
@@ -78,7 +78,7 @@ Instead of reading *about* Euclid in a textbook, students learn mathematics **wi
 
 Each **Maestro** is an AI tutor embodying a legendary figure from history:
 
-**16 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Science), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (PE), Smith (Economics)
+**20 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Simone (Sport)
 
 ---
 
@@ -150,7 +150,7 @@ MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft
 - **Configuration Versioning**: Rollback safety settings with history
 - **Knowledge Base Auditing**: Content validation before embedding
 
-**→ Technical details: [docs/adr/0042-ethical-design-hardening.md](docs/adr/0042-ethical-design-hardening.md)**
+**→ Technical details: [docs/adr/0004-safety-guardrails.md](docs/adr/0004-safety-guardrails.md) | [docs/adr/0008-parent-dashboard-gdpr.md](docs/adr/0008-parent-dashboard-gdpr.md)**
 
 ---
 
