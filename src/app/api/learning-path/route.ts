@@ -4,11 +4,12 @@
  * Plan 8 MVP - Wave 3: Progress Tracking [F-15]
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { CreateLearningPathSchema } from '@/lib/validation/schemas/learning-path';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { CreateLearningPathSchema } from "@/lib/validation/schemas/learning-path";
+import { requireCSRF } from "@/lib/security/csrf";
 
 /**
  * GET /api/learning-path
@@ -16,18 +17,18 @@ import { CreateLearningPathSchema } from '@/lib/validation/schemas/learning-path
  */
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('userId')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     const paths = await prisma.learningPath.findMany({
       where: { userId },
       include: {
         topics: {
-          orderBy: { order: 'asc' },
+          orderBy: { order: "asc" },
           select: {
             id: true,
             order: true,
@@ -38,13 +39,16 @@ export async function GET() {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ paths });
   } catch (error) {
-    logger.error('Failed to fetch learning paths', { error });
-    return NextResponse.json({ error: 'Failed to fetch learning paths' }, { status: 500 });
+    logger.error("Failed to fetch learning paths", { error });
+    return NextResponse.json(
+      { error: "Failed to fetch learning paths" },
+      { status: 500 },
+    );
   }
 }
 
@@ -53,13 +57,17 @@ export async function GET() {
  * Create a new learning path (usually from study kit)
  */
 export async function POST(request: NextRequest) {
-  try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('userId')?.value;
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     const body = await request.json();
 
@@ -68,14 +76,15 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid learning path data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid learning path data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { title, subject, sourceStudyKitId, topics, visualOverview } = validation.data;
+    const { title, subject, sourceStudyKitId, topics, visualOverview } =
+      validation.data;
 
     // Create path with topics
     const path = await prisma.learningPath.create({
@@ -87,31 +96,37 @@ export async function POST(request: NextRequest) {
         totalTopics: topics.length,
         completedTopics: 0,
         progressPercent: 0,
-        status: 'ready',
+        status: "ready",
         visualOverview,
         topics: {
           create: topics.map((topic, index) => ({
             order: topic.order || index + 1,
             title: topic.title,
-            description: topic.description || '',
+            description: topic.description || "",
             keyConcepts: JSON.stringify(topic.keyConcepts || []),
-            difficulty: topic.difficulty || 'intermediate',
-            status: index === 0 ? 'unlocked' : 'locked',
+            difficulty: topic.difficulty || "intermediate",
+            status: index === 0 ? "unlocked" : "locked",
           })),
         },
       },
       include: {
         topics: {
-          orderBy: { order: 'asc' },
+          orderBy: { order: "asc" },
         },
       },
     });
 
-    logger.info('Learning path created', { pathId: path.id, topicCount: topics.length });
+    logger.info("Learning path created", {
+      pathId: path.id,
+      topicCount: topics.length,
+    });
 
     return NextResponse.json({ path }, { status: 201 });
   } catch (error) {
-    logger.error('Failed to create learning path', { error });
-    return NextResponse.json({ error: 'Failed to create learning path' }, { status: 500 });
+    logger.error("Failed to create learning path", { error });
+    return NextResponse.json(
+      { error: "Failed to create learning path" },
+      { status: 500 },
+    );
   }
 }

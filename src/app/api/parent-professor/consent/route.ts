@@ -4,10 +4,11 @@
 // POST: Record consent
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { requireCSRF } from "@/lib/security/csrf";
 
 export async function GET() {
   try {
@@ -27,15 +28,19 @@ export async function GET() {
       consentedAt: settings?.parentChatConsentAt || null,
     });
   } catch (error) {
-    logger.error('Parent consent GET error', { error: String(error) });
+    logger.error("Parent consent GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to check consent' },
-      { status: 500 }
+      { error: "Failed to check consent" },
+      { status: 500 },
     );
   }
 }
 
-export async function POST(_request: NextRequest) {
+export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -53,17 +58,17 @@ export async function POST(_request: NextRequest) {
       },
     });
 
-    logger.info('Parent chat consent recorded', { userId });
+    logger.info("Parent chat consent recorded", { userId });
 
     return NextResponse.json({
       success: true,
       consentedAt: settings.parentChatConsentAt,
     });
   } catch (error) {
-    logger.error('Parent consent POST error', { error: String(error) });
+    logger.error("Parent consent POST error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to record consent' },
-      { status: 500 }
+      { error: "Failed to record consent" },
+      { status: 500 },
     );
   }
 }

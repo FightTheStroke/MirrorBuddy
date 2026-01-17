@@ -7,16 +7,16 @@
  * - Collected data during onboarding
  */
 
-import { create } from 'zustand';
+import { create } from "zustand";
 import {
   type OnboardingStep,
   type OnboardingData,
   type VoiceTranscriptEntry,
   STEP_ORDER,
-} from './onboarding-types';
+} from "./onboarding-types";
 
 export type { OnboardingStep, OnboardingData, VoiceTranscriptEntry };
-export { getStepIndex, getTotalSteps } from './onboarding-types';
+export { getStepIndex, getTotalSteps } from "./onboarding-types";
 
 interface OnboardingState {
   // Flow state
@@ -44,7 +44,7 @@ interface OnboardingState {
   setVoiceMuted: (muted: boolean) => void;
   setVoiceSessionActive: (active: boolean) => void;
   setVoiceSessionConnecting: (connecting: boolean) => void;
-  addVoiceTranscript: (role: 'user' | 'assistant', text: string) => void;
+  addVoiceTranscript: (role: "user" | "assistant", text: string) => void;
   clearVoiceTranscript: () => void;
   setAzureAvailable: (available: boolean) => void;
   completeOnboarding: () => void;
@@ -54,192 +54,192 @@ interface OnboardingState {
   hydrateFromApi: () => Promise<void>;
 }
 
-export const useOnboardingStore = create<OnboardingState>()(
-  (set, get) => ({
+export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
+  hasCompletedOnboarding: false,
+  onboardingCompletedAt: null,
+  currentStep: "welcome",
+  isReplayMode: false,
+  isVoiceMuted: false,
+  isHydrated: false,
+
+  // Voice session state
+  voiceSessionActive: false,
+  voiceSessionConnecting: false,
+  voiceTranscript: [],
+  azureAvailable: null,
+
+  data: {
+    name: "",
+  },
+
+  setStep: (step) => set({ currentStep: step }),
+
+  setVoiceMuted: (muted) => set({ isVoiceMuted: muted }),
+
+  setVoiceSessionActive: (active) => set({ voiceSessionActive: active }),
+
+  setVoiceSessionConnecting: (connecting) =>
+    set({ voiceSessionConnecting: connecting }),
+
+  addVoiceTranscript: (role, text) =>
+    set((state) => ({
+      voiceTranscript: [
+        ...state.voiceTranscript,
+        { role, text, timestamp: Date.now() },
+      ],
+    })),
+
+  clearVoiceTranscript: () => set({ voiceTranscript: [] }),
+
+  setAzureAvailable: (available) => set({ azureAvailable: available }),
+
+  nextStep: () => {
+    const currentIndex = STEP_ORDER.indexOf(get().currentStep);
+    if (currentIndex < STEP_ORDER.length - 1) {
+      set({ currentStep: STEP_ORDER[currentIndex + 1] });
+    }
+  },
+
+  prevStep: () => {
+    const currentIndex = STEP_ORDER.indexOf(get().currentStep);
+    if (currentIndex > 0) {
+      set({ currentStep: STEP_ORDER[currentIndex - 1] });
+    }
+  },
+
+  updateData: (data) =>
+    set((state) => ({
+      data: { ...state.data, ...data },
+    })),
+
+  completeOnboarding: () =>
+    set({
+      hasCompletedOnboarding: true,
+      onboardingCompletedAt: new Date().toISOString(),
+      isReplayMode: false,
+    }),
+
+  startReplay: () =>
+    set({
+      currentStep: "welcome",
+      isReplayMode: true,
+    }),
+
+  resetOnboarding: () =>
+    set({
       hasCompletedOnboarding: false,
       onboardingCompletedAt: null,
-      currentStep: 'welcome',
+      currentStep: "welcome",
       isReplayMode: false,
       isVoiceMuted: false,
       isHydrated: false,
-
-      // Voice session state
       voiceSessionActive: false,
       voiceSessionConnecting: false,
       voiceTranscript: [],
       azureAvailable: null,
+      data: { name: "" },
+    }),
 
-      data: {
-        name: '',
-      },
+  resetAllData: async () => {
+    // Delete all user data from database (primary data source)
+    try {
+      await fetch("/api/user/data", { method: "DELETE" });
+    } catch {
+      // Continue with local cleanup even if API fails
+    }
 
-      setStep: (step) => set({ currentStep: step }),
+    // Clear any remaining localStorage (legacy/session data)
+    const storeKeys = [
+      "mirrorbuddy-settings",
+      "mirrorbuddy-progress",
+      "mirrorbuddy-conversations",
+      "mirrorbuddy-learnings",
+      "mirrorbuddy-html-snippets",
+      "mirrorbuddy-calendar",
+      "mirrorbuddy-onboarding",
+      "mirrorbuddy-accessibility",
+      "mirrorbuddy-notifications",
+      "mirrorbuddy-pomodoro",
+      "mirrorbuddy-user-id",
+    ];
 
-      setVoiceMuted: (muted) => set({ isVoiceMuted: muted }),
+    storeKeys.forEach((key) => {
+      localStorage.removeItem(key);
+    });
 
-      setVoiceSessionActive: (active) => set({ voiceSessionActive: active }),
+    // Clear IndexedDB (legacy materials storage)
+    const databases = ["mirrorbuddy-materials", "mirrorbuddy-flashcards"];
+    for (const dbName of databases) {
+      try {
+        indexedDB.deleteDatabase(dbName);
+      } catch {
+        // Ignore errors
+      }
+    }
 
-      setVoiceSessionConnecting: (connecting) =>
-        set({ voiceSessionConnecting: connecting }),
+    // Reset this store to initial state
+    set({
+      hasCompletedOnboarding: false,
+      onboardingCompletedAt: null,
+      currentStep: "welcome",
+      isReplayMode: false,
+      isVoiceMuted: false,
+      isHydrated: false,
+      voiceSessionActive: false,
+      voiceSessionConnecting: false,
+      voiceTranscript: [],
+      azureAvailable: null,
+      data: { name: "" },
+    });
 
-      addVoiceTranscript: (role, text) =>
-        set((state) => ({
-          voiceTranscript: [
-            ...state.voiceTranscript,
-            { role, text, timestamp: Date.now() },
-          ],
-        })),
+    // Reload the page to reinitialize everything
+    window.location.href = "/welcome";
+  },
 
-      clearVoiceTranscript: () => set({ voiceTranscript: [] }),
+  hydrateFromApi: async () => {
+    // Skip if already hydrated
+    if (get().isHydrated) return;
 
-      setAzureAvailable: (available) => set({ azureAvailable: available }),
+    try {
+      const response = await fetch("/api/onboarding");
+      if (!response.ok) {
+        // API error - mark as hydrated but don't update state
+        set({ isHydrated: true });
+        return;
+      }
 
-      nextStep: () => {
-        const currentIndex = STEP_ORDER.indexOf(get().currentStep);
-        if (currentIndex < STEP_ORDER.length - 1) {
-          set({ currentStep: STEP_ORDER[currentIndex + 1] });
-        }
-      },
+      const data = await response.json();
 
-      prevStep: () => {
-        const currentIndex = STEP_ORDER.indexOf(get().currentStep);
-        if (currentIndex > 0) {
-          set({ currentStep: STEP_ORDER[currentIndex - 1] });
-        }
-      },
+      // If user has existing data (profile with name), consider them as onboarded
+      // This handles the case where OnboardingState record is missing but user exists
+      const isCompleted =
+        data.onboardingState?.hasCompletedOnboarding ??
+        data.hasExistingData ??
+        false;
 
-      updateData: (data) =>
-        set((state) => ({
-          data: { ...state.data, ...data },
-        })),
-
-      completeOnboarding: () =>
-        set({
-          hasCompletedOnboarding: true,
-          onboardingCompletedAt: new Date().toISOString(),
-          isReplayMode: false,
+      // Update store with DB state
+      set({
+        isHydrated: true,
+        hasCompletedOnboarding: isCompleted,
+        onboardingCompletedAt:
+          data.onboardingState?.onboardingCompletedAt ?? null,
+        currentStep:
+          (data.onboardingState?.currentStep as OnboardingStep) ??
+          (isCompleted ? "ready" : "welcome"),
+        isReplayMode: data.onboardingState?.isReplayMode ?? false,
+        ...(data.data && {
+          data: {
+            name: data.data.name ?? "",
+            age: data.data.age,
+            schoolLevel: data.data.schoolLevel,
+            learningDifferences: data.data.learningDifferences,
+            gender: data.data.gender,
+          },
         }),
-
-      startReplay: () =>
-        set({
-          currentStep: 'welcome',
-          isReplayMode: true,
-        }),
-
-      resetOnboarding: () =>
-        set({
-          hasCompletedOnboarding: false,
-          onboardingCompletedAt: null,
-          currentStep: 'welcome',
-          isReplayMode: false,
-          isVoiceMuted: false,
-          isHydrated: false,
-          voiceSessionActive: false,
-          voiceSessionConnecting: false,
-          voiceTranscript: [],
-          azureAvailable: null,
-          data: { name: '' },
-        }),
-
-      resetAllData: async () => {
-        // Delete all user data from database (primary data source)
-        try {
-          await fetch('/api/user/data', { method: 'DELETE' });
-        } catch {
-          // Continue with local cleanup even if API fails
-        }
-
-        // Clear any remaining localStorage (legacy/session data)
-        const storeKeys = [
-          'mirrorbuddy-settings',
-          'mirrorbuddy-progress',
-          'mirrorbuddy-conversations',
-          'mirrorbuddy-learnings',
-          'mirrorbuddy-html-snippets',
-          'mirrorbuddy-calendar',
-          'mirrorbuddy-onboarding',
-          'mirrorbuddy-accessibility',
-          'mirrorbuddy-notifications',
-          'mirrorbuddy-pomodoro',
-          'mirrorbuddy-user-id',
-        ];
-
-        storeKeys.forEach((key) => {
-          localStorage.removeItem(key);
-        });
-
-        // Clear sessionStorage (temporary user ID)
-        sessionStorage.removeItem('mirrorbuddy-user-id');
-
-        // Clear IndexedDB (legacy materials storage)
-        const databases = ['mirrorbuddy-materials', 'mirrorbuddy-flashcards'];
-        for (const dbName of databases) {
-          try {
-            indexedDB.deleteDatabase(dbName);
-          } catch {
-            // Ignore errors
-          }
-        }
-
-        // Reset this store to initial state
-        set({
-          hasCompletedOnboarding: false,
-          onboardingCompletedAt: null,
-          currentStep: 'welcome',
-          isReplayMode: false,
-          isVoiceMuted: false,
-          isHydrated: false,
-          voiceSessionActive: false,
-          voiceSessionConnecting: false,
-          voiceTranscript: [],
-          azureAvailable: null,
-          data: { name: '' },
-        });
-
-        // Reload the page to reinitialize everything
-        window.location.href = '/welcome';
-      },
-
-      hydrateFromApi: async () => {
-        // Skip if already hydrated
-        if (get().isHydrated) return;
-
-        try {
-          const response = await fetch('/api/onboarding');
-          if (!response.ok) {
-            // API error - mark as hydrated but don't update state
-            set({ isHydrated: true });
-            return;
-          }
-
-          const data = await response.json();
-
-          // If user has existing data (profile with name), consider them as onboarded
-          // This handles the case where OnboardingState record is missing but user exists
-          const isCompleted = data.onboardingState?.hasCompletedOnboarding ?? data.hasExistingData ?? false;
-
-          // Update store with DB state
-          set({
-            isHydrated: true,
-            hasCompletedOnboarding: isCompleted,
-            onboardingCompletedAt: data.onboardingState?.onboardingCompletedAt ?? null,
-            currentStep: (data.onboardingState?.currentStep as OnboardingStep) ?? (isCompleted ? 'ready' : 'welcome'),
-            isReplayMode: data.onboardingState?.isReplayMode ?? false,
-            ...(data.data && {
-              data: {
-                name: data.data.name ?? '',
-                age: data.data.age,
-                schoolLevel: data.data.schoolLevel,
-                learningDifferences: data.data.learningDifferences,
-                gender: data.data.gender,
-              },
-            }),
-          });
-        } catch {
-          // Network error - mark as hydrated to avoid infinite loop
-          set({ isHydrated: true });
-        }
-      },
-    })
-);
-
+      });
+    } catch {
+      // Network error - mark as hydrated to avoid infinite loop
+      set({ isHydrated: true });
+    }
+  },
+}));

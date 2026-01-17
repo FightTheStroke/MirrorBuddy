@@ -5,15 +5,19 @@
 // Updated for #013: Cryptographically signed session cookies
 // ============================================================================
 
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
+import { cookies } from "next/headers";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { isSignedCookie, verifyCookieValue } from "@/lib/auth/cookie-signing";
 
 export interface AuthResult {
   authenticated: boolean;
   userId: string | null;
   error?: string;
+}
+
+export interface AdminAuthResult extends AuthResult {
+  isAdmin: boolean;
 }
 
 /**
@@ -27,44 +31,45 @@ export async function validateAuth(): Promise<AuthResult> {
   try {
     const cookieStore = await cookies();
     // Check new cookie first, fallback to legacy cookie for existing users
-    const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value
-      || cookieStore.get('convergio-user-id')?.value;
+    const cookieValue =
+      cookieStore.get("mirrorbuddy-user-id")?.value ||
+      cookieStore.get("convergio-user-id")?.value;
 
     if (!cookieValue) {
       return {
         authenticated: false,
         userId: null,
-        error: 'No authentication cookie',
+        error: "No authentication cookie",
       };
     }
 
     // Only accept signed cookies - unsigned cookies are rejected for security
     if (!isSignedCookie(cookieValue)) {
-      logger.warn('Unsigned cookie rejected', {
-        hint: 'Cookie must be cryptographically signed',
+      logger.warn("Unsigned cookie rejected", {
+        hint: "Cookie must be cryptographically signed",
       });
       return {
         authenticated: false,
         userId: null,
-        error: 'Invalid cookie format',
+        error: "Invalid cookie format",
       };
     }
 
     const verification = verifyCookieValue(cookieValue);
 
     if (!verification.valid) {
-      logger.warn('Cookie signature verification failed', {
+      logger.warn("Cookie signature verification failed", {
         error: verification.error,
       });
       return {
         authenticated: false,
         userId: null,
-        error: 'Invalid cookie signature',
+        error: "Invalid cookie signature",
       };
     }
 
     const userId = verification.value!;
-    logger.debug('Signed cookie verified', { userId });
+    logger.debug("Signed cookie verified", { userId });
 
     // Verify user exists in database
     const user = await prisma.user.findUnique({
@@ -73,7 +78,10 @@ export async function validateAuth(): Promise<AuthResult> {
     });
 
     if (!user) {
-      if (process.env.E2E_TESTS === '1' || process.env.NODE_ENV !== 'production') {
+      if (
+        process.env.E2E_TESTS === "1" ||
+        process.env.NODE_ENV !== "production"
+      ) {
         const created = await prisma.user.create({
           data: {
             id: userId,
@@ -93,7 +101,7 @@ export async function validateAuth(): Promise<AuthResult> {
       return {
         authenticated: false,
         userId: null,
-        error: 'User not found',
+        error: "User not found",
       };
     }
 
@@ -102,11 +110,11 @@ export async function validateAuth(): Promise<AuthResult> {
       userId,
     };
   } catch (error) {
-    logger.error('Auth validation error', { error: String(error) });
+    logger.error("Auth validation error", { error: String(error) });
     return {
       authenticated: false,
       userId: null,
-      error: 'Auth validation failed',
+      error: "Auth validation failed",
     };
   }
 }
@@ -120,13 +128,13 @@ export async function validateAuth(): Promise<AuthResult> {
  */
 export async function validateSessionOwnership(
   sessionId: string,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
   try {
     // Voice sessions are ephemeral - allow for authenticated users
     // Format: voice-{maestroId}-{timestamp}
-    if (sessionId.startsWith('voice-')) {
-      logger.debug('Voice session validated', { sessionId, userId });
+    if (sessionId.startsWith("voice-")) {
+      logger.debug("Voice session validated", { sessionId, userId });
       return true;
     }
 
@@ -141,8 +149,47 @@ export async function validateSessionOwnership(
 
     return !!conversation;
   } catch (error) {
-    logger.error('Session ownership check failed', { error: String(error) });
+    logger.error("Session ownership check failed", { error: String(error) });
     return false;
+  }
+}
+
+/**
+ * Validate admin authentication from cookie
+ * Returns authenticated + isAdmin status
+ *
+ * Use this at the start of admin-only API endpoints
+ */
+export async function validateAdminAuth(): Promise<AdminAuthResult> {
+  const auth = await validateAuth();
+
+  if (!auth.authenticated || !auth.userId) {
+    return {
+      ...auth,
+      isAdmin: false,
+    };
+  }
+
+  try {
+    // Check user role in database
+    const user = await prisma.user.findUnique({
+      where: { id: auth.userId },
+      select: { role: true },
+    });
+
+    return {
+      ...auth,
+      isAdmin: user?.role === "ADMIN",
+    };
+  } catch (error) {
+    logger.error("Admin role check failed", {
+      error: String(error),
+      userId: auth.userId,
+    });
+    return {
+      ...auth,
+      isAdmin: false,
+    };
   }
 }
 

@@ -7,22 +7,28 @@
  * DELETE /api/notifications - Delete notifications
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import {
   GetNotificationsQuerySchema,
   CreateNotificationSchema,
   UpdateNotificationsSchema,
   DeleteNotificationsQuerySchema,
-} from '@/lib/validation/schemas/notifications';
+} from "@/lib/validation/schemas/notifications";
 import {
   getNotifications,
   getUnreadCount,
   createNotification,
   markNotificationsAsRead,
   dismissNotifications,
-} from './helpers';
+} from "./helpers";
+import { requireCSRF } from "@/lib/security/csrf";
 
 /**
  * GET /api/notifications
@@ -30,7 +36,10 @@ import {
  */
 export async function GET(request: NextRequest) {
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`notifications:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `notifications:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -41,23 +50,27 @@ export async function GET(request: NextRequest) {
 
     // Validate query parameters
     const queryValidation = GetNotificationsQuerySchema.safeParse({
-      userId: searchParams.get('userId'),
-      unreadOnly: searchParams.get('unreadOnly'),
-      limit: searchParams.get('limit'),
+      userId: searchParams.get("userId"),
+      unreadOnly: searchParams.get("unreadOnly"),
+      limit: searchParams.get("limit"),
     });
 
     if (!queryValidation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid query parameters',
-          details: queryValidation.error.issues.map(i => i.message),
+          error: "Invalid query parameters",
+          details: queryValidation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { userId, unreadOnly: unreadOnlyParam, limit: limitParam } = queryValidation.data;
-    const unreadOnly = unreadOnlyParam === 'true';
+    const {
+      userId,
+      unreadOnly: unreadOnlyParam,
+      limit: limitParam,
+    } = queryValidation.data;
+    const unreadOnly = unreadOnlyParam === "true";
     const limit = limitParam ? parseInt(limitParam, 10) : 50;
 
     const notifications = await getNotifications(userId, unreadOnly, limit);
@@ -71,8 +84,11 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Get notifications error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logger.error("Get notifications error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -81,8 +97,15 @@ export async function GET(request: NextRequest) {
  * Create a notification
  */
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`notifications:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `notifications:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -96,14 +119,26 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid notification data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid notification data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { userId, type, title, message, actionUrl, metadata, scheduledFor, expiresAt, priority, relatedId, melissaVoice } = validation.data;
+    const {
+      userId,
+      type,
+      title,
+      message,
+      actionUrl,
+      metadata,
+      scheduledFor,
+      expiresAt,
+      priority,
+      relatedId,
+      melissaVoice,
+    } = validation.data;
 
     const notification = await createNotification(userId, {
       type,
@@ -118,7 +153,11 @@ export async function POST(request: NextRequest) {
       melissaVoice,
     });
 
-    logger.info('Notification created', { userId, type, notificationId: notification.id });
+    logger.info("Notification created", {
+      userId,
+      type,
+      notificationId: notification.id,
+    });
 
     return NextResponse.json({
       success: true,
@@ -131,8 +170,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Create notification error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logger.error("Create notification error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -141,8 +183,15 @@ export async function POST(request: NextRequest) {
  * Mark notifications as read
  */
 export async function PATCH(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`notifications:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `notifications:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -156,10 +205,10 @@ export async function PATCH(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid update data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid update data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -167,22 +216,31 @@ export async function PATCH(request: NextRequest) {
 
     if (markAllRead) {
       await markNotificationsAsRead(userId);
-      return NextResponse.json({ success: true, message: 'All notifications marked as read' });
+      return NextResponse.json({
+        success: true,
+        message: "All notifications marked as read",
+      });
     }
 
     // notificationIds is guaranteed to exist by schema validation when markAllRead is false
     if (!notificationIds || notificationIds.length === 0) {
       return NextResponse.json(
-        { error: 'notificationIds required when markAllRead is false' },
-        { status: 400 }
+        { error: "notificationIds required when markAllRead is false" },
+        { status: 400 },
       );
     }
 
     await markNotificationsAsRead(userId, notificationIds);
-    return NextResponse.json({ success: true, message: 'Notifications marked as read' });
+    return NextResponse.json({
+      success: true,
+      message: "Notifications marked as read",
+    });
   } catch (error) {
-    logger.error('Update notifications error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logger.error("Update notifications error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -191,8 +249,15 @@ export async function PATCH(request: NextRequest) {
  * Delete or dismiss notifications
  */
 export async function DELETE(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`notifications:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `notifications:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -203,40 +268,53 @@ export async function DELETE(request: NextRequest) {
 
     // Validate query parameters
     const queryValidation = DeleteNotificationsQuerySchema.safeParse({
-      userId: searchParams.get('userId'),
-      id: searchParams.get('id'),
-      dismissAll: searchParams.get('dismissAll'),
+      userId: searchParams.get("userId"),
+      id: searchParams.get("id"),
+      dismissAll: searchParams.get("dismissAll"),
     });
 
     if (!queryValidation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid query parameters',
-          details: queryValidation.error.issues.map(i => i.message),
+          error: "Invalid query parameters",
+          details: queryValidation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { userId, id: notificationId, dismissAll: dismissAllParam } = queryValidation.data;
-    const dismissAll = dismissAllParam === 'true';
+    const {
+      userId,
+      id: notificationId,
+      dismissAll: dismissAllParam,
+    } = queryValidation.data;
+    const dismissAll = dismissAllParam === "true";
 
     if (dismissAll) {
       await dismissNotifications(userId);
-      return NextResponse.json({ success: true, message: 'All notifications dismissed' });
+      return NextResponse.json({
+        success: true,
+        message: "All notifications dismissed",
+      });
     }
 
     if (notificationId) {
       await dismissNotifications(userId, notificationId);
-      return NextResponse.json({ success: true, message: 'Notification dismissed' });
+      return NextResponse.json({
+        success: true,
+        message: "Notification dismissed",
+      });
     }
 
     return NextResponse.json(
-      { error: 'Either notificationId or dismissAll=true is required' },
-      { status: 400 }
+      { error: "Either notificationId or dismissAll=true is required" },
+      { status: 400 },
     );
   } catch (error) {
-    logger.error('Delete notifications error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logger.error("Delete notifications error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

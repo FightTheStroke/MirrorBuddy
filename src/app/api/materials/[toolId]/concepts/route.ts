@@ -3,11 +3,12 @@
  * Wave 3: GET, POST, DELETE concept links for a material
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { z } from "zod";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import { logger } from "@/lib/logger";
 
 const ConceptLinkSchema = z.object({
   conceptId: z.string().min(1),
@@ -22,16 +23,16 @@ type RouteContext = { params: Promise<{ toolId: string }> };
  */
 export async function GET(
   _request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<NextResponse> {
   try {
     const { toolId } = await context.params;
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     const material = await prisma.material.findUnique({
       where: { toolId },
@@ -40,8 +41,8 @@ export async function GET(
 
     if (!material || material.userId !== userId) {
       return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
+        { error: "Material not found" },
+        { status: 404 },
       );
     }
 
@@ -57,7 +58,7 @@ export async function GET(
           },
         },
       },
-      orderBy: { relevance: 'desc' },
+      orderBy: { relevance: "desc" },
     });
 
     return NextResponse.json({
@@ -67,10 +68,13 @@ export async function GET(
       })),
     });
   } catch (error) {
-    logger.error('Failed to fetch concepts', { error, toolId: (await context.params).toolId });
+    logger.error("Failed to fetch concepts", {
+      error,
+      toolId: (await context.params).toolId,
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch concepts' },
-      { status: 500 }
+      { error: "Failed to fetch concepts" },
+      { status: 500 },
     );
   }
 }
@@ -81,23 +85,31 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<NextResponse> {
   try {
+    // CSRF check
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const { toolId } = await context.params;
     const body = await request.json();
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     const parsed = ConceptLinkSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid request body', details: parsed.error.flatten() },
-        { status: 400 }
+        { error: "Invalid request body", details: parsed.error.flatten() },
+        { status: 400 },
       );
     }
 
@@ -108,8 +120,8 @@ export async function POST(
 
     if (!material || material.userId !== userId) {
       return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
+        { error: "Material not found" },
+        { status: 404 },
       );
     }
 
@@ -119,10 +131,7 @@ export async function POST(
     });
 
     if (!concept) {
-      return NextResponse.json(
-        { error: 'Concept not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Concept not found" }, { status: 404 });
     }
 
     // Create or update link
@@ -155,13 +164,16 @@ export async function POST(
           relevance: link.relevance,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
-    logger.error('Failed to link concept', { error, toolId: (await context.params).toolId });
+    logger.error("Failed to link concept", {
+      error,
+      toolId: (await context.params).toolId,
+    });
     return NextResponse.json(
-      { error: 'Failed to link concept' },
-      { status: 500 }
+      { error: "Failed to link concept" },
+      { status: 500 },
     );
   }
 }
@@ -172,22 +184,30 @@ export async function POST(
  */
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<NextResponse> {
   try {
+    // CSRF check
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const { toolId } = await context.params;
     const { searchParams } = new URL(request.url);
-    const conceptId = searchParams.get('conceptId');
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const conceptId = searchParams.get("conceptId");
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
     if (!conceptId) {
       return NextResponse.json(
-        { error: 'Missing conceptId query param' },
-        { status: 400 }
+        { error: "Missing conceptId query param" },
+        { status: 400 },
       );
     }
 
@@ -198,8 +218,8 @@ export async function DELETE(
 
     if (!material || material.userId !== userId) {
       return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
+        { error: "Material not found" },
+        { status: 404 },
       );
     }
 
@@ -209,10 +229,7 @@ export async function DELETE(
     });
 
     if (!concept) {
-      return NextResponse.json(
-        { error: 'Concept not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Concept not found" }, { status: 404 });
     }
 
     await prisma.materialConcept.delete({
@@ -226,10 +243,13 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to unlink concept', { error, toolId: (await context.params).toolId });
+    logger.error("Failed to unlink concept", {
+      error,
+      toolId: (await context.params).toolId,
+    });
     return NextResponse.json(
-      { error: 'Failed to unlink concept' },
-      { status: 500 }
+      { error: "Failed to unlink concept" },
+      { status: 500 },
     );
   }
 }

@@ -4,33 +4,34 @@
 // Events are sent to all SSE-connected clients in the session
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import {
   broadcastToolEvent,
   getSessionClientCount,
   type ToolEvent,
   type ToolEventType,
   type ToolType,
-} from '@/lib/realtime/tool-events';
+} from "@/lib/realtime/tool-events";
+import { requireCSRF } from "@/lib/security/csrf";
 
 // Validate tool event type
 const VALID_EVENT_TYPES: ToolEventType[] = [
-  'tool:created',
-  'tool:update',
-  'tool:complete',
-  'tool:error',
-  'tool:cancelled',
+  "tool:created",
+  "tool:update",
+  "tool:complete",
+  "tool:error",
+  "tool:cancelled",
 ];
 
 // Validate tool type
 const VALID_TOOL_TYPES: ToolType[] = [
-  'mindmap',
-  'flashcard',
-  'quiz',
-  'summary',
-  'timeline',
-  'diagram',
+  "mindmap",
+  "flashcard",
+  "quiz",
+  "summary",
+  "timeline",
+  "diagram",
 ];
 
 interface PublishEventRequest {
@@ -62,6 +63,14 @@ interface PublishEventRequest {
  */
 export async function POST(request: NextRequest) {
   try {
+    // F-02: CSRF check - prevent cross-site request forgery
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const body: PublishEventRequest = await request.json();
     const { sessionId, maestroId, type, toolType, toolId, data } = body;
 
@@ -69,10 +78,10 @@ export async function POST(request: NextRequest) {
     if (!sessionId || !maestroId || !type || !toolType) {
       return NextResponse.json(
         {
-          error: 'Missing required fields',
-          required: ['sessionId', 'maestroId', 'type', 'toolType'],
+          error: "Missing required fields",
+          required: ["sessionId", "maestroId", "type", "toolType"],
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -80,10 +89,10 @@ export async function POST(request: NextRequest) {
     if (!VALID_EVENT_TYPES.includes(type)) {
       return NextResponse.json(
         {
-          error: 'Invalid event type',
+          error: "Invalid event type",
           validTypes: VALID_EVENT_TYPES,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -91,35 +100,39 @@ export async function POST(request: NextRequest) {
     if (!VALID_TOOL_TYPES.includes(toolType)) {
       return NextResponse.json(
         {
-          error: 'Invalid tool type',
+          error: "Invalid tool type",
           validTypes: VALID_TOOL_TYPES,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Validate session ID format
     if (!/^[a-zA-Z0-9_-]{1,64}$/.test(sessionId)) {
       return NextResponse.json(
-        { error: 'Invalid sessionId format' },
-        { status: 400 }
+        { error: "Invalid sessionId format" },
+        { status: 400 },
       );
     }
 
     // Validate maestro ID format
     if (!/^[a-zA-Z0-9_-]{1,32}$/.test(maestroId)) {
       return NextResponse.json(
-        { error: 'Invalid maestroId format' },
-        { status: 400 }
+        { error: "Invalid maestroId format" },
+        { status: 400 },
       );
     }
 
     // Validate progress range if provided
     if (data.progress !== undefined) {
-      if (typeof data.progress !== 'number' || data.progress < 0 || data.progress > 100) {
+      if (
+        typeof data.progress !== "number" ||
+        data.progress < 0 ||
+        data.progress > 100
+      ) {
         return NextResponse.json(
-          { error: 'Progress must be a number between 0 and 100' },
-          { status: 400 }
+          { error: "Progress must be a number between 0 and 100" },
+          { status: 400 },
         );
       }
     }
@@ -127,7 +140,7 @@ export async function POST(request: NextRequest) {
     // Check if there are connected clients
     const clientCount = getSessionClientCount(sessionId);
     if (clientCount === 0) {
-      logger.warn('No SSE clients connected for session', { sessionId });
+      logger.warn("No SSE clients connected for session", { sessionId });
       // Still accept the event, just warn
     }
 
@@ -145,7 +158,7 @@ export async function POST(request: NextRequest) {
     // Broadcast to all connected clients in session
     broadcastToolEvent(event);
 
-    logger.info('Tool event published', {
+    logger.info("Tool event published", {
       eventId: event.id,
       type,
       toolType,
@@ -160,10 +173,10 @@ export async function POST(request: NextRequest) {
       clientsReached: clientCount,
     });
   } catch (error) {
-    logger.error('Failed to publish tool event', { error: String(error) });
+    logger.error("Failed to publish tool event", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to publish event' },
-      { status: 500 }
+      { error: "Failed to publish event" },
+      { status: 500 },
     );
   }
 }
@@ -173,19 +186,19 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   return NextResponse.json({
-    endpoint: '/api/tools/events',
-    method: 'POST',
-    description: 'Publish tool creation events to SSE clients',
+    endpoint: "/api/tools/events",
+    method: "POST",
+    description: "Publish tool creation events to SSE clients",
     eventTypes: VALID_EVENT_TYPES,
     toolTypes: VALID_TOOL_TYPES,
     example: {
-      sessionId: 'session_abc123',
-      maestroId: 'archimede',
-      type: 'tool:created',
-      toolType: 'mindmap',
+      sessionId: "session_abc123",
+      maestroId: "archimede",
+      type: "tool:created",
+      toolType: "mindmap",
       data: {
-        title: 'La Rivoluzione Francese',
-        subject: 'storia',
+        title: "La Rivoluzione Francese",
+        subject: "storia",
       },
     },
   });

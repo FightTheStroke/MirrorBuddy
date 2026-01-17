@@ -9,22 +9,30 @@
  * Related: Issue #31 Collaborative Student Profile
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rate-limit';
-import { validateRequest, formatValidationErrors } from '@/lib/validation/middleware';
-import { ProfileGenerateSchema } from '@/lib/validation/schemas/profile';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import {
+  validateRequest,
+  formatValidationErrors,
+} from "@/lib/validation/middleware";
+import { ProfileGenerateSchema } from "@/lib/validation/schemas/profile";
+import { requireCSRF } from "@/lib/security/csrf";
 import {
   generateStudentProfile,
   type MaestroInsightInput,
-} from '@/lib/profile/profile-generator';
+} from "@/lib/profile/profile-generator";
 import {
   getMaestroDisplayName,
   mapCategoryFromLearning,
   calculateConfidenceScore,
   isProfileUpToDate,
-} from './helpers';
+} from "./helpers";
 
 const GENERATE_RATE_LIMIT = {
   maxRequests: 5,
@@ -35,11 +43,22 @@ const GENERATE_RATE_LIMIT = {
  * POST - Generate student insight profile from all Learning data
  */
 export async function POST(request: NextRequest) {
+  // Validate CSRF token
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`profile-gen:${clientId}`, GENERATE_RATE_LIMIT);
+  const rateLimit = checkRateLimit(
+    `profile-gen:${clientId}`,
+    GENERATE_RATE_LIMIT,
+  );
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/profile/generate' });
+    logger.warn("Rate limit exceeded", {
+      clientId,
+      endpoint: "/api/profile/generate",
+    });
     return rateLimitResponse(rateLimit);
   }
 
@@ -49,8 +68,11 @@ export async function POST(request: NextRequest) {
     const validation = validateRequest(ProfileGenerateSchema, body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
-        { status: 400 }
+        {
+          error: "Validation failed",
+          details: formatValidationErrors(validation.error),
+        },
+        { status: 400 },
       );
     }
 
@@ -65,7 +87,7 @@ export async function POST(request: NextRequest) {
       if (existingProfile && isProfileUpToDate(existingProfile.updatedAt)) {
         return NextResponse.json({
           success: true,
-          message: 'Profile is up to date (less than 24h old)',
+          message: "Profile is up to date (less than 24h old)",
           data: {
             id: existingProfile.id,
             lastUpdated: existingProfile.updatedAt,
@@ -79,20 +101,21 @@ export async function POST(request: NextRequest) {
       where: { userId },
     });
 
-    const studentName = userProfile?.name || 'Studente';
+    const studentName = userProfile?.name || "Studente";
 
     const learnings = await prisma.learning.findMany({
       where: { userId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     if (learnings.length === 0) {
       return NextResponse.json(
         {
-          error: 'No learning data',
-          message: 'No conversation insights found. The student needs to interact with Maestri first.',
+          error: "No learning data",
+          message:
+            "No conversation insights found. The student needs to interact with Maestri first.",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -100,12 +123,21 @@ export async function POST(request: NextRequest) {
       where: { userId },
     });
 
-    const totalMinutes = sessions.reduce((sum: number, s) => sum + (s.duration || 0), 0);
-    const maestriInteracted = [...new Set(sessions.map((s) => s.maestroId).filter((id): id is string => id !== null))];
+    const totalMinutes = sessions.reduce(
+      (sum: number, s) => sum + (s.duration || 0),
+      0,
+    );
+    const maestriInteracted = [
+      ...new Set(
+        sessions
+          .map((s) => s.maestroId)
+          .filter((id): id is string => id !== null),
+      ),
+    ];
 
     const insights: MaestroInsightInput[] = learnings.map((learning) => ({
-      maestroId: learning.maestroId || 'unknown',
-      maestroName: getMaestroDisplayName(learning.maestroId || 'unknown'),
+      maestroId: learning.maestroId || "unknown",
+      maestroName: getMaestroDisplayName(learning.maestroId || "unknown"),
       category: mapCategoryFromLearning(learning.category),
       content: learning.insight,
       isStrength: learning.confidence >= 0.7,
@@ -121,7 +153,7 @@ export async function POST(request: NextRequest) {
         totalSessions: sessions.length,
         totalMinutes,
         maestriInteracted,
-      }
+      },
     );
 
     const savedProfile = await prisma.studentInsightProfile.upsert({
@@ -150,7 +182,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    logger.info('Profile generated', {
+    logger.info("Profile generated", {
       userId,
       insightsCount: insights.length,
       strengthsCount: generatedProfile.strengths.length,
@@ -159,7 +191,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Profile generated successfully',
+      message: "Profile generated successfully",
       data: {
         id: savedProfile.id,
         updatedAt: savedProfile.updatedAt,
@@ -174,10 +206,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Profile generation error', { error: String(error) });
+    logger.error("Profile generation error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

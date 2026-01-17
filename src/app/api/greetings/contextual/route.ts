@@ -6,29 +6,29 @@
  * Generates a contextual greeting based on previous conversation with this character.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { getGreetingForCharacter } from '@/lib/conversation/contextual-greeting';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { getGreetingForCharacter } from "@/lib/conversation/contextual-greeting";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const userId = auth.userId;
+
     const { searchParams } = new URL(request.url);
-    const characterId = searchParams.get('characterId');
-    const studentName = searchParams.get('studentName');
-    const maestroName = searchParams.get('maestroName');
+    const characterId = searchParams.get("characterId");
+    const studentName = searchParams.get("studentName");
+    const maestroName = searchParams.get("maestroName");
 
     if (!characterId || !studentName || !maestroName) {
       return NextResponse.json(
-        { error: 'characterId, studentName, and maestroName are required' },
-        { status: 400 }
+        { error: "characterId, studentName, and maestroName are required" },
+        { status: 400 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       userId,
       characterId,
       studentName,
-      maestroName
+      maestroName,
     );
 
     if (!result) {
@@ -49,10 +49,10 @@ export async function GET(request: NextRequest) {
       topics: result.topics,
     });
   } catch (error) {
-    logger.error('Failed to get contextual greeting', { error: String(error) });
+    logger.error("Failed to get contextual greeting", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get greeting' },
-      { status: 500 }
+      { error: "Failed to get greeting" },
+      { status: 500 },
     );
   }
 }

@@ -3,15 +3,21 @@
  * Wave 3: GET, POST, DELETE edges for a material
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { z } from "zod";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import { logger } from "@/lib/logger";
 
 const EdgeCreateSchema = z.object({
   toId: z.string().min(1),
-  relationType: z.enum(['derived_from', 'related_to', 'prerequisite', 'extends']),
+  relationType: z.enum([
+    "derived_from",
+    "related_to",
+    "prerequisite",
+    "extends",
+  ]),
   weight: z.number().min(0).max(1).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
@@ -24,16 +30,16 @@ type RouteContext = { params: Promise<{ toolId: string }> };
  */
 export async function GET(
   _request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<NextResponse> {
   try {
     const { toolId } = await context.params;
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     // Find material by toolId
     const material = await prisma.material.findUnique({
@@ -43,8 +49,8 @@ export async function GET(
 
     if (!material || material.userId !== userId) {
       return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
+        { error: "Material not found" },
+        { status: 404 },
       );
     }
 
@@ -53,18 +59,23 @@ export async function GET(
         OR: [{ fromId: material.id }, { toId: material.id }],
       },
       include: {
-        from: { select: { id: true, toolId: true, title: true, toolType: true } },
+        from: {
+          select: { id: true, toolId: true, title: true, toolType: true },
+        },
         to: { select: { id: true, toolId: true, title: true, toolType: true } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ edges });
   } catch (error) {
-    logger.error('Failed to fetch edges', { error, toolId: (await context.params).toolId });
+    logger.error("Failed to fetch edges", {
+      error,
+      toolId: (await context.params).toolId,
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch edges' },
-      { status: 500 }
+      { error: "Failed to fetch edges" },
+      { status: 500 },
     );
   }
 }
@@ -75,23 +86,31 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<NextResponse> {
   try {
+    // CSRF check
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const { toolId } = await context.params;
     const body = await request.json();
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     const parsed = EdgeCreateSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid request body', details: parsed.error.flatten() },
-        { status: 400 }
+        { error: "Invalid request body", details: parsed.error.flatten() },
+        { status: 400 },
       );
     }
 
@@ -103,8 +122,8 @@ export async function POST(
 
     if (!fromMaterial || fromMaterial.userId !== userId) {
       return NextResponse.json(
-        { error: 'Source material not found' },
-        { status: 404 }
+        { error: "Source material not found" },
+        { status: 404 },
       );
     }
 
@@ -116,8 +135,8 @@ export async function POST(
 
     if (!toMaterial || toMaterial.userId !== userId) {
       return NextResponse.json(
-        { error: 'Target material not found' },
-        { status: 404 }
+        { error: "Target material not found" },
+        { status: 404 },
       );
     }
 
@@ -131,7 +150,9 @@ export async function POST(
         metadata: parsed.data.metadata as object | undefined,
       },
       include: {
-        from: { select: { id: true, toolId: true, title: true, toolType: true } },
+        from: {
+          select: { id: true, toolId: true, title: true, toolType: true },
+        },
         to: { select: { id: true, toolId: true, title: true, toolType: true } },
       },
     });
@@ -139,20 +160,20 @@ export async function POST(
     return NextResponse.json({ edge }, { status: 201 });
   } catch (error) {
     // Handle unique constraint violation
-    if (
-      error instanceof Error &&
-      error.message.includes('Unique constraint')
-    ) {
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
       return NextResponse.json(
-        { error: 'Edge already exists' },
-        { status: 409 }
+        { error: "Edge already exists" },
+        { status: 409 },
       );
     }
 
-    logger.error('Failed to create edge', { error, toolId: (await context.params).toolId });
+    logger.error("Failed to create edge", {
+      error,
+      toolId: (await context.params).toolId,
+    });
     return NextResponse.json(
-      { error: 'Failed to create edge' },
-      { status: 500 }
+      { error: "Failed to create edge" },
+      { status: 500 },
     );
   }
 }
@@ -163,36 +184,55 @@ export async function POST(
  */
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext
+  context: RouteContext,
 ): Promise<NextResponse> {
   try {
+    // CSRF check
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const { toolId } = await context.params;
     const { searchParams } = new URL(request.url);
-    const toToolId = searchParams.get('toId');
-    const relationType = searchParams.get('relationType');
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const toToolId = searchParams.get("toId");
+    const relationType = searchParams.get("relationType");
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
     if (!toToolId || !relationType) {
       return NextResponse.json(
-        { error: 'Missing toId or relationType query params' },
-        { status: 400 }
+        { error: "Missing toId or relationType query params" },
+        { status: 400 },
       );
     }
 
     // Find both materials
     const [fromMaterial, toMaterial] = await Promise.all([
-      prisma.material.findUnique({ where: { toolId }, select: { id: true, userId: true } }),
-      prisma.material.findUnique({ where: { toolId: toToolId }, select: { id: true, userId: true } }),
+      prisma.material.findUnique({
+        where: { toolId },
+        select: { id: true, userId: true },
+      }),
+      prisma.material.findUnique({
+        where: { toolId: toToolId },
+        select: { id: true, userId: true },
+      }),
     ]);
 
-    if (!fromMaterial || !toMaterial || fromMaterial.userId !== userId || toMaterial.userId !== userId) {
+    if (
+      !fromMaterial ||
+      !toMaterial ||
+      fromMaterial.userId !== userId ||
+      toMaterial.userId !== userId
+    ) {
       return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
+        { error: "Material not found" },
+        { status: 404 },
       );
     }
 
@@ -208,10 +248,13 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to delete edge', { error, toolId: (await context.params).toolId });
+    logger.error("Failed to delete edge", {
+      error,
+      toolId: (await context.params).toolId,
+    });
     return NextResponse.json(
-      { error: 'Failed to delete edge' },
-      { status: 500 }
+      { error: "Failed to delete edge" },
+      { status: 500 },
     );
   }
 }

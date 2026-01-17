@@ -4,27 +4,35 @@
 // SECURITY: Requires authentication
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAdminAuth } from "@/lib/auth/session-auth";
 
 export async function GET(request: Request) {
   try {
-    // Require authentication for admin dashboard
-    const auth = await validateAuth();
+    // Require admin authentication for dashboard
+    const auth = await validateAdminAuth();
+
     if (!auth.authenticated) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!auth.isAdmin) {
+      return NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') ?? '7', 10);
+    const days = parseInt(searchParams.get("days") ?? "7", 10);
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     const userId = auth.userId;
     if (!userId) {
-      return NextResponse.json({ error: 'User ID required' }, { status: 401 });
+      return NextResponse.json({ error: "User ID required" }, { status: 401 });
     }
 
     // Get flashcard review data - FILTERED BY USER
@@ -38,8 +46,8 @@ export async function GET(request: Request) {
       prisma.telemetryEvent.findMany({
         where: {
           userId,
-          category: 'flashcard',
-          action: 'review',
+          category: "flashcard",
+          action: "review",
           timestamp: { gte: startDate },
         },
         select: {
@@ -51,7 +59,7 @@ export async function GET(request: Request) {
 
       // Cards by state for this user
       prisma.flashcardProgress.groupBy({
-        by: ['state'],
+        by: ["state"],
         where: { userId },
         _count: { _all: true },
       }),
@@ -70,8 +78,12 @@ export async function GET(request: Request) {
       totalDifficulty += review.value || 0;
     }
 
-    const accuracy = totalReviews > 0 ? Math.round((correctReviews / totalReviews) * 100) : 0;
-    const avgDifficulty = totalReviews > 0 ? Math.round((totalDifficulty / totalReviews) * 10) / 10 : 0;
+    const accuracy =
+      totalReviews > 0 ? Math.round((correctReviews / totalReviews) * 100) : 0;
+    const avgDifficulty =
+      totalReviews > 0
+        ? Math.round((totalDifficulty / totalReviews) * 10) / 10
+        : 0;
 
     // State distribution
     const stateDistribution: Record<string, number> = {};
@@ -82,7 +94,7 @@ export async function GET(request: Request) {
     // Daily reviews
     const dailyReviews: Record<string, number> = {};
     for (const review of reviews) {
-      const day = review.timestamp.toISOString().split('T')[0];
+      const day = review.timestamp.toISOString().split("T")[0];
       dailyReviews[day] = (dailyReviews[day] || 0) + 1;
     }
 
@@ -109,10 +121,10 @@ export async function GET(request: Request) {
       dailyReviews,
     });
   } catch (error) {
-    logger.error('Dashboard fsrs-stats error', { error: String(error) });
+    logger.error("Dashboard fsrs-stats error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to fetch FSRS stats' },
-      { status: 500 }
+      { error: "Failed to fetch FSRS stats" },
+      { status: 500 },
     );
   }
 }

@@ -7,48 +7,60 @@
  * Related: Issue #31 Collaborative Student Profile
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-import { validateRequest, formatValidationErrors } from '@/lib/validation/middleware';
-import { ProfileQuerySchema, ProfileCreateUpdateSchema } from '@/lib/validation/schemas/profile';
-import type { StudentInsights, MaestroObservation, LearningStrategy, LearningStyleProfile } from '@/types';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import {
+  checkRateLimit,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import {
+  validateRequest,
+  formatValidationErrors,
+} from "@/lib/validation/middleware";
+import { ProfileCreateUpdateSchema } from "@/lib/validation/schemas/profile";
+import { requireCSRF } from "@/lib/security/csrf";
+import type {
+  StudentInsights,
+  MaestroObservation,
+  LearningStrategy,
+  LearningStyleProfile,
+} from "@/types";
 
 /**
  * GET /api/profile
  * Returns the student's insight profile for the parent dashboard
  */
 export async function GET(request: NextRequest) {
-  const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`profile:${clientId}`, RATE_LIMITS.GENERAL);
+  const auth = await validateAuth();
+  if (!auth.authenticated || !auth.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit(
+    `profile:${auth.userId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/profile' });
+    logger.warn("Rate limit exceeded", {
+      userId: auth.userId,
+      endpoint: "/api/profile",
+    });
     return rateLimitResponse(rateLimit);
   }
 
   try {
-    // Get userId from query params (in production, this would come from auth)
-    const { searchParams } = new URL(request.url);
-    const queryParams = Object.fromEntries(searchParams.entries());
-
-    const validation = validateRequest(ProfileQuerySchema, queryParams);
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
-        { status: 400 }
-      );
-    }
-
-    const { userId } = validation.data;
+    const userId = auth.userId;
 
     // Fetch profile from database
     const profile = await prisma.studentInsightProfile.findUnique({
       where: { userId },
       include: {
         accessLogs: {
-          orderBy: { timestamp: 'desc' },
+          orderBy: { timestamp: "desc" },
           take: 10,
         },
       },
@@ -56,8 +68,11 @@ export async function GET(request: NextRequest) {
 
     if (!profile) {
       return NextResponse.json(
-        { error: 'Profile not found', message: 'No insights profile exists for this user yet' },
-        { status: 404 }
+        {
+          error: "Profile not found",
+          message: "No insights profile exists for this user yet",
+        },
+        { status: 404 },
       );
     }
 
@@ -65,11 +80,11 @@ export async function GET(request: NextRequest) {
     if (!profile.parentConsent) {
       return NextResponse.json(
         {
-          error: 'Consent required',
-          message: 'Parent consent is required to view this profile',
+          error: "Consent required",
+          message: "Parent consent is required to view this profile",
           requiresConsent: true,
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -91,10 +106,10 @@ export async function GET(request: NextRequest) {
     await prisma.profileAccessLog.create({
       data: {
         profileId: profile.id,
-        userId: clientId,
-        action: 'view',
-        ipAddress: clientId,
-        userAgent: request.headers.get('user-agent') || undefined,
+        userId: auth.userId,
+        action: "view",
+        ipAddress: auth.userId,
+        userAgent: request.headers.get("user-agent") || undefined,
       },
     });
 
@@ -108,10 +123,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Profile API error', { error: String(error) });
+    logger.error("Profile API error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -121,11 +136,26 @@ export async function GET(request: NextRequest) {
  * Creates or updates a student insight profile
  */
 export async function POST(request: NextRequest) {
-  const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`profile:${clientId}`, RATE_LIMITS.GENERAL);
+  // Validate CSRF token
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
+  const auth = await validateAuth();
+  if (!auth.authenticated || !auth.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit(
+    `profile:${auth.userId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/profile' });
+    logger.warn("Rate limit exceeded", {
+      userId: auth.userId,
+      endpoint: "/api/profile",
+    });
     return rateLimitResponse(rateLimit);
   }
 
@@ -135,12 +165,20 @@ export async function POST(request: NextRequest) {
     const validation = validateRequest(ProfileCreateUpdateSchema, body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
-        { status: 400 }
+        {
+          error: "Validation failed",
+          details: formatValidationErrors(validation.error),
+        },
+        { status: 400 },
       );
     }
 
     const { userId, studentName, insights } = validation.data;
+
+    // Verify the user is updating their own profile
+    if (userId !== auth.userId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
 
     // Upsert the profile
     const profile = await prisma.studentInsightProfile.upsert({
@@ -178,10 +216,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Profile create/update error', { error: String(error) });
+    logger.error("Profile create/update error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

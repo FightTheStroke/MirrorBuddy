@@ -6,12 +6,12 @@
  * Wave 2: Study Kit Generator
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import type { StudyKit } from '@/types/study-kit';
-import { ListStudyKitsQuerySchema } from '@/lib/validation/schemas/study-kit';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import type { StudyKit } from "@/types/study-kit";
+import { ListStudyKitsQuerySchema } from "@/lib/validation/schemas/study-kit";
 
 /**
  * GET /api/study-kit
@@ -20,15 +20,12 @@ import { ListStudyKitsQuerySchema } from '@/lib/validation/schemas/study-kit';
 export async function GET(request: NextRequest) {
   try {
     // Auth check
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    const auth = await validateAuth();
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     // Get and validate query params
     const { searchParams } = new URL(request.url);
@@ -37,8 +34,11 @@ export async function GET(request: NextRequest) {
     const validation = ListStudyKitsQuerySchema.safeParse(queryParams);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid query parameters', details: validation.error.format() },
-        { status: 400 }
+        {
+          error: "Invalid query parameters",
+          details: validation.error.format(),
+        },
+        { status: 400 },
       );
     }
 
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
     const [studyKits, total] = await Promise.all([
       prisma.studyKit.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: limit,
         skip: offset,
       }),
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       mindmap: kit.mindmap ? JSON.parse(kit.mindmap) : undefined,
       demo: kit.demo ? JSON.parse(kit.demo) : undefined,
       quiz: kit.quiz ? JSON.parse(kit.quiz) : undefined,
-      status: kit.status as 'processing' | 'ready' | 'error',
+      status: kit.status as "processing" | "ready" | "error",
       errorMessage: kit.errorMessage || undefined,
       subject: kit.subject || undefined,
       pageCount: kit.pageCount || undefined,
@@ -91,10 +91,10 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    logger.error('Failed to list study kits', { error: String(error) });
+    logger.error("Failed to list study kits", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to list study kits' },
-      { status: 500 }
+      { error: "Failed to list study kits" },
+      { status: 500 },
     );
   }
 }

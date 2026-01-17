@@ -5,11 +5,12 @@
 // DELETE: Delete collection
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { UpdateCollectionSchema } from '@/lib/validation/schemas/organization';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { UpdateCollectionSchema } from "@/lib/validation/schemas/organization";
+import { requireCSRF } from "@/lib/security/csrf";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -20,22 +21,23 @@ type RouteParams = { params: Promise<{ id: string }> };
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     const collection = await prisma.collection.findFirst({
       where: { id, userId },
       include: {
         children: {
-          orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
+          orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
         },
         materials: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 50,
         },
         _count: {
@@ -46,17 +48,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (!collection) {
       return NextResponse.json(
-        { error: 'Collection not found' },
-        { status: 404 }
+        { error: "Collection not found" },
+        { status: 404 },
       );
     }
 
     return NextResponse.json(collection);
   } catch (error) {
-    logger.error('Collection GET error', { error: String(error) });
+    logger.error("Collection GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to fetch collection' },
-      { status: 500 }
+      { error: "Failed to fetch collection" },
+      { status: 500 },
     );
   }
 }
@@ -67,14 +69,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * Update a collection.
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     // Verify ownership
     const existing = await prisma.collection.findFirst({
@@ -83,8 +90,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: 'Collection not found' },
-        { status: 404 }
+        { error: "Collection not found" },
+        { status: 404 },
       );
     }
 
@@ -95,18 +102,18 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid request',
-          details: validation.error.issues.map(e => e.message),
+          error: "Invalid request",
+          details: validation.error.issues.map((e) => e.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Prevent circular parent reference
     if (validation.data.parentId === id) {
       return NextResponse.json(
-        { error: 'Collection cannot be its own parent' },
-        { status: 400 }
+        { error: "Collection cannot be its own parent" },
+        { status: 400 },
       );
     }
 
@@ -117,8 +124,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       });
       if (!parent) {
         return NextResponse.json(
-          { error: 'Parent collection not found' },
-          { status: 404 }
+          { error: "Parent collection not found" },
+          { status: 404 },
         );
       }
     }
@@ -133,28 +140,25 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    logger.info('Collection updated', {
+    logger.info("Collection updated", {
       userId,
       collectionId: id,
     });
 
     return NextResponse.json(collection);
   } catch (error) {
-    logger.error('Collection PUT error', { error: String(error) });
+    logger.error("Collection PUT error", { error: String(error) });
 
-    if (
-      error instanceof Error &&
-      error.message.includes('Unique constraint')
-    ) {
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
       return NextResponse.json(
-        { error: 'A collection with this name already exists' },
-        { status: 409 }
+        { error: "A collection with this name already exists" },
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to update collection' },
-      { status: 500 }
+      { error: "Failed to update collection" },
+      { status: 500 },
     );
   }
 }
@@ -166,14 +170,19 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * Materials in this collection will have their collectionId set to null.
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     // Verify ownership
     const existing = await prisma.collection.findFirst({
@@ -187,16 +196,16 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: 'Collection not found' },
-        { status: 404 }
+        { error: "Collection not found" },
+        { status: 404 },
       );
     }
 
     // Check for children
     if (existing._count.children > 0) {
       return NextResponse.json(
-        { error: 'Cannot delete collection with sub-collections' },
-        { status: 400 }
+        { error: "Cannot delete collection with sub-collections" },
+        { status: 400 },
       );
     }
 
@@ -205,17 +214,17 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: { id },
     });
 
-    logger.info('Collection deleted', {
+    logger.info("Collection deleted", {
       userId,
       collectionId: id,
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Collection DELETE error', { error: String(error) });
+    logger.error("Collection DELETE error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete collection' },
-      { status: 500 }
+      { error: "Failed to delete collection" },
+      { status: 500 },
     );
   }
 }

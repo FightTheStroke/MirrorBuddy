@@ -2,22 +2,25 @@
  * Scheduler check-due helpers
  */
 
-import { cookies } from 'next/headers';
-import { MELISSA_VOICE_TEMPLATES, type NotificationPreferences } from '@/lib/scheduler/types';
+import { validateAuth } from "@/lib/auth/session-auth";
+import {
+  MELISSA_VOICE_TEMPLATES,
+  type NotificationPreferences,
+} from "@/lib/scheduler/types";
 
 /**
- * Get userId from cookies
+ * Get userId from validated authentication
  */
 export async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get('mirrorbuddy-user-id')?.value || null;
+  const auth = await validateAuth();
+  return auth.authenticated && auth.userId ? auth.userId : null;
 }
 
 /**
  * Parse time string (e.g., "16:00") to hours and minutes
  */
 export function parseTime(time: string): { hours: number; minutes: number } {
-  const [hours, minutes] = time.split(':').map(Number);
+  const [hours, minutes] = time.split(":").map(Number);
   return { hours, minutes };
 }
 
@@ -50,10 +53,10 @@ export function isQuietHours(prefs: NotificationPreferences): boolean {
  */
 export function getMelissaVoice(
   type: keyof typeof MELISSA_VOICE_TEMPLATES,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): string {
   const templates = MELISSA_VOICE_TEMPLATES[type];
   const template = templates[Math.floor(Math.random() * templates.length)];
 
-  return template.replace(/\{(\w+)\}/g, (_, key) => String(data[key] ?? ''));
+  return template.replace(/\{(\w+)\}/g, (_, key) => String(data[key] ?? ""));
 }
