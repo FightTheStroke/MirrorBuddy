@@ -7,7 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
 import { cookies } from 'next/headers';
 import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
 import {
@@ -16,10 +16,11 @@ import {
   logDeletionAudit,
 } from './helpers';
 
-const log = logger.child({ module: 'gdpr-delete' });
+
 
 /**
- * Extract userId from cookie (handles both signed and legacy unsigned cookies)
+ * Extract userId from signed cookie
+ * Only accepts signed cookies with httpOnly/secure flags
  */
 function extractUserId(cookieValue: string | undefined): string | null {
   if (!cookieValue) return null;
@@ -29,8 +30,7 @@ function extractUserId(cookieValue: string | undefined): string | null {
     return verification.valid ? verification.value! : null;
   }
 
-  // Legacy unsigned cookie
-  return cookieValue;
+  return null;
 }
 
 interface DeleteRequestBody {
@@ -61,25 +61,30 @@ interface DeleteResult {
 export async function POST(
   request: NextRequest
 ): Promise<NextResponse<DeleteResult | { error: string }>> {
+  const log = getRequestLogger(request);
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
   const userId = extractUserId(cookieValue);
 
   if (!userId) {
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Unauthorized - no user session found' },
       { status: 401 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 
   try {
     const body = (await request.json()) as DeleteRequestBody;
 
     if (!body.confirmDeletion) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Deletion must be explicitly confirmed' },
         { status: 400 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     log.info('GDPR deletion request initiated', {
@@ -101,13 +106,17 @@ export async function POST(
       ...result.deletedData,
     });
 
-    return NextResponse.json(result);
+    const response = NextResponse.json(result);
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   } catch (error) {
     log.error('GDPR deletion failed', { error, userId: userId.slice(0, 8) });
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Failed to delete user data. Please contact support.' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }
 
@@ -118,33 +127,40 @@ export async function POST(
  * Helps users understand what deletion will remove.
  */
 export async function GET(
-  _request: NextRequest
+  request: NextRequest
 ): Promise<NextResponse> {
+  const log = getRequestLogger(request);
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
   const userId = extractUserId(cookieValue);
 
   if (!userId) {
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Unauthorized - no user session found' },
       { status: 401 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 
   try {
     const summary = await getUserDataSummary(userId);
-    return NextResponse.json({
+    const response = NextResponse.json({
       userId: userId.slice(0, 8) + '...',
       dataToBeDeleted: summary,
       warning:
         'This action is irreversible. All your learning progress, conversations, and preferences will be permanently deleted.',
     });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   } catch (error) {
     log.error('Failed to get data summary', { error });
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Failed to retrieve data summary' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }
 

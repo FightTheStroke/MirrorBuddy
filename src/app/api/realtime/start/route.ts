@@ -1,14 +1,19 @@
 // src/app/api/realtime/start/route.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { startRealtimeProxy } from '@/server/realtime-proxy';
 import { logger } from '@/lib/logger';
+import { getRequestId } from '@/lib/tracing';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     startRealtimeProxy();
-    return NextResponse.json({ status: 'started' });
+    const response = NextResponse.json({ status: 'started' });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   } catch (error) {
     logger.error('Failed to start realtime proxy', { error });
-    return NextResponse.json({ error: 'Failed to start proxy' }, { status: 500 });
+    const response = NextResponse.json({ error: 'Failed to start proxy' }, { status: 500 });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }

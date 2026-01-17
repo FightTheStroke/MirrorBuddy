@@ -11,31 +11,35 @@
  * Related: #30 Safety Guardrails Issue
  */
 
-// Re-export all from modular age-gating directory
+// Re-export types
 export type {
   AgeBracket,
   TopicSensitivity,
   ContentTopic,
   AgeGateResult,
-} from './age-gating/types';
+} from './age-gating-types';
 
+// Re-export configuration matrix and guidance
 export {
   TOPIC_MATRIX,
   ADAPTATION_GUIDANCE,
   ALTERNATIVE_SUGGESTIONS,
-} from './age-gating/topic-matrix';
+} from './age-gating-matrix';
 
+// Re-export core age gating functions
 export {
   getAgeBracket,
   checkAgeGate,
-} from './age-gating/core';
+} from './age-gating-core';
 
+// Re-export topic detection functions
 export {
   detectTopics,
   filterForAge,
-} from './age-gating/topic-detection';
+} from './age-gating-detection';
 
+// Re-export language guidance functions
 export {
   getLanguageGuidance,
   getAgeGatePrompt,
-} from './age-gating/language-guidance';
+} from './age-gating-language';

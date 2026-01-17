@@ -24,8 +24,10 @@ export {
   completeToolState,
   failToolState,
   cancelToolState,
-  initializeContent,
 } from './tool-state/operations';
+
+// Re-export helpers
+export { initializeContent } from './tool-state/helpers';
 
 // Re-export queries
 export {

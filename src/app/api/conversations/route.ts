@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma, isDatabaseNotInitialized } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { getRequestId } from '@/lib/tracing';
 import { ConversationCreateSchema } from '@/lib/validation/schemas/conversations';
 import { validateAuth } from '@/lib/auth/session-auth';
 import type { Conversation, Message } from '@prisma/client';
@@ -15,7 +16,9 @@ export async function GET(request: NextRequest) {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
     const userId = auth.userId;
 
@@ -58,7 +61,7 @@ export async function GET(request: NextRequest) {
       messages: undefined, // Remove full messages from list
     }));
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       items,
       pagination: {
         page,
@@ -69,20 +72,26 @@ export async function GET(request: NextRequest) {
         hasPrevPage: page > 1,
       },
     });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   } catch (error) {
     logger.error('Conversations GET error', { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Database not initialized', message: 'Run: npx prisma db push' },
         { status: 503 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Failed to get conversations' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }
 
@@ -90,7 +99,9 @@ export async function POST(request: NextRequest) {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
     const userId = auth.userId;
 
@@ -99,13 +110,15 @@ export async function POST(request: NextRequest) {
     // #92: Validate with Zod before processing
     const validation = ConversationCreateSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           error: 'Invalid conversation data',
           details: validation.error.issues.map(i => i.message),
         },
         { status: 400 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     const data = validation.data;
@@ -118,15 +131,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ...conversation,
       topics: JSON.parse(conversation.topics || '[]'),
     });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   } catch (error) {
     logger.error('Conversations POST error', { error: String(error) });
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Failed to create conversation' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }

@@ -18,13 +18,17 @@ vi.mock('@/lib/logger', () => ({
 import {
   getAgeBracket,
   checkAgeGate,
+} from '../age-gating-core';
+import {
   detectTopics,
   filterForAge,
+} from '../age-gating-detection';
+import {
   getLanguageGuidance,
   getAgeGatePrompt,
-  type AgeBracket as _AgeBracket,
-  type ContentTopic as _ContentTopic,
-} from '../age-gating-core';
+} from '../age-gating-language';
+import type { AgeBracket as _AgeBracket } from '../age-gating-types';
+import type { ContentTopic as _ContentTopic } from '../age-gating-types';
 
 describe('Age Gating Core', () => {
   describe('getAgeBracket', () => {
