@@ -47,11 +47,22 @@ export async function GET() {
       },
     });
 
-    // Set cookie (1 year expiry) with cryptographic signature
+    // Set cookies (1 year expiry)
     const signedCookie = signCookieValue(user.id);
     const cookieStore = await cookies();
+
+    // Server-side auth cookie (httpOnly, signed)
     cookieStore.set("mirrorbuddy-user-id", signedCookie.signed, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+      path: "/",
+    });
+
+    // Client-readable cookie (for client-side userId access)
+    cookieStore.set("mirrorbuddy-user-id-client", user.id, {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 365,

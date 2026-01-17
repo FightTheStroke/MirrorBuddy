@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { getUserIdFromCookie, isAuthenticated } from "../client-auth";
 
 describe("client-auth", () => {
@@ -43,24 +43,10 @@ describe("client-auth", () => {
       expect(result).toBeNull();
     });
 
-    it("returns userId when unsigned cookie is present", () => {
+    it("returns userId from client cookie", () => {
       const userId = "user-123-abc";
       Object.defineProperty(global, "document", {
-        value: { cookie: `mirrorbuddy-user-id=${userId}` },
-        writable: true,
-        configurable: true,
-      });
-
-      const result = getUserIdFromCookie();
-      expect(result).toBe(userId);
-    });
-
-    it("returns userId (before dot) when signed cookie is present", () => {
-      const userId = "user-123-abc";
-      const signature = "sig123456789";
-      const signedValue = `${userId}.${signature}`;
-      Object.defineProperty(global, "document", {
-        value: { cookie: `mirrorbuddy-user-id=${signedValue}` },
+        value: { cookie: `mirrorbuddy-user-id-client=${userId}` },
         writable: true,
         configurable: true,
       });
@@ -73,7 +59,7 @@ describe("client-auth", () => {
       const userId = "user-123-abc";
       const encodedValue = encodeURIComponent(userId);
       Object.defineProperty(global, "document", {
-        value: { cookie: `mirrorbuddy-user-id=${encodedValue}` },
+        value: { cookie: `mirrorbuddy-user-id-client=${encodedValue}` },
         writable: true,
         configurable: true,
       });
@@ -82,41 +68,26 @@ describe("client-auth", () => {
       expect(result).toBe(userId);
     });
 
-    it("handles URL-encoded signed cookie values correctly", () => {
+    it("ignores server-side httpOnly cookie name", () => {
+      // The client should not be able to read the httpOnly cookie
+      // This test verifies we don't accidentally match the wrong cookie
       const userId = "user-123-abc";
-      const signature = "sig123456789";
-      const signedValue = `${userId}.${signature}`;
-      const encodedValue = encodeURIComponent(signedValue);
       Object.defineProperty(global, "document", {
-        value: { cookie: `mirrorbuddy-user-id=${encodedValue}` },
+        value: { cookie: `mirrorbuddy-user-id=${userId}.signature` },
         writable: true,
         configurable: true,
       });
 
       const result = getUserIdFromCookie();
-      expect(result).toBe(userId);
+      expect(result).toBeNull();
     });
   });
 
   describe("isAuthenticated", () => {
-    it("returns true when cookie exists", () => {
+    it("returns true when client cookie exists", () => {
       const userId = "user-123-abc";
       Object.defineProperty(global, "document", {
-        value: { cookie: `mirrorbuddy-user-id=${userId}` },
-        writable: true,
-        configurable: true,
-      });
-
-      const result = isAuthenticated();
-      expect(result).toBe(true);
-    });
-
-    it("returns true when signed cookie exists", () => {
-      const userId = "user-123-abc";
-      const signature = "sig123456789";
-      const signedValue = `${userId}.${signature}`;
-      Object.defineProperty(global, "document", {
-        value: { cookie: `mirrorbuddy-user-id=${signedValue}` },
+        value: { cookie: `mirrorbuddy-user-id-client=${userId}` },
         writable: true,
         configurable: true,
       });

@@ -16,6 +16,7 @@ import { StudentSummaryEditor } from "./student-summary-editor";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import type { ToolState, SummaryData, StudentSummaryData } from "@/types/tools";
 import type {
   QuizRequest,
@@ -56,9 +57,8 @@ export function ToolPanel({
     async (data: StudentSummaryData) => {
       try {
         const userId = getUserId();
-        const response = await fetch("/api/tools/saved", {
+        const response = await csrfFetch("/api/tools/saved", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             userId,
             type: "summary",

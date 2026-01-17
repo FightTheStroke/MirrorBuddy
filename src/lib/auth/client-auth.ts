@@ -4,21 +4,23 @@
  */
 
 /**
- * Get user ID from cookie (client-side)
+ * Get user ID from client-readable cookie
  * Returns null if no valid cookie found
+ *
+ * Note: This reads from 'mirrorbuddy-user-id-client' cookie which is NOT httpOnly.
+ * The server uses a separate httpOnly signed cookie for authentication.
  */
 export function getUserIdFromCookie(): string | null {
   if (typeof document === "undefined") {
     return null; // SSR safety
   }
 
-  const cookieMatch = document.cookie.match(/mirrorbuddy-user-id=([^;]+)/);
+  // Read from client-readable cookie (not httpOnly)
+  const cookieMatch = document.cookie.match(
+    /mirrorbuddy-user-id-client=([^;]+)/,
+  );
   if (cookieMatch && cookieMatch[1]) {
-    // Cookie value may be signed - extract just the ID part before any signature
-    const value = decodeURIComponent(cookieMatch[1]);
-    // Signed cookies have format: value.signature
-    const dotIndex = value.indexOf(".");
-    return dotIndex > 0 ? value.substring(0, dotIndex) : value;
+    return decodeURIComponent(cookieMatch[1]);
   }
 
   return null;
