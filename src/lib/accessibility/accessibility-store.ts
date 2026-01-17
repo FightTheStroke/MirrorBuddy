@@ -8,6 +8,9 @@ import type {
   ADHDSessionStats,
   AccessibilityContext,
 } from './accessibility-store/types';
+import * as profiles from './accessibility-store/profiles';
+import * as adhdActions from './accessibility-store/adhd-actions';
+import * as helpers from './accessibility-store/helpers';
 
 export type {
   AccessibilitySettings,
@@ -154,103 +157,50 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
           parentSettings: defaultAccessibilitySettings,
         }),
 
-      // Profile presets
+      // Profile presets (delegated to profiles module)
       applyDyslexiaProfile: () =>
         set((state) => ({
-          settings: {
-            ...state.settings,
-            dyslexiaFont: true,
-            extraLetterSpacing: true,
-            increasedLineHeight: true,
-            lineSpacing: 1.5,
-            fontSize: 1.1,
-          },
+          settings: profiles.applyDyslexiaProfile(state.settings),
         })),
 
       applyADHDProfile: () =>
         set((state) => ({
-          settings: {
-            ...state.settings,
-            adhdMode: true,
-            distractionFreeMode: true,
-            breakReminders: true,
-            reducedMotion: true,
-          },
+          settings: profiles.applyADHDProfile(state.settings),
         })),
 
       applyVisualImpairmentProfile: () =>
         set((state) => ({
-          settings: {
-            ...state.settings,
-            highContrast: true,
-            largeText: true,
-            fontSize: 1.3,
-            ttsEnabled: true,
-          },
+          settings: profiles.applyVisualImpairmentProfile(state.settings),
         })),
 
       applyMotorImpairmentProfile: () =>
         set((state) => ({
-          settings: {
-            ...state.settings,
-            keyboardNavigation: true,
-            reducedMotion: true,
-          },
+          settings: profiles.applyMotorImpairmentProfile(state.settings),
         })),
 
       applyAutismProfile: () =>
         set((state) => ({
-          settings: {
-            ...state.settings,
-            reducedMotion: true,
-            distractionFreeMode: true,
-            highContrast: false, // Avoid sensory overload from harsh contrast
-            lineSpacing: 1.4,
-            fontSize: 1.1,
-          },
+          settings: profiles.applyAutismProfile(state.settings),
         })),
 
       applyAuditoryImpairmentProfile: () =>
         set((state) => ({
-          settings: {
-            ...state.settings,
-            ttsEnabled: false, // TTS not useful for hearing impairment
-            largeText: true, // Emphasize visual communication
-            lineSpacing: 1.3,
-            // Visual cues become primary - no audio-dependent features
-          },
+          settings: profiles.applyAuditoryImpairmentProfile(state.settings),
         })),
 
       applyCerebralPalsyProfile: () =>
         set((state) => ({
-          settings: {
-            ...state.settings,
-            keyboardNavigation: true, // Essential for motor control challenges
-            reducedMotion: true, // Reduce visual fatigue
-            ttsEnabled: true, // Assist with reading if eye tracking is difficult
-            largeText: true, // Easier visual targeting
-            fontSize: 1.2,
-            lineSpacing: 1.4,
-            extraLetterSpacing: true, // Compensate for visual tracking difficulties
-          },
+          settings: profiles.applyCerebralPalsyProfile(state.settings),
         })),
 
-      // ADHD actions
+      // ADHD actions (delegated to adhdActions module)
       updateADHDConfig: (updates) =>
         set((state) => ({
           adhdConfig: { ...state.adhdConfig, ...updates },
         })),
 
       startADHDSession: () =>
-        set((state) => ({
-          adhdSessionState: 'working',
-          adhdTimeRemaining: state.adhdConfig.workDuration,
-          adhdSessionProgress: 0,
-          adhdStats: {
-            ...state.adhdStats,
-            totalSessions: state.adhdStats.totalSessions + 1,
-          },
-        })),
+        set((state) => adhdActions.startADHDSession(state)),
 
       pauseADHDSession: () => {
         // Timer pause handled externally
@@ -261,132 +211,38 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
       },
 
       stopADHDSession: () =>
-        set((state) => ({
-          adhdSessionState: 'idle',
-          adhdTimeRemaining: state.adhdConfig.workDuration,
-          adhdSessionProgress: 0,
-        })),
+        set((state) => adhdActions.stopADHDSession(state)),
 
       completeADHDSession: () => {
         const state = get();
-        const today = new Date().toDateString();
-        const lastSessionDay = state.adhdStats.lastSessionDate
-          ? new Date(state.adhdStats.lastSessionDate).toDateString()
-          : null;
-
-        let newStreak = state.adhdStats.currentStreak;
-        if (lastSessionDay === today) {
-          // Same day, streak continues
-        } else if (
-          lastSessionDay &&
-          new Date(today).getTime() - new Date(lastSessionDay).getTime() <=
-            24 * 60 * 60 * 1000
-        ) {
-          // Consecutive day
-          newStreak += 1;
-        } else {
-          // Streak broken
-          newStreak = 1;
-        }
-
-        set({
-          adhdSessionState: 'completed',
-          adhdStats: {
-            ...state.adhdStats,
-            completedSessions: state.adhdStats.completedSessions + 1,
-            totalWorkTime:
-              state.adhdStats.totalWorkTime + state.adhdConfig.workDuration,
-            currentStreak: newStreak,
-            longestStreak: Math.max(state.adhdStats.longestStreak, newStreak),
-            totalXPEarned: state.adhdConfig.enableGamification
-              ? state.adhdStats.totalXPEarned + state.adhdConfig.xpPerSession
-              : state.adhdStats.totalXPEarned,
-            lastSessionDate: new Date().toISOString(),
-          },
-        });
+        set(adhdActions.completeADHDSession(state));
       },
 
       startADHDBreak: (isLongBreak = false) =>
-        set((state) => ({
-          adhdSessionState: 'breakTime',
-          adhdTimeRemaining: isLongBreak
-            ? state.adhdConfig.longBreakDuration
-            : state.adhdConfig.breakDuration,
-          adhdSessionProgress: 0,
-        })),
+        set((state) => adhdActions.startADHDBreak(state, isLongBreak)),
 
       tickADHDTimer: () =>
-        set((state) => {
-          const newTime = Math.max(0, state.adhdTimeRemaining - 1);
-          const totalDuration =
-            state.adhdSessionState === 'working'
-              ? state.adhdConfig.workDuration
-              : state.adhdStats.completedSessions %
-                  state.adhdConfig.sessionsUntilLongBreak ===
-                0
-              ? state.adhdConfig.longBreakDuration
-              : state.adhdConfig.breakDuration;
-
-          return {
-            adhdTimeRemaining: newTime,
-            adhdSessionProgress: 1 - newTime / totalDuration,
-          };
-        }),
+        set((state) => adhdActions.tickADHDTimer(state)),
 
       resetADHDStats: () =>
         set({
           adhdStats: defaultADHDStats,
         }),
 
-      // Helpers
-      getLineSpacing: () => {
-        const { settings } = get();
-        let spacing = settings.lineSpacing;
-        if (settings.dyslexiaFont && settings.increasedLineHeight) {
-          spacing = Math.max(spacing, 1.5);
-        }
-        return spacing;
-      },
+      // Helpers (delegated to helpers module)
+      getLineSpacing: () => helpers.getLineSpacing(get().settings),
 
-      getFontSizeMultiplier: () => {
-        const { settings } = get();
-        let multiplier = settings.fontSize;
-        if (settings.largeText) {
-          multiplier *= 1.2;
-        }
-        return multiplier;
-      },
+      getFontSizeMultiplier: () => helpers.getFontSizeMultiplier(get().settings),
 
-      getLetterSpacing: () => {
-        const { settings } = get();
-        if (settings.dyslexiaFont && settings.extraLetterSpacing) {
-          return 0.05;
-        }
-        return 0;
-      },
+      getLetterSpacing: () => helpers.getLetterSpacing(get().settings),
 
-      shouldAnimate: () => {
-        const { settings } = get();
-        return !settings.reducedMotion;
-      },
+      shouldAnimate: () => helpers.shouldAnimate(get().settings),
 
-      getAnimationDuration: (baseDuration = 0.3) => {
-        const { settings } = get();
-        return settings.reducedMotion ? 0 : baseDuration;
-      },
+      getAnimationDuration: (baseDuration = 0.3) => helpers.getAnimationDuration(get().settings, baseDuration),
 
-      getFormattedTimeRemaining: () => {
-        const { adhdTimeRemaining } = get();
-        const minutes = Math.floor(adhdTimeRemaining / 60);
-        const seconds = Math.floor(adhdTimeRemaining % 60);
-        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      },
+      getFormattedTimeRemaining: () => adhdActions.formatTimeRemaining(get().adhdTimeRemaining),
 
-      getCompletionRate: () => {
-        const { adhdStats } = get();
-        if (adhdStats.totalSessions === 0) return 0;
-        return adhdStats.completedSessions / adhdStats.totalSessions;
-      },
+      getCompletionRate: () => adhdActions.getCompletionRate(get().adhdStats),
     })
 );
 

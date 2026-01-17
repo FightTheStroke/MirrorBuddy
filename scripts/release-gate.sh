@@ -30,6 +30,16 @@ echo -e "${BLUE}[PHASE 0] Pre-release checks...${NC}"
 npm run pre-release
 
 echo ""
+echo -e "${BLUE}[PHASE 0.5] Repo hygiene (non-docs)...${NC}"
+repo_todos=$(rg -n "(TODO|FIXME|HACK|XXX):" -g "*.{ts,tsx,js,jsx,mjs,cjs,sh}" -g "!docs/**" -g "!node_modules/**" -g "!.next/**" -g "!coverage/**" -g "!playwright-report/**" -g "!test-results/**" -g "!logs/**" -g "!**/__tests__/**" -g "!**/*.test.*" -g "!**/*.spec.*" . 2>/dev/null || true)
+if [ -n "$repo_todos" ]; then
+  echo -e "${RED}✗ BLOCKED: TODO/FIXME/HACK outside docs${NC}"
+  echo "$repo_todos" | head -50
+  exit 1
+fi
+echo -e "${GREEN}✓ Repo hygiene passed${NC}"
+
+echo ""
 echo -e "${BLUE}[PHASE 1] TypeScript rigor...${NC}"
 ts_ignore=$(rg -n "@ts-ignore|@ts-nocheck" src -g "*.ts" -g "*.tsx" 2>/dev/null || true)
 if [ -n "$ts_ignore" ]; then
