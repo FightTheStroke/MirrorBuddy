@@ -11,6 +11,9 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+// We need to test the internal functions, so we'll test via the exported logger
+// and capture console output
+
 // Helper to safely set NODE_ENV in tests
 function setNodeEnv(value: string) {
   (process.env as { NODE_ENV: string }).NODE_ENV = value;
@@ -36,6 +39,7 @@ describe('logger', () => {
 
   describe('error serialization', () => {
     it('should properly serialize Error when passed as third argument', async () => {
+      // Fresh import to get clean module state
       const { logger } = await import('../index');
 
       const testError = new Error('Test error message');
@@ -45,6 +49,8 @@ describe('logger', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalled();
       const logOutput = consoleErrorSpy.mock.calls[0]?.[0] as string;
+
+      // In development mode, we should see the error message
       expect(logOutput).toContain('Operation failed');
     });
 
@@ -64,19 +70,29 @@ describe('logger', () => {
     });
 
     /**
-     * REGRESSION TEST: Documents the WRONG pattern that causes { error: {} }
+     * REGRESSION TEST: This documents the WRONG pattern that causes { error: {} }
+     *
+     * When Error is passed inside context like { error }, JSON.stringify
+     * produces {} because Error properties are not enumerable.
+     *
+     * This test ensures we don't accidentally use this pattern.
      */
     it('should NOT put Error objects inside context - they serialize to empty object', async () => {
       const testError = new Error('This will be lost');
+
+      // Demonstrate the problem: Error objects don't serialize
       const badContext = { error: testError };
       const serialized = JSON.stringify(badContext);
 
       // This is the BUG we're preventing
       expect(serialized).toBe('{"error":{}}');
+
+      // The error message is completely lost!
       expect(serialized).not.toContain('This will be lost');
     });
 
     it('should serialize non-Error objects in context correctly', async () => {
+      // Regular objects DO serialize correctly in context
       const context = {
         errorCode: 'E001',
         errorMessage: 'Something went wrong',
@@ -105,11 +121,14 @@ describe('logger', () => {
 
       expect(consoleErrorSpy).toHaveBeenCalled();
       const logOutput = consoleErrorSpy.mock.calls[0]?.[0] as string;
+
+      // In production, output is JSON
       const parsed = JSON.parse(logOutput);
 
       expect(parsed.error).toBeDefined();
       expect(parsed.error.name).toBe('TimeoutError');
       expect(parsed.error.message).toBe('Connection timeout');
+      // Stack is omitted in production
       expect(parsed.error.stack).toBeUndefined();
     });
 
@@ -118,6 +137,8 @@ describe('logger', () => {
       vi.resetModules();
 
       const { logger } = await import('../index');
+
+      // Sometimes people throw strings or objects
       const weirdError = 'Something broke';
 
       logger.error('Unexpected error', undefined, weirdError);

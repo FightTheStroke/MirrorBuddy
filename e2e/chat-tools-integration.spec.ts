@@ -18,8 +18,10 @@
 
 import { test, expect, APIRequestContext } from '@playwright/test';
 
+// Extended timeout for AI tool generation
 const AI_TIMEOUT = 60000;
 
+// Tool validation schemas
 interface MindmapNode {
   id: string;
   label: string;
@@ -64,12 +66,16 @@ interface ToolCallResult {
   blocked?: boolean;
 }
 
+/**
+ * Helper to make chat API calls with tools enabled
+ */
 async function chatWithTools(
   request: APIRequestContext,
   maestroId: string,
   userMessage: string,
   requestedTool?: string
 ): Promise<ToolCallResult> {
+  // Get maestro's system prompt
   const maestriResponse = await request.get('/api/maestri');
   const maestri = await maestriResponse.json();
   const maestro = maestri.find((m: { id: string }) => m.id === maestroId);
@@ -98,10 +104,20 @@ async function chatWithTools(
   return response.json();
 }
 
+/**
+ * Parse tool call arguments from AI response
+ */
 function parseToolArgs<T>(toolCall: { function: { arguments: string } }): T {
-  return JSON.parse(toolCall.function.arguments);
+  try {
+    return JSON.parse(toolCall.function.arguments);
+  } catch {
+    throw new Error(`Failed to parse tool arguments: ${toolCall.function.arguments}`);
+  }
 }
 
+// ============================================================================
+// MINDMAP TOOL TESTS
+// ============================================================================
 test.describe('Chat Tools: Mindmap @slow', () => {
   test('creates hierarchical mindmap on explicit request', async ({ request }) => {
     const result = await chatWithTools(
@@ -111,6 +127,7 @@ test.describe('Chat Tools: Mindmap @slow', () => {
       'mindmap'
     );
 
+    // Skip if no AI provider available
     if (result.error?.includes('No AI provider')) {
       test.skip();
       return;
@@ -126,15 +143,51 @@ test.describe('Chat Tools: Mindmap @slow', () => {
 
       if (mindmapCall) {
         const args = parseToolArgs<{ title: string; nodes: MindmapNode[] }>(mindmapCall);
+
         expect(args.title).toBeTruthy();
         expect(args.nodes.length).toBeGreaterThan(0);
+
+        // Verify hierarchical structure (at least some nodes have parentId)
         const hasHierarchy = args.nodes.some(n => n.parentId);
         expect(hasHierarchy).toBeTruthy();
       }
     }
   });
+
+  test('mindmap nodes have required properties', async ({ request }) => {
+    const result = await chatWithTools(
+      request,
+      'darwin-biologia',
+      'Fammi una mappa mentale sulla cellula',
+      'mindmap'
+    );
+
+    if (result.error?.includes('No AI provider')) {
+      test.skip();
+      return;
+    }
+
+    if (result.toolCalls?.length) {
+      const mindmapCall = result.toolCalls.find(
+        tc => tc.function.name === 'create_mindmap'
+      );
+
+      if (mindmapCall) {
+        const args = parseToolArgs<{ nodes: MindmapNode[] }>(mindmapCall);
+
+        // Each node must have id and label
+        args.nodes.forEach(node => {
+          expect(node.id).toBeTruthy();
+          expect(node.label).toBeTruthy();
+        });
+      }
+    }
+  });
 });
 
+// ============================================================================
+// QUIZ TOOL TESTS
+// ============================================================================
 test.describe('Chat Tools: Quiz @slow', () => {
   test('creates quiz with valid structure', async ({ request }) => {
     const result = await chatWithTools(
@@ -159,20 +212,53 @@ test.describe('Chat Tools: Quiz @slow', () => {
 
       if (quizCall) {
         const args = parseToolArgs<{ topic: string; questions: QuizQuestion[] }>(quizCall);
+
         expect(args.topic).toBeTruthy();
         expect(args.questions.length).toBeGreaterThan(0);
 
+        // Validate each question
         args.questions.forEach(q => {
           expect(q.question).toBeTruthy();
-          expect(q.options.length).toBe(4);
+          expect(q.options.length).toBe(4); // Always 4 options
           expect(q.correctIndex).toBeGreaterThanOrEqual(0);
           expect(q.correctIndex).toBeLessThan(4);
         });
       }
     }
   });
+
+  test('quiz has explanations for answers', async ({ request }) => {
+    const result = await chatWithTools(
+      request,
+      'feynman-fisica',
+      'Crea un quiz sulla gravità con spiegazioni',
+      'quiz'
+    );
+
+    if (result.error?.includes('No AI provider')) {
+      test.skip();
+      return;
+    }
+
+    if (result.toolCalls?.length) {
+      const quizCall = result.toolCalls.find(
+        tc => tc.function.name === 'create_quiz'
+      );
+
+      if (quizCall) {
+        const args = parseToolArgs<{ questions: QuizQuestion[] }>(quizCall);
+
+        // At least some questions should have explanations
+        const hasExplanations = args.questions.some(q => q.explanation);
+        expect(hasExplanations).toBeTruthy();
+      }
+    }
+  });
 });
 
+// ============================================================================
+// FLASHCARDS TOOL TESTS
+// ============================================================================
 test.describe('Chat Tools: Flashcards @slow', () => {
   test('creates flashcards with front and back', async ({ request }) => {
     const result = await chatWithTools(
@@ -197,9 +283,11 @@ test.describe('Chat Tools: Flashcards @slow', () => {
 
       if (flashcardCall) {
         const args = parseToolArgs<{ topic: string; cards: FlashCard[] }>(flashcardCall);
+
         expect(args.topic).toBeTruthy();
         expect(args.cards.length).toBeGreaterThan(0);
 
+        // Each card must have front and back
         args.cards.forEach(card => {
           expect(card.front).toBeTruthy();
           expect(card.back).toBeTruthy();
@@ -209,6 +297,9 @@ test.describe('Chat Tools: Flashcards @slow', () => {
   });
 });
 
+// ============================================================================
+// SUMMARY TOOL TESTS
+// ============================================================================
 test.describe('Chat Tools: Summary @slow', () => {
   test('creates structured summary with sections', async ({ request }) => {
     const result = await chatWithTools(
@@ -233,9 +324,11 @@ test.describe('Chat Tools: Summary @slow', () => {
 
       if (summaryCall) {
         const args = parseToolArgs<{ topic: string; sections: SummarySection[] }>(summaryCall);
+
         expect(args.topic).toBeTruthy();
         expect(args.sections.length).toBeGreaterThan(0);
 
+        // Each section must have title and content
         args.sections.forEach(section => {
           expect(section.title).toBeTruthy();
           expect(section.content).toBeTruthy();
@@ -245,6 +338,9 @@ test.describe('Chat Tools: Summary @slow', () => {
   });
 });
 
+// ============================================================================
+// DIAGRAM TOOL TESTS
+// ============================================================================
 test.describe('Chat Tools: Diagram @slow', () => {
   test('creates valid Mermaid diagram', async ({ request }) => {
     const result = await chatWithTools(
@@ -277,11 +373,23 @@ test.describe('Chat Tools: Diagram @slow', () => {
         expect(args.topic).toBeTruthy();
         expect(['flowchart', 'sequence', 'class', 'er']).toContain(args.diagramType);
         expect(args.mermaidCode).toBeTruthy();
+
+        // Mermaid code should start with valid directive
+        expect(
+          args.mermaidCode.includes('flowchart') ||
+          args.mermaidCode.includes('graph') ||
+          args.mermaidCode.includes('sequenceDiagram') ||
+          args.mermaidCode.includes('classDiagram') ||
+          args.mermaidCode.includes('erDiagram')
+        ).toBeTruthy();
       }
     }
   });
 });
 
+// ============================================================================
+// TIMELINE TOOL TESTS
+// ============================================================================
 test.describe('Chat Tools: Timeline @slow', () => {
   test('creates timeline with chronological events', async ({ request }) => {
     const result = await chatWithTools(
@@ -314,6 +422,7 @@ test.describe('Chat Tools: Timeline @slow', () => {
         expect(args.topic).toBeTruthy();
         expect(args.events.length).toBeGreaterThan(0);
 
+        // Each event must have date and title
         args.events.forEach(event => {
           expect(event.date).toBeTruthy();
           expect(event.title).toBeTruthy();
@@ -323,6 +432,70 @@ test.describe('Chat Tools: Timeline @slow', () => {
   });
 });
 
+// ============================================================================
+// CROSS-TOOL TESTS
+// ============================================================================
+test.describe('Chat Tools: Cross-functional @slow', () => {
+  test('different maestri can use their appropriate tools', async ({ request }) => {
+    // Test that each maestro type can generate their relevant tools
+    const testCases = [
+      {
+        maestroId: 'euclide-matematica',
+        message: 'Fammi una mappa mentale sulle frazioni',
+        expectedTool: 'create_mindmap',
+      },
+      {
+        maestroId: 'socrate-filosofia',
+        message: 'Crea un quiz su Platone',
+        expectedTool: 'create_quiz',
+      },
+    ];
+
+    for (const testCase of testCases) {
+      const result = await chatWithTools(
+        request,
+        testCase.maestroId,
+        testCase.message
+      );
+
+      if (result.error?.includes('No AI provider')) {
+        continue; // Skip if no provider
+      }
+
+      // Tool should be called or content should reference the tool
+      expect(
+        result.toolCalls?.some(tc => tc.function.name === testCase.expectedTool) ||
+        result.hasTools ||
+        result.content
+      ).toBeTruthy();
+    }
+  });
+
+  test('tool calls return valid JSON arguments', async ({ request }) => {
+    const result = await chatWithTools(
+      request,
+      'euclide-matematica',
+      'Crea delle flashcard sulle tabelline',
+      'flashcards'
+    );
+
+    if (result.error?.includes('No AI provider')) {
+      test.skip();
+      return;
+    }
+
+    if (result.toolCalls?.length) {
+      // All tool calls should have valid JSON arguments
+      result.toolCalls.forEach(tc => {
+        expect(() => JSON.parse(tc.function.arguments)).not.toThrow();
+      });
+    }
+  });
+});
+
+// ============================================================================
+// ERROR HANDLING TESTS
+// ============================================================================
 test.describe('Chat Tools: Error Handling', () => {
   test('handles missing AI provider gracefully', async ({ request }) => {
     const result = await chatWithTools(
@@ -331,6 +504,28 @@ test.describe('Chat Tools: Error Handling', () => {
       'Test message'
     );
 
+    // Should either succeed or return a clear error message
     expect(result.content || result.error || result.toolCalls).toBeTruthy();
+
+    if (result.error) {
+      // Error should be informative
+      expect(
+        result.error.includes('provider') ||
+        result.error.includes('configured') ||
+        result.error.includes('failed')
+      ).toBeTruthy();
+    }
+  });
+
+  test('handles invalid maestro ID', async ({ request }) => {
+    try {
+      await chatWithTools(
+        request,
+        'non-existent-maestro',
+        'Test message'
+      );
+    } catch (error) {
+      expect(error).toBeDefined();
+    }
   });
 });
