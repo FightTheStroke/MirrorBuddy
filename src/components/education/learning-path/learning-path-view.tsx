@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { motion } from 'framer-motion';
 import {
   BookOpen,
@@ -18,9 +19,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { VisualOverview } from './visual-overview';
 import { TopicCard } from './components/topic-card';
 import type { LearningPath, LearningPathTopic } from '@/types';
+
+// Lazy load VisualOverview to avoid bundling mermaid (~300KB) in main chunk
+const VisualOverview = dynamic(
+  () => import('./visual-overview').then((m) => m.VisualOverview),
+  {
+    loading: () => (
+      <div className="animate-pulse bg-slate-700/50 rounded-xl h-[250px]" />
+    ),
+    ssr: false,
+  }
+);
 
 interface LearningPathViewProps {
   pathId: string;

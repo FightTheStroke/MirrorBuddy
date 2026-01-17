@@ -286,7 +286,10 @@ test.describe('Backend API: Learnings', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBeTruthy();
+    // API returns { learnings: [...], pagination: {...} }
+    expect(data.learnings).toBeDefined();
+    expect(Array.isArray(data.learnings)).toBeTruthy();
+    expect(data.pagination).toBeDefined();
   });
 
   test('GET /api/learnings?category=preference - filters by category', async ({ request }) => {
@@ -296,9 +299,11 @@ test.describe('Backend API: Learnings', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBeTruthy();
+    // API returns { learnings: [...], pagination: {...} }
+    expect(data.learnings).toBeDefined();
+    expect(Array.isArray(data.learnings)).toBeTruthy();
     // All should be preferences if any exist
-    data.forEach((l: { category: string }) => {
+    data.learnings.forEach((l: { category: string }) => {
       expect(l.category).toBe('preference');
     });
   });
@@ -389,7 +394,10 @@ test.describe('Backend API: Flashcard Progress', () => {
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(Array.isArray(data)).toBeTruthy();
+    // API returns { data: [...], pagination: {...} }
+    expect(data.data).toBeDefined();
+    expect(Array.isArray(data.data)).toBeTruthy();
+    expect(data.pagination).toBeDefined();
   });
 });
 

@@ -75,45 +75,74 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Save learnings
-    const results = [];
+    // Save learnings using batch operations to avoid N+1 queries
+    // 1. Batch find existing learnings by category
+    const categories = [...new Set(learnings.map((l) => l.category))];
+    const existingLearnings = await prisma.learning.findMany({
+      where: {
+        userId,
+        category: { in: categories },
+      },
+    });
+
+    // 2. Match existing learnings by insight prefix
+    const existingMap = new Map(
+      existingLearnings.map((e) => [`${e.category}:${e.insight.slice(0, 30)}`, e])
+    );
+
+    const toUpdate: Array<{ id: string; confidence: number; occurrences: number }> = [];
+    const toCreate: Array<{
+      userId: string;
+      category: string;
+      insight: string;
+      maestroId: string;
+      subject: string;
+      confidence: number;
+    }> = [];
+
     for (const learning of learnings) {
-      // Check for existing similar learning
-      const existing = await prisma.learning.findFirst({
-        where: {
-          userId,
-          category: learning.category,
-          insight: {
-            contains: learning.insight.slice(0, 30),
-          },
-        },
-      });
+      const key = `${learning.category}:${learning.insight.slice(0, 30)}`;
+      const existing = existingMap.get(key);
 
       if (existing) {
-        // Reinforce existing
-        const updated = await prisma.learning.update({
-          where: { id: existing.id },
-          data: {
-            confidence: Math.min(1, existing.confidence + 0.1),
-            occurrences: existing.occurrences + 1,
-          },
+        toUpdate.push({
+          id: existing.id,
+          confidence: Math.min(1, existing.confidence + 0.1),
+          occurrences: existing.occurrences + 1,
         });
-        results.push({ ...updated, reinforced: true });
       } else {
-        // Create new learning
-        const created = await prisma.learning.create({
-          data: {
-            userId,
-            category: learning.category,
-            insight: learning.insight,
-            maestroId: conversation.maestroId,
-            subject: data.subject,
-            confidence: learning.confidence,
-          },
+        toCreate.push({
+          userId,
+          category: learning.category,
+          insight: learning.insight,
+          maestroId: conversation.maestroId,
+          subject: data.subject,
+          confidence: learning.confidence,
         });
-        results.push({ ...created, reinforced: false });
       }
     }
+
+    // 3. Batch updates and creates in a transaction
+    const results = await prisma.$transaction(async (tx) => {
+      const updateResults = await Promise.all(
+        toUpdate.map((u) =>
+          tx.learning.update({
+            where: { id: u.id },
+            data: { confidence: u.confidence, occurrences: u.occurrences },
+          })
+        )
+      );
+
+      const createResults =
+        toCreate.length > 0
+          ? await tx.learning.createManyAndReturn({ data: toCreate })
+          : [];
+
+      return [
+        ...updateResults.map((r) => ({ ...r, reinforced: true })),
+        ...createResults.map((r) => ({ ...r, reinforced: false })),
+      ];
+    });
 
     return NextResponse.json({
       extracted: results.length,

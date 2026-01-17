@@ -121,129 +121,144 @@ export async function POST(request: Request) {
     // 2. Check for upcoming scheduled sessions
     const currentDayOfWeek = now.getDay();
 
-    if (schedule?.sessions) {
+    if (schedule?.sessions?.length) {
+      // Batch fetch all recent session notifications to avoid N+1
+      const sessionIds = schedule.sessions.map((s) => s.id);
+      const recentSessionNotifs = await prisma.notification.findMany({
+        where: {
+          userId,
+          type: 'scheduled_session',
+          relatedId: { in: sessionIds },
+          createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) },
+        },
+      });
+      const notifiedSessionIds = new Set(recentSessionNotifs.map((n) => n.relatedId));
+
+      // Prepare batch creates
+      const sessionNotifsToCreate: Array<{
+        session: (typeof schedule.sessions)[0];
+        minutesUntil: number;
+      }> = [];
+
       for (const session of schedule.sessions) {
         if (session.dayOfWeek !== currentDayOfWeek) continue;
 
-        // Check if session is coming up within reminder offset
         const sessionTime = parseTime(session.time);
         const sessionMinutes = sessionTime.hours * 60 + sessionTime.minutes;
         const nowMinutes = now.getHours() * 60 + now.getMinutes();
         const minutesUntil = sessionMinutes - nowMinutes;
 
         if (minutesUntil > 0 && minutesUntil <= session.reminderOffset) {
-          // Check if we already sent this reminder
-          const recentSessionNotif = await prisma.notification.findFirst({
-            where: {
-              userId,
-              type: 'scheduled_session',
-              relatedId: session.id,
-              createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) }, // Within last hour
-            },
-          });
-
-          if (!recentSessionNotif) {
-            const melissaVoice = getMelissaVoice('scheduled_session', {
-              minutes: minutesUntil,
-              subject: session.subject,
-            });
-
-            const sessionTitle = `Studio: ${session.subject}`;
-            const sessionMessage = `Tra ${minutesUntil} minuti e' ora di studiare ${session.subject}!`;
-            const sessionUrl = session.maestroId ? `/maestro/${session.maestroId}` : '/maestri';
-
-            await prisma.notification.create({
-              data: {
-                userId,
-                type: 'scheduled_session',
-                title: sessionTitle,
-                message: sessionMessage,
-                actionUrl: sessionUrl,
-                priority: 'high',
-                relatedId: session.id,
-                melissaVoice,
-                sentAt: now,
-                expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000), // Expires in 2h
-              },
-            });
-
-            // Send push notification (ADR-0014)
-            if (isPushConfigured()) {
-              await sendPushToUser(userId, {
-                title: sessionTitle,
-                body: sessionMessage,
-                url: sessionUrl,
-                tag: `session_${session.id}`,
-                requireInteraction: true, // High priority - keep visible
-              });
-            }
-
-            notificationsCreated.push('scheduled_session');
-            logger.info('Created session reminder', { userId, sessionId: session.id, subject: session.subject });
+          if (!notifiedSessionIds.has(session.id)) {
+            sessionNotifsToCreate.push({ session, minutesUntil });
           }
         }
+      }
+
+      // Batch create notifications and send pushes
+      for (const { session, minutesUntil } of sessionNotifsToCreate) {
+        const melissaVoice = getMelissaVoice('scheduled_session', {
+          minutes: minutesUntil,
+          subject: session.subject,
+        });
+
+        const sessionTitle = `Studio: ${session.subject}`;
+        const sessionMessage = `Tra ${minutesUntil} minuti e' ora di studiare ${session.subject}!`;
+        const sessionUrl = session.maestroId ? `/maestro/${session.maestroId}` : '/maestri';
+
+        await prisma.notification.create({
+          data: {
+            userId,
+            type: 'scheduled_session',
+            title: sessionTitle,
+            message: sessionMessage,
+            actionUrl: sessionUrl,
+            priority: 'high',
+            relatedId: session.id,
+            melissaVoice,
+            sentAt: now,
+            expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000),
+          },
+        });
+
+        if (isPushConfigured()) {
+          await sendPushToUser(userId, {
+            title: sessionTitle,
+            body: sessionMessage,
+            url: sessionUrl,
+            tag: `session_${session.id}`,
+            requireInteraction: true,
+          });
+        }
+
+        notificationsCreated.push('scheduled_session');
+        logger.info('Created session reminder', { userId, sessionId: session.id, subject: session.subject });
       }
     }
 
     // 3. Check for custom reminders
-    if (schedule?.reminders) {
+    if (schedule?.reminders?.length) {
+      // Batch fetch all recent reminder notifications to avoid N+1
+      const reminderIds = schedule.reminders.map((r) => r.id);
+      const recentReminderNotifs = await prisma.notification.findMany({
+        where: {
+          userId,
+          type: 'reminder',
+          relatedId: { in: reminderIds },
+          createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) },
+        },
+      });
+      const notifiedReminderIds = new Set(recentReminderNotifs.map((n) => n.relatedId));
+
+      const remindersToDeactivate: string[] = [];
+
       for (const reminder of schedule.reminders) {
         const reminderTime = new Date(reminder.datetime);
         const diffMinutes = (reminderTime.getTime() - now.getTime()) / (60 * 1000);
 
-        // Fire reminder if it's within the next 5 minutes
-        if (diffMinutes >= 0 && diffMinutes <= 5) {
-          // Check if already fired
-          const recentReminderNotif = await prisma.notification.findFirst({
-            where: {
+        if (diffMinutes >= 0 && diffMinutes <= 5 && !notifiedReminderIds.has(reminder.id)) {
+          const reminderTitle = 'Promemoria';
+          const reminderUrl = reminder.maestroId ? `/maestro/${reminder.maestroId}` : '/';
+
+          await prisma.notification.create({
+            data: {
               userId,
               type: 'reminder',
+              title: reminderTitle,
+              message: reminder.message,
+              actionUrl: reminderUrl,
+              priority: 'medium',
               relatedId: reminder.id,
-              createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) },
+              sentAt: now,
+              expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
             },
           });
 
-          if (!recentReminderNotif) {
-            const reminderTitle = 'Promemoria';
-            const reminderUrl = reminder.maestroId ? `/maestro/${reminder.maestroId}` : '/';
-
-            await prisma.notification.create({
-              data: {
-                userId,
-                type: 'reminder',
-                title: reminderTitle,
-                message: reminder.message,
-                actionUrl: reminderUrl,
-                priority: 'medium',
-                relatedId: reminder.id,
-                sentAt: now,
-                expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
-              },
+          if (isPushConfigured()) {
+            await sendPushToUser(userId, {
+              title: reminderTitle,
+              body: reminder.message,
+              url: reminderUrl,
+              tag: `reminder_${reminder.id}`,
             });
-
-            // Send push notification (ADR-0014)
-            if (isPushConfigured()) {
-              await sendPushToUser(userId, {
-                title: reminderTitle,
-                body: reminder.message,
-                url: reminderUrl,
-                tag: `reminder_${reminder.id}`,
-              });
-            }
-
-            notificationsCreated.push('custom_reminder');
-
-            // Handle non-repeating reminders
-            if (reminder.repeat === 'none') {
-              await prisma.customReminder.update({
-                where: { id: reminder.id },
-                data: { active: false },
-              });
-            }
-
-            logger.info('Created custom reminder notification', { userId, reminderId: reminder.id });
           }
+
+          notificationsCreated.push('custom_reminder');
+
+          if (reminder.repeat === 'none') {
+            remindersToDeactivate.push(reminder.id);
+          }
+
+          logger.info('Created custom reminder notification', { userId, reminderId: reminder.id });
         }
+      }
+
+      // Batch update non-repeating reminders
+      if (remindersToDeactivate.length > 0) {
+        await prisma.customReminder.updateMany({
+          where: { id: { in: remindersToDeactivate } },
+          data: { active: false },
+        });
       }
     }
 
