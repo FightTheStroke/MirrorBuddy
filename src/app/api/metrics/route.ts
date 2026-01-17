@@ -4,16 +4,17 @@
 // https://prometheus.io/docs/instrumenting/exposition_formats/
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { metricsStore } from '@/lib/observability/metrics-store';
-import { generateSLIMetrics } from './sli-metrics';
-import { generateBehavioralMetrics } from './behavioral-metrics';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { metricsStore } from "@/lib/observability/metrics-store";
+import { generateSLIMetrics } from "./sli-metrics";
+import { generateBehavioralMetrics } from "./behavioral-metrics";
+import { generateExternalServiceMetrics } from "@/lib/metrics/external-service-metrics";
 
 interface MetricLine {
   name: string;
-  type: 'counter' | 'gauge' | 'histogram';
+  type: "counter" | "gauge" | "histogram";
   help: string;
   labels: Record<string, string>;
   value: number;
@@ -40,24 +41,28 @@ export async function GET() {
       prisma.user.count(),
 
       // Active users in last hour (unique userIds in events)
-      prisma.telemetryEvent.findMany({
-        where: { timestamp: { gte: hourAgo }, userId: { not: null } },
-        select: { userId: true },
-        distinct: ['userId'],
-      }).then((r) => r.length),
+      prisma.telemetryEvent
+        .findMany({
+          where: { timestamp: { gte: hourAgo }, userId: { not: null } },
+          select: { userId: true },
+          distinct: ["userId"],
+        })
+        .then((r) => r.length),
 
       // Active users in last 24 hours
-      prisma.telemetryEvent.findMany({
-        where: { timestamp: { gte: dayAgo }, userId: { not: null } },
-        select: { userId: true },
-        distinct: ['userId'],
-      }).then((r) => r.length),
+      prisma.telemetryEvent
+        .findMany({
+          where: { timestamp: { gte: dayAgo }, userId: { not: null } },
+          select: { userId: true },
+          distinct: ["userId"],
+        })
+        .then((r) => r.length),
 
       // Sessions in last hour
       prisma.telemetryEvent.count({
         where: {
-          category: 'navigation',
-          action: 'session_started',
+          category: "navigation",
+          action: "session_started",
           timestamp: { gte: hourAgo },
         },
       }),
@@ -65,15 +70,15 @@ export async function GET() {
       // Sessions in last 24 hours
       prisma.telemetryEvent.count({
         where: {
-          category: 'navigation',
-          action: 'session_started',
+          category: "navigation",
+          action: "session_started",
           timestamp: { gte: dayAgo },
         },
       }),
 
       // Event counts by category (last hour)
       prisma.telemetryEvent.groupBy({
-        by: ['category'],
+        by: ["category"],
         where: { timestamp: { gte: hourAgo } },
         _count: true,
       }),
@@ -81,7 +86,7 @@ export async function GET() {
       // Error count (last hour)
       prisma.telemetryEvent.count({
         where: {
-          category: 'error',
+          category: "error",
           timestamp: { gte: hourAgo },
         },
       }),
@@ -89,8 +94,8 @@ export async function GET() {
       // Average API response time (last hour)
       prisma.telemetryEvent.aggregate({
         where: {
-          category: 'performance',
-          action: 'api_response',
+          category: "performance",
+          action: "api_response",
           timestamp: { gte: hourAgo },
         },
         _avg: { value: true },
@@ -99,7 +104,7 @@ export async function GET() {
 
     // Fetch maestro usage metrics
     const maestroUsage = await prisma.studySession.groupBy({
-      by: ['maestroId'],
+      by: ["maestroId"],
       where: { startedAt: { gte: dayAgo } },
       _count: true,
     });
@@ -109,82 +114,82 @@ export async function GET() {
 
     // User metrics
     metrics.push({
-      name: 'mirrorbuddy_users_total',
-      type: 'gauge',
-      help: 'Total number of registered users',
+      name: "mirrorbuddy_users_total",
+      type: "gauge",
+      help: "Total number of registered users",
       labels: {},
       value: totalUsers,
     });
 
     metrics.push({
-      name: 'mirrorbuddy_users_active',
-      type: 'gauge',
-      help: 'Number of active users',
-      labels: { period: '1h' },
+      name: "mirrorbuddy_users_active",
+      type: "gauge",
+      help: "Number of active users",
+      labels: { period: "1h" },
       value: activeUsersHour,
     });
 
     metrics.push({
-      name: 'mirrorbuddy_users_active',
-      type: 'gauge',
-      help: 'Number of active users',
-      labels: { period: '24h' },
+      name: "mirrorbuddy_users_active",
+      type: "gauge",
+      help: "Number of active users",
+      labels: { period: "24h" },
       value: activeUsersDay,
     });
 
     // Session metrics
     metrics.push({
-      name: 'mirrorbuddy_sessions_total',
-      type: 'counter',
-      help: 'Total number of sessions',
-      labels: { period: '1h' },
+      name: "mirrorbuddy_sessions_total",
+      type: "counter",
+      help: "Total number of sessions",
+      labels: { period: "1h" },
       value: sessionsHour,
     });
 
     metrics.push({
-      name: 'mirrorbuddy_sessions_total',
-      type: 'counter',
-      help: 'Total number of sessions',
-      labels: { period: '24h' },
+      name: "mirrorbuddy_sessions_total",
+      type: "counter",
+      help: "Total number of sessions",
+      labels: { period: "24h" },
       value: sessionsDay,
     });
 
     // Event metrics by category
     for (const cat of eventCounts) {
       metrics.push({
-        name: 'mirrorbuddy_events_total',
-        type: 'counter',
-        help: 'Total events by category',
-        labels: { category: cat.category, period: '1h' },
+        name: "mirrorbuddy_events_total",
+        type: "counter",
+        help: "Total events by category",
+        labels: { category: cat.category, period: "1h" },
         value: cat._count,
       });
     }
 
     // Error metrics
     metrics.push({
-      name: 'mirrorbuddy_errors_total',
-      type: 'counter',
-      help: 'Total number of errors',
-      labels: { period: '1h' },
+      name: "mirrorbuddy_errors_total",
+      type: "counter",
+      help: "Total number of errors",
+      labels: { period: "1h" },
       value: errorCount,
     });
 
     // Performance metrics
     metrics.push({
-      name: 'mirrorbuddy_api_response_ms',
-      type: 'gauge',
-      help: 'Average API response time in milliseconds',
-      labels: { period: '1h' },
+      name: "mirrorbuddy_api_response_ms",
+      type: "gauge",
+      help: "Average API response time in milliseconds",
+      labels: { period: "1h" },
       value: avgResponseTime._avg.value || 0,
     });
 
     // Maestro usage metrics
     for (const m of maestroUsage) {
       metrics.push({
-        name: 'mirrorbuddy_maestro_sessions',
-        type: 'counter',
-        help: 'Sessions by maestro',
-        labels: { maestro_id: m.maestroId, period: '24h' },
+        name: "mirrorbuddy_maestro_sessions",
+        type: "counter",
+        help: "Sessions by maestro",
+        labels: { maestro_id: m.maestroId, period: "24h" },
         value: m._count,
       });
     }
@@ -201,17 +206,21 @@ export async function GET() {
     // Format as Prometheus exposition format
     const output = formatPrometheusOutput(metrics);
 
-    return new NextResponse(output, {
+    // EXTERNAL SERVICE METRICS: Azure OpenAI, Google Drive, Brave Search quotas
+    const externalServiceMetrics = await generateExternalServiceMetrics();
+    const fullOutput = output + "\n" + externalServiceMetrics;
+
+    return new NextResponse(fullOutput, {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
       },
     });
   } catch (error) {
-    logger.error('Metrics GET error', { error: String(error) });
-    return new NextResponse('# Error fetching metrics\n', {
+    logger.error("Metrics GET error", { error: String(error) });
+    return new NextResponse("# Error fetching metrics\n", {
       status: 500,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
   }
 }
@@ -237,15 +246,15 @@ function formatPrometheusOutput(metrics: MetricLine[]): string {
       Object.keys(metric.labels).length > 0
         ? `{${Object.entries(metric.labels)
             .map(([k, v]) => `${k}="${v}"`)
-            .join(',')}}`
-        : '';
+            .join(",")}}`
+        : "";
 
     lines.push(`${metric.name}${labelStr} ${metric.value}`);
   }
 
   // Add timestamp comment
-  lines.push('');
+  lines.push("");
   lines.push(`# Generated at ${new Date().toISOString()}`);
 
-  return lines.join('\n');
+  return lines.join("\n");
 }

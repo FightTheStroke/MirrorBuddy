@@ -11,11 +11,11 @@
  * - Cost per session
  */
 
-import { prisma } from '@/lib/db';
+import { prisma } from "@/lib/db";
 
 interface MetricLine {
   name: string;
-  type: 'counter' | 'gauge' | 'histogram';
+  type: "counter" | "gauge" | "histogram";
   help: string;
   labels: Record<string, string>;
   value: number;
@@ -54,154 +54,159 @@ export async function generateBehavioralMetrics(): Promise<MetricLine[]> {
   const sessionStats = await getSessionStats(dayAgo, now);
 
   // Session Health metrics
-  const successRate = sessionStats.totalSessions > 0
-    ? sessionStats.successfulSessions / sessionStats.totalSessions
-    : 0;
-  const dropoffRate = sessionStats.totalSessions > 0
-    ? sessionStats.droppedSessions / sessionStats.totalSessions
-    : 0;
-  const stuckLoopRate = sessionStats.totalSessions > 0
-    ? sessionStats.stuckLoopSessions / sessionStats.totalSessions
-    : 0;
+  const successRate =
+    sessionStats.totalSessions > 0
+      ? sessionStats.successfulSessions / sessionStats.totalSessions
+      : 0;
+  const dropoffRate =
+    sessionStats.totalSessions > 0
+      ? sessionStats.droppedSessions / sessionStats.totalSessions
+      : 0;
+  const stuckLoopRate =
+    sessionStats.totalSessions > 0
+      ? sessionStats.stuckLoopSessions / sessionStats.totalSessions
+      : 0;
 
   metrics.push(
     {
-      name: 'mirrorbuddy_session_success_rate',
-      type: 'gauge',
-      help: 'Session success rate (target: >=0.80)',
-      labels: { period: '24h' },
+      name: "mirrorbuddy_session_success_rate",
+      type: "gauge",
+      help: "Session success rate (target: >=0.80)",
+      labels: { period: "24h" },
       value: successRate,
     },
     {
-      name: 'mirrorbuddy_session_dropoff_rate',
-      type: 'gauge',
-      help: 'Session drop-off rate (target: <=0.10)',
-      labels: { period: '24h' },
+      name: "mirrorbuddy_session_dropoff_rate",
+      type: "gauge",
+      help: "Session drop-off rate (target: <=0.10)",
+      labels: { period: "24h" },
       value: dropoffRate,
     },
     {
-      name: 'mirrorbuddy_session_stuck_loop_rate',
-      type: 'gauge',
-      help: 'Session stuck loop rate (target: <=0.05)',
-      labels: { period: '24h' },
+      name: "mirrorbuddy_session_stuck_loop_rate",
+      type: "gauge",
+      help: "Session stuck loop rate (target: <=0.05)",
+      labels: { period: "24h" },
       value: stuckLoopRate,
     },
     {
-      name: 'mirrorbuddy_session_turns_avg',
-      type: 'gauge',
-      help: 'Average turns per session (target: 5-20)',
-      labels: { period: '24h' },
+      name: "mirrorbuddy_session_turns_avg",
+      type: "gauge",
+      help: "Average turns per session (target: 5-20)",
+      labels: { period: "24h" },
       value: sessionStats.avgTurnsPerSession,
     },
     {
-      name: 'mirrorbuddy_session_duration_minutes_avg',
-      type: 'gauge',
-      help: 'Average session duration in minutes (target: 5-30)',
-      labels: { period: '24h' },
+      name: "mirrorbuddy_session_duration_minutes_avg",
+      type: "gauge",
+      help: "Average session duration in minutes (target: 5-30)",
+      labels: { period: "24h" },
       value: sessionStats.avgDurationMinutes,
     },
     {
-      name: 'mirrorbuddy_sessions_total',
-      type: 'counter',
-      help: 'Total sessions',
-      labels: { period: '24h', status: 'all' },
+      name: "mirrorbuddy_sessions_total",
+      type: "counter",
+      help: "Total sessions",
+      labels: { period: "24h", status: "all" },
       value: sessionStats.totalSessions,
     },
     {
-      name: 'mirrorbuddy_sessions_total',
-      type: 'counter',
-      help: 'Total sessions',
-      labels: { period: '24h', status: 'success' },
+      name: "mirrorbuddy_sessions_total",
+      type: "counter",
+      help: "Total sessions",
+      labels: { period: "24h", status: "success" },
       value: sessionStats.successfulSessions,
     },
     {
-      name: 'mirrorbuddy_sessions_total',
-      type: 'counter',
-      help: 'Total sessions',
-      labels: { period: '24h', status: 'dropped' },
+      name: "mirrorbuddy_sessions_total",
+      type: "counter",
+      help: "Total sessions",
+      labels: { period: "24h", status: "dropped" },
       value: sessionStats.droppedSessions,
-    }
+    },
   );
 
   // Safety metrics (7d window for incidents)
   const safetyStats = await getSafetyStats(weekAgo, now);
 
-  const refusalPrecision = safetyStats.totalRefusals > 0
-    ? safetyStats.correctRefusals / safetyStats.totalRefusals
-    : 1; // 100% if no refusals
-  const jailbreakBlockRate = safetyStats.jailbreakAttempts > 0
-    ? safetyStats.jailbreakBlocked / safetyStats.jailbreakAttempts
-    : 1;
+  const refusalPrecision =
+    safetyStats.totalRefusals > 0
+      ? safetyStats.correctRefusals / safetyStats.totalRefusals
+      : 1; // 100% if no refusals
+  const jailbreakBlockRate =
+    safetyStats.jailbreakAttempts > 0
+      ? safetyStats.jailbreakBlocked / safetyStats.jailbreakAttempts
+      : 1;
 
   metrics.push(
     {
-      name: 'mirrorbuddy_refusal_precision',
-      type: 'gauge',
-      help: 'Refusal precision rate (target: >=0.95)',
-      labels: { period: '7d' },
+      name: "mirrorbuddy_refusal_precision",
+      type: "gauge",
+      help: "Refusal precision rate (target: >=0.95)",
+      labels: { period: "7d" },
       value: refusalPrecision,
     },
     {
-      name: 'mirrorbuddy_jailbreak_block_rate',
-      type: 'gauge',
-      help: 'Jailbreak attempts blocked (target: 1.00)',
-      labels: { period: '7d' },
+      name: "mirrorbuddy_jailbreak_block_rate",
+      type: "gauge",
+      help: "Jailbreak attempts blocked (target: 1.00)",
+      labels: { period: "7d" },
       value: jailbreakBlockRate,
     },
     {
-      name: 'mirrorbuddy_incidents_total',
-      type: 'counter',
-      help: 'Total incidents by severity',
-      labels: { period: '7d', severity: 'S0' },
+      name: "mirrorbuddy_incidents_total",
+      type: "counter",
+      help: "Total incidents by severity",
+      labels: { period: "7d", severity: "S0" },
       value: safetyStats.incidentsS0,
     },
     {
-      name: 'mirrorbuddy_incidents_total',
-      type: 'counter',
-      help: 'Total incidents by severity',
-      labels: { period: '7d', severity: 'S1' },
+      name: "mirrorbuddy_incidents_total",
+      type: "counter",
+      help: "Total incidents by severity",
+      labels: { period: "7d", severity: "S1" },
       value: safetyStats.incidentsS1,
     },
     {
-      name: 'mirrorbuddy_incidents_total',
-      type: 'counter',
-      help: 'Total incidents by severity',
-      labels: { period: '7d', severity: 'S2' },
+      name: "mirrorbuddy_incidents_total",
+      type: "counter",
+      help: "Total incidents by severity",
+      labels: { period: "7d", severity: "S2" },
       value: safetyStats.incidentsS2,
     },
     {
-      name: 'mirrorbuddy_incidents_total',
-      type: 'counter',
-      help: 'Total incidents by severity (target: 0)',
-      labels: { period: '7d', severity: 'S3' },
+      name: "mirrorbuddy_incidents_total",
+      type: "counter",
+      help: "Total incidents by severity (target: 0)",
+      labels: { period: "7d", severity: "S3" },
       value: safetyStats.incidentsS3,
-    }
+    },
   );
 
   // Cost metrics (from telemetry if available)
   const costStats = await getCostStats(dayAgo, now);
   metrics.push(
     {
-      name: 'mirrorbuddy_cost_per_session_eur',
-      type: 'gauge',
-      help: 'Average cost per session in EUR (target: <=0.05 text, <=0.15 voice)',
-      labels: { period: '24h', type: 'text' },
+      name: "mirrorbuddy_cost_per_session_eur",
+      type: "gauge",
+      help: "Average cost per session in EUR (target: <=0.05 text, <=0.15 voice)",
+      labels: { period: "24h", type: "text" },
       value: costStats.avgCostText,
     },
     {
-      name: 'mirrorbuddy_cost_per_session_eur',
-      type: 'gauge',
-      help: 'Average cost per session in EUR',
-      labels: { period: '24h', type: 'voice' },
+      name: "mirrorbuddy_cost_per_session_eur",
+      type: "gauge",
+      help: "Average cost per session in EUR",
+      labels: { period: "24h", type: "voice" },
       value: costStats.avgCostVoice,
     },
     {
-      name: 'mirrorbuddy_cost_spikes_total',
-      type: 'counter',
-      help: 'Cost spikes (>P95*1.5) this week (target: <=1)',
-      labels: { period: '7d' },
+      name: "mirrorbuddy_cost_spikes_total",
+      type: "counter",
+      help: "Cost spikes (>P95*1.5) this week (target: <=1)",
+      labels: { period: "7d" },
       value: costStats.spikesThisWeek,
-    }
+    },
   );
 
   return metrics;
@@ -241,7 +246,8 @@ async function getSessionStats(from: Date, to: Date): Promise<SessionStats> {
     }
 
     // Dropped = ended early with <=2 turns OR abandoned (no endedAt, started >1h ago)
-    const isAbandoned = !session.endedAt &&
+    const isAbandoned =
+      !session.endedAt &&
       session.startedAt.getTime() < Date.now() - 60 * 60 * 1000;
     if (turns <= 2 || isAbandoned) {
       droppedSessions++;
@@ -266,9 +272,10 @@ async function getSessionStats(from: Date, to: Date): Promise<SessionStats> {
     droppedSessions,
     stuckLoopSessions,
     avgTurnsPerSession: totalSessions > 0 ? totalTurns / totalSessions : 0,
-    avgDurationMinutes: sessionsWithDuration > 0
-      ? totalDurationSec / sessionsWithDuration / 60
-      : 0,
+    avgDurationMinutes:
+      sessionsWithDuration > 0
+        ? totalDurationSec / sessionsWithDuration / 60
+        : 0,
   };
 }
 
@@ -279,7 +286,7 @@ async function getSafetyStats(from: Date, to: Date): Promise<SafetyStats> {
   const events = await prisma.telemetryEvent.findMany({
     where: {
       timestamp: { gte: from, lte: to },
-      category: { in: ['safety', 'moderation', 'security'] },
+      category: { in: ["safety", "moderation", "security"] },
     },
     select: { action: true, label: true },
   });
@@ -294,22 +301,22 @@ async function getSafetyStats(from: Date, to: Date): Promise<SafetyStats> {
   let jailbreakBlocked = 0;
 
   for (const event of events) {
-    if (event.action === 'refusal') {
+    if (event.action === "refusal") {
       totalRefusals++;
       // Correct refusal if labeled as such
-      if (event.label !== 'false_positive') {
+      if (event.label !== "false_positive") {
         correctRefusals++;
       }
     }
-    if (event.action === 'incident') {
-      if (event.label === 'S0') incidentsS0++;
-      if (event.label === 'S1') incidentsS1++;
-      if (event.label === 'S2') incidentsS2++;
-      if (event.label === 'S3') incidentsS3++;
+    if (event.action === "incident") {
+      if (event.label === "S0") incidentsS0++;
+      if (event.label === "S1") incidentsS1++;
+      if (event.label === "S2") incidentsS2++;
+      if (event.label === "S3") incidentsS3++;
     }
-    if (event.action === 'jailbreak_attempt') {
+    if (event.action === "jailbreak_attempt") {
       jailbreakAttempts++;
-      if (event.label === 'blocked') jailbreakBlocked++;
+      if (event.label === "blocked") jailbreakBlocked++;
     }
   }
 
@@ -326,17 +333,24 @@ async function getSafetyStats(from: Date, to: Date): Promise<SafetyStats> {
 }
 
 /**
- * Calculate cost statistics (placeholder - needs cost tracking implementation)
+ * Calculate cost statistics from REAL SessionMetrics data.
+ * Uses cost-tracking-service.ts which calculates costs from actual API token counts.
  */
 async function getCostStats(
   _from: Date,
-  _to: Date
-): Promise<{ avgCostText: number; avgCostVoice: number; spikesThisWeek: number }> {
-  // TODO: Implement actual cost tracking from Azure billing or token counts
-  // For now, return placeholder values
+  _to: Date,
+): Promise<{
+  avgCostText: number;
+  avgCostVoice: number;
+  spikesThisWeek: number;
+}> {
+  // Import dynamically to avoid circular dependency
+  const { getCostMetricsSummary } =
+    await import("@/lib/metrics/cost-tracking-service");
+  const summary = await getCostMetricsSummary();
   return {
-    avgCostText: 0.02,
-    avgCostVoice: 0.15,
-    spikesThisWeek: 0,
+    avgCostText: summary.avgCostText24h,
+    avgCostVoice: summary.avgCostVoice24h,
+    spikesThisWeek: summary.spikesThisWeek,
   };
 }
