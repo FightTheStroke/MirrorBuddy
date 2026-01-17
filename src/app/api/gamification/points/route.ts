@@ -4,13 +4,18 @@
  * GET /api/gamification/points - Get points history
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { awardPoints, getOrCreateGamification, checkAchievements } from '@/lib/gamification/db';
-import { logger } from '@/lib/logger';
-import { validateJsonRequest } from '@/lib/validation/middleware';
-import { AwardPointsRequestSchema } from '@/lib/validation/schemas/gamification';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import {
+  awardPoints,
+  getOrCreateGamification,
+  checkAchievements,
+} from "@/lib/gamification/db";
+import { logger } from "@/lib/logger";
+import { validateJsonRequest } from "@/lib/validation/middleware";
+import { AwardPointsRequestSchema } from "@/lib/validation/schemas/gamification";
+import { requireCSRF } from "@/lib/security/csrf";
 
 export async function GET() {
   try {
@@ -25,7 +30,7 @@ export async function GET() {
     // Get recent transactions
     const transactions = await prisma.pointsTransaction.findMany({
       where: { gamificationId: gamification.id },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 50,
     });
 
@@ -34,7 +39,7 @@ export async function GET() {
       totalPoints: gamification.totalPoints,
       seasonPoints: gamification.seasonPoints,
       mirrorBucks: gamification.mirrorBucks,
-      transactions: transactions.map(t => ({
+      transactions: transactions.map((t) => ({
         points: t.points,
         reason: t.reason,
         multiplier: t.multiplier,
@@ -42,12 +47,19 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    logger.error('Failed to get points', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to get points' }, { status: 500 });
+    logger.error("Failed to get points", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to get points" },
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -56,14 +68,23 @@ export async function POST(request: NextRequest) {
     const userId = auth.userId!;
 
     // Validate request body
-    const validation = await validateJsonRequest(request, AwardPointsRequestSchema);
+    const validation = await validateJsonRequest(
+      request,
+      AwardPointsRequestSchema,
+    );
     if (!validation.success) {
       return validation.response;
     }
 
     const { points, reason, sourceId, sourceType } = validation.data;
 
-    const result = await awardPoints(userId, points, reason, sourceId, sourceType);
+    const result = await awardPoints(
+      userId,
+      points,
+      reason,
+      sourceId,
+      sourceType,
+    );
 
     // Check for new achievements after awarding points
     const newAchievements = await checkAchievements(userId);
@@ -74,7 +95,10 @@ export async function POST(request: NextRequest) {
       newAchievements,
     });
   } catch (error) {
-    logger.error('Failed to award points', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to award points' }, { status: 500 });
+    logger.error("Failed to award points", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to award points" },
+      { status: 500 },
+    );
   }
 }

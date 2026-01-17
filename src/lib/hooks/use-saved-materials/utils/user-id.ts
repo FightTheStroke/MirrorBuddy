@@ -3,14 +3,11 @@
  * @brief User ID utility
  */
 
+import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+
 export function getUserId(): string {
-  if (typeof window === 'undefined') return 'default-user';
+  if (typeof window === "undefined") return "default-user";
 
-  let userId = sessionStorage.getItem('mirrorbuddy-user-id');
-  if (!userId) {
-    userId = `user-${crypto.randomUUID()}`;
-    sessionStorage.setItem('mirrorbuddy-user-id', userId);
-  }
-  return userId;
+  const userId = getUserIdFromCookie();
+  return userId ?? "default-user";
 }
-

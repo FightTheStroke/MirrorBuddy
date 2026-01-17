@@ -2,14 +2,14 @@
  * Scheduler API helpers
  */
 
-import { cookies } from 'next/headers';
+import { validateAuth } from "@/lib/auth/session-auth";
 
 /**
- * Get userId from cookies
+ * Get userId from validated authentication
  */
 export async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get('mirrorbuddy-user-id')?.value || null;
+  const auth = await validateAuth();
+  return auth.authenticated && auth.userId ? auth.userId : null;
 }
 
 /**
@@ -39,7 +39,7 @@ export function createScheduleSessionData(data: Record<string, unknown>) {
     topic: data.topic ? String(data.topic) : undefined,
     active: true,
     reminderOffset: Number(data.reminderOffset ?? 5),
-    repeat: String(data.repeat ?? 'weekly'),
+    repeat: String(data.repeat ?? "weekly"),
   };
 }
 
@@ -52,7 +52,7 @@ export function createReminderData(data: Record<string, unknown>) {
     message: String(data.message),
     subject: data.subject ? String(data.subject) : undefined,
     maestroId: data.maestroId ? String(data.maestroId) : undefined,
-    repeat: String(data.repeat ?? 'none'),
+    repeat: String(data.repeat ?? "none"),
     active: true,
   };
 }
@@ -67,10 +67,13 @@ export function updateSessionData(data: Record<string, unknown>) {
   if (data.time !== undefined) updated.time = String(data.time);
   if (data.duration !== undefined) updated.duration = Number(data.duration);
   if (data.subject !== undefined) updated.subject = String(data.subject);
-  if (data.maestroId !== undefined) updated.maestroId = data.maestroId ? String(data.maestroId) : null;
-  if (data.topic !== undefined) updated.topic = data.topic ? String(data.topic) : null;
+  if (data.maestroId !== undefined)
+    updated.maestroId = data.maestroId ? String(data.maestroId) : null;
+  if (data.topic !== undefined)
+    updated.topic = data.topic ? String(data.topic) : null;
   if (data.active !== undefined) updated.active = Boolean(data.active);
-  if (data.reminderOffset !== undefined) updated.reminderOffset = Number(data.reminderOffset);
+  if (data.reminderOffset !== undefined)
+    updated.reminderOffset = Number(data.reminderOffset);
   if (data.repeat !== undefined) updated.repeat = String(data.repeat);
 
   return updated;
@@ -82,10 +85,13 @@ export function updateSessionData(data: Record<string, unknown>) {
 export function updateReminderData(data: Record<string, unknown>) {
   const updated: Record<string, unknown> = {};
 
-  if (data.datetime !== undefined) updated.datetime = new Date(String(data.datetime));
+  if (data.datetime !== undefined)
+    updated.datetime = new Date(String(data.datetime));
   if (data.message !== undefined) updated.message = String(data.message);
-  if (data.subject !== undefined) updated.subject = data.subject ? String(data.subject) : null;
-  if (data.maestroId !== undefined) updated.maestroId = data.maestroId ? String(data.maestroId) : null;
+  if (data.subject !== undefined)
+    updated.subject = data.subject ? String(data.subject) : null;
+  if (data.maestroId !== undefined)
+    updated.maestroId = data.maestroId ? String(data.maestroId) : null;
   if (data.repeat !== undefined) updated.repeat = String(data.repeat);
   if (data.active !== undefined) updated.active = Boolean(data.active);
 

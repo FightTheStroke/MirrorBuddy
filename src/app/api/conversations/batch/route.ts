@@ -1,14 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { requireCSRF } from "@/lib/security/csrf";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 export async function DELETE(request: NextRequest) {
   try {
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const body = await request.json();
     const { ids } = body as { ids: string[] };
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
-      return NextResponse.json({ error: 'ids array is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "ids array is required" },
+        { status: 400 },
+      );
     }
 
     // Delete messages first (due to foreign key constraints)
@@ -23,7 +34,10 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ deleted: result.count });
   } catch (error) {
-    logger.error('Failed to delete conversations', { error });
-    return NextResponse.json({ error: 'Failed to delete conversations' }, { status: 500 });
+    logger.error("Failed to delete conversations", { error });
+    return NextResponse.json(
+      { error: "Failed to delete conversations" },
+      { status: 500 },
+    );
   }
 }

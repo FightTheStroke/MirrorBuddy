@@ -4,16 +4,25 @@
 // ADR: 0022-knowledge-hub-material-organization.md
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { requireCSRF } from "@/lib/security/csrf";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 // Zod schema for bulk operations
 const BulkOperationSchema = z.object({
   materialIds: z.array(z.string().cuid()).min(1).max(100),
-  operation: z.enum(['move', 'archive', 'delete', 'restore', 'addTags', 'removeTags', 'setTags']),
+  operation: z.enum([
+    "move",
+    "archive",
+    "delete",
+    "restore",
+    "addTags",
+    "removeTags",
+    "setTags",
+  ]),
   // Optional parameters depending on operation
   collectionId: z.string().cuid().nullable().optional(), // For 'move'
   tagIds: z.array(z.string().cuid()).optional(), // For tag operations
@@ -35,30 +44,38 @@ const BulkOperationSchema = z.object({
  */
 export async function POST(request: NextRequest) {
   try {
-    // 1. Auth check
+    // 1. CSRF check
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
+    // 2. Auth check
     const auth = await validateAuth();
     if (!auth.authenticated) {
       return NextResponse.json({ error: auth.error }, { status: 401 });
     }
     const userId = auth.userId!;
 
-    // 2. Validate input
+    // 3. Validate input
     const body = await request.json();
     const validation = BulkOperationSchema.safeParse(body);
 
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid request',
-          details: validation.error.issues.map(e => e.message),
+          error: "Invalid request",
+          details: validation.error.issues.map((e) => e.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const { materialIds, operation, collectionId, tagIds } = validation.data;
 
-    // 3. Verify all materials belong to user
+    // 4. Verify all materials belong to user
     const materials = await prisma.material.findMany({
       where: {
         id: { in: materialIds },
@@ -69,16 +86,16 @@ export async function POST(request: NextRequest) {
 
     if (materials.length !== materialIds.length) {
       return NextResponse.json(
-        { error: 'Some materials not found or not owned by user' },
-        { status: 404 }
+        { error: "Some materials not found or not owned by user" },
+        { status: 404 },
       );
     }
 
-    // 4. Execute operation
+    // 5. Execute operation
     let result: { affected: number; operation: string };
 
     switch (operation) {
-      case 'move':
+      case "move":
         // Verify collection belongs to user if not null
         if (collectionId !== null && collectionId !== undefined) {
           const collection = await prisma.collection.findFirst({
@@ -86,8 +103,8 @@ export async function POST(request: NextRequest) {
           });
           if (!collection) {
             return NextResponse.json(
-              { error: 'Collection not found' },
-              { status: 404 }
+              { error: "Collection not found" },
+              { status: 404 },
             );
           }
         }
@@ -96,38 +113,38 @@ export async function POST(request: NextRequest) {
           where: { id: { in: materialIds } },
           data: { collectionId: collectionId ?? null },
         });
-        result = { affected: materialIds.length, operation: 'moved' };
+        result = { affected: materialIds.length, operation: "moved" };
         break;
 
-      case 'archive':
+      case "archive":
         await prisma.material.updateMany({
           where: { id: { in: materialIds } },
-          data: { status: 'archived' },
+          data: { status: "archived" },
         });
-        result = { affected: materialIds.length, operation: 'archived' };
+        result = { affected: materialIds.length, operation: "archived" };
         break;
 
-      case 'delete':
+      case "delete":
         await prisma.material.updateMany({
           where: { id: { in: materialIds } },
-          data: { status: 'deleted' },
+          data: { status: "deleted" },
         });
-        result = { affected: materialIds.length, operation: 'deleted' };
+        result = { affected: materialIds.length, operation: "deleted" };
         break;
 
-      case 'restore':
+      case "restore":
         await prisma.material.updateMany({
           where: { id: { in: materialIds } },
-          data: { status: 'active' },
+          data: { status: "active" },
         });
-        result = { affected: materialIds.length, operation: 'restored' };
+        result = { affected: materialIds.length, operation: "restored" };
         break;
 
-      case 'addTags':
+      case "addTags":
         if (!tagIds || tagIds.length === 0) {
           return NextResponse.json(
-            { error: 'tagIds required for addTags operation' },
-            { status: 400 }
+            { error: "tagIds required for addTags operation" },
+            { status: 400 },
           );
         }
 
@@ -137,35 +154,38 @@ export async function POST(request: NextRequest) {
         });
         if (addTags.length !== tagIds.length) {
           return NextResponse.json(
-            { error: 'Some tags not found' },
-            { status: 404 }
+            { error: "Some tags not found" },
+            { status: 404 },
           );
         }
 
         // Create MaterialTag entries using transaction for batch insert
-        const tagData = materialIds.flatMap(materialId =>
-          tagIds.map(tagId => ({ materialId, tagId }))
+        const tagData = materialIds.flatMap((materialId) =>
+          tagIds.map((tagId) => ({ materialId, tagId })),
         );
         // Use createMany with skipDuplicates via raw upsert pattern
         await prisma.$transaction(
           tagData.map((entry) =>
             prisma.materialTag.upsert({
               where: {
-                materialId_tagId: { materialId: entry.materialId, tagId: entry.tagId },
+                materialId_tagId: {
+                  materialId: entry.materialId,
+                  tagId: entry.tagId,
+                },
               },
               update: {}, // No update needed - just skip if exists
               create: entry,
-            })
-          )
+            }),
+          ),
         );
-        result = { affected: materialIds.length, operation: 'tags added' };
+        result = { affected: materialIds.length, operation: "tags added" };
         break;
 
-      case 'removeTags':
+      case "removeTags":
         if (!tagIds || tagIds.length === 0) {
           return NextResponse.json(
-            { error: 'tagIds required for removeTags operation' },
-            { status: 400 }
+            { error: "tagIds required for removeTags operation" },
+            { status: 400 },
           );
         }
 
@@ -175,14 +195,14 @@ export async function POST(request: NextRequest) {
             tagId: { in: tagIds },
           },
         });
-        result = { affected: materialIds.length, operation: 'tags removed' };
+        result = { affected: materialIds.length, operation: "tags removed" };
         break;
 
-      case 'setTags':
+      case "setTags":
         if (!tagIds) {
           return NextResponse.json(
-            { error: 'tagIds required for setTags operation' },
-            { status: 400 }
+            { error: "tagIds required for setTags operation" },
+            { status: 400 },
           );
         }
 
@@ -193,8 +213,8 @@ export async function POST(request: NextRequest) {
           });
           if (setTagsCheck.length !== tagIds.length) {
             return NextResponse.json(
-              { error: 'Some tags not found' },
-              { status: 404 }
+              { error: "Some tags not found" },
+              { status: 404 },
             );
           }
         }
@@ -206,22 +226,22 @@ export async function POST(request: NextRequest) {
 
         if (tagIds.length > 0) {
           await prisma.materialTag.createMany({
-            data: materialIds.flatMap(materialId =>
-              tagIds.map(tagId => ({ materialId, tagId }))
+            data: materialIds.flatMap((materialId) =>
+              tagIds.map((tagId) => ({ materialId, tagId })),
             ),
           });
         }
-        result = { affected: materialIds.length, operation: 'tags replaced' };
+        result = { affected: materialIds.length, operation: "tags replaced" };
         break;
 
       default:
         return NextResponse.json(
-          { error: 'Unknown operation' },
-          { status: 400 }
+          { error: "Unknown operation" },
+          { status: 400 },
         );
     }
 
-    logger.info('Bulk operation completed', {
+    logger.info("Bulk operation completed", {
       userId,
       operation,
       materialCount: materialIds.length,
@@ -232,10 +252,10 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (error) {
-    logger.error('Bulk operation error', { error: String(error) });
+    logger.error("Bulk operation error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to perform bulk operation' },
-      { status: 500 }
+      { error: "Failed to perform bulk operation" },
+      { status: 500 },
     );
   }
 }

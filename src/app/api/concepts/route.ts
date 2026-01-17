@@ -3,15 +3,15 @@
  * Wave 3: GET all, POST new concept
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { z } from 'zod';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get('mirrorbuddy-user-id')?.value || null;
+  const auth = await validateAuth();
+  return auth.authenticated && auth.userId ? auth.userId : null;
 }
 
 const ConceptCreateSchema = z.object({
@@ -28,15 +28,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const userId = await getUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const subject = searchParams.get('subject');
+    const subject = searchParams.get("subject");
 
     // Pagination parameters (defaults: page 1, limit 50, max 200)
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const limit = Math.min(200, Math.max(1, parseInt(searchParams.get('limit') || '50', 10)));
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(
+      200,
+      Math.max(1, parseInt(searchParams.get("limit") || "50", 10)),
+    );
     const skip = (page - 1) * limit;
 
     const whereClause = {
@@ -54,7 +57,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             select: { materials: true },
           },
         },
-        orderBy: { name: 'asc' },
+        orderBy: { name: "asc" },
         skip,
         take: limit,
       }),
@@ -79,10 +82,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    logger.error('Failed to fetch concepts', { error });
+    logger.error("Failed to fetch concepts", { error });
     return NextResponse.json(
-      { error: 'Failed to fetch concepts' },
-      { status: 500 }
+      { error: "Failed to fetch concepts" },
+      { status: 500 },
     );
   }
 }
@@ -95,7 +98,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const userId = await getUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -103,8 +106,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (!parsed.success) {
       return NextResponse.json(
-        { error: 'Invalid request body', details: parsed.error.flatten() },
-        { status: 400 }
+        { error: "Invalid request body", details: parsed.error.flatten() },
+        { status: 400 },
       );
     }
 
@@ -120,20 +123,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ concept }, { status: 201 });
   } catch (error) {
     // Handle unique constraint violation
-    if (
-      error instanceof Error &&
-      error.message.includes('Unique constraint')
-    ) {
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
       return NextResponse.json(
-        { error: 'Concept with this name already exists' },
-        { status: 409 }
+        { error: "Concept with this name already exists" },
+        { status: 409 },
       );
     }
 
-    logger.error('Failed to create concept', { error });
+    logger.error("Failed to create concept", { error });
     return NextResponse.json(
-      { error: 'Failed to create concept' },
-      { status: 500 }
+      { error: "Failed to create concept" },
+      { status: 500 },
     );
   }
 }

@@ -6,11 +6,14 @@
  * Persists safety events to database for compliance tracking.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import type { SafetyEventType, EventSeverity } from '@/lib/safety/monitoring/types';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import type {
+  SafetyEventType,
+  EventSeverity,
+} from "@/lib/safety/monitoring/types";
 
 interface SafetyEventBody {
   type: SafetyEventType;
@@ -22,16 +25,16 @@ interface SafetyEventBody {
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
+    const userId = auth.authenticated && auth.userId ? auth.userId : null;
 
     const body = (await request.json()) as SafetyEventBody;
     const { type, severity, sessionId, category } = body;
 
     if (!type || !severity) {
       return NextResponse.json(
-        { error: 'type and severity are required' },
-        { status: 400 }
+        { error: "type and severity are required" },
+        { status: 400 },
       );
     }
 
@@ -49,10 +52,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to persist safety event', { error: String(error) });
+    logger.error("Failed to persist safety event", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to save event' },
-      { status: 500 }
+      { error: "Failed to save event" },
+      { status: 500 },
     );
   }
 }

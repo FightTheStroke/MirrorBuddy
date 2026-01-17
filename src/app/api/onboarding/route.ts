@@ -7,20 +7,21 @@
  * Issue #73: Load existing user data for returning users
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { z } from 'zod';
-import { prisma, isDatabaseNotInitialized } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { z } from "zod";
+import { prisma, isDatabaseNotInitialized } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { cookies } from "next/headers";
+import { requireCSRF } from "@/lib/security/csrf";
 
 // Zod schema for input validation
 const OnboardingDataSchema = z.object({
   name: z.string().min(2).max(50),
   age: z.number().int().min(6).max(19).optional(),
-  schoolLevel: z.enum(['elementare', 'media', 'superiore']).optional(),
+  schoolLevel: z.enum(["elementare", "media", "superiore"]).optional(),
   learningDifferences: z.array(z.string()).optional(),
-  gender: z.enum(['male', 'female', 'other']).optional(),
+  gender: z.enum(["male", "female", "other"]).optional(),
 });
 
 const PostBodySchema = z.object({
@@ -33,9 +34,9 @@ const PostBodySchema = z.object({
 interface OnboardingData {
   name: string;
   age?: number;
-  schoolLevel?: 'elementare' | 'media' | 'superiore';
+  schoolLevel?: "elementare" | "media" | "superiore";
   learningDifferences?: string[];
-  gender?: 'male' | 'female' | 'other';
+  gender?: "male" | "female" | "other";
 }
 
 /**
@@ -73,17 +74,21 @@ export async function GET() {
 
     // Build existing data from profile and onboarding state
     const existingData: OnboardingData = {
-      name: '',
+      name: "",
     };
 
     // Priority: onboarding data > profile data
     if (user.onboarding?.data) {
       try {
-        const onboardingData = JSON.parse(user.onboarding.data) as OnboardingData;
+        const onboardingData = JSON.parse(
+          user.onboarding.data,
+        ) as OnboardingData;
         if (onboardingData.name) existingData.name = onboardingData.name;
         if (onboardingData.age) existingData.age = onboardingData.age;
-        if (onboardingData.schoolLevel) existingData.schoolLevel = onboardingData.schoolLevel;
-        if (onboardingData.learningDifferences) existingData.learningDifferences = onboardingData.learningDifferences;
+        if (onboardingData.schoolLevel)
+          existingData.schoolLevel = onboardingData.schoolLevel;
+        if (onboardingData.learningDifferences)
+          existingData.learningDifferences = onboardingData.learningDifferences;
         if (onboardingData.gender) existingData.gender = onboardingData.gender;
       } catch {
         // Invalid JSON, ignore
@@ -98,7 +103,10 @@ export async function GET() {
       existingData.age = user.profile.age;
     }
     if (!existingData.schoolLevel && user.profile?.schoolLevel) {
-      existingData.schoolLevel = user.profile.schoolLevel as 'elementare' | 'media' | 'superiore';
+      existingData.schoolLevel = user.profile.schoolLevel as
+        | "elementare"
+        | "media"
+        | "superiore";
     }
 
     const hasExistingData = Boolean(existingData.name);
@@ -106,26 +114,28 @@ export async function GET() {
     return NextResponse.json({
       hasExistingData,
       data: hasExistingData ? existingData : null,
-      onboardingState: user.onboarding ? {
-        hasCompletedOnboarding: user.onboarding.hasCompletedOnboarding,
-        onboardingCompletedAt: user.onboarding.onboardingCompletedAt,
-        currentStep: user.onboarding.currentStep,
-        isReplayMode: user.onboarding.isReplayMode,
-      } : null,
+      onboardingState: user.onboarding
+        ? {
+            hasCompletedOnboarding: user.onboarding.hasCompletedOnboarding,
+            onboardingCompletedAt: user.onboarding.onboardingCompletedAt,
+            currentStep: user.onboarding.currentStep,
+            isReplayMode: user.onboarding.isReplayMode,
+          }
+        : null,
     });
   } catch (error) {
-    logger.error('Onboarding API GET error', { error: String(error) });
+    logger.error("Onboarding API GET error", { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
       return NextResponse.json(
-        { error: 'Database not initialized' },
-        { status: 503 }
+        { error: "Database not initialized" },
+        { status: 503 },
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to get onboarding state' },
-      { status: 500 }
+      { error: "Failed to get onboarding state" },
+      { status: 500 },
     );
   }
 }
@@ -135,28 +145,30 @@ export async function GET() {
  * Saves onboarding state and syncs data to user profile.
  */
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
-    const cookieStore = await cookies();
-    let userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
+    let userId = auth.userId;
 
     const body = await request.json();
 
     // Validate input with Zod
     const parseResult = PostBodySchema.safeParse(body);
     if (!parseResult.success) {
-      logger.warn('Onboarding API validation failed', { issues: parseResult.error.issues });
+      logger.warn("Onboarding API validation failed", {
+        issues: parseResult.error.issues,
+      });
       return NextResponse.json(
-        { error: 'Invalid request data', details: parseResult.error.issues },
-        { status: 400 }
+        { error: "Invalid request data", details: parseResult.error.issues },
+        { status: 400 },
       );
     }
 
-    const {
-      data,
-      hasCompletedOnboarding,
-      currentStep,
-      isReplayMode,
-    } = parseResult.data;
+    const { data, hasCompletedOnboarding, currentStep, isReplayMode } =
+      parseResult.data;
 
     // Create user if doesn't exist
     if (!userId) {
@@ -165,12 +177,16 @@ export async function POST(request: NextRequest) {
       });
       userId = user.id;
 
-      cookieStore.set('mirrorbuddy-user-id', userId, {
+      // Set cookie for new user
+      const { signCookieValue } = await import("@/lib/auth/cookie-signing");
+      const signedCookie = signCookieValue(user.id);
+      const cookieStore = await cookies();
+      cookieStore.set("mirrorbuddy-user-id", signedCookie.signed, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
         maxAge: 60 * 60 * 24 * 365,
-        path: '/',
+        path: "/",
       });
     }
 
@@ -179,9 +195,9 @@ export async function POST(request: NextRequest) {
       where: { userId },
       create: {
         userId,
-        data: data ? JSON.stringify(data) : '{}',
+        data: data ? JSON.stringify(data) : "{}",
         hasCompletedOnboarding: hasCompletedOnboarding ?? false,
-        currentStep: currentStep ?? 'welcome',
+        currentStep: currentStep ?? "welcome",
         isReplayMode: isReplayMode ?? false,
       },
       update: {
@@ -201,7 +217,7 @@ export async function POST(request: NextRequest) {
           userId,
           name: data.name,
           age: data.age,
-          schoolLevel: data.schoolLevel ?? 'superiore',
+          schoolLevel: data.schoolLevel ?? "superiore",
         },
         update: {
           name: data.name,
@@ -211,7 +227,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    logger.info('Onboarding state saved', { userId, hasCompletedOnboarding });
+    logger.info("Onboarding state saved", { userId, hasCompletedOnboarding });
 
     return NextResponse.json({
       success: true,
@@ -221,18 +237,18 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Onboarding API POST error', { error: String(error) });
+    logger.error("Onboarding API POST error", { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
       return NextResponse.json(
-        { error: 'Database not initialized' },
-        { status: 503 }
+        { error: "Database not initialized" },
+        { status: 503 },
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to save onboarding state' },
-      { status: 500 }
+      { error: "Failed to save onboarding state" },
+      { status: 500 },
     );
   }
 }

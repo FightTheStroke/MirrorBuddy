@@ -1,0 +1,25 @@
+# GitGuardian Configuration
+# https://docs.gitguardian.com/ggshield-docs/reference/gitguardian-yaml
+
+version: 2
+
+# Paths to ignore (test files, CI configs with test credentials)
+secret:
+  ignored-paths:
+    # E2E test configuration files with test-only secrets
+    - "e2e/**"
+    - "playwright.config.ts"
+    # CI workflow uses ephemeral test database credentials
+    - ".github/workflows/ci.yml"
+
+  # Ignore specific patterns that are test values, not real secrets
+  ignored-matches:
+    # Test session secret (not production)
+    - name: "E2E test session secret"
+      match: "e2e-test-session-secret-32-characters-min"
+    # Test cron secret (not production)
+    - name: "E2E test cron secret"
+      match: "e2e-test-cron-secret"
+    # CI PostgreSQL test database (ephemeral, no real data)
+    - name: "CI test database password"
+      match: "POSTGRES_PASSWORD: postgres"

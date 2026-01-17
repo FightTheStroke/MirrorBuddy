@@ -5,10 +5,11 @@
 // DELETE: Delete conversation
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       where: { id, userId },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: "asc" },
           take: 100, // Limit messages, use pagination for more
         },
       },
@@ -36,27 +37,36 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (!conversation) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
     return NextResponse.json({
       ...conversation,
-      topics: JSON.parse(conversation.topics || '[]'),
-      keyFacts: conversation.keyFacts ? JSON.parse(conversation.keyFacts) : null,
+      topics: JSON.parse(conversation.topics || "[]"),
+      keyFacts: conversation.keyFacts
+        ? JSON.parse(conversation.keyFacts)
+        : null,
     });
   } catch (error) {
-    logger.error('Conversation GET error', { error: String(error) });
+    logger.error("Conversation GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get conversation' },
-      { status: 500 }
+      { error: "Failed to get conversation" },
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const auth = await validateAuth();
     const { id } = await params;
 
@@ -72,8 +82,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
@@ -97,20 +107,29 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({
       ...conversation,
-      topics: JSON.parse(conversation.topics || '[]'),
-      keyFacts: conversation.keyFacts ? JSON.parse(conversation.keyFacts) : null,
+      topics: JSON.parse(conversation.topics || "[]"),
+      keyFacts: conversation.keyFacts
+        ? JSON.parse(conversation.keyFacts)
+        : null,
     });
   } catch (error) {
-    logger.error('Conversation PUT error', { error: String(error) });
+    logger.error("Conversation PUT error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to update conversation' },
-      { status: 500 }
+      { error: "Failed to update conversation" },
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const auth = await validateAuth();
     const { id } = await params;
 
@@ -126,8 +145,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
@@ -137,10 +156,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Conversation DELETE error', { error: String(error) });
+    logger.error("Conversation DELETE error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete conversation' },
-      { status: 500 }
+      { error: "Failed to delete conversation" },
+      { status: 500 },
     );
   }
 }

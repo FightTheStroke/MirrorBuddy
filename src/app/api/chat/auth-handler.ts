@@ -1,36 +1,21 @@
 /**
  * Chat API authentication handling
- * Extracts and verifies user identity from cookies
+ * Extracts and verifies user identity from authenticated session
  */
 
-import { cookies } from 'next/headers';
-import { logger } from '@/lib/logger';
-import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
-
-const COOKIE_NAME = 'mirrorbuddy-user-id';
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 /**
- * Extract userId from signed or legacy unsigned cookies
+ * Extract userId from validated authentication
  */
 export async function extractUserId(): Promise<string | undefined> {
-  const cookieStore = await cookies();
-  const cookieValue = cookieStore.get(COOKIE_NAME)?.value;
+  const auth = await validateAuth();
 
-  if (!cookieValue) {
+  if (!auth.authenticated || !auth.userId) {
+    logger.debug("No authenticated user in chat API");
     return undefined;
   }
 
-  if (isSignedCookie(cookieValue)) {
-    const verification = verifyCookieValue(cookieValue);
-    if (verification.valid) {
-      return verification.value;
-    }
-    logger.warn('Invalid signed cookie in /api/chat', {
-      error: verification.error,
-    });
-    return undefined;
-  }
-
-  // Legacy unsigned cookie
-  return cookieValue;
+  return auth.userId;
 }

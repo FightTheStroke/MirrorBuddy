@@ -4,14 +4,18 @@
 // Server-side only - uses Node.js specific modules
 // ============================================================================
 
-import 'server-only';
+import "server-only";
 
-import { logger } from '@/lib/logger';
-import { NodeSDK } from '@opentelemetry/sdk-node';
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
-import { AzureMonitorTraceExporter } from '@azure/monitor-opentelemetry-exporter';
-import { resourceFromAttributes } from '@opentelemetry/resources';
-import { SEMRESATTRS_SERVICE_NAME, SEMRESATTRS_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
+import { logger } from "@/lib/logger";
+import { NodeSDK } from "@opentelemetry/sdk-node";
+import { getNodeAutoInstrumentations } from "@opentelemetry/auto-instrumentations-node";
+import { AzureMonitorTraceExporter } from "@azure/monitor-opentelemetry-exporter";
+import { resourceFromAttributes } from "@opentelemetry/resources";
+import {
+  SEMRESATTRS_SERVICE_NAME,
+  SEMRESATTRS_SERVICE_VERSION,
+} from "@opentelemetry/semantic-conventions";
+import { metrics } from "@opentelemetry/api";
 
 /**
  * Initialize OpenTelemetry SDK with Azure Monitor exporter.
@@ -27,12 +31,14 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
 
   // Skip initialization if connection string not provided
   if (!connectionString) {
-    logger.warn('APPLICATIONINSIGHTS_CONNECTION_STRING not set. Telemetry disabled.');
+    logger.warn(
+      "APPLICATIONINSIGHTS_CONNECTION_STRING not set. Telemetry disabled.",
+    );
     return undefined;
   }
 
   // Read service version from package.json or VERSION file
-  const serviceVersion = process.env.npm_package_version || '2.0.0';
+  const serviceVersion = process.env.npm_package_version || "2.0.0";
 
   try {
     // Configure Azure Monitor exporter
@@ -43,24 +49,24 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
     // Create SDK with auto-instrumentations
     const sdk = new NodeSDK({
       resource: resourceFromAttributes({
-        [SEMRESATTRS_SERVICE_NAME]: 'mirrorbuddy',
+        [SEMRESATTRS_SERVICE_NAME]: "mirrorbuddy",
         [SEMRESATTRS_SERVICE_VERSION]: serviceVersion,
       }),
       traceExporter,
       instrumentations: [
         getNodeAutoInstrumentations({
           // Auto-instrument HTTP, Express, Next.js, Prisma, etc.
-          '@opentelemetry/instrumentation-http': { enabled: true },
-          '@opentelemetry/instrumentation-express': { enabled: true },
-          '@opentelemetry/instrumentation-fs': { enabled: false }, // Reduce noise
+          "@opentelemetry/instrumentation-http": { enabled: true },
+          "@opentelemetry/instrumentation-express": { enabled: true },
+          "@opentelemetry/instrumentation-fs": { enabled: false }, // Reduce noise
         }),
       ],
     });
 
-    logger.info('OpenTelemetry SDK initialized with Azure Monitor exporter');
+    logger.info("OpenTelemetry SDK initialized with Azure Monitor exporter");
     return sdk;
   } catch (error) {
-    logger.error('Failed to initialize OpenTelemetry SDK', { error });
+    logger.error("Failed to initialize OpenTelemetry SDK", { error });
     return undefined;
   }
 }
@@ -72,17 +78,65 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
 export function startOpenTelemetry(sdk: NodeSDK): void {
   try {
     sdk.start();
-    logger.info('OpenTelemetry SDK started successfully');
+    logger.info("OpenTelemetry SDK started successfully");
 
     // Graceful shutdown on process termination
-    process.on('SIGTERM', () => {
+    process.on("SIGTERM", () => {
       sdk
         .shutdown()
-        .then(() => logger.info('OpenTelemetry SDK shut down successfully'))
-        .catch((error) => logger.error('Error shutting down OpenTelemetry SDK', { error }))
+        .then(() => logger.info("OpenTelemetry SDK shut down successfully"))
+        .catch((error) =>
+          logger.error("Error shutting down OpenTelemetry SDK", { error }),
+        )
         .finally(() => process.exit(0));
     });
   } catch (error) {
-    logger.error('Failed to start OpenTelemetry SDK', { error });
+    logger.error("Failed to start OpenTelemetry SDK", { error });
   }
 }
+
+// ============================================================================
+// CUSTOM BUSINESS METRICS
+// Export counters for application-specific metrics
+// ============================================================================
+
+/**
+ * Create meter for custom MirrorBuddy metrics.
+ */
+const meter = metrics.getMeter("mirrorbuddy");
+
+/**
+ * Counter for AI tokens consumed across all chat interactions.
+ * Increment with: tokenUsageCounter.add(tokens, { provider: 'azure' })
+ */
+export const tokenUsageCounter = meter.createCounter(
+  "mirrorbuddy.tokens.used",
+  {
+    description: "Total AI tokens consumed",
+    unit: "tokens",
+  },
+);
+
+/**
+ * Counter for FSRS flashcard reviews completed.
+ * Increment with: fsrsReviewCounter.add(1, { quality: 'good' })
+ */
+export const fsrsReviewCounter = meter.createCounter(
+  "mirrorbuddy.fsrs.reviews",
+  {
+    description: "Total FSRS flashcard reviews",
+    unit: "reviews",
+  },
+);
+
+/**
+ * Counter for chat API requests received.
+ * Increment with: chatRequestCounter.add(1, { maestro: 'galileo' })
+ */
+export const chatRequestCounter = meter.createCounter(
+  "mirrorbuddy.chat.requests",
+  {
+    description: "Total chat API requests",
+    unit: "requests",
+  },
+);

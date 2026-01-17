@@ -5,28 +5,29 @@
  * Part of I-02: Voice Tool Commands.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import {
   createToolState,
   updateToolState,
   completeToolState,
-} from '@/lib/realtime/tool-state';
+} from "@/lib/realtime/tool-state";
+import { broadcastToolEvent, type ToolType } from "@/lib/realtime/tool-events";
 import {
-  broadcastToolEvent,
-  type ToolType,
-} from '@/lib/realtime/tool-events';
-import { validateAuth, validateSessionOwnership } from '@/lib/auth/session-auth';
+  validateAuth,
+  validateSessionOwnership,
+} from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 
 // Valid tool types
 const VALID_TOOL_TYPES: ToolType[] = [
-  'mindmap',
-  'flashcard',
-  'quiz',
-  'summary',
-  'timeline',
-  'diagram',
-  'demo',
+  "mindmap",
+  "flashcard",
+  "quiz",
+  "summary",
+  "timeline",
+  "diagram",
+  "demo",
 ];
 
 interface CreateToolRequest {
@@ -55,8 +56,16 @@ export async function POST(request: NextRequest) {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
       return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
+        { error: "Authentication required" },
+        { status: 401 },
+      );
+    }
+
+    // F-02: CSRF check - prevent cross-site request forgery
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
       );
     }
 
@@ -67,10 +76,10 @@ export async function POST(request: NextRequest) {
     if (!sessionId || !maestroId || !toolType || !title) {
       return NextResponse.json(
         {
-          error: 'Missing required fields',
-          required: ['sessionId', 'maestroId', 'toolType', 'title'],
+          error: "Missing required fields",
+          required: ["sessionId", "maestroId", "toolType", "title"],
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -78,18 +87,18 @@ export async function POST(request: NextRequest) {
     if (!VALID_TOOL_TYPES.includes(toolType)) {
       return NextResponse.json(
         {
-          error: 'Invalid tool type',
+          error: "Invalid tool type",
           validTypes: VALID_TOOL_TYPES,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Validate session ID format
     if (!/^[a-zA-Z0-9_-]{1,64}$/.test(sessionId)) {
       return NextResponse.json(
-        { error: 'Invalid sessionId format' },
-        { status: 400 }
+        { error: "Invalid sessionId format" },
+        { status: 400 },
       );
     }
 
@@ -97,8 +106,8 @@ export async function POST(request: NextRequest) {
     const ownsSession = await validateSessionOwnership(sessionId, auth.userId);
     if (!ownsSession) {
       return NextResponse.json(
-        { error: 'Session not found or access denied' },
-        { status: 403 }
+        { error: "Session not found or access denied" },
+        { status: 403 },
       );
     }
 
@@ -118,7 +127,7 @@ export async function POST(request: NextRequest) {
     // Broadcast tool:created event
     broadcastToolEvent({
       id: toolId,
-      type: 'tool:created',
+      type: "tool:created",
       toolType,
       sessionId,
       maestroId,
@@ -129,7 +138,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    logger.info('Tool created from voice command', {
+    logger.info("Tool created from voice command", {
       toolId,
       toolType,
       sessionId,
@@ -147,7 +156,7 @@ export async function POST(request: NextRequest) {
       // Broadcast progress update
       broadcastToolEvent({
         id: toolId,
-        type: 'tool:update',
+        type: "tool:update",
         toolType,
         sessionId,
         maestroId,
@@ -160,12 +169,15 @@ export async function POST(request: NextRequest) {
 
     // Complete the tool (for voice commands, content is usually complete)
     // Cast through unknown since voice content may not exactly match ToolContent types
-    completeToolState(toolId, content as unknown as Parameters<typeof completeToolState>[1]);
+    completeToolState(
+      toolId,
+      content as unknown as Parameters<typeof completeToolState>[1],
+    );
 
     // Broadcast completion
     broadcastToolEvent({
       id: toolId,
-      type: 'tool:complete',
+      type: "tool:complete",
       toolType,
       sessionId,
       maestroId,
@@ -182,10 +194,10 @@ export async function POST(request: NextRequest) {
       status: toolState.status,
     });
   } catch (error) {
-    logger.error('Failed to create tool', { error: String(error) });
+    logger.error("Failed to create tool", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to create tool' },
-      { status: 500 }
+      { error: "Failed to create tool" },
+      { status: 500 },
     );
   }
 }
@@ -195,22 +207,22 @@ export async function POST(request: NextRequest) {
  */
 export async function GET() {
   return NextResponse.json({
-    endpoint: '/api/tools/create',
-    method: 'POST',
-    description: 'Create a tool from voice command',
+    endpoint: "/api/tools/create",
+    method: "POST",
+    description: "Create a tool from voice command",
     toolTypes: VALID_TOOL_TYPES,
     example: {
-      sessionId: 'session_abc123',
-      maestroId: 'archimede',
-      toolType: 'mindmap',
-      title: 'I Teoremi di Pitagora',
-      subject: 'mathematics',
+      sessionId: "session_abc123",
+      maestroId: "archimede",
+      toolType: "mindmap",
+      title: "I Teoremi di Pitagora",
+      subject: "mathematics",
       content: {
-        title: 'I Teoremi di Pitagora',
-        topic: 'Teoremi fondamentali della geometria',
+        title: "I Teoremi di Pitagora",
+        topic: "Teoremi fondamentali della geometria",
         nodes: [
-          { id: '1', label: 'Teorema di Pitagora', parentId: null },
-          { id: '2', label: 'a² + b² = c²', parentId: '1' },
+          { id: "1", label: "Teorema di Pitagora", parentId: null },
+          { id: "2", label: "a² + b² = c²", parentId: "1" },
         ],
       },
     },
