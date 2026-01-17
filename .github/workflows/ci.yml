@@ -275,7 +275,7 @@ jobs:
       - name: Setup database
         run: |
           npx prisma generate
-          npx prisma db push --skip-generate
+          npx prisma db push
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
