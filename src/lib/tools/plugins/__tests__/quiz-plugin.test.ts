@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { quizPlugin } from '../quiz-plugin';
-import { ToolCategory, Permission } from '../../plugin/types';
+import { ToolCategory, Permission, type VoicePromptConfig } from '../../plugin/types';
 
 // Extract schema for testing
 const QuizPluginSchema = z.object({
@@ -68,13 +68,15 @@ describe('quiz-plugin', () => {
     });
 
     it('has voice prompt with topic placeholder', () => {
-      expect(quizPlugin.voicePrompt?.template).toContain('{topic}');
-      expect(quizPlugin.voicePrompt?.requiresContext).toContain('topic');
+      const voicePrompt = quizPlugin.voicePrompt as VoicePromptConfig;
+      expect(voicePrompt.template).toContain('{topic}');
+      expect(voicePrompt.requiresContext).toContain('topic');
     });
 
     it('has voice feedback with questionCount', () => {
-      expect(quizPlugin.voiceFeedback?.template).toContain('{questionCount}');
-      expect(quizPlugin.voiceFeedback?.requiresContext).toContain('questionCount');
+      const voiceFeedback = quizPlugin.voiceFeedback as VoicePromptConfig;
+      expect(voiceFeedback.template).toContain('{questionCount}');
+      expect(voiceFeedback.requiresContext).toContain('questionCount');
     });
 
     it('has no prerequisites', () => {

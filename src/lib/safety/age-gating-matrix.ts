@@ -3,7 +3,7 @@
  * Topic appropriateness by age bracket and guidance
  */
 
-import type { ContentTopic, AgeBracket, TopicSensitivity } from './age-gating-core';
+import type { ContentTopic, AgeBracket, TopicSensitivity } from './age-gating-types';
 
 /**
  * Topic restrictions by age bracket

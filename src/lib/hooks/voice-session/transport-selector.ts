@@ -6,7 +6,19 @@
 'use client';
 
 import { logger } from '@/lib/logger';
-import { ProbeResults, ProbeResult } from './transport-probe';
+import type {
+  ProbeResults,
+  ProbeResult,
+  TransportError,
+  TransportSelectionResult,
+} from './transport-types';
+
+// Re-export types for backwards compatibility
+export type {
+  TransportSelection,
+  TransportError,
+  TransportSelectionResult,
+} from './transport-types';
 
 // Re-export cache functions for backwards compatibility
 export {
@@ -16,28 +28,6 @@ export {
   isCacheValid,
   getCacheInfo,
 } from './transport-cache';
-
-/**
- * Transport selection result
- */
-export interface TransportSelection {
-  transport: 'webrtc' | 'websocket';
-  reason: string;
-  confidence: 'high' | 'medium' | 'low';
-  probeResults: ProbeResults;
-}
-
-/**
- * Error state when both transports fail
- */
-export interface TransportError {
-  error: true;
-  message: string;
-  webrtcError?: string;
-  websocketError?: string;
-}
-
-export type TransportSelectionResult = TransportSelection | TransportError;
 
 /**
  * Selection thresholds

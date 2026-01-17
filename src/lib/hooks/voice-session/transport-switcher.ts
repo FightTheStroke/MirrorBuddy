@@ -9,16 +9,12 @@ import { logger } from '@/lib/logger';
 import { probeTransports } from './transport-probe';
 import {
   selectBestTransport,
-  invalidateCache,
-  cacheProbeResults,
   isTransportError,
-  TransportSelection,
 } from './transport-selector';
-import {
-  TransportMonitor,
-  getTransportMonitor,
-  DegradationEvent,
-} from './transport-monitor';
+import { invalidateCache, cacheProbeResults } from './transport-cache';
+import { TransportMonitor } from './transport-monitor';
+import { getTransportMonitor } from './transport-monitor-singleton';
+import type { TransportSelection, DegradationEvent } from './transport-types';
 
 /**
  * Transport switch request event
@@ -225,6 +221,3 @@ export class TransportSwitcher {
     });
   }
 }
-
-// Re-export singleton functions
-export { getTransportSwitcher, resetTransportSwitcher } from './transport-switcher-singleton';

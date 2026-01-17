@@ -8,7 +8,7 @@
 import { logger } from '@/lib/logger';
 import { generateEmbedding, isEmbeddingConfigured } from '@/lib/rag/embedding-service';
 import { storeEmbedding } from '@/lib/rag/vector-store';
-import type { StoredToolOutput } from './tool-output-storage';
+import type { StoredToolOutput } from './tool-output-types';
 import type { ToolType } from '@/types/tools/tool-types';
 
 /**

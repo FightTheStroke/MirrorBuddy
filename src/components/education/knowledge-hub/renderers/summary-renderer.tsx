@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Summary Renderer
@@ -14,14 +14,14 @@
  * }
  */
 
-import { SummaryRenderer as BaseSummaryRenderer } from '@/components/tools/summary-renderer';
-import type { SummarySection } from '@/types/tools';
-import type { BaseRendererProps } from './index';
+import { SummaryRenderer as BaseSummaryRenderer } from "@/components/tools/summary-renderer";
+import type { SummarySection } from "@/types/tools";
+import type { BaseRendererProps } from "./types";
 
 interface SummaryData {
   title?: string;
   sections: SummarySection[];
-  length?: 'short' | 'medium' | 'long';
+  length?: "short" | "medium" | "long";
 }
 
 /**
@@ -30,7 +30,7 @@ interface SummaryData {
 export function SummaryRenderer({ data, className }: BaseRendererProps) {
   const summaryData = data as unknown as SummaryData;
 
-  const title = summaryData.title || 'Riassunto';
+  const title = summaryData.title || "Riassunto";
   const sections = summaryData.sections || [];
 
   return (

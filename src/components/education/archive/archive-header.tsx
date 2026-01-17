@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
 /**
  * Archive Header Component
  * Search, sort, and view mode controls
  */
 
-import { type ChangeEvent } from 'react';
-import { Grid, List, Search, ArrowUpDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { type SortBy, SORT_OPTIONS } from './index';
+import { type ChangeEvent } from "react";
+import { Grid, List, Search, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { type SortBy, SORT_OPTIONS } from "./constants";
 
 interface ArchiveHeaderProps {
   searchQuery: string;
   onSearchChange: (e: ChangeEvent<HTMLInputElement>) => void;
   sortBy: SortBy;
   onSortChange: (sort: SortBy) => void;
-  viewMode: 'grid' | 'list';
-  onViewModeChange: (mode: 'grid' | 'list') => void;
+  viewMode: "grid" | "list";
+  onViewModeChange: (mode: "grid" | "list") => void;
 }
 
 export function ArchiveHeader({
@@ -76,12 +76,12 @@ export function ArchiveHeader({
             variant="ghost"
             size="icon"
             className={cn(
-              'rounded-r-none',
-              viewMode === 'grid' && 'bg-slate-100 dark:bg-slate-800'
+              "rounded-r-none",
+              viewMode === "grid" && "bg-slate-100 dark:bg-slate-800",
             )}
-            onClick={() => onViewModeChange('grid')}
+            onClick={() => onViewModeChange("grid")}
             aria-label="Vista griglia"
-            aria-pressed={viewMode === 'grid'}
+            aria-pressed={viewMode === "grid"}
           >
             <Grid className="w-4 h-4" />
           </Button>
@@ -89,12 +89,12 @@ export function ArchiveHeader({
             variant="ghost"
             size="icon"
             className={cn(
-              'rounded-l-none',
-              viewMode === 'list' && 'bg-slate-100 dark:bg-slate-800'
+              "rounded-l-none",
+              viewMode === "list" && "bg-slate-100 dark:bg-slate-800",
             )}
-            onClick={() => onViewModeChange('list')}
+            onClick={() => onViewModeChange("list")}
             aria-label="Vista lista"
-            aria-pressed={viewMode === 'list'}
+            aria-pressed={viewMode === "list"}
           >
             <List className="w-4 h-4" />
           </Button>

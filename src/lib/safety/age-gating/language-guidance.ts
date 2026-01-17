@@ -3,18 +3,18 @@
 // Language complexity and age-appropriate prompts
 // ============================================================================
 
-import type { AgeBracket, ContentTopic } from './types';
-import { TOPIC_MATRIX } from './topic-matrix';
+import type { AgeBracket } from "./types";
+import { TOPIC_MATRIX } from "./topic-matrix";
 
 /**
  * Determine age bracket from numeric age (local copy to avoid circular dependency)
  */
 function getAgeBracketLocal(age: number): AgeBracket {
-  if (age < 6) return 'elementary';
-  if (age <= 10) return 'elementary';
-  if (age <= 13) return 'middle';
-  if (age <= 19) return 'highschool';
-  return 'adult';
+  if (age < 6) return "elementary";
+  if (age <= 10) return "elementary";
+  if (age <= 13) return "middle";
+  if (age <= 19) return "highschool";
+  return "adult";
 }
 
 /**
@@ -25,7 +25,7 @@ export function getLanguageGuidance(age: number): string {
   const bracket = getAgeBracketLocal(age);
 
   switch (bracket) {
-    case 'elementary':
+    case "elementary":
       return `
 ADATTAMENTO LINGUISTICO (6-10 anni):
 - Usa frasi brevi e semplici (max 10-15 parole)
@@ -34,7 +34,7 @@ ADATTAMENTO LINGUISTICO (6-10 anni):
 - Tono amichevole e incoraggiante
 - Molte ripetizioni per rafforzare concetti
 `;
-    case 'middle':
+    case "middle":
       return `
 ADATTAMENTO LINGUISTICO (11-13 anni):
 - Frasi di media lunghezza
@@ -43,7 +43,7 @@ ADATTAMENTO LINGUISTICO (11-13 anni):
 - Tono rispettoso ma non infantile
 - Incoraggia il ragionamento critico
 `;
-    case 'highschool':
+    case "highschool":
       return `
 ADATTAMENTO LINGUISTICO (14-19 anni):
 - Linguaggio standard, vocabolario completo
@@ -52,7 +52,7 @@ ADATTAMENTO LINGUISTICO (14-19 anni):
 - Rispetta la maturità cognitiva
 - Evita tono paternalistico
 `;
-    case 'adult':
+    case "adult":
     default:
       return `
 ADATTAMENTO LINGUISTICO (adulti):
@@ -71,16 +71,18 @@ function getTopicRestrictionsForBracket(bracket: AgeBracket): string {
 
   for (const [topic, matrix] of Object.entries(TOPIC_MATRIX)) {
     const sensitivity = matrix[bracket];
-    if (sensitivity === 'blocked' || sensitivity === 'restricted') {
-      restrictions.push(`- ${topic.replace(/_/g, ' ')}: ${sensitivity.toUpperCase()}`);
+    if (sensitivity === "blocked" || sensitivity === "restricted") {
+      restrictions.push(
+        `- ${topic.replace(/_/g, " ")}: ${sensitivity.toUpperCase()}`,
+      );
     }
   }
 
   if (restrictions.length === 0) {
-    return 'Nessuna restrizione speciale per questa fascia d\'età.';
+    return "Nessuna restrizione speciale per questa fascia d'età.";
   }
 
-  return restrictions.join('\n');
+  return restrictions.join("\n");
 }
 
 /**

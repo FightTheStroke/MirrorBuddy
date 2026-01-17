@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { diagramPlugin } from '../diagram-plugin';
-import { ToolCategory, Permission } from '../../plugin/types';
+import { ToolCategory, Permission, type VoicePromptConfig } from '../../plugin/types';
 
 // Extract schema for testing
 const DiagramPluginSchema = z.object({
@@ -51,13 +51,15 @@ describe('diagram-plugin', () => {
     });
 
     it('has voice prompt with topic placeholder', () => {
-      expect(diagramPlugin.voicePrompt?.template).toContain('{topic}');
-      expect(diagramPlugin.voicePrompt?.requiresContext).toContain('topic');
+      const voicePrompt = diagramPlugin.voicePrompt as VoicePromptConfig;
+      expect(voicePrompt.template).toContain('{topic}');
+      expect(voicePrompt.requiresContext).toContain('topic');
     });
 
     it('has voice feedback with diagramType', () => {
-      expect(diagramPlugin.voiceFeedback?.template).toContain('{diagramType}');
-      expect(diagramPlugin.voiceFeedback?.requiresContext).toContain('diagramType');
+      const voiceFeedback = diagramPlugin.voiceFeedback as VoicePromptConfig;
+      expect(voiceFeedback.template).toContain('{diagramType}');
+      expect(voiceFeedback.requiresContext).toContain('diagramType');
     });
 
     it('has no prerequisites', () => {

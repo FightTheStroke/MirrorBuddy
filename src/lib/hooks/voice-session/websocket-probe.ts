@@ -6,7 +6,7 @@
 'use client';
 
 import { logger } from '@/lib/logger';
-import type { ProbeResult } from './transport-probe';
+import type { ProbeResult } from './transport-types';
 
 const PROBE_TIMEOUT_MS = 5000;
 

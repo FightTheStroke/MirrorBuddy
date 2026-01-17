@@ -5,7 +5,7 @@ import { logger } from '@/lib/logger';
 import type { Maestro } from '@/types';
 import type { ConnectionInfo, UseVoiceSessionOptions } from './types';
 import { CONNECTION_TIMEOUT_MS } from './constants';
-import type { ConnectionRefs } from './connection';
+import type { ConnectionRefs } from './connection-types';
 
 export interface WebSocketConnectionConfig {
   maestro: Maestro;

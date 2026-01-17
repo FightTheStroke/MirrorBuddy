@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Chart Renderer
@@ -14,20 +14,22 @@
  * }
  */
 
-import { ChartRenderer as BaseChartRenderer } from '@/components/tools/chart-renderer';
-import type { ChartRequest } from '@/types';
-import type { BaseRendererProps } from './index';
+import { ChartRenderer as BaseChartRenderer } from "@/components/tools/chart-renderer";
+import type { ChartRequest } from "@/types";
+import type { BaseRendererProps } from "./types";
 
 /**
  * Render a chart from stored material data.
  */
 export function ChartRenderer({ data, className }: BaseRendererProps) {
-  const chartData = data as unknown as Partial<ChartRequest> & { title?: string };
+  const chartData = data as unknown as Partial<ChartRequest> & {
+    title?: string;
+  };
 
   // Build the request object for the base renderer
   const request: ChartRequest = {
-    type: chartData.type || 'bar',
-    title: chartData.title || 'Grafico',
+    type: chartData.type || "bar",
+    title: chartData.title || "Grafico",
     data: chartData.data || { labels: [], datasets: [] },
   };
 

@@ -20,7 +20,7 @@ describe('progress-store-actions-helpers', () => {
 
   describe('createSeasonHistory', () => {
     it('creates season history from state', () => {
-      const state: ProgressState = {
+      const state = {
         currentSeason: {
           name: 'Primavera 2026',
           startDate: new Date('2026-03-01'),
@@ -45,7 +45,7 @@ describe('progress-store-actions-helpers', () => {
           },
         ],
         totalStudyMinutes: 1200,
-      } as ProgressState;
+      } as unknown as ProgressState;
 
       const history = createSeasonHistory(state);
 
@@ -58,7 +58,7 @@ describe('progress-store-actions-helpers', () => {
     });
 
     it('counts zero achievements when none in season', () => {
-      const state: ProgressState = {
+      const state = {
         currentSeason: {
           name: 'Estate 2026',
           startDate: new Date('2026-06-01'),
@@ -68,7 +68,7 @@ describe('progress-store-actions-helpers', () => {
         seasonLevel: 2,
         achievements: [],
         totalStudyMinutes: 60,
-      } as ProgressState;
+      } as unknown as ProgressState;
 
       const history = createSeasonHistory(state);
 
@@ -88,6 +88,7 @@ describe('progress-store-actions-helpers', () => {
         startedAt: new Date(),
         maestroId: 'euclide',
         subject: 'math',
+        questionsAsked: 5,
         xpEarned: 50,
         mirrorBucksEarned: 50,
       };
@@ -99,12 +100,13 @@ describe('progress-store-actions-helpers', () => {
     });
 
     it('handles session with undefined mirrorBucksEarned', () => {
-      const session: StudySession = {
+      const session = {
         id: 'sess2',
         startedAt: new Date(),
         maestroId: 'feynman',
         subject: 'physics',
-      } as StudySession;
+        questionsAsked: 0,
+      } as unknown as StudySession;
 
       const result = updateSessionWithMirrorBucks(session, 25);
 
@@ -117,16 +119,16 @@ describe('progress-store-actions-helpers', () => {
         startedAt: new Date('2026-01-15T10:00:00.000Z'),
         maestroId: 'manzoni',
         subject: 'italian',
+        questionsAsked: 3,
         xpEarned: 0,
         mirrorBucksEarned: 0,
-        toolsUsed: ['mindmap', 'flashcard'],
       };
 
       const result = updateSessionWithMirrorBucks(session, 50);
 
       expect(result?.id).toBe('sess3');
       expect(result?.maestroId).toBe('manzoni');
-      expect(result?.toolsUsed).toEqual(['mindmap', 'flashcard']);
+      expect(result?.subject).toBe('italian');
     });
   });
 
@@ -138,7 +140,7 @@ describe('progress-store-actions-helpers', () => {
           longest: 0,
           lastStudyDate: null,
         },
-      } as ProgressState;
+      } as unknown as ProgressState;
 
       const result = calculateStreakUpdate(state);
 
@@ -155,7 +157,7 @@ describe('progress-store-actions-helpers', () => {
           longest: 5,
           lastStudyDate: yesterday,
         },
-      } as ProgressState;
+      } as unknown as ProgressState;
 
       const result = calculateStreakUpdate(state);
 
@@ -171,7 +173,7 @@ describe('progress-store-actions-helpers', () => {
           longest: 5,
           lastStudyDate: yesterday,
         },
-      } as ProgressState;
+      } as unknown as ProgressState;
 
       const result = calculateStreakUpdate(state);
 
@@ -187,7 +189,7 @@ describe('progress-store-actions-helpers', () => {
           longest: 15,
           lastStudyDate: twoDaysAgo,
         },
-      } as ProgressState;
+      } as unknown as ProgressState;
 
       const result = calculateStreakUpdate(state);
 
@@ -203,7 +205,7 @@ describe('progress-store-actions-helpers', () => {
           longest: 10,
           lastStudyDate: today,
         },
-      } as ProgressState;
+      } as unknown as ProgressState;
 
       const result = calculateStreakUpdate(state);
 
@@ -239,6 +241,9 @@ describe('progress-store-actions-helpers', () => {
         startedAt: new Date(),
         maestroId: 'euclide',
         subject: 'math',
+        questionsAsked: 0,
+        xpEarned: 0,
+        mirrorBucksEarned: 0,
       };
 
       const count = countSessionsThisWeek([], newSession);
@@ -252,12 +257,18 @@ describe('progress-store-actions-helpers', () => {
           startedAt: new Date(Date.now() - 2 * 86400000),
           maestroId: 'euclide',
           subject: 'math',
+          questionsAsked: 3,
+          xpEarned: 30,
+          mirrorBucksEarned: 30,
         },
         {
           id: 's2',
           startedAt: new Date(Date.now() - 5 * 86400000),
           maestroId: 'feynman',
           subject: 'physics',
+          questionsAsked: 5,
+          xpEarned: 50,
+          mirrorBucksEarned: 50,
         },
       ];
       const newSession: StudySession = {
@@ -265,6 +276,9 @@ describe('progress-store-actions-helpers', () => {
         startedAt: new Date(),
         maestroId: 'manzoni',
         subject: 'italian',
+        questionsAsked: 0,
+        xpEarned: 0,
+        mirrorBucksEarned: 0,
       };
 
       const count = countSessionsThisWeek(sessions, newSession);
@@ -278,6 +292,9 @@ describe('progress-store-actions-helpers', () => {
           startedAt: new Date(Date.now() - 10 * 86400000),
           maestroId: 'euclide',
           subject: 'math',
+          questionsAsked: 2,
+          xpEarned: 20,
+          mirrorBucksEarned: 20,
         },
       ];
       const newSession: StudySession = {
@@ -285,6 +302,9 @@ describe('progress-store-actions-helpers', () => {
         startedAt: new Date(),
         maestroId: 'manzoni',
         subject: 'italian',
+        questionsAsked: 0,
+        xpEarned: 0,
+        mirrorBucksEarned: 0,
       };
 
       const count = countSessionsThisWeek(sessions, newSession);
