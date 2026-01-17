@@ -12,3 +12,6 @@ export { ThumbnailPreview } from './thumbnail-preview';
 export { GridView } from './grid-view';
 export { ListView } from './list-view';
 export { MaterialViewer } from './material-viewer';
+export { ArchiveHeader } from './archive-header';
+export { ArchiveFilters } from './archive-filters';
+export { useArchiveView } from './use-archive-view';
