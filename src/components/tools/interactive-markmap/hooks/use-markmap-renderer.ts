@@ -5,15 +5,11 @@
  */
 
 import { useEffect, useState, RefObject, MutableRefObject } from 'react';
-import { Markmap } from 'markmap-view';
-import { Transformer } from 'markmap-lib';
+import type { Markmap } from 'markmap-view';
 import { logger } from '@/lib/logger';
 import type { AccessibilitySettings } from '@/lib/accessibility/accessibility-store';
 import type { MindmapNode } from '../types';
 import { nodesToMarkdown } from '../helpers';
-
-// Transformer instance for markdown parsing
-const transformer = new Transformer();
 
 export interface UseMarkmapRendererProps {
   nodes: MindmapNode[];
@@ -77,6 +73,12 @@ export function useMarkmapRenderer({
         svgRef.current.setAttribute('width', String(rect.width));
         svgRef.current.setAttribute('height', String(rect.height - 60)); // Account for toolbar
 
+        // Lazy-load markmap-lib to reduce bundle size
+        const { Transformer } = await import('markmap-lib');
+        if (cancelled) return;
+
+        const transformer = new Transformer();
+
         // Get markdown from nodes
         const content = nodesToMarkdown(nodes, title);
         const { root } = transformer.transform(content);
@@ -92,7 +94,11 @@ export function useMarkmapRenderer({
 
         if (cancelled) return;
 
-        markmapRef.current = Markmap.create(
+        // Lazy-load markmap-view to reduce bundle size
+        const { Markmap: MarkmapClass } = await import('markmap-view');
+        if (cancelled) return;
+
+        markmapRef.current = MarkmapClass.create(
           svgRef.current,
           {
             autoFit: true,

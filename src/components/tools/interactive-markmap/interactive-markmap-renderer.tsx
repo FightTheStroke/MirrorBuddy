@@ -11,7 +11,7 @@
 
 import { useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import { motion } from 'framer-motion';
-import { Markmap } from 'markmap-view';
+import type { Markmap } from 'markmap-view';
 import { cn } from '@/lib/utils';
 import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
 import type { InteractiveMarkMapRendererProps, InteractiveMarkMapHandle } from './types';
