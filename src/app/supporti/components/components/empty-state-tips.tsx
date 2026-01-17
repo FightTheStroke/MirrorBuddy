@@ -34,7 +34,7 @@ export function EmptyStateTips({ show }: EmptyStateTipsProps) {
       </p>
       <Button
         onClick={() => router.push('/astuccio')}
-        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+        className="bg-emerald-700 hover:bg-emerald-800 text-white"
       >
         Vai all&apos;Astuccio
       </Button>

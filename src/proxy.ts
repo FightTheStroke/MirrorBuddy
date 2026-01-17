@@ -11,6 +11,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { generateNonce, CSP_NONCE_HEADER } from "@/lib/security/csp-nonce";
 
+const REQUEST_ID_HEADER = "x-request-id";
+
 // Routes that do NOT require a provider to be configured
 const PUBLIC_ROUTES = [
   "/landing",
@@ -91,19 +93,32 @@ function buildCSPHeader(nonce: string): string {
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip static files - no CSP needed
+  // Generate request ID for tracing (merged from middleware.ts)
+  const requestId =
+    request.headers.get(REQUEST_ID_HEADER) ?? crypto.randomUUID();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(REQUEST_ID_HEADER, requestId);
+
+  // Skip static files - no CSP needed, but add request ID
   if (STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext))) {
-    return NextResponse.next();
+    const response = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
+    response.headers.set(REQUEST_ID_HEADER, requestId);
+    return response;
   }
 
   // Generate nonce for CSP
   const nonce = generateNonce();
 
-  // Skip public routes but still add CSP
+  // Skip public routes but still add CSP and request ID
   if (PUBLIC_ROUTES.some((route) => pathname.startsWith(route))) {
-    const response = NextResponse.next();
+    const response = NextResponse.next({
+      request: { headers: requestHeaders },
+    });
     response.headers.set(CSP_NONCE_HEADER, nonce);
     response.headers.set("Content-Security-Policy", buildCSPHeader(nonce));
+    response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
   }
 
@@ -115,10 +130,13 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Provider configured, allow access with CSP
-  const response = NextResponse.next();
+  // Provider configured, allow access with CSP and request ID
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
   response.headers.set(CSP_NONCE_HEADER, nonce);
   response.headers.set("Content-Security-Policy", buildCSPHeader(nonce));
+  response.headers.set(REQUEST_ID_HEADER, requestId);
   return response;
 }
 

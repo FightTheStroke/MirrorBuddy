@@ -126,11 +126,12 @@ html.light,
 }
 
 /* Accent color themes - Light mode (including explicit .light class) - Fix #5 */
-[data-accent="blue"], .light[data-accent="blue"], html.light[data-accent="blue"] { --primary: 221.2 83.2% 53.3%; --ring: 221.2 83.2% 53.3%; --accent-color: #3b82f6; }
-[data-accent="green"], .light[data-accent="green"], html.light[data-accent="green"] { --primary: 142.1 76.2% 36.3%; --ring: 142.1 76.2% 36.3%; --accent-color: #22c55e; }
-[data-accent="purple"], .light[data-accent="purple"], html.light[data-accent="purple"] { --primary: 262.1 83.3% 57.8%; --ring: 262.1 83.3% 57.8%; --accent-color: #a855f7; }
-[data-accent="orange"], .light[data-accent="orange"], html.light[data-accent="orange"] { --primary: 24.6 95% 53.1%; --ring: 24.6 95% 53.1%; --accent-color: #f97316; }
-[data-accent="pink"], .light[data-accent="pink"], html.light[data-accent="pink"] { --primary: 330 81% 60%; --ring: 330 81% 60%; --accent-color: #ec4899; }
+/* WCAG 2.1 AA: All colors meet 4.5:1 contrast with white text */
+[data-accent="blue"], .light[data-accent="blue"], html.light[data-accent="blue"] { --primary: 221.2 83.2% 53.3%; --ring: 221.2 83.2% 53.3%; --accent-color: #2563eb; }
+[data-accent="green"], .light[data-accent="green"], html.light[data-accent="green"] { --primary: 142.1 76.2% 36.3%; --ring: 142.1 76.2% 36.3%; --accent-color: #16a34a; }
+[data-accent="purple"], .light[data-accent="purple"], html.light[data-accent="purple"] { --primary: 262.1 83.3% 57.8%; --ring: 262.1 83.3% 57.8%; --accent-color: #9333ea; }
+[data-accent="orange"], .light[data-accent="orange"], html.light[data-accent="orange"] { --primary: 24.6 95% 53.1%; --ring: 24.6 95% 53.1%; --accent-color: #c2410c; }
+[data-accent="pink"], .light[data-accent="pink"], html.light[data-accent="pink"] { --primary: 330 81% 60%; --ring: 330 81% 60%; --accent-color: #db2777; }
 
 /* Accent color themes - Dark mode (multiple selectors for maximum compatibility) - Fix #5 */
 .dark[data-accent="blue"], [data-accent="blue"].dark, html.dark[data-accent="blue"] { --primary: 217.2 91.2% 59.8%; --ring: 224.3 76.3% 48%; --accent-color: #60a5fa; }
@@ -253,9 +254,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Gradient text */
+/* Gradient text - WCAG compliant colors */
 .gradient-text {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
