@@ -1,10 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
 import { Sun, Moon, Laptop, Globe, Check } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+
+// Static arrays moved outside component to prevent recreation
+const THEMES: Array<{ value: 'light' | 'dark' | 'system'; label: string; icon: React.ReactNode }> = [
+  { value: 'light', label: 'Chiaro', icon: <Sun className="w-5 h-5" /> },
+  { value: 'dark', label: 'Scuro', icon: <Moon className="w-5 h-5" /> },
+  { value: 'system', label: 'Sistema', icon: <Laptop className="w-5 h-5" /> },
+];
+
+const ACCENT_COLORS = [
+  { value: 'blue', label: 'Blu', class: 'bg-blue-500' },
+  { value: 'green', label: 'Verde', class: 'bg-green-500' },
+  { value: 'purple', label: 'Viola', class: 'bg-purple-500' },
+  { value: 'orange', label: 'Arancione', class: 'bg-orange-500' },
+  { value: 'pink', label: 'Rosa', class: 'bg-pink-500' },
+];
+
+const LANGUAGES = [
+  { value: 'it' as const, label: 'Italiano', flag: '🇮🇹' },
+  { value: 'en' as const, label: 'English', flag: '🇬🇧' },
+  { value: 'es' as const, label: 'Español', flag: '🇪🇸' },
+  { value: 'fr' as const, label: 'Français', flag: '🇫🇷' },
+  { value: 'de' as const, label: 'Deutsch', flag: '🇩🇪' },
+];
 
 // Appearance Settings
 interface AppearanceSettingsProps {
@@ -26,24 +49,10 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
     setMounted(true);
   }, []);
 
-  const themes: Array<{ value: 'light' | 'dark' | 'system'; label: string; icon: React.ReactNode }> = [
-    { value: 'light', label: 'Chiaro', icon: <Sun className="w-5 h-5" /> },
-    { value: 'dark', label: 'Scuro', icon: <Moon className="w-5 h-5" /> },
-    { value: 'system', label: 'Sistema', icon: <Laptop className="w-5 h-5" /> },
-  ];
-
-  const accentColors = [
-    { value: 'blue', label: 'Blu', class: 'bg-blue-500' },
-    { value: 'green', label: 'Verde', class: 'bg-green-500' },
-    { value: 'purple', label: 'Viola', class: 'bg-purple-500' },
-    { value: 'orange', label: 'Arancione', class: 'bg-orange-500' },
-    { value: 'pink', label: 'Rosa', class: 'bg-pink-500' },
-  ];
-
-  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+  const handleThemeChange = useCallback((newTheme: 'light' | 'dark' | 'system') => {
     setTheme(newTheme);
     onUpdate({ theme: newTheme });
-  };
+  }, [setTheme, onUpdate]);
 
   // Show loading state during hydration
   if (!mounted) {
@@ -55,7 +64,7 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
-              {themes.map(theme => (
+              {THEMES.map(theme => (
                 <div
                   key={theme.value}
                   className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700"
@@ -79,7 +88,7 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
-            {themes.map(theme => (
+            {THEMES.map(theme => (
               <button
                 key={theme.value}
                 onClick={() => handleThemeChange(theme.value)}
@@ -109,7 +118,7 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
         </CardHeader>
         <CardContent>
           <div className="flex gap-3">
-            {accentColors.map(color => (
+            {ACCENT_COLORS.map(color => (
               <button
                 key={color.value}
                 onClick={() => onUpdate({ accentColor: color.value })}
@@ -139,13 +148,7 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
             Seleziona la lingua in cui i professori ti parleranno
           </p>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {[
-              { value: 'it' as const, label: 'Italiano', flag: '🇮🇹' },
-              { value: 'en' as const, label: 'English', flag: '🇬🇧' },
-              { value: 'es' as const, label: 'Español', flag: '🇪🇸' },
-              { value: 'fr' as const, label: 'Français', flag: '🇫🇷' },
-              { value: 'de' as const, label: 'Deutsch', flag: '🇩🇪' },
-            ].map(lang => {
+            {LANGUAGES.map(lang => {
               const isSelected = (appearance.language || 'it') === lang.value;
               return (
                 <button

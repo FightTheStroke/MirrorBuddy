@@ -67,6 +67,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     processorRef: refs.processorRef,
     analyserRef: refs.analyserRef,
     lastLevelUpdateRef: refs.lastLevelUpdateRef,
+    frequencyDataRef: refs.frequencyDataRef,
   };
 
   const startAudioCapture = useStartAudioCapture(

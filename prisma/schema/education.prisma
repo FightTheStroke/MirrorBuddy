@@ -30,6 +30,7 @@ model FlashcardProgress {
   @@index([userId])
   @@index([nextReview])
   @@index([userId, nextReview])
+  @@index([userId, deckId])
 }
 
 model QuizResult {
@@ -79,6 +80,7 @@ model Learning {
   @@index([userId])
   @@index([category])
   @@index([confidence])
+  @@index([userId, category])
 }
 
 model StudySession {

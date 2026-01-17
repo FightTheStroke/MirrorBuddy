@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
     const learnings = await prisma.learning.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
+      take: 2000,
     });
 
     if (learnings.length === 0) {
@@ -121,6 +122,7 @@ export async function POST(request: NextRequest) {
 
     const sessions = await prisma.studySession.findMany({
       where: { userId },
+      take: 1000,
     });
 
     const totalMinutes = sessions.reduce(

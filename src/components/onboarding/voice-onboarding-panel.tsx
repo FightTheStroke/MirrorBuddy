@@ -18,7 +18,7 @@
  * Related: #61 Onboarding Voice Integration
  */
 
-import { useEffect, useCallback, useState, useRef } from 'react';
+import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
 import { logger } from '@/lib/logger';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import type { Maestro, VoiceSessionHandle } from '@/types';
@@ -128,8 +128,8 @@ export function VoiceOnboardingPanel({
   // Get last 4 transcript entries
   const recentTranscript = voiceTranscript.slice(-4);
 
-  // Data checklist based on step
-  const getChecklist = () => {
+  // Memoize checklist to avoid recreation on every render
+  const checklist = useMemo(() => {
     if (step === 'welcome') {
       return [
         { key: 'name', label: 'Nome', value: data.name, required: true },
@@ -144,9 +144,7 @@ export function VoiceOnboardingPanel({
       { key: 'differences', label: 'Difficoltà', value: data.learningDifferences?.length ?
         `${data.learningDifferences.length} indicate` : null, required: false },
     ];
-  };
-
-  const checklist = getChecklist();
+  }, [step, data.name, data.age, data.schoolLevel, data.learningDifferences?.length]);
 
   // If Azure is not available, show nothing (form mode will be used)
   if (!connectionInfo) {

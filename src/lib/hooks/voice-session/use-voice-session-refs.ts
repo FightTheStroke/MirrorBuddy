@@ -6,6 +6,8 @@
 
 import { useRef, useState } from 'react';
 import type { Maestro } from '@/types';
+import { RingBuffer } from './ring-buffer';
+import { MAX_QUEUE_SIZE } from './constants';
 
 export interface VoiceSessionRefs {
   wsRef: React.MutableRefObject<WebSocket | null>;
@@ -17,12 +19,13 @@ export interface VoiceSessionRefs {
   sourceNodeRef: React.MutableRefObject<MediaStreamAudioSourceNode | null>;
   processorRef: React.MutableRefObject<ScriptProcessorNode | null>;
   analyserRef: React.MutableRefObject<AnalyserNode | null>;
-  audioQueueRef: React.MutableRefObject<Int16Array[]>;
+  frequencyDataRef: React.MutableRefObject<Uint8Array<ArrayBuffer> | null>;
+  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
   isPlayingRef: React.MutableRefObject<boolean>;
   lastLevelUpdateRef: React.MutableRefObject<number>;
   playNextChunkRef: React.MutableRefObject<(() => void) | null>;
   nextPlayTimeRef: React.MutableRefObject<number>;
-  scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
+  scheduledSourcesRef: React.MutableRefObject<Set<AudioBufferSourceNode>>;
   isBufferingRef: React.MutableRefObject<boolean>;
   playbackAnalyserRef: React.MutableRefObject<AnalyserNode | null>;
   gainNodeRef: React.MutableRefObject<GainNode | null>;
@@ -55,12 +58,13 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     sourceNodeRef: useRef<MediaStreamAudioSourceNode | null>(null),
     processorRef: useRef<ScriptProcessorNode | null>(null),
     analyserRef: useRef<AnalyserNode | null>(null),
-    audioQueueRef: useRef<Int16Array[]>([]),
+    frequencyDataRef: useRef<Uint8Array<ArrayBuffer> | null>(null),
+    audioQueueRef: useRef<RingBuffer<Int16Array>>(new RingBuffer(MAX_QUEUE_SIZE)),
     isPlayingRef: useRef(false),
     lastLevelUpdateRef: useRef<number>(0),
     playNextChunkRef: useRef<(() => void) | null>(null),
     nextPlayTimeRef: useRef<number>(0),
-    scheduledSourcesRef: useRef<AudioBufferSourceNode[]>([]),
+    scheduledSourcesRef: useRef<Set<AudioBufferSourceNode>>(new Set()),
     isBufferingRef: useRef(true),
     playbackAnalyserRef: useRef<AnalyserNode | null>(null),
     gainNodeRef: useRef<GainNode | null>(null),

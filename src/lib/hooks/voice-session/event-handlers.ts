@@ -8,18 +8,19 @@
 import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
 import { base64ToInt16Array } from './audio-utils';
-import { MAX_QUEUE_SIZE } from './constants';
 import { handleToolCall, type ToolHandlerParams } from './tool-handlers';
 import { recordUserSpeechEnd, recordWebSocketFirstAudio } from './latency-utils';
 import { handleErrorEvent } from './error-handler';
 
+import type { RingBuffer } from './ring-buffer';
+
 export interface EventHandlerDeps extends Omit<ToolHandlerParams, 'event'> {
   hasActiveResponseRef: React.MutableRefObject<boolean>;
   sessionReadyRef: React.MutableRefObject<boolean>;
-  audioQueueRef: React.MutableRefObject<Int16Array[]>;
+  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
   isPlayingRef: React.MutableRefObject<boolean>;
   isBufferingRef: React.MutableRefObject<boolean>;
-  scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
+  scheduledSourcesRef: React.MutableRefObject<Set<AudioBufferSourceNode>>;
   playbackContextRef: React.MutableRefObject<AudioContext | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
@@ -112,24 +113,24 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
               deps.wsRef.current.send(cancelMsg);
             }
             deps.hasActiveResponseRef.current = false;
-            deps.audioQueueRef.current = [];
+            deps.audioQueueRef.current.clear();
             deps.isPlayingRef.current = false;
             deps.isBufferingRef.current = true;
             deps.scheduledSourcesRef.current.forEach(source => {
               try { source.stop(); } catch { /* already stopped */ }
             });
-            deps.scheduledSourcesRef.current = [];
+            deps.scheduledSourcesRef.current.clear();
             deps.setSpeaking(false);
           }
         } else if (deps.voiceBargeInEnabled && deps.isSpeaking) {
           logger.debug('[VoiceSession] Clearing local audio queue (response already done)');
-          deps.audioQueueRef.current = [];
+          deps.audioQueueRef.current.clear();
           deps.isPlayingRef.current = false;
           deps.isBufferingRef.current = true;
           deps.scheduledSourcesRef.current.forEach(source => {
             try { source.stop(); } catch { /* already stopped */ }
           });
-          deps.scheduledSourcesRef.current = [];
+          deps.scheduledSourcesRef.current.clear();
           deps.setSpeaking(false);
         }
         break;
@@ -164,9 +165,10 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
 
           const audioData = base64ToInt16Array(event.delta);
 
-          // Limit queue size to prevent memory issues
-          if (deps.audioQueueRef.current.length >= MAX_QUEUE_SIZE) {
-            deps.audioQueueRef.current.splice(0, deps.audioQueueRef.current.length - MAX_QUEUE_SIZE + 1);
+          // RingBuffer handles max size automatically - push returns false if full
+          // If full, drop oldest chunk to make room
+          if (deps.audioQueueRef.current.isFull()) {
+            deps.audioQueueRef.current.shift(); // Drop oldest
           }
 
           deps.audioQueueRef.current.push(audioData);

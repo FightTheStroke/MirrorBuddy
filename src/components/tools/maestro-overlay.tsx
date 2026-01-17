@@ -6,7 +6,7 @@
 // Part of Phase 4: Fullscreen Layout
 // ============================================================================
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { Loader2, MessageSquare, X, Minimize2, GripVertical } from 'lucide-react';
@@ -53,14 +53,14 @@ export function MaestroOverlay({
   const dragStartRef = useRef({ x: 0, y: 0 });
 
   // Handle dragging
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('button')) return;
     setIsDragging(true);
     dragStartRef.current = {
       x: e.clientX - position.x,
       y: e.clientY - position.y,
     };
-  };
+  }, [position.x, position.y]);
 
   useEffect(() => {
     if (!isDragging) return;

@@ -7,14 +7,15 @@
 
 import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import type { RingBuffer } from './ring-buffer';
 
 export interface ActionRefs {
   wsRef: React.MutableRefObject<WebSocket | null>;
   hasActiveResponseRef: React.MutableRefObject<boolean>;
-  audioQueueRef: React.MutableRefObject<Int16Array[]>;
+  audioQueueRef: React.MutableRefObject<RingBuffer<Int16Array>>;
   isPlayingRef: React.MutableRefObject<boolean>;
   isBufferingRef: React.MutableRefObject<boolean>;
-  scheduledSourcesRef: React.MutableRefObject<AudioBufferSourceNode[]>;
+  scheduledSourcesRef: React.MutableRefObject<Set<AudioBufferSourceNode>>;
   transportRef: React.MutableRefObject<'websocket' | 'webrtc'>;
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;
@@ -90,13 +91,13 @@ export function useCancelResponse(refs: ActionRefs, setSpeaking: (value: boolean
     }
 
     // Always clear local audio queue and stop scheduled sources
-    refs.audioQueueRef.current = [];
+    refs.audioQueueRef.current.clear();
     refs.isPlayingRef.current = false;
     refs.isBufferingRef.current = true;
     refs.scheduledSourcesRef.current.forEach(source => {
       try { source.stop(); } catch { /* already stopped */ }
     });
-    refs.scheduledSourcesRef.current = [];
+    refs.scheduledSourcesRef.current.clear();
     setSpeaking(false);
   }, [refs, setSpeaking]);
 }

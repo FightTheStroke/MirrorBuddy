@@ -20,9 +20,9 @@ export function useDisconnect(
   return useCallback(() => {
     logger.debug('[VoiceSession] Disconnecting...');
 
-    // WebRTC heartbeat cleanup
+    // WebRTC heartbeat cleanup (uses setTimeout with jitter, not setInterval)
     if (refs.webrtcHeartbeatRef.current) {
-      clearInterval(refs.webrtcHeartbeatRef.current);
+      clearTimeout(refs.webrtcHeartbeatRef.current);
       // eslint-disable-next-line react-hooks/immutability -- Intentional ref cleanup
       refs.webrtcHeartbeatRef.current = null;
     }
@@ -90,7 +90,7 @@ export function useDisconnect(
     }
 
     // Reset audio state
-    refs.audioQueueRef.current = [];
+    refs.audioQueueRef.current.clear();
     refs.isPlayingRef.current = false;
     refs.isBufferingRef.current = true;
     refs.nextPlayTimeRef.current = 0;
@@ -99,7 +99,7 @@ export function useDisconnect(
     refs.scheduledSourcesRef.current.forEach(source => {
       try { source.stop(); } catch { /* already stopped */ }
     });
-    refs.scheduledSourcesRef.current = [];
+    refs.scheduledSourcesRef.current.clear();
 
     // Reset session state
     refs.sessionReadyRef.current = false;
