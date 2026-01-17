@@ -370,9 +370,11 @@ jobs:
 
       - name: Check bundle sizes
         run: |
-          LARGE_CHUNKS=$(find .next/static/chunks -name "*.js" -size +1M 2>/dev/null | head -5)
+          # Check for large chunks (>500KB is warning, >1.2MB is error)
+          # Note: markmap-lib bundles prismjs + highlight.js (~1.1MB) for mindmap code highlighting
+          LARGE_CHUNKS=$(find .next/static/chunks -name "*.js" -size +1200k 2>/dev/null | head -5)
           if [ -n "$LARGE_CHUNKS" ]; then
-            echo "ERROR: Chunks over 1MB found:"
+            echo "ERROR: Chunks over 1.2MB found:"
             for chunk in $LARGE_CHUNKS; do
               du -h "$chunk"
             done
