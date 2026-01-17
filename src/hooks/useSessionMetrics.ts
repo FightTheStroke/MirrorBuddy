@@ -153,6 +153,24 @@ export function useSessionMetrics(maestroId?: string) {
   }, []);
 
   /**
+   * Record a safety incident.
+   * @param severity - S0 (info), S1 (warning), S2 (alert), S3 (critical)
+   */
+  const recordIncident = useCallback((severity: "S0" | "S1" | "S2" | "S3") => {
+    if (!sessionIdRef.current) return;
+
+    fetch("/api/metrics/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "incident",
+        sessionId: sessionIdRef.current,
+        severity,
+      }),
+    }).catch(() => {});
+  }, []);
+
+  /**
    * Get current session stats.
    * Call in event handlers, not during render.
    */
@@ -181,6 +199,7 @@ export function useSessionMetrics(maestroId?: string) {
     recordTurn,
     recordVoiceUsage,
     recordRefusal,
+    recordIncident,
     getStats,
   };
 }
