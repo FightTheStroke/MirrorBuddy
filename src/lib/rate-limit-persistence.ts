@@ -3,9 +3,9 @@
  * Dashboard analytics and logging for rate limit violations
  */
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import type { RateLimitConfig } from './rate-limit';
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import type { RateLimitConfig } from "./rate-limit-types";
 
 /**
  * Log a rate limit violation event to the database
@@ -14,7 +14,7 @@ import type { RateLimitConfig } from './rate-limit';
 export async function logRateLimitEvent(
   endpoint: string,
   config: RateLimitConfig,
-  options: { userId?: string; ipAddress?: string } = {}
+  options: { userId?: string; ipAddress?: string } = {},
 ): Promise<void> {
   try {
     await prisma.rateLimitEvent.create({
@@ -27,19 +27,21 @@ export async function logRateLimitEvent(
       },
     });
   } catch (error) {
-    logger.error('Failed to log rate limit event:', { error: String(error) });
+    logger.error("Failed to log rate limit event:", { error: String(error) });
   }
 }
 
 /**
  * Get rate limit events for dashboard analytics
  */
-export async function getRateLimitEvents(options: {
-  startDate?: Date;
-  endDate?: Date;
-  endpoint?: string;
-  limit?: number;
-} = {}): Promise<{
+export async function getRateLimitEvents(
+  options: {
+    startDate?: Date;
+    endDate?: Date;
+    endpoint?: string;
+    limit?: number;
+  } = {},
+): Promise<{
   events: Array<{
     id: string;
     userId: string | null;
@@ -66,7 +68,7 @@ export async function getRateLimitEvents(options: {
   const [events, total] = await Promise.all([
     prisma.rateLimitEvent.findMany({
       where,
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
       take: options.limit ?? 100,
     }),
     prisma.rateLimitEvent.count({ where }),
@@ -80,7 +82,7 @@ export async function getRateLimitEvents(options: {
  */
 export async function getRateLimitStats(
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): Promise<{
   totalEvents: number;
   byEndpoint: Record<string, number>;

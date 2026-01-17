@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Image Renderer
@@ -14,11 +14,11 @@
  * }
  */
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Image as ImageIcon, Download, ZoomIn, ZoomOut, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { BaseRendererProps } from './index';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Image as ImageIcon, Download, ZoomIn, ZoomOut, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BaseRendererProps } from "./types";
 
 interface ImageData {
   title?: string;
@@ -34,13 +34,13 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
   const imageData = data as ImageData;
   const [isZoomed, setIsZoomed] = useState(false);
 
-  const title = imageData.title || 'Immagine';
+  const title = imageData.title || "Immagine";
   const url = imageData.url;
   const alt = imageData.alt || title;
 
   if (!url) {
     return (
-      <div className={cn('p-4 text-center text-slate-500', className)}>
+      <div className={cn("p-4 text-center text-slate-500", className)}>
         <ImageIcon className="w-12 h-12 mx-auto mb-2 text-slate-300" />
         Nessuna immagine disponibile
       </div>
@@ -53,8 +53,8 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className={cn(
-          'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800',
-          className
+          "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800",
+          className,
         )}
       >
         <div className="relative group">
