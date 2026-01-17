@@ -3,7 +3,7 @@
 |                     |                                  |
 | ------------------- | -------------------------------- |
 | **Status**          | Accepted                         |
-| **Date**            | 2025-01-11 (Updated: 2025-01-18) |
+| **Date**            | 2025-01-11 (Updated: 2025-01-17) |
 | **Deciders**        | Roberto D'Angelo                 |
 | **Technical Story** | Production hardening review      |
 
@@ -117,27 +117,6 @@ The following capabilities were implemented as part of Plan 46 production harden
 - OpenTelemetry (have request IDs, not full OTel)
 - Infrastructure as Code (Bicep/Terraform)
 
-## Items Addressed by Plan 49 (Jan 2025)
-
-Plan 49 "V1-Enterprise-Ready" added enterprise reliability features:
-
-| Item                     | Implementation                                       | Location                   |
-| ------------------------ | ---------------------------------------------------- | -------------------------- |
-| **Feature Flags**        | Kill-switch per-feature + global, percentage rollout | `src/lib/feature-flags/`   |
-| **Graceful Degradation** | Auto-degradation based on service health             | `src/lib/degradation/`     |
-| **SLO Monitoring**       | Voice/Chat/Session SLOs with error budget tracking   | `src/lib/alerting/`        |
-| **Go/No-Go Alerting**    | Release decision support with checks                 | `go-nogo-alerting.ts`      |
-| **Admin Dashboard**      | Feature flags panel + SLO monitoring                 | `src/components/admin/`    |
-| **Admin API**            | CRUD for feature flags, kill-switch toggle           | `/api/admin/feature-flags` |
-
-**Key Capabilities:**
-
-- Global kill-switch for emergency shutdown
-- Per-feature kill-switch for targeted disabling
-- Automatic degradation rules (voice → disable on high latency, RAG → cache mode)
-- SLO breach alerting with severity levels
-- Go/No-Go release decision API
-
 ## Consequences
 
 ### Positive
@@ -165,6 +144,7 @@ Plan 49 "V1-Enterprise-Ready" added enterprise reliability features:
 - [ADR 0015: Database-First Architecture](./0015-database-first-architecture.md)
 - [ADR 0004: Safety Guardrails](./0004-safety-guardrails.md)
 - [ADR 0046: Production Hardening Plan 46](./0046-production-hardening-plan46.md)
+- [ADR 0049: Enterprise Reliability Plan 49](./0049-enterprise-reliability-plan49.md)
 
 ## References
 
@@ -173,4 +153,4 @@ Plan 49 "V1-Enterprise-Ready" added enterprise reliability features:
 
 ---
 
-_Version 3.0 | January 2025 | Plan 49 Enterprise Update_
+_Version 2.1 | January 2025 | Plan 46 Update_
