@@ -242,7 +242,7 @@ Rispondi SOLO con JSON (no markdown, no spiegazioni):
       js: code.js || '',
     };
   } catch (error) {
-    logger.error('Failed to generate demo code', { error });
+    logger.error('Failed to generate demo code', undefined, error);
     return null;
   }
 }

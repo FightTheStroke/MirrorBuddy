@@ -103,7 +103,7 @@ export function useMicrophoneTest(preferredMicrophoneId: string | null) {
       setMicTestActive(true);
       drawWaveform();
     } catch (error) {
-      logger.error('Mic test error', { error });
+      logger.error('Mic test error', undefined, error);
     }
   }, [preferredMicrophoneId]);
 

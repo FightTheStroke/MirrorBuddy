@@ -125,7 +125,7 @@ export function useMindmapsView() {
         downloadExport(result);
         logger.info('Mindmap exported', { format, title: mindmap.title });
       } catch (error) {
-        logger.error('Export failed', { error });
+        logger.error('Export failed', undefined, error);
         alert(
           `Errore durante l'esportazione: ${
             error instanceof Error ? error.message : 'Errore sconosciuto'
@@ -199,7 +199,7 @@ export function useMindmapsView() {
           file: file.name,
         });
       } catch (error) {
-        logger.error('Import failed', { error, file: file.name });
+        logger.error('Import failed', { file: file.name }, error);
         alert(
           `Errore durante l'importazione: ${
             error instanceof Error ? error.message : 'Errore sconosciuto'

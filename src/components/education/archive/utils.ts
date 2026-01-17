@@ -30,7 +30,7 @@ export async function updateMaterialInteraction(
     });
     return response.ok;
   } catch (error) {
-    logger.error('Failed to update material interaction', { error, toolId });
+    logger.error('Failed to update material interaction', { toolId }, error);
     return false;
   }
 }

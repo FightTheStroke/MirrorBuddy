@@ -67,11 +67,10 @@ export async function saveToolOutput(
     // Index for semantic search if enabled and userId provided
     if (enableRAG && userId) {
       // Don't await - index asynchronously to avoid blocking
-      indexToolOutput(storedOutput, userId, conversationId).catch((error) => {
+      indexToolOutput(storedOutput, userId, conversationId).catch((err) => {
         logger.error('Failed to index tool output (non-blocking)', {
           toolOutputId: toolOutput.id,
-          error,
-        });
+        }, err);
       });
     }
 
@@ -80,8 +79,7 @@ export async function saveToolOutput(
     logger.error('Failed to save tool output', {
       conversationId,
       toolType,
-      error,
-    });
+    }, error);
     throw error;
   }
 }
@@ -107,7 +105,7 @@ export async function getToolOutputs(
       data: JSON.parse(output.data),
     }));
   } catch (error) {
-    logger.error('Failed to get tool outputs', { conversationId, error });
+    logger.error('Failed to get tool outputs', { conversationId }, error);
     throw error;
   }
 }
@@ -141,8 +139,7 @@ export async function getToolOutputsByType(
     logger.error('Failed to get tool outputs by type', {
       conversationId,
       toolType,
-      error,
-    });
+    }, error);
     throw error;
   }
 }
@@ -162,7 +159,7 @@ export async function getToolOutputCount(
       where: { conversationId },
     });
   } catch (error) {
-    logger.error('Failed to get tool output count', { conversationId, error });
+    logger.error('Failed to get tool output count', { conversationId }, error);
     return 0;
   }
 }
@@ -190,7 +187,7 @@ export async function getToolOutputStats(
 
     return stats;
   } catch (error) {
-    logger.error('Failed to get tool output stats', { conversationId, error });
+    logger.error('Failed to get tool output stats', { conversationId }, error);
     return {};
   }
 }
@@ -217,7 +214,7 @@ export async function deleteToolOutputs(
 
     return result.count;
   } catch (error) {
-    logger.error('Failed to delete tool outputs', { conversationId, error });
+    logger.error('Failed to delete tool outputs', { conversationId }, error);
     throw error;
   }
 }

@@ -21,7 +21,7 @@ export async function fetchMaterials(
     const data = await response.json();
     return data.materials || [];
   } catch (error) {
-    logger.error('Failed to fetch materials', { error, toolType });
+    logger.error('Failed to fetch materials', { toolType }, error);
     return [];
   }
 }
@@ -57,7 +57,7 @@ export async function saveMaterialToAPI(
     const data = await response.json();
     return data.material;
   } catch (error) {
-    logger.error('Failed to save material', { error, toolType, title });
+    logger.error('Failed to save material', { toolType, title }, error);
     return null;
   }
 }
@@ -69,7 +69,7 @@ export async function deleteMaterialFromAPI(toolId: string): Promise<boolean> {
     });
     return response.ok;
   } catch (error) {
-    logger.error('Failed to delete material', { error, toolId });
+    logger.error('Failed to delete material', { toolId }, error);
     return false;
   }
 }
@@ -87,7 +87,7 @@ export async function updateMaterialInAPI(
     });
     return response.ok;
   } catch (error) {
-    logger.error('Failed to update material', { error, toolId });
+    logger.error('Failed to update material', { toolId }, error);
     return false;
   }
 }
@@ -143,7 +143,7 @@ export async function saveMaterialToAPIWithId(
       
       const errorMessage = `API error: ${response.status} - ${JSON.stringify(errorData)}`;
       logger.error('Failed to save material - API error', {
-        error: errorMessage,
+        errorDetails: errorMessage,
         status: response.status,
         statusText: response.statusText,
         toolType,
@@ -174,7 +174,7 @@ export async function saveMaterialToAPIWithId(
         : String(error);
     
     logger.error('Failed to save material', {
-      error: errorMessage || 'Unknown error',
+      errorDetails: errorMessage || 'Unknown error',
       toolType: toolType || 'unknown',
       title: title || 'untitled',
       userId: userId || 'unknown',

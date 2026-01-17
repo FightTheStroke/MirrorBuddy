@@ -34,7 +34,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ deleted: result.count });
   } catch (error) {
-    logger.error("Failed to delete conversations", { error });
+    logger.error("Failed to delete conversations", undefined, error);
     return NextResponse.json(
       { error: "Failed to delete conversations" },
       { status: 500 },

@@ -113,7 +113,7 @@ export class VoiceToolFlow {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
-      logger.error('VoiceToolFlow error:', { error: errorMessage });
+      logger.error('VoiceToolFlow error:', { errorDetails: errorMessage });
 
       return {
         triggered: false,

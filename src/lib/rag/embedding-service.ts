@@ -98,9 +98,9 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    logger.error('[Embedding] API error', { status: response.status, error });
-    throw new Error(`Azure Embedding error (${response.status}): ${error}`);
+    const errorText = await response.text();
+    logger.error('[Embedding] API error', { status: response.status, errorDetails: errorText });
+    throw new Error(`Azure Embedding error (${response.status}): ${errorText}`);
   }
 
   const data = await response.json();
@@ -151,9 +151,9 @@ export async function generateEmbeddings(texts: string[]): Promise<EmbeddingResu
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    logger.error('[Embedding] Batch API error', { status: response.status, error });
-    throw new Error(`Azure Embedding error (${response.status}): ${error}`);
+    const errorText = await response.text();
+    logger.error('[Embedding] Batch API error', { status: response.status, errorDetails: errorText });
+    throw new Error(`Azure Embedding error (${response.status}): ${errorText}`);
   }
 
   const data = await response.json();

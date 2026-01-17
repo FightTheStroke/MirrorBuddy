@@ -52,7 +52,7 @@ registerToolHandler('upload_pdf', async (args): Promise<ToolExecutionResult> => 
   // Validate buffer
   const validation = validatePDFBuffer(buffer);
   if (!validation.valid) {
-    logger.error('PDF validation failed', { error: validation.error, fileName });
+    logger.error('PDF validation failed', { errorDetails: validation.error, fileName });
     return {
       success: false,
       toolId: nanoid(),
@@ -105,7 +105,7 @@ registerToolHandler('upload_pdf', async (args): Promise<ToolExecutionResult> => 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logger.error('PDF extraction failed', {
-      error: errorMessage,
+      errorDetails: errorMessage,
       fileName,
       fileSize,
     });

@@ -37,7 +37,7 @@ export function useSpeakerTest() {
           setSpeakerTestActive(false);
         }, 600);
       } catch (error) {
-        logger.error('Fallback tone error', { error });
+        logger.error('Fallback tone error', undefined, error);
         setSpeakerTestActive(false);
       }
     };
@@ -76,7 +76,7 @@ export function useSpeakerTest() {
         playFallbackTone();
       }
     } catch (error) {
-      logger.error('Speaker test error', { error });
+      logger.error('Speaker test error', undefined, error);
       playFallbackTone();
     }
   }, []);

@@ -81,7 +81,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ attempts, stats });
   } catch (error) {
-    logger.error("Failed to fetch attempts", { error });
+    logger.error("Failed to fetch attempts", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch attempts" },
       { status: 500 },
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ attempt, passed }, { status: 201 });
   } catch (error) {
-    logger.error("Failed to save attempt", { error });
+    logger.error("Failed to save attempt", undefined, error);
     return NextResponse.json(
       { error: "Failed to save attempt" },
       { status: 500 },

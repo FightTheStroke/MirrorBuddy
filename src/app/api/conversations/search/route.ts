@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    logger.error('Failed to search conversations', { error });
+    logger.error('Failed to search conversations', undefined, error);
     return NextResponse.json({ error: 'Failed to search conversations' }, { status: 500 });
   }
 }

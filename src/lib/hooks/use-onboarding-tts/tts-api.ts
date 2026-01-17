@@ -42,7 +42,7 @@ export async function speakViaOpenAI(
     if ((error as Error).name === 'AbortError') {
       return null; // Request was aborted
     }
-    logger.error('[OnboardingTTS] OpenAI error', { error });
+    logger.error('[OnboardingTTS] OpenAI error', undefined, error);
     return null; // Signal to fallback
   }
 }

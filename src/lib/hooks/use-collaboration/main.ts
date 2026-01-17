@@ -104,7 +104,7 @@ export function useCollaboration(
         await connectToRoom(result.roomId);
         return result.roomId;
       } catch (error) {
-        logger.error('Failed to create collaboration room', { error });
+        logger.error('Failed to create collaboration room', undefined, error);
         setState((prev) => ({
           ...prev,
           isConnecting: false,
@@ -142,7 +142,7 @@ export function useCollaboration(
         await connectToRoom(roomId);
         return true;
       } catch (error) {
-        logger.error('Failed to join collaboration room', { error, roomId });
+        logger.error('Failed to join collaboration room', { roomId }, error);
         setState((prev) => ({
           ...prev,
           isConnecting: false,

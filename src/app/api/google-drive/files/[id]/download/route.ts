@@ -60,7 +60,7 @@ export async function GET(
     });
 
   } catch (error) {
-    logger.error('Google Drive download failed', { error, fileId, userId });
+    logger.error('Google Drive download failed', { fileId, userId }, error);
     return NextResponse.json(
       { error: 'Failed to download file' },
       { status: 500 }

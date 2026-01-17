@@ -36,7 +36,7 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
     logger.debug('[Push] Service worker registered', { scope: registration.scope });
     return registration;
   } catch (error) {
-    logger.error('[Push] Service worker registration failed', { error });
+    logger.error('[Push] Service worker registration failed', undefined, error);
     return null;
   }
 }
@@ -124,7 +124,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
 
     return json;
   } catch (error) {
-    logger.error('[Push] Subscription failed', { error });
+    logger.error('[Push] Subscription failed', undefined, error);
     return null;
   }
 }
@@ -149,7 +149,7 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     logger.info('[Push] Unsubscribed');
     return true;
   } catch (error) {
-    logger.error('[Push] Unsubscribe failed', { error });
+    logger.error('[Push] Unsubscribe failed', undefined, error);
     return false;
   }
 }
@@ -177,7 +177,7 @@ async function saveSubscriptionToServer(subscription: PushSubscriptionJSON): Pro
 
     return true;
   } catch (error) {
-    logger.error('[Push] Server save error', { error });
+    logger.error('[Push] Server save error', undefined, error);
     return false;
   }
 }
@@ -195,7 +195,7 @@ async function removeSubscriptionFromServer(endpoint: string): Promise<boolean> 
 
     return response.ok;
   } catch (error) {
-    logger.error('[Push] Server delete error', { error });
+    logger.error('[Push] Server delete error', undefined, error);
     return false;
   }
 }

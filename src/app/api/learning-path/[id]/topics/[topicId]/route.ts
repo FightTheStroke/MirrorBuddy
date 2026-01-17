@@ -54,7 +54,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ topic });
   } catch (error) {
-    logger.error("Failed to fetch topic", { error });
+    logger.error("Failed to fetch topic", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch topic" },
       { status: 500 },
@@ -216,7 +216,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       nextTopicId,
     });
   } catch (error) {
-    logger.error("Failed to update topic status", { error });
+    logger.error("Failed to update topic status", undefined, error);
     return NextResponse.json(
       { error: "Failed to update topic status" },
       { status: 500 },

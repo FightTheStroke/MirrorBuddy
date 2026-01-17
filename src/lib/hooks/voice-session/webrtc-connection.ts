@@ -52,7 +52,7 @@ export class WebRTCConnection {
     } catch (error) {
       this.cleanup();
       const message = error instanceof Error ? error.message : 'Unknown WebRTC error';
-      logger.error('[WebRTC] Connection failed', { error: message });
+      logger.error('[WebRTC] Connection failed', { errorDetails: message });
       this.config.onError?.(new Error(message));
       throw error;
     }
@@ -128,7 +128,7 @@ export class WebRTCConnection {
       this.config.onDataChannelClose?.();
     };
     channel.onerror = (event) => {
-      logger.error('[WebRTC] Data channel error', { error: event.error });
+      logger.error('[WebRTC] Data channel error', { errorDetails: event.error });
     };
     channel.onmessage = (event) => {
       try {

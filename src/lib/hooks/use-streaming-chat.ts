@@ -128,7 +128,7 @@ export function useStreamingChat(options: UseStreamingChatOptions = {}): UseStre
       }
 
       const errorMessage = (err as Error).message || 'Streaming failed';
-      logger.error('[StreamingChat] Error', { error: errorMessage });
+      logger.error('[StreamingChat] Error', { errorDetails: errorMessage });
       setError(errorMessage);
       setStreamingState('error');
       callbacksRef.current.onError?.(err as Error);

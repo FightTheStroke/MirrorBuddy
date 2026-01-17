@@ -82,7 +82,7 @@ Rispondi SOLO con JSON valido: {"html":"...","css":"...","js":"..."}`;
       js: code.js || '',
     };
   } catch (error) {
-    logger.error(`Failed to generate demo code for ${topic}`, { error });
+    logger.error(`Failed to generate demo code for ${topic}`, undefined, error);
     return null;
   }
 }
@@ -147,7 +147,7 @@ export const demoPlugin: ToolPlugin = {
         },
       };
     } catch (error) {
-      logger.error('Demo handler error', { error });
+      logger.error('Demo handler error', undefined, error);
       return {
         success: false,
         error: `Errore nella creazione della demo: ${error instanceof Error ? error.message : 'Sconosciuto'}`,

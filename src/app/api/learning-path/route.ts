@@ -44,7 +44,7 @@ export async function GET() {
 
     return NextResponse.json({ paths });
   } catch (error) {
-    logger.error("Failed to fetch learning paths", { error });
+    logger.error("Failed to fetch learning paths", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch learning paths" },
       { status: 500 },
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ path }, { status: 201 });
   } catch (error) {
-    logger.error("Failed to create learning path", { error });
+    logger.error("Failed to create learning path", undefined, error);
     return NextResponse.json(
       { error: "Failed to create learning path" },
       { status: 500 },

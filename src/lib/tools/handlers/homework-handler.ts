@@ -75,7 +75,7 @@ Rispondi SOLO con JSON valido.`;
       originalText: text,
     };
   } catch (error) {
-    logger.error('Failed to analyze homework', { error });
+    logger.error('Failed to analyze homework', undefined, error);
     return {
       exerciseType: 'unknown',
       problemStatement: text.substring(0, 500),
@@ -131,7 +131,7 @@ async function extractTextFromImage(imageData: string): Promise<string> {
 
     if (!response.ok) {
       const errorText = await response.text();
-      logger.error('Azure Vision API error', { status: response.status, error: errorText });
+      logger.error('Azure Vision API error', { status: response.status, errorDetails: errorText });
       throw new Error(`Azure Vision API error (${response.status})`);
     }
 
@@ -144,7 +144,7 @@ async function extractTextFromImage(imageData: string): Promise<string> {
 
     return content.trim();
   } catch (error) {
-    logger.error('Failed to extract text from image', { error });
+    logger.error('Failed to extract text from image', undefined, error);
     throw new Error('Impossibile estrarre il testo dall\'immagine');
   }
 }
@@ -218,7 +218,7 @@ registerToolHandler('homework_help', async (args): Promise<ToolExecutionResult> 
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Failed to process homework', { error: errorMessage });
+    logger.error('Failed to process homework', { errorDetails: errorMessage });
 
     return {
       success: false,

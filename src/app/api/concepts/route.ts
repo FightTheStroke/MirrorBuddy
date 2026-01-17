@@ -82,7 +82,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
-    logger.error("Failed to fetch concepts", { error });
+    logger.error("Failed to fetch concepts", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch concepts" },
       { status: 500 },
@@ -130,7 +130,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    logger.error("Failed to create concept", { error });
+    logger.error("Failed to create concept", undefined, error);
     return NextResponse.json(
       { error: "Failed to create concept" },
       { status: 500 },

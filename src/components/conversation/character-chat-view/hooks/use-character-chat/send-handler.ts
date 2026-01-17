@@ -65,7 +65,7 @@ export async function handleSendMessage(options: SendMessageOptions): Promise<bo
         callbacks.onStreamingComplete(streamingMsgId, fullResponse);
       },
       onError: (error) => {
-        logger.error('Streaming error', { error });
+        logger.error('Streaming error', undefined, error);
         callbacks.onStreamingError(streamingMsgId);
       },
     });
@@ -89,7 +89,7 @@ export async function handleSendMessage(options: SendMessageOptions): Promise<bo
     callbacks.onNonStreamingComplete(assistantMessage, toolState);
     return false;
   } catch (error) {
-    logger.error('Chat error', { error });
+    logger.error('Chat error', undefined, error);
     callbacks.onError();
     return false;
   }

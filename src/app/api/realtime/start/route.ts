@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('X-Request-ID', getRequestId(request));
     return response;
   } catch (error) {
-    logger.error('Failed to start realtime proxy', { error });
+    logger.error('Failed to start realtime proxy', undefined, error);
     const response = NextResponse.json({ error: 'Failed to start proxy' }, { status: 500 });
     response.headers.set('X-Request-ID', getRequestId(request));
     return response;

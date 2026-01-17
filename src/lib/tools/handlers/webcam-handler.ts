@@ -82,7 +82,7 @@ Be thorough and accurate. For educational content, note mathematical formulas, d
     const errorText = await response.text();
     logger.error('[Webcam Handler] Azure Vision API error', {
       status: response.status,
-      error: errorText,
+      errorDetails: errorText,
     });
     throw new Error(`Azure Vision API error (${response.status}): ${errorText}`);
   }
@@ -101,7 +101,7 @@ Be thorough and accurate. For educational content, note mathematical formulas, d
       description: parsed.description || '',
     };
   } catch (error) {
-    logger.error('[Webcam Handler] Failed to parse Vision API response', { content, error });
+    logger.error('[Webcam Handler] Failed to parse Vision API response', { content }, error);
     throw new Error('Invalid JSON response from Vision API');
   }
 }
@@ -160,7 +160,7 @@ registerToolHandler('capture_webcam', async (args): Promise<ToolExecutionResult>
       data,
     };
   } catch (error) {
-    logger.error('[Webcam Handler] Error during image analysis', { error });
+    logger.error('[Webcam Handler] Error during image analysis', undefined, error);
 
     return {
       success: false,

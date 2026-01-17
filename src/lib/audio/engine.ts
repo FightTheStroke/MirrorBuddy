@@ -58,7 +58,7 @@ export class AmbientAudioEngine {
         state: this.audioContext.state,
       });
     } catch (error) {
-      logger.error('Failed to initialize audio engine', { error });
+      logger.error('Failed to initialize audio engine', undefined, error);
       throw new Error('Failed to initialize audio engine');
     }
   }
@@ -105,7 +105,7 @@ export class AmbientAudioEngine {
         startAudioLayer(activeLayer);
       }
     } catch (error) {
-      logger.error('Failed to add audio layer', { error, layer });
+      logger.error('Failed to add audio layer', { layer }, error);
       throw error;
     }
   }

@@ -78,7 +78,7 @@ export function VoiceSearch({ onSearchUpdate, onFilterUpdate }: VoiceSearchProps
 
       logger.info('Voice command processed', { command, filters });
     } catch (error) {
-      logger.error('Failed to process voice command', { error, command });
+      logger.error('Failed to process voice command', { command }, error);
     } finally {
       setIsProcessing(false);
     }
@@ -103,7 +103,7 @@ export function VoiceSearch({ onSearchUpdate, onFilterUpdate }: VoiceSearchProps
         };
 
         recognition.onerror = (event) => {
-          logger.error('Speech recognition error', { error: event.error });
+          logger.error('Speech recognition error', { errorCode: event.error });
           setIsListening(false);
           setIsProcessing(false);
         };

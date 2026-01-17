@@ -91,7 +91,7 @@ export function useMaterialContent(
         setData(material.content);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load material';
-        logger.error('Error loading material content', { toolId: toolCall.id, error: message });
+        logger.error('Error loading material content', { toolId: toolCall.id, errorMessage: message });
         setError(message);
       } finally {
         setIsLoading(false);

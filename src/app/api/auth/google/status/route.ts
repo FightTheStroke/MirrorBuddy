@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(status);
 
   } catch (error) {
-    logger.error('Google status check failed', { error, userId });
+    logger.error('Google status check failed', { userId }, error);
     return NextResponse.json(
       { error: 'Failed to get status' },
       { status: 500 }

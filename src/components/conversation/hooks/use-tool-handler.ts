@@ -83,7 +83,7 @@ export function useToolHandler({
           setActiveTool(null);
         }
       } catch (error) {
-        logger.error('Tool request error', { error });
+        logger.error('Tool request error', undefined, error);
         addMessage({
           role: 'assistant',
           content: 'Mi dispiace, non sono riuscito a creare lo strumento. Riprova?',
@@ -120,7 +120,7 @@ export function useToolHandler({
             }
           }
         } catch (error) {
-          logger.error('Failed to parse pendingToolRequest', { error });
+          logger.error('Failed to parse pendingToolRequest', undefined, error);
         }
       }
 

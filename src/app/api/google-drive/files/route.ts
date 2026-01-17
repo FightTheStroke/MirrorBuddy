@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    logger.error('Google Drive files list failed', { error, userId, folderId, search });
+    logger.error('Google Drive files list failed', { userId, folderId, search }, error);
     return NextResponse.json(
       { error: 'Failed to list files' },
       { status: 500 }

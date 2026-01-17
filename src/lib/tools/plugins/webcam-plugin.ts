@@ -80,7 +80,7 @@ async function webcamHandler(
     }
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('[Webcam Plugin] Error during image analysis', { error: errorMessage });
+    logger.error('[Webcam Plugin] Error during image analysis', { errorDetails: errorMessage });
 
     return createErrorResult(
       'capture_webcam',

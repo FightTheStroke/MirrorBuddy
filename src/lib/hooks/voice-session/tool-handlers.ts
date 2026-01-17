@@ -200,6 +200,6 @@ export async function handleToolCall(params: ToolHandlerParams): Promise<void> {
     });
     sendViaTransport(wsRef, transportRef, webrtcDataChannelRef, { type: 'response.create' });
   } catch (error) {
-    logger.error('[VoiceSession] Failed to parse/execute tool call', { error });
+    logger.error('[VoiceSession] Failed to parse/execute tool call', undefined, error);
   }
 }

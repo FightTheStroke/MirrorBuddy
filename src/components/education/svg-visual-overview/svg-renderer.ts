@@ -98,7 +98,7 @@ export async function renderSVGDiagram(
     return { svg: sanitizedSvg, error: null };
   } catch (err) {
     const errorMsg = err instanceof Error ? err.message : String(err);
-    logger.error('[SVGRenderer] Render error', { error: errorMsg });
+    logger.error('[SVGRenderer] Render error', { errorMessage: errorMsg });
     return { svg: '', error: errorMsg };
   }
 }

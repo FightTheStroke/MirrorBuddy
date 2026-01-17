@@ -27,7 +27,7 @@ export function useMessageSending({
     try {
       await sendMessage(userMessage);
     } catch (error) {
-      logger.error('Chat error', { error });
+      logger.error('Chat error', undefined, error);
       addMessage({
         role: 'assistant',
         content: 'Mi dispiace, ho avuto un problema. Puoi riprovare?',

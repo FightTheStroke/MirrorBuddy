@@ -27,6 +27,15 @@ const eslintConfig = defineConfig([
           caughtErrorsIgnorePattern: "^_",
         },
       ],
+      // Prevent logger.error('msg', { error }) - Error objects don't serialize in JSON
+      // CORRECT: logger.error('msg', context, error) or logger.error('msg', undefined, error)
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.object.name='logger'][callee.property.name='error'] > ObjectExpression > Property[key.name='error'][value.type='Identifier']",
+          message: "Don't pass Error in context object - it serializes to {}. Use: logger.error('msg', context, error) or logger.error('msg', undefined, error)",
+        },
+      ],
     },
   },
   // Test files - allow any and Function for mocking

@@ -144,7 +144,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ similar });
   } catch (error) {
-    logger.error("Failed to find similar materials", { error });
+    logger.error("Failed to find similar materials", undefined, error);
     return NextResponse.json(
       { error: "Failed to find similar materials" },
       { status: 500 },

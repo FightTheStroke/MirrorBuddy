@@ -27,7 +27,7 @@ export function useCameraTest(preferredCameraId: string | null) {
 
       setCamTestActive(true);
     } catch (error) {
-      logger.error('Camera test error', { error });
+      logger.error('Camera test error', undefined, error);
     }
   }, [preferredCameraId]);
 

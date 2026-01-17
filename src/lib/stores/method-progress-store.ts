@@ -81,7 +81,7 @@ export const useMethodProgressStore = create<MethodProgressState>()(
             }
           }
         } catch (error) {
-          logger.error('Failed to fetch method progress', { error });
+          logger.error('Failed to fetch method progress', undefined, error);
         } finally {
           set({ isLoading: false });
         }
@@ -108,7 +108,7 @@ export const useMethodProgressStore = create<MethodProgressState>()(
           });
           set({ lastSyncedAt: new Date() });
         } catch (error) {
-          logger.error('Failed to sync method progress', { error });
+          logger.error('Failed to sync method progress', undefined, error);
         }
       },
 

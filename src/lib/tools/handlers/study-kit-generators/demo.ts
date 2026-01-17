@@ -124,7 +124,7 @@ Rispondi SOLO con JSON valido (no markdown, no commenti):
       js: demoData.js || '',
     };
   } catch (error) {
-    logger.error('Failed to parse demo JSON', { error });
+    logger.error('Failed to parse demo JSON', undefined, error);
     return null;
   }
 }

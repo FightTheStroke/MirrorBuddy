@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
   // Handle OAuth errors from Google
   if (error) {
-    logger.error('Google OAuth error from provider', { error });
+    logger.error('Google OAuth error from provider', { errorType: error });
     const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', error);
     return NextResponse.redirect(errorUrl.toString());
@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(successUrl.toString());
 
   } catch (err) {
-    logger.error('Google OAuth callback failed', { error: err });
+    logger.error('Google OAuth callback failed', undefined, err);
     const errorUrl = new URL('/', baseUrl);
     errorUrl.searchParams.set('google_error', 'callback_failed');
     return NextResponse.redirect(errorUrl.toString());

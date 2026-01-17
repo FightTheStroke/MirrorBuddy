@@ -117,7 +117,7 @@ async function homeworkHandler(
     }
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('Failed to process homework', { error: errorMessage });
+    logger.error('Failed to process homework', { errorDetails: errorMessage });
 
     return createErrorResult(
       'homework_help',

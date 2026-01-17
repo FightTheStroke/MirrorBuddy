@@ -56,7 +56,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ path });
   } catch (error) {
-    logger.error("Failed to fetch learning path", { error });
+    logger.error("Failed to fetch learning path", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch learning path" },
       { status: 500 },
@@ -102,7 +102,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error("Failed to delete learning path", { error });
+    logger.error("Failed to delete learning path", undefined, error);
     return NextResponse.json(
       { error: "Failed to delete learning path" },
       { status: 500 },

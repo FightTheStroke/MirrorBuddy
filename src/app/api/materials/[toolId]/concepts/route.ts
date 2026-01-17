@@ -69,9 +69,8 @@ export async function GET(
     });
   } catch (error) {
     logger.error("Failed to fetch concepts", {
-      error,
       toolId: (await context.params).toolId,
-    });
+    }, error);
     return NextResponse.json(
       { error: "Failed to fetch concepts" },
       { status: 500 },
@@ -168,9 +167,8 @@ export async function POST(
     );
   } catch (error) {
     logger.error("Failed to link concept", {
-      error,
       toolId: (await context.params).toolId,
-    });
+    }, error);
     return NextResponse.json(
       { error: "Failed to link concept" },
       { status: 500 },
@@ -244,9 +242,8 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error("Failed to unlink concept", {
-      error,
       toolId: (await context.params).toolId,
-    });
+    }, error);
     return NextResponse.json(
       { error: "Failed to unlink concept" },
       { status: 500 },

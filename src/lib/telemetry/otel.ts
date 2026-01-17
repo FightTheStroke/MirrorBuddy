@@ -66,7 +66,7 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
     logger.info("OpenTelemetry SDK initialized with Azure Monitor exporter");
     return sdk;
   } catch (error) {
-    logger.error("Failed to initialize OpenTelemetry SDK", { error });
+    logger.error("Failed to initialize OpenTelemetry SDK", undefined, error);
     return undefined;
   }
 }
@@ -86,12 +86,12 @@ export function startOpenTelemetry(sdk: NodeSDK): void {
         .shutdown()
         .then(() => logger.info("OpenTelemetry SDK shut down successfully"))
         .catch((error) =>
-          logger.error("Error shutting down OpenTelemetry SDK", { error }),
+          logger.error("Error shutting down OpenTelemetry SDK", undefined, error),
         )
         .finally(() => process.exit(0));
     });
   } catch (error) {
-    logger.error("Failed to start OpenTelemetry SDK", { error });
+    logger.error("Failed to start OpenTelemetry SDK", undefined, error);
   }
 }
 

@@ -154,7 +154,7 @@ async function formulaHandler(
     }
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('Formula creation failed', { error: errorMessage });
+    logger.error('Formula creation failed', { errorDetails: errorMessage });
 
     return createErrorResult(
       'create_formula',

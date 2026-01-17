@@ -38,7 +38,7 @@ export function WebcamPreview({
 
       setWebcamActive(true);
     } catch (error) {
-      logger.error('Webcam error', { error });
+      logger.error('Webcam error', undefined, error);
       setWebcamActive(false);
     }
   };

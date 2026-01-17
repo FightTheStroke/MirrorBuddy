@@ -63,8 +63,8 @@ export async function exchangeCodeForTokens(
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    logger.error('[Google OAuth] Token exchange failed', { error });
+    const errorText = await response.text();
+    logger.error('[Google OAuth] Token exchange failed', { errorText });
     return null;
   }
 
@@ -94,8 +94,8 @@ export async function refreshAccessToken(
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    logger.error('[Google OAuth] Token refresh failed', { error });
+    const errorText = await response.text();
+    logger.error('[Google OAuth] Token refresh failed', { errorText });
     return null;
   }
 

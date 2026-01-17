@@ -164,7 +164,7 @@ export function useGooglePicker({
       if (!tokenResponse.ok) {
         const data = await tokenResponse.json();
         const errorMsg = data.error || 'Failed to get access token';
-        logger.error('[GooglePicker] Token error:', { error: errorMsg });
+        logger.error('[GooglePicker] Token error:', { errorMessage: errorMsg });
         if (errorMsg.includes('Not connected')) {
           toast.error('Devi prima connettere Google Drive nelle Impostazioni.');
         } else {
@@ -222,7 +222,7 @@ export function useGooglePicker({
       picker.setVisible(true);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to open picker';
-      logger.error('[GooglePicker] Error:', { error: errorMsg });
+      logger.error('[GooglePicker] Error:', { errorMessage: errorMsg });
       setError(errorMsg);
     } finally {
       setIsLoading(false);
