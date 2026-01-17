@@ -162,7 +162,7 @@ Rispondi SOLO con JSON valido in questo formato:
   } catch (parseError) {
     const errorMessage = parseError instanceof Error ? parseError.message : String(parseError);
     logger.error('JSON parsing failed for topic analysis', {
-      error: errorMessage,
+      errorDetails: errorMessage,
       jsonAttempt: jsonMatch[0].substring(0, 500),
     });
     // Preserve validation errors, wrap JSON parsing errors

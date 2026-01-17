@@ -107,7 +107,7 @@ export function WaveformVisualization({
 
       draw();
     } catch (error) {
-      logger.error('Waveform error', { error });
+      logger.error('Waveform error', undefined, error);
       setWaveformActive(false);
     }
   };

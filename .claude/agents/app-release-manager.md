@@ -193,5 +193,6 @@ Before release, ALL must be checked:
 - [ ] Cron jobs: Tests exist
 - [ ] `/api/chat/stream`: Tests exist
 - [ ] `/api/realtime/start`: Tests exist
+- [ ] Chat tools integration: E2E tests pass (`e2e/chat-tools-integration.spec.ts`)
 
 **RULE: No proof = BLOCKED.**

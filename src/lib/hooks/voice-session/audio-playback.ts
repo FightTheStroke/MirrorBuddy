@@ -120,7 +120,7 @@ export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (v
         refs.nextPlayTimeRef.current += chunkDuration;
 
       } catch (e) {
-        logger.error('[VoiceSession] Playback scheduling error', { error: e });
+        logger.error('[VoiceSession] Playback scheduling error', undefined, e);
       }
     }
   }, [refs, setSpeaking, setOutputLevel]);

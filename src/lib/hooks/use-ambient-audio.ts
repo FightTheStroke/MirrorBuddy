@@ -24,7 +24,7 @@ export function useAmbientAudio() {
         await engine.initialize();
         logger.info('Ambient audio hook: engine initialized');
       } catch (error) {
-        logger.error('Failed to initialize audio engine', { error });
+        logger.error('Failed to initialize audio engine', undefined, error);
         store.setError('Failed to initialize audio system');
       }
     };
@@ -52,7 +52,7 @@ export function useAmbientAudio() {
           }
         }
       } catch (error) {
-        logger.error('Failed to sync layers with engine', { error });
+        logger.error('Failed to sync layers with engine', undefined, error);
         store.setError('Failed to sync audio layers');
       }
     };
@@ -71,7 +71,7 @@ export function useAmbientAudio() {
       await engine.resume();
       store.play();
     } catch (error) {
-      logger.error('Failed to play audio', { error });
+      logger.error('Failed to play audio', undefined, error);
       store.setError('Failed to start audio playback');
     }
   }, [engine, store]);

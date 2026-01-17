@@ -75,7 +75,7 @@ async function generateAzureTTS(text: string, voice: TTSVoice): Promise<ArrayBuf
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error('[TTS] Azure API error', { status: response.status, error: errorText });
+    logger.error('[TTS] Azure API error', { status: response.status, errorMessage: errorText });
     throw new Error(`Azure TTS failed: ${response.status}`);
   }
 
@@ -105,7 +105,7 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error('[TTS] OpenAI API error', { status: response.status, error: errorText });
+    logger.error('[TTS] OpenAI API error', { status: response.status, errorMessage: errorText });
     throw new Error(`OpenAI TTS failed: ${response.status}`);
   }
 
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('[TTS] Error', { error });
+    logger.error('[TTS] Error', undefined, error);
     return NextResponse.json(
       { error: 'Internal server error', fallback: true },
       { status: 500 }

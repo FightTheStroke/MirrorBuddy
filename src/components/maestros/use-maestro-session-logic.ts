@@ -204,7 +204,7 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
         setSessionEnded(false);
       }
     } catch (error) {
-      logger.error('Failed to load conversation', { error, conversationId });
+      logger.error('Failed to load conversation', { conversationId }, error);
     }
   }, []);
 

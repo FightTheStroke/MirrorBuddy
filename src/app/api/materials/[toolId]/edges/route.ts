@@ -70,9 +70,8 @@ export async function GET(
     return NextResponse.json({ edges });
   } catch (error) {
     logger.error("Failed to fetch edges", {
-      error,
       toolId: (await context.params).toolId,
-    });
+    }, error);
     return NextResponse.json(
       { error: "Failed to fetch edges" },
       { status: 500 },
@@ -168,9 +167,8 @@ export async function POST(
     }
 
     logger.error("Failed to create edge", {
-      error,
       toolId: (await context.params).toolId,
-    });
+    }, error);
     return NextResponse.json(
       { error: "Failed to create edge" },
       { status: 500 },
@@ -249,9 +247,8 @@ export async function DELETE(
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error("Failed to delete edge", {
-      error,
       toolId: (await context.params).toolId,
-    });
+    }, error);
     return NextResponse.json(
       { error: "Failed to delete edge" },
       { status: 500 },

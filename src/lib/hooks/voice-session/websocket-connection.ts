@@ -120,7 +120,7 @@ export async function createWebSocketConnection(config: WebSocketConnectionConfi
         logger.error('[VoiceSession] handleServerEventRef is NULL, event lost', { eventType: data.type });
       }
     } catch (e) {
-      logger.error('[VoiceSession] ws.onmessage parse error', { error: e });
+      logger.error('[VoiceSession] ws.onmessage parse error', undefined, e);
     }
   };
 

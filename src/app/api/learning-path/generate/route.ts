@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ path: generatedPath }, { status: 201 });
   } catch (error) {
-    logger.error("Failed to generate learning path", { error });
+    logger.error("Failed to generate learning path", undefined, error);
     return NextResponse.json(
       { error: "Failed to generate learning path" },
       { status: 500 },

@@ -119,7 +119,7 @@ export function useWebcamCapture({
         // Log error with safe serialization
         try {
           logger.error('Camera error', {
-            error: errorMessage,
+            errorDetails: errorMessage,
             errorName,
             errorType,
             deviceId: deviceId || null,

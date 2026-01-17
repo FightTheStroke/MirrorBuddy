@@ -33,7 +33,7 @@ export async function createCollabRoom(
     const data = await response.json();
     return { roomId: data.room.roomId, participants: data.participants || [] };
   } catch (error) {
-    logger.error('Failed to create collaboration room', { error });
+    logger.error('Failed to create collaboration room', undefined, error);
     return null;
   }
 }
@@ -65,7 +65,7 @@ export async function joinCollabRoom(
     const data = await response.json();
     return { mindmap: data.mindmap, participants: data.participants || [] };
   } catch (error) {
-    logger.error('Failed to join collaboration room', { error, roomId });
+    logger.error('Failed to join collaboration room', { roomId }, error);
     return null;
   }
 }

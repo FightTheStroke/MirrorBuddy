@@ -182,7 +182,7 @@ export function useStudentSummarySync({
         }),
       });
     } catch (error) {
-      logger.error('[StudentSummarySync] Broadcast failed', { error });
+      logger.error('[StudentSummarySync] Broadcast failed', undefined, error);
     }
   }, [sessionId]);
 
@@ -199,7 +199,7 @@ export function useStudentSummarySync({
         }),
       });
     } catch (error) {
-      logger.error('[StudentSummarySync] Broadcast save failed', { error });
+      logger.error('[StudentSummarySync] Broadcast save failed', undefined, error);
     }
   }, [sessionId]);
 

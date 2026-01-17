@@ -120,7 +120,7 @@ async function chartHandler(
     }
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('Chart creation failed', { error: errorMessage });
+    logger.error('Chart creation failed', { errorDetails: errorMessage });
 
     return createErrorResult(
       'create_chart',

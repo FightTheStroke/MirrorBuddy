@@ -58,7 +58,7 @@ export async function azureChatCompletion(
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error(`[Azure Chat] Error ${response.status}`, { error: errorText });
+    logger.error(`[Azure Chat] Error ${response.status}`, { errorDetails: errorText });
 
     // Handle Azure content filter (400 with content_filter code)
     if (response.status === 400) {

@@ -170,7 +170,7 @@ export async function getActiveMaterials(): Promise<MaterialRecord[]> {
     const data = await response.json();
     return data.materials || [];
   } catch (error) {
-    logger.error("Error fetching active materials", { error });
+    logger.error("Error fetching active materials", undefined, error);
     return [];
   }
 }

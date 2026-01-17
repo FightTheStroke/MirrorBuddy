@@ -55,7 +55,7 @@ export default function ParentDashboardPage() {
       try {
         await exportProfile(format);
       } catch (err) {
-        logger.error('Export failed', { error: err, format });
+        logger.error('Export failed', { format }, err);
       } finally {
         setIsExporting(false);
       }

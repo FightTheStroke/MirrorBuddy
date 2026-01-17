@@ -69,7 +69,7 @@ export function useParentDashboard() {
         setDiaryEntries(data.entries || []);
       }
     } catch (err) {
-      logger.error('Failed to fetch diary entries', { error: err });
+      logger.error('Failed to fetch diary entries', undefined, err);
     } finally {
       setIsDiaryLoading(false);
     }

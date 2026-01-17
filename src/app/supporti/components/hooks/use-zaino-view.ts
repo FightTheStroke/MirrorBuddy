@@ -57,7 +57,7 @@ export function useZainoView({
         const records = await getActiveMaterials();
         setMaterials(records as ArchiveItem[]);
       } catch (err) {
-        logger.error('Failed to load materials', { error: err });
+        logger.error('Failed to load materials', undefined, err);
         setError('Impossibile caricare i materiali. Riprova più tardi.');
       } finally {
         setIsLoading(false);
@@ -173,7 +173,7 @@ export function useZainoView({
         }
       });
     } catch (err) {
-      logger.error('Filter error', { error: err });
+      logger.error('Filter error', undefined, err);
     }
 
     return result;
@@ -231,7 +231,7 @@ export function useZainoView({
       await deleteMaterial(toolId);
       setMaterials((prev) => prev.filter((m) => m.toolId !== toolId));
     } catch (err) {
-      logger.error('Failed to delete', { error: err });
+      logger.error('Failed to delete', undefined, err);
     }
   }, []);
 
@@ -254,7 +254,7 @@ export function useZainoView({
         );
       }
     } catch (err) {
-      logger.error('Failed to update bookmark', { error: err });
+      logger.error('Failed to update bookmark', undefined, err);
     }
   }, []);
 
@@ -267,7 +267,7 @@ export function useZainoView({
         );
       }
     } catch (err) {
-      logger.error('Failed to update rating', { error: err });
+      logger.error('Failed to update rating', undefined, err);
     }
   }, []);
 

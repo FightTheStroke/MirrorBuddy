@@ -85,7 +85,7 @@ export function extractSearchableText(
     const text = JSON.stringify(data);
     return text.length > 10000 ? text.substring(0, 10000) : text;
   } catch (error) {
-    logger.error('Failed to extract searchable text', { toolType, error });
+    logger.error('Failed to extract searchable text', { toolType }, error);
     return JSON.stringify(data).substring(0, 1000);
   }
 }
@@ -159,8 +159,7 @@ export async function indexToolOutput(
     logger.error('[ToolRAG] Failed to index tool output', {
       toolOutputId: toolOutput.id,
       toolType: toolOutput.toolType,
-      error,
-    });
+    }, error);
     return null;
   }
 }

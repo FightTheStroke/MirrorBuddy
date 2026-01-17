@@ -30,7 +30,7 @@ export function useAudioDevices() {
       setAvailableOutputs(outputs);
       setAvailableCameras(cams);
     } catch (error) {
-      logger.error('Error fetching devices', { error });
+      logger.error('Error fetching devices', undefined, error);
     }
   }, []);
 

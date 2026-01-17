@@ -102,7 +102,7 @@ export async function processPDF(
           height: viewport.height,
         });
       } catch (renderError) {
-        logger.error(`Failed to render page ${pageNum}`, { error: renderError });
+        logger.error(`Failed to render page ${pageNum}`, undefined, renderError);
         // Continue with other pages
       }
     }

@@ -17,7 +17,7 @@ export function useMediaDevices() {
       // Only set default if no selection exists
       setSelectedMicId(prev => prev || (mics.length > 0 ? mics[0].deviceId : ''));
     } catch (error) {
-      logger.error('Error fetching microphones', { error });
+      logger.error('Error fetching microphones', undefined, error);
     }
   }, []);
 
@@ -31,7 +31,7 @@ export function useMediaDevices() {
       // Only set default if no selection exists
       setSelectedCamId(prev => prev || (cams.length > 0 ? cams[0].deviceId : ''));
     } catch (error) {
-      logger.error('Error fetching cameras', { error });
+      logger.error('Error fetching cameras', undefined, error);
     }
   }, []);
 

@@ -66,7 +66,7 @@ export async function processStudyKit(
       originalText: text,
     };
   } catch (error) {
-    logger.error('Failed to process study kit', { error });
+    logger.error('Failed to process study kit', undefined, error);
     throw error;
   }
 }

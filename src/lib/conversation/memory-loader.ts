@@ -75,7 +75,7 @@ export async function loadPreviousContext(
       lastSessionDate: conversations[0].updatedAt,
     };
   } catch (error) {
-    logger.error('Failed to load conversation memory', { userId, maestroId, error });
+    logger.error('Failed to load conversation memory', { userId, maestroId }, error);
     return {
       recentSummary: null,
       keyFacts: [],

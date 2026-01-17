@@ -98,7 +98,7 @@ Rispondi SOLO con JSON (no markdown):
       explanation: parsed.explanation,
     };
   } catch (error) {
-    logger.error('Failed to generate LaTeX from description', { error, description });
+    logger.error('Failed to generate LaTeX from description', { description }, error);
     return null;
   }
 }

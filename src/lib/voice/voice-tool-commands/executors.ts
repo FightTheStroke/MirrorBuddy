@@ -81,7 +81,7 @@ export async function executeVoiceTool(
       displayed: true,
     };
   } catch (error) {
-    logger.error('[VoiceToolCommands] Failed to execute tool', { error });
+    logger.error('[VoiceToolCommands] Failed to execute tool', undefined, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -125,7 +125,7 @@ export async function executeMindmapModification(
       displayed: true,
     };
   } catch (error) {
-    logger.error('[VoiceToolCommands] Failed to modify mindmap', { error });
+    logger.error('[VoiceToolCommands] Failed to modify mindmap', undefined, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -170,7 +170,7 @@ export async function executeSummaryModification(
       displayed: true,
     };
   } catch (error) {
-    logger.error('[VoiceToolCommands] Failed to modify summary', { error });
+    logger.error('[VoiceToolCommands] Failed to modify summary', undefined, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',

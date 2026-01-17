@@ -191,7 +191,7 @@ export const useAmbientAudioStore = create<AmbientAudioStore>((set, get) => ({
   },
 
   setError: (error: string | null) => {
-    logger.error('Ambient audio: error', { error });
+    logger.error('Ambient audio: error', { errorMessage: error });
     set({ error, playbackState: error ? 'error' : 'idle' });
   },
 

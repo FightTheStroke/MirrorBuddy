@@ -119,7 +119,7 @@ export async function* azureStreamingCompletion(
   // Handle HTTP errors
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error(`[Azure Streaming] Error ${response.status}`, { error: errorText });
+    logger.error(`[Azure Streaming] Error ${response.status}`, { errorDetails: errorText });
 
     // Handle content filter on initial request
     if (response.status === 400) {

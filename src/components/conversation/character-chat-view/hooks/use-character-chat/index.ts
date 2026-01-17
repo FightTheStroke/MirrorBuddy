@@ -231,7 +231,7 @@ export function useCharacterChat(characterId: string, character: CharacterInfo) 
         if (assistantMessage) setMessages((prev) => [...prev, assistantMessage]);
         setActiveTool(toolState);
       } catch (error) {
-        logger.error('Tool request error', { error });
+        logger.error('Tool request error', undefined, error);
         setMessages((prev) => [...prev, createErrorMessage()]);
         setActiveTool(createErrorToolState(toolType, 'Tool request failed'));
       } finally {

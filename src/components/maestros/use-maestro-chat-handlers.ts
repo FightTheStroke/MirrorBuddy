@@ -71,7 +71,7 @@ export function useMaestroChatHandlers({
         setToolCalls(prev => [...prev, ...data.toolCalls]);
       }
     } catch (error) {
-      logger.error('Chat error', { error });
+      logger.error('Chat error', undefined, error);
       setMessages(prev => [...prev, {
         id: `error-${Date.now()}`,
         role: 'assistant',

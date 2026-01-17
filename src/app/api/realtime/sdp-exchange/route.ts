@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       const errorText = await response.text();
       logger.error('[SDP Proxy] Azure SDP exchange failed', {
         status: response.status,
-        error: errorText,
+        errorDetails: errorText,
       });
       return NextResponse.json(
         { error: `SDP exchange failed: ${response.status}`, details: errorText },

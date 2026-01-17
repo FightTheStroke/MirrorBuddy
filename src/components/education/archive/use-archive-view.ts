@@ -49,7 +49,7 @@ export function useArchiveView(): UseArchiveViewReturn {
         const records = await getActiveMaterials();
         setMaterials(records as ArchiveItem[]);
       } catch (error) {
-        logger.error("Failed to load materials", { error });
+        logger.error("Failed to load materials", undefined, error);
       } finally {
         setIsLoading(false);
       }
@@ -128,7 +128,7 @@ export function useArchiveView(): UseArchiveViewReturn {
       await deleteMaterial(toolId);
       setMaterials((prev) => prev.filter((m) => m.toolId !== toolId));
     } catch (error) {
-      logger.error("Failed to delete material", { error });
+      logger.error("Failed to delete material", undefined, error);
     }
   }, []);
 

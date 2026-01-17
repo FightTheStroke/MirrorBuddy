@@ -102,7 +102,7 @@ Rispondi SOLO con il codice Mermaid, senza backticks o spiegazioni.`;
 
     return code;
   } catch (error) {
-    logger.error('AI visual overview generation failed', { error });
+    logger.error('AI visual overview generation failed', undefined, error);
     return generateSimpleOverview(topics);
   }
 }

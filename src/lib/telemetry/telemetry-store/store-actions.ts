@@ -161,7 +161,7 @@ export async function handleFetchUsageStats(): Promise<TelemetryState['usageStat
       };
     }
   } catch (error) {
-    logger.error('Failed to fetch usage stats', { error });
+    logger.error('Failed to fetch usage stats', undefined, error);
   }
   return null;
 }

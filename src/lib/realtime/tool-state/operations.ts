@@ -175,7 +175,7 @@ export function failToolState(
   logger.error('Tool state failed', {
     toolId,
     type: state.type,
-    error: errorMessage,
+    errorDetails: errorMessage,
   });
 
   return state;

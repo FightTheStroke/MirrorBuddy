@@ -85,7 +85,7 @@ async function searchWithBrave(query: string): Promise<SearchResult[] | null> {
     logger.debug('Brave Search returned results', { count: results.length, query });
     return results;
   } catch (error) {
-    logger.error('Brave Search failed', { error, query });
+    logger.error('Brave Search failed', { query }, error);
     return null;
   }
 }
@@ -116,7 +116,7 @@ async function searchWithWikipedia(query: string): Promise<SearchResult[]> {
       }
     }
   } catch (error) {
-    logger.error('Wikipedia search failed', { error, query });
+    logger.error('Wikipedia search failed', { query }, error);
   }
 
   return results;

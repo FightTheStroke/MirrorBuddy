@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
       const errorData = await response.text();
       logger.error('Azure ephemeral token request failed', {
         status: response.status,
-        error: errorData,
+        errorDetails: errorData,
       });
 
       return NextResponse.json(

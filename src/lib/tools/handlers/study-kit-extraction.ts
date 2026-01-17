@@ -53,7 +53,7 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<{
     const errorStack = error instanceof Error ? error.stack : undefined;
 
     logger.error('Failed to extract text from PDF', {
-      error: errorMessage,
+      errorDetails: errorMessage,
       stack: errorStack,
       bufferSize: buffer?.length,
     });

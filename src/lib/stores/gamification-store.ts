@@ -111,7 +111,7 @@ export const useGamificationStore = create<GamificationStore>()((set, get) => ({
         });
       }
     } catch (error) {
-      logger.error('Failed to fetch gamification progression', { error });
+      logger.error('Failed to fetch gamification progression', undefined, error);
       set({ isLoading: false, lastError: String(error) });
     }
   },
@@ -130,7 +130,7 @@ export const useGamificationStore = create<GamificationStore>()((set, get) => ({
         });
       }
     } catch (error) {
-      logger.error('Failed to fetch achievements', { error });
+      logger.error('Failed to fetch achievements', undefined, error);
     }
   },
 
@@ -169,7 +169,7 @@ export const useGamificationStore = create<GamificationStore>()((set, get) => ({
         });
       }
     } catch (error) {
-      logger.error('Failed to award points', { error, points, reason });
+      logger.error('Failed to award points', { points, reason }, error);
     }
   },
 
@@ -196,7 +196,7 @@ export const useGamificationStore = create<GamificationStore>()((set, get) => ({
         });
       }
     } catch (error) {
-      logger.error('Failed to update streak', { error, minutes });
+      logger.error('Failed to update streak', { minutes }, error);
     }
   },
 

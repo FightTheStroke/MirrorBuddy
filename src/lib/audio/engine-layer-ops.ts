@@ -93,6 +93,6 @@ export function stopAudioLayer(layer: ActiveLayer): void {
     }
     layer.gainNode.disconnect();
   } catch (error) {
-    logger.error('Error stopping audio layer', { error, layerId: layer.id });
+    logger.error('Error stopping audio layer', { layerId: layer.id }, error);
   }
 }

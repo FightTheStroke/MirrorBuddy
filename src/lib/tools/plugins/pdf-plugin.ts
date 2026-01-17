@@ -61,7 +61,7 @@ async function pdfHandler(
     // Validate PDF format
     const validation = validatePDFBuffer(buffer);
     if (!validation.valid) {
-      logger.error('PDF validation failed', { error: validation.error, fileName });
+      logger.error('PDF validation failed', { errorDetails: validation.error, fileName });
       return createErrorResult(
         'upload_pdf',
         ToolErrorCode.VALIDATION_FAILED,
@@ -113,7 +113,7 @@ async function pdfHandler(
     }
 
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('PDF extraction failed', { error: errorMessage });
+    logger.error('PDF extraction failed', { errorDetails: errorMessage });
 
     return createErrorResult(
       'upload_pdf',
