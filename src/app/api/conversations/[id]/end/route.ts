@@ -12,15 +12,16 @@
  * - No consent = note generation skipped, logged, conversation still ends normally
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { endConversationWithSummary } from '@/lib/conversation/summary-generator';
-import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
-import { generateMaestroEvaluation } from '@/lib/session/maestro-evaluation';
-import { generateAndSaveParentNote } from '@/lib/session/parent-note-generator';
-import { getMaestroById } from '@/data/maestri';
-import type { MaestroFull } from '@/data/maestri';
+import { NextRequest, NextResponse } from "next/server";
+import { requireCSRF } from "@/lib/security/csrf";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { endConversationWithSummary } from "@/lib/conversation/summary-generator";
+import { inactivityMonitor } from "@/lib/conversation/inactivity-monitor";
+import { generateMaestroEvaluation } from "@/lib/session/maestro-evaluation";
+import { generateAndSaveParentNote } from "@/lib/session/parent-note-generator";
+import { getMaestroById } from "@/data/maestri";
+import type { MaestroFull } from "@/data/maestri";
 
 interface RouteParams {
   params: Promise<{
@@ -39,14 +40,21 @@ interface RouteParams {
  */
 export async function POST(request: NextRequest, context: RouteParams) {
   try {
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const { id: conversationId } = await context.params;
     const body = await request.json();
-    const { userId, reason = 'explicit' } = body;
+    const { userId, reason = "explicit" } = body;
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
+        { error: "userId is required" },
+        { status: 400 },
       );
     }
 
@@ -60,15 +68,15 @@ export async function POST(request: NextRequest, context: RouteParams) {
 
     if (!conversation) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
     if (!conversation.isActive) {
       return NextResponse.json(
-        { error: 'Conversation already closed' },
-        { status: 400 }
+        { error: "Conversation already closed" },
+        { status: 400 },
       );
     }
 
@@ -80,8 +88,8 @@ export async function POST(request: NextRequest, context: RouteParams) {
 
     if (!result) {
       return NextResponse.json(
-        { error: 'Failed to generate summary' },
-        { status: 500 }
+        { error: "Failed to generate summary" },
+        { status: 500 },
       );
     }
 
@@ -92,26 +100,31 @@ export async function POST(request: NextRequest, context: RouteParams) {
         where: { id: conversationId },
         include: {
           messages: {
-            orderBy: { createdAt: 'asc' },
+            orderBy: { createdAt: "asc" },
           },
         },
       });
 
-      if (conversationWithMessages && conversationWithMessages.messages.length > 0) {
+      if (
+        conversationWithMessages &&
+        conversationWithMessages.messages.length > 0
+      ) {
         // Calculate session duration (in minutes)
         const startTime = conversationWithMessages.createdAt;
         const endTime = new Date();
         const durationMinutes = Math.max(
           1,
-          Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60))
+          Math.round((endTime.getTime() - startTime.getTime()) / (1000 * 60)),
         );
 
         // Get maestro name
-        const maestro: MaestroFull | undefined = getMaestroById(conversation.maestroId);
-        const maestroName = maestro?.name || 'Maestro';
+        const maestro: MaestroFull | undefined = getMaestroById(
+          conversation.maestroId,
+        );
+        const maestroName = maestro?.name || "Maestro";
 
         // Determine subject from maestro or use default
-        const subject = maestro?.subject || 'Studio generale';
+        const subject = maestro?.subject || "Studio generale";
 
         // Generate maestro evaluation
         const messages = conversationWithMessages.messages.map((m) => ({
@@ -134,11 +147,11 @@ export async function POST(request: NextRequest, context: RouteParams) {
             topics: result.topics,
             summary: result.summary,
           },
-          evaluation
+          evaluation,
         );
 
         if (parentNoteId) {
-          logger.info('Parent note generated and saved', {
+          logger.info("Parent note generated and saved", {
             conversationId,
             userId,
             parentNoteId,
@@ -148,13 +161,13 @@ export async function POST(request: NextRequest, context: RouteParams) {
       }
     } catch (error) {
       // Log error but don't block conversation end
-      logger.error('Failed to generate parent note (non-blocking)', {
+      logger.error("Failed to generate parent note (non-blocking)", {
         conversationId,
         error: String(error),
       });
     }
 
-    logger.info('Conversation ended', {
+    logger.info("Conversation ended", {
       conversationId,
       userId,
       reason,
@@ -171,10 +184,10 @@ export async function POST(request: NextRequest, context: RouteParams) {
       learningsCount: result.learningsCount,
     });
   } catch (error) {
-    logger.error('Failed to end conversation', { error: String(error) });
+    logger.error("Failed to end conversation", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to end conversation' },
-      { status: 500 }
+      { error: "Failed to end conversation" },
+      { status: 500 },
     );
   }
 }
@@ -188,12 +201,12 @@ export async function GET(request: NextRequest, context: RouteParams) {
   try {
     const { id: conversationId } = await context.params;
     const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
+    const userId = searchParams.get("userId");
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
+        { error: "userId is required" },
+        { status: 400 },
       );
     }
 
@@ -215,8 +228,8 @@ export async function GET(request: NextRequest, context: RouteParams) {
 
     if (!conversation) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
@@ -225,15 +238,19 @@ export async function GET(request: NextRequest, context: RouteParams) {
       maestroId: conversation.maestroId,
       isActive: conversation.isActive,
       summary: conversation.summary,
-      keyFacts: conversation.keyFacts ? JSON.parse(conversation.keyFacts) : null,
+      keyFacts: conversation.keyFacts
+        ? JSON.parse(conversation.keyFacts)
+        : null,
       topics: JSON.parse(conversation.topics),
       closedAt: conversation.isActive ? null : conversation.updatedAt,
     });
   } catch (error) {
-    logger.error('Failed to get conversation summary', { error: String(error) });
+    logger.error("Failed to get conversation summary", {
+      error: String(error),
+    });
     return NextResponse.json(
-      { error: 'Failed to get conversation summary' },
-      { status: 500 }
+      { error: "Failed to get conversation summary" },
+      { status: 500 },
     );
   }
 }

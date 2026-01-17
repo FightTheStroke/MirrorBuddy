@@ -5,16 +5,17 @@
  * DELETE - Deny parental consent
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import {
   verifyParentalConsent,
   denyParentalConsent,
-} from '@/lib/compliance/coppa-service';
-import { logger } from '@/lib/logger';
-import { getClientIdentifier } from '@/lib/rate-limit';
-import { validateAuth } from '@/lib/auth/session-auth';
+} from "@/lib/compliance/coppa-service";
+import { logger } from "@/lib/logger";
+import { getClientIdentifier } from "@/lib/rate-limit";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 
-const log = logger.child({ module: 'api-coppa-verify' });
+const log = logger.child({ module: "api-coppa-verify" });
 
 /**
  * POST /api/coppa/verify - Verify parental consent
@@ -22,14 +23,18 @@ const log = logger.child({ module: 'api-coppa-verify' });
  * Body: { verificationCode: string }
  */
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const body = await request.json();
     const { verificationCode } = body;
 
-    if (!verificationCode || typeof verificationCode !== 'string') {
+    if (!verificationCode || typeof verificationCode !== "string") {
       return NextResponse.json(
-        { error: 'Verification code is required' },
-        { status: 400 }
+        { error: "Verification code is required" },
+        { status: 400 },
       );
     }
 
@@ -38,8 +43,8 @@ export async function POST(request: NextRequest) {
 
     if (normalizedCode.length !== 6) {
       return NextResponse.json(
-        { error: 'Invalid verification code format' },
-        { status: 400 }
+        { error: "Invalid verification code format" },
+        { status: 400 },
       );
     }
 
@@ -47,25 +52,22 @@ export async function POST(request: NextRequest) {
     const result = await verifyParentalConsent(normalizedCode, ipAddress);
 
     if (!result.success) {
-      log.warn('COPPA verification failed', {
+      log.warn("COPPA verification failed", {
         error: result.error,
         ipAddress,
       });
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    log.info('COPPA consent verified', { userId: result.userId });
+    log.info("COPPA consent verified", { userId: result.userId });
 
     return NextResponse.json({
       success: true,
-      message: 'Parental consent verified successfully',
+      message: "Parental consent verified successfully",
     });
   } catch (error) {
-    log.error('Failed to verify consent', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Verification failed' },
-      { status: 500 }
-    );
+    log.error("Failed to verify consent", { error: String(error) });
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
 }
 
@@ -74,7 +76,11 @@ export async function POST(request: NextRequest) {
  *
  * Requires authentication - the user requesting denial
  */
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const auth = await validateAuth();
   if (!auth.authenticated || !auth.userId) {
     return NextResponse.json({ error: auth.error }, { status: 401 });
@@ -85,22 +91,22 @@ export async function DELETE() {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: 'Failed to deny consent' },
-        { status: 500 }
+        { error: "Failed to deny consent" },
+        { status: 500 },
       );
     }
 
-    log.info('COPPA consent denied by parent', { userId: auth.userId });
+    log.info("COPPA consent denied by parent", { userId: auth.userId });
 
     return NextResponse.json({
       success: true,
-      message: 'Parental consent denied',
+      message: "Parental consent denied",
     });
   } catch (error) {
-    log.error('Failed to deny consent', { error: String(error) });
+    log.error("Failed to deny consent", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to deny consent' },
-      { status: 500 }
+      { error: "Failed to deny consent" },
+      { status: 500 },
     );
   }
 }

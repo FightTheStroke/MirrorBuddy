@@ -4,29 +4,33 @@
 // POST: Create new conversation
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma, isDatabaseNotInitialized } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { getRequestId } from '@/lib/tracing';
-import { ConversationCreateSchema } from '@/lib/validation/schemas/conversations';
-import { validateAuth } from '@/lib/auth/session-auth';
-import type { Conversation, Message } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma, isDatabaseNotInitialized } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { getRequestId } from "@/lib/tracing";
+import { ConversationCreateSchema } from "@/lib/validation/schemas/conversations";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import type { Conversation, Message } from "@prisma/client";
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
-      response.headers.set('X-Request-ID', getRequestId(request));
+      const response = NextResponse.json(
+        { error: auth.error || "No user" },
+        { status: 401 },
+      );
+      response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     }
     const userId = auth.userId;
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const maestroId = searchParams.get('maestroId');
-    const activeOnly = searchParams.get('active') === 'true';
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
+    const maestroId = searchParams.get("maestroId");
+    const activeOnly = searchParams.get("active") === "true";
 
     const where = {
       userId,
@@ -42,24 +46,26 @@ export async function GET(request: NextRequest) {
 
     const conversations = await prisma.conversation.findMany({
       where,
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { updatedAt: "desc" },
       skip: offset,
       take: limit,
       include: {
         messages: {
           take: 1,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
         },
       },
     });
 
-    const items = conversations.map((c: Conversation & { messages: Message[] }) => ({
-      ...c,
-      topics: JSON.parse(c.topics || '[]'),
-      keyFacts: c.keyFacts ? JSON.parse(c.keyFacts) : null,
-      lastMessage: c.messages[0]?.content?.slice(0, 100),
-      messages: undefined, // Remove full messages from list
-    }));
+    const items = conversations.map(
+      (c: Conversation & { messages: Message[] }) => ({
+        ...c,
+        topics: JSON.parse(c.topics || "[]"),
+        keyFacts: c.keyFacts ? JSON.parse(c.keyFacts) : null,
+        lastMessage: c.messages[0]?.content?.slice(0, 100),
+        messages: undefined, // Remove full messages from list
+      }),
+    );
 
     const response = NextResponse.json({
       items,
@@ -72,35 +78,48 @@ export async function GET(request: NextRequest) {
         hasPrevPage: page > 1,
       },
     });
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   } catch (error) {
-    logger.error('Conversations GET error', { error: String(error) });
+    logger.error("Conversations GET error", { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
       const response = NextResponse.json(
-        { error: 'Database not initialized', message: 'Run: npx prisma db push' },
-        { status: 503 }
+        {
+          error: "Database not initialized",
+          message: "Run: npx prisma db push",
+        },
+        { status: 503 },
       );
-      response.headers.set('X-Request-ID', getRequestId(request));
+      response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     }
 
     const response = NextResponse.json(
-      { error: 'Failed to get conversations' },
-      { status: 500 }
+      { error: "Failed to get conversations" },
+      { status: 500 },
     );
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
-      response.headers.set('X-Request-ID', getRequestId(request));
+      const response = NextResponse.json(
+        { error: auth.error || "No user" },
+        { status: 401 },
+      );
+      response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     }
     const userId = auth.userId;
@@ -112,12 +131,12 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       const response = NextResponse.json(
         {
-          error: 'Invalid conversation data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid conversation data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
-      response.headers.set('X-Request-ID', getRequestId(request));
+      response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     }
 
@@ -133,17 +152,17 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       ...conversation,
-      topics: JSON.parse(conversation.topics || '[]'),
+      topics: JSON.parse(conversation.topics || "[]"),
     });
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   } catch (error) {
-    logger.error('Conversations POST error', { error: String(error) });
+    logger.error("Conversations POST error", { error: String(error) });
     const response = NextResponse.json(
-      { error: 'Failed to create conversation' },
-      { status: 500 }
+      { error: "Failed to create conversation" },
+      { status: 500 },
     );
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   }
 }

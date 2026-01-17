@@ -3,15 +3,15 @@
  * Find materials similar to a given material using vector similarity
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { cosineSimilarity } from '@/lib/rag/embedding-service';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { cosineSimilarity } from "@/lib/rag/embedding-service";
+import { logger } from "@/lib/logger";
 
 async function getUserId(): Promise<string | null> {
-  const cookieStore = await cookies();
-  return cookieStore.get('mirrorbuddy-user-id')?.value || null;
+  const auth = await validateAuth();
+  return auth.authenticated && auth.userId ? auth.userId : null;
 }
 
 interface SimilarMaterial {
@@ -30,17 +30,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const userId = await getUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const toolId = searchParams.get('toolId');
-    const limit = Math.min(parseInt(searchParams.get('limit') ?? '5'), 20);
+    const toolId = searchParams.get("toolId");
+    const limit = Math.min(parseInt(searchParams.get("limit") ?? "5"), 20);
 
     if (!toolId) {
       return NextResponse.json(
-        { error: 'Missing toolId query param' },
-        { status: 400 }
+        { error: "Missing toolId query param" },
+        { status: 400 },
       );
     }
 
@@ -52,15 +52,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     if (!sourceMaterial) {
       return NextResponse.json(
-        { error: 'Material not found' },
-        { status: 404 }
+        { error: "Material not found" },
+        { status: 404 },
       );
     }
 
     // Get source embedding
     const sourceEmbedding = await prisma.contentEmbedding.findFirst({
       where: {
-        sourceType: 'material',
+        sourceType: "material",
         sourceId: sourceMaterial.id,
       },
       select: { vector: true },
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const embeddings = await prisma.contentEmbedding.findMany({
       where: {
         userId,
-        sourceType: 'material',
+        sourceType: "material",
         NOT: { sourceId: sourceMaterial.id },
       },
       select: {
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const materials = await prisma.material.findMany({
       where: {
         id: { in: topMatches.map((m) => m.sourceId) },
-        status: 'active',
+        status: "active",
       },
       select: {
         id: true,
@@ -144,10 +144,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ similar });
   } catch (error) {
-    logger.error('Failed to find similar materials', { error });
+    logger.error("Failed to find similar materials", { error });
     return NextResponse.json(
-      { error: 'Failed to find similar materials' },
-      { status: 500 }
+      { error: "Failed to find similar materials" },
+      { status: 500 },
     );
   }
 }

@@ -4,10 +4,11 @@
 // DELETE: Delete conversation
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { requireCSRF } from "@/lib/security/csrf";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -31,15 +32,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: "asc" },
         },
       },
     });
 
     if (!conversation) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
@@ -59,15 +60,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       updatedAt: conversation.updatedAt,
     });
   } catch (error) {
-    logger.error('Parent conversation GET error', { error: String(error) });
+    logger.error("Parent conversation GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get conversation' },
-      { status: 500 }
+      { error: "Failed to get conversation" },
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -88,8 +93,8 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
 
     if (!conversation) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
@@ -98,14 +103,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       where: { id },
     });
 
-    logger.info('Parent conversation deleted', { conversationId: id, userId });
+    logger.info("Parent conversation deleted", { conversationId: id, userId });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Parent conversation DELETE error', { error: String(error) });
+    logger.error("Parent conversation DELETE error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete conversation' },
-      { status: 500 }
+      { error: "Failed to delete conversation" },
+      { status: 500 },
     );
   }
 }

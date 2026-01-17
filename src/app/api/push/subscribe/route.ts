@@ -3,11 +3,17 @@
 // Manages push notification subscriptions for PWA
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import { requireCSRF } from "@/lib/security/csrf";
 
 interface SubscriptionBody {
   endpoint: string;
@@ -17,9 +23,16 @@ interface SubscriptionBody {
 }
 
 // POST - Save a new push subscription
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`push-subscribe:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `push-subscribe:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -38,8 +51,8 @@ export async function POST(request: Request) {
     // Validate required fields
     if (!endpoint || !p256dh || !auth) {
       return NextResponse.json(
-        { error: 'Missing required fields: endpoint, p256dh, auth' },
-        { status: 400 }
+        { error: "Missing required fields: endpoint, p256dh, auth" },
+        { status: 400 },
       );
     }
 
@@ -48,8 +61,8 @@ export async function POST(request: Request) {
       new URL(endpoint);
     } catch {
       return NextResponse.json(
-        { error: 'Invalid endpoint URL' },
-        { status: 400 }
+        { error: "Invalid endpoint URL" },
+        { status: 400 },
       );
     }
 
@@ -71,29 +84,39 @@ export async function POST(request: Request) {
       },
     });
 
-    logger.info('Push subscription saved', {
+    logger.info("Push subscription saved", {
       userId,
       subscriptionId: subscription.id,
-      endpoint: endpoint.slice(0, 50) + '...',
+      endpoint: endpoint.slice(0, 50) + "...",
     });
 
-    return NextResponse.json({
-      success: true,
-      subscriptionId: subscription.id,
-    }, { status: 201 });
-  } catch (error) {
-    logger.error('Push subscribe error', { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to save subscription' },
-      { status: 500 }
+      {
+        success: true,
+        subscriptionId: subscription.id,
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    logger.error("Push subscribe error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to save subscription" },
+      { status: 500 },
     );
   }
 }
 
 // DELETE - Remove a push subscription
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`push-unsubscribe:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `push-unsubscribe:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -110,10 +133,7 @@ export async function DELETE(request: Request) {
     const { endpoint } = body;
 
     if (!endpoint) {
-      return NextResponse.json(
-        { error: 'Missing endpoint' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });
     }
 
     // Delete subscription (only if it belongs to this user)
@@ -125,21 +145,24 @@ export async function DELETE(request: Request) {
     });
 
     if (result.count === 0) {
-      logger.warn('Push subscription not found for deletion', { userId, endpoint: endpoint.slice(0, 50) });
+      logger.warn("Push subscription not found for deletion", {
+        userId,
+        endpoint: endpoint.slice(0, 50),
+      });
       return NextResponse.json({ success: true }); // Idempotent - already deleted
     }
 
-    logger.info('Push subscription deleted', {
+    logger.info("Push subscription deleted", {
       userId,
-      endpoint: endpoint.slice(0, 50) + '...',
+      endpoint: endpoint.slice(0, 50) + "...",
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Push unsubscribe error', { error: String(error) });
+    logger.error("Push unsubscribe error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete subscription' },
-      { status: 500 }
+      { error: "Failed to delete subscription" },
+      { status: 500 },
     );
   }
 }
@@ -147,7 +170,10 @@ export async function DELETE(request: Request) {
 // GET - Check if user has any push subscriptions
 export async function GET(request: Request) {
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`push-check:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `push-check:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -172,31 +198,31 @@ export async function GET(request: Request) {
     return NextResponse.json({
       hasSubscriptions: subscriptions.length > 0,
       count: subscriptions.length,
-      subscriptions: subscriptions.map(s => ({
+      subscriptions: subscriptions.map((s) => ({
         id: s.id,
         device: parseUserAgent(s.userAgent),
         createdAt: s.createdAt,
       })),
     });
   } catch (error) {
-    logger.error('Push check error', { error: String(error) });
+    logger.error("Push check error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to check subscriptions' },
-      { status: 500 }
+      { error: "Failed to check subscriptions" },
+      { status: 500 },
     );
   }
 }
 
 // Helper to parse user agent into friendly device name
 function parseUserAgent(ua?: string | null): string {
-  if (!ua) return 'Dispositivo sconosciuto';
+  if (!ua) return "Dispositivo sconosciuto";
 
-  if (/iPad/.test(ua)) return 'iPad';
-  if (/iPhone/.test(ua)) return 'iPhone';
-  if (/Android/.test(ua)) return 'Android';
-  if (/Mac/.test(ua)) return 'Mac';
-  if (/Windows/.test(ua)) return 'Windows';
-  if (/Linux/.test(ua)) return 'Linux';
+  if (/iPad/.test(ua)) return "iPad";
+  if (/iPhone/.test(ua)) return "iPhone";
+  if (/Android/.test(ua)) return "Android";
+  if (/Mac/.test(ua)) return "Mac";
+  if (/Windows/.test(ua)) return "Windows";
+  if (/Linux/.test(ua)) return "Linux";
 
-  return 'Browser';
+  return "Browser";
 }

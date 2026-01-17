@@ -13,18 +13,31 @@
  * Related: Issue #31 Collaborative Student Profile
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-import { validateRequest, formatValidationErrors } from '@/lib/validation/middleware';
-import { ProfileConsentSchema, ProfileDeleteQuerySchema, ProfileQuerySchema } from '@/lib/validation/schemas/profile';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import {
+  validateRequest,
+  formatValidationErrors,
+} from "@/lib/validation/middleware";
+import {
+  ProfileConsentSchema,
+  ProfileDeleteQuerySchema,
+  ProfileQuerySchema,
+} from "@/lib/validation/schemas/profile";
+import { requireCSRF } from "@/lib/security/csrf";
 import {
   upsertConsentProfile,
   logConsentAction,
   markProfileForDeletion,
   deleteProfileImmediately,
-} from './helpers';
+} from "./helpers";
 
 /**
  * GET /api/profile/consent - Check consent status for a user
@@ -44,8 +57,11 @@ export async function GET(request: NextRequest) {
     const validation = validateRequest(ProfileQuerySchema, queryParams);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
-        { status: 400 }
+        {
+          error: "Validation failed",
+          details: formatValidationErrors(validation.error),
+        },
+        { status: 400 },
       );
     }
 
@@ -83,10 +99,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Consent check error', { error: String(error) });
+    logger.error("Consent check error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -95,11 +111,19 @@ export async function GET(request: NextRequest) {
  * POST /api/profile/consent - Records consent for profile creation and viewing
  */
 export async function POST(request: NextRequest) {
+  // Validate CSRF token
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`consent:${clientId}`, RATE_LIMITS.GENERAL);
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/profile/consent' });
+    logger.warn("Rate limit exceeded", {
+      clientId,
+      endpoint: "/api/profile/consent",
+    });
     return rateLimitResponse(rateLimit);
   }
 
@@ -109,32 +133,43 @@ export async function POST(request: NextRequest) {
     const validation = validateRequest(ProfileConsentSchema, body);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
-        { status: 400 }
+        {
+          error: "Validation failed",
+          details: formatValidationErrors(validation.error),
+        },
+        { status: 400 },
       );
     }
 
-    const { userId, parentConsent, studentConsent, consentGivenBy } = validation.data;
+    const { userId, parentConsent, studentConsent, consentGivenBy } =
+      validation.data;
 
     if (parentConsent === undefined && studentConsent === undefined) {
       return NextResponse.json(
-        { error: 'At least one consent type (parentConsent or studentConsent) is required' },
-        { status: 400 }
+        {
+          error:
+            "At least one consent type (parentConsent or studentConsent) is required",
+        },
+        { status: 400 },
       );
     }
 
-    const profile = await upsertConsentProfile(userId, parentConsent, studentConsent);
+    const profile = await upsertConsentProfile(
+      userId,
+      parentConsent,
+      studentConsent,
+    );
 
     await logConsentAction(
       profile.id,
       consentGivenBy || clientId,
-      'edit',
+      "edit",
       `Consent updated: parent=${profile.parentConsent}, student=${profile.studentConsent}`,
       clientId,
-      request.headers.get('user-agent') || undefined
+      request.headers.get("user-agent") || undefined,
     );
 
-    logger.info('Consent recorded', {
+    logger.info("Consent recorded", {
       userId,
       parentConsent: profile.parentConsent,
       studentConsent: profile.studentConsent,
@@ -142,7 +177,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Consent recorded successfully',
+      message: "Consent recorded successfully",
       data: {
         parentConsent: profile.parentConsent,
         studentConsent: profile.studentConsent,
@@ -150,10 +185,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Consent API error', { error: String(error) });
+    logger.error("Consent API error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -162,11 +197,19 @@ export async function POST(request: NextRequest) {
  * DELETE /api/profile/consent - Request deletion of all profile data (GDPR right to erasure)
  */
 export async function DELETE(request: NextRequest) {
+  // Validate CSRF token
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`consent:${clientId}`, RATE_LIMITS.GENERAL);
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/profile/consent' });
+    logger.warn("Rate limit exceeded", {
+      clientId,
+      endpoint: "/api/profile/consent",
+    });
     return rateLimitResponse(rateLimit);
   }
 
@@ -177,23 +220,23 @@ export async function DELETE(request: NextRequest) {
     const validation = validateRequest(ProfileDeleteQuerySchema, queryParams);
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Validation failed', details: formatValidationErrors(validation.error) },
-        { status: 400 }
+        {
+          error: "Validation failed",
+          details: formatValidationErrors(validation.error),
+        },
+        { status: 400 },
       );
     }
 
     const { userId, immediate: immediateParam } = validation.data;
-    const immediate = immediateParam === 'true';
+    const immediate = immediateParam === "true";
 
     const profile = await prisma.studentInsightProfile.findUnique({
       where: { userId },
     });
 
     if (!profile) {
-      return NextResponse.json(
-        { error: 'Profile not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
     if (immediate) {
@@ -201,7 +244,7 @@ export async function DELETE(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: 'Profile and all associated data have been deleted',
+        message: "Profile and all associated data have been deleted",
       });
     }
 
@@ -209,24 +252,25 @@ export async function DELETE(request: NextRequest) {
       profile.id,
       clientId,
       clientId,
-      request.headers.get('user-agent') || undefined
+      request.headers.get("user-agent") || undefined,
     );
 
-    logger.info('Deletion requested', { userId });
+    logger.info("Deletion requested", { userId });
 
     return NextResponse.json({
       success: true,
-      message: 'Deletion request recorded. Data will be deleted within 30 days.',
+      message:
+        "Deletion request recorded. Data will be deleted within 30 days.",
       data: {
         deletionRequested: new Date(),
         expectedDeletion: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
   } catch (error) {
-    logger.error('Deletion request error', { error: String(error) });
+    logger.error("Deletion request error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

@@ -4,10 +4,11 @@
  * POST: Update the last viewed timestamp
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { requireCSRF } from "@/lib/security/csrf";
 
 /**
  * GET /api/profile/last-viewed
@@ -30,7 +31,9 @@ export async function GET() {
       lastViewed: settings?.parentDashboardLastViewed?.toISOString() || null,
     });
   } catch (error) {
-    logger.error('Failed to get last viewed timestamp', { error: String(error) });
+    logger.error("Failed to get last viewed timestamp", {
+      error: String(error),
+    });
     return NextResponse.json({ lastViewed: null });
   }
 }
@@ -40,6 +43,11 @@ export async function GET() {
  * Updates the last viewed timestamp
  */
 export async function POST(request: NextRequest) {
+  // Validate CSRF token
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -60,9 +68,14 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({ success: true, lastViewed: timestamp.toISOString() });
+    return NextResponse.json({
+      success: true,
+      lastViewed: timestamp.toISOString(),
+    });
   } catch (error) {
-    logger.error('Failed to update last viewed timestamp', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
+    logger.error("Failed to update last viewed timestamp", {
+      error: String(error),
+    });
+    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }

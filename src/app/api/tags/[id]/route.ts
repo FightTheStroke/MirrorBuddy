@@ -5,11 +5,12 @@
 // DELETE: Delete tag
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { UpdateTagSchema } from '@/lib/validation/schemas/organization';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { UpdateTagSchema } from "@/lib/validation/schemas/organization";
+import { requireCSRF } from "@/lib/security/csrf";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -20,13 +21,14 @@ type RouteParams = { params: Promise<{ id: string }> };
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     const tag = await prisma.tag.findFirst({
       where: { id, userId },
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
               },
             },
           },
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 50,
         },
         _count: {
@@ -52,22 +54,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!tag) {
-      return NextResponse.json({ error: 'Tag not found' }, { status: 404 });
+      return NextResponse.json({ error: "Tag not found" }, { status: 404 });
     }
 
     // Flatten materials for easier consumption
     const response = {
       ...tag,
-      materials: tag.materials.map(mt => mt.material),
+      materials: tag.materials.map((mt) => mt.material),
     };
 
     return NextResponse.json(response);
   } catch (error) {
-    logger.error('Tag GET error', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Failed to fetch tag' },
-      { status: 500 }
-    );
+    logger.error("Tag GET error", { error: String(error) });
+    return NextResponse.json({ error: "Failed to fetch tag" }, { status: 500 });
   }
 }
 
@@ -77,14 +76,19 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
  * Update a tag.
  */
 export async function PUT(request: NextRequest, { params }: RouteParams) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     // Verify ownership
     const existing = await prisma.tag.findFirst({
@@ -92,7 +96,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Tag not found' }, { status: 404 });
+      return NextResponse.json({ error: "Tag not found" }, { status: 404 });
     }
 
     // Validate input
@@ -102,10 +106,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid request',
-          details: validation.error.issues.map(e => e.message),
+          error: "Invalid request",
+          details: validation.error.issues.map((e) => e.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -119,25 +123,22 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       },
     });
 
-    logger.info('Tag updated', { userId, tagId: id });
+    logger.info("Tag updated", { userId, tagId: id });
 
     return NextResponse.json(tag);
   } catch (error) {
-    logger.error('Tag PUT error', { error: String(error) });
+    logger.error("Tag PUT error", { error: String(error) });
 
-    if (
-      error instanceof Error &&
-      error.message.includes('Unique constraint')
-    ) {
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
       return NextResponse.json(
-        { error: 'A tag with this name already exists' },
-        { status: 409 }
+        { error: "A tag with this name already exists" },
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to update tag' },
-      { status: 500 }
+      { error: "Failed to update tag" },
+      { status: 500 },
     );
   }
 }
@@ -148,14 +149,19 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
  * Delete a tag. MaterialTag relations are cascade deleted.
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get('mirrorbuddy-user-id')?.value;
+    const auth = await validateAuth();
     const { id } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = auth.userId;
 
     // Verify ownership
     const existing = await prisma.tag.findFirst({
@@ -163,21 +169,21 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Tag not found' }, { status: 404 });
+      return NextResponse.json({ error: "Tag not found" }, { status: 404 });
     }
 
     await prisma.tag.delete({
       where: { id },
     });
 
-    logger.info('Tag deleted', { userId, tagId: id });
+    logger.info("Tag deleted", { userId, tagId: id });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Tag DELETE error', { error: String(error) });
+    logger.error("Tag DELETE error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete tag' },
-      { status: 500 }
+      { error: "Failed to delete tag" },
+      { status: 500 },
     );
   }
 }

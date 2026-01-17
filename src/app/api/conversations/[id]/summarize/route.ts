@@ -3,18 +3,19 @@
 // POST: Trigger LLM summarization of old messages
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import {
   generateConversationSummary,
   extractKeyFacts,
   extractTopics,
   extractLearnings,
-} from '@/lib/ai/summarize';
-import type { Message } from '@prisma/client';
-import type { Prisma } from '@prisma/client';
+} from "@/lib/ai/summarize";
+import type { Message } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -27,6 +28,13 @@ const MESSAGES_TO_KEEP = 10;
 
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     const auth = await validateAuth();
     const { id } = await params;
 
@@ -40,15 +48,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       where: { id, userId },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: "asc" },
         },
       },
     });
 
     if (!conversation) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
@@ -78,7 +86,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       extractLearnings(
         formattedMessages,
         conversation.maestroId,
-        undefined // subject not yet implemented
+        undefined, // subject not yet implemented
       ),
     ]);
 
@@ -115,10 +123,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         });
 
         const existingMap = new Map(
-          existingLearnings.map((e) => [`${e.category}:${e.insight.slice(0, 30)}`, e])
+          existingLearnings.map((e) => [
+            `${e.category}:${e.insight.slice(0, 30)}`,
+            e,
+          ]),
         );
 
-        const toUpdate: Array<{ id: string; confidence: number; occurrences: number }> = [];
+        const toUpdate: Array<{
+          id: string;
+          confidence: number;
+          occurrences: number;
+        }> = [];
         const toCreate: Array<{
           userId: string;
           category: string;
@@ -154,8 +169,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             tx.learning.update({
               where: { id: u.id },
               data: { confidence: u.confidence, occurrences: u.occurrences },
-            })
-          )
+            }),
+          ),
         );
 
         if (toCreate.length > 0) {
@@ -171,10 +186,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       learningsExtracted: learnings.length,
     });
   } catch (error) {
-    logger.error('Summarize POST error', { error: String(error) });
+    logger.error("Summarize POST error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to summarize conversation' },
-      { status: 500 }
+      { error: "Failed to summarize conversation" },
+      { status: 500 },
     );
   }
 }

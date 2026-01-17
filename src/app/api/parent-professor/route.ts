@@ -4,33 +4,46 @@
 // GET: List parent conversations
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { chatCompletion, getActiveProvider } from "@/lib/ai/providers";
 import {
   generateParentModePrompt,
   getParentModeGreeting,
-} from '@/lib/ai/parent-mode';
-import { filterInput, sanitizeOutput } from '@/lib/safety';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+} from "@/lib/ai/parent-mode";
+import { filterInput, sanitizeOutput } from "@/lib/safety";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import {
   getOrCreateParentConversation,
   addConversationMessage,
   updateConversationMetadata,
   getStudentLearnings,
   formatConversationResponse,
-} from './helpers';
-import type { ParentChatRequest } from './types';
+} from "./helpers";
+import type { ParentChatRequest } from "./types";
+import { requireCSRF } from "@/lib/security/csrf";
 
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   // Rate limiting
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`parent-chat:${clientId}`, RATE_LIMITS.CHAT);
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/parent-professor' });
+    logger.warn("Rate limit exceeded", {
+      clientId,
+      endpoint: "/api/parent-professor",
+    });
     return rateLimitResponse(rateLimit);
   }
 
@@ -54,15 +67,20 @@ export async function POST(request: NextRequest) {
 
     if (!maestroId || !studentId || !studentName || !message) {
       return NextResponse.json(
-        { error: 'maestroId, studentId, studentName, and message are required' },
-        { status: 400 }
+        {
+          error: "maestroId, studentId, studentName, and message are required",
+        },
+        { status: 400 },
       );
     }
 
     // Safety filter on parent message
     const filterResult = filterInput(message);
-    if (!filterResult.safe && filterResult.action === 'block') {
-      logger.warn('Parent content blocked', { clientId, category: filterResult.category });
+    if (!filterResult.safe && filterResult.action === "block") {
+      logger.warn("Parent content blocked", {
+        clientId,
+        category: filterResult.category,
+      });
       return NextResponse.json({
         content: filterResult.suggestedResponse,
         blocked: true,
@@ -76,7 +94,7 @@ export async function POST(request: NextRequest) {
     const parentModePrompt = generateParentModePrompt(
       maestroSystemPrompt,
       learnings,
-      studentName
+      studentName,
     );
 
     // Get or create conversation
@@ -86,67 +104,71 @@ export async function POST(request: NextRequest) {
       maestroId,
       maestroDisplayName,
       studentId,
-      studentName
+      studentName,
     );
 
     if (!convResult.success) {
       return NextResponse.json(
-        { error: 'Conversation not found' },
-        { status: 404 }
+        { error: "Conversation not found" },
+        { status: 404 },
       );
     }
 
     const { conversation, isNew } = convResult;
     if (!conversation) {
       return NextResponse.json(
-        { error: 'Failed to create conversation' },
-        { status: 500 }
+        { error: "Failed to create conversation" },
+        { status: 500 },
       );
     }
-    const messages: Array<{ role: string; content: string }> = convResult.messages || [];
+    const messages: Array<{ role: string; content: string }> =
+      convResult.messages || [];
 
     // Add greeting if new conversation
     if (isNew) {
       const greeting = getParentModeGreeting(
         maestroDisplayName,
         studentName,
-        learnings.length > 0
+        learnings.length > 0,
       );
-      await addConversationMessage(conversation.id, 'assistant', greeting);
-      messages.push({ role: 'assistant', content: greeting });
+      await addConversationMessage(conversation.id, "assistant", greeting);
+      messages.push({ role: "assistant", content: greeting });
     }
 
     // Add user message to database
-    await addConversationMessage(conversation.id, 'user', message);
+    await addConversationMessage(conversation.id, "user", message);
 
     // Add to messages for AI call
-    messages.push({ role: 'user', content: message });
+    messages.push({ role: "user", content: message });
 
     // Get AI response
     const providerConfig = getActiveProvider();
     if (!providerConfig) {
       return NextResponse.json(
-        { error: 'No AI provider available' },
-        { status: 503 }
+        { error: "No AI provider available" },
+        { status: 503 },
       );
     }
 
     const result = await chatCompletion(
-      messages.map(m => ({ ...m, role: m.role as 'user' | 'assistant' | 'system' })),
+      messages.map((m) => ({
+        ...m,
+        role: m.role as "user" | "assistant" | "system",
+      })),
       parentModePrompt,
-      { tool_choice: 'none' } // No tools in parent mode
+      { tool_choice: "none" }, // No tools in parent mode
     );
 
     // Sanitize output
     const sanitized = sanitizeOutput(result.content);
 
     // Save assistant response to database
-    await addConversationMessage(conversation.id, 'assistant', sanitized.text);
+    await addConversationMessage(conversation.id, "assistant", sanitized.text);
 
     // Update conversation metadata
     await updateConversationMetadata(conversation.id, 2);
 
-    logger.info('Parent-professor conversation', {
+    logger.info("Parent-professor conversation", {
       conversationId: conversation.id,
       maestroId,
       studentId,
@@ -161,10 +183,10 @@ export async function POST(request: NextRequest) {
       isParentMode: true,
     });
   } catch (error) {
-    logger.error('Parent-professor API error', { error: String(error) });
+    logger.error("Parent-professor API error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -179,8 +201,8 @@ export async function GET(request: NextRequest) {
     const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-    const studentId = searchParams.get('studentId');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const studentId = searchParams.get("studentId");
+    const limit = parseInt(searchParams.get("limit") || "20");
 
     const conversations = await prisma.conversation.findMany({
       where: {
@@ -188,22 +210,22 @@ export async function GET(request: NextRequest) {
         isParentMode: true,
         ...(studentId && { studentId }),
       },
-      orderBy: { updatedAt: 'desc' },
+      orderBy: { updatedAt: "desc" },
       take: limit,
       include: {
         messages: {
           take: 1,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
         },
       },
     });
 
     return NextResponse.json(conversations.map(formatConversationResponse));
   } catch (error) {
-    logger.error('Parent conversations GET error', { error: String(error) });
+    logger.error("Parent conversations GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get conversations' },
-      { status: 500 }
+      { error: "Failed to get conversations" },
+      { status: 500 },
     );
   }
 }
