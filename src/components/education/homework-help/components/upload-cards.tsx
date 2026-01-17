@@ -46,7 +46,7 @@ export function UploadCards({
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
               Scatta una foto
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+            <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
               Fotografa direttamente dal libro o quaderno usando la webcam.
             </p>
             <div className="space-y-1.5 text-sm mb-4">
@@ -57,7 +57,7 @@ export function UploadCards({
               ].map((text, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 text-slate-500 dark:text-slate-400"
+                  className="flex items-center gap-2 text-slate-700 dark:text-slate-300"
                 >
                   <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                   <span>{text}</span>
@@ -94,7 +94,7 @@ export function UploadCards({
             <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
               Carica un file
             </h3>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+            <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
               Seleziona un&apos;immagine o un documento PDF dal dispositivo.
             </p>
             <div className="space-y-1.5 text-sm mb-4">
@@ -105,7 +105,7 @@ export function UploadCards({
               ].map((text, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-2 text-slate-500 dark:text-slate-400"
+                  className="flex items-center gap-2 text-slate-700 dark:text-slate-300"
                 >
                   <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                   <span>{text}</span>
@@ -133,7 +133,7 @@ export function UploadCards({
             className={cn(
               'cursor-pointer transition-all duration-300 hover:shadow-xl hover:border-emerald-400 dark:hover:border-emerald-600 group overflow-hidden h-full',
               isUploading && 'opacity-50 pointer-events-none',
-              !isGoogleDriveConnected && 'opacity-70'
+              !isGoogleDriveConnected && 'border-dashed border-2 border-slate-300 dark:border-slate-600'
             )}
             onClick={() => !isUploading && onGoogleDriveClick()}
           >
@@ -144,7 +144,7 @@ export function UploadCards({
               <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1">
                 Google Drive
               </h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+              <p className="text-sm text-slate-700 dark:text-slate-300 mb-3">
                 {isGoogleDriveConnected
                   ? 'Seleziona file direttamente dal tuo Google Drive.'
                   : 'Collega Google Drive nelle impostazioni per usare questa opzione.'}
@@ -157,7 +157,7 @@ export function UploadCards({
                 ].map((text, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-2 text-slate-500 dark:text-slate-400"
+                    className="flex items-center gap-2 text-slate-700 dark:text-slate-300"
                   >
                     <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                     <span>{text}</span>
@@ -165,7 +165,7 @@ export function UploadCards({
                 ))}
               </div>
               <Button
-                className="w-full bg-emerald-600 hover:bg-emerald-700"
+                className="w-full bg-emerald-700 hover:bg-emerald-800"
                 disabled={isUploading || !isGoogleDriveConnected}
               >
                 <Cloud className="w-4 h-4 mr-2" />

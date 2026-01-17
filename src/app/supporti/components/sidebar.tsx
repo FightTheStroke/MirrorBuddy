@@ -92,7 +92,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
         >
           <BookOpen className="w-4 h-4" />
           Tutti i Supporti
-          <span className="ml-auto text-xs opacity-70">{counts.total}</span>
+          <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{counts.total}</span>
         </button>
 
         {/* Bookmarked */}
@@ -107,7 +107,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
         >
           <Bookmark className="w-4 h-4" />
           Preferiti
-          <span className="ml-auto text-xs opacity-70">{counts.bookmarked}</span>
+          <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{counts.bookmarked}</span>
         </button>
 
         {/* By Type */}
@@ -138,7 +138,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
                   >
                     <Icon className="w-4 h-4" />
                     {label}
-                    <span className="ml-auto text-xs opacity-70">{count}</span>
+                    <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{count}</span>
                   </button>
                 );
               })}
@@ -172,7 +172,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
                       )}
                     >
                       {SUBJECT_LABELS[subject] || subject}
-                      <span className="ml-auto text-xs opacity-70">{count}</span>
+                      <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{count}</span>
                     </button>
                   );
                 })}
@@ -209,7 +209,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
                     >
                       <Users className="w-4 h-4" />
                       {maestro.name}
-                      <span className="ml-auto text-xs opacity-70">{count}</span>
+                      <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{count}</span>
                     </button>
                   );
                 })}
