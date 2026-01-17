@@ -6,6 +6,7 @@
 
 import 'server-only';
 
+import { logger } from '@/lib/logger';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { AzureMonitorTraceExporter } from '@azure/monitor-opentelemetry-exporter';
@@ -26,7 +27,7 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
 
   // Skip initialization if connection string not provided
   if (!connectionString) {
-    console.warn('[OpenTelemetry] APPLICATIONINSIGHTS_CONNECTION_STRING not set. Telemetry disabled.');
+    logger.warn('APPLICATIONINSIGHTS_CONNECTION_STRING not set. Telemetry disabled.');
     return undefined;
   }
 
@@ -56,10 +57,10 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
       ],
     });
 
-    console.log('[OpenTelemetry] SDK initialized with Azure Monitor exporter');
+    logger.info('OpenTelemetry SDK initialized with Azure Monitor exporter');
     return sdk;
   } catch (error) {
-    console.error('[OpenTelemetry] Failed to initialize SDK:', error);
+    logger.error('Failed to initialize OpenTelemetry SDK', { error });
     return undefined;
   }
 }
@@ -71,17 +72,17 @@ export function initializeOpenTelemetry(): NodeSDK | undefined {
 export function startOpenTelemetry(sdk: NodeSDK): void {
   try {
     sdk.start();
-    console.log('[OpenTelemetry] SDK started successfully');
+    logger.info('OpenTelemetry SDK started successfully');
 
     // Graceful shutdown on process termination
     process.on('SIGTERM', () => {
       sdk
         .shutdown()
-        .then(() => console.log('[OpenTelemetry] SDK shut down successfully'))
-        .catch((error) => console.error('[OpenTelemetry] Error shutting down SDK', error))
+        .then(() => logger.info('OpenTelemetry SDK shut down successfully'))
+        .catch((error) => logger.error('Error shutting down OpenTelemetry SDK', { error }))
         .finally(() => process.exit(0));
     });
   } catch (error) {
-    console.error('[OpenTelemetry] Failed to start SDK:', error);
+    logger.error('Failed to start OpenTelemetry SDK', { error });
   }
 }
