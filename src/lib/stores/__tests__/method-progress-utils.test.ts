@@ -2,51 +2,58 @@
  * Tests for Method Progress Store Utilities
  */
 
-import { describe, it, expect } from 'vitest';
-import { calculateLevel, calculateAutonomyScore } from '../method-progress-utils';
-import { DEFAULT_METHOD_PROGRESS, LEVEL_THRESHOLDS } from '@/lib/method-progress/types';
+import { describe, it, expect } from "vitest";
+import {
+  calculateLevel,
+  calculateAutonomyScore,
+} from "../method-progress-utils";
+import {
+  DEFAULT_METHOD_PROGRESS,
+  LEVEL_THRESHOLDS,
+  type Subject,
+} from "@/lib/method-progress/types";
 
-describe('method-progress-utils', () => {
-  describe('calculateLevel', () => {
-    it('returns novice for 0 progress', () => {
-      expect(calculateLevel(0)).toBe('novice');
+describe("method-progress-utils", () => {
+  describe("calculateLevel", () => {
+    it("returns novice for 0 progress", () => {
+      expect(calculateLevel(0)).toBe("novice");
     });
 
-    it('returns novice for progress below learning threshold', () => {
-      expect(calculateLevel(LEVEL_THRESHOLDS.learning - 1)).toBe('novice');
-      expect(calculateLevel(10)).toBe('novice');
+    it("returns novice for progress below learning threshold", () => {
+      expect(calculateLevel(LEVEL_THRESHOLDS.learning - 1)).toBe("novice");
+      expect(calculateLevel(10)).toBe("novice");
     });
 
-    it('returns learning at learning threshold', () => {
-      expect(calculateLevel(LEVEL_THRESHOLDS.learning)).toBe('learning');
+    it("returns learning at learning threshold", () => {
+      expect(calculateLevel(LEVEL_THRESHOLDS.learning)).toBe("learning");
     });
 
-    it('returns learning for progress between learning and competent', () => {
-      expect(calculateLevel(40)).toBe('learning');
-      expect(calculateLevel(59)).toBe('learning');
+    it("returns learning for progress between learning and competent", () => {
+      expect(calculateLevel(40)).toBe("learning");
+      expect(calculateLevel(59)).toBe("learning");
     });
 
-    it('returns competent at competent threshold', () => {
-      expect(calculateLevel(LEVEL_THRESHOLDS.competent)).toBe('competent');
+    it("returns competent at competent threshold", () => {
+      expect(calculateLevel(LEVEL_THRESHOLDS.competent)).toBe("competent");
     });
 
-    it('returns competent for progress between competent and expert', () => {
-      expect(calculateLevel(70)).toBe('competent');
-      expect(calculateLevel(84)).toBe('competent');
+    it("returns competent for progress between competent and expert", () => {
+      expect(calculateLevel(70)).toBe("competent");
+      expect(calculateLevel(84)).toBe("competent");
     });
 
-    it('returns expert at expert threshold', () => {
-      expect(calculateLevel(LEVEL_THRESHOLDS.expert)).toBe('expert');
+    it("returns expert at expert threshold", () => {
+      expect(calculateLevel(LEVEL_THRESHOLDS.expert)).toBe("expert");
     });
 
-    it('returns expert for progress above expert threshold', () => {
-      expect(calculateLevel(90)).toBe('expert');
-      expect(calculateLevel(100)).toBe('expert');
+    it("returns expert for progress above expert threshold", () => {
+      expect(calculateLevel(90)).toBe("expert");
+      expect(calculateLevel(100)).toBe("expert");
     });
   });
 
-  describe('calculateAutonomyScore', () => {
-    it('returns 0 for default progress state', () => {
+  describe("calculateAutonomyScore", () => {
+    it("returns 0 for default progress state", () => {
       const state = {
         mindMaps: DEFAULT_METHOD_PROGRESS.mindMaps,
         flashcards: DEFAULT_METHOD_PROGRESS.flashcards,
@@ -58,7 +65,7 @@ describe('method-progress-utils', () => {
       expect(calculateAutonomyScore(state)).toBe(0);
     });
 
-    it('calculates alone ratio correctly', () => {
+    it("calculates alone ratio correctly", () => {
       const state = {
         mindMaps: { ...DEFAULT_METHOD_PROGRESS.mindMaps },
         flashcards: { ...DEFAULT_METHOD_PROGRESS.flashcards },
@@ -78,7 +85,7 @@ describe('method-progress-utils', () => {
       expect(score).toBeCloseTo(0.3, 2);
     });
 
-    it('calculates self-correction ratio correctly', () => {
+    it("calculates self-correction ratio correctly", () => {
       const state = {
         mindMaps: { ...DEFAULT_METHOD_PROGRESS.mindMaps },
         flashcards: { ...DEFAULT_METHOD_PROGRESS.flashcards },
@@ -98,7 +105,7 @@ describe('method-progress-utils', () => {
       expect(score).toBeCloseTo(0.2, 2);
     });
 
-    it('calculates tools alone ratio correctly', () => {
+    it("calculates tools alone ratio correctly", () => {
       const state = {
         mindMaps: {
           ...DEFAULT_METHOD_PROGRESS.mindMaps,
@@ -122,7 +129,7 @@ describe('method-progress-utils', () => {
       expect(score).toBeCloseTo(0.3, 2);
     });
 
-    it('calculates transfer bonus correctly', () => {
+    it("calculates transfer bonus correctly", () => {
       const state = {
         mindMaps: { ...DEFAULT_METHOD_PROGRESS.mindMaps },
         flashcards: { ...DEFAULT_METHOD_PROGRESS.flashcards },
@@ -130,7 +137,13 @@ describe('method-progress-utils', () => {
         helpBehavior: { ...DEFAULT_METHOD_PROGRESS.helpBehavior },
         methodTransfer: {
           ...DEFAULT_METHOD_PROGRESS.methodTransfer,
-          subjectsApplied: ['matematica', 'italiano', 'storia', 'scienze', 'inglese'],
+          subjectsApplied: [
+            "matematica",
+            "italiano",
+            "storia",
+            "scienze",
+            "inglese",
+          ] as Subject[],
         },
       };
 
@@ -140,7 +153,7 @@ describe('method-progress-utils', () => {
       expect(score).toBeCloseTo(0.2, 2);
     });
 
-    it('caps transfer bonus at 1', () => {
+    it("caps transfer bonus at 1", () => {
       const state = {
         mindMaps: { ...DEFAULT_METHOD_PROGRESS.mindMaps },
         flashcards: { ...DEFAULT_METHOD_PROGRESS.flashcards },
@@ -149,9 +162,16 @@ describe('method-progress-utils', () => {
         methodTransfer: {
           ...DEFAULT_METHOD_PROGRESS.methodTransfer,
           subjectsApplied: [
-            'matematica', 'italiano', 'storia', 'scienze',
-            'inglese', 'arte', 'musica', 'geografia', 'other',
-          ],
+            "matematica",
+            "italiano",
+            "storia",
+            "scienze",
+            "inglese",
+            "arte",
+            "musica",
+            "geografia",
+            "other",
+          ] as Subject[],
         },
       };
 
@@ -161,7 +181,7 @@ describe('method-progress-utils', () => {
       expect(score).toBeCloseTo(0.2, 2);
     });
 
-    it('calculates combined score correctly', () => {
+    it("calculates combined score correctly", () => {
       const state = {
         mindMaps: {
           ...DEFAULT_METHOD_PROGRESS.mindMaps,
@@ -183,7 +203,13 @@ describe('method-progress-utils', () => {
         },
         methodTransfer: {
           ...DEFAULT_METHOD_PROGRESS.methodTransfer,
-          subjectsApplied: ['matematica', 'italiano', 'storia', 'scienze', 'inglese'],
+          subjectsApplied: [
+            "matematica",
+            "italiano",
+            "storia",
+            "scienze",
+            "inglese",
+          ] as Subject[],
         },
       };
 
@@ -203,7 +229,7 @@ describe('method-progress-utils', () => {
       expect(score).toBeGreaterThan(1); // Score can exceed 1 with high self-corrections
     });
 
-    it('handles partial progress correctly', () => {
+    it("handles partial progress correctly", () => {
       const state = {
         mindMaps: {
           ...DEFAULT_METHOD_PROGRESS.mindMaps,
@@ -225,7 +251,7 @@ describe('method-progress-utils', () => {
         },
         methodTransfer: {
           ...DEFAULT_METHOD_PROGRESS.methodTransfer,
-          subjectsApplied: ['matematica', 'italiano'],
+          subjectsApplied: ["matematica", "italiano"] as Subject[],
         },
       };
 
