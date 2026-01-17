@@ -88,7 +88,18 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npx prisma generate
-      - run: npm run test:unit
+
+      - name: Run unit tests with coverage
+        run: npm run test:unit -- --coverage
+
+      - name: Check coverage thresholds
+        run: |
+          if [ -f coverage/coverage-final.json ]; then
+            echo "✓ Coverage report generated - thresholds enforced by Vitest"
+          else
+            echo "✗ Coverage report not found"
+            exit 1
+          fi
 
   # Lane 4: Documentation Check
   docs:
