@@ -37,6 +37,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Admin Role (F-26)**: UserRole enum (USER/ADMIN) and `requireAdmin()` middleware in `src/lib/auth/`
 - **Circular Dependencies (F-27)**: Verified 0 circular dependencies with madge (1867 files)
 
+#### P3.2: Accessibility Testing
+- **WCAG 2.1 AA Test Suite**: Comprehensive `e2e/accessibility.spec.ts` with 24 tests using axe-core
+- **Color Contrast Fixes**: Updated accent colors to meet 4.5:1 minimum contrast ratio
+- **Keyboard Navigation Tests**: Tab order, focus indicators, escape key handling
+- **Screen Reader Support**: Heading hierarchy, alt text, ARIA roles, form labels
+- **DSA Profile Testing**: Dyslexia font toggle verification
+
 ### Added (Jan 17 - Release Gate 10/10)
 
 - **Release gate**: Added `npm run release:gate` to enforce full P0 checks in one command.
