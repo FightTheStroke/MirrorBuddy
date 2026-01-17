@@ -5,22 +5,22 @@
  * so tests skip the welcome flow.
  */
 
-import path from 'path';
-import fs from 'fs';
-import { createHmac } from 'crypto';
+import path from "path";
+import fs from "fs";
+import { createHmac } from "crypto";
 
-const STORAGE_STATE_PATH = path.join(__dirname, '.auth', 'storage-state.json');
+const STORAGE_STATE_PATH = path.join(__dirname, ".auth", "storage-state.json");
 
 // Must match playwright.config.ts SESSION_SECRET
-const E2E_SESSION_SECRET = 'e2e-test-session-secret-32-characters-min';
+const E2E_SESSION_SECRET = "e2e-test-session-secret-32-characters-min";
 
 /**
  * Sign cookie value for E2E tests (matches src/lib/auth/cookie-signing.ts)
  */
 function signCookieValue(value: string): string {
-  const hmac = createHmac('sha256', E2E_SESSION_SECRET);
+  const hmac = createHmac("sha256", E2E_SESSION_SECRET);
   hmac.update(value);
-  const signature = hmac.digest('hex');
+  const signature = hmac.digest("hex");
   return `${value}.${signature}`;
 }
 
@@ -32,40 +32,52 @@ async function globalSetup() {
   }
 
   // Sign the test user cookie
-  const signedCookie = signCookieValue('test-user');
+  const signedCookie = signCookieValue("test-user");
 
   // Create storage state with onboarding completed
   const storageState = {
     cookies: [
       {
-        name: 'mirrorbuddy-user-id',
+        // Server-side auth cookie (signed)
+        name: "mirrorbuddy-user-id",
         value: signedCookie,
-        domain: 'localhost',
-        path: '/',
+        domain: "localhost",
+        path: "/",
+        expires: -1,
+        httpOnly: true,
+        secure: false,
+        sameSite: "Lax",
+      },
+      {
+        // Client-readable cookie (not signed, for JS access)
+        name: "mirrorbuddy-user-id-client",
+        value: "test-user",
+        domain: "localhost",
+        path: "/",
         expires: -1,
         httpOnly: false,
         secure: false,
-        sameSite: 'Lax',
+        sameSite: "Lax",
       },
     ],
     origins: [
       {
-        origin: 'http://localhost:3000',
+        origin: "http://localhost:3000",
         localStorage: [
           {
-            name: 'mirrorbuddy-onboarding',
+            name: "mirrorbuddy-onboarding",
             value: JSON.stringify({
               state: {
                 hasCompletedOnboarding: true,
                 onboardingCompletedAt: new Date().toISOString(),
-                currentStep: 'ready',
+                currentStep: "ready",
                 isReplayMode: false,
                 data: {
-                  name: 'Test User',
+                  name: "Test User",
                   age: 12,
-                  schoolLevel: 'media',
+                  schoolLevel: "media",
                   learningDifferences: [],
-                  gender: 'other',
+                  gender: "other",
                 },
               },
               version: 0,
@@ -79,7 +91,10 @@ async function globalSetup() {
   // Write storage state file
   fs.writeFileSync(STORAGE_STATE_PATH, JSON.stringify(storageState, null, 2));
 
-  console.log('Global setup complete: onboarding state saved to', STORAGE_STATE_PATH);
+  console.log(
+    "Global setup complete: onboarding state saved to",
+    STORAGE_STATE_PATH,
+  );
 }
 
 export default globalSetup;

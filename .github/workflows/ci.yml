@@ -238,6 +238,22 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
     if: github.event.pull_request.draft != true
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -256,7 +272,12 @@ jobs:
         if: steps.npm-cache.outputs.cache-hit != 'true'
         run: npm ci
 
-      - run: npx prisma generate
+      - name: Setup database
+        run: |
+          npx prisma generate
+          npx prisma db push --skip-generate
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
@@ -284,6 +305,8 @@ jobs:
         run: npm run test
         env:
           CI: true
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       - name: Upload Playwright report
         if: always()
