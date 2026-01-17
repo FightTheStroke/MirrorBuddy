@@ -3,20 +3,39 @@
  * Handles sending messages with streaming or non-streaming flow
  */
 
-import { logger } from '@/lib/logger';
-import type { CharacterInfo } from '../../utils/character-utils';
-import type { Message } from './types';
-import { sendChatMessage, createAssistantMessage, createErrorMessage } from './message-handler';
-import { sendStreamingMessage, messageRequiresTool } from './streaming-handler';
-import type { ToolState } from '@/types/tools';
+import { logger } from "@/lib/logger";
+import type { CharacterInfo } from "../../utils/character-utils";
+import type { Message } from "./types";
+import {
+  sendChatMessage,
+  createAssistantMessage,
+  createErrorMessage,
+  type ChatUsage,
+} from "./message-handler";
+import { sendStreamingMessage, messageRequiresTool } from "./streaming-handler";
+import type { ToolState } from "@/types/tools";
+
+/** Metrics data from chat turn (REAL data from API) */
+export interface TurnMetricsData {
+  usage: ChatUsage | null;
+  latencyMs: number;
+}
 
 export interface SendMessageCallbacks {
   onStreamingStart: (streamingMsgId: string) => void;
   onStreamingChunk: (streamingMsgId: string, accumulated: string) => void;
-  onStreamingComplete: (streamingMsgId: string, fullResponse: string) => void;
+  onStreamingComplete: (
+    streamingMsgId: string,
+    fullResponse: string,
+    metrics?: TurnMetricsData,
+  ) => void;
   onStreamingError: (streamingMsgId: string) => void;
   onStreamingFallback: (streamingMsgId: string) => void;
-  onNonStreamingComplete: (message: Message, toolState: ToolState | null) => void;
+  onNonStreamingComplete: (
+    message: Message,
+    toolState: ToolState | null,
+    metrics: TurnMetricsData,
+  ) => void;
   onError: () => void;
 }
 
@@ -34,7 +53,9 @@ export interface SendMessageOptions {
  * Send a message with automatic streaming/non-streaming routing
  * Returns true if streaming was used, false if non-streaming
  */
-export async function handleSendMessage(options: SendMessageOptions): Promise<boolean> {
+export async function handleSendMessage(
+  options: SendMessageOptions,
+): Promise<boolean> {
   const {
     content,
     messages,
@@ -61,11 +82,14 @@ export async function handleSendMessage(options: SendMessageOptions): Promise<bo
       onChunk: (_chunk, accumulated) => {
         callbacks.onStreamingChunk(streamingMsgId, accumulated);
       },
-      onComplete: (fullResponse) => {
-        callbacks.onStreamingComplete(streamingMsgId, fullResponse);
+      onComplete: (fullResponse, usage, latencyMs) => {
+        callbacks.onStreamingComplete(streamingMsgId, fullResponse, {
+          usage,
+          latencyMs,
+        });
       },
       onError: (error) => {
-        logger.error('Streaming error', undefined, error);
+        logger.error("Streaming error", undefined, error);
         callbacks.onStreamingError(streamingMsgId);
       },
     });
@@ -78,18 +102,17 @@ export async function handleSendMessage(options: SendMessageOptions): Promise<bo
 
   // Non-streaming path
   try {
-    const { responseContent, toolState } = await sendChatMessage(
-      content,
-      messages,
-      character,
-      characterId
-    );
+    const { responseContent, toolState, usage, latencyMs } =
+      await sendChatMessage(content, messages, character, characterId);
 
     const assistantMessage = createAssistantMessage(responseContent);
-    callbacks.onNonStreamingComplete(assistantMessage, toolState);
+    callbacks.onNonStreamingComplete(assistantMessage, toolState, {
+      usage,
+      latencyMs,
+    });
     return false;
   } catch (error) {
-    logger.error('Chat error', undefined, error);
+    logger.error("Chat error", undefined, error);
     callbacks.onError();
     return false;
   }

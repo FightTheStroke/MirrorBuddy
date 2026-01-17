@@ -2,31 +2,42 @@
  * Message sending and chat API logic
  */
 
-import { logger } from '@/lib/logger';
-import type { Message } from './types';
-import type { CharacterInfo } from '../../utils/character-utils';
-import type { ToolState, ToolType, ToolCallRef, ToolCall } from '@/types/tools';
+import { logger } from "@/lib/logger";
+import type { Message } from "./types";
+import type { CharacterInfo } from "../../utils/character-utils";
+import type { ToolState, ToolType, ToolCallRef, ToolCall } from "@/types/tools";
+
+/** REAL usage data from API response (not estimated) */
+export interface ChatUsage {
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_tokens: number;
+}
 
 /**
- * Send message to chat API and handle response
+ * Send message to chat API and handle response.
+ * Returns REAL usage data from API for metrics tracking.
  */
 export async function sendChatMessage(
   input: string,
   messages: Message[],
   character: CharacterInfo,
   characterId: string,
-  enableTools: boolean = true
+  enableTools: boolean = true,
 ): Promise<{
   responseContent: string;
   toolState: ToolState | null;
+  usage: ChatUsage | null;
+  latencyMs: number;
 }> {
-  const response = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const startTime = performance.now();
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       messages: [
         ...messages.map((m) => ({ role: m.role, content: m.content })),
-        { role: 'user', content: input },
+        { role: "user", content: input },
       ],
       systemPrompt: character.systemPrompt,
       maestroId: characterId,
@@ -34,12 +45,12 @@ export async function sendChatMessage(
     }),
   });
 
-  if (!response.ok) throw new Error('Failed to send message');
+  if (!response.ok) throw new Error("Failed to send message");
 
   const data = await response.json();
 
   let responseContent = data.content || data.message;
-  if (!responseContent || responseContent.trim() === '') {
+  if (!responseContent || responseContent.trim() === "") {
     responseContent = generateDefaultResponse(data.toolCalls);
   }
 
@@ -50,45 +61,64 @@ export async function sendChatMessage(
 
     // Handle both old format (with result.data) and new format (with materialId)
     let toolContent = null;
-    const toolCallWithFallback = toolCall as ToolCallRef | (ToolCall & { result: { data: unknown } });
+    const toolCallWithFallback = toolCall as
+      | ToolCallRef
+      | (ToolCall & { result: { data: unknown } });
 
     // Try to get content from result.data (old format with full data)
-    if ('result' in toolCallWithFallback &&
-        typeof toolCallWithFallback.result === 'object' &&
-        toolCallWithFallback.result !== null &&
-        'data' in toolCallWithFallback.result) {
+    if (
+      "result" in toolCallWithFallback &&
+      typeof toolCallWithFallback.result === "object" &&
+      toolCallWithFallback.result !== null &&
+      "data" in toolCallWithFallback.result
+    ) {
       toolContent = (toolCallWithFallback.result as { data: unknown }).data;
     } else if (toolCall.materialId) {
       // New format: fetch from Material table
       try {
-        const materialResponse = await fetch(`/api/materials/${toolCall.materialId}`);
+        const materialResponse = await fetch(
+          `/api/materials/${toolCall.materialId}`,
+        );
         if (materialResponse.ok) {
           const data = await materialResponse.json();
           // Response wraps material in { material: parsed }
           toolContent = data.material?.content || null;
         }
       } catch (error) {
-        logger.warn('Failed to fetch material content', { error: String(error) });
+        logger.warn("Failed to fetch material content", {
+          error: String(error),
+        });
         // Fall back to empty content, UI will display error
       }
     }
 
     // If no content found, use arguments as fallback
-    if (!toolContent && 'arguments' in toolCallWithFallback) {
+    if (!toolContent && "arguments" in toolCallWithFallback) {
       toolContent = (toolCallWithFallback as ToolCall).arguments || null;
     }
 
     toolState = {
       id: toolCall.id,
       type: toolType,
-      status: 'completed',
+      status: "completed",
       progress: 1,
       content: toolContent,
       createdAt: new Date(),
     };
   }
 
-  return { responseContent, toolState };
+  const latencyMs = Math.round(performance.now() - startTime);
+
+  // Extract REAL usage from API response (null if not provided)
+  const usage: ChatUsage | null = data.usage
+    ? {
+        prompt_tokens: data.usage.prompt_tokens || 0,
+        completion_tokens: data.usage.completion_tokens || 0,
+        total_tokens: data.usage.total_tokens || 0,
+      }
+    : null;
+
+  return { responseContent, toolState, usage, latencyMs };
 }
 
 /**
@@ -96,22 +126,22 @@ export async function sendChatMessage(
  */
 function generateDefaultResponse(toolCalls: Array<{ type?: string }>): string {
   if (!toolCalls || toolCalls.length === 0) {
-    return 'Mi dispiace, non ho capito. Puoi ripetere?';
+    return "Mi dispiace, non ho capito. Puoi ripetere?";
   }
 
   const toolNames = toolCalls.map((tc) => tc.type);
 
-  if (toolNames.includes('mindmap')) {
-    return 'Ti sto creando la mappa mentale...';
-  } else if (toolNames.includes('quiz')) {
-    return 'Ti sto preparando il quiz...';
-  } else if (toolNames.includes('flashcard')) {
-    return 'Ti sto creando le flashcard...';
-  } else if (toolNames.includes('summary')) {
-    return 'Ti sto preparando il riassunto...';
+  if (toolNames.includes("mindmap")) {
+    return "Ti sto creando la mappa mentale...";
+  } else if (toolNames.includes("quiz")) {
+    return "Ti sto preparando il quiz...";
+  } else if (toolNames.includes("flashcard")) {
+    return "Ti sto creando le flashcard...";
+  } else if (toolNames.includes("summary")) {
+    return "Ti sto preparando il riassunto...";
   }
 
-  return 'Sto elaborando la tua richiesta...';
+  return "Sto elaborando la tua richiesta...";
 }
 
 /**
@@ -120,7 +150,7 @@ function generateDefaultResponse(toolCalls: Array<{ type?: string }>): string {
 export function createUserMessage(content: string): Message {
   return {
     id: `user-${Date.now()}`,
-    role: 'user',
+    role: "user",
     content: content.trim(),
     timestamp: new Date(),
   };
@@ -132,7 +162,7 @@ export function createUserMessage(content: string): Message {
 export function createAssistantMessage(content: string): Message {
   return {
     id: `assistant-${Date.now()}`,
-    role: 'assistant',
+    role: "assistant",
     content,
     timestamp: new Date(),
   };
@@ -144,8 +174,8 @@ export function createAssistantMessage(content: string): Message {
 export function createErrorMessage(): Message {
   return {
     id: `error-${Date.now()}`,
-    role: 'assistant',
-    content: 'Mi dispiace, c\'è stato un errore. Riprova tra poco!',
+    role: "assistant",
+    content: "Mi dispiace, c'è stato un errore. Riprova tra poco!",
     timestamp: new Date(),
   };
 }
