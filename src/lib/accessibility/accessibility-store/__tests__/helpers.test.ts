@@ -22,12 +22,16 @@ describe('accessibility-store-helpers', () => {
     largeText: false,
     increasedLineHeight: false,
     extraLetterSpacing: false,
-    screenReaderOptimized: false,
-    focusHighlight: false,
-    simplifiedUI: false,
-    textToSpeech: false,
-    captions: false,
-    colorBlindSupport: 'none',
+    ttsEnabled: false,
+    ttsSpeed: 1.0,
+    ttsAutoRead: false,
+    adhdMode: false,
+    distractionFreeMode: false,
+    breakReminders: false,
+    colorBlindMode: false,
+    keyboardNavigation: false,
+    customBackgroundColor: '',
+    customTextColor: '',
   };
 
   describe('getLineSpacing', () => {

@@ -9,7 +9,6 @@
  */
 
 import {
-  type StorageConfig,
   type IStorageService,
   StorageError,
 } from './types';

@@ -9,7 +9,6 @@ import { logger } from '@/lib/logger';
 import type {
   ProbeResults,
   ProbeResult,
-  TransportSelection,
   TransportError,
   TransportSelectionResult,
 } from './transport-types';

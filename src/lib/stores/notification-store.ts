@@ -10,7 +10,6 @@ import {
   showBrowserNotification,
 } from './notification-helpers';
 import type {
-  NotificationType,
   Notification,
   NotificationPreferences,
 } from './notification-types';

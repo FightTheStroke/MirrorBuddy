@@ -10,9 +10,7 @@
 import { prisma } from '@/lib/db';
 import {
   materialToSavedTool,
-  type SaveToolParams,
   type SavedTool,
-  type GetToolsFilter,
 } from './tool-persistence-types';
 
 // Re-export types for backwards compatibility

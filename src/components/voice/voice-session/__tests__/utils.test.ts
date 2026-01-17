@@ -9,7 +9,7 @@ describe("voice-session-utils", () => {
   describe("getStateText", () => {
     it("returns config error message when configError exists", () => {
       const result = getStateText(
-        { type: "config", message: "Error" },
+        { error: "config", message: "Error" },
         false,
         "idle",
         false,
@@ -113,7 +113,7 @@ describe("voice-session-utils", () => {
 
     it("prioritizes config error over other states", () => {
       const result = getStateText(
-        { type: "config", message: "Error" },
+        { error: "config", message: "Error" },
         true, // would show permissions loading
         "connecting", // would show connecting
         true, // would show listening
@@ -143,8 +143,10 @@ describe("voice-session-utils", () => {
       const session = {
         id: "1",
         startedAt: new Date(),
+        maestroId: "euclide",
+        questionsAsked: 5,
         xpEarned: 50,
-        minutesStudied: 10,
+        mirrorBucksEarned: 50,
         subject: "math",
       };
       expect(calculateSessionXP(session, 10)).toBe(50);
@@ -154,8 +156,10 @@ describe("voice-session-utils", () => {
       const session = {
         id: "1",
         startedAt: new Date(),
+        maestroId: "euclide",
+        questionsAsked: 5,
         xpEarned: 0,
-        minutesStudied: 10,
+        mirrorBucksEarned: 0,
         subject: "math",
       };
       // 0 is falsy, so falls through to calculation

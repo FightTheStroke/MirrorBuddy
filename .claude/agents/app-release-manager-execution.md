@@ -10,12 +10,12 @@ Reference module for `app-release-manager`. Contains manual validation and relea
 
 ---
 
-## PHASE 3: EDUCATION-SPECIFIC VALIDATION (P0)
+## PHASE 4: EDUCATION-SPECIFIC VALIDATION (P0)
 
 Manual verification required:
 
 ### Student Safety (ADR-0004)
-- [ ] All 17 maestri respond appropriately
+- [ ] All 20 maestri/amici respond appropriately
 - [ ] Safety guardrails block inappropriate content
 - [ ] Crisis keywords trigger helpline info (Telefono Azzurro: 19696)
 - [ ] `injectSafetyGuardrails()` used in all AI prompts
@@ -24,7 +24,7 @@ Manual verification required:
 
 **Verification command:**
 ```bash
-npm test -- run src/lib/safety/__tests__/
+npm run test:unit -- src/lib/safety/__tests__/
 # Should pass ALL safety tests (150+)
 ```
 
@@ -51,7 +51,7 @@ grep -r "mirrorbuddy-user-id" src/app/api/ --include="*.ts" | wc -l
 
 **Verification command:**
 ```bash
-npm test -- run e2e/accessibility*.spec.ts
+npm run test -- e2e/accessibility*.spec.ts
 # Should pass Axe accessibility audit
 ```
 
@@ -83,10 +83,114 @@ grep "lastUpdated" src/data/app-knowledge-base.ts
 
 ---
 
-## PHASE 3.5: RELEASE SCORECARD (P0)
+## PHASE 5: TESTING GAP VALIDATION (P0 - BLOCKING)
+
+> Added 2026-01-17: Assessment revealed ZERO tests for critical paths.
+
+### 5.1 Authentication Tests (MANDATORY)
+
+OAuth flow must have tests:
+```bash
+# Verify auth tests exist
+ls src/app/api/auth/**/__tests__/*.test.ts 2>/dev/null || ls e2e/*auth*.spec.ts 2>/dev/null
+# MUST find test files
+```
+
+Required test coverage:
+- [ ] CSRF token validation
+- [ ] State parameter verification
+- [ ] Redirect URL validation
+- [ ] Token refresh flow
+- [ ] Session fixation prevention
+
+### 5.2 Cron Job Tests (MANDATORY)
+
+Data retention cron must be tested:
+```bash
+# Verify cron tests exist
+ls src/app/api/cron/**/__tests__/*.test.ts 2>/dev/null
+# MUST find test files
+```
+
+Required test coverage:
+- [ ] CRON_SECRET authentication
+- [ ] Multi-phase deletion logic
+- [ ] Audit trail creation
+- [ ] Edge cases (user not found, partial deletion)
+
+### 5.3 Critical API Route Tests (MANDATORY)
+
+Core features must have E2E tests:
+```bash
+# Verify critical API tests
+grep -rn "chat/stream\|realtime/start\|learning-path" e2e/*.spec.ts
+# MUST find tests for these routes
+```
+
+Required test coverage:
+- [ ] `/api/chat/stream` - streaming works, budget enforced
+- [ ] `/api/realtime/start` - voice session initiates
+- [ ] `/api/learning-path/*` - path creation and progress
+- [ ] `/api/gamification/*` - XP and achievements
+
+### 5.4 Coverage Enforcement
+
+```bash
+# Verify coverage meets threshold
+npm run test:coverage
+# Statements: ≥80%
+# Branches: ≥70%
+# Functions: ≥75%
+# Lines: ≥80%
+```
+
+**If ANY test gap exists: STOP. Write tests first.**
+
+---
+
+## PHASE 5.5: CODE QUALITY VALIDATION (P1)
+
+### localStorage Audit (ADR 0015)
+
+```bash
+# Find all localStorage usage
+grep -rn "localStorage\." src/ --include="*.ts" --include="*.tsx" | grep -v test | grep -v __tests__
+# Each usage must be documented exception (cache, permissions) NOT user data
+```
+
+Legitimate uses (OK):
+- Transport cache (WebRTC probe results)
+- Permission cache (browser permissions)
+- PWA banner dismissal
+
+Violations (BLOCKED):
+- User profile data
+- Conversation history
+- Progress/XP data
+
+### Empty Catch Blocks
+
+```bash
+# Find empty catch blocks
+grep -rn "catch.*{}" src/ --include="*.ts" --include="*.tsx" | grep -v test
+# MUST return 0 results (all catch blocks must log)
+```
+
+### Console.log Cleanup
+
+```bash
+# Find console statements (excluding logger)
+grep -rn "console\.\(log\|error\|warn\)" src/ --include="*.ts" --include="*.tsx" | grep -v test | grep -v logger
+# MUST return 0 results in production code
+```
+
+---
+
+## PHASE 6: RELEASE SCORECARD (P0)
 
 **No proof = BLOCKED.** Store evidence in `docs/releases/<version>/` or equivalent.
 
+### Required Artifacts
 - [ ] `npm run release:gate` full log captured
 - [ ] Coverage report saved (`coverage/index.html` or `coverage/coverage-summary.json`)
 - [ ] Playwright report saved (`playwright-report/index.html`)
@@ -94,11 +198,17 @@ grep "lastUpdated" src/data/app-knowledge-base.ts
 - [ ] Manual QA screenshots for key flows (mindmap, quiz, flashcards, knowledge hub)
 - [ ] Security audit output saved (`npm audit --audit-level=high`)
 
+### Security Artifacts (NEW)
+- [ ] CSP header screenshot/curl output
+- [ ] CSRF token in form screenshot
+- [ ] Rate limit test output (100 requests, proper 429 response)
+- [ ] COPPA consent flow recording/screenshots
+
 If any artifact is missing, release is blocked.
 
 ---
 
-## PHASE 4: RELEASE
+## PHASE 7: RELEASE
 
 Only after ALL phases pass:
 
@@ -140,7 +250,7 @@ https://microsoft.github.io/code-with-engineering-playbook/
 
 ## CRITICAL LEARNINGS
 
-See `mirrorbuddy-hardening-checks.md` for post-mortem learnings (2026-01-03).
+See `mirrorbuddy-hardening-checks.md` for post-mortem learnings.
 
 **Quick validation**:
 ```bash

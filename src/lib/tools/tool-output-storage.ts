@@ -10,7 +10,6 @@ import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 import { indexToolOutput } from './tool-rag-indexer';
 import type {
-  ToolOutputData,
   SaveToolOutputOptions,
   StoredToolOutput,
 } from './tool-output-types';
