@@ -1,7 +1,7 @@
 # ADR-0047: Security Hardening (Plan 17)
 
 **Status:** Accepted
-**Date:** 2026-01-17
+**Date:** 2026-01-17 (Updated: 2026-01-18)
 **Decision Makers:** Roberto
 
 ## Context
@@ -59,7 +59,18 @@ Implement security hardening across 4 waves:
 
 - **Trace ID**: Logger now includes OpenTelemetry trace ID in all logs
 - **CI**: Added `dependency-review.yml` workflow for vulnerability scanning
-- **Note**: CodeQL workflow removed - repository uses default setup
+- **CI**: Added `codeql.yml` workflow for static analysis (JavaScript/TypeScript)
+
+### Wave 5: CSRF Coverage Completion (2026-01-18)
+
+Post-audit review identified 5 endpoints missing CSRF protection:
+- `/api/chat` - Main chat endpoint
+- `/api/chat/stream` - Streaming chat endpoint
+- `/api/tts` - Text-to-speech endpoint
+- `/api/realtime/ephemeral-token` - WebRTC token endpoint
+- `/api/privacy/delete-my-data` - GDPR deletion endpoint
+
+All now enforce `requireCSRF()` pattern.
 
 ## Files Changed
 
@@ -68,7 +79,8 @@ Implement security hardening across 4 waves:
 - `src/app/api/session/route.ts` - CSRF token endpoint
 - `src/lib/auth/client-auth.ts` - Cookie-based userId helper
 - `src/lib/auth/__tests__/client-auth.test.ts` - Unit tests
-- `.github/workflows/dependency-review.yml` - Security workflow
+- `.github/workflows/dependency-review.yml` - Dependency vulnerability scanning
+- `.github/workflows/codeql.yml` - Static analysis (security-and-quality queries)
 - `docs/operations/REDIS-FAILURE.md` - Runbook
 
 ### Modified Files (26 total)
