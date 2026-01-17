@@ -1,11 +1,11 @@
 # ADR 0039: Deferred Production Items
 
-| | |
-|---|---|
-| **Status** | Accepted |
-| **Date** | 2025-01-11 (Updated: 2025-01-17) |
-| **Deciders** | Roberto D'Angelo |
-| **Technical Story** | Production hardening review |
+|                     |                                  |
+| ------------------- | -------------------------------- |
+| **Status**          | Accepted                         |
+| **Date**            | 2025-01-11 (Updated: 2025-01-18) |
+| **Deciders**        | Roberto D'Angelo                 |
+| **Technical Story** | Production hardening review      |
 
 ## Context and Problem Statement
 
@@ -45,12 +45,12 @@ graph LR
     end
 ```
 
-| Aspect | Current | Future |
-|--------|---------|--------|
-| Identity | Cookie-based | OAuth 2.0 + OIDC |
-| Parent verification | Manual | ID verification flow |
-| Child consent | Assumed | Dual-consent GDPR flow |
-| Session management | Memory | Redis + JWT |
+| Aspect              | Current      | Future                 |
+| ------------------- | ------------ | ---------------------- |
+| Identity            | Cookie-based | OAuth 2.0 + OIDC       |
+| Parent verification | Manual       | ID verification flow   |
+| Child consent       | Assumed      | Dual-consent GDPR flow |
+| Session management  | Memory       | Redis + JWT            |
 
 **Why Deferred**: Beta users are known entities with parent supervision. Adding auth requires significant UX changes and legal review for child data handling.
 
@@ -60,11 +60,11 @@ graph LR
 
 ### 2. Redis for Rate Limiting
 
-| Aspect | Current | Future |
-|--------|---------|--------|
-| Storage | In-memory | Redis Cluster |
-| Persistence | Lost on restart | Persistent |
-| Scaling | Single instance | Multi-instance |
+| Aspect      | Current         | Future         |
+| ----------- | --------------- | -------------- |
+| Storage     | In-memory       | Redis Cluster  |
+| Persistence | Lost on restart | Persistent     |
+| Scaling     | Single instance | Multi-instance |
 
 **Why Deferred**: Single-instance deployment is sufficient for beta scale. In-memory rate limiting protects against abuse; state loss on restart is acceptable.
 
@@ -74,11 +74,11 @@ graph LR
 
 ### 3. Infrastructure as Code
 
-| Aspect | Current | Future |
-|--------|---------|--------|
-| Deployment | Docker Compose | Azure Container Apps |
-| Provisioning | Manual | Bicep/Terraform |
-| Secrets | .env files | Azure Key Vault |
+| Aspect       | Current        | Future               |
+| ------------ | -------------- | -------------------- |
+| Deployment   | Docker Compose | Azure Container Apps |
+| Provisioning | Manual         | Bicep/Terraform      |
+| Secrets      | .env files     | Azure Key Vault      |
 
 **Why Deferred**: Focus on application hardening first. IaC provides diminishing returns for single-environment beta.
 
@@ -86,11 +86,11 @@ graph LR
 
 ### 4. Distributed Tracing (OpenTelemetry)
 
-| Aspect | Current | Future |
-|--------|---------|--------|
+| Aspect  | Current         | Future               |
+| ------- | --------------- | -------------------- |
 | Logging | Structured JSON | OTel + Azure Monitor |
-| Tracing | None | Distributed spans |
-| Metrics | Health endpoint | Custom metrics |
+| Tracing | None            | Distributed spans    |
+| Metrics | Health endpoint | Custom metrics       |
 
 **Why Deferred**: Structured logging is sufficient for single-service debugging. OTel requires collector infrastructure.
 
@@ -100,21 +100,43 @@ graph LR
 
 The following capabilities were implemented as part of Plan 46 production hardening (see [ADR 0046](./0046-production-hardening-plan46.md)):
 
-| Item | Previous | Now |
-|------|----------|-----|
-| **Rate Limiting** | None | Token bucket in-memory (60 req/min) |
-| **Request Tracing** | None | Request IDs in `src/lib/tracing/` |
-| **Structured Logging** | Basic | JSON production, human-readable dev |
-| **Admin Authorization** | None | UserRole enum + `requireAdmin()` |
-| **CSP/CSRF** | None | Strict CSP + cookie signing |
-| **Health Endpoints** | None | `/api/health` + `/api/health/detailed` |
-| **Runbook/SLI-SLO** | None | `docs/operations/` documentation |
+| Item                    | Previous | Now                                    |
+| ----------------------- | -------- | -------------------------------------- |
+| **Rate Limiting**       | None     | Token bucket in-memory (60 req/min)    |
+| **Request Tracing**     | None     | Request IDs in `src/lib/tracing/`      |
+| **Structured Logging**  | Basic    | JSON production, human-readable dev    |
+| **Admin Authorization** | None     | UserRole enum + `requireAdmin()`       |
+| **CSP/CSRF**            | None     | Strict CSP + cookie signing            |
+| **Health Endpoints**    | None     | `/api/health` + `/api/health/detailed` |
+| **Runbook/SLI-SLO**     | None     | `docs/operations/` documentation       |
 
 **Still Deferred:**
+
 - Full OAuth (Azure AD B2C)
 - Redis for distributed rate limiting
 - OpenTelemetry (have request IDs, not full OTel)
 - Infrastructure as Code (Bicep/Terraform)
+
+## Items Addressed by Plan 49 (Jan 2025)
+
+Plan 49 "V1-Enterprise-Ready" added enterprise reliability features:
+
+| Item                     | Implementation                                       | Location                   |
+| ------------------------ | ---------------------------------------------------- | -------------------------- |
+| **Feature Flags**        | Kill-switch per-feature + global, percentage rollout | `src/lib/feature-flags/`   |
+| **Graceful Degradation** | Auto-degradation based on service health             | `src/lib/degradation/`     |
+| **SLO Monitoring**       | Voice/Chat/Session SLOs with error budget tracking   | `src/lib/alerting/`        |
+| **Go/No-Go Alerting**    | Release decision support with checks                 | `go-nogo-alerting.ts`      |
+| **Admin Dashboard**      | Feature flags panel + SLO monitoring                 | `src/components/admin/`    |
+| **Admin API**            | CRUD for feature flags, kill-switch toggle           | `/api/admin/feature-flags` |
+
+**Key Capabilities:**
+
+- Global kill-switch for emergency shutdown
+- Per-feature kill-switch for targeted disabling
+- Automatic degradation rules (voice → disable on high latency, RAG → cache mode)
+- SLO breach alerting with severity levels
+- Go/No-Go release decision API
 
 ## Consequences
 
@@ -132,11 +154,11 @@ The following capabilities were implemented as part of Plan 46 production harden
 
 ### Risks and Mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|------------|--------|------------|
-| Unauthorized access | Low | High | Network isolation, parent supervision |
-| Rate limit exhaustion | Low | Medium | Conservative limits, restart clears state |
-| Debugging difficulty | Medium | Low | Structured logs, health endpoints |
+| Risk                  | Likelihood | Impact | Mitigation                                |
+| --------------------- | ---------- | ------ | ----------------------------------------- |
+| Unauthorized access   | Low        | High   | Network isolation, parent supervision     |
+| Rate limit exhaustion | Low        | Medium | Conservative limits, restart clears state |
+| Debugging difficulty  | Medium     | Low    | Structured logs, health endpoints         |
 
 ## Related ADRs
 
@@ -150,4 +172,5 @@ The following capabilities were implemented as part of Plan 46 production harden
 - [ISE Engineering Playbook](https://microsoft.github.io/code-with-engineering-playbook/)
 
 ---
-*Version 2.0 | January 2025 | Technical Fellow Review*
+
+_Version 3.0 | January 2025 | Plan 49 Enterprise Update_
