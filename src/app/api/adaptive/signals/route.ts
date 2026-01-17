@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { validateAuth } from '@/lib/auth/session-auth';
 import { AdaptiveSignalsPayloadSchema } from '@/lib/validation/schemas/adaptive';
-import { normalizeAdaptiveDifficultyMode, recordAdaptiveSignal } from '@/lib/education/adaptive-difficulty';
+import { normalizeAdaptiveDifficultyMode, recordAdaptiveSignalsBatch } from '@/lib/education/adaptive-difficulty';
 import type { AdaptiveSignalInput } from '@/types/adaptive-difficulty';
 
 export async function POST(request: NextRequest) {
@@ -32,11 +32,13 @@ export async function POST(request: NextRequest) {
     });
     const mode = normalizeAdaptiveDifficultyMode(settings?.adaptiveDifficultyMode);
 
-    let latestProfile = null;
-    for (const signal of validation.data.signals) {
-      const metadata = signal.metadata as AdaptiveSignalInput['metadata'];
-      latestProfile = await recordAdaptiveSignal(userId, { ...signal, mode, metadata });
-    }
+    // Batch process all signals to avoid N+1 queries
+    const signalsWithMode = validation.data.signals.map((signal) => ({
+      ...signal,
+      mode,
+      metadata: signal.metadata as AdaptiveSignalInput['metadata'],
+    }));
+    const latestProfile = await recordAdaptiveSignalsBatch(userId, signalsWithMode);
 
     return NextResponse.json({ ok: true, profile: latestProfile });
   } catch (error) {

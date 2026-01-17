@@ -5,8 +5,12 @@ import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
 import type { DiagramRequest } from '@/types';
-// Using default import to enable typeof on the ref
-import mermaidAPI from 'mermaid';
+
+// Mermaid type for ref - avoids static import that bundles the library
+type MermaidAPI = {
+  initialize: (config: Record<string, unknown>) => void;
+  render: (id: string, code: string) => Promise<{ svg: string }>;
+};
 
 // Mermaid configuration
 const MERMAID_CONFIG = {
@@ -50,8 +54,8 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const mermaidRef = useRef<typeof mermaidAPI | null>(null);
-  const loadingPromiseRef = useRef<Promise<typeof mermaidAPI> | null>(null);
+  const mermaidRef = useRef<MermaidAPI | null>(null);
+  const loadingPromiseRef = useRef<Promise<MermaidAPI> | null>(null);
 
   useEffect(() => {
     const renderDiagram = async () => {

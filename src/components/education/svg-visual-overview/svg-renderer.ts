@@ -1,4 +1,3 @@
-import mermaid from 'mermaid';
 import DOMPurify from 'dompurify';
 import { logger } from '@/lib/logger';
 import {
@@ -8,10 +7,16 @@ import {
   type SVGGenerationOptions,
 } from '@/lib/tools/svg-overview-generator';
 
-// Initialize mermaid for fallback rendering
-mermaid.initialize({
+// Mermaid type for lazy loading
+type MermaidAPI = {
+  initialize: (config: Record<string, unknown>) => void;
+  render: (id: string, code: string) => Promise<{ svg: string }>;
+};
+
+// Mermaid configuration for fallback rendering
+const MERMAID_CONFIG = {
   startOnLoad: false,
-  theme: 'dark',
+  theme: 'dark' as const,
   themeVariables: {
     primaryColor: '#3b82f6',
     primaryTextColor: '#f1f5f9',
@@ -20,10 +25,26 @@ mermaid.initialize({
     background: '#1e293b',
   },
   flowchart: {
-    curve: 'basis',
+    curve: 'basis' as const,
     padding: 15,
   },
-});
+};
+
+// Lazy-loaded mermaid instance
+let mermaidInstance: MermaidAPI | null = null;
+let mermaidLoadPromise: Promise<MermaidAPI> | null = null;
+
+async function getMermaid(): Promise<MermaidAPI> {
+  if (mermaidInstance) return mermaidInstance;
+  if (!mermaidLoadPromise) {
+    mermaidLoadPromise = import('mermaid').then((module) => {
+      module.default.initialize(MERMAID_CONFIG);
+      mermaidInstance = module.default;
+      return module.default;
+    });
+  }
+  return mermaidLoadPromise;
+}
 
 export async function renderSVGDiagram(
   container: HTMLDivElement,
@@ -41,7 +62,8 @@ export async function renderSVGDiagram(
     const height = options.height || 600;
 
     if (options.useMermaid) {
-      // Fallback to Mermaid rendering
+      // Fallback to Mermaid rendering (lazy loaded)
+      const mermaid = await getMermaid();
       const code = generateMermaidCode(overviewData);
       const id = `svg-overview-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
       const { svg } = await mermaid.render(id, code);

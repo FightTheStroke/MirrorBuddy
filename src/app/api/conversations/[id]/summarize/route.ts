@@ -107,39 +107,59 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         },
       });
 
-      // Save extracted learnings
-      for (const learning of learnings) {
-        // Check for existing similar learning
-        const existing = await tx.learning.findFirst({
-          where: {
-            userId,
-            category: learning.category,
-            insight: {
-              contains: learning.insight.slice(0, 30),
-            },
-          },
+      // Save extracted learnings using batch operations to avoid N+1
+      if (learnings.length > 0) {
+        const categories = [...new Set(learnings.map((l) => l.category))];
+        const existingLearnings = await tx.learning.findMany({
+          where: { userId, category: { in: categories } },
         });
 
-        if (existing) {
-          // Reinforce existing
-          await tx.learning.update({
-            where: { id: existing.id },
-            data: {
+        const existingMap = new Map(
+          existingLearnings.map((e) => [`${e.category}:${e.insight.slice(0, 30)}`, e])
+        );
+
+        const toUpdate: Array<{ id: string; confidence: number; occurrences: number }> = [];
+        const toCreate: Array<{
+          userId: string;
+          category: string;
+          insight: string;
+          maestroId: string;
+          confidence: number;
+        }> = [];
+
+        for (const learning of learnings) {
+          const key = `${learning.category}:${learning.insight.slice(0, 30)}`;
+          const existing = existingMap.get(key);
+
+          if (existing) {
+            toUpdate.push({
+              id: existing.id,
               confidence: Math.min(1, existing.confidence + 0.1),
               occurrences: existing.occurrences + 1,
-            },
-          });
-        } else {
-          // Create new learning
-          await tx.learning.create({
-            data: {
+            });
+          } else {
+            toCreate.push({
               userId,
               category: learning.category,
               insight: learning.insight,
               maestroId: conversation.maestroId,
               confidence: learning.confidence,
-            },
-          });
+            });
+          }
+        }
+
+        // Batch updates and creates
+        await Promise.all(
+          toUpdate.map((u) =>
+            tx.learning.update({
+              where: { id: u.id },
+              data: { confidence: u.confidence, occurrences: u.occurrences },
+            })
+          )
+        );
+
+        if (toCreate.length > 0) {
+          await tx.learning.createMany({ data: toCreate });
         }
       }
     });

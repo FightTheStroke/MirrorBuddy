@@ -14,11 +14,11 @@
 import type { ComponentType } from 'react';
 import type { ToolType } from '@/types/tools';
 
-// Re-export existing renderers
+// Re-export existing renderers (non-heavy ones only)
+// NOTE: ChartRenderer and DiagramRenderer are lazy-loaded via getRendererImport()
+// to avoid bundling recharts (~200KB) and mermaid (~300KB) in main chunk
 export { SummaryRenderer } from '@/components/tools/summary-renderer';
 export { FormulaRenderer } from '@/components/tools/formula-renderer';
-export { ChartRenderer } from '@/components/tools/chart-renderer';
-export { DiagramRenderer } from '@/components/tools/diagram-renderer';
 export { MarkMapRenderer } from '@/components/tools/markmap';
 
 // Re-export validation utilities

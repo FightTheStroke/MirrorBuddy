@@ -96,7 +96,9 @@ export const useLearningsStore = create<LearningsState>()(
         try {
           const response = await fetch('/api/learnings');
           if (response.ok) {
-            const learnings = await response.json();
+            const data = await response.json();
+            // API returns { learnings: [...], pagination: {...} }
+            const learnings = data.learnings || [];
             set({
               learnings: learnings.map((l: Learning & { createdAt: string; updatedAt: string }) => ({
                 ...l,

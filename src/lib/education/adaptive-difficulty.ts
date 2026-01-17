@@ -98,3 +98,41 @@ export async function getAdaptiveContextForUser(
     pragmatic: options.pragmatic,
   });
 }
+
+/**
+ * Batch record multiple adaptive signals with a single DB load/save
+ * Avoids N+1 queries when processing multiple signals
+ */
+export async function recordAdaptiveSignalsBatch(
+  userId: string,
+  signals: AdaptiveSignalInput[]
+): Promise<AdaptiveProfile> {
+  if (signals.length === 0) {
+    return loadAdaptiveProfile(userId);
+  }
+
+  // Load profile once
+  const profile = await loadAdaptiveProfile(userId);
+
+  // Process all signals in memory
+  for (const signal of signals) {
+    updateGlobalSignals(profile, signal);
+    updateSubjectSignals(profile, signal);
+
+    if (signal.subject) {
+      const context = calculateAdaptiveContext(profile, {
+        mode: signal.mode ?? 'balanced',
+        subject: signal.subject,
+        baselineDifficulty: signal.baselineDifficulty,
+      });
+      const subjectProfile = ensureSubjectProfile(profile, signal.subject);
+      if (subjectProfile) {
+        subjectProfile.targetDifficulty = context.targetDifficulty;
+      }
+    }
+  }
+
+  // Save profile once
+  await saveAdaptiveProfile(userId, profile);
+  return profile;
+}
