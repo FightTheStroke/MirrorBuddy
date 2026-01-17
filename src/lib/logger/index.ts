@@ -76,13 +76,36 @@ function shouldLog(level: LogLevel): boolean {
   return LOG_LEVELS[level] <= getMinLevel();
 }
 
+/**
+ * PII fields to sanitize in production logs (GDPR compliance).
+ * V1Plan FASE 2.0.7: No PII in logs.
+ */
+const PII_FIELDS = [
+  "email",
+  "ip",
+  "name",
+  "firstName",
+  "lastName",
+  "phone",
+  "address",
+  "password",
+  "token",
+  "apiKey",
+  "secret",
+];
+
 function sanitizeContext(ctx?: LogContext): LogContext | undefined {
   if (!ctx) return undefined;
   const sanitized = { ...ctx };
-  // Remove potential PII in production
+  // Remove PII in production (GDPR compliance)
   if (process.env.NODE_ENV === "production") {
-    delete sanitized.email;
-    delete sanitized.ip;
+    for (const field of PII_FIELDS) {
+      delete sanitized[field];
+    }
+    // Truncate userId to first 8 chars for correlation without full ID
+    if (sanitized.userId && typeof sanitized.userId === "string") {
+      sanitized.userId = sanitized.userId.substring(0, 8) + "...";
+    }
   }
   return sanitized;
 }
