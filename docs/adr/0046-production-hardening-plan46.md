@@ -4,8 +4,8 @@
 |---|---|
 | **Status** | Accepted |
 | **Date** | 2025-01-17 |
-| **Deciders** | Roberto Danese |
-| **Technical Story** | Fallo17-10su10 Production Readiness |
+| **Deciders** | Roberto D'Angelo |
+| **Technical Story** | Production Hardening 10/10 |
 
 ## Context and Problem Statement
 
@@ -148,4 +148,4 @@ npx madge --circular  # No circular dependencies
 - [ADR 0042: Ethical Design Hardening](./0042-ethical-design-hardening.md)
 
 ---
-*Plan 46 Fallo17-10su10 | January 2025*
+*Plan 46 | January 2025*

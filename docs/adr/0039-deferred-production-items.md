@@ -3,8 +3,8 @@
 | | |
 |---|---|
 | **Status** | Accepted |
-| **Date** | 2025-01-11 |
-| **Deciders** | Roberto Danese |
+| **Date** | 2025-01-11 (Updated: 2025-01-17) |
+| **Deciders** | Roberto D'Angelo |
 | **Technical Story** | Production hardening review |
 
 ## Context and Problem Statement
@@ -96,6 +96,26 @@ graph LR
 
 **Timeline**: Multi-service architecture phase
 
+## Items Addressed by Plan 46 (Jan 2025)
+
+The following capabilities were implemented as part of Plan 46 production hardening (see [ADR 0046](./0046-production-hardening-plan46.md)):
+
+| Item | Previous | Now |
+|------|----------|-----|
+| **Rate Limiting** | None | Token bucket in-memory (60 req/min) |
+| **Request Tracing** | None | Request IDs in `src/lib/tracing/` |
+| **Structured Logging** | Basic | JSON production, human-readable dev |
+| **Admin Authorization** | None | UserRole enum + `requireAdmin()` |
+| **CSP/CSRF** | None | Strict CSP + cookie signing |
+| **Health Endpoints** | None | `/api/health` + `/api/health/detailed` |
+| **Runbook/SLI-SLO** | None | `docs/operations/` documentation |
+
+**Still Deferred:**
+- Full OAuth (Azure AD B2C)
+- Redis for distributed rate limiting
+- OpenTelemetry (have request IDs, not full OTel)
+- Infrastructure as Code (Bicep/Terraform)
+
 ## Consequences
 
 ### Positive
@@ -122,6 +142,7 @@ graph LR
 
 - [ADR 0015: Database-First Architecture](./0015-database-first-architecture.md)
 - [ADR 0004: Safety Guardrails](./0004-safety-guardrails.md)
+- [ADR 0046: Production Hardening Plan 46](./0046-production-hardening-plan46.md)
 
 ## References
 
