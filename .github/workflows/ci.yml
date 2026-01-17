@@ -102,21 +102,33 @@ jobs:
             [ -f "$f" ] && echo "OK: $f" || { echo "MISSING: $f"; exit 1; }
           done
 
-  # Lane 5: Code Quality
+  # Lane 5: Code Quality (BLOCKING)
   quality:
     name: Code Quality
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check TODOs
-        run: |
-          TODOS=$(grep -rn "TODO\|FIXME" src/ --include="*.ts" --include="*.tsx" || true)
-          [ -n "$TODOS" ] && echo "WARNING: TODOs found:" && echo "$TODOS" || echo "No TODOs"
 
-      - name: Check console.log
+      - name: Check for forbidden TODOs in critical areas
         run: |
-          LOGS=$(grep -rn "console\\.log" src/ --include="*.ts" --include="*.tsx" | grep -v "logger" || true)
-          [ -n "$LOGS" ] && echo "WARNING: console.log found:" && echo "$LOGS" || echo "Clean"
+          # Block TODOs in privacy/security/safety (critical paths)
+          CRITICAL=$(grep -rn "TODO\|FIXME" src/lib/privacy src/lib/safety src/lib/security --include="*.ts" --include="*.tsx" 2>/dev/null || true)
+          if [ -n "$CRITICAL" ]; then
+            echo "BLOCKING: TODOs found in critical areas:"
+            echo "$CRITICAL"
+            exit 1
+          fi
+          echo "No critical TODOs"
+
+      - name: Check console.log (fail on any)
+        run: |
+          LOGS=$(grep -rn "console\\.log" src/ --include="*.ts" --include="*.tsx" | grep -v "logger" | grep -v "__tests__" 2>/dev/null || true)
+          if [ -n "$LOGS" ]; then
+            echo "BLOCKING: console.log found (use logger instead):"
+            echo "$LOGS"
+            exit 1
+          fi
+          echo "Clean - no console.log"
 
   # Lane 6: Docker Build Test
   docker:
