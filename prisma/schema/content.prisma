@@ -4,48 +4,53 @@
 // ============================================================================
 
 model Material {
-  id          String   @id @default(cuid())
-  userId      String
-  toolId      String   @unique
-  toolType    String
-  title       String
-  content     String
+  id       String @id @default(cuid())
+  userId   String
+  toolId   String @unique
+  toolType String
+  title    String
+  content  String
 
   // Context
-  maestroId   String?
-  sessionId   String?
-  session     StudySession? @relation(fields: [sessionId], references: [id])
-  subject     String?
-  preview     String?
+  maestroId String?
+  sessionId String?
+  session   StudySession? @relation(fields: [sessionId], references: [id])
+  subject   String?
+  preview   String?
 
   // Message reference
-  messageId   String?
+  messageId String?
 
   // Migrated from CreatedTool
   topic          String?
   conversationId String?
 
   // Status
-  status      String   @default("active")
+  status String @default("active")
 
   // User interaction
   userRating   Int?
-  isBookmarked Boolean  @default(false)
-  viewCount    Int      @default(0)
+  isBookmarked Boolean @default(false)
+  viewCount    Int     @default(0)
 
   // Full-text search (ADR 0022)
   searchableText String?
 
   // Organization (ADR 0022)
   collectionId String?
-  collection   Collection? @relation(fields: [collectionId], references: [id])
+  collection   Collection?   @relation(fields: [collectionId], references: [id])
   tags         MaterialTag[]
 
   // Study Kit integration
   sourceStudyKitId String?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Knowledge Graph (Wave 3)
+  edgesFrom MaterialEdge[]    @relation("MaterialEdgeFrom")
+  edgesTo   MaterialEdge[]    @relation("MaterialEdgeTo")
+  concepts  MaterialConcept[]
 
   @@index([userId])
   @@index([toolType])
@@ -57,11 +62,6 @@ model Material {
   @@index([collectionId])
   @@index([sourceStudyKitId])
   @@index([userId, status])
-
-  // Knowledge Graph (Wave 3)
-  edgesFrom        MaterialEdge[]    @relation("MaterialEdgeFrom")
-  edgesTo          MaterialEdge[]    @relation("MaterialEdgeTo")
-  concepts         MaterialConcept[]
 }
 
 model Collection {
@@ -112,24 +112,24 @@ model MaterialTag {
 
 // DEPRECATED: Use Material table instead
 model CreatedTool {
-  id             String   @id @default(cuid())
-  userId         String
+  id     String @id @default(cuid())
+  userId String
 
-  type           String
-  title          String
-  topic          String?
-  content        String   @default("{}")
+  type    String
+  title   String
+  topic   String?
+  content String  @default("{}")
 
   maestroId      String?
   conversationId String?
   sessionId      String?
 
-  userRating     Int?
-  isBookmarked   Boolean  @default(false)
-  viewCount      Int      @default(0)
+  userRating   Int?
+  isBookmarked Boolean @default(false)
+  viewCount    Int     @default(0)
 
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([type])
@@ -138,11 +138,11 @@ model CreatedTool {
 }
 
 model HtmlSnippet {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  snippetId String   @unique
+  snippetId String  @unique
   html      String
   css       String?
   js        String?
@@ -158,31 +158,31 @@ model HtmlSnippet {
 }
 
 model StudyKit {
-  id          String   @id @default(cuid())
-  userId      String
-  sourceFile  String
-  title       String
+  id         String @id @default(cuid())
+  userId     String
+  sourceFile String
+  title      String
 
   // Generated materials (JSON strings)
-  summary     String?
-  mindmap     String?
-  demo        String?
-  quiz        String?
+  summary String?
+  mindmap String?
+  demo    String?
+  quiz    String?
 
   // Original PDF content for RAG context
   originalText String? @db.Text
 
   // Processing status
-  status      String   @default("processing")
+  status       String  @default("processing")
   errorMessage String?
 
   // Metadata
-  subject     String?
-  pageCount   Int?
-  wordCount   Int?
+  subject   String?
+  pageCount Int?
+  wordCount Int?
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
   learningPaths LearningPath[]

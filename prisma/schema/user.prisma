@@ -8,9 +8,9 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  profile       Profile?
-  settings      Settings?
-  progress      Progress?
+  profile           Profile?
+  settings          Settings?
+  progress          Progress?
   sessions          StudySession[]
   flashcards        FlashcardProgress[]
   quizResults       QuizResult[]
@@ -19,50 +19,53 @@ model User {
   pushSubscriptions PushSubscription[]
 
   // Issue #64: Consolidated localStorage data
-  accessibility     AccessibilitySettings?
-  onboarding        OnboardingState?
-  pomodoroStats     PomodoroStats?
-  calendarEvents    CalendarEvent[]
-  htmlSnippets      HtmlSnippet[]
-  homeworkSessions  HomeworkSession[]
-  gamification      UserGamification?
+  accessibility    AccessibilitySettings?
+  onboarding       OnboardingState?
+  pomodoroStats    PomodoroStats?
+  calendarEvents   CalendarEvent[]
+  htmlSnippets     HtmlSnippet[]
+  homeworkSessions HomeworkSession[]
+  gamification     UserGamification?
 
   // Knowledge Graph (Wave 3)
-  concepts          Concept[]
+  concepts Concept[]
 
   // Google Drive Integration (ADR 0038)
-  googleAccount     GoogleAccount?
+  googleAccount GoogleAccount?
+
+  // Privacy & Data Retention (F-02)
+  privacyPreferences UserPrivacyPreferences?
 }
 
 model Profile {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   name          String?
   age           Int?
   schoolYear    Int?
-  schoolLevel   String   @default("superiore")
+  schoolLevel   String  @default("superiore")
   gradeLevel    String?
-  learningGoals String   @default("[]")
+  learningGoals String  @default("[]")
 
   // Character preferences (coach and buddy selection)
-  preferredCoach String?  // melissa, roberto, chiara, andrea, favij
-  preferredBuddy String?  // mario, noemi, enea, bruno, sofia
+  preferredCoach String? // melissa, roberto, chiara, andrea, favij
+  preferredBuddy String? // mario, noemi, enea, bruno, sofia
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Settings {
-  id            String  @id @default(cuid())
-  userId        String  @unique
-  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Appearance
-  theme         String  @default("system")
-  language      String  @default("it")
-  accentColor   String  @default("blue")
+  theme       String @default("system")
+  language    String @default("it")
+  accentColor String @default("blue")
 
   // Accessibility
   fontSize           String  @default("medium")
@@ -74,10 +77,10 @@ model Settings {
   adhdMode           Boolean @default(false)
 
   // AI Provider
-  provider      String  @default("azure")
-  model         String  @default("gpt-4o")
-  budgetLimit   Float   @default(50.0)
-  totalSpent    Float   @default(0.0)
+  provider               String @default("azure")
+  model                  String @default("gpt-4o")
+  budgetLimit            Float  @default(50.0)
+  totalSpent             Float  @default(0.0)
   adaptiveDifficultyMode String @default("balanced")
 
   // Parent Mode Consent (Issue #63)
@@ -87,22 +90,22 @@ model Settings {
   parentDashboardLastViewed DateTime?
 
   // Azure Cost Configuration
-  azureCostConfig String?  // JSON: {token_cost, audio_cost, etc.}
+  azureCostConfig String? // JSON: {token_cost, audio_cost, etc.}
 
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model GoogleAccount {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Google profile info
-  googleId     String   @unique
-  email        String
-  displayName  String?
-  avatarUrl    String?
+  googleId    String  @unique
+  email       String
+  displayName String?
+  avatarUrl   String?
 
   // OAuth tokens (encrypted at rest via application layer)
   accessToken  String
@@ -111,23 +114,23 @@ model GoogleAccount {
   expiresAt    DateTime
 
   // Scopes granted by user
-  scopes       String   @default("[]")
+  scopes String @default("[]")
 
   // Connection status
-  isConnected  Boolean  @default(true)
-  lastUsedAt   DateTime @default(now())
+  isConnected Boolean  @default(true)
+  lastUsedAt  DateTime @default(now())
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
   @@index([googleId])
 }
 
 model AccessibilitySettings {
-  id        String @id @default(cuid())
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Dyslexia support
   dyslexiaFont        Boolean @default(false)
@@ -135,9 +138,9 @@ model AccessibilitySettings {
   increasedLineHeight Boolean @default(false)
 
   // Visual support
-  highContrast   Boolean @default(false)
-  largeText      Boolean @default(false)
-  reducedMotion  Boolean @default(false)
+  highContrast  Boolean @default(false)
+  largeText     Boolean @default(false)
+  reducedMotion Boolean @default(false)
 
   // Text-to-Speech
   ttsEnabled  Boolean @default(false)
@@ -145,9 +148,9 @@ model AccessibilitySettings {
   ttsAutoRead Boolean @default(false)
 
   // ADHD support
-  adhdMode           Boolean @default(false)
+  adhdMode            Boolean @default(false)
   distractionFreeMode Boolean @default(false)
-  breakReminders     Boolean @default(false)
+  breakReminders      Boolean @default(false)
 
   // General accessibility
   lineSpacing        Float   @default(1.0)
@@ -170,16 +173,16 @@ model AccessibilitySettings {
 }
 
 model OnboardingState {
-  id        String @id @default(cuid())
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Flow state
-  hasCompletedOnboarding Boolean  @default(false)
+  hasCompletedOnboarding Boolean   @default(false)
   onboardingCompletedAt  DateTime?
-  currentStep            String   @default("welcome")
-  isReplayMode           Boolean  @default(false)
-  isVoiceMuted           Boolean  @default(false)
+  currentStep            String    @default("welcome")
+  isReplayMode           Boolean   @default(false)
+  isVoiceMuted           Boolean   @default(false)
 
   // Collected data (JSON)
   data String @default("{}")
@@ -191,15 +194,15 @@ model OnboardingState {
 }
 
 model PomodoroStats {
-  id        String @id @default(cuid())
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Persistent stats
-  completedPomodoros Int @default(0)
-  totalFocusTime     Int @default(0)
-  todayPomodoros     Int @default(0)
-  todayFocusMinutes  Int @default(0)
+  completedPomodoros Int    @default(0)
+  totalFocusTime     Int    @default(0)
+  todayPomodoros     Int    @default(0)
+  todayFocusMinutes  Int    @default(0)
   lastActiveDate     String @default("")
 
   // Settings (JSON)
