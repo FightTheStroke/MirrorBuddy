@@ -60,4 +60,4 @@ We use [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## License
 
-By contributing, you agree that your code will be released under the MIT license.
+By contributing, you agree that your contributions will be licensed under the Apache License 2.0.
