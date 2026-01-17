@@ -138,11 +138,65 @@ sequenceDiagram
 | L2 | Tech lead | SEV1-2 after 30min |
 | L3 | Engineering manager | SEV1 after 1hr |
 
+## Grafana Cloud Observability
+
+### Setup Guide
+
+1. **Get Grafana Cloud credentials**:
+   - Go to Grafana Cloud > Connections > Hosted Prometheus
+   - Copy the remote write URL, instance ID, and create an API key with `metrics:write`
+
+2. **Configure environment variables**:
+   ```bash
+   GRAFANA_CLOUD_PROMETHEUS_URL=https://prometheus-prod-XX-prod-region.grafana.net/api/prom/push
+   GRAFANA_CLOUD_PROMETHEUS_USER=123456  # Instance ID
+   GRAFANA_CLOUD_API_KEY=your-api-key
+   GRAFANA_CLOUD_PUSH_INTERVAL=60  # seconds
+   ```
+
+3. **Verify metrics are being pushed**:
+   ```bash
+   # Check push service logs
+   docker logs mirrorbuddy-app 2>&1 | grep "Grafana Cloud"
+
+   # Query metrics in Grafana
+   # Dashboard: MirrorBuddy - SLI/SLO Dashboard (uid: mirrorbuddy-sli-slo)
+   ```
+
+### Dashboard & Alerts
+
+| Resource | UID | Purpose |
+|----------|-----|---------|
+| Folder | `mirrorbuddy` | All MirrorBuddy dashboards |
+| Dashboard | `mirrorbuddy-sli-slo` | SLI/SLO monitoring |
+| Alert Group | `MirrorBuddy SLO Alerts` | GO/NO-GO thresholds |
+
+### Key Metrics
+
+| Metric | GO Threshold | NO-GO Threshold |
+|--------|--------------|-----------------|
+| `mirrorbuddy_session_success_rate` | ≥80% | <60% |
+| `mirrorbuddy_session_dropoff_rate` | ≤10% | >25% |
+| `mirrorbuddy_session_stuck_loop_rate` | ≤5% | >15% |
+| `mirrorbuddy_refusal_precision` | ≥95% | <80% |
+| `mirrorbuddy_incidents_total{severity="S3"}` | 0 | ≥1 (STOP) |
+
+### S3 Incident Response
+
+**IMMEDIATE STOP TRIGGER**: Any S3 incident requires production halt.
+
+1. Alert fires → Acknowledge immediately
+2. Stop all user traffic (feature flag: `VOICE_ENABLED=false`)
+3. Document incident details
+4. Full incident review within 24h
+5. No restart without safety team approval
+
 ## Related Documents
 
 - [RUNBOOK-PROCEDURES.md](./RUNBOOK-PROCEDURES.md) - Maintenance & recovery
 - [SLI-SLO.md](./SLI-SLO.md) - Service level definitions
 - [ADR 0037](../adr/0037-deferred-production-items.md) - Known limitations
+- [ADR 0047](../adr/0047-grafana-cloud-observability.md) - Grafana Cloud architecture
 
 ---
-*Version 2.0 | January 2025 | Technical Fellow Review*
+*Version 2.1 | January 2026 | Added Grafana Cloud section*

@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 17 - V1 Enterprise Ready Plan 49)
+
+#### W0: Grafana Cloud Observability
+- **Env Config (T0-01)**: Added `GRAFANA_CLOUD_*` variables to `.env.example` for remote write
+- **Push Service (T0-02)**: Created `prometheus-push-service.ts` for Grafana Cloud metrics push
+- **Behavioral Metrics (T0-03)**: Extended `/api/metrics` with session health, safety, and cost metrics
+- **SLI/SLO Dashboard (T0-04)**: Created Grafana dashboard `mirrorbuddy-sli-slo` with GO/NO-GO panels
+- **Alert Rules (T0-05)**: Implemented 5 Grafana alert rules for critical thresholds (S3 incident, success rate, etc.)
+- **RUNBOOK Update (T0-06)**: Added Grafana Cloud setup guide and S3 incident response procedure
+- **ADR 0047**: Documented Grafana Cloud observability architecture decisions
+
 ### Added (Jan 17 - Production Hardening Plan 46)
 
 #### W1: P0 Security & Privacy Blockers
