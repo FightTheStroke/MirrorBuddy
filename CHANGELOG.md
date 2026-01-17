@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Added (Jan 17 - Release Gate 10/10)
+
+- **Release gate**: Added `npm run release:gate` to enforce full P0 checks in one command.
+- **Release scorecard**: Required artifacts (coverage, Playwright report, perf output, audit log, QA screenshots) before ship.
+- **Hardening guidance**: Updated release manager docs to treat warnings as blocking.
+
 ### Changed (Jan 16 - Schema Modularization)
 
 #### Prisma Multi-File Schema
