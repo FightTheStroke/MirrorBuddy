@@ -4,6 +4,9 @@
  * V1Plan FASE 2.0.6: CRUD operations for feature flag management
  *
  * GET /api/admin/feature-flags - List all flags
+ * GET /api/admin/feature-flags?health=true - Include health/degradation status
+ * GET /api/admin/feature-flags?gonogo=true - Include GO/NO-GO checks
+ * GET /api/admin/feature-flags?costs=true - Include cost stats and voice sessions
  * POST /api/admin/feature-flags - Update a flag
  * DELETE /api/admin/feature-flags?id=xxx - Activate kill-switch
  */
@@ -29,6 +32,11 @@ import {
   getActiveAlerts,
   getAllSLOStatuses,
 } from "@/lib/alerting";
+import {
+  getCostMetricsSummary,
+  getActiveVoiceSessions,
+  getVoiceLimits,
+} from "@/lib/metrics";
 
 interface UpdateFlagRequest {
   featureId: KnownFeatureFlag;
@@ -51,6 +59,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const includeHealth = searchParams.get("health") === "true";
     const includeGoNogo = searchParams.get("gonogo") === "true";
+    const includeCosts = searchParams.get("costs") === "true";
 
     const flags = getAllFlags();
     const globalKillSwitch = isGlobalKillSwitchActive();
@@ -70,6 +79,12 @@ export async function GET(request: NextRequest) {
 
     if (includeGoNogo) {
       response.goNoGoResult = runGoNoGoChecks();
+    }
+
+    if (includeCosts) {
+      response.costStats = await getCostMetricsSummary();
+      response.activeVoiceSessions = getActiveVoiceSessions();
+      response.voiceLimits = getVoiceLimits();
     }
 
     return NextResponse.json(response);
