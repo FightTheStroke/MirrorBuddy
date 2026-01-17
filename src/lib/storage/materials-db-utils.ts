@@ -3,16 +3,17 @@
  * Cleanup, statistics, thumbnail generation, and archive operations
  */
 
-import { logger } from '@/lib/logger';
-import { getMaterialsDB, MaterialsDB } from './materials-db-schema';
-import type { ToolType } from '@/types/tools';
+import { logger } from "@/lib/logger";
+import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { getMaterialsDB, MaterialsDB } from "./materials-db-schema";
+import type { ToolType } from "@/types/tools";
 
 // ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 
-export type MaterialMetadata = MaterialsDB['metadata']['value'];
-export type MaterialFile = MaterialsDB['files']['value'];
+export type MaterialMetadata = MaterialsDB["metadata"]["value"];
+export type MaterialFile = MaterialsDB["files"]["value"];
 
 /**
  * Unified material record (for Archive View)
@@ -28,7 +29,7 @@ export interface MaterialRecord {
   sessionId?: string;
   subject?: string;
   preview?: string;
-  status: 'active' | 'archived' | 'deleted';
+  status: "active" | "archived" | "deleted";
   // User interaction (Issue #37 - Archive features)
   userRating?: number; // 1-5 stars
   isBookmarked: boolean;
@@ -46,8 +47,8 @@ export interface MaterialRecord {
  */
 export async function clearAllMaterials(): Promise<void> {
   const db = await getMaterialsDB();
-  await db.clear('files');
-  await db.clear('metadata');
+  await db.clear("files");
+  await db.clear("metadata");
 }
 
 /**
@@ -61,7 +62,7 @@ export async function getMaterialsStats(): Promise<{
   bySubject: Record<string, number>;
 }> {
   const db = await getMaterialsDB();
-  const all = await db.getAll('metadata');
+  const all = await db.getAll("metadata");
 
   const stats = {
     total: all.length,
@@ -72,9 +73,9 @@ export async function getMaterialsStats(): Promise<{
   };
 
   for (const material of all) {
-    if (material.format === 'image') {
+    if (material.format === "image") {
       stats.images++;
-    } else if (material.format === 'pdf') {
+    } else if (material.format === "pdf") {
       stats.pdfs++;
     }
 
@@ -96,9 +97,12 @@ export async function getMaterialsStats(): Promise<{
 /**
  * Generate a thumbnail for an image blob
  */
-export async function generateThumbnail(blob: Blob, maxSize = 200): Promise<Blob> {
+export async function generateThumbnail(
+  blob: Blob,
+  maxSize = 200,
+): Promise<Blob> {
   // Server-side check
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return blob;
   }
 
@@ -106,12 +110,12 @@ export async function generateThumbnail(blob: Blob, maxSize = 200): Promise<Blob
     const img = new Image();
 
     img.onload = () => {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       const scale = Math.min(maxSize / img.width, maxSize / img.height);
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (!ctx) {
         resolve(blob);
         return;
@@ -124,8 +128,8 @@ export async function generateThumbnail(blob: Blob, maxSize = 200): Promise<Blob
           URL.revokeObjectURL(img.src);
           resolve(thumbBlob || blob);
         },
-        'image/jpeg',
-        0.7
+        "image/jpeg",
+        0.7,
       );
     };
 
@@ -147,27 +151,26 @@ export async function generateThumbnail(blob: Blob, maxSize = 200): Promise<Blob
  * Fetches from the /api/materials endpoint which queries Prisma
  */
 export async function getActiveMaterials(): Promise<MaterialRecord[]> {
-  if (typeof window === 'undefined') {
+  if (typeof window === "undefined") {
     return [];
   }
 
   try {
-    // Get userId from sessionStorage (temporary until auth is implemented)
-    const userId =
-      sessionStorage.getItem('mirrorbuddy-user-id') || 'default-user';
+    // Get userId from cookie
+    const userId = getUserIdFromCookie() || "default-user";
 
     const response = await fetch(
-      `/api/materials?userId=${userId}&status=active`
+      `/api/materials?userId=${userId}&status=active`,
     );
     if (!response.ok) {
-      logger.error('Failed to fetch materials', { status: response.status });
+      logger.error("Failed to fetch materials", { status: response.status });
       return [];
     }
 
     const data = await response.json();
     return data.materials || [];
   } catch (error) {
-    logger.error('Error fetching active materials', { error });
+    logger.error("Error fetching active materials", { error });
     return [];
   }
 }

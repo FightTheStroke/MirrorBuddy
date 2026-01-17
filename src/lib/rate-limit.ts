@@ -98,7 +98,7 @@ import type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
  */
 function checkMemoryRateLimit(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): RateLimitResult {
   startCleanup();
 
@@ -139,7 +139,7 @@ function checkMemoryRateLimit(
  */
 async function checkRedisRateLimitAsync(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): Promise<RateLimitResult> {
   try {
     const limiter = getRedisRatelimit(config.maxRequests, config.windowMs);
@@ -169,8 +169,20 @@ async function checkRedisRateLimitAsync(
  */
 export function checkRateLimit(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): RateLimitResult {
+  // Validate identifier at start
+  const idValidation = validateIdentifier(identifier);
+  if (!idValidation.valid) {
+    return {
+      success: false,
+      remaining: 0,
+      resetTime: Date.now() + 60000,
+      limit: 0,
+      error: idValidation.error,
+    };
+  }
+
   if (process.env.E2E_TESTS === "1") {
     const resetTime = Date.now() + config.windowMs;
     return {
@@ -195,8 +207,21 @@ export function checkRateLimit(
  */
 export async function checkRateLimitAsync(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): Promise<RateLimitResult> {
+  // Validate identifier at start
+  const idValidation = validateIdentifier(identifier);
+  if (!idValidation.valid) {
+    return {
+      success: false,
+      remaining: 0,
+      resetTime: Date.now() + 60000,
+      limit: 0,
+      error: idValidation.error,
+    };
+  }
+
+  // Skip in E2E tests
   if (process.env.E2E_TESTS === "1") {
     const resetTime = Date.now() + config.windowMs;
     return {
@@ -207,11 +232,44 @@ export async function checkRateLimitAsync(
     };
   }
 
+  // In production, Redis is REQUIRED - fail fast if not configured
+  if (process.env.NODE_ENV === "production" && !isRedisConfigured()) {
+    log.error(
+      "CRITICAL: Redis not configured in production - rate limiting disabled",
+    );
+    // Fail-fast: return service unavailable
+    return {
+      success: false,
+      remaining: 0,
+      resetTime: Date.now() + 60000, // Retry in 1 minute
+      limit: 0,
+      error: "Rate limiting service unavailable",
+    };
+  }
+
   if (isRedisConfigured()) {
     return checkRedisRateLimitAsync(identifier, config);
   }
 
   return checkMemoryRateLimit(identifier, config);
+}
+
+/**
+ * Validate rate limit identifier
+ * In production, "anonymous" is not allowed (security risk)
+ */
+export function validateIdentifier(identifier: string): {
+  valid: boolean;
+  error?: string;
+} {
+  if (process.env.NODE_ENV === "production" && identifier === "anonymous") {
+    log.warn("Anonymous rate limit identifier rejected in production");
+    return {
+      valid: false,
+      error: "Unable to identify client for rate limiting",
+    };
+  }
+  return { valid: true };
 }
 
 /**
@@ -232,6 +290,27 @@ export function getClientIdentifier(request: Request): string {
 
   // Fallback for local development
   return "anonymous";
+}
+
+/**
+ * Get the best identifier for rate limiting
+ * Prefers userId (authenticated) over IP address
+ *
+ * @param request - The incoming request
+ * @param userId - Optional authenticated userId
+ * @returns Best identifier for rate limiting
+ */
+export function getRateLimitIdentifier(
+  request: Request,
+  userId?: string | null,
+): string {
+  // Prefer userId for authenticated users (more accurate, prevents IP sharing issues)
+  if (userId) {
+    return `user:${userId}`;
+  }
+
+  // Fall back to client IP
+  return getClientIdentifier(request);
 }
 
 // ============================================================================

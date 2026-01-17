@@ -19,4 +19,6 @@ export interface RateLimitResult {
   resetTime: number;
   /** Total limit for the window */
   limit: number;
+  /** Optional error message (e.g., service unavailable) */
+  error?: string;
 }

@@ -4,29 +4,39 @@
 // SECURITY: Requires authentication
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAdminAuth } from "@/lib/auth/session-auth";
 
 export async function GET(request: Request) {
   try {
-    // Require authentication for admin dashboard
-    const auth = await validateAuth();
+    // Require admin authentication for dashboard
+    const auth = await validateAdminAuth();
+
     if (!auth.authenticated) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!auth.isAdmin) {
+      return NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') ?? '7', 10);
+    const days = parseInt(searchParams.get("days") ?? "7", 10);
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
     // Get token usage from telemetry events
     const tokenEvents = await prisma.telemetryEvent.findMany({
       where: {
-        category: 'ai',
-        action: { in: ['chat_completion', 'voice_transcription', 'tts_generation'] },
+        category: "ai",
+        action: {
+          in: ["chat_completion", "voice_transcription", "tts_generation"],
+        },
         timestamp: { gte: startDate },
       },
       select: {
@@ -35,7 +45,7 @@ export async function GET(request: Request) {
         timestamp: true,
         metadata: true,
       },
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
     });
 
     // Aggregate by action type
@@ -57,7 +67,7 @@ export async function GET(request: Request) {
     // Daily breakdown
     const dailyUsage: Record<string, number> = {};
     for (const event of tokenEvents) {
-      const day = event.timestamp.toISOString().split('T')[0];
+      const day = event.timestamp.toISOString().split("T")[0];
       dailyUsage[day] = (dailyUsage[day] || 0) + (event.value || 0);
     }
 
@@ -70,17 +80,18 @@ export async function GET(request: Request) {
       summary: {
         totalTokens,
         totalCalls,
-        avgTokensPerCall: totalCalls > 0 ? Math.round(totalTokens / totalCalls) : 0,
+        avgTokensPerCall:
+          totalCalls > 0 ? Math.round(totalTokens / totalCalls) : 0,
         estimatedCostUsd: Math.round(estimatedCost * 100) / 100,
       },
       byAction,
       dailyUsage,
     });
   } catch (error) {
-    logger.error('Dashboard token-usage error', { error: String(error) });
+    logger.error("Dashboard token-usage error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to fetch token usage' },
-      { status: 500 }
+      { error: "Failed to fetch token usage" },
+      { status: 500 },
     );
   }
 }

@@ -4,23 +4,31 @@
 // SECURITY: Requires authentication
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { getRateLimitEvents, getRateLimitStats } from '@/lib/rate-limit';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextResponse } from "next/server";
+import { getRateLimitEvents, getRateLimitStats } from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
+import { validateAdminAuth } from "@/lib/auth/session-auth";
 
 export async function GET(request: Request) {
   try {
-    // Require authentication for admin dashboard
-    const auth = await validateAuth();
+    // Require admin authentication for dashboard
+    const auth = await validateAdminAuth();
+
     if (!auth.authenticated) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (!auth.isAdmin) {
+      return NextResponse.json(
+        { error: "Forbidden: Admin access required" },
+        { status: 403 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') ?? '7', 10);
-    const endpoint = searchParams.get('endpoint') ?? undefined;
-    const limit = parseInt(searchParams.get('limit') ?? '100', 10);
+    const days = parseInt(searchParams.get("days") ?? "7", 10);
+    const endpoint = searchParams.get("endpoint") ?? undefined;
+    const limit = parseInt(searchParams.get("limit") ?? "100", 10);
 
     const endDate = new Date();
     const startDate = new Date();
@@ -40,7 +48,7 @@ export async function GET(request: Request) {
     // Daily breakdown
     const dailyEvents: Record<string, number> = {};
     for (const event of eventsResult.events) {
-      const day = event.timestamp.toISOString().split('T')[0];
+      const day = event.timestamp.toISOString().split("T")[0];
       dailyEvents[day] = (dailyEvents[day] || 0) + 1;
     }
 
@@ -53,7 +61,7 @@ export async function GET(request: Request) {
       },
       byEndpoint: stats.byEndpoint,
       dailyEvents,
-      recentEvents: eventsResult.events.slice(0, 20).map(e => ({
+      recentEvents: eventsResult.events.slice(0, 20).map((e) => ({
         id: e.id,
         endpoint: e.endpoint,
         limit: e.limit,
@@ -62,10 +70,10 @@ export async function GET(request: Request) {
       })),
     });
   } catch (error) {
-    logger.error('Dashboard rate-limits error', { error: String(error) });
+    logger.error("Dashboard rate-limits error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to fetch rate limit stats' },
-      { status: 500 }
+      { error: "Failed to fetch rate limit stats" },
+      { status: 500 },
     );
   }
 }

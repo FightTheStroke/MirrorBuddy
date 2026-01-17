@@ -8,22 +8,30 @@
  * - Contextual greetings based on previous conversations
  */
 
-import type { StateCreator } from 'zustand';
-import type { ExtendedStudentProfile, CharacterType } from '@/types';
-import type { MaestroFull } from '@/data/maestri';
-import type { SupportTeacher, BuddyProfile } from '@/types';
-import type { ConversationFlowState, ActiveCharacter } from '../types';
+import type { StateCreator } from "zustand";
+import type { ExtendedStudentProfile, CharacterType } from "@/types";
+import type { MaestroFull } from "@/data/maestri";
+import type { SupportTeacher, BuddyProfile } from "@/types";
+import type { ConversationFlowState, ActiveCharacter } from "../types";
 import {
   routeToCharacter,
   type RoutingResult,
-} from '@/lib/ai/character-router';
-import { getDefaultSupportTeacher, getSupportTeacherById } from '@/data/support-teachers';
-import { getBuddyForStudent } from '@/lib/ai/character-router';
-import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
-import { getMaestroById } from '@/data/maestri';
-import { logger } from '@/lib/logger';
-import { MIN_MESSAGES_FOR_SUMMARY } from '../persistence';
-import { createActiveCharacter, saveCurrentConversation, loadConversationMessages } from '../helpers';
+} from "@/lib/ai/character-router";
+import {
+  getDefaultSupportTeacher,
+  getSupportTeacherById,
+} from "@/data/support-teachers";
+import { getBuddyForStudent } from "@/lib/ai/character-router";
+import { getBuddyById, type BuddyId } from "@/data/buddy-profiles";
+import { getMaestroById } from "@/data/maestri";
+import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { logger } from "@/lib/logger";
+import { MIN_MESSAGES_FOR_SUMMARY } from "../persistence";
+import {
+  createActiveCharacter,
+  saveCurrentConversation,
+  loadConversationMessages,
+} from "../helpers";
 
 // ============================================================================
 // CHARACTER STATE
@@ -35,15 +43,21 @@ export interface CharacterSlice {
   characterHistory: Array<{ type: CharacterType; id: string; timestamp: Date }>;
 
   // Actions
-  routeMessage: (message: string, profile: ExtendedStudentProfile) => RoutingResult;
+  routeMessage: (
+    message: string,
+    profile: ExtendedStudentProfile,
+  ) => RoutingResult;
   switchToCharacter: (
     character: MaestroFull | SupportTeacher | BuddyProfile,
     type: CharacterType,
     profile: ExtendedStudentProfile,
-    reason?: string
+    reason?: string,
   ) => Promise<void>;
   switchToCoach: (profile: ExtendedStudentProfile) => Promise<void>;
-  switchToMaestro: (maestro: MaestroFull, profile: ExtendedStudentProfile) => Promise<void>;
+  switchToMaestro: (
+    maestro: MaestroFull,
+    profile: ExtendedStudentProfile,
+  ) => Promise<void>;
   switchToBuddy: (profile: ExtendedStudentProfile) => Promise<void>;
   goBack: (profile: ExtendedStudentProfile) => boolean;
 }
@@ -79,39 +93,43 @@ export const createCharacterSlice: StateCreator<
     const state = get();
 
     // Get userId once at the start of the function (avoid duplication)
-    const userId = typeof window !== 'undefined'
-      ? sessionStorage.getItem('mirrorbuddy-user-id')
-      : null;
+    const userId = typeof window !== "undefined" ? getUserIdFromCookie() : null;
 
     // #98: End current conversation with summary before switching
     const currentConversationId = state.activeCharacter
       ? state.conversationsByCharacter[state.activeCharacter.id]?.conversationId
       : null;
 
-    if (currentConversationId && state.messages.length > MIN_MESSAGES_FOR_SUMMARY) {
+    if (
+      currentConversationId &&
+      state.messages.length > MIN_MESSAGES_FOR_SUMMARY
+    ) {
       try {
         if (userId) {
-          logger.info('Switching character, ending previous conversation', {
+          logger.info("Switching character, ending previous conversation", {
             from: state.activeCharacter?.id,
             to: character.id,
-            conversationId: currentConversationId
+            conversationId: currentConversationId,
           });
 
-          const response = await fetch(`/api/conversations/${currentConversationId}/end`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, reason: 'character_switch' }),
-          });
+          const response = await fetch(
+            `/api/conversations/${currentConversationId}/end`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ userId, reason: "character_switch" }),
+            },
+          );
 
           if (!response.ok) {
-            logger.error('Failed to end conversation on character switch', {
-              status: response.status
+            logger.error("Failed to end conversation on character switch", {
+              status: response.status,
             });
           }
         }
       } catch (error) {
-        logger.error('Error ending conversation on character switch', {
-          error: String(error)
+        logger.error("Error ending conversation on character switch", {
+          error: String(error),
         });
       }
     }
@@ -143,12 +161,14 @@ export const createCharacterSlice: StateCreator<
             const result = await response.json();
             if (result?.greeting) {
               greeting = result.greeting;
-              logger.info('Using contextual greeting', { characterId: character.id });
+              logger.info("Using contextual greeting", {
+                characterId: character.id,
+              });
             }
           }
         } catch (error) {
-          logger.warn('Failed to load contextual greeting, using default', {
-            error: String(error)
+          logger.warn("Failed to load contextual greeting, using default", {
+            error: String(error),
           });
         }
       }
@@ -157,7 +177,7 @@ export const createCharacterSlice: StateCreator<
       messages = [
         {
           id: crypto.randomUUID(),
-          role: 'assistant',
+          role: "assistant",
           content: greeting,
           timestamp: new Date(),
           characterId: activeCharacter.id,
@@ -183,16 +203,16 @@ export const createCharacterSlice: StateCreator<
 
   switchToCoach: async (profile) => {
     const coach = getDefaultSupportTeacher();
-    await get().switchToCharacter(coach, 'coach', profile);
+    await get().switchToCharacter(coach, "coach", profile);
   },
 
   switchToMaestro: async (maestro, profile) => {
-    await get().switchToCharacter(maestro, 'maestro', profile);
+    await get().switchToCharacter(maestro, "maestro", profile);
   },
 
   switchToBuddy: async (profile) => {
     const buddy = getBuddyForStudent(profile);
-    await get().switchToCharacter(buddy, 'buddy', profile);
+    await get().switchToCharacter(buddy, "buddy", profile);
   },
 
   goBack: (profile) => {
@@ -210,13 +230,13 @@ export const createCharacterSlice: StateCreator<
     let character: MaestroFull | SupportTeacher | BuddyProfile | undefined;
 
     switch (previous.type) {
-      case 'maestro':
+      case "maestro":
         character = getMaestroById(previous.id);
         break;
-      case 'coach':
-        character = getSupportTeacherById(previous.id as 'melissa' | 'roberto');
+      case "coach":
+        character = getSupportTeacherById(previous.id as "melissa" | "roberto");
         break;
-      case 'buddy':
+      case "buddy":
         character = getBuddyById(previous.id as BuddyId);
         break;
     }
@@ -225,23 +245,30 @@ export const createCharacterSlice: StateCreator<
       return false;
     }
 
-    const activeCharacter = createActiveCharacter(character, previous.type, profile);
+    const activeCharacter = createActiveCharacter(
+      character,
+      previous.type,
+      profile,
+    );
 
     // Load that character's messages
     const messages = loadConversationMessages(savedConversations, previous.id);
 
     set({
       activeCharacter,
-      messages: messages.length > 0 ? messages : [
-        {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: activeCharacter.greeting,
-          timestamp: new Date(),
-          characterId: activeCharacter.id,
-          characterType: previous.type,
-        },
-      ],
+      messages:
+        messages.length > 0
+          ? messages
+          : [
+              {
+                id: crypto.randomUUID(),
+                role: "assistant",
+                content: activeCharacter.greeting,
+                timestamp: new Date(),
+                characterId: activeCharacter.id,
+                characterType: previous.type,
+              },
+            ],
       characterHistory: newHistory,
       pendingHandoff: null,
       conversationsByCharacter: savedConversations,
