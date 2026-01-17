@@ -9,4 +9,35 @@
 // See: src/lib/hooks/voice-session/ for WebRTC implementation.
 // ============================================================================
 
-export * from './realtime-proxy/index';
+// Timer utilities
+export {
+  IDLE_TIMEOUT_MS,
+  CONNECTION_TIMEOUT_MS,
+  PING_INTERVAL_MS,
+  cleanupTimers,
+  resetIdleTimer,
+  clearIdleTimer,
+  startConnectionTimeout,
+  clearConnectionTimeout,
+  startPingInterval,
+  clearPingTimer,
+  handlePong,
+} from './timers';
+
+// Connection management
+export {
+  getConnections,
+  getConnection,
+  setConnection,
+  deleteConnection,
+  cleanupConnection,
+  getConnectionCount,
+  forEachConnection,
+} from './connections';
+
+// Server functions
+export {
+  startRealtimeProxy,
+  stopRealtimeProxy,
+  getProxyStatus,
+} from './server';
