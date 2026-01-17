@@ -12,6 +12,7 @@ import {
   Clock,
   Loader2,
 } from 'lucide-react';
+import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -98,7 +99,11 @@ export function TopicDetail({
         });
         onComplete?.();
       } catch (err) {
-        console.error('Failed to complete topic', err);
+        logger.error('Failed to complete topic', {
+          topicId,
+          pathId,
+          error: err instanceof Error ? err.message : String(err),
+        });
         // Revert optimistic update on error
         setTopic(previousTopic);
         setActiveStepIndex(previousStepIndex);

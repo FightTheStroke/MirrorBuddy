@@ -43,8 +43,11 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
     }
 
     // Schedule SSE fallback asynchronously
-    this.broadcastViaSSE(event).catch(() => {
-      // Fallback already logged in broadcastViaSSE
+    this.broadcastViaSSE(event).catch((err) => {
+      logger.error('[ToolEventBroadcaster] SSE broadcast promise rejected', {
+        toolId: event.toolId,
+        error: err instanceof Error ? err.message : String(err),
+      });
     });
 
     return false; // DataChannel not available

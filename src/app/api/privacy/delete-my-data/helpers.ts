@@ -49,17 +49,29 @@ export async function executeUserDataDeletion(userId: string) {
     // 5. Delete flashcard progress
     await tx.flashcardProgress.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete flashcard progress (optional table)', {
+        error: String(err),
+      });
+    });
 
     // 6. Delete quiz results
     await tx.quizResult.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete quiz results (optional table)', {
+        error: String(err),
+      });
+    });
 
     // 7. Delete study sessions
     await tx.studySession.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete study sessions (optional table)', {
+        error: String(err),
+      });
+    });
 
     // 8. Delete settings
     const settingsResult = await tx.settings.deleteMany({
@@ -70,35 +82,63 @@ export async function executeUserDataDeletion(userId: string) {
     // 9. Delete accessibility settings
     await tx.accessibilitySettings.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete accessibility settings (optional table)', {
+        error: String(err),
+      });
+    });
 
     // 10. Delete notifications
     await tx.notification.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete notifications (optional table)', {
+        error: String(err),
+      });
+    });
 
     // 11. Delete telemetry events
     await tx.telemetryEvent.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete telemetry events (optional table)', {
+        error: String(err),
+      });
+    });
 
     // 12. Delete parent notes
     await tx.parentNote.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete parent notes (optional table)', {
+        error: String(err),
+      });
+    });
 
     // 13. Delete collections and tags
     await tx.materialTag.deleteMany({
       where: { material: { userId } },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete material tags (optional table)', {
+        error: String(err),
+      });
+    });
 
     await tx.collection.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete collections (optional table)', {
+        error: String(err),
+      });
+    });
 
     await tx.tag.deleteMany({
       where: { userId },
-    }).catch(() => { /* May not exist */ });
+    }).catch((err) => {
+      log.error('Failed to delete tags (optional table)', {
+        error: String(err),
+      });
+    });
   });
 
   return {

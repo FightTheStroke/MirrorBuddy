@@ -2,8 +2,8 @@
  * Vector Store Service for RAG
  * Handles storage and similarity search of embeddings.
  *
- * SQLite Mode: Uses JSON string for vectors, JavaScript cosine similarity
- * PostgreSQL Mode: Use raw SQL with pgvector for better performance
+ * PostgreSQL Mode: Uses native pgvector with HNSW index for O(log n) queries
+ * Fallback Mode: Uses JSON string for vectors, JavaScript cosine similarity
  *
  * @module rag/vector-store
  */
@@ -11,6 +11,11 @@
 import { prisma } from '@/lib/db';
 import { cosineSimilarity } from './embedding-service';
 import { logger } from '@/lib/logger';
+import {
+  checkPgvectorStatus,
+  nativeVectorSearch,
+  updateNativeVector,
+} from './pgvector-utils';
 
 /** Expected embedding dimensions */
 const EXPECTED_DIMENSIONS = 1536;
@@ -67,6 +72,7 @@ export interface DeleteOptions {
 
 /**
  * Store an embedding in the database
+ * Also updates native vector column when pgvector is available
  */
 export async function storeEmbedding(input: StoreEmbeddingInput) {
   if (input.vector.length !== EXPECTED_DIMENSIONS) {
@@ -81,7 +87,7 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
     chunkIndex: input.chunkIndex ?? 0,
   });
 
-  return prisma.contentEmbedding.create({
+  const embedding = await prisma.contentEmbedding.create({
     data: {
       userId: input.userId,
       sourceType: input.sourceType,
@@ -96,13 +102,20 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
       tags: JSON.stringify(input.tags ?? []),
     },
   });
+
+  // Update native vector for pgvector search (non-blocking)
+  updateNativeVector(prisma, embedding.id, input.vector).catch((err) => {
+    logger.warn('[VectorStore] Failed to update native vector', { error: String(err) });
+  });
+
+  return embedding;
 }
 
 /**
  * Search for similar embeddings
  *
- * SQLite Mode: Fetches all embeddings and computes similarity in JavaScript
- * For production with large datasets, migrate to PostgreSQL with pgvector
+ * PostgreSQL Mode: Uses native pgvector with HNSW index for O(log n) queries
+ * Fallback Mode: Fetches all embeddings and computes similarity in JavaScript
  */
 export async function searchSimilar(options: SearchOptions): Promise<VectorSearchResult[]> {
   const { userId, vector, limit = 10, minSimilarity = 0.5, sourceType, subject } = options;
@@ -115,13 +128,46 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
     subject,
   });
 
-  // Build where clause - filter out null vectors at database level for performance
+  // Try native pgvector search first
+  const pgStatus = await checkPgvectorStatus(prisma);
+  if (pgStatus.available) {
+    try {
+      const nativeResults = await nativeVectorSearch(prisma, {
+        userId,
+        vector,
+        limit,
+        minSimilarity,
+        sourceType,
+        subject,
+      });
+
+      logger.debug('[VectorStore] Native pgvector search used', {
+        resultCount: nativeResults.length,
+        indexType: pgStatus.indexType,
+      });
+
+      return nativeResults.map((r) => ({
+        id: r.id,
+        sourceType: r.source_type,
+        sourceId: r.source_id,
+        chunkIndex: r.chunk_index,
+        content: r.content,
+        similarity: r.similarity,
+        subject: r.subject,
+        tags: JSON.parse(r.tags) as string[],
+      }));
+    } catch (err) {
+      logger.warn('[VectorStore] Native search failed, falling back to JS', {
+        error: String(err),
+      });
+    }
+  }
+
+  // Fallback: JavaScript-based similarity computation
   const where: Record<string, unknown> = { userId, vector: { not: null } };
   if (sourceType) where.sourceType = sourceType;
   if (subject) where.subject = subject;
 
-  // Fetch candidate embeddings
-  // Note: For large datasets, consider pagination or PostgreSQL pgvector with vectorNative column for native vector operations
   const embeddings = await prisma.contentEmbedding.findMany({
     where,
     select: {
@@ -136,19 +182,10 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
     },
   });
 
-  // Compute similarity scores
   const results: VectorSearchResult[] = [];
 
   for (const emb of embeddings) {
-    // Skip embeddings with null vectors
-    if (!emb.vector) {
-      logger.warn('[VectorStore] Skipping embedding with null vector', {
-        id: emb.id,
-        sourceType: emb.sourceType,
-        sourceId: emb.sourceId,
-      });
-      continue;
-    }
+    if (!emb.vector) continue;
 
     const storedVector = JSON.parse(emb.vector) as number[];
     const similarity = cosineSimilarity(vector, storedVector);
@@ -167,10 +204,7 @@ export async function searchSimilar(options: SearchOptions): Promise<VectorSearc
     }
   }
 
-  // Sort by similarity descending
   results.sort((a, b) => b.similarity - a.similarity);
-
-  // Return top results
   return results.slice(0, limit);
 }
 

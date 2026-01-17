@@ -247,30 +247,31 @@ describe('Content Filter', () => {
     });
   });
 
-  describe('filterInput - PII Detection', () => {
-    it('should warn about Italian phone numbers', () => {
+  // F-16: PII Detection now blocks instead of warns
+  describe('filterInput - PII Detection (F-16)', () => {
+    it('should block Italian phone numbers', () => {
       const phones = ['+39 3331234567', '333 123 4567', '02 12345678'];
 
       for (const phone of phones) {
         const result = filterInput(`Chiamami al ${phone}`);
         expect(result.category).toBe('pii');
-        expect(result.severity).toBe('low');
-        // PII is a warning, not a block
-        expect(result.safe).toBe(true);
-        expect(result.action).toBe('warn');
+        expect(result.severity).toBe('medium');
+        // F-16: PII is now blocked for privacy protection
+        expect(result.safe).toBe(false);
+        expect(result.action).toBe('block');
       }
     });
 
-    it('should warn about Italian addresses', () => {
+    it('should block Italian addresses', () => {
       const result = filterInput('Abito in via Roma 15');
       expect(result.category).toBe('pii');
-      expect(result.action).toBe('warn');
+      expect(result.action).toBe('block');
     });
 
-    it('should warn about email addresses', () => {
+    it('should block email addresses', () => {
       const result = filterInput('La mia email è mario@example.com');
       expect(result.category).toBe('pii');
-      expect(result.action).toBe('warn');
+      expect(result.action).toBe('block');
     });
 
     it('should suggest not sharing personal info', () => {
@@ -333,8 +334,11 @@ describe('Content Filter', () => {
     it('should return false for warned content (not blocked)', () => {
       // Profanity is warned, not blocked
       expect(isInputBlocked('cazzo')).toBe(false);
-      // PII is warned, not blocked
-      expect(isInputBlocked('La mia email è test@test.com')).toBe(false);
+    });
+
+    it('should return true for PII (F-16: now blocked)', () => {
+      // F-16: PII is now blocked, not warned
+      expect(isInputBlocked('La mia email è test@test.com')).toBe(true);
     });
   });
 
@@ -473,9 +477,10 @@ describe('Content Filter', () => {
       expect(result.severity).toBe('none');
     });
 
-    it('should use low for PII', () => {
+    it('should use medium for PII (F-16)', () => {
+      // F-16: PII severity changed from low to medium
       const result = filterInput('email: test@test.com');
-      expect(result.severity).toBe('low');
+      expect(result.severity).toBe('medium');
     });
 
     it('should use medium for profanity', () => {
@@ -501,9 +506,13 @@ describe('Content Filter', () => {
       expect(result.action).toBe('allow');
     });
 
-    it('should use warn for profanity and PII', () => {
+    it('should use warn for profanity', () => {
       expect(filterInput('cazzo').action).toBe('warn');
-      expect(filterInput('via Roma 15').action).toBe('warn');
+    });
+
+    it('should use block for PII (F-16)', () => {
+      // F-16: PII action changed from warn to block
+      expect(filterInput('via Roma 15').action).toBe('block');
     });
 
     it('should use block for violence and explicit', () => {

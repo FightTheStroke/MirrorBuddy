@@ -13,6 +13,7 @@
  */
 
 import React, { Component, type ReactNode } from 'react';
+import { logger } from '@/lib/logger';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -36,25 +37,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-    // Log to console in development, structured in production
-    const logData = {
-      timestamp: new Date().toISOString(),
-      level: 'error',
-      message: 'React Error Boundary caught error',
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-      },
+    // Log error using structured logger
+    logger.error('React Error Boundary caught error', {
+      errorName: error.name,
+      errorMessage: error.message,
       componentStack: errorInfo.componentStack,
-    };
-
-    if (process.env.NODE_ENV === 'production') {
-      console.error(JSON.stringify(logData));
-    } else {
-      console.error('[ERROR] React Error Boundary:', error);
-      console.error('Component stack:', errorInfo.componentStack);
-    }
+    }, error);
 
     this.props.onError?.(error, errorInfo);
   }

@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { cookies } from 'next/headers';
+import { isSignedCookie, verifyCookieValue } from '@/lib/auth/cookie-signing';
 import {
   executeUserDataDeletion,
   getUserDataSummary,
@@ -16,6 +17,21 @@ import {
 } from './helpers';
 
 const log = logger.child({ module: 'gdpr-delete' });
+
+/**
+ * Extract userId from cookie (handles both signed and legacy unsigned cookies)
+ */
+function extractUserId(cookieValue: string | undefined): string | null {
+  if (!cookieValue) return null;
+
+  if (isSignedCookie(cookieValue)) {
+    const verification = verifyCookieValue(cookieValue);
+    return verification.valid ? verification.value! : null;
+  }
+
+  // Legacy unsigned cookie
+  return cookieValue;
+}
 
 interface DeleteRequestBody {
   /** Confirmation that user understands deletion is irreversible */
@@ -46,7 +62,8 @@ export async function POST(
   request: NextRequest
 ): Promise<NextResponse<DeleteResult | { error: string }>> {
   const cookieStore = await cookies();
-  const userId = cookieStore.get('userId')?.value;
+  const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
+  const userId = extractUserId(cookieValue);
 
   if (!userId) {
     return NextResponse.json(
@@ -77,7 +94,7 @@ export async function POST(
     logDeletionAudit(userId, body.reason);
 
     // Clear the user cookie
-    cookieStore.delete('userId');
+    cookieStore.delete('mirrorbuddy-user-id');
 
     log.info('GDPR deletion completed', {
       userId: userId.slice(0, 8),
@@ -104,7 +121,8 @@ export async function GET(
   _request: NextRequest
 ): Promise<NextResponse> {
   const cookieStore = await cookies();
-  const userId = cookieStore.get('userId')?.value;
+  const cookieValue = cookieStore.get('mirrorbuddy-user-id')?.value;
+  const userId = extractUserId(cookieValue);
 
   if (!userId) {
     return NextResponse.json(

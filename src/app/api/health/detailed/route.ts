@@ -4,11 +4,72 @@
  * GET /api/health/detailed - Returns comprehensive system health metrics
  *
  * This endpoint provides detailed health information for monitoring dashboards.
- * Should be protected in production (internal network only).
+ * Protected in production via auth header or IP allowlist (F-15).
+ *
+ * Authentication methods:
+ * 1. Authorization header: Bearer {HEALTH_SECRET}
+ * 2. IP allowlist: localhost, private networks, or HEALTH_ALLOWED_IPS
  */
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { logger } from '@/lib/logger';
+
+/** Secret for health endpoint auth (optional) */
+const HEALTH_SECRET = process.env.HEALTH_SECRET;
+
+/** Comma-separated list of allowed IPs (optional) */
+const HEALTH_ALLOWED_IPS = process.env.HEALTH_ALLOWED_IPS?.split(',').map(ip => ip.trim()) || [];
+
+/** Private network ranges (RFC 1918) */
+const PRIVATE_NETWORK_PREFIXES = [
+  '10.',
+  '172.16.', '172.17.', '172.18.', '172.19.',
+  '172.20.', '172.21.', '172.22.', '172.23.',
+  '172.24.', '172.25.', '172.26.', '172.27.',
+  '172.28.', '172.29.', '172.30.', '172.31.',
+  '192.168.',
+];
+
+/**
+ * Check if IP is allowed (F-15)
+ */
+function isAllowedIP(ip: string | null): boolean {
+  if (!ip) return false;
+
+  // Always allow localhost
+  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') return true;
+
+  // Allow private networks
+  if (PRIVATE_NETWORK_PREFIXES.some(prefix => ip.startsWith(prefix))) return true;
+
+  // Check custom allowlist
+  if (HEALTH_ALLOWED_IPS.includes(ip)) return true;
+
+  return false;
+}
+
+/**
+ * Check if request is authorized (F-15)
+ */
+function isAuthorized(request: NextRequest): boolean {
+  // In development, allow all
+  if (process.env.NODE_ENV === 'development') return true;
+
+  // Check auth header
+  const authHeader = request.headers.get('authorization');
+  if (HEALTH_SECRET && authHeader === `Bearer ${HEALTH_SECRET}`) return true;
+
+  // Check IP allowlist
+  const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+    || request.headers.get('x-real-ip')
+    || null;
+
+  if (isAllowedIP(clientIP)) return true;
+
+  logger.warn('Unauthorized access to /api/health/detailed', { clientIP });
+  return false;
+}
 
 const startTime = Date.now();
 
@@ -125,7 +186,15 @@ function formatUptime(seconds: number): string {
   return parts.join(' ') || '< 1m';
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // F-15: Check authorization
+  if (!isAuthorized(request)) {
+    return NextResponse.json(
+      { error: 'Unauthorized', message: 'Access to detailed health metrics requires authentication' },
+      { status: 401 }
+    );
+  }
+
   const database = await checkDatabase();
   const ai = checkAI();
   const memory = checkMemory();

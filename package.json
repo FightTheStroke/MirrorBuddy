@@ -57,6 +57,8 @@
     "@types/dompurify": "^3.0.5",
     "@types/pdfjs-dist": "^2.10.377",
     "@uiw/react-md-editor": "^4.0.11",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.36.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dompurify": "^3.3.1",

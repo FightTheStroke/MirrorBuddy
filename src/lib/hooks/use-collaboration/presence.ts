@@ -6,6 +6,7 @@
 import { useRef, useCallback } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import type { CollaborationState } from './types';
+import { logger } from '@/lib/logger';
 
 /**
  * Hook for cursor update function with throttling
@@ -33,7 +34,13 @@ export function useCursorUpdater(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, cursor: lastCursorRef.current }),
-      }).catch(() => {});
+      }).catch((err) => {
+        logger.error('Failed to broadcast cursor position', {
+          roomId,
+          userId,
+          error: String(err),
+        });
+      });
     }, 50);
   }, [userId, setState]);
 }
@@ -57,6 +64,13 @@ export function useNodeSelector(
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, nodeId }),
-    }).catch(() => {});
+    }).catch((err) => {
+      logger.error('Failed to broadcast node selection', {
+        roomId,
+        userId,
+        nodeId,
+        error: String(err),
+      });
+    });
   }, [userId, setState]);
 }

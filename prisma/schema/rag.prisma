@@ -37,6 +37,8 @@ model ContentEmbedding {
   @@index([sourceId])
   @@index([subject])
   @@index([createdAt])
+  // F-18: Composite index for user-scoped queries by source
+  @@index([userId, sourceType, sourceId])
 }
 
 // Edges between materials

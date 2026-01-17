@@ -103,9 +103,11 @@ function initClientErrorLogger(): void {
     });
   });
 
-  // Intercept console.error
-  const originalConsoleError = console.error;
-  console.error = (...args) => {
+  // Intercept console.error - intentionally accessing console for interception
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const originalConsoleError = (console as any).error.bind(console);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (console as any).error = (...args: unknown[]) => {
     const message = args.map(arg => {
       if (arg instanceof Error) return arg.message;
       if (typeof arg === 'object') {
@@ -134,9 +136,11 @@ function initClientErrorLogger(): void {
     originalConsoleError.apply(console, args);
   };
 
-  // Intercept console.warn
-  const originalConsoleWarn = console.warn;
-  console.warn = (...args) => {
+  // Intercept console.warn - intentionally accessing console for interception
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const originalConsoleWarn = (console as any).warn.bind(console);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (console as any).warn = (...args: unknown[]) => {
     const message = args.map(arg => {
       if (typeof arg === 'object') {
         try {

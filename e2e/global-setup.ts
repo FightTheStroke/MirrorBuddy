@@ -7,8 +7,22 @@
 
 import path from 'path';
 import fs from 'fs';
+import { createHmac } from 'crypto';
 
 const STORAGE_STATE_PATH = path.join(__dirname, '.auth', 'storage-state.json');
+
+// Must match playwright.config.ts SESSION_SECRET
+const E2E_SESSION_SECRET = 'e2e-test-session-secret-32-characters-min';
+
+/**
+ * Sign cookie value for E2E tests (matches src/lib/auth/cookie-signing.ts)
+ */
+function signCookieValue(value: string): string {
+  const hmac = createHmac('sha256', E2E_SESSION_SECRET);
+  hmac.update(value);
+  const signature = hmac.digest('hex');
+  return `${value}.${signature}`;
+}
 
 async function globalSetup() {
   // Ensure .auth directory exists
@@ -17,12 +31,15 @@ async function globalSetup() {
     fs.mkdirSync(authDir, { recursive: true });
   }
 
+  // Sign the test user cookie
+  const signedCookie = signCookieValue('test-user');
+
   // Create storage state with onboarding completed
   const storageState = {
     cookies: [
       {
         name: 'mirrorbuddy-user-id',
-        value: 'test-user',
+        value: signedCookie,
         domain: 'localhost',
         path: '/',
         expires: -1,

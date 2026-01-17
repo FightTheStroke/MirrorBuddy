@@ -3,6 +3,7 @@
 // GET: Get current settings
 // PUT: Update settings
 // #92: Added Zod validation for type safety
+// F-14: Added ETag/If-Match support for optimistic concurrency
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -11,6 +12,16 @@ import { logger } from '@/lib/logger';
 import { getOrCompute, del, CACHE_TTL } from '@/lib/cache';
 import { SettingsUpdateSchema } from '@/lib/validation/schemas/user';
 import { validateAuth } from '@/lib/auth/session-auth';
+import { createHash } from 'crypto';
+
+/**
+ * Generate ETag from settings data (F-14)
+ * Uses updatedAt timestamp for version tracking
+ */
+function generateETag(updatedAt: Date): string {
+  const hash = createHash('md5').update(updatedAt.toISOString()).digest('hex');
+  return `"${hash.substring(0, 16)}"`;
+}
 
 export async function GET() {
   try {
@@ -40,7 +51,13 @@ export async function GET() {
       { ttl: CACHE_TTL.SETTINGS }
     );
 
-    return NextResponse.json(settings);
+    // F-14: Add ETag header for optimistic concurrency
+    const etag = settings.updatedAt ? generateETag(settings.updatedAt) : undefined;
+    const response = NextResponse.json(settings);
+    if (etag) {
+      response.headers.set('ETag', etag);
+    }
+    return response;
   } catch (error) {
     logger.error('Settings GET error', { error: String(error) });
     return NextResponse.json(
@@ -72,6 +89,26 @@ export async function PUT(request: NextRequest) {
       );
     }
 
+    // F-14: Check If-Match header for optimistic concurrency
+    const ifMatch = request.headers.get('If-Match');
+    if (ifMatch) {
+      const currentSettings = await prisma.settings.findUnique({
+        where: { userId },
+        select: { updatedAt: true },
+      });
+
+      if (currentSettings?.updatedAt) {
+        const currentETag = generateETag(currentSettings.updatedAt);
+        if (ifMatch !== currentETag) {
+          logger.warn('Settings update conflict (ETag mismatch)', { userId });
+          return NextResponse.json(
+            { error: 'Conflict - settings were modified by another request' },
+            { status: 412 }
+          );
+        }
+      }
+    }
+
     const settings = await prisma.settings.upsert({
       where: { userId },
       update: validation.data,
@@ -81,7 +118,13 @@ export async function PUT(request: NextRequest) {
     // WAVE 3: Invalidate cache when settings are updated
     del(`settings:${userId}`);
 
-    return NextResponse.json(settings);
+    // F-14: Return ETag in response
+    const etag = settings.updatedAt ? generateETag(settings.updatedAt) : undefined;
+    const response = NextResponse.json(settings);
+    if (etag) {
+      response.headers.set('ETag', etag);
+    }
+    return response;
   } catch (error) {
     logger.error('Settings PUT error', { error: String(error) });
     return NextResponse.json(

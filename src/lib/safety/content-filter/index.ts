@@ -37,4 +37,6 @@ export {
   getFilterResponse,
   filterMessages,
   hasBlockedMessage,
+  redactPII,
+  containsPII,
 } from './filter';

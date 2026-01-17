@@ -76,7 +76,12 @@ export function logSafetyEvent(
   }
 
   // Persist via API (non-blocking)
-  persistSafetyEventToApi(event).catch(() => {});
+  persistSafetyEventToApi(event).catch((err) => {
+    logger.error('Failed to persist safety event to API', {
+      eventId: event.id,
+      error: String(err),
+    });
+  });
 
   return event;
 }
