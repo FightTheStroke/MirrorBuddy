@@ -295,6 +295,15 @@ Apache 2.0 — See [LICENSE](LICENSE)
 
 Chosen for patent protection (critical for AI/ML projects) and institutional trust.
 
+### Licensing & IP Strategy
+
+MirrorBuddy is Apache 2.0 in product proof mode. The competitive advantage is the governed system around the repository, not the code itself.
+
+See [LICENSE-STRATEGY.md](LICENSE-STRATEGY.md) for:
+- Why Apache 2.0 (not MIT or Commons Clause)
+- What constitutes "open-core" vs proprietary value
+- Trigger points for license revision
+
 ---
 
 <p align="center">
