@@ -1,0 +1,26 @@
+{
+  "maxLines": 250,
+  "directories": [
+    "src",
+    "scripts",
+    ".claude",
+    "docs",
+    "e2e",
+    "@docs"
+  ],
+  "extensions": [".ts", ".tsx", ".js", ".jsx", ".sh", ".md"],
+  "excludePatterns": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/generated/**",
+    "**/__tests__/**",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ],
+  "exemptFiles": [
+    "CHANGELOG.md",
+    "TROUBLESHOOTING.md"
+  ]
+}
