@@ -9,6 +9,7 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import { metricsStore } from '@/lib/observability/metrics-store';
 import { generateSLIMetrics } from './sli-metrics';
+import { generateBehavioralMetrics } from './behavioral-metrics';
 
 interface MetricLine {
   name: string;
@@ -192,6 +193,10 @@ export async function GET() {
     const metricsSummary = metricsStore.getMetricsSummary();
     const sliMetrics = generateSLIMetrics(metricsSummary);
     metrics.push(...sliMetrics);
+
+    // BEHAVIORAL METRICS (V1Plan FASE 2): Session health, safety, cost
+    const behavioralMetrics = await generateBehavioralMetrics();
+    metrics.push(...behavioralMetrics);
 
     // Format as Prometheus exposition format
     const output = formatPrometheusOutput(metrics);
