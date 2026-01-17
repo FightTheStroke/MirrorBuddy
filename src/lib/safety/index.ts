@@ -50,7 +50,7 @@ export {
   type JailbreakCategory,
   type ThreatLevel,
   type ConversationContext,
-} from './jailbreak-detector-core';
+} from './jailbreak-detector';
 
 export {
   checkAgeGate,
@@ -63,7 +63,7 @@ export {
   type TopicSensitivity,
   type ContentTopic,
   type AgeGateResult,
-} from './age-gating-core';
+} from './age-gating';
 
 export {
   logSafetyEvent,
