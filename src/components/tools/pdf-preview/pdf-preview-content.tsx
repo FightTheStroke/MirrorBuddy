@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
   Loader2,
   AlertCircle,
   Check,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { ProcessedPDF, ProcessedPage } from '@/lib/pdf';
-import type { ViewMode } from './use-pdf-preview';
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { ProcessedPDF, ProcessedPage } from "@/lib/pdf";
+import type { ViewMode } from "./use-pdf-preview";
 
 interface PDFPreviewContentProps {
   viewMode: ViewMode;
@@ -22,7 +22,7 @@ interface PDFPreviewContentProps {
   currentPageData: ProcessedPage | undefined;
   allowMultiSelect: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   onPrevPage: () => void;
   onNextPage: () => void;
   onSetCurrentPage: (page: number) => void;
@@ -39,7 +39,7 @@ export function PDFPreviewContent({
   currentPageData,
   allowMultiSelect,
   onClose,
-  onConfirm,
+  onConfirm: _onConfirm,
   onPrevPage,
   onNextPage,
   onSetCurrentPage,
@@ -47,26 +47,30 @@ export function PDFPreviewContent({
 }: PDFPreviewContentProps) {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      {viewMode === 'loading' && (
+      {viewMode === "loading" && (
         <div className="flex-1 flex items-center justify-center flex-col gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
           <p className="text-slate-400">Elaborazione PDF in corso...</p>
         </div>
       )}
 
-      {viewMode === 'error' && (
+      {viewMode === "error" && (
         <div className="flex-1 flex items-center justify-center flex-col gap-4 p-6">
           <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
             <AlertCircle className="w-8 h-8 text-red-400" />
           </div>
           <p className="text-slate-300 text-center max-w-md">{error}</p>
-          <Button variant="outline" onClick={onClose} className="border-slate-600">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="border-slate-600"
+          >
             Chiudi
           </Button>
         </div>
       )}
 
-      {viewMode === 'preview' && pdfData && (
+      {viewMode === "preview" && pdfData && (
         <>
           {/* Page preview */}
           <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-slate-950">
@@ -76,7 +80,10 @@ export function PDFPreviewContent({
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="relative"
-                style={{ transform: `scale(${zoom})`, transformOrigin: 'center' }}
+                style={{
+                  transform: `scale(${zoom})`,
+                  transformOrigin: "center",
+                }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- Data URL from PDF rendering */}
                 <img
@@ -123,10 +130,10 @@ export function PDFPreviewContent({
                       relative w-12 h-16 rounded border-2 overflow-hidden flex-shrink-0 transition-all
                       ${
                         currentPage === index
-                          ? 'border-blue-500 ring-2 ring-blue-500/50'
+                          ? "border-blue-500 ring-2 ring-blue-500/50"
                           : selectedPages.has(index)
-                          ? 'border-green-500'
-                          : 'border-slate-600 hover:border-slate-500'
+                            ? "border-green-500"
+                            : "border-slate-600 hover:border-slate-500"
                       }
                     `}
                   >

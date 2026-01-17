@@ -2,52 +2,55 @@
  * Tests for Tool Persistence Helpers
  */
 
-import { describe, it, expect } from 'vitest';
-import { materialToSavedTool, MaterialRecord, SavedTool } from '../tool-persistence-helpers';
+import { describe, it, expect } from "vitest";
+import {
+  materialToSavedTool,
+  MaterialRecord,
+} from "../tool-persistence-helpers";
 
-describe('tool-persistence-helpers', () => {
-  describe('materialToSavedTool', () => {
+describe("tool-persistence-helpers", () => {
+  describe("materialToSavedTool", () => {
     const baseMaterial: MaterialRecord = {
-      id: 'mat-123',
-      toolId: 'tool-456',
-      userId: 'user-789',
-      toolType: 'mindmap',
-      title: 'Test Mindmap',
-      topic: 'Math basics',
+      id: "mat-123",
+      toolId: "tool-456",
+      userId: "user-789",
+      toolType: "mindmap",
+      title: "Test Mindmap",
+      topic: "Math basics",
       content: '{"nodes":[{"id":"1","label":"Root"}]}',
-      maestroId: 'euclide',
-      conversationId: 'conv-abc',
-      sessionId: 'sess-def',
+      maestroId: "euclide",
+      conversationId: "conv-abc",
+      sessionId: "sess-def",
       userRating: 4,
       isBookmarked: true,
       viewCount: 10,
-      createdAt: new Date('2026-01-15T10:00:00.000Z'),
-      updatedAt: new Date('2026-01-15T11:00:00.000Z'),
+      createdAt: new Date("2026-01-15T10:00:00.000Z"),
+      updatedAt: new Date("2026-01-15T11:00:00.000Z"),
     };
 
-    it('converts all required fields correctly', () => {
+    it("converts all required fields correctly", () => {
       const result = materialToSavedTool(baseMaterial);
 
-      expect(result.id).toBe('mat-123');
-      expect(result.toolId).toBe('tool-456');
-      expect(result.userId).toBe('user-789');
-      expect(result.type).toBe('mindmap');
-      expect(result.title).toBe('Test Mindmap');
+      expect(result.id).toBe("mat-123");
+      expect(result.toolId).toBe("tool-456");
+      expect(result.userId).toBe("user-789");
+      expect(result.type).toBe("mindmap");
+      expect(result.title).toBe("Test Mindmap");
     });
 
-    it('maps toolType to type', () => {
+    it("maps toolType to type", () => {
       const result = materialToSavedTool(baseMaterial);
       expect(result.type).toBe(baseMaterial.toolType);
     });
 
-    it('parses JSON content string to object', () => {
+    it("parses JSON content string to object", () => {
       const result = materialToSavedTool(baseMaterial);
 
-      expect(typeof result.content).toBe('object');
-      expect(result.content).toEqual({ nodes: [{ id: '1', label: 'Root' }] });
+      expect(typeof result.content).toBe("object");
+      expect(result.content).toEqual({ nodes: [{ id: "1", label: "Root" }] });
     });
 
-    it('preserves nullable fields as null', () => {
+    it("preserves nullable fields as null", () => {
       const materialWithNulls: MaterialRecord = {
         ...baseMaterial,
         topic: null,
@@ -66,7 +69,7 @@ describe('tool-persistence-helpers', () => {
       expect(result.userRating).toBeNull();
     });
 
-    it('preserves boolean fields', () => {
+    it("preserves boolean fields", () => {
       const result = materialToSavedTool(baseMaterial);
       expect(result.isBookmarked).toBe(true);
 
@@ -77,27 +80,27 @@ describe('tool-persistence-helpers', () => {
       expect(notBookmarked.isBookmarked).toBe(false);
     });
 
-    it('preserves numeric fields', () => {
+    it("preserves numeric fields", () => {
       const result = materialToSavedTool(baseMaterial);
       expect(result.viewCount).toBe(10);
       expect(result.userRating).toBe(4);
     });
 
-    it('preserves date objects', () => {
+    it("preserves date objects", () => {
       const result = materialToSavedTool(baseMaterial);
 
-      expect(result.createdAt).toEqual(new Date('2026-01-15T10:00:00.000Z'));
-      expect(result.updatedAt).toEqual(new Date('2026-01-15T11:00:00.000Z'));
+      expect(result.createdAt).toEqual(new Date("2026-01-15T10:00:00.000Z"));
+      expect(result.updatedAt).toEqual(new Date("2026-01-15T11:00:00.000Z"));
     });
 
-    it('handles complex nested content', () => {
+    it("handles complex nested content", () => {
       const complexContent = {
         nodes: [
-          { id: '1', label: 'Root', children: ['2', '3'] },
-          { id: '2', label: 'Child A', data: { value: 42 } },
-          { id: '3', label: 'Child B', styles: { color: 'red' } },
+          { id: "1", label: "Root", children: ["2", "3"] },
+          { id: "2", label: "Child A", data: { value: 42 } },
+          { id: "3", label: "Child B", styles: { color: "red" } },
         ],
-        metadata: { version: 2, author: 'test' },
+        metadata: { version: 2, author: "test" },
       };
 
       const materialWithComplex: MaterialRecord = {
@@ -109,28 +112,28 @@ describe('tool-persistence-helpers', () => {
       expect(result.content).toEqual(complexContent);
     });
 
-    it('handles empty JSON object content', () => {
+    it("handles empty JSON object content", () => {
       const emptyContent: MaterialRecord = {
         ...baseMaterial,
-        content: '{}',
+        content: "{}",
       };
 
       const result = materialToSavedTool(emptyContent);
       expect(result.content).toEqual({});
     });
 
-    it('handles array content', () => {
+    it("handles array content", () => {
       const arrayContent: MaterialRecord = {
         ...baseMaterial,
         content: '["item1","item2","item3"]',
       };
 
       const result = materialToSavedTool(arrayContent);
-      expect(result.content).toEqual(['item1', 'item2', 'item3']);
+      expect(result.content).toEqual(["item1", "item2", "item3"]);
     });
 
-    it('handles different tool types', () => {
-      const toolTypes = ['mindmap', 'flashcard', 'quiz', 'summary', 'diagram'];
+    it("handles different tool types", () => {
+      const toolTypes = ["mindmap", "flashcard", "quiz", "summary", "diagram"];
 
       for (const toolType of toolTypes) {
         const material: MaterialRecord = {
@@ -143,7 +146,7 @@ describe('tool-persistence-helpers', () => {
       }
     });
 
-    it('preserves zero values correctly', () => {
+    it("preserves zero values correctly", () => {
       const zeroValues: MaterialRecord = {
         ...baseMaterial,
         userRating: 0,

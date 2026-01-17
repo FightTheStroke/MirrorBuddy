@@ -3,21 +3,25 @@
  * Contains all the logic for the StudyWorkspace component
  */
 
-import { useState, useCallback, useMemo } from 'react';
-import { logger } from '@/lib/logger';
-import type { Character, SUPPORT_CHARACTERS } from '../character-switcher';
-import type { Maestro } from '@/types';
-import type { ViewMode } from './types';
+import { useState, useCallback, useMemo } from "react";
+import { logger } from "@/lib/logger";
+import type { Character } from "../character-switcher";
+import type { Maestro } from "@/types";
+import type { ViewMode } from "./types";
 
 interface UseStudyWorkspaceProps {
   maestri: Maestro[];
   initialCharacter: Character;
 }
 
-export function useStudyWorkspace({ maestri, initialCharacter }: UseStudyWorkspaceProps) {
+export function useStudyWorkspace({
+  maestri,
+  initialCharacter,
+}: UseStudyWorkspaceProps) {
   // State
-  const [viewMode, setViewMode] = useState<ViewMode>('conversation');
-  const [activeCharacter, setActiveCharacter] = useState<Character>(initialCharacter);
+  const [viewMode, setViewMode] = useState<ViewMode>("conversation");
+  const [activeCharacter, setActiveCharacter] =
+    useState<Character>(initialCharacter);
   const [showCharacterSwitcher, setShowCharacterSwitcher] = useState(false);
   const [isToolActive, setIsToolActive] = useState(false);
   const [recentCharacterIds, setRecentCharacterIds] = useState<string[]>([]);
@@ -37,8 +41,8 @@ export function useStudyWorkspace({ maestri, initialCharacter }: UseStudyWorkspa
   const handleToolStart = useCallback(() => {
     setIsToolActive(true);
     // Auto-switch to split view when tool starts
-    if (viewMode === 'conversation') {
-      setViewMode('split');
+    if (viewMode === "conversation") {
+      setViewMode("split");
     }
   }, [viewMode]);
 
@@ -49,7 +53,7 @@ export function useStudyWorkspace({ maestri, initialCharacter }: UseStudyWorkspa
 
   // Get Maestro if active character is a maestro
   const activeMaestro = useMemo(() => {
-    if (activeCharacter.role === 'maestro') {
+    if (activeCharacter.role === "maestro") {
       return maestri.find((m) => m.id === activeCharacter.id);
     }
     return undefined;
@@ -60,27 +64,29 @@ export function useStudyWorkspace({ maestri, initialCharacter }: UseStudyWorkspa
     if (activeMaestro) {
       setShowVoiceSession(true);
     } else {
-      logger.warn('Voice sessions are only available when chatting with a Maestro');
+      logger.warn(
+        "Voice sessions are only available when chatting with a Maestro",
+      );
     }
   }, [activeMaestro]);
 
   // Layout classes based on view mode
   const layoutClasses = useMemo(() => {
     switch (viewMode) {
-      case 'conversation':
+      case "conversation":
         return {
-          conversation: 'w-full',
-          canvas: 'hidden',
+          conversation: "w-full",
+          canvas: "hidden",
         };
-      case 'split':
+      case "split":
         return {
-          conversation: 'w-full lg:w-1/2',
-          canvas: 'hidden lg:block lg:w-1/2',
+          conversation: "w-full lg:w-1/2",
+          canvas: "hidden lg:block lg:w-1/2",
         };
-      case 'canvas':
+      case "canvas":
         return {
-          conversation: 'hidden',
-          canvas: 'w-full',
+          conversation: "hidden",
+          canvas: "w-full",
         };
     }
   }, [viewMode]);
