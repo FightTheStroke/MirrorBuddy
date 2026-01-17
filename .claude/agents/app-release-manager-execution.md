@@ -51,8 +51,8 @@ grep -r "mirrorbuddy-user-id" src/app/api/ --include="*.ts" | wc -l
 
 **Verification command:**
 ```bash
-npm run test -- e2e/accessibility*.spec.ts
-# Should pass Axe accessibility audit
+npx playwright test e2e/accessibility.spec.ts
+# Must pass ALL 24 tests (axe-core WCAG 2.1 AA, keyboard nav, screen reader, DSA profiles)
 ```
 
 ### Educational Quality
