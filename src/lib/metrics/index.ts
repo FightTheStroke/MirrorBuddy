@@ -55,3 +55,22 @@ export {
 } from "./external-service-metrics";
 
 export type { ExternalServiceUsage } from "./external-service-metrics";
+
+// Voice cost guards (V1Plan FASE 6.2.3)
+export {
+  startVoiceSession,
+  updateVoiceDuration,
+  endVoiceSession,
+  isVoiceAllowed,
+  handleCostSpike,
+  getVoiceSessionState,
+  getActiveVoiceSessions,
+  getVoiceLimits,
+  VOICE_DURATION_LIMITS,
+} from "./voice-cost-guards";
+
+export type {
+  VoiceCapStatus,
+  VoiceSessionState,
+  VoiceCapCheck,
+} from "./voice-cost-guards";

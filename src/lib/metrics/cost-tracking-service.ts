@@ -220,6 +220,8 @@ export async function getCostMetricsSummary(): Promise<{
   avgCostText24h: number;
   avgCostVoice24h: number;
   spikesThisWeek: number;
+  totalCost24h: number;
+  sessionCount24h: number;
 }> {
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -234,6 +236,9 @@ export async function getCostMetricsSummary(): Promise<{
     where: { createdAt: { gte: dayAgo }, voiceMinutes: { gt: 0 } },
     _avg: { costEur: true },
   });
+
+  // Get 24h totals
+  const dayStats = await getCostStats(dayAgo, new Date());
 
   // Count spikes this week
   const weekStats = await getCostStats(weekAgo, new Date());
@@ -251,6 +256,8 @@ export async function getCostMetricsSummary(): Promise<{
     avgCostText24h: round(textSessions._avg.costEur || 0),
     avgCostVoice24h: round(voiceSessions._avg.costEur || 0),
     spikesThisWeek: spikeSessions,
+    totalCost24h: round(dayStats.totalCost),
+    sessionCount24h: dayStats.sessionCount,
   };
 }
 
