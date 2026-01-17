@@ -4,65 +4,65 @@
 // ============================================================================
 
 model Progress {
-  id                String    @id @default(cuid())
-  userId            String    @unique
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // MirrorBucks system (xp is backward compatibility)
-  xp                Int       @default(0)
-  level             Int       @default(1)
+  xp    Int @default(0)
+  level Int @default(1)
 
   // Season system
-  seasonMirrorBucks Int       @default(0)
-  seasonLevel       Int       @default(1)
-  allTimeLevel      Int       @default(1)
+  seasonMirrorBucks Int     @default(0)
+  seasonLevel       Int     @default(1)
+  allTimeLevel      Int     @default(1)
   currentSeason     String?
-  seasonHistory     String    @default("[]")
+  seasonHistory     String  @default("[]")
 
   // Streak
-  streakCurrent     Int       @default(0)
-  streakLongest     Int       @default(0)
-  lastStudyDate     DateTime?
+  streakCurrent Int       @default(0)
+  streakLongest Int       @default(0)
+  lastStudyDate DateTime?
 
   // Aggregates
-  totalStudyMinutes Int       @default(0)
-  questionsAsked    Int       @default(0)
-  sessionsThisWeek  Int       @default(0)
+  totalStudyMinutes Int @default(0)
+  questionsAsked    Int @default(0)
+  sessionsThisWeek  Int @default(0)
 
   // Complex data as JSON
-  achievements      String    @default("[]")
-  masteries         String    @default("[]")
-  adaptiveProfile   String    @default("{}")
+  achievements    String @default("[]")
+  masteries       String @default("[]")
+  adaptiveProfile String @default("{}")
 
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model UserGamification {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Points & Level
-  totalPoints     Int      @default(0)
-  seasonPoints    Int      @default(0)
-  level           Int      @default(1)
-  tier            String   @default("principiante")
+  totalPoints  Int    @default(0)
+  seasonPoints Int    @default(0)
+  level        Int    @default(1)
+  tier         String @default("principiante")
 
   // Season tracking
   currentSeason   String
   seasonStartDate DateTime @default(now())
 
   // MirrorBucks (renamed from XP)
-  mirrorBucks     Int      @default(0)
+  mirrorBucks Int @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  achievements    UserAchievement[]
-  streak          DailyStreak?
-  pointsHistory   PointsTransaction[]
+  achievements  UserAchievement[]
+  streak        DailyStreak?
+  pointsHistory PointsTransaction[]
 
   @@index([level])
   @@index([totalPoints])
@@ -70,16 +70,16 @@ model UserGamification {
 }
 
 model Achievement {
-  id          String   @id @default(cuid())
-  code        String   @unique
+  id          String  @id @default(cuid())
+  code        String  @unique
   name        String
   description String
   category    String
   icon        String
-  points      Int      @default(0)
-  tier        String   @default("bronze")
+  points      Int     @default(0)
+  tier        String  @default("bronze")
   requirement String
-  isSecret    Boolean  @default(false)
+  isSecret    Boolean @default(false)
 
   createdAt DateTime @default(now())
 
@@ -91,11 +91,11 @@ model Achievement {
 }
 
 model UserAchievement {
-  id             String   @id @default(cuid())
+  id             String           @id @default(cuid())
   gamificationId String
   gamification   UserGamification @relation(fields: [gamificationId], references: [id], onDelete: Cascade)
   achievementId  String
-  achievement    Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  achievement    Achievement      @relation(fields: [achievementId], references: [id], onDelete: Cascade)
 
   unlockedAt DateTime @default(now())
   progress   Int      @default(100)
@@ -107,8 +107,8 @@ model UserAchievement {
 }
 
 model DailyStreak {
-  id             String   @id @default(cuid())
-  gamificationId String   @unique
+  id             String           @id @default(cuid())
+  gamificationId String           @unique
   gamification   UserGamification @relation(fields: [gamificationId], references: [id], onDelete: Cascade)
 
   currentStreak  Int      @default(0)
@@ -128,15 +128,15 @@ model DailyStreak {
 }
 
 model PointsTransaction {
-  id             String   @id @default(cuid())
+  id             String           @id @default(cuid())
   gamificationId String
   gamification   UserGamification @relation(fields: [gamificationId], references: [id], onDelete: Cascade)
 
-  points      Int
-  reason      String
-  sourceId    String?
-  sourceType  String?
-  multiplier  Float    @default(1.0)
+  points     Int
+  reason     String
+  sourceId   String?
+  sourceType String?
+  multiplier Float   @default(1.0)
 
   createdAt DateTime @default(now())
 

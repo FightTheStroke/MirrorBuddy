@@ -4,32 +4,32 @@
 // ============================================================================
 
 model ContentEmbedding {
-  id          String   @id @default(cuid())
-  userId      String
+  id     String @id @default(cuid())
+  userId String
 
   // Source content reference
-  sourceType  String
-  sourceId    String
-  chunkIndex  Int      @default(0)
+  sourceType String
+  sourceId   String
+  chunkIndex Int    @default(0)
 
   // The actual text that was embedded
-  content     String
+  content String
 
   // Vector embedding - dual storage for migration
   vector       String?
   vectorNative Unsupported("vector(1536)")?
 
   // Embedding metadata
-  model       String   @default("text-embedding-3-small")
-  dimensions  Int      @default(1536)
-  tokenCount  Int      @default(0)
+  model      String @default("text-embedding-3-small")
+  dimensions Int    @default(1536)
+  tokenCount Int    @default(0)
 
   // Search optimization
-  subject     String?
-  tags        String   @default("[]")
+  subject String?
+  tags    String  @default("[]")
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([sourceType, sourceId, chunkIndex])
   @@index([userId])
@@ -49,8 +49,8 @@ model MaterialEdge {
   metadata     Json?
   createdAt    DateTime @default(now())
 
-  from         Material @relation("MaterialEdgeFrom", fields: [fromId], references: [id], onDelete: Cascade)
-  to           Material @relation("MaterialEdgeTo", fields: [toId], references: [id], onDelete: Cascade)
+  from Material @relation("MaterialEdgeFrom", fields: [fromId], references: [id], onDelete: Cascade)
+  to   Material @relation("MaterialEdgeTo", fields: [toId], references: [id], onDelete: Cascade)
 
   @@unique([fromId, toId, relationType])
   @@index([fromId])
@@ -68,8 +68,8 @@ model Concept {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  materials   MaterialConcept[]
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  materials MaterialConcept[]
 
   @@unique([userId, name])
   @@index([userId])
@@ -83,8 +83,8 @@ model MaterialConcept {
   relevance  Float    @default(1.0)
   createdAt  DateTime @default(now())
 
-  material   Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  concept    Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
+  material Material @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  concept  Concept  @relation(fields: [conceptId], references: [id], onDelete: Cascade)
 
   @@id([materialId, conceptId])
   @@index([materialId])

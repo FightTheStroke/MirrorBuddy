@@ -1,0 +1,34 @@
+{
+  "$schema": "https://unpkg.com/bundlewatch@0.3.3/schema.json",
+  "ci": {
+    "trackBranches": ["main", "development"]
+  },
+  "files": [
+    {
+      "path": ".next/static/chunks/main-*.js",
+      "maxSize": "250KB",
+      "compression": "gzip"
+    },
+    {
+      "path": ".next/static/chunks/webpack-*.js",
+      "maxSize": "50KB",
+      "compression": "gzip"
+    },
+    {
+      "path": ".next/static/chunks/framework-*.js",
+      "maxSize": "150KB",
+      "compression": "gzip"
+    },
+    {
+      "path": ".next/static/chunks/pages/_app-*.js",
+      "maxSize": "200KB",
+      "compression": "gzip"
+    },
+    {
+      "path": ".next/static/chunks/pages/**/*.js",
+      "maxSize": "300KB",
+      "compression": "gzip"
+    }
+  ],
+  "defaultCompression": "gzip"
+}

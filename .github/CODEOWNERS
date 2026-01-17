@@ -1,0 +1,33 @@
+# CODEOWNERS - MirrorBuddy
+# F-09: Ownership chiara per aree critiche
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @roberdan
+
+# Critical Security Areas - require security review
+/src/lib/safety/ @roberdan
+/src/lib/security/ @roberdan
+/src/lib/privacy/ @roberdan
+
+# AI/Education Core - require AI team review
+/src/lib/ai/ @roberdan
+/src/lib/education/ @roberdan
+/src/lib/rag/ @roberdan
+/src/data/maestri/ @roberdan
+
+# Infrastructure - require DevOps review
+/.github/workflows/ @roberdan
+/prisma/ @roberdan
+/Dockerfile @roberdan
+/docker-compose*.yml @roberdan
+
+# Accessibility - require a11y review
+/src/lib/accessibility/ @roberdan
+
+# PDF Generator - require PDF team review
+/src/lib/pdf-generator/ @roberdan
+
+# Documentation
+/docs/ @roberdan
+*.md @roberdan
