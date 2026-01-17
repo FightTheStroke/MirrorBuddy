@@ -14,9 +14,16 @@ export interface ChatUsage {
   total_tokens: number;
 }
 
+/** Safety event data when content is blocked */
+export interface SafetyBlockEvent {
+  blocked: true;
+  category: string;
+}
+
 /**
  * Send message to chat API and handle response.
  * Returns REAL usage data from API for metrics tracking.
+ * Returns safety event when content is blocked by safety filter.
  */
 export async function sendChatMessage(
   input: string,
@@ -29,6 +36,7 @@ export async function sendChatMessage(
   toolState: ToolState | null;
   usage: ChatUsage | null;
   latencyMs: number;
+  safetyEvent: SafetyBlockEvent | null;
 }> {
   const startTime = performance.now();
   const response = await fetch("/api/chat", {
@@ -118,7 +126,12 @@ export async function sendChatMessage(
       }
     : null;
 
-  return { responseContent, toolState, usage, latencyMs };
+  // Check for safety filter block
+  const safetyEvent: SafetyBlockEvent | null = data.blocked
+    ? { blocked: true, category: data.category || "unknown" }
+    : null;
+
+  return { responseContent, toolState, usage, latencyMs, safetyEvent };
 }
 
 /**

@@ -11,6 +11,7 @@ import {
   createAssistantMessage,
   createErrorMessage,
   type ChatUsage,
+  type SafetyBlockEvent,
 } from "./message-handler";
 import { sendStreamingMessage, messageRequiresTool } from "./streaming-handler";
 import type { ToolState } from "@/types/tools";
@@ -19,6 +20,7 @@ import type { ToolState } from "@/types/tools";
 export interface TurnMetricsData {
   usage: ChatUsage | null;
   latencyMs: number;
+  safetyEvent?: SafetyBlockEvent | null;
 }
 
 export interface SendMessageCallbacks {
@@ -102,13 +104,14 @@ export async function handleSendMessage(
 
   // Non-streaming path
   try {
-    const { responseContent, toolState, usage, latencyMs } =
+    const { responseContent, toolState, usage, latencyMs, safetyEvent } =
       await sendChatMessage(content, messages, character, characterId);
 
     const assistantMessage = createAssistantMessage(responseContent);
     callbacks.onNonStreamingComplete(assistantMessage, toolState, {
       usage,
       latencyMs,
+      safetyEvent,
     });
     return false;
   } catch (error) {

@@ -53,8 +53,12 @@ export function useCharacterChat(
 
   // Session metrics tracking (REAL data from API)
   // Note: recordVoiceUsage will be used when voice session metrics are implemented
-  const { recordTurn, recordVoiceUsage: _recordVoiceUsage } =
-    useSessionMetrics(characterId);
+  const {
+    recordTurn,
+    recordVoiceUsage: _recordVoiceUsage,
+    recordRefusal,
+    recordIncident: _recordIncident,
+  } = useSessionMetrics(characterId);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const hasAttemptedConnection = useRef(false);
@@ -296,6 +300,15 @@ export function useCharacterChat(
             });
           }
 
+          // Track safety refusal events (blocked by content filter)
+          if (metrics.safetyEvent?.blocked) {
+            // Safety filter blocks are considered correct refusals
+            recordRefusal(true);
+            logger.debug("Safety refusal recorded", {
+              category: metrics.safetyEvent.category,
+            });
+          }
+
           setIsLoading(false);
         },
         onError: () => {
@@ -313,6 +326,7 @@ export function useCharacterChat(
     addMessageToStore,
     streamingEnabled,
     recordTurn,
+    recordRefusal,
   ]);
 
   // Handle tool request
