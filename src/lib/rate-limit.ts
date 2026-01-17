@@ -7,7 +7,6 @@
  * For multi-instance production, replace with Redis-based solution.
  */
 
-
 interface RateLimitEntry {
   count: number;
   resetTime: number;
@@ -44,23 +43,9 @@ export function stopCleanup(): void {
   }
 }
 
-export interface RateLimitConfig {
-  /** Maximum requests allowed in the window */
-  maxRequests: number;
-  /** Time window in milliseconds */
-  windowMs: number;
-}
-
-export interface RateLimitResult {
-  /** Whether the request is allowed */
-  success: boolean;
-  /** Remaining requests in current window */
-  remaining: number;
-  /** Unix timestamp when the limit resets */
-  resetTime: number;
-  /** Total limit for the window */
-  limit: number;
-}
+// Re-export types from shared module to maintain API compatibility
+export type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
+import type { RateLimitConfig, RateLimitResult } from "./rate-limit-types";
 
 /**
  * Check rate limit for a given identifier (usually IP or userId)
@@ -71,9 +56,9 @@ export interface RateLimitResult {
  */
 export function checkRateLimit(
   identifier: string,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): RateLimitResult {
-  if (process.env.E2E_TESTS === '1') {
+  if (process.env.E2E_TESTS === "1") {
     const resetTime = Date.now() + config.windowMs;
     return {
       success: true,
@@ -127,18 +112,18 @@ export function checkRateLimit(
  */
 export function getClientIdentifier(request: Request): string {
   // Try various headers for IP
-  const forwarded = request.headers.get('x-forwarded-for');
+  const forwarded = request.headers.get("x-forwarded-for");
   if (forwarded) {
-    return forwarded.split(',')[0].trim();
+    return forwarded.split(",")[0].trim();
   }
 
-  const realIp = request.headers.get('x-real-ip');
+  const realIp = request.headers.get("x-real-ip");
   if (realIp) {
     return realIp;
   }
 
   // Fallback for local development
-  return 'anonymous';
+  return "anonymous";
 }
 
 // ============================================================================
@@ -187,22 +172,28 @@ export const RATE_LIMITS = {
 export function rateLimitResponse(result: RateLimitResult): Response {
   return new Response(
     JSON.stringify({
-      error: 'Too many requests',
-      message: 'Rate limit exceeded. Please try again later.',
+      error: "Too many requests",
+      message: "Rate limit exceeded. Please try again later.",
       retryAfter: Math.ceil((result.resetTime - Date.now()) / 1000),
     }),
     {
       status: 429,
       headers: {
-        'Content-Type': 'application/json',
-        'X-RateLimit-Limit': result.limit.toString(),
-        'X-RateLimit-Remaining': '0',
-        'X-RateLimit-Reset': result.resetTime.toString(),
-        'Retry-After': Math.ceil((result.resetTime - Date.now()) / 1000).toString(),
+        "Content-Type": "application/json",
+        "X-RateLimit-Limit": result.limit.toString(),
+        "X-RateLimit-Remaining": "0",
+        "X-RateLimit-Reset": result.resetTime.toString(),
+        "Retry-After": Math.ceil(
+          (result.resetTime - Date.now()) / 1000,
+        ).toString(),
       },
-    }
+    },
   );
 }
 
 // Re-export persistence functions
-export { logRateLimitEvent, getRateLimitEvents, getRateLimitStats } from './rate-limit-persistence';
+export {
+  logRateLimitEvent,
+  getRateLimitEvents,
+  getRateLimitStats,
+} from "./rate-limit-persistence";

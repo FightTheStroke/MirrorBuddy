@@ -14,6 +14,7 @@ import {
   TransparencyDisplayConfig,
   TRANSPARENCY_LABELS,
 } from './types';
+import type { TransparencyContext } from './types';
 import {
   assessConfidence,
   assessHallucinationRisk,
@@ -21,30 +22,10 @@ import {
   shouldShowTransparencyUI,
 } from './transparency-generators';
 
-const log = logger.child({ module: 'ai-transparency' });
+// Re-export for backward compatibility
+export type { TransparencyContext } from './types';
 
-/**
- * Context for transparency assessment
- */
-export interface TransparencyContext {
-  /** The AI response to assess */
-  response: string;
-  /** The user's original query */
-  query: string;
-  /** RAG retrieval results (if any) */
-  ragResults?: Array<{
-    content: string;
-    similarity: number;
-    sourceId?: string;
-    sourceType?: string;
-  }>;
-  /** Whether maestro knowledge was used */
-  usedKnowledgeBase: boolean;
-  /** Maestro ID (for knowledge attribution) */
-  maestroId?: string;
-  /** Whether response was streamed */
-  isStreamed?: boolean;
-}
+const log = logger.child({ module: 'ai-transparency' });
 
 /**
  * Assess transparency for an AI response

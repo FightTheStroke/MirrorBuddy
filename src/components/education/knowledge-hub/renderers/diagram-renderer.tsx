@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Diagram Renderer
@@ -14,20 +14,22 @@
  * }
  */
 
-import { DiagramRenderer as BaseDiagramRenderer } from '@/components/tools/diagram-renderer';
-import type { DiagramRequest } from '@/types';
-import type { BaseRendererProps } from './index';
+import { DiagramRenderer as BaseDiagramRenderer } from "@/components/tools/diagram-renderer";
+import type { DiagramRequest } from "@/types";
+import type { BaseRendererProps } from "./types";
 
 /**
  * Render a Mermaid diagram from stored material data.
  */
 export function DiagramRenderer({ data, className }: BaseRendererProps) {
-  const diagramData = data as unknown as Partial<DiagramRequest> & { title?: string };
+  const diagramData = data as unknown as Partial<DiagramRequest> & {
+    title?: string;
+  };
 
   // Build the request object for the base renderer
   const request: DiagramRequest = {
-    type: diagramData.type || 'flowchart',
-    code: diagramData.code || '',
+    type: diagramData.type || "flowchart",
+    code: diagramData.code || "",
     title: diagramData.title,
   };
 

@@ -7,7 +7,7 @@
 
 import { logger } from '@/lib/logger';
 import { ICE_SERVERS } from './webrtc-types';
-import type { ProbeResult } from './transport-probe';
+import type { ProbeResult } from './transport-types';
 
 const PROBE_TIMEOUT_MS = 5000;
 

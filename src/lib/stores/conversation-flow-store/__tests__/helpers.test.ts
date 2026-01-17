@@ -12,11 +12,11 @@ import type { ConversationFlowState, FlowMessage, CharacterConversation } from '
 describe('conversation-flow-store helpers', () => {
   describe('saveCurrentConversation', () => {
     it('returns existing conversations when no active character', () => {
-      const state: ConversationFlowState = {
+      const state = {
         activeCharacter: null,
         messages: [],
         conversationsByCharacter: { existing: {} as CharacterConversation },
-      } as ConversationFlowState;
+      } as unknown as ConversationFlowState;
 
       const result = saveCurrentConversation(state);
 

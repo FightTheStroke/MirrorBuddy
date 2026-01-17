@@ -10,17 +10,10 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { Collection } from '../components/sidebar-navigation';
 import { buildCollectionTree } from './collection-tree-builder';
+import type { CollectionData } from './collection-types';
 
-export interface CollectionData {
-  id: string;
-  name: string;
-  icon?: string;
-  color?: string;
-  parentId?: string | null;
-  materialCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+// Re-export for backward compatibility
+export type { CollectionData } from './collection-types';
 
 export interface UseCollectionsOptions {
   /** Initial collections data */

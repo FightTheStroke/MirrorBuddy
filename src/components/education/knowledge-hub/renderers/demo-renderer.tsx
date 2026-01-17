@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Demo/Interactive Renderer
@@ -16,19 +16,19 @@
  * }
  */
 
-import { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PlayCircle, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { HTMLPreview } from '@/components/education/html-preview';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { generateAccessibilityCSS, buildDemoCode } from './demo-utils';
-import type { BaseRendererProps } from './index';
+import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { PlayCircle, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { HTMLPreview } from "@/components/education/html-preview";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { generateAccessibilityCSS, buildDemoCode } from "./demo-utils";
+import type { BaseRendererProps } from "./types";
 
 interface DemoData {
   title?: string;
   description?: string;
-  type?: 'simulation' | 'animation' | 'interactive';
+  type?: "simulation" | "animation" | "interactive";
   content?: unknown;
   previewImage?: string;
   code?: string;
@@ -47,19 +47,25 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
   // C-7 FIX: Get accessibility settings from store
   const settings = useAccessibilityStore((state) => state.settings);
 
-  const title = demoData.title || 'Demo Interattiva';
-  const description = demoData.description || 'Clicca per avviare la demo';
-  const type = demoData.type || 'interactive';
+  const title = demoData.title || "Demo Interattiva";
+  const description = demoData.description || "Clicca per avviare la demo";
+  const type = demoData.type || "interactive";
 
   const typeLabels = {
-    simulation: 'Simulazione',
-    animation: 'Animazione',
-    interactive: 'Interattivo',
+    simulation: "Simulazione",
+    animation: "Animazione",
+    interactive: "Interattivo",
   };
 
   // C-7 FIX: Generate accessibility CSS and inject into demo code
-  const accessibilityCSS = useMemo(() => generateAccessibilityCSS(settings), [settings]);
-  const demoCode = useMemo(() => buildDemoCode(demoData, accessibilityCSS), [demoData, accessibilityCSS]);
+  const accessibilityCSS = useMemo(
+    () => generateAccessibilityCSS(settings),
+    [settings],
+  );
+  const demoCode = useMemo(
+    () => buildDemoCode(demoData, accessibilityCSS),
+    [demoData, accessibilityCSS],
+  );
   const hasCode = !!demoCode;
 
   return (
@@ -68,8 +74,8 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className={cn(
-          'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden',
-          className
+          "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden",
+          className,
         )}
       >
         <div className="p-4 bg-gradient-to-r from-accent-themed/10 to-purple-500/10">
@@ -104,16 +110,16 @@ export function DemoRenderer({ data, className }: BaseRendererProps) {
 
           <button
             className={cn(
-              'w-full flex items-center justify-center gap-2 p-3 rounded-lg transition-all',
+              "w-full flex items-center justify-center gap-2 p-3 rounded-lg transition-all",
               hasCode
-                ? 'bg-accent-themed text-white hover:brightness-110'
-                : 'bg-slate-200 dark:bg-slate-700 text-slate-500 cursor-not-allowed'
+                ? "bg-accent-themed text-white hover:brightness-110"
+                : "bg-slate-200 dark:bg-slate-700 text-slate-500 cursor-not-allowed",
             )}
             onClick={() => hasCode && setShowDemo(true)}
             disabled={!hasCode}
           >
             <PlayCircle className="w-5 h-5" />
-            {hasCode ? 'Avvia Demo' : 'Demo non disponibile'}
+            {hasCode ? "Avvia Demo" : "Demo non disponibile"}
           </button>
         </div>
       </motion.div>

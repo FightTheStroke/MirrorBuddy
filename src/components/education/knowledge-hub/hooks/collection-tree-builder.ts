@@ -4,7 +4,7 @@
  */
 
 import type { Collection } from '../components/sidebar-navigation';
-import type { CollectionData } from './use-collections';
+import type { CollectionData } from './collection-types';
 
 /**
  * Build nested tree structure from flat collections list.

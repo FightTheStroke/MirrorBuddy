@@ -12,21 +12,9 @@ import type {
   TelemetryConfig,
 } from './types';
 import type { TelemetryState } from './telemetry-store/types';
-import { generateSessionId, isSameDay } from './telemetry-store/helpers';
+import { generateSessionId, isSameDay } from './telemetry-store/utils';
 
 export type { TelemetryState } from './telemetry-store/types';
-
-// Re-export tracking functions
-export {
-  trackPageView,
-  trackFeatureUsage,
-  trackMaestroInteraction,
-  trackError,
-  trackPerformance,
-} from './telemetry-store/track-functions';
-
-// Re-export initialization
-export { initializeTelemetry } from './telemetry-store/initialize';
 
 // ============================================================================
 // DEFAULT CONFIG

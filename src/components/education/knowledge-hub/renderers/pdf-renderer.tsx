@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub PDF Renderer
@@ -14,10 +14,10 @@
  * }
  */
 
-import { motion } from 'framer-motion';
-import { FileText, Download, ExternalLink, File } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { BaseRendererProps } from './index';
+import { motion } from "framer-motion";
+import { FileText, Download, ExternalLink, File } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BaseRendererProps } from "./types";
 
 interface PdfData {
   title?: string;
@@ -33,7 +33,7 @@ interface PdfData {
 export function PdfRenderer({ data, className }: BaseRendererProps) {
   const pdfData = data as PdfData;
 
-  const title = pdfData.title || pdfData.filename || 'Documento PDF';
+  const title = pdfData.title || pdfData.filename || "Documento PDF";
   const url = pdfData.url;
 
   return (
@@ -41,8 +41,8 @@ export function PdfRenderer({ data, className }: BaseRendererProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800',
-        className
+        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800",
+        className,
       )}
     >
       <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">

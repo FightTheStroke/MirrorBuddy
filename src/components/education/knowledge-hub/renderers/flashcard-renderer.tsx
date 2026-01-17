@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Flashcard Renderer
@@ -13,11 +13,11 @@
  * }
  */
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { BaseRendererProps } from './index';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BaseRendererProps } from "./types";
 
 interface Flashcard {
   id: string;
@@ -39,11 +39,11 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
   const [isFlipped, setIsFlipped] = useState(false);
 
   const cards = flashcardData.cards || [];
-  const title = flashcardData.title || 'Flashcard';
+  const title = flashcardData.title || "Flashcard";
 
   if (cards.length === 0) {
     return (
-      <div className={cn('p-4 text-center text-slate-500', className)}>
+      <div className={cn("p-4 text-center text-slate-500", className)}>
         Nessuna flashcard disponibile
       </div>
     );
@@ -65,7 +65,7 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className={cn('space-y-4', className)}
+      className={cn("space-y-4", className)}
     >
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -81,21 +81,21 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
         onClick={() => setIsFlipped(!isFlipped)}
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && setIsFlipped(!isFlipped)}
-        aria-label={isFlipped ? 'Mostra domanda' : 'Mostra risposta'}
+        onKeyDown={(e) => e.key === "Enter" && setIsFlipped(!isFlipped)}
+        aria-label={isFlipped ? "Mostra domanda" : "Mostra risposta"}
       >
         <motion.div
           className="w-full h-full"
           animate={{ rotateY: isFlipped ? 180 : 0 }}
           transition={{ duration: 0.4 }}
-          style={{ transformStyle: 'preserve-3d' }}
+          style={{ transformStyle: "preserve-3d" }}
         >
           {/* Front */}
           <div
             className={cn(
-              'absolute inset-0 p-6 rounded-xl border-2 flex items-center justify-center text-center',
-              'border-accent-themed bg-white dark:bg-slate-800',
-              'backface-hidden'
+              "absolute inset-0 p-6 rounded-xl border-2 flex items-center justify-center text-center",
+              "border-accent-themed bg-white dark:bg-slate-800",
+              "backface-hidden",
             )}
           >
             <p className="text-lg font-medium text-slate-900 dark:text-slate-100">
@@ -106,11 +106,11 @@ export function FlashcardRenderer({ data, className }: BaseRendererProps) {
           {/* Back */}
           <div
             className={cn(
-              'absolute inset-0 p-6 rounded-xl border-2 flex items-center justify-center text-center',
-              'border-green-500 bg-green-50 dark:bg-green-900/20',
-              'backface-hidden'
+              "absolute inset-0 p-6 rounded-xl border-2 flex items-center justify-center text-center",
+              "border-green-500 bg-green-50 dark:bg-green-900/20",
+              "backface-hidden",
             )}
-            style={{ transform: 'rotateY(180deg)' }}
+            style={{ transform: "rotateY(180deg)" }}
           >
             <p className="text-lg text-slate-700 dark:text-slate-300">
               {currentCard.back}

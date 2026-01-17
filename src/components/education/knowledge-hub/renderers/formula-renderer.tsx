@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Formula Renderer
@@ -13,9 +13,9 @@
  * }
  */
 
-import { FormulaRenderer as BaseFormulaRenderer } from '@/components/tools/formula-renderer';
-import type { FormulaRequest } from '@/types';
-import type { BaseRendererProps } from './index';
+import { FormulaRenderer as BaseFormulaRenderer } from "@/components/tools/formula-renderer";
+import type { FormulaRequest } from "@/types";
+import type { BaseRendererProps } from "./types";
 
 /**
  * Render a LaTeX formula from stored material data.
@@ -25,7 +25,7 @@ export function FormulaRenderer({ data, className }: BaseRendererProps) {
 
   // Build the request object for the base renderer
   const request: FormulaRequest = {
-    latex: formulaData.latex || '',
+    latex: formulaData.latex || "",
     description: formulaData.description,
   };
 

@@ -29,7 +29,7 @@ import {
   generateStoragePath,
   calculateChecksum,
   toBuffer,
-} from '../storage-service';
+} from '../storage-utils';
 
 /**
  * Upload a file to local storage

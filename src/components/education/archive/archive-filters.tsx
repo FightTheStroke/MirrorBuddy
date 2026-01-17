@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
 /**
  * Archive Filters Component
  * Type tabs and advanced filters (subject, date range)
  */
 
-import { Calendar, BookOpen, Filter, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { type FilterType, FILTER_TABS, SUBJECT_LABELS } from './index';
+import { Calendar, BookOpen, Filter, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { type FilterType, FILTER_TABS, SUBJECT_LABELS } from "./constants";
 
 interface ArchiveFiltersProps {
   filter: FilterType;
@@ -42,11 +42,15 @@ export function ArchiveFilters({
   return (
     <>
       {/* Filter Tabs */}
-      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filtra per tipo">
+      <div
+        className="flex flex-wrap gap-2"
+        role="tablist"
+        aria-label="Filtra per tipo"
+      >
         {FILTER_TABS.map(({ value, label }) => (
           <Button
             key={value}
-            variant={filter === value ? 'default' : 'outline'}
+            variant={filter === value ? "default" : "outline"}
             size="sm"
             onClick={() => onFilterChange(value)}
             role="tab"
@@ -55,12 +59,14 @@ export function ArchiveFilters({
           >
             {label}
             {countByType[value] > 0 && (
-              <span className={cn(
-                'text-xs px-1.5 py-0.5 rounded-full',
-                filter === value
-                  ? 'bg-white/20'
-                  : 'bg-slate-200 dark:bg-slate-700'
-              )}>
+              <span
+                className={cn(
+                  "text-xs px-1.5 py-0.5 rounded-full",
+                  filter === value
+                    ? "bg-white/20"
+                    : "bg-slate-200 dark:bg-slate-700",
+                )}
+              >
                 {countByType[value]}
               </span>
             )}

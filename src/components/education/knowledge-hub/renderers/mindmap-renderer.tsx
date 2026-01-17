@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Mindmap Renderer
@@ -14,8 +14,8 @@
  * }
  */
 
-import { MarkMapRenderer, type MindmapNode } from '@/components/tools/markmap';
-import type { BaseRendererProps } from './index';
+import { MarkMapRenderer, type MindmapNode } from "@/components/tools/markmap";
+import type { BaseRendererProps } from "./types";
 
 interface MindmapData {
   title?: string;
@@ -33,7 +33,7 @@ interface MindmapData {
 export function MindmapRenderer({ data, className }: BaseRendererProps) {
   const mindmapData = data as MindmapData;
 
-  const title = mindmapData.title || 'Mappa Mentale';
+  const title = mindmapData.title || "Mappa Mentale";
   const markdown = mindmapData.markdown;
   const nodes = mindmapData.nodes;
 

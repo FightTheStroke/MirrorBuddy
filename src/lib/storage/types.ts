@@ -173,3 +173,66 @@ export type StorageErrorCode =
   | 'PERMISSION_DENIED'
   | 'PROVIDER_ERROR'
   | 'INVALID_CONFIG';
+
+/**
+ * Abstract storage service interface.
+ * All providers must implement these methods.
+ */
+export interface IStorageService {
+  /**
+   * Upload a file to storage
+   * @param data - File data (Buffer, Blob, or ReadableStream)
+   * @param options - Upload options including type, userId, filename
+   * @returns StoredFile with ID and metadata
+   * @throws StorageError on failure
+   */
+  upload(
+    data: Buffer | Blob | ReadableStream<Uint8Array>,
+    options: UploadOptions
+  ): Promise<StoredFile>;
+
+  /**
+   * Download a file from storage
+   * @param fileId - Unique file identifier
+   * @returns File data as Buffer
+   * @throws StorageError if file not found
+   */
+  download(fileId: string): Promise<Buffer>;
+
+  /**
+   * Get a URL to access the file
+   * @param fileId - Unique file identifier
+   * @param options - URL generation options (expiration, download)
+   * @returns URL string (may be signed for private storage)
+   */
+  getUrl(fileId: string, options?: UrlOptions): Promise<string>;
+
+  /**
+   * Delete a file from storage
+   * @param fileId - Unique file identifier
+   * @throws StorageError if file not found or delete fails
+   */
+  delete(fileId: string): Promise<void>;
+
+  /**
+   * List files matching criteria
+   * @param options - Filter and pagination options
+   * @returns List of files with pagination info
+   */
+  list(options?: ListOptions): Promise<ListResult>;
+
+  /**
+   * Check if a file exists
+   * @param fileId - Unique file identifier
+   * @returns true if file exists
+   */
+  exists(fileId: string): Promise<boolean>;
+
+  /**
+   * Get file metadata without downloading
+   * @param fileId - Unique file identifier
+   * @returns StoredFile metadata
+   * @throws StorageError if file not found
+   */
+  getMetadata(fileId: string): Promise<StoredFile>;
+}

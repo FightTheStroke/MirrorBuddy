@@ -6,39 +6,23 @@
 'use client';
 
 import { logger } from '@/lib/logger';
-import { invalidateCache } from './transport-selector';
+import { invalidateCache } from './transport-cache';
 import {
   calculateAverageLatency,
   isLatencySpike,
 } from './transport-monitor-helpers';
+import type {
+  ConnectionMetrics,
+  DegradationEvent,
+  DegradationCallback,
+} from './transport-types';
 
-/**
- * Connection quality metrics
- */
-export interface ConnectionMetrics {
-  consecutiveFailures: number;
-  totalFailures: number;
-  totalSuccesses: number;
-  lastLatencyMs: number;
-  avgLatencyMs: number;
-  latencySpikes: number;
-  lastUpdated: number;
-}
-
-/**
- * Transport degradation event
- */
-export interface DegradationEvent {
-  reason: 'failures' | 'latency_spike' | 'network_change';
-  currentTransport: 'webrtc' | 'websocket';
-  metrics: ConnectionMetrics;
-  timestamp: number;
-}
-
-/**
- * Callback for degradation events
- */
-export type DegradationCallback = (event: DegradationEvent) => void;
+// Re-export types for backwards compatibility
+export type {
+  ConnectionMetrics,
+  DegradationEvent,
+  DegradationCallback,
+} from './transport-types';
 
 /**
  * Monitor configuration
@@ -307,6 +291,3 @@ export class TransportMonitor {
     // Just log, don't emit degradation (nothing we can do while offline)
   };
 }
-
-// Re-export singleton functions
-export { getTransportMonitor, resetTransportMonitor } from './transport-monitor-singleton';

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Homework Renderer
@@ -15,10 +15,10 @@
  * }
  */
 
-import { motion } from 'framer-motion';
-import { BookOpen, CheckCircle, Circle, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { BaseRendererProps } from './index';
+import { motion } from "framer-motion";
+import { BookOpen, CheckCircle, Circle, Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BaseRendererProps } from "./types";
 
 interface HomeworkTask {
   id: string;
@@ -41,7 +41,7 @@ interface HomeworkData {
 export function HomeworkRenderer({ data, className }: BaseRendererProps) {
   const homeworkData = data as unknown as HomeworkData;
 
-  const title = homeworkData.title || 'Compiti';
+  const title = homeworkData.title || "Compiti";
   const tasks = homeworkData.tasks || [];
   const completedCount = tasks.filter((t) => t.completed).length;
 
@@ -50,8 +50,8 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800',
-        className
+        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800",
+        className,
       )}
     >
       {/* Header */}
@@ -59,18 +59,18 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              'p-2 rounded-lg',
+              "p-2 rounded-lg",
               homeworkData.completed
-                ? 'bg-green-100 dark:bg-green-900/30'
-                : 'bg-amber-100 dark:bg-amber-900/30'
+                ? "bg-green-100 dark:bg-green-900/30"
+                : "bg-amber-100 dark:bg-amber-900/30",
             )}
           >
             <BookOpen
               className={cn(
-                'w-6 h-6',
+                "w-6 h-6",
                 homeworkData.completed
-                  ? 'text-green-600 dark:text-green-400'
-                  : 'text-amber-600 dark:text-amber-400'
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-amber-600 dark:text-amber-400",
               )}
             />
           </div>
@@ -79,7 +79,9 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
               {title}
             </h3>
             {homeworkData.subject && (
-              <span className="text-sm text-slate-500">{homeworkData.subject}</span>
+              <span className="text-sm text-slate-500">
+                {homeworkData.subject}
+              </span>
             )}
           </div>
           <div className="text-sm text-slate-500">
@@ -104,8 +106,8 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
             <div
               key={task.id}
               className={cn(
-                'flex items-start gap-3 p-2 rounded-lg',
-                task.completed && 'bg-green-50 dark:bg-green-900/10'
+                "flex items-start gap-3 p-2 rounded-lg",
+                task.completed && "bg-green-50 dark:bg-green-900/10",
               )}
             >
               {task.completed ? (
@@ -115,10 +117,10 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
               )}
               <span
                 className={cn(
-                  'text-sm',
+                  "text-sm",
                   task.completed
-                    ? 'text-slate-500 line-through'
-                    : 'text-slate-700 dark:text-slate-300'
+                    ? "text-slate-500 line-through"
+                    : "text-slate-700 dark:text-slate-300",
                 )}
               >
                 {task.description}

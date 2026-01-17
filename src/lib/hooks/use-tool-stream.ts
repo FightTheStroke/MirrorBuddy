@@ -7,70 +7,21 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { logger } from '@/lib/logger';
-import type { ToolType } from '@/lib/realtime/tool-events';
 import { processStreamToolEvent } from './use-tool-stream/tool-event-processor';
+import type {
+  StreamToolEvent,
+  ConnectionState,
+  UseToolStreamResult,
+  ActiveToolState,
+} from './use-tool-stream/types';
 
-// Event received from SSE stream
-export interface StreamToolEvent {
-  id: string;
-  type:
-    | 'tool:created'
-    | 'tool:update'
-    | 'tool:complete'
-    | 'tool:error'
-    | 'tool:cancelled';
-  toolType: ToolType;
-  sessionId: string;
-  maestroId: string;
-  timestamp: number;
-  data: {
-    title?: string;
-    subject?: string;
-    chunk?: string;
-    progress?: number;
-    content?: unknown;
-    error?: string;
-  };
-}
-
-// Connection state
-export type ConnectionState =
-  | 'disconnected'
-  | 'connecting'
-  | 'connected'
-  | 'error'
-  | 'reconnecting';
-
-// Hook return type
-export interface UseToolStreamResult {
-  // Connection
-  connectionState: ConnectionState;
-  clientId: string | null;
-  connect: () => void;
-  disconnect: () => void;
-
-  // Active tool state
-  activeTool: ActiveToolState | null;
-  toolHistory: StreamToolEvent[];
-
-  // Stats
-  eventsReceived: number;
-}
-
-// Active tool being built
-export interface ActiveToolState {
-  id: string;
-  type: ToolType;
-  maestroId: string;
-  title: string;
-  subject?: string;
-  progress: number;
-  chunks: string[];
-  content: unknown;
-  status: 'building' | 'completed' | 'error' | 'cancelled';
-  startedAt: number;
-  errorMessage?: string;
-}
+// Re-export types for backwards compatibility
+export type {
+  StreamToolEvent,
+  ConnectionState,
+  UseToolStreamResult,
+  ActiveToolState,
+} from './use-tool-stream/types';
 
 interface UseToolStreamOptions {
   sessionId: string;

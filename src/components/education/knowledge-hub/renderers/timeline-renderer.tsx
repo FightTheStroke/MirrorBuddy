@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Timeline Renderer
@@ -12,10 +12,10 @@
  * }
  */
 
-import { motion } from 'framer-motion';
-import { Clock, Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { BaseRendererProps } from './index';
+import { motion } from "framer-motion";
+import { Clock, Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BaseRendererProps } from "./types";
 
 interface TimelineEvent {
   id: string;
@@ -36,12 +36,12 @@ interface TimelineData {
 export function TimelineRenderer({ data, className }: BaseRendererProps) {
   const timelineData = data as unknown as TimelineData;
 
-  const title = timelineData.title || 'Linea del Tempo';
+  const title = timelineData.title || "Linea del Tempo";
   const events = timelineData.events || [];
 
   if (events.length === 0) {
     return (
-      <div className={cn('p-4 text-center text-slate-500', className)}>
+      <div className={cn("p-4 text-center text-slate-500", className)}>
         Nessun evento disponibile
       </div>
     );
@@ -51,7 +51,7 @@ export function TimelineRenderer({ data, className }: BaseRendererProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className={cn('space-y-4', className)}
+      className={cn("space-y-4", className)}
     >
       <div className="flex items-center gap-2">
         <Clock className="w-5 h-5 text-accent-themed" />

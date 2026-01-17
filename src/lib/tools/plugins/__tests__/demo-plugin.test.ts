@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { demoPlugin } from '../demo-plugin';
-import { ToolCategory, Permission } from '../../plugin/types';
+import { ToolCategory, Permission, type VoicePromptConfig } from '../../plugin/types';
 
 // Extract schema for testing
 const DemoInputSchema = z.object({
@@ -48,13 +48,15 @@ describe('demo-plugin', () => {
     });
 
     it('has voice prompt with topic placeholder', () => {
-      expect(demoPlugin.voicePrompt?.template).toContain('{topic}');
-      expect(demoPlugin.voicePrompt?.requiresContext).toContain('topic');
+      const voicePrompt = demoPlugin.voicePrompt as VoicePromptConfig;
+      expect(voicePrompt.template).toContain('{topic}');
+      expect(voicePrompt.requiresContext).toContain('topic');
     });
 
     it('has voice feedback configuration', () => {
-      expect(demoPlugin.voiceFeedback?.template).toContain('{topic}');
-      expect(demoPlugin.voiceFeedback?.fallback).toBeDefined();
+      const voiceFeedback = demoPlugin.voiceFeedback as VoicePromptConfig;
+      expect(voiceFeedback.template).toContain('{topic}');
+      expect(voiceFeedback.fallback).toBeDefined();
     });
 
     it('has no prerequisites', () => {

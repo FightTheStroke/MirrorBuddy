@@ -6,8 +6,7 @@
 'use client';
 
 import { logger } from '@/lib/logger';
-import type { ProbeResults } from './transport-probe';
-import type { TransportSelection } from './transport-selector';
+import type { ProbeResults, TransportSelection } from './transport-types';
 
 /**
  * Cache configuration

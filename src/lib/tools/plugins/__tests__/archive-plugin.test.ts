@@ -5,7 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import { archivePlugin } from '../archive-plugin';
-import { ToolCategory, Permission } from '../../plugin/types';
+import { ToolCategory, Permission, type VoicePromptConfig } from '../../plugin/types';
 
 // Extract schema for testing
 const ArchivePluginSchema = z.object({
@@ -47,13 +47,15 @@ describe('archive-plugin', () => {
     });
 
     it('has voice prompt configuration', () => {
-      expect(archivePlugin.voicePrompt?.template).toContain('archivio personale');
-      expect(archivePlugin.voicePrompt?.fallback).toBeDefined();
+      const voicePrompt = archivePlugin.voicePrompt as VoicePromptConfig;
+      expect(voicePrompt.template).toContain('archivio personale');
+      expect(voicePrompt.fallback).toBeDefined();
     });
 
     it('has voice feedback configuration', () => {
-      expect(archivePlugin.voiceFeedback?.template).toContain('materiali');
-      expect(archivePlugin.voiceFeedback?.requiresContext).toContain('resultCount');
+      const voiceFeedback = archivePlugin.voiceFeedback as VoicePromptConfig;
+      expect(voiceFeedback.template).toContain('materiali');
+      expect(voiceFeedback.requiresContext).toContain('resultCount');
     });
 
     it('has no prerequisites', () => {

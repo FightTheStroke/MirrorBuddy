@@ -30,14 +30,15 @@ describe('scheduler-helpers', () => {
       expect(result.streakWarningTime).toBe('09:00');
     });
 
-    it('preserves additional fields', () => {
+    it('extracts only known preference fields', () => {
       const data = {
         enabledNotifications: true,
-        customField: 'value',
+        quietHoursStart: '23:00',
       };
       const result = extractPreferencesData(data);
 
-      expect(result.customField).toBe('value');
+      expect(result.enabledNotifications).toBe(true);
+      expect(result.quietHoursStart).toBe('23:00');
     });
 
     it('handles undefined fields', () => {

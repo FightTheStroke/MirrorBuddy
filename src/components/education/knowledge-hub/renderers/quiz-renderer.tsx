@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Quiz Renderer
@@ -11,13 +11,13 @@
  * 2. Tool format (Study Kit): { topic, questions: [{question, options: string[], correctIndex}] }
  */
 
-import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { CheckCircle, XCircle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { BaseRendererProps } from './index';
+import { useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { CheckCircle, XCircle } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { BaseRendererProps } from "./types";
 
 interface QuizOption {
   id: string;
@@ -65,7 +65,10 @@ function normalizeQuizData(data: unknown): QuizData {
     const firstQuestion = questions[0] as Record<string, unknown>;
 
     // Tool format: options is string[] with correctIndex
-    if (Array.isArray(firstQuestion.options) && typeof firstQuestion.options[0] === 'string') {
+    if (
+      Array.isArray(firstQuestion.options) &&
+      typeof firstQuestion.options[0] === "string"
+    ) {
       const toolData = rawData as unknown as ToolQuizData;
       return {
         title: toolData.title || toolData.topic,
@@ -93,14 +96,16 @@ function normalizeQuizData(data: unknown): QuizData {
 export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
   // Normalize data from either format
   const quizData = useMemo(() => normalizeQuizData(data), [data]);
-  const [showAnswers, setShowAnswers] = useState(quizData.showAnswers ?? readOnly ?? false);
+  const [showAnswers, setShowAnswers] = useState(
+    quizData.showAnswers ?? readOnly ?? false,
+  );
 
   const questions = quizData.questions || [];
-  const title = quizData.title || quizData.topic || 'Quiz';
+  const title = quizData.title || quizData.topic || "Quiz";
 
   if (questions.length === 0) {
     return (
-      <div className={cn('p-4 text-center text-slate-500', className)}>
+      <div className={cn("p-4 text-center text-slate-500", className)}>
         Nessuna domanda disponibile
       </div>
     );
@@ -118,7 +123,7 @@ export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
             size="sm"
             onClick={() => setShowAnswers(!showAnswers)}
           >
-            {showAnswers ? 'Nascondi risposte' : 'Mostra risposte'}
+            {showAnswers ? "Nascondi risposte" : "Mostra risposte"}
           </Button>
         </div>
 
@@ -138,10 +143,14 @@ export function QuizRenderer({ data, className, readOnly }: BaseRendererProps) {
                   <div
                     key={opt.id || `option-${qIndex}-${optIndex}`}
                     className={cn(
-                      'w-full p-4 rounded-xl border-2 transition-all',
-                      showAnswers && opt.isCorrect && 'border-green-500 bg-green-50 dark:bg-green-900/20',
-                      showAnswers && !opt.isCorrect && 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50',
-                      !showAnswers && 'border-slate-200 dark:border-slate-700'
+                      "w-full p-4 rounded-xl border-2 transition-all",
+                      showAnswers &&
+                        opt.isCorrect &&
+                        "border-green-500 bg-green-50 dark:bg-green-900/20",
+                      showAnswers &&
+                        !opt.isCorrect &&
+                        "border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50",
+                      !showAnswers && "border-slate-200 dark:border-slate-700",
                     )}
                   >
                     <div className="flex items-center justify-between">

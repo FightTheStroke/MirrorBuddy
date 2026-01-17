@@ -49,7 +49,7 @@ describe('profile-generator-utils', () => {
       content: 'Test observation',
       isStrength,
       confidence: 0.8,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
       sessionId: 'test-session',
     });
 

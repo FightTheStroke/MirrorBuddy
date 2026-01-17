@@ -4,16 +4,16 @@
  * Extracted from transparency-service.ts
  */
 
-import type {
-  ConfidenceAssessment,
-  ConfidenceFactor,
-  ConfidenceLevel,
-  HallucinationIndicator,
-  HallucinationRisk,
-  SourceCitation,
+import {
   TRANSPARENCY_LABELS,
+  type ConfidenceAssessment,
+  type ConfidenceFactor,
+  type ConfidenceLevel,
+  type HallucinationIndicator,
+  type HallucinationRisk,
+  type SourceCitation,
+  type TransparencyContext,
 } from './types';
-import type { TransparencyContext } from './transparency-service';
 
 /**
  * Map source type strings to citation reference types
