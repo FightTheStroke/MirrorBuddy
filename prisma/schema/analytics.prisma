@@ -4,22 +4,22 @@
 // ============================================================================
 
 model TelemetryEvent {
-  id          String   @id @default(cuid())
-  eventId     String   @unique
+  id      String @id @default(cuid())
+  eventId String @unique
 
   // Event data
-  timestamp   DateTime
-  category    String
-  action      String
-  label       String?
-  value       Float?
-  metadata    String?
+  timestamp DateTime
+  category  String
+  action    String
+  label     String?
+  value     Float?
+  metadata  String?
 
   // Session & user tracking
-  sessionId   String
-  userId      String?
+  sessionId String
+  userId    String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([sessionId])
@@ -44,15 +44,15 @@ model RateLimitEvent {
 }
 
 model SafetyEvent {
-  id              String    @id @default(cuid())
-  userId          String?
-  type            String
-  severity        String
-  conversationId  String?
-  resolvedBy      String?
-  resolvedAt      DateTime?
-  resolution      String?
-  timestamp       DateTime  @default(now())
+  id             String    @id @default(cuid())
+  userId         String?
+  type           String
+  severity       String
+  conversationId String?
+  resolvedBy     String?
+  resolvedAt     DateTime?
+  resolution     String?
+  timestamp      DateTime  @default(now())
 
   @@index([userId, timestamp])
   @@index([severity, timestamp])

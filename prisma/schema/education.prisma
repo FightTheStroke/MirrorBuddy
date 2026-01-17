@@ -4,27 +4,27 @@
 // ============================================================================
 
 model FlashcardProgress {
-  id             String    @id @default(cuid())
-  userId         String
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  cardId         String
-  deckId         String?
+  cardId String
+  deckId String?
 
   // FSRS Algorithm State
-  difficulty     Float     @default(0.0)
-  stability      Float     @default(0.0)
-  retrievability Float     @default(1.0)
-  state          String    @default("new")
+  difficulty     Float  @default(0.0)
+  stability      Float  @default(0.0)
+  retrievability Float  @default(1.0)
+  state          String @default("new")
 
   // Review tracking
-  reps           Int       @default(0)
-  lapses         Int       @default(0)
-  lastReview     DateTime?
-  nextReview     DateTime?
+  reps       Int       @default(0)
+  lapses     Int       @default(0)
+  lastReview DateTime?
+  nextReview DateTime?
 
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, cardId])
   @@index([userId])
@@ -33,9 +33,9 @@ model FlashcardProgress {
 }
 
 model QuizResult {
-  id             String   @id @default(cuid())
-  userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   quizId         String
   subject        String?
@@ -47,34 +47,34 @@ model QuizResult {
   source         String?
 
   // Detailed answers as JSON
-  answers        String   @default("[]")
+  answers String @default("[]")
 
-  completedAt    DateTime @default(now())
+  completedAt DateTime @default(now())
 
   @@index([userId])
   @@index([completedAt])
 }
 
 model Learning {
-  id          String   @id @default(cuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Context
-  maestroId   String?
-  subject     String?
+  maestroId String?
+  subject   String?
 
   // The learning itself
-  category    String
-  insight     String
+  category String
+  insight  String
 
   // Confidence tracking
-  confidence  Float    @default(0.5)
-  occurrences Int      @default(1)
+  confidence  Float @default(0.5)
+  occurrences Int   @default(1)
 
   // Timestamps
-  createdAt   DateTime @default(now())
-  lastSeen    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  lastSeen  DateTime @updatedAt
 
   @@index([userId])
   @@index([category])
@@ -82,34 +82,34 @@ model Learning {
 }
 
 model StudySession {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  maestroId   String
-  subject     String
-  startedAt   DateTime  @default(now())
-  endedAt     DateTime?
-  duration    Int?
-  xpEarned    Int       @default(0)
-  questions   Int       @default(0)
+  maestroId String
+  subject   String
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  duration  Int?
+  xpEarned  Int       @default(0)
+  questions Int       @default(0)
 
   // Student self-evaluation (1-5 stars)
-  studentRating    Int?
-  studentFeedback  String?
+  studentRating   Int?
+  studentFeedback String?
 
   // AI Maestro evaluation (1-10 score)
-  maestroScore     Int?
-  maestroFeedback  String?
-  strengths        String?
-  areasToImprove   String?
+  maestroScore    Int?
+  maestroFeedback String?
+  strengths       String?
+  areasToImprove  String?
 
   // Session context
-  topics           String    @default("[]")
-  conversationId   String?
+  topics         String  @default("[]")
+  conversationId String?
 
   // Tools created during session
-  materials        Material[]
+  materials Material[]
 
   @@index([userId])
   @@index([maestroId])
@@ -118,8 +118,8 @@ model StudySession {
 }
 
 model MethodProgress {
-  id        String @id @default(cuid())
-  userId    String @unique
+  id     String @id @default(cuid())
+  userId String @unique
 
   // Skill progress (JSON stored)
   mindMaps       String @default("{}")

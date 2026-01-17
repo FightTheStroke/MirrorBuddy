@@ -4,67 +4,67 @@
 // ============================================================================
 
 model StudentInsightProfile {
-  id           String    @id @default(cuid())
-  userId       String    @unique
-  studentName  String
+  id          String @id @default(cuid())
+  userId      String @unique
+  studentName String
 
   // Access control (GDPR)
-  visibleTo    String    @default("parents")
+  visibleTo String @default("parents")
 
   // Consent tracking
-  parentConsent   Boolean  @default(false)
-  studentConsent  Boolean  @default(false)
-  consentDate     DateTime?
+  parentConsent     Boolean   @default(false)
+  studentConsent    Boolean   @default(false)
+  consentDate       DateTime?
   deletionRequested DateTime?
 
   // Synthesized profile data as JSON
-  insights     String    @default("[]")
-  strengths    String    @default("[]")
-  growthAreas  String    @default("[]")
-  learningStyle String   @default("{}")
-  strategies   String    @default("[]")
+  insights      String @default("[]")
+  strengths     String @default("[]")
+  growthAreas   String @default("[]")
+  learningStyle String @default("{}")
+  strategies    String @default("[]")
 
   // Historical snapshots
-  progressHistory String  @default("[]")
+  progressHistory String @default("[]")
 
   // Metadata
-  sessionCount  Int       @default(0)
-  lastSessionId String?
+  sessionCount    Int     @default(0)
+  lastSessionId   String?
   confidenceScore Float   @default(0.0)
 
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Access log for GDPR audit
-  accessLogs   ProfileAccessLog[]
+  accessLogs ProfileAccessLog[]
 
   @@index([userId])
 }
 
 model ProfileAccessLog {
-  id         String   @id @default(cuid())
-  profileId  String
-  profile    StudentInsightProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id        String                @id @default(cuid())
+  profileId String
+  profile   StudentInsightProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
-  userId     String
-  action     String
-  details    String?
-  ipAddress  String?
-  userAgent  String?
+  userId    String
+  action    String
+  details   String?
+  ipAddress String?
+  userAgent String?
 
-  timestamp  DateTime @default(now())
+  timestamp DateTime @default(now())
 
   @@index([profileId])
   @@index([timestamp])
 }
 
 model ParentNote {
-  id          String    @id @default(cuid())
-  userId      String
-  sessionId   String
-  maestroId   String
-  subject     String
-  duration    Int
+  id        String @id @default(cuid())
+  userId    String
+  sessionId String
+  maestroId String
+  subject   String
+  duration  Int
 
   // Content
   summary     String
@@ -82,22 +82,22 @@ model ParentNote {
 }
 
 model HomeworkSession {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Session data
   subject     String?
   topic       String?
   problemType String?
-  status      String   @default("active")
+  status      String  @default("active")
 
   // Messages and steps (JSON arrays)
   messages String @default("[]")
   steps    String @default("[]")
 
   // Timing
-  startedAt   DateTime @default(now())
+  startedAt   DateTime  @default(now())
   completedAt DateTime?
 
   createdAt DateTime @default(now())

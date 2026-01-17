@@ -1,33 +1,38 @@
-import { defineConfig } from 'vitest/config';
-import path from 'path';
+import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'src/**/*.spec.ts'],
-    exclude: ['node_modules', 'e2e/**'],
-    setupFiles: ['./src/test/setup.ts'],
+    environment: "node",
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.spec.ts"],
+    exclude: ["node_modules", "e2e/**"],
+    setupFiles: ["./src/test/setup.ts"],
+    // Retry flaky tests on CI (F-07)
+    retry: process.env.CI ? 2 : 0,
+    // JSON reporter for flaky test tracking
+    reporters: process.env.CI ? ["default", "json"] : ["default"],
+    outputFile: process.env.CI ? "./coverage/test-results.json" : undefined,
     coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-      reportsDirectory: './coverage',
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      reportsDirectory: "./coverage",
       include: [
-        'src/lib/education/**/*.ts',
-        'src/lib/ai/**/*.ts',
-        'src/lib/safety/**/*.ts',
-        'src/lib/tools/**/*.ts',
-        'src/lib/profile/**/*.ts',
-        'src/lib/pdf-generator/**/*.ts',
+        "src/lib/education/**/*.ts",
+        "src/lib/ai/**/*.ts",
+        "src/lib/safety/**/*.ts",
+        "src/lib/tools/**/*.ts",
+        "src/lib/profile/**/*.ts",
+        "src/lib/pdf-generator/**/*.ts",
       ],
       exclude: [
-        'node_modules/',
-        'e2e/',
-        '**/*.config.*',
-        '**/*.d.ts',
-        'src/types/**',
-        '**/*.test.ts',
-        '**/*.spec.ts',
+        "node_modules/",
+        "e2e/",
+        "**/*.config.*",
+        "**/*.d.ts",
+        "src/types/**",
+        "**/*.test.ts",
+        "**/*.spec.ts",
       ],
       thresholds: {
         global: {
@@ -41,7 +46,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });
