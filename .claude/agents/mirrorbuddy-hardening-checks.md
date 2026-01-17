@@ -2,7 +2,7 @@
 name: mirrorbuddy-hardening-checks
 description: Production hardening validation for MirrorBuddy releases. Used by app-release-manager.
 tools: ["Read", "Grep", "Glob", "Bash", "Task"]
-model: sonnet
+model: opus-4.5
 ---
 
 # Hardening Checks - MirrorBuddy
@@ -70,6 +70,12 @@ await expect(page.locator('.mindmap-node')).toHaveCount.greaterThan(1);
 ---
 
 ## Additional Hardening Checks
+
+### Release Gate (10/10)
+```bash
+# Single command, all P0 checks (no warnings allowed)
+npm run release:gate
+```
 
 ### File Size Validation
 ```bash

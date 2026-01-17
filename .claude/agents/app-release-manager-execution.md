@@ -1,7 +1,7 @@
 ---
 name: app-release-manager-execution
 description: Execution phases (3-5) for app-release-manager. Reference module.
-model: opus
+model: opus-4.5
 ---
 
 # RELEASE MANAGER - Execution Phases
@@ -80,6 +80,21 @@ grep "lastUpdated" src/data/app-knowledge-base.ts
 - [ ] Flashcard review with FSRS works
 - [ ] Knowledge Hub search finds materials
 - [ ] Collection and tag organization works
+
+---
+
+## PHASE 3.5: RELEASE SCORECARD (P0)
+
+**No proof = BLOCKED.** Store evidence in `docs/releases/<version>/` or equivalent.
+
+- [ ] `npm run release:gate` full log captured
+- [ ] Coverage report saved (`coverage/index.html` or `coverage/coverage-summary.json`)
+- [ ] Playwright report saved (`playwright-report/index.html`)
+- [ ] Perf check output saved (from `./scripts/perf-check.sh`)
+- [ ] Manual QA screenshots for key flows (mindmap, quiz, flashcards, knowledge hub)
+- [ ] Security audit output saved (`npm audit --audit-level=high`)
+
+If any artifact is missing, release is blocked.
 
 ---
 
