@@ -131,7 +131,8 @@ jobs:
       - name: Check for forbidden TODOs in critical areas
         run: |
           # Block TODOs in privacy/security/safety (critical paths)
-          CRITICAL=$(find src/lib/privacy src/lib/safety src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -n "TODO\|FIXME" {} + 2>/dev/null || true)
+          # Use word boundaries to avoid matching words like "METODO" (Italian for "method")
+          CRITICAL=$(find src/lib/privacy src/lib/safety src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -nE '\bTODO\b|\bFIXME\b' {} + 2>/dev/null || true)
           if [ -n "$CRITICAL" ]; then
             echo "BLOCKING: TODOs found in critical areas:"
             echo "$CRITICAL"
