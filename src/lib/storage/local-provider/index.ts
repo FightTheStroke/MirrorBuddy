@@ -10,8 +10,6 @@
 
 import type {
   IStorageService,
-} from '../storage-service';
-import type {
   StoredFile,
   UploadOptions,
   UrlOptions,

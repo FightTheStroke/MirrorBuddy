@@ -8,26 +8,10 @@
 import { logger } from '@/lib/logger';
 import { probeWebRTC } from './webrtc-probe';
 import { probeWebSocket } from './websocket-probe';
+import type { ProbeResult, ProbeResults } from './transport-types';
 
-/**
- * Result of a single transport probe
- */
-export interface ProbeResult {
-  transport: 'webrtc' | 'websocket';
-  success: boolean;
-  latencyMs: number;
-  error?: string;
-  timestamp: number;
-}
-
-/**
- * Combined results from both probes
- */
-export interface ProbeResults {
-  webrtc: ProbeResult;
-  websocket: ProbeResult;
-  recommendedTransport: 'webrtc' | 'websocket';
-}
+// Re-export types for backwards compatibility
+export type { ProbeResult, ProbeResults } from './transport-types';
 
 // ============================================================================
 // F-03: Probe Orchestration & Latency Measurement

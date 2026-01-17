@@ -7,16 +7,16 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { TransportMonitor } from '../transport-monitor';
 import {
-  TransportMonitor,
-  resetTransportMonitor,
   getTransportMonitor,
-} from '../transport-monitor';
+  resetTransportMonitor,
+} from '../transport-monitor-singleton';
+import { TransportSwitcher } from '../transport-switcher';
 import {
-  TransportSwitcher,
-  resetTransportSwitcher,
   getTransportSwitcher,
-} from '../transport-switcher';
+  resetTransportSwitcher,
+} from '../transport-switcher-singleton';
 import {
   selectBestTransport,
   invalidateCache,

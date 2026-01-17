@@ -1,4 +1,4 @@
-import type { VoiceToolDefinition } from '../voice-tool-commands';
+import type { VoiceToolDefinition } from '../voice-tool-commands/types';
 
 export const ONBOARDING_TOOLS: VoiceToolDefinition[] = [
   {

@@ -1,6 +1,6 @@
 import { logger } from '@/lib/logger';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import type { VoiceToolCallResult } from '../voice-tool-commands';
+import type { VoiceToolCallResult } from '../voice-tool-commands/types';
 import type {
   SetStudentNameArgs,
   SetStudentAgeArgs,

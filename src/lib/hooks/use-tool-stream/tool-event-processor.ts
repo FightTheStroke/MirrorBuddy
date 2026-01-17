@@ -5,7 +5,7 @@
 
 'use client';
 
-import type { StreamToolEvent, ActiveToolState } from '../use-tool-stream';
+import type { StreamToolEvent, ActiveToolState } from './types';
 
 /**
  * Process a tool event and return updated active tool state

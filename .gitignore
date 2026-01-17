@@ -78,3 +78,6 @@ __pycache__/
 # Claude process artifacts
 .verification/
 @docs/
+
+# Local audit notes
+fallo17.md

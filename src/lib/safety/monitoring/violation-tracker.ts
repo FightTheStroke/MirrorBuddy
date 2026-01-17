@@ -1,5 +1,5 @@
 import type { SafetyEvent } from './types';
-import { logSafetyEvent } from './logging';
+import { emitLogEvent } from './violation-callback';
 
 const userViolationCounts: Map<string, { count: number; lastEvent: Date }> = new Map();
 const VIOLATION_THRESHOLD = 3;
@@ -17,7 +17,7 @@ export function checkViolationPattern(userId: string, event: SafetyEvent): void 
       existing.lastEvent = new Date();
 
       if (existing.count >= VIOLATION_THRESHOLD) {
-        logSafetyEvent('repeated_violation', 'alert', {
+        emitLogEvent('repeated_violation', 'alert', {
           userId: event.userId,
           sessionId: event.sessionId,
           context: {

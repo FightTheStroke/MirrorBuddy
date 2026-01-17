@@ -11,7 +11,7 @@ import {
   type SaveToolParams,
   type SavedTool,
   type GetToolsFilter,
-} from './tool-persistence-utils';
+} from './tool-persistence-types';
 
 /**
  * Save a tool to the database (using Material table)

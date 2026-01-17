@@ -2,7 +2,7 @@
  * Notification Store Helper Functions
  */
 
-import type { NotificationType, Notification, NotificationPreferences } from './notification-store';
+import type { NotificationType, Notification, NotificationPreferences } from './notification-types';
 
 /**
  * Helper: Check if notification type is enabled

@@ -7,10 +7,9 @@
 
 import { logger } from '@/lib/logger';
 import type { SafetyEvent, SafetyEventType, EventSeverity } from './types';
-import { anonymizeId } from './utils';
+import { anonymizeId, isViolationType, generateEventId } from './utils';
 import { checkViolationPattern } from './violation-tracker';
-import { isViolationType } from './utils';
-import { generateEventId } from './utils';
+import { registerLogCallback } from './violation-callback';
 
 const eventBuffer: SafetyEvent[] = [];
 const MAX_BUFFER_SIZE = 1000;
@@ -83,3 +82,7 @@ export function logSafetyEvent(
 }
 
 export { eventBuffer };
+
+// Register callback for violation-tracker to emit log events
+// This breaks the circular dependency
+registerLogCallback(logSafetyEvent);

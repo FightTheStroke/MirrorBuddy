@@ -9,38 +9,18 @@ import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 import { indexToolOutput } from './tool-rag-indexer';
+import type {
+  ToolOutputData,
+  SaveToolOutputOptions,
+  StoredToolOutput,
+} from './tool-output-types';
 
-/**
- * Tool output data structure for storage
- */
-export interface ToolOutputData {
-  conversationId: string;
-  toolType: ToolType;
-  toolId?: string; // Reference to Material if persisted
-  data: Record<string, unknown>; // Tool-specific output data
-}
-
-/**
- * Options for saving tool outputs
- */
-export interface SaveToolOutputOptions {
-  /** Enable RAG indexing for semantic search (default: true) */
-  enableRAG?: boolean;
-  /** User ID for RAG indexing (required if enableRAG is true) */
-  userId?: string;
-}
-
-/**
- * Stored tool output with metadata
- */
-export interface StoredToolOutput {
-  id: string;
-  conversationId: string;
-  toolType: string;
-  toolId: string | null;
-  data: Record<string, unknown>;
-  createdAt: Date;
-}
+// Re-export types for backwards compatibility
+export type {
+  ToolOutputData,
+  SaveToolOutputOptions,
+  StoredToolOutput,
+} from './tool-output-types';
 
 /**
  * Save a tool output to the database

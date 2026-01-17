@@ -3,10 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Wifi, WifiOff, Radio, Globe, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import {
-  getTransportSwitcher,
-  TransportSwitchRequest,
-} from '@/lib/hooks/voice-session/transport-switcher';
+import { getTransportSwitcher } from '@/lib/hooks/voice-session/transport-switcher-singleton';
+import type { TransportSwitchRequest } from '@/lib/hooks/voice-session/transport-switcher';
 import {
   getTransportDisplayName,
   getConfidenceDescription,

@@ -157,3 +157,27 @@ export const TRANSPARENCY_LABELS = {
     high: 'Attenzione: questa risposta potrebbe non essere accurata. Ti consiglio di verificare con altre fonti.',
   },
 } as const;
+
+/**
+ * Context for transparency assessment
+ * (Extracted to break circular dependency)
+ */
+export interface TransparencyContext {
+  /** The AI response to assess */
+  response: string;
+  /** The user's original query */
+  query: string;
+  /** RAG retrieval results (if any) */
+  ragResults?: Array<{
+    content: string;
+    similarity: number;
+    sourceId?: string;
+    sourceType?: string;
+  }>;
+  /** Whether maestro knowledge was used */
+  usedKnowledgeBase: boolean;
+  /** Maestro ID (for knowledge attribution) */
+  maestroId?: string;
+  /** Whether response was streamed */
+  isStreamed?: boolean;
+}

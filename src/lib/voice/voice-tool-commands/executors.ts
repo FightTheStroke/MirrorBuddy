@@ -8,7 +8,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { executeOnboardingTool } from '../onboarding-tools';
+import { executeOnboardingTool } from '../onboarding-tools/tool-handlers';
 import {
   isMindmapModificationCommand,
   isSummaryModificationCommand,

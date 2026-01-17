@@ -12,7 +12,7 @@
  */
 
 import type { ToolType } from "@/types/tools";
-import type { RendererComponent } from "./types";
+import type { BaseRendererProps, RendererComponent } from "./types";
 
 // Re-export types from types.ts to maintain API compatibility
 export type { BaseRendererProps, RendererComponent } from "./types";
