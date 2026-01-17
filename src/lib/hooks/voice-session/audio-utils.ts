@@ -3,6 +3,32 @@
 // Base64, PCM16, Float32 conversion and resampling
 // ============================================================================
 
+// Simple typed array pool for common sizes (reduces GC pressure)
+// Note: Arrays passed to WebAudio API cannot be pooled (API takes ownership)
+const float32Pool: Map<number, Float32Array[]> = new Map();
+const MAX_POOL_SIZE = 4;
+
+function getFloat32FromPool(size: number): Float32Array {
+  const pool = float32Pool.get(size);
+  if (pool && pool.length > 0) {
+    return pool.pop()!;
+  }
+  return new Float32Array(size);
+}
+
+/** Return a Float32Array to pool for reuse (only if not passed to WebAudio) */
+export function returnFloat32ToPool(array: Float32Array): void {
+  const size = array.length;
+  let pool = float32Pool.get(size);
+  if (!pool) {
+    pool = [];
+    float32Pool.set(size, pool);
+  }
+  if (pool.length < MAX_POOL_SIZE) {
+    pool.push(array);
+  }
+}
+
 /**
  * Convert base64-encoded PCM16 to Int16Array
  */
@@ -52,13 +78,14 @@ export function int16ToFloat32(int16Array: Int16Array): Float32Array {
 
 /**
  * Resample audio from one sample rate to another using linear interpolation
+ * Uses pool for output array when possible (common resampling sizes)
  */
 export function resample(inputData: Float32Array, fromRate: number, toRate: number): Float32Array {
   if (fromRate === toRate) return inputData;
 
   const ratio = fromRate / toRate;
   const outputLength = Math.floor(inputData.length / ratio);
-  const output = new Float32Array(outputLength);
+  const output = getFloat32FromPool(outputLength);
 
   for (let i = 0; i < outputLength; i++) {
     const srcIndex = i * ratio;

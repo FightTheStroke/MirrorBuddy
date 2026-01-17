@@ -13,6 +13,7 @@ import {
   MIN_BUFFER_CHUNKS,
   SCHEDULE_AHEAD_TIME,
   CHUNK_GAP_TOLERANCE,
+  MAX_SCHEDULE_LOOKAHEAD,
 } from './constants';
 import type { AudioPlaybackRefs, PollingControls } from './audio-playback-types';
 import {
@@ -21,7 +22,7 @@ import {
   createPlaybackAnalyser,
   createAndConnectGainNode,
 } from './audio-context-init';
-import { calculateAverageLevel, shouldUpdateLevel } from './audio-polling-helpers';
+import { calculateAverageLevel, shouldUpdateLevel, shouldUpdateLevelByDelta } from './audio-polling-helpers';
 
 export type { AudioPlaybackRefs, PollingControls };
 
@@ -98,17 +99,24 @@ export function useScheduleQueuedChunks(refs: AudioPlaybackRefs, setSpeaking: (v
         refs.nextPlayTimeRef.current = currentTime + SCHEDULE_AHEAD_TIME;
       }
 
+      // Don't schedule more than MAX_SCHEDULE_LOOKAHEAD (500ms) ahead
+      // Prevents memory buildup and allows responsive interruption
+      if (refs.nextPlayTimeRef.current > currentTime + MAX_SCHEDULE_LOOKAHEAD) {
+        // Put chunk back in queue and wait for next scheduling cycle
+        refs.audioQueueRef.current.unshift(audioData);
+        break;
+      }
+
       try {
         source.start(refs.nextPlayTimeRef.current);
-        refs.scheduledSourcesRef.current.push(source);
+        refs.scheduledSourcesRef.current.add(source);
 
-        // Clean up finished sources to prevent memory leak
+        // Clean up finished sources to prevent memory leak (O(1) with Set)
         source.onended = () => {
-          const idx = refs.scheduledSourcesRef.current.indexOf(source);
-          if (idx > -1) refs.scheduledSourcesRef.current.splice(idx, 1);
+          refs.scheduledSourcesRef.current.delete(source);
 
           // Check if all playback is done
-          if (refs.scheduledSourcesRef.current.length === 0 && refs.audioQueueRef.current.length === 0) {
+          if (refs.scheduledSourcesRef.current.size === 0 && refs.audioQueueRef.current.length === 0) {
             refs.isPlayingRef.current = false;
             refs.isBufferingRef.current = true; // Reset to buffering for next response
             setSpeaking(false);
@@ -140,7 +148,7 @@ export function usePlayNextChunk(
 
     if (!ctx || refs.audioQueueRef.current.length === 0) {
       // Check if there are still scheduled sources playing
-      if (refs.scheduledSourcesRef.current.length === 0) {
+      if (refs.scheduledSourcesRef.current.size === 0) {
         // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
         refs.isPlayingRef.current = false;
         setSpeaking(false);
@@ -183,12 +191,14 @@ export function useOutputLevelPolling(
   const _dataArrayRef = useRef<Uint8Array<ArrayBuffer> | null>(null);
   const pollLevelRef = useRef<(() => void) | null>(null);
   const lastUpdateRef = useRef<number>(0);
+  const lastLevelRef = useRef<number>(0);
 
   const pollLevel = useCallback(() => {
     const analyser = playbackAnalyserRef.current;
 
     if (!analyser || !isPlayingRef.current) {
       setOutputLevel(0);
+      lastLevelRef.current = 0;
       animationFrameRef.current = null;
       return;
     }
@@ -201,9 +211,11 @@ export function useOutputLevelPolling(
       return;
     }
 
-    // Calculate and set output level
+    // Calculate level and only update if delta > 5%
     const level = calculateAverageLevel(analyser);
-    setOutputLevel(level);
+    if (shouldUpdateLevelByDelta(level, lastLevelRef)) {
+      setOutputLevel(level);
+    }
 
     // Continue polling
     animationFrameRef.current = requestAnimationFrame(() => {

@@ -1,12 +1,13 @@
 /**
  * Similarity Search API - Wave 4
  * Find materials similar to a given material using vector similarity
+ * Uses pgvector O(log n) HNSW index when available (T4-05 optimization)
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAuth } from "@/lib/auth/session-auth";
-import { cosineSimilarity } from "@/lib/rag/embedding-service";
+import { searchSimilar } from "@/lib/rag/vector-store";
 import { logger } from "@/lib/logger";
 
 async function getUserId(): Promise<string | null> {
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Find source material
+    // Find source material with its embedding
     const sourceMaterial = await prisma.material.findUnique({
       where: { toolId },
       select: { id: true },
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // Get source embedding
+    // Get source embedding vector
     const sourceEmbedding = await prisma.contentEmbedding.findFirst({
       where: {
         sourceType: "material",
@@ -70,7 +71,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ similar: [] });
     }
 
-    // Parse source vector
     let sourceVector: number[];
     try {
       sourceVector = JSON.parse(sourceEmbedding.vector);
@@ -78,45 +78,28 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ similar: [] });
     }
 
-    // Get all material embeddings for this user (excluding source)
-    const embeddings = await prisma.contentEmbedding.findMany({
-      where: {
-        userId,
-        sourceType: "material",
-        NOT: { sourceId: sourceMaterial.id },
-      },
-      select: {
-        sourceId: true,
-        vector: true,
-      },
+    // Use optimized searchSimilar (pgvector when available)
+    const searchResults = await searchSimilar({
+      userId,
+      vector: sourceVector,
+      limit: limit + 1,
+      minSimilarity: 0.3,
+      sourceType: "material",
     });
 
-    // Calculate similarities
-    const similarities: Array<{ sourceId: string; similarity: number }> = [];
+    // Filter out the source material itself
+    const filtered = searchResults.filter(
+      (r) => r.sourceId !== sourceMaterial.id
+    ).slice(0, limit);
 
-    for (const emb of embeddings) {
-      if (!emb.vector) continue;
-      try {
-        const vector = JSON.parse(emb.vector);
-        const similarity = cosineSimilarity(sourceVector, vector);
-        similarities.push({ sourceId: emb.sourceId, similarity });
-      } catch {
-        continue;
-      }
-    }
-
-    // Sort by similarity and take top N
-    similarities.sort((a, b) => b.similarity - a.similarity);
-    const topMatches = similarities.slice(0, limit);
-
-    if (topMatches.length === 0) {
+    if (filtered.length === 0) {
       return NextResponse.json({ similar: [] });
     }
 
-    // Fetch material details
+    // Fetch material details in single query
     const materials = await prisma.material.findMany({
       where: {
-        id: { in: topMatches.map((m) => m.sourceId) },
+        id: { in: filtered.map((r) => r.sourceId) },
         status: "active",
       },
       select: {
@@ -127,17 +110,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     });
 
-    // Build result with similarity scores
-    const similar: SimilarMaterial[] = topMatches
-      .map((match) => {
-        const mat = materials.find((m) => m.id === match.sourceId);
+    // Build result with similarity scores (preserve order)
+    const similar: SimilarMaterial[] = filtered
+      .map((result) => {
+        const mat = materials.find((m) => m.id === result.sourceId);
         if (!mat) return null;
         return {
           id: mat.id,
           toolId: mat.toolId,
           title: mat.title,
           toolType: mat.toolType,
-          similarity: Math.round(match.similarity * 100) / 100,
+          similarity: Math.round(result.similarity * 100) / 100,
         };
       })
       .filter((m): m is SimilarMaterial => m !== null);

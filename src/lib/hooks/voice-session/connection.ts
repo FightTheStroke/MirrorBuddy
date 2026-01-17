@@ -13,7 +13,10 @@ import { createWebRTCConnection } from './webrtc-connection';
 import { createWebSocketConnection } from './websocket-connection';
 import { handleWebRTCTrack } from './webrtc-handlers';
 import type { ConnectionRefs } from './connection-types';
-import { HEARTBEAT_INTERVAL_MS } from './constants';
+import { getHeartbeatIntervalWithJitter } from './constants';
+
+// Pre-stringified heartbeat message to avoid JSON.stringify on every beat
+const HEARTBEAT_MESSAGE = JSON.stringify({ type: 'session.update', session: {} });
 import { probeTransports } from './transport-probe';
 import {
   selectBestTransport,
@@ -225,21 +228,28 @@ async function connectWebRTC(
   refs.webrtcDataChannelRef.current = result.dataChannel;
 
   // Start WebRTC keepalive heartbeat to prevent connection timeout
+  // Uses setTimeout with jitter instead of setInterval to prevent synchronized requests
   if (refs.webrtcHeartbeatRef.current) {
-    clearInterval(refs.webrtcHeartbeatRef.current);
+    clearTimeout(refs.webrtcHeartbeatRef.current);
   }
-  refs.webrtcHeartbeatRef.current = setInterval(() => {
-    const dc = refs.webrtcDataChannelRef.current;
-    if (dc && dc.readyState === 'open') {
-      try {
-        // Send no-op session.update as keepalive (does NOT clear audio buffer)
-        dc.send(JSON.stringify({ type: 'session.update', session: {} }));
-        logger.debug('[VoiceSession] WebRTC heartbeat sent');
-      } catch {
-        logger.warn('[VoiceSession] WebRTC heartbeat failed');
+
+  const scheduleHeartbeat = () => {
+    refs.webrtcHeartbeatRef.current = setTimeout(() => {
+      const dc = refs.webrtcDataChannelRef.current;
+      if (dc && dc.readyState === 'open') {
+        try {
+          // Send no-op session.update as keepalive (does NOT clear audio buffer)
+          dc.send(HEARTBEAT_MESSAGE);
+          logger.debug('[VoiceSession] WebRTC heartbeat sent');
+          // Schedule next heartbeat with new jittered interval
+          scheduleHeartbeat();
+        } catch {
+          logger.warn('[VoiceSession] WebRTC heartbeat failed');
+        }
       }
-    }
-  }, HEARTBEAT_INTERVAL_MS);
+    }, getHeartbeatIntervalWithJitter());
+  };
+  scheduleHeartbeat();
 
   logger.debug('[VoiceSession] WebRTC connection established with heartbeat');
 }

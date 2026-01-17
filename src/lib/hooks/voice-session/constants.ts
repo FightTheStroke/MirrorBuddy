@@ -20,6 +20,9 @@ export const MIN_BUFFER_CHUNKS = 3;
 /** Schedule chunks 100ms ahead */
 export const SCHEDULE_AHEAD_TIME = 0.1;
 
+/** Maximum lookahead for audio scheduling (500ms) - prevents scheduling too far ahead */
+export const MAX_SCHEDULE_LOOKAHEAD = 0.5;
+
 /** 20ms tolerance for scheduling gaps */
 export const CHUNK_GAP_TOLERANCE = 0.02;
 
@@ -43,6 +46,18 @@ export const IDLE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
  * Heartbeat interval - ping to detect dead connections
  */
 export const HEARTBEAT_INTERVAL_MS = 30000; // 30 seconds
+
+/** Jitter factor for heartbeat (±10%) to prevent synchronized requests */
+export const HEARTBEAT_JITTER_FACTOR = 0.1;
+
+/**
+ * Calculate heartbeat interval with jitter
+ * Prevents thundering herd when multiple connections exist
+ */
+export function getHeartbeatIntervalWithJitter(): number {
+  const jitter = 1 + (Math.random() * 2 - 1) * HEARTBEAT_JITTER_FACTOR;
+  return Math.round(HEARTBEAT_INTERVAL_MS * jitter);
+}
 
 // ============================================================================
 // RECONNECTION BACKOFF CONFIGURATION

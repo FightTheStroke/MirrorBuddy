@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { RotateCcw, ThumbsDown, ThumbsUp, Zap, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -27,8 +27,12 @@ export function FlashcardStudy({ deck, onRating, onComplete }: FlashcardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [cardsReviewed, setCardsReviewed] = useState(0);
 
-  const cardsToReview = deck.cards.filter(card =>
-    !card.lastReview || new Date(card.nextReview) <= new Date()
+  // Memoize filtered cards to avoid re-filtering on every render
+  const cardsToReview = useMemo(
+    () => deck.cards.filter(card =>
+      !card.lastReview || new Date(card.nextReview) <= new Date()
+    ),
+    [deck.cards]
   );
 
   const currentCard = cardsToReview[currentIndex];

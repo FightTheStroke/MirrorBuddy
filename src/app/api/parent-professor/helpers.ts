@@ -25,6 +25,7 @@ export async function getOrCreateParentConversation(
       include: {
         messages: {
           orderBy: { createdAt: 'asc' },
+          take: 50,
         },
       },
     });

@@ -17,6 +17,8 @@ export interface AudioCaptureRefs {
   processorRef: React.MutableRefObject<ScriptProcessorNode | null>;
   analyserRef: React.MutableRefObject<AnalyserNode | null>;
   lastLevelUpdateRef: React.MutableRefObject<number>;
+  /** Reusable typed array for frequency data - avoids allocation per frame */
+  frequencyDataRef: React.MutableRefObject<Uint8Array<ArrayBuffer> | null>;
 }
 
 /**
@@ -73,9 +75,19 @@ export function useStartAudioCapture(
       const now = performance.now();
       if (now - refs.lastLevelUpdateRef.current > 30 && refs.analyserRef.current) {
         refs.lastLevelUpdateRef.current = now;
-        const dataArray = new Uint8Array(refs.analyserRef.current.frequencyBinCount);
-        refs.analyserRef.current.getByteFrequencyData(dataArray);
-        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+
+        // Reuse typed array to minimize GC pressure
+        const binCount = refs.analyserRef.current.frequencyBinCount;
+        if (!refs.frequencyDataRef.current || refs.frequencyDataRef.current.length !== binCount) {
+          refs.frequencyDataRef.current = new Uint8Array(binCount);
+        }
+        refs.analyserRef.current.getByteFrequencyData(refs.frequencyDataRef.current);
+
+        let sum = 0;
+        for (let i = 0; i < binCount; i++) {
+          sum += refs.frequencyDataRef.current[i];
+        }
+        const average = sum / binCount;
         // Scale up for better visualization (mic levels are often quiet)
         setInputLevel(Math.min(1, (average / 255) * 2));
       }

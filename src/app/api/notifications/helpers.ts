@@ -18,6 +18,16 @@ export async function getNotifications(userId: string, unreadOnly: boolean, limi
         { expiresAt: { gt: new Date() } },
       ],
     },
+    select: {
+      id: true,
+      type: true,
+      title: true,
+      message: true,
+      actionUrl: true,
+      metadata: true,
+      read: true,
+      createdAt: true,
+    },
     orderBy: { createdAt: 'desc' },
     take: Math.min(limit, 100),
   });
