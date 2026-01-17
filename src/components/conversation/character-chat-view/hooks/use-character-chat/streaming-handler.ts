@@ -5,9 +5,17 @@
  * @see ADR 0034 for streaming architecture
  */
 
-import type { Message } from './types';
-import type { CharacterInfo } from '../../utils/character-utils';
-import { logger } from '@/lib/logger';
+import type { Message } from "./types";
+import type { CharacterInfo } from "../../utils/character-utils";
+import { logger } from "@/lib/logger";
+import type { ChatUsage } from "./message-handler";
+
+/** Streaming result with REAL usage data from API */
+export interface StreamingResult {
+  success: boolean;
+  usage: ChatUsage | null;
+  latencyMs: number;
+}
 
 /**
  * Streaming message options
@@ -18,7 +26,11 @@ export interface StreamingMessageOptions {
   character: CharacterInfo;
   characterId: string;
   onChunk: (chunk: string, accumulated: string) => void;
-  onComplete: (fullResponse: string) => void;
+  onComplete: (
+    fullResponse: string,
+    usage: ChatUsage | null,
+    latencyMs: number,
+  ) => void;
   onError: (error: Error) => void;
   signal?: AbortSignal;
 }
@@ -29,17 +41,38 @@ export interface StreamingMessageOptions {
  */
 const TOOL_KEYWORDS = [
   // Mindmap
-  'mappa', 'mappe', 'schema', 'schemi', 'diagramma',
+  "mappa",
+  "mappe",
+  "schema",
+  "schemi",
+  "diagramma",
   // Quiz
-  'quiz', 'domande', 'verifica', 'test', 'interroga',
+  "quiz",
+  "domande",
+  "verifica",
+  "test",
+  "interroga",
   // Flashcard
-  'flashcard', 'flash card', 'carte', 'schede',
+  "flashcard",
+  "flash card",
+  "carte",
+  "schede",
   // Summary
-  'riassunto', 'riassumi', 'sintesi', 'sintetizza',
+  "riassunto",
+  "riassumi",
+  "sintesi",
+  "sintetizza",
   // Demo
-  'demo', 'dimostra', 'esempio', 'simulazione',
+  "demo",
+  "dimostra",
+  "esempio",
+  "simulazione",
   // General tool requests
-  'crea', 'genera', 'prepara', 'fammi', 'fai',
+  "crea",
+  "genera",
+  "prepara",
+  "fammi",
+  "fai",
 ];
 
 /**
@@ -48,7 +81,7 @@ const TOOL_KEYWORDS = [
  */
 export function messageRequiresTool(input: string): boolean {
   const lowerInput = input.toLowerCase();
-  return TOOL_KEYWORDS.some(keyword => lowerInput.includes(keyword));
+  return TOOL_KEYWORDS.some((keyword) => lowerInput.includes(keyword));
 }
 
 /**
@@ -57,9 +90,9 @@ export function messageRequiresTool(input: string): boolean {
  */
 export async function isStreamingAvailable(): Promise<boolean> {
   try {
-    const response = await fetch('/api/chat/stream', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/chat/stream", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) return false;
@@ -74,9 +107,10 @@ export async function isStreamingAvailable(): Promise<boolean> {
 /**
  * Send message with streaming response
  * Returns true if streaming was used, false if fallback was needed
+ * Extracts REAL usage data from SSE stream for metrics
  */
 export async function sendStreamingMessage(
-  options: StreamingMessageOptions
+  options: StreamingMessageOptions,
 ): Promise<boolean> {
   const {
     input,
@@ -89,14 +123,17 @@ export async function sendStreamingMessage(
     signal,
   } = options;
 
+  const startTime = performance.now();
+  let streamUsage: ChatUsage | null = null;
+
   try {
-    const response = await fetch('/api/chat/stream', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/chat/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         messages: [
           ...messages.map((m) => ({ role: m.role, content: m.content })),
-          { role: 'user', content: input },
+          { role: "user", content: input },
         ],
         systemPrompt: character.systemPrompt,
         maestroId: characterId,
@@ -109,24 +146,24 @@ export async function sendStreamingMessage(
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       if (errorData.fallback) {
-        logger.debug('[Streaming] Not available, needs fallback');
+        logger.debug("[Streaming] Not available, needs fallback");
         return false; // Signal to use fallback
       }
       throw new Error(errorData.error || `HTTP ${response.status}`);
     }
 
     // Verify SSE content type
-    const contentType = response.headers.get('Content-Type');
-    if (!contentType?.includes('text/event-stream')) {
-      logger.debug('[Streaming] Not SSE response, needs fallback');
+    const contentType = response.headers.get("Content-Type");
+    if (!contentType?.includes("text/event-stream")) {
+      logger.debug("[Streaming] Not SSE response, needs fallback");
       return false;
     }
 
     // Process SSE stream
     const reader = response.body!.getReader();
     const decoder = new TextDecoder();
-    let accumulated = '';
-    let buffer = '';
+    let accumulated = "";
+    let buffer = "";
 
     while (true) {
       const { done, value } = await reader.read();
@@ -136,17 +173,18 @@ export async function sendStreamingMessage(
       buffer += decoder.decode(value, { stream: true });
 
       // Process complete lines
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || "";
 
       for (const line of lines) {
         const trimmedLine = line.trim();
-        if (!trimmedLine || !trimmedLine.startsWith('data: ')) continue;
+        if (!trimmedLine || !trimmedLine.startsWith("data: ")) continue;
 
         const data = trimmedLine.slice(6);
 
-        if (data === '[DONE]') {
-          onComplete(accumulated);
+        if (data === "[DONE]") {
+          const latencyMs = Math.round(performance.now() - startTime);
+          onComplete(accumulated, streamUsage, latencyMs);
           return true;
         }
 
@@ -158,17 +196,26 @@ export async function sendStreamingMessage(
             onChunk(parsed.content, accumulated);
           }
 
+          // Extract REAL usage data from stream
+          if (parsed.usage) {
+            streamUsage = {
+              prompt_tokens: parsed.usage.prompt_tokens || 0,
+              completion_tokens: parsed.usage.completion_tokens || 0,
+              total_tokens: parsed.usage.total_tokens || 0,
+            };
+          }
+
           if (parsed.error) {
             throw new Error(parsed.error);
           }
 
           // Log content filter but continue
           if (parsed.filtered) {
-            logger.warn('[Streaming] Content filtered by Azure');
+            logger.warn("[Streaming] Content filtered by Azure");
           }
         } catch (parseError) {
           // Ignore parse errors for individual chunks
-          if ((parseError as Error).message.includes('filtered')) {
+          if ((parseError as Error).message.includes("filtered")) {
             throw parseError;
           }
         }
@@ -176,15 +223,16 @@ export async function sendStreamingMessage(
     }
 
     // Stream ended normally
-    onComplete(accumulated);
+    const latencyMs = Math.round(performance.now() - startTime);
+    onComplete(accumulated, streamUsage, latencyMs);
     return true;
   } catch (error) {
-    if ((error as Error).name === 'AbortError') {
-      logger.debug('[Streaming] Aborted by user');
+    if ((error as Error).name === "AbortError") {
+      logger.debug("[Streaming] Aborted by user");
       return true; // Abort is handled, don't fallback
     }
 
-    logger.error('[Streaming] Error', { error: String(error) });
+    logger.error("[Streaming] Error", { error: String(error) });
     onError(error as Error);
     return true; // Error is handled, don't fallback
   }
