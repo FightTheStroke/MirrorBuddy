@@ -1,0 +1,222 @@
+/**
+ * Feature Flags Admin API
+ *
+ * V1Plan FASE 2.0.6: CRUD operations for feature flag management
+ *
+ * GET /api/admin/feature-flags - List all flags
+ * POST /api/admin/feature-flags - Update a flag
+ * DELETE /api/admin/feature-flags?id=xxx - Activate kill-switch
+ */
+
+import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
+import {
+  getAllFlags,
+  getFlag,
+  updateFlag,
+  activateKillSwitch,
+  deactivateKillSwitch,
+  setGlobalKillSwitch,
+  isGlobalKillSwitchActive,
+} from "@/lib/feature-flags";
+import type {
+  KnownFeatureFlag,
+  FeatureFlagUpdate,
+} from "@/lib/feature-flags/types";
+import { getDegradationState, getRecentEvents } from "@/lib/degradation";
+import {
+  runGoNoGoChecks,
+  getActiveAlerts,
+  getAllSLOStatuses,
+} from "@/lib/alerting";
+
+interface UpdateFlagRequest {
+  featureId: KnownFeatureFlag;
+  update: FeatureFlagUpdate;
+}
+
+interface KillSwitchRequest {
+  featureId?: KnownFeatureFlag;
+  global?: boolean;
+  enabled: boolean;
+  reason?: string;
+}
+
+/**
+ * GET /api/admin/feature-flags
+ * Returns all flags with system health status
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const includeHealth = searchParams.get("health") === "true";
+    const includeGoNogo = searchParams.get("gonogo") === "true";
+
+    const flags = getAllFlags();
+    const globalKillSwitch = isGlobalKillSwitchActive();
+
+    const response: Record<string, unknown> = {
+      flags,
+      globalKillSwitch,
+      timestamp: new Date().toISOString(),
+    };
+
+    if (includeHealth) {
+      response.degradation = getDegradationState();
+      response.recentEvents = getRecentEvents(10);
+      response.activeAlerts = getActiveAlerts();
+      response.sloStatuses = getAllSLOStatuses();
+    }
+
+    if (includeGoNogo) {
+      response.goNoGoResult = runGoNoGoChecks();
+    }
+
+    return NextResponse.json(response);
+  } catch (error) {
+    logger.error("Failed to fetch feature flags", {}, error as Error);
+    return NextResponse.json(
+      { error: "Failed to fetch feature flags" },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * POST /api/admin/feature-flags
+ * Update a feature flag or toggle kill-switch
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+
+    // Kill-switch operation
+    if ("enabled" in body && (body.featureId || body.global)) {
+      return handleKillSwitch(body as KillSwitchRequest);
+    }
+
+    // Flag update operation
+    if (body.featureId && body.update) {
+      return handleFlagUpdate(body as UpdateFlagRequest);
+    }
+
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 },
+    );
+  } catch (error) {
+    logger.error("Failed to update feature flag", {}, error as Error);
+    return NextResponse.json(
+      { error: "Failed to update feature flag" },
+      { status: 500 },
+    );
+  }
+}
+
+/**
+ * DELETE /api/admin/feature-flags?id=xxx
+ * Activate kill-switch for a feature (emergency disable)
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const featureId = searchParams.get("id") as KnownFeatureFlag | null;
+    const reason = searchParams.get("reason") || "Emergency disable via API";
+
+    if (!featureId) {
+      return NextResponse.json(
+        { error: "Feature ID is required" },
+        { status: 400 },
+      );
+    }
+
+    const flag = getFlag(featureId);
+    if (!flag) {
+      return NextResponse.json({ error: "Feature not found" }, { status: 404 });
+    }
+
+    activateKillSwitch(featureId, reason, "admin-api");
+
+    logger.warn("Kill-switch activated via API", { featureId, reason });
+
+    return NextResponse.json({
+      success: true,
+      featureId,
+      killSwitch: true,
+      message: `Kill-switch activated for ${featureId}`,
+    });
+  } catch (error) {
+    logger.error("Failed to activate kill-switch", {}, error as Error);
+    return NextResponse.json(
+      { error: "Failed to activate kill-switch" },
+      { status: 500 },
+    );
+  }
+}
+
+// Handle flag update
+function handleFlagUpdate(body: UpdateFlagRequest) {
+  const { featureId, update } = body;
+
+  const flag = getFlag(featureId);
+  if (!flag) {
+    return NextResponse.json({ error: "Feature not found" }, { status: 404 });
+  }
+
+  const updated = updateFlag(featureId, {
+    ...update,
+    updatedBy: "admin-api",
+  });
+
+  if (!updated) {
+    return NextResponse.json(
+      { error: "Failed to update flag" },
+      { status: 500 },
+    );
+  }
+
+  logger.info("Feature flag updated via API", { featureId, update });
+
+  return NextResponse.json({
+    success: true,
+    flag: updated,
+  });
+}
+
+// Handle kill-switch toggle
+function handleKillSwitch(body: KillSwitchRequest) {
+  const { featureId, global, enabled, reason } = body;
+
+  if (global) {
+    setGlobalKillSwitch(enabled, reason);
+    return NextResponse.json({
+      success: true,
+      globalKillSwitch: enabled,
+      message: enabled
+        ? "Global kill-switch activated"
+        : "Global kill-switch deactivated",
+    });
+  }
+
+  if (featureId) {
+    if (enabled) {
+      activateKillSwitch(featureId, reason || "API request", "admin-api");
+    } else {
+      deactivateKillSwitch(featureId, "admin-api");
+    }
+
+    return NextResponse.json({
+      success: true,
+      featureId,
+      killSwitch: enabled,
+      message: enabled
+        ? `Kill-switch activated for ${featureId}`
+        : `Kill-switch deactivated for ${featureId}`,
+    });
+  }
+
+  return NextResponse.json(
+    { error: "Either featureId or global must be specified" },
+    { status: 400 },
+  );
+}
