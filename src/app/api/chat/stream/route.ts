@@ -10,8 +10,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { azureStreamingCompletion, getActiveProvider } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
+import { checkRateLimitAsync, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { StreamingSanitizer } from '@/lib/safety';
 
 import type { ChatRequest } from '../types';
@@ -30,17 +30,21 @@ const STREAMING_ENABLED = process.env.ENABLE_CHAT_STREAMING !== 'false';
 
 export async function POST(request: NextRequest) {
   if (!STREAMING_ENABLED) {
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Streaming is disabled', fallback: '/api/chat' },
       { status: 503 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 
+  const log = getRequestLogger(request);
+
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`chat:${clientId}`, RATE_LIMITS.CHAT);
+  const rateLimit = await checkRateLimitAsync(`chat:${clientId}`, RATE_LIMITS.CHAT);
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/chat/stream' });
+    log.warn('Rate limit exceeded', { clientId, endpoint: '/api/chat/stream' });
     return rateLimitResponse(rateLimit);
   }
 
@@ -49,12 +53,14 @@ export async function POST(request: NextRequest) {
     const { messages, systemPrompt, maestroId, enableMemory = true, enableTools } = body;
 
     if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+      const response = NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     // Streaming does not support tool calls - warn if requested
     if (enableTools) {
-      logger.debug('Tool calls requested but not supported in streaming mode', { maestroId });
+      log.debug('Tool calls requested but not supported in streaming mode', { maestroId });
     }
 
     const userId = await getUserId();
@@ -64,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // Budget check
     if (userSettings && userSettings.totalSpent >= userSettings.budgetLimit) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           error: 'Budget limit exceeded',
           message: `You have reached your budget limit of $${userSettings.budgetLimit.toFixed(2)}.`,
@@ -72,21 +78,27 @@ export async function POST(request: NextRequest) {
         },
         { status: 402 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     const config = getActiveProvider(providerPreference);
     if (!config) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'No AI provider configured', fallback: '/api/chat' },
         { status: 503 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     if (config.provider !== 'azure') {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Streaming only available with Azure OpenAI', fallback: '/api/chat' },
         { status: 400 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     // Enhance prompt with memory and RAG
@@ -103,7 +115,7 @@ export async function POST(request: NextRequest) {
     if (lastUserMessage) {
       const safetyBlock = checkInputSafety(lastUserMessage.content);
       if (safetyBlock) {
-        logger.warn('Content blocked by safety filter', { clientId });
+        log.warn('Content blocked by safety filter', { clientId });
         return createSSEResponse(async function* () {
           yield `data: ${JSON.stringify({ content: safetyBlock.response, blocked: true })}\n\n`;
           yield 'data: [DONE]\n\n';
@@ -177,7 +189,7 @@ export async function POST(request: NextRequest) {
           }
         } catch (error) {
           if ((error as Error).name !== 'AbortError') {
-            logger.error('Streaming error', { error: String(error) });
+            log.error('Streaming error', { error: String(error) });
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'Streaming failed' })}\n\n`));
           }
         } finally {
@@ -192,28 +204,33 @@ export async function POST(request: NextRequest) {
         'Cache-Control': 'no-cache, no-transform',
         'Connection': 'keep-alive',
         'X-Accel-Buffering': 'no',
+        'X-Request-ID': getRequestId(request),
       },
     });
   } catch (error) {
-    logger.error('Chat stream API error', { error: String(error) });
-    return NextResponse.json(
+    log.error('Chat stream API error', { error: String(error) });
+    const response = NextResponse.json(
       { error: 'Internal server error', fallback: '/api/chat' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }
 
 /** GET endpoint for connection test */
-export async function GET() {
+export async function GET(request: NextRequest) {
   const config = getActiveProvider();
   const providerSupportsStreaming = config?.provider === 'azure';
   const streamingAvailable = STREAMING_ENABLED && providerSupportsStreaming;
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     streaming: streamingAvailable,
     provider: config?.provider ?? null,
     endpoint: '/api/chat/stream',
     method: 'POST',
     note: 'Tool calls not supported - use /api/chat for tools',
   });
+  response.headers.set('X-Request-ID', getRequestId(request));
+  return response;
 }

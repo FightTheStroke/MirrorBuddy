@@ -20,3 +20,6 @@ export { initializeTelemetry } from './telemetry-store/initialize';
 
 // Utilities
 export { generateSessionId, isSameDay } from './telemetry-store/utils';
+
+// NOTE: OpenTelemetry SDK (otel.ts) is server-only and NOT exported here
+// Import directly from '@/lib/telemetry/otel' in server code only

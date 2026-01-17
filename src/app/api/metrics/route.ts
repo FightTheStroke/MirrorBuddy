@@ -7,6 +7,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { metricsStore } from '@/lib/observability/metrics-store';
+import { generateSLIMetrics } from './sli-metrics';
 
 interface MetricLine {
   name: string;
@@ -185,6 +187,11 @@ export async function GET() {
         value: m._count,
       });
     }
+
+    // SLI METRICS (F-02, F-03): Latency percentiles and error rates per route
+    const metricsSummary = metricsStore.getMetricsSummary();
+    const sliMetrics = generateSLIMetrics(metricsSummary);
+    metrics.push(...sliMetrics);
 
     // Format as Prometheus exposition format
     const output = formatPrometheusOutput(metrics);

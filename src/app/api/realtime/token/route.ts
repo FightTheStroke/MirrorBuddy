@@ -5,19 +5,20 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-import { logger } from '@/lib/logger';
+import { checkRateLimitAsync, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
 
 // WebSocket proxy port (must match instrumentation.ts)
 const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || '3001', 10);
 
 export async function GET(request: NextRequest) {
+  const log = getRequestLogger(request);
   // Rate limiting: 10 requests per minute per IP
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`realtime-token:${clientId}`, RATE_LIMITS.REALTIME_TOKEN);
+  const rateLimit = await checkRateLimitAsync(`realtime-token:${clientId}`, RATE_LIMITS.REALTIME_TOKEN);
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/realtime/token' });
+    log.warn('Rate limit exceeded', { clientId, endpoint: '/api/realtime/token' });
     return rateLimitResponse(rateLimit);
   }
   // Azure OpenAI Realtime configuration (required)
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
   if (!azureDeployment) missingConfig.push('AZURE_OPENAI_REALTIME_DEPLOYMENT');
 
   if (missingConfig.length > 0 || !azureEndpoint || !azureApiKey || !azureDeployment) {
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         error: 'Azure OpenAI not configured',
         missingVariables: missingConfig,
@@ -40,6 +41,8 @@ export async function GET(request: NextRequest) {
       },
       { status: 503 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 
   // Transport mode: webrtc or websocket (from env, defaults to webrtc)
@@ -50,7 +53,7 @@ export async function GET(request: NextRequest) {
 
   // Return connection info based on transport mode
   // SECURITY: apiKey is NEVER included - stays server-side
-  return NextResponse.json({
+  const response = NextResponse.json({
     provider: 'azure',
     transport,
     // WebRTC mode: client uses ephemeral token + regional endpoint for direct Azure connection
@@ -66,6 +69,8 @@ export async function GET(request: NextRequest) {
         }),
     configured: true,
   });
+  response.headers.set('X-Request-ID', getRequestId(request));
+  return response;
 }
 
 // Check configuration status (for settings page)

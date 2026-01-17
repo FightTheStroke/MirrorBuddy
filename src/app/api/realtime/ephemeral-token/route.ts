@@ -7,7 +7,7 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { checkRateLimitAsync, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { logger } from '@/lib/logger';
 
 interface AzureSessionResponse {
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
   const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
 
   // Rate limiting: 30 requests per minute per IP (global rate limit)
-  const rateLimit = checkRateLimit(
+  const rateLimit = await checkRateLimitAsync(
     `realtime-ephemeral-token:${clientId}`,
     RATE_LIMITS.REALTIME_TOKEN
   );

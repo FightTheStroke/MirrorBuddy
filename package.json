@@ -49,6 +49,12 @@
     "hono": "4.11.4"
   },
   "dependencies": {
+    "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.32",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.68.0",
+    "@opentelemetry/resources": "^2.4.0",
+    "@opentelemetry/sdk-node": "^0.210.0",
+    "@opentelemetry/semantic-conventions": "^1.39.0",
     "@prisma/adapter-pg": "^7.2.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",

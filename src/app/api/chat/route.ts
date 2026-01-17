@@ -7,8 +7,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { chatCompletion, getActiveProvider, type AIProvider } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
+import { checkRateLimitAsync, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
 import { filterInput, sanitizeOutput } from '@/lib/safety';
 import { CHAT_TOOL_DEFINITIONS } from '@/types/tools';
 import { assessResponseTransparency, type TransparencyContext } from '@/lib/ai/transparency';
@@ -27,11 +27,12 @@ import { buildAllContexts } from './context-builders';
 import { processToolCalls, buildToolChoice } from './tool-handler';
 
 export async function POST(request: NextRequest) {
+  const log = getRequestLogger(request);
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`chat:${clientId}`, RATE_LIMITS.CHAT);
+  const rateLimit = await checkRateLimitAsync(`chat:${clientId}`, RATE_LIMITS.CHAT);
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/chat' });
+    log.warn('Rate limit exceeded', { clientId, endpoint: '/api/chat' });
     return rateLimitResponse(rateLimit);
   }
 
@@ -40,7 +41,9 @@ export async function POST(request: NextRequest) {
     const { messages, systemPrompt, maestroId, conversationId, enableTools = true, enableMemory = true, requestedTool } = body;
 
     if (!messages || !Array.isArray(messages)) {
-      return NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+      const response = NextResponse.json({ error: 'Messages array is required' }, { status: 400 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     // Authentication
@@ -66,7 +69,7 @@ export async function POST(request: NextRequest) {
       const toolContext = requestedTool === 'demo' ? getDemoContext(maestroId) : TOOL_CONTEXT[requestedTool];
       if (toolContext) {
         enhancedSystemPrompt = `${systemPrompt}\n\n${toolContext}`;
-        logger.debug('Tool context injected', { requestedTool, maestroId });
+        log.debug('Tool context injected', { requestedTool, maestroId });
       }
     }
 
@@ -90,13 +93,13 @@ export async function POST(request: NextRequest) {
     if (lastUserMessage) {
       const { normalized, wasModified } = normalizeUnicode(lastUserMessage.content);
       if (wasModified) {
-        logger.debug('Unicode normalized in user input', { clientId });
+        log.debug('Unicode normalized in user input', { clientId });
         lastUserMessage.content = normalized;
       }
 
       const filterResult = filterInput(lastUserMessage.content);
       if (!filterResult.safe && filterResult.action === 'block') {
-        logger.warn('Content blocked by safety filter', {
+        log.warn('Content blocked by safety filter', {
           clientId,
           category: filterResult.category,
           severity: filterResult.severity,
@@ -106,13 +109,15 @@ export async function POST(request: NextRequest) {
           maestroId,
           actionTaken: 'blocked',
         });
-        return NextResponse.json({
+        const response = NextResponse.json({
           content: filterResult.suggestedResponse,
           provider: 'safety_filter',
           model: 'content-filter',
           blocked: true,
           category: filterResult.category,
         });
+        response.headers.set('X-Request-ID', getRequestId(request));
+        return response;
       }
     }
 
@@ -120,7 +125,7 @@ export async function POST(request: NextRequest) {
 
     try {
       if (requestedTool) {
-        logger.info('Tool mode active', {
+        log.info('Tool mode active', {
           requestedTool,
           toolsEnabled: enableTools,
           hasToolContext: !!TOOL_CONTEXT[requestedTool],
@@ -136,7 +141,7 @@ export async function POST(request: NextRequest) {
         providerPreference,
       });
 
-      logger.debug('Chat response', {
+      log.debug('Chat response', {
         hasToolCalls: !!(result.tool_calls && result.tool_calls.length > 0),
         toolCallCount: result.tool_calls?.length || 0,
         toolCallNames: result.tool_calls?.map(tc => tc.function.name) || [],
@@ -151,7 +156,7 @@ export async function POST(request: NextRequest) {
           userId,
         });
 
-        return NextResponse.json({
+        const response = NextResponse.json({
           content: result.content || '',
           provider: result.provider,
           model: result.model,
@@ -163,12 +168,14 @@ export async function POST(request: NextRequest) {
           hasToolContext: contexts.hasToolContext,
           hasRAG: contexts.hasRAG,
         });
+        response.headers.set('X-Request-ID', getRequestId(request));
+        return response;
       }
 
       // Sanitize output
       const sanitized = sanitizeOutput(result.content);
       if (sanitized.modified) {
-        logger.warn('Output sanitized', {
+        log.warn('Output sanitized', {
           clientId,
           issuesFound: sanitized.issuesFound,
           categories: sanitized.categories,
@@ -190,7 +197,7 @@ export async function POST(request: NextRequest) {
         await updateBudget(userId, result.usage.total_tokens || 0, userSettings.totalSpent);
       }
 
-      return NextResponse.json({
+      const response = NextResponse.json({
         content: sanitized.text,
         provider: result.provider,
         model: result.model,
@@ -207,11 +214,13 @@ export async function POST(request: NextRequest) {
           needsCitation: transparency.hallucinationRisk.indicators.some((h: { type: string }) => h.type === 'factual_claim'),
         },
       });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     } catch (providerError) {
       const errorMessage = providerError instanceof Error ? providerError.message : 'Unknown provider error';
 
       if (errorMessage.includes('Ollama is not running')) {
-        return NextResponse.json(
+        const response = NextResponse.json(
           {
             error: 'No AI provider available',
             message: errorMessage,
@@ -220,25 +229,35 @@ export async function POST(request: NextRequest) {
           },
           { status: 503 }
         );
+        response.headers.set('X-Request-ID', getRequestId(request));
+        return response;
       }
 
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Chat request failed', message: errorMessage, provider: providerConfig?.provider ?? 'unknown' },
         { status: 500 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
   } catch (error) {
-    logger.error('Chat API error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    log.error('Chat API error', { error: String(error) });
+    const response = NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const provider = getActiveProvider();
 
   if (!provider) {
-    return NextResponse.json({ available: false, provider: null, message: 'No AI provider configured' });
+    const response = NextResponse.json({ available: false, provider: null, message: 'No AI provider configured' });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 
-  return NextResponse.json({ available: true, provider: provider.provider, model: provider.model });
+  const response = NextResponse.json({ available: true, provider: provider.provider, model: provider.model });
+  response.headers.set('X-Request-ID', getRequestId(request));
+  return response;
 }

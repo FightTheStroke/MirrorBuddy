@@ -10,4 +10,5 @@ export {
   getRequestId,
   getRequestLogger,
   getClientInfo,
+  addRequestIdToResponse,
 } from './request-id';

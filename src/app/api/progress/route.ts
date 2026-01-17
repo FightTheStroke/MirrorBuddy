@@ -7,15 +7,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { logger } from '@/lib/logger';
+import { getRequestId } from '@/lib/tracing';
 import { serverNotifications } from '@/lib/notifications/server-triggers';
 import { ProgressUpdateSchema } from '@/lib/validation/schemas/progress';
 import { validateAuth } from '@/lib/auth/session-auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
     const userId = auth.userId;
 
@@ -31,7 +34,7 @@ export async function GET() {
     }
 
     // Parse JSON fields and add season data
-    return NextResponse.json({
+    const response = NextResponse.json({
       ...progress,
       mirrorBucks: progress.xp ?? 0, // Map xp to mirrorBucks for backward compatibility
       seasonMirrorBucks: progress.seasonMirrorBucks ?? 0,
@@ -47,12 +50,16 @@ export async function GET() {
         lastStudyDate: progress.lastStudyDate,
       },
     });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   } catch (error) {
     logger.error('Progress GET error', { error: String(error) });
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Failed to get progress' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }
 
@@ -60,7 +67,9 @@ export async function PUT(request: NextRequest) {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
     const userId = auth.userId;
 
@@ -69,13 +78,15 @@ export async function PUT(request: NextRequest) {
     // #92: Validate with Zod before processing
     const validation = ProgressUpdateSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           error: 'Invalid progress data',
           details: validation.error.issues.map(i => i.message),
         },
         { status: 400 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     const data = validation.data;
@@ -176,7 +187,7 @@ export async function PUT(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ...progress,
       mirrorBucks: progress.xp ?? 0,
       seasonMirrorBucks: progress.seasonMirrorBucks ?? 0,
@@ -192,11 +203,15 @@ export async function PUT(request: NextRequest) {
         lastStudyDate: progress.lastStudyDate,
       },
     });
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   } catch (error) {
     logger.error('Progress PUT error', { error: String(error) });
-    return NextResponse.json(
+    const response = NextResponse.json(
       { error: 'Failed to update progress' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }

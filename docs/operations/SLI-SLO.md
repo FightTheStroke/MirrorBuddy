@@ -131,6 +131,118 @@ const chatSLI = {
 | Monthly | Target adjustment | Engineering manager |
 | Quarterly | Capacity planning | Technical director |
 
+## Dashboard & Live Monitoring
+
+### Health Status Endpoint
+
+**Real-time health dashboard for load balancers and status pages:**
+
+```bash
+# Basic health check (liveness)
+curl -s http://localhost:3000/api/health | jq .
+
+# Detailed metrics (for dashboards)
+curl -s http://localhost:3000/api/health/detailed | jq .
+```
+
+**Response includes**:
+- Service uptime / downtime
+- Database connection pool status
+- AI provider availability (Azure OpenAI, Ollama)
+- Vector store health (pgvector)
+- Response times for all dependencies
+
+**Use for**:
+- Load balancer health probes (every 10s)
+- Status page automation
+- Incident alerting (consume with `jq .status`)
+
+### Prometheus Metrics Endpoint
+
+**Production observability via Prometheus-compatible metrics:**
+
+```bash
+# Scrape metrics in Prometheus format
+curl -s http://localhost:3000/api/metrics
+```
+
+**Exposed metrics** (OpenTelemetry instrumentation):
+- `http_requests_total` - All HTTP requests with status code labels
+- `http_request_duration_seconds` - Request latency (P50, P95, P99)
+- `voice_session_duration_seconds` - WebSocket session lengths
+- `chat_messages_total` - Messages sent/received
+- `db_query_duration_seconds` - PostgreSQL query latencies
+- `vector_search_duration_seconds` - pgvector semantic search times
+- `ai_provider_requests_total` - Azure OpenAI vs Ollama fallback counts
+
+**Prometheus scrape config** (`prometheus.yml`):
+```yaml
+scrape_configs:
+  - job_name: 'mirrorbuddy'
+    static_configs:
+      - targets: ['localhost:3000']
+    metrics_path: '/api/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+```
+
+### Grafana Dashboard Setup
+
+**Deploy dashboard for SLI visualization:**
+
+1. **Add Prometheus data source**
+   - URL: `http://prometheus:9090`
+   - Auth: None (internal cluster)
+   - Test & Save
+
+2. **Import SLO dashboard**
+   ```bash
+   # Copy dashboard JSON from docs/dashboards/slo-dashboard.json
+   # In Grafana UI: Dashboards → Import → Paste JSON
+   ```
+
+3. **Key dashboard panels**
+   - Voice API Availability (%) - Last 30 days
+   - Chat API TTFB P50/P99 - Rolling 1-hour
+   - Database Query Latency - P99 percentile
+   - Error Budget Burn Rate - Alert if > 6× during 6-hour window
+   - Service Status Grid - Green/Yellow/Red status per component
+
+4. **Alert rules** (in Grafana)
+   - **SEV1**: Voice availability < 95% (14.4× burn rate)
+   - **SEV2**: Chat latency P99 > 3000ms (6× burn rate)
+   - **SEV3**: DB queries > 500ms P99 (3× burn rate)
+
+### Manual SLI Checks
+
+**For on-call without dashboard access:**
+
+```bash
+# Voice API - check last hour of sessions
+psql mirrorbuddy -c "
+  SELECT
+    COUNT(*) as total_sessions,
+    COUNTIF(duration_ms > 2000) as p99_breaches,
+    ROUND(100 - (COUNTIF(duration_ms > 2000) * 100 / COUNT(*)), 2) as availability_pct
+  FROM voice_sessions
+  WHERE created_at > NOW() - INTERVAL '1 hour';"
+
+# Chat API - TTFB latencies
+psql mirrorbuddy -c "
+  SELECT
+    PERCENTILE_CONT(0.50) WITHIN GROUP (ORDER BY ttfb_ms) as p50_ms,
+    PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY ttfb_ms) as p99_ms
+  FROM chat_requests
+  WHERE created_at > NOW() - INTERVAL '1 hour';"
+
+# Database - Query latency
+psql mirrorbuddy -c "
+  SELECT
+    PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms) as p99_ms
+  FROM pg_stat_statements
+  WHERE query NOT LIKE '%pg_stat%';"
+```
+
 ## References
 
 - [ADR 0037: Deferred Production Items](../adr/0037-deferred-production-items.md)

@@ -8,7 +8,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
 import { getOrCompute, del, CACHE_TTL } from '@/lib/cache';
 import { SettingsUpdateSchema } from '@/lib/validation/schemas/user';
 import { validateAuth } from '@/lib/auth/session-auth';
@@ -23,11 +23,14 @@ function generateETag(updatedAt: Date): string {
   return `"${hash.substring(0, 16)}"`;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const log = getRequestLogger(request);
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
     const userId = auth.userId;
 
@@ -57,21 +60,27 @@ export async function GET() {
     if (etag) {
       response.headers.set('ETag', etag);
     }
+    response.headers.set('X-Request-ID', getRequestId(request));
     return response;
   } catch (error) {
-    logger.error('Settings GET error', { error: String(error) });
-    return NextResponse.json(
+    log.error('Settings GET error', { error: String(error) });
+    const response = NextResponse.json(
       { error: 'Failed to get settings' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }
 
 export async function PUT(request: NextRequest) {
+  const log = getRequestLogger(request);
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
     const userId = auth.userId;
 
@@ -80,13 +89,15 @@ export async function PUT(request: NextRequest) {
     // #92: Validate with Zod before writing to DB
     const validation = SettingsUpdateSchema.safeParse(body);
     if (!validation.success) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         {
           error: 'Invalid settings data',
           details: validation.error.issues.map(i => i.message),
         },
         { status: 400 }
       );
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
     }
 
     // F-14: Check If-Match header for optimistic concurrency
@@ -100,11 +111,13 @@ export async function PUT(request: NextRequest) {
       if (currentSettings?.updatedAt) {
         const currentETag = generateETag(currentSettings.updatedAt);
         if (ifMatch !== currentETag) {
-          logger.warn('Settings update conflict (ETag mismatch)', { userId });
-          return NextResponse.json(
+          log.warn('Settings update conflict (ETag mismatch)', { userId });
+          const response = NextResponse.json(
             { error: 'Conflict - settings were modified by another request' },
             { status: 412 }
           );
+          response.headers.set('X-Request-ID', getRequestId(request));
+          return response;
         }
       }
     }
@@ -124,12 +137,15 @@ export async function PUT(request: NextRequest) {
     if (etag) {
       response.headers.set('ETag', etag);
     }
+    response.headers.set('X-Request-ID', getRequestId(request));
     return response;
   } catch (error) {
-    logger.error('Settings PUT error', { error: String(error) });
-    return NextResponse.json(
+    log.error('Settings PUT error', { error: String(error) });
+    const response = NextResponse.json(
       { error: 'Failed to update settings' },
       { status: 500 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 }

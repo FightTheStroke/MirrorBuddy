@@ -13,7 +13,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { getRequestLogger, getRequestId } from '@/lib/tracing';
 
 /** Secret for health endpoint auth (optional) */
 const HEALTH_SECRET = process.env.HEALTH_SECRET;
@@ -52,7 +52,7 @@ function isAllowedIP(ip: string | null): boolean {
 /**
  * Check if request is authorized (F-15)
  */
-function isAuthorized(request: NextRequest): boolean {
+function isAuthorized(request: NextRequest, log: ReturnType<typeof getRequestLogger>): boolean {
   // In development, allow all
   if (process.env.NODE_ENV === 'development') return true;
 
@@ -67,7 +67,7 @@ function isAuthorized(request: NextRequest): boolean {
 
   if (isAllowedIP(clientIP)) return true;
 
-  logger.warn('Unauthorized access to /api/health/detailed', { clientIP });
+  log.warn('Unauthorized access to /api/health/detailed', { clientIP });
   return false;
 }
 
@@ -187,12 +187,15 @@ function formatUptime(seconds: number): string {
 }
 
 export async function GET(request: NextRequest) {
+  const log = getRequestLogger(request);
   // F-15: Check authorization
-  if (!isAuthorized(request)) {
-    return NextResponse.json(
+  if (!isAuthorized(request, log)) {
+    const response = NextResponse.json(
       { error: 'Unauthorized', message: 'Access to detailed health metrics requires authentication' },
       { status: 401 }
     );
+    response.headers.set('X-Request-ID', getRequestId(request));
+    return response;
   }
 
   const database = await checkDatabase();
@@ -220,5 +223,7 @@ export async function GET(request: NextRequest) {
     },
   };
 
-  return NextResponse.json(health, { status: health.status === 'unhealthy' ? 503 : 200 });
+  const response = NextResponse.json(health, { status: health.status === 'unhealthy' ? 503 : 200 });
+  response.headers.set('X-Request-ID', getRequestId(request));
+  return response;
 }

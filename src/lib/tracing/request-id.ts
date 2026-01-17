@@ -68,3 +68,16 @@ export function getClientInfo(request: NextRequest): {
 
   return { ip, userAgent };
 }
+
+/**
+ * Add X-Request-ID header to response (F-01)
+ * Extracts requestId from request and adds it to response headers
+ */
+export function addRequestIdToResponse<T extends { headers: Headers }>(
+  request: NextRequest,
+  response: T
+): T {
+  const requestId = getRequestId(request);
+  response.headers.set('X-Request-ID', requestId);
+  return response;
+}
