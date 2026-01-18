@@ -7,13 +7,19 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { POST } from '../route';
 import { NextRequest } from 'next/server';
 
-// Mock logger
+// Mock logger with child method for rate-limit.ts
 vi.mock('@/lib/logger', () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+    child: vi.fn(() => ({
+      debug: vi.fn(),
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+    })),
   },
 }));
 
