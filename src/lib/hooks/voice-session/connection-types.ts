@@ -3,16 +3,14 @@
 // Shared types for connection management
 // ============================================================================
 
-import type { Maestro } from '@/types';
-import type { RingBuffer } from './ring-buffer';
+import type { Maestro } from "@/types";
+import type { RingBuffer } from "./ring-buffer";
 
 /**
  * All refs used by connection management
  */
 export interface ConnectionRefs {
-  wsRef: React.MutableRefObject<WebSocket | null>;
   maestroRef: React.MutableRefObject<Maestro | null>;
-  transportRef: React.MutableRefObject<'websocket' | 'webrtc'>;
   captureContextRef: React.MutableRefObject<AudioContext | null>;
   playbackContextRef: React.MutableRefObject<AudioContext | null>;
   mediaStreamRef: React.MutableRefObject<MediaStream | null>;
@@ -26,7 +24,9 @@ export interface ConnectionRefs {
   sessionReadyRef: React.MutableRefObject<boolean>;
   greetingSentRef: React.MutableRefObject<boolean>;
   hasActiveResponseRef: React.MutableRefObject<boolean>;
-  handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
+  handleServerEventRef: React.MutableRefObject<
+    ((event: Record<string, unknown>) => void) | null
+  >;
   sessionIdRef: React.MutableRefObject<string | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
@@ -35,9 +35,13 @@ export interface ConnectionRefs {
   webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   webrtcHeartbeatRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  animationFrameRef: React.MutableRefObject<number | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
   /** Messages to inject for conversation continuity */
-  initialMessagesRef: React.MutableRefObject<Array<{ role: 'user' | 'assistant'; content: string }> | null>;
+  initialMessagesRef: React.MutableRefObject<Array<{
+    role: "user" | "assistant";
+    content: string;
+  }> | null>;
 }

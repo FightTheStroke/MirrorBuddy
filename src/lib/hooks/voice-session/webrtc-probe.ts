@@ -148,7 +148,6 @@ export async function probeWebRTC(): Promise<ProbeResult> {
       });
 
       return {
-        transport: "webrtc",
         success: true,
         latencyMs: sdpLatency,
         timestamp,
@@ -167,7 +166,6 @@ export async function probeWebRTC(): Promise<ProbeResult> {
     });
 
     return {
-      transport: "webrtc",
       success: false,
       latencyMs: latency,
       error: errorMessage,

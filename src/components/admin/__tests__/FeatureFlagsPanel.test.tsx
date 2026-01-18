@@ -52,13 +52,20 @@ vi.mock("@/lib/hooks/use-feature-flags", () => ({
   })),
 }));
 
-// Mock fetch
-global.fetch = vi.fn();
+// Mock csrfFetch
+vi.mock("@/lib/auth/csrf-client", () => ({
+  csrfFetch: vi.fn().mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve({ success: true }),
+  }),
+}));
+
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 describe("FeatureFlagsPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+    (csrfFetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ success: true }),
     });
@@ -112,11 +119,10 @@ describe("FeatureFlagsPanel", () => {
     fireEvent.click(disableButtons[0]);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(csrfFetch).toHaveBeenCalledWith(
         "/api/admin/feature-flags",
         expect.objectContaining({
           method: "POST",
-          headers: { "Content-Type": "application/json" },
         }),
       );
     });
