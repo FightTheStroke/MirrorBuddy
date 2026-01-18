@@ -96,7 +96,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       : summary;
 
     // Transaction: delete old messages, update conversation, save learnings
-    // Use Omit to get transaction-compatible client type
     await prisma.$transaction(async (tx) => {
       // Delete summarized messages
       await tx.message.deleteMany({

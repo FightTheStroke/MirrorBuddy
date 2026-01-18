@@ -38,12 +38,14 @@
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
+    "pre-push": "./scripts/pre-push-vercel.sh",
     "pre-release": "./scripts/pre-release-check.sh",
     "release:gate": "./scripts/release-gate.sh",
     "version:patch": "npm version patch && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "version:minor": "npm version minor && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "version:major": "npm version major && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "prisma generate"
   },
   "overrides": {
     "hono": "4.11.4"
