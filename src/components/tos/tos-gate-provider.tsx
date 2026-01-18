@@ -3,6 +3,7 @@
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import { TosAcceptanceModal } from "./tos-acceptance-modal";
+import { logger } from "@/lib/logger";
 
 /**
  * TosGateProvider - Enforces Terms of Service acceptance for authenticated users.
@@ -126,7 +127,11 @@ export function TosGateProvider({ children }: { children: React.ReactNode }) {
         }
       })
       .catch((error) => {
-        console.error("ToS check error:", error);
+        logger.error(
+          "ToS check error",
+          { component: "TosGateProvider" },
+          error,
+        );
         // On error, allow access (graceful degradation)
         setTosStatus({ accepted: true, checked: true });
       });

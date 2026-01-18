@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { TOS_VERSION } from "@/app/terms/page";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { logger } from "@/lib/logger";
 
 interface TosAcceptanceModalProps {
   open: boolean;
@@ -46,7 +47,11 @@ export function TosAcceptanceModal({
       await response.json();
       onAccept(TOS_VERSION);
     } catch (error) {
-      console.error("Failed to save ToS acceptance:", error);
+      logger.error(
+        "Failed to save ToS acceptance",
+        { component: "TosAcceptanceModal" },
+        error,
+      );
       toast.warning(
         "Accettazione salvata localmente",
         "La sincronizzazione con il server è fallita. Riproveremo più tardi.",
