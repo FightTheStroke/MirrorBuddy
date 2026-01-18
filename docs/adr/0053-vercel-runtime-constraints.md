@@ -210,6 +210,112 @@ const nextConfig: NextConfig = {
 
 **Fix applied**: Removed `pdf-parse` from `serverExternalPackages`. Now bundled.
 
+### Static Module Initialization (CRITICAL)
+
+Some packages initialize at module load time, which can break the entire import chain on
+Vercel even if the package itself is bundled correctly.
+
+#### The Problem
+
+```typescript
+// ❌ BROKEN - Initializes at module load time
+import DOMPurify from "dompurify";
+import { JSDOM } from "jsdom";
+
+const window = new JSDOM("").window; // Executes at module load!
+const purify = DOMPurify(window); // Creates instance at module load!
+
+export function sanitizeHtml(html: string): string {
+  return purify.sanitize(html);
+}
+```
+
+**What happens on Vercel**:
+
+1. Module loads during function cold start
+2. JSDOM tries to initialize (requires native dependencies)
+3. Fails with `ERR_REQUIRE_ESM` or similar
+4. **Entire import chain breaks** - not just the function that uses sanitization
+5. API route returns 500 on ALL requests (even GET)
+
+#### The Import Chain Problem
+
+```
+/api/chat/route.ts
+  └─ import '@/lib/tools/handlers'
+       └─ handlers/index.ts
+            └─ import './demo-handler'
+                 └─ demo-handler.ts
+                      └─ import { sanitizeHtml } from './demo-validators'
+                           └─ demo-validators.ts
+                                └─ const window = new JSDOM('').window  💥 FAILS
+```
+
+If ANY module in the chain fails to load, the ENTIRE `/api/chat` route fails.
+
+#### The Fix: Lazy Initialization
+
+```typescript
+// ✅ CORRECT - Lazy initialization with dynamic imports
+let purifyInstance: ReturnType<typeof import("dompurify").default> | null =
+  null;
+
+async function getPurify() {
+  if (!purifyInstance) {
+    // Dynamic imports - only loads when function is called
+    const { JSDOM } = await import("jsdom");
+    const DOMPurify = (await import("dompurify")).default;
+    const window = new JSDOM("").window;
+    purifyInstance = DOMPurify(window as any);
+  }
+  return purifyInstance;
+}
+
+export async function sanitizeHtml(html: string): Promise<string> {
+  if (!html) return "";
+  const purify = await getPurify();
+  return purify.sanitize(html);
+}
+```
+
+**Key changes**:
+
+1. Dynamic `import()` instead of static `import`
+2. Lazy initialization - only when function is called
+3. Singleton pattern - only create instance once
+4. Function becomes `async` - callers must await
+
+#### Fixed Files (2026-01-18)
+
+| File                      | Issue                    | Fix                           |
+| ------------------------- | ------------------------ | ----------------------------- |
+| `demo-validators.ts`      | JSDOM at module load     | Lazy init with dynamic import |
+| `demo-handler.ts`         | Called sync sanitizeHtml | Added await                   |
+| `demo-plugin.ts`          | Called sync sanitizeHtml | Added await                   |
+| `pdf-extraction.ts`       | pdf-parse at module load | Dynamic import in function    |
+| `study-kit-extraction.ts` | pdf-parse at module load | Dynamic import in function    |
+
+#### Detecting This Issue
+
+**Symptoms**:
+
+- GET /api/chat returns 500 (even though GET doesn't use sanitization)
+- Vercel logs show: `ERR_REQUIRE_ESM: require() of ES Module`
+- Error mentions a file you wouldn't expect (indirect import)
+
+**Check for problematic patterns**:
+
+```bash
+# Find static imports of known problematic packages
+grep -r "^import.*from ['\"]jsdom" src/
+grep -r "^import.*from ['\"]dompurify" src/
+grep -r "^import.*from ['\"]pdf-parse" src/
+
+# Find module-level initializations
+grep -r "new JSDOM\(\)" src/
+grep -r "= DOMPurify\(" src/
+```
+
 #### When serverExternalPackages IS Needed
 
 Only use it for packages with **native bindings** that:
@@ -299,15 +405,16 @@ First request after cold start may show high latency (500+ ms) due to:
 
 **Use this table when something breaks on Vercel production.**
 
-| Symptom                       | Check                                   | Root Cause                           | Fix                               |
-| ----------------------------- | --------------------------------------- | ------------------------------------ | --------------------------------- |
-| Chat API 500                  | Vercel logs: "MODULE_NOT_FOUND"         | Package in serverExternalPackages    | Remove from next.config.ts        |
-| Chat API 403                  | Response body: "Invalid CSRF"           | Using `fetch` instead of `csrfFetch` | Import and use csrfFetch          |
-| Voice "WebRTC required" error | Browser console: 403 on ephemeral-token | webrtc-probe.ts using plain fetch    | Change to csrfFetch               |
-| Voice SDP exchange 400        | "SDP exchange failed: 400" in logs      | Missing `?model=` in WebRTC URL      | Add model param to token route    |
-| Voice "operation insecure"    | CSP violation in console                | Missing wss:// in CSP connect-src    | Update proxy.ts CSP               |
-| Database timeout              | Health endpoint shows high latency      | Cold start + wrong region            | Deploy in same region as Supabase |
-| SSL certificate error         | Prisma logs SSL errors                  | Missing SUPABASE_CA_CERT             | Add CA cert to env vars           |
+| Symptom                        | Check                                   | Root Cause                           | Fix                               |
+| ------------------------------ | --------------------------------------- | ------------------------------------ | --------------------------------- |
+| Chat API 500                   | Vercel logs: "MODULE_NOT_FOUND"         | Package in serverExternalPackages    | Remove from next.config.ts        |
+| Chat API 500 (ERR_REQUIRE_ESM) | Vercel logs: "ERR_REQUIRE_ESM"          | Static import initializes at load    | Use lazy init + dynamic import    |
+| Chat API 403                   | Response body: "Invalid CSRF"           | Using `fetch` instead of `csrfFetch` | Import and use csrfFetch          |
+| Voice "WebRTC required" error  | Browser console: 403 on ephemeral-token | webrtc-probe.ts using plain fetch    | Change to csrfFetch               |
+| Voice SDP exchange 400         | "SDP exchange failed: 400" in logs      | Missing `?model=` in WebRTC URL      | Add model param to token route    |
+| Voice "operation insecure"     | CSP violation in console                | Missing wss:// in CSP connect-src    | Update proxy.ts CSP               |
+| Database timeout               | Health endpoint shows high latency      | Cold start + wrong region            | Deploy in same region as Supabase |
+| SSL certificate error          | Prisma logs SSL errors                  | Missing SUPABASE_CA_CERT             | Add CA cert to env vars           |
 
 **First response to any production failure**:
 

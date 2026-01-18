@@ -46,6 +46,41 @@ serverExternalPackages: ["pdf-parse"],
 // (removed entirely, package now bundled)
 ```
 
+### Chat API Returns 500 (ERR_REQUIRE_ESM)
+
+**Symptoms**: "Mi dispiace, ho avuto un problema" in chat, GET /api/chat also returns 500
+
+**Check Vercel logs for**:
+
+```
+Error: ERR_REQUIRE_ESM: require() of ES Module
+Failed to load external module jsdom
+```
+
+**Root cause**: A module (like JSDOM or DOMPurify) initializes at module load time,
+breaking the entire import chain.
+
+**Fix**: Use lazy initialization with dynamic imports:
+
+```typescript
+// BEFORE - BROKEN (initializes at module load)
+import { JSDOM } from "jsdom";
+const window = new JSDOM("").window;
+
+// AFTER - WORKING (lazy initialization)
+let instance = null;
+
+async function getInstance() {
+  if (!instance) {
+    const { JSDOM } = await import("jsdom");
+    instance = new JSDOM("").window;
+  }
+  return instance;
+}
+```
+
+**Example fix** (2026-01-18): `demo-validators.ts` - JSDOM/DOMPurify lazy init
+
 ### Chat API Returns 403
 
 **Symptoms**: Silent failure, "Invalid CSRF token" in response
