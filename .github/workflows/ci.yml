@@ -64,8 +64,14 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       # Share build output with E2E and Performance jobs
-      - name: Clean build cache before upload
-        run: rm -rf .next/cache
+      - name: Verify and prepare build output
+        run: |
+          echo "Build output contents:"
+          ls -la .next/ || echo ".next directory not found!"
+          du -sh .next/ || echo "Cannot check .next size"
+          rm -rf .next/cache
+          echo "After cache removal:"
+          ls -la .next/ || echo ".next directory missing after cache removal!"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
