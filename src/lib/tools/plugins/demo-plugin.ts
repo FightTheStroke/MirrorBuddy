@@ -5,13 +5,13 @@
  * Implements F-02 (Maestri can create tools) and F-03 (Tools integrate with system)
  */
 
-import { z } from 'zod';
-import { ToolPlugin, ToolCategory, Permission } from '../plugin/types';
-import { nanoid } from 'nanoid';
-import { chatCompletion } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import { sanitizeHtml } from '../handlers/demo-handler';
-import type { ToolContext, ToolResult } from '@/types/tools';
+import { z } from "zod";
+import { ToolPlugin, ToolCategory, Permission } from "../plugin/types";
+import { nanoid } from "nanoid";
+import { chatCompletion } from "@/lib/ai/providers";
+import { logger } from "@/lib/logger";
+import { sanitizeHtml } from "../handlers/demo-handler";
+import type { ToolContext, ToolResult } from "@/types/tools";
 
 /**
  * Input validation schema for demo creation
@@ -19,7 +19,10 @@ import type { ToolContext, ToolResult } from '@/types/tools';
  */
 const DemoInputSchema = z.object({
   topic: z.string().min(1).max(200),
-  type: z.enum(['simulation', 'visualization', 'experiment']).optional().default('visualization'),
+  type: z
+    .enum(["simulation", "visualization", "experiment"])
+    .optional()
+    .default("visualization"),
   title: z.string().min(1).max(100).optional(),
   concept: z.string().min(1).max(500).optional(),
   visualization: z.string().min(1).max(500).optional(),
@@ -46,7 +49,7 @@ async function generateDemoCode(args: {
     title = `Demo: ${topic}`,
     concept = topic,
     visualization = `Interactive visualization for ${topic}`,
-    interaction = 'Click and drag to explore',
+    interaction = "Click and drag to explore",
     wowFactor,
   } = args;
 
@@ -57,16 +60,16 @@ TIPO: ${type}
 CONCETTO: ${concept}
 VISUALIZZAZIONE: ${visualization}
 INTERAZIONE: ${interaction}
-${wowFactor ? `WOW: ${wowFactor}` : ''}
+${wowFactor ? `WOW: ${wowFactor}` : ""}
 
 Usa il template base con CSS e JS spettacolari (gradients, animazioni, particelle).
 Rispondi SOLO con JSON valido: {"html":"...","css":"...","js":"..."}`;
 
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: prompt }],
-      'Sei un generatore di codice. Rispondi SOLO con JSON valido.',
-      { temperature: 0.7, maxTokens: 4000 }
+      [{ role: "user", content: prompt }],
+      "Sei un generatore di codice. Rispondi SOLO con JSON valido.",
+      { temperature: 0.7, maxTokens: 4000 },
     );
 
     const jsonMatch = result.content.match(/\{[\s\S]*\}/);
@@ -77,9 +80,9 @@ Rispondi SOLO con JSON valido: {"html":"...","css":"...","js":"..."}`;
 
     const code = JSON.parse(jsonMatch[0]);
     return {
-      html: code.html || '',
-      css: code.css || '',
-      js: code.js || '',
+      html: code.html || "",
+      css: code.css || "",
+      js: code.js || "",
     };
   } catch (error) {
     logger.error(`Failed to generate demo code for ${topic}`, undefined, error);
@@ -93,15 +96,18 @@ Rispondi SOLO con JSON valido: {"html":"...","css":"...","js":"..."}`;
  * Addresses F-02 (Maestri can create tools) and F-03 (integration)
  */
 export const demoPlugin: ToolPlugin = {
-  id: 'create_demo',
-  name: 'Demo Interattiva',
+  id: "create_demo",
+  name: "Demo Interattiva",
   category: ToolCategory.EDUCATIONAL,
 
   // Input schema for validation
   schema: DemoInputSchema,
 
   // Handler wraps demo creation logic
-  handler: async (args: Record<string, unknown>, _context: ToolContext): Promise<ToolResult> => {
+  handler: async (
+    args: Record<string, unknown>,
+    _context: ToolContext,
+  ): Promise<ToolResult> => {
     try {
       const validated = DemoInputSchema.parse(args);
       const {
@@ -110,7 +116,7 @@ export const demoPlugin: ToolPlugin = {
         title = `Demo: ${topic}`,
         concept = topic,
         visualization = `Visualizzazione per ${topic}`,
-        interaction = 'Clicca e trascina per esplorare',
+        interaction = "Clicca e trascina per esplorare",
         wowFactor,
       } = validated;
 
@@ -128,7 +134,7 @@ export const demoPlugin: ToolPlugin = {
       if (!code) {
         return {
           success: false,
-          error: 'Non è stato possibile generare il codice della demo',
+          error: "Non è stato possibile generare il codice della demo",
         };
       }
 
@@ -140,17 +146,17 @@ export const demoPlugin: ToolPlugin = {
           title,
           type,
           topic,
-          html: sanitizeHtml(code.html),
+          html: await sanitizeHtml(code.html),
           css: code.css,
           js: code.js,
           description: `${concept}: ${visualization}`,
         },
       };
     } catch (error) {
-      logger.error('Demo handler error', undefined, error);
+      logger.error("Demo handler error", undefined, error);
       return {
         success: false,
-        error: `Errore nella creazione della demo: ${error instanceof Error ? error.message : 'Sconosciuto'}`,
+        error: `Errore nella creazione della demo: ${error instanceof Error ? error.message : "Sconosciuto"}`,
       };
     }
   },
@@ -158,21 +164,28 @@ export const demoPlugin: ToolPlugin = {
   // Voice integration for maestro system
   // Supports dynamic template substitution with {topic}
   voicePrompt: {
-    template: 'Vuoi vedere una demo interattiva su {topic}?',
-    requiresContext: ['topic'],
-    fallback: 'Vuoi creare una demo interattiva?',
+    template: "Vuoi vedere una demo interattiva su {topic}?",
+    requiresContext: ["topic"],
+    fallback: "Vuoi creare una demo interattiva?",
   },
 
   voiceFeedback: {
-    template: 'Ecco la demo su {topic} pronta per esplorare!',
-    requiresContext: ['topic'],
-    fallback: 'Ecco la demo pronta!',
+    template: "Ecco la demo su {topic} pronta per esplorare!",
+    requiresContext: ["topic"],
+    fallback: "Ecco la demo pronta!",
   },
 
   voiceEnabled: true,
 
   // Voice triggers in Italian for maestro context
-  triggers: ['demo', 'mostra demo', 'esempio', 'simulazione', 'visualizza', 'interattivo'],
+  triggers: [
+    "demo",
+    "mostra demo",
+    "esempio",
+    "simulazione",
+    "visualizza",
+    "interattivo",
+  ],
 
   // No prerequisites - works standalone
   prerequisites: [],
