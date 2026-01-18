@@ -120,10 +120,8 @@ export function useConnect(
       refs,
       setConnected,
       setConnectionState,
-      connectionState,
       handleServerEvent,
       preferredMicrophoneId,
-      initPlaybackContext,
       options,
     ],
   );

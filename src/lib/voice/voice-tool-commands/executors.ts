@@ -7,15 +7,16 @@
  * Related: #25 Voice-First Tool Creation
  */
 
-import { logger } from '@/lib/logger';
-import { executeOnboardingTool } from '../onboarding-tools/tool-handlers';
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import { executeOnboardingTool } from "../onboarding-tools/tool-handlers";
 import {
   isMindmapModificationCommand,
   isSummaryModificationCommand,
   isOnboardingCommand,
   getToolTypeFromName,
-} from './helpers';
-import type { VoiceToolCallResult } from './types';
+} from "./helpers";
+import type { VoiceToolCallResult } from "./types";
 
 // ============================================================================
 // TOOL EXECUTION API
@@ -29,7 +30,7 @@ export async function executeVoiceTool(
   sessionId: string,
   maestroId: string,
   toolName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<VoiceToolCallResult> {
   // Check for mindmap modification commands first
   if (isMindmapModificationCommand(toolName)) {
@@ -55,14 +56,14 @@ export async function executeVoiceTool(
 
   try {
     // Call the API to create the tool and broadcast events
-    const response = await fetch('/api/tools/create', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    // CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
+    const response = await csrfFetch("/api/tools/create", {
+      method: "POST",
       body: JSON.stringify({
         sessionId,
         maestroId,
         toolType,
-        title: args.title || args.name || 'Untitled',
+        title: args.title || args.name || "Untitled",
         subject: args.subject,
         content: args,
       }),
@@ -70,7 +71,10 @@ export async function executeVoiceTool(
 
     if (!response.ok) {
       const error = await response.json();
-      return { success: false, error: error.message || 'Failed to create tool' };
+      return {
+        success: false,
+        error: error.message || "Failed to create tool",
+      };
     }
 
     const result = await response.json();
@@ -81,10 +85,14 @@ export async function executeVoiceTool(
       displayed: true,
     };
   } catch (error) {
-    logger.error('[VoiceToolCommands] Failed to execute tool', undefined, error);
+    logger.error(
+      "[VoiceToolCommands] Failed to execute tool",
+      undefined,
+      error,
+    );
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -96,13 +104,13 @@ export async function executeVoiceTool(
 export async function executeMindmapModification(
   sessionId: string,
   commandName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<VoiceToolCallResult> {
   try {
     // Send modification event to SSE endpoint
-    const response = await fetch('/api/tools/stream/modify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    // CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
+    const response = await csrfFetch("/api/tools/stream/modify", {
+      method: "POST",
       body: JSON.stringify({
         sessionId,
         command: commandName,
@@ -114,21 +122,28 @@ export async function executeMindmapModification(
       const error = await response.json();
       return {
         success: false,
-        error: error.message || 'Failed to modify mindmap',
+        error: error.message || "Failed to modify mindmap",
       };
     }
 
-    logger.info('[VoiceToolCommands] Mindmap modification sent', { commandName, args });
+    logger.info("[VoiceToolCommands] Mindmap modification sent", {
+      commandName,
+      args,
+    });
     return {
       success: true,
-      toolType: 'mindmap',
+      toolType: "mindmap",
       displayed: true,
     };
   } catch (error) {
-    logger.error('[VoiceToolCommands] Failed to modify mindmap', undefined, error);
+    logger.error(
+      "[VoiceToolCommands] Failed to modify mindmap",
+      undefined,
+      error,
+    );
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -140,16 +155,16 @@ export async function executeMindmapModification(
 export async function executeSummaryModification(
   sessionId: string,
   commandName: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ): Promise<VoiceToolCallResult> {
   try {
     // Send modification event to SSE endpoint
-    const response = await fetch('/api/tools/stream/modify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    // CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
+    const response = await csrfFetch("/api/tools/stream/modify", {
+      method: "POST",
       body: JSON.stringify({
         sessionId,
-        toolType: 'summary',
+        toolType: "summary",
         command: commandName,
         args,
       }),
@@ -159,21 +174,28 @@ export async function executeSummaryModification(
       const error = await response.json();
       return {
         success: false,
-        error: error.message || 'Failed to modify summary',
+        error: error.message || "Failed to modify summary",
       };
     }
 
-    logger.info('[VoiceToolCommands] Summary modification sent', { commandName, args });
+    logger.info("[VoiceToolCommands] Summary modification sent", {
+      commandName,
+      args,
+    });
     return {
       success: true,
-      toolType: 'summary',
+      toolType: "summary",
       displayed: true,
     };
   } catch (error) {
-    logger.error('[VoiceToolCommands] Failed to modify summary', undefined, error);
+    logger.error(
+      "[VoiceToolCommands] Failed to modify summary",
+      undefined,
+      error,
+    );
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }

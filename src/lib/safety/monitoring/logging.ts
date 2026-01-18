@@ -5,11 +5,12 @@
  * DB persistence happens via API when available.
  */
 
-import { logger } from '@/lib/logger';
-import type { SafetyEvent, SafetyEventType, EventSeverity } from './types';
-import { anonymizeId, isViolationType, generateEventId } from './utils';
-import { checkViolationPattern } from './violation-tracker';
-import { registerLogCallback } from './violation-callback';
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import type { SafetyEvent, SafetyEventType, EventSeverity } from "./types";
+import { anonymizeId, isViolationType, generateEventId } from "./utils";
+import { checkViolationPattern } from "./violation-tracker";
+import { registerLogCallback } from "./violation-callback";
 
 const eventBuffer: SafetyEvent[] = [];
 const MAX_BUFFER_SIZE = 1000;
@@ -19,12 +20,12 @@ const MAX_BUFFER_SIZE = 1000;
  * Non-blocking - fires and forgets
  */
 async function persistSafetyEventToApi(event: SafetyEvent): Promise<void> {
-  if (typeof window === 'undefined') return; // Server-side, handled differently
+  if (typeof window === "undefined") return; // Server-side, handled differently
 
   try {
-    await fetch('/api/safety/events', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    // CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
+    await csrfFetch("/api/safety/events", {
+      method: "POST",
       body: JSON.stringify({
         type: event.type,
         severity: event.severity,
@@ -41,7 +42,9 @@ async function persistSafetyEventToApi(event: SafetyEvent): Promise<void> {
 export function logSafetyEvent(
   type: SafetyEventType,
   severity: EventSeverity,
-  options: Partial<Omit<SafetyEvent, 'id' | 'type' | 'severity' | 'timestamp'>> = {}
+  options: Partial<
+    Omit<SafetyEvent, "id" | "type" | "severity" | "timestamp">
+  > = {},
 ): SafetyEvent {
   const event: SafetyEvent = {
     id: generateEventId(),
@@ -57,11 +60,12 @@ export function logSafetyEvent(
     eventBuffer.shift();
   }
 
-  const logMethod = severity === 'critical' || severity === 'alert'
-    ? 'error'
-    : severity === 'warning'
-      ? 'warn'
-      : 'info';
+  const logMethod =
+    severity === "critical" || severity === "alert"
+      ? "error"
+      : severity === "warning"
+        ? "warn"
+        : "info";
 
   logger[logMethod](`Safety event: ${type}`, {
     eventId: event.id,
@@ -77,7 +81,7 @@ export function logSafetyEvent(
 
   // Persist via API (non-blocking)
   persistSafetyEventToApi(event).catch((err) => {
-    logger.error('Failed to persist safety event to API', {
+    logger.error("Failed to persist safety event to API", {
       eventId: event.id,
       error: String(err),
     });

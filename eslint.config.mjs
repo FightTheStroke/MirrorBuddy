@@ -50,10 +50,19 @@ const eslintConfig = defineConfig([
       "src/lib/stores/**/*.ts",
       "src/lib/client-*.ts",
       "src/hooks/**/*.ts",
+      // Additional client-side code that makes API calls
+      "src/lib/voice/**/*.ts",
+      "src/lib/tools/**/*.ts",
+      "src/lib/safety/**/*.ts",
     ],
     ignores: [
       // WebRTC files call Azure directly (not through our API)
       "src/lib/hooks/voice-session/webrtc-*.ts",
+      // Server-side handlers that call Azure APIs directly (not our /api/*)
+      "src/lib/tools/handlers/**/*.ts",
+      // Server-side only files
+      "src/lib/tools/server-*.ts",
+      "src/lib/safety/server-*.ts",
     ],
     rules: {
       "no-restricted-syntax": [
