@@ -64,13 +64,15 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
       # Share build output with E2E and Performance jobs
+      - name: Clean build cache before upload
+        run: rm -rf .next/cache
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: |
-            .next
-            !.next/cache
+          path: .next
+          if-no-files-found: error
           retention-days: 1
 
   # Lane 2: Security Audit + SBOM (runs in parallel with build)
