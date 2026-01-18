@@ -80,10 +80,14 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
 
   useEffect(() => {
     refs.playNextChunkRef.current = playNextChunk;
-  }, [playNextChunk]);
+  }, [playNextChunk, refs]);
 
   useEffect(() => {
-    store.isSpeaking ? startPolling() : stopPolling();
+    if (store.isSpeaking) {
+      startPolling();
+    } else {
+      stopPolling();
+    }
   }, [store.isSpeaking, startPolling, stopPolling]);
 
   // ============================================================================
@@ -162,7 +166,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
 
   useEffect(() => {
     refs.handleServerEventRef.current = handleServerEvent;
-  }, [handleServerEvent]);
+  }, [handleServerEvent, refs]);
 
   // ============================================================================
   // CONNECTION

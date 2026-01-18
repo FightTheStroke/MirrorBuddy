@@ -4,10 +4,11 @@
  * Ensures reliable delivery across connection types
  */
 
-import { logger } from '@/lib/logger';
-import type { ToolDataChannelMessage } from './data-channel-protocol';
-import { ToolDataChannelSender } from './data-channel-sender';
-import type { EventBroadcaster as EventBroadcasterInterface } from './orchestrator';
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import type { ToolDataChannelMessage } from "./data-channel-protocol";
+import { ToolDataChannelSender } from "./data-channel-sender";
+import type { EventBroadcaster as EventBroadcasterInterface } from "./orchestrator";
 
 /**
  * ToolEventBroadcaster - Manages dual-path event delivery
@@ -34,7 +35,7 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
     if (this.isUsingDataChannel()) {
       const success = this.sender!.sendEvent(event);
       if (success) {
-        logger.debug('[ToolEventBroadcaster] Event sent via DataChannel', {
+        logger.debug("[ToolEventBroadcaster] Event sent via DataChannel", {
           toolId: event.toolId,
           eventType: event.type,
         });
@@ -44,7 +45,7 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
 
     // Schedule SSE fallback asynchronously
     this.broadcastViaSSE(event).catch((err) => {
-      logger.error('[ToolEventBroadcaster] SSE broadcast promise rejected', {
+      logger.error("[ToolEventBroadcaster] SSE broadcast promise rejected", {
         toolId: event.toolId,
         error: err instanceof Error ? err.message : String(err),
       });
@@ -55,12 +56,14 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
 
   /**
    * Send event via SSE fallback endpoint
+   * CSRF: Must use csrfFetch for POST requests on Vercel (ADR 0053)
    */
-  private async broadcastViaSSE(event: ToolDataChannelMessage): Promise<boolean> {
+  private async broadcastViaSSE(
+    event: ToolDataChannelMessage,
+  ): Promise<boolean> {
     try {
-      const response = await fetch('/api/tools/events', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await csrfFetch("/api/tools/events", {
+        method: "POST",
         body: JSON.stringify({
           event,
           sessionId: this.sessionId,
@@ -68,22 +71,22 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
       });
 
       if (!response.ok) {
-        logger.warn('[ToolEventBroadcaster] SSE fallback failed', {
+        logger.warn("[ToolEventBroadcaster] SSE fallback failed", {
           toolId: event.toolId,
           status: response.status,
         });
         return false;
       }
 
-      logger.debug('[ToolEventBroadcaster] Event sent via SSE fallback', {
+      logger.debug("[ToolEventBroadcaster] Event sent via SSE fallback", {
         toolId: event.toolId,
         eventType: event.type,
       });
       return true;
     } catch (error) {
-      logger.error('[ToolEventBroadcaster] SSE broadcast error', {
+      logger.error("[ToolEventBroadcaster] SSE broadcast error", {
         toolId: event.toolId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       });
       return false;
     }
@@ -94,7 +97,7 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
    */
   setDataChannelSender(sender: ToolDataChannelSender | null): void {
     this.sender = sender;
-    logger.debug('[ToolEventBroadcaster] Sender updated', {
+    logger.debug("[ToolEventBroadcaster] Sender updated", {
       hasDataChannel: this.isUsingDataChannel(),
     });
   }
@@ -116,8 +119,8 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
   /**
    * Get delivery mode for debugging
    */
-  getDeliveryMode(): 'dataChannel' | 'sse' {
-    return this.isUsingDataChannel() ? 'dataChannel' : 'sse';
+  getDeliveryMode(): "dataChannel" | "sse" {
+    return this.isUsingDataChannel() ? "dataChannel" : "sse";
   }
 
   /**
@@ -137,4 +140,3 @@ export function createToolEventBroadcaster(
 ): ToolEventBroadcaster {
   return new ToolEventBroadcaster(sender || null, sessionId);
 }
-
