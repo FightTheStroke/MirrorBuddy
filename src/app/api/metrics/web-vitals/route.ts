@@ -102,7 +102,15 @@ function formatInfluxLineProtocol(
   return metrics
     .map((m) => {
       const tags = Object.entries(m.labels)
-        .map(([k, v]) => `${k}=${v.replace(/[, ]/g, '\\ ')}`)
+        .map(([k, v]) => {
+          // Influx Line Protocol requires escaping: backslash first, then comma/space/equals
+          const escaped = v
+            .replace(/\\/g, '\\\\')  // Escape backslashes first
+            .replace(/,/g, '\\,')     // Escape commas
+            .replace(/ /g, '\\ ')     // Escape spaces
+            .replace(/=/g, '\\=');    // Escape equals
+          return `${k}=${escaped}`;
+        })
         .join(',');
       return `${m.name},${tags} value=${m.value} ${timestamp * 1000000}`;
     })

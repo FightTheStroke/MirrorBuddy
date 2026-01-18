@@ -11,6 +11,24 @@ export type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
 const SESSION_ID_KEY = 'mirrorbuddy-web-vitals-session';
 
+/**
+ * Generate a cryptographically secure random ID
+ * Uses crypto.randomUUID() when available, falls back to crypto.getRandomValues()
+ */
+function generateSecureId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  // Fallback for older browsers
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    const arr = new Uint8Array(16);
+    crypto.getRandomValues(arr);
+    return Array.from(arr, (b) => b.toString(16).padStart(2, '0')).join('');
+  }
+  // Last resort fallback (should rarely happen in modern browsers)
+  return `${Date.now()}-${performance.now().toString(36)}`;
+}
+
 export function getOrCreateSessionId(): string {
   if (typeof window === 'undefined') {
     return 'unknown';
@@ -19,13 +37,13 @@ export function getOrCreateSessionId(): string {
   try {
     let sessionId = sessionStorage.getItem(SESSION_ID_KEY);
     if (!sessionId) {
-      sessionId = `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+      sessionId = `${Date.now()}-${generateSecureId().slice(0, 12)}`;
       sessionStorage.setItem(SESSION_ID_KEY, sessionId);
     }
     return sessionId;
   } catch {
     // sessionStorage may not be available (private browsing)
-    return `temp-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    return `temp-${Date.now()}-${generateSecureId().slice(0, 12)}`;
   }
 }
 
