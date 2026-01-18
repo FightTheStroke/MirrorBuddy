@@ -10,6 +10,7 @@ import { logger } from "@/lib/logger";
 import { metricsStore } from "@/lib/observability/metrics-store";
 import { generateSLIMetrics } from "./sli-metrics";
 import { generateBehavioralMetrics } from "./behavioral-metrics";
+import { generateBusinessMetrics } from "./business-metrics";
 import { generateExternalServiceMetrics } from "@/lib/metrics/external-service-metrics";
 
 interface MetricLine {
@@ -202,6 +203,10 @@ export async function GET() {
     // BEHAVIORAL METRICS (V1Plan FASE 2): Session health, safety, cost
     const behavioralMetrics = await generateBehavioralMetrics();
     metrics.push(...behavioralMetrics);
+
+    // BUSINESS METRICS: User engagement, conversion, retention, maestri usage
+    const businessMetrics = await generateBusinessMetrics();
+    metrics.push(...businessMetrics);
 
     // Format as Prometheus exposition format
     const output = formatPrometheusOutput(metrics);

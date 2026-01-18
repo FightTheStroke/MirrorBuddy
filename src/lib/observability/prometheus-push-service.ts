@@ -1,12 +1,14 @@
 /**
  * Prometheus Push Service for Grafana Cloud
  *
- * Pushes metrics to Grafana Cloud using remote write protocol.
+ * Pushes metrics to Grafana Cloud using Influx Line Protocol.
  * Configure via environment variables:
- *   - GRAFANA_CLOUD_PROMETHEUS_URL
+ *   - GRAFANA_CLOUD_PROMETHEUS_URL (use /api/v1/push/influx/write endpoint)
  *   - GRAFANA_CLOUD_PROMETHEUS_USER
  *   - GRAFANA_CLOUD_API_KEY
  *   - GRAFANA_CLOUD_PUSH_INTERVAL (default: 60s)
+ *
+ * Tested: 18 Jan 2026 - metrics visible in Grafana Cloud
  */
 
 import { metricsStore } from './metrics-store';

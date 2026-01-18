@@ -11,8 +11,8 @@
 
 <p align="center">
   <a href="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/tests-3144-brightgreen" alt="Tests: 3144">
-  <img src="https://img.shields.io/badge/e2e-85-blue" alt="E2E: 85">
+  <img src="https://img.shields.io/badge/tests-5169-brightgreen" alt="Tests: 5169">
+  <img src="https://img.shields.io/badge/e2e-229-blue" alt="E2E: 229">
   <img src="https://img.shields.io/badge/coverage-80%25-brightgreen" alt="Coverage: 80%">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>
   <a href="https://github.com/FightTheStroke/MirrorBuddy/releases"><img src="https://img.shields.io/github/v/release/FightTheStroke/MirrorBuddy?include_prereleases&label=version" alt="Version"></a>
@@ -23,6 +23,14 @@
   <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5-blue" alt="TypeScript"></a>
   <a href="https://www.w3.org/WAI/WCAG21/quickref/"><img src="https://img.shields.io/badge/WCAG-2.1%20AA-green" alt="WCAG 2.1 AA"></a>
   <a href="https://fightthestroke.org"><img src="https://img.shields.io/badge/FightTheStroke-Partner-red" alt="FightTheStroke"></a>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/AI%20Maestri-20-purple" alt="20 AI Maestri">
+  <img src="https://img.shields.io/badge/DSA%20Profiles-7-orange" alt="7 DSA Profiles">
+  <img src="https://img.shields.io/badge/GDPR-Compliant-blue" alt="GDPR Compliant">
+  <img src="https://img.shields.io/badge/Child%20Safe-5%20Layer%20Security-brightgreen" alt="Child Safe">
+  <a href="https://mirrorbuddy.grafana.net/d/dashboard/"><img src="https://img.shields.io/badge/Grafana-Dashboard-F46800?logo=grafana" alt="Grafana Dashboard"></a>
 </p>
 
 <p align="center">
@@ -206,6 +214,35 @@ Open http://localhost:3000 and start learning.
 | Mind Maps | MarkMap |
 | Database | Prisma + PostgreSQL + pgvector |
 | Testing | Playwright E2E (API-focused) + Vitest unit |
+| Observability | Grafana Cloud + Prometheus metrics |
+
+---
+
+## Observability & Monitoring
+
+**Dashboard:** https://mirrorbuddy.grafana.net/d/dashboard/
+
+**Metrics Exported (V1Plan compliance):**
+- Session Health: success rate, drop-off rate, stuck loop rate
+- Safety: refusal precision, jailbreak block rate, incidents S0-S3
+- Performance: HTTP latency P95, error rates by route
+- Cost: per-session cost (text/voice), cost spikes
+
+**Setup:**
+```bash
+# .env
+GRAFANA_CLOUD_PROMETHEUS_URL=https://prometheus-prod-XX.grafana.net/api/v1/push/influx/write
+GRAFANA_CLOUD_PROMETHEUS_USER=your-instance-id
+GRAFANA_CLOUD_API_KEY=glc_your_token
+
+# Test push
+npx tsx scripts/test-grafana-push.ts
+```
+
+**Endpoints:**
+- `GET /api/health` — Load balancer health check
+- `GET /api/health/detailed` — Full system metrics
+- `GET /api/metrics` — Prometheus format (Grafana scrape)
 
 ---
 

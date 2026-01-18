@@ -10,7 +10,7 @@
 
 ## Grafana Cloud
 
-**Dashboard**: https://mirrorbuddy.grafana.net/d/mirrorbuddy-sli-slo/
+**Dashboard**: https://mirrorbuddy.grafana.net/d/dashboard/
 
 **Environment variables** (in `.env`):
 ```bash
