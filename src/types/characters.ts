@@ -2,33 +2,33 @@
 // CHARACTER TYPES - Support Teachers, Buddies, Learning Differences
 // ============================================================================
 
-import type { MaestroVoice } from './content';
-import type { StudentProfile } from './user';
+import type { MaestroVoice } from "./content";
+import type { StudentProfile } from "./user";
 
 /**
  * Learning differences that the platform supports.
  * Used for both student profiles and buddy matching.
  */
 export type LearningDifference =
-  | 'dyslexia'
-  | 'dyscalculia'
-  | 'dysgraphia'
-  | 'adhd'
-  | 'autism'
-  | 'cerebralPalsy'
-  | 'visualImpairment'
-  | 'auditoryProcessing';
+  | "dyslexia"
+  | "dyscalculia"
+  | "dysgraphia"
+  | "adhd"
+  | "autism"
+  | "cerebralPalsy"
+  | "visualImpairment"
+  | "auditoryProcessing";
 
 /**
  * Role of support characters in the Support Triangle.
  */
-export type SupportRole = 'learning_coach' | 'peer_buddy';
+export type SupportRole = "learning_coach" | "peer_buddy";
 
 /**
  * Gender option for support characters.
  * Students can choose their preferred coach/buddy gender.
  */
-export type CharacterGender = 'male' | 'female';
+export type CharacterGender = "male" | "female";
 
 /**
  * Extended student profile with learning differences.
@@ -36,8 +36,14 @@ export type CharacterGender = 'male' | 'female';
  */
 export interface ExtendedStudentProfile extends StudentProfile {
   learningDifferences: LearningDifference[];
-  preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
-  preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+  preferredCoach?:
+    | "melissa"
+    | "roberto"
+    | "chiara"
+    | "andrea"
+    | "favij"
+    | "laura";
+  preferredBuddy?: "mario" | "noemi" | "enea" | "bruno" | "sofia" | "marta";
 }
 
 /**
@@ -46,12 +52,12 @@ export interface ExtendedStudentProfile extends StudentProfile {
  * Relationship: vertical (coach), but talks "alongside" not "from above".
  */
 export interface SupportTeacher {
-  id: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+  id: "melissa" | "roberto" | "chiara" | "andrea" | "favij" | "laura";
   name: string;
   gender: CharacterGender;
   age: number;
   personality: string;
-  role: 'learning_coach';
+  role: "learning_coach";
   voice: MaestroVoice;
   voiceInstructions: string;
   systemPrompt: string;
@@ -71,12 +77,12 @@ export interface SupportTeacher {
  * - Learning differences mirror the student's
  */
 export interface BuddyProfile {
-  id: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+  id: "mario" | "noemi" | "enea" | "bruno" | "sofia" | "marta";
   name: string;
   gender: CharacterGender;
   ageOffset: number; // Always 1 (one year older)
   personality: string;
-  role: 'peer_buddy';
+  role: "peer_buddy";
   voice: MaestroVoice;
   voiceInstructions: string;
   /**
@@ -102,4 +108,4 @@ export type SupportCharacter = SupportTeacher | BuddyProfile;
  * Character type identifier for routing.
  * Note: 'support_assistant' was removed in Issue #16 - coaches handle platform support directly.
  */
-export type CharacterType = 'maestro' | 'coach' | 'buddy';
+export type CharacterType = "maestro" | "coach" | "buddy";

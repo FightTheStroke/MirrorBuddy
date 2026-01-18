@@ -15,18 +15,19 @@
  * Related: #24 MirrorBuddy Issue, ManifestoEdu.md
  */
 
-import type { BuddyProfile } from '@/types';
-import { MARIO } from './mario';
-import { NOEMI } from './noemi';
-import { ENEA } from './enea';
-import { BRUNO } from './bruno';
-import { SOFIA } from './sofia';
+import type { BuddyProfile } from "@/types";
+import { MARIO } from "./mario";
+import { NOEMI } from "./noemi";
+import { ENEA } from "./enea";
+import { BRUNO } from "./bruno";
+import { SOFIA } from "./sofia";
+import { MARTA } from "./marta";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type BuddyId = 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+export type BuddyId = "mario" | "noemi" | "enea" | "bruno" | "sofia" | "marta";
 
 // ============================================================================
 // BUDDY PROFILES MAP
@@ -41,13 +42,14 @@ const BUDDY_PROFILES: Record<BuddyId, BuddyProfile> = {
   enea: ENEA,
   bruno: BRUNO,
   sofia: SOFIA,
+  marta: MARTA,
 };
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
-export { MARIO, NOEMI, ENEA, BRUNO, SOFIA };
+export { MARIO, NOEMI, ENEA, BRUNO, SOFIA, MARTA };
 
 /**
  * Get a buddy profile by ID.
@@ -60,7 +62,7 @@ export function getBuddyById(id: BuddyId): BuddyProfile | undefined {
  * Get all buddy profiles.
  */
 export function getAllBuddies(): BuddyProfile[] {
-  return [MARIO, NOEMI, ENEA, BRUNO, SOFIA];
+  return [MARIO, NOEMI, ENEA, BRUNO, SOFIA, MARTA];
 }
 
 /**
@@ -73,6 +75,6 @@ export function getDefaultBuddy(): BuddyProfile {
 /**
  * Get a buddy by gender preference.
  */
-export function getBuddyByGender(gender: 'male' | 'female'): BuddyProfile {
-  return gender === 'female' ? NOEMI : MARIO;
+export function getBuddyByGender(gender: "male" | "female"): BuddyProfile {
+  return gender === "female" ? NOEMI : MARIO;
 }
