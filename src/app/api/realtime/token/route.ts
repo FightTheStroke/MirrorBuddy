@@ -83,7 +83,8 @@ export async function GET(request: NextRequest) {
     ...(transport === "webrtc"
       ? {
           endpoint: azureEndpoint.replace(/\/$/, ""), // For session creation
-          webrtcEndpoint: `https://${azureRegion}.realtimeapi-preview.ai.azure.com/v1/realtimertc`,
+          // CRITICAL: model parameter is REQUIRED by Azure WebRTC endpoint
+          webrtcEndpoint: `https://${azureRegion}.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=${encodeURIComponent(azureDeployment)}`,
           deployment: azureDeployment,
         }
       : {
