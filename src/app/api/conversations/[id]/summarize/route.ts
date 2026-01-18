@@ -14,7 +14,6 @@ import {
   extractTopics,
   extractLearnings,
 } from "@/lib/ai/summarize";
-import type { Message } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 
 interface RouteParams {
@@ -73,10 +72,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const toKeep = conversation.messages.slice(-MESSAGES_TO_KEEP);
 
     // Format messages for LLM
-    const formattedMessages = toSummarize.map((m: Message) => ({
-      role: m.role,
-      content: m.content,
-    }));
+    const formattedMessages = toSummarize.map(
+      (m: (typeof toSummarize)[number]) => ({
+        role: m.role,
+        content: m.content,
+      }),
+    );
 
     // Generate summary and extract insights in parallel
     const [summary, keyFacts, topics, learnings] = await Promise.all([
@@ -100,7 +101,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       // Delete summarized messages
       await tx.message.deleteMany({
         where: {
-          id: { in: toSummarize.map((m: Message) => m.id) },
+          id: { in: toSummarize.map((m: (typeof toSummarize)[number]) => m.id) },
         },
       });
 
