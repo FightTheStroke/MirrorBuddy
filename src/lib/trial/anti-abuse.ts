@@ -1,6 +1,10 @@
 // Anti-abuse detection for trial visitor tracking
 // Detects patterns: multiple visitors per IP, IP rotation, cookie clearing
 
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "trial/anti-abuse" });
+
 const ABUSE_THRESHOLD = 10;
 const MAX_TRACKED_IPS = 100;
 
@@ -75,9 +79,9 @@ export async function incrementAbuseScore(
   db?: { session: { update: (args: unknown) => Promise<unknown> } },
 ): Promise<void> {
   if (!db) {
-    console.warn(
-      `Cannot increment abuse score: database not provided for session ${sessionId}`,
-    );
+    log.warn("Cannot increment abuse score: database not provided", {
+      sessionId,
+    });
     return;
   }
 
@@ -87,10 +91,10 @@ export async function incrementAbuseScore(
       data: { abuseScore: { increment: points } },
     });
   } catch (error) {
-    console.error(
-      `Failed to increment abuse score for session ${sessionId}:`,
-      error,
-    );
+    log.error("Failed to increment abuse score", {
+      sessionId,
+      error: String(error),
+    });
   }
 }
 
@@ -117,10 +121,10 @@ export async function isSessionBlocked(
 
     return session ? session.abuseScore > ABUSE_THRESHOLD : false;
   } catch (error) {
-    console.error(
-      `Failed to check session block status for ${sessionId}:`,
-      error,
-    );
+    log.error("Failed to check session block status", {
+      sessionId,
+      error: String(error),
+    });
     return false;
   }
 }

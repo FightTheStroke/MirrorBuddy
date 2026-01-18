@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { parse, serialize } from "cookie";
 import crypto from "crypto";
+import { logger } from "@/lib/logger";
+
+const log = logger.child({ module: "trial/middleware" });
 
 export interface TrialSession {
   visitorId: string;
@@ -82,12 +85,11 @@ export const withTrial = (
       session;
 
     // Log trial session activity
-    console.log("[Trial Session]", {
+    log.debug("Trial session activity", {
       visitorId: session.visitorId,
       ip: session.ip,
       method: req.method,
       path: req.url,
-      timestamp: new Date().toISOString(),
     });
 
     return handler(req, res, session);
