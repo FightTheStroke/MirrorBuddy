@@ -183,8 +183,8 @@ export async function getCostStats(
     return { totalCost: 0, avgCostPerSession: 0, sessionCount: 0, p95Cost: 0 };
   }
 
-  const costs = metrics.map((m) => m.costEur);
-  const totalCost = costs.reduce((sum, c) => sum + c, 0);
+  const costs = metrics.map((m: { costEur: number }) => m.costEur);
+  const totalCost = costs.reduce((sum: number, c: number) => sum + c, 0);
   const avgCostPerSession = totalCost / costs.length;
   const p95Index = Math.floor(costs.length * 0.95);
   const p95Cost = costs[p95Index] || costs[costs.length - 1];

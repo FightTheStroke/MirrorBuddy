@@ -78,7 +78,7 @@ is_exempt() {
 
 # Find all source files from configured directories
 # Include: src, scripts, .claude, docs, e2e, @docs, and root-level md files
-FILES=$(find src scripts .claude docs e2e @docs -type f \( \
+FILES=$(/usr/bin/find src scripts .claude docs e2e @docs -type f \( \
     -name "*.ts" -o \
     -name "*.tsx" -o \
     -name "*.js" -o \
@@ -97,7 +97,7 @@ FILES=$(find src scripts .claude docs e2e @docs -type f \( \
     2>/dev/null || true)
 
 # Also include root-level markdown files
-ROOT_MD=$(find . -maxdepth 1 -type f -name "*.md" 2>/dev/null || true)
+ROOT_MD=$(/usr/bin/find . -maxdepth 1 -type f -name "*.md" 2>/dev/null || true)
 FILES="$FILES $ROOT_MD"
 
 OVER_LIMIT=""

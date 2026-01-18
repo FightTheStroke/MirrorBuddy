@@ -58,3 +58,4 @@ model SafetyEvent {
   @@index([severity, timestamp])
   @@index([timestamp])
 }
+

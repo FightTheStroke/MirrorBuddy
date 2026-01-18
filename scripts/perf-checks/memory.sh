@@ -27,7 +27,7 @@ check_eventsource() {
         if grep -qE "return\s+(es|eventSource|source)" "$file" 2>/dev/null; then
             local dir has_cleanup=0
             dir=$(dirname "$file")
-            for related in $(find "$dir" -maxdepth 2 \( -name "*.ts" -o -name "*.tsx" \) 2>/dev/null); do
+            for related in $(/usr/bin/find "$dir" -maxdepth 2 \( -name "*.ts" -o -name "*.tsx" \) 2>/dev/null); do
                 if [ "$related" != "$file" ] && grep -q "\.close()" "$related" 2>/dev/null; then
                     has_cleanup=1
                     break
