@@ -1,186 +1,90 @@
-import Link from "next/link";
+'use client';
 
-export const metadata = {
-  title: "Privacy Policy | MirrorBuddy",
-  description: "Informativa sulla privacy di MirrorBuddy - GDPR compliant",
-};
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { PrivacyContent } from './content';
+
+export const PRIVACY_VERSION = '1.1';
+const LAST_UPDATED = '18 Gennaio 2025';
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">
-            Informativa sulla Privacy
-          </h1>
-          <p className="text-slate-600">
-            Ultimo aggiornamento: 18 Gennaio 2026
-          </p>
-        </div>
-
-        {/* Content */}
-        <div className="space-y-8 prose prose-slate max-w-none">
-          {/* Section 1 */}
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              1. Titolare del Trattamento
-            </h2>
-            <p className="text-slate-700">
-              Il titolare del trattamento dei tuoi dati personali è{" "}
-              <strong>FightTheStroke Foundation</strong>, che opera MirrorBuddy
-              come piattaforma educativa per studenti con esigenze speciali.
-            </p>
-          </section>
-
-          {/* Section 2 */}
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              2. Dati Raccolti
-            </h2>
-            <p className="text-slate-700 mb-3">Raccogliamo i seguenti dati:</p>
-            <ul className="list-disc list-inside space-y-2 text-slate-700">
-              <li>Session data (token autenticazione, durata sessione)</li>
-              <li>
-                Statistiche di utilizzo (pagine visitate, tempo trascorso)
-              </li>
-              <li>Preferenze di accessibilità (contrasto, dimensioni font)</li>
-              <li>Log API per monitoraggio e debugging</li>
-            </ul>
-          </section>
-
-          {/* Section 3 */}
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              3. Finalità del Trattamento
-            </h2>
-            <p className="text-slate-700">
-              Utilizziamo i dati per migliorare il servizio educativo,
-              personalizzare l&apos;esperienza di apprendimento, e monitorare la
-              sicurezza della piattaforma.
-            </p>
-          </section>
-
-          {/* Section 4 */}
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              4. Base Giuridica
-            </h2>
-            <p className="text-slate-700 mb-3">Il trattamento si basa su:</p>
-            <ul className="list-disc list-inside space-y-2 text-slate-700">
-              <li>
-                <strong>Consenso</strong> esplicito per dati non essenziali
-              </li>
-              <li>
-                <strong>Legittimo interesse</strong> per miglioramento servizio
-              </li>
-              <li>
-                <strong>Obblighi legali</strong> per conformità normativa
-              </li>
-            </ul>
-          </section>
-
-          {/* Section 5 */}
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              5. Servizi Terzi
-            </h2>
-            <p className="text-slate-700 mb-3">
-              Utilizziamo i seguenti servizi terzi che possono accedere ai tuoi
-              dati:
-            </p>
-            <ul className="list-disc list-inside space-y-1 text-slate-700">
-              <li>
-                <strong>Azure OpenAI</strong> - Elaborazione IA conversazionale
-              </li>
-              <li>
-                <strong>Supabase</strong> - Database e autenticazione
-              </li>
-              <li>
-                <strong>Upstash</strong> - Cache e gestione code
-              </li>
-              <li>
-                <strong>Resend</strong> - Invio email
-              </li>
-              <li>
-                <strong>Vercel</strong> - Hosting e deployment
-              </li>
-            </ul>
-          </section>
-
-          {/* Section 6 */}
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              6. Diritti dell&apos;Utente (GDPR)
-            </h2>
-            <p className="text-slate-700 mb-3">Hai il diritto di:</p>
-            <ul className="list-disc list-inside space-y-2 text-slate-700">
-              <li>
-                <strong>Accesso</strong> - ricevere copia dei tuoi dati
-              </li>
-              <li>
-                <strong>Rettifica</strong> - correggere dati errati
-              </li>
-              <li>
-                <strong>Cancellazione</strong> - &quot;diritto
-                all&apos;oblio&quot;
-              </li>
-              <li>
-                <strong>Portabilità</strong> - ricevere dati in formato
-                leggibile
-              </li>
-              <li>
-                <strong>Opposizione</strong> - a trattamenti specifici
-              </li>
-            </ul>
-            <p className="text-slate-700 mt-3">
-              Per esercitare questi diritti, contattaci all&apos;indirizzo email
-              sottostante.
-            </p>
-          </section>
-
-          {/* Section 7 */}
-          <section>
-            <h2 className="text-2xl font-bold text-slate-900 mb-3">
-              7. Contatti
-            </h2>
-            <p className="text-slate-700">
-              Per domande sulla privacy o per esercitare i tuoi diritti:
-            </p>
-            <div className="mt-3 p-4 bg-slate-100 rounded-lg">
-              <p className="text-slate-900 font-medium">
-                roberdan@fightthestroke.org
-              </p>
-              <p className="text-slate-600 text-sm mt-1">
-                Titolare del trattamento: FightTheStroke Foundation
-              </p>
-            </div>
-          </section>
-
-          {/* Cookie Link */}
-          <section className="pt-6 border-t border-slate-200">
-            <p className="text-slate-700">
-              Per informazioni sui cookie, consulta la nostra{" "}
-              <Link
-                href="/cookies"
-                className="text-blue-600 hover:text-blue-700 underline"
-              >
-                informativa sui cookie
-              </Link>
-              .
-            </p>
-          </section>
-        </div>
-
-        {/* Footer Link */}
-        <div className="mt-12 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Navigation */}
+      <nav className="bg-white border-b border-slate-200 print:border-b-2" aria-label="Navigazione pagina">
+        <div className="max-w-4xl mx-auto px-4 py-6">
           <Link
             href="/"
-            className="text-slate-600 hover:text-slate-900 underline"
+            className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors print:hidden"
+            aria-label="Torna alla home page di MirrorBuddy"
           >
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             Torna alla home
           </Link>
         </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 py-12 print:py-8">
+        <article className="bg-white rounded-2xl shadow-lg p-8 md:p-12 print:shadow-none print:rounded-none">
+          {/* Title */}
+          <div className="mb-8 pb-8 border-b border-slate-200">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Privacy Policy di MirrorBuddy
+            </h1>
+            <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+              <span>Versione {PRIVACY_VERSION}</span>
+              <span>•</span>
+              <span>Ultimo aggiornamento: {LAST_UPDATED}</span>
+            </div>
+          </div>
+
+          {/* TL;DR Box */}
+          <section className="mb-12 p-6 bg-blue-50 rounded-xl border-l-4 border-blue-500 print:bg-transparent print:border print:border-blue-500" aria-labelledby="tldr-heading">
+            <h2 id="tldr-heading" className="text-2xl font-bold text-slate-900 mb-4">
+              In breve (TL;DR)
+            </h2>
+            <ul className="space-y-2 text-slate-700 leading-relaxed">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Raccogliamo solo i dati necessari (email, chat, progressi)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Non vendiamo MAI i tuoi dati a nessuno</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Puoi cancellare tutto quando vuoi</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>I dati restano in Europa (GDPR)</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Web Vitals opzionali - puoi disattivarli</span>
+              </li>
+            </ul>
+          </section>
+
+          {/* Main Sections */}
+          <PrivacyContent />
+
+          {/* Footer */}
+          <footer className="mt-12 pt-8 border-t border-slate-200">
+            <p className="text-slate-600 text-center">
+              Domande sulla privacy? Scrivici:{' '}
+              <a
+                href="mailto:privacy@fightthestroke.org"
+                className="text-blue-600 hover:text-blue-700 underline"
+                aria-label="Invia email a privacy@fightthestroke.org per domande sulla Privacy Policy"
+              >
+                privacy@fightthestroke.org
+              </a>
+            </p>
+          </footer>
+        </article>
       </div>
     </div>
   );

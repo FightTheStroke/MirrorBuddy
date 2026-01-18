@@ -70,10 +70,24 @@ export async function GET(_request: NextRequest) {
       });
     }
 
-    // User hasn't accepted current version
+    // User hasn't accepted current version - check if they have any previous acceptance
+    const previousAcceptance = await prisma.tosAcceptance.findFirst({
+      where: {
+        userId: auth.userId,
+        version: {
+          not: TOS_VERSION,
+        },
+      },
+      orderBy: {
+        acceptedAt: 'desc',
+      },
+    });
+
+    // Return with previousVersion if user needs re-consent
     return NextResponse.json({
       accepted: false,
       version: TOS_VERSION,
+      previousVersion: previousAcceptance?.version,
     });
   } catch (error) {
     log.error('ToS check error', {
