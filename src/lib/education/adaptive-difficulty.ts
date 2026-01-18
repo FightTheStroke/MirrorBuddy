@@ -131,7 +131,8 @@ export async function recordAdaptiveSignalsBatch(
     updateGlobalSignals(profile, signal);
     updateSubjectSignals(profile, signal);
 
-    if (signal.subject) {
+    // Only update subject-specific data if subject key is safe (prevent prototype pollution)
+    if (signal.subject && isSafeSubjectKey(signal.subject)) {
       const context = calculateAdaptiveContext(profile, {
         mode: signal.mode ?? "balanced",
         subject: signal.subject,
