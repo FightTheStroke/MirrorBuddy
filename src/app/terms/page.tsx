@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { CookiesContent } from './content';
+import { TermsContent } from './content';
 
-export const COOKIES_VERSION = '1.0';
+export const TOS_VERSION = '1.0';
 const LAST_UPDATED = '18 Gennaio 2025';
 
-export default function CookiesPage() {
+export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Navigation */}
@@ -30,10 +30,10 @@ export default function CookiesPage() {
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              Cookie Policy di MirrorBuddy
+              Termini di Servizio di MirrorBuddy
             </h1>
             <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-              <span>Versione {COOKIES_VERSION}</span>
+              <span>Versione {TOS_VERSION}</span>
               <span>•</span>
               <span>Ultimo aggiornamento: {LAST_UPDATED}</span>
             </div>
@@ -47,36 +47,40 @@ export default function CookiesPage() {
             <ul className="space-y-2 text-slate-700 leading-relaxed">
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
-                <span>Usiamo pochissimi cookie, solo quelli utili</span>
+                <span>MirrorBuddy è gratuito, fatto per aiutare</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
-                <span>Niente cookie pubblicitari o di tracciamento</span>
+                <span>Non siamo una scuola, l&apos;AI può sbagliare</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
-                <span>Cookie analytics solo se li accetti</span>
+                <span>Usalo con un adulto vicino se sei minorenne</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
-                <span>Puoi disattivarli quando vuoi</span>
+                <span>Rispetta gli altri, noi rispettiamo te</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Problemi? Scrivici, siamo qui per aiutare</span>
               </li>
             </ul>
           </section>
 
           {/* Main Sections */}
-          <CookiesContent />
+          <TermsContent />
 
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-slate-200">
             <p className="text-slate-600 text-center">
-              Domande sui cookie? Scrivici:{' '}
+              Domande? Scrivici:{' '}
               <a
-                href="mailto:privacy@fightthestroke.org"
+                href="mailto:info@fightthestroke.org"
                 className="text-blue-600 hover:text-blue-700 underline"
-                aria-label="Invia email a privacy@fightthestroke.org per domande sui cookie"
+                aria-label="Invia email a info@fightthestroke.org per domande sui Termini di Servizio"
               >
-                privacy@fightthestroke.org
+                info@fightthestroke.org
               </a>
             </p>
           </footer>

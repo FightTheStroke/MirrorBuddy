@@ -48,6 +48,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.8.0] - 2025-01-18 - Web Vitals Analytics & Legal Docs
+
+### Added
+
+#### Web Vitals Analytics (Plan 053 - W1/W2)
+- **Real-time Collection (F-01)**: Core Web Vitals (LCP, CLS, INP, TTFB, FCP) with userId for debugging
+- **Consent Integration (F-02)**: Analytics only collected with explicit user consent via Zustand store
+- **API Endpoint (F-03)**: POST `/api/metrics/web-vitals` with rate limiting (60 req/min)
+- **Beacon API (F-04)**: Beacon with fetch keepalive fallback for reliable data delivery
+- **Grafana Dashboard (F-05)**: 16-panel dashboard with gauges, heatmaps, and user lookup
+- **Alert Rules (F-06)**: 6 alerts (warning + critical for LCP/CLS/INP)
+- **Data Retention (F-07)**: 90-day retention policy, 30-day for user-tagged data
+
+#### Terms of Service (Plan 053 - W3)
+- **ToS Page (F-11)**: Simple Italian ToS at `/terms` with TL;DR summary
+- **Acceptance Modal (F-12)**: Non-dismissible WCAG compliant modal on first login
+- **Database Model (F-13)**: TosAcceptance with versioning and audit trail (IP, userAgent)
+- **E2E Tests (F-14)**: 14 Playwright tests for ToS acceptance flow
+- **Admin Panel (F-15)**: `/admin/tos` to view acceptances by user/version/date
+
+#### Legal Documents (Plan 053 - W4)
+- **Privacy Policy (F-16)**: 14-section page at `/privacy` including Web Vitals disclosure
+- **Cookie Policy (F-17)**: Detailed cookie list at `/cookies` with management instructions
+- **Re-consent System (F-18)**: Automatic re-consent when ToS/Privacy version changes
+
+### Security
+- **CSRF Protection**: ToS POST endpoint protected with CSRF token validation
+- **Rate Limiting**: 10 req/min on ToS POST to prevent abuse
+- **Audit Trail**: ToS acceptance logged with sanitized IP and userAgent
+
+---
 ## [0.7.0] - 2025-01-18 - Security Hardening Release
 
 ### Security

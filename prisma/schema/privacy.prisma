@@ -56,3 +56,24 @@ model UserPrivacyPreferences {
 
   @@index([userId])
 }
+
+// F-13: Terms of Service Acceptance Tracking
+// Tracks user acceptance of ToS with versioning and audit trail
+model TosAcceptance {
+  id        String   @id @default(cuid())
+  userId    String
+  version   String   // e.g., "1.0", "1.1", "2.0"
+  acceptedAt DateTime @default(now())
+
+  // Audit trail for compliance
+  ipAddress String?  // Last IP segment only for privacy
+  userAgent String?  // Browser/client info
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Ensure one record per user per version
+  @@unique([userId, version])
+  @@index([userId])
+  @@index([version])
+  @@map("tos_acceptances")
+}
