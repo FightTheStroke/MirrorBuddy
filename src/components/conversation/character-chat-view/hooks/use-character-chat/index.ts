@@ -4,7 +4,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { logger } from "@/lib/logger";
-import { useConversationStore } from "@/lib/stores";
+import { useConversationStore, useSettingsStore } from "@/lib/stores";
 import {
   useVoiceSession,
   type ConnectionInfo,
@@ -17,6 +17,8 @@ import type { Message } from "./types";
 import {
   loadMessagesFromServer,
   convertStoreMessages,
+  fetchContextualGreeting,
+  createGreetingMessage,
 } from "./conversation-loader";
 import { createUserMessage, createErrorMessage } from "./message-handler";
 import { isStreamingAvailable } from "./streaming-handler";
@@ -71,6 +73,16 @@ export function useCharacterChat(
     createConversation,
     addMessage: addMessageToStore,
   } = useConversationStore();
+
+  // Get user's language preference from settings
+  const language = useSettingsStore((state) => state.appearance.language) as
+    | "it"
+    | "en"
+    | "es"
+    | "fr"
+    | "de";
+  // Get student name for contextual greetings
+  const studentName = useSettingsStore((state) => state.studentProfile.name);
 
   const voiceSession = useVoiceSession({
     onTranscript: (role, text) => {
@@ -178,28 +190,64 @@ export function useCharacterChat(
         (c) => c.maestroId === characterId,
       );
 
+      let loadedMessages: Message[] = [];
+
       if (existingConv) {
         conversationIdRef.current = existingConv.id;
         const serverMessages = await loadMessagesFromServer(existingConv.id);
-        if (serverMessages) {
+        if (serverMessages && serverMessages.length > 0) {
           setMessages(serverMessages);
-          return;
+          return; // Has history, no greeting needed
         }
         if (existingConv.messages.length > 0) {
-          setMessages(convertStoreMessages(existingConv.messages));
-          return;
+          loadedMessages = convertStoreMessages(existingConv.messages);
+          if (loadedMessages.length > 0) {
+            setMessages(loadedMessages);
+            return; // Has history, no greeting needed
+          }
         }
+      } else {
+        const newConvId = await createConversation(characterId);
+        conversationIdRef.current = newConvId;
       }
 
-      const newConvId = await createConversation(characterId);
-      conversationIdRef.current = newConvId;
+      // No messages - send greeting to start conversation
+      // Try to get contextual greeting first (based on previous sessions)
+      const contextualResult = await fetchContextualGreeting(
+        characterId,
+        studentName,
+        character.name,
+      );
 
-      // Greeting is shown in header, not in chat messages
-      setMessages([]);
+      const greetingMessage: Message = contextualResult
+        ? {
+            id: "greeting",
+            role: "assistant",
+            content: contextualResult.greeting,
+            timestamp: new Date(),
+          }
+        : createGreetingMessage(character);
+
+      setMessages([greetingMessage]);
+
+      // Save greeting to store
+      if (conversationIdRef.current) {
+        addMessageToStore(conversationIdRef.current, {
+          role: "assistant",
+          content: greetingMessage.content,
+        });
+      }
     }
 
     initConversation();
-  }, [characterId, conversations, createConversation]);
+  }, [
+    characterId,
+    conversations,
+    createConversation,
+    character,
+    studentName,
+    addMessageToStore,
+  ]);
 
   // Handle send message
   const handleSend = useCallback(async () => {
@@ -228,6 +276,7 @@ export function useCharacterChat(
       characterId,
       streamingEnabled,
       signal: abortController.signal,
+      language,
       callbacks: {
         onStreamingStart: (id) => {
           setIsStreaming(true);
@@ -327,6 +376,7 @@ export function useCharacterChat(
     streamingEnabled,
     recordTurn,
     recordRefusal,
+    language,
   ]);
 
   // Handle tool request
@@ -346,6 +396,7 @@ export function useCharacterChat(
           messages,
           character,
           characterId,
+          language,
         );
         if (assistantMessage)
           setMessages((prev) => [...prev, assistantMessage]);
@@ -358,7 +409,7 @@ export function useCharacterChat(
         setIsLoading(false);
       }
     },
-    [isLoading, messages, character, characterId],
+    [isLoading, messages, character, characterId, language],
   );
 
   // Handle voice call toggle

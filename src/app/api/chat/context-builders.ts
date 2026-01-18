@@ -3,23 +3,32 @@
  * Extracts and injects various contexts into system prompts
  */
 
-import { logger } from '@/lib/logger';
-import { loadPreviousContext } from '@/lib/conversation/memory-loader';
-import { enhanceSystemPrompt } from '@/lib/conversation/prompt-enhancer';
-import { findSimilarMaterials, findRelatedConcepts } from '@/lib/rag/retrieval-service';
-import { buildToolContext } from '@/lib/tools/tool-context-builder';
-import { getMaestroById } from '@/data/maestri';
+import { logger } from "@/lib/logger";
+import { loadPreviousContext } from "@/lib/conversation/memory-loader";
+import { enhanceSystemPrompt } from "@/lib/conversation/prompt-enhancer";
+import {
+  findSimilarMaterials,
+  findRelatedConcepts,
+} from "@/lib/rag/retrieval-service";
+import { buildToolContext } from "@/lib/tools/tool-context-builder";
+import { getMaestroById } from "@/data/maestri";
 import {
   buildAdaptiveInstruction,
   getAdaptiveContextForUser,
-} from '@/lib/education/adaptive-difficulty';
+} from "@/lib/education/adaptive-difficulty";
+import { getLanguageInstruction } from "@/lib/i18n/language-instructions";
+import type { SupportedLanguage } from "./types";
 
 export interface ContextResult {
   enhancedPrompt: string;
   hasMemory: boolean;
   hasToolContext: boolean;
   hasRAG: boolean;
-  ragResultsForTransparency: Array<{ content: string; similarity: number; sourceType?: string }>;
+  ragResultsForTransparency: Array<{
+    content: string;
+    similarity: number;
+    sourceType?: string;
+  }>;
 }
 
 interface ContextOptions {
@@ -31,6 +40,7 @@ interface ContextOptions {
   lastUserMessage?: string;
   adaptiveDifficultyMode?: string | null;
   requestedTool?: string;
+  language?: SupportedLanguage;
 }
 
 /**
@@ -39,7 +49,7 @@ interface ContextOptions {
 export async function injectMemoryContext(
   systemPrompt: string,
   userId: string,
-  maestroId: string
+  maestroId: string,
 ): Promise<{ enhancedPrompt: string; hasMemory: boolean }> {
   try {
     const memory = await loadPreviousContext(userId, maestroId);
@@ -47,9 +57,9 @@ export async function injectMemoryContext(
       const enhanced = enhanceSystemPrompt({
         basePrompt: systemPrompt,
         memory,
-        safetyOptions: { role: 'maestro' },
+        safetyOptions: { role: "maestro" },
       });
-      logger.debug('Conversation memory injected', {
+      logger.debug("Conversation memory injected", {
         maestroId,
         keyFactCount: memory.keyFacts.length,
         hasSummary: !!memory.recentSummary,
@@ -57,7 +67,7 @@ export async function injectMemoryContext(
       return { enhancedPrompt: enhanced, hasMemory: true };
     }
   } catch (memoryError) {
-    logger.warn('Failed to load conversation memory', {
+    logger.warn("Failed to load conversation memory", {
       userId,
       maestroId,
       error: String(memoryError),
@@ -72,13 +82,13 @@ export async function injectMemoryContext(
 export async function injectToolContextData(
   systemPrompt: string,
   userId: string,
-  conversationId: string
+  conversationId: string,
 ): Promise<{ enhancedPrompt: string; hasToolContext: boolean }> {
   try {
     const toolContext = await buildToolContext(userId, conversationId);
     if (toolContext.toolCount > 0) {
       const enhanced = `${systemPrompt}\n\n${toolContext.formattedContext}`;
-      logger.debug('Tool context injected', {
+      logger.debug("Tool context injected", {
         conversationId,
         toolCount: toolContext.toolCount,
         types: toolContext.types,
@@ -86,7 +96,7 @@ export async function injectToolContextData(
       return { enhancedPrompt: enhanced, hasToolContext: true };
     }
   } catch (toolContextError) {
-    logger.warn('Failed to load tool context', {
+    logger.warn("Failed to load tool context", {
       userId,
       conversationId,
       error: String(toolContextError),
@@ -101,11 +111,15 @@ export async function injectToolContextData(
 export async function injectRAGContext(
   systemPrompt: string,
   userId: string,
-  query: string
+  query: string,
 ): Promise<{
   enhancedPrompt: string;
   hasRAG: boolean;
-  ragResults: Array<{ content: string; similarity: number; sourceType?: string }>;
+  ragResults: Array<{
+    content: string;
+    similarity: number;
+    sourceType?: string;
+  }>;
 }> {
   try {
     const relevantMaterials = await findSimilarMaterials({
@@ -128,13 +142,13 @@ export async function injectRAGContext(
     const ragResults = allResults.map((r) => ({
       content: r.content,
       similarity: r.similarity,
-      sourceType: 'material',
+      sourceType: "material",
     }));
 
     if (allResults.length > 0) {
-      const ragContext = allResults.map((m) => `- ${m.content}`).join('\n');
+      const ragContext = allResults.map((m) => `- ${m.content}`).join("\n");
       const enhanced = `${systemPrompt}\n\n[Materiali rilevanti dello studente]\n${ragContext}`;
-      logger.debug('RAG context injected', {
+      logger.debug("RAG context injected", {
         userId,
         materialCount: relevantMaterials.length,
         studyKitCount: relatedStudyKits.length,
@@ -143,7 +157,10 @@ export async function injectRAGContext(
       return { enhancedPrompt: enhanced, hasRAG: true, ragResults };
     }
   } catch (ragError) {
-    logger.warn('Failed to load RAG context', { userId, error: String(ragError) });
+    logger.warn("Failed to load RAG context", {
+      userId,
+      error: String(ragError),
+    });
   }
   return { enhancedPrompt: systemPrompt, hasRAG: false, ragResults: [] };
 }
@@ -158,27 +175,36 @@ export async function injectAdaptiveContext(
     maestroId?: string;
     requestedTool?: string;
     adaptiveDifficultyMode?: string | null;
-  }
+  },
 ): Promise<string> {
   try {
-    const maestro = options.maestroId ? getMaestroById(options.maestroId) : undefined;
+    const maestro = options.maestroId
+      ? getMaestroById(options.maestroId)
+      : undefined;
     const pragmatic =
-      options.requestedTool === 'summary' ||
-      options.requestedTool === 'homework' ||
-      options.requestedTool === 'pdf' ||
-      options.requestedTool === 'webcam' ||
-      options.requestedTool === 'study-kit';
+      options.requestedTool === "summary" ||
+      options.requestedTool === "homework" ||
+      options.requestedTool === "pdf" ||
+      options.requestedTool === "webcam" ||
+      options.requestedTool === "study-kit";
 
     const adaptiveContext = await getAdaptiveContextForUser(userId, {
       subject: maestro?.subject,
       baselineDifficulty: 3,
       pragmatic,
-      modeOverride: options.adaptiveDifficultyMode as 'manual' | 'guided' | 'balanced' | 'automatic' | undefined,
+      modeOverride: options.adaptiveDifficultyMode as
+        | "manual"
+        | "guided"
+        | "balanced"
+        | "automatic"
+        | undefined,
     });
     const adaptiveInstruction = buildAdaptiveInstruction(adaptiveContext);
     return `${systemPrompt}\n\n${adaptiveInstruction}`;
   } catch (error) {
-    logger.warn('Failed to load adaptive difficulty context', { error: String(error) });
+    logger.warn("Failed to load adaptive difficulty context", {
+      error: String(error),
+    });
     return systemPrompt;
   }
 }
@@ -186,30 +212,60 @@ export async function injectAdaptiveContext(
 /**
  * Build all contexts for a chat request
  */
-export async function buildAllContexts(options: ContextOptions): Promise<ContextResult> {
+export async function buildAllContexts(
+  options: ContextOptions,
+): Promise<ContextResult> {
   let enhancedPrompt = options.systemPrompt;
   let hasMemory = false;
   let hasToolContext = false;
   let hasRAG = false;
-  let ragResultsForTransparency: Array<{ content: string; similarity: number; sourceType?: string }> = [];
+  let ragResultsForTransparency: Array<{
+    content: string;
+    similarity: number;
+    sourceType?: string;
+  }> = [];
+
+  // Language instruction (FIRST - most important)
+  const language = options.language || "it";
+  const languageInstruction = getLanguageInstruction(
+    language,
+    options.maestroId,
+  );
+  enhancedPrompt = `${enhancedPrompt}\n\n${languageInstruction}`;
+  logger.debug("Language instruction injected", {
+    language,
+    maestroId: options.maestroId,
+  });
 
   // Memory context
   if (options.enableMemory && options.userId && options.maestroId) {
-    const memoryResult = await injectMemoryContext(enhancedPrompt, options.userId, options.maestroId);
+    const memoryResult = await injectMemoryContext(
+      enhancedPrompt,
+      options.userId,
+      options.maestroId,
+    );
     enhancedPrompt = memoryResult.enhancedPrompt;
     hasMemory = memoryResult.hasMemory;
   }
 
   // Tool context
   if (options.userId && options.conversationId) {
-    const toolResult = await injectToolContextData(enhancedPrompt, options.userId, options.conversationId);
+    const toolResult = await injectToolContextData(
+      enhancedPrompt,
+      options.userId,
+      options.conversationId,
+    );
     enhancedPrompt = toolResult.enhancedPrompt;
     hasToolContext = toolResult.hasToolContext;
   }
 
   // RAG context
   if (options.userId && options.lastUserMessage) {
-    const ragResult = await injectRAGContext(enhancedPrompt, options.userId, options.lastUserMessage);
+    const ragResult = await injectRAGContext(
+      enhancedPrompt,
+      options.userId,
+      options.lastUserMessage,
+    );
     enhancedPrompt = ragResult.enhancedPrompt;
     hasRAG = ragResult.hasRAG;
     ragResultsForTransparency = ragResult.ragResults;
@@ -217,11 +273,15 @@ export async function buildAllContexts(options: ContextOptions): Promise<Context
 
   // Adaptive difficulty context
   if (options.userId) {
-    enhancedPrompt = await injectAdaptiveContext(enhancedPrompt, options.userId, {
-      maestroId: options.maestroId,
-      requestedTool: options.requestedTool,
-      adaptiveDifficultyMode: options.adaptiveDifficultyMode,
-    });
+    enhancedPrompt = await injectAdaptiveContext(
+      enhancedPrompt,
+      options.userId,
+      {
+        maestroId: options.maestroId,
+        requestedTool: options.requestedTool,
+        adaptiveDifficultyMode: options.adaptiveDifficultyMode,
+      },
+    );
   }
 
   return {

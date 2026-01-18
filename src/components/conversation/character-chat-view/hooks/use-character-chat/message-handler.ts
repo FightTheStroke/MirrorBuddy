@@ -6,7 +6,7 @@ import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import type { Message } from "./types";
 import type { CharacterInfo } from "../../utils/character-utils";
-import type { ToolState, ToolType, ToolCallRef, ToolCall } from "@/types/tools";
+import type { ToolState, ToolType, ToolCallRef } from "@/types/tools";
 
 /** REAL usage data from API response (not estimated) */
 export interface ChatUsage {
@@ -32,6 +32,7 @@ export async function sendChatMessage(
   character: CharacterInfo,
   characterId: string,
   enableTools: boolean = true,
+  language: "it" | "en" | "es" | "fr" | "de" = "it",
 ): Promise<{
   responseContent: string;
   toolState: ToolState | null;
@@ -50,6 +51,7 @@ export async function sendChatMessage(
       systemPrompt: character.systemPrompt,
       maestroId: characterId,
       enableTools,
+      language,
     }),
   });
 
@@ -67,42 +69,37 @@ export async function sendChatMessage(
     const toolCall = data.toolCalls[0] as ToolCallRef;
     const toolType = toolCall.type as ToolType;
 
-    // Handle both old format (with result.data) and new format (with materialId)
+    // Get tool content from API response
+    // Priority: data (inline) > arguments (fallback) > fetch from Material table
     let toolContent = null;
-    const toolCallWithFallback = toolCall as
-      | ToolCallRef
-      | (ToolCall & { result: { data: unknown } });
+    const toolCallData = toolCall as ToolCallRef & {
+      data?: unknown;
+      arguments?: Record<string, unknown>;
+    };
 
-    // Try to get content from result.data (old format with full data)
-    if (
-      "result" in toolCallWithFallback &&
-      typeof toolCallWithFallback.result === "object" &&
-      toolCallWithFallback.result !== null &&
-      "data" in toolCallWithFallback.result
-    ) {
-      toolContent = (toolCallWithFallback.result as { data: unknown }).data;
-    } else if (toolCall.materialId) {
-      // New format: fetch from Material table
+    // Try inline data first (new format)
+    if (toolCallData.data) {
+      toolContent = toolCallData.data;
+    }
+    // Fallback to arguments
+    else if (toolCallData.arguments) {
+      toolContent = toolCallData.arguments;
+    }
+    // Last resort: fetch from Material table
+    else if (toolCall.materialId) {
       try {
         const materialResponse = await fetch(
           `/api/materials/${toolCall.materialId}`,
         );
         if (materialResponse.ok) {
-          const data = await materialResponse.json();
-          // Response wraps material in { material: parsed }
-          toolContent = data.material?.content || null;
+          const materialData = await materialResponse.json();
+          toolContent = materialData.material?.content || null;
         }
       } catch (error) {
         logger.warn("Failed to fetch material content", {
           error: String(error),
         });
-        // Fall back to empty content, UI will display error
       }
-    }
-
-    // If no content found, use arguments as fallback
-    if (!toolContent && "arguments" in toolCallWithFallback) {
-      toolContent = (toolCallWithFallback as ToolCall).arguments || null;
     }
 
     toolState = {

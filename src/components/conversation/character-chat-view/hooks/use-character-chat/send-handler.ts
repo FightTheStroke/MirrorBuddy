@@ -49,6 +49,7 @@ export interface SendMessageOptions {
   streamingEnabled: boolean;
   signal: AbortSignal;
   callbacks: SendMessageCallbacks;
+  language?: "it" | "en" | "es" | "fr" | "de";
 }
 
 /**
@@ -66,6 +67,7 @@ export async function handleSendMessage(
     streamingEnabled,
     signal,
     callbacks,
+    language = "it",
   } = options;
 
   const needsTool = messageRequiresTool(content);
@@ -81,6 +83,7 @@ export async function handleSendMessage(
       character,
       characterId,
       signal,
+      language,
       onChunk: (_chunk, accumulated) => {
         callbacks.onStreamingChunk(streamingMsgId, accumulated);
       },
@@ -105,7 +108,14 @@ export async function handleSendMessage(
   // Non-streaming path
   try {
     const { responseContent, toolState, usage, latencyMs, safetyEvent } =
-      await sendChatMessage(content, messages, character, characterId);
+      await sendChatMessage(
+        content,
+        messages,
+        character,
+        characterId,
+        true,
+        language,
+      );
 
     const assistantMessage = createAssistantMessage(responseContent);
     callbacks.onNonStreamingComplete(assistantMessage, toolState, {
