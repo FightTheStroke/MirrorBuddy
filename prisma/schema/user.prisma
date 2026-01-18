@@ -52,6 +52,9 @@ model User {
 
   // COPPA Compliance (F-09)
   coppaConsent CoppaConsent?
+
+  // Terms of Service (F-13)
+  tosAcceptances TosAcceptance[]
 }
 
 model Profile {
