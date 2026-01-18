@@ -14,7 +14,6 @@ import {
   extractTopics,
   extractLearnings,
 } from "@/lib/ai/summarize";
-import type { Prisma } from "@prisma/client";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -97,7 +96,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       : summary;
 
     // Transaction: delete old messages, update conversation, save learnings
-    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // Use Omit to get transaction-compatible client type
+    await prisma.$transaction(async (tx) => {
       // Delete summarized messages
       await tx.message.deleteMany({
         where: {
