@@ -1,16 +1,14 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Sparkles, Search } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useProviderSettings } from './ai-provider-settings/hooks/use-provider-settings';
-import { ProviderStatusCard } from './ai-provider-settings/components/provider-status-card';
-import { ProviderSelection } from './ai-provider-settings/components/provider-selection';
-import { EnvVarsSection } from './ai-provider-settings/components/env-vars-section';
-import { CostConfigForm } from './ai-provider-settings/components/cost-config-form';
-import { CostsSection } from './ai-provider-settings/components/costs-section';
+import { useState } from "react";
+import { Search } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProviderSettings } from "./ai-provider-settings/hooks/use-provider-settings";
+import { ProviderStatusCard } from "./ai-provider-settings/components/provider-status-card";
+import { ProviderSelection } from "./ai-provider-settings/components/provider-selection";
+import { EnvVarsSection } from "./ai-provider-settings/components/env-vars-section";
+import { CostConfigForm } from "./ai-provider-settings/components/cost-config-form";
+import { CostsSection } from "./ai-provider-settings/components/costs-section";
 
 export function AIProviderSettings() {
   const {
@@ -39,7 +37,7 @@ export function AIProviderSettings() {
               providerStatus={providerStatus}
               preferredProvider={preferredProvider}
               onSelectProvider={setPreferredProvider}
-              onResetToAuto={() => setPreferredProvider('auto')}
+              onResetToAuto={() => setPreferredProvider("auto")}
             />
 
             {!providerStatus.activeProvider && (
@@ -48,7 +46,8 @@ export function AIProviderSettings() {
                   Nessun provider configurato
                 </h4>
                 <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
-                  Configura Azure OpenAI nel file .env oppure avvia Ollama localmente.
+                  Configura Azure OpenAI nel file .env oppure avvia Ollama
+                  localmente.
                 </p>
               </div>
             )}
@@ -62,7 +61,7 @@ export function AIProviderSettings() {
         </Card>
       )}
 
-      {providerStatus?.activeProvider === 'azure' && (
+      {providerStatus?.activeProvider === "azure" && (
         <CostsSection
           costs={costs}
           forecast={forecast}
@@ -112,7 +111,8 @@ export function AIProviderSettings() {
                 Le conversazioni vocali richiedono Azure OpenAI Realtime.
               </p>
               <p className="text-xs text-slate-500">
-                Configura: AZURE_OPENAI_REALTIME_ENDPOINT, AZURE_OPENAI_REALTIME_API_KEY, AZURE_OPENAI_REALTIME_DEPLOYMENT
+                Configura: AZURE_OPENAI_REALTIME_ENDPOINT,
+                AZURE_OPENAI_REALTIME_API_KEY, AZURE_OPENAI_REALTIME_DEPLOYMENT
               </p>
             </div>
           )}
@@ -136,7 +136,8 @@ export function AIProviderSettings() {
                 </span>
               </div>
               <p className="text-sm text-green-600 dark:text-green-400">
-                Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.
+                Brave Search API configurata. I maestri possono accedere a
+                notizie e informazioni in tempo reale.
               </p>
             </div>
           ) : (
@@ -148,38 +149,23 @@ export function AIProviderSettings() {
                 </span>
               </div>
               <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">
-                I maestri usano Wikipedia come fonte. Per notizie e informazioni aggiornate, configura Brave Search.
+                I maestri usano Wikipedia come fonte. Per notizie e informazioni
+                aggiornate, configura Brave Search.
               </p>
               <p className="text-xs text-slate-500">
-                Ottieni una API key gratuita su{' '}
-                <a href="https://brave.com/search/api/" target="_blank" rel="noopener noreferrer" className="underline">
+                Ottieni una API key gratuita su{" "}
+                <a
+                  href="https://brave.com/search/api/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
                   brave.com/search/api
-                </a>
-                {' '}e aggiungi: BRAVE_SEARCH_API_KEY
+                </a>{" "}
+                e aggiungi: BRAVE_SEARCH_API_KEY
               </p>
             </div>
           )}
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-500" />
-            Modalità Showcase
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-            Esplora MirrorBuddy senza configurare un provider AI. Demo interattive
-            con contenuti statici: maestri, quiz, flashcards, mappe mentali e altro.
-          </p>
-          <Link href="/showcase">
-            <Button variant="outline" className="w-full gap-2">
-              <Sparkles className="w-4 h-4" />
-              Apri Showcase
-            </Button>
-          </Link>
         </CardContent>
       </Card>
     </div>

@@ -19,7 +19,6 @@ const RESPONSE_TIME_HEADER = "x-response-time";
 // Routes that do NOT require a provider to be configured
 const PUBLIC_ROUTES = [
   "/landing",
-  "/showcase",
   "/api",
   "/_next",
   "/favicon",
@@ -53,7 +52,7 @@ const STATIC_EXTENSIONS = [
 function normalizeRoute(pathname: string): string {
   let normalized = pathname.replace(
     /\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
-    "/[id]"
+    "/[id]",
   );
   normalized = normalized.replace(/\/\d+(?=\/|$)/g, "/[id]");
   normalized = normalized.replace(/\/[a-zA-Z0-9_-]{8,}(?=\/|$)/g, "/[id]");
@@ -166,7 +165,7 @@ export function proxy(request: NextRequest) {
   // Skip public routes but still add CSP and request ID
   if (PUBLIC_ROUTES.some((r) => pathname.startsWith(r))) {
     return finalizeResponse(
-      NextResponse.next({ request: { headers: requestHeaders } })
+      NextResponse.next({ request: { headers: requestHeaders } }),
     );
   }
 
@@ -179,7 +178,7 @@ export function proxy(request: NextRequest) {
 
   // Provider configured, allow access with CSP, request ID, and metrics
   return finalizeResponse(
-    NextResponse.next({ request: { headers: requestHeaders } })
+    NextResponse.next({ request: { headers: requestHeaders } }),
   );
 }
 
