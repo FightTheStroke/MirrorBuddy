@@ -8,9 +8,9 @@ const nextConfig: NextConfig = {
   env: {
     APP_VERSION: packageJson.version,
   },
-  // C-18 FIX: External packages that should not be bundled by Next.js
-  // pdf-parse uses pdfjs-dist which has native dependencies
-  serverExternalPackages: ["pdf-parse"],
+  // Note: pdf-parse was previously in serverExternalPackages, but this caused
+  // runtime failures on Vercel serverless because the package wasn't available.
+  // Now bundled with the app for proper Vercel deployment.
 
   // Bundle optimization: Tree-shake large packages
   // Reduces bundle size by only importing used components
