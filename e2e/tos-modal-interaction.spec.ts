@@ -16,15 +16,17 @@
  * Run: npx playwright test e2e/tos-modal-interaction.spec.ts
  */
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Terms of Service - Modal UI (F-12)', () => {
-  test('ToS modal appears for user who has not accepted', async ({ page, context }) => {
+test.describe("Terms of Service - Modal UI (F-12)", () => {
+  test("ToS modal appears for user who has not accepted", async ({
+    context,
+  }) => {
     // Create a fresh context without the default storage state
     // to simulate a user who hasn't accepted ToS
     const freshContext = await context.browser()?.newContext();
     if (!freshContext) {
-      throw new Error('Failed to create new context');
+      throw new Error("Failed to create new context");
     }
 
     const freshPage = await freshContext.newPage();
@@ -32,62 +34,84 @@ test.describe('Terms of Service - Modal UI (F-12)', () => {
     // Set up auth cookies but no ToS acceptance in sessionStorage
     const cookies = [
       {
-        name: 'mirrorbuddy-user-id',
-        value: 'e2e-test-user-unsigned.sig123',
-        domain: 'localhost',
-        path: '/',
+        name: "mirrorbuddy-user-id",
+        value: "e2e-test-user-unsigned.sig123",
+        domain: "localhost",
+        path: "/",
         httpOnly: true,
-        sameSite: 'Lax' as const,
+        sameSite: "Lax" as const,
       },
     ];
     await freshContext.addCookies(cookies);
 
     // Navigate to protected page (not a public path)
-    await freshPage.goto('/');
-    await freshPage.waitForLoadState('domcontentloaded');
+    await freshPage.goto("/");
+    await freshPage.waitForLoadState("domcontentloaded");
 
     // Modal should appear with welcome message
-    const modalHeading = freshPage.getByRole('heading', { name: /Benvenuto in MirrorBuddy/i });
+    const modalHeading = freshPage.getByRole("heading", {
+      name: /Benvenuto in MirrorBuddy/i,
+    });
     const isModalVisible = await modalHeading.isVisible().catch(() => false);
 
     // Modal may or may not appear depending on API response and sessionStorage state
     // But if it does appear, verify its content
     if (isModalVisible) {
       await expect(modalHeading).toBeVisible();
-      await expect(freshPage.getByText(/Prima di iniziare, leggi i nostri Termini di Servizio/i)).toBeVisible();
+      await expect(
+        freshPage.getByText(
+          /Prima di iniziare, leggi i nostri Termini di Servizio/i,
+        ),
+      ).toBeVisible();
     }
 
     await freshContext.close();
   });
 
-  test('ToS modal displays all key information', async ({ page }) => {
+  test("ToS modal displays all key information", async ({ page }) => {
     // Check if modal is present (it may be cached)
     const modal = page.locator('[role="dialog"]');
 
     // If modal is visible, verify content
     if (await modal.isVisible().catch(() => false)) {
       // Check heading
-      const heading = page.getByRole('heading', { name: /Benvenuto in MirrorBuddy/i });
+      const heading = page.getByRole("heading", {
+        name: /Benvenuto in MirrorBuddy/i,
+      });
       await expect(heading).toBeVisible();
 
       // Check description
-      const description = page.getByText(/Prima di iniziare, leggi i nostri Termini di Servizio/i);
+      const description = page.getByText(
+        /Prima di iniziare, leggi i nostri Termini di Servizio/i,
+      );
       await expect(description).toBeVisible();
 
       // Check TL;DR items in modal
-      await expect(page.getByText(/MirrorBuddy è gratuito, fatto per aiutare/)).toBeVisible();
-      await expect(page.getByText(/Non siamo una scuola, l'AI può sbagliare/)).toBeVisible();
-      await expect(page.getByText(/Se hai meno di 14 anni, usa l'app con un adulto vicino/)).toBeVisible();
-      await expect(page.getByText(/Rispetta gli altri, noi rispettiamo te/)).toBeVisible();
+      await expect(
+        page.getByText(/MirrorBuddy è gratuito, fatto per aiutare/),
+      ).toBeVisible();
+      await expect(
+        page.getByText(/Non siamo una scuola, l'AI può sbagliare/),
+      ).toBeVisible();
+      await expect(
+        page.getByText(
+          /Se hai meno di 14 anni, usa l'app con un adulto vicino/,
+        ),
+      ).toBeVisible();
+      await expect(
+        page.getByText(/Rispetta gli altri, noi rispettiamo te/),
+      ).toBeVisible();
     }
   });
 
-  test('ToS modal checkbox and accept button work correctly', async ({ page }) => {
+  test("ToS modal checkbox and accept button work correctly", async ({
+    page,
+  }) => {
     const modal = page.locator('[role="dialog"]');
 
     if (await modal.isVisible().catch(() => false)) {
       // Accept button should be disabled initially
-      const acceptButton = page.getByRole('button', { name: /Accetto/i });
+      const acceptButton = page.getByRole("button", { name: /Accetto/i });
       await expect(acceptButton).toBeDisabled();
 
       // Find checkbox
@@ -102,14 +126,14 @@ test.describe('Terms of Service - Modal UI (F-12)', () => {
     }
   });
 
-  test('modal cannot be dismissed by pressing Escape', async ({ page }) => {
+  test("modal cannot be dismissed by pressing Escape", async ({ page }) => {
     const modal = page.locator('[role="dialog"]');
 
     if (await modal.isVisible().catch(() => false)) {
       const initiallyVisible = await modal.isVisible();
 
       // Try to press Escape
-      await page.keyboard.press('Escape');
+      await page.keyboard.press("Escape");
       await page.waitForTimeout(300);
 
       // Modal should still be visible
@@ -118,13 +142,11 @@ test.describe('Terms of Service - Modal UI (F-12)', () => {
     }
   });
 
-  test('modal cannot be dismissed by clicking outside', async ({ page }) => {
+  test("modal cannot be dismissed by clicking outside", async ({ page }) => {
     const modal = page.locator('[role="dialog"]');
 
     if (await modal.isVisible().catch(() => false)) {
       // Try to click on the overlay (outside the modal)
-      const overlay = page.locator('[role="dialog"]').locator('..').first();
-
       // Get modal position and click far outside
       await page.click('[role="dialog"]', { position: { x: 0, y: 0 } });
       await page.waitForTimeout(300);
@@ -134,16 +156,18 @@ test.describe('Terms of Service - Modal UI (F-12)', () => {
     }
   });
 
-  test('link to full terms opens terms page', async ({ page, context }) => {
+  test("link to full terms opens terms page", async ({ page }) => {
     const modal = page.locator('[role="dialog"]');
 
     if (await modal.isVisible().catch(() => false)) {
       // Find link to terms
-      const termsLink = page.getByRole('link', { name: /Leggi i Termini completi/i });
+      const termsLink = page.getByRole("link", {
+        name: /Leggi i Termini completi/i,
+      });
 
       // Verify it points to /terms
-      const href = await termsLink.getAttribute('href');
-      expect(href).toBe('/terms');
+      const href = await termsLink.getAttribute("href");
+      expect(href).toBe("/terms");
 
       // Click it (may open in new tab)
       await termsLink.click();
@@ -156,18 +180,18 @@ test.describe('Terms of Service - Modal UI (F-12)', () => {
   });
 });
 
-test.describe('Terms of Service - Accessibility (F-12)', () => {
-  test('ToS modal is keyboard accessible', async ({ page }) => {
+test.describe("Terms of Service - Accessibility (F-12)", () => {
+  test("ToS modal is keyboard accessible", async ({ page }) => {
     const modal = page.locator('[role="dialog"]');
 
     if (await modal.isVisible().catch(() => false)) {
       // Tab to checkbox
-      await page.keyboard.press('Tab');
-      await page.keyboard.press('Tab'); // May need multiple tabs
+      await page.keyboard.press("Tab");
+      await page.keyboard.press("Tab"); // May need multiple tabs
       await page.waitForTimeout(100);
 
       // Space to toggle checkbox
-      await page.keyboard.press('Space');
+      await page.keyboard.press("Space");
       await page.waitForTimeout(100);
 
       // Verify checkbox state changed
@@ -177,7 +201,7 @@ test.describe('Terms of Service - Accessibility (F-12)', () => {
     }
   });
 
-  test('ToS modal has proper ARIA labels', async ({ page }) => {
+  test("ToS modal has proper ARIA labels", async ({ page }) => {
     const modal = page.locator('[role="dialog"]');
 
     if (await modal.isVisible().catch(() => false)) {
@@ -187,12 +211,12 @@ test.describe('Terms of Service - Accessibility (F-12)', () => {
 
       // Check for checkbox ARIA attributes
       const checkbox = page.locator('[aria-required="true"]');
-      const ariaRequired = await checkbox.getAttribute('aria-required');
-      expect(ariaRequired).toBe('true');
+      const ariaRequired = await checkbox.getAttribute("aria-required");
+      expect(ariaRequired).toBe("true");
     }
   });
 
-  test('modal content meets contrast requirements', async ({ page }) => {
+  test("modal content meets contrast requirements", async ({ page }) => {
     const modal = page.locator('[role="dialog"]');
 
     if (await modal.isVisible().catch(() => false)) {
