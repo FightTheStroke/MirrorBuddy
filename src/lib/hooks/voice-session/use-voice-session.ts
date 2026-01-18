@@ -78,11 +78,10 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     store.setOutputLevel,
   );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
   useEffect(() => {
     refs.playNextChunkRef.current = playNextChunk;
   }, [playNextChunk]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- intentional ternary
+
   useEffect(() => {
     store.isSpeaking ? startPolling() : stopPolling();
   }, [store.isSpeaking, startPolling, stopPolling]);
@@ -96,6 +95,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     mediaStreamRef: refs.mediaStreamRef,
     sourceNodeRef: refs.sourceNodeRef,
     analyserRef: refs.analyserRef,
+    animationFrameRef: refs.animationFrameRef,
     lastLevelUpdateRef: refs.lastLevelUpdateRef,
     frequencyDataRef: refs.frequencyDataRef,
   };
@@ -160,7 +160,6 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     scheduleQueuedChunks,
   });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
   useEffect(() => {
     refs.handleServerEventRef.current = handleServerEvent;
   }, [handleServerEvent]);
@@ -193,6 +192,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
     webrtcHeartbeatRef: refs.webrtcHeartbeatRef,
+    animationFrameRef: refs.animationFrameRef,
     userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
     firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
     sendSessionConfigRef: refs.sendSessionConfigRef,

@@ -35,6 +35,7 @@ export interface ConnectionRefs {
   webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   webrtcHeartbeatRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  animationFrameRef: React.MutableRefObject<number | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;

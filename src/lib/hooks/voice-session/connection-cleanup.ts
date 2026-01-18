@@ -22,10 +22,17 @@ export function useDisconnect(
   return useCallback(() => {
     logger.debug("[VoiceSession] Disconnecting...");
 
+    // Cancel input level monitoring animation frame
+    if (refs.animationFrameRef.current) {
+      cancelAnimationFrame(refs.animationFrameRef.current);
+      // eslint-disable-next-line react-hooks/immutability -- Intentional ref cleanup
+      refs.animationFrameRef.current = null;
+    }
+
     // WebRTC heartbeat cleanup (uses setTimeout with jitter, not setInterval)
     if (refs.webrtcHeartbeatRef.current) {
       clearTimeout(refs.webrtcHeartbeatRef.current);
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref cleanup
+
       refs.webrtcHeartbeatRef.current = null;
     }
 

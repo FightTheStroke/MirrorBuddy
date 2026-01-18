@@ -41,6 +41,7 @@ export interface VoiceSessionRefs {
   webrtcAudioElementRef: React.MutableRefObject<HTMLAudioElement | null>;
   webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>;
   webrtcHeartbeatRef: React.MutableRefObject<NodeJS.Timeout | null>;
+  animationFrameRef: React.MutableRefObject<number | null>;
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
@@ -85,6 +86,7 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     webrtcAudioElementRef: useRef<HTMLAudioElement | null>(null),
     webrtcDataChannelRef: useRef<RTCDataChannel | null>(null),
     webrtcHeartbeatRef: useRef<NodeJS.Timeout | null>(null),
+    animationFrameRef: useRef<number | null>(null),
     userSpeechEndTimeRef: useRef<number | null>(null),
     firstAudioPlaybackTimeRef: useRef<number | null>(null),
     sendSessionConfigRef: useRef<(() => void) | null>(null),

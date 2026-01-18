@@ -13,6 +13,7 @@ export interface AudioCaptureRefs {
   mediaStreamRef: React.MutableRefObject<MediaStream | null>;
   sourceNodeRef: React.MutableRefObject<MediaStreamAudioSourceNode | null>;
   analyserRef: React.MutableRefObject<AnalyserNode | null>;
+  animationFrameRef: React.MutableRefObject<number | null>;
   lastLevelUpdateRef: React.MutableRefObject<number>;
   /** Reusable typed array for frequency data - avoids allocation per frame */
   frequencyDataRef: React.MutableRefObject<Uint8Array<ArrayBuffer> | null>;
@@ -59,7 +60,10 @@ export function useStartAudioCapture(
 
     // Start input level monitoring
     const updateInputLevel = () => {
-      if (!refs.analyserRef.current) return;
+      if (!refs.analyserRef.current) {
+        refs.animationFrameRef.current = null;
+        return;
+      }
 
       const now = performance.now();
       if (now - refs.lastLevelUpdateRef.current > 30) {
@@ -84,10 +88,10 @@ export function useStartAudioCapture(
         setInputLevel(Math.min(1, (average / 255) * 2));
       }
 
-      requestAnimationFrame(updateInputLevel);
+      refs.animationFrameRef.current = requestAnimationFrame(updateInputLevel);
     };
 
-    requestAnimationFrame(updateInputLevel);
+    refs.animationFrameRef.current = requestAnimationFrame(updateInputLevel);
 
     logger.debug(
       "[VoiceSession] Audio capture started (WebRTC, input level monitoring only)",
