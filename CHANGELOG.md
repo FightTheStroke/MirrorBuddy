@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-01-18 - Security Hardening Release
+
+### Security
+- **COPPA Enforcement**: Integrated `canAccessFullFeatures()` into chat, streaming, and tool creation APIs
+- **Under-13 Protection**: Users under 13 without parental consent are now blocked from AI features
+- **Observability Hardening**: OTel is now mandatory in production (error log if not configured)
+- **CodeQL Analysis**: Added GitHub CodeQL workflow for static security analysis
+
+### Fixed
+- Closed all security audit gaps identified by Codex review
+- CSRF protection verified on all mutating endpoints
+
+---
+
 ## [Unreleased] - Gamification Fortnite/Duolingo Style
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
