@@ -2,17 +2,15 @@
 // VOICE SESSION REFS - Extracted for file size management
 // ============================================================================
 
-'use client';
+"use client";
 
-import { useRef, useState } from 'react';
-import type { Maestro } from '@/types';
-import { RingBuffer } from './ring-buffer';
-import { MAX_QUEUE_SIZE } from './constants';
+import { useRef, useState } from "react";
+import type { Maestro } from "@/types";
+import { RingBuffer } from "./ring-buffer";
+import { MAX_QUEUE_SIZE } from "./constants";
 
 export interface VoiceSessionRefs {
-  wsRef: React.MutableRefObject<WebSocket | null>;
   maestroRef: React.MutableRefObject<Maestro | null>;
-  transportRef: React.MutableRefObject<'websocket' | 'webrtc'>;
   captureContextRef: React.MutableRefObject<AudioContext | null>;
   playbackContextRef: React.MutableRefObject<AudioContext | null>;
   mediaStreamRef: React.MutableRefObject<MediaStream | null>;
@@ -32,7 +30,9 @@ export interface VoiceSessionRefs {
   sessionReadyRef: React.MutableRefObject<boolean>;
   greetingSentRef: React.MutableRefObject<boolean>;
   hasActiveResponseRef: React.MutableRefObject<boolean>;
-  handleServerEventRef: React.MutableRefObject<((event: Record<string, unknown>) => void) | null>;
+  handleServerEventRef: React.MutableRefObject<
+    ((event: Record<string, unknown>) => void) | null
+  >;
   sessionIdRef: React.MutableRefObject<string | null>;
   connectionTimeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
   greetingTimeoutsRef: React.MutableRefObject<NodeJS.Timeout[]>;
@@ -44,14 +44,15 @@ export interface VoiceSessionRefs {
   userSpeechEndTimeRef: React.MutableRefObject<number | null>;
   firstAudioPlaybackTimeRef: React.MutableRefObject<number | null>;
   sendSessionConfigRef: React.MutableRefObject<(() => void) | null>;
-  initialMessagesRef: React.MutableRefObject<Array<{ role: 'user' | 'assistant'; content: string }> | null>;
+  initialMessagesRef: React.MutableRefObject<Array<{
+    role: "user" | "assistant";
+    content: string;
+  }> | null>;
 }
 
 export function useVoiceSessionRefs(): VoiceSessionRefs {
   return {
-    wsRef: useRef<WebSocket | null>(null),
     maestroRef: useRef<Maestro | null>(null),
-    transportRef: useRef<'websocket' | 'webrtc'>('websocket'),
     captureContextRef: useRef<AudioContext | null>(null),
     playbackContextRef: useRef<AudioContext | null>(null),
     mediaStreamRef: useRef<MediaStream | null>(null),
@@ -59,7 +60,9 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     processorRef: useRef<ScriptProcessorNode | null>(null),
     analyserRef: useRef<AnalyserNode | null>(null),
     frequencyDataRef: useRef<Uint8Array<ArrayBuffer> | null>(null),
-    audioQueueRef: useRef<RingBuffer<Int16Array>>(new RingBuffer(MAX_QUEUE_SIZE)),
+    audioQueueRef: useRef<RingBuffer<Int16Array>>(
+      new RingBuffer(MAX_QUEUE_SIZE),
+    ),
     isPlayingRef: useRef(false),
     lastLevelUpdateRef: useRef<number>(0),
     playNextChunkRef: useRef<(() => void) | null>(null),
@@ -71,7 +74,9 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     sessionReadyRef: useRef(false),
     greetingSentRef: useRef(false),
     hasActiveResponseRef: useRef(false),
-    handleServerEventRef: useRef<((event: Record<string, unknown>) => void) | null>(null),
+    handleServerEventRef: useRef<
+      ((event: Record<string, unknown>) => void) | null
+    >(null),
     sessionIdRef: useRef<string | null>(null),
     connectionTimeoutRef: useRef<NodeJS.Timeout | null>(null),
     greetingTimeoutsRef: useRef<NodeJS.Timeout[]>([]),
@@ -83,10 +88,13 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
     userSpeechEndTimeRef: useRef<number | null>(null),
     firstAudioPlaybackTimeRef: useRef<number | null>(null),
     sendSessionConfigRef: useRef<(() => void) | null>(null),
-    initialMessagesRef: useRef<Array<{ role: 'user' | 'assistant'; content: string }> | null>(null),
+    initialMessagesRef: useRef<Array<{
+      role: "user" | "assistant";
+      content: string;
+    }> | null>(null),
   };
 }
 
 export function useConnectionState() {
-  return useState<'idle' | 'connecting' | 'connected' | 'error'>('idle');
+  return useState<"idle" | "connecting" | "connected" | "error">("idle");
 }
