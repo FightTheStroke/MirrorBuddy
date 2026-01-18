@@ -23,7 +23,7 @@ import { requireCSRF } from '@/lib/security/csrf';
 import { ChatRequest } from './types';
 import { TOOL_CONTEXT } from './constants';
 import { getDemoContext } from './helpers';
-import { extractUserId } from './auth-handler';
+import { extractUserIdWithCoppaCheck } from './auth-handler';
 import { loadUserSettings, checkBudgetLimit, checkBudgetWarning, updateBudget } from './budget-handler';
 import { buildAllContexts } from './context-builders';
 import { processToolCalls, buildToolChoice } from './tool-handler';
@@ -53,8 +53,18 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // Authentication
-    const userId = await extractUserId();
+    // Authentication + COPPA compliance check
+    const coppaCheck = await extractUserIdWithCoppaCheck();
+    if (!coppaCheck.allowed) {
+      const response = NextResponse.json({
+        error: 'Parental consent required',
+        code: 'COPPA_CONSENT_REQUIRED',
+        message: 'Users under 13 require parental consent to use AI features. Please ask a parent or guardian to provide consent.',
+      }, { status: 403 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
+    }
+    const userId = coppaCheck.userId;
 
     // Load user settings and check budget
     let providerPreference: AIProvider | 'auto' | undefined;

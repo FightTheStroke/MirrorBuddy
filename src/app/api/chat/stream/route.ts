@@ -17,7 +17,7 @@ import { requireCSRF } from '@/lib/security/csrf';
 
 import type { ChatRequest } from '../types';
 import {
-  getUserId,
+  getUserIdWithCoppaCheck,
   loadUserSettings,
   enhancePromptWithContext,
   checkInputSafety,
@@ -71,7 +71,20 @@ export async function POST(request: NextRequest) {
       log.debug('Tool calls requested but not supported in streaming mode', { maestroId });
     }
 
-    const userId = await getUserId();
+    // Authentication + COPPA compliance check
+    const coppaCheck = await getUserIdWithCoppaCheck();
+    if (!coppaCheck.allowed) {
+      const response = NextResponse.json({
+        error: 'Parental consent required',
+        code: 'COPPA_CONSENT_REQUIRED',
+        message: 'Users under 13 require parental consent to use AI features.',
+        fallback: '/api/chat',
+      }, { status: 403 });
+      response.headers.set('X-Request-ID', getRequestId(request));
+      return response;
+    }
+    const userId = coppaCheck.userId;
+
     const { settings: userSettings, providerPreference } = userId
       ? await loadUserSettings(userId)
       : { settings: null, providerPreference: undefined };

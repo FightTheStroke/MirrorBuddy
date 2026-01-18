@@ -6,6 +6,7 @@
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
 import { filterInput } from "@/lib/safety";
 import { loadPreviousContext } from "@/lib/conversation/memory-loader";
 import { enhanceSystemPrompt } from "@/lib/conversation/prompt-enhancer";
@@ -52,6 +53,38 @@ export interface PreparedContext {
 export async function getUserId(): Promise<string | undefined> {
   const auth = await validateAuth();
   return auth.authenticated && auth.userId ? auth.userId : undefined;
+}
+
+/**
+ * COPPA compliance check result
+ */
+export interface CoppaCheckResult {
+  allowed: boolean;
+  userId?: string;
+  reason?: "coppa_blocked";
+}
+
+/**
+ * Get user ID with COPPA compliance check
+ * Blocks under-13 users without parental consent
+ */
+export async function getUserIdWithCoppaCheck(): Promise<CoppaCheckResult> {
+  const auth = await validateAuth();
+
+  if (!auth.authenticated || !auth.userId) {
+    return { allowed: true, userId: undefined };
+  }
+
+  const canAccess = await canAccessFullFeatures(auth.userId);
+
+  if (!canAccess) {
+    logger.info("COPPA: Streaming access blocked", {
+      userId: auth.userId.slice(0, 8),
+    });
+    return { allowed: false, userId: auth.userId, reason: "coppa_blocked" };
+  }
+
+  return { allowed: true, userId: auth.userId };
 }
 
 /**

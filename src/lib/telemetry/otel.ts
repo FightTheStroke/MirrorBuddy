@@ -24,16 +24,28 @@ import { metrics } from "@opentelemetry/api";
  * Environment variables:
  * - APPLICATIONINSIGHTS_CONNECTION_STRING: Azure App Insights connection string
  *
+ * PRODUCTION REQUIREMENT: OTel is mandatory in production.
+ * The application will log an error if telemetry is not configured in production.
+ *
  * @returns NodeSDK instance (or undefined if not configured)
  */
 export function initializeOpenTelemetry(): NodeSDK | undefined {
   const connectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING;
+  const isProduction = process.env.NODE_ENV === "production";
 
-  // Skip initialization if connection string not provided
+  // In production, OTel is mandatory - log error if not configured
   if (!connectionString) {
-    logger.warn(
-      "APPLICATIONINSIGHTS_CONNECTION_STRING not set. Telemetry disabled.",
-    );
+    if (isProduction) {
+      logger.error(
+        "CRITICAL: APPLICATIONINSIGHTS_CONNECTION_STRING not set in production. " +
+          "Observability is REQUIRED for production deployments. " +
+          "Set this environment variable to enable Azure Monitor telemetry.",
+      );
+    } else {
+      logger.warn(
+        "APPLICATIONINSIGHTS_CONNECTION_STRING not set. Telemetry disabled in development.",
+      );
+    }
     return undefined;
   }
 
