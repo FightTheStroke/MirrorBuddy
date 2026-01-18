@@ -123,7 +123,16 @@ export async function probeWebRTC(): Promise<ProbeResult> {
       ]);
 
       if (!sdpResponse.ok) {
-        throw new Error(`SDP exchange failed: ${sdpResponse.statusText}`);
+        const errorBody = await sdpResponse.text();
+        logger.error("[TransportProbe] Azure WebRTC SDP exchange failed", {
+          status: sdpResponse.status,
+          statusText: sdpResponse.statusText,
+          errorBody,
+          webrtcEndpoint,
+        });
+        throw new Error(
+          `SDP exchange failed: ${sdpResponse.status} - ${errorBody || sdpResponse.statusText}`,
+        );
       }
 
       const answer = await sdpResponse.text();
