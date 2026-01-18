@@ -404,7 +404,14 @@ class PrometheusPushService {
     return samples
       .map((s) => {
         const tags = Object.entries(s.labels)
-          .map(([k, v]) => `${k}=${v.replace(/[, ]/g, "\\ ")}`)
+          .map(([k, v]) => {
+            // Escape backslashes first, then commas and spaces (Influx Line Protocol)
+            const escaped = v
+              .replace(/\\/g, "\\\\")
+              .replace(/,/g, "\\,")
+              .replace(/ /g, "\\ ");
+            return `${k}=${escaped}`;
+          })
           .join(",");
         return `${s.name},${tags} value=${s.value} ${s.timestamp * 1000000}`;
       })

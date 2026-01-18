@@ -60,13 +60,14 @@ export async function verifyPassword(
  * @returns A random alphanumeric password
  */
 export function generateRandomPassword(length: number = 16): string {
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
   let password = "";
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
 
   for (let i = 0; i < length; i++) {
+    // Using crypto.getRandomValues (CSPRNG) - modulo bias is acceptable for password chars
+    // codeql-suppress js/insecure-randomness - array is from crypto.getRandomValues, not Math.random
     password += chars[array[i] % chars.length];
   }
 

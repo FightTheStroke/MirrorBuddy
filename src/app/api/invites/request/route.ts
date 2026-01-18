@@ -23,7 +23,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    // Simple email validation - avoid complex regex for ReDoS safety
+    const emailParts = email.split("@");
+    const isValidEmail =
+      emailParts.length === 2 &&
+      emailParts[0].length > 0 &&
+      emailParts[1].includes(".") &&
+      !email.includes(" ");
+    if (!email || !isValidEmail) {
       return NextResponse.json({ error: "Email non valida" }, { status: 400 });
     }
 

@@ -59,9 +59,10 @@ test.describe("Beta Invite System", () => {
 
   test.describe("Admin Invites Page", () => {
     test.beforeEach(async ({ page }) => {
-      // Mock admin authentication
+      // Mock admin authentication with secure cookie settings
       await page.addInitScript(() => {
-        document.cookie = "mirrorbuddy-user-id=admin-test-id; path=/";
+        document.cookie =
+          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax";
       });
 
       // Mock the invites API
@@ -182,9 +183,10 @@ test.describe("Beta Invite System", () => {
 
   test.describe("Invite Approval Flow", () => {
     test("should approve invite and show success", async ({ page }) => {
-      // Mock admin auth
+      // Mock admin auth with secure cookie settings
       await page.addInitScript(() => {
-        document.cookie = "mirrorbuddy-user-id=admin-test-id; path=/";
+        document.cookie =
+          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax";
       });
 
       // Mock invites list

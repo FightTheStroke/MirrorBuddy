@@ -109,14 +109,19 @@ export async function sendRequestConfirmation(
 }
 
 /**
- * Generate a username from email
+ * Generate a username from email using cryptographically secure randomness
  */
 function generateUsername(email: string): string {
   const local = email.split("@")[0];
   // Clean up: remove dots, plus signs, etc.
   const clean = local.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-  // Add random suffix to ensure uniqueness
-  const suffix = Math.random().toString(36).substring(2, 6);
+  // Add random suffix using crypto for uniqueness
+  const array = new Uint8Array(4);
+  crypto.getRandomValues(array);
+  const suffix = Array.from(array)
+    .map((b) => b.toString(36).padStart(2, "0"))
+    .join("")
+    .substring(0, 4);
   return `${clean}${suffix}`;
 }
 
