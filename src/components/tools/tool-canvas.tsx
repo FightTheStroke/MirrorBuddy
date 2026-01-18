@@ -10,6 +10,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Network } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { useToolStream, type ActiveToolState, type StreamToolEvent } from '@/lib/hooks/use-tool-stream';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -47,9 +48,8 @@ export function ToolCanvas({
   const handleSaveStudentSummary = useCallback(async (data: StudentSummaryData) => {
     try {
       const userId = getUserId();
-      const response = await fetch('/api/tools/saved', {
+      const response = await csrfFetch('/api/tools/saved', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId,
           type: 'summary',

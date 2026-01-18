@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { getCurrentSeason } from '@/lib/gamification/seasons';
 import type { ProgressState, StudySession } from './progress-store-types';
 import { createProgressActions } from './progress-store-actions';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 // Re-export types for convenience
 export type { StudySession, SessionGrade } from './progress-store-types';
@@ -42,9 +43,8 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
 
         try {
           // Sync main progress
-          await fetch('/api/progress', {
+          await csrfFetch('/api/progress', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               xp: state.xp,
               level: state.level,
@@ -62,9 +62,8 @@ export const useProgressStore = create<ProgressState>()((set, get) => ({
           ).slice(0, 10);
 
           for (const session of unsyncedSessions) {
-            await fetch('/api/progress/sessions', {
+            await csrfFetch('/api/progress/sessions', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(session),
             });
           }

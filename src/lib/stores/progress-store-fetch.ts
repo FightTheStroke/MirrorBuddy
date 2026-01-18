@@ -4,6 +4,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 /**
  * Fire-and-forget fetch with exponential backoff retry.
@@ -18,7 +19,7 @@ export async function fetchWithRetry(
 ): Promise<void> {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const response = await fetch(url, options);
+      const response = await csrfFetch(url, options);
       if (response.ok) return;
       // Don't retry on client errors (4xx)
       if (response.status >= 400 && response.status < 500) {

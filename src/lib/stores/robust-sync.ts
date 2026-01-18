@@ -4,6 +4,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 /**
  * Sync result with ETag and status
@@ -68,7 +69,7 @@ export async function fetchWithBackoff<T>(
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const response = await fetch(url, options);
+      const response = await csrfFetch(url, options);
       const etag = response.headers.get('etag') || undefined;
 
       if (response.ok) {

@@ -6,6 +6,7 @@
 import type { ConsentStatus } from './types';
 import type { StudentInsights } from '@/types';
 import { DEMO_USER_ID } from './constants';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 export async function fetchConsentStatus(): Promise<ConsentStatus | null> {
   try {
@@ -41,9 +42,8 @@ export async function fetchProfile(): Promise<StudentInsights | null> {
 }
 
 export async function generateProfile(): Promise<void> {
-  const response = await fetch('/api/profile/generate', {
+  const response = await csrfFetch('/api/profile/generate', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId: DEMO_USER_ID, forceRegenerate: true }),
   });
   const data = await response.json();
@@ -51,9 +51,8 @@ export async function generateProfile(): Promise<void> {
 }
 
 export async function giveConsent(): Promise<void> {
-  const response = await fetch('/api/profile/consent', {
+  const response = await csrfFetch('/api/profile/consent', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId: DEMO_USER_ID, parentConsent: true, studentConsent: true }),
   });
   const data = await response.json();
@@ -75,7 +74,7 @@ export async function exportProfile(format: 'json' | 'pdf'): Promise<void> {
 }
 
 export async function requestDeletion(): Promise<void> {
-  const response = await fetch(`/api/profile/consent?userId=${DEMO_USER_ID}`, { method: 'DELETE' });
+  const response = await csrfFetch(`/api/profile/consent?userId=${DEMO_USER_ID}`, { method: 'DELETE' });
   const data = await response.json();
   if (!data.success) throw new Error('Failed to request deletion');
 }

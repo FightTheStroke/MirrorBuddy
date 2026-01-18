@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 // Privacy Settings
 export function PrivacySettings() {
@@ -71,7 +72,7 @@ export function PrivacySettings() {
 
                 // Delete all data from database (primary data source)
                 try {
-                  await fetch("/api/user/data", { method: "DELETE" });
+                  await csrfFetch("/api/user/data", { method: "DELETE" });
                 } catch {
                   // Continue even if API fails - user will be logged out anyway
                 }

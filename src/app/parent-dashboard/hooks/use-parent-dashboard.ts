@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { StudentInsights } from '@/types';
 import type { DiaryEntry } from '@/components/profile/teacher-diary';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 const DEMO_USER_ID = 'demo-student-1';
 
@@ -152,9 +153,8 @@ export function useParentDashboard() {
     setError(null);
 
     try {
-      const response = await fetch('/api/profile/generate', {
+      const response = await csrfFetch('/api/profile/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: DEMO_USER_ID, forceRegenerate: true }),
       });
 
@@ -175,9 +175,8 @@ export function useParentDashboard() {
 
   const handleGiveConsent = async () => {
     try {
-      const response = await fetch('/api/profile/consent', {
+      const response = await csrfFetch('/api/profile/consent', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: DEMO_USER_ID,
           parentConsent: true,
@@ -213,7 +212,7 @@ export function useParentDashboard() {
     }
 
     try {
-      const response = await fetch(
+      const response = await csrfFetch(
         `/api/profile/consent?userId=${DEMO_USER_ID}`,
         { method: 'DELETE' }
       );

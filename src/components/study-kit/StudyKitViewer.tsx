@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { StudyKit } from '@/types/study-kit';
 import type { QuizResult } from '@/types/index';
 
@@ -72,9 +73,8 @@ export function StudyKitViewer({ studyKit, onDelete, onGeneratePath, className }
     const avgDifficulty =
       transformedQuiz.questions.reduce((sum, q) => sum + q.difficulty, 0) / transformedQuiz.questions.length;
 
-    fetch('/api/quizzes/results', {
+    csrfFetch('/api/quizzes/results', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         quizId: result.quizId,
         score: result.correctAnswers,

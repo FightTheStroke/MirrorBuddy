@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { Conversation, ChatMessage } from '@/types';
 
 // === STORE ===
@@ -51,9 +52,8 @@ export const useConversationStore = create<ConversationState>()(
 
         // Sync to server
         try {
-          const response = await fetch('/api/conversations', {
+          const response = await csrfFetch('/api/conversations', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ maestroId }),
           });
 
@@ -105,9 +105,8 @@ export const useConversationStore = create<ConversationState>()(
 
         // Sync to server
         try {
-          await fetch(`/api/conversations/${conversationId}/messages`, {
+          await csrfFetch(`/api/conversations/${conversationId}/messages`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               role: message.role,
               content: message.content,
@@ -133,7 +132,7 @@ export const useConversationStore = create<ConversationState>()(
 
         // Sync to server
         try {
-          await fetch(`/api/conversations/${id}`, { method: 'DELETE' });
+          await csrfFetch(`/api/conversations/${id}`, { method: 'DELETE' });
         } catch (error) {
           logger.error('Failed to delete conversation on server', { error: String(error) });
         }

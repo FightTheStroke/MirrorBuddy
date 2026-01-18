@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { Maestro, ChatMessage, ToolCall } from '@/types';
 
 interface UseMaestroChatHandlersProps {
@@ -43,9 +44,8 @@ export function useMaestroChatHandlers({
     if (userContent.includes('?')) onQuestionAsked();
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await csrfFetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [
             { role: 'system', content: maestro.systemPrompt },

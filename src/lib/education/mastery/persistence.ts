@@ -5,6 +5,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { MasteryState, TopicProgress } from './types';
 import { SkillStatus } from './types';
 
@@ -57,9 +58,8 @@ function deserializeMasteryState(data: unknown[]): MasteryState {
 export async function saveMasteryState(state: MasteryState): Promise<void> {
   try {
     const serialized = serializeMasteryState(state);
-    await fetch('/api/progress', {
+    await csrfFetch('/api/progress', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ masteries: serialized }),
     });
   } catch (error) {
@@ -90,9 +90,8 @@ export async function loadMasteryState(): Promise<MasteryState> {
  */
 export async function clearMasteryState(): Promise<void> {
   try {
-    await fetch('/api/progress', {
+    await csrfFetch('/api/progress', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ masteries: [] }),
     });
   } catch (error) {

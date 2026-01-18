@@ -14,6 +14,7 @@ import type {
 import { getUserId } from '../utils/user-id';
 import { fsrs5Schedule } from '../utils/fsrs';
 import { sendAdaptiveSignals } from '@/lib/education/adaptive-difficulty-client';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 interface UseFlashcardsViewOptions {
   initialMaestroId?: string | null;
@@ -95,9 +96,8 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
 
   const saveDeckToAPI = useCallback(async (deck: FlashcardDeck) => {
     const userId = getUserId();
-    await fetch('/api/materials', {
+    await csrfFetch('/api/materials', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         userId,
         toolId: deck.id,
@@ -161,7 +161,7 @@ export function useFlashcardsView(options: UseFlashcardsViewOptions = {}) {
   const deleteDeck = useCallback(
     async (deckId: string) => {
       try {
-        await fetch(`/api/materials?toolId=${deckId}`, { method: 'DELETE' });
+        await csrfFetch(`/api/materials?toolId=${deckId}`, { method: 'DELETE' });
         setDecks(decks.filter((d) => d.id !== deckId));
         if (selectedDeck?.id === deckId) {
           setSelectedDeck(null);

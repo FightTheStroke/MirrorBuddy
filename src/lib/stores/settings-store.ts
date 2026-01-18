@@ -5,6 +5,7 @@
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
 import type { Theme, AIProvider } from '@/types';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import {
   type TeachingStyle,
   type LearningDifference,
@@ -143,9 +144,8 @@ export const useSettingsStore = create<SettingsState>()(
 
         try {
           // Sync settings - #88: Added totalSpent to persist budget tracking
-          await fetch('/api/user/settings', {
+          await csrfFetch('/api/user/settings', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               theme: state.theme,
               provider: state.provider,
@@ -159,9 +159,8 @@ export const useSettingsStore = create<SettingsState>()(
           });
 
           // Sync profile
-          await fetch('/api/user/profile', {
+          await csrfFetch('/api/user/profile', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               name: state.studentProfile.name,
               age: state.studentProfile.age,

@@ -6,6 +6,7 @@
 
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type {
   MethodProgress,
   SkillLevel,
@@ -92,9 +93,8 @@ export const useMethodProgressStore = create<MethodProgressState>()(
         if (!state.userId) return;
 
         try {
-          await fetch('/api/progress/autonomy', {
+          await csrfFetch('/api/progress/autonomy', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               userId: state.userId,
               mindMaps: state.mindMaps,

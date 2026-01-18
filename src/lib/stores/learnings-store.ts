@@ -4,6 +4,7 @@
 
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 // === TYPES ===
 
@@ -39,9 +40,8 @@ export const useLearningsStore = create<LearningsState>()(
 
       addLearning: async (learning) => {
         try {
-          const response = await fetch('/api/learnings', {
+          const response = await csrfFetch('/api/learnings', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(learning),
           });
 
@@ -82,7 +82,7 @@ export const useLearningsStore = create<LearningsState>()(
         }));
 
         try {
-          await fetch(`/api/learnings?id=${id}`, { method: 'DELETE' });
+          await csrfFetch(`/api/learnings?id=${id}`, { method: 'DELETE' });
         } catch (error) {
           logger.error('Failed to remove learning', { error: String(error) });
         }

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { ParentProfessorChat } from '@/components/profile/parent-professor-chat';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { useParentDashboard } from './hooks/use-parent-dashboard';
 import { exportProfile } from './utils/export-utils';
 import { logger } from '@/lib/logger';
@@ -65,9 +66,8 @@ export default function ParentDashboardPage() {
 
   const handleStudentConsent = useCallback(async () => {
     try {
-      await fetch('/api/profile/consent', {
+      await csrfFetch('/api/profile/consent', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: DEMO_USER_ID,
           studentConsent: true,

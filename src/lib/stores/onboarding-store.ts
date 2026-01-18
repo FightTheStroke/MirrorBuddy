@@ -8,6 +8,7 @@
  */
 
 import { create } from "zustand";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import {
   type OnboardingStep,
   type OnboardingData,
@@ -143,7 +144,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
   resetAllData: async () => {
     // Delete all user data from database (primary data source)
     try {
-      await fetch("/api/user/data", { method: "DELETE" });
+      await csrfFetch("/api/user/data", { method: "DELETE" });
     } catch {
       // Continue with local cleanup even if API fails
     }

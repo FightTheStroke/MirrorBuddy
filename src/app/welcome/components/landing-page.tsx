@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { useOnboardingStore } from '@/lib/stores/onboarding-store';
 import { useRouter } from 'next/navigation';
 import { HeroSection } from './hero-section';
@@ -22,9 +23,8 @@ export function LandingPage({ existingUserData, onStartOnboarding }: LandingPage
     try {
       logger.info('[WelcomePage] Skip button clicked, marking onboarding complete');
 
-      const response = await fetch('/api/onboarding', {
+      const response = await csrfFetch('/api/onboarding', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ hasCompletedOnboarding: true }),
       });
 
