@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/data-retention",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/metrics-push",
+      "schedule": "* * * * *"
     }
   ]
 }
