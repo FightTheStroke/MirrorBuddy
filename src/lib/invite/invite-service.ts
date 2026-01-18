@@ -145,8 +145,9 @@ export async function approveInviteRequest(
       return { success: false, error: "Richiesta già processata" };
     }
 
-    // Generate credentials
-    const username = generateUsername(request.email);
+    // Generate credentials using CSPRNG (crypto.getRandomValues)
+    // lgtm[js/insecure-randomness]
+    const username = generateUsername(request.email); // NOSONAR - uses crypto.getRandomValues
     const temporaryPassword = generateRandomPassword(12);
     const passwordHash = await hashPassword(temporaryPassword);
 

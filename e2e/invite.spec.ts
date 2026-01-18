@@ -59,10 +59,12 @@ test.describe("Beta Invite System", () => {
 
   test.describe("Admin Invites Page", () => {
     test.beforeEach(async ({ page }) => {
-      // Mock admin authentication with secure cookie settings
+      // Mock admin authentication - test-only cookie, not used in production
+      // lgtm[js/clear-text-storage-of-sensitive-data] - E2E test mock, not production code
       await page.addInitScript(() => {
+        // Test cookie - Secure flag not possible over HTTP localhost
         document.cookie =
-          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax";
+          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax"; // NOSONAR - test mock
       });
 
       // Mock the invites API
@@ -183,10 +185,12 @@ test.describe("Beta Invite System", () => {
 
   test.describe("Invite Approval Flow", () => {
     test("should approve invite and show success", async ({ page }) => {
-      // Mock admin auth with secure cookie settings
+      // Mock admin auth - test-only cookie, not used in production
+      // lgtm[js/clear-text-storage-of-sensitive-data] - E2E test mock, not production code
       await page.addInitScript(() => {
+        // Test cookie - Secure flag not possible over HTTP localhost
         document.cookie =
-          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax";
+          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax"; // NOSONAR - test mock
       });
 
       // Mock invites list
