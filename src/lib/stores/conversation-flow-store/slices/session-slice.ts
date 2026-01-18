@@ -21,6 +21,7 @@ import { getDefaultSupportTeacher, getSupportTeacherById, type CoachId } from '@
 import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
 import { loadConversationSummariesFromDB } from '../persistence';
 import { createActiveCharacter, saveCurrentConversation, loadConversationMessages } from '../helpers';
@@ -139,9 +140,8 @@ export const createSessionSlice: StateCreator<
 
     try {
       // Call API to generate summary (server-side operation)
-      const response = await fetch(`/api/conversations/${conversationId}/end`, {
+      const response = await csrfFetch(`/api/conversations/${conversationId}/end`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, reason: 'explicit' }),
       });
 

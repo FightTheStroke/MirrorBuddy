@@ -9,6 +9,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { CharacterType } from '@/types';
 import type { ConversationSummary } from './types';
 
@@ -35,9 +36,8 @@ export async function createConversationInDB(
   characterName: string
 ): Promise<string | null> {
   try {
-    const response = await fetch('/api/conversations', {
+    const response = await csrfFetch('/api/conversations', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         maestroId: characterId,
         title: `Conversazione con ${characterName}`,
@@ -65,9 +65,8 @@ export async function saveMessageToDB(
   content: string
 ): Promise<void> {
   try {
-    const response = await fetch(`/api/conversations/${conversationId}/messages`, {
+    const response = await csrfFetch(`/api/conversations/${conversationId}/messages`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ role, content }),
     });
     if (!response.ok) {
@@ -126,9 +125,8 @@ export async function updateConversationSummary(
   topics: string[]
 ): Promise<void> {
   try {
-    await fetch(`/api/conversations/${conversationId}`, {
+    await csrfFetch(`/api/conversations/${conversationId}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ summary, keyFacts: JSON.stringify(keyFacts), topics }),
     });
   } catch (error) {

@@ -10,6 +10,7 @@ import {
   getPushCapabilityStatus,
 } from './vapid';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 export interface PushSubscriptionJSON {
   endpoint: string;
@@ -159,9 +160,8 @@ export async function unsubscribeFromPush(): Promise<boolean> {
  */
 async function saveSubscriptionToServer(subscription: PushSubscriptionJSON): Promise<boolean> {
   try {
-    const response = await fetch('/api/push/subscribe', {
+    const response = await csrfFetch('/api/push/subscribe', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
@@ -187,9 +187,8 @@ async function saveSubscriptionToServer(subscription: PushSubscriptionJSON): Pro
  */
 async function removeSubscriptionFromServer(endpoint: string): Promise<boolean> {
   try {
-    const response = await fetch('/api/push/subscribe', {
+    const response = await csrfFetch('/api/push/subscribe', {
       method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ endpoint }),
     });
 

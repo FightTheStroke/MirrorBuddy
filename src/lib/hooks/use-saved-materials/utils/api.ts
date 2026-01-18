@@ -6,6 +6,7 @@
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 import type { SavedMaterial } from '../types';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 export async function fetchMaterials(
   toolType: ToolType,
@@ -39,9 +40,8 @@ export async function saveMaterialToAPI(
 ): Promise<SavedMaterial | null> {
   try {
     const toolId = crypto.randomUUID();
-    const response = await fetch('/api/materials', {
+    const response = await csrfFetch('/api/materials', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         userId,
         toolId,
@@ -64,7 +64,7 @@ export async function saveMaterialToAPI(
 
 export async function deleteMaterialFromAPI(toolId: string): Promise<boolean> {
   try {
-    const response = await fetch(`/api/materials?toolId=${toolId}`, {
+    const response = await csrfFetch(`/api/materials?toolId=${toolId}`, {
       method: 'DELETE',
     });
     return response.ok;
@@ -80,9 +80,8 @@ export async function updateMaterialInAPI(
   title?: string
 ): Promise<boolean> {
   try {
-    const response = await fetch('/api/materials', {
+    const response = await csrfFetch('/api/materials', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ toolId, content, title }),
     });
     return response.ok;
@@ -125,9 +124,8 @@ export async function saveMaterialToAPIWithId(
       ...options,
     };
 
-    const response = await fetch('/api/materials', {
+    const response = await csrfFetch('/api/materials', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(requestBody),
     });
 

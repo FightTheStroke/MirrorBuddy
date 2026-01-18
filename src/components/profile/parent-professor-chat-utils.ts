@@ -3,6 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 interface Message {
   id: string;
@@ -74,7 +75,7 @@ export async function initializeChatHistory(
  */
 export async function saveConsent(): Promise<void> {
   try {
-    await fetch('/api/parent-professor/consent', { method: 'POST' });
+    await csrfFetch('/api/parent-professor/consent', { method: 'POST' });
   } catch (err) {
     logger.error('Failed to save consent', { error: String(err) });
   }
@@ -96,9 +97,8 @@ export async function sendMessageToMaestro(
   conversationId: string;
   blocked: boolean;
 }> {
-  const response = await fetch('/api/parent-professor', {
+  const response = await csrfFetch('/api/parent-professor', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       maestroId,
       studentId,

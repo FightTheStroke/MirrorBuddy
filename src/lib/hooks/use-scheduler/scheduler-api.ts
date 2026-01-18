@@ -11,6 +11,7 @@ import type {
   CustomReminder,
   NotificationPreferences,
 } from '@/lib/scheduler/types';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 /**
  * Fetch user's complete schedule
@@ -35,9 +36,8 @@ export async function fetchScheduleAPI(): Promise<StudySchedule> {
 export async function createSessionAPI(
   data: Omit<ScheduledSession, 'id' | 'userId'>
 ): Promise<ScheduledSession> {
-  const response = await fetch('/api/scheduler', {
+  const response = await csrfFetch('/api/scheduler', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'session', ...data }),
   });
 
@@ -57,9 +57,8 @@ export async function updateSessionAPI(
   id: string,
   data: Partial<ScheduledSession>
 ): Promise<ScheduledSession> {
-  const response = await fetch('/api/scheduler', {
+  const response = await csrfFetch('/api/scheduler', {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'session', id, ...data }),
   });
 
@@ -76,7 +75,7 @@ export async function updateSessionAPI(
  * Delete a session
  */
 export async function deleteSessionAPI(id: string): Promise<void> {
-  const response = await fetch(`/api/scheduler?type=session&id=${id}`, {
+  const response = await csrfFetch(`/api/scheduler?type=session&id=${id}`, {
     method: 'DELETE',
   });
 
@@ -93,9 +92,8 @@ export async function deleteSessionAPI(id: string): Promise<void> {
 export async function createReminderAPI(
   data: Omit<CustomReminder, 'id' | 'userId' | 'createdAt'>
 ): Promise<CustomReminder> {
-  const response = await fetch('/api/scheduler', {
+  const response = await csrfFetch('/api/scheduler', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'reminder', ...data }),
   });
 
@@ -115,9 +113,8 @@ export async function updateReminderAPI(
   id: string,
   data: Partial<CustomReminder>
 ): Promise<CustomReminder> {
-  const response = await fetch('/api/scheduler', {
+  const response = await csrfFetch('/api/scheduler', {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'reminder', id, ...data }),
   });
 
@@ -134,7 +131,7 @@ export async function updateReminderAPI(
  * Delete a reminder
  */
 export async function deleteReminderAPI(id: string): Promise<void> {
-  const response = await fetch(`/api/scheduler?type=reminder&id=${id}`, {
+  const response = await csrfFetch(`/api/scheduler?type=reminder&id=${id}`, {
     method: 'DELETE',
   });
 
@@ -151,9 +148,8 @@ export async function deleteReminderAPI(id: string): Promise<void> {
 export async function updatePreferencesAPI(
   prefs: Partial<NotificationPreferences>
 ): Promise<NotificationPreferences> {
-  const response = await fetch('/api/scheduler', {
+  const response = await csrfFetch('/api/scheduler', {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'preferences', ...prefs }),
   });
 
@@ -174,9 +170,8 @@ export async function checkDueItemsAPI(): Promise<{
   notificationsCreated: number;
   types: string[];
 }> {
-  const response = await fetch('/api/scheduler/check-due', {
+  const response = await csrfFetch('/api/scheduler/check-due', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: '{}',
   });
 

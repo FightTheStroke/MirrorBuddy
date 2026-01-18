@@ -14,6 +14,7 @@ import { UnifiedFilePicker, type SelectedFile } from '@/components/google-drive'
 import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 interface StudyKitUploadProps {
   onUploadComplete?: (studyKitId: string) => void;
@@ -136,7 +137,7 @@ export function StudyKitUpload({ onUploadComplete, className }: StudyKitUploadPr
 
       // Upload
       setUploadProgress(40);
-      const response = await fetch('/api/study-kit/upload', {
+      const response = await csrfFetch('/api/study-kit/upload', {
         method: 'POST',
         body: formData,
       });

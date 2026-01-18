@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { ToolCall } from '@/types';
 import { ToolResultDisplay } from '@/components/tools';
 import { useChatSession } from './hooks';
@@ -68,9 +69,8 @@ export function ChatSession({ maestro, onClose, onSwitchToVoice }: ChatSessionPr
     }
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await csrfFetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: [...messages, userMessage].map((m) => ({
             role: m.role,

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { getMaestroById } from '@/data/maestri';
 import type { MaestroFull } from '@/data/maestri';
 import type { ToolType, ToolState } from '@/types/tools';
@@ -42,9 +43,8 @@ export function useToolHandler({
       setActiveTool(newTool);
 
       try {
-        const response = await fetch('/api/chat', {
+        const response = await csrfFetch('/api/chat', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             messages: [
               { role: 'system', content: maestro.systemPrompt },

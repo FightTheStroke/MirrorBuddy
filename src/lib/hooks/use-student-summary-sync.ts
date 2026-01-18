@@ -7,6 +7,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { StudentSummaryData, InlineComment, StudentSummarySection } from '@/types/tools';
 
 export type StudentSummaryCommand =
@@ -172,9 +173,8 @@ export function useStudentSummarySync({
   const broadcastContentChange = useCallback(async (sectionId: string, content: string) => {
     if (!sessionId) return;
     try {
-      await fetch('/api/tools/broadcast', {
+      await csrfFetch('/api/tools/broadcast', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'student_summary:modify',
           sessionId,
@@ -189,9 +189,8 @@ export function useStudentSummarySync({
   const broadcastSave = useCallback(async () => {
     if (!sessionId) return;
     try {
-      await fetch('/api/tools/broadcast', {
+      await csrfFetch('/api/tools/broadcast', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'student_summary:modify',
           sessionId,

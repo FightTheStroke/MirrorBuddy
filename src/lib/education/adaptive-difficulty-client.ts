@@ -3,6 +3,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { AdaptiveSignalInput, AdaptiveSignalSource } from '@/types';
 
 // Patterns handle both accented and non-accented versions
@@ -67,9 +68,8 @@ export async function sendAdaptiveSignals(
 
   while (attempt <= maxRetries) {
     try {
-      const response = await fetch('/api/adaptive/signals', {
+      const response = await csrfFetch('/api/adaptive/signals', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ signals }),
       });
 

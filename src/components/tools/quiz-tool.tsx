@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { Quiz } from '@/components/education/quiz';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { useProgressStore } from '@/lib/stores';
 import toast from '@/components/ui/toast';
 import type { Question, QuizRequest, Quiz as QuizType, QuizResult } from '@/types';
@@ -74,9 +75,8 @@ export function QuizTool({ request, onComplete }: QuizToolProps) {
     const avgDifficulty =
       quiz.questions.reduce((sum, q) => sum + (q.difficulty || 3), 0) / quiz.questions.length;
 
-    fetch('/api/quizzes/results', {
+    csrfFetch('/api/quizzes/results', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         quizId: result.quizId,
         score: result.correctAnswers,

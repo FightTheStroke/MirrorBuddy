@@ -11,6 +11,7 @@ import { X, Download, Loader2, FileText, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import toast from '@/components/ui/toast';
 import { DSA_PROFILES, type DSAProfile } from './dsa-profiles';
 import type { StudyKit } from '@/types/study-kit';
@@ -29,9 +30,8 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await fetch('/api/pdf-generator', {
+      const response = await csrfFetch('/api/pdf-generator', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           kitId: studyKit.id,
           profile: selectedProfile,

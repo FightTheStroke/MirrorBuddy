@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Brain, Play, Trophy, Target, Sparkles, MessageSquare, Loader2, Trash2, Clock } from 'lucide-react';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Quiz } from './quiz';
@@ -70,9 +71,8 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
     if (selectedQuiz) {
       const avgDifficulty =
         selectedQuiz.questions.reduce((sum, q) => sum + (q.difficulty || 3), 0) / selectedQuiz.questions.length;
-      fetch('/api/quizzes/results', {
+      csrfFetch('/api/quizzes/results', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           quizId: result.quizId,
           score: result.correctAnswers,

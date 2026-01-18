@@ -6,6 +6,7 @@ import { Mic, MicOff, PhoneOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
 import { useVoiceSession } from '@/lib/hooks/use-voice-session';
 import { CharacterAvatar } from './character-avatar';
@@ -83,9 +84,8 @@ export function VoiceCallOverlay({
 
     const createConversation = async () => {
       try {
-        const response = await fetch('/api/conversations', {
+        const response = await csrfFetch('/api/conversations', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             maestroId: character.id,
             title: `Sessione vocale con ${character.name}`,
@@ -114,9 +114,8 @@ export function VoiceCallOverlay({
         if (savedMessagesRef.current.has(messageKey)) continue;
 
         try {
-          await fetch(`/api/conversations/${conversationIdRef.current}/messages`, {
+          await csrfFetch(`/api/conversations/${conversationIdRef.current}/messages`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               role: entry.role,
               content: entry.content,
@@ -213,9 +212,8 @@ export function VoiceCallOverlay({
       const userId = getUserId();
       if (userId) {
         try {
-          const response = await fetch(`/api/conversations/${conversationIdRef.current}/end`, {
+          const response = await csrfFetch(`/api/conversations/${conversationIdRef.current}/end`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, reason: 'explicit' }),
           });
           if (response.ok) {

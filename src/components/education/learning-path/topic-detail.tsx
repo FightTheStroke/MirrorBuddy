@@ -13,6 +13,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -92,9 +93,8 @@ export function TopicDetail({
     const allComplete = topic.steps.every((s) => s.id === stepId || s.isCompleted);
     if (allComplete) {
       try {
-        await fetch(`/api/learning-path/${pathId}/topics/${topicId}`, {
+        await csrfFetch(`/api/learning-path/${pathId}/topics/${topicId}`, {
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'completed' }),
         });
         onComplete?.();

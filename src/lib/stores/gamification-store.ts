@@ -7,6 +7,7 @@
 
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 export interface GamificationState {
   // Core progression
@@ -136,9 +137,8 @@ export const useGamificationStore = create<GamificationStore>()((set, get) => ({
 
   awardPoints: async (points: number, reason: string, sourceId?: string, sourceType?: string) => {
     try {
-      const res = await fetch('/api/gamification/points', {
+      const res = await csrfFetch('/api/gamification/points', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ points, reason, sourceId, sourceType }),
       });
 
@@ -175,9 +175,8 @@ export const useGamificationStore = create<GamificationStore>()((set, get) => ({
 
   updateStreak: async (minutes: number) => {
     try {
-      const res = await fetch('/api/gamification/streak', {
+      const res = await csrfFetch('/api/gamification/streak', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ minutes }),
       });
 

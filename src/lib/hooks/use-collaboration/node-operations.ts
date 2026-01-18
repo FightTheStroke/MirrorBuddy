@@ -3,6 +3,7 @@
  */
 
 import type { MindmapNode } from '@/lib/tools/mindmap-export';
+import { csrfFetch } from '@/lib/auth/csrf-client';
 
 /**
  * Add a node to the mindmap
@@ -14,9 +15,8 @@ export async function addNodeToRoom(
   parentId: string
 ): Promise<boolean> {
   try {
-    const response = await fetch(`/api/collab/rooms/${roomId}`, {
+    const response = await csrfFetch(`/api/collab/rooms/${roomId}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'add_node',
         user: { id: userId },
@@ -40,9 +40,8 @@ export async function updateNodeInRoom(
   changes: Partial<MindmapNode>
 ): Promise<boolean> {
   try {
-    const response = await fetch(`/api/collab/rooms/${roomId}`, {
+    const response = await csrfFetch(`/api/collab/rooms/${roomId}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'update_node',
         user: { id: userId },
@@ -65,9 +64,8 @@ export async function deleteNodeFromRoom(
   nodeId: string
 ): Promise<boolean> {
   try {
-    const response = await fetch(`/api/collab/rooms/${roomId}`, {
+    const response = await csrfFetch(`/api/collab/rooms/${roomId}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'delete_node',
         user: { id: userId },
@@ -90,9 +88,8 @@ export async function moveNodeInRoom(
   newParentId: string
 ): Promise<boolean> {
   try {
-    const response = await fetch(`/api/collab/rooms/${roomId}`, {
+    const response = await csrfFetch(`/api/collab/rooms/${roomId}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'move_node',
         user: { id: userId },
