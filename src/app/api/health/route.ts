@@ -36,9 +36,11 @@ async function checkDatabase(): Promise<CheckResult> {
     await prisma.$queryRaw`SELECT 1`;
     const latency = Date.now() - start;
 
+    // 500ms threshold accounts for Vercel serverless cold starts
+    // (TLS handshake + connection pooling can take 300-800ms on first request)
     return {
-      status: latency < 100 ? "pass" : "warn",
-      message: latency < 100 ? "Connected" : "Slow response",
+      status: latency < 500 ? "pass" : "warn",
+      message: latency < 500 ? "Connected" : "Slow response",
       latency_ms: latency,
     };
   } catch (error) {
