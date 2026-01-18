@@ -50,12 +50,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       studentId: conversation.studentId,
       title: conversation.title,
       messageCount: conversation.messageCount,
-      messages: conversation.messages.map((m) => ({
-        id: m.id,
-        role: m.role,
-        content: m.content,
-        createdAt: m.createdAt,
-      })),
+      messages: conversation.messages.map(
+        (m: (typeof conversation.messages)[number]) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          createdAt: m.createdAt,
+        }),
+      ),
       createdAt: conversation.createdAt,
       updatedAt: conversation.updatedAt,
     });
