@@ -82,6 +82,28 @@ const response = await csrfFetch("/api/chat", {
 
 **Fix**: Change to `csrfFetch()` in the probe/connection files
 
+### Voice SDP Exchange 400 Error
+
+**Symptoms**: "SDP exchange failed: 400" in console logs
+
+**Check**: Network tab → POST to `realtimeapi-preview.ai.azure.com` returns 400
+
+**Root cause**: WebRTC endpoint URL missing required `?model={deployment}` parameter
+
+**Fix** (applied 2026-01-18):
+
+```typescript
+// src/app/api/realtime/token/route.ts
+// BEFORE - BROKEN
+webrtcEndpoint: `https://${azureRegion}.realtimeapi-preview.ai.azure.com/v1/realtimertc`,
+
+// AFTER - WORKING
+webrtcEndpoint: `https://${azureRegion}.realtimeapi-preview.ai.azure.com/v1/realtimertc?model=${encodeURIComponent(azureDeployment)}`,
+```
+
+**Note**: This issue was not caught in local development because local uses WebSocket
+proxy (port 3001) which bypasses the WebRTC endpoint entirely.
+
 ### Voice Shows "Operation Insecure"
 
 **Symptoms**: Console error about insecure operation
