@@ -7,6 +7,7 @@
 import 'server-only';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -17,9 +18,14 @@ const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:543
 // Configure SSL for Supabase connection
 // In production (Vercel), we need to accept the Supabase certificate
 const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
-const ssl = isProduction ? { rejectUnauthorized: false } : undefined;
 
-const adapter = new PrismaPg({ connectionString, ssl });
+// Create pg Pool with SSL configuration
+const pool = new Pool({
+  connectionString,
+  ssl: isProduction ? { rejectUnauthorized: false } : undefined,
+});
+
+const adapter = new PrismaPg(pool);
 
 export const prisma =
   globalForPrisma.prisma ??
