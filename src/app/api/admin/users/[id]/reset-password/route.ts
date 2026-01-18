@@ -6,10 +6,12 @@ import { generateRandomPassword, hashPassword } from "@/lib/auth/password";
 import { sendEmail } from "@/lib/email";
 
 export const POST = withAdmin(
-  async (request: NextRequest, { userId: adminId }) => {
+  async (request: NextRequest, { userId: adminId, params }) => {
     try {
-      const targetId = new URL(request.url).pathname.split("/").slice(0, -2).pop();
-      if (!targetId) {
+      // Extract user ID from route params (Next.js App Router)
+      const routeParams = await params;
+      const targetId = routeParams?.id;
+      if (!targetId || typeof targetId !== "string") {
         return NextResponse.json(
           { error: "User ID is required" },
           { status: 400 },

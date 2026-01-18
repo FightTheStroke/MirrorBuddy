@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth, validateAdminAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth, validateAdminAuth } from "@/lib/auth/session-auth";
 
 /**
  * Wraps an API route handler to require authentication
@@ -20,14 +20,18 @@ export function withAuth(
     const auth = await validateAuth();
 
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     return handler(request, { userId: auth.userId });
   };
+}
+
+/**
+ * Route context with dynamic params (Next.js App Router)
+ */
+interface RouteContext {
+  params: Promise<Record<string, string>>;
 }
 
 /**
@@ -36,29 +40,30 @@ export function withAuth(
  * Returns 403 if not admin
  *
  * @example
- * export const POST = withAdmin(async (request, { userId, isAdmin }) => {
- *   // user is guaranteed to be admin here
+ * export const POST = withAdmin(async (request, { userId, isAdmin, params }) => {
+ *   const { id } = await params; // Access route params
  * });
  */
 export function withAdmin(
   handler: (
     request: NextRequest,
-    context: { userId: string; isAdmin: boolean },
+    context: {
+      userId: string;
+      isAdmin: boolean;
+      params: Promise<Record<string, string>>;
+    },
   ) => Promise<Response | NextResponse>,
 ) {
-  return async (request: NextRequest) => {
+  return async (request: NextRequest, routeContext: RouteContext) => {
     const auth = await validateAdminAuth();
 
     if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 },
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!auth.isAdmin) {
       return NextResponse.json(
-        { error: 'Forbidden: admin access required' },
+        { error: "Forbidden: admin access required" },
         { status: 403 },
       );
     }
@@ -66,6 +71,7 @@ export function withAdmin(
     return handler(request, {
       userId: auth.userId,
       isAdmin: auth.isAdmin,
+      params: routeContext?.params ?? Promise.resolve({}),
     });
   };
 }

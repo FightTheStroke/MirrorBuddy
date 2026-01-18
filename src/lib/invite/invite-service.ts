@@ -110,12 +110,13 @@ export async function sendRequestConfirmation(
 
 /**
  * Generate a username from email using cryptographically secure randomness
+ * lgtm[js/insecure-randomness] - crypto.getRandomValues IS cryptographically secure (CSPRNG)
  */
 function generateUsername(email: string): string {
   const local = email.split("@")[0];
   // Clean up: remove dots, plus signs, etc.
   const clean = local.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
-  // Add random suffix using crypto for uniqueness
+  // Add random suffix using CSPRNG (crypto.getRandomValues) for uniqueness
   const array = new Uint8Array(4);
   crypto.getRandomValues(array);
   const suffix = Array.from(array)
