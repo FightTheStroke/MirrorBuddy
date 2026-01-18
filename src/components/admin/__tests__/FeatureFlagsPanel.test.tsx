@@ -8,6 +8,12 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { FeatureFlagsPanel } from "../FeatureFlagsPanel";
 
+// Mock csrfFetch to avoid CSRF token fetching in tests
+const mockCsrfFetch = vi.fn();
+vi.mock("@/lib/auth/csrf-client", () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
+
 // Mock the hooks
 vi.mock("@/lib/hooks/use-feature-flags", () => ({
   useFeatureFlags: vi.fn(() => ({
@@ -52,13 +58,10 @@ vi.mock("@/lib/hooks/use-feature-flags", () => ({
   })),
 }));
 
-// Mock fetch
-global.fetch = vi.fn();
-
 describe("FeatureFlagsPanel", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+    mockCsrfFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ success: true }),
     });
@@ -112,11 +115,10 @@ describe("FeatureFlagsPanel", () => {
     fireEvent.click(disableButtons[0]);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockCsrfFetch).toHaveBeenCalledWith(
         "/api/admin/feature-flags",
         expect.objectContaining({
           method: "POST",
-          headers: { "Content-Type": "application/json" },
         }),
       );
     });

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Download, Trash2, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface TrialSummary {
   chatsUsed: number;
@@ -33,9 +34,8 @@ export function MigrationChoice({
     setError(null);
 
     try {
-      const response = await fetch("/api/user/migrate-trial", {
+      const response = await csrfFetch("/api/user/migrate-trial", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId, trialSessionId }),
       });
 

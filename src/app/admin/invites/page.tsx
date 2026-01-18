@@ -12,6 +12,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface InviteRequest {
   id: string;
@@ -72,9 +73,8 @@ export default function AdminInvitesPage() {
   const handleApprove = async (id: string) => {
     setProcessingId(id);
     try {
-      const response = await fetch("/api/invites/approve", {
+      const response = await csrfFetch("/api/invites/approve", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ requestId: id }),
       });
 
@@ -94,9 +94,8 @@ export default function AdminInvitesPage() {
   const handleReject = async (id: string) => {
     setProcessingId(id);
     try {
-      const response = await fetch("/api/invites/reject", {
+      const response = await csrfFetch("/api/invites/reject", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           requestId: id,
           reason: rejectReason || undefined,

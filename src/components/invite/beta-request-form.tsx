@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface BetaRequestFormProps {
   visitorId?: string;
@@ -65,9 +66,8 @@ export function BetaRequestForm({
     setErrors({});
 
     try {
-      const response = await fetch("/api/invites/request", {
+      const response = await csrfFetch("/api/invites/request", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim().toLowerCase(),
