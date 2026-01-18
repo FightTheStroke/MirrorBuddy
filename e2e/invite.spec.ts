@@ -59,13 +59,16 @@ test.describe("Beta Invite System", () => {
 
   test.describe("Admin Invites Page", () => {
     test.beforeEach(async ({ page }) => {
-      // Mock admin authentication - test-only cookie, not used in production
-      // lgtm[js/clear-text-storage-of-sensitive-data] - E2E test mock, not production code
-      await page.addInitScript(() => {
-        // Test cookie - Secure flag not possible over HTTP localhost
-        document.cookie =
-          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax"; // NOSONAR - test mock
-      });
+      // Mock admin authentication using Playwright's cookie API
+      await page.context().addCookies([
+        {
+          name: "mirrorbuddy-user-id",
+          value: "admin-test-id",
+          domain: "localhost",
+          path: "/",
+          sameSite: "Lax",
+        },
+      ]);
 
       // Mock the invites API
       await page.route("/api/invites*", async (route) => {
@@ -185,13 +188,16 @@ test.describe("Beta Invite System", () => {
 
   test.describe("Invite Approval Flow", () => {
     test("should approve invite and show success", async ({ page }) => {
-      // Mock admin auth - test-only cookie, not used in production
-      // lgtm[js/clear-text-storage-of-sensitive-data] - E2E test mock, not production code
-      await page.addInitScript(() => {
-        // Test cookie - Secure flag not possible over HTTP localhost
-        document.cookie =
-          "mirrorbuddy-user-id=admin-test-id; path=/; SameSite=Lax"; // NOSONAR - test mock
-      });
+      // Mock admin authentication using Playwright's cookie API
+      await page.context().addCookies([
+        {
+          name: "mirrorbuddy-user-id",
+          value: "admin-test-id",
+          domain: "localhost",
+          path: "/",
+          sameSite: "Lax",
+        },
+      ]);
 
       // Mock invites list
       await page.route("/api/invites?status=PENDING", async (route) => {
