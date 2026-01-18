@@ -115,8 +115,10 @@ export function TermsContent() {
 
       <Section number={7} title="I tuoi dati">
         <p>
-          Trattiamo i tuoi dati con rispetto. Per tutti i dettagli, leggi la
-          nostra Privacy Policy.
+          Trattiamo i tuoi dati con rispetto. Per tutti i dettagli, leggi la{' '}
+          <a href="/privacy" className="text-blue-600 hover:text-blue-700 underline">
+            Privacy Policy completa
+          </a>.
         </p>
         <p>In breve:</p>
         <ul>
@@ -169,10 +171,11 @@ function Section({
   title: string;
   children: React.ReactNode;
 }) {
+  const headingId = `section-${number}`;
   return (
-    <section className="mb-8">
-      <h2 className="text-2xl font-bold text-slate-900 mb-4 flex items-baseline gap-3">
-        <span className="text-blue-600">{number}.</span>
+    <section className="mb-8" aria-labelledby={headingId}>
+      <h2 id={headingId} className="text-2xl font-bold text-slate-900 mb-4 flex items-baseline gap-3">
+        <span className="text-blue-600" aria-hidden="true">{number}.</span>
         {title}
       </h2>
       <div className="space-y-4">{children}</div>

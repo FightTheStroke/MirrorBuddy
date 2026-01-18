@@ -10,15 +10,21 @@ import { csrfFetch } from '@/lib/auth/csrf-client';
 
 interface TosAcceptanceModalProps {
   open: boolean;
-  onAccept: () => void;
+  onAccept: (version: string) => void;
+  isReconsent?: boolean;
 }
 
 /**
- * Modal for Terms of Service acceptance on first login.
+ * Modal for Terms of Service acceptance on first login or version update.
  * Cannot be dismissed without accepting (no ESC, no outside click).
  * WCAG 2.1 AA compliant with focus trap and keyboard navigation.
+ * Supports re-consent scenario with different messaging.
  */
-export function TosAcceptanceModal({ open, onAccept }: TosAcceptanceModalProps) {
+export function TosAcceptanceModal({
+  open,
+  onAccept,
+  isReconsent = false,
+}: TosAcceptanceModalProps) {
   const [accepted, setAccepted] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
@@ -38,12 +44,12 @@ export function TosAcceptanceModal({ open, onAccept }: TosAcceptanceModalProps) 
 
       const data = await response.json();
       console.log('ToS accepted:', data);
-      onAccept();
+      onAccept(TOS_VERSION);
     } catch (error) {
       console.error('Failed to save ToS acceptance:', error);
       // TODO: Add error handling (toast notification)
       // For now, still allow user to proceed (graceful degradation)
-      onAccept();
+      onAccept(TOS_VERSION);
     } finally {
       setIsSubmitting(false);
     }
@@ -87,15 +93,30 @@ export function TosAcceptanceModal({ open, onAccept }: TosAcceptanceModalProps) 
           {/* Header */}
           <div className="flex flex-col space-y-2 text-center sm:text-left">
             <DialogPrimitive.Title className="text-2xl font-bold leading-none tracking-tight text-slate-900 dark:text-slate-50">
-              Benvenuto in MirrorBuddy!
+              {isReconsent
+                ? 'Termini Aggiornati'
+                : 'Benvenuto in MirrorBuddy!'}
             </DialogPrimitive.Title>
             <DialogPrimitive.Description
               id="tos-description"
               className="text-sm text-slate-600 dark:text-slate-400"
             >
-              Prima di iniziare, leggi i nostri Termini di Servizio.
+              {isReconsent
+                ? 'Abbiamo aggiornato i nostri Termini di Servizio. Per continuare a usare MirrorBuddy, leggi e accetta i nuovi termini.'
+                : 'Prima di iniziare, leggi i nostri Termini di Servizio.'}
             </DialogPrimitive.Description>
           </div>
+
+          {/* Re-consent notice */}
+          {isReconsent && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                <strong>Cosa è cambiato:</strong> Abbiamo aggiornato le informazioni
+                sulla raccolta dati di performance (Web Vitals) e la Privacy Policy.
+                Leggi i termini completi per i dettagli.
+              </p>
+            </div>
+          )}
 
           {/* TL;DR Summary */}
           <div className="space-y-4">

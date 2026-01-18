@@ -1,128 +1,86 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+'use client';
 
-export const metadata: Metadata = {
-  title: "Politica sui Cookie",
-  description:
-    "Scopri come utilizziamo i cookie e come gestire le tue preferenze",
-  robots: "noindex, follow",
-};
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { CookiesContent } from './content';
+
+export const COOKIES_VERSION = '1.0';
+const LAST_UPDATED = '18 Gennaio 2025';
 
 export default function CookiesPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
-          Politica sui Cookie
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400 mb-8">
-          Ultimo aggiornamento: Gennaio 2026
-        </p>
-
-        {/* Cosa sono i cookie */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Cosa sono i cookie?
-          </h2>
-          <p className="text-slate-700 dark:text-slate-300 mb-4">
-            I cookie sono piccoli file di testo memorizzati sul tuo dispositivo
-            quando visiti il nostro sito. Ci aiutano a ricordare le tue
-            preferenze, mantenere la sessione autenticata e migliorare
-            l&apos;esperienza di utilizzo. Tutti i cookie che utilizziamo sono
-            completamente sicuri e conformi alla normativa sulla privacy.
-          </p>
-        </section>
-
-        {/* Cookie che utilizziamo */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Cookie che utilizziamo
-          </h2>
-          <ul className="space-y-4 text-slate-700 dark:text-slate-300">
-            <li>
-              <strong>mirrorbuddy-user-id:</strong> Mantiene la tua sessione di
-              autenticazione per accedere in modo sicuro alla piattaforma.
-            </li>
-            <li>
-              <strong>mirrorbuddy-visitor-id:</strong> Identifica i visitatori
-              durante il periodo di prova, permettendoti di testare le
-              funzionalità senza account.
-            </li>
-            <li>
-              <strong>mirrorbuddy-consent:</strong> Salva le tue preferenze
-              relative ai cookie e al consenso al trattamento dei dati.
-            </li>
-          </ul>
-        </section>
-
-        {/* Cookie di terze parti */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Cookie di terze parti
-          </h2>
-          <p className="text-slate-700 dark:text-slate-300 mb-4">
-            Utilizziamo Vercel Analytics per analizzare come gli utenti
-            interagiscono con il nostro servizio, al fine di migliorare
-            continuamente l&apos;esperienza. Non utilizziamo alcun cookie
-            pubblicitario o di tracciamento intrusivo.
-          </p>
-        </section>
-
-        {/* Gestire i cookie */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Come gestire i cookie
-          </h2>
-          <p className="text-slate-700 dark:text-slate-300 mb-4">
-            Puoi controllare i cookie dal tuo browser:
-          </p>
-          <ul className="list-disc list-inside text-slate-700 dark:text-slate-300 space-y-2">
-            <li>
-              <strong>Chrome:</strong> Impostazioni → Privacy e sicurezza →
-              Cookie e altri dati dei siti
-            </li>
-            <li>
-              <strong>Firefox:</strong> Preferenze → Privacy e sicurezza →
-              Cookie e dati dei siti
-            </li>
-            <li>
-              <strong>Safari:</strong> Preferenze → Privacy → Gestisci dati per
-              siti web
-            </li>
-            <li>
-              <strong>Edge:</strong> Impostazioni → Privacy, ricerca e servizi →
-              Cookie e altri dati
-            </li>
-          </ul>
-        </section>
-
-        {/* Contatti */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Domande sui cookie?
-          </h2>
-          <p className="text-slate-700 dark:text-slate-300">
-            Se hai dubbi sulla nostra politica sui cookie, contattaci attraverso
-            il nostro modulo di supporto o invia un&apos;email al nostro team di
-            privacy.
-          </p>
-        </section>
-
-        {/* Link di ritorno */}
-        <div className="flex flex-col sm:flex-row gap-4 pt-8 border-t border-slate-200 dark:border-slate-700">
-          <Link
-            href="/privacy"
-            className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
-          >
-            ← Leggi la Politica sulla Privacy
-          </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Navigation */}
+      <nav className="bg-white border-b border-slate-200 print:border-b-2" aria-label="Navigazione pagina">
+        <div className="max-w-4xl mx-auto px-4 py-6">
           <Link
             href="/"
-            className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+            className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors print:hidden"
+            aria-label="Torna alla home page di MirrorBuddy"
           >
-            Torna alla home →
+            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
+            Torna alla home
           </Link>
         </div>
+      </nav>
+
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-4 py-12 print:py-8">
+        <article className="bg-white rounded-2xl shadow-lg p-8 md:p-12 print:shadow-none print:rounded-none">
+          {/* Title */}
+          <div className="mb-8 pb-8 border-b border-slate-200">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+              Cookie Policy di MirrorBuddy
+            </h1>
+            <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+              <span>Versione {COOKIES_VERSION}</span>
+              <span>•</span>
+              <span>Ultimo aggiornamento: {LAST_UPDATED}</span>
+            </div>
+          </div>
+
+          {/* TL;DR Box */}
+          <section className="mb-12 p-6 bg-blue-50 rounded-xl border-l-4 border-blue-500 print:bg-transparent print:border print:border-blue-500" aria-labelledby="tldr-heading">
+            <h2 id="tldr-heading" className="text-2xl font-bold text-slate-900 mb-4">
+              In breve (TL;DR)
+            </h2>
+            <ul className="space-y-2 text-slate-700 leading-relaxed">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Usiamo pochissimi cookie, solo quelli utili</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Niente cookie pubblicitari o di tracciamento</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Cookie analytics solo se li accetti</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-500 mt-1" aria-hidden="true">✓</span>
+                <span>Puoi disattivarli quando vuoi</span>
+              </li>
+            </ul>
+          </section>
+
+          {/* Main Sections */}
+          <CookiesContent />
+
+          {/* Footer */}
+          <footer className="mt-12 pt-8 border-t border-slate-200">
+            <p className="text-slate-600 text-center">
+              Domande sui cookie? Scrivici:{' '}
+              <a
+                href="mailto:privacy@fightthestroke.org"
+                className="text-blue-600 hover:text-blue-700 underline"
+                aria-label="Invia email a privacy@fightthestroke.org per domande sui cookie"
+              >
+                privacy@fightthestroke.org
+              </a>
+            </p>
+          </footer>
+        </article>
       </div>
     </div>
   );
