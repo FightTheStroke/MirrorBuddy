@@ -304,6 +304,7 @@ First request after cold start may show high latency (500+ ms) due to:
 | Chat API 500                  | Vercel logs: "MODULE_NOT_FOUND"         | Package in serverExternalPackages    | Remove from next.config.ts        |
 | Chat API 403                  | Response body: "Invalid CSRF"           | Using `fetch` instead of `csrfFetch` | Import and use csrfFetch          |
 | Voice "WebRTC required" error | Browser console: 403 on ephemeral-token | webrtc-probe.ts using plain fetch    | Change to csrfFetch               |
+| Voice SDP exchange 400        | "SDP exchange failed: 400" in logs      | Missing `?model=` in WebRTC URL      | Add model param to token route    |
 | Voice "operation insecure"    | CSP violation in console                | Missing wss:// in CSP connect-src    | Update proxy.ts CSP               |
 | Database timeout              | Health endpoint shows high latency      | Cold start + wrong region            | Deploy in same region as Supabase |
 | SSL certificate error         | Prisma logs SSL errors                  | Missing SUPABASE_CA_CERT             | Add CA cert to env vars           |
