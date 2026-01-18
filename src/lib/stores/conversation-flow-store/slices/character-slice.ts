@@ -25,6 +25,7 @@ import { getBuddyForStudent } from "@/lib/ai/character-router";
 import { getBuddyById, type BuddyId } from "@/data/buddy-profiles";
 import { getMaestroById } from "@/data/maestri";
 import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import { logger } from "@/lib/logger";
 import { MIN_MESSAGES_FOR_SUMMARY } from "../persistence";
 import {
@@ -112,11 +113,10 @@ export const createCharacterSlice: StateCreator<
             conversationId: currentConversationId,
           });
 
-          const response = await fetch(
+          const response = await csrfFetch(
             `/api/conversations/${currentConversationId}/end`,
             {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ userId, reason: "character_switch" }),
             },
           );

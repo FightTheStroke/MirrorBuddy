@@ -1,29 +1,36 @@
 // WebSocket connection helper for Azure OpenAI Realtime API
-'use client';
+"use client";
 
-import { logger } from '@/lib/logger';
-import type { Maestro } from '@/types';
-import type { ConnectionInfo, UseVoiceSessionOptions } from './types';
-import { CONNECTION_TIMEOUT_MS } from './constants';
-import type { ConnectionRefs } from './connection-types';
+import { logger } from "@/lib/logger";
+import type { Maestro } from "@/types";
+import type { ConnectionInfo, UseVoiceSessionOptions } from "./types";
+import { CONNECTION_TIMEOUT_MS } from "./constants";
+import type { ConnectionRefs } from "./connection-types";
 
 export interface WebSocketConnectionConfig {
   maestro: Maestro;
   connectionInfo: ConnectionInfo;
   preferredMicrophoneId?: string;
-  initPlaybackContext?: () => Promise<{
-    context: AudioContext;
-    analyser: AnalyserNode | null;
-    gainNode: GainNode | null;
-  } | undefined>;
+  initPlaybackContext?: () => Promise<
+    | {
+        context: AudioContext;
+        analyser: AnalyserNode | null;
+        gainNode: GainNode | null;
+      }
+    | undefined
+  >;
   refs: ConnectionRefs;
   setConnected: (value: boolean) => void;
-  setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void;
-  connectionState: 'idle' | 'connecting' | 'connected' | 'error';
+  setConnectionState: (
+    state: "idle" | "connecting" | "connected" | "error",
+  ) => void;
+  connectionState: "idle" | "connecting" | "connected" | "error";
   options: UseVoiceSessionOptions;
 }
 
-export async function createWebSocketConnection(config: WebSocketConnectionConfig): Promise<void> {
+export async function createWebSocketConnection(
+  config: WebSocketConnectionConfig,
+): Promise<void> {
   const {
     maestro,
     connectionInfo,
@@ -38,11 +45,15 @@ export async function createWebSocketConnection(config: WebSocketConnectionConfi
 
   // Initialize CAPTURE AudioContext
   const AudioContextClass =
-    window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    window.AudioContext ||
+    (window as unknown as { webkitAudioContext: typeof AudioContext })
+      .webkitAudioContext;
   refs.captureContextRef.current = new AudioContextClass();
-  logger.debug(`[VoiceSession] Capture context at ${refs.captureContextRef.current.sampleRate}Hz`);
+  logger.debug(
+    `[VoiceSession] Capture context at ${refs.captureContextRef.current.sampleRate}Hz`,
+  );
 
-  if (refs.captureContextRef.current.state === 'suspended') {
+  if (refs.captureContextRef.current.state === "suspended") {
     await refs.captureContextRef.current.resume();
   }
 
@@ -53,7 +64,9 @@ export async function createWebSocketConnection(config: WebSocketConnectionConfi
 
   // Check mediaDevices availability
   if (!navigator.mediaDevices?.getUserMedia) {
-    throw new Error('Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.');
+    throw new Error(
+      "Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.",
+    );
   }
 
   // Request microphone
@@ -67,19 +80,42 @@ export async function createWebSocketConnection(config: WebSocketConnectionConfi
     audioConstraints.deviceId = { ideal: preferredMicrophoneId };
   }
 
-  refs.mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
-  logger.debug('[VoiceSession] Microphone access granted');
+  refs.mediaStreamRef.current = await navigator.mediaDevices.getUserMedia({
+    audio: audioConstraints,
+  });
+  logger.debug("[VoiceSession] Microphone access granted");
 
   // Build WebSocket URL
   let wsUrl: string;
-  if (connectionInfo.provider === 'azure') {
+  if (connectionInfo.provider === "azure") {
+    // WebSocket proxy is only available in local development (port 3001)
+    // In production (Vercel), WebRTC must be used instead
+    const isProduction =
+      typeof window !== "undefined" &&
+      window.location.hostname !== "localhost" &&
+      !window.location.hostname.startsWith("127.") &&
+      !window.location.hostname.startsWith("192.168.");
+
+    if (isProduction) {
+      throw new Error(
+        "La modalità voce richiede WebRTC. " +
+          "Se vedi questo errore, WebRTC non è riuscito a connettersi. " +
+          "Verifica che il browser supporti WebRTC e riprova.",
+      );
+    }
+
     const proxyPort = connectionInfo.proxyPort || 3001;
-    const host = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const characterType = connectionInfo.characterType || 'maestro';
+    const host =
+      typeof window !== "undefined" ? window.location.hostname : "localhost";
+    const protocol =
+      typeof window !== "undefined" && window.location.protocol === "https:"
+        ? "wss"
+        : "ws";
+    const characterType = connectionInfo.characterType || "maestro";
     wsUrl = `${protocol}://${host}:${proxyPort}?maestroId=${maestro.id}&characterType=${characterType}`;
   } else {
-    wsUrl = 'wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17';
+    wsUrl =
+      "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
   }
 
   // Connect WebSocket
@@ -88,17 +124,24 @@ export async function createWebSocketConnection(config: WebSocketConnectionConfi
 
   // Set connection timeout
   refs.connectionTimeoutRef.current = setTimeout(() => {
-    logger.error('[VoiceSession] Connection timeout');
-    if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-      ws.close(4000, 'Connection timeout');
+    logger.error("[VoiceSession] Connection timeout");
+    if (
+      ws.readyState === WebSocket.OPEN ||
+      ws.readyState === WebSocket.CONNECTING
+    ) {
+      ws.close(4000, "Connection timeout");
     }
-    setConnectionState('error');
-    options.onStateChange?.('error');
-    options.onError?.(new Error('Timeout connessione: il server non risponde. Riprova.'));
+    setConnectionState("error");
+    options.onStateChange?.("error");
+    options.onError?.(
+      new Error("Timeout connessione: il server non risponde. Riprova."),
+    );
   }, CONNECTION_TIMEOUT_MS);
 
   ws.onopen = () => {
-    logger.debug('[VoiceSession] WebSocket connected, waiting for proxy.ready...');
+    logger.debug(
+      "[VoiceSession] WebSocket connected, waiting for proxy.ready...",
+    );
   };
 
   ws.onmessage = async (event) => {
@@ -106,7 +149,7 @@ export async function createWebSocketConnection(config: WebSocketConnectionConfi
       let msgText: string;
       if (event.data instanceof Blob) {
         msgText = await event.data.text();
-      } else if (typeof event.data === 'string') {
+      } else if (typeof event.data === "string") {
         msgText = event.data;
       } else {
         return;
@@ -117,25 +160,31 @@ export async function createWebSocketConnection(config: WebSocketConnectionConfi
       if (refs.handleServerEventRef.current) {
         refs.handleServerEventRef.current(data);
       } else {
-        logger.error('[VoiceSession] handleServerEventRef is NULL, event lost', { eventType: data.type });
+        logger.error(
+          "[VoiceSession] handleServerEventRef is NULL, event lost",
+          { eventType: data.type },
+        );
       }
     } catch (e) {
-      logger.error('[VoiceSession] ws.onmessage parse error', undefined, e);
+      logger.error("[VoiceSession] ws.onmessage parse error", undefined, e);
     }
   };
 
   ws.onerror = (event) => {
-    logger.error('[VoiceSession] WebSocket error', { event });
-    setConnectionState('error');
-    options.onStateChange?.('error');
-    options.onError?.(new Error('WebSocket connection failed'));
+    logger.error("[VoiceSession] WebSocket error", { event });
+    setConnectionState("error");
+    options.onStateChange?.("error");
+    options.onError?.(new Error("WebSocket connection failed"));
   };
 
   ws.onclose = (event) => {
-    logger.debug('[VoiceSession] WebSocket closed', { code: event.code, reason: event.reason });
+    logger.debug("[VoiceSession] WebSocket closed", {
+      code: event.code,
+      reason: event.reason,
+    });
     setConnected(false);
-    if (connectionState !== 'error') {
-      setConnectionState('idle');
+    if (connectionState !== "error") {
+      setConnectionState("idle");
     }
   };
 }

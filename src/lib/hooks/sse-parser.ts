@@ -5,19 +5,20 @@
  * @see ADR 0034 for streaming architecture
  */
 
-import { logger } from '@/lib/logger';
-import type { StreamUsage, SSEParserCallbacks } from './streaming-types';
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import type { StreamUsage, SSEParserCallbacks } from "./streaming-types";
 
 /**
  * Parse SSE stream from ReadableStream
  */
 export async function parseSSEStream(
   reader: ReadableStreamDefaultReader<Uint8Array>,
-  callbacks: SSEParserCallbacks
+  callbacks: SSEParserCallbacks,
 ): Promise<void> {
   const decoder = new TextDecoder();
-  let accumulated = '';
-  let buffer = '';
+  let accumulated = "";
+  let buffer = "";
   let localUsage: StreamUsage | undefined;
 
   while (true) {
@@ -27,18 +28,18 @@ export async function parseSSEStream(
 
     buffer += decoder.decode(value, { stream: true });
 
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
 
     for (const line of lines) {
       const trimmedLine = line.trim();
 
       if (!trimmedLine) continue;
 
-      if (trimmedLine.startsWith('data: ')) {
+      if (trimmedLine.startsWith("data: ")) {
         const data = trimmedLine.slice(6);
 
-        if (data === '[DONE]') {
+        if (data === "[DONE]") {
           callbacks.onDone(accumulated, localUsage);
           return;
         }
@@ -64,7 +65,7 @@ export async function parseSSEStream(
             throw new Error(parsed.error);
           }
         } catch (_parseError) {
-          logger.warn('[SSEParser] Failed to parse SSE data', {
+          logger.warn("[SSEParser] Failed to parse SSE data", {
             data: data.substring(0, 100),
           });
         }
@@ -84,11 +85,10 @@ export async function fetchStreamingResponse(
   systemPrompt: string,
   maestroId: string,
   enableMemory: boolean,
-  signal: AbortSignal
+  signal: AbortSignal,
 ): Promise<Response> {
-  const response = await fetch('/api/chat/stream', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+  const response = await csrfFetch("/api/chat/stream", {
+    method: "POST",
     body: JSON.stringify({
       messages,
       systemPrompt,
@@ -99,10 +99,12 @@ export async function fetchStreamingResponse(
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+    const errorData = await response
+      .json()
+      .catch(() => ({ error: "Unknown error" }));
 
     if (errorData.fallback) {
-      logger.warn('[SSEParser] Streaming not available, use fallback', {
+      logger.warn("[SSEParser] Streaming not available, use fallback", {
         fallback: errorData.fallback,
       });
     }
@@ -110,9 +112,9 @@ export async function fetchStreamingResponse(
     throw new Error(errorData.error || `HTTP ${response.status}`);
   }
 
-  const contentType = response.headers.get('Content-Type');
-  if (!contentType?.includes('text/event-stream')) {
-    throw new Error('Expected SSE response');
+  const contentType = response.headers.get("Content-Type");
+  if (!contentType?.includes("text/event-stream")) {
+    throw new Error("Expected SSE response");
   }
 
   return response;

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Client-side error logger - Captures all browser errors and sends to server
@@ -14,7 +14,9 @@
  *   import '@/lib/client-error-logger';
  */
 
-type LogLevel = 'error' | 'warn' | 'info' | 'debug';
+import { csrfFetch } from "@/lib/auth/csrf-client";
+
+type LogLevel = "error" | "warn" | "info" | "debug";
 type ConsoleMethod = (...args: unknown[]) => void;
 type PatchableConsole = Console & {
   error: ConsoleMethod;
@@ -29,7 +31,7 @@ interface ClientLogEntry {
   url?: string;
 }
 
-const LOG_ENDPOINT = '/api/debug/log';
+const LOG_ENDPOINT = "/api/debug/log";
 
 // Debounce to avoid flooding
 const sentErrors = new Set<string>();
@@ -40,7 +42,7 @@ let errorCount = 0;
  * Send log to server
  */
 async function sendLog(entry: ClientLogEntry): Promise<void> {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   if (errorCount >= MAX_ERRORS_PER_SESSION) return;
 
   // Dedupe by message
@@ -50,9 +52,8 @@ async function sendLog(entry: ClientLogEntry): Promise<void> {
   errorCount++;
 
   try {
-    await fetch(LOG_ENDPOINT, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    await csrfFetch(LOG_ENDPOINT, {
+      method: "POST",
       body: JSON.stringify({
         ...entry,
         url: window.location.href,
@@ -67,19 +68,19 @@ async function sendLog(entry: ClientLogEntry): Promise<void> {
  * Initialize error capturing
  */
 function initClientErrorLogger(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
 
   // Skip in production
-  if (process.env.NODE_ENV !== 'development') return;
+  if (process.env.NODE_ENV !== "development") return;
 
   // Skip in test/E2E environment (navigator.webdriver is set by Playwright, Selenium, etc.)
-  if (typeof navigator !== 'undefined' && navigator.webdriver) return;
+  if (typeof navigator !== "undefined" && navigator.webdriver) return;
 
   // Global error handler
   const originalOnError = window.onerror;
   window.onerror = (message, source, lineno, colno, error) => {
     sendLog({
-      level: 'error',
+      level: "error",
       message: String(message),
       stack: error?.stack,
       context: {
@@ -96,14 +97,14 @@ function initClientErrorLogger(): void {
   };
 
   // Unhandled promise rejections
-  window.addEventListener('unhandledrejection', (event) => {
+  window.addEventListener("unhandledrejection", (event) => {
     const reason = event.reason;
     sendLog({
-      level: 'error',
+      level: "error",
       message: `Unhandled Promise Rejection: ${reason?.message || String(reason)}`,
       stack: reason?.stack,
       context: {
-        type: 'unhandledrejection',
+        type: "unhandledrejection",
       },
     });
   });
@@ -112,27 +113,32 @@ function initClientErrorLogger(): void {
   const patchableConsole = console as PatchableConsole;
   const originalConsoleError = patchableConsole.error.bind(console);
   patchableConsole.error = (...args: unknown[]) => {
-    const message = args.map(arg => {
-      if (arg instanceof Error) return arg.message;
-      if (typeof arg === 'object') {
-        try {
-          return JSON.stringify(arg);
-        } catch {
-          return String(arg);
+    const message = args
+      .map((arg) => {
+        if (arg instanceof Error) return arg.message;
+        if (typeof arg === "object") {
+          try {
+            return JSON.stringify(arg);
+          } catch {
+            return String(arg);
+          }
         }
-      }
-      return String(arg);
-    }).join(' ');
+        return String(arg);
+      })
+      .join(" ");
 
     // Filter out known non-critical errors
-    if (message.includes('clipboard') && message.includes('model does not support image input')) {
+    if (
+      message.includes("clipboard") &&
+      message.includes("model does not support image input")
+    ) {
       return; // Silently ignore Azure Realtime SDK clipboard warnings
     }
 
-    const errorArg = args.find(arg => arg instanceof Error);
+    const errorArg = args.find((arg) => arg instanceof Error);
 
     sendLog({
-      level: 'error',
+      level: "error",
       message: `[console.error] ${message}`,
       stack: errorArg?.stack,
     });
@@ -143,19 +149,21 @@ function initClientErrorLogger(): void {
   // Intercept console.warn - intentionally accessing console for interception
   const originalConsoleWarn = patchableConsole.warn.bind(console);
   patchableConsole.warn = (...args: unknown[]) => {
-    const message = args.map(arg => {
-      if (typeof arg === 'object') {
-        try {
-          return JSON.stringify(arg);
-        } catch {
-          return String(arg);
+    const message = args
+      .map((arg) => {
+        if (typeof arg === "object") {
+          try {
+            return JSON.stringify(arg);
+          } catch {
+            return String(arg);
+          }
         }
-      }
-      return String(arg);
-    }).join(' ');
+        return String(arg);
+      })
+      .join(" ");
 
     sendLog({
-      level: 'warn',
+      level: "warn",
       message: `[console.warn] ${message}`,
     });
 
@@ -169,9 +177,9 @@ function initClientErrorLogger(): void {
       const response = await originalFetch(...args);
 
       // Log failed HTTP responses (4xx, 5xx)
-      if (!response.ok && !String(args[0]).includes('/api/debug/log')) {
+      if (!response.ok && !String(args[0]).includes("/api/debug/log")) {
         sendLog({
-          level: 'warn',
+          level: "warn",
           message: `Fetch failed: ${response.status} ${response.statusText}`,
           context: {
             url: String(args[0]),
@@ -183,9 +191,9 @@ function initClientErrorLogger(): void {
       return response;
     } catch (error) {
       // Network errors
-      if (!String(args[0]).includes('/api/debug/log')) {
+      if (!String(args[0]).includes("/api/debug/log")) {
         sendLog({
-          level: 'error',
+          level: "error",
           message: `Fetch error: ${error instanceof Error ? error.message : String(error)}`,
           context: {
             url: String(args[0]),
@@ -199,8 +207,8 @@ function initClientErrorLogger(): void {
 
   // Log initialization
   sendLog({
-    level: 'info',
-    message: '--- Client error logger initialized ---',
+    level: "info",
+    message: "--- Client error logger initialized ---",
     context: {
       userAgent: navigator.userAgent,
       timestamp: new Date().toISOString(),
@@ -216,16 +224,16 @@ initClientErrorLogger();
  */
 export const clientLog = {
   error: (message: string, context?: Record<string, unknown>) => {
-    sendLog({ level: 'error', message, context });
+    sendLog({ level: "error", message, context });
   },
   warn: (message: string, context?: Record<string, unknown>) => {
-    sendLog({ level: 'warn', message, context });
+    sendLog({ level: "warn", message, context });
   },
   info: (message: string, context?: Record<string, unknown>) => {
-    sendLog({ level: 'info', message, context });
+    sendLog({ level: "info", message, context });
   },
   debug: (message: string, context?: Record<string, unknown>) => {
-    sendLog({ level: 'debug', message, context });
+    sendLog({ level: "debug", message, context });
   },
 };
 

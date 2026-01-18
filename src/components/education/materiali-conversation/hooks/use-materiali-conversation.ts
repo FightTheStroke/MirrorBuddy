@@ -3,19 +3,20 @@
  * @brief Custom hook for materiali conversation logic
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { useTTS } from '@/components/accessibility';
-import { logger } from '@/lib/logger';
-import { fileToBase64 } from '../utils/file-utils';
-import type { ConversationMessage, Attachment, Character } from '../types';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useTTS } from "@/components/accessibility";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import { fileToBase64 } from "../utils/file-utils";
+import type { ConversationMessage, Attachment, Character } from "../types";
 
 export function useMaterialiConversation(character: Character) {
   const { settings } = useAccessibilityStore();
   const { speak } = useTTS();
 
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [showAttachPanel, setShowAttachPanel] = useState(false);
@@ -29,14 +30,14 @@ export function useMaterialiConversation(character: Character) {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({
-      behavior: settings.reducedMotion ? 'auto' : 'smooth',
+      behavior: settings.reducedMotion ? "auto" : "smooth",
     });
   }, [messages, settings.reducedMotion]);
 
   useEffect(() => {
     const greetingMessage: ConversationMessage = {
-      id: 'greeting',
-      role: 'assistant',
+      id: "greeting",
+      role: "assistant",
       content: character.greeting,
       timestamp: new Date(),
     };
@@ -57,7 +58,7 @@ export function useMaterialiConversation(character: Character) {
         const url = await fileToBase64(file);
         const attachment: Attachment = {
           id: crypto.randomUUID(),
-          type: file.type.startsWith('image/') ? 'image' : 'document',
+          type: file.type.startsWith("image/") ? "image" : "document",
           name: file.name,
           url,
           mimeType: file.type,
@@ -65,10 +66,10 @@ export function useMaterialiConversation(character: Character) {
         setAttachments((prev) => [...prev, attachment]);
       }
 
-      event.target.value = '';
+      event.target.value = "";
       setShowAttachPanel(false);
     },
-    []
+    [],
   );
 
   const removeAttachment = useCallback((id: string) => {
@@ -82,14 +83,14 @@ export function useMaterialiConversation(character: Character) {
 
       const userMessage: ConversationMessage = {
         id: `user-${Date.now()}`,
-        role: 'user',
+        role: "user",
         content: input.trim(),
         timestamp: new Date(),
         attachments: attachments.length > 0 ? [...attachments] : undefined,
       };
 
       setMessages((prev) => [...prev, userMessage]);
-      setInput('');
+      setInput("");
       setAttachments([]);
       setIsLoading(true);
       setShowQuickActions(false);
@@ -103,27 +104,26 @@ export function useMaterialiConversation(character: Character) {
           systemPrompt: character.systemPrompt,
         };
 
-        if (userMessage.attachments?.some((a) => a.type === 'image')) {
+        if (userMessage.attachments?.some((a) => a.type === "image")) {
           requestBody.images = userMessage.attachments
-            .filter((a) => a.type === 'image')
+            .filter((a) => a.type === "image")
             .map((a) => a.url);
         }
 
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await csrfFetch("/api/chat", {
+          method: "POST",
           body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
-          throw new Error('Chat request failed');
+          throw new Error("Chat request failed");
         }
 
         const data = await response.json();
 
         const assistantMessage: ConversationMessage = {
           id: `assistant-${Date.now()}`,
-          role: 'assistant',
+          role: "assistant",
           content: data.content,
           timestamp: new Date(),
           tokens: data.usage?.total_tokens,
@@ -136,11 +136,11 @@ export function useMaterialiConversation(character: Character) {
           speak(data.content);
         }
       } catch (error) {
-        logger.error('Materiali conversation error', { error: String(error) });
+        logger.error("Materiali conversation error", { error: String(error) });
         const errorMessage: ConversationMessage = {
           id: `error-${Date.now()}`,
-          role: 'assistant',
-          content: 'Mi scuso, si è verificato un errore. Riprova.',
+          role: "assistant",
+          content: "Mi scuso, si è verificato un errore. Riprova.",
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, errorMessage]);
@@ -157,7 +157,7 @@ export function useMaterialiConversation(character: Character) {
       character.systemPrompt,
       settings.ttsAutoRead,
       speak,
-    ]
+    ],
   );
 
   const handleQuickAction = useCallback(
@@ -168,24 +168,24 @@ export function useMaterialiConversation(character: Character) {
         handleSubmit();
       }, 100);
     },
-    [handleSubmit]
+    [handleSubmit],
   );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         handleSubmit();
       }
     },
-    [handleSubmit]
+    [handleSubmit],
   );
 
   const clearConversation = useCallback(() => {
     setMessages([
       {
-        id: 'greeting',
-        role: 'assistant',
+        id: "greeting",
+        role: "assistant",
         content: character.greeting,
         timestamp: new Date(),
       },
@@ -221,4 +221,3 @@ export function useMaterialiConversation(character: Character) {
     toggleVoiceMode,
   };
 }
-

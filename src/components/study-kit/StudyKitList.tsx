@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * StudyKitList Component
@@ -6,13 +6,22 @@
  * Wave 2: Study Kit Generator
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { FileText, Loader2, AlertCircle, Clock, CheckCircle2, Eye, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
-import { getStatusText, formatDate } from './study-kit-utils';
-import type { StudyKit } from '@/types/study-kit';
+import { useState, useEffect, useCallback } from "react";
+import {
+  FileText,
+  Loader2,
+  AlertCircle,
+  Clock,
+  CheckCircle2,
+  Eye,
+  Trash2,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import { getStatusText, formatDate } from "./study-kit-utils";
+import type { StudyKit } from "@/types/study-kit";
 
 interface StudyKitListProps {
   onSelect?: (studyKit: StudyKit) => void;
@@ -22,29 +31,31 @@ interface StudyKitListProps {
 export function StudyKitList({ onSelect, className }: StudyKitListProps) {
   const [studyKits, setStudyKits] = useState<StudyKit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'processing' | 'ready' | 'error'>('all');
+  const [error, setError] = useState("");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "processing" | "ready" | "error"
+  >("all");
 
   const loadStudyKits = useCallback(async () => {
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
-      const url = new URL('/api/study-kit', window.location.origin);
-      if (statusFilter !== 'all') {
-        url.searchParams.set('status', statusFilter);
+      const url = new URL("/api/study-kit", window.location.origin);
+      if (statusFilter !== "all") {
+        url.searchParams.set("status", statusFilter);
       }
 
       const response = await fetch(url);
       if (!response.ok) {
-        throw new Error('Failed to load study kits');
+        throw new Error("Failed to load study kits");
       }
 
       const data = await response.json();
       setStudyKits(data.studyKits);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load');
-      logger.error('Failed to load study kits', { error: String(err) });
+      setError(err instanceof Error ? err.message : "Failed to load");
+      logger.error("Failed to load study kits", { error: String(err) });
     } finally {
       setIsLoading(false);
     }
@@ -60,29 +71,29 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
     }
 
     try {
-      const response = await fetch(`/api/study-kit/${kitId}`, {
-        method: 'DELETE',
+      const response = await csrfFetch(`/api/study-kit/${kitId}`, {
+        method: "DELETE",
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete study kit');
+        throw new Error("Failed to delete study kit");
       }
 
       // Remove from local state
-      setStudyKits(prev => prev.filter(kit => kit.id !== kitId));
+      setStudyKits((prev) => prev.filter((kit) => kit.id !== kitId));
     } catch (err) {
-      logger.error('Failed to delete study kit', { error: String(err) });
-      alert('Errore durante l\'eliminazione. Riprova.');
+      logger.error("Failed to delete study kit", { error: String(err) });
+      alert("Errore durante l'eliminazione. Riprova.");
     }
   };
 
   const getStatusIconElement = (status: string) => {
     switch (status) {
-      case 'processing':
+      case "processing":
         return <Loader2 className="w-4 h-4 animate-spin text-blue-600" />;
-      case 'ready':
+      case "ready":
         return <CheckCircle2 className="w-4 h-4 text-green-600" />;
-      case 'error':
+      case "error":
         return <AlertCircle className="w-4 h-4 text-red-600" />;
       default:
         return <Clock className="w-4 h-4 text-slate-400" />;
@@ -102,11 +113,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
         <AlertCircle className="w-8 h-8 text-red-600 mx-auto mb-2" />
         <p className="text-red-800 dark:text-red-200">{error}</p>
-        <Button
-          variant="outline"
-          onClick={loadStudyKits}
-          className="mt-4"
-        >
+        <Button variant="outline" onClick={loadStudyKits} className="mt-4">
           Riprova
         </Button>
       </div>
@@ -114,22 +121,24 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
   }
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn("space-y-4", className)}>
       {/* Filters */}
       <div className="flex items-center gap-2">
-        <span className="text-sm text-slate-600 dark:text-slate-400">Stato:</span>
+        <span className="text-sm text-slate-600 dark:text-slate-400">
+          Stato:
+        </span>
         <div className="flex gap-2">
-          {(['all', 'processing', 'ready', 'error'] as const).map((status) => (
+          {(["all", "processing", "ready", "error"] as const).map((status) => (
             <Button
               key={status}
-              variant={statusFilter === status ? 'default' : 'outline'}
+              variant={statusFilter === status ? "default" : "outline"}
               size="sm"
               onClick={() => setStatusFilter(status)}
             >
-              {status === 'all' && 'Tutti'}
-              {status === 'processing' && 'In corso'}
-              {status === 'ready' && 'Pronti'}
-              {status === 'error' && 'Errori'}
+              {status === "all" && "Tutti"}
+              {status === "processing" && "In corso"}
+              {status === "ready" && "Pronti"}
+              {status === "error" && "Errori"}
             </Button>
           ))}
         </div>
@@ -152,13 +161,13 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
             <div
               key={kit.id}
               className={cn(
-                'bg-white dark:bg-slate-800 border rounded-2xl p-4 transition-all shadow-sm',
-                'hover:shadow-lg hover:border-primary',
-                kit.status === 'ready'
-                  ? 'border-slate-200 dark:border-slate-700'
-                  : kit.status === 'processing'
-                  ? 'border-blue-200 dark:border-blue-800'
-                  : 'border-red-200 dark:border-red-800'
+                "bg-white dark:bg-slate-800 border rounded-2xl p-4 transition-all shadow-sm",
+                "hover:shadow-lg hover:border-primary",
+                kit.status === "ready"
+                  ? "border-slate-200 dark:border-slate-700"
+                  : kit.status === "processing"
+                    ? "border-blue-200 dark:border-blue-800"
+                    : "border-red-200 dark:border-red-800",
               )}
             >
               <div className="flex items-start justify-between">
@@ -184,14 +193,19 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                   <div className="flex items-center gap-3 mt-2 text-xs text-slate-500">
                     <span>{formatDate(kit.createdAt)}</span>
                     {kit.pageCount && <span>{kit.pageCount} pagine</span>}
-                    {kit.status === 'ready' && (
+                    {kit.status === "ready" && (
                       <span className="text-green-600 dark:text-green-400">
-                        {[kit.summary, kit.mindmap, kit.demo, kit.quiz].filter(Boolean).length} materiali
+                        {
+                          [kit.summary, kit.mindmap, kit.demo, kit.quiz].filter(
+                            Boolean,
+                          ).length
+                        }{" "}
+                        materiali
                       </span>
                     )}
                   </div>
 
-                  {kit.status === 'processing' && (
+                  {kit.status === "processing" && (
                     <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                       <div className="flex items-start gap-2">
                         <Loader2 className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0 animate-spin" />
@@ -207,7 +221,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                     </div>
                   )}
 
-                  {kit.status === 'error' && (
+                  {kit.status === "error" && (
                     <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
                       <div className="flex items-start gap-2">
                         <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
@@ -221,7 +235,8 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                             </p>
                           )}
                           <p className="text-xs text-red-600 dark:text-red-500 mt-2">
-                            Puoi eliminare questo Study Kit e riprovare con un altro file.
+                            Puoi eliminare questo Study Kit e riprovare con un
+                            altro file.
                           </p>
                         </div>
                       </div>
@@ -230,7 +245,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                 </div>
 
                 <div className="ml-4 flex items-center gap-2">
-                  {kit.status === 'ready' && (
+                  {kit.status === "ready" && (
                     <Button
                       variant="outline"
                       size="sm"
@@ -240,7 +255,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                       Apri
                     </Button>
                   )}
-                  {kit.status === 'error' && (
+                  {kit.status === "error" && (
                     <Button
                       variant="destructive"
                       size="sm"
@@ -250,7 +265,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                       Elimina
                     </Button>
                   )}
-                  {kit.status === 'processing' && (
+                  {kit.status === "processing" && (
                     <Button
                       variant="outline"
                       size="sm"
