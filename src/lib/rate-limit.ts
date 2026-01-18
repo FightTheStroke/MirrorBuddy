@@ -351,6 +351,11 @@ export const RATE_LIMITS = {
     maxRequests: 60,
     windowMs: 60 * 1000,
   },
+  /** Web Vitals metrics: 60 requests per minute (client-side performance monitoring) */
+  WEB_VITALS: {
+    maxRequests: 60,
+    windowMs: 60 * 1000,
+  },
 } as const;
 
 /**

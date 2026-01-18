@@ -76,6 +76,33 @@ GO/NO-GO threshold alerts with severity-based routing:
 - Drop-off Rate > 25% → Critical
 - Refusal Precision < 80% → Critical
 
+### 5. Data Retention & Privacy Compliance
+
+Metric retention tiers designed for compliance and cost efficiency:
+
+**Aggregated Metrics (90 days)**
+- Web Vitals, session counts, performance metrics
+- Non-PII data sufficient for quarterly reviews and SLI/SLO analysis
+- Balances operational need with data minimization principle
+
+**User ID Tagged Metrics (30 days)**
+- Keep for 30 days to debug recent user-level issues
+- Drop or anonymize after 30 days (GDPR "right to be forgotten")
+- No personal information (names, emails) in metrics anywhere
+
+**Safety Incident Metrics (365 days)**
+- Legal hold for annual compliance audits
+- No user_id in incident logs (use session_id for correlation)
+- Descriptions sanitized of PII before logging
+
+**Rationale**:
+- GDPR/CCPA compliance through data minimization
+- Privacy-by-design: shorter retention for PII, longer for safety audits
+- Cost optimization: only essential metrics retained
+- Operational clarity: sufficient history for trend analysis without excess data
+
+Configuration documented in `docs/operations/grafana-web-vitals.md` (Retention Policy section) and `src/lib/observability/grafana-dashboards/retention-config.json`.
+
 ## Consequences
 
 ### Positive

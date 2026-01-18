@@ -8,6 +8,7 @@ import { ToastContainer } from "@/components/ui/toast";
 import { IOSInstallBanner } from "@/components/pwa";
 import { ParentAccessButton } from "@/components/navigation/parent-access-button";
 import { CookieConsentWall } from "@/components/consent";
+import { TosGateProvider } from "@/components/tos/tos-gate-provider";
 import {
   useSettingsStore,
   initializeStores,
@@ -145,12 +146,14 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
     >
       <AccessibilityProvider>
         <CookieConsentWall>
-          <StoreInitializer />
-          <AccentColorApplier />
-          {children}
-          <ToastContainer />
-          <IOSInstallBanner />
-          <ConditionalParentAccess />
+          <TosGateProvider>
+            <StoreInitializer />
+            <AccentColorApplier />
+            {children}
+            <ToastContainer />
+            <IOSInstallBanner />
+            <ConditionalParentAccess />
+          </TosGateProvider>
         </CookieConsentWall>
       </AccessibilityProvider>
     </ThemeProvider>
