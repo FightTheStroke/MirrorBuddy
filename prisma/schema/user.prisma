@@ -15,6 +15,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Plan 052: Internal auth (username/password)
+  username           String?  @unique // null for legacy/cookie-only users
+  email              String?  @unique // for password reset notifications
+  passwordHash       String?           // bcrypt hash, null for legacy users
+  mustChangePassword Boolean  @default(false)
+  disabled           Boolean  @default(false)
+
   profile           Profile?
   settings          Settings?
   progress          Progress?
