@@ -3,11 +3,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { buildSignalsFromText, sendAdaptiveSignals } from '../adaptive-difficulty-client';
 
-// Mock fetch
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+// Mock csrfFetch before importing the module
+const mockCsrfFetch = vi.fn();
+vi.mock('@/lib/auth/csrf-client', () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
 
 // Mock logger
 vi.mock('@/lib/logger', () => ({
@@ -18,9 +19,11 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
+import { buildSignalsFromText, sendAdaptiveSignals } from '../adaptive-difficulty-client';
+
 describe('adaptive-difficulty-client', () => {
   beforeEach(() => {
-    mockFetch.mockReset();
+    mockCsrfFetch.mockReset();
   });
 
   afterEach(() => {
@@ -122,37 +125,37 @@ describe('adaptive-difficulty-client', () => {
     it('returns true for empty signals array', async () => {
       const result = await sendAdaptiveSignals([]);
       expect(result).toBe(true);
-      expect(mockFetch).not.toHaveBeenCalled();
+      expect(mockCsrfFetch).not.toHaveBeenCalled();
     });
 
     it('sends signals to API and returns true on success', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: true });
+      mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       const signals = [{ type: 'question' as const, source: 'chat' as const }];
       const result = await sendAdaptiveSignals(signals);
 
       expect(result).toBe(true);
-      expect(mockFetch).toHaveBeenCalledWith(
+      expect(mockCsrfFetch).toHaveBeenCalledWith(
         '/api/adaptive/signals',
         expect.objectContaining({
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          body: expect.any(String),
         })
       );
     });
 
     it('returns false on 4xx client error without retry', async () => {
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 400 });
+      mockCsrfFetch.mockResolvedValueOnce({ ok: false, status: 400 });
 
       const signals = [{ type: 'question' as const, source: 'chat' as const }];
       const result = await sendAdaptiveSignals(signals, { retries: 2 });
 
       expect(result).toBe(false);
-      expect(mockFetch).toHaveBeenCalledTimes(1); // No retries for 4xx
+      expect(mockCsrfFetch).toHaveBeenCalledTimes(1); // No retries for 4xx
     });
 
     it('retries on 5xx server error', async () => {
-      mockFetch
+      mockCsrfFetch
         .mockResolvedValueOnce({ ok: false, status: 500 })
         .mockResolvedValueOnce({ ok: true });
 
@@ -160,11 +163,11 @@ describe('adaptive-difficulty-client', () => {
       const result = await sendAdaptiveSignals(signals, { retries: 2 });
 
       expect(result).toBe(true);
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockCsrfFetch).toHaveBeenCalledTimes(2);
     });
 
     it('retries on network error', async () => {
-      mockFetch
+      mockCsrfFetch
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({ ok: true });
 
@@ -172,17 +175,17 @@ describe('adaptive-difficulty-client', () => {
       const result = await sendAdaptiveSignals(signals, { retries: 2 });
 
       expect(result).toBe(true);
-      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockCsrfFetch).toHaveBeenCalledTimes(2);
     });
 
     it('returns false after max retries exhausted', async () => {
-      mockFetch.mockRejectedValue(new Error('Network error'));
+      mockCsrfFetch.mockRejectedValue(new Error('Network error'));
 
       const signals = [{ type: 'question' as const, source: 'chat' as const }];
       const result = await sendAdaptiveSignals(signals, { retries: 1 });
 
       expect(result).toBe(false);
-      expect(mockFetch).toHaveBeenCalledTimes(2); // Initial + 1 retry
+      expect(mockCsrfFetch).toHaveBeenCalledTimes(2); // Initial + 1 retry
     });
   });
 });

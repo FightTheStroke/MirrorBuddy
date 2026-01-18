@@ -12,6 +12,13 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// Mock csrfFetch before importing the module that uses it
+const mockCsrfFetch = vi.fn();
+vi.mock('@/lib/auth/csrf-client', () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
+
 import {
   SkillStatus,
   recordAnswer,
@@ -36,10 +43,8 @@ import {
   type Topic,
 } from './mastery';
 
-// Mock fetch for API calls (used by auto-save in recordAnswer)
+// Mock fetch for GET calls (loadMasteryState uses regular fetch)
 const mockFetch = vi.fn();
-
-// Set up global fetch mock
 Object.defineProperty(globalThis, 'fetch', { value: mockFetch, writable: true });
 
 describe('Mastery Learning System', () => {
@@ -49,8 +54,10 @@ describe('Mastery Learning System', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockReset();
+    mockCsrfFetch.mockReset();
     // Default mock: successful API responses
     mockFetch.mockResolvedValue({ ok: true });
+    mockCsrfFetch.mockResolvedValue({ ok: true });
     emptyState = { topics: new Map() };
     sampleTopics = createExampleCurriculum();
   });
@@ -115,8 +122,8 @@ describe('Mastery Learning System', () => {
 
     it('should auto-save to API', () => {
       recordAnswer(emptyState, 'topic1', true);
-      // recordAnswer calls saveMasteryState which uses fetch
-      expect(mockFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
+      // recordAnswer calls saveMasteryState which uses csrfFetch
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
         method: 'PUT',
       }));
     });
@@ -424,10 +431,10 @@ describe('Mastery Learning System', () => {
     });
 
     it('should clear state via API', async () => {
-      mockFetch.mockResolvedValue({ ok: true });
+      mockCsrfFetch.mockResolvedValue({ ok: true });
 
       await clearMasteryState();
-      expect(mockFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ masteries: [] }),
       }));

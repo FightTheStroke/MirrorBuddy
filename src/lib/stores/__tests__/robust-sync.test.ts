@@ -4,6 +4,12 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
+// Mock csrfFetch before importing the module
+const mockCsrfFetch = vi.fn();
+vi.mock('@/lib/auth/csrf-client', () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
+
 import {
   fetchWithBackoff,
   syncWithETag,
@@ -14,6 +20,7 @@ import {
 describe('fetchWithBackoff', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    mockCsrfFetch.mockReset();
   });
 
   afterEach(() => {
@@ -28,7 +35,7 @@ describe('fetchWithBackoff', () => {
       headers: new Headers({ 'etag': '"abc123"', 'content-type': 'application/json' }),
       json: vi.fn().mockResolvedValue({ test: 'data' }),
     };
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce(mockResponse as unknown as Response);
+    mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
     const result = await fetchWithBackoff('/api/test', { method: 'GET' });
 
@@ -44,7 +51,7 @@ describe('fetchWithBackoff', () => {
       status: 412,
       headers: new Headers(),
     };
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce(mockResponse as unknown as Response);
+    mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
     const result = await fetchWithBackoff('/api/test', { method: 'PUT' });
 
@@ -60,13 +67,13 @@ describe('fetchWithBackoff', () => {
       headers: new Headers(),
       text: vi.fn().mockResolvedValue('Bad Request'),
     };
-    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValue(mockResponse as unknown as Response);
+    mockCsrfFetch.mockResolvedValue(mockResponse);
 
     const result = await fetchWithBackoff('/api/test', { method: 'GET' });
 
     expect(result.success).toBe(false);
     expect(result.status).toBe(400);
-    expect(fetchSpy).toHaveBeenCalledTimes(1); // No retries
+    expect(mockCsrfFetch).toHaveBeenCalledTimes(1); // No retries
   });
 
   it('retries on 500 errors with exponential backoff', async () => {
@@ -82,9 +89,9 @@ describe('fetchWithBackoff', () => {
       json: vi.fn().mockResolvedValue({ success: true }),
     };
 
-    const fetchSpy = vi.spyOn(global, 'fetch')
-      .mockResolvedValueOnce(mockErrorResponse as unknown as Response)
-      .mockResolvedValueOnce(mockSuccessResponse as unknown as Response);
+    mockCsrfFetch
+      .mockResolvedValueOnce(mockErrorResponse)
+      .mockResolvedValueOnce(mockSuccessResponse);
 
     const resultPromise = fetchWithBackoff('/api/test', { method: 'GET' }, { maxRetries: 3 });
 
@@ -94,11 +101,15 @@ describe('fetchWithBackoff', () => {
     const result = await resultPromise;
 
     expect(result.success).toBe(true);
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(mockCsrfFetch).toHaveBeenCalledTimes(2);
   });
 });
 
 describe('syncWithETag', () => {
+  beforeEach(() => {
+    mockCsrfFetch.mockReset();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -110,11 +121,11 @@ describe('syncWithETag', () => {
       headers: new Headers({ 'etag': '"newetag"', 'content-type': 'application/json' }),
       json: vi.fn().mockResolvedValue({ updated: true }),
     };
-    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce(mockResponse as unknown as Response);
+    mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
     await syncWithETag('/api/test', { data: 'test' }, { etag: '"oldetag"' });
 
-    expect(fetchSpy).toHaveBeenCalledWith(
+    expect(mockCsrfFetch).toHaveBeenCalledWith(
       '/api/test',
       expect.objectContaining({
         method: 'PUT',
@@ -132,16 +143,20 @@ describe('syncWithETag', () => {
       headers: new Headers({ 'content-type': 'application/json' }),
       json: vi.fn().mockResolvedValue({ updated: true }),
     };
-    const fetchSpy = vi.spyOn(global, 'fetch').mockResolvedValueOnce(mockResponse as unknown as Response);
+    mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
     await syncWithETag('/api/test', { data: 'test' });
 
-    const calledHeaders = (fetchSpy.mock.calls[0][1] as RequestInit).headers as Record<string, string>;
+    const calledHeaders = (mockCsrfFetch.mock.calls[0][1] as RequestInit).headers as Record<string, string>;
     expect(calledHeaders['If-Match']).toBeUndefined();
   });
 });
 
 describe('loadWithETag', () => {
+  beforeEach(() => {
+    mockCsrfFetch.mockReset();
+  });
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -153,7 +168,7 @@ describe('loadWithETag', () => {
       headers: new Headers({ 'etag': '"version123"', 'content-type': 'application/json' }),
       json: vi.fn().mockResolvedValue({ id: 1 }),
     };
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce(mockResponse as unknown as Response);
+    mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
     const result = await loadWithETag('/api/test');
 

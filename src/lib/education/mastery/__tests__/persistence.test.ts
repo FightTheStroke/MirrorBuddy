@@ -18,6 +18,12 @@ vi.mock('@/lib/logger', () => ({
   },
 }));
 
+// Mock csrfFetch - used for mutations (PUT/POST/DELETE)
+const mockCsrfFetch = vi.fn();
+vi.mock('@/lib/auth/csrf-client', () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
+
 const createProgress = (overrides: Partial<TopicProgress>): TopicProgress => ({
   topicId: 'test-topic',
   totalQuestions: 10,
@@ -36,6 +42,7 @@ describe('mastery persistence', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCsrfFetch.mockReset();
   });
 
   afterEach(() => {
@@ -44,8 +51,7 @@ describe('mastery persistence', () => {
 
   describe('saveMasteryState', () => {
     it('should serialize and save state', async () => {
-      const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-      global.fetch = mockFetch;
+      mockCsrfFetch.mockResolvedValue({ ok: true });
 
       const state: MasteryState = {
         topics: new Map([
@@ -55,15 +61,14 @@ describe('mastery persistence', () => {
 
       await saveMasteryState(state);
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        body: expect.any(String),
       }));
     });
 
     it('should serialize masteredAt date', async () => {
-      const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-      global.fetch = mockFetch;
+      mockCsrfFetch.mockResolvedValue({ ok: true });
 
       const masteredAt = new Date('2024-01-20');
       const state: MasteryState = {
@@ -74,12 +79,12 @@ describe('mastery persistence', () => {
 
       await saveMasteryState(state);
 
-      const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+      const body = JSON.parse(mockCsrfFetch.mock.calls[0][1].body);
       expect(body.masteries[0].masteredAt).toBe(masteredAt.toISOString());
     });
 
     it('should handle fetch errors gracefully', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+      mockCsrfFetch.mockRejectedValue(new Error('Network error'));
 
       const state: MasteryState = { topics: new Map() };
 
@@ -208,19 +213,18 @@ describe('mastery persistence', () => {
 
   describe('clearMasteryState', () => {
     it('should clear all mastery data', async () => {
-      const mockFetch = vi.fn().mockResolvedValue({ ok: true });
-      global.fetch = mockFetch;
+      mockCsrfFetch.mockResolvedValue({ ok: true });
 
       await clearMasteryState();
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
         method: 'PUT',
         body: JSON.stringify({ masteries: [] }),
       }));
     });
 
     it('should handle fetch errors gracefully', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+      mockCsrfFetch.mockRejectedValue(new Error('Network error'));
 
       // Should not throw
       await expect(clearMasteryState()).resolves.toBeUndefined();
