@@ -26,6 +26,7 @@ export async function requestTool(
   messages: Message[],
   character: CharacterInfo,
   characterId: string,
+  language: "it" | "en" | "es" | "fr" | "de" = "it",
 ): Promise<{
   assistantMessage: Message | null;
   toolState: ToolState;
@@ -43,6 +44,7 @@ export async function requestTool(
       maestroId: characterId,
       enableTools: true,
       requestedTool: toolType === "flashcard" ? "flashcard" : toolType,
+      language,
     }),
   });
 

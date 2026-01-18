@@ -3,10 +3,10 @@
  * Processes and executes AI tool calls
  */
 
-import { logger } from '@/lib/logger';
-import { executeToolCall } from '@/lib/tools/tool-executor';
-import { saveTool } from '@/lib/tools/tool-persistence';
-import { functionNameToToolType } from '@/types/tools';
+import { logger } from "@/lib/logger";
+import { executeToolCall } from "@/lib/tools/tool-executor";
+import { saveTool } from "@/lib/tools/tool-persistence";
+import { functionNameToToolType } from "@/types/tools";
 
 interface ToolCall {
   id: string;
@@ -20,9 +20,13 @@ export interface ToolCallRef {
   id: string;
   type: string;
   name: string;
-  status: 'completed' | 'error';
+  status: "completed" | "error";
   error?: string;
   materialId?: string;
+  /** Tool result data for frontend rendering */
+  data?: unknown;
+  /** Original arguments passed to the tool */
+  arguments?: Record<string, unknown>;
 }
 
 interface ToolContext {
@@ -36,21 +40,17 @@ interface ToolContext {
  */
 async function processSingleToolCall(
   toolCall: ToolCall,
-  context: ToolContext
+  context: ToolContext,
 ): Promise<ToolCallRef> {
   const toolType = functionNameToToolType(toolCall.function.name);
 
   try {
     const args = JSON.parse(toolCall.function.arguments);
-    const toolResult = await executeToolCall(
-      toolCall.function.name,
-      args,
-      {
-        maestroId: context.maestroId,
-        conversationId: context.conversationId,
-        userId: context.userId
-      }
-    );
+    const toolResult = await executeToolCall(toolCall.function.name, args, {
+      maestroId: context.maestroId,
+      conversationId: context.conversationId,
+      userId: context.userId,
+    });
 
     let materialId: string | undefined;
 
@@ -65,11 +65,14 @@ async function processSingleToolCall(
           maestroId: context.maestroId,
           conversationId: context.conversationId,
           topic: args.topic,
-          sourceToolId: typeof args.sourceToolId === 'string' ? args.sourceToolId : undefined,
+          sourceToolId:
+            typeof args.sourceToolId === "string"
+              ? args.sourceToolId
+              : undefined,
         });
         materialId = savedMaterial.toolId;
       } catch (saveError) {
-        logger.warn('Failed to save tool to Material table', {
+        logger.warn("Failed to save tool to Material table", {
           toolType,
           error: String(saveError),
         });
@@ -80,12 +83,14 @@ async function processSingleToolCall(
       id: materialId || toolResult.toolId || toolCall.id,
       type: toolType,
       name: toolCall.function.name,
-      status: toolResult.success ? 'completed' : 'error',
+      status: toolResult.success ? "completed" : "error",
       error: toolResult.error,
       materialId,
+      data: toolResult.data,
+      arguments: args,
     };
   } catch (toolError) {
-    logger.error('Tool execution failed', {
+    logger.error("Tool execution failed", {
       toolCall: toolCall.function.name,
       error: String(toolError),
     });
@@ -94,8 +99,11 @@ async function processSingleToolCall(
       id: toolCall.id,
       type: toolType,
       name: toolCall.function.name,
-      status: 'error',
-      error: toolError instanceof Error ? toolError.message : 'Tool execution failed',
+      status: "error",
+      error:
+        toolError instanceof Error
+          ? toolError.message
+          : "Tool execution failed",
     };
   }
 }
@@ -105,7 +113,7 @@ async function processSingleToolCall(
  */
 export async function processToolCalls(
   toolCalls: ToolCall[],
-  context: ToolContext
+  context: ToolContext,
 ): Promise<ToolCallRef[]> {
   const toolCallRefs: ToolCallRef[] = [];
 
@@ -114,10 +122,10 @@ export async function processToolCalls(
     toolCallRefs.push(ref);
   }
 
-  logger.debug('Tool calls processed', {
+  logger.debug("Tool calls processed", {
     totalCalls: toolCalls.length,
-    successful: toolCallRefs.filter(r => r.status === 'completed').length,
-    failed: toolCallRefs.filter(r => r.status === 'error').length,
+    successful: toolCallRefs.filter((r) => r.status === "completed").length,
+    failed: toolCallRefs.filter((r) => r.status === "error").length,
   });
 
   return toolCallRefs;
@@ -128,24 +136,24 @@ export async function processToolCalls(
  */
 export function buildToolChoice(
   enableTools: boolean,
-  requestedTool?: string
-): 'none' | 'auto' | { type: 'function'; function: { name: string } } {
-  if (!enableTools) return 'none' as const;
+  requestedTool?: string,
+): "none" | "auto" | { type: "function"; function: { name: string } } {
+  if (!enableTools) return "none" as const;
 
   if (requestedTool) {
     const toolFunctionMap: Record<string, string> = {
-      mindmap: 'create_mindmap',
-      quiz: 'create_quiz',
-      flashcard: 'create_flashcards',
-      demo: 'create_demo',
-      summary: 'create_summary',
-      search: 'web_search',
+      mindmap: "create_mindmap",
+      quiz: "create_quiz",
+      flashcard: "create_flashcards",
+      demo: "create_demo",
+      summary: "create_summary",
+      search: "web_search",
     };
     const functionName = toolFunctionMap[requestedTool];
     if (functionName) {
-      return { type: 'function' as const, function: { name: functionName } };
+      return { type: "function" as const, function: { name: functionName } };
     }
   }
 
-  return 'auto' as const;
+  return "auto" as const;
 }

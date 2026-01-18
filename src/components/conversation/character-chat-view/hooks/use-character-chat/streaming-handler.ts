@@ -34,6 +34,7 @@ export interface StreamingMessageOptions {
   ) => void;
   onError: (error: Error) => void;
   signal?: AbortSignal;
+  language?: "it" | "en" | "es" | "fr" | "de";
 }
 
 /**
@@ -122,6 +123,7 @@ export async function sendStreamingMessage(
     onComplete,
     onError,
     signal,
+    language = "it",
   } = options;
 
   const startTime = performance.now();
@@ -138,6 +140,7 @@ export async function sendStreamingMessage(
         systemPrompt: character.systemPrompt,
         maestroId: characterId,
         enableMemory: true,
+        language,
       }),
       signal,
     });
