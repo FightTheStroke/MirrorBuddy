@@ -57,17 +57,22 @@ const response = await csrfFetch("/api/chat", {
 
 Core chat files updated to use `csrfFetch`:
 
-| File                            | Component                |
-| ------------------------------- | ------------------------ |
-| `message-handler.ts`            | Chat message sending     |
-| `tool-handler.ts`               | AI tool execution        |
-| `streaming-handler.ts`          | Streaming chat responses |
-| `sse-parser.ts`                 | SSE stream fetching      |
-| `use-materiali-conversation.ts` | Materials chat           |
-| `use-maieutic-chat.ts`          | Homework help chat       |
-| `config-chat-tests.ts`          | Diagnostics chat test    |
-| `webrtc-connection.ts`          | Voice ephemeral token    |
-| `websocket-connection.ts`       | Voice WS fallback        |
+| File                            | Component                  |
+| ------------------------------- | -------------------------- |
+| `message-handler.ts`            | Chat message sending       |
+| `tool-handler.ts`               | AI tool execution          |
+| `streaming-handler.ts`          | Streaming chat responses   |
+| `sse-parser.ts`                 | SSE stream fetching        |
+| `use-materiali-conversation.ts` | Materials chat             |
+| `use-maieutic-chat.ts`          | Homework help chat         |
+| `config-chat-tests.ts`          | Diagnostics chat test      |
+| `webrtc-connection.ts`          | Voice ephemeral token      |
+| `websocket-connection.ts`       | Voice WS fallback          |
+| `webrtc-probe.ts`               | Transport probe (CRITICAL) |
+
+**Note**: `webrtc-probe.ts` was particularly insidious - it caused WebRTC to appear
+"unavailable" which triggered WebSocket fallback, which doesn't work on Vercel.
+The actual error was a 403 CSRF failure, but the symptom was "voice doesn't work".
 
 #### Files Requiring Review
 
@@ -170,6 +175,78 @@ user sees clear error message instead of cryptic "The operation is insecure".
 | Browser doesn't support WebRTC | <1%                   | Show clear error message   |
 | Azure endpoint unavailable     | Rare                  | Retry logic                |
 
+### Module Bundling Constraints (CRITICAL)
+
+Vercel serverless functions run in an isolated environment. Modules must be **bundled**
+with the application, NOT loaded at runtime from node_modules.
+
+#### The `serverExternalPackages` Trap
+
+**DO NOT** add packages to `serverExternalPackages` unless you absolutely know what
+you're doing. This setting tells Next.js to NOT bundle the package, expecting it to
+be available at runtime.
+
+```typescript
+// next.config.ts - THIS WILL BREAK ON VERCEL
+const nextConfig: NextConfig = {
+  serverExternalPackages: ["pdf-parse"], // ❌ BROKEN ON VERCEL
+};
+```
+
+**What happens on Vercel**:
+
+1. Package marked as "external" is NOT included in the serverless function bundle
+2. At runtime, Node.js tries to `require('pdf-parse')` from node_modules
+3. node_modules doesn't exist in Vercel's runtime environment
+4. **500 Internal Server Error** with cryptic "MODULE_NOT_FOUND" in logs
+
+**What happened to MirrorBuddy (2026-01-18)**:
+
+| Symptom                             | Root Cause                                          |
+| ----------------------------------- | --------------------------------------------------- |
+| Chat API returns 500                | pdf-parse in serverExternalPackages                 |
+| Error: "MODULE_NOT_FOUND pdf-parse" | Package not bundled, not available at runtime       |
+| Import chain breaks entire API      | `/api/chat` → handlers → pdf-handler → pdf-parse 💥 |
+
+**Fix applied**: Removed `pdf-parse` from `serverExternalPackages`. Now bundled.
+
+#### When serverExternalPackages IS Needed
+
+Only use it for packages with **native bindings** that:
+
+1. Are available in Vercel's Lambda runtime (e.g., `sharp` - Vercel pre-installs it)
+2. Have specific Vercel support documented
+
+**Safe examples** (Vercel provides these):
+
+```typescript
+serverExternalPackages: [
+  "@prisma/client", // Vercel has special Prisma handling
+  "sharp", // Pre-installed on Vercel
+];
+```
+
+**Dangerous examples** (will break):
+
+```typescript
+serverExternalPackages: [
+  "pdf-parse", // NOT on Vercel runtime
+  "canvas", // Requires native compilation
+  "any-native-pkg", // Unless Vercel explicitly supports it
+];
+```
+
+#### Debugging Module Issues
+
+Check Vercel function logs for:
+
+```
+Error: Cannot find module 'package-name'
+Error: Module not found: Can't resolve 'package-name'
+```
+
+**Fix**: Remove the package from `serverExternalPackages` in `next.config.ts`.
+
 ### Health Check Considerations on Vercel
 
 #### Memory Reporting
@@ -217,6 +294,25 @@ First request after cold start may show high latency (500+ ms) due to:
 
 - Developers must learn `csrfFetch` pattern
 - WebSocket-based features need alternative solutions
+
+## Common Deployment Failures Quick Reference
+
+**Use this table when something breaks on Vercel production.**
+
+| Symptom                       | Check                                   | Root Cause                           | Fix                               |
+| ----------------------------- | --------------------------------------- | ------------------------------------ | --------------------------------- |
+| Chat API 500                  | Vercel logs: "MODULE_NOT_FOUND"         | Package in serverExternalPackages    | Remove from next.config.ts        |
+| Chat API 403                  | Response body: "Invalid CSRF"           | Using `fetch` instead of `csrfFetch` | Import and use csrfFetch          |
+| Voice "WebRTC required" error | Browser console: 403 on ephemeral-token | webrtc-probe.ts using plain fetch    | Change to csrfFetch               |
+| Voice "operation insecure"    | CSP violation in console                | Missing wss:// in CSP connect-src    | Update proxy.ts CSP               |
+| Database timeout              | Health endpoint shows high latency      | Cold start + wrong region            | Deploy in same region as Supabase |
+| SSL certificate error         | Prisma logs SSL errors                  | Missing SUPABASE_CA_CERT             | Add CA cert to env vars           |
+
+**First response to any production failure**:
+
+1. Check Vercel Function Logs: `vercel logs --prod`
+2. Look for: 403 (CSRF), 500 (module/crash), MODULE_NOT_FOUND
+3. Cross-reference with this table
 
 ## Related
 
