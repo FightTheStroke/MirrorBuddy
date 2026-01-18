@@ -1,8 +1,9 @@
 // ============================================================================
-// PROXY: Provider Check & Landing Redirect + CSP Nonce + Observability
-// 1. Redirects to /landing if no AI provider is configured
-// 2. Injects nonce-based CSP headers for XSS protection (F-03)
-// 3. Tracks latency and errors for API routes (F-02, F-03)
+// PROXY: Route Protection + Provider Check + CSP Nonce + Observability
+// 1. Protects MirrorBuddy from unauthorized access (ADR 0055, 0056)
+// 2. Redirects to /landing if no AI provider is configured
+// 3. Injects nonce-based CSP headers for XSS protection (F-03)
+// 4. Tracks latency and errors for API routes (F-02, F-03)
 //
 // Next.js 16: middleware.ts renamed to proxy.ts
 // See: https://nextjs.org/docs/messages/middleware-to-proxy
@@ -15,6 +16,22 @@ import { metricsStore } from "@/lib/observability/metrics-store";
 
 const REQUEST_ID_HEADER = "x-request-id";
 const RESPONSE_TIME_HEADER = "x-response-time";
+
+// Public routes that don't require authentication (ADR 0055, 0056)
+const AUTH_PUBLIC_ROUTES = [
+  "/welcome",
+  "/login",
+  "/privacy",
+  "/terms",
+  "/cookies",
+  "/landing",
+  "/showcase",
+  "/invite",
+  "/maestri", // Avatar images
+];
+
+// Admin routes require authenticated user (ADR 0055)
+const ADMIN_PREFIX = "/admin";
 
 // Routes that do NOT require a provider to be configured
 const PUBLIC_ROUTES = [
@@ -169,6 +186,47 @@ export function proxy(request: NextRequest) {
     );
   }
 
+  // ==========================================================================
+  // ROUTE PROTECTION (ADR 0055, 0056)
+  // ==========================================================================
+
+  // Check for authentication cookies
+  const userCookie = request.cookies.get("mirrorbuddy-user-id");
+  const visitorCookie = request.cookies.get("mirrorbuddy-visitor-id");
+  const isAuthenticated = !!userCookie?.value;
+  const hasTrialSession = !!visitorCookie?.value;
+
+  // Auth public routes - allow without auth but add CSP
+  if (AUTH_PUBLIC_ROUTES.some((r) => pathname.startsWith(r))) {
+    return finalizeResponse(
+      NextResponse.next({ request: { headers: requestHeaders } }),
+    );
+  }
+
+  // Admin routes - require authenticated user
+  if (pathname.startsWith(ADMIN_PREFIX)) {
+    if (!isAuthenticated) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    // Admin check is done server-side in API handlers
+    return finalizeResponse(
+      NextResponse.next({ request: { headers: requestHeaders } }),
+    );
+  }
+
+  // Protected routes - require EITHER authenticated user OR trial session
+  if (!isAuthenticated && !hasTrialSession) {
+    // No valid access - redirect to welcome to create trial session
+    const welcomeUrl = new URL("/welcome", request.url);
+    return NextResponse.redirect(welcomeUrl);
+  }
+
+  // ==========================================================================
+  // PROVIDER CHECK
+  // ==========================================================================
+
   // Check if any provider is configured
   if (!hasAnyProvider()) {
     const url = request.nextUrl.clone();
@@ -176,7 +234,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Provider configured, allow access with CSP, request ID, and metrics
+  // Provider configured and user authorized - allow access
   return finalizeResponse(
     NextResponse.next({ request: { headers: requestHeaders } }),
   );

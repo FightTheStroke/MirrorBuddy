@@ -53,7 +53,6 @@ export default function Home() {
 
   const [currentView, setCurrentView] = useState<View>("maestri");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [debugMenuOpen, setDebugMenuOpen] = useState(false);
   const [selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const [maestroSessionMode, setMaestroSessionMode] =
     useState<MaestroSessionMode>("voice");
@@ -180,8 +179,6 @@ export default function Home() {
         }}
         selectedCoach={selectedCoach}
         selectedBuddy={selectedBuddy}
-        debugMenuOpen={debugMenuOpen}
-        onDebugMenuToggle={() => setDebugMenuOpen(!debugMenuOpen)}
       />
 
       <main

@@ -1,20 +1,34 @@
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
 
+// Real maestri IDs from src/data/maestri/index.ts
 const MAESTRI = [
+  "leonardo",
+  "galileo",
+  "curie",
+  "cicerone",
+  "lovelace",
+  "smith",
+  "shakespeare",
+  "humboldt",
+  "erodoto",
+  "manzoni",
+  "euclide",
   "mozart",
-  "beethoven",
-  "bach",
-  "chopin",
-  "brahms",
-  "debussy",
-  "liszt",
-  "vivaldi",
-  "handel",
-  "tchaikovsky",
+  "socrate",
+  "ippocrate",
+  "feynman",
+  "darwin",
+  "chris",
+  "omero",
+  "alexPina",
+  "simone",
+  "cassese",
+  // Excluded from trial: mascetti (amico, not maestro)
 ];
 
-const COACHES = ["coaching-ai", "mentor-ai", "guide-ai"];
+// Available coaches from src/data/coaches/
+const COACHES = ["melissa", "laura"];
 
 export const TOOLS_WHITELIST = ["mindmap", "summary"];
 
