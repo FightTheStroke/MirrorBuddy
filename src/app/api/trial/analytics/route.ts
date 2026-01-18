@@ -57,13 +57,21 @@ async function getTrialAnalytics(): Promise<Response> {
     const conversionRate =
       totalTrials > 0 ? Math.round((limitHits / totalTrials) * 100) : 0;
 
+    // Count beta CTA clicks from telemetry (action: beta_request_click)
+    const betaCtaClicks = await prisma.telemetryEvent.count({
+      where: {
+        action: "beta_request_click",
+        timestamp: { gte: thirtyDaysAgo },
+      },
+    });
+
     const metrics: TrialFunnelMetrics = {
       period: "last_30_days",
       trialStarts: totalTrials,
       trialChats: totalChats,
       limitHits,
       betaCtaShown: limitHits, // Shown when limit reached
-      betaCtaClicked: 0, // TODO: Track from telemetry
+      betaCtaClicked: betaCtaClicks,
       conversionRate,
       avgChatsPerTrial: totalTrials > 0 ? totalChats / totalTrials : 0,
     };
