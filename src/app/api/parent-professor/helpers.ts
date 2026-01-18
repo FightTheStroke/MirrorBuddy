@@ -34,10 +34,12 @@ export async function getOrCreateParentConversation(
       return { success: false, conversation: null, isNew: false };
     }
 
-    const messages = conversation.messages.map((m) => ({
-      role: m.role as 'user' | 'assistant' | 'system',
-      content: m.content,
-    }));
+    const messages = conversation.messages.map(
+      (m: (typeof conversation.messages)[number]) => ({
+        role: m.role as 'user' | 'assistant' | 'system',
+        content: m.content,
+      }),
+    );
 
     return { success: true, conversation, messages, isNew: false };
   }

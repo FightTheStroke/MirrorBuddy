@@ -127,10 +127,12 @@ export async function POST(request: NextRequest, context: RouteParams) {
         const subject = maestro?.subject || "Studio generale";
 
         // Generate maestro evaluation
-        const messages = conversationWithMessages.messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        }));
+        const messages = conversationWithMessages.messages.map(
+          (m: (typeof conversationWithMessages.messages)[number]) => ({
+            role: m.role,
+            content: m.content,
+          }),
+        );
 
         const evaluation = await generateMaestroEvaluation(messages);
 
