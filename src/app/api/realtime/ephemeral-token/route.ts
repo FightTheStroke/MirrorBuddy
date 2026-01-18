@@ -6,10 +6,15 @@
 //       multiple clients sharing the same session (security/privacy issue)
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimitAsync, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-import { logger } from '@/lib/logger';
-import { requireCSRF } from '@/lib/security/csrf';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  checkRateLimitAsync,
+  getClientIdentifier,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
+import { requireCSRF } from "@/lib/security/csrf";
 
 interface AzureSessionResponse {
   client_secret: {
@@ -54,7 +59,7 @@ function checkPerIPRateLimit(clientId: string): boolean {
 export async function POST(request: NextRequest) {
   // CSRF validation (double-submit cookie pattern)
   if (!requireCSRF(request)) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
 
   // Get client identifier for rate limiting and caching
@@ -62,61 +67,71 @@ export async function POST(request: NextRequest) {
 
   // Per-IP rate limit: 1 request per second maximum
   if (!checkPerIPRateLimit(clientId)) {
-    logger.warn('Per-IP rate limit exceeded (1 req/sec)', {
+    logger.warn("Per-IP rate limit exceeded (1 req/sec)", {
       clientId,
-      endpoint: '/api/realtime/ephemeral-token',
+      endpoint: "/api/realtime/ephemeral-token",
     });
     return NextResponse.json(
       {
-        error: 'Too many requests',
-        message: 'Maximum 1 request per second per IP',
+        error: "Too many requests",
+        message: "Maximum 1 request per second per IP",
       },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
   // Azure OpenAI Realtime configuration (required)
-  const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
-  const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
+  // Use .trim() to handle env vars with trailing whitespace/newlines
+  const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT?.trim();
+  const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT?.trim();
 
   // Rate limiting: 30 requests per minute per IP (global rate limit)
   const rateLimit = await checkRateLimitAsync(
     `realtime-ephemeral-token:${clientId}`,
-    RATE_LIMITS.REALTIME_TOKEN
+    RATE_LIMITS.REALTIME_TOKEN,
   );
 
   if (!rateLimit.success) {
-    logger.warn('Global rate limit exceeded (30 req/min)', {
+    logger.warn("Global rate limit exceeded (30 req/min)", {
       clientId,
-      endpoint: '/api/realtime/ephemeral-token',
+      endpoint: "/api/realtime/ephemeral-token",
     });
     return rateLimitResponse(rateLimit);
   }
 
   // Get API key (needed for new token request)
-  const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
+  const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY?.trim();
 
   // Validate Azure configuration
   const missingConfig: string[] = [];
-  if (!azureEndpoint) missingConfig.push('AZURE_OPENAI_REALTIME_ENDPOINT');
-  if (!azureApiKey) missingConfig.push('AZURE_OPENAI_REALTIME_API_KEY');
-  if (!azureDeployment) missingConfig.push('AZURE_OPENAI_REALTIME_DEPLOYMENT');
+  if (!azureEndpoint) missingConfig.push("AZURE_OPENAI_REALTIME_ENDPOINT");
+  if (!azureApiKey) missingConfig.push("AZURE_OPENAI_REALTIME_API_KEY");
+  if (!azureDeployment) missingConfig.push("AZURE_OPENAI_REALTIME_DEPLOYMENT");
 
-  if (missingConfig.length > 0 || !azureEndpoint || !azureApiKey || !azureDeployment) {
-    logger.error('Azure OpenAI Realtime not configured', { missingConfig });
+  if (
+    missingConfig.length > 0 ||
+    !azureEndpoint ||
+    !azureApiKey ||
+    !azureDeployment
+  ) {
+    logger.error("Azure OpenAI Realtime not configured", { missingConfig });
     return NextResponse.json(
       {
-        error: 'Azure OpenAI not configured',
+        error: "Azure OpenAI not configured",
         missingVariables: missingConfig,
-        message: 'Configure Azure OpenAI settings in the app or add environment variables',
+        message:
+          "Configure Azure OpenAI settings in the app or add environment variables",
       },
-      { status: 503 }
+      { status: 503 },
     );
   }
 
   // Ensure azureEndpoint is defined for TypeScript
   if (!azureEndpoint) {
-    return NextResponse.json({ error: 'Azure endpoint not configured' }, { status: 503 });
+    return NextResponse.json(
+      { error: "Azure endpoint not configured" },
+      { status: 503 },
+    );
   }
 
   try {
@@ -126,10 +141,10 @@ export async function POST(request: NextRequest) {
     const azureUrl = `${url.protocol}//${url.hostname}/openai/realtimeapi/sessions?api-version=2025-04-01-preview`;
 
     const response = await fetch(azureUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'api-key': azureApiKey,
-        'Content-Type': 'application/json',
+        "api-key": azureApiKey,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         model: azureDeployment,
@@ -139,17 +154,17 @@ export async function POST(request: NextRequest) {
     // Handle Azure API errors
     if (!response.ok) {
       const errorData = await response.text();
-      logger.error('Azure ephemeral token request failed', {
+      logger.error("Azure ephemeral token request failed", {
         status: response.status,
         errorDetails: errorData,
       });
 
       return NextResponse.json(
         {
-          error: 'Failed to get ephemeral token from Azure',
+          error: "Failed to get ephemeral token from Azure",
           status: response.status,
         },
-        { status: response.status >= 500 ? 503 : 400 }
+        { status: response.status >= 500 ? 503 : 400 },
       );
     }
 
@@ -158,15 +173,15 @@ export async function POST(request: NextRequest) {
     // Extract ephemeral token details
     const { client_secret, id: sessionId } = sessionData;
     if (!client_secret || !client_secret.value || !client_secret.expires_at) {
-      logger.error('Invalid Azure session response - missing client_secret', {
+      logger.error("Invalid Azure session response - missing client_secret", {
         sessionData,
       });
 
       return NextResponse.json(
         {
-          error: 'Invalid response from Azure - missing ephemeral token',
+          error: "Invalid response from Azure - missing ephemeral token",
         },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -174,10 +189,10 @@ export async function POST(request: NextRequest) {
     const payload: EphemeralTokenResponse = {
       token: client_secret.value,
       expiresAt: client_secret.expires_at,
-      sessionId: sessionId || '',
+      sessionId: sessionId || "",
     };
 
-    logger.info('Ephemeral token issued (unique session)', {
+    logger.info("Ephemeral token issued (unique session)", {
       clientId,
       sessionId,
       expiresAt: client_secret.expires_at,
@@ -185,16 +200,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(payload, { status: 200 });
   } catch (error) {
-    logger.error('Unexpected error in ephemeral token endpoint', {
+    logger.error("Unexpected error in ephemeral token endpoint", {
       error: error instanceof Error ? error.message : String(error),
     });
 
     return NextResponse.json(
       {
-        error: 'Internal server error',
-        message: 'Failed to get ephemeral token',
+        error: "Internal server error",
+        message: "Failed to get ephemeral token",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
