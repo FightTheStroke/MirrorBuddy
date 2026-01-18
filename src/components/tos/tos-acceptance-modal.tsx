@@ -42,8 +42,7 @@ export function TosAcceptanceModal({
         throw new Error(`Failed to save ToS acceptance: ${response.status}`);
       }
 
-      const data = await response.json();
-      console.log('ToS accepted:', data);
+      await response.json();
       onAccept(TOS_VERSION);
     } catch (error) {
       console.error('Failed to save ToS acceptance:', error);

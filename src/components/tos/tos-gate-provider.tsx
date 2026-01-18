@@ -138,8 +138,6 @@ export function TosGateProvider({ children }: { children: React.ReactNode }) {
     // Update state
     setTosStatus({ accepted: true, checked: true, version });
     setShowModal(false);
-
-    console.log('ToS accepted, modal closed, version:', version);
   }, []);
 
   return (
