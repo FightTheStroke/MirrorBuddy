@@ -28,6 +28,8 @@ const EXPECTED_SCHEMA_FILES = [
   "insights.prisma", // StudentInsightProfile, ParentNote
   "rag.prisma", // ContentEmbedding, MaterialEdge, Concept
   "privacy.prisma", // UserPrivacyPreferences (GDPR compliance)
+  "trial.prisma", // TrialSession (anonymous trial mode)
+  "invite.prisma", // InviteRequest (beta invite system)
 ];
 
 // Expected models that should be present across all schema files
@@ -93,6 +95,10 @@ const EXPECTED_MODELS = [
   "MaterialConcept",
   // privacy.prisma
   "UserPrivacyPreferences",
+  // trial.prisma
+  "TrialSession",
+  // invite.prisma
+  "InviteRequest",
 ];
 
 describe("Prisma Schema Split", () => {
