@@ -59,3 +59,31 @@ model SafetyEvent {
   @@index([timestamp])
 }
 
+// ============================================================================
+// FEATURE FLAGS - Persistent feature flag state for production reliability
+// ============================================================================
+
+model FeatureFlag {
+  id                String   @id // e.g., "voice_realtime", "rag_enabled"
+  name              String
+  description       String
+  status            String   @default("enabled") // enabled | disabled | degraded
+  enabledPercentage Int      @default(100) // 0-100 for gradual rollout
+  killSwitch        Boolean  @default(false)
+  killSwitchReason  String?
+  metadata          Json?
+  updatedAt         DateTime @updatedAt
+  updatedBy         String?
+
+  @@index([status])
+  @@index([killSwitch])
+}
+
+model GlobalConfig {
+  id        String   @id @default("global")
+  killSwitch Boolean @default(false)
+  killSwitchReason String?
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+

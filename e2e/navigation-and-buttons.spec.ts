@@ -207,16 +207,15 @@ test.describe('Navigation and Button Functionality', () => {
   });
 
   test.describe('Interactive Pages', () => {
-    test('quiz page loads and is interactive', async ({ page }) => {
+    test('quiz page redirects to astuccio', async ({ page }) => {
       await page.goto('/quiz');
       await page.waitForLoadState('networkidle');
 
+      // /quiz redirects to /astuccio
+      await expect(page).toHaveURL(/\/astuccio/);
+
       // Should have content visible
       await expect(page.locator('main').first()).toBeVisible();
-
-      // Should have quiz-related content
-      const heading = page.locator('h1, h2').filter({ hasText: /Quiz/i });
-      await expect(heading.first()).toBeVisible();
     });
 
     test('flashcards page loads and is interactive', async ({ page }) => {
