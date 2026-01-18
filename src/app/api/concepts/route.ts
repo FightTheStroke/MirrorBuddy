@@ -64,7 +64,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     ]);
 
     return NextResponse.json({
-      concepts: concepts.map((c) => ({
+      concepts: concepts.map((c: (typeof concepts)[number]) => ({
         id: c.id,
         name: c.name,
         description: c.description,
