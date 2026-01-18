@@ -131,10 +131,20 @@ export function ensureSubjectProfile(
   return profile.subjects[key];
 }
 
+// Safe prototype keys for subject access
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+export function isSafeSubjectKey(subject?: string): boolean {
+  if (!subject) return false;
+  return !UNSAFE_KEYS.has(subject.toLowerCase());
+}
+
 export function updateSubjectSignals(
   profile: AdaptiveProfile,
   signal: AdaptiveSignalInput,
 ): void {
+  // Validate subject key to prevent prototype pollution
+  if (!isSafeSubjectKey(signal.subject)) return;
   const subjectProfile = ensureSubjectProfile(profile, signal.subject);
   if (!subjectProfile) return;
 

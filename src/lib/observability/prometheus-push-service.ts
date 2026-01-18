@@ -29,6 +29,18 @@ interface MetricSample {
   timestamp: number;
 }
 
+/**
+ * Escape a string for use as an Influx Line Protocol tag value.
+ * Escapes backslash, comma, equals, and space characters.
+ */
+function escapeInfluxTagValue(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/,/g, "\\,")
+    .replace(/=/g, "\\=")
+    .replace(/ /g, "\\ ");
+}
+
 class PrometheusPushService {
   private config: PushConfig | null = null;
   private intervalId: ReturnType<typeof setInterval> | null = null;
@@ -160,7 +172,10 @@ class PrometheusPushService {
     };
 
     // Route-level metrics
-    for (const [route, metrics] of Object.entries(summary.routes)) {
+    for (const [rawRoute, metrics] of Object.entries(summary.routes)) {
+      // Sanitize route: only allow alphanumeric, slashes, hyphens, underscores
+      // This prevents any injection in Influx Line Protocol
+      const route = rawRoute.replace(/[^a-zA-Z0-9/_-]/g, "_");
       const routeLabels = { ...instanceLabels, route };
 
       samples.push(
@@ -404,16 +419,7 @@ class PrometheusPushService {
     return samples
       .map((s) => {
         const tags = Object.entries(s.labels)
-          .map(([k, v]) => {
-            // Escape special chars for Influx Line Protocol tag values:
-            // backslash, comma, equals, space (in that order)
-            const escaped = v
-              .replace(/\\/g, "\\\\")
-              .replace(/,/g, "\\,")
-              .replace(/=/g, "\\=")
-              .replace(/ /g, "\\ ");
-            return `${k}=${escaped}`;
-          })
+          .map(([k, v]) => `${k}=${escapeInfluxTagValue(v)}`)
           .join(",");
         return `${s.name},${tags} value=${s.value} ${s.timestamp * 1000000}`;
       })
