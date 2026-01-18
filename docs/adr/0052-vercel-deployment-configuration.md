@@ -1,14 +1,18 @@
 # ADR 0052: Vercel Deployment Configuration
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-01-18
 
 ## Context
+
 MirrorBuddy needs production deployment on Vercel with proper environment configuration.
 The application requires multiple external services:
+
 - Azure OpenAI (chat, embeddings, realtime voice, TTS)
 - Supabase PostgreSQL database
 - Upstash Redis (rate limiting)
@@ -18,7 +22,8 @@ The application requires multiple external services:
 ## Decision
 
 ### Project Setup
-- **Project Name**: `mirror-buddy` (URL: `mirror-buddy.vercel.app`)
+
+- **Project Name**: `mirrorbuddy` (URL: `mirrorbuddy.vercel.app`)
 - **Team**: FightTheStroke Foundation (`team_nDwLfqx9JbVIs4C7Il79f4ln`)
 - **Framework**: Next.js 16 with Turbopack
 - **Node Version**: 24.x
@@ -26,15 +31,30 @@ The application requires multiple external services:
 ### Environment Variables Required
 
 #### Database (Supabase PostgreSQL)
+
 ```
 DATABASE_URL          # Pooled connection (port 6543, pgbouncer=true)
 DIRECT_URL            # Direct connection (port 5432, for migrations)
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_CA_CERT      # [OPTIONAL] CA certificate for full SSL verification
 ```
 
+**SSL Configuration Note**: Supabase Pooler (Supavisor) uses a CA certificate that is
+NOT in Node.js's default trust store. Without `SUPABASE_CA_CERT`:
+
+- Connection encrypts traffic but skips certificate verification
+- This is the default behavior with `sslmode=require`
+
+For **full SSL verification** (recommended for production):
+
+1. Download CA cert from: Supabase Dashboard → Database Settings → SSL Configuration
+2. Copy the entire certificate content (including BEGIN/END lines)
+3. Add as `SUPABASE_CA_CERT` environment variable on Vercel
+
 #### Azure OpenAI - Chat
+
 ```
 AZURE_OPENAI_ENDPOINT           # https://your-resource.openai.azure.com/
 AZURE_OPENAI_API_KEY            # [SENSITIVE]
@@ -43,6 +63,7 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT  # e.g., text-embedding-ada-002
 ```
 
 #### Azure OpenAI - Realtime Voice
+
 ```
 AZURE_OPENAI_REALTIME_ENDPOINT     # Same as ENDPOINT or dedicated
 AZURE_OPENAI_REALTIME_API_KEY      # [SENSITIVE] Can be same as API_KEY
@@ -51,11 +72,13 @@ AZURE_OPENAI_TTS_DEPLOYMENT        # e.g., tts-deployment
 ```
 
 #### Authentication
+
 ```
 SESSION_SECRET     # 64-char hex string for session encryption
 ```
 
 #### Push Notifications (VAPID)
+
 ```
 NEXT_PUBLIC_VAPID_PUBLIC_KEY   # Public key (safe to expose)
 VAPID_PRIVATE_KEY              # [SENSITIVE]
@@ -63,6 +86,7 @@ VAPID_SUBJECT                  # mailto:support@yourdomain.com
 ```
 
 #### Observability (Grafana Cloud)
+
 ```
 GRAFANA_CLOUD_PROMETHEUS_URL   # Prometheus push endpoint
 GRAFANA_CLOUD_PROMETHEUS_USER  # User ID
@@ -71,6 +95,7 @@ GRAFANA_CLOUD_PUSH_INTERVAL    # Push interval in seconds (60)
 ```
 
 #### Rate Limiting (Upstash Redis)
+
 ```
 UPSTASH_REDIS_REST_URL    # https://your-instance.upstash.io
 UPSTASH_REDIS_REST_TOKEN  # [SENSITIVE]
@@ -85,7 +110,24 @@ Next.js 16 uses `src/proxy.ts` (renamed from middleware.ts):
 3. **Request Tracking**: Adds `x-request-id` for tracing
 4. **Metrics**: Records latency for API routes
 
+#### CSP connect-src Configuration
+
+The proxy allows these connections for Azure OpenAI voice/chat:
+
+```
+https://*.openai.azure.com
+wss://*.openai.azure.com
+https://*.realtimeapi-preview.ai.azure.com
+wss://*.realtimeapi-preview.ai.azure.com
+ws://localhost:* wss://localhost:*  # Local development
+http://localhost:11434              # Ollama
+```
+
+**Note**: Without `wss://*.realtimeapi-preview.ai.azure.com`, voice features
+fail with "The operation is insecure" error in production.
+
 ### Public Routes (No Provider Required)
+
 - `/landing` - LLM configuration instructions
 - `/showcase/*` - Demo features
 - `/api/*` - API endpoints
@@ -113,6 +155,7 @@ vercel env pull
 ### Supabase Integration
 
 Vercel automatically adds these when Supabase integration is enabled:
+
 - `POSTGRES_URL`, `POSTGRES_PRISMA_URL`, `POSTGRES_URL_NON_POOLING`
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_DATABASE`
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
@@ -124,20 +167,24 @@ manually pointing to the Supabase pooler/direct URLs.
 ## Consequences
 
 ### Positive
+
 - All services configured as encrypted secrets
 - Automatic deployments on git push to main
 - Environment separation (production, preview, development)
 - Integrated with Supabase for database
 
 ### Negative
+
 - Environment variables must be synced between local and Vercel
 - Sensitive keys visible in Vercel dashboard to team members
 
 ### Neutral
+
 - Proxy redirects to `/landing` if Azure not configured (intended behavior)
 - `NEXT_PUBLIC_*` variables are bundled into client code
 
 ## Related
+
 - ADR 0028: PostgreSQL + pgvector migration
 - ADR 0047: Grafana Cloud observability
 - ADR 0039: Deferred production items
