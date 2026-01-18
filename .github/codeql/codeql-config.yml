@@ -1,0 +1,18 @@
+# CodeQL Configuration for MirrorBuddy
+# Handles false positives and test exclusions
+
+name: "MirrorBuddy CodeQL Config"
+
+# Exclude test files from security analysis
+# E2E tests use mock cookies that can't have Secure flag over HTTP localhost
+paths-ignore:
+  - "e2e/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "src/test/**"
+
+# Note: The "insecure randomness" alerts in password.ts and invite-service.ts
+# are FALSE POSITIVES. The code uses crypto.getRandomValues() (CSPRNG),
+# not Math.random(). CodeQL incorrectly flags the modulo operation.
+# These should be dismissed manually in GitHub Security tab as "false positive".
