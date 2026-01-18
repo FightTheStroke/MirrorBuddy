@@ -71,7 +71,9 @@ function sendMetric(event: WebVitalsEvent): void {
   }
 
   const endpoint = '/api/metrics/web-vitals';
-  const data = JSON.stringify(event);
+  // API expects { metrics: [...] } format
+  const payload = { metrics: [event] };
+  const data = JSON.stringify(payload);
 
   // Primary: Try Beacon API (most reliable during page unload)
   if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
