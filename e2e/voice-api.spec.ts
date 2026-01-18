@@ -12,7 +12,9 @@ import WebSocket from 'ws';
 
 const WS_PROXY_URL = 'ws://localhost:3001';
 
+// Skip WebSocket tests in CI - proxy not available
 test.describe('WebSocket Proxy', () => {
+  test.skip(!!process.env.CI, 'WebSocket proxy not available in CI');
   test('proxy server is running on port 3001', async () => {
     // Try to connect to the proxy
     const ws = new WebSocket(`${WS_PROXY_URL}?maestroId=test`);

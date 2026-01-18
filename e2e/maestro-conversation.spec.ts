@@ -19,6 +19,9 @@
 
 import { test, expect, APIRequestContext } from '@playwright/test';
 
+// Skip AI-dependent tests in CI - Azure OpenAI not configured
+test.skip(!!process.env.CI, 'Azure OpenAI not available in CI');
+
 // Extended timeout for AI responses
 const AI_TIMEOUT = 45000;
 
