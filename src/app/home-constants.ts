@@ -52,11 +52,6 @@ export const debugPages: DebugPage[] = [
     note: "Redirect -> /welcome (backwards compat)",
     status: "redirect",
   },
-  {
-    href: "/materiali",
-    note: "HomeworkHelpView legacy - ORPHANED",
-    status: "dead",
-  },
 
   // SHOWCASE (demo pages - not linked)
   { href: "/showcase", note: "Showcase home", status: "dead" },

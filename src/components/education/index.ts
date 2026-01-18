@@ -1,16 +1,13 @@
-export { Quiz } from './quiz';
-export { QuizView } from './quiz-view';
-export { FlashcardStudy, FlashcardPreview } from './flashcard';
-export { FlashcardsView } from './flashcards-view';
-export { MindmapsView } from './mindmaps-view';
-export { SummariesView } from './summaries-view';
-// HomeworkHelp uses pdfjs which requires DOMMatrix (browser-only)
-// Use LazyHomeworkHelpView instead for SSR compatibility
-export { HomeworkHelpView } from './homework-help-view';
-export { CalendarView } from './calendar-view';
-export { HTMLPreview } from './html-preview';
-export { HTMLSnippetsView } from './html-snippets-view';
-export { ArchiveView } from './archive-view';
+export { Quiz } from "./quiz";
+export { QuizView } from "./quiz-view";
+export { FlashcardStudy, FlashcardPreview } from "./flashcard";
+export { FlashcardsView } from "./flashcards-view";
+export { MindmapsView } from "./mindmaps-view";
+export { SummariesView } from "./summaries-view";
+export { CalendarView } from "./calendar-view";
+export { HTMLPreview } from "./html-preview";
+export { HTMLSnippetsView } from "./html-snippets-view";
+export { ArchiveView } from "./archive-view";
 
 // Lazy-loaded versions for performance
 export {
@@ -18,10 +15,9 @@ export {
   LazyFlashcardsView,
   LazyMindmapsView,
   LazySummariesView,
-  LazyHomeworkHelpView,
   LazyCalendarView,
   LazyHTMLSnippetsView,
   LazyArchiveView,
   LazyStudyKitView,
   LazyGenitoriView,
-} from './lazy';
+} from "./lazy";
