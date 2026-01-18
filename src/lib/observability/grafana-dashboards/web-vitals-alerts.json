@@ -1,0 +1,256 @@
+{
+  "groups": [
+    {
+      "name": "web_vitals_alerts",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "lcp_p75_warning",
+          "title": "LCP P75 Warning",
+          "condition": "B",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 300,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "expression": "histogram_quantile(0.75, sum(rate(web_vitals_lcp_seconds_bucket[5m])) by (le))",
+              "intervalMs": 1000,
+              "maxDataPoints": 43200
+            },
+            {
+              "refId": "B",
+              "queryType": "",
+              "expression": "A",
+              "reducer": "mean",
+              "settings": {
+                "math": "A > 2.5"
+              },
+              "datasourceUid": "__expr__"
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Alerting",
+          "for": "5m",
+          "annotations": {
+            "summary": "LCP P75 exceeds 2.5s threshold",
+            "description": "Large Contentful Paint P75: {{ $value | humanizeDuration }}. Users experiencing slow page loads.",
+            "runbook_url": "https://wiki.example.com/runbook/web-vitals"
+          },
+          "labels": {
+            "severity": "warning",
+            "metric": "lcp"
+          }
+        },
+        {
+          "uid": "lcp_p75_critical",
+          "title": "LCP P75 Critical",
+          "condition": "B",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 300,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "expression": "histogram_quantile(0.75, sum(rate(web_vitals_lcp_seconds_bucket[5m])) by (le))",
+              "intervalMs": 1000,
+              "maxDataPoints": 43200
+            },
+            {
+              "refId": "B",
+              "queryType": "",
+              "expression": "A",
+              "reducer": "mean",
+              "settings": {
+                "math": "A > 4.0"
+              },
+              "datasourceUid": "__expr__"
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Alerting",
+          "for": "5m",
+          "annotations": {
+            "summary": "LCP P75 exceeds 4s (Critical)",
+            "description": "Large Contentful Paint P75: {{ $value | humanizeDuration }}. Critical performance impact.",
+            "runbook_url": "https://wiki.example.com/runbook/web-vitals"
+          },
+          "labels": {
+            "severity": "critical",
+            "metric": "lcp"
+          }
+        },
+        {
+          "uid": "cls_p75_warning",
+          "title": "CLS P75 Warning",
+          "condition": "B",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 300,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "expression": "histogram_quantile(0.75, sum(rate(web_vitals_cls_bucket[5m])) by (le))",
+              "intervalMs": 1000,
+              "maxDataPoints": 43200
+            },
+            {
+              "refId": "B",
+              "queryType": "",
+              "expression": "A",
+              "reducer": "mean",
+              "settings": {
+                "math": "A > 0.1"
+              },
+              "datasourceUid": "__expr__"
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Alerting",
+          "for": "5m",
+          "annotations": {
+            "summary": "CLS P75 exceeds 0.1 threshold",
+            "description": "Cumulative Layout Shift P75: {{ $value }}. Layout instability detected.",
+            "runbook_url": "https://wiki.example.com/runbook/web-vitals"
+          },
+          "labels": {
+            "severity": "warning",
+            "metric": "cls"
+          }
+        },
+        {
+          "uid": "cls_p75_critical",
+          "title": "CLS P75 Critical",
+          "condition": "B",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 300,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "expression": "histogram_quantile(0.75, sum(rate(web_vitals_cls_bucket[5m])) by (le))",
+              "intervalMs": 1000,
+              "maxDataPoints": 43200
+            },
+            {
+              "refId": "B",
+              "queryType": "",
+              "expression": "A",
+              "reducer": "mean",
+              "settings": {
+                "math": "A > 0.25"
+              },
+              "datasourceUid": "__expr__"
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Alerting",
+          "for": "5m",
+          "annotations": {
+            "summary": "CLS P75 exceeds 0.25 (Critical)",
+            "description": "Cumulative Layout Shift P75: {{ $value }}. Critical layout instability.",
+            "runbook_url": "https://wiki.example.com/runbook/web-vitals"
+          },
+          "labels": {
+            "severity": "critical",
+            "metric": "cls"
+          }
+        },
+        {
+          "uid": "inp_p75_warning",
+          "title": "INP P75 Warning",
+          "condition": "B",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 300,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "expression": "histogram_quantile(0.75, sum(rate(web_vitals_inp_milliseconds_bucket[5m])) by (le))",
+              "intervalMs": 1000,
+              "maxDataPoints": 43200
+            },
+            {
+              "refId": "B",
+              "queryType": "",
+              "expression": "A",
+              "reducer": "mean",
+              "settings": {
+                "math": "A > 200"
+              },
+              "datasourceUid": "__expr__"
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Alerting",
+          "for": "5m",
+          "annotations": {
+            "summary": "INP P75 exceeds 200ms threshold",
+            "description": "Interaction to Next Paint P75: {{ $value | humanizeDuration }}. Responsiveness degradation.",
+            "runbook_url": "https://wiki.example.com/runbook/web-vitals"
+          },
+          "labels": {
+            "severity": "warning",
+            "metric": "inp"
+          }
+        },
+        {
+          "uid": "inp_p75_critical",
+          "title": "INP P75 Critical",
+          "condition": "B",
+          "data": [
+            {
+              "refId": "A",
+              "queryType": "",
+              "relativeTimeRange": {
+                "from": 300,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "expression": "histogram_quantile(0.75, sum(rate(web_vitals_inp_milliseconds_bucket[5m])) by (le))",
+              "intervalMs": 1000,
+              "maxDataPoints": 43200
+            },
+            {
+              "refId": "B",
+              "queryType": "",
+              "expression": "A",
+              "reducer": "mean",
+              "settings": {
+                "math": "A > 500"
+              },
+              "datasourceUid": "__expr__"
+            }
+          ],
+          "noDataState": "NoData",
+          "execErrState": "Alerting",
+          "for": "5m",
+          "annotations": {
+            "summary": "INP P75 exceeds 500ms (Critical)",
+            "description": "Interaction to Next Paint P75: {{ $value | humanizeDuration }}. Critical responsiveness issue.",
+            "runbook_url": "https://wiki.example.com/runbook/web-vitals"
+          },
+          "labels": {
+            "severity": "critical",
+            "metric": "inp"
+          }
+        }
+      ]
+    }
+  ]
+}

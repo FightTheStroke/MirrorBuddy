@@ -1,0 +1,124 @@
+{
+  "version": "1.0",
+  "description": "Grafana Cloud Retention Policy Configuration",
+  "lastUpdated": "2026-01-18",
+  "context": "This file documents the retention policy for MirrorBuddy metrics in Grafana Cloud. Retention is configured in the Grafana Cloud UI, not in code. This serves as a reference for the configured settings.",
+  "grafanaCloudPlan": {
+    "name": "Pro",
+    "retentionDefault": "13 months",
+    "retentionConfigurable": true
+  },
+  "retentionPolicies": {
+    "aggregatedMetrics": {
+      "description": "Non-PII aggregated metrics (page performance, session counts, etc.)",
+      "retentionDays": 90,
+      "rationale": "Sufficient for trend analysis, quarterly reviews, and SLI/SLO compliance tracking without storing excessive historical data",
+      "metrics": [
+        "web_vitals_lcp_seconds",
+        "web_vitals_cls_score",
+        "web_vitals_inp_seconds",
+        "web_vitals_fcp_seconds",
+        "web_vitals_ttfb_seconds",
+        "session_duration_seconds",
+        "user_engagement_score",
+        "error_rate",
+        "api_latency_seconds",
+        "database_latency_seconds"
+      ]
+    },
+    "userIdentifierMetrics": {
+      "description": "Metrics tagged with user_id (to preserve privacy)",
+      "retentionDays": 30,
+      "rationale": "User IDs are PII. Keep only for 30 days to investigate recent issues, then purge. Ensure anonymization of all downstream data",
+      "metrics": [
+        "user_session_duration",
+        "user_error_count",
+        "user_api_calls",
+        "user_feature_usage"
+      ],
+      "privacyNotes": [
+        "All user_id labels should be removed after 30 days",
+        "Aggregate user metrics without ID tags before retention expires",
+        "No user-identified logs beyond 30 days",
+        "Compliant with GDPR right to be forgotten (within 30 days)"
+      ]
+    },
+    "safetyMetrics": {
+      "description": "Safety incident tracking (S0-S3 classifications)",
+      "retentionDays": 365,
+      "rationale": "Incidents must be retained for annual compliance audits and legal holds. Do not include PII in incident logs.",
+      "metrics": [
+        "safety_incident_count",
+        "safety_refusal_count",
+        "safety_jailbreak_blocked",
+        "safety_incident_severity"
+      ],
+      "privacyNotes": [
+        "No user_id in safety metrics",
+        "Use session_id instead if correlation needed",
+        "Incident descriptions must be sanitized of PII before logging"
+      ]
+    },
+    "businessMetrics": {
+      "description": "Business metrics (DAU, MAU, retention, conversion)",
+      "retentionDays": 90,
+      "rationale": "Sufficient for quarterly business reviews without revealing user details",
+      "metrics": [
+        "dau_count",
+        "mau_count",
+        "new_user_registrations",
+        "onboarding_completion_rate",
+        "feature_adoption_rate",
+        "voice_adoption_rate"
+      ]
+    }
+  },
+  "configurationSteps": {
+    "description": "How to configure retention in Grafana Cloud UI",
+    "steps": [
+      {
+        "step": 1,
+        "title": "Navigate to Grafana Cloud Metrics",
+        "action": "Go to https://mirrorbuddy.grafana.net → Connections → Data Sources → Prometheus"
+      },
+      {
+        "step": 2,
+        "title": "Access Metrics Settings",
+        "action": "Click on the Prometheus data source → Retention tab (if available in your plan tier)"
+      },
+      {
+        "step": 3,
+        "title": "Set Retention Policies",
+        "action": "Configure individual metric retention: Aggregated (90 days), User IDs (30 days), Safety (365 days)"
+      },
+      {
+        "step": 4,
+        "title": "Enable Metric Relabeling",
+        "action": "Use metric relabeling rules to drop user_id labels after 30 days OR handle in client-side metric generation"
+      },
+      {
+        "step": 5,
+        "title": "Verify Configuration",
+        "action": "Test by querying old metrics: those beyond retention window should return no data"
+      }
+    ]
+  },
+  "implementation": {
+    "clientSide": "Metrics are generated in src/lib/observability/prometheus-push-service.ts with appropriate labels. Remove user_id tags before pushing to Grafana Cloud.",
+    "serverSide": "Use metric relabeling in Grafana Cloud data source config to drop user_id label from all incoming metrics",
+    "testing": "Run 'npm run test' to verify metrics conform to retention policy standards"
+  },
+  "complianceNotes": {
+    "gdpr": "Right to be forgotten is satisfied: user_id metrics retained max 30 days. Deletion not required but retention ensures privacy.",
+    "ccpa": "California Consumer Privacy Act: Metrics contain no personal information (no names, emails, addresses) after user_id drop.",
+    "dataMinimization": "Only essential metrics retained: performance, business, safety. No marketing data, no user behavior profiles.",
+    "auditability": "ADR 0047 documents decision to use Grafana Cloud. Retention config in this file serves as proof of privacy-by-design."
+  },
+  "relatedDocuments": [
+    "docs/operations/grafana-web-vitals.md",
+    "docs/operations/RUNBOOK.md",
+    "docs/operations/SLI-SLO.md",
+    "docs/adr/0047-grafana-cloud-observability.md",
+    "docs/compliance/PRIVACY-POLICY.md"
+  ]
+}

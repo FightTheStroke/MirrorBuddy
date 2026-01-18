@@ -1,0 +1,383 @@
+{
+  "dashboard": {
+    "uid": "mirrorbuddy-web-vitals",
+    "title": "MirrorBuddy - Client Performance",
+    "description": "Real-time Web Vitals monitoring - Platform health at a glance",
+    "tags": ["mirrorbuddy", "web-vitals", "performance"],
+    "timezone": "browser",
+    "editable": true,
+    "graphTooltip": 2,
+    "refresh": "30s",
+    "time": { "from": "now-1h", "to": "now" },
+    "panels": [
+      {
+        "id": 1,
+        "title": "Platform Health",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+        "targets": [{
+          "expr": "100 - (sum(rate(web_vitals_lcp_seconds_count{rating=\"poor\"}[5m])) / sum(rate(web_vitals_lcp_seconds_count[5m])) * 100)",
+          "legendFormat": "Health %"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0, "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 75, "color": "yellow" },
+                { "value": 90, "color": "green" }
+              ]
+            },
+            "mappings": [{ "type": "special", "options": { "match": "null", "result": { "text": "No data" }}}]
+          }
+        },
+        "options": { "graphMode": "area", "colorMode": "background", "textMode": "value_and_name" }
+      },
+      {
+        "id": 2,
+        "title": "LCP (Target: <2.5s)",
+        "description": "Largest Contentful Paint - How fast main content loads",
+        "type": "gauge",
+        "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+        "targets": [{
+          "expr": "histogram_quantile(0.75, sum(rate(web_vitals_lcp_seconds_bucket[5m])) by (le))",
+          "legendFormat": "P75"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "min": 0, "max": 6,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 2.5, "color": "yellow" },
+                { "value": 4, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": { "showThresholdMarkers": true, "showThresholdLabels": true }
+      },
+      {
+        "id": 3,
+        "title": "CLS (Target: <0.1)",
+        "description": "Cumulative Layout Shift - Visual stability",
+        "type": "gauge",
+        "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 },
+        "targets": [{
+          "expr": "histogram_quantile(0.75, sum(rate(web_vitals_cls_score_bucket[5m])) by (le))",
+          "legendFormat": "P75"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "none",
+            "decimals": 3,
+            "min": 0, "max": 0.5,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 0.1, "color": "yellow" },
+                { "value": 0.25, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": { "showThresholdMarkers": true, "showThresholdLabels": true }
+      },
+      {
+        "id": 4,
+        "title": "INP (Target: <200ms)",
+        "description": "Interaction to Next Paint - Responsiveness",
+        "type": "gauge",
+        "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
+        "targets": [{
+          "expr": "histogram_quantile(0.75, sum(rate(web_vitals_inp_seconds_bucket[5m])) by (le)) * 1000",
+          "legendFormat": "P75"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "min": 0, "max": 600,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 200, "color": "yellow" },
+                { "value": 500, "color": "red" }
+              ]
+            }
+          }
+        },
+        "options": { "showThresholdMarkers": true, "showThresholdLabels": true }
+      },
+      {
+        "id": 5,
+        "title": "Metrics/min",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+        "targets": [{
+          "expr": "sum(rate(web_vitals_lcp_seconds_count[1m])) * 60",
+          "legendFormat": "Events"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "red" },
+                { "value": 1, "color": "yellow" },
+                { "value": 10, "color": "green" }
+              ]
+            }
+          }
+        },
+        "options": { "graphMode": "area", "colorMode": "value" }
+      },
+      {
+        "id": 6,
+        "title": "Active Users",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+        "targets": [{
+          "expr": "count(count by (user_id) (web_vitals_lcp_seconds_count{user_id!=\"\"}))",
+          "legendFormat": "Users"
+        }],
+        "fieldConfig": { "defaults": { "unit": "short" }},
+        "options": { "graphMode": "none", "colorMode": "value" }
+      },
+      {
+        "id": 7,
+        "title": "Data Freshness",
+        "description": "Time since last metric was received - indicates collection pipeline health",
+        "type": "stat",
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 4 },
+        "targets": [{
+          "expr": "time() - max(web_vitals_lcp_seconds_timestamp)",
+          "legendFormat": "Seconds ago"
+        }],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "s",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 300, "color": "yellow" },
+                { "value": 900, "color": "red" }
+              ]
+            },
+            "mappings": [
+              { "type": "special", "options": { "match": "null", "result": { "text": "No data" }}}
+            ]
+          }
+        },
+        "options": { "graphMode": "none", "colorMode": "background", "textMode": "value_and_name" }
+      },
+
+      {
+        "id": 10,
+        "title": "Core Web Vitals - Real-time (last hour)",
+        "type": "timeseries",
+        "gridPos": { "h": 8, "w": 16, "x": 0, "y": 8 },
+        "targets": [
+          { "expr": "histogram_quantile(0.75, sum(rate(web_vitals_lcp_seconds_bucket[1m])) by (le))", "legendFormat": "LCP P75" },
+          { "expr": "histogram_quantile(0.75, sum(rate(web_vitals_inp_seconds_bucket[1m])) by (le))", "legendFormat": "INP P75" },
+          { "expr": "histogram_quantile(0.75, sum(rate(web_vitals_fcp_seconds_bucket[1m])) by (le))", "legendFormat": "FCP P75" },
+          { "expr": "histogram_quantile(0.75, sum(rate(web_vitals_ttfb_seconds_bucket[1m])) by (le))", "legendFormat": "TTFB P75" }
+        ],
+        "fieldConfig": {
+          "defaults": { "unit": "s", "custom": { "lineWidth": 2, "fillOpacity": 10 }},
+          "overrides": [
+            { "matcher": { "id": "byName", "options": "LCP P75" }, "properties": [{ "id": "color", "value": { "fixedColor": "#FF6B6B", "mode": "fixed" }}]},
+            { "matcher": { "id": "byName", "options": "INP P75" }, "properties": [{ "id": "color", "value": { "fixedColor": "#4ECDC4", "mode": "fixed" }}]},
+            { "matcher": { "id": "byName", "options": "FCP P75" }, "properties": [{ "id": "color", "value": { "fixedColor": "#45B7D1", "mode": "fixed" }}]},
+            { "matcher": { "id": "byName", "options": "TTFB P75" }, "properties": [{ "id": "color", "value": { "fixedColor": "#96CEB4", "mode": "fixed" }}]}
+          ]
+        },
+        "options": { "legend": { "displayMode": "table", "placement": "right", "calcs": ["mean", "max"] }}
+      },
+      {
+        "id": 11,
+        "title": "Rating Distribution",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+        "targets": [{
+          "expr": "sum by (rating) (rate(web_vitals_lcp_seconds_count[5m]))",
+          "legendFormat": "{{rating}}"
+        }],
+        "fieldConfig": {
+          "overrides": [
+            { "matcher": { "id": "byName", "options": "good" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" }}]},
+            { "matcher": { "id": "byName", "options": "needs-improvement" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" }}]},
+            { "matcher": { "id": "byName", "options": "poor" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" }}]}
+          ]
+        },
+        "options": { "legend": { "displayMode": "table", "placement": "right", "values": ["percent"] }, "pieType": "donut" }
+      },
+
+      {
+        "id": 20,
+        "title": "Slowest Pages (Action Required)",
+        "description": "Pages with worst LCP - Fix these first!",
+        "type": "table",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [{
+          "expr": "topk(10, histogram_quantile(0.75, sum by (route, le) (rate(web_vitals_lcp_seconds_bucket[15m]))))",
+          "format": "table",
+          "instant": true
+        }],
+        "fieldConfig": {
+          "defaults": { "unit": "s" },
+          "overrides": [
+            { "matcher": { "id": "byName", "options": "Value" }, "properties": [
+              { "id": "displayName", "value": "LCP P75" },
+              { "id": "custom.cellOptions", "value": { "type": "color-background" }},
+              { "id": "thresholds", "value": { "mode": "absolute", "steps": [
+                { "value": 0, "color": "green" },
+                { "value": 2.5, "color": "yellow" },
+                { "value": 4, "color": "red" }
+              ]}}
+            ]}
+          ]
+        },
+        "transformations": [
+          { "id": "organize", "options": { "excludeByName": { "Time": true, "le": true }, "renameByName": { "route": "Page" }}}
+        ],
+        "options": { "showHeader": true, "sortBy": [{ "displayName": "LCP P75", "desc": true }] }
+      },
+      {
+        "id": 21,
+        "title": "Performance by Device",
+        "type": "barchart",
+        "gridPos": { "h": 8, "w": 6, "x": 12, "y": 16 },
+        "targets": [{
+          "expr": "sum by (device_type, rating) (rate(web_vitals_lcp_seconds_count[15m]))",
+          "legendFormat": "{{device_type}} - {{rating}}"
+        }],
+        "fieldConfig": {
+          "overrides": [
+            { "matcher": { "id": "byRegexp", "options": ".*good.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" }}]},
+            { "matcher": { "id": "byRegexp", "options": ".*needs.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" }}]},
+            { "matcher": { "id": "byRegexp", "options": ".*poor.*" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" }}]}
+          ]
+        },
+        "options": { "orientation": "horizontal", "barWidth": 0.8, "groupWidth": 0.7, "stacking": "normal" }
+      },
+      {
+        "id": 22,
+        "title": "Connection Type Impact",
+        "type": "barchart",
+        "gridPos": { "h": 8, "w": 6, "x": 18, "y": 16 },
+        "targets": [{
+          "expr": "histogram_quantile(0.75, sum by (connection_type, le) (rate(web_vitals_lcp_seconds_bucket[15m])))",
+          "legendFormat": "{{connection_type}}"
+        }],
+        "fieldConfig": { "defaults": { "unit": "s" }},
+        "options": { "orientation": "horizontal", "barWidth": 0.6 }
+      },
+
+      {
+        "id": 30,
+        "title": "Problems by Hour (When do users struggle?)",
+        "type": "heatmap",
+        "gridPos": { "h": 6, "w": 24, "x": 0, "y": 24 },
+        "targets": [{
+          "expr": "sum by (le) (increase(web_vitals_lcp_seconds_bucket{rating=\"poor\"}[1h]))",
+          "legendFormat": "Poor LCP"
+        }],
+        "options": {
+          "calculate": false,
+          "yAxis": { "axisPlacement": "left" },
+          "color": { "scheme": "RdYlGn", "reverse": true },
+          "cellGap": 1,
+          "legend": { "show": true }
+        }
+      },
+
+      {
+        "id": 40,
+        "title": "LCP by Route",
+        "type": "timeseries",
+        "gridPos": { "h": 7, "w": 12, "x": 0, "y": 30 },
+        "targets": [{
+          "expr": "histogram_quantile(0.75, sum by (route, le) (rate(web_vitals_lcp_seconds_bucket{route=~\"$route\"}[$__rate_interval])))",
+          "legendFormat": "{{route}}"
+        }],
+        "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 2 }}},
+        "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }}
+      },
+      {
+        "id": 41,
+        "title": "INP by Route",
+        "type": "timeseries",
+        "gridPos": { "h": 7, "w": 12, "x": 12, "y": 30 },
+        "targets": [{
+          "expr": "histogram_quantile(0.75, sum by (route, le) (rate(web_vitals_inp_seconds_bucket{route=~\"$route\"}[$__rate_interval]))) * 1000",
+          "legendFormat": "{{route}}"
+        }],
+        "fieldConfig": { "defaults": { "unit": "ms", "custom": { "lineWidth": 2 }}},
+        "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"] }}
+      },
+
+      {
+        "id": 50,
+        "title": "User Lookup (Debug)",
+        "description": "Enter user_id to see their metrics",
+        "type": "timeseries",
+        "gridPos": { "h": 7, "w": 24, "x": 0, "y": 37 },
+        "targets": [
+          { "expr": "web_vitals_lcp_seconds{user_id=~\"$user_id\"}", "legendFormat": "LCP - {{route}}" },
+          { "expr": "web_vitals_inp_seconds{user_id=~\"$user_id\"}", "legendFormat": "INP - {{route}}" },
+          { "expr": "web_vitals_cls_score{user_id=~\"$user_id\"}", "legendFormat": "CLS - {{route}}" }
+        ],
+        "fieldConfig": { "defaults": { "unit": "s" }},
+        "options": { "legend": { "displayMode": "table", "placement": "right" }}
+      }
+    ],
+    "templating": {
+      "list": [
+        {
+          "name": "route",
+          "label": "Page",
+          "type": "query",
+          "datasource": "${DS_PROMETHEUS}",
+          "query": "label_values(web_vitals_lcp_seconds, route)",
+          "multi": true,
+          "includeAll": true,
+          "current": { "text": "All", "value": "$__all" }
+        },
+        {
+          "name": "device_type",
+          "label": "Device",
+          "type": "query",
+          "datasource": "${DS_PROMETHEUS}",
+          "query": "label_values(web_vitals_lcp_seconds, device_type)",
+          "multi": true,
+          "includeAll": true,
+          "current": { "text": "All", "value": "$__all" }
+        },
+        {
+          "name": "user_id",
+          "label": "User ID (Debug)",
+          "type": "textbox",
+          "current": { "text": "", "value": "" }
+        }
+      ]
+    },
+    "annotations": {
+      "list": [{
+        "name": "Deployments",
+        "datasource": "${DS_PROMETHEUS}",
+        "enable": true,
+        "iconColor": "blue",
+        "expr": "changes(deployment_timestamp[1m]) > 0"
+      }]
+    }
+  }
+}

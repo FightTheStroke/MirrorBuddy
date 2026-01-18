@@ -11,6 +11,7 @@ export { useLearningsStore } from './learnings-store';
 export { useHTMLSnippetsStore } from './html-snippets-store';
 export { useCalendarStore } from './calendar-store';
 export { useUIStore } from './ui-store';
+export { useConsentStore } from './consent-store';
 
 // Re-export sync utilities
 export { initializeStores, setupAutoSync } from './use-store-sync';
@@ -27,3 +28,4 @@ export type {
 export type { SessionGrade } from './progress-store';
 export type { HTMLSnippet } from './html-snippets-store';
 export type { SchoolEvent } from './calendar-store';
+export type { ConsentState } from './consent-store';
