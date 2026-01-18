@@ -149,9 +149,10 @@ class PrometheusPushService {
     const summary = metricsStore.getMetricsSummary();
 
     // Add instance label to all metrics
+    // env=production for real data, env=test for test script
     const instanceLabels = {
       instance: 'mirrorbuddy',
-      env: process.env.NODE_ENV || 'development',
+      env: process.env.NODE_ENV === 'production' ? 'production' : 'development',
     };
 
     // Route-level metrics
