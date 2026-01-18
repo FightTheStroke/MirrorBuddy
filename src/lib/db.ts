@@ -13,7 +13,13 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://localhost:5432/mirrorbuddy';
-const adapter = new PrismaPg({ connectionString });
+
+// Configure SSL for Supabase connection
+// In production (Vercel), we need to accept the Supabase certificate
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
+const ssl = isProduction ? { rejectUnauthorized: false } : undefined;
+
+const adapter = new PrismaPg({ connectionString, ssl });
 
 export const prisma =
   globalForPrisma.prisma ??
