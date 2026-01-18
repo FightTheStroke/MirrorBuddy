@@ -119,6 +119,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
             type="button"
             role="switch"
             aria-checked={analyticsEnabled}
+            aria-label="Abilita cookie analitici"
             onClick={() => setAnalyticsEnabled(!analyticsEnabled)}
             className={`relative w-11 h-6 rounded-full transition-colors ${
               analyticsEnabled
@@ -163,7 +164,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
         </div>
 
         {/* COPPA note */}
-        <p className="text-[10px] text-slate-400 dark:text-slate-500 text-center">
+        <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
           MirrorBuddy e conforme alle normative GDPR e COPPA per la protezione
           dei minori. I tuoi dati sono al sicuro con noi.
         </p>
