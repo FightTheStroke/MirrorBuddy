@@ -57,18 +57,21 @@ const response = await csrfFetch("/api/chat", {
 
 Core chat files updated to use `csrfFetch`:
 
-| File                            | Component                  |
-| ------------------------------- | -------------------------- |
-| `message-handler.ts`            | Chat message sending       |
-| `tool-handler.ts`               | AI tool execution          |
-| `streaming-handler.ts`          | Streaming chat responses   |
-| `sse-parser.ts`                 | SSE stream fetching        |
-| `use-materiali-conversation.ts` | Materials chat             |
-| `use-maieutic-chat.ts`          | Homework help chat         |
-| `config-chat-tests.ts`          | Diagnostics chat test      |
-| `webrtc-connection.ts`          | Voice ephemeral token      |
-| `websocket-connection.ts`       | Voice WS fallback          |
-| `webrtc-probe.ts`               | Transport probe (CRITICAL) |
+| File                            | Component                     |
+| ------------------------------- | ----------------------------- |
+| `message-handler.ts`            | Chat message sending          |
+| `tool-handler.ts`               | AI tool execution             |
+| `streaming-handler.ts`          | Streaming chat responses      |
+| `sse-parser.ts`                 | SSE stream fetching           |
+| `use-materiali-conversation.ts` | Materials chat                |
+| `use-maieutic-chat.ts`          | Homework help chat            |
+| `config-chat-tests.ts`          | Diagnostics chat test         |
+| `webrtc-connection.ts`          | Voice ephemeral token         |
+| `websocket-connection.ts`       | Voice WS fallback             |
+| `webrtc-probe.ts`               | Transport probe (CRITICAL)    |
+| `executors.ts`                  | Voice tool commands (3 calls) |
+| `event-broadcaster.ts`          | Tool SSE fallback             |
+| `logging.ts`                    | Safety event logging          |
 
 **Note**: `webrtc-probe.ts` was particularly insidious - it caused WebRTC to appear
 "unavailable" which triggered WebSocket fallback, which doesn't work on Vercel.
@@ -92,22 +95,35 @@ src/lib/stores/character/character-slice.ts
 src/components/education/homework-help-view/hooks/use-homework-help.ts
 src/components/education/homework-help-view/hooks/use-session-effects.ts
 src/components/voice/handlers.ts
-src/lib/events/event-broadcaster.ts
 src/components/study-kit/StudyKitViewer/handlers.ts
-src/lib/voice/voice-tool-commands/executors.ts
-src/lib/voice/webrtc-probe.ts
 src/lib/integrations/google-drive/use-google-drive.ts
-src/lib/safety/monitoring/logging.ts
 ```
 
-#### Prevention
+**Note**: Files in `src/lib/tools/handlers/` call Azure APIs directly (server-side)
+and don't need `csrfFetch` - they're not calling our `/api/*` endpoints.
 
-**Recommended**: Add ESLint rule or pre-commit hook to flag:
+#### Prevention (IMPLEMENTED)
 
+ESLint rule in `eslint.config.mjs` now enforces `csrfFetch` for client-side code:
+
+```javascript
+// eslint.config.mjs - CSRF enforcement rule
+{
+  files: ["src/components/**", "src/lib/hooks/**", "src/lib/stores/**",
+          "src/lib/voice/**", "src/lib/tools/**", "src/lib/safety/**"],
+  ignores: ["**/webrtc-*.ts", "**/handlers/**"],  // Azure direct calls
+  rules: {
+    "no-restricted-syntax": ["error", {
+      selector: "CallExpression[callee.name='fetch']:has(...method: 'POST')",
+      message: "Use csrfFetch for POST requests. See ADR 0053."
+    }]
+  }
+}
 ```
-Pattern: fetch\(['"]\/api\/ + method: ['"]POST
-Warning: "Use csrfFetch for POST requests to /api/* endpoints"
-```
+
+**Coverage**: Components, hooks, stores, voice, tools, safety modules.
+
+**Excluded**: WebRTC files (call Azure directly), tool handlers (server-side Azure calls).
 
 ### Voice Transport Architecture
 
