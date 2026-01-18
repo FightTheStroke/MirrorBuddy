@@ -313,8 +313,10 @@ test.describe("Admin External Services Dashboard", () => {
     expect(response.ok()).toBe(true);
     const data = await response.json();
 
-    expect(data.services).toBeDefined();
-    expect(Array.isArray(data.services)).toBe(true);
+    expect(data.byService).toBeDefined();
+    expect(typeof data.byService).toBe("object");
+    expect(data.summary).toBeDefined();
+    expect(data.quotas).toBeDefined();
   });
 
   test("External services include quota information", async ({ request }) => {
@@ -323,12 +325,14 @@ test.describe("Admin External Services Dashboard", () => {
     expect(response.ok()).toBe(true);
     const data = await response.json();
 
-    for (const service of data.services) {
-      expect(service.name).toBeDefined();
-      expect(service.usage).toBeDefined();
-      expect(service.quota).toBeDefined();
-      expect(typeof service.percentUsed).toBe("number");
-    }
+    // Check summary structure
+    expect(typeof data.summary.totalServices).toBe("number");
+    expect(typeof data.summary.hasAlerts).toBe("boolean");
+
+    // Check quotas are defined for known services
+    expect(data.quotas.azureOpenAI).toBeDefined();
+    expect(data.quotas.googleDrive).toBeDefined();
+    expect(data.quotas.braveSearch).toBeDefined();
   });
 });
 
@@ -341,22 +345,24 @@ test.describe("Admin Session Metrics Dashboard", () => {
     expect(response.ok()).toBe(true);
     const data = await response.json();
 
-    expect(data.metrics).toBeDefined();
-    expect(typeof data.metrics.totalSessions).toBe("number");
-    expect(typeof data.metrics.activeSessions).toBe("number");
+    expect(data.summary).toBeDefined();
+    expect(typeof data.summary.totalSessions).toBe("number");
+    expect(data.period).toBeDefined();
+    expect(data.cost).toBeDefined();
   });
 
   test("Session metrics include time-based aggregations", async ({
     request,
   }) => {
     const response = await request.get(
-      "/api/dashboard/session-metrics?period=24h",
+      "/api/dashboard/session-metrics?days=1",
     );
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
 
-    expect(data.metrics.period).toBe("24h");
-    expect(data.metrics.aggregations).toBeDefined();
+    expect(data.period.days).toBe(1);
+    expect(data.dailyBreakdown).toBeDefined();
+    expect(data.tokens).toBeDefined();
   });
 });

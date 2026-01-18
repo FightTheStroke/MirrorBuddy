@@ -18,6 +18,9 @@
 
 import { test, expect, APIRequestContext } from '@playwright/test';
 
+// Skip AI-dependent tests in CI - no provider configured
+test.skip(!!process.env.CI, 'AI provider not available in CI');
+
 // Extended timeout for AI tool generation
 const AI_TIMEOUT = 60000;
 
