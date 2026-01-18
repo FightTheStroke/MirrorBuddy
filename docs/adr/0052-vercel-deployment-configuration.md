@@ -152,6 +152,85 @@ vercel --prod
 vercel env pull
 ```
 
+### CRITICAL: Trailing `\n` in Environment Variables
+
+**Problem**: When adding env vars via Vercel CLI, trailing newlines can corrupt values,
+causing authentication failures with cryptic error messages.
+
+**How it happens**:
+
+```bash
+# ❌ WRONG - echo adds trailing newline, stored as literal "\n" in value
+echo "my-api-key" | vercel env add API_KEY production
+
+# ❌ WRONG - heredoc may include newline
+vercel env add API_KEY production <<< "my-api-key"
+
+# ❌ WRONG - even this can add newline depending on shell
+vercel env add API_KEY production < <(echo "my-api-key")
+```
+
+**Symptoms**:
+
+| Service        | Error                                    | Actual Cause                |
+| -------------- | ---------------------------------------- | --------------------------- |
+| Grafana Cloud  | `401 invalid authentication credentials` | API key has `\n` suffix     |
+| Azure OpenAI   | `401 Unauthorized`                       | API key has `\n` suffix     |
+| Supabase       | `PGRST301 JWT expired`                   | Service key has `\n` suffix |
+| Any Basic Auth | `401` even with correct credentials      | User or password corrupted  |
+
+**Detection**:
+
+```bash
+# Pull and inspect with cat -A (shows hidden characters)
+vercel env pull /tmp/check.txt --environment=production
+command grep YOUR_VAR /tmp/check.txt | cat -A
+rm /tmp/check.txt
+
+# If you see: YOUR_VAR="value\n"$  <- the \n is LITERAL, not a newline
+# Correct:    YOUR_VAR="value"$    <- just $ for end of line
+```
+
+**Correct patterns**:
+
+```bash
+# ✅ CORRECT - printf with %s (no trailing newline)
+printf '%s' 'my-api-key' | vercel env add API_KEY production
+
+# ✅ CORRECT - echo -n (no trailing newline)
+echo -n 'my-api-key' | vercel env add API_KEY production
+
+# ✅ CORRECT - tr to strip any newlines from variable
+echo "$MY_KEY" | tr -d '\n' | vercel env add API_KEY production
+```
+
+**Fix for corrupted variables**:
+
+```bash
+# 1. Remove the corrupted variable
+echo "y" | vercel env rm VAR_NAME production
+
+# 2. Re-add with printf (guaranteed no trailing chars)
+printf '%s' 'correct-value' | vercel env add VAR_NAME production
+
+# 3. Verify it's clean
+vercel env pull /tmp/check.txt --environment=production
+command grep VAR_NAME /tmp/check.txt | cat -A
+rm /tmp/check.txt
+
+# 4. Redeploy
+vercel --prod
+```
+
+**Historical incidents**:
+
+| Date       | Variables Affected        | Impact                       |
+| ---------- | ------------------------- | ---------------------------- |
+| 2026-01-18 | All GRAFANA*CLOUD*\* vars | Metrics push 401 for 2 hours |
+| 2026-01-18 | CRON_SECRET               | Build failed "whitespace"    |
+
+**Prevention**: Always use `printf '%s'` when piping to `vercel env add`.
+
 ### Supabase Integration
 
 Vercel automatically adds these when Supabase integration is enabled:
