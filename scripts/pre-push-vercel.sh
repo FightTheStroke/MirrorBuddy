@@ -124,6 +124,25 @@ echo -e "${GREEN}✓ Build passed${NC}"
 # =============================================================================
 echo -e "${BLUE}[4/4] Quality checks...${NC}"
 
+# CSRF Check: Ensure client-side POST/PUT/DELETE use csrfFetch (ADR 0053)
+# ESLint already catches this, but explicit check provides clear error message
+# Check: files with fetch() and POST/PUT/DELETE that don't import csrfFetch
+CSRF_FILES=$(grep -rl "method.*POST\|method.*PUT\|method.*DELETE" src/components src/lib/hooks src/lib/stores src/lib/voice src/lib/tools src/lib/safety 2>/dev/null | grep -v "\.test\." | grep -v "__tests__" | grep -v "webrtc-" | grep -v "handlers/" | grep -v "server-" || true)
+CSRF_VIOLATIONS=""
+for file in $CSRF_FILES; do
+    # If file has plain fetch( but no csrfFetch import, it's a violation
+    if grep -q "[^a-zA-Z]fetch(" "$file" 2>/dev/null && ! grep -q "csrfFetch\|from.*csrf-client" "$file" 2>/dev/null; then
+        CSRF_VIOLATIONS="$CSRF_VIOLATIONS\n$file"
+    fi
+done
+if [ -n "$CSRF_VIOLATIONS" ]; then
+    echo -e "${RED}✗ CSRF violation: Use csrfFetch for POST/PUT/DELETE requests${NC}"
+    echo -e "${YELLOW}See ADR 0053: Vercel Runtime Constraints${NC}"
+    echo -e "$CSRF_VIOLATIONS"
+    exit 1
+fi
+echo -e "${GREEN}✓ CSRF protection OK${NC}"
+
 # Check for TODOs in critical areas (same as CI)
 CRITICAL=$(find src/lib/privacy src/lib/safety src/lib/security \( -name "*.ts" -o -name "*.tsx" \) -exec grep -nE '\bTODO\b|\bFIXME\b' {} + 2>/dev/null || true)
 if [ -n "$CRITICAL" ]; then
