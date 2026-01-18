@@ -1,7 +1,7 @@
 # MirrorBuddy Architecture
 
 > AI-powered educational platform for students with learning differences.
-> Last updated: 2026-01-03
+> Last updated: 2026-01-18
 
 ---
 
@@ -26,7 +26,7 @@
 
 ```mermaid
 flowchart TB
-    subgraph Client["Client (Next.js 14)"]
+    subgraph Client["Client (Next.js 16)"]
         UI[React Components]
         Stores[Zustand Stores]
         Audio[Web Audio API]
@@ -42,11 +42,17 @@ flowchart TB
         Azure[Azure OpenAI]
         Ollama[Ollama Fallback]
         Safety[Safety Guardrails]
+        RAG[RAG Retrieval]
     end
 
     subgraph Data["Data Layer"]
         Prisma[(Prisma ORM)]
         DB[(PostgreSQL + pgvector)]
+    end
+
+    subgraph Observability["Observability"]
+        Metrics[Prometheus Push]
+        Grafana[Grafana Cloud]
     end
 
     UI --> Stores
@@ -58,46 +64,63 @@ flowchart TB
     SSE --> Safety
     Safety --> Azure
     Safety --> Ollama
+    Azure --> RAG
+    RAG --> DB
 
     API --> Prisma
     Prisma --> DB
 
     Voice --> Azure
+
+    API --> Metrics
+    Metrics --> Grafana
 ```
 
 ## Overview
 
-MirrorBuddy is a Next.js 14 application providing AI tutoring for K-12 students with learning differences (dyslexia, ADHD, autism, etc.).
+MirrorBuddy is a Next.js 16 application providing AI tutoring for K-12 students with learning differences (dyslexia, ADHD, autism, etc.).
 
 ### Tech Stack
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | Next.js 14, React 18, TypeScript |
-| Styling | Tailwind CSS, Radix UI |
-| State | Zustand (no persist, API-synced) |
-| Database | Prisma + PostgreSQL + pgvector (ADR 0028) |
+| Frontend | Next.js 16.1.1, React 19.2.3, TypeScript 5 |
+| Styling | Tailwind CSS 4, Radix UI |
+| State | Zustand 5.0.9 (no persist, API-synced) |
+| Database | Prisma + PostgreSQL 17 + pgvector (ADR 0028) |
 | AI | Azure OpenAI (primary), Ollama (fallback) |
 | Voice | Azure Realtime API (WebRTC) |
 | Audio | Web Audio API (procedural generation) |
+| Observability | Grafana Cloud + Prometheus push (ADR 0047) |
+| RAG | pgvector semantic search (ADR 0033) |
 
 ### Directory Structure
 
 ```
 src/
 ├── app/                    # Next.js App Router
-│   ├── api/               # REST API routes
-│   └── (pages)/           # Page components
-├── components/            # React components
-├── data/                  # Static data (maestri, coaches, buddies)
+│   ├── api/               # REST API routes (50+)
+│   └── [features]/        # Page routes (astuccio, flashcard, quiz, etc.)
+├── components/            # React components (60+ features)
+├── data/                  # Static data
+│   ├── maestri/           # 20 AI maestro definitions
+│   ├── buddy-profiles/    # 5 buddy definitions
+│   └── support-teachers/  # 5 coach definitions
 ├── lib/
 │   ├── ai/               # AI providers, intent detection, routing
 │   ├── audio/            # Ambient audio generators
-│   ├── education/        # FSRS, quiz logic
+│   ├── conversation/     # Chat history & memory injection
+│   ├── education/        # FSRS, adaptive difficulty, mastery
+│   ├── observability/    # Prometheus push to Grafana Cloud
+│   ├── privacy/          # GDPR compliance
+│   ├── rag/              # Embeddings, semantic search (pgvector)
+│   ├── realtime/         # SSE & tool events
 │   ├── safety/           # Safety guardrails
+│   ├── security/         # Auth, encryption, CSP
 │   ├── stores/           # Zustand stores
-│   └── tools/            # Tool handlers
-└── types/                # TypeScript definitions
+│   └── tools/            # Tool handlers & plugins
+├── hooks/                 # React hooks (20+)
+└── types/                 # TypeScript definitions (barrel export)
 ```
 
 ---
@@ -113,7 +136,7 @@ flowchart TD
     Student((Student))
 
     subgraph Triangle["Triangle of Support"]
-        Maestro["🎓 MAESTRO (17)<br/>Subject Expert<br/>Vertical • Content"]
+        Maestro["🎓 MAESTRO (20)<br/>Subject Expert<br/>Vertical • Content"]
         Coach["📚 COACH (5)<br/>Learning Method<br/>Vertical • Autonomy"]
         Buddy["🤝 BUDDY (5)<br/>Peer Support<br/>Horizontal • Emotional"]
     end
@@ -151,27 +174,34 @@ flowchart LR
 
 ## Character System
 
-### 17 Maestri (Subject Experts)
+### 20 Maestri (18 Teaching + 2 Amici)
 
-| Maestro | Subject | Voice |
-|---------|---------|-------|
-| Euclide | Mathematics | coral |
-| Marie Curie | Chemistry | shimmer |
-| Richard Feynman | Physics | echo |
-| Galileo Galilei | Astronomy | verse |
-| Charles Darwin | Biology/Sciences | ballad |
-| Alessandro Manzoni | Italian Literature | sage |
-| William Shakespeare | English | ash |
-| Erodoto | History | ballad |
-| Alexander von Humboldt | Geography | echo |
-| Leonardo da Vinci | Art | coral |
-| Wolfgang Amadeus Mozart | Music | verse |
-| Ada Lovelace | Computer Science | shimmer |
-| Adam Smith | Economics | echo |
-| Socrate | Philosophy | sage |
-| Marco Tullio Cicerone | Civic Education | ash |
-| Ippocrate | Physical Education/Health | coral |
-| Chris | Storytelling | alloy |
+| Maestro | Subject | Type | Voice |
+|---------|---------|------|-------|
+| Euclide | Mathematics | Maestro | coral |
+| Marie Curie | Chemistry | Maestro | shimmer |
+| Richard Feynman | Physics | Maestro | echo |
+| Galileo Galilei | Astronomy | Maestro | verse |
+| Charles Darwin | Biology/Sciences | Maestro | ballad |
+| Alessandro Manzoni | Italian Literature | Maestro | sage |
+| William Shakespeare | English | Maestro | ash |
+| Erodoto | History | Maestro | ballad |
+| Alexander von Humboldt | Geography | Maestro | echo |
+| Leonardo da Vinci | Art | Maestro | coral |
+| Wolfgang Amadeus Mozart | Music | Maestro | verse |
+| Ada Lovelace | Computer Science | Maestro | shimmer |
+| Adam Smith | Economics | Maestro | echo |
+| Socrate | Philosophy | Maestro | sage |
+| Marco Tullio Cicerone | Civic Education | Maestro | ash |
+| Ippocrate | Health | Maestro | coral |
+| Chris | Physical Education | Maestro | alloy |
+| Omero | Storytelling | Maestro | verse |
+| Alex Pina | Spanish | Maestro | coral |
+| **Mascetti** | Supercazzola | **Amico** | ballad |
+
+**Two Character Types**:
+- **Maestro**: Has tools, earns XP, teaches (variable character intensity)
+- **Amico**: No tools, `excludeFromGamification: true`, 100% character always
 
 **Location**: `src/data/maestri/`
 
@@ -775,34 +805,130 @@ flowchart TB
 
 ---
 
+## RAG System (ADR 0033)
+
+### Semantic Search Architecture
+
+```mermaid
+flowchart LR
+    Input[/"User Query"/]
+    Embed["Azure Embeddings<br/>text-embedding-3-small"]
+    Vector[(pgvector<br/>1536 dims)]
+    Results["Top 3 Materials"]
+    Context["Enhanced Prompt"]
+
+    Input --> Embed
+    Embed --> Vector
+    Vector --> |"cosine similarity"| Results
+    Results --> Context
+```
+
+### Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| Embedding Service | `src/lib/rag/embedding-service.ts` | Azure OpenAI embeddings |
+| Retrieval Service | `src/lib/rag/retrieval-service.ts` | Similarity search |
+| Vector Store | `src/lib/rag/vector-store.ts` | pgvector queries |
+| Semantic Chunker | `src/lib/rag/semantic-chunker.ts` | Content chunking |
+
+### Configuration
+
+```typescript
+// Embedding model
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+EMBEDDING_DIMENSIONS=1536
+
+// Search parameters
+MIN_SIMILARITY_THRESHOLD=0.6
+MAX_CONTEXT_MATERIALS=3
+MAX_CONTEXT_TOKENS=1500
+```
+
+### Storage
+
+- **ContentEmbedding table**: Native pgvector storage
+- **Cosine distance**: `<=>` operator for similarity
+- **Graceful degradation**: Falls back if embedding service unavailable
+
+---
+
+## Observability (ADR 0047)
+
+### Grafana Cloud Integration
+
+```mermaid
+flowchart LR
+    App["Next.js App"]
+    Push["Prometheus Push<br/>(Remote Write)"]
+    Grafana["Grafana Cloud"]
+    Dashboard["Dashboard"]
+
+    App --> |"metrics every 60s"| Push
+    Push --> Grafana
+    Grafana --> Dashboard
+```
+
+### Metric Categories
+
+**SLI/SLO Metrics**:
+- Session success rate, drop-off, stuck loops
+- Safety incidents (S0-S3), jailbreak blocks
+- Latency percentiles (P50/P95/P99)
+
+**Business Metrics**:
+- DAU/WAU/MAU, registrations
+- Onboarding completion, voice adoption
+- Retention cohorts (D1/D7/D30)
+- Maestri usage, XP earned, streaks
+
+### Health Endpoints
+
+| Endpoint | Purpose |
+|----------|---------|
+| `GET /api/health` | Basic health (k8s probes) |
+| `GET /api/health/detailed` | Full metrics (debugging) |
+| `GET /api/metrics` | Prometheus format (pull-based) |
+
+### Push Service
+
+**Location**: `src/lib/observability/prometheus-push-service.ts`
+
+```typescript
+// Configuration
+GRAFANA_CLOUD_PROMETHEUS_URL=https://...
+GRAFANA_CLOUD_PROMETHEUS_USER=...
+GRAFANA_CLOUD_API_KEY=...
+
+// Push interval: 60s (min 15s)
+// Labels: instance, environment
+```
+
+---
+
 ## Key ADRs
 
 | ADR | Title | Decision |
 |-----|-------|----------|
 | 0001 | Materials Storage | Provider-agnostic (local/Azure Blob) |
-| 0002 | Mind Maps | MarkMap instead of Mermaid |
 | 0003 | Triangle of Support | 3 character types (Maestro/Coach/Buddy) |
 | 0004 | Safety Guardrails | 5-layer defense for child protection |
 | 0005 | Real-time Tools | SSE for streaming tool creation |
-| 0006 | Telemetry | Prometheus-compatible metrics |
-| 0007 | Notifications | Server-side persistence |
-| 0008 | Parent Dashboard | Dual GDPR consent model |
 | 0009 | Tool Execution | OpenAI function calling |
-| 0010 | Conversations | Separate history per character |
-| 0011 | Voice Mindmaps | Real-time voice editing |
-| 0012 | Unified Voice | Side-by-side chat/voice layout |
-| 0013 | Platform Support | Coach handles tech support |
-| 0014 | PWA Push | Browser notifications via VAPID |
 | 0015 | Database-First | No localStorage, API-synced |
-| 0016 | Modularization | Barrel exports, max 300 lines |
-| 0017 | Voice Summaries | Voice-driven summary creation |
-| 0018 | Audio Coordination | Pause ambient during voice |
-| 0019 | Session Summaries | Auto-generate summaries at session end |
-| 0020 | Mindmap Data Fix | Unified title field, hierarchy rendering |
 | 0021 | Conversational Memory | Memory injection into system prompts |
 | 0022 | Knowledge Hub | File-manager interface for materials |
+| 0027 | Bilingual Voice | Auto language detection for language teachers |
+| 0028 | PostgreSQL Migration | PostgreSQL 17 + pgvector for semantic search |
+| 0031 | Embedded Knowledge | Character intensity dial for maestri |
+| 0033 | RAG Semantic Search | pgvector embeddings with Azure OpenAI |
+| 0034 | Chat Streaming | Native SSE for chat responses |
+| 0037 | Tool Plugin Architecture | Extensible tool system |
+| 0045 | Domain Boundaries | Barrel exports, circular import prevention |
+| 0047 | Grafana Cloud Observability | Prometheus push metrics |
+| 0051 | Claude Code Optimization | Token-efficient CLAUDE.md |
 
-**Location**: `docs/adr/`
+**51+ ADRs total** - See `docs/adr/` for complete list
 
 ---
 
@@ -825,32 +951,36 @@ npx prisma db push   # Sync schema
 | Purpose | Path |
 |---------|------|
 | Types | `src/types/index.ts` |
-| AI Providers | `src/lib/ai/providers/` (modular) |
+| AI Providers | `src/lib/ai/providers/` |
+| RAG | `src/lib/rag/` |
 | Safety | `src/lib/safety/` |
-| FSRS | `src/lib/education/fsrs/` (modular) |
-| Accessibility | `src/lib/education/accessibility/` (modular) |
+| FSRS | `src/lib/education/fsrs/` |
+| Accessibility | `src/lib/accessibility/` |
+| Observability | `src/lib/observability/` |
 | Maestri | `src/data/maestri/` |
-| Coaches | `src/data/support-teachers/` (modular) |
-| Buddies | `src/data/buddy-profiles/` (modular) |
+| Coaches | `src/data/support-teachers/` |
+| Buddies | `src/data/buddy-profiles/` |
 | Stores | `src/lib/stores/` |
 | API | `src/app/api/` |
+| Tools | `src/lib/tools/` |
 
 ---
 
 ## Statistics
 
 - **Components**: 150+ React components
-- **API Routes**: 60+ REST endpoints
-- **Zustand Stores**: 8 stores
+- **API Routes**: 50+ REST endpoints
+- **Zustand Stores**: 10+ stores
 - **Prisma Models**: 25+ models
-- **Maestri**: 17 subject experts
+- **Maestri**: 20 (18 teaching + 2 amici)
 - **Coaches**: 5 learning coaches
 - **Buddies**: 5 peer buddies
-- **Accessibility Profiles**: 7 profiles
-- **Audio Modes**: 14 modes
-- **Audio Presets**: 7 presets
-- **Safety Layers**: 5 layers
-- **ADRs**: 23 architecture decisions
+- **Accessibility Profiles**: 7 DSA profiles
+- **Audio Modes**: 14 procedural modes
+- **Audio Presets**: 7 focus presets
+- **Safety Layers**: 5 defense layers
+- **ADRs**: 51+ architecture decisions
 - **Knowledge Hub Renderers**: 12 type-specific renderers
-- **Knowledge Hub Hooks**: 5 custom hooks
-- **Unit Tests**: 1400+ tests
+- **Unit Tests**: 5169+ tests
+- **E2E Tests**: 229 Playwright tests
+- **Test Coverage**: 80%+ business logic

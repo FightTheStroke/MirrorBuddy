@@ -1,6 +1,7 @@
 # MirrorBuddy Architecture
 
 > Technical overview of the MirrorBuddy platform architecture
+> Last updated: 2026-01-18
 
 ---
 
@@ -11,21 +12,28 @@ flowchart TB
     User([Student])
 
     subgraph Frontend["Frontend Layer"]
-        UI[Next.js 16 App Router<br/>React + TypeScript + Tailwind]
+        UI[Next.js 16 App Router<br/>React 19 + TypeScript + Tailwind 4]
         State[Zustand State Management]
     end
 
     subgraph Backend["Backend Layer"]
         API[API Routes]
+        SSE[SSE Streaming]
     end
 
     subgraph AI["AI Providers"]
-        Azure[Azure OpenAI<br/>Chat + Voice Realtime]
+        Azure[Azure OpenAI<br/>Chat + Voice + Embeddings]
         Ollama[Ollama<br/>Local Text-Only]
+        RAG[RAG Retrieval<br/>pgvector]
     end
 
     subgraph Data["Data Layer"]
-        DB[(Prisma ORM<br/>SQLite/PostgreSQL)]
+        DB[(Prisma ORM<br/>PostgreSQL + pgvector)]
+    end
+
+    subgraph Observability["Observability"]
+        Metrics[Prometheus Push]
+        Grafana[Grafana Cloud]
     end
 
     User --> UI
@@ -34,12 +42,17 @@ flowchart TB
     State <-- REST --> API
     API --> Azure
     API -.fallback.-> Ollama
+    Azure --> RAG
+    RAG --> DB
     API <--> DB
+    API --> Metrics --> Grafana
 
     style Azure fill:#0078D4,stroke:#005A9E,color:#fff,stroke-width:2px
     style Ollama fill:#77B05D,stroke:#5A8A44,color:#fff,stroke-width:2px
     style State fill:#FF4785,stroke:#DB2C66,color:#fff,stroke-width:2px
     style DB fill:#336791,stroke:#26516D,color:#fff,stroke-width:2px
+    style RAG fill:#8B5CF6,stroke:#7C3AED,color:#fff,stroke-width:2px
+    style Grafana fill:#F46800,stroke:#E05400,color:#fff,stroke-width:2px
 ```
 
 ---
@@ -52,27 +65,37 @@ Zustand stores sync with backend via REST APIs. User data is NEVER stored in loc
 
 **Why:** Data consistency, GDPR compliance (right to be forgotten), proper server-side validation, no stale data.
 
-**Implementation:** `src/lib/stores/app-store.ts` (Zustand stores), API routes handle all persistence, state updates trigger API calls.
+**Implementation:** `src/lib/stores/` (10+ Zustand stores), API routes handle all persistence, state updates trigger API calls.
+
+### ADR 0028 - PostgreSQL + pgvector
+
+PostgreSQL 17 with pgvector extension for semantic search. Migrated from SQLite.
+
+**Why:** Vector storage for RAG, production-ready scaling, native cosine similarity search.
+
+### ADR 0033 - RAG Semantic Search
+
+Retrieval-Augmented Generation using Azure OpenAI embeddings (text-embedding-3-small, 1536 dims) stored in pgvector.
+
+**Flow:** User query → Embedding → Cosine similarity search → Top 3 materials → Enhanced prompt → AI response
+
+### ADR 0047 - Grafana Cloud Observability
+
+Prometheus push metrics to Grafana Cloud (60s interval). Dashboard at https://mirrorbuddy.grafana.net/d/dashboard/
+
+**Metrics:** Session health, safety incidents, latency P50/P95/P99, business metrics (DAU/WAU/MAU)
 
 ### AI Provider Strategy
 
-Azure OpenAI primary (chat + voice), Ollama fallback (text-only).
+Azure OpenAI primary (chat + voice + embeddings), Ollama fallback (text-only).
 
 **Selection:** Azure → Ollama → Showcase Mode (demo)
 
-**Implementation:** `src/lib/ai/providers.ts` handles provider detection, environment variables control configuration.
+**Implementation:** `src/lib/ai/providers/` handles provider detection, environment variables control configuration.
 
 ### Data Flow
 
 User Action → UI Component → Zustand Store (optimistic) → API Route → AI Provider/Database → Response → Zustand Store (final) → UI re-render
-
-### Adaptive Difficulty (ADR 0041)
-
-Adaptive difficulty calibrates learning to stay “challenging but achievable.” Signals from
-chat/voice/quiz/flashcards are stored in `Progress.adaptiveProfile`, and instructions are injected
-into chat/voice prompts and Study Kit generation.
-
-**Flow:** `signals → /api/adaptive/signals → adaptive profile → /api/adaptive/context → prompt/tool generation`
 
 ---
 
@@ -80,16 +103,18 @@ into chat/voice prompts and Study Kit generation.
 
 | Layer | Technology | Purpose |
 |-------|------------|---------|
-| **Framework** | Next.js 16 (App Router) | SSR, routing, API routes |
+| **Framework** | Next.js 16.1.1 (App Router) | SSR, routing, API routes |
 | **Language** | TypeScript 5 (strict mode) | Type safety, developer experience |
-| **Styling** | Tailwind CSS 4 | Utility-first styling |
-| **State** | Zustand | Lightweight state management |
-| **Voice** | Azure OpenAI Realtime API | Real-time voice conversations |
+| **UI** | React 19.2.3 | Component framework |
+| **Styling** | Tailwind CSS 4, Radix UI | Utility-first + accessible components |
+| **State** | Zustand 5.0.9 | Lightweight state management |
+| **Voice** | Azure OpenAI Realtime API | Real-time voice conversations (WebRTC) |
+| **AI** | Azure OpenAI (chat, embeddings) | GPT-4o, text-embedding-3-small |
+| **RAG** | pgvector | Semantic search (1536 dims) |
 | **Mind Maps** | MarkMap | Interactive mind map visualization |
-| **Diagrams** | Mermaid.js | Flowchart, sequence, class, state, ER diagrams |
-| **Math** | KaTeX | LaTeX math rendering |
-| **Database** | Prisma + SQLite/PostgreSQL | Type-safe ORM |
-| **Testing** | Playwright E2E | End-to-end testing |
+| **Database** | Prisma + PostgreSQL 17 + pgvector | Type-safe ORM + vector search |
+| **Testing** | Playwright (E2E) + Vitest (unit) | 229 E2E, 5169+ unit tests |
+| **Observability** | Grafana Cloud | Prometheus push metrics |
 
 ---
 
@@ -97,15 +122,27 @@ into chat/voice prompts and Study Kit generation.
 
 ```
 src/
-├── app/              # Next.js App Router (pages, API routes, showcase)
-├── components/       # React components (ui/, features)
-├── lib/              # Core (ai/, stores/, safety/, education/, accessibility/)
-├── data/             # maestri-full.ts
-├── types/            # TypeScript definitions
+├── app/              # Next.js App Router (pages, 50+ API routes)
+├── components/       # React components (150+)
+├── lib/
+│   ├── ai/           # Providers, character routing, intent detection
+│   ├── rag/          # Embeddings, semantic search, vector store
+│   ├── stores/       # 10+ Zustand stores
+│   ├── safety/       # 5-layer content safety
+│   ├── education/    # FSRS, adaptive difficulty, mastery
+│   ├── accessibility/# 7 DSA profiles
+│   ├── observability/# Prometheus push to Grafana
+│   └── tools/        # Tool handlers & plugins
+├── data/
+│   ├── maestri/      # 20 AI maestro definitions (modular)
+│   ├── buddy-profiles/
+│   └── support-teachers/
+├── hooks/            # 20+ React hooks
+├── types/            # TypeScript definitions (barrel export)
 └── middleware.ts
 
-prisma/schema.prisma  # Database schema
-docs/claude/          # On-demand AI documentation
+prisma/schema/        # PostgreSQL + pgvector schema
+docs/adr/             # 51+ Architecture Decision Records
 ```
 
 ---
@@ -113,18 +150,22 @@ docs/claude/          # On-demand AI documentation
 ## Key Components
 
 ### Frontend
-- **Next.js App Router** (`src/app/`) - SSR, routing, API routes
-- **Zustand Stores** (`src/lib/stores/`) - app-store.ts, conversation-store.ts, progress-store.ts
+- **Next.js App Router** (`src/app/`) - SSR, routing, 50+ API routes
+- **Zustand Stores** (`src/lib/stores/`) - progress, settings, conversation, pomodoro, voice, accessibility, etc.
 
 ### Backend
-- **API Routes** (`src/app/api/`) - /chat, /realtime/token, /conversations, /progress, /tools/*
+- **API Routes** (`src/app/api/`) - /chat, /chat/stream (SSE), /voice/*, /tools/stream, /materials, /progress, /health, /metrics
 
 ### AI Providers
-- **Azure OpenAI** - GPT-4o (chat), GPT-4o Realtime (voice), requires Azure credentials
-- **Ollama** - Local fallback, llama3.2/mistral/llama3.1:70b, text-only
+- **Azure OpenAI** - GPT-4o (chat), GPT-4o Realtime (voice WebRTC), text-embedding-3-small (RAG)
+- **Ollama** - Local fallback, text-only
+
+### RAG System
+- **Embeddings** (`src/lib/rag/`) - Azure embeddings → pgvector storage → cosine similarity search
+- **Integration** - Conversation memory injection, material context enhancement
 
 ### Database
-- **Prisma ORM** - Type-safe, SQLite (dev), PostgreSQL (prod)
+- **Prisma ORM** + **PostgreSQL 17** + **pgvector** - Semantic search, GDPR-compliant data management
 
 ---
 
@@ -156,13 +197,16 @@ WCAG 2.1 AA compliant with 7 profiles (`src/lib/accessibility/profiles.ts`):
 
 ## Testing & Monitoring
 
-**E2E Tests:** 1945 Playwright tests (80.75% coverage), all critical flows, voice sessions, accessibility, cross-browser.
+**E2E Tests:** 229 Playwright tests, critical paths (chat, tools, accessibility), API-focused strategy (ADR 0030).
 
-**CI/CD:** GitHub Actions - Lint + TypeScript + Build + E2E on every PR.
+**Unit Tests:** 5169+ Vitest tests, 80%+ coverage on business logic.
 
-**Telemetry:** Event tracking (`/api/telemetry/events`), session analytics, error tracking, performance metrics.
+**CI/CD:** GitHub Actions - Lint + TypeScript + Build + Tests on every PR.
 
-**Diagnostics:** System health (`/api/health`), API connectivity, provider status, settings page.
+**Observability:**
+- **Dashboard:** https://mirrorbuddy.grafana.net/d/dashboard/
+- **Health:** `GET /api/health` (k8s probes), `GET /api/health/detailed` (full metrics)
+- **Metrics:** `GET /api/metrics` (Prometheus format), push every 60s to Grafana Cloud
 
 ---
 
