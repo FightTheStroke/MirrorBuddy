@@ -28,16 +28,23 @@ export function useStartAudioCapture(
   setInputLevel: (value: number) => void,
 ) {
   return useCallback(() => {
-    if (!refs.captureContextRef.current || !refs.mediaStreamRef.current) {
-      logger.warn(
-        "[VoiceSession] Cannot start capture: missing context or stream",
-      );
+    if (!refs.mediaStreamRef.current) {
+      logger.warn("[VoiceSession] Cannot start capture: missing media stream");
       return;
+    }
+
+    // Lazily create AudioContext for input level visualization (WebRTC mode)
+    if (!refs.captureContextRef.current) {
+      // eslint-disable-next-line react-hooks/immutability -- Lazy initialization
+      refs.captureContextRef.current = new AudioContext();
+      logger.debug(
+        "[VoiceSession] Created AudioContext for input level monitoring",
+      );
     }
 
     const context = refs.captureContextRef.current;
     const source = context.createMediaStreamSource(refs.mediaStreamRef.current);
-    // eslint-disable-next-line react-hooks/immutability -- Intentional ref mutation
+
     refs.sourceNodeRef.current = source;
 
     // WebRTC: Skip audio processing, codec handled by RTCPeerConnection
