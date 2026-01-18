@@ -148,28 +148,48 @@ sequenceDiagram
 
 2. **Configure environment variables**:
    ```bash
-   GRAFANA_CLOUD_PROMETHEUS_URL=https://prometheus-prod-XX-prod-region.grafana.net/api/prom/push
-   GRAFANA_CLOUD_PROMETHEUS_USER=123456  # Instance ID
-   GRAFANA_CLOUD_API_KEY=your-api-key
-   GRAFANA_CLOUD_PUSH_INTERVAL=60  # seconds
+   # Use Influx Line Protocol endpoint (not /api/prom/push which needs Snappy)
+   GRAFANA_CLOUD_PROMETHEUS_URL=https://prometheus-prod-XX-prod-region.grafana.net/api/v1/push/influx/write
+   GRAFANA_CLOUD_PROMETHEUS_USER=123456  # Instance ID from Grafana Cloud
+   GRAFANA_CLOUD_API_KEY=glc_xxxxx       # Create at Access Policies > metrics:write
+   GRAFANA_CLOUD_PUSH_INTERVAL=60        # seconds (minimum 15)
    ```
 
-3. **Verify metrics are being pushed**:
+3. **Test push manually**:
+   ```bash
+   npx tsx scripts/test-grafana-push.ts
+   ```
+
+4. **Verify metrics in Grafana**:
    ```bash
    # Check push service logs
-   docker logs mirrorbuddy-app 2>&1 | grep "Grafana Cloud"
+   docker logs mirrorbuddy-app 2>&1 | grep "Grafana"
 
-   # Query metrics in Grafana
-   # Dashboard: MirrorBuddy - SLI/SLO Dashboard (uid: mirrorbuddy-sli-slo)
+   # Dashboard URL
+   # https://mirrorbuddy.grafana.net/d/dashboard/
    ```
 
-### Dashboard & Alerts
+### Dashboard Structure
 
 | Resource | UID | Purpose |
 |----------|-----|---------|
 | Folder | `mirrorbuddy` | All MirrorBuddy dashboards |
-| Dashboard | `mirrorbuddy-sli-slo` | SLI/SLO monitoring |
+| Dashboard | `dashboard` | Main observability dashboard |
 | Alert Group | `MirrorBuddy SLO Alerts` | GO/NO-GO thresholds |
+
+**Dashboard Structure:**
+
+📈 **BUSINESS METRICS:**
+1. Session Health - GO/NO-GO decision (success, drop-off, stuck loops)
+2. User Engagement - DAU/WAU/MAU, new users
+3. Conversion & Retention - Onboarding, voice adoption, D1/D7/D30
+4. Cost Control - Per-session costs (text/voice), spikes
+5. Maestri & Learning - Top 10, XP, streaks, quizzes, flashcards
+
+🛠️ **TECHNICAL METRICS:**
+6. Safety Metrics - Refusal precision, jailbreak blocking, incidents S0-S3
+7. Performance - HTTP latency P95, error rates
+8. External Services - Azure OpenAI, Google Drive, Brave quotas
 
 ### Key Metrics
 
