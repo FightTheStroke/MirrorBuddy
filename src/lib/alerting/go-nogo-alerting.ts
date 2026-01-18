@@ -89,6 +89,16 @@ export function initializeSLOs(): void {
 }
 
 /**
+ * Reset all state for testing
+ */
+export function resetForTesting(): void {
+  sloDefinitions.clear();
+  sloStatuses.clear();
+  activeAlerts.clear();
+  alertHistory.length = 0;
+}
+
+/**
  * Register an SLO
  */
 export function registerSLO(slo: SLODefinition): void {

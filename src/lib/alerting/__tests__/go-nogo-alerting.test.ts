@@ -31,6 +31,7 @@ vi.mock("@/lib/degradation", () => ({
 
 import {
   initializeSLOs,
+  resetForTesting,
   registerSLO,
   updateSLOStatus,
   createAlert,
@@ -46,6 +47,7 @@ import {
 describe("go-nogo-alerting", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetForTesting();
     initializeSLOs();
   });
 
@@ -103,7 +105,8 @@ describe("go-nogo-alerting", () => {
     });
 
     it("tracks trend", () => {
-      updateSLOStatus("voice-availability", 99.5);
+      // Trend requires > 0.5 difference to be "improving" or "degrading"
+      updateSLOStatus("voice-availability", 99.0);
       const status = updateSLOStatus("voice-availability", 99.9);
 
       expect(status?.trend).toBe("improving");
