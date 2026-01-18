@@ -3,10 +3,11 @@
  * Broadcasts user cursor position and selected node to other participants
  */
 
-import { useRef, useCallback } from 'react';
-import type { Dispatch, SetStateAction } from 'react';
-import type { CollaborationState } from './types';
-import { logger } from '@/lib/logger';
+import { useRef, useCallback } from "react";
+import type { Dispatch, SetStateAction } from "react";
+import type { CollaborationState } from "./types";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 /**
  * Hook for cursor update function with throttling
@@ -14,35 +15,37 @@ import { logger } from '@/lib/logger';
  */
 export function useCursorUpdater(
   setState: Dispatch<SetStateAction<CollaborationState>>,
-  userId: string
+  userId: string,
 ) {
   const cursorThrottleRef = useRef<NodeJS.Timeout | null>(null);
   const lastCursorRef = useRef<{ x: number; y: number } | null>(null);
 
-  return useCallback((x: number, y: number) => {
-    lastCursorRef.current = { x, y };
-    if (cursorThrottleRef.current) return;
-    cursorThrottleRef.current = setTimeout(() => {
-      cursorThrottleRef.current = null;
-      let roomId: string | null = null;
-      setState((prev) => {
-        roomId = prev.roomId;
-        return prev;
-      });
-      if (!roomId || !lastCursorRef.current) return;
-      fetch(`/api/collab/rooms/${roomId}/cursor`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, cursor: lastCursorRef.current }),
-      }).catch((err) => {
-        logger.error('Failed to broadcast cursor position', {
-          roomId,
-          userId,
-          error: String(err),
+  return useCallback(
+    (x: number, y: number) => {
+      lastCursorRef.current = { x, y };
+      if (cursorThrottleRef.current) return;
+      cursorThrottleRef.current = setTimeout(() => {
+        cursorThrottleRef.current = null;
+        let roomId: string | null = null;
+        setState((prev) => {
+          roomId = prev.roomId;
+          return prev;
         });
-      });
-    }, 50);
-  }, [userId, setState]);
+        if (!roomId || !lastCursorRef.current) return;
+        csrfFetch(`/api/collab/rooms/${roomId}/cursor`, {
+          method: "POST",
+          body: JSON.stringify({ userId, cursor: lastCursorRef.current }),
+        }).catch((err) => {
+          logger.error("Failed to broadcast cursor position", {
+            roomId,
+            userId,
+            error: String(err),
+          });
+        });
+      }, 50);
+    },
+    [userId, setState],
+  );
 }
 
 /**
@@ -51,26 +54,28 @@ export function useCursorUpdater(
  */
 export function useNodeSelector(
   setState: Dispatch<SetStateAction<CollaborationState>>,
-  userId: string
+  userId: string,
 ) {
-  return useCallback((nodeId: string | null) => {
-    let roomId: string | null = null;
-    setState((prev) => {
-      roomId = prev.roomId;
-      return prev;
-    });
-    if (!roomId) return;
-    fetch(`/api/collab/rooms/${roomId}/select`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId, nodeId }),
-    }).catch((err) => {
-      logger.error('Failed to broadcast node selection', {
-        roomId,
-        userId,
-        nodeId,
-        error: String(err),
+  return useCallback(
+    (nodeId: string | null) => {
+      let roomId: string | null = null;
+      setState((prev) => {
+        roomId = prev.roomId;
+        return prev;
       });
-    });
-  }, [userId, setState]);
+      if (!roomId) return;
+      csrfFetch(`/api/collab/rooms/${roomId}/select`, {
+        method: "POST",
+        body: JSON.stringify({ userId, nodeId }),
+      }).catch((err) => {
+        logger.error("Failed to broadcast node selection", {
+          roomId,
+          userId,
+          nodeId,
+          error: String(err),
+        });
+      });
+    },
+    [userId, setState],
+  );
 }

@@ -185,6 +185,8 @@ manually pointing to the Supabase pooler/direct URLs.
 
 ## Related
 
+- **ADR 0053**: Vercel Runtime Constraints (CSRF, Voice Transport, Health Checks)
 - ADR 0028: PostgreSQL + pgvector migration
+- ADR 0038: WebRTC migration for voice
 - ADR 0047: Grafana Cloud observability
 - ADR 0039: Deferred production items

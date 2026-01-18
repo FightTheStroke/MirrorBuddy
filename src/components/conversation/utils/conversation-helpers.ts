@@ -5,6 +5,7 @@
 
 import { logger } from "@/lib/logger";
 import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 /**
  * Get userId from cookie (client-side)
@@ -28,11 +29,13 @@ export async function endConversationWithSummary(
   }
 
   try {
-    const response = await fetch(`/api/conversations/${conversationId}/end`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, reason }),
-    });
+    const response = await csrfFetch(
+      `/api/conversations/${conversationId}/end`,
+      {
+        method: "POST",
+        body: JSON.stringify({ userId, reason }),
+      },
+    );
 
     if (!response.ok) {
       logger.error("Failed to end conversation", { status: response.status });

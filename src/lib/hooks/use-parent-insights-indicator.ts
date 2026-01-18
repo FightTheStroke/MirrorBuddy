@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 const CHECK_INTERVAL_MS = 60000; // Check every minute
 
@@ -16,7 +17,7 @@ export function useParentInsightsIndicator() {
   const checkForNewInsights = useCallback(async () => {
     try {
       // Get last viewed timestamp from database
-      const lastViewedResponse = await fetch('/api/profile/last-viewed');
+      const lastViewedResponse = await fetch("/api/profile/last-viewed");
       let lastViewedDate = new Date(0);
       if (lastViewedResponse.ok) {
         const lastViewedData = await lastViewedResponse.json();
@@ -26,7 +27,7 @@ export function useParentInsightsIndicator() {
       }
 
       // Fetch latest learning entries
-      const response = await fetch('/api/learnings?limit=1');
+      const response = await fetch("/api/learnings?limit=1");
       if (!response.ok) {
         setHasNewInsights(false);
         return;
@@ -50,9 +51,8 @@ export function useParentInsightsIndicator() {
   // Mark as viewed - call this when user visits parent dashboard
   const markAsViewed = useCallback(async () => {
     try {
-      await fetch('/api/profile/last-viewed', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await csrfFetch("/api/profile/last-viewed", {
+        method: "POST",
         body: JSON.stringify({ timestamp: new Date().toISOString() }),
       });
       setHasNewInsights(false);
@@ -69,5 +69,10 @@ export function useParentInsightsIndicator() {
     return () => clearInterval(interval);
   }, [checkForNewInsights]);
 
-  return { hasNewInsights, isLoading, markAsViewed, refresh: checkForNewInsights };
+  return {
+    hasNewInsights,
+    isLoading,
+    markAsViewed,
+    refresh: checkForNewInsights,
+  };
 }

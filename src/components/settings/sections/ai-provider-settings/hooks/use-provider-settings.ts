@@ -1,10 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useSettingsStore } from '@/lib/stores';
-import type { DetailedProviderStatus, CostSummary, CostForecast } from '../types';
+import { useState, useEffect } from "react";
+import { useSettingsStore } from "@/lib/stores";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import type {
+  DetailedProviderStatus,
+  CostSummary,
+  CostForecast,
+} from "../types";
 
 export function useProviderSettings() {
   const { preferredProvider, setPreferredProvider } = useSettingsStore();
-  const [providerStatus, setProviderStatus] = useState<DetailedProviderStatus | null>(null);
+  const [providerStatus, setProviderStatus] =
+    useState<DetailedProviderStatus | null>(null);
   const [costs, setCosts] = useState<CostSummary | null>(null);
   const [forecast, setForecast] = useState<CostForecast | null>(null);
   const [loadingCosts, setLoadingCosts] = useState(false);
@@ -12,22 +18,22 @@ export function useProviderSettings() {
   const [showEnvDetails, setShowEnvDetails] = useState(false);
 
   useEffect(() => {
-    fetch('/api/provider/status')
-      .then(res => res.json())
-      .then(data => setProviderStatus(data))
+    fetch("/api/provider/status")
+      .then((res) => res.json())
+      .then((data) => setProviderStatus(data))
       .catch(() => setProviderStatus(null));
   }, []);
 
   useEffect(() => {
-    if (providerStatus?.activeProvider !== 'azure') return;
+    if (providerStatus?.activeProvider !== "azure") return;
 
     let cancelled = false;
 
     const fetchCosts = async () => {
       try {
         const [costRes, forecastRes] = await Promise.all([
-          fetch('/api/azure/costs?days=30'),
-          fetch('/api/azure/costs?type=forecast'),
+          fetch("/api/azure/costs?days=30"),
+          fetch("/api/azure/costs?type=forecast"),
         ]);
 
         if (cancelled) return;
@@ -70,7 +76,9 @@ export function useProviderSettings() {
     setLoadingCosts(true);
     fetchCosts();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [providerStatus?.activeProvider]);
 
   const saveCostConfig = async (config: {
@@ -79,9 +87,8 @@ export function useProviderSettings() {
     clientSecret: string;
     subscriptionId: string;
   }) => {
-    await fetch('/api/user/settings', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+    await csrfFetch("/api/user/settings", {
+      method: "PUT",
       body: JSON.stringify({ azureCostConfig: JSON.stringify(config) }),
     });
   };
@@ -99,4 +106,3 @@ export function useProviderSettings() {
     saveCostConfig,
   };
 }
-

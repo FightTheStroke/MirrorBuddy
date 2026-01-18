@@ -1,26 +1,35 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { useProgressStore } from '@/lib/stores';
-import toast from '@/components/ui/toast';
-import { generateAutoEvaluation } from './maestro-session-utils';
-import { MAESTRI_XP } from '@/lib/constants/xp-rewards';
-import { useMaestroVoiceConnection } from './use-maestro-voice-connection';
-import { useMaestroChatHandlers } from './use-maestro-chat-handlers';
-import { logger } from '@/lib/logger';
-import type { Maestro, ChatMessage, ToolCall, ToolType } from '@/types';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useProgressStore } from "@/lib/stores";
+import toast from "@/components/ui/toast";
+import { generateAutoEvaluation } from "./maestro-session-utils";
+import { MAESTRI_XP } from "@/lib/constants/xp-rewards";
+import { useMaestroVoiceConnection } from "./use-maestro-voice-connection";
+import { useMaestroChatHandlers } from "./use-maestro-chat-handlers";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import type { Maestro, ChatMessage, ToolCall, ToolType } from "@/types";
 
 interface UseMaestroSessionLogicProps {
   maestro: Maestro;
-  initialMode: 'voice' | 'chat';
+  initialMode: "voice" | "chat";
   requestedToolType?: ToolType;
 }
 
-export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType }: UseMaestroSessionLogicProps) {
+export function useMaestroSessionLogic({
+  maestro,
+  initialMode,
+  requestedToolType,
+}: UseMaestroSessionLogicProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [toolCalls, setToolCalls] = useState<ToolCall[]>([]);
   const [showWebcam, setShowWebcam] = useState(false);
-  const [webcamRequest, setWebcamRequest] = useState<{ purpose: string; instructions?: string; callId: string } | null>(null);
+  const [webcamRequest, setWebcamRequest] = useState<{
+    purpose: string;
+    instructions?: string;
+    callId: string;
+  } | null>(null);
   const [sessionEnded, setSessionEnded] = useState(false);
 
   const sessionStartTimeRef = useRef<number | null>(null);
@@ -39,7 +48,7 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
   }, []);
 
   const onVoiceTranscript = useCallback((message: ChatMessage) => {
-    setMessages(prev => [...prev, message]);
+    setMessages((prev) => [...prev, message]);
   }, []);
 
   const voiceConnection = useMaestroVoiceConnection({
@@ -83,14 +92,14 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
         formula: `Ciao! Vuoi lavorare con le formule. Quale formula matematica o scientifica vuoi esplorare?`,
         calculator: `Ciao! Vuoi fare dei calcoli? Dimmi l'espressione matematica da calcolare!`,
         chart: `Ciao! Creiamo un grafico insieme. Quali dati vuoi visualizzare?`,
-        'study-kit': `Ciao! Creiamo materiali di studio completi. Carica un PDF per iniziare!`,
+        "study-kit": `Ciao! Creiamo materiali di studio completi. Carica un PDF per iniziare!`,
       };
 
       const greeting = contextualGreetings[requestedToolType];
       if (greeting) {
         initialMessages.push({
           id: `initial-${Date.now()}`,
-          role: 'assistant',
+          role: "assistant",
           content: greeting,
           timestamp: new Date(),
         });
@@ -100,7 +109,7 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     setMessages(initialMessages);
 
     // Handle legacy pendingToolRequest from sessionStorage (backward compatibility)
-    const pendingRequest = sessionStorage.getItem('pendingToolRequest');
+    const pendingRequest = sessionStorage.getItem("pendingToolRequest");
     if (pendingRequest) {
       try {
         const { tool, maestroId } = JSON.parse(pendingRequest);
@@ -112,10 +121,10 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
             demo: `Crea una demo interattiva per spiegarmi meglio il concetto`,
           };
           if (toolPrompts[tool]) setInput(toolPrompts[tool]);
-          sessionStorage.removeItem('pendingToolRequest');
+          sessionStorage.removeItem("pendingToolRequest");
         }
       } catch {
-        sessionStorage.removeItem('pendingToolRequest');
+        sessionStorage.removeItem("pendingToolRequest");
       }
     }
 
@@ -135,37 +144,46 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     }
     setSessionEnded(true);
 
-    const sessionDuration = Math.round((Date.now() - (sessionStartTimeRef.current || Date.now())) / 60000);
+    const sessionDuration = Math.round(
+      (Date.now() - (sessionStartTimeRef.current || Date.now())) / 60000,
+    );
     const xpEarned = Math.min(
       MAESTRI_XP.MAX_PER_SESSION,
-      sessionDuration * MAESTRI_XP.PER_MINUTE + questionCount.current * MAESTRI_XP.PER_QUESTION
+      sessionDuration * MAESTRI_XP.PER_MINUTE +
+        questionCount.current * MAESTRI_XP.PER_QUESTION,
     );
-    const evaluation = generateAutoEvaluation(questionCount.current, sessionDuration, xpEarned);
+    const evaluation = generateAutoEvaluation(
+      questionCount.current,
+      sessionDuration,
+      xpEarned,
+    );
 
     try {
-      const response = await fetch('/api/learnings/extract', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await csrfFetch("/api/learnings/extract", {
+        method: "POST",
         body: JSON.stringify({
           conversationId: `maestro-${maestro.id}-${Date.now()}`,
           maestroId: maestro.id,
-          messages: messages.map(m => ({ role: m.role, content: m.content })),
+          messages: messages.map((m) => ({ role: m.role, content: m.content })),
         }),
       });
       evaluation.savedToDiary = response.ok;
     } catch (error) {
-      logger.warn('Failed to save to diary (non-critical)', { error });
+      logger.warn("Failed to save to diary (non-critical)", { error });
       evaluation.savedToDiary = false;
     }
 
-    setMessages(prev => [...prev, {
-      id: `eval-${Date.now()}`,
-      role: 'assistant',
-      content: '',
-      timestamp: new Date(),
-      type: 'evaluation',
-      evaluation,
-    }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `eval-${Date.now()}`,
+        role: "assistant",
+        content: "",
+        timestamp: new Date(),
+        type: "evaluation",
+        evaluation,
+      },
+    ]);
 
     addXP(xpEarned);
     endSession();
@@ -173,7 +191,7 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
     toast.success(
       `+${xpEarned} XP guadagnati!`,
       `${sessionDuration} minuti di studio, ${questionCount.current} domande fatte. Ottimo lavoro!`,
-      { duration: 6000 }
+      { duration: 6000 },
     );
   }, [voiceConnection, maestro.id, messages, addXP, endSession]);
 
@@ -184,7 +202,11 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
   }, [chatHandlers]);
 
   const handleRequestPhoto = useCallback(() => {
-    setWebcamRequest({ purpose: 'homework', instructions: 'Mostra il tuo compito', callId: `cam-${Date.now()}` });
+    setWebcamRequest({
+      purpose: "homework",
+      instructions: "Mostra il tuo compito",
+      callId: `cam-${Date.now()}`,
+    });
     setShowWebcam(true);
   }, []);
 
@@ -194,26 +216,36 @@ export function useMaestroSessionLogic({ maestro, initialMode, requestedToolType
       const res = await fetch(`/api/conversations/${conversationId}/messages`);
       if (res.ok) {
         const data = await res.json();
-        const loadedMessages: ChatMessage[] = data.map((m: { id: string; role: string; content: string; createdAt: string }) => ({
-          id: m.id,
-          role: m.role as 'user' | 'assistant',
-          content: m.content,
-          timestamp: new Date(m.createdAt),
-        }));
+        const loadedMessages: ChatMessage[] = data.map(
+          (m: {
+            id: string;
+            role: string;
+            content: string;
+            createdAt: string;
+          }) => ({
+            id: m.id,
+            role: m.role as "user" | "assistant",
+            content: m.content,
+            timestamp: new Date(m.createdAt),
+          }),
+        );
         setMessages(loadedMessages);
         setSessionEnded(false);
       }
     } catch (error) {
-      logger.error('Failed to load conversation', { conversationId }, error);
+      logger.error("Failed to load conversation", { conversationId }, error);
     }
   }, []);
 
   // Wrap webcam capture to also close the modal after processing
-  const handleWebcamCaptureWithClose = useCallback((imageData: string) => {
-    chatHandlers.handleWebcamCapture(imageData);
-    setShowWebcam(false);
-    setWebcamRequest(null);
-  }, [chatHandlers]);
+  const handleWebcamCaptureWithClose = useCallback(
+    (imageData: string) => {
+      chatHandlers.handleWebcamCapture(imageData);
+      setShowWebcam(false);
+      setWebcamRequest(null);
+    },
+    [chatHandlers],
+  );
 
   return {
     // State

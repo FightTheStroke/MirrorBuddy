@@ -38,6 +38,41 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // CSRF Protection: Enforce csrfFetch for client-side POST/PUT/DELETE requests
+  // Only applies to client-side code (components, hooks, stores, client utils)
+  // Excludes: API routes, AI providers, server utilities, scripts
+  // See ADR 0053 for full documentation
+  {
+    files: [
+      "src/components/**/*.ts",
+      "src/components/**/*.tsx",
+      "src/lib/hooks/**/*.ts",
+      "src/lib/stores/**/*.ts",
+      "src/lib/client-*.ts",
+      "src/hooks/**/*.ts",
+    ],
+    ignores: [
+      // WebRTC files call Azure directly (not through our API)
+      "src/lib/hooks/voice-session/webrtc-*.ts",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='POST'])",
+          message: "Use csrfFetch from '@/lib/auth/csrf-client' for POST requests. Plain fetch fails with 403 in production. See ADR 0053.",
+        },
+        {
+          selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='PUT'])",
+          message: "Use csrfFetch from '@/lib/auth/csrf-client' for PUT requests. Plain fetch fails with 403 in production. See ADR 0053.",
+        },
+        {
+          selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='DELETE'])",
+          message: "Use csrfFetch from '@/lib/auth/csrf-client' for DELETE requests. Plain fetch fails with 403 in production. See ADR 0053.",
+        },
+      ],
+    },
+  },
   // Test files - allow any and Function for mocking
   {
     files: ["**/*.test.ts", "**/*.test.tsx", "**/__tests__/**/*.ts", "**/__tests__/**/*.tsx"],

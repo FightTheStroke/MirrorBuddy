@@ -3,6 +3,7 @@
  */
 
 import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import type { Message } from "./types";
 import type { CharacterInfo } from "../../utils/character-utils";
 import type { ToolState, ToolType, ToolCallRef, ToolCall } from "@/types/tools";
@@ -39,9 +40,8 @@ export async function sendChatMessage(
   safetyEvent: SafetyBlockEvent | null;
 }> {
   const startTime = performance.now();
-  const response = await fetch("/api/chat", {
+  const response = await csrfFetch("/api/chat", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       messages: [
         ...messages.map((m) => ({ role: m.role, content: m.content })),

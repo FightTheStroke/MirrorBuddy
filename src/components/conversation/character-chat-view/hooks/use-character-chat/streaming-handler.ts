@@ -8,6 +8,7 @@
 import type { Message } from "./types";
 import type { CharacterInfo } from "../../utils/character-utils";
 import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import type { ChatUsage } from "./message-handler";
 
 /** Streaming result with REAL usage data from API */
@@ -127,9 +128,8 @@ export async function sendStreamingMessage(
   let streamUsage: ChatUsage | null = null;
 
   try {
-    const response = await fetch("/api/chat/stream", {
+    const response = await csrfFetch("/api/chat/stream", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         messages: [
           ...messages.map((m) => ({ role: m.role, content: m.content })),

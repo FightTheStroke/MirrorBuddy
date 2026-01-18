@@ -10,6 +10,7 @@ import { useState, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useFeatureFlags } from "@/lib/hooks/use-feature-flags";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import type { FeatureFlag, KnownFeatureFlag } from "@/lib/feature-flags/types";
 
 interface FeatureFlagsPanelProps {
@@ -28,9 +29,8 @@ export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
       setError(null);
 
       try {
-        const response = await fetch("/api/admin/feature-flags", {
+        const response = await csrfFetch("/api/admin/feature-flags", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             featureId,
             enabled: !currentKillSwitch,
@@ -60,9 +60,8 @@ export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
     setError(null);
 
     try {
-      const response = await fetch("/api/admin/feature-flags", {
+      const response = await csrfFetch("/api/admin/feature-flags", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           global: true,
           enabled: !globalKillSwitch,

@@ -13,6 +13,7 @@ import {
   type UnifiedCharacter,
 } from "@/components/character";
 import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import type { ActiveCharacter } from "@/lib/stores/conversation-flow-store";
 import type { Maestro } from "@/types";
 import { useVoiceSession } from "@/lib/hooks/use-voice-session";
@@ -118,9 +119,8 @@ export function VoiceCallPanel({
 
     const createConversation = async () => {
       try {
-        const response = await fetch("/api/conversations", {
+        const response = await csrfFetch("/api/conversations", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             maestroId: character.id,
             title: `Sessione vocale con ${character.name}`,
@@ -211,11 +211,13 @@ export function VoiceCallPanel({
       const userId = getUserIdFromCookie();
       if (userId) {
         try {
-          await fetch(`/api/conversations/${conversationIdRef.current}/end`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId, reason: "explicit" }),
-          });
+          await csrfFetch(
+            `/api/conversations/${conversationIdRef.current}/end`,
+            {
+              method: "POST",
+              body: JSON.stringify({ userId, reason: "explicit" }),
+            },
+          );
           logger.info("[VoiceCallPanel] Conversation ended", {
             conversationId: conversationIdRef.current,
           });

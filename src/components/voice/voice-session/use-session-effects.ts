@@ -1,9 +1,13 @@
-import { useEffect, useRef } from 'react';
-import { useProgressStore, useUIStore } from '@/lib/stores';
-import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
-import { logger } from '@/lib/logger';
-import { buildSignalsFromText, sendAdaptiveSignals } from '@/lib/education/adaptive-difficulty-client';
-import type { AdaptiveSignalInput, Maestro, ToolCall } from '@/types';
+import { useEffect, useRef } from "react";
+import { useProgressStore, useUIStore } from "@/lib/stores";
+import { useAmbientAudioStore } from "@/lib/stores/ambient-audio-store";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import {
+  buildSignalsFromText,
+  sendAdaptiveSignals,
+} from "@/lib/education/adaptive-difficulty-client";
+import type { AdaptiveSignalInput, Maestro, ToolCall } from "@/types";
 
 interface UseSessionEffectsProps {
   maestro: Maestro;
@@ -37,12 +41,19 @@ export function useSessionEffects({
       sessionStartTime.current = new Date();
       startSession(maestro.id, maestro.specialty);
     }
-  }, [isConnected, currentSession, maestro.id, maestro.specialty, startSession]);
+  }, [
+    isConnected,
+    currentSession,
+    maestro.id,
+    maestro.specialty,
+    startSession,
+  ]);
 
   // Track tool completions (focus mode has been removed)
   useEffect(() => {
     const completedTools = toolCalls.filter(
-      (tc) => tc.status === 'completed' && !processedToolsRef.current.has(tc.id)
+      (tc) =>
+        tc.status === "completed" && !processedToolsRef.current.has(tc.id),
     );
 
     if (completedTools.length === 0) return;
@@ -51,18 +62,19 @@ export function useSessionEffects({
     processedToolsRef.current.add(toolCall.id);
 
     const toolTypeMap: Record<string, string> = {
-      create_mindmap: 'mindmap',
-      create_quiz: 'quiz',
-      create_flashcards: 'flashcard',
-      create_summary: 'summary',
-      create_demo: 'demo',
-      create_diagram: 'diagram',
-      create_timeline: 'timeline',
-      web_search: 'search',
+      create_mindmap: "mindmap",
+      create_quiz: "quiz",
+      create_flashcards: "flashcard",
+      create_summary: "summary",
+      create_demo: "demo",
+      create_diagram: "diagram",
+      create_timeline: "timeline",
+      web_search: "search",
     };
-    const mappedToolType = (toolTypeMap[toolCall.type] || 'mindmap') as import('@/types/tools').ToolType;
+    const mappedToolType = (toolTypeMap[toolCall.type] ||
+      "mindmap") as import("@/types/tools").ToolType;
 
-    logger.debug('[VoiceSession] Tool created', {
+    logger.debug("[VoiceSession] Tool created", {
       toolId: toolCall.id,
       toolType: mappedToolType,
     });
@@ -74,9 +86,8 @@ export function useSessionEffects({
 
     const createConversation = async () => {
       try {
-        const response = await fetch('/api/conversations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await csrfFetch("/api/conversations", {
+          method: "POST",
           body: JSON.stringify({
             maestroId: maestro.id,
             title: `Sessione vocale con ${maestro.name}`,
@@ -85,10 +96,14 @@ export function useSessionEffects({
         if (response.ok) {
           const data = await response.json();
           conversationIdRef.current = data.id;
-          logger.debug('[VoiceSession] Conversation created', { conversationId: data.id });
+          logger.debug("[VoiceSession] Conversation created", {
+            conversationId: data.id,
+          });
         }
       } catch (error) {
-        logger.error('[VoiceSession] Failed to create conversation', { error: String(error) });
+        logger.error("[VoiceSession] Failed to create conversation", {
+          error: String(error),
+        });
       }
     };
 
@@ -105,17 +120,21 @@ export function useSessionEffects({
         if (savedMessagesRef.current.has(messageKey)) continue;
 
         try {
-          await fetch(`/api/conversations/${conversationIdRef.current}/messages`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              role: entry.role,
-              content: entry.content,
-            }),
-          });
+          await csrfFetch(
+            `/api/conversations/${conversationIdRef.current}/messages`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                role: entry.role,
+                content: entry.content,
+              }),
+            },
+          );
           savedMessagesRef.current.add(messageKey);
         } catch (error) {
-          logger.error('[VoiceSession] Failed to save message', { error: String(error) });
+          logger.error("[VoiceSession] Failed to save message", {
+            error: String(error),
+          });
         }
       }
     };
@@ -132,21 +151,25 @@ export function useSessionEffects({
 
     const signals: AdaptiveSignalInput[] = [];
     for (const entry of newEntries) {
-      if (entry.role === 'assistant') {
+      if (entry.role === "assistant") {
         lastAssistantAtRef.current = Date.now();
         continue;
       }
 
-      if (entry.role === 'user') {
+      if (entry.role === "user") {
         const responseTimeMs = lastAssistantAtRef.current
           ? Date.now() - lastAssistantAtRef.current
           : undefined;
-        const textSignals = buildSignalsFromText(entry.content, 'voice', maestro.subject);
+        const textSignals = buildSignalsFromText(
+          entry.content,
+          "voice",
+          maestro.subject,
+        );
         signals.push(...textSignals);
         if (responseTimeMs !== undefined) {
           signals.push({
-            type: 'response_time_ms',
-            source: 'voice',
+            type: "response_time_ms",
+            source: "voice",
             subject: maestro.subject,
             responseTimeMs,
           });
@@ -167,16 +190,16 @@ export function useSessionEffects({
 
   useEffect(() => {
     if (isConnected) {
-      if (ambientPlaybackState === 'playing') {
+      if (ambientPlaybackState === "playing") {
         wasPlayingRef.current = true;
         pauseAmbient();
-        logger.debug('[VoiceSession] Paused ambient audio');
+        logger.debug("[VoiceSession] Paused ambient audio");
       }
     } else {
       if (wasPlayingRef.current) {
         wasPlayingRef.current = false;
         playAmbient();
-        logger.debug('[VoiceSession] Resumed ambient audio');
+        logger.debug("[VoiceSession] Resumed ambient audio");
       }
     }
   }, [isConnected, ambientPlaybackState, pauseAmbient, playAmbient]);

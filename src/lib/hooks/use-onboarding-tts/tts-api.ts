@@ -3,11 +3,12 @@
  * OpenAI TTS voice synthesis
  */
 
-'use client';
+"use client";
 
-import { logger } from '@/lib/logger';
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
-type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+type TTSVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
 
 /**
  * Speak text using OpenAI TTS API
@@ -15,12 +16,11 @@ type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
 export async function speakViaOpenAI(
   textToSpeak: string,
   voice: TTSVoice,
-  abortSignal?: AbortSignal
+  abortSignal?: AbortSignal,
 ): Promise<{ audio: HTMLAudioElement; audioUrl: string } | null> {
   try {
-    const response = await fetch('/api/tts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await csrfFetch("/api/tts", {
+      method: "POST",
       body: JSON.stringify({ text: textToSpeak, voice }),
       signal: abortSignal,
     });
@@ -30,7 +30,7 @@ export async function speakViaOpenAI(
       if (errorData.fallback) {
         return null; // Signal to fallback
       }
-      throw new Error(errorData.error || 'TTS failed');
+      throw new Error(errorData.error || "TTS failed");
     }
 
     const audioBlob = await response.blob();
@@ -39,10 +39,10 @@ export async function speakViaOpenAI(
 
     return { audio, audioUrl };
   } catch (error) {
-    if ((error as Error).name === 'AbortError') {
+    if ((error as Error).name === "AbortError") {
       return null; // Request was aborted
     }
-    logger.error('[OnboardingTTS] OpenAI error', undefined, error);
+    logger.error("[OnboardingTTS] OpenAI error", undefined, error);
     return null; // Signal to fallback
   }
 }

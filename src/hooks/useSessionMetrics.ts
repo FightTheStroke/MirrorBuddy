@@ -10,6 +10,7 @@
 
 import { useCallback, useRef, useEffect } from "react";
 import { getUserId } from "@/lib/hooks/use-saved-materials/utils/user-id";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface TurnMetrics {
   latencyMs: number;
@@ -65,9 +66,8 @@ export function useSessionMetrics(maestroId?: string) {
     };
 
     // Start session on server
-    fetch("/api/metrics/sessions", {
+    csrfFetch("/api/metrics/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "start",
         sessionId: newSessionId,
@@ -80,9 +80,8 @@ export function useSessionMetrics(maestroId?: string) {
     // End session on unmount
     return () => {
       if (sessionIdRef.current) {
-        fetch("/api/metrics/sessions", {
+        csrfFetch("/api/metrics/sessions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "end",
             sessionId: sessionIdRef.current,
@@ -103,9 +102,8 @@ export function useSessionMetrics(maestroId?: string) {
     stateRef.current.totalTokensIn += metrics.tokensIn;
     stateRef.current.totalTokensOut += metrics.tokensOut;
 
-    fetch("/api/metrics/sessions", {
+    csrfFetch("/api/metrics/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "turn",
         sessionId: sessionIdRef.current,
@@ -123,9 +121,8 @@ export function useSessionMetrics(maestroId?: string) {
 
     stateRef.current.voiceMinutes += minutes;
 
-    fetch("/api/metrics/sessions", {
+    csrfFetch("/api/metrics/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "voice",
         sessionId: sessionIdRef.current,
@@ -141,9 +138,8 @@ export function useSessionMetrics(maestroId?: string) {
   const recordRefusal = useCallback((wasCorrect: boolean) => {
     if (!sessionIdRef.current) return;
 
-    fetch("/api/metrics/sessions", {
+    csrfFetch("/api/metrics/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "refusal",
         sessionId: sessionIdRef.current,
@@ -159,9 +155,8 @@ export function useSessionMetrics(maestroId?: string) {
   const recordIncident = useCallback((severity: "S0" | "S1" | "S2" | "S3") => {
     if (!sessionIdRef.current) return;
 
-    fetch("/api/metrics/sessions", {
+    csrfFetch("/api/metrics/sessions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "incident",
         sessionId: sessionIdRef.current,
