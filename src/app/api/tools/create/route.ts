@@ -18,6 +18,7 @@ import {
   validateSessionOwnership,
 } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
+import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
 
 // Valid tool types
 const VALID_TOOL_TYPES: ToolType[] = [
@@ -58,6 +59,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Authentication required" },
         { status: 401 },
+      );
+    }
+
+    // COPPA compliance check - under-13 users require parental consent
+    const canAccess = await canAccessFullFeatures(auth.userId);
+    if (!canAccess) {
+      return NextResponse.json(
+        {
+          error: "Parental consent required",
+          code: "COPPA_CONSENT_REQUIRED",
+          message: "Users under 13 require parental consent to create learning materials.",
+        },
+        { status: 403 },
       );
     }
 
