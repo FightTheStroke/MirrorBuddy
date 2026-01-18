@@ -12,24 +12,71 @@ BRUTAL mode: ZERO TOLERANCE. FIX FIRST, REPORT LATER.
 ## TOKEN OPTIMIZATION
 
 This agent is optimized for minimal token usage:
+
 1. **`npm run release:gate`** handles ALL automated checks in a single command
 2. Agent focuses ONLY on manual/AI-dependent validations
 3. Use subagents for parallel verification when needed
 
 **Modules:**
+
 - `app-release-manager-execution.md` - Phase 3-5 details
 - `mirrorbuddy-hardening-checks.md` - Post-mortem learnings
 
 ---
 
-## PHASE 1: AUTOMATED CHECKS (RUN FIRST)
+## PHASE 0: VERSION ANALYSIS (RUN FIRST)
+
+Determine the appropriate version bump based on commits since last release:
+
+```bash
+./scripts/auto-version.sh
+```
+
+This script analyzes git commits using Conventional Commits:
+
+- `BREAKING CHANGE:` or `!:` → **major** bump
+- `feat:` or `feat(scope):` → **minor** bump
+- `fix:` or `fix(scope):` → **patch** bump
+- Other commits → defaults to **patch** if any unreleased commits
+
+**Output shows:**
+
+- Current version and last tag
+- Commit breakdown by type (breaking/feat/fix/other)
+- Recommended version bump
+- Recent commits summary
+
+**To apply the version bump:**
+
+```bash
+./scripts/auto-version.sh --apply
+```
+
+This updates:
+
+- `VERSION` file
+- `package.json`
+
+**For CI/scripts, use JSON output:**
+
+```bash
+./scripts/auto-version.sh --json
+```
+
+**If no commits since last tag:** Skip to Phase 6 (no release needed).
+
+---
+
+## PHASE 1: AUTOMATED CHECKS
 
 Run this command BEFORE anything else:
+
 ```bash
 npm run release:gate
 ```
 
 This script verifies (no agent tokens needed):
+
 - ESLint (0 errors, 0 warnings)
 - TypeScript (0 errors)
 - npm audit (0 high/critical vulnerabilities)
@@ -55,6 +102,7 @@ This script verifies (no agent tokens needed):
 ### 2.1 Web Application Security
 
 **CSP (Content Security Policy):**
+
 ```bash
 # Verify CSP header exists
 curl -sI http://localhost:3000 | grep -i "content-security-policy"
@@ -62,6 +110,7 @@ curl -sI http://localhost:3000 | grep -i "content-security-policy"
 ```
 
 **CSRF Protection:**
+
 ```bash
 # Verify CSRF token in forms
 grep -r "csrf" src/components --include="*.tsx" | head -5
@@ -69,12 +118,14 @@ grep -r "csrf" src/components --include="*.tsx" | head -5
 ```
 
 **Debug Endpoints:**
+
 ```bash
 # Verify no debug endpoints in production
 ls src/app/api/debug/ 2>/dev/null && echo "BLOCKED: Debug endpoints exist" || echo "OK"
 ```
 
 **Cookie Security:**
+
 ```bash
 # Verify no unsigned cookie acceptance
 grep -n "Legacy unsigned cookie" src/lib/auth/
@@ -129,6 +180,7 @@ grep -rn "age.*13\|under.*13\|parental.*consent" src/app/welcome/ src/lib/safety
 - [ ] Consent timestamp stored in database
 
 **Verification:**
+
 ```bash
 # Check consent tracking in schema
 grep -n "consent\|parentalConsent" prisma/schema/*.prisma
@@ -139,6 +191,7 @@ grep -n "consent\|parentalConsent" prisma/schema/*.prisma
 ## PHASES 4-6: EXECUTION
 
 See **`app-release-manager-execution.md`** for:
+
 - Phase 4: Education-specific validation (safety, GDPR, WCAG, educational quality)
 - Phase 5: Testing gap validation
 - Phase 6: Release process
@@ -147,14 +200,15 @@ See **`app-release-manager-execution.md`** for:
 
 ## QUICK REFERENCE
 
-| Phase | Command/Check | Blocking |
-|-------|---------------|----------|
-| 1 | `npm run release:gate` | Yes |
-| 2 | Security validation (CSP, CSRF, cookies, rate-limit) | Yes |
-| 3 | COPPA compliance (parental consent) | Yes |
-| 4 | Education validation (safety, GDPR, WCAG) | Yes |
-| 5 | Testing gaps (auth, cron, critical APIs) | Yes |
-| 6 | `gh release create` | - |
+| Phase | Command/Check                                        | Blocking |
+| ----- | ---------------------------------------------------- | -------- |
+| 0     | `./scripts/auto-version.sh` (version analysis)       | No       |
+| 1     | `npm run release:gate`                               | Yes      |
+| 2     | Security validation (CSP, CSRF, cookies, rate-limit) | Yes      |
+| 3     | COPPA compliance (parental consent)                  | Yes      |
+| 4     | Education validation (safety, GDPR, WCAG)            | Yes      |
+| 5     | Testing gaps (auth, cron, critical APIs)             | Yes      |
+| 6     | `gh release create`                                  | -        |
 
 ---
 
@@ -163,6 +217,7 @@ See **`app-release-manager-execution.md`** for:
 Before release, ALL must be checked:
 
 ### Build & Quality
+
 - [ ] `npm run release:gate` passes (0 errors, 0 warnings)
 - [ ] TypeScript: 0 errors
 - [ ] ESLint: 0 errors, 0 warnings
@@ -171,6 +226,7 @@ Before release, ALL must be checked:
 - [ ] Files >250 lines: 0
 
 ### Security
+
 - [ ] CSP header present
 - [ ] CSRF protection active
 - [ ] No debug endpoints
@@ -179,16 +235,19 @@ Before release, ALL must be checked:
 - [ ] PII detection blocks (not warns)
 
 ### Compliance
+
 - [ ] COPPA: Parental consent enforced for under-13
 - [ ] GDPR: Data export/delete functional
 - [ ] WCAG 2.1 AA: Accessibility audit passes
 
 ### Performance
+
 - [ ] RAG query: O(log n) with HNSW index
 - [ ] Bundle size: Within budgets
 - [ ] Lighthouse: Performance score ≥90
 
 ### Testing Coverage
+
 - [ ] Auth OAuth: Tests exist
 - [ ] Cron jobs: Tests exist
 - [ ] `/api/chat/stream`: Tests exist
