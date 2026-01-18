@@ -53,28 +53,6 @@ export const debugPages: DebugPage[] = [
     status: "redirect",
   },
 
-  // SHOWCASE (demo pages - not linked)
-  { href: "/showcase", note: "Showcase home", status: "dead" },
-  { href: "/showcase/maestri", note: "Showcase - Professori", status: "dead" },
-  {
-    href: "/showcase/accessibility",
-    note: "Showcase - Accessibilita",
-    status: "dead",
-  },
-  {
-    href: "/showcase/flashcards",
-    note: "Showcase - Flashcards",
-    status: "dead",
-  },
-  { href: "/showcase/quiz", note: "Showcase - Quiz", status: "dead" },
-  { href: "/showcase/mindmaps", note: "Showcase - Mindmaps", status: "dead" },
-  { href: "/showcase/chat", note: "Showcase - Chat", status: "dead" },
-  {
-    href: "/showcase/solar-system",
-    note: "Showcase - Solar System demo",
-    status: "dead",
-  },
-
   // ADMIN
   {
     href: "/admin/analytics",

@@ -116,11 +116,8 @@ function StoreInitializer() {
 // Pages where parent access button should NOT appear
 const EXCLUDED_PATHS = [
   "/", // Home page has its own button in sidebar
-  "/parent-dashboard",
-  "/genitori",
   "/landing",
   "/welcome",
-  "/showcase",
 ];
 
 function ConditionalParentAccess() {
