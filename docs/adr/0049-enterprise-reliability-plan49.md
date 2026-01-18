@@ -127,22 +127,54 @@ Four SLOs from V1Plan requirements:
 
 ### Negative
 
-- In-memory state lost on restart (acceptable for beta)
 - No persistence of SLO history (future: write to DB)
 
 ### Future Enhancements
 
-- Persist feature flag state to database
 - SLO history for trend analysis
 - Webhook notifications for alerts
 - Integration with PagerDuty/Opsgenie
 
+## Database Persistence (Added January 2025)
+
+Feature flag state is now persisted to PostgreSQL via Prisma for production reliability:
+
+```prisma
+// prisma/schema/analytics.prisma
+model FeatureFlag {
+  id                String   @id // e.g., "voice_realtime"
+  name              String
+  description       String
+  status            String   @default("enabled")
+  enabledPercentage Int      @default(100)
+  killSwitch        Boolean  @default(false)
+  killSwitchReason  String?
+  metadata          Json?
+  updatedAt         DateTime @updatedAt
+  updatedBy         String?
+}
+
+model GlobalConfig {
+  id               String   @id @default("global")
+  killSwitch       Boolean  @default(false)
+  killSwitchReason String?
+  updatedAt        DateTime @updatedAt
+  updatedBy        String?
+}
+```
+
+**Behavior**:
+- On startup: loads flags from DB, seeds defaults if missing
+- On update: writes to cache immediately, persists to DB async
+- Graceful fallback: if DB unavailable, uses in-memory defaults
+
 ## Files Created
 
-| File                                             | Purpose           |
-| ------------------------------------------------ | ----------------- |
-| `src/lib/feature-flags/types.ts`                 | Type definitions  |
-| `src/lib/feature-flags/feature-flags-service.ts` | Core service      |
+| File                                             | Purpose               |
+| ------------------------------------------------ | --------------------- |
+| `prisma/schema/analytics.prisma`                 | DB models (FF/Global) |
+| `src/lib/feature-flags/types.ts`                 | Type definitions      |
+| `src/lib/feature-flags/feature-flags-service.ts` | Core service + DB     |
 | `src/lib/degradation/types.ts`                   | Degradation types |
 | `src/lib/degradation/degradation-service.ts`     | Auto-degradation  |
 | `src/lib/alerting/types.ts`                      | Alert/SLO types   |

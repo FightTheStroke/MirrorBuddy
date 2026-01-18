@@ -2,12 +2,14 @@
  * Feature Flags Service
  *
  * V1Plan FASE 2.0.6: Centralized feature flag management
- * - In-memory cache with Prisma persistence
+ * - Prisma persistence for production reliability
+ * - In-memory cache for performance
  * - Kill-switch support for emergency disabling
  * - Percentage-based rollout
  * - Graceful degradation hooks
  */
 
+import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import type {
   FeatureFlag,
@@ -94,27 +96,104 @@ const DEFAULT_FLAGS: Record<
   },
 };
 
-// In-memory cache (initialized from defaults)
+// In-memory cache for performance
 const flagCache = new Map<string, FeatureFlag>();
-
-// Global kill-switch (disables ALL features)
 let globalKillSwitch = false;
+let globalKillSwitchReason: string | undefined;
+let initialized = false;
 
 /**
- * Initialize flags from defaults (call on startup)
+ * Initialize flags from database, seeding defaults if needed
  */
-export function initializeFlags(): void {
-  const now = new Date();
+export async function initializeFlags(): Promise<void> {
+  if (initialized) return;
 
-  for (const [id, config] of Object.entries(DEFAULT_FLAGS)) {
-    flagCache.set(id, {
-      id,
-      ...config,
-      updatedAt: now,
+  try {
+    // Load global config
+    const globalConfig = await prisma.globalConfig.findUnique({
+      where: { id: "global" },
     });
-  }
 
-  logger.info("Feature flags initialized", { count: flagCache.size });
+    if (globalConfig) {
+      globalKillSwitch = globalConfig.killSwitch;
+      globalKillSwitchReason = globalConfig.killSwitchReason ?? undefined;
+    }
+
+    // Load existing flags from DB
+    const dbFlags = await prisma.featureFlag.findMany();
+    const dbFlagMap = new Map(dbFlags.map((f) => [f.id, f]));
+
+    // Seed missing flags and populate cache
+    const now = new Date();
+    for (const [id, config] of Object.entries(DEFAULT_FLAGS)) {
+      const existing = dbFlagMap.get(id);
+
+      if (existing) {
+        // Use DB value
+        flagCache.set(id, {
+          id: existing.id,
+          name: existing.name,
+          description: existing.description,
+          status: existing.status as FeatureFlagStatus,
+          enabledPercentage: existing.enabledPercentage,
+          killSwitch: existing.killSwitch,
+          metadata: existing.metadata as Record<string, unknown> | undefined,
+          updatedAt: existing.updatedAt,
+          updatedBy: existing.updatedBy ?? undefined,
+        });
+      } else {
+        // Seed to DB and cache
+        const newFlag = await prisma.featureFlag.create({
+          data: {
+            id,
+            name: config.name,
+            description: config.description,
+            status: config.status,
+            enabledPercentage: config.enabledPercentage,
+            killSwitch: config.killSwitch,
+          },
+        });
+
+        flagCache.set(id, {
+          id: newFlag.id,
+          name: newFlag.name,
+          description: newFlag.description,
+          status: newFlag.status as FeatureFlagStatus,
+          enabledPercentage: newFlag.enabledPercentage,
+          killSwitch: newFlag.killSwitch,
+          updatedAt: newFlag.updatedAt,
+        });
+      }
+    }
+
+    // Ensure global config exists
+    if (!globalConfig) {
+      await prisma.globalConfig.create({
+        data: { id: "global", killSwitch: false },
+      });
+    }
+
+    initialized = true;
+    logger.info("Feature flags initialized from database", {
+      count: flagCache.size,
+    });
+  } catch (error) {
+    // Fallback to in-memory defaults if DB unavailable
+    logger.error("Failed to load flags from DB, using defaults", { error });
+    initializeFlagsSync();
+  }
+}
+
+/**
+ * Synchronous initialization (fallback when DB unavailable)
+ */
+function initializeFlagsSync(): void {
+  const now = new Date();
+  for (const [id, config] of Object.entries(DEFAULT_FLAGS)) {
+    flagCache.set(id, { id, ...config, updatedAt: now });
+  }
+  initialized = true;
+  logger.warn("Feature flags initialized from defaults (no DB)");
 }
 
 /**
@@ -124,6 +203,9 @@ export function isFeatureEnabled(
   featureId: KnownFeatureFlag,
   userId?: string,
 ): FeatureFlagCheckResult {
+  // Ensure initialized (sync fallback)
+  if (!initialized) initializeFlagsSync();
+
   const flag = flagCache.get(featureId);
 
   if (!flag) {
@@ -175,12 +257,15 @@ export function isFeatureEnabled(
 }
 
 /**
- * Update a feature flag
+ * Update a feature flag (persists to DB)
  */
-export function updateFlag(
+export async function updateFlag(
   featureId: KnownFeatureFlag,
   update: FeatureFlagUpdate,
-): FeatureFlag | null {
+): Promise<FeatureFlag | null> {
+  // Ensure initialized (sync fallback for tests)
+  if (!initialized) initializeFlagsSync();
+
   const flag = flagCache.get(featureId);
   if (!flag) {
     logger.warn("Attempted to update unknown flag", { featureId });
@@ -201,7 +286,30 @@ export function updateFlag(
     updatedBy: update.updatedBy,
   };
 
+  // Update cache immediately
   flagCache.set(featureId, updated);
+
+  // Persist to DB
+  try {
+    await prisma.featureFlag.update({
+      where: { id: featureId },
+      data: {
+        status: updated.status,
+        enabledPercentage: updated.enabledPercentage,
+        killSwitch: updated.killSwitch,
+        killSwitchReason: update.killSwitch
+          ? (update.metadata?.reason as string)
+          : null,
+        metadata: updated.metadata
+          ? JSON.parse(JSON.stringify(updated.metadata))
+          : undefined,
+        updatedBy: update.updatedBy,
+      },
+    });
+  } catch (error) {
+    logger.error("Failed to persist flag update", { featureId, error });
+    // Cache is still updated - will sync on next restart
+  }
 
   logger.info("Feature flag updated", {
     featureId,
@@ -216,31 +324,50 @@ export function updateFlag(
 /**
  * Activate kill-switch for a feature
  */
-export function activateKillSwitch(
+export async function activateKillSwitch(
   featureId: KnownFeatureFlag,
   reason: string,
   updatedBy?: string,
-): void {
-  updateFlag(featureId, { killSwitch: true, updatedBy });
+): Promise<void> {
+  await updateFlag(featureId, {
+    killSwitch: true,
+    metadata: { reason },
+    updatedBy,
+  });
   logger.error("Kill-switch activated", { featureId, reason, updatedBy });
 }
 
 /**
  * Deactivate kill-switch for a feature
  */
-export function deactivateKillSwitch(
+export async function deactivateKillSwitch(
   featureId: KnownFeatureFlag,
   updatedBy?: string,
-): void {
-  updateFlag(featureId, { killSwitch: false, updatedBy });
+): Promise<void> {
+  await updateFlag(featureId, { killSwitch: false, updatedBy });
   logger.info("Kill-switch deactivated", { featureId, updatedBy });
 }
 
 /**
- * Get/set global kill-switch
+ * Set global kill-switch (persists to DB)
  */
-export function setGlobalKillSwitch(enabled: boolean, reason?: string): void {
+export async function setGlobalKillSwitch(
+  enabled: boolean,
+  reason?: string,
+): Promise<void> {
   globalKillSwitch = enabled;
+  globalKillSwitchReason = reason;
+
+  try {
+    await prisma.globalConfig.upsert({
+      where: { id: "global" },
+      update: { killSwitch: enabled, killSwitchReason: reason },
+      create: { id: "global", killSwitch: enabled, killSwitchReason: reason },
+    });
+  } catch (error) {
+    logger.error("Failed to persist global kill-switch", { error });
+  }
+
   if (enabled) {
     logger.error("GLOBAL kill-switch activated", { reason });
   } else {
@@ -252,10 +379,15 @@ export function isGlobalKillSwitchActive(): boolean {
   return globalKillSwitch;
 }
 
+export function getGlobalKillSwitchReason(): string | undefined {
+  return globalKillSwitchReason;
+}
+
 /**
  * Get all flags
  */
 export function getAllFlags(): FeatureFlag[] {
+  if (!initialized) initializeFlagsSync();
   return Array.from(flagCache.values());
 }
 
@@ -263,18 +395,28 @@ export function getAllFlags(): FeatureFlag[] {
  * Get a single flag
  */
 export function getFlag(featureId: KnownFeatureFlag): FeatureFlag | undefined {
+  if (!initialized) initializeFlagsSync();
   return flagCache.get(featureId);
 }
 
 /**
  * Set flag status
  */
-export function setFlagStatus(
+export async function setFlagStatus(
   featureId: KnownFeatureFlag,
   status: FeatureFlagStatus,
   updatedBy?: string,
-): FeatureFlag | null {
+): Promise<FeatureFlag | null> {
   return updateFlag(featureId, { status, updatedBy });
+}
+
+/**
+ * Reload flags from database (useful after external changes)
+ */
+export async function reloadFlags(): Promise<void> {
+  initialized = false;
+  flagCache.clear();
+  await initializeFlags();
 }
 
 // Simple hash function for deterministic percentage rollout
@@ -288,5 +430,12 @@ function simpleHash(str: string): number {
   return Math.abs(hash);
 }
 
-// Auto-initialize on import
-initializeFlags();
+/**
+ * Reset state (for testing only)
+ */
+export function _resetForTesting(): void {
+  flagCache.clear();
+  globalKillSwitch = false;
+  globalKillSwitchReason = undefined;
+  initialized = false;
+}
