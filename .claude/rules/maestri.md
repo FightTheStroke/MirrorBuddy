@@ -1,54 +1,56 @@
 # Maestri Rules - MirrorBuddy
 
-## 20 AI Maestros (18 Maestri + 2 Amici)
+## 22 AI Maestros (20 Maestri + 2 Amici)
 
 Educational AI tutors with embedded knowledge in `src/data/maestri/`:
 
-| Maestro | Subject | Type | Knowledge File |
-|---------|---------|------|----------------|
-| Leonardo | Art | Maestro | `leonardo-knowledge.ts` |
-| Galileo | Physics/Astronomy | Maestro | `galileo-knowledge.ts` |
-| Curie | Chemistry | Maestro | `curie-knowledge.ts` |
-| Cicerone | Civic Education | Maestro | `cicerone-knowledge.ts` |
-| Lovelace | Computer Science | Maestro | `lovelace-knowledge.ts` |
-| Smith | Economics | Maestro | `smith-knowledge.ts` |
-| Shakespeare | English | Maestro | `shakespeare-knowledge.ts` |
-| Humboldt | Geography | Maestro | `humboldt-knowledge.ts` |
-| Erodoto | History | Maestro | `erodoto-knowledge.ts` |
-| Manzoni | Italian | Maestro | `manzoni-knowledge.ts` |
-| Euclide | Mathematics | Maestro | `euclide-knowledge.ts` |
-| Mozart | Music | Maestro | `mozart-knowledge.ts` |
-| Socrate | Philosophy | Maestro | `socrate-knowledge.ts` |
-| Ippocrate | Health | Maestro | `ippocrate-knowledge.ts` |
-| Feynman | Physics | Maestro | `feynman-knowledge.ts` |
-| Darwin | Biology | Maestro | `darwin-knowledge.ts` |
-| Chris | Physical Education | Maestro | `chris-knowledge.ts` |
-| Omero | Storytelling | Maestro | `omero-knowledge.ts` |
-| Alex Pina | Spanish | Maestro | `alex-pina-knowledge.ts` |
-| Mascetti | Supercazzola | **Amico** | `amici-miei-knowledge.ts` |
+| Maestro     | Subject            | Type      | Knowledge File             |
+| ----------- | ------------------ | --------- | -------------------------- |
+| Leonardo    | Art                | Maestro   | `leonardo-knowledge.ts`    |
+| Galileo     | Physics/Astronomy  | Maestro   | `galileo-knowledge.ts`     |
+| Curie       | Chemistry          | Maestro   | `curie-knowledge.ts`       |
+| Cicerone    | Civic Education    | Maestro   | `cicerone-knowledge.ts`    |
+| Lovelace    | Computer Science   | Maestro   | `lovelace-knowledge.ts`    |
+| Smith       | Economics          | Maestro   | `smith-knowledge.ts`       |
+| Shakespeare | English            | Maestro   | `shakespeare-knowledge.ts` |
+| Humboldt    | Geography          | Maestro   | `humboldt-knowledge.ts`    |
+| Erodoto     | History            | Maestro   | `erodoto-knowledge.ts`     |
+| Manzoni     | Italian            | Maestro   | `manzoni-knowledge.ts`     |
+| Euclide     | Mathematics        | Maestro   | `euclide-knowledge.ts`     |
+| Mozart      | Music              | Maestro   | `mozart-knowledge.ts`      |
+| Socrate     | Philosophy         | Maestro   | `socrate-knowledge.ts`     |
+| Ippocrate   | Health             | Maestro   | `ippocrate-knowledge.ts`   |
+| Feynman     | Physics            | Maestro   | `feynman-knowledge.ts`     |
+| Darwin      | Biology            | Maestro   | `darwin-knowledge.ts`      |
+| Chris       | Physical Education | Maestro   | `chris-knowledge.ts`       |
+| Omero       | Storytelling       | Maestro   | `omero-knowledge.ts`       |
+| Alex Pina   | Spanish            | Maestro   | `alex-pina-knowledge.ts`   |
+| Simone      | Sport              | Maestro   | `simone-knowledge.ts`      |
+| Cassese     | International Law  | Maestro   | `cassese-knowledge.ts`     |
+| Mascetti    | Supercazzola       | **Amico** | `amici-miei-knowledge.ts`  |
 
 ## Two Character Types
 
-| Type | Tools | Teaching | XP | Character Immersion |
-|------|-------|----------|----|--------------------|
-| **Maestro** | Yes | Yes | Earns XP | Variable (dial) |
-| **Amico** | None | No | `excludeFromGamification: true` | 100% always |
+| Type        | Tools | Teaching | XP                              | Character Immersion |
+| ----------- | ----- | -------- | ------------------------------- | ------------------- |
+| **Maestro** | Yes   | Yes      | Earns XP                        | Variable (dial)     |
+| **Amico**   | None  | No       | `excludeFromGamification: true` | 100% always         |
 
 ## Data Structure
 
 ```typescript
 // src/data/maestri/types.ts
 interface MaestroFull {
-  id: string;           // e.g., "euclide-matematica"
-  name: string;         // filename-based identifier
-  displayName: string;  // Human readable, e.g., "Euclide"
-  subject: string;      // e.g., "mathematics", "history"
-  tools: string[];      // Available tools for this maestro
+  id: string; // e.g., "euclide-matematica"
+  name: string; // filename-based identifier
+  displayName: string; // Human readable, e.g., "Euclide"
+  subject: string; // e.g., "mathematics", "history"
+  tools: string[]; // Available tools for this maestro
   systemPrompt: string; // Full prompt including embedded knowledge
-  avatar: string;       // `/maestri/${id}.png`
-  color: string;        // Subject-based color
-  greeting: string;     // Initial greeting message
-  excludeFromGamification?: boolean;  // true for Amici
+  avatar: string; // `/maestri/${id}.png`
+  color: string; // Subject-based color
+  greeting: string; // Initial greeting message
+  excludeFromGamification?: boolean; // true for Amici
 }
 ```
 
@@ -60,23 +62,23 @@ import {
   getAllMaestri,
   getMaestriBySubject,
   getAllSubjects,
-  SUBJECT_NAMES
-} from '@/data/maestri';
+  SUBJECT_NAMES,
+} from "@/data/maestri";
 
 // Get single maestro
-const maestro = getMaestroById('galileo');
+const maestro = getMaestroById("galileo");
 
 // Get all maestri
 const all = getAllMaestri();
 
 // Get by subject
-const physicists = getMaestriBySubject('physics');
+const physicists = getMaestriBySubject("physics");
 
 // Get all subjects
 const subjects = getAllSubjects();
 
 // Subject display name
-const name = SUBJECT_NAMES['mathematics']; // "Matematica"
+const name = SUBJECT_NAMES["mathematics"]; // "Matematica"
 ```
 
 ## Adding New Maestro
@@ -94,15 +96,15 @@ const name = SUBJECT_NAMES['mathematics']; // "Matematica"
 
 ```typescript
 // src/data/maestri/newton.ts
-import type { MaestroFull } from './types';
-import { NEWTON_KNOWLEDGE } from './newton-knowledge';
+import type { MaestroFull } from "./types";
+import { NEWTON_KNOWLEDGE } from "./newton-knowledge";
 
 export const newton: MaestroFull = {
-  id: 'newton-physics',
-  name: 'newton-physics',
-  displayName: 'Isaac Newton',
-  subject: 'physics',
-  tools: ['quiz', 'flashcards', 'mindmap'],
+  id: "newton-physics",
+  name: "newton-physics",
+  displayName: "Isaac Newton",
+  subject: "physics",
+  tools: ["quiz", "flashcards", "mindmap"],
   systemPrompt: `Sei Isaac Newton...
 
 ## CHARACTER INTENSITY DIAL
@@ -113,9 +115,9 @@ ${NEWTON_KNOWLEDGE}
 
 ## TEACHING APPROACH
 [Subject-specific pedagogy]`,
-  avatar: '/maestri/newton.png',
-  color: '#4B5563',
-  greeting: 'Buongiorno! Sono Isaac Newton...'
+  avatar: "/maestri/newton.png",
+  color: "#4B5563",
+  greeting: "Buongiorno! Sono Isaac Newton...",
 };
 ```
 
@@ -124,16 +126,16 @@ ${NEWTON_KNOWLEDGE}
 ```typescript
 // src/data/maestri/character.ts
 export const character: MaestroFull = {
-  id: 'character-topic',
-  name: 'character-topic',
-  displayName: 'Character Name',
-  subject: 'topic',
+  id: "character-topic",
+  name: "character-topic",
+  displayName: "Character Name",
+  subject: "topic",
   tools: [], // NO tools
   excludeFromGamification: true, // NO XP
   systemPrompt: `...`,
-  avatar: '/maestri/character.png',
-  color: '#722F37',
-  greeting: '...'
+  avatar: "/maestri/character.png",
+  color: "#722F37",
+  greeting: "...",
 };
 ```
 
@@ -141,11 +143,11 @@ export const character: MaestroFull = {
 
 Maestri adjust character intensity based on context:
 
-| Mode | When | Behavior |
-|------|------|----------|
-| **Full Character** | Greetings, anecdotes, motivation | 100% authentic voice |
-| **Reduced** | Complex concepts, confusion, autism profile | Clarity priority |
-| **Override** | Student stuck 3+ times, crisis | Direct help immediately |
+| Mode               | When                                        | Behavior                |
+| ------------------ | ------------------------------------------- | ----------------------- |
+| **Full Character** | Greetings, anecdotes, motivation            | 100% authentic voice    |
+| **Reduced**        | Complex concepts, confusion, autism profile | Clarity priority        |
+| **Override**       | Student stuck 3+ times, crisis              | Direct help immediately |
 
 ## Safety Guidelines
 

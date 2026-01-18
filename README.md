@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/AI%20Maestri-20-purple" alt="20 AI Maestri">
+  <img src="https://img.shields.io/badge/AI%20Maestri-22-purple" alt="22 AI Maestri">
   <img src="https://img.shields.io/badge/DSA%20Profiles-7-orange" alt="7 DSA Profiles">
   <img src="https://img.shields.io/badge/GDPR-Compliant-blue" alt="GDPR Compliant">
   <img src="https://img.shields.io/badge/Child%20Safe-5%20Layer%20Security-brightgreen" alt="Child Safe">
@@ -67,26 +67,26 @@ Every student in MirrorBuddy has access to three types of AI support:
               v             v             v
         +-----------+ +-----------+ +-----------+
         |   COACH   | |   BUDDY   | |  MAESTRI  |
-        |  (5 AI)   | |  (5 AI)   | |  (20 AI)  |
+        |  (6 AI)   | |  (6 AI)   | |  (22 AI)  |
         |           | |           | |           |
         |  Method   | |   Peer    | |  Content  |
         |  Support  | |  Support  | |  Experts  |
         +-----------+ +-----------+ +-----------+
 ```
 
-| Type | Characters | Relationship | Goal |
-|------|------------|--------------|------|
-| **Maestri** | 20 historical figures | Mentor (vertical) | Teach subjects with passion |
-| **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij | Learning coach (vertical) | Develop METHOD and autonomy |
-| **Buddies** | Mario, Noemi, Enea, Bruno, Sofia | Peer friend (horizontal) | Emotional support, shared struggles |
+| Type        | Characters                                     | Relationship              | Goal                                |
+| ----------- | ---------------------------------------------- | ------------------------- | ----------------------------------- |
+| **Maestri** | 22 historical figures                          | Mentor (vertical)         | Teach subjects with passion         |
+| **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij, Laura | Learning coach (vertical) | Develop METHOD and autonomy         |
+| **Buddies** | Mario, Noemi, Enea, Bruno, Sofia, Marta        | Peer friend (horizontal)  | Emotional support, shared struggles |
 
 ### Learning WITH the Greats, Not About Them
 
-Instead of reading *about* Euclid in a textbook, students learn mathematics **with Euclid himself**. Instead of memorizing dates about Darwin, they explore evolution **alongside Darwin**. Instead of watching a video about Marie Curie, they discuss chemistry **with Curie**.
+Instead of reading _about_ Euclid in a textbook, students learn mathematics **with Euclid himself**. Instead of memorizing dates about Darwin, they explore evolution **alongside Darwin**. Instead of watching a video about Marie Curie, they discuss chemistry **with Curie**.
 
 Each **Maestro** is an AI tutor embodying a legendary figure from history:
 
-**20 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Simone (Sport)
+**22 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Mascetti (Supercazzola), Simone (Sport), Cassese (International Law)
 
 ---
 
@@ -98,7 +98,7 @@ Mario survived a pediatric stroke at birth. It left him with cerebral palsy. Lik
 
 In 2013, his parents founded [FightTheStroke](https://fightthestroke.org) to fight for children like Mario. After a decade of advocacy, research, and watching AI transform what's possible, they built what they always wanted: **the school Mario deserved**.
 
-> *"A birth accident should not dictate a child's future."*
+> _"A birth accident should not dictate a child's future."_
 
 Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www.ted.com/talks/roberto_d_angelo_and_francesca_fedeli_in_our_baby_s_illness_a_life_lesson)
 
@@ -132,28 +132,32 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft.com/en-us/security/blog/2025/01/13/the-ethical-design-hacker-6-mindsets-for-secure-ux-in-ai/) security mindsets, designed specifically for protecting children with learning differences.
 
 ### Privacy Protection (GDPR Compliant)
-| Feature | Protection |
-|---------|------------|
-| **PII Detection** | Auto-detects Italian fiscal codes, names, emails, phones |
-| **Anonymization** | Replaces sensitive data before AI processing |
-| **Data Retention** | Configurable TTL (365d conversations, 730d progress) |
-| **Right to Erasure** | GDPR Article 17 deletion with audit trail |
+
+| Feature              | Protection                                               |
+| -------------------- | -------------------------------------------------------- |
+| **PII Detection**    | Auto-detects Italian fiscal codes, names, emails, phones |
+| **Anonymization**    | Replaces sensitive data before AI processing             |
+| **Data Retention**   | Configurable TTL (365d conversations, 730d progress)     |
+| **Right to Erasure** | GDPR Article 17 deletion with audit trail                |
 
 ### AI Transparency
-| Indicator | Meaning |
-|-----------|---------|
-| 🟢 Green | High confidence, knowledge-base backed |
-| 🟡 Yellow | Medium confidence, partial sources |
-| 🟠 Orange | Low confidence, AI-generated |
-| 🔴 Red | Hallucination risk detected |
+
+| Indicator | Meaning                                |
+| --------- | -------------------------------------- |
+| 🟢 Green  | High confidence, knowledge-base backed |
+| 🟡 Yellow | Medium confidence, partial sources     |
+| 🟠 Orange | Low confidence, AI-generated           |
+| 🔴 Red    | Hallucination risk detected            |
 
 ### Child Safety
+
 - **Content Filtering**: Age-appropriate responses with Italian messaging
 - **Jailbreak Detection**: Pattern matching for prompt injection attempts
 - **Session Throttling**: Gradual escalation from warnings to timeouts
 - **Audit Trail**: Anonymized logging for safety monitoring
 
 ### Security Hardening
+
 - **Unicode Normalization**: Prevents Cyrillic/Greek homoglyph attacks
 - **Configuration Versioning**: Rollback safety settings with history
 - **Knowledge Base Auditing**: Content validation before embedding
@@ -194,6 +198,7 @@ Open http://localhost:3000 and start learning.
 **Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Ollama (fallback, text) → Prisma ORM → PostgreSQL + pgvector
 
 **Key Decisions:**
+
 - **ADR 0015:** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.
 - **ADR 0033:** RAG (Retrieval-Augmented Generation) using Azure OpenAI embeddings + pgvector for semantic search of user materials.
 
@@ -203,18 +208,18 @@ Open http://localhost:3000 and start learning.
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript 5 (strict mode) |
-| Styling | Tailwind CSS 4 |
-| State | Zustand |
-| AI | Azure OpenAI (chat, voice, embeddings) |
-| RAG | pgvector (semantic search) |
-| Mind Maps | MarkMap |
-| Database | Prisma + PostgreSQL + pgvector |
-| Testing | Playwright E2E (API-focused) + Vitest unit |
-| Observability | Grafana Cloud + Prometheus metrics |
+| Layer         | Technology                                 |
+| ------------- | ------------------------------------------ |
+| Framework     | Next.js 16 (App Router)                    |
+| Language      | TypeScript 5 (strict mode)                 |
+| Styling       | Tailwind CSS 4                             |
+| State         | Zustand                                    |
+| AI            | Azure OpenAI (chat, voice, embeddings)     |
+| RAG           | pgvector (semantic search)                 |
+| Mind Maps     | MarkMap                                    |
+| Database      | Prisma + PostgreSQL + pgvector             |
+| Testing       | Playwright E2E (API-focused) + Vitest unit |
+| Observability | Grafana Cloud + Prometheus metrics         |
 
 ---
 
@@ -223,12 +228,14 @@ Open http://localhost:3000 and start learning.
 **Dashboard:** https://mirrorbuddy.grafana.net/d/dashboard/
 
 **Metrics Exported (V1Plan compliance):**
+
 - Session Health: success rate, drop-off rate, stuck loop rate
 - Safety: refusal precision, jailbreak block rate, incidents S0-S3
 - Performance: HTTP latency P95, error rates by route
 - Cost: per-session cost (text/voice), cost spikes
 
 **Setup:**
+
 ```bash
 # .env
 GRAFANA_CLOUD_PROMETHEUS_URL=https://prometheus-prod-XX.grafana.net/api/v1/push/influx/write
@@ -240,6 +247,7 @@ npx tsx scripts/test-grafana-push.ts
 ```
 
 **Endpoints:**
+
 - `GET /api/health` — Load balancer health check
 - `GET /api/health/detailed` — Full system metrics
 - `GET /api/metrics` — Prometheus format (Grafana scrape)
@@ -264,11 +272,13 @@ uvicorn api.main:app --reload
 ```
 
 **Endpoints:**
+
 - `GET /api/v1/costs?days=30` — Cost summary by service
 - `GET /api/v1/costs/forecast` — Monthly forecast
 - `GET /api/v1/costs/drilldown?days=30` — Detailed breakdown with AI model usage
 
 **Configuration** (all from `.env`, never hardcoded):
+
 ```env
 AZURE_SUBSCRIPTION_ID=your-subscription-id  # Required
 AZURE_SUBSCRIPTION_NAME=My Subscription     # Optional display name
@@ -279,6 +289,7 @@ AZURE_CLIENT_SECRET=...
 ```
 
 **Quick test** (requires `az login`):
+
 ```bash
 cd backend && python3 -c "
 from api.azure_costs import AzureCostService
@@ -312,6 +323,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md).
 **Important:** All PRs must follow the [Execution Checklist](docs/EXECUTION-CHECKLIST.md). PRs without a completed checklist will be rejected.
 
 This project was born for inclusion. Every contribution must be:
+
 - Keyboard accessible
 - Screen reader compatible
 - Color-blind friendly
@@ -338,6 +350,7 @@ Chosen for patent protection (critical for AI/ML projects) and institutional tru
 MirrorBuddy is Apache 2.0 in product proof mode. The competitive advantage is the governed system around the repository, not the code itself.
 
 See [LICENSE-STRATEGY.md](LICENSE-STRATEGY.md) for:
+
 - Why Apache 2.0 (not MIT or Commons Clause)
 - What constitutes "open-core" vs proprietary value
 - Trigger points for license revision
