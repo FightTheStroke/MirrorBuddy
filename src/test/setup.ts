@@ -3,12 +3,12 @@
  * Configures global test environment
  */
 
-import { vi } from 'vitest';
-import '@testing-library/jest-dom/vitest';
+import { vi } from "vitest";
+import "@testing-library/jest-dom/vitest";
 
 // Mock server-only module - it throws when imported outside of server components
 // This allows testing modules that import server-only code
-vi.mock('server-only', () => ({}));
+vi.mock("server-only", () => ({}));
 
 // Mock console methods for cleaner test output
 global.console = {
@@ -21,14 +21,16 @@ global.console = {
   error: console.error,
 };
 
-// Mock crypto for nanoid
-if (typeof globalThis.crypto === 'undefined') {
+// Mock crypto for nanoid - use Node.js crypto module (CSPRNG, not Math.random)
+// This ensures CodeQL doesn't flag test code as using insecure randomness
+if (typeof globalThis.crypto === "undefined") {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const nodeCrypto = require("crypto");
   globalThis.crypto = {
-    randomUUID: () => 'test-uuid-' + Math.random().toString(36).substring(2, 9),
+    randomUUID: () => nodeCrypto.randomUUID(),
     getRandomValues: (arr: Uint8Array) => {
-      for (let i = 0; i < arr.length; i++) {
-        arr[i] = Math.floor(Math.random() * 256);
-      }
+      const bytes = nodeCrypto.randomBytes(arr.length);
+      arr.set(bytes);
       return arr;
     },
   } as Crypto;

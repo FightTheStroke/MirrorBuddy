@@ -146,8 +146,8 @@ export async function approveInviteRequest(
     }
 
     // Generate credentials using CSPRNG (crypto.getRandomValues)
-    // lgtm[js/insecure-randomness]
-    const username = generateUsername(request.email); // NOSONAR - uses crypto.getRandomValues
+    const username = generateUsername(request.email);
+    // Note: generateUsername and generateRandomPassword both use crypto.getRandomValues (CSPRNG)
     const temporaryPassword = generateRandomPassword(12);
     const passwordHash = await hashPassword(temporaryPassword);
 

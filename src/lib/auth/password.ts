@@ -66,9 +66,8 @@ export function generateRandomPassword(length: number = 16): string {
   crypto.getRandomValues(array);
 
   for (let i = 0; i < length; i++) {
-    // Using crypto.getRandomValues (CSPRNG) - modulo bias is acceptable for password chars
-    // lgtm[js/insecure-randomness]
-    password += chars[array[i] % chars.length]; // NOSONAR - uses crypto.getRandomValues, not Math.random
+    // Using crypto.getRandomValues (CSPRNG) - modulo bias is acceptable for password generation
+    password += chars[array[i] % chars.length];
   }
 
   return password;
