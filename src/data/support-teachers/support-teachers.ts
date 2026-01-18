@@ -10,18 +10,25 @@
  * Related: #24 Melissa/Roberto Issue, ManifestoEdu.md
  */
 
-import type { SupportTeacher } from '@/types';
-import { MELISSA } from './melissa';
-import { ROBERTO } from './roberto';
-import { CHIARA } from './chiara';
-import { ANDREA } from './andrea';
-import { FAVIJ } from './favij';
+import type { SupportTeacher } from "@/types";
+import { MELISSA } from "./melissa";
+import { ROBERTO } from "./roberto";
+import { CHIARA } from "./chiara";
+import { ANDREA } from "./andrea";
+import { FAVIJ } from "./favij";
+import { LAURA } from "./laura";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-export type CoachId = 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
+export type CoachId =
+  | "melissa"
+  | "roberto"
+  | "chiara"
+  | "andrea"
+  | "favij"
+  | "laura";
 
 // ============================================================================
 // SUPPORT TEACHERS MAP
@@ -36,20 +43,19 @@ const SUPPORT_TEACHERS: Record<CoachId, SupportTeacher> = {
   chiara: CHIARA,
   andrea: ANDREA,
   favij: FAVIJ,
+  laura: LAURA,
 };
 
 // ============================================================================
 // EXPORTS
 // ============================================================================
 
-export { MELISSA, ROBERTO, CHIARA, ANDREA, FAVIJ };
+export { MELISSA, ROBERTO, CHIARA, ANDREA, FAVIJ, LAURA };
 
 /**
  * Get a support teacher by ID.
  */
-export function getSupportTeacherById(
-  id: CoachId
-): SupportTeacher | undefined {
+export function getSupportTeacherById(id: CoachId): SupportTeacher | undefined {
   return SUPPORT_TEACHERS[id];
 }
 
@@ -57,7 +63,7 @@ export function getSupportTeacherById(
  * Get all support teachers.
  */
 export function getAllSupportTeachers(): SupportTeacher[] {
-  return [MELISSA, ROBERTO, CHIARA, ANDREA, FAVIJ];
+  return [MELISSA, ROBERTO, CHIARA, ANDREA, FAVIJ, LAURA];
 }
 
 /**
@@ -71,7 +77,7 @@ export function getDefaultSupportTeacher(): SupportTeacher {
  * Get a support teacher by gender preference.
  */
 export function getSupportTeacherByGender(
-  gender: 'male' | 'female'
+  gender: "male" | "female",
 ): SupportTeacher {
-  return gender === 'male' ? ROBERTO : MELISSA;
+  return gender === "male" ? ROBERTO : MELISSA;
 }

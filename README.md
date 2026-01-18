@@ -67,18 +67,18 @@ Every student in MirrorBuddy has access to three types of AI support:
               v             v             v
         +-----------+ +-----------+ +-----------+
         |   COACH   | |   BUDDY   | |  MAESTRI  |
-        |  (5 AI)   | |  (5 AI)   | |  (22 AI)  |
+        |  (6 AI)   | |  (6 AI)   | |  (22 AI)  |
         |           | |           | |           |
         |  Method   | |   Peer    | |  Content  |
         |  Support  | |  Support  | |  Experts  |
         +-----------+ +-----------+ +-----------+
 ```
 
-| Type        | Characters                              | Relationship              | Goal                                |
-| ----------- | --------------------------------------- | ------------------------- | ----------------------------------- |
-| **Maestri** | 22 historical figures                   | Mentor (vertical)         | Teach subjects with passion         |
-| **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij | Learning coach (vertical) | Develop METHOD and autonomy         |
-| **Buddies** | Mario, Noemi, Enea, Bruno, Sofia        | Peer friend (horizontal)  | Emotional support, shared struggles |
+| Type        | Characters                                     | Relationship              | Goal                                |
+| ----------- | ---------------------------------------------- | ------------------------- | ----------------------------------- |
+| **Maestri** | 22 historical figures                          | Mentor (vertical)         | Teach subjects with passion         |
+| **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij, Laura | Learning coach (vertical) | Develop METHOD and autonomy         |
+| **Buddies** | Mario, Noemi, Enea, Bruno, Sofia, Marta        | Peer friend (horizontal)  | Emotional support, shared struggles |
 
 ### Learning WITH the Greats, Not About Them
 
