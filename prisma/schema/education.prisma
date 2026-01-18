@@ -128,21 +128,21 @@ model SessionMetrics {
   outcome String @default("unknown") // success | dropped | stuck_loop | abandoned
 
   // Behavioral metrics
-  turnCount       Int   @default(0)
+  turnCount        Int   @default(0)
   avgTurnLatencyMs Int?
-  stuckLoopCount  Int   @default(0) // Same intent repeated 3+ times in 5 turns
+  stuckLoopCount   Int   @default(0) // Same intent repeated 3+ times in 5 turns
 
   // Cost tracking (V1Plan FASE 6)
-  tokensIn       Int   @default(0)
-  tokensOut      Int   @default(0)
-  voiceMinutes   Float @default(0)
-  costEur        Float @default(0)
+  tokensIn     Int   @default(0)
+  tokensOut    Int   @default(0)
+  voiceMinutes Float @default(0)
+  costEur      Float @default(0)
 
   // Safety events
-  refusalCount      Int @default(0)
-  refusalCorrect    Int @default(0)
+  refusalCount      Int     @default(0)
+  refusalCorrect    Int     @default(0)
   incidentSeverity  String? // S0 | S1 | S2 | S3 (highest in session)
-  jailbreakAttempts Int @default(0)
+  jailbreakAttempts Int     @default(0)
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -152,6 +152,7 @@ model SessionMetrics {
   @@index([outcome])
   @@index([createdAt])
   @@index([incidentSeverity])
+  @@map("session_metrics")
 }
 
 model MethodProgress {

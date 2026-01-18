@@ -9,7 +9,7 @@ check_images() {
     echo -e "${BLUE}[1/6] Checking avatar image formats...${NC}"
 
     local non_webp
-    non_webp=$(find public/maestri -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null)
+    non_webp=$(/usr/bin/find public/maestri -type f \( -name "*.png" -o -name "*.jpg" -o -name "*.jpeg" \) 2>/dev/null)
 
     if [ -n "$non_webp" ]; then
         echo -e "${RED}✗ Found non-WebP avatars (should be converted):${NC}"
@@ -17,7 +17,7 @@ check_images() {
         fail
     else
         local webp_count
-        webp_count=$(find public/maestri -name "*.webp" 2>/dev/null | grep -c . || echo 0)
+        webp_count=$(/usr/bin/find public/maestri -name "*.webp" 2>/dev/null | /usr/bin/grep -c . || echo 0)
         echo -e "${GREEN}✓ All $webp_count avatars are WebP format${NC}"
     fi
 }
@@ -28,7 +28,7 @@ check_bundle_size() {
 
     if [ -d ".next" ]; then
         local large_chunks
-        large_chunks=$(find .next/static/chunks -name "*.js" -size +500k 2>/dev/null | grep -v "node_modules" | head -5)
+        large_chunks=$(/usr/bin/find .next/static/chunks -name "*.js" -size +500k 2>/dev/null | /usr/bin/grep -v "node_modules" | head -5)
 
         if [ -n "$large_chunks" ]; then
             echo -e "${YELLOW}  ⚠ Large app chunks found (>500KB):${NC}"

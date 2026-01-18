@@ -44,17 +44,19 @@ fi
 echo -e "${GREEN}✓ Documentation exists${NC}"
 
 # Code hygiene with ripgrep (much faster than grep)
+# Exclude: logger.ts, test files, JSDoc comments (: * ), intentional demo sandboxing
 if command -v rg &> /dev/null; then
-    TODO_COUNT=$(rg -c "(TODO|FIXME|HACK|XXX):" src/ -t ts -t tsx 2>/dev/null | awk -F: '{sum+=$2} END {print sum+0}')
-    CONSOLE_COUNT=$(rg -c "console\.(log|warn|error|debug|info)\(" src/ -t ts -t tsx 2>/dev/null | rg -v "logger\.ts" | awk -F: '{sum+=$2} END {print sum+0}')
+    TODO_COUNT=$(rg -c "(TODO|FIXME|HACK|XXX):" src/ -g '*.ts' -g '*.tsx' 2>/dev/null | rg -v "__tests__" | rg -v "\.test\." | rg -v "\.spec\." | awk -F: '{sum+=$2} END {print sum+0}')
+    # Filter console.* calls: exclude logger, test files, JSDoc comments (: * ), demo-html-builder
+    CONSOLE_COUNT=$(rg "console\.(log|warn|error|debug|info)\(" src/ -g '*.ts' -g '*.tsx' 2>/dev/null | rg -v "__tests__" | rg -v "\.test\." | rg -v "\.spec\." | rg -v "logger" | rg -v ": \*" | rg -v "demo-html-builder" | /usr/bin/wc -l | tr -d ' ')
 else
-    TODO_COUNT=$(grep -rE "(TODO|FIXME|HACK|XXX):" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | wc -l | tr -d ' ')
-    CONSOLE_COUNT=$(grep -rE "console\.(log|warn|error|debug|info)\(" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | grep -v "logger.ts" | wc -l | tr -d ' ')
+    TODO_COUNT=$(/usr/bin/grep -rE "(TODO|FIXME|HACK|XXX):" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | /usr/bin/grep -v "__tests__" | /usr/bin/grep -v "\.test\." | /usr/bin/wc -l | tr -d ' ')
+    CONSOLE_COUNT=$(/usr/bin/grep -rE "console\.(log|warn|error|debug|info)\(" src/ --include="*.ts" --include="*.tsx" 2>/dev/null | /usr/bin/grep -v "logger" | /usr/bin/grep -v "__tests__" | /usr/bin/grep -v "\.test\." | /usr/bin/grep -v ": \*" | /usr/bin/wc -l | tr -d ' ')
 fi
 
 if [ "$TODO_COUNT" -gt 0 ]; then
     echo -e "${RED}✗ Found $TODO_COUNT TODO/FIXME markers${NC}"
-    rg "(TODO|FIXME|HACK|XXX):" src/ -t ts -t tsx 2>/dev/null | head -5
+    rg "(TODO|FIXME|HACK|XXX):" src/ -g '*.ts' -g '*.tsx' 2>/dev/null | head -5
     exit 1
 fi
 if [ "$CONSOLE_COUNT" -gt 0 ]; then

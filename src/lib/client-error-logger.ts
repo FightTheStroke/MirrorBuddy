@@ -15,6 +15,11 @@
  */
 
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
+type ConsoleMethod = (...args: unknown[]) => void;
+type PatchableConsole = Console & {
+  error: ConsoleMethod;
+  warn: ConsoleMethod;
+};
 
 interface ClientLogEntry {
   level: LogLevel;
@@ -104,10 +109,9 @@ function initClientErrorLogger(): void {
   });
 
   // Intercept console.error - intentionally accessing console for interception
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const originalConsoleError = (console as any).error.bind(console);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (console as any).error = (...args: unknown[]) => {
+  const patchableConsole = console as PatchableConsole;
+  const originalConsoleError = patchableConsole.error.bind(console);
+  patchableConsole.error = (...args: unknown[]) => {
     const message = args.map(arg => {
       if (arg instanceof Error) return arg.message;
       if (typeof arg === 'object') {
@@ -137,10 +141,8 @@ function initClientErrorLogger(): void {
   };
 
   // Intercept console.warn - intentionally accessing console for interception
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const originalConsoleWarn = (console as any).warn.bind(console);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (console as any).warn = (...args: unknown[]) => {
+  const originalConsoleWarn = patchableConsole.warn.bind(console);
+  patchableConsole.warn = (...args: unknown[]) => {
     const message = args.map(arg => {
       if (typeof arg === 'object') {
         try {
