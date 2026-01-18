@@ -1,0 +1,92 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+
+interface InviteRequestBody {
+  name: string;
+  email: string;
+  motivation: string;
+  visitorId?: string;
+  trialSessionId?: string;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = (await request.json()) as InviteRequestBody;
+    const { name, email, motivation, trialSessionId } = body;
+
+    // Validation
+    if (!name || name.trim().length < 2) {
+      return NextResponse.json(
+        { error: "Nome richiesto (minimo 2 caratteri)" },
+        { status: 400 },
+      );
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Email non valida" }, { status: 400 });
+    }
+
+    if (!motivation || motivation.trim().length < 20) {
+      return NextResponse.json(
+        { error: "Motivazione richiesta (minimo 20 caratteri)" },
+        { status: 400 },
+      );
+    }
+
+    // Check for existing request
+    const existing = await prisma.inviteRequest.findUnique({
+      where: { email: email.toLowerCase() },
+    });
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "Questa email ha gia una richiesta in corso" },
+        { status: 409 },
+      );
+    }
+
+    // Create invite request
+    const inviteRequest = await prisma.inviteRequest.create({
+      data: {
+        name: name.trim(),
+        email: email.toLowerCase().trim(),
+        motivation: motivation.trim(),
+        trialSessionId: trialSessionId || null,
+      },
+    });
+
+    logger.info("Beta request created", {
+      inviteId: inviteRequest.id,
+      email: inviteRequest.email,
+      hasTrialSession: !!trialSessionId,
+    });
+
+    // Send notifications (non-blocking)
+    import("@/lib/invite/invite-service").then(
+      ({ notifyAdminNewRequest, sendRequestConfirmation }) => {
+        notifyAdminNewRequest(inviteRequest.id);
+        sendRequestConfirmation(inviteRequest.id);
+      },
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Richiesta inviata con successo",
+        id: inviteRequest.id,
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    logger.error("Failed to create beta request", undefined, error as Error);
+    return NextResponse.json(
+      { error: "Errore durante la creazione della richiesta" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function GET() {
+  return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+}
