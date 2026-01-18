@@ -3,15 +3,15 @@
 // localStorage-based probe results cache with TTL
 // ============================================================================
 
-'use client';
+"use client";
 
-import { logger } from '@/lib/logger';
-import type { ProbeResults, TransportSelection } from './transport-types';
+import { logger } from "@/lib/logger";
+import type { ProbeResults, TransportSelection } from "./transport-types";
 
 /**
  * Cache configuration
  */
-const CACHE_KEY = 'mirrorbuddy_transport_probe_cache';
+const CACHE_KEY = "mirrorbuddy_transport_probe_cache";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
@@ -29,7 +29,7 @@ interface CachedProbeResults {
  */
 function hasLocalStorage(): boolean {
   try {
-    return typeof window !== 'undefined' && typeof localStorage !== 'undefined';
+    return typeof window !== "undefined" && typeof localStorage !== "undefined";
   } catch {
     return false;
   }
@@ -37,15 +37,13 @@ function hasLocalStorage(): boolean {
 
 /**
  * Save probe results and selection to localStorage cache
- *
- * F-05: Cache probe results with 24h TTL
  */
 export function cacheProbeResults(
   probeResults: ProbeResults,
-  selection: TransportSelection
+  selection: TransportSelection,
 ): void {
   if (!hasLocalStorage()) {
-    logger.debug('[TransportSelector] localStorage not available, skipping cache');
+    logger.debug("[TransportCache] localStorage not available, skipping cache");
     return;
   }
 
@@ -59,23 +57,19 @@ export function cacheProbeResults(
 
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
-    logger.debug('[TransportSelector] Probe results cached', {
-      transport: selection.transport,
-      expiresIn: '24h',
+    logger.debug("[TransportCache] Probe results cached", {
+      confidence: selection.confidence,
+      expiresIn: "24h",
     });
   } catch (error) {
-    logger.warn('[TransportSelector] Failed to cache probe results', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+    logger.warn("[TransportCache] Failed to cache probe results", {
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 }
 
 /**
  * Load cached probe results if valid (not expired)
- *
- * F-05: Skip re-probe for 24h if successful
- *
- * @returns Cached selection or null if cache is invalid/expired
  */
 export function loadCachedSelection(): TransportSelection | null {
   if (!hasLocalStorage()) {
@@ -85,7 +79,7 @@ export function loadCachedSelection(): TransportSelection | null {
   try {
     const raw = localStorage.getItem(CACHE_KEY);
     if (!raw) {
-      logger.debug('[TransportSelector] No cached probe results found');
+      logger.debug("[TransportCache] No cached probe results found");
       return null;
     }
 
@@ -94,35 +88,36 @@ export function loadCachedSelection(): TransportSelection | null {
 
     // Check if cache is expired
     if (now >= cached.expiresAt) {
-      logger.info('[TransportSelector] Cache expired, will re-probe', {
-        cachedAt: new Date(cached.cachedAt).toISOString(),
-        expiredAt: new Date(cached.expiresAt).toISOString(),
-      });
+      logger.info("[TransportCache] Cache expired, will re-probe");
       invalidateCache();
       return null;
     }
 
-    // Check if the cached transport was successful
+    // Check if the cached probe was successful
     const { selection } = cached;
-    const isStillValid = selection.probeResults[selection.transport].success;
+    const isStillValid = selection.probeResults.webrtc.success;
 
     if (!isStillValid) {
-      logger.info('[TransportSelector] Cached transport was not successful, will re-probe');
+      logger.info(
+        "[TransportCache] Cached probe was not successful, will re-probe",
+      );
       invalidateCache();
       return null;
     }
 
-    const remainingHours = ((cached.expiresAt - now) / (1000 * 60 * 60)).toFixed(1);
-    logger.info('[TransportSelector] Using cached transport selection', {
-      transport: selection.transport,
+    const remainingHours = (
+      (cached.expiresAt - now) /
+      (1000 * 60 * 60)
+    ).toFixed(1);
+    logger.info("[TransportCache] Using cached selection", {
       confidence: selection.confidence,
       remainingTTL: `${remainingHours}h`,
     });
 
     return selection;
   } catch (error) {
-    logger.warn('[TransportSelector] Failed to load cached results', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+    logger.warn("[TransportCache] Failed to load cached results", {
+      error: error instanceof Error ? error.message : "Unknown error",
     });
     invalidateCache();
     return null;
@@ -131,11 +126,6 @@ export function loadCachedSelection(): TransportSelection | null {
 
 /**
  * Invalidate the probe results cache
- *
- * Called on:
- * - Cache expiration
- * - Network change events
- * - Manual reset request
  */
 export function invalidateCache(): void {
   if (!hasLocalStorage()) {
@@ -144,10 +134,10 @@ export function invalidateCache(): void {
 
   try {
     localStorage.removeItem(CACHE_KEY);
-    logger.debug('[TransportSelector] Cache invalidated');
+    logger.debug("[TransportCache] Cache invalidated");
   } catch (error) {
-    logger.warn('[TransportSelector] Failed to invalidate cache', {
-      error: error instanceof Error ? error.message : 'Unknown error',
+    logger.warn("[TransportCache] Failed to invalidate cache", {
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 }
@@ -176,7 +166,7 @@ export function isCacheValid(): boolean {
 /**
  * Get cache info for debugging
  */
-export function getCacheInfo(): { valid: boolean; transport?: string; expiresIn?: string } {
+export function getCacheInfo(): { valid: boolean; expiresIn?: string } {
   if (!hasLocalStorage()) {
     return { valid: false };
   }
@@ -200,7 +190,6 @@ export function getCacheInfo(): { valid: boolean; transport?: string; expiresIn?
 
     return {
       valid: true,
-      transport: cached.selection.transport,
       expiresIn: `${hours}h ${minutes}m`,
     };
   } catch {

@@ -1,13 +1,13 @@
 // ============================================================================
 // CONNECTION CLEANUP
-// Resource cleanup for voice session disconnect
+// Resource cleanup for voice session disconnect (WebRTC only)
 // ============================================================================
 
-'use client';
+"use client";
 
-import { useCallback } from 'react';
-import { logger } from '@/lib/logger';
-import type { ConnectionRefs } from './connection-types';
+import { useCallback } from "react";
+import { logger } from "@/lib/logger";
+import type { ConnectionRefs } from "./connection-types";
 
 /**
  * Disconnect from voice session and clean up all resources
@@ -15,21 +15,30 @@ import type { ConnectionRefs } from './connection-types';
 export function useDisconnect(
   refs: ConnectionRefs,
   reset: () => void,
-  setConnectionState: (state: 'idle' | 'connecting' | 'connected' | 'error') => void
+  setConnectionState: (
+    state: "idle" | "connecting" | "connected" | "error",
+  ) => void,
 ) {
   return useCallback(() => {
-    logger.debug('[VoiceSession] Disconnecting...');
+    logger.debug("[VoiceSession] Disconnecting...");
+
+    // Cancel input level monitoring animation frame
+    if (refs.animationFrameRef.current) {
+      cancelAnimationFrame(refs.animationFrameRef.current);
+      // eslint-disable-next-line react-hooks/immutability -- Intentional ref cleanup
+      refs.animationFrameRef.current = null;
+    }
 
     // WebRTC heartbeat cleanup (uses setTimeout with jitter, not setInterval)
     if (refs.webrtcHeartbeatRef.current) {
       clearTimeout(refs.webrtcHeartbeatRef.current);
-      // eslint-disable-next-line react-hooks/immutability -- Intentional ref cleanup
+
       refs.webrtcHeartbeatRef.current = null;
     }
 
     // WebRTC cleanup
     if (refs.webrtcCleanupRef.current) {
-      logger.debug('[VoiceSession] Cleaning up WebRTC connection');
+      logger.debug("[VoiceSession] Cleaning up WebRTC connection");
       refs.webrtcCleanupRef.current();
       refs.webrtcCleanupRef.current = null;
     }
@@ -41,7 +50,9 @@ export function useDisconnect(
       refs.webrtcAudioElementRef.current = null;
     }
     if (refs.remoteAudioStreamRef.current) {
-      refs.remoteAudioStreamRef.current.getTracks().forEach(track => track.stop());
+      refs.remoteAudioStreamRef.current
+        .getTracks()
+        .forEach((track) => track.stop());
       refs.remoteAudioStreamRef.current = null;
     }
 
@@ -67,15 +78,9 @@ export function useDisconnect(
       refs.sourceNodeRef.current = null;
     }
 
-    // WebSocket cleanup
-    if (refs.wsRef.current) {
-      refs.wsRef.current.close();
-      refs.wsRef.current = null;
-    }
-
     // Media stream cleanup
     if (refs.mediaStreamRef.current) {
-      refs.mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      refs.mediaStreamRef.current.getTracks().forEach((track) => track.stop());
       refs.mediaStreamRef.current = null;
     }
 
@@ -96,8 +101,12 @@ export function useDisconnect(
     refs.nextPlayTimeRef.current = 0;
 
     // Stop all scheduled audio sources
-    refs.scheduledSourcesRef.current.forEach(source => {
-      try { source.stop(); } catch { /* already stopped */ }
+    refs.scheduledSourcesRef.current.forEach((source) => {
+      try {
+        source.stop();
+      } catch {
+        /* already stopped */
+      }
     });
     refs.scheduledSourcesRef.current.clear();
 
@@ -108,6 +117,6 @@ export function useDisconnect(
     refs.maestroRef.current = null;
 
     reset();
-    setConnectionState('idle');
+    setConnectionState("idle");
   }, [refs, reset, setConnectionState]);
 }

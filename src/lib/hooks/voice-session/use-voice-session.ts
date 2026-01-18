@@ -1,24 +1,38 @@
 // ============================================================================
 // MIRRORBUDDY - VOICE SESSION HOOK (MODULAR)
-// Azure OpenAI Realtime API with proper audio handling
+// Azure OpenAI Realtime API via WebRTC
 // ============================================================================
 
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useVoiceSessionStore, useSettingsStore } from '@/lib/stores';
-import type { UseVoiceSessionOptions } from './types';
-import { useInitPlaybackContext, useScheduleQueuedChunks, usePlayNextChunk, useOutputLevelPolling } from './audio-playback';
-import { useStartAudioCapture } from './audio-capture';
-import { useSendGreeting, useSendSessionConfig } from './session-config';
-import { useHandleServerEvent } from './event-handlers';
-import { useConnect, useDisconnect } from './connection';
-import { useToggleMute, useSendText, useCancelResponse, useSendWebcamResult } from './actions';
-import { useVoiceSessionRefs, useConnectionState } from './use-voice-session-refs';
+import { useEffect } from "react";
+import { useVoiceSessionStore, useSettingsStore } from "@/lib/stores";
+import type { UseVoiceSessionOptions } from "./types";
+import {
+  useInitPlaybackContext,
+  useScheduleQueuedChunks,
+  usePlayNextChunk,
+  useOutputLevelPolling,
+} from "./audio-playback";
+import { useStartAudioCapture } from "./audio-capture";
+import { useSendGreeting, useSendSessionConfig } from "./session-config";
+import { useHandleServerEvent } from "./event-handlers";
+import { useConnect, useDisconnect } from "./connection";
+import {
+  useToggleMute,
+  useSendText,
+  useCancelResponse,
+  useSendWebcamResult,
+} from "./actions";
+import {
+  useVoiceSessionRefs,
+  useConnectionState,
+} from "./use-voice-session-refs";
 
 export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   const store = useVoiceSessionStore();
-  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled } = useSettingsStore();
+  const { preferredMicrophoneId, preferredOutputId, voiceBargeInEnabled } =
+    useSettingsStore();
 
   // All refs extracted to separate file for line count management
   const refs = useVoiceSessionRefs();
@@ -32,7 +46,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     refs.playbackContextRef,
     refs.playbackAnalyserRef,
     refs.gainNodeRef,
-    preferredOutputId
+    preferredOutputId,
   );
 
   const audioPlaybackRefs = {
@@ -47,14 +61,30 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     gainNodeRef: refs.gainNodeRef,
   };
 
-  const scheduleQueuedChunks = useScheduleQueuedChunks(audioPlaybackRefs, store.setSpeaking, store.setOutputLevel);
-  const playNextChunk = usePlayNextChunk(audioPlaybackRefs, scheduleQueuedChunks, store.setSpeaking, store.setOutputLevel);
-  const { startPolling, stopPolling } = useOutputLevelPolling(refs.playbackAnalyserRef, refs.isPlayingRef, store.setOutputLevel);
+  const scheduleQueuedChunks = useScheduleQueuedChunks(
+    audioPlaybackRefs,
+    store.setSpeaking,
+    store.setOutputLevel,
+  );
+  const playNextChunk = usePlayNextChunk(
+    audioPlaybackRefs,
+    scheduleQueuedChunks,
+    store.setSpeaking,
+    store.setOutputLevel,
+  );
+  const { startPolling, stopPolling } = useOutputLevelPolling(
+    refs.playbackAnalyserRef,
+    refs.isPlayingRef,
+    store.setOutputLevel,
+  );
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
-  useEffect(() => { refs.playNextChunkRef.current = playNextChunk; }, [playNextChunk]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-expressions -- intentional ternary
-  useEffect(() => { store.isSpeaking ? startPolling() : stopPolling(); }, [store.isSpeaking, startPolling, stopPolling]);
+  useEffect(() => {
+    refs.playNextChunkRef.current = playNextChunk;
+  }, [playNextChunk]);
+
+  useEffect(() => {
+    store.isSpeaking ? startPolling() : stopPolling();
+  }, [store.isSpeaking, startPolling, stopPolling]);
 
   // ============================================================================
   // AUDIO CAPTURE
@@ -64,42 +94,44 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     captureContextRef: refs.captureContextRef,
     mediaStreamRef: refs.mediaStreamRef,
     sourceNodeRef: refs.sourceNodeRef,
-    processorRef: refs.processorRef,
     analyserRef: refs.analyserRef,
+    animationFrameRef: refs.animationFrameRef,
     lastLevelUpdateRef: refs.lastLevelUpdateRef,
     frequencyDataRef: refs.frequencyDataRef,
   };
 
   const startAudioCapture = useStartAudioCapture(
-    audioCaptureRefs, refs.wsRef, refs.transportRef, refs.hasActiveResponseRef, store.isMuted, store.setInputLevel
+    audioCaptureRefs,
+    store.setInputLevel,
   );
 
   // ============================================================================
   // SESSION & EVENTS
   // ============================================================================
 
-  const sendGreeting = useSendGreeting(refs.wsRef, refs.greetingSentRef, refs.transportRef, refs.webrtcDataChannelRef);
+  const sendGreeting = useSendGreeting(
+    refs.greetingSentRef,
+    refs.webrtcDataChannelRef,
+  );
   const sendSessionConfig = useSendSessionConfig(
     refs.maestroRef,
-    refs.wsRef,
     store.setConnected,
     store.setCurrentMaestro,
     setConnectionState,
     options,
-    refs.transportRef,
     refs.webrtcDataChannelRef,
     refs.initialMessagesRef,
-    refs.greetingSentRef
+    refs.greetingSentRef,
   );
 
   // Store sendSessionConfig in ref so it can be called from connection.ts for WebRTC
-  useEffect(() => { refs.sendSessionConfigRef.current = sendSessionConfig; }, [sendSessionConfig, refs]);
+  useEffect(() => {
+    refs.sendSessionConfigRef.current = sendSessionConfig;
+  }, [sendSessionConfig, refs]);
 
   const handleServerEvent = useHandleServerEvent({
     maestroRef: refs.maestroRef,
     sessionIdRef: refs.sessionIdRef,
-    wsRef: refs.wsRef,
-    transportRef: refs.transportRef,
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
     hasActiveResponseRef: refs.hasActiveResponseRef,
     sessionReadyRef: refs.sessionReadyRef,
@@ -128,17 +160,16 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     scheduleQueuedChunks,
   });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- refs are stable
-  useEffect(() => { refs.handleServerEventRef.current = handleServerEvent; }, [handleServerEvent]);
+  useEffect(() => {
+    refs.handleServerEventRef.current = handleServerEvent;
+  }, [handleServerEvent]);
 
   // ============================================================================
   // CONNECTION
   // ============================================================================
 
   const connectionRefs = {
-    wsRef: refs.wsRef,
     maestroRef: refs.maestroRef,
-    transportRef: refs.transportRef,
     captureContextRef: refs.captureContextRef,
     playbackContextRef: refs.playbackContextRef,
     mediaStreamRef: refs.mediaStreamRef,
@@ -161,6 +192,7 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
     webrtcHeartbeatRef: refs.webrtcHeartbeatRef,
+    animationFrameRef: refs.animationFrameRef,
     userSpeechEndTimeRef: refs.userSpeechEndTimeRef,
     firstAudioPlaybackTimeRef: refs.firstAudioPlaybackTimeRef,
     sendSessionConfigRef: refs.sendSessionConfigRef,
@@ -168,25 +200,37 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
   };
 
   const connect = useConnect(
-    connectionRefs, store.setConnected, setConnectionState, connectionState,
-    handleServerEvent, preferredMicrophoneId, initPlaybackContext, options
+    connectionRefs,
+    store.setConnected,
+    setConnectionState,
+    connectionState,
+    handleServerEvent,
+    preferredMicrophoneId,
+    initPlaybackContext,
+    options,
   );
-  const disconnect = useDisconnect(connectionRefs, store.reset, setConnectionState);
+  const disconnect = useDisconnect(
+    connectionRefs,
+    store.reset,
+    setConnectionState,
+  );
 
-  useEffect(() => { return () => { disconnect(); }; }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    return () => {
+      disconnect();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ============================================================================
   // ACTIONS & RETURN
   // ============================================================================
 
   const actionRefs = {
-    wsRef: refs.wsRef,
     hasActiveResponseRef: refs.hasActiveResponseRef,
     audioQueueRef: refs.audioQueueRef,
     isPlayingRef: refs.isPlayingRef,
     isBufferingRef: refs.isBufferingRef,
     scheduledSourcesRef: refs.scheduledSourcesRef,
-    transportRef: refs.transportRef,
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
   };
@@ -202,15 +246,19 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     inputLevel: store.inputLevel,
     outputLevel: store.outputLevel,
     connectionState,
-    get inputAnalyser() { return refs.analyserRef.current; },
-    get sessionId() { return refs.sessionIdRef.current; },
+    get inputAnalyser() {
+      return refs.analyserRef.current;
+    },
+    get sessionId() {
+      return refs.sessionIdRef.current;
+    },
     connect,
     disconnect,
     toggleMute: useToggleMute(store.isMuted, store.setMuted),
-    sendText: useSendText(refs.wsRef, refs.transportRef, refs.webrtcDataChannelRef, store.addTranscript),
+    sendText: useSendText(refs.webrtcDataChannelRef, store.addTranscript),
     cancelResponse: useCancelResponse(actionRefs, store.setSpeaking),
     clearTranscript: store.clearTranscript,
     clearToolCalls: store.clearToolCalls,
-    sendWebcamResult: useSendWebcamResult(refs.wsRef, refs.transportRef, refs.webrtcDataChannelRef),
+    sendWebcamResult: useSendWebcamResult(refs.webrtcDataChannelRef),
   };
 }

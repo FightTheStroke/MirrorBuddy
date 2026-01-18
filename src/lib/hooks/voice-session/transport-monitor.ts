@@ -1,28 +1,28 @@
 // ============================================================================
 // TRANSPORT MONITOR
-// Runtime monitoring of connection quality for adaptive transport switching
+// Runtime monitoring of WebRTC connection quality
 // ============================================================================
 
-'use client';
+"use client";
 
-import { logger } from '@/lib/logger';
-import { invalidateCache } from './transport-cache';
+import { logger } from "@/lib/logger";
+import { invalidateCache } from "./transport-cache";
 import {
   calculateAverageLatency,
   isLatencySpike,
-} from './transport-monitor-helpers';
+} from "./transport-monitor-helpers";
 import type {
   ConnectionMetrics,
   DegradationEvent,
   DegradationCallback,
-} from './transport-types';
+} from "./transport-types";
 
-// Re-export types for backwards compatibility
+// Re-export types
 export type {
   ConnectionMetrics,
   DegradationEvent,
   DegradationCallback,
-} from './transport-types';
+} from "./transport-types";
 
 /**
  * Monitor configuration
@@ -39,17 +39,10 @@ const DEFAULT_CONFIG: MonitorConfig = {
   latencySpikeMultiplier: 2.5,
 };
 
-// ============================================================================
-// F-06: Connection Quality Monitoring
-// ============================================================================
-
 /**
- * Transport Monitor for tracking connection quality during active sessions
- *
- * F-06: Monitor connection quality during active session
+ * Transport Monitor for tracking WebRTC connection quality
  */
 export class TransportMonitor {
-  private currentTransport: 'webrtc' | 'websocket' = 'webrtc';
   private metrics: ConnectionMetrics;
   private config: MonitorConfig;
   private degradationCallbacks: Set<DegradationCallback> = new Set();
@@ -72,27 +65,6 @@ export class TransportMonitor {
       latencySpikes: 0,
       lastUpdated: Date.now(),
     };
-  }
-
-  /**
-   * Set the current transport being monitored
-   */
-  setTransport(transport: 'webrtc' | 'websocket'): void {
-    if (this.currentTransport !== transport) {
-      logger.info('[TransportMonitor] Transport changed', {
-        from: this.currentTransport,
-        to: transport,
-      });
-      this.currentTransport = transport;
-      this.reset();
-    }
-  }
-
-  /**
-   * Get current transport
-   */
-  getTransport(): 'webrtc' | 'websocket' {
-    return this.currentTransport;
   }
 
   /**
@@ -121,15 +93,14 @@ export class TransportMonitor {
     // Check for latency spike
     if (this.isLatencySpikeDetected(latencyMs)) {
       this.metrics.latencySpikes++;
-      logger.warn('[TransportMonitor] Latency spike detected', {
+      logger.warn("[TransportMonitor] Latency spike detected", {
         latencyMs,
         avgLatencyMs: this.metrics.avgLatencyMs,
-        transport: this.currentTransport,
       });
-      this.emitDegradation('latency_spike');
+      this.emitDegradation("latency_spike");
     }
 
-    logger.debug('[TransportMonitor] Success recorded', {
+    logger.debug("[TransportMonitor] Success recorded", {
       latencyMs,
       avgLatencyMs: this.metrics.avgLatencyMs.toFixed(0),
     });
@@ -143,16 +114,17 @@ export class TransportMonitor {
     this.metrics.totalFailures++;
     this.metrics.lastUpdated = Date.now();
 
-    logger.warn('[TransportMonitor] Failure recorded', {
+    logger.warn("[TransportMonitor] Failure recorded", {
       consecutiveFailures: this.metrics.consecutiveFailures,
       totalFailures: this.metrics.totalFailures,
       error,
-      transport: this.currentTransport,
     });
 
     // Check if we've exceeded the failure threshold
-    if (this.metrics.consecutiveFailures >= this.config.maxConsecutiveFailures) {
-      this.emitDegradation('failures');
+    if (
+      this.metrics.consecutiveFailures >= this.config.maxConsecutiveFailures
+    ) {
+      this.emitDegradation("failures");
     }
   }
 
@@ -184,48 +156,42 @@ export class TransportMonitor {
   }
 
   /**
-   * Reset metrics (e.g., after transport switch)
+   * Reset metrics
    */
   reset(): void {
     this.metrics = this.createInitialMetrics();
     this.latencyHistory = [];
-    logger.debug('[TransportMonitor] Metrics reset');
+    logger.debug("[TransportMonitor] Metrics reset");
   }
-
-  // ============================================================================
-  // F-08: Network Change Detection
-  // ============================================================================
 
   /**
    * Start listening for network change events
-   *
-   * F-08: Re-probe on network change events (online/offline)
    */
   startNetworkListeners(): void {
-    if (this.networkListenersBound || typeof window === 'undefined') {
+    if (this.networkListenersBound || typeof window === "undefined") {
       return;
     }
 
-    window.addEventListener('online', this.handleOnline);
-    window.addEventListener('offline', this.handleOffline);
+    window.addEventListener("online", this.handleOnline);
+    window.addEventListener("offline", this.handleOffline);
     this.networkListenersBound = true;
 
-    logger.debug('[TransportMonitor] Network listeners started');
+    logger.debug("[TransportMonitor] Network listeners started");
   }
 
   /**
    * Stop listening for network change events
    */
   stopNetworkListeners(): void {
-    if (!this.networkListenersBound || typeof window === 'undefined') {
+    if (!this.networkListenersBound || typeof window === "undefined") {
       return;
     }
 
-    window.removeEventListener('online', this.handleOnline);
-    window.removeEventListener('offline', this.handleOffline);
+    window.removeEventListener("online", this.handleOnline);
+    window.removeEventListener("offline", this.handleOffline);
     this.networkListenersBound = false;
 
-    logger.debug('[TransportMonitor] Network listeners stopped');
+    logger.debug("[TransportMonitor] Network listeners stopped");
   }
 
   /**
@@ -250,21 +216,19 @@ export class TransportMonitor {
       latencyMs,
       this.latencyHistory,
       this.config.latencySpikeThresholdMs,
-      this.config.latencySpikeMultiplier
+      this.config.latencySpikeMultiplier,
     );
   }
 
-  private emitDegradation(reason: DegradationEvent['reason']): void {
+  private emitDegradation(reason: DegradationEvent["reason"]): void {
     const event: DegradationEvent = {
       reason,
-      currentTransport: this.currentTransport,
       metrics: this.getMetrics(),
       timestamp: Date.now(),
     };
 
-    logger.warn('[TransportMonitor] Degradation detected', {
+    logger.warn("[TransportMonitor] Degradation detected", {
       reason,
-      transport: this.currentTransport,
       consecutiveFailures: this.metrics.consecutiveFailures,
       latencySpikes: this.metrics.latencySpikes,
     });
@@ -273,21 +237,20 @@ export class TransportMonitor {
       try {
         callback(event);
       } catch (error) {
-        logger.error('[TransportMonitor] Degradation callback error', {
-          error: error instanceof Error ? error.message : 'Unknown',
+        logger.error("[TransportMonitor] Degradation callback error", {
+          error: error instanceof Error ? error.message : "Unknown",
         });
       }
     });
   }
 
   private handleOnline = (): void => {
-    logger.info('[TransportMonitor] Network online detected');
+    logger.info("[TransportMonitor] Network online detected");
     invalidateCache();
-    this.emitDegradation('network_change');
+    this.emitDegradation("network_change");
   };
 
   private handleOffline = (): void => {
-    logger.info('[TransportMonitor] Network offline detected');
-    // Just log, don't emit degradation (nothing we can do while offline)
+    logger.info("[TransportMonitor] Network offline detected");
   };
 }
