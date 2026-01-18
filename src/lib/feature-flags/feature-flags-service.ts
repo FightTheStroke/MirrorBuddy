@@ -124,7 +124,6 @@ export async function initializeFlags(): Promise<void> {
     const dbFlagMap = new Map(dbFlags.map((f) => [f.id, f]));
 
     // Seed missing flags and populate cache
-    const now = new Date();
     for (const [id, config] of Object.entries(DEFAULT_FLAGS)) {
       const existing = dbFlagMap.get(id);
 
@@ -179,7 +178,7 @@ export async function initializeFlags(): Promise<void> {
     });
   } catch (error) {
     // Fallback to in-memory defaults if DB unavailable
-    logger.error("Failed to load flags from DB, using defaults", { error });
+    logger.error("Failed to load flags from DB, using defaults", undefined, error);
     initializeFlagsSync();
   }
 }
@@ -307,7 +306,7 @@ export async function updateFlag(
       },
     });
   } catch (error) {
-    logger.error("Failed to persist flag update", { featureId, error });
+    logger.error("Failed to persist flag update", { featureId }, error);
     // Cache is still updated - will sync on next restart
   }
 
@@ -365,7 +364,7 @@ export async function setGlobalKillSwitch(
       create: { id: "global", killSwitch: enabled, killSwitchReason: reason },
     });
   } catch (error) {
-    logger.error("Failed to persist global kill-switch", { error });
+    logger.error("Failed to persist global kill-switch", undefined, error);
   }
 
   if (enabled) {
