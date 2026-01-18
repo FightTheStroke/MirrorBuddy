@@ -16,6 +16,7 @@ npm run lint         # ESLint
 npm run typecheck    # TypeScript
 npm run test         # Playwright E2E
 npm run test:unit    # Vitest unit tests
+npm run pre-push     # Vercel simulation (~45s) - AUTO on git push
 npm run release:gate # Full 10/10 release gate
 npx prisma generate  # After schema changes
 npx prisma db push   # Sync schema to PostgreSQL
