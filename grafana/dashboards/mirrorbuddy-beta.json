@@ -1,0 +1,253 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "MirrorBuddy Beta - Trial and Invite Funnels",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [
+    {
+      "asDropdown": false,
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": false,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Admin Invites",
+      "tooltip": "Manage beta invites",
+      "type": "link",
+      "url": "${APP_URL}/admin/invites"
+    }
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Trial Funnel",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "trial_started_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Started"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Trial Engaged",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "trial_engaged_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Engaged"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Limits Hit",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Limit Hit"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Beta Requests",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "trial_beta_requested_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Requested"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Invite Funnel",
+      "type": "bargauge",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "invite_requested_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Requested"
+        },
+        {
+          "expr": "invite_approved_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Approved"
+        },
+        {
+          "expr": "invite_first_login_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "First Login"
+        },
+        {
+          "expr": "invite_active_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Active"
+        }
+      ],
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 6,
+      "title": "Budget Usage",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "budget_usage_percent{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Usage %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 60 },
+              { "color": "orange", "value": 80 },
+              { "color": "red", "value": 95 }
+            ]
+          },
+          "unit": "percent",
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Budget Details",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 4 },
+      "targets": [
+        {
+          "expr": "budget_used_eur{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Used EUR"
+        },
+        {
+          "expr": "budget_projected_monthly_eur{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Projected EUR"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyEUR"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Abuse Detection",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 8 },
+      "targets": [
+        {
+          "expr": "abuse_flagged_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Flagged"
+        },
+        {
+          "expr": "abuse_blocked_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Blocked"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Conversion Rates",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "targets": [
+        {
+          "expr": "conversion_trial_to_engaged{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Trial → Engaged"
+        },
+        {
+          "expr": "conversion_engaged_to_limit{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Engaged → Limit"
+        },
+        {
+          "expr": "conversion_limit_to_request{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Limit → Request"
+        },
+        {
+          "expr": "conversion_request_to_approved{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Request → Approved"
+        },
+        {
+          "expr": "conversion_approved_to_login{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Approved → Login"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Trial Engagement Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 },
+      "targets": [
+        {
+          "expr": "rate(trial_started_total{instance=\"mirrorbuddy\"}[1h])",
+          "legendFormat": "Trials/hour"
+        },
+        {
+          "expr": "rate(trial_engaged_total{instance=\"mirrorbuddy\"}[1h])",
+          "legendFormat": "Engaged/hour"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["mirrorbuddy", "beta", "trial", "invite"],
+  "templating": {
+    "list": [
+      {
+        "name": "APP_URL",
+        "type": "constant",
+        "current": {
+          "value": "https://mirrorbuddy.vercel.app"
+        }
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "title": "MirrorBuddy Beta Dashboard",
+  "uid": "mirrorbuddy-beta-v1",
+  "version": 1
+}

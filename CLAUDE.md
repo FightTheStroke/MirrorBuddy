@@ -25,7 +25,7 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 
 ## Architecture
 
-**Database**: PostgreSQL + pgvector (`prisma/schema.prisma`) - ADR 0028
+**Database**: PostgreSQL + pgvector (`prisma/schema/`) - ADR 0028
 
 **AI Providers** (`src/lib/ai/providers.ts`): Azure OpenAI (primary) | Ollama (fallback)
 
@@ -33,7 +33,21 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 
 **State** (`src/lib/stores/`): Zustand + REST APIs - NO localStorage (ADR 0015)
 
+**Trial Mode** (`src/lib/trial/`): Anonymous sessions, 3 chat limit, budget control - ADR 0056
+
+**Invite System** (`src/lib/invite/`): Admin-approved beta access, email notifications - ADR 0057
+
+**Auth** (`src/lib/auth/`): Session-based with `validateSessionAuth()`, admin via `ADMIN_EMAIL`
+
 **Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri/` | PDF `src/lib/pdf-generator/`
+
+## Beta Environment Variables
+
+```bash
+ADMIN_EMAIL=admin@example.com     # Admin access control
+TRIAL_BUDGET_LIMIT_EUR=100        # Monthly trial budget
+RESEND_API_KEY=re_xxx             # Email notifications
+```
 
 ## Modular Rules (auto-loaded)
 
@@ -46,6 +60,7 @@ Load with `@docs/claude/<name>.md`:
 **Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub | rag | safety | validation
 **Voice**: voice-api | ambient-audio | onboarding
 **Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator | gamification
+**Beta**: trial-mode (ADR 0056) | invite-system (ADR 0057) | observability-kpis (ADR 0058)
 **Characters**: buddies | coaches | adding-maestri
 
 ## Setup Docs (one-time)
@@ -56,31 +71,31 @@ Load with `@docs/claude/<name>.md`:
 
 TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 
-| Task | LSP Command | Instead of |
-|------|-------------|------------|
-| Find definition | go-to-definition | Grep "function X" |
-| Find usages | find-references | Grep "useHook" |
-| Check signature | hover | Read entire file |
-| Find type | go-to-type-definition | Grep "interface X" |
+| Task            | LSP Command           | Instead of         |
+| --------------- | --------------------- | ------------------ |
+| Find definition | go-to-definition      | Grep "function X"  |
+| Find usages     | find-references       | Grep "useHook"     |
+| Check signature | hover                 | Read entire file   |
+| Find type       | go-to-type-definition | Grep "interface X" |
 
 **Parallelize** independent tool calls in single message.
 
 ## Skills
 
-| Skill | When |
-|-------|------|
-| `/prompt` | Extract F-xx requirements |
-| `/planner` | Create wave/task plan |
-| `/execute {id}` | Run plan tasks |
-| `/frontend-design` | UI components |
+| Skill              | When                      |
+| ------------------ | ------------------------- |
+| `/prompt`          | Extract F-xx requirements |
+| `/planner`         | Create wave/task plan     |
+| `/execute {id}`    | Run plan tasks            |
+| `/frontend-design` | UI components             |
 
 ## Subagents
 
-| Agent | When |
-|-------|------|
-| `Explore` | Codebase questions |
-| `task-executor` | Plan task execution |
-| `thor-quality-assurance-guardian` | Wave validation |
+| Agent                             | When                |
+| --------------------------------- | ------------------- |
+| `Explore`                         | Codebase questions  |
+| `task-executor`                   | Plan task execution |
+| `thor-quality-assurance-guardian` | Wave validation     |
 
 ## Workflow (non-trivial tasks)
 
@@ -108,6 +123,7 @@ npm run lint && npm run typecheck && npm run build && npm run test
 ## Closure Protocol
 
 **NEVER say "fatto/done" without**:
+
 1. Verification output shown
 2. All F-xx listed with [x] or [ ]
 3. Deliverables with file paths
