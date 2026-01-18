@@ -98,10 +98,25 @@ function checkMemory(): CheckResult {
   const usagePercent = Math.round((used.heapUsed / used.heapTotal) * 100);
 
   let status: "pass" | "warn" | "fail" = "pass";
-  if (usagePercent > 90) {
-    status = "fail";
-  } else if (usagePercent > 70) {
-    status = "warn";
+
+  // Vercel serverless functions start with small heap (~30MB)
+  // Use absolute thresholds for small heaps, percentage for larger ones
+  const isServerlessSmallHeap = heapTotalMB < 100;
+
+  if (isServerlessSmallHeap) {
+    // For serverless: warn at 200MB, fail at 400MB absolute
+    if (heapUsedMB > 400) {
+      status = "fail";
+    } else if (heapUsedMB > 200) {
+      status = "warn";
+    }
+  } else {
+    // For larger heaps: use percentage thresholds
+    if (usagePercent > 90) {
+      status = "fail";
+    } else if (usagePercent > 70) {
+      status = "warn";
+    }
   }
 
   return {
