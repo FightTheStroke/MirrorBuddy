@@ -1,0 +1,148 @@
+{
+  "alertRules": [
+    {
+      "uid": "budget-80-percent",
+      "title": "Budget at 80%",
+      "condition": "A",
+      "data": [
+        {
+          "refId": "A",
+          "queryType": "",
+          "relativeTimeRange": {
+            "from": 600,
+            "to": 0
+          },
+          "model": {
+            "expr": "budget_usage_percent{instance=\"mirrorbuddy\"} > 80",
+            "intervalMs": 1000,
+            "maxDataPoints": 43200,
+            "refId": "A"
+          }
+        }
+      ],
+      "noDataState": "OK",
+      "execErrState": "Error",
+      "for": "5m",
+      "annotations": {
+        "summary": "Trial budget at 80% - {{ $value }}%",
+        "description": "Monthly trial budget is approaching limit. Current usage: {{ $value }}%. Consider increasing limit or reducing trial features."
+      },
+      "labels": {
+        "severity": "warning",
+        "team": "mirrorbuddy"
+      }
+    },
+    {
+      "uid": "budget-95-percent",
+      "title": "Budget Critical (95%)",
+      "condition": "A",
+      "data": [
+        {
+          "refId": "A",
+          "model": {
+            "expr": "budget_usage_percent{instance=\"mirrorbuddy\"} > 95"
+          }
+        }
+      ],
+      "noDataState": "OK",
+      "execErrState": "Error",
+      "for": "5m",
+      "annotations": {
+        "summary": "CRITICAL: Trial budget at {{ $value }}%",
+        "description": "Monthly trial budget nearly exhausted. Trial features may be disabled soon."
+      },
+      "labels": {
+        "severity": "critical",
+        "team": "mirrorbuddy"
+      }
+    },
+    {
+      "uid": "abuse-spike",
+      "title": "Abuse Detection Spike",
+      "condition": "A",
+      "data": [
+        {
+          "refId": "A",
+          "model": {
+            "expr": "rate(abuse_flagged_total{instance=\"mirrorbuddy\"}[1h]) > 5"
+          }
+        }
+      ],
+      "noDataState": "OK",
+      "execErrState": "Error",
+      "for": "10m",
+      "annotations": {
+        "summary": "Abuse spike detected - {{ $value }} flags/hour",
+        "description": "Unusual number of abuse flags. Check for coordinated attack or bot traffic."
+      },
+      "labels": {
+        "severity": "warning",
+        "team": "mirrorbuddy"
+      }
+    },
+    {
+      "uid": "conversion-drop",
+      "title": "Conversion Rate Drop",
+      "condition": "A",
+      "data": [
+        {
+          "refId": "A",
+          "model": {
+            "expr": "conversion_trial_to_engaged{instance=\"mirrorbuddy\"} < 0.3"
+          }
+        }
+      ],
+      "noDataState": "OK",
+      "execErrState": "Error",
+      "for": "1h",
+      "annotations": {
+        "summary": "Trial conversion dropped to {{ $value | humanizePercentage }}",
+        "description": "Trial to engaged conversion below 30%. Check for UX issues or onboarding problems."
+      },
+      "labels": {
+        "severity": "warning",
+        "team": "mirrorbuddy"
+      }
+    },
+    {
+      "uid": "invite-backlog",
+      "title": "Pending Invites Backlog",
+      "condition": "A",
+      "data": [
+        {
+          "refId": "A",
+          "model": {
+            "expr": "invite_requested_total{instance=\"mirrorbuddy\"} - invite_approved_total{instance=\"mirrorbuddy\"} - invite_rejected_total{instance=\"mirrorbuddy\"} > 10"
+          }
+        }
+      ],
+      "noDataState": "OK",
+      "execErrState": "Error",
+      "for": "24h",
+      "annotations": {
+        "summary": "{{ $value }} pending invite requests",
+        "description": "Invite requests piling up. Review and process pending requests."
+      },
+      "labels": {
+        "severity": "info",
+        "team": "mirrorbuddy"
+      }
+    }
+  ],
+  "contactPoints": [
+    {
+      "name": "mirrorbuddy-team",
+      "type": "email",
+      "settings": {
+        "addresses": "roberdan@fightthestroke.org"
+      }
+    }
+  ],
+  "notificationPolicies": {
+    "receiver": "mirrorbuddy-team",
+    "group_by": ["alertname", "severity"],
+    "group_wait": "30s",
+    "group_interval": "5m",
+    "repeat_interval": "4h"
+  }
+}

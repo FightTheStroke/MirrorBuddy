@@ -1,0 +1,23 @@
+# CodeQL Configuration for MirrorBuddy
+# Properly excludes test files from security scanning
+# Reference: https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning
+
+name: "MirrorBuddy CodeQL Config"
+
+# Exclude test files from security analysis
+# These use patterns that would trigger false positives:
+# - E2E tests use mock cookies without Secure flag (HTTP localhost)
+# - Unit tests may use mock data patterns
+paths-ignore:
+  - "e2e/**"
+  - "**/*.test.ts"
+  - "**/*.test.tsx"
+  - "**/*.spec.ts"
+  - "**/*.spec.tsx"
+  - "src/test/**"
+  - "**/__tests__/**"
+  - "**/__mocks__/**"
+  - "*.config.ts"
+  - "*.config.js"
+  - "vitest.config.ts"
+  - "playwright.config.ts"
