@@ -10,9 +10,9 @@ import { defineConfig } from "prisma/config";
 // WARNING: This placeholder is intentionally invalid - DO NOT use for actual connections
 const databaseUrl = process.env.DATABASE_URL || 'postgresql://INVALID_CREDENTIALS:INVALID_CREDENTIALS@localhost:5432/schema_only';
 
-// Direct URL for migrations (bypasses pgbouncer connection pooling)
-// Required for Supabase: migrations need direct connection, not pooled
-const directUrl = process.env.DIRECT_URL || databaseUrl;
+// For Supabase migrations, use DIRECT_URL (port 5432) instead of pooled URL (port 6543)
+// Run migrations with: DATABASE_URL="$DIRECT_URL" npx prisma db push
+const effectiveUrl = process.env.DIRECT_URL || databaseUrl;
 
 export default defineConfig({
   schema: "prisma/schema",
@@ -20,7 +20,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: databaseUrl,
-    directUrl: directUrl,
+    url: effectiveUrl,
   },
 });

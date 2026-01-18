@@ -8,6 +8,13 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
+
+// Mock csrfFetch before importing - used for mutations (POST/PATCH/DELETE)
+const mockCsrfFetch = vi.fn();
+vi.mock('@/lib/auth/csrf-client', () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
+
 import {
   useMindmaps,
   useQuizzes,
@@ -16,7 +23,7 @@ import {
   autoSaveMaterial,
 } from '../use-saved-materials';
 
-// Mock fetch globally
+// Mock fetch globally - used for GET operations (fetching materials)
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
@@ -57,6 +64,7 @@ describe('use-saved-materials', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetch.mockReset();
+    mockCsrfFetch.mockReset();
     sessionStorage.clear();
   });
 
@@ -118,7 +126,7 @@ describe('use-saved-materials', () => {
     });
 
     it('should save mindmap and reload list', async () => {
-      // Initial load
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [] }),
@@ -130,13 +138,13 @@ describe('use-saved-materials', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      // Save request
-      mockFetch.mockResolvedValueOnce({
+      // Save request (POST uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ material: mockMindmapMaterial }),
       });
 
-      // Reload after save
+      // Reload after save (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockMindmapMaterial] }),
@@ -151,13 +159,13 @@ describe('use-saved-materials', () => {
         });
       });
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
       }));
     });
 
     it('should delete mindmap and update local state', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockMindmapMaterial] }),
@@ -169,8 +177,8 @@ describe('use-saved-materials', () => {
         expect(result.current.mindmaps).toHaveLength(1);
       });
 
-      // Delete request
-      mockFetch.mockResolvedValueOnce({ ok: true });
+      // Delete request (DELETE uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
         const success = await result.current.deleteMindmap('mindmap-1');
@@ -221,6 +229,7 @@ describe('use-saved-materials', () => {
     });
 
     it('should save quiz and reload list', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [] }),
@@ -232,10 +241,12 @@ describe('use-saved-materials', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      mockFetch.mockResolvedValueOnce({
+      // Save request (POST uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ material: mockQuizMaterial }),
       });
+      // Reload after save (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockQuizMaterial] }),
@@ -249,12 +260,13 @@ describe('use-saved-materials', () => {
         });
       });
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
         method: 'POST',
       }));
     });
 
     it('should delete quiz and update state', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockQuizMaterial] }),
@@ -266,7 +278,8 @@ describe('use-saved-materials', () => {
         expect(result.current.quizzes).toHaveLength(1);
       });
 
-      mockFetch.mockResolvedValueOnce({ ok: true });
+      // Delete request (DELETE uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
         const success = await result.current.deleteQuiz('quiz-1');
@@ -315,6 +328,7 @@ describe('use-saved-materials', () => {
     });
 
     it('should save deck and reload list', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [] }),
@@ -326,10 +340,12 @@ describe('use-saved-materials', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      mockFetch.mockResolvedValueOnce({
+      // Save request (POST uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ material: mockDeckMaterial }),
       });
+      // Reload after save (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockDeckMaterial] }),
@@ -343,12 +359,13 @@ describe('use-saved-materials', () => {
         });
       });
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
         method: 'POST',
       }));
     });
 
     it('should delete deck and update state', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockDeckMaterial] }),
@@ -360,7 +377,8 @@ describe('use-saved-materials', () => {
         expect(result.current.decks).toHaveLength(1);
       });
 
-      mockFetch.mockResolvedValueOnce({ ok: true });
+      // Delete request (DELETE uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
         const success = await result.current.deleteDeck('deck-1');
@@ -411,6 +429,7 @@ describe('use-saved-materials', () => {
     });
 
     it('should update homework session', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockHomeworkMaterial] }),
@@ -422,7 +441,8 @@ describe('use-saved-materials', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      mockFetch.mockResolvedValueOnce({ ok: true });
+      // Update request (PATCH uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
         const success = await result.current.updateSession({
@@ -432,12 +452,13 @@ describe('use-saved-materials', () => {
         expect(success).toBe(true);
       });
 
-      expect(mockFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
         method: 'PATCH',
       }));
     });
 
     it('should delete homework session', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ materials: [mockHomeworkMaterial] }),
@@ -449,7 +470,8 @@ describe('use-saved-materials', () => {
         expect(result.current.sessions).toHaveLength(1);
       });
 
-      mockFetch.mockResolvedValueOnce({ ok: true });
+      // Delete request (DELETE uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({ ok: true });
 
       await act(async () => {
         const success = await result.current.deleteSession('homework-1');
@@ -467,7 +489,8 @@ describe('use-saved-materials', () => {
     // C-14/C-15 FIX: autoSaveMaterial now uses upsert pattern (single POST call)
     // and returns boolean instead of void
     it('should save material using upsert pattern', async () => {
-      mockFetch.mockResolvedValueOnce({
+      // autoSaveMaterial uses csrfFetch for POST
+      mockCsrfFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({ material: { id: '1' } }),
       });
@@ -475,14 +498,14 @@ describe('use-saved-materials', () => {
       const result = await autoSaveMaterial('mindmap', 'New Mindmap', { nodes: [] });
 
       expect(result).toBe(true);
-      expect(mockFetch).toHaveBeenCalledTimes(1);
-      expect(mockFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
+      expect(mockCsrfFetch).toHaveBeenCalledTimes(1);
+      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/materials', expect.objectContaining({
         method: 'POST',
       }));
     });
 
     it('should return false when save fails', async () => {
-      mockFetch.mockResolvedValueOnce({
+      mockCsrfFetch.mockResolvedValueOnce({
         ok: false,
         json: async () => ({ error: 'Failed to save' }),
       });
@@ -493,7 +516,7 @@ describe('use-saved-materials', () => {
     });
 
     it('should handle fetch errors and return false', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'));
+      mockCsrfFetch.mockRejectedValueOnce(new Error('Network error'));
 
       // Should not throw, returns false on error
       const result = await autoSaveMaterial('quiz', 'Test Quiz', { questions: [] });
@@ -518,6 +541,7 @@ describe('use-saved-materials', () => {
     });
 
     it('should return false when delete fails', async () => {
+      // Initial load (GET uses regular fetch)
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => ({
@@ -538,7 +562,8 @@ describe('use-saved-materials', () => {
         expect(result.current.loading).toBe(false);
       });
 
-      mockFetch.mockResolvedValueOnce({ ok: false, status: 500 });
+      // Delete request fails (DELETE uses csrfFetch)
+      mockCsrfFetch.mockResolvedValueOnce({ ok: false, status: 500 });
 
       await act(async () => {
         const success = await result.current.deleteMindmap('test-1');
