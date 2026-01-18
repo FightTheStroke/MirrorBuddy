@@ -405,10 +405,12 @@ class PrometheusPushService {
       .map((s) => {
         const tags = Object.entries(s.labels)
           .map(([k, v]) => {
-            // Escape backslashes first, then commas and spaces (Influx Line Protocol)
+            // Escape special chars for Influx Line Protocol tag values:
+            // backslash, comma, equals, space (in that order)
             const escaped = v
               .replace(/\\/g, "\\\\")
               .replace(/,/g, "\\,")
+              .replace(/=/g, "\\=")
               .replace(/ /g, "\\ ");
             return `${k}=${escaped}`;
           })
