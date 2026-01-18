@@ -4,14 +4,15 @@
 // ISE Engineering Fundamentals: https://microsoft.github.io/code-with-engineering-playbook/
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { getAppVersion } from "@/lib/version";
 
 // Track server start time for uptime calculation
 const startTime = Date.now();
 
 interface HealthCheck {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   version: string;
   timestamp: string;
   uptime: number;
@@ -23,7 +24,7 @@ interface HealthCheck {
 }
 
 interface CheckResult {
-  status: 'pass' | 'fail' | 'warn';
+  status: "pass" | "fail" | "warn";
   message: string;
   latency_ms?: number;
 }
@@ -36,14 +37,14 @@ async function checkDatabase(): Promise<CheckResult> {
     const latency = Date.now() - start;
 
     return {
-      status: latency < 100 ? 'pass' : 'warn',
-      message: latency < 100 ? 'Connected' : 'Slow response',
+      status: latency < 100 ? "pass" : "warn",
+      message: latency < 100 ? "Connected" : "Slow response",
       latency_ms: latency,
     };
   } catch (error) {
     return {
-      status: 'fail',
-      message: error instanceof Error ? error.message : 'Connection failed',
+      status: "fail",
+      message: error instanceof Error ? error.message : "Connection failed",
       latency_ms: Date.now() - start,
     };
   }
@@ -51,16 +52,15 @@ async function checkDatabase(): Promise<CheckResult> {
 
 async function checkAIProvider(): Promise<CheckResult> {
   const azureConfigured = !!(
-    process.env.AZURE_OPENAI_ENDPOINT &&
-    process.env.AZURE_OPENAI_API_KEY
+    process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY
   );
 
-  const ollamaUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
+  const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
 
   if (azureConfigured) {
     return {
-      status: 'pass',
-      message: 'Azure OpenAI configured',
+      status: "pass",
+      message: "Azure OpenAI configured",
     };
   }
 
@@ -73,20 +73,20 @@ async function checkAIProvider(): Promise<CheckResult> {
 
     if (response.ok) {
       return {
-        status: 'pass',
-        message: 'Ollama available',
+        status: "pass",
+        message: "Ollama available",
         latency_ms: Date.now() - start,
       };
     }
 
     return {
-      status: 'fail',
-      message: 'No AI provider configured or available',
+      status: "fail",
+      message: "No AI provider configured or available",
     };
   } catch {
     return {
-      status: 'fail',
-      message: 'No AI provider configured or available',
+      status: "fail",
+      message: "No AI provider configured or available",
     };
   }
 }
@@ -97,11 +97,11 @@ function checkMemory(): CheckResult {
   const heapTotalMB = Math.round(used.heapTotal / 1024 / 1024);
   const usagePercent = Math.round((used.heapUsed / used.heapTotal) * 100);
 
-  let status: 'pass' | 'warn' | 'fail' = 'pass';
+  let status: "pass" | "warn" | "fail" = "pass";
   if (usagePercent > 90) {
-    status = 'fail';
+    status = "fail";
   } else if (usagePercent > 70) {
-    status = 'warn';
+    status = "warn";
   }
 
   return {
@@ -110,20 +110,18 @@ function checkMemory(): CheckResult {
   };
 }
 
-function getOverallStatus(checks: HealthCheck['checks']): HealthCheck['status'] {
+function getOverallStatus(
+  checks: HealthCheck["checks"],
+): HealthCheck["status"] {
   const results = Object.values(checks);
 
-  if (results.some(c => c.status === 'fail')) {
-    return 'unhealthy';
+  if (results.some((c) => c.status === "fail")) {
+    return "unhealthy";
   }
-  if (results.some(c => c.status === 'warn')) {
-    return 'degraded';
+  if (results.some((c) => c.status === "warn")) {
+    return "degraded";
   }
-  return 'healthy';
-}
-
-function getVersion(): string {
-  return process.env.npm_package_version || '0.0.0';
+  return "healthy";
 }
 
 export async function GET() {
@@ -139,14 +137,14 @@ export async function GET() {
 
   const health: HealthCheck = {
     status,
-    version: getVersion(),
+    version: getAppVersion(),
     timestamp: new Date().toISOString(),
     uptime: Math.round((Date.now() - startTime) / 1000),
     checks,
   };
 
   // Return 503 if unhealthy (for load balancer health checks)
-  const httpStatus = status === 'unhealthy' ? 503 : 200;
+  const httpStatus = status === "unhealthy" ? 503 : 200;
 
   return NextResponse.json(health, { status: httpStatus });
 }

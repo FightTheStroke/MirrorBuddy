@@ -11,24 +11,38 @@
  * 2. IP allowlist: localhost, private networks, or HEALTH_ALLOWED_IPS
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { getRequestLogger, getRequestId } from '@/lib/tracing';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { getRequestLogger, getRequestId } from "@/lib/tracing";
+import { getAppVersion } from "@/lib/version";
 
 /** Secret for health endpoint auth (optional) */
 const HEALTH_SECRET = process.env.HEALTH_SECRET;
 
 /** Comma-separated list of allowed IPs (optional) */
-const HEALTH_ALLOWED_IPS = process.env.HEALTH_ALLOWED_IPS?.split(',').map(ip => ip.trim()) || [];
+const HEALTH_ALLOWED_IPS =
+  process.env.HEALTH_ALLOWED_IPS?.split(",").map((ip) => ip.trim()) || [];
 
 /** Private network ranges (RFC 1918) */
 const PRIVATE_NETWORK_PREFIXES = [
-  '10.',
-  '172.16.', '172.17.', '172.18.', '172.19.',
-  '172.20.', '172.21.', '172.22.', '172.23.',
-  '172.24.', '172.25.', '172.26.', '172.27.',
-  '172.28.', '172.29.', '172.30.', '172.31.',
-  '192.168.',
+  "10.",
+  "172.16.",
+  "172.17.",
+  "172.18.",
+  "172.19.",
+  "172.20.",
+  "172.21.",
+  "172.22.",
+  "172.23.",
+  "172.24.",
+  "172.25.",
+  "172.26.",
+  "172.27.",
+  "172.28.",
+  "172.29.",
+  "172.30.",
+  "172.31.",
+  "192.168.",
 ];
 
 /**
@@ -38,10 +52,11 @@ function isAllowedIP(ip: string | null): boolean {
   if (!ip) return false;
 
   // Always allow localhost
-  if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') return true;
+  if (ip === "127.0.0.1" || ip === "::1" || ip === "localhost") return true;
 
   // Allow private networks
-  if (PRIVATE_NETWORK_PREFIXES.some(prefix => ip.startsWith(prefix))) return true;
+  if (PRIVATE_NETWORK_PREFIXES.some((prefix) => ip.startsWith(prefix)))
+    return true;
 
   // Check custom allowlist
   if (HEALTH_ALLOWED_IPS.includes(ip)) return true;
@@ -52,29 +67,33 @@ function isAllowedIP(ip: string | null): boolean {
 /**
  * Check if request is authorized (F-15)
  */
-function isAuthorized(request: NextRequest, log: ReturnType<typeof getRequestLogger>): boolean {
+function isAuthorized(
+  request: NextRequest,
+  log: ReturnType<typeof getRequestLogger>,
+): boolean {
   // In development, allow all
-  if (process.env.NODE_ENV === 'development') return true;
+  if (process.env.NODE_ENV === "development") return true;
 
   // Check auth header
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get("authorization");
   if (HEALTH_SECRET && authHeader === `Bearer ${HEALTH_SECRET}`) return true;
 
   // Check IP allowlist
-  const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-    || request.headers.get('x-real-ip')
-    || null;
+  const clientIP =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    null;
 
   if (isAllowedIP(clientIP)) return true;
 
-  log.warn('Unauthorized access to /api/health/detailed', { clientIP });
+  log.warn("Unauthorized access to /api/health/detailed", { clientIP });
   return false;
 }
 
 const startTime = Date.now();
 
 interface DetailedHealth {
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   version: string;
   environment: string;
   timestamp: string;
@@ -92,7 +111,7 @@ interface DetailedHealth {
 }
 
 interface DatabaseCheck {
-  status: 'pass' | 'warn' | 'fail';
+  status: "pass" | "warn" | "fail";
   latencyMs: number;
   connectionPool?: { active: number; idle: number };
 }
@@ -103,7 +122,7 @@ interface AICheck {
 }
 
 interface MemoryCheck {
-  status: 'pass' | 'warn' | 'fail';
+  status: "pass" | "warn" | "fail";
   heapUsedMB: number;
   heapTotalMB: number;
   usagePercent: number;
@@ -129,19 +148,23 @@ async function checkDatabase(): Promise<DatabaseCheck> {
     await prisma.$queryRaw`SELECT 1`;
     const latency = Date.now() - start;
     return {
-      status: latency < 100 ? 'pass' : 'warn',
+      status: latency < 100 ? "pass" : "warn",
       latencyMs: latency,
     };
   } catch {
-    return { status: 'fail', latencyMs: Date.now() - start };
+    return { status: "fail", latencyMs: Date.now() - start };
   }
 }
 
 function checkAI(): AICheck {
   return {
     azure: {
-      configured: !!(process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY),
-      endpoint: process.env.AZURE_OPENAI_ENDPOINT?.replace(/\/+$/, '').split('/').pop(),
+      configured: !!(
+        process.env.AZURE_OPENAI_ENDPOINT && process.env.AZURE_OPENAI_API_KEY
+      ),
+      endpoint: process.env.AZURE_OPENAI_ENDPOINT?.replace(/\/+$/, "")
+        .split("/")
+        .pop(),
     },
     ollama: {
       configured: !!process.env.OLLAMA_URL,
@@ -157,7 +180,7 @@ function checkMemory(): MemoryCheck {
   const usagePercent = Math.round((mem.heapUsed / mem.heapTotal) * 100);
 
   return {
-    status: usagePercent > 90 ? 'fail' : usagePercent > 70 ? 'warn' : 'pass',
+    status: usagePercent > 90 ? "fail" : usagePercent > 70 ? "warn" : "pass",
     heapUsedMB,
     heapTotalMB,
     usagePercent,
@@ -183,7 +206,7 @@ function formatUptime(seconds: number): string {
   if (d > 0) parts.push(`${d}d`);
   if (h > 0) parts.push(`${h}h`);
   if (m > 0) parts.push(`${m}m`);
-  return parts.join(' ') || '< 1m';
+  return parts.join(" ") || "< 1m";
 }
 
 export async function GET(request: NextRequest) {
@@ -191,10 +214,13 @@ export async function GET(request: NextRequest) {
   // F-15: Check authorization
   if (!isAuthorized(request, log)) {
     const response = NextResponse.json(
-      { error: 'Unauthorized', message: 'Access to detailed health metrics requires authentication' },
-      { status: 401 }
+      {
+        error: "Unauthorized",
+        message: "Access to detailed health metrics requires authentication",
+      },
+      { status: 401 },
     );
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   }
 
@@ -206,13 +232,13 @@ export async function GET(request: NextRequest) {
   const checks = { database, ai, memory, safety };
   const uptimeSeconds = Math.round((Date.now() - startTime) / 1000);
 
-  const hasFailure = database.status === 'fail' || memory.status === 'fail';
-  const hasWarning = database.status === 'warn' || memory.status === 'warn';
+  const hasFailure = database.status === "fail" || memory.status === "fail";
+  const hasWarning = database.status === "warn" || memory.status === "warn";
 
   const health: DetailedHealth = {
-    status: hasFailure ? 'unhealthy' : hasWarning ? 'degraded' : 'healthy',
-    version: process.env.npm_package_version || '0.0.0',
-    environment: process.env.NODE_ENV || 'development',
+    status: hasFailure ? "unhealthy" : hasWarning ? "degraded" : "healthy",
+    version: getAppVersion(),
+    environment: process.env.NODE_ENV || "development",
     timestamp: new Date().toISOString(),
     uptime: { seconds: uptimeSeconds, human: formatUptime(uptimeSeconds) },
     checks,
@@ -223,7 +249,9 @@ export async function GET(request: NextRequest) {
     },
   };
 
-  const response = NextResponse.json(health, { status: health.status === 'unhealthy' ? 503 : 200 });
-  response.headers.set('X-Request-ID', getRequestId(request));
+  const response = NextResponse.json(health, {
+    status: health.status === "unhealthy" ? 503 : 200,
+  });
+  response.headers.set("X-Request-ID", getRequestId(request));
   return response;
 }
