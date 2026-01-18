@@ -24,8 +24,6 @@ interface HomeSidebarProps {
   navItems: NavItem[];
   hasNewInsights: boolean;
   onParentAccess: () => void;
-  selectedCoach: string;
-  selectedBuddy: string;
 }
 
 export function HomeSidebar({
