@@ -75,15 +75,6 @@ export const debugPages: DebugPage[] = [
     status: "dead",
   },
 
-  // TEST (dev-only, not for production)
-  { href: "/test-voice", note: "DEV ONLY - Test voice", status: "dead" },
-  { href: "/test-audio", note: "DEV ONLY - Test audio", status: "dead" },
-  {
-    href: "/test-proposals",
-    note: "DEV ONLY - Test proposals",
-    status: "dead",
-  },
-
   // ADMIN
   {
     href: "/admin/analytics",
