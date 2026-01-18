@@ -21,11 +21,13 @@ if (!url || !user || !apiKey) {
   process.exit(1);
 }
 
-console.log("Pushing V1 metrics to Grafana Cloud...");
-console.log(`URL: ${url}`);
+console.log("╔════════════════════════════════════════════════════════════╗");
+console.log("║  🧪 TEST DATA PUSH - env=test (excluded from dashboard)   ║");
+console.log("╚════════════════════════════════════════════════════════════╝");
+console.log(`\nURL: ${url}`);
 
 const timestamp = Date.now() * 1000000; // nanoseconds
-const baseLabels = "instance=mirrorbuddy,env=development";
+const baseLabels = "instance=mirrorbuddy,env=test";
 
 // All metrics matching dashboard queries
 const metrics = [
@@ -124,11 +126,12 @@ async function pushMetrics() {
     });
 
     if (response.ok) {
-      console.log("\n\u2705 All V1 metrics pushed successfully!");
-      console.log(
-        "Dashboard: https://mirrorbuddy.grafana.net/d/dashboard/"
-      );
-      console.log("\nMetrics sent:");
+      console.log("\n✅ All V1 TEST metrics pushed successfully!");
+      console.log("\n⚠️  NOTE: These metrics have env=test label");
+      console.log("   They are EXCLUDED from the main dashboard by default.");
+      console.log("   To view test data, edit dashboard queries to remove env!=\"test\" filter.");
+      console.log("\nDashboard: https://mirrorbuddy.grafana.net/d/dashboard/");
+      console.log("\nTest metrics sent (env=test):");
       console.log("  Session Health:");
       console.log("    - success=85%, dropoff=8%, stuck=3%, turns=12.5");
       console.log("  Safety:");
