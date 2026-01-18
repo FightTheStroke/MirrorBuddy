@@ -1,0 +1,959 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Grafana Cloud Prometheus datasource",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "11.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    }
+  ],
+  "description": "V1 Enterprise monitoring: Business KPIs and Technical Health",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "id": 100,
+      "title": "BUSINESS METRICS",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 1 },
+      "id": 1,
+      "title": "Session Health (GO/NO-GO Decision)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "GO: >=80% | NO-GO: <60%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.6 },
+              { "color": "green", "value": 0.8 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 2 },
+      "id": 2,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_session_success_rate{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Success Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "GO: <=10% | NO-GO: >25%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.1 },
+              { "color": "red", "value": 0.25 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 2 },
+      "id": 3,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_session_dropoff_rate{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Drop-off Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "GO: <=5% | NO-GO: >15%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.05 },
+              { "color": "red", "value": 0.15 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 2 },
+      "id": 4,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_session_stuck_loop_rate{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Stuck Loop Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Target: 5-20 turns",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 5 },
+              { "color": "yellow", "value": 20 },
+              { "color": "red", "value": 50 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 2 },
+      "id": 5,
+      "options": { "colorMode": "value", "graphMode": "none" },
+      "targets": [
+        { "expr": "mirrorbuddy_session_turns_avg{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Avg Turns",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Target: 5-30 min",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 5 },
+              { "color": "yellow", "value": 30 },
+              { "color": "red", "value": 60 }
+            ]
+          },
+          "unit": "m"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 2 },
+      "id": 6,
+      "options": { "colorMode": "value", "graphMode": "none" },
+      "targets": [
+        { "expr": "mirrorbuddy_session_duration_minutes_avg{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Avg Duration",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Total sessions today",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 2 },
+      "id": 7,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_sessions_total{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Sessions Today",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+      "id": 50,
+      "title": "User Engagement (DAU/WAU/MAU)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Users active in last 24h",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 7 },
+      "id": 51,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_active_users{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Daily Active Users",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Users active in last 7d",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 7 },
+      "id": 52,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_active_users{period=\"7d\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Weekly Active Users",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Users active in last 30d",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 7 },
+      "id": 53,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_active_users{period=\"30d\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Monthly Active Users",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "New registrations today",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 7 },
+      "id": 54,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_new_users{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "New Users Today",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
+      "id": 60,
+      "title": "Conversion & Retention",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Target: >=80%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "green", "value": 0.8 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 12 },
+      "id": 61,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_onboarding_completion_rate{env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Onboarding Completion",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Target: >=30%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "yellow", "value": null },
+              { "color": "green", "value": 0.3 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 12 },
+      "id": 62,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_voice_adoption_rate{env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Voice Adoption",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Target: >=50%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.3 },
+              { "color": "green", "value": 0.5 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 12 },
+      "id": 63,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_retention_rate{cohort=\"D1\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "D1 Retention",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Target: >=35%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.2 },
+              { "color": "green", "value": 0.35 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 12 },
+      "id": 64,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_retention_rate{cohort=\"D7\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "D7 Retention",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Target: >=20%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.1 },
+              { "color": "green", "value": 0.2 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 12 },
+      "id": 65,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_retention_rate{cohort=\"D30\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "D30 Retention",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 },
+      "id": 30,
+      "title": "Cost Control",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "GO: <=0.05 | NO-GO: >0.10",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.05 },
+              { "color": "red", "value": 0.1 }
+            ]
+          },
+          "unit": "currencyEUR"
+        }
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 0, "y": 17 },
+      "id": 31,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_cost_per_session_eur{type=\"text\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Cost/Session (Text)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "GO: <=0.15 | NO-GO: >0.30",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.15 },
+              { "color": "red", "value": 0.3 }
+            ]
+          },
+          "unit": "currencyEUR"
+        }
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 8, "y": 17 },
+      "id": 32,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_cost_per_session_eur{type=\"voice\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Cost/Session (Voice)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "GO: <=1/week | NO-GO: >5/week",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        }
+      },
+      "gridPos": { "h": 4, "w": 8, "x": 16, "y": 17 },
+      "id": 33,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_cost_spikes_total{period=\"7d\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Cost Spikes (7d)",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 21 },
+      "id": 70,
+      "title": "Maestri & Learning",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Sessions per maestro (24h)",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 22 },
+      "id": 71,
+      "options": { "displayMode": "gradient", "orientation": "horizontal" },
+      "targets": [
+        {
+          "expr": "topk(10, mirrorbuddy_maestro_sessions{period=\"24h\",env=\"production\"})",
+          "legendFormat": "{{maestro}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 10 Maestri (24h)",
+      "type": "bargauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Total XP earned today",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "purple", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 3, "w": 4, "x": 12, "y": 22 },
+      "id": 72,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_xp_earned{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "XP Earned Today",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Users with active streaks",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "orange", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 3, "w": 4, "x": 16, "y": 22 },
+      "id": 73,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_active_streaks{env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Active Streaks",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Highest level achieved",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 3, "w": 4, "x": 20, "y": 22 },
+      "id": 74,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_max_level{env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Max Level",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Quizzes completed today",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 3, "w": 4, "x": 12, "y": 25 },
+      "id": 75,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_quizzes_completed{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Quizzes Today",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Flashcards reviewed today",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 3, "w": 4, "x": 16, "y": 25 },
+      "id": 76,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_flashcards_reviewed{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Flashcards Today",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Mind maps created today",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "blue", "value": null }]
+          }
+        }
+      },
+      "gridPos": { "h": 3, "w": 4, "x": 20, "y": 25 },
+      "id": 77,
+      "options": { "colorMode": "value" },
+      "targets": [
+        { "expr": "mirrorbuddy_mindmaps_created{period=\"24h\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Mind Maps Today",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 28 },
+      "id": 200,
+      "title": "TECHNICAL METRICS",
+      "type": "row"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 },
+      "id": 10,
+      "title": "Safety Metrics (Child Protection)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "GO: >=95% | NO-GO: <80%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 0.8 },
+              { "color": "green", "value": 0.95 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 30 },
+      "id": 11,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        { "expr": "mirrorbuddy_refusal_precision{period=\"7d\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Refusal Precision",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Must be 100%",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 30 },
+      "id": 12,
+      "options": { "colorMode": "value", "graphMode": "none" },
+      "targets": [
+        { "expr": "mirrorbuddy_jailbreak_block_rate{period=\"7d\",env=\"production\"}", "refId": "A" }
+      ],
+      "title": "Jailbreak Block Rate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "S3=STOP | S2<=2/week",
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 3 }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "S3 (critical)" },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "green", "value": null },
+                    { "color": "red", "value": 1 }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 30 },
+      "id": 13,
+      "options": { "displayMode": "gradient", "orientation": "horizontal" },
+      "targets": [
+        {
+          "expr": "mirrorbuddy_incidents_total{period=\"7d\",severity=\"S0\",env=\"production\"}",
+          "legendFormat": "S0 (glitch)",
+          "refId": "A"
+        },
+        {
+          "expr": "mirrorbuddy_incidents_total{period=\"7d\",severity=\"S1\",env=\"production\"}",
+          "legendFormat": "S1 (confusing)",
+          "refId": "B"
+        },
+        {
+          "expr": "mirrorbuddy_incidents_total{period=\"7d\",severity=\"S2\",env=\"production\"}",
+          "legendFormat": "S2 (policy)",
+          "refId": "C"
+        },
+        {
+          "expr": "mirrorbuddy_incidents_total{period=\"7d\",severity=\"S3\",env=\"production\"}",
+          "legendFormat": "S3 (critical)",
+          "refId": "D"
+        }
+      ],
+      "title": "Incidents by Severity (7d)",
+      "type": "bargauge"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 },
+      "id": 20,
+      "title": "Performance (SLI/SLO)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "lineWidth": 2 },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 35 },
+      "id": 21,
+      "targets": [
+        {
+          "expr": "http_request_duration_seconds{quantile=\"0.95\",env=\"production\"}",
+          "legendFormat": "{{route}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP Latency by Route (P95)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "fieldConfig": {
+        "defaults": {
+          "custom": { "drawStyle": "line", "lineWidth": 2 },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 0.01 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 35 },
+      "id": 22,
+      "targets": [
+        {
+          "expr": "http_request_error_rate{env=\"production\"}",
+          "legendFormat": "{{route}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Error Rate by Route",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 41 },
+      "id": 40,
+      "title": "External Services (API Quotas)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Limit: 120K TPM",
+      "fieldConfig": {
+        "defaults": {
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "red", "value": 95 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 42 },
+      "id": 41,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        {
+          "expr": "mirrorbuddy_external_service_usage{service=\"Azure OpenAI\",metric=\"Chat Tokens/min\",env=\"production\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Azure Chat TPM",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Limit: 350K TPM",
+      "fieldConfig": {
+        "defaults": {
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "red", "value": 95 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 42 },
+      "id": 42,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        {
+          "expr": "mirrorbuddy_external_service_usage{service=\"Azure OpenAI\",metric=\"Embedding Tokens/min\",env=\"production\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Azure Embedding TPM",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Limit: 12K/min",
+      "fieldConfig": {
+        "defaults": {
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 42 },
+      "id": 43,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        {
+          "expr": "mirrorbuddy_external_service_usage{service=\"Google Drive\",metric=\"Queries/min\",env=\"production\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Google Drive QPM",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+      "description": "Limit: 2K/month",
+      "fieldConfig": {
+        "defaults": {
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 50 },
+              { "color": "red", "value": 90 }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 42 },
+      "id": 44,
+      "options": { "colorMode": "value", "graphMode": "area" },
+      "targets": [
+        {
+          "expr": "mirrorbuddy_external_service_usage{service=\"Brave Search\",metric=\"Queries/month\",env=\"production\"}",
+          "refId": "A"
+        }
+      ],
+      "title": "Brave Search Monthly",
+      "type": "stat"
+    }
+  ],
+  "refresh": "1m",
+  "schemaVersion": 39,
+  "tags": ["mirrorbuddy", "sli", "slo", "v1", "business", "technical"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "MirrorBuddy Dashboard",
+  "uid": "dashboard",
+  "version": 6
+}
