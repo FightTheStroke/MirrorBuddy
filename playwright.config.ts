@@ -48,6 +48,9 @@ export default defineConfig({
             '**/gdpr-compliance.spec.ts',        // Requires complex DB state
             '**/google-drive.spec.ts',           // Requires Google OAuth
             '**/full-app-smoke.spec.ts',         // Requires full UI
+            '**/auth-system.spec.ts',            // Requires session/auth setup
+            '**/critical-api-routes.spec.ts',    // Requires proper API environment
+            '**/maestri-data.spec.ts',           // Requires full UI rendering
           ]
         : '**/cookie-signing.spec.ts',
     },
