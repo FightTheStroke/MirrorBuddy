@@ -79,6 +79,7 @@ jobs:
           name: build-output
           path: .next
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 1
 
   # Lane 2: Security Audit + SBOM (runs in parallel with build)
