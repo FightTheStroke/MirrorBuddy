@@ -21,9 +21,12 @@ async function getPurify(): Promise<
     // Dynamic imports to avoid breaking chat API at module load
     const { JSDOM } = await import("jsdom");
     const DOMPurify = (await import("dompurify")).default;
-    const window = new JSDOM("").window;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    purifyInstance = DOMPurify(window as any);
+    const jsdomWindow = new JSDOM("").window;
+    // JSDOM's Window type doesn't match DOMPurify's WindowLike exactly
+    // but it works at runtime - use double cast to satisfy TypeScript
+    purifyInstance = DOMPurify(
+      jsdomWindow as unknown as Window & typeof globalThis,
+    );
   }
   return purifyInstance;
 }
