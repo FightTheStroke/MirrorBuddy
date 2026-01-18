@@ -5,15 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-beta] - 2026-01-18 - MVP Beta Release
+
+### Added
+
+#### Trial Mode (ADR 0056)
+
+- **Anonymous Trial Sessions**: Fingerprint-based anonymous users with 3 chat limit
+- **Trial Limits**: Configurable message/tool limits, soft/hard limit enforcement
+- **Trial UI**: Gentle reminder at 2 messages, conversion CTA at limit
+- **Budget Control**: TRIAL_BUDGET_LIMIT_EUR environment variable (default: 100 EUR)
+- **Trial Metrics**: track trial_started, trial_engaged, trial_limit_hit, trial_beta_requested
+
+#### Invite-Only Beta System (ADR 0057)
+
+- **Beta Request Form**: `/api/invites/request` - email, name, motivation, optional trial link
+- **Admin Management**: `/admin/invites` - approve/reject with email notifications
+- **Secure Onboarding**: Time-limited invite tokens, auto-generated credentials
+- **Trial Migration**: Option to migrate trial data on first login
+- **Email Templates**: Resend-based templates for request confirmation, approval, rejection
+
+#### Authentication Enhancements
+
+- **Session-Based Auth**: Secure cookie-based sessions with validateSessionAuth
+- **Admin Role**: ADMIN_EMAIL environment variable for admin access control
+- **Password Security**: bcrypt hashing, secure random password generation
+- **Magic Link Support**: Email-based passwordless authentication
+
+#### Observability & KPIs (ADR 0058)
+
+- **Funnel Metrics**: Trial funnel (started→engaged→limit→request), Invite funnel (request→approved→login→active)
+- **Budget Metrics**: budget_used_eur, budget_limit_eur, budget_projected_monthly_eur, budget_usage_percent
+- **Abuse Detection**: abuse_flagged_total, abuse_blocked_total, abuse_score_total
+- **Conversion Rates**: 6 KPIs with targets and alert thresholds
+- **Grafana Dashboard**: `mirrorbuddy-beta-v1` with 10 panels (trial/invite funnels, budget gauge, abuse, trends)
+- **Alerts**: Budget 80%/95%, abuse spike, conversion drop, invite backlog
+
+### Changed
+
+- **Prisma Schema**: Multi-file schema with `prisma/schema/trial.prisma` and `prisma/schema/invite.prisma`
+- **Prometheus Push**: Extended to include funnel, budget, abuse, and conversion metrics
+
+---
+
 ## [0.7.0] - 2025-01-18 - Security Hardening Release
 
 ### Security
+
 - **COPPA Enforcement**: Integrated `canAccessFullFeatures()` into chat, streaming, and tool creation APIs
 - **Under-13 Protection**: Users under 13 without parental consent are now blocked from AI features
 - **Observability Hardening**: OTel is now mandatory in production (error log if not configured)
 - **CodeQL Analysis**: Added GitHub CodeQL workflow for static security analysis
 
 ### Fixed
+
 - Closed all security audit gaps identified by Codex review
 - CSRF protection verified on all mutating endpoints
 
@@ -26,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Jan 17 - V1 Enterprise Ready Plan 49)
 
 #### W0: Grafana Cloud Observability
+
 - **Env Config (T0-01)**: Added `GRAFANA_CLOUD_*` variables to `.env.example` for remote write
 - **Push Service (T0-02)**: Created `prometheus-push-service.ts` for Grafana Cloud metrics push
 - **Behavioral Metrics (T0-03)**: Extended `/api/metrics` with session health, safety, and cost metrics
@@ -37,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Jan 17 - Production Hardening Plan 46)
 
 #### W1: P0 Security & Privacy Blockers
+
 - **Content Security Policy (F-01)**: Strict CSP headers in `middleware.ts` with nonces for inline scripts
 - **CSRF Protection (F-02)**: Cookie signing with HMAC-SHA256 in `src/lib/auth/cookie-signing.ts`
 - **COPPA Compliance (F-03)**: Under-13 consent flow with parent verification in `prisma/schema/privacy.prisma`
@@ -45,6 +92,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Rate Limiting (F-06)**: Token bucket algorithm with 60 req/min default in `src/lib/rate-limit.ts`
 
 #### W2: P1 Critical Infrastructure
+
 - **Budget Enforcement (F-07)**: Hard stop when Azure spending exceeds user-defined limit
 - **Integration Tests (F-08)**: Database integration tests with Prisma transactions
 - **Error Boundaries (F-09)**: React error boundaries with structured logging in `src/components/error-boundary.tsx`
@@ -54,6 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Runbook (F-13)**: Incident response procedures in `docs/operations/RUNBOOK.md`
 
 #### W3: P2 Code Quality Improvements
+
 - **Request Tracing (F-21)**: Request ID generation for distributed tracing in `src/lib/tracing/`
 - **Console.log Cleanup (F-22)**: Migrated 11 files from console.log to structured logger
 - **localStorage Audit (F-23)**: Verified ADR 0015 compliance - no user data in localStorage
@@ -63,6 +112,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Circular Dependencies (F-27)**: Verified 0 circular dependencies with madge (1867 files)
 
 #### P3.2: Accessibility Testing
+
 - **WCAG 2.1 AA Test Suite**: Comprehensive `e2e/accessibility.spec.ts` with 24 tests using axe-core
 - **Color Contrast Fixes**: Updated accent colors to meet 4.5:1 minimum contrast ratio
 - **Keyboard Navigation Tests**: Tab order, focus indicators, escape key handling
@@ -78,6 +128,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed (Jan 16 - Schema Modularization)
 
 #### Prisma Multi-File Schema
+
 - **Split 1450-line schema.prisma into 11 domain files** for better organization:
   - `user.prisma`: User, Profile, Settings, Accessibility (180 lines)
   - `education.prisma`: Flashcards, Quizzes, Learning, Sessions (120 lines)
@@ -95,27 +146,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed (Jan 16 - Performance & N+1 Patterns)
 
 #### Memory Leaks (P0)
+
 - **rate-limit.ts**: Fixed interval never cleared - added `unref()` and `stopCleanup()` export
 - **event-handlers.ts**: Fixed setTimeout leaks - track greeting timeouts in `greetingTimeoutsRef`
 - **connection-cleanup.ts**: Clear greeting timeouts array on disconnect
 
 #### API Pagination
+
 - **flashcards/progress**: Added `page`/`limit` params with pagination metadata
 - **tags**: Added pagination (default 100, max 500)
 - **collections**: Added pagination with same pattern
 
 #### React Performance
+
 - **maestri-grid.tsx**: Added `useMemo` for filteredMaestri, `useCallback` for handleSelect
 - **subject-mastery.tsx**: Added `useMemo` for sortedMasteries and topSubjects
 
 #### Database Indexes
+
 - Added index on `StudySession.maestroId`
 - Added indexes on `Notification.type` and `Notification.priority`
 
 #### Voice Session
+
 - Added `RECONNECT_BACKOFF` config with exponential backoff in `constants.ts`
 
 #### Database Performance Optimization
+
 - **N+1 Query Resolution**: Fixed 3 critical N+1 patterns using `$transaction` and batch operations
   - `learning-persistence.ts`: Batch findMany + createMany instead of loop queries
   - `materials/bulk/route.ts`: Transaction with upsert for tag assignments
@@ -134,6 +191,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: All pencil case (astuccio) tools are now available during conversations with any maestro, buddy, or coach. Generated content is automatically injected into conversation context so AI can reference previously created materials.
 
 **New Tool Handlers (5)**:
+
 - **PDF Handler** (`upload_pdf`): Extract text from uploaded PDFs for AI analysis
 - **Webcam Handler** (`capture_webcam`): OCR for text + multimodal interpretation for images/diagrams
 - **Homework Handler** (`homework_help`): Maieutic assistance for exercises - guides without giving answers
@@ -141,18 +199,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Chart Handler** (`create_chart`): Generate Chart.js configurations for data visualization
 
 **Context Integration**:
+
 - Tool outputs saved with conversation FK (`ToolOutput` Prisma model)
 - Context builder injects previous tool outputs into AI system prompt
 - RAG indexing for semantic retrieval of generated content
 - AI can now reference "the mindmap we created earlier" or "the quiz from before"
 
 **Tool Alignment**:
+
 - 20 teaching maestri: Added PDF, Webcam, Homework, Formula, Chart tools
 - 5 buddies (Mario, Noemi, Enea, Bruno, Sofia): Full tool access
 - 5 support teachers (Melissa, Roberto, Chiara, Andrea, Favij): Full tool access
 - Mascetti (Amico): Correctly excluded (no tools - conversation only)
 
 **Trigger Detection**: Italian/English triggers for all new tools:
+
 - "carica pdf", "upload pdf", "analizza documento"
 - "scatta foto", "fotografa", "take photo"
 - "aiuto compiti", "esercizio", "homework"
@@ -160,6 +221,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - "grafico", "chart", "visualizza dati"
 
 **Key Files**:
+
 - `src/lib/tools/handlers/{pdf,webcam,homework,formula,chart}-handler.ts`
 - `src/lib/tools/plugins/{pdf,webcam,homework,formula,chart}-plugin.ts`
 - `src/lib/tools/tool-output-storage.ts` - Persist tool outputs
@@ -179,12 +241,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Enables maestri to access real-time web information for current events, tech news, and sports updates.
 
 **How it works**:
+
 - Integrates Brave Search API for live web results
 - Falls back to Wikipedia when API key not configured
 - Italian language and country targeting for relevant results
 - Treccani always added as authoritative Italian source
 
 **Why it matters**: Maestri can now discuss:
+
 - **Lovelace**: Rust, AI agents, modern programming trends
 - **Cicerone**: Daily news, current events
 - **Chris**: Upcoming Olympics, sports events
@@ -202,36 +266,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **How it works**: A comprehensive 4-wave implementation covering privacy, transparency, safety, and security:
 
 **Wave 1 - Privacy Infrastructure**:
+
 - PII detection for Italian fiscal codes, names, emails, phone numbers
 - Content anonymization with pseudonymization support
 - GDPR-compliant data retention (365d conversations, 730d progress)
 - Right to Erasure implementation (Article 17)
 
 **Wave 2 - AI Response Transparency**:
+
 - Confidence scoring with visual indicators (green/yellow/orange/red)
 - Hallucination risk detection with Italian-language warnings
 - Source attribution (knowledge base, RAG, AI-generated)
 - Child-friendly UI with encouraging messaging
 
 **Wave 3 - Safety Monitoring**:
+
 - Anonymized audit trail logging
 - Knowledge base safety auditing before embedding
 - Configuration versioning with rollback support
 - Jailbreak attempt flagging and review workflow
 
 **Wave 4 - Security Hardening**:
+
 - Unicode homoglyph attack prevention (Cyrillic, Greek, Arabic lookalikes)
 - Session throttling with escalation (warning → cooldown → timeout)
 - Privacy-aware RAG embeddings
 - Safety event monitoring dashboard
 
 **Why it matters**: Children with learning differences deserve AI tools built with their safety as the foundation. This implementation ensures:
+
 - Personal data is protected before AI processing
 - AI responses are transparent about confidence levels
 - Suspicious activity is logged and flagged
 - Parents and educators can trust the platform
 
 **Key Files**:
+
 - `src/lib/privacy/` - Anonymization, PII detection, data retention
 - `src/lib/ai/transparency/` - Confidence scoring, hallucination detection
 - `src/lib/safety/` - Audit trail, versioning, unicode normalization
@@ -247,6 +317,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Modes**: Manuale, Guidata, Bilanciata (default), Automatica.
 
 **Key Files**:
+
 - `src/lib/education/adaptive-difficulty.ts`
 - `src/app/api/adaptive/*`
 - `src/components/settings/sections/profile-settings.tsx`
@@ -259,12 +330,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Users can now import study materials directly from Google Drive instead of only uploading from local filesystem.
 
 **How it works**:
+
 1. Connect Google account in Settings > Integrations
 2. In Study Kit or Homework Help, choose "Da Google Drive"
 3. Browse folders, search files, select the one you need
 4. File is downloaded and processed as if uploaded locally
 
 **Features**:
+
 - Server-side OAuth 2.0 flow (secure, no tokens in browser)
 - Read-only access (minimal scope, `drive.readonly`)
 - Folder navigation with breadcrumbs
@@ -276,6 +349,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Why it matters**: Many students, especially on Chromebooks or in Google Workspace schools, store materials in Google Drive. Direct import eliminates download-then-upload friction.
 
 **Key Files**:
+
 - `src/lib/google/` - OAuth and Drive API clients
 - `src/components/google-drive/` - React components (picker, card, unified picker)
 - `src/app/api/auth/google/` - OAuth routes
@@ -289,6 +363,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Each character (Maestri, Coach, Buddy) now has their own conversation history sidebar, replacing the centralized "Storia" page.
 
 **How it works**:
+
 1. Click the History icon in the character header
 2. Sidebar slides in from the right (same position as voice panel)
 3. Browse, search, and filter past conversations with that specific character
@@ -296,6 +371,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 5. Delete conversations with confirmation dialog
 
 **Features**:
+
 - Search conversations by content
 - Date filters (Today, 7 days, 30 days, All)
 - Date grouping (Oggi, Ieri, Questa settimana, Questo mese, Più vecchie)
@@ -306,6 +382,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Why it matters**: Like ChatGPT/Claude, users can quickly access their conversation history without leaving the current context.
 
 **Key Files**:
+
 - `src/components/conversation/conversation-drawer/conversation-sidebar.tsx`
 - `src/app/api/conversations/search/route.ts`
 - `src/app/api/conversations/batch/route.ts`
@@ -315,6 +392,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: When you load an old conversation and start a voice call, the AI now has full context of the previous messages.
 
 **How it works**:
+
 1. Load conversation from history sidebar
 2. Start voice call
 3. Messages are injected into the Azure Realtime session
@@ -323,6 +401,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Why it matters**: Previously, voice calls started fresh with no context. Now chat and voice are seamlessly connected - you can review old content and continue vocally.
 
 **Technical Details**:
+
 - Messages passed via `connectionInfo.initialMessages`
 - Injected as `conversation.item.create` after session setup
 - Works with both WebSocket and WebRTC transports
@@ -335,6 +414,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Provides a flexible, discoverable plugin system for extending MirrorBuddy with custom tools.
 
 **Key Components**:
+
 - **ToolRegistry**: Singleton registry managing plugin registration, discovery, and filtering
 - **ToolOrchestrator**: Execution engine with validation, prerequisite checking, permission verification
 - **ToolPlugin Interface**: Standardized plugin definition with metadata, schema, handler, voice integration
@@ -342,6 +422,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **DataChannel Broadcasting**: Real-time tool event delivery via WebRTC DataChannel with SSE fallback
 
 **Features**:
+
 - Zod schema validation for plugin inputs
 - Permission-based access control (READ_CONVERSATION, READ_PROFILE, WRITE_CONTENT, VOICE_OUTPUT, FILE_ACCESS)
 - Trigger-based voice activation with confidence scoring
@@ -350,12 +431,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive JSDoc documentation for all interfaces and classes
 
 **Technical Details**:
+
 - Location: `src/lib/tools/plugin/`
 - Files: types.ts, registry.ts, orchestrator.ts, trigger-detector.ts, voice-feedback.ts, data-channel-protocol.ts
 - `@docs/claude/tool-plugins.md` - Reference guide
 - `@docs/claude/tool-architecture.md` - System architecture diagram (Mermaid)
 
 **Benefits**:
+
 - Modular tool management without monolithic code
 - Voice-first tool integration for students
 - Type-safe plugin definition and execution
@@ -369,11 +452,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Prepares MirrorBuddy for production deployment with containerization, monitoring, and incident response.
 
 **Key Components**:
+
 - **Dockerfile**: Multi-stage builds (build → runner) with optimized image size
 - **docker-compose**: Health checks, volume mounts, restart policies, PostgreSQL service
 - **Structured Logging**: JSON format for monitoring integration
 
 **Files**:
+
 - `Dockerfile` - Multi-stage production build
 - `docker-compose.yml` - Full stack with PostgreSQL
 
@@ -384,6 +469,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Comprehensive XSS prevention for AI-generated demos.
 
 **Security Layers**:
+
 1. **Whitespace normalization**: Defeats `< s c r i p t >` obfuscation
 2. **Loop-based removal**: Iterates until no changes (nested scripts)
 3. **Unclosed tag removal**: Catches `<script>...` without `</script>`
@@ -392,6 +478,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 6. **Protocol sanitization**: Blocks `javascript:`, `vbscript:`, `data:` URLs
 
 **Additional Fixes**:
+
 - UUID validation in content-extractor (SSRF prevention)
 - HTML entity decoding before protocol checks
 - Malformed closing tag handling (`</script foo>`)
@@ -399,6 +486,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Jan 11 - WebRTC Voice Transport Migration)
 
 #### WebRTC Transport for Azure OpenAI Realtime API
+
 - **Default Transport**: WebRTC (lower latency, better performance)
 - **Fallback**: WebSocket for older browsers
 - **Configuration**: `VOICE_TRANSPORT=webrtc` (default) or `VOICE_TRANSPORT=websocket`
@@ -414,6 +502,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Chat responses now stream in real-time instead of waiting for the full response.
 
 **How it works**:
+
 1. Student sends a message to a Maestro
 2. Response streams character by character via Server-Sent Events (SSE)
 3. First content appears in ~100-200ms instead of 3-8 seconds
@@ -422,6 +511,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Why it matters**: Students with ADHD or anxiety benefit from immediate visual feedback. No more staring at a blank screen wondering if the app is working.
 
 **Technical Details**:
+
 - **Endpoint**: `POST /api/chat/stream` for streaming, `/api/chat` for tools
 - **Feature flag**: `ENABLE_CHAT_STREAMING=true` (default)
 - **Provider**: Azure OpenAI only (Ollama doesn't support streaming)
@@ -429,6 +519,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fallback**: Automatic if streaming unavailable
 
 **Key Files**:
+
 - `src/lib/ai/providers/azure-streaming.ts` - SSE client
 - `src/app/api/chat/stream/route.ts` - Streaming endpoint
 - `src/lib/hooks/use-streaming-chat.ts` - React hook
@@ -441,12 +532,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Adds the iconic Conte Mascetti from "Amici Miei" as a philosophy/life wisdom maestro.
 
 **Character Features**:
+
 - Authentic persona with embedded knowledge from all 3 Amici Miei films
 - Famous supercazzole and zingarate references
 - Vintage rotary phone icon for voice calls
 - Italian cultural immersion
 
 **Technical Details**:
+
 - Character authenticity overhaul across all maestri
 - Embedded knowledge base pattern for character-specific facts
 - System prompts rewritten for consistency
@@ -460,6 +553,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Why it matters**: Enables AI-powered semantic search across study materials, finding related content based on meaning, not just keywords.
 
 **Technical Details**:
+
 - PostgreSQL with pgvector extension for embeddings
 - Binary engine configuration for ARM64 compatibility
 - Schema migration scripts included
@@ -469,12 +563,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Retrieval-Augmented Generation for contextual AI responses.
 
 **How it works**:
+
 1. Student asks question to Maestro
 2. System finds semantically similar materials from their uploaded content
 3. Relevant materials injected into AI context
 4. More personalized, accurate responses
 
 **Technical Details**:
+
 - Wave 4 implementation: `findSimilarMaterials()` retrieval service
 - Embedding generation via Azure OpenAI
 - Graceful degradation if RAG unavailable
@@ -484,6 +580,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Connects concepts across student's learning materials.
 
 **Technical Details**:
+
 - Knowledge Graph models and APIs
 - Concept extraction and relationship mapping
 - Foundation for future "connections" feature
@@ -504,6 +601,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **What it does**: Transforms a PDF into a structured learning journey, like an educational video game.
 
 **How it works**:
+
 1. Student uploads a PDF (e.g., "The French Revolution")
 2. AI analyzes the content and identifies 3-5 main topics
 3. Orders them from simplest to most complex (pedagogical sequencing)
@@ -513,6 +611,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Why it matters**: A student with learning differences facing 50 pages of PDF doesn't know where to start. Learning Path provides clear structure, one goal at a time, and immediate progress feedback.
 
 **Where to find it**:
+
 - Zaino → "Percorsi" filter to view created paths
 - Study Kit → "Genera Percorso" button to create a new one
 
@@ -529,6 +628,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added (Jan 4 - MirrorBucks & Seasons Gamification)
 
 #### Phase 1: Zaino/Astuccio Navigation
+
 - **Zaino** (`/zaino`): Material archive with dynamic navigation
   - Filter by materia, data, tipo
   - Search with Fuse.js fuzzy matching
@@ -540,6 +640,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Direct navigation to focused tool creation
 
 #### Phase 2: MirrorBucks & Seasons System
+
 - **MirrorBucks Currency**: Replaces XP system (Fortnite-style)
   - 5 MB/minute active conversation
   - 30 MB per quiz (50 MB if perfect)
@@ -561,6 +662,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Leaderboard**: Personal stats (day/week/season/year) - multi-user ready
 
 #### Phase 3: Maestri Redesign
+
 - **Enhanced Maestro Cards**: Larger avatars, emotional design
   - Rotating famous quotes per maestro (5+ each)
   - Personalized suggestions ("Ieri hai studiato X")
@@ -569,6 +671,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Session Context**: 5-min timeout triggers summary/close
 
 #### Phase 4: Professional Dashboard
+
 - **Dashboard** (`/dashboard`): Complete telemetry visualization
   - Study time (today/week/month/season)
   - MirrorBucks earned and level progress
@@ -578,6 +681,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Token usage statistics
 
 #### Phase 5: Fix & Polish
+
 - **Tool Buttons Responsive**: Flex-wrap on narrow screens
 - **Parent Access Button**: Fixed bottom-left, replaces XP bar concept
   - Visible on all pages except parent-dashboard, landing, welcome
@@ -712,6 +816,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Phase 9: Testing & Verification (Tasks 9.01-9.07)
+
 - **E2E Tests**:
   - `e2e/mindmap-hierarchy.spec.ts`: Tests mindmap title field and hierarchy rendering (ADR 0020)
   - `e2e/knowledge-hub.spec.ts`: Tests Knowledge Hub views, search, organization (ADR 0022)
@@ -724,6 +829,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Total New Tests**: 75+ tests covering adversarial inputs, jailbreak prevention, accessibility
 
 #### Phase 10: Documentation (Tasks 10.01-10.11)
+
 - Updated `docs/ARCHITECTURE.md`:
   - Added Conversational Memory section (ADR-0021)
   - Added Knowledge Hub section (ADR-0022)
@@ -739,6 +845,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated `docs/claude/knowledge-hub.md`: Full implementation reference
 
 #### Knowledge Hub UI Components (Phase 5, Tasks 5.17-5.22)
+
 - **SearchBar** (`src/components/education/knowledge-hub/components/search-bar.tsx`):
   - Debounced search input with configurable delay
   - Type filter dropdown with ARIA listbox
@@ -775,6 +882,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All components WCAG 2.1 AA compliant with keyboard navigation and ARIA attributes
 
 #### Knowledge Hub Hooks (Phase 5, Tasks 5.23-5.28)
+
 - **useMaterialsSearch** (`src/components/education/knowledge-hub/hooks/use-materials-search.ts`):
   - Fuse.js fuzzy search integration with configurable threshold
   - Debounced query execution with adjustable delay
@@ -810,6 +918,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `use-bulk-actions.test.ts`: 25 tests (selection, actions, error handling)
 
 #### Knowledge Hub Renderer Registry (Phase 5, Tasks 5.03-5.15)
+
 - **Renderer Registry** (`src/components/education/knowledge-hub/renderers/index.tsx`):
   - Lazy loading with dynamic imports for code splitting
   - Utility functions: `getRendererImport`, `hasRenderer`, `getSupportedRenderers`
@@ -835,6 +944,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `error-boundary.test.tsx`: 10 tests for RendererErrorBoundary and withErrorBoundary HOC
 
 #### Knowledge Hub Material Dialog (Phase 5, Tasks 5.01-5.02)
+
 - **Material Dialog** (`src/components/education/knowledge-hub/material-dialog.tsx`):
   - WCAG 2.1 AA accessible modal with focus trap
   - Dynamic renderer loading via React.lazy
@@ -852,6 +962,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Conversation Summaries
+
 - **Summary Generator** (`src/lib/conversation/summary-generator.ts`): Auto-generate summaries at session end
   - Triggered by explicit close or 15-min inactivity timeout
   - Extracts topics, key facts, and student learnings
@@ -862,12 +973,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Singleton pattern for global tracking
 
 #### Contextual Greetings
+
 - **Greeting Generator** (`src/lib/conversation/contextual-greeting.ts`): Personalized welcome messages
   - References previous conversation summary
   - Time-aware greetings ("ieri", "la settimana scorsa")
   - Fallback to default greeting if no history
 
 #### Dual Rating System
+
 - **Maestro Evaluation** (`src/lib/session/maestro-evaluation.ts`): AI evaluation of sessions
   - Score 1-10 with constructive feedback
   - Identifies strengths and areas to improve
@@ -878,6 +991,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Skip option for quick exit
 
 #### Parent Notes
+
 - **Parent Note Generator** (`src/lib/session/parent-note-generator.ts`): Auto-generated parent summaries
   - Parent-friendly language (non-technical)
   - Highlights achievements
@@ -889,11 +1003,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Delete functionality
 
 #### API Endpoints
+
 - `POST /api/conversations/[id]/end`: End conversation with summary
 - `GET /api/conversations/[id]/end`: Get conversation summary
 - `GET/PATCH/DELETE /api/parent-notes`: Parent notes CRUD
 
 #### Knowledge Hub API Routes (ADR 0022, MasterPlan Phase 4)
+
 - `GET /api/conversations/memory`: Load conversation context for memory injection (ADR 0021)
 - `GET/POST /api/collections`: List and create material folders (nested support)
 - `GET/PUT/DELETE /api/collections/[id]`: Single collection operations
@@ -907,6 +1023,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 #### Unified Tool Archive
+
 - **Material table extended**: Now includes sessionId relation, topic, conversationId
 - **tool-persistence.ts**: Migrated from CreatedTool to Material table
   - All CRUD operations now use Material
@@ -914,11 +1031,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Session linking support
 
 #### StudySession Schema
+
 - Added rating fields: studentRating, studentFeedback, maestroScore, maestroFeedback
 - Added session context: topics, conversationId, strengths, areasToImprove
 - Added materials relation for session-tool linking
 
 #### Knowledge Hub Schema (ADR 0022)
+
 - **Material.searchableText**: Pre-computed searchable content for Fuse.js full-text search
 - **Material.collectionId**: Foreign key to Collection for folder organization
 - **Collection model**: Folders for organizing materials
@@ -930,17 +1049,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All new fields properly indexed for query performance
 
 #### Conversation Flow Store
+
 - `endConversationWithSummary()`: New action for summary-aware session end
 - `loadContextualGreeting()`: Fetch personalized greeting
 - `showRatingModal` / `sessionSummary`: State for rating flow
 - Integration with inactivity monitor
 
 ### Deprecated
+
 - **CreatedTool table**: Marked deprecated, use Material instead
   - Migration script: `scripts/migrate-created-tools.ts`
   - 30-day buffer before removal
 
 ### Documentation
+
 - ADR 0019: Session Summaries & Unified Archive
 - ADR 0020: Mindmap Data Structure Fix
 - ADR 0021: Conversational Memory Injection
@@ -956,6 +1078,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 #### Demo/HTML Snippets Migration to Database
+
 - **Migrated Demo storage** from Zustand in-memory store to database API (ADR 0015 compliance)
   - Added `useDemos()` hook in `src/lib/hooks/use-saved-materials.ts`
   - Updated `html-snippets-view.tsx` to use database-backed `useDemos()` instead of `useHTMLSnippetsStore`
@@ -967,6 +1090,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - All tools now consistently auto-save to database on creation
 
 #### Mindmap Improvements
+
 - **Fixed "undefined" central node** bug: AI prompt now uses `title` parameter consistently
 - **Improved mindmap structure**: Enhanced AI prompt with detailed instructions for hierarchical structure
   - Clear guidance on main branches (3-5) and sub-nodes (2-4 per branch)
@@ -974,6 +1098,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 2-3 depth levels specification
 
 #### Uniform Focus Mode
+
 - **Standardized "Crea con Professore"** across all tool views:
   - `mindmaps-view.tsx`: Uses `enterFocusMode('mindmap')`
   - `quiz-view.tsx`: Uses `enterFocusMode('quiz')`
@@ -981,15 +1106,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `summaries-view.tsx`: Uses `enterFocusMode('summary')`
 
 ### Added
+
 - `'create_demo'` and `'create_summary'` to ToolType union in `types/index.ts`
 - `SavedDemo` interface for typed demo data
 - Loading state in `html-snippets-view.tsx` for better UX
 
 ### Technical
+
 - All educational tools now follow ADR 0015 Database-First Architecture
 - Removed dependency on `useHTMLSnippetsStore` Zustand store for demos
 
 ---
+
 ## [Unreleased] - Ambient Audio Feature
 
 > **Branch**: `feature/71-ambient-audio-enhanced` | **GitHub Issue**: #71
@@ -997,6 +1125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Ambient Audio System for Focus & Study
+
 - **Audio Engine** (`src/lib/audio/engine.ts`): Web Audio API-based engine for real-time audio generation and mixing
   - Singleton pattern for global audio management
   - Multi-layer audio mixing with individual volume controls
@@ -1051,6 +1180,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Screen reader compatibility
 
 #### Audio Modes Available
+
 - **Noise Types**:
   - White Noise: Equal energy masking
   - Pink Noise: Natural 1/f spectrum
@@ -1069,6 +1199,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Ocean: Wave patterns with rhythm
 
 #### Presets
+
 - **Focus**: Binaural alpha for concentration
 - **Deep Work**: Beta waves + brown noise
 - **Creative**: Theta waves + nature sounds
@@ -1078,6 +1209,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Nature**: Forest + ocean sounds
 
 ### Technical Details
+
 - Web Audio API for cross-browser compatibility
 - Procedural generation eliminates need for large audio files
 - Singleton audio engine pattern for resource efficiency
@@ -1090,6 +1222,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript strict mode compliance
 
 ### Future Enhancements
+
 - Pomodoro timer integration
 - Study session auto-start
 - Settings persistence across sessions
@@ -1103,6 +1236,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Landing Page & Returning User Support (Issues #73, #74)
+
 - **Beautiful Landing Page** (`src/app/welcome/page.tsx`): Gradient hero with Melissa avatar, feature grid
 - **Returning User Detection**: API endpoint `/api/onboarding` fetches existing user data from database
 - **Dynamic Melissa Prompt**: `generateMelissaOnboardingPrompt(existingData)` adapts greeting for returning users
@@ -1113,12 +1247,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Unit Tests**: 27 new tests for onboarding tools
 
 #### Conversation-First Tool Creation (Issue #23)
+
 - **Fullscreen Tool Layout** (`src/components/conversation/fullscreen-tool-layout.tsx`): 82/18 split with Maestro overlay
 - **Maestro Overlay** (`src/components/tools/maestro-overlay.tsx`): Floating Maestro during tool building
 - **Intent Detection** with tool type recognition (mindmap, quiz, flashcard)
 - Tools created through natural conversation, not forms
 
 #### Voice Commands for Mindmaps (ADR-0011, Issue #44)
+
 - **useMindmapModifications Hook** (`src/lib/hooks/use-mindmap-modifications.ts`): SSE subscription for real-time mindmap modification events
 - **InteractiveMarkMapRenderer** (`src/components/tools/interactive-markmap-renderer.tsx`): Extended renderer with imperative modification API
   - `addNode(concept, parentNode?)` - Add new concept as child
@@ -1133,6 +1269,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - D3 animations for smooth visual feedback
 
 #### Multi-User Collaboration (Issue #44)
+
 - **Mindmap Room** (`src/lib/collab/mindmap-room.ts`): Real-time room state with CRDT-like versioning
 - **Collab WebSocket** (`src/lib/collab/collab-websocket.ts`): WebSocket connection management
 - **Room API** (`src/app/api/collab/rooms/`): Create, join, leave rooms
@@ -1140,11 +1277,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Conflict resolution via version numbers
 
 #### Import/Export Multi-Format (Issue #44)
+
 - **Mindmap Export** (`src/lib/tools/mindmap-export.ts`): PNG, SVG, Markdown, FreeMind (.mm), XMind, JSON
 - **Mindmap Import** (`src/lib/tools/mindmap-import.ts`): Auto-detect format, parse Markdown/FreeMind/XMind/JSON
 - Download helper for browser blob saving
 
 #### Tool Execution System (ADR-0009)
+
 - **OpenAI Function Calling**: Maestri can create tools via structured function calls
 - **Tool Executor** (`src/lib/tools/tool-executor.ts`): Handler registry pattern
 - **Tool Handlers**: mindmap, quiz, demo, search, flashcard
@@ -1152,6 +1291,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tool Persistence**: IndexedDB for binaries, Prisma for metadata
 
 #### Student Summary Editor with Maieutic Method (Issue #70)
+
 - **StudentSummaryEditor** (`src/components/tools/student-summary-editor.tsx`): Student writes their own summary with Coach guidance
   - Guided 3-section structure: Introduzione, Sviluppo, Conclusione
   - Each section has a guiding question to prompt student thinking
@@ -1164,26 +1304,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Archive Integration**: Summaries appear in Archivio under "Riassunti" filter
 
 #### Showcase Mode
+
 - **Offline Demo** (`src/app/showcase/`): Full app demo without LLM connection
 - **Showcase Button**: Added to AI Provider settings for easy access
 - Pre-recorded responses for all features demonstration
 
 #### Pomodoro Timer (Issue #45)
+
 - **PomodoroTimer** (`src/components/education/pomodoro-timer.tsx`): ADHD-friendly focus sessions
 - Configurable work/break intervals
 - Visual and audio notifications
 - Integration with unified header
 
 #### Video Conference Layout
+
 - **Voice Session Layout**: Video-conference style with Maestro fullscreen
 - **Fullscreen Mindmaps**: Tool takes 100% during creation
 - **Picture-in-Picture**: Maestro avatar overlay during tool building
 
 #### Side-by-Side Voice UI
+
 - **Coach/Buddy Voice**: Separate voice layout for Coach and Buddy characters
 - Dual panel design for conversation + character display
 
 #### Unified Maestri Voice Experience (PR #43)
+
 - **MaestroSession** (`src/components/maestros/maestro-session.tsx`): 835-line unified component combining voice and chat
   - Side-by-side layout: chat on left (flex-1), voice panel on right (w-64)
   - Seamless voice/chat switching within same session
@@ -1204,21 +1349,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **LazyMaestroSession**: Code-split wrapper for performance
 
 #### Separate Conversations per Character (ADR-0010)
+
 - Each Maestro/Coach/Buddy maintains independent conversation history
 - Context preserved across sessions per character
 - Clean handoffs between characters
 
 #### Telemetry System (ADR-0006)
+
 - **TelemetryEvent** model in Prisma schema
 - Usage analytics for Grafana integration
 - Privacy-respecting event tracking
 
 #### Notification Persistence (ADR-0007)
+
 - **Notification** model with scheduling support
 - Server-side triggers for level-up, streak, achievements
 - API endpoints for CRUD operations
 
 #### Parent Dashboard GDPR (ADR-0008)
+
 - **Dual Consent**: Parent AND student must approve
 - **Data Export**: JSON/PDF portability
 - **Right to Erasure**: Deletion request tracking
@@ -1226,20 +1375,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Settings Integration**: "Genitori" tab in Settings links to `/parent-dashboard`
 
 #### Materiali Redesign
+
 - **50/50 Responsive Grid**: Better layout for materials view
 - Improved visual hierarchy
 
 #### Audio Device Selection
+
 - **setSinkId Integration**: Choose output audio device
 - Device picker in voice settings
 
 #### Onboarding Flow
+
 - **Welcome Page** (`src/app/welcome/`): Multi-step onboarding
 - **Onboarding Store**: Track completion state
 - Redirect to welcome if not completed
 - Meet the Maestri carousel
 
 #### Triangle of Support Architecture (ADR-0003)
+
 - **Melissa & Davide (Learning Coaches)**: New AI characters focused on building student autonomy
   - Melissa: Young, energetic female coach (default)
   - Davide: Calm, reassuring male coach (alternative)
@@ -1254,6 +1407,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Handoff Manager** (`src/lib/ai/handoff-manager.ts`): Manages transitions between characters
 
 #### Safety Guardrails for Child Protection (ADR-0004)
+
 - **Core Safety Prompts** (`src/lib/safety/safety-prompts.ts`): Injected into ALL character system prompts
 - **Content Filter** (`src/lib/safety/content-filter.ts`): Input filtering for profanity and inappropriate content
 - **Output Sanitizer** (`src/lib/safety/output-sanitizer.ts`): Response sanitization before delivery
@@ -1262,35 +1416,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Italian-specific crisis keywords detection with helpline referrals (Telefono Azzurro: 19696)
 
 #### Real-time Tool Canvas (ADR-0005)
+
 - **SSE Streaming** (`src/app/api/tools/stream/route.ts`): Server-Sent Events for real-time updates
 - **Tool Events Manager** (`src/lib/realtime/tool-events.ts`): Client registry and event broadcasting
 - **Tool State Management** (`src/lib/realtime/tool-state.ts`): Track tool creation progress
 - 80/20 layout: 80% tool canvas, 20% Maestro picture-in-picture
 
 #### Student Profile System
+
 - **Profile Generator** (`src/lib/profile/profile-generator.ts`): Synthesizes insights from all Maestri
 - **Parent Dashboard** (`src/app/parent-dashboard/page.tsx`): View for parents to see student progress
 - Insight collection from Maestri conversations
 - Growth-focused language (strengths and "areas of growth", not deficits)
 
 #### Storage Architecture (ADR-0001)
+
 - **Provider-agnostic Storage Service**: Abstract interface for file storage
 - **Local Storage Provider**: Development mode using `./uploads/`
 - **Azure Blob Provider**: Production mode (deferred implementation)
 - Support for: homework photos, mind maps, PDFs, voice recordings
 
 #### Voice Improvements
+
 - **Barge-in**: Users can now interrupt the Maestro while speaking for natural conversation flow
 - **Enhanced voice personalities**: Cicerone and Erodoto have detailed speaking style, pacing, and emotional instructions
 
 #### Accessibility
+
 - **7 Accessibility Profiles**: Quick-select presets for Dislessia, ADHD, Autismo, Visivo, Uditivo, Motorio, Paralisi Cerebrale
 - **Cerebral Palsy profile**: TTS, large text, keyboard nav, extra spacing
 
 #### Other
+
 - **Notification Service Stub**: Placeholder for future notification system (NOT_IMPLEMENTED, see Issue #14)
 
 ### Changed
+
 - **Conversation Flow**: Now routes to appropriate character based on intent
 - **Settings UI**: Reorganized Audio/Video settings for better UX
 - **Theme System**: Fixed theme detection and added value prop to ThemeProvider
@@ -1308,6 +1469,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Turn-taking speed**: silence_duration_ms 500 → 400 (faster response)
 
 ### Fixed
+
 - **Onboarding Voice Session** (#61): Voice session now persists across onboarding steps, preventing disconnect/reconnect and fallback to Web Speech API
 - **Parent Dashboard Navigation**: Added sticky header with "Torna all'app" back button
 - WCAG 2.1 AA accessibility fixes for conversation-flow component
@@ -1327,6 +1489,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed unused imports and lint warnings
 
 ### Security
+
 - All 17 Maestri now have safety guardrails injected automatically
 - Crisis keyword detection with Italian helpline numbers
 - Jailbreak/prompt injection detection and blocking
@@ -1334,10 +1497,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GDPR-compliant data handling for minors
 
 ### Removed
+
 - Deprecated `libretto-view.tsx` component
 - Fake history data replaced with real sessionHistory
 
 ### Documentation
+
 - **ADR 0001**: Materials Storage Strategy
 - **ADR 0002**: MarkMap for Mind Maps
 - **ADR 0003**: Triangle of Support Architecture
@@ -1360,6 +1525,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### AI Maestri (17 Tutors)
+
 - **Euclide** - Mathematics tutor inspired by Euclid of Alexandria
 - **Leonardo** - Art tutor inspired by Leonardo da Vinci
 - **Darwin** - Science tutor inspired by Charles Darwin
@@ -1379,6 +1545,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Chris** - Storytelling tutor inspired by Chris Anderson (TED)
 
 #### Voice Features
+
 - Real-time voice sessions with Azure OpenAI Realtime API
 - Natural voice-to-voice conversations
 - Automatic transcription
@@ -1386,6 +1553,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Interrupt-and-respond capability
 
 #### Learning Tools
+
 - Mind maps with MarkMap visualization
 - FSRS flashcard system (spaced repetition)
 - Adaptive quiz system
@@ -1393,6 +1561,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Session history
 
 #### Gamification
+
 - XP system for all activities
 - Level progression
 - Achievement badges
@@ -1400,6 +1569,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optional leaderboards
 
 #### Accessibility (WCAG 2.1 AA)
+
 - OpenDyslexic font option for dyslexia
 - Reduced motion mode for ADHD
 - Predictable layouts for autism
@@ -1410,6 +1580,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Focus indicators
 
 #### Technical
+
 - Next.js 16 with App Router
 - TypeScript 5 strict mode
 - Prisma ORM with SQLite/PostgreSQL
@@ -1418,6 +1589,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Playwright E2E tests
 
 ### Configuration
+
 - Azure OpenAI support (full features including voice)
 - Ollama support for local development (text only)
 - Azure Cost Management integration (optional)
@@ -1427,14 +1599,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Roadmap
 
 ### Completed in MirrorBuddy v2.0
+
 - [x] Parent/teacher dashboard (`/parent-dashboard`)
 - [x] Study companion feature (MirrorBuddy: Mario & Maria)
 
 ### Future
+
 - [ ] Multi-language support
 - [ ] Mobile-optimized UI
 - [ ] Offline mode
 
 ---
 
-*This project is part of [FightTheStroke](https://fightthestroke.org)'s mission to support children with learning differences.*
+_This project is part of [FightTheStroke](https://fightthestroke.org)'s mission to support children with learning differences._

@@ -2,12 +2,13 @@
  * Adaptive Difficulty Profile - Profile management and signal processing
  */
 
-import { z } from 'zod';
-import type {
-  AdaptiveProfile,
-  AdaptiveSignalInput,
-} from '@/types';
-import { clamp, ema, DEFAULT_BASELINE_DIFFICULTY } from './adaptive-difficulty-core';
+import { z } from "zod";
+import type { AdaptiveProfile, AdaptiveSignalInput } from "@/types";
+import {
+  clamp,
+  ema,
+  DEFAULT_BASELINE_DIFFICULTY,
+} from "./adaptive-difficulty-core";
 
 // Zod schema for runtime validation of stored profiles
 const AdaptiveGlobalSignalsSchema = z.object({
@@ -47,7 +48,7 @@ export function createDefaultAdaptiveProfile(): AdaptiveProfile {
 }
 
 export function parseAdaptiveProfile(raw?: string | null): AdaptiveProfile {
-  if (!raw || raw === '{}') {
+  if (!raw || raw === "{}") {
     return createDefaultAdaptiveProfile();
   }
 
@@ -69,7 +70,7 @@ export function parseAdaptiveProfile(raw?: string | null): AdaptiveProfile {
 
 export function updateGlobalSignals(
   profile: AdaptiveProfile,
-  signal: AdaptiveSignalInput
+  signal: AdaptiveSignalInput,
 ): void {
   const now = new Date().toISOString();
   const global = profile.global;
@@ -80,20 +81,25 @@ export function updateGlobalSignals(
   global.questionRate *= decay;
 
   switch (signal.type) {
-    case 'frustration':
-      global.frustration = clamp(ema(global.frustration, signal.value ?? 1, 0.3), 0, 1);
+    case "frustration":
+      global.frustration = clamp(
+        ema(global.frustration, signal.value ?? 1, 0.3),
+        0,
+        1,
+      );
       break;
-    case 'repeat_request':
+    case "repeat_request":
       global.repeatRate = clamp(ema(global.repeatRate, 1, 0.3), 0, 1);
       break;
-    case 'question':
+    case "question":
       global.questionRate = clamp(ema(global.questionRate, 1, 0.2), 0, 1);
       break;
-    case 'response_time_ms': {
+    case "response_time_ms": {
       const responseTime = signal.responseTimeMs ?? signal.value ?? 0;
-      global.averageResponseMs = responseTime > 0
-        ? ema(global.averageResponseMs, responseTime, 0.2)
-        : global.averageResponseMs;
+      global.averageResponseMs =
+        responseTime > 0
+          ? ema(global.averageResponseMs, responseTime, 0.2)
+          : global.averageResponseMs;
       break;
     }
     default:
@@ -106,11 +112,15 @@ export function updateGlobalSignals(
 
 export function ensureSubjectProfile(
   profile: AdaptiveProfile,
-  subject?: string
-): AdaptiveProfile['subjects'][string] | null {
+  subject?: string,
+): AdaptiveProfile["subjects"][string] | null {
   if (!subject) return null;
   const key = subject.toLowerCase();
-  if (!profile.subjects[key]) {
+  // Prevent prototype pollution
+  if (key === "__proto__" || key === "constructor" || key === "prototype") {
+    return null;
+  }
+  if (!Object.hasOwn(profile.subjects, key)) {
     const now = new Date().toISOString();
     profile.subjects[key] = {
       mastery: 50,
@@ -121,29 +131,43 @@ export function ensureSubjectProfile(
   return profile.subjects[key];
 }
 
+// Safe prototype keys for subject access
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+export function isSafeSubjectKey(subject?: string): boolean {
+  if (!subject) return false;
+  return !UNSAFE_KEYS.has(subject.toLowerCase());
+}
+
 export function updateSubjectSignals(
   profile: AdaptiveProfile,
-  signal: AdaptiveSignalInput
+  signal: AdaptiveSignalInput,
 ): void {
+  // Validate subject key to prevent prototype pollution
+  if (!isSafeSubjectKey(signal.subject)) return;
   const subjectProfile = ensureSubjectProfile(profile, signal.subject);
   if (!subjectProfile) return;
 
   const now = new Date().toISOString();
 
-  if (signal.type === 'quiz_result') {
+  if (signal.type === "quiz_result") {
     const score = clamp(signal.value ?? 0, 0, 100);
-    subjectProfile.mastery = clamp(ema(subjectProfile.mastery, score, 0.3), 0, 100);
+    subjectProfile.mastery = clamp(
+      ema(subjectProfile.mastery, score, 0.3),
+      0,
+      100,
+    );
     subjectProfile.lastQuizScore = score;
   }
 
-  if (signal.type === 'flashcard_rating') {
+  if (signal.type === "flashcard_rating") {
     const deltaMap: Record<string, number> = {
       again: -6,
       hard: -3,
       good: 2,
       easy: 4,
     };
-    const delta = deltaMap[signal.rating || 'good'] ?? 0;
+    const delta = deltaMap[signal.rating || "good"] ?? 0;
     subjectProfile.mastery = clamp(subjectProfile.mastery + delta, 0, 100);
   }
 

@@ -1,10 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Shield } from "lucide-react";
+import { Shield, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import {
+  getConsent,
+  saveConsent,
+  syncConsentToServer,
+} from "@/lib/consent/consent-storage";
 
 // Privacy Settings
 export function PrivacySettings() {
@@ -13,6 +18,12 @@ export function PrivacySettings() {
     buildTime: string;
     environment: string;
   } | null>(null);
+  // Use lazy initialization to read consent from localStorage
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const consent = getConsent();
+    return consent?.analytics ?? true;
+  });
 
   useEffect(() => {
     fetch("/api/version")
@@ -20,6 +31,13 @@ export function PrivacySettings() {
       .then(setVersion)
       .catch(() => null);
   }, []);
+
+  const handleAnalyticsToggle = async () => {
+    const newValue = !analyticsEnabled;
+    setAnalyticsEnabled(newValue);
+    const consent = saveConsent(newValue);
+    await syncConsentToServer(consent);
+  };
 
   return (
     <div className="space-y-6">
@@ -84,6 +102,50 @@ export function PrivacySettings() {
           >
             Elimina tutti i miei dati
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* Telemetry Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-blue-500" />
+            Telemetria e Analisi
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            I dati anonimi ci aiutano a migliorare MirrorBuddy. Nessun dato
+            personale viene raccolto.
+          </p>
+
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
+            <div>
+              <p className="font-medium text-slate-900 dark:text-white text-sm">
+                Invia dati anonimi
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Statistiche di utilizzo anonime
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={analyticsEnabled}
+              onClick={handleAnalyticsToggle}
+              className={`relative w-11 h-6 rounded-full transition-colors ${
+                analyticsEnabled
+                  ? "bg-blue-600"
+                  : "bg-slate-300 dark:bg-slate-600"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
+                  analyticsEnabled ? "translate-x-5" : ""
+                }`}
+              />
+            </button>
+          </div>
         </CardContent>
       </Card>
 

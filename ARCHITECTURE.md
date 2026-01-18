@@ -101,20 +101,20 @@ User Action → UI Component → Zustand Store (optimistic) → API Route → AI
 
 ## Tech Stack
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Framework** | Next.js 16.1.1 (App Router) | SSR, routing, API routes |
-| **Language** | TypeScript 5 (strict mode) | Type safety, developer experience |
-| **UI** | React 19.2.3 | Component framework |
-| **Styling** | Tailwind CSS 4, Radix UI | Utility-first + accessible components |
-| **State** | Zustand 5.0.9 | Lightweight state management |
-| **Voice** | Azure OpenAI Realtime API | Real-time voice conversations (WebRTC) |
-| **AI** | Azure OpenAI (chat, embeddings) | GPT-4o, text-embedding-3-small |
-| **RAG** | pgvector | Semantic search (1536 dims) |
-| **Mind Maps** | MarkMap | Interactive mind map visualization |
-| **Database** | Prisma + PostgreSQL 17 + pgvector | Type-safe ORM + vector search |
-| **Testing** | Playwright (E2E) + Vitest (unit) | 229 E2E, 5169+ unit tests |
-| **Observability** | Grafana Cloud | Prometheus push metrics |
+| Layer             | Technology                        | Purpose                                |
+| ----------------- | --------------------------------- | -------------------------------------- |
+| **Framework**     | Next.js 16.1.1 (App Router)       | SSR, routing, API routes               |
+| **Language**      | TypeScript 5 (strict mode)        | Type safety, developer experience      |
+| **UI**            | React 19.2.3                      | Component framework                    |
+| **Styling**       | Tailwind CSS 4, Radix UI          | Utility-first + accessible components  |
+| **State**         | Zustand 5.0.9                     | Lightweight state management           |
+| **Voice**         | Azure OpenAI Realtime API         | Real-time voice conversations (WebRTC) |
+| **AI**            | Azure OpenAI (chat, embeddings)   | GPT-4o, text-embedding-3-small         |
+| **RAG**           | pgvector                          | Semantic search (1536 dims)            |
+| **Mind Maps**     | MarkMap                           | Interactive mind map visualization     |
+| **Database**      | Prisma + PostgreSQL 17 + pgvector | Type-safe ORM + vector search          |
+| **Testing**       | Playwright (E2E) + Vitest (unit)  | 229 E2E, 5169+ unit tests              |
+| **Observability** | Grafana Cloud                     | Prometheus push metrics                |
 
 ---
 
@@ -150,21 +150,26 @@ docs/adr/             # 51+ Architecture Decision Records
 ## Key Components
 
 ### Frontend
+
 - **Next.js App Router** (`src/app/`) - SSR, routing, 50+ API routes
 - **Zustand Stores** (`src/lib/stores/`) - progress, settings, conversation, pomodoro, voice, accessibility, etc.
 
 ### Backend
-- **API Routes** (`src/app/api/`) - /chat, /chat/stream (SSE), /voice/*, /tools/stream, /materials, /progress, /health, /metrics
+
+- **API Routes** (`src/app/api/`) - /chat, /chat/stream (SSE), /voice/\*, /tools/stream, /materials, /progress, /health, /metrics
 
 ### AI Providers
+
 - **Azure OpenAI** - GPT-4o (chat), GPT-4o Realtime (voice WebRTC), text-embedding-3-small (RAG)
 - **Ollama** - Local fallback, text-only
 
 ### RAG System
+
 - **Embeddings** (`src/lib/rag/`) - Azure embeddings → pgvector storage → cosine similarity search
 - **Integration** - Conversation memory injection, material context enhancement
 
 ### Database
+
 - **Prisma ORM** + **PostgreSQL 17** + **pgvector** - Semantic search, GDPR-compliant data management
 
 ---
@@ -179,19 +184,78 @@ docs/adr/             # 51+ Architecture Decision Records
 
 ---
 
+## Beta Launch Architecture
+
+### Trial Mode (ADR 0056)
+
+Anonymous users can try MirrorBuddy without registration:
+
+```
+Trial User → Fingerprint ID → 3 Chat Messages → Soft Limit (reminder) → Hard Limit (CTA) → Beta Request
+```
+
+**Components:**
+
+- `src/lib/trial/trial-service.ts` - Session management, limit checking
+- `src/lib/trial/fingerprint.ts` - Browser fingerprinting for anonymous IDs
+- `src/components/trial/trial-limit-banner.tsx` - Limit notifications
+- `prisma/schema/trial.prisma` - TrialSession model
+
+**Budget:** `TRIAL_BUDGET_LIMIT_EUR` env var (default: 100 EUR/month) controls trial API costs.
+
+### Invite System (ADR 0057)
+
+Beta access requires admin approval:
+
+```
+Beta Request → Admin Review → Approve/Reject → Email Notification → First Login → Trial Migration (optional)
+```
+
+**API Endpoints:**
+
+- `POST /api/invites/request` - Submit beta request
+- `GET /api/invites` - List invites (admin only)
+- `POST /api/invites/approve` - Approve with auto-generated credentials
+- `POST /api/invites/reject` - Reject with reason
+
+**Components:**
+
+- `src/lib/invite/invite-service.ts` - Approval workflow, email notifications
+- `src/lib/email/templates/invite-templates.ts` - Resend email templates
+- `src/app/admin/invites/page.tsx` - Admin management UI
+- `prisma/schema/invite.prisma` - InviteRequest model
+
+### Authentication Flow
+
+```mermaid
+flowchart LR
+    A[Trial User] -->|Beta Request| B[InviteRequest]
+    B -->|Admin Approves| C[Credentials Generated]
+    C -->|Email Sent| D[User Login]
+    D -->|First Login| E{Migrate Trial?}
+    E -->|Yes| F[Copy Trial Data]
+    E -->|No| G[Fresh Start]
+    F --> H[Full Access]
+    G --> H
+```
+
+**Session Auth:** `src/lib/auth/session-auth.ts` - Cookie-based sessions with `validateSessionAuth()` and `validateAdminAuth()`.
+
+---
+
 ## Accessibility
 
 WCAG 2.1 AA compliant with 7 profiles (`src/lib/accessibility/profiles.ts`):
 
-| Profile | Condition | Key Features |
-|---------|-----------|--------------|
-| dyslexia | Dyslexia | OpenDyslexic font, extra spacing |
-| dyscalculia | Dyscalculia | Visual numbers |
-| adhd | ADHD | Focus mode, reduced distractions |
-| autism | Autism | Predictable layouts |
-| cerebral-palsy | Cerebral Palsy | Large targets, keyboard nav |
-| visual-impairment | Low vision | High contrast, screen reader |
-| motor-difficulties | Motor impairments | Voice control |
+| Profile            | Condition         | Key Features                     |
+| ------------------ | ----------------- | -------------------------------- |
+| dyslexia           | Dyslexia          | OpenDyslexic font, extra spacing |
+| dyscalculia        | Dyscalculia       | Visual numbers                   |
+| adhd               | ADHD              | Focus mode, reduced distractions |
+| autism             | Autism            | Predictable layouts              |
+| cerebral-palsy     | Cerebral Palsy    | Large targets, keyboard nav      |
+| visual-impairment  | Low vision        | High contrast, screen reader     |
+| motor-difficulties | Motor impairments | Voice control                    |
 
 ---
 
@@ -204,6 +268,7 @@ WCAG 2.1 AA compliant with 7 profiles (`src/lib/accessibility/profiles.ts`):
 **CI/CD:** GitHub Actions - Lint + TypeScript + Build + Tests on every PR.
 
 **Observability:**
+
 - **Dashboard:** https://mirrorbuddy.grafana.net/d/dashboard/
 - **Health:** `GET /api/health` (k8s probes), `GET /api/health/detailed` (full metrics)
 - **Metrics:** `GET /api/metrics` (Prometheus format), push every 60s to Grafana Cloud

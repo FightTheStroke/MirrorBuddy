@@ -1,0 +1,40 @@
+/// Beta Invite Request System
+/// Tracks beta access requests and their approval status.
+/// Links trial sessions to invite requests for data migration.
+
+enum InviteStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model InviteRequest {
+  id              String       @id @default(cuid())
+  email           String       @unique
+  name            String
+  motivation      String       @db.Text
+  trialSessionId  String?      // Optional link to trial session
+  status          InviteStatus @default(PENDING)
+
+  // Approval/rejection details
+  reviewedAt      DateTime?
+  reviewedBy      String?      // Admin user ID
+  rejectionReason String?
+
+  // Generated credentials (set on approval)
+  generatedUsername String?    @unique
+  inviteToken       String?    @unique  // One-time token for first login
+  inviteExpiresAt   DateTime?
+
+  // First login tracking
+  firstLoginAt    DateTime?
+  migratedData    Boolean   @default(false) // Did user migrate trial data?
+  createdUserId   String?   @unique         // Reference to created User
+
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status])
+  @@index([email])
+  @@index([trialSessionId])
+}

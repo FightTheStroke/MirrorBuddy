@@ -11,8 +11,9 @@
  * Tested: 18 Jan 2026 - metrics visible in Grafana Cloud
  */
 
-import { metricsStore } from './metrics-store';
-import { logger } from '@/lib/logger';
+import { metricsStore } from "./metrics-store";
+import { getFunnelMetrics, getConversionRates } from "./funnel-metrics";
+import { logger } from "@/lib/logger";
 
 interface PushConfig {
   url: string;
@@ -28,6 +29,18 @@ interface MetricSample {
   timestamp: number;
 }
 
+/**
+ * Escape a string for use as an Influx Line Protocol tag value.
+ * Escapes backslash, comma, equals, and space characters.
+ */
+function escapeInfluxTagValue(value: string): string {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/,/g, "\\,")
+    .replace(/=/g, "\\=")
+    .replace(/ /g, "\\ ");
+}
+
 class PrometheusPushService {
   private config: PushConfig | null = null;
   private intervalId: ReturnType<typeof setInterval> | null = null;
@@ -40,10 +53,13 @@ class PrometheusPushService {
     const url = process.env.GRAFANA_CLOUD_PROMETHEUS_URL;
     const user = process.env.GRAFANA_CLOUD_PROMETHEUS_USER;
     const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
-    const interval = parseInt(process.env.GRAFANA_CLOUD_PUSH_INTERVAL || '60', 10);
+    const interval = parseInt(
+      process.env.GRAFANA_CLOUD_PUSH_INTERVAL || "60",
+      10,
+    );
 
     if (!url || !user || !apiKey) {
-      logger.info('Grafana Cloud push disabled (missing config)');
+      logger.info("Grafana Cloud push disabled (missing config)");
       return false;
     }
 
@@ -54,8 +70,8 @@ class PrometheusPushService {
       intervalSeconds: Math.max(15, interval), // Minimum 15s
     };
 
-    logger.info('Grafana Cloud push initialized', {
-      url: url.replace(/\/\/.*@/, '//***@'), // Redact credentials
+    logger.info("Grafana Cloud push initialized", {
+      url: url.replace(/\/\/.*@/, "//***@"), // Redact credentials
       interval: this.config.intervalSeconds,
     });
 
@@ -71,7 +87,7 @@ class PrometheusPushService {
     }
 
     if (this.isRunning) {
-      logger.warn('Push service already running');
+      logger.warn("Push service already running");
       return;
     }
 
@@ -80,17 +96,17 @@ class PrometheusPushService {
 
     // Push immediately on start
     this.pushMetrics().catch((err) =>
-      logger.error('Initial metrics push failed', { error: String(err) })
+      logger.error("Initial metrics push failed", { error: String(err) }),
     );
 
     // Then push periodically
     this.intervalId = setInterval(() => {
       this.pushMetrics().catch((err) =>
-        logger.error('Periodic metrics push failed', { error: String(err) })
+        logger.error("Periodic metrics push failed", { error: String(err) }),
       );
     }, intervalMs);
 
-    logger.info('Prometheus push service started', {
+    logger.info("Prometheus push service started", {
       intervalSeconds: this.config!.intervalSeconds,
     });
   }
@@ -104,7 +120,7 @@ class PrometheusPushService {
       this.intervalId = null;
     }
     this.isRunning = false;
-    logger.info('Prometheus push service stopped');
+    logger.info("Prometheus push service stopped");
   }
 
   /**
@@ -112,22 +128,22 @@ class PrometheusPushService {
    */
   async pushMetrics(): Promise<void> {
     if (!this.config) {
-      throw new Error('Push service not initialized');
+      throw new Error("Push service not initialized");
     }
 
     const samples = this.collectSamples();
     if (samples.length === 0) {
-      logger.debug('No metrics to push');
+      logger.debug("No metrics to push");
       return;
     }
 
     const body = this.formatInfluxLineProtocol(samples);
 
     const response = await fetch(this.config.url, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'text/plain',
-        Authorization: `Basic ${Buffer.from(`${this.config.user}:${this.config.apiKey}`).toString('base64')}`,
+        "Content-Type": "text/plain",
+        Authorization: `Basic ${Buffer.from(`${this.config.user}:${this.config.apiKey}`).toString("base64")}`,
       },
       body,
     });
@@ -137,7 +153,7 @@ class PrometheusPushService {
       throw new Error(`Push failed: ${response.status} ${text}`);
     }
 
-    logger.debug('Metrics pushed successfully', { count: samples.length });
+    logger.debug("Metrics pushed successfully", { count: samples.length });
   }
 
   /**
@@ -151,27 +167,60 @@ class PrometheusPushService {
     // Add instance label to all metrics
     // env=production for real data, env=test for test script
     const instanceLabels = {
-      instance: 'mirrorbuddy',
-      env: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+      instance: "mirrorbuddy",
+      env: process.env.NODE_ENV === "production" ? "production" : "development",
     };
 
     // Route-level metrics
-    for (const [route, metrics] of Object.entries(summary.routes)) {
+    for (const [rawRoute, metrics] of Object.entries(summary.routes)) {
+      // Sanitize route: only allow alphanumeric, slashes, hyphens, underscores
+      // This prevents any injection in Influx Line Protocol
+      const route = rawRoute.replace(/[^a-zA-Z0-9/_-]/g, "_");
       const routeLabels = { ...instanceLabels, route };
 
       samples.push(
-        { name: 'http_requests_total', labels: routeLabels, value: metrics.count, timestamp: now },
-        { name: 'http_request_duration_seconds_p50', labels: routeLabels, value: metrics.p50LatencyMs / 1000, timestamp: now },
-        { name: 'http_request_duration_seconds_p95', labels: routeLabels, value: metrics.p95LatencyMs / 1000, timestamp: now },
-        { name: 'http_request_duration_seconds_p99', labels: routeLabels, value: metrics.p99LatencyMs / 1000, timestamp: now },
-        { name: 'http_request_errors_total', labels: routeLabels, value: metrics.errorCount, timestamp: now },
-        { name: 'http_request_error_rate', labels: routeLabels, value: metrics.errorRate, timestamp: now }
+        {
+          name: "http_requests_total",
+          labels: routeLabels,
+          value: metrics.count,
+          timestamp: now,
+        },
+        {
+          name: "http_request_duration_seconds_p50",
+          labels: routeLabels,
+          value: metrics.p50LatencyMs / 1000,
+          timestamp: now,
+        },
+        {
+          name: "http_request_duration_seconds_p95",
+          labels: routeLabels,
+          value: metrics.p95LatencyMs / 1000,
+          timestamp: now,
+        },
+        {
+          name: "http_request_duration_seconds_p99",
+          labels: routeLabels,
+          value: metrics.p99LatencyMs / 1000,
+          timestamp: now,
+        },
+        {
+          name: "http_request_errors_total",
+          labels: routeLabels,
+          value: metrics.errorCount,
+          timestamp: now,
+        },
+        {
+          name: "http_request_error_rate",
+          labels: routeLabels,
+          value: metrics.errorRate,
+          timestamp: now,
+        },
       );
 
       // Error breakdown by status
       for (const [status, count] of Object.entries(metrics.errors)) {
         samples.push({
-          name: 'http_request_errors_by_status',
+          name: "http_request_errors_by_status",
           labels: { ...routeLabels, status_code: status },
           value: count,
           timestamp: now,
@@ -181,9 +230,183 @@ class PrometheusPushService {
 
     // Overall metrics
     samples.push(
-      { name: 'http_requests_total_all', labels: instanceLabels, value: summary.totalRequests, timestamp: now },
-      { name: 'http_errors_total_all', labels: instanceLabels, value: summary.totalErrors, timestamp: now },
-      { name: 'http_error_rate_all', labels: instanceLabels, value: summary.overallErrorRate, timestamp: now }
+      {
+        name: "http_requests_total_all",
+        labels: instanceLabels,
+        value: summary.totalRequests,
+        timestamp: now,
+      },
+      {
+        name: "http_errors_total_all",
+        labels: instanceLabels,
+        value: summary.totalErrors,
+        timestamp: now,
+      },
+      {
+        name: "http_error_rate_all",
+        labels: instanceLabels,
+        value: summary.overallErrorRate,
+        timestamp: now,
+      },
+    );
+
+    // Funnel metrics
+    const funnel = getFunnelMetrics();
+    const rates = getConversionRates();
+
+    // Trial funnel
+    samples.push(
+      {
+        name: "trial_started_total",
+        labels: instanceLabels,
+        value: funnel.trial.started,
+        timestamp: now,
+      },
+      {
+        name: "trial_engaged_total",
+        labels: instanceLabels,
+        value: funnel.trial.engaged,
+        timestamp: now,
+      },
+      {
+        name: "trial_limit_hit_total",
+        labels: instanceLabels,
+        value: funnel.trial.limitHit,
+        timestamp: now,
+      },
+      {
+        name: "trial_beta_requested_total",
+        labels: instanceLabels,
+        value: funnel.trial.betaRequested,
+        timestamp: now,
+      },
+    );
+
+    // Invite funnel
+    samples.push(
+      {
+        name: "invite_requested_total",
+        labels: instanceLabels,
+        value: funnel.invite.requested,
+        timestamp: now,
+      },
+      {
+        name: "invite_approved_total",
+        labels: instanceLabels,
+        value: funnel.invite.approved,
+        timestamp: now,
+      },
+      {
+        name: "invite_rejected_total",
+        labels: instanceLabels,
+        value: funnel.invite.rejected,
+        timestamp: now,
+      },
+      {
+        name: "invite_first_login_total",
+        labels: instanceLabels,
+        value: funnel.invite.firstLogin,
+        timestamp: now,
+      },
+      {
+        name: "invite_active_total",
+        labels: instanceLabels,
+        value: funnel.invite.active,
+        timestamp: now,
+      },
+    );
+
+    // Budget metrics
+    samples.push(
+      {
+        name: "budget_used_eur",
+        labels: instanceLabels,
+        value: funnel.budget.usedEur,
+        timestamp: now,
+      },
+      {
+        name: "budget_limit_eur",
+        labels: instanceLabels,
+        value: funnel.budget.limitEur,
+        timestamp: now,
+      },
+      {
+        name: "budget_projected_monthly_eur",
+        labels: instanceLabels,
+        value: funnel.budget.projectedMonthlyEur,
+        timestamp: now,
+      },
+      {
+        name: "budget_usage_percent",
+        labels: instanceLabels,
+        value:
+          funnel.budget.limitEur > 0
+            ? (funnel.budget.usedEur / funnel.budget.limitEur) * 100
+            : 0,
+        timestamp: now,
+      },
+    );
+
+    // Abuse metrics
+    samples.push(
+      {
+        name: "abuse_flagged_total",
+        labels: instanceLabels,
+        value: funnel.abuse.flaggedSessions,
+        timestamp: now,
+      },
+      {
+        name: "abuse_blocked_total",
+        labels: instanceLabels,
+        value: funnel.abuse.blockedSessions,
+        timestamp: now,
+      },
+      {
+        name: "abuse_score_total",
+        labels: instanceLabels,
+        value: funnel.abuse.totalAbuseScore,
+        timestamp: now,
+      },
+    );
+
+    // Conversion rates
+    samples.push(
+      {
+        name: "conversion_trial_to_engaged",
+        labels: instanceLabels,
+        value: rates.trialToEngaged,
+        timestamp: now,
+      },
+      {
+        name: "conversion_engaged_to_limit",
+        labels: instanceLabels,
+        value: rates.engagedToLimit,
+        timestamp: now,
+      },
+      {
+        name: "conversion_limit_to_request",
+        labels: instanceLabels,
+        value: rates.limitToRequest,
+        timestamp: now,
+      },
+      {
+        name: "conversion_request_to_approved",
+        labels: instanceLabels,
+        value: rates.requestToApproved,
+        timestamp: now,
+      },
+      {
+        name: "conversion_approved_to_login",
+        labels: instanceLabels,
+        value: rates.approvedToLogin,
+        timestamp: now,
+      },
+      {
+        name: "conversion_login_to_active",
+        labels: instanceLabels,
+        value: rates.loginToActive,
+        timestamp: now,
+      },
     );
 
     return samples;
@@ -196,11 +419,11 @@ class PrometheusPushService {
     return samples
       .map((s) => {
         const tags = Object.entries(s.labels)
-          .map(([k, v]) => `${k}=${v.replace(/[, ]/g, '\\ ')}`)
-          .join(',');
+          .map(([k, v]) => `${k}=${escapeInfluxTagValue(v)}`)
+          .join(",");
         return `${s.name},${tags} value=${s.value} ${s.timestamp * 1000000}`;
       })
-      .join('\n');
+      .join("\n");
   }
 
   /**

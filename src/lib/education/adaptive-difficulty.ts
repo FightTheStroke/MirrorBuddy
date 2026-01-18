@@ -3,13 +3,13 @@
  * Database operations and public API
  */
 
-import { prisma } from '@/lib/db';
+import { prisma } from "@/lib/db";
 import type {
   AdaptiveContext,
   AdaptiveDifficultyMode,
   AdaptiveProfile,
   AdaptiveSignalInput,
-} from '@/types';
+} from "@/types";
 
 // Re-export core functions
 export {
@@ -17,24 +17,30 @@ export {
   normalizeAdaptiveDifficultyMode,
   calculateAdaptiveContext,
   buildAdaptiveInstruction,
-} from './adaptive-difficulty-core';
+} from "./adaptive-difficulty-core";
 
 // Re-export profile functions
 export {
   createDefaultAdaptiveProfile,
   parseAdaptiveProfile,
-} from './adaptive-difficulty-profile';
+} from "./adaptive-difficulty-profile";
 
 // Internal imports for this module
-import { normalizeAdaptiveDifficultyMode, calculateAdaptiveContext } from './adaptive-difficulty-core';
+import {
+  normalizeAdaptiveDifficultyMode,
+  calculateAdaptiveContext,
+} from "./adaptive-difficulty-core";
 import {
   parseAdaptiveProfile,
   updateGlobalSignals,
   updateSubjectSignals,
   ensureSubjectProfile,
-} from './adaptive-difficulty-profile';
+  isSafeSubjectKey,
+} from "./adaptive-difficulty-profile";
 
-export async function loadAdaptiveProfile(userId: string): Promise<AdaptiveProfile> {
+export async function loadAdaptiveProfile(
+  userId: string,
+): Promise<AdaptiveProfile> {
   let progress = await prisma.progress.findUnique({ where: { userId } });
   if (!progress) {
     progress = await prisma.progress.create({ data: { userId } });
@@ -44,7 +50,7 @@ export async function loadAdaptiveProfile(userId: string): Promise<AdaptiveProfi
 
 export async function saveAdaptiveProfile(
   userId: string,
-  profile: AdaptiveProfile
+  profile: AdaptiveProfile,
 ): Promise<void> {
   await prisma.progress.update({
     where: { userId },
@@ -54,15 +60,16 @@ export async function saveAdaptiveProfile(
 
 export async function recordAdaptiveSignal(
   userId: string,
-  signal: AdaptiveSignalInput
+  signal: AdaptiveSignalInput,
 ): Promise<AdaptiveProfile> {
   const profile = await loadAdaptiveProfile(userId);
   updateGlobalSignals(profile, signal);
   updateSubjectSignals(profile, signal);
 
-  if (signal.subject) {
+  // Only update subject-specific data if subject key is safe (prevent prototype pollution)
+  if (signal.subject && isSafeSubjectKey(signal.subject)) {
     const context = calculateAdaptiveContext(profile, {
-      mode: signal.mode ?? 'balanced',
+      mode: signal.mode ?? "balanced",
       subject: signal.subject,
       baselineDifficulty: signal.baselineDifficulty,
     });
@@ -83,14 +90,19 @@ export async function getAdaptiveContextForUser(
     baselineDifficulty?: number;
     pragmatic?: boolean;
     modeOverride?: AdaptiveDifficultyMode;
-  }
+  },
 ): Promise<AdaptiveContext> {
   const [profile, settings] = await Promise.all([
     loadAdaptiveProfile(userId),
-    prisma.settings.findUnique({ where: { userId }, select: { adaptiveDifficultyMode: true } }),
+    prisma.settings.findUnique({
+      where: { userId },
+      select: { adaptiveDifficultyMode: true },
+    }),
   ]);
 
-  const mode = normalizeAdaptiveDifficultyMode(options.modeOverride ?? settings?.adaptiveDifficultyMode);
+  const mode = normalizeAdaptiveDifficultyMode(
+    options.modeOverride ?? settings?.adaptiveDifficultyMode,
+  );
   return calculateAdaptiveContext(profile, {
     mode,
     subject: options.subject,
@@ -105,7 +117,7 @@ export async function getAdaptiveContextForUser(
  */
 export async function recordAdaptiveSignalsBatch(
   userId: string,
-  signals: AdaptiveSignalInput[]
+  signals: AdaptiveSignalInput[],
 ): Promise<AdaptiveProfile> {
   if (signals.length === 0) {
     return loadAdaptiveProfile(userId);
@@ -119,9 +131,10 @@ export async function recordAdaptiveSignalsBatch(
     updateGlobalSignals(profile, signal);
     updateSubjectSignals(profile, signal);
 
-    if (signal.subject) {
+    // Only update subject-specific data if subject key is safe (prevent prototype pollution)
+    if (signal.subject && isSafeSubjectKey(signal.subject)) {
       const context = calculateAdaptiveContext(profile, {
-        mode: signal.mode ?? 'balanced',
+        mode: signal.mode ?? "balanced",
         subject: signal.subject,
         baselineDifficulty: signal.baselineDifficulty,
       });
