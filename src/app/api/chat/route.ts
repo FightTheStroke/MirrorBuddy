@@ -44,6 +44,7 @@ import {
 } from "./budget-handler";
 import { buildAllContexts } from "./context-builders";
 import { processToolCalls, buildToolChoice } from "./tool-handler";
+import { checkTrialForAnonymous, incrementTrialUsage } from "./trial-handler";
 
 export async function POST(request: NextRequest) {
   // CSRF validation (double-submit cookie pattern)
@@ -101,6 +102,24 @@ export async function POST(request: NextRequest) {
       return response;
     }
     const userId = coppaCheck.userId;
+
+    // Trial limit check for anonymous users (ADR 0056)
+    const trialCheck = await checkTrialForAnonymous(!!userId);
+    if (!trialCheck.allowed) {
+      const response = NextResponse.json(
+        {
+          error: "Trial limit reached",
+          code: "TRIAL_LIMIT_REACHED",
+          message:
+            "Hai raggiunto il limite di chat gratuite. Richiedi un invito beta per continuare!",
+          chatsRemaining: 0,
+        },
+        { status: 403 },
+      );
+      response.headers.set("X-Request-ID", getRequestId(request));
+      return response;
+    }
+    const trialSessionId = trialCheck.sessionId;
 
     // Load user settings and check budget
     let providerPreference: AIProvider | "auto" | undefined;
@@ -267,6 +286,11 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      // Increment trial usage for anonymous users (ADR 0056)
+      if (trialSessionId && !userId) {
+        await incrementTrialUsage(trialSessionId);
+      }
+
       const response = NextResponse.json({
         content: sanitized.text,
         provider: result.provider,
@@ -286,6 +310,15 @@ export async function POST(request: NextRequest) {
             (h: { type: string }) => h.type === "factual_claim",
           ),
         },
+        // Trial info for anonymous users (ADR 0056)
+        trial: trialSessionId
+          ? {
+              chatsRemaining: Math.max(
+                0,
+                (trialCheck.chatsRemaining ?? 10) - 1,
+              ),
+            }
+          : undefined,
       });
       response.headers.set("X-Request-ID", getRequestId(request));
       return response;

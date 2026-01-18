@@ -1,13 +1,12 @@
-'use client';
+"use client";
 
-import { ChevronUp, ChevronDown } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ActiveMaestroAvatar } from '@/components/conversation';
-import { debugPages } from './home-constants';
-import type { View } from '@/app/types';
+import { ChevronUp, ChevronDown } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { ActiveMaestroAvatar } from "@/components/conversation";
+import type { View } from "@/app/types";
 
 interface NavItem {
   id: View;
@@ -27,8 +26,6 @@ interface HomeSidebarProps {
   onParentAccess: () => void;
   selectedCoach: string;
   selectedBuddy: string;
-  debugMenuOpen: boolean;
-  onDebugMenuToggle: () => void;
 }
 
 export function HomeSidebar({
@@ -39,20 +36,18 @@ export function HomeSidebar({
   navItems,
   hasNewInsights,
   onParentAccess,
-  debugMenuOpen,
-  onDebugMenuToggle,
 }: HomeSidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300',
-        open ? 'w-64' : 'w-20'
+        "fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300",
+        open ? "w-64" : "w-20",
       )}
     >
       {/* Logo - clickable to return home */}
       <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
         <button
-          onClick={() => onViewChange('maestri')}
+          onClick={() => onViewChange("maestri")}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           aria-label="Torna alla home"
         >
@@ -63,7 +58,7 @@ export function HomeSidebar({
               width={36}
               height={36}
               className="object-cover"
-              style={{ width: '100%', height: '100%' }}
+              style={{ width: "100%", height: "100%" }}
             />
           </div>
           {open && (
@@ -77,17 +72,24 @@ export function HomeSidebar({
           size="icon-sm"
           onClick={onToggle}
           className="text-slate-500"
-          aria-label={open ? 'Chiudi menu' : 'Apri menu'}
+          aria-label={open ? "Chiudi menu" : "Apri menu"}
         >
-          {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          {open ? (
+            <ChevronUp className="h-4 w-4" />
+          ) : (
+            <ChevronDown className="h-4 w-4" />
+          )}
         </Button>
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 space-y-2 overflow-y-auto pb-24" style={{ maxHeight: 'calc(100vh - 120px)' }}>
+      <nav
+        className="p-4 space-y-2 overflow-y-auto pb-24"
+        style={{ maxHeight: "calc(100vh - 120px)" }}
+      >
         {navItems.map((item) => {
-          const isChatItem = item.id === 'coach' || item.id === 'buddy';
-          const avatarSrc = 'avatar' in item ? item.avatar : null;
+          const isChatItem = item.id === "coach" || item.id === "buddy";
+          const avatarSrc = "avatar" in item ? item.avatar : null;
 
           const isActive = currentView === item.id;
           const isCollapsed = !open;
@@ -97,23 +99,35 @@ export function HomeSidebar({
               key={item.id}
               onClick={() => onViewChange(item.id)}
               className={cn(
-                'w-full flex items-center gap-3 rounded-xl transition-all',
+                "w-full flex items-center gap-3 rounded-xl transition-all",
                 // Collapsed: center content, minimal padding
-                isCollapsed ? 'justify-center px-2 py-2' : 'px-4 py-3',
+                isCollapsed ? "justify-center px-2 py-2" : "px-4 py-3",
                 // Active state: full background only when expanded
-                isActive && !isCollapsed && 'bg-accent-themed text-white shadow-lg',
+                isActive &&
+                  !isCollapsed &&
+                  "bg-accent-themed text-white shadow-lg",
                 // Inactive state
-                !isActive && 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
-                isChatItem && 'relative'
+                !isActive &&
+                  "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800",
+                isChatItem && "relative",
               )}
-              style={isActive && !isCollapsed ? { boxShadow: '0 10px 15px -3px var(--accent-color, #3b82f6)40' } : undefined}
+              style={
+                isActive && !isCollapsed
+                  ? {
+                      boxShadow:
+                        "0 10px 15px -3px var(--accent-color, #3b82f6)40",
+                    }
+                  : undefined
+              }
             >
               {avatarSrc ? (
                 <div
                   className={cn(
-                    'relative flex-shrink-0 rounded-full',
+                    "relative flex-shrink-0 rounded-full",
                     // When collapsed and active, add accent ring around avatar
-                    isCollapsed && isActive && 'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900'
+                    isCollapsed &&
+                      isActive &&
+                      "ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900",
                   )}
                 >
                   <Image
@@ -128,12 +142,19 @@ export function HomeSidebar({
               ) : (
                 <div
                   className={cn(
-                    'relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+                    "relative flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center",
                     // When collapsed and active, add accent ring around icon (circular)
-                    isCollapsed && isActive && 'ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900 bg-accent-themed/10'
+                    isCollapsed &&
+                      isActive &&
+                      "ring-[3px] ring-accent-themed ring-offset-2 ring-offset-white dark:ring-offset-slate-900 bg-accent-themed/10",
                   )}
                 >
-                  <item.icon className={cn('h-5 w-5', isCollapsed && isActive && 'text-accent-themed')} />
+                  <item.icon
+                    className={cn(
+                      "h-5 w-5",
+                      isCollapsed && isActive && "text-accent-themed",
+                    )}
+                  />
                 </div>
               )}
               {open && <span className="font-medium">{item.label}</span>}
@@ -142,54 +163,11 @@ export function HomeSidebar({
         })}
       </nav>
 
-      {/* DEBUG MENU */}
-      <div className="px-2 pb-2">
-        <button
-          onClick={onDebugMenuToggle}
-          className={cn(
-            'w-full flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-xs',
-            debugMenuOpen
-              ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
-          )}
-        >
-          <span className="font-bold">DEBUG MENU</span>
-          {debugMenuOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-        </button>
-
-        {debugMenuOpen && (
-          <div className="mt-2 p-2 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 max-h-64 overflow-y-auto">
-            <div className="text-xs text-slate-400 mb-2 font-bold">TUTTE LE PAGINE:</div>
-            {debugPages.map((page, idx) => {
-              const isRedirect = page.status === 'redirect';
-              const isDead = page.status === 'dead';
-
-              return (
-                <a
-                  key={page.href}
-                  href={page.href}
-                  target="_self"
-                  className={cn(
-                    'block px-2 py-1.5 rounded-lg text-xs mb-1 transition-colors',
-                    isDead
-                      ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100'
-                      : isRedirect
-                        ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 hover:bg-amber-100'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
-                  )}
-                >
-                  <span className="font-bold">[{idx + 1}]</span> {page.href}
-                  {page.note && <span className="ml-2 opacity-75">- {page.note}</span>}
-                </a>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
       {/* Active Maestro Avatar */}
       <div className="px-4 mb-2">
-        <ActiveMaestroAvatar onReturnToMaestro={() => onViewChange('maestro-session')} />
+        <ActiveMaestroAvatar
+          onReturnToMaestro={() => onViewChange("maestro-session")}
+        />
       </div>
 
       {/* Parent Access Button */}
@@ -197,12 +175,12 @@ export function HomeSidebar({
         <button
           onClick={onParentAccess}
           className={cn(
-            'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl',
-            'bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800/50',
-            'border border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300',
-            'text-sm font-medium transition-all duration-200',
-            'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
-            'relative'
+            "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl",
+            "bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800/50",
+            "border border-indigo-200 dark:border-indigo-700 text-indigo-700 dark:text-indigo-300",
+            "text-sm font-medium transition-all duration-200",
+            "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+            "relative",
           )}
         >
           <span className="relative">
