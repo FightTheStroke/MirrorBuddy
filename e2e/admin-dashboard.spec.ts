@@ -42,7 +42,7 @@ test.describe("Admin Feature Flags API", () => {
     const data = await response.json();
 
     expect(data.goNoGoResult).toBeDefined();
-    expect(data.goNoGoResult.decision).toMatch(/GO|NO-GO/);
+    expect(data.goNoGoResult.decision).toMatch(/^(go|nogo|degraded)$/);
     expect(data.goNoGoResult.score).toBeGreaterThanOrEqual(0);
     expect(data.goNoGoResult.score).toBeLessThanOrEqual(100);
   });
@@ -238,7 +238,7 @@ test.describe("Admin SLO Monitoring", () => {
     const data = await response.json();
 
     const result = data.goNoGoResult;
-    expect(result.decision).toMatch(/GO|NO-GO/);
+    expect(result.decision).toMatch(/^(go|nogo|degraded)$/);
     expect(result.score).toBeGreaterThanOrEqual(0);
     expect(result.score).toBeLessThanOrEqual(100);
     expect(Array.isArray(result.checks)).toBe(true);
