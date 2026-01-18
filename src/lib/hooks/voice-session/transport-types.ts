@@ -1,14 +1,12 @@
 // ============================================================================
 // TRANSPORT TYPES
-// Shared types for transport probe, selection, and monitoring
-// Extracted to avoid circular dependencies
+// Shared types for WebRTC transport probe, selection, and monitoring
 // ============================================================================
 
 /**
- * Result of a single transport probe
+ * Result of WebRTC probe
  */
 export interface ProbeResult {
-  transport: 'webrtc' | 'websocket';
   success: boolean;
   latencyMs: number;
   error?: string;
@@ -16,32 +14,28 @@ export interface ProbeResult {
 }
 
 /**
- * Combined results from both probes
+ * Probe results structure
  */
 export interface ProbeResults {
   webrtc: ProbeResult;
-  websocket: ProbeResult;
-  recommendedTransport: 'webrtc' | 'websocket';
 }
 
 /**
  * Transport selection result
  */
 export interface TransportSelection {
-  transport: 'webrtc' | 'websocket';
   reason: string;
-  confidence: 'high' | 'medium' | 'low';
+  confidence: "high" | "medium" | "low";
   probeResults: ProbeResults;
 }
 
 /**
- * Error state when both transports fail
+ * Error state when WebRTC fails
  */
 export interface TransportError {
   error: true;
   message: string;
   webrtcError?: string;
-  websocketError?: string;
 }
 
 export type TransportSelectionResult = TransportSelection | TransportError;
@@ -60,11 +54,10 @@ export interface ConnectionMetrics {
 }
 
 /**
- * Transport degradation event
+ * Degradation event
  */
 export interface DegradationEvent {
-  reason: 'failures' | 'latency_spike' | 'network_change';
-  currentTransport: 'webrtc' | 'websocket';
+  reason: "failures" | "latency_spike" | "network_change";
   metrics: ConnectionMetrics;
   timestamp: number;
 }
