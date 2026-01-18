@@ -87,3 +87,4 @@ V1Plan.md
 REPO-HYGIENE-PLAN.md
 .mcp.json
 audit-report.txt
+.env*.local
