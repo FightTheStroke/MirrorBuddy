@@ -10,8 +10,10 @@ interface AccessibilityProviderProps {
 export function AccessibilityProvider({
   children,
 }: AccessibilityProviderProps) {
-  const getActiveSettings = useAccessibilityStore(
-    (state) => state.getActiveSettings,
+  // Subscribe to actual settings object, not just the getter function
+  // This ensures re-render when settings change
+  const settings = useAccessibilityStore((state) =>
+    state.currentContext === "parent" ? state.parentSettings : state.settings,
   );
   const currentContext = useAccessibilityStore((state) => state.currentContext);
   const loadFromCookie = useAccessibilityStore((state) => state.loadFromCookie);
@@ -19,9 +21,6 @@ export function AccessibilityProvider({
     (state) => state.applyBrowserPreferences,
   );
   const initialized = useRef(false);
-
-  // Get settings based on current context (student or parent)
-  const settings = getActiveSettings();
 
   // Load settings from cookie on mount, detect browser preferences if no cookie
   useEffect(() => {
@@ -172,10 +171,9 @@ export function AccessibilityProvider({
 
 // Hook for TTS (Text-to-Speech)
 export function useTTS() {
-  const getActiveSettings = useAccessibilityStore(
-    (state) => state.getActiveSettings,
+  const settings = useAccessibilityStore((state) =>
+    state.currentContext === "parent" ? state.parentSettings : state.settings,
   );
-  const settings = getActiveSettings();
 
   const speak = (text: string) => {
     if (!settings.ttsEnabled || typeof window === "undefined") return;
