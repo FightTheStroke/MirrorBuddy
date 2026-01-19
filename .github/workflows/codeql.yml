@@ -24,13 +24,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [javascript-typescript, python, actions]
+        language: [javascript-typescript, python]
         include:
           - language: javascript-typescript
             build-mode: none
           - language: python
-            build-mode: none
-          - language: actions
             build-mode: none
 
     steps:
