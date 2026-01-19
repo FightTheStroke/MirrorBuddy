@@ -2,14 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Settings,
-  Mic,
-  MessageSquare,
-  LogIn,
-  UserPlus,
-} from "lucide-react";
+import { ArrowRight, Settings, LogIn, UserPlus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface QuickStartProps {
@@ -23,14 +16,12 @@ interface QuickStartProps {
 /**
  * Quick Start Section - Simplified welcome page CTAs
  *
- * Two clear sections:
- * 1. Beta access (login/request invite) - prominent
- * 2. Demo mode - simple with clear limits
+ * Two clear options:
+ * 1. Beta access (login/request invite)
+ * 2. Trial mode - single button, goes directly to app
  */
 export function QuickStart({
   isReturningUser,
-  onStartWithVoice,
-  onStartWithoutVoice,
   onSkip,
   onUpdateProfile,
 }: QuickStartProps) {
@@ -69,7 +60,7 @@ export function QuickStart({
           )}
         </div>
       ) : (
-        <div className="flex flex-col items-center gap-6">
+        <div className="flex flex-col items-center gap-5">
           {/* Beta Access Section */}
           <div className="w-full p-5 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-200 dark:border-purple-800/50">
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -79,31 +70,24 @@ export function QuickStart({
                 </span>
               </div>
             </div>
-            <p className="text-center text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-              Accesso su invito
+            <p className="text-center text-xs text-gray-500 dark:text-gray-400 mb-4">
+              22 Maestri AI &bull; Tutti gli strumenti &bull; Progressi salvati
             </p>
-            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mb-4">
-              <li>22 Maestri AI</li>
-              <li>&bull;</li>
-              <li>Tutti gli strumenti</li>
-              <li>&bull;</li>
-              <li>Progressi salvati</li>
-            </ul>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link href="/login" className="w-full sm:w-auto">
+            <div className="flex items-center justify-center gap-3">
+              <Link href="/login">
                 <Button
                   size="lg"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   <LogIn className="w-4 h-4 mr-2" aria-hidden="true" />
                   Accedi
                 </Button>
               </Link>
-              <Link href="/invite/request" className="w-full sm:w-auto">
+              <Link href="/invite/request">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300"
+                  className="border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300"
                 >
                   <UserPlus className="w-4 h-4 mr-2" aria-hidden="true" />
                   Richiedi invito
@@ -121,52 +105,19 @@ export function QuickStart({
             <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
           </div>
 
-          {/* Demo Section - Simplified */}
-          <div className="w-full p-5 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
-                <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">
-                  PROVALO SUBITO
-                </span>
-              </div>
-            </div>
-            <p className="text-center text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-              Demo gratuita senza registrazione
-            </p>
-            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mb-4">
-              <li>3 Maestri AI</li>
-              <li>&bull;</li>
-              <li>10 messaggi</li>
-              <li>&bull;</li>
-              <li>Strumenti base</li>
-            </ul>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Button
-                size="lg"
-                onClick={onStartWithVoice}
-                className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white"
-              >
-                <Mic className="w-4 h-4 mr-2" aria-hidden="true" />
-                Con voce
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={onStartWithoutVoice}
-                className="w-full sm:w-auto"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" aria-hidden="true" />
-                Solo testo
-              </Button>
-            </div>
-
-            <button
+          {/* Trial - Single button */}
+          <div className="w-full flex flex-col items-center gap-2">
+            <Button
+              size="lg"
               onClick={onSkip}
-              className="w-full flex items-center justify-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 transition-colors mt-3"
+              className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8"
             >
-              Salta intro
-            </button>
+              <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
+              Prova gratis
+            </Button>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              3 Maestri &bull; 10 messaggi &bull; Nessuna registrazione
+            </p>
           </div>
         </div>
       )}
