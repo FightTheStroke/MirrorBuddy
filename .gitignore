@@ -79,6 +79,9 @@ __pycache__/
 .verification/
 @docs/
 
+# Internal legal documents (confidential)
+docs/legal/
+
 # Local audit notes
 fallo17.md
 plan17.md
