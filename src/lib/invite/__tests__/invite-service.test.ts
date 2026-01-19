@@ -153,4 +153,131 @@ describe("Invite Service", () => {
       expect(sendEmail).not.toHaveBeenCalled();
     });
   });
+
+  describe("bulkApproveInvites", () => {
+    it("should process multiple approve requests", async () => {
+      const mockRequests = [
+        {
+          id: "req-1",
+          email: "user1@test.com",
+          name: "User 1",
+          status: "PENDING",
+        },
+        {
+          id: "req-2",
+          email: "user2@test.com",
+          name: "User 2",
+          status: "PENDING",
+        },
+      ];
+
+      vi.mocked(prisma.inviteRequest.findUnique)
+        .mockResolvedValueOnce(mockRequests[0] as never)
+        .mockResolvedValueOnce(mockRequests[1] as never);
+
+      const { bulkApproveInvites } = await import("../invite-service");
+      const result = await bulkApproveInvites(["req-1", "req-2"], "admin-123");
+
+      expect(result.processed).toBe(2);
+      expect(result.failed).toBe(0);
+      expect(result.success).toBe(true);
+    });
+
+    it("should limit batch size to 50", async () => {
+      const ids = Array.from({ length: 60 }, (_, i) => `req-${i}`);
+
+      vi.mocked(prisma.inviteRequest.findUnique).mockResolvedValue({
+        id: "req-1",
+        email: "user@test.com",
+        name: "User",
+        status: "PENDING",
+      } as never);
+
+      const { bulkApproveInvites } = await import("../invite-service");
+      const result = await bulkApproveInvites(ids, "admin-123");
+
+      // Should only process first 50
+      expect(result.processed + result.failed).toBeLessThanOrEqual(50);
+    });
+
+    it("should report errors for failed requests", async () => {
+      vi.mocked(prisma.inviteRequest.findUnique)
+        .mockResolvedValueOnce({
+          id: "req-1",
+          email: "user1@test.com",
+          name: "User 1",
+          status: "PENDING",
+        } as never)
+        .mockResolvedValueOnce(null); // This will fail
+
+      const { bulkApproveInvites } = await import("../invite-service");
+      const result = await bulkApproveInvites(["req-1", "req-2"], "admin-123");
+
+      expect(result.processed).toBe(1);
+      expect(result.failed).toBe(1);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0].requestId).toBe("req-2");
+    });
+  });
+
+  describe("bulkRejectInvites", () => {
+    it("should process multiple reject requests with reason", async () => {
+      const mockRequests = [
+        {
+          id: "req-1",
+          email: "user1@test.com",
+          name: "User 1",
+          status: "PENDING",
+        },
+        {
+          id: "req-2",
+          email: "user2@test.com",
+          name: "User 2",
+          status: "PENDING",
+        },
+      ];
+
+      vi.mocked(prisma.inviteRequest.findUnique)
+        .mockResolvedValueOnce(mockRequests[0] as never)
+        .mockResolvedValueOnce(mockRequests[1] as never);
+
+      vi.mocked(prisma.inviteRequest.update).mockResolvedValue({} as never);
+
+      const { bulkRejectInvites } = await import("../invite-service");
+      const result = await bulkRejectInvites(
+        ["req-1", "req-2"],
+        "admin-123",
+        "Not eligible",
+      );
+
+      expect(result.processed).toBe(2);
+      expect(result.failed).toBe(0);
+      expect(result.success).toBe(true);
+    });
+
+    it("should handle mixed success and failure", async () => {
+      vi.mocked(prisma.inviteRequest.findUnique)
+        .mockResolvedValueOnce({
+          id: "req-1",
+          email: "user@test.com",
+          name: "User",
+          status: "PENDING",
+        } as never)
+        .mockResolvedValueOnce({
+          id: "req-2",
+          email: "user2@test.com",
+          name: "User 2",
+          status: "APPROVED", // Already processed
+        } as never);
+
+      vi.mocked(prisma.inviteRequest.update).mockResolvedValue({} as never);
+
+      const { bulkRejectInvites } = await import("../invite-service");
+      const result = await bulkRejectInvites(["req-1", "req-2"], "admin-123");
+
+      expect(result.processed).toBe(1);
+      expect(result.failed).toBe(1);
+      expect(result.success).toBe(false);
+    });
+  });
 });
