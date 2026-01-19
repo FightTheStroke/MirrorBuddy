@@ -98,7 +98,7 @@ run_e2e_test "4/10" "e2e/full-ui-audit/admin-ui.spec.ts" \
 
 # PHASE 5: SETTINGS TESTS
 echo -e "${BLUE}[5/10] Settings tests...${NC}"
-if npx playwright test e2e/accessibility.spec.ts > "$TEMP_DIR/settings.log" 2>&1; then
+if npx playwright test e2e/full-ui-audit/settings.spec.ts > "$TEMP_DIR/settings.log" 2>&1; then
   echo -e "${GREEN}✓ Settings tests passed${NC}"
   RESULTS+=("✓ Settings")
 else
@@ -174,19 +174,15 @@ fi
 # PHASE 10: GENERATE HTML REPORT
 echo -e "${BLUE}[10/10] Generating HTML report...${NC}"
 REPORT_FILE="$REPORTS_DIR/full-test-report.html"
-if [ -f "$SCRIPT_DIR/generate-html-report.sh" ]; then
-  if "$SCRIPT_DIR/generate-html-report.sh" "$REPORT_FILE" > "$TEMP_DIR/report.log" 2>&1; then
-    echo -e "${GREEN}✓ Report generated: $REPORT_FILE${NC}"
-    RESULTS+=("✓ HTML report")
-  else
-    echo -e "${YELLOW}⚠ Report generation failed${NC}"
-    RESULTS+=("⚠ HTML report")
-    WARNINGS=$((WARNINGS + 1))
-  fi
-else
-  generate_basic_report "$REPORT_FILE" "${RESULTS[@]}"
-  echo -e "${GREEN}✓ Basic report generated: $REPORT_FILE${NC}"
+if npx tsx "$SCRIPT_DIR/generate-test-report.ts" > "$TEMP_DIR/report.log" 2>&1; then
+  echo -e "${GREEN}✓ Report generated: $REPORT_FILE${NC}"
   RESULTS+=("✓ HTML report")
+else
+  echo -e "${YELLOW}⚠ Report generation failed${NC}"
+  generate_basic_report "$REPORT_FILE" "${RESULTS[@]}"
+  echo -e "${YELLOW}⚠ Using basic report instead${NC}"
+  RESULTS+=("⚠ HTML report")
+  WARNINGS=$((WARNINGS + 1))
 fi
 
 # SUMMARY
