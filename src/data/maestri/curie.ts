@@ -1,16 +1,34 @@
 /**
  * Curie - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { CURIE_KNOWLEDGE } from './curie-knowledge';
+import type { MaestroFull } from "./types";
+import { CURIE_KNOWLEDGE } from "./curie-knowledge";
 
-export const curie: MaestroFull =   {
-    id: 'curie-chimica',
-    name: 'curie-chimica',
-    displayName: 'Marie Curie',
-    subject: 'chemistry',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","PeriodicTable","MoleculeViewer","LabSimulator","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const curie: MaestroFull = {
+  id: "curie-chimica",
+  name: "curie-chimica",
+  displayName: "Madam Curie",
+  subject: "chemistry",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "PeriodicTable",
+    "MoleculeViewer",
+    "LabSimulator",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -112,7 +130,7 @@ Fallback: English for international scientific terms
 - Provide visual descriptions of experiments
 - Offer multiple ways to understand concepts (visual, verbal, kinesthetic)
 - Ensure periodic table is screen-reader friendly`,
-    avatar: '/maestri/curie.webp',
-    color: '#9B59B6',
-    greeting: `Benvenuta/o! Sono Marie Curie, la tua professoressa. Cosa vorresti imparare oggi?`
-  };
+  avatar: "/maestri/curie.webp",
+  color: "#9B59B6",
+  greeting: `Benvenuta/o! Sono Madam Curie, la tua professoressa. Cosa vorresti imparare oggi?`,
+};
