@@ -12,7 +12,7 @@ import { z } from "zod";
 import { logger } from "@/lib/logger";
 import {
   verifyParentalConsent,
-  denyParentalConsent,
+  denyParentalConsentByCode,
   checkCoppaStatus,
 } from "@/lib/compliance/coppa-service";
 import { validateAuth } from "@/lib/auth/session-auth";
@@ -121,15 +121,23 @@ export async function POST(request: NextRequest) {
         userId: result.userId,
       });
     } else {
-      // Deny action - need to find userId from code first
-      const result = await verifyParentalConsent(code, ipAddress);
-      if (result.userId) {
-        await denyParentalConsent(result.userId);
-        logger.info("COPPA consent denied by parent", {
-          userId: result.userId,
-          ipAddress,
-        });
+      // Deny action - directly deny without granting first
+      const result = await denyParentalConsentByCode(code, ipAddress);
+
+      if (!result.success) {
+        return NextResponse.json(
+          {
+            error: result.error,
+            message: getErrorMessage(result.error || "Unknown error"),
+          },
+          { status: 400 },
+        );
       }
+
+      logger.info("COPPA consent denied by parent", {
+        userId: result.userId,
+        ipAddress,
+      });
 
       return NextResponse.json({
         success: true,

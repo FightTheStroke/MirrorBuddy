@@ -288,7 +288,60 @@ export async function verifyParentalConsent(
 }
 
 /**
- * Deny parental consent (parent declines)
+ * Deny parental consent by verification code (parent declines via email link)
+ * This function denies consent WITHOUT granting it first, ensuring the parent's
+ * denial is honored immediately and atomically.
+ */
+export async function denyParentalConsentByCode(
+  verificationCode: string,
+  ipAddress?: string,
+): Promise<{ success: boolean; error?: string; userId?: string }> {
+  try {
+    const consent = await prisma.coppaConsent.findFirst({
+      where: { verificationCode },
+      select: {
+        id: true,
+        userId: true,
+        verificationExpiresAt: true,
+        consentGranted: true,
+      },
+    });
+
+    if (!consent) {
+      return { success: false, error: "Invalid verification code" };
+    }
+
+    if (
+      consent.verificationExpiresAt &&
+      new Date(consent.verificationExpiresAt) < new Date()
+    ) {
+      return { success: false, error: "Verification code expired" };
+    }
+
+    // Deny consent directly - no granting first
+    await prisma.coppaConsent.update({
+      where: { id: consent.id },
+      data: {
+        consentGranted: false,
+        consentDeniedAt: new Date(),
+        parentIpAddress: ipAddress,
+        verificationCode: null, // Clear code after use
+      },
+    });
+
+    log.info("Parental consent denied via code", { userId: consent.userId });
+
+    return { success: true, userId: consent.userId };
+  } catch (error) {
+    log.error("Failed to deny parental consent by code", {
+      error: String(error),
+    });
+    return { success: false, error: "Denial failed" };
+  }
+}
+
+/**
+ * Deny parental consent by userId (admin action)
  */
 export async function denyParentalConsent(
   userId: string,
