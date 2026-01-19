@@ -6,6 +6,7 @@
 model Notification {
   id     String @id @default(cuid())
   userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   type      String
   title     String
@@ -54,6 +55,7 @@ model PushSubscription {
 model StudySchedule {
   id     String @id @default(cuid())
   userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Notification preferences (JSON)
   preferences String @default("{}")
@@ -70,6 +72,7 @@ model StudySchedule {
 model ScheduledSession {
   id         String        @id @default(cuid())
   userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   scheduleId String
   schedule   StudySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 
@@ -98,6 +101,7 @@ model ScheduledSession {
 model CustomReminder {
   id         String        @id @default(cuid())
   userId     String
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   scheduleId String
   schedule   StudySchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
 

@@ -6,6 +6,7 @@
 model Material {
   id       String @id @default(cuid())
   userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   toolId   String @unique
   toolType String
   title    String
@@ -67,6 +68,7 @@ model Material {
 model Collection {
   id          String       @id @default(cuid())
   userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   name        String
   description String?
   color       String?
@@ -87,6 +89,7 @@ model Collection {
 model Tag {
   id        String        @id @default(cuid())
   userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   color     String?
   materials MaterialTag[]
@@ -114,6 +117,7 @@ model MaterialTag {
 model CreatedTool {
   id     String @id @default(cuid())
   userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   type    String
   title   String
@@ -160,6 +164,7 @@ model HtmlSnippet {
 model StudyKit {
   id         String @id @default(cuid())
   userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   sourceFile String
   title      String
 

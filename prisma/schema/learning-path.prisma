@@ -6,6 +6,7 @@
 model LearningPath {
   id          String  @id @default(cuid())
   userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   title       String
   description String?
   subject     String?
@@ -106,6 +107,7 @@ model TopicAttempt {
   topicId String
   topic   LearningPathTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
   userId  String
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Attempt type: quiz | study | review
   type String @default("quiz")
