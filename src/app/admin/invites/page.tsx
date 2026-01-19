@@ -277,10 +277,17 @@ export default function AdminInvitesPage() {
               <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
                 Rifiuta richiesta
               </h3>
+              <label
+                htmlFor="reject-reason"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              >
+                Motivo del rifiuto
+              </label>
               <textarea
+                id="reject-reason"
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Motivo del rifiuto (opzionale)"
+                placeholder="Opzionale"
                 className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
                 rows={3}
               />

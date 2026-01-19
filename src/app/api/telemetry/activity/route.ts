@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
+import { logger } from "@/lib/logger";
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (error) {
     // Silent failure - don't break the user experience for telemetry
-    console.error("[activity] Failed to record:", error);
+    logger.error("[activity] Failed to record", { error: String(error) });
     return NextResponse.json({ ok: false }, { status: 200 });
   }
 }
