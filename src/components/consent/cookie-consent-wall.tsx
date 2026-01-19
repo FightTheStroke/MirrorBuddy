@@ -4,30 +4,18 @@ import { useState, useSyncExternalStore } from "react";
 import { Cookie, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  hasConsent,
   saveConsent,
   syncConsentToServer,
 } from "@/lib/consent/consent-storage";
+import {
+  subscribeToConsent,
+  getConsentSnapshot,
+  getServerConsentSnapshot,
+  updateConsentSnapshot,
+} from "@/lib/consent/consent-store";
 
 interface CookieConsentWallProps {
   children: React.ReactNode;
-}
-
-// External store for consent state
-const consentSubscribers = new Set<() => void>();
-let consentSnapshot = false;
-
-function subscribeToConsent(callback: () => void) {
-  consentSubscribers.add(callback);
-  return () => consentSubscribers.delete(callback);
-}
-
-function getConsentSnapshot() {
-  return consentSnapshot;
-}
-
-function getServerConsentSnapshot() {
-  return false; // Server-side, assume no consent
 }
 
 /**
@@ -40,13 +28,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
   // Use useSyncExternalStore to avoid setState-in-effect
   const consented = useSyncExternalStore(
     subscribeToConsent,
-    () => {
-      // Initialize snapshot on first call
-      if (!consentSnapshot) {
-        consentSnapshot = hasConsent();
-      }
-      return getConsentSnapshot();
-    },
+    getConsentSnapshot,
     getServerConsentSnapshot,
   );
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
@@ -55,8 +37,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
     const consent = saveConsent(analyticsEnabled);
     await syncConsentToServer(consent);
     // Update external store and notify subscribers
-    consentSnapshot = true;
-    consentSubscribers.forEach((cb) => cb());
+    updateConsentSnapshot(true);
   };
 
   // User has consented, show app
