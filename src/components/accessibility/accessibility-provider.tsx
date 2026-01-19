@@ -1,18 +1,39 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { useEffect, useRef } from "react";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 
 interface AccessibilityProviderProps {
   children: React.ReactNode;
 }
 
-export function AccessibilityProvider({ children }: AccessibilityProviderProps) {
-  const getActiveSettings = useAccessibilityStore((state) => state.getActiveSettings);
+export function AccessibilityProvider({
+  children,
+}: AccessibilityProviderProps) {
+  const getActiveSettings = useAccessibilityStore(
+    (state) => state.getActiveSettings,
+  );
   const currentContext = useAccessibilityStore((state) => state.currentContext);
+  const loadFromCookie = useAccessibilityStore((state) => state.loadFromCookie);
+  const applyBrowserPreferences = useAccessibilityStore(
+    (state) => state.applyBrowserPreferences,
+  );
+  const initialized = useRef(false);
 
   // Get settings based on current context (student or parent)
   const settings = getActiveSettings();
+
+  // Load settings from cookie on mount, detect browser preferences if no cookie
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    // First, try to load from cookie
+    loadFromCookie();
+
+    // If no cookie, detect and apply browser preferences
+    applyBrowserPreferences();
+  }, [loadFromCookie, applyBrowserPreferences]);
 
   // Apply accessibility classes to document
   useEffect(() => {
@@ -21,87 +42,96 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
 
     // Dyslexia font
     if (settings.dyslexiaFont) {
-      body.classList.add('dyslexia-font');
+      body.classList.add("dyslexia-font");
       if (settings.extraLetterSpacing) {
-        body.classList.add('dyslexia-spacing');
+        body.classList.add("dyslexia-spacing");
       }
       if (settings.increasedLineHeight) {
-        body.classList.add('dyslexia-line-height');
+        body.classList.add("dyslexia-line-height");
       }
     } else {
-      body.classList.remove('dyslexia-font', 'dyslexia-spacing', 'dyslexia-line-height');
+      body.classList.remove(
+        "dyslexia-font",
+        "dyslexia-spacing",
+        "dyslexia-line-height",
+      );
     }
 
     // High contrast
     if (settings.highContrast) {
-      html.classList.add('high-contrast');
+      html.classList.add("high-contrast");
     } else {
-      html.classList.remove('high-contrast');
+      html.classList.remove("high-contrast");
     }
 
     // Large text
     if (settings.largeText) {
-      html.classList.add('large-text');
+      html.classList.add("large-text");
     } else {
-      html.classList.remove('large-text');
+      html.classList.remove("large-text");
     }
 
     // Reduced motion
     if (settings.reducedMotion) {
-      html.classList.add('reduced-motion');
+      html.classList.add("reduced-motion");
     } else {
-      html.classList.remove('reduced-motion');
+      html.classList.remove("reduced-motion");
     }
 
     // Color blind mode
     if (settings.colorBlindMode) {
-      html.classList.add('color-blind-mode');
+      html.classList.add("color-blind-mode");
     } else {
-      html.classList.remove('color-blind-mode');
+      html.classList.remove("color-blind-mode");
     }
 
     // Distraction-free mode
     if (settings.distractionFreeMode) {
-      html.classList.add('distraction-free');
+      html.classList.add("distraction-free");
     } else {
-      html.classList.remove('distraction-free');
+      html.classList.remove("distraction-free");
     }
 
     // Keyboard navigation
     if (settings.keyboardNavigation) {
-      html.classList.add('keyboard-nav');
+      html.classList.add("keyboard-nav");
     } else {
-      html.classList.remove('keyboard-nav');
+      html.classList.remove("keyboard-nav");
     }
 
     // Custom font size
     if (settings.fontSize !== 1.0) {
       body.style.fontSize = `${settings.fontSize * 100}%`;
     } else {
-      body.style.fontSize = '';
+      body.style.fontSize = "";
     }
 
     // Custom line spacing
     if (settings.lineSpacing !== 1.0) {
       body.style.lineHeight = `${settings.lineSpacing}`;
     } else {
-      body.style.lineHeight = '';
+      body.style.lineHeight = "";
     }
 
     // Sync with system preferences
     const syncWithSystem = () => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches && !settings.reducedMotion) {
+      if (
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
+        !settings.reducedMotion
+      ) {
         // Could auto-enable reduced motion here
       }
     };
 
     syncWithSystem();
 
-    const motionMediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    motionMediaQuery.addEventListener('change', syncWithSystem);
+    const motionMediaQuery = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    );
+    motionMediaQuery.addEventListener("change", syncWithSystem);
 
     return () => {
-      motionMediaQuery.removeEventListener('change', syncWithSystem);
+      motionMediaQuery.removeEventListener("change", syncWithSystem);
     };
   }, [settings, currentContext]);
 
@@ -110,32 +140,28 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     if (!settings.keyboardNavigation) return;
 
     const handleFirstTab = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        document.body.classList.add('user-is-tabbing');
+      if (e.key === "Tab") {
+        document.body.classList.add("user-is-tabbing");
       }
     };
 
     const handleMouseDown = () => {
-      document.body.classList.remove('user-is-tabbing');
+      document.body.classList.remove("user-is-tabbing");
     };
 
-    window.addEventListener('keydown', handleFirstTab);
-    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener("keydown", handleFirstTab);
+    window.addEventListener("mousedown", handleMouseDown);
 
     return () => {
-      window.removeEventListener('keydown', handleFirstTab);
-      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener("keydown", handleFirstTab);
+      window.removeEventListener("mousedown", handleMouseDown);
     };
   }, [settings.keyboardNavigation]);
 
   return (
     <>
       {/* Skip to content link */}
-      <a
-        href="#main-content"
-        className="skip-link"
-        tabIndex={0}
-      >
+      <a href="#main-content" className="skip-link" tabIndex={0}>
         Salta al contenuto principale
       </a>
 
@@ -146,19 +172,21 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
 
 // Hook for TTS (Text-to-Speech)
 export function useTTS() {
-  const getActiveSettings = useAccessibilityStore((state) => state.getActiveSettings);
+  const getActiveSettings = useAccessibilityStore(
+    (state) => state.getActiveSettings,
+  );
   const settings = getActiveSettings();
 
   const speak = (text: string) => {
-    if (!settings.ttsEnabled || typeof window === 'undefined') return;
+    if (!settings.ttsEnabled || typeof window === "undefined") return;
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = settings.ttsSpeed;
-    utterance.lang = 'it-IT';
+    utterance.lang = "it-IT";
 
     // Try to find an Italian voice
     const voices = speechSynthesis.getVoices();
-    const italianVoice = voices.find(v => v.lang.startsWith('it'));
+    const italianVoice = voices.find((v) => v.lang.startsWith("it"));
     if (italianVoice) {
       utterance.voice = italianVoice;
     }
@@ -168,7 +196,7 @@ export function useTTS() {
   };
 
   const stop = () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
     speechSynthesis.cancel();
   };
 
@@ -192,7 +220,7 @@ export function useADHDTimer() {
   } = useAccessibilityStore();
 
   useEffect(() => {
-    if (adhdSessionState !== 'working' && adhdSessionState !== 'breakTime') {
+    if (adhdSessionState !== "working" && adhdSessionState !== "breakTime") {
       return;
     }
 
@@ -201,15 +229,17 @@ export function useADHDTimer() {
 
       // Check if session is complete
       if (adhdTimeRemaining <= 1) {
-        if (adhdSessionState === 'working') {
+        if (adhdSessionState === "working") {
           completeADHDSession();
           // Auto-start break after a short delay
           setTimeout(() => {
             const shouldLongBreak =
-              (adhdStats.completedSessions + 1) % adhdConfig.sessionsUntilLongBreak === 0;
+              (adhdStats.completedSessions + 1) %
+                adhdConfig.sessionsUntilLongBreak ===
+              0;
             startADHDBreak(shouldLongBreak);
           }, 2000);
-        } else if (adhdSessionState === 'breakTime') {
+        } else if (adhdSessionState === "breakTime") {
           stopADHDSession();
         }
       }
