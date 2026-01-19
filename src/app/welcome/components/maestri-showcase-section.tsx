@@ -81,6 +81,9 @@ export function MaestriShowcaseSection() {
           ref={scrollRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          tabIndex={0}
+          role="region"
+          aria-label="Carosello professori - usa le frecce per navigare"
         >
           {maestri.map((maestro, i) => (
             <motion.div
