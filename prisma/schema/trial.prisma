@@ -1,19 +1,21 @@
 /// Trial Session Tracking
 /// Tracks free trial usage per IP+visitor to enforce usage limits and detect abuse.
-/// Each trial session gets 10 chats and 5 docs searches before requiring authentication.
+/// Trial limits: 10 chats, 5 minutes voice, 10 tools, 1 doc
 /// Stores maestro roster assignments and optional coach pairing for trial users.
 
 model TrialSession {
-  id              String   @id @default(uuid())
-  ipHash          String   // SHA256 of IP address
-  visitorId       String   // Cookie visitor ID
-  chatsUsed       Int      @default(0)
-  docsUsed        Int      @default(0)
-  assignedMaestri String   @default("[]") // JSON array of 3 maestro IDs
-  assignedCoach   String?  // Single coach ID
-  abuseScore      Int      @default(0)
-  createdAt       DateTime @default(now())
-  lastActivityAt  DateTime @updatedAt
+  id               String   @id @default(uuid())
+  ipHash           String   // SHA256 of IP address
+  visitorId        String   // Cookie visitor ID
+  chatsUsed        Int      @default(0)
+  docsUsed         Int      @default(0)
+  voiceSecondsUsed Int      @default(0) // Total voice seconds (max 300 = 5 min)
+  toolsUsed        Int      @default(0) // Total tool calls (max 10)
+  assignedMaestri  String   @default("[]") // JSON array of 3 maestro IDs
+  assignedCoach    String?  // Single coach ID
+  abuseScore       Int      @default(0)
+  createdAt        DateTime @default(now())
+  lastActivityAt   DateTime @updatedAt
 
   @@index([ipHash])
   @@index([visitorId])

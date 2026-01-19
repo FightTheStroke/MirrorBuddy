@@ -1,10 +1,18 @@
 # Education Accessibility Library
 
-TypeScript implementation of accessibility runtime adaptations for the MirrorBuddycation Pack.
+TypeScript implementation of accessibility runtime adaptations for the MirrorBuddy Education Pack.
+
+> **Note**: The React hooks (`useEducationAccessibility`, etc.) have been removed.
+> Import functions directly from the modular library instead:
+>
+> ```typescript
+> import { formatNumberColored } from "@/lib/education/accessibility/dyscalculia";
+> import { syllabifyText } from "@/lib/education/accessibility/dyslexia";
+> ```
 
 ## Reference
 
-Based on the C implementation in `/Users/roberdan/GitHub/MirrorBuddyCLI/include/nous/education.h` (lines 549-590: a11y_* functions)
+Based on the C implementation in `/Users/roberdan/GitHub/MirrorBuddyCLI/include/nous/education.h` (lines 549-590: a11y\_\* functions)
 
 ## Features
 
@@ -49,7 +57,7 @@ Based on the C implementation in `/Users/roberdan/GitHub/MirrorBuddyCLI/include/
 ## Installation
 
 ```typescript
-import { useEducationAccessibility } from '@/lib/education';
+import { useEducationAccessibility } from "@/lib/education";
 ```
 
 ## Usage
@@ -197,6 +205,7 @@ function LessonContent({ content }: { content: string }) {
 ### Main Hook: `useEducationAccessibility()`
 
 Returns:
+
 - `profile: AccessibilityProfile` - Current accessibility settings
 - `adaptContent(text: string): string` - Adapt text for all conditions
 - `getCSS(): CSSProperties` - Get CSS properties for current profile
@@ -206,6 +215,7 @@ Returns:
 ### Specialized Hooks
 
 #### `useDyslexiaFormatting()`
+
 - `enabled: boolean`
 - `severity: Severity`
 - `syllabifyText(text: string): string`
@@ -213,6 +223,7 @@ Returns:
 - `shouldSyllabify: boolean`
 
 #### `useMathAccessibility()`
+
 - `enabled: boolean`
 - `severity: Severity`
 - `formatNumber(num: number, useColors?: boolean): string`
@@ -220,6 +231,7 @@ Returns:
 - `useColorCoding: boolean`
 
 #### `useADHDSession()`
+
 - `isActive: boolean`
 - `timeRemaining: number`
 - `sessionDuration: number`
@@ -228,6 +240,7 @@ Returns:
 - `shouldShowBreak(startTime: Date): boolean`
 
 #### `useMotorAccessibility()`
+
 - `enabled: boolean`
 - `severity: Severity`
 - `timeoutMultiplier: number`
@@ -247,18 +260,20 @@ import {
   a11yGetBackgroundColor,
   a11yGetTextColor,
   syllabifyText,
-  formatForDyslexia
-} from '@/lib/education';
+  formatForDyslexia,
+} from "@/lib/education";
 
-const profile: AccessibilityProfile = { /* ... */ };
+const profile: AccessibilityProfile = {
+  /* ... */
+};
 
-const font = a11yGetFont(profile);               // Get dyslexia-friendly font
-const lineSpacing = a11yGetLineSpacing(profile);  // Get line spacing (1.5-2.0)
-const maxWidth = a11yGetMaxLineWidth(profile);    // Get max line width (50-80 chars)
-const wrapped = a11yWrapText(text, maxWidth);     // Wrap text to max width
-const bgColor = a11yGetBackgroundColor(profile);  // Get background color
-const textColor = a11yGetTextColor(profile);      // Get text color
-const syllabified = syllabifyText(text);          // Add soft hyphens
+const font = a11yGetFont(profile); // Get dyslexia-friendly font
+const lineSpacing = a11yGetLineSpacing(profile); // Get line spacing (1.5-2.0)
+const maxWidth = a11yGetMaxLineWidth(profile); // Get max line width (50-80 chars)
+const wrapped = a11yWrapText(text, maxWidth); // Wrap text to max width
+const bgColor = a11yGetBackgroundColor(profile); // Get background color
+const textColor = a11yGetTextColor(profile); // Get text color
+const syllabified = syllabifyText(text); // Add soft hyphens
 ```
 
 ### Dyscalculia
@@ -269,14 +284,14 @@ import {
   generatePlaceValueBlocks,
   shouldDisableMathTimer,
   formatMathStep,
-  formatFractionVisual
-} from '@/lib/education';
+  formatFractionVisual,
+} from "@/lib/education";
 
-const coloredNum = formatNumberColored(12345, true);      // <span> tags with colors
-const blocks = generatePlaceValueBlocks(123);             // Visual blocks HTML
-const noTimer = shouldDisableMathTimer(profile);          // true/false
-const steps = formatMathStep("2 + 3 × 4");                // Array of steps
-const fractionHTML = formatFractionVisual(3, 4);          // 3/4 as visual
+const coloredNum = formatNumberColored(12345, true); // <span> tags with colors
+const blocks = generatePlaceValueBlocks(123); // Visual blocks HTML
+const noTimer = shouldDisableMathTimer(profile); // true/false
+const steps = formatMathStep("2 + 3 × 4"); // Array of steps
+const fractionHTML = formatFractionVisual(3, 4); // 3/4 as visual
 ```
 
 ### ADHD
@@ -288,15 +303,15 @@ import {
   shouldShowBreakReminder,
   getMaxBullets,
   generateProgressBar,
-  getCelebrationMessage
-} from '@/lib/education';
+  getCelebrationMessage,
+} from "@/lib/education";
 
-const limited = limitBulletPoints(text, 5);                    // Max 5 bullets
-const duration = getSessionDuration(profile);                  // Seconds
+const limited = limitBulletPoints(text, 5); // Max 5 bullets
+const duration = getSessionDuration(profile); // Seconds
 const needsBreak = shouldShowBreakReminder(startDate, profile); // true/false
-const maxBullets = getMaxBullets(profile);                     // 3-10
-const progressBar = generateProgressBar(7, 10, 20);            // [███████░░░] 70%
-const celebration = getCelebrationMessage(3);                  // "Eccellente!"
+const maxBullets = getMaxBullets(profile); // 3-10
+const progressBar = generateProgressBar(7, 10, 20); // [███████░░░] 70%
+const celebration = getCelebrationMessage(3); // "Eccellente!"
 ```
 
 ### Cerebral Palsy
@@ -307,14 +322,14 @@ import {
   getAdjustedTimeout,
   shouldUseVoiceInput,
   shouldSuggestBreak,
-  getRecommendedInputMethod
-} from '@/lib/education';
+  getRecommendedInputMethod,
+} from "@/lib/education";
 
-const multiplier = getTimeoutMultiplier(profile);         // 1.0-3.0x
-const timeout = getAdjustedTimeout(profile, 5000);        // Adjusted ms
-const useVoice = shouldUseVoiceInput(profile);            // true/false
-const suggestBreak = shouldSuggestBreak(profile, 15);     // true/false
-const inputMethod = getRecommendedInputMethod(profile);   // InputMethod enum
+const multiplier = getTimeoutMultiplier(profile); // 1.0-3.0x
+const timeout = getAdjustedTimeout(profile, 5000); // Adjusted ms
+const useVoice = shouldUseVoiceInput(profile); // true/false
+const suggestBreak = shouldSuggestBreak(profile, 15); // true/false
+const inputMethod = getRecommendedInputMethod(profile); // InputMethod enum
 ```
 
 ### Autism
@@ -326,15 +341,15 @@ import {
   getStructurePrefix,
   getTopicChangeWarning,
   shouldAvoidSocialPressure,
-  shouldReduceMotion
-} from '@/lib/education';
+  shouldReduceMotion,
+} from "@/lib/education";
 
-const avoidMetaphors = shouldAvoidMetaphors(profile);                // true/false
-const hasMetaphors = containsMetaphors("piece of cake");             // true/false
-const prefix = getStructurePrefix("introduction");                   // "📖 Introduzione:"
-const warning = getTopicChangeWarning("Math", "Science");            // "⚠️ Cambio..."
-const noSocial = shouldAvoidSocialPressure(profile);                 // true/false
-const reduceMotion = shouldReduceMotion(profile);                    // true/false
+const avoidMetaphors = shouldAvoidMetaphors(profile); // true/false
+const hasMetaphors = containsMetaphors("piece of cake"); // true/false
+const prefix = getStructurePrefix("introduction"); // "📖 Introduzione:"
+const warning = getTopicChangeWarning("Math", "Science"); // "⚠️ Cambio..."
+const noSocial = shouldAvoidSocialPressure(profile); // true/false
+const reduceMotion = shouldReduceMotion(profile); // true/false
 ```
 
 ## TypeScript Types
@@ -359,12 +374,12 @@ interface AccessibilityProfile {
   preferredInput: InputMethod;
   preferredOutput: OutputMethod;
   ttsEnabled: boolean;
-  ttsSpeed: number;        // 0.5 - 2.0
-  ttsPitch: number;        // -1.0 to 1.0
+  ttsSpeed: number; // 0.5 - 2.0
+  ttsPitch: number; // -1.0 to 1.0
   ttsVoice?: string;
   highContrast: boolean;
   reduceMotion: boolean;
-  fontSize: 'normal' | 'large' | 'x-large';
+  fontSize: "normal" | "large" | "x-large";
 }
 ```
 
@@ -375,14 +390,14 @@ enum Severity {
   NONE = 0,
   MILD = 1,
   MODERATE = 2,
-  SEVERE = 3
+  SEVERE = 3,
 }
 
 enum ADHDType {
   NONE = 0,
   INATTENTIVE = 1,
   HYPERACTIVE = 2,
-  COMBINED = 3
+  COMBINED = 3,
 }
 
 enum InputMethod {
@@ -391,7 +406,7 @@ enum InputMethod {
   BOTH = 2,
   TOUCH = 3,
   SWITCH = 4,
-  EYE_TRACKING = 5
+  EYE_TRACKING = 5,
 }
 
 enum OutputMethod {
@@ -401,7 +416,7 @@ enum OutputMethod {
   VISUAL = 3,
   AUDIO = 4,
   BRAILLE = 5,
-  HAPTIC = 6
+  HAPTIC = 6,
 }
 ```
 
@@ -422,7 +437,7 @@ Recommended global CSS classes:
 ```css
 /* Dyslexia support */
 .dyslexia-font {
-  font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif;
+  font-family: "OpenDyslexic", "Comic Sans MS", sans-serif;
 }
 
 .dyslexia-spacing {
@@ -470,6 +485,7 @@ Recommended global CSS classes:
 The hooks automatically integrate with the existing `AccessibilityProvider` from `@/components/accessibility`. The profile is derived from the global accessibility store.
 
 Current mappings:
+
 - `settings.dyslexiaFont` → `profile.dyslexia`
 - `settings.adhdMode` → `profile.adhd`
 - `settings.ttsEnabled` → `profile.ttsEnabled`
@@ -560,7 +576,7 @@ Soft hyphens (`\u00AD`) are inserted at syllable breaks. These are invisible unt
 To test accessibility adaptations:
 
 ```typescript
-import { createDefaultProfile, Severity, adaptContent } from '@/lib/education';
+import { createDefaultProfile, Severity, adaptContent } from "@/lib/education";
 
 // Create test profile
 const testProfile = createDefaultProfile();
@@ -573,8 +589,8 @@ testProfile.adhdSeverity = Severity.MILD;
 const original = "Questa è una lunga lista di cose da fare...";
 const adapted = adaptContent(original, testProfile);
 
-console.log('Original:', original);
-console.log('Adapted:', adapted);
+console.log("Original:", original);
+console.log("Adapted:", adapted);
 ```
 
 ## References

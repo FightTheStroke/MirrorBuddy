@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
-import { getOrCreateTrialSession } from "@/lib/trial/trial-service";
+import {
+  getOrCreateTrialSession,
+  TRIAL_LIMITS,
+} from "@/lib/trial/trial-service";
 import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "api/trial/session" });
@@ -38,8 +41,26 @@ export async function POST(_request: NextRequest) {
     // Set visitor cookie if not present
     const response = NextResponse.json({
       sessionId: session.id,
+      // Chat limits
       chatsUsed: session.chatsUsed,
+      chatsRemaining: Math.max(0, TRIAL_LIMITS.CHAT - session.chatsUsed),
+      maxChats: TRIAL_LIMITS.CHAT,
+      // Voice limits
+      voiceSecondsUsed: session.voiceSecondsUsed,
+      voiceSecondsRemaining: Math.max(
+        0,
+        TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed,
+      ),
+      maxVoiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
+      // Tool limits
+      toolsUsed: session.toolsUsed,
+      toolsRemaining: Math.max(0, TRIAL_LIMITS.TOOLS - session.toolsUsed),
+      maxTools: TRIAL_LIMITS.TOOLS,
+      // Doc limits
       docsUsed: session.docsUsed,
+      docsRemaining: Math.max(0, TRIAL_LIMITS.DOCS - session.docsUsed),
+      maxDocs: TRIAL_LIMITS.DOCS,
+      // Assigned characters
       assignedMaestri: JSON.parse(session.assignedMaestri),
       assignedCoach: session.assignedCoach,
     });
@@ -90,10 +111,26 @@ export async function GET() {
     return NextResponse.json({
       hasSession: true,
       sessionId: session.id,
+      // Chat limits
       chatsUsed: session.chatsUsed,
+      chatsRemaining: Math.max(0, TRIAL_LIMITS.CHAT - session.chatsUsed),
+      maxChats: TRIAL_LIMITS.CHAT,
+      // Voice limits
+      voiceSecondsUsed: session.voiceSecondsUsed,
+      voiceSecondsRemaining: Math.max(
+        0,
+        TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed,
+      ),
+      maxVoiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
+      // Tool limits
+      toolsUsed: session.toolsUsed,
+      toolsRemaining: Math.max(0, TRIAL_LIMITS.TOOLS - session.toolsUsed),
+      maxTools: TRIAL_LIMITS.TOOLS,
+      // Doc limits
       docsUsed: session.docsUsed,
-      chatsRemaining: Math.max(0, 10 - session.chatsUsed),
-      docsRemaining: Math.max(0, 1 - session.docsUsed),
+      docsRemaining: Math.max(0, TRIAL_LIMITS.DOCS - session.docsUsed),
+      maxDocs: TRIAL_LIMITS.DOCS,
+      // Assigned characters
       assignedMaestri: JSON.parse(session.assignedMaestri),
       assignedCoach: session.assignedCoach,
     });
