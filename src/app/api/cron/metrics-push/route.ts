@@ -12,10 +12,13 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
+import { prisma } from "@/lib/db";
 import { metricsStore } from "@/lib/observability/metrics-store";
 import { generateBehavioralMetrics } from "@/app/api/metrics/behavioral-metrics";
 import { generateBusinessMetrics } from "@/app/api/metrics/business-metrics";
 import { generateSLIMetrics } from "@/app/api/metrics/sli-metrics";
+
+const ACTIVITY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 const log = logger.child({ module: "cron-metrics-push" });
 
@@ -132,6 +135,98 @@ async function collectAllMetrics(): Promise<MetricSample[]> {
     }
   } catch (err) {
     log.warn("Failed to collect behavioral metrics", { error: String(err) });
+  }
+
+  // 4. Real-time active users (from database - serverless safe)
+  try {
+    const windowStart = new Date(now - ACTIVITY_WINDOW_MS);
+
+    // Get unique user count per type
+    const uniqueByType = await prisma.$queryRaw<
+      Array<{ userType: string; count: bigint }>
+    >`
+      SELECT "userType", COUNT(DISTINCT identifier) as count
+      FROM "UserActivity"
+      WHERE timestamp >= ${windowStart}
+      GROUP BY "userType"
+    `;
+
+    const counts: Record<string, number> = {
+      logged: 0,
+      trial: 0,
+      anonymous: 0,
+    };
+
+    for (const row of uniqueByType) {
+      counts[row.userType] = Number(row.count);
+    }
+
+    const total = counts.logged + counts.trial + counts.anonymous;
+
+    // Total active users by type
+    samples.push(
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "total" },
+        value: total,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "logged" },
+        value: counts.logged,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "trial" },
+        value: counts.trial,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "anonymous" },
+        value: counts.anonymous,
+        timestamp: now,
+      },
+    );
+
+    // Active users by route (top 10)
+    const routeCounts = await prisma.$queryRaw<
+      Array<{ route: string; count: bigint }>
+    >`
+      SELECT route, COUNT(DISTINCT identifier) as count
+      FROM "UserActivity"
+      WHERE timestamp >= ${windowStart}
+      GROUP BY route
+      ORDER BY count DESC
+      LIMIT 10
+    `;
+
+    for (const row of routeCounts) {
+      samples.push({
+        name: "mirrorbuddy_realtime_active_users_by_route",
+        labels: { ...instanceLabels, route: row.route },
+        value: Number(row.count),
+        timestamp: now,
+      });
+    }
+
+    log.debug("Collected realtime active users from database", {
+      total,
+      logged: counts.logged,
+      trial: counts.trial,
+    });
+
+    // Cleanup old records (older than 10 minutes to be safe)
+    const cleanupCutoff = new Date(now - ACTIVITY_WINDOW_MS * 2);
+    await prisma.userActivity.deleteMany({
+      where: { timestamp: { lt: cleanupCutoff } },
+    });
+  } catch (err) {
+    log.warn("Failed to collect realtime active users", {
+      error: String(err),
+    });
   }
 
   return samples;

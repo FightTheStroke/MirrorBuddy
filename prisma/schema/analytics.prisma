@@ -87,3 +87,20 @@ model GlobalConfig {
   updatedBy String?
 }
 
+// ============================================================================
+// REAL-TIME USER ACTIVITY - Tracks active users for serverless-safe metrics
+// Records are cleaned up after 10 minutes by the metrics-push cron job
+// ============================================================================
+
+model UserActivity {
+  id         String   @id @default(cuid())
+  identifier String   // User ID or visitor ID
+  userType   String   // "logged" | "trial" | "anonymous"
+  route      String   // Normalized route path
+  timestamp  DateTime @default(now())
+
+  @@index([timestamp])
+  @@index([userType, timestamp])
+  @@index([identifier, timestamp])
+}
+
