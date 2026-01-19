@@ -10,7 +10,12 @@
 module.exports = {
   ci: {
     collect: {
-      url: ['http://localhost:3000/', 'http://localhost:3000/app'],
+      url: [
+        'http://localhost:3000/',
+        'http://localhost:3000/welcome',
+        'http://localhost:3000/astuccio',
+        'http://localhost:3000/admin',
+      ],
       numberOfRuns: 3,
       startServerCommand: 'npm run start',
       startServerReadyPattern: 'Ready on',
@@ -19,14 +24,29 @@ module.exports = {
     assert: {
       preset: 'lighthouse:recommended',
       assertions: {
-        // Performance (Core Web Vitals)
-        // FCP 1800ms target: faster than 2000ms default for better UX
-        'first-contentful-paint': ['warn', { maxNumericValue: 1800 }],
+        // Overall Performance Score
+        // F-17, F-28: Target 90% (0.9) performance score
+        'categories:performance': ['error', { minScore: 0.9 }],
+
+        // Core Web Vitals (F-17)
+        // LCP: Largest Contentful Paint - 2500ms max
         'largest-contentful-paint': ['error', { maxNumericValue: 2500 }],
+
+        // FID: First Input Delay - 100ms max
+        'first-input-delay': ['error', { maxNumericValue: 100 }],
+
+        // CLS: Cumulative Layout Shift - 0.1 max
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
+
+        // TTI: Time to Interactive - 3800ms max
+        'interactive': ['error', { maxNumericValue: 3800 }],
+
+        // Additional Performance Metrics
+        'first-contentful-paint': ['warn', { maxNumericValue: 1800 }],
         'total-blocking-time': ['warn', { maxNumericValue: 300 }],
 
         // Accessibility (WCAG 2.1 AA - critical for DSA students)
+        // F-28: Target 90% accessibility score
         'categories:accessibility': ['error', { minScore: 0.9 }],
         'color-contrast': 'error',
         'image-alt': 'error',

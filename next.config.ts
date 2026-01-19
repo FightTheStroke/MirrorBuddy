@@ -1,5 +1,11 @@
 import type { NextConfig } from "next";
 import packageJson from "./package.json";
+import bundleAnalyzer from "@next/bundle-analyzer";
+
+// Bundle analyzer configuration (enabled via ANALYZE=true)
+const withBundleAnalyzer = bundleAnalyzer({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const nextConfig: NextConfig = {
   // Enable standalone output for Docker deployment
@@ -110,4 +116,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withBundleAnalyzer(nextConfig);
