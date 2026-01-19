@@ -120,8 +120,8 @@ test.describe("Login/Logout Authentication Flow", () => {
     // Click logout
     await page.click('[data-testid="logout-button"]');
 
-    // Should redirect to login
-    await page.waitForURL("/login", { timeout: 5000 });
+    // Should redirect to login (may include query params like ?redirect=...)
+    await page.waitForURL(/\/login/, { timeout: 5000 });
 
     // Session cookie should be cleared
     const cookies = await page.context().cookies();
@@ -142,7 +142,7 @@ test.describe("Login/Logout Authentication Flow", () => {
     // Should redirect to login or show unauthorized
     // Admin pages require authentication
     await Promise.race([
-      page.waitForURL("/login", { timeout: 5000 }),
+      page.waitForURL(/\/login/, { timeout: 5000 }),
       page.waitForSelector("text=/unauthorized|accesso negato|login/i", {
         timeout: 5000,
       }),
